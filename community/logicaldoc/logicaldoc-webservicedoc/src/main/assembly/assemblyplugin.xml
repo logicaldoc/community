@@ -1,0 +1,25 @@
+<!--
+ Describes the plugin archive
+  
+ @author Alessandro Gasparini
+ @version 7.5.1
+-->
+<assembly>
+	<id>plugin</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>WEB-INF/lib</outputDirectory>
+			<includes>
+				<include>io.swagger:*</include>
+				<include>org.apache.commons:commons-lang3:*</include>
+				<include>org.reflections:*</include>
+				<include>com.fasterxml.jackson.dataformat:*</include>
+				<include>javax.validation:*</include>				
+			</includes>
+		</dependencySet>
+	</dependencySets>
+</assembly>

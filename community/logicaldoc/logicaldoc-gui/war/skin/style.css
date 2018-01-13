@@ -1,0 +1,196 @@
+.gwt-HorizontalSplitPanel {
+	
+}
+
+.gwt-HorizontalSplitPanel .hsplitter {
+	cursor: move;
+	border: 0px;
+	background: #91c0ef url(./images/vborder.png) repeat-y;
+}
+
+
+/*calendar styles*/
+.calendarevent2 {
+   font-size:9px;
+   background-color: #7BDE7B;
+   border: 1px solid 	#008A00;
+   font-family: Arial, Verdana, sans-serif;
+}
+
+.calendarevent2Header {
+    font-size:9px; color: white;
+    background-color:	#005C00;
+}
+
+.calendarevent2Body {
+    font-size: 9px;
+    background-color: #7BDE7B;
+    padding: 3px;
+    font-family: Arial, Verdana, sans-serif;
+    color: black;
+}
+
+.calendarevent2Resizer{
+    border-top:1px solid white;
+    border-bottom: 1px solid white;
+}
+
+.calendarevent3 {
+   font-size:9px;
+   background-color:#FA8072;
+   border: 1px solid #004D99;
+   font-family: Arial, Verdana, sans-serif;
+}
+
+.calendarevent3Header {
+    font-size:9px; color: white;
+    background-color:#B22222;
+}
+
+.calendarevent3Body {
+    font-size: 9px;
+    background-color: #FA8072;
+    padding: 3px;
+    font-family: Arial, Verdana, sans-serif;
+    color: black;
+}
+
+.calendarevent3Resizer{
+    border-top:1px solid white;
+    border-bottom: 1px solid white;
+}
+
+
+/* Generic styles */
+
+.bigtext {
+  font-size: 24pt;
+}
+
+.contactingserver {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 16pt;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.sessiontimeout {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 16pt;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.updateavailable {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 14pt;
+  font-weight: bold;
+  white-space: nowrap;
+  color: green;
+}
+
+.updateunavailable {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 14pt;
+  font-weight: bold;
+  white-space: nowrap;
+  color: red;
+}
+
+.row {
+  border-top: 1px solid #cccccc;
+  margin-top: 4px;
+}
+
+.setupHeader {
+	font-family: Arial, Bitstream Vera Sans, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	color: #AAAAAA;
+	vertical-align: center;
+}
+
+.logo_head {
+	margin-left: 5px;
+	margin-top: 5px;
+	border: 0px solid;
+	float: left;
+	width: 205px;
+}
+
+.logo_head_oem {
+	margin-right: 5px;
+	margin-top: 5px;
+	border: 0px solid;
+	float: right;
+	width: 205px;
+}
+
+.footer {
+	height: 20px;
+	background-color: #DDDDDD;
+}
+
+.searchOptions {
+	padding-left: 5px;
+	color: white;
+	cursor: pointer;
+}
+
+.warn {
+	background-color: #FFFFA1;
+}
+
+.diff {
+	color: #FF8723;
+}
+
+.footerInfo {
+	color: #577ED0;
+}
+
+.footerError {
+	color: #EF4A4A;
+}
+
+.footerWarn {
+	color: #CC9900;
+}
+
+.immutable {
+	color: #888888;
+	font-style: italic;
+}
+
+.upload {
+	margin-left: 5px;
+	margin-top: 10px;
+}
+
+.infoPanel {
+	background-color: #DDDDDD;
+}
+
+.cursor {
+	background-color: #DDDDDD;
+}
+
+.officelogout {
+	color: #536CDF;
+}
+
+
+.s {
+	border-bottom: 1px solid #dddddd;
+}
+
+.deletedItem {
+	color: grey;
+	text-decoration: line-through;
+}
+
+.hint {
+	white-space: nowrap;
+	padding-left: 3px;
+	color: grey;
+}

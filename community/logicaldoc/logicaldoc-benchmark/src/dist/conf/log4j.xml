@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<!-- <!DOCTYPE log4j:configuration SYSTEM "http://svn.apache.org/viewvc/logging/log4j/branches/v1_2-branch/src/java/org/apache/log4j/xml/log4j.dtd?view=co"> -->
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+	threshold="null" debug="false">
+	
+	<appender name="BENCHMARK" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="logs/benchmark.log" />
+		<param name="MaxFileSize" value="5MB" />
+		<param name="MaxBackupIndex" value="5" />
+		<param name="Append" value="true" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%t] %d{dd.MM.yyyy HH:mm:ss,SSS} %-5p (%c:%4L) - %m%n" />
+		</layout>
+	</appender>
+	
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%t] %-5p - %m%n" />
+		</layout>
+	</appender>
+
+  <category name="org.apache.cxf" additivity="false">
+		<priority value="fatal" />
+	</category>
+
+	<category name="com.logicaldoc.bm" additivity="true">
+		<priority value="info" />
+	</category>
+
+	<root>
+		<priority value="info" />
+		<appender-ref ref="BENCHMARK" />
+		<!-- appender-ref ref="CONSOLE" /-->
+	</root>
+</log4j:configuration>

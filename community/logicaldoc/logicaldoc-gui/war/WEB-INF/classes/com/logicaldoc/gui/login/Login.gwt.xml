@@ -1,0 +1,6 @@
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.0.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.0.0/distro-source/core/src/gwt-module.dtd">
+<module rename-to="login">
+    <inherits name="com.logicaldoc.gui.common.Common" />
+	
+	<entry-point class="com.logicaldoc.gui.login.client.Login" />
+</module>

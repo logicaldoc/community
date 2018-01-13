@@ -1,0 +1,124 @@
+.tag a{
+	text-decoration: none;
+	color: #7A7A7A;
+	font-family: Verdana, Arial, serif, sans-serif;
+}
+
+.tag a:hover{
+	text-decoration: underline;
+}
+
+.tag a img{
+	border: none;
+}
+
+.tag1 a {
+	font-size: 1.0em;
+	font-weight: 100;
+}
+
+.tag2 a{
+	font-size: 1.3em;
+	font-weight: 200;
+}
+
+.tag3 a{
+	font-size: 1.6em;
+	font-weight: 300;
+}
+
+.tag4 a{
+	font-size: 1.9em;
+	font-weight: 400;
+}
+
+.tag5 a{
+	font-size: 2.2em;
+	font-weight: 500;
+}
+
+.tag6 a{
+	font-size: 2.5em;
+	font-weight: 600;
+}
+
+.tag7 a{
+	font-size: 2.9em;
+	font-weight: 700;
+}
+
+.tag8 a{
+	font-size: 3.2em;
+	font-weight: 800;
+}
+
+.tag9 a{
+	font-size: 3.5em;
+	font-weight: 900;
+}
+
+.tag10 a{
+	font-size: 3.8em;
+	font-weight: 900;
+}
+
+.red a{
+	color: #EE0000;
+}
+
+.green a{
+	color: #69CE00;
+}
+
+.blue a{
+	color: #007CFF;
+}
+
+.lightblue a{
+	color: #00C2EC;
+}
+
+.orange a{
+	color: #FF9B00;
+}
+
+.pink a{
+	color: #FF04DA;
+}
+
+.brown a{
+	color: #A57100;
+}
+
+.purple a{
+	color: #9A00CE;
+}
+
+.black a{
+	color: #000000;
+}
+
+.white a{
+	color: #FFFFFF;
+}
+
+.lightgrey a{
+	color: #CCCCCC;
+}
+
+.grey a{
+	color: #999999;
+}
+
+.darkgrey a{
+    color: #666666;
+}
+
+.verticalL a{
+	writing-mode: tb-rl;
+    filter: flipV() flipH();
+}
+
+.verticalR a{
+	writing-mode: tb-rl;
+}

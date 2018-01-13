@@ -1,0 +1,19 @@
+<project name="logicaldoc-webdav" default="deploy" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+	<property file="${user.home}/logicaldoc-dev.properties" />
+	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
+
+	<target name="deploy" depends="init-all" description="Updates a deployed webapp">
+		<property environment="env" />
+		<property id="properties" file="build.properties" />
+
+		<echo message="Deploying ${pom.artifactId}" />
+
+		<exec executable="mvn.bat" resolveexecutable="true" searchpath="true">
+		  <arg line="-o -Dmaven.test.skip=true install"/>
+		</exec>
+		
+		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
+
+		<echo message="${pom.artifactId} is deployed" />
+	</target>
+</project>

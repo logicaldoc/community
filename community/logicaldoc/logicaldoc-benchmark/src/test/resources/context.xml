@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="no" default-lazy-init="false"
+    xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util 
+            http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security.xsd
+            http://cxf.apache.org/jaxws
+            http://cxf.apache.org/schemas/jaxws.xsd
+            http://cxf.apache.org/jaxrs
+            http://cxf.apache.org/schemas/jaxrs.xsd">
+
+	<!-- This post processor ensures placeholders substitutions -->
+	<bean id="PropertyPlaceholderConfigurer" class="com.logicaldoc.util.spring.PropertiesPlaceHolder"
+		lazy-init="false" abstract="false" autowire="default">
+		<property name="locations">
+			<list>
+				<value>classpath*:context.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties" />
+
+	<bean id="Context" class="com.logicaldoc.util.Context" abstract="false"
+		lazy-init="default" autowire="default"  />
+
+	<bean id="LoadSession" class="com.logicaldoc.bm.LoadSession"
+		init-method="connect" destroy-method="close">
+		<property name="url" value="${session.url}" />
+		<property name="username" value="${session.username}" />
+		<property name="password" value="${session.password}" />
+		<property name="language" value="${session.language}" />
+	</bean>
+
+	<bean id="MultiLoader" class="com.logicaldoc.bm.MultiLoader"
+		init-method="init" >
+		<property name="session" ref="LoadSession" />
+		<property name="config" ref="ContextProperties" />
+	</bean>
+</beans>

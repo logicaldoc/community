@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="no" default-lazy-init="false"
+    xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util 
+            http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security.xsd">
+   
+    <bean id="LDBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
+      <property name="realmName" value="Security Realm" />
+    </bean>        
+    
+    <bean id="LDAuthenticationDetailsSource" class="com.logicaldoc.core.security.spring.LDAuthenticationDetailsSource" />
+    <bean id="LDAuthenticationProvider" class="com.logicaldoc.core.security.spring.LDAuthenticationProvider" />
+    <bean id="AdminAuthenticationProvider"  class="${security.adminauthprovider}" />
+    <bean id="LDAccessDecisionManager" class="com.logicaldoc.core.security.spring.LDAccessDecisionManager">
+        <constructor-arg>
+            <list>
+                <bean
+                    class="org.springframework.security.web.access.expression.WebExpressionVoter" />
+                <bean class="org.springframework.security.access.vote.RoleVoter" />
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean id="LDAuthenticationSuccessHandler"
+        class="com.logicaldoc.core.security.spring.LDAuthenticationSuccessHandler" />
+    <bean id="LDAuthenticationFailureHandler"
+        class="com.logicaldoc.core.security.spring.LDAuthenticationFailureHandler" />
+    <security:authentication-manager id="AuthenticationManager">
+        <security:authentication-provider ref='LDAuthenticationProvider' />
+    </security:authentication-manager>
+    <bean id="LDAnonymousLoginFilter" class="com.logicaldoc.core.security.spring.LDAnonymousLoginFilter" />
+    <bean id="LDSecurityContextRepository"
+        class="com.logicaldoc.core.security.spring.LDSecurityContextRepository" />
+    <security:authentication-manager id="AdminAuthenticationManager">
+        <security:authentication-provider ref='AdminAuthenticationProvider' />
+    </security:authentication-manager>
+    <security:http pattern="/setup/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AdminAuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>
+    <security:http pattern="/license/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AdminAuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>
+    <security:http pattern="/sessions/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AdminAuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>
+    <security:http pattern="/services/rest/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>
+    <security:http pattern="/webdav/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>
+    <security:http pattern="/webdavb/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />       
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>    
+    <security:http pattern="/service/cmis/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>
+    <security:http pattern="/doc_rss/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>
+    <security:http pattern="/folder_rss/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>
+    <security:http pattern="/download/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>    
+    <security:http pattern="/display/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>   
+    
+    <security:http use-expressions="true" create-session="never"
+        disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- Protected areas -->
+        <security:intercept-url pattern="/frontend.jsp"
+            access="isAuthenticated()" />
+        <security:intercept-url pattern="/frontend/**"
+            access="isAuthenticated()" />
+        <security:intercept-url pattern="/mobile.jsp"
+            access="isAuthenticated()" />
+        <security:intercept-url pattern="/mobile/**"
+            access="isAuthenticated()" />
+        
+        <!-- Login page -->
+        <security:form-login login-page="/login.jsp"
+            login-processing-url="/j_spring_security_check"
+            username-parameter="j_username" password-parameter="j_password"
+            authentication-details-source-ref="LDAuthenticationDetailsSource"
+            authentication-success-handler-ref="LDAuthenticationSuccessHandler"
+            authentication-failure-handler-ref="LDAuthenticationFailureHandler" />
+        <!-- Exclude the default session management -->
+        <!-- security:session-management session-fixation-protection="none" / -->
+        <!-- Some session-related custom filters -->
+        <security:custom-filter ref="LDAnonymousLoginFilter"
+            before="ANONYMOUS_FILTER" />
+    </security:http>
+</beans>

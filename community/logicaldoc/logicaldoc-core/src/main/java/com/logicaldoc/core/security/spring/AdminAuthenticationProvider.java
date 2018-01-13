@@ -1,0 +1,99 @@
+package com.logicaldoc.core.security.spring;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.util.Context;
+import com.logicaldoc.util.config.ContextProperties;
+
+/**
+ * This Authentication provider extends the standard
+ * <code>LDAuthenticationProvider</code> but in addition it is able to checks if
+ * the provided password matches the context property 'adminpswd' in cases when
+ * the database is not available or the max concurrent sessions number is
+ * reached.
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 7.5
+ */
+public class AdminAuthenticationProvider implements AuthenticationProvider {
+	public AdminAuthenticationProvider() {
+		super();
+	}
+
+	@Override
+	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
+		String username = String.valueOf(auth.getPrincipal());
+		String password = String.valueOf(auth.getCredentials());
+
+		if (!"admin".equals(username))
+			throw new BadCredentialsException("badcredentials");
+
+		User user = new User();
+		user.setUsername("admin");
+
+		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+
+		/**
+		 * The standard authentication has failed, now check the database
+		 * availability
+		 */
+		boolean dbAvailable = false;
+		try {
+			long userId = uDao.queryForLong("select ld_id from ld_user where ld_username='admin' and ld_deleted=0");
+			dbAvailable = userId == 1L;
+		} catch (Throwable t) {
+		}
+
+		String adminPasswd = null;
+
+		if (dbAvailable) {
+			// If the database is available, get the password from the db
+			try {
+				adminPasswd = uDao
+						.queryForString("select ld_password from ld_user where ld_username='admin' and ld_deleted=0");
+			} catch (Throwable t) {
+			}
+		} else {
+			// If the database is not available, get the password from the
+			// configuration file
+			try {
+				ContextProperties config = Context.get().getProperties();
+				adminPasswd = config.getProperty("adminpasswd");
+			} catch (Throwable t) {
+			}
+		}
+
+		if (adminPasswd == null || adminPasswd.isEmpty())
+			throw new BadCredentialsException("badcredentials");
+
+		user.setDecodedPassword(password);
+
+		if (!user.getPassword().equals(adminPasswd))
+			throw new BadCredentialsException("badcredentials");
+
+		Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority("admin"));
+
+		// Return an authenticated token, containing user data and
+		// authorities
+		LDAuthenticationToken a = new LDAuthenticationToken(user, null, authorities);
+		return a;
+	}
+
+	@Override
+	public boolean supports(Class<?> arg0) {
+		return true;
+	}
+}

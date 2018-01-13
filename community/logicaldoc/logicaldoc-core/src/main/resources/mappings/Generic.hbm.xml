@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false">
+	<class name="com.logicaldoc.core.generic.Generic" table="ld_generic" where="ld_deleted=0">
+		<cache usage="read-write" />
+		<id name="id" type="long" column="ld_id" unsaved-value="0">
+			<generator class="hilo" />
+		</id>
+		<version name="recordVersion" column="ld_recordversion"  type="long" />   
+        <property name="lastModified" type="timestamp" column="ld_lastmodified" />
+		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
+        <property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
+		<property name="type" type="string" column="ld_type" length="255" not-null="true"/>
+		<property name="subtype" type="string" column="ld_subtype" length="255" not-null="true"/>
+		<property name="qualifier" type="long" column="ld_qualifier" />
+		<property name="string1" type="string" column="ld_string1" length="4000" />
+		<property name="string2" type="string" column="ld_string2" length="4000" />
+		<property name="string3" type="string" column="ld_string3" length="4000" />
+		<property name="integer1" type="long" column="ld_integer1" />
+		<property name="integer2" type="long" column="ld_integer2" />
+		<property name="integer3" type="long" column="ld_integer3" />
+		<property name="double1" type="double" column="ld_double1" />
+		<property name="double2" type="double" column="ld_double2" />
+		<property name="date1" type="timestamp" column="ld_date1" />
+		<property name="date2" type="timestamp" column="ld_date2" />
+		<map name="attributes" table="ld_generic_ext" lazy="true" cascade="all" order-by="ld_position asc">
+		   <key column="ld_genid" />
+		   <map-key type="string" column="ld_name" length="255"/>
+		   <composite-element class="com.logicaldoc.core.metadata.Attribute">
+               <property name="setId" type="long" column="ld_setid" />
+		       <property name="label" type="string" column="ld_label" length="255"/>
+    	       <property name="mandatory" type="int" column="ld_mandatory" not-null="true"/>
+               <property name="type" type="int" column="ld_type" not-null="true"/>
+               <property name="editor" type="int" column="ld_editor" not-null="true"/>
+               <property name="position" type="int" column="ld_position" not-null="true"/>
+               <property name="stringValue" type="string" column="ld_stringvalue" length="4000"/>
+               <property name="intValue" type="long" column="ld_intvalue"/>
+               <property name="doubleValue" type="double" column="ld_doublevalue"/>
+               <property name="dateValue" type="timestamp" column="ld_datevalue"/>
+		   </composite-element>
+		</map>
+	</class>
+</hibernate-mapping>

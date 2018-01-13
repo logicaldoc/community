@@ -1,0 +1,35 @@
+The LogicalDOC development team is pleased to announce the availability of LogicalDOC CE 7.7.3
+
+You can get this distribution in various formats from the LD's website: 
+https://www.logicaldoc.com/download-logicaldoc-community
+
+LogicalDOC is a web-based document management system that, thanks to its modern interface, is easy to use and very fast.
+Leveraging the best-of-breed open source Java frameworks it implements a flexible and scalable DMS platform.
+LogicalDOC uses the latest technology to build web applications: Google GWT. Thanks to this choice it offers unparalleled user experience accessible from any desktop browser.  
+
+LogicalDOC Community Edition is free (libre) software (FLOSS) and allows organizations and individuals to centralize the management, storage, retrieval and distribution of documents.
+
+For a complete list of features, take a look at https://www.logicaldoc.com/features
+
+New Feature:
+* New Skin
+* Ability to change the interface density
+* Option to convert an alias to a document
+
+Improvements:
+* Compliance with new Dropbox API v2
+* New flag in SMTP settings to comply with strict anti-spam mailserver rules
+* Hibernate upgrade to 4.3.11
+* Upgraded Spring to release 4.3.12 
+
+
+See also the file CHANGELOG.txt for more details
+
+The web-service API documentation is available in the LogicalDOC Documentation website https://docs.logicaldoc.com/en/web-services-api
+
+At any time you can start a discussion in the Community forums http://forums.logicaldoc.com
+
+If you like this free software, why don't you leave a positive review on SourceForge?
+https://sourceforge.net/projects/logicaldoc/reviews/new
+
+The LogicalDOC Development Team

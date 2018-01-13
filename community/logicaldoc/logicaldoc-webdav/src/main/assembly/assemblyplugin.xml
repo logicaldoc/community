@@ -1,0 +1,21 @@
+<!--
+ Describes the plugin archive
+  
+ @author Marco Meschieri
+ @version 4.0
+-->
+<assembly>
+	<id>plugin</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>WEB-INF/lib</outputDirectory>
+			<includes>
+				<include>*:jar:*</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
+</assembly>

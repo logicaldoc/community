@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.logicaldoc</groupId>
+    <artifactId>logicaldoc</artifactId>
+    <version>7.7.3</version>
+  </parent>
+  <artifactId>logicaldoc-gui</artifactId>
+  <name>logicaldoc-gui</name>
+  <packaging>jar</packaging>
+  <properties>
+    <gwt.output.directory>./war</gwt.output.directory>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+      <scope>provided</scope>      
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.googlecode.gwtupload</groupId>
+      <artifactId>gwtupload</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-incubator</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.allen_sauer.gwt.dnd</groupId>
+        <artifactId>gwt-dnd</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.timepedia.exporter</groupId>
+      <artifactId>gwtexporter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>gwtchismes</groupId>
+      <artifactId>gwtchismes</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.smartgwt</groupId>
+      <artifactId>smartgwt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.smartgwt</groupId>
+      <artifactId>smartgwt-skins</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>gdurelle.tagcloud</groupId>
+      <artifactId>tagcloud</artifactId>
+      <version>0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.orange.links</groupId>
+      <artifactId>gwt-links</artifactId>
+      <version>1.4.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.novanic.gwteventservice</groupId>
+      <artifactId>gwteventservice</artifactId>
+      <version>1.2.1</version>
+      <scope>compile</scope>
+    </dependency>    
+    <dependency>
+	  <groupId>org.slf4j</groupId>
+	  <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-digester</groupId>
+      <artifactId>commons-digester</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.logicaldoc</groupId>
+      <artifactId>logicaldoc-i18n</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-validator</groupId>
+      <artifactId>commons-validator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+  </dependencies>
+  <build>
+    <outputDirectory>${gwt.output.directory}/WEB-INF/classes</outputDirectory>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>${gwt.version}</version>
+        <configuration>
+          <webappDirectory>./war</webappDirectory>
+          <webXml>./war/WEB-INF/web.xml</webXml>
+          <hostedWebapp>./war</hostedWebapp>
+          <!-- draftCompile>true</draftCompile -->
+          <modules>
+            <module>com.logicaldoc.gui.common.Common</module>
+            <module>com.logicaldoc.gui.frontend.Frontend</module>
+            <module>com.logicaldoc.gui.login.Login</module>
+            <module>com.logicaldoc.gui.setup.Setup</module>
+          </modules>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>compile</goal>
+              <goal>eclipse</goal>
+              <goal>eclipseTest</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>integration-test-gwt</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/assemblyplugin.xml</descriptor>
+          </descriptors>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attached</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <delete dir="war/common" quiet="true" />
+                <delete dir="war/frontend" quiet="true" />
+                <delete dir="war/setup" quiet="true" />
+                <delete dir="war/login" quiet="true" />
+                <delete dir="war/WEB-INF/deploy" quiet="true" />
+              </tasks>
+            </configuration>
+          </execution>
+          <execution>
+            <id>package</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <delete dir="target/api" quiet="true" />
+                <unzip src="target/${project.artifactId}-${project.version}.jar" dest="target/api" />
+                <copy todir="target/api">
+                  <fileset dir="src/main/java">
+                    <include name="**/*.java" />
+                  </fileset>
+                </copy>
+                <delete>
+                  <fileset dir="target/api" includes="*.html,*.properties" />
+                </delete>
+                <zip destfile="target/${project.artifactId}-${project.version}.jar" basedir="target/api" />
+
+                <delete dir="target/work" quiet="true" />
+                <unzip src="target/${project.artifactId}-${project.version}.${project.packaging}" dest="target/work" />
+                <delete dir="target/work/META-INF" />
+                <delete dir="target/work/com/i18n" />
+                <delete file="target/work/context.properties" />
+                <delete file="target/work/dms.log.html" />
+                <delete dir="target/plugin" quiet="true" />
+                <unzip src="target/${project.artifactId}-${project.version}-plugin.zip" dest="target/plugin" />
+                <delete file="target/${project.artifactId}-${project.version}-plugin.zip" />
+                <delete file="target/plugin/pom.xml" />
+                <copy todir="target/plugin">
+                  <fileset dir="war">
+                    <exclude name="**/WEB-INF/**" />
+                    <exclude name="**/common/**" />
+                    <exclude name="**/skin/**" />
+                    <exclude name="**/skin-Tahoe/**" />
+                  </fileset>
+                </copy>
+                
+                <!-- Copy static resources in the skins -->
+                <copy todir="target/plugin/frontend/sc/skins/Enterprise" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+                <copy todir="target/plugin/frontend/sc/skins/Simplicity" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+                <copy todir="target/plugin/frontend/sc/skins/Tahoe" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+				<copy todir="target/plugin/frontend/sc/skins/Tahoe" overwrite="true">
+                	<fileset dir="war/skin-Tahoe" includes="**" />
+                </copy>                
+                
+                <copy todir="target/plugin/login/sc/skins/Enterprise" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+                <copy todir="target/plugin/login/sc/skins/Simplicity" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+                <copy todir="target/plugin/login/sc/skins/Tahoe" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+                <copy todir="target/plugin/login/sc/skins/Tahoe" overwrite="true">
+                	<fileset dir="war/skin-Tahoe" includes="**" />
+                </copy>
+                
+                <copy todir="target/plugin/setup/sc/skins/Enterprise" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+                <copy todir="target/plugin/setup/sc/skins/Simplicity" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+                <copy todir="target/plugin/setup/sc/skins/Tahoe" overwrite="true">
+                     <fileset dir="war/skin" includes="**" />
+                </copy>
+                <copy todir="target/plugin/setup/sc/skins/Tahoe" overwrite="true">
+                	<fileset dir="war/skin-Tahoe" includes="**" />
+                </copy>	
+                
+                <!-- Delete all the sources from the smartgwt jar -->
+                <delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false"/>
+                <unzip dest="target/plugin/WEB-INF/lib/smartgwt"
+                       src="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar" />
+                <delete dir="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar"/>
+                <delete>
+                   <fileset dir="target/plugin/WEB-INF/lib/smartgwt" excludes="**/*.class" />
+                </delete>
+                <zip destfile="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar"
+                      basedir="target/plugin/WEB-INF/lib/smartgwt"/>
+                <delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false"/>
+                
+                <copy file="target/${project.artifactId}-${project.version}.${project.packaging}"
+                  tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
+                <copy todir="target/plugin/frontend/sc/skins/standard/images/" file="./war/skin/images/blank.gif" />
+                <copy todir="target/plugin/setup/sc/skins/standard/images/" file="./war/skin/images/blank.gif" />
+                <zip destfile="target/${project.artifactId}-${project.version}-plugin2.zip" basedir="target/plugin" />
+                <move file="target/${project.artifactId}-${project.version}-plugin2.zip" tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

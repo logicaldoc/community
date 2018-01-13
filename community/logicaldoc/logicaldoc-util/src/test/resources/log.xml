@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<!-- <!DOCTYPE log4j:configuration SYSTEM "http://svn.apache.org/viewvc/logging/log4j/branches/v1_2-branch/src/java/org/apache/log4j/xml/log4j.dtd?view=co"> -->
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" threshold="null" debug="false">
+  <appender name="RetentionProcessor_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/retentionprocessor_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="RetentionProcessor" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/retentionprocessor.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="CalendarProcessor_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/calendarprocessor_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="CalendarProcessor" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/calendarprocessor.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="IncrementalArchiveCreator_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/incrementalarchivecreator_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="IncrementalArchiveCreator" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/incrementalarchivecreator.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="ArchiveImporter_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/archiveimporter_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="ArchiveImporter" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/archiveimporter.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="ArchiveBuilder_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/archivebuilder_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="ArchiveBuilder" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/archivebuilder.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="Audit_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/audit_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="Audit" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/audit.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="Notifier_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/notifier_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="Notifier" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/notifier.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="BarcodeProcessor_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/barcodeprocessor_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="BarcodeProcessor" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/barcodeprocessor.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="NetworkBrowser_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/networkbrowser_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="NetworkBrowser" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/networkbrowser.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="ImportFolderCrawler_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/importfolder_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="ImportFolderCrawler" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/importfolder.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="StatsCollector_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/stats.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="StatsCollector" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/stats.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="EmailCrawler_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/emailcrawler_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="EmailCrawler" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/emailcrawler.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="Cleaner_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/cleaner_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="Cleaner" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/cleaner.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="FSCleaner_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/fscleaner_web.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="FSCleaner" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/fscleaner.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="DMS" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/dms.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="DMS_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/dms.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="DB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/db.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="IndexOptimizer" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/indexoptimizer.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="IndexOptimizer_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/indexoptimizer.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="TagsProcessor" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/tagsprocessor.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="TagsProcessor_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/tagsprocessor.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="IndexerTask" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/indexertask.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="IndexerTask_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/indexertask.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="DigestProcessor" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/digestprocessor.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="DigestProcessor_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/digestprocessor.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <appender name="ProductNews" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/productnews.log" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <param name="Append" value="true" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
+    </layout>
+  </appender>
+  <appender name="ProductNews_WEB" class="org.apache.log4j.RollingFileAppender">
+    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/productnews.log.html" />
+    <param name="MaxFileSize" value="5MB" />
+    <param name="MaxBackupIndex" value="5" />
+    <layout class="com.logicaldoc.web.util.HTMLLayout" />
+  </appender>
+  <category name="org.hibernate" additivity="true">
+    <priority value="error" />
+    <appender-ref ref="DB" />
+  </category>
+  <category name="com.logicaldoc.core" additivity="true">
+    <priority value="info" />
+  </category>
+  <category name="com.logicaldoc.web" additivity="true">
+    <priority value="info" />
+  </category>
+  <category name="com.logicaldoc.webdav" additivity="true">
+    <priority value="debug" />
+  </category>
+  <category name="com.logicaldoc.core.security" additivity="true">
+    <priority value="warn" />
+  </category>
+  <category name="com.logicaldoc.core.searchengine.IndexOptimizer" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="IndexOptimizer" />
+    <appender-ref ref="IndexOptimizer_WEB" />
+  </category>
+  <category name="com.logicaldoc.core.document.TagsProcessor" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="TagsProcessor" />
+    <appender-ref ref="TagsProcessor_WEB" />
+  </category>
+  <category name="com.logicaldoc.core.searchengine.IndexerTask" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="IndexerTask" />
+    <appender-ref ref="IndexerTask_WEB" />
+  </category>
+  <category name="com.logicaldoc.core.rss.ProductNews" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="ProductNews" />
+    <appender-ref ref="ProductNews_WEB" />
+  </category>
+  <category name="com.logicaldoc.enterprise.cleaner.CleanerTask" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="Cleaner" />
+    <appender-ref ref="Cleaner_WEB" />
+  </category>
+  <category name="com.logicaldoc.enterprise.cleaner.FSCleanerTask" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="FSCleaner" />
+    <appender-ref ref="FSCleaner_WEB" />
+  </category>
+  <category name="com.logicaldoc.email.EmailCrawler" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="EmailCrawler" />
+    <appender-ref ref="EmailCrawler_WEB" />
+  </category>
+  <category name="com.logicaldoc.importfolder.ImportFolderCrawler" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="ImportFolderCrawler" />
+    <appender-ref ref="ImportFolderCrawler_WEB" />
+  </category>
+  <category name="com.logicaldoc.core.stats.StatsCollector" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="StatsCollector" />
+    <appender-ref ref="StatsCollector_WEB" />
+  </category>
+  <category name="com.logicaldoc.share.NetworkBrowser" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="NetworkBrowser" />
+    <appender-ref ref="NetworkBrowser_WEB" />
+  </category>
+  <category name="com.logicaldoc.barcode.BarcodeProcessor" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="BarcodeProcessor" />
+    <appender-ref ref="BarcodeProcessor_WEB" />
+  </category>
+  <category name="com.logicaldoc.notifier.Notifier" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="Notifier" />
+    <appender-ref ref="Notifier_WEB" />
+  </category>
+  <category name="com.logicaldoc.audit.Audit" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="Audit" />
+    <appender-ref ref="Audit_WEB" />
+  </category>
+  <category name="com.logicaldoc.impex.ArchiveBuilder" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="ArchiveBuilder" />
+    <appender-ref ref="ArchiveBuilder_WEB" />
+  </category>
+  <category name="com.logicaldoc.impex.ArchiveImporter" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="ArchiveImporter" />
+    <appender-ref ref="ArchiveImporter_WEB" />
+  </category>
+  <category name="com.logicaldoc.impex.IncrementalArchiveCreator" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="IncrementalArchiveCreator" />
+    <appender-ref ref="IncrementalArchiveCreator_WEB" />
+  </category>
+  <category name="com.logicaldoc.calendar.CalendarProcessor" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="CalendarProcessor" />
+    <appender-ref ref="CalendarProcessor_WEB" />
+  </category>
+  <category name="com.logicaldoc.cmis" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="DMS" />
+  </category>
+  <category name="com.logicaldoc.retention.RetentionPoliciesProcessor" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="RetentionProcessor" />
+    <appender-ref ref="RetentionProcessor_WEB" />
+  </category>
+  <category name="com.logicaldoc.core.document.DigestProcessor" additivity="false">
+    <priority value="info" />
+    <appender-ref ref="DigestProcessor" />
+    <appender-ref ref="DigestProcessor_WEB" />
+  </category>
+  <root>
+    <priority value="info" />
+    <appender-ref ref="DMS" />
+    <appender-ref ref="DMS_WEB" />
+  </root>
+</log4j:configuration>
+

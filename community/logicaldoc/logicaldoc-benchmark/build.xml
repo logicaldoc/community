@@ -1,0 +1,12 @@
+<project name="logicaldoc-benchmark" default="deploy" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+	<target name="deploy" description="Updates a deployed wwww">
+	  <copy todir="C:/benchmark/classes" verbose="true">
+			<fileset dir="target/classes">
+        <exclude name="**/*.xml"/>
+        <exclude name="**/*.properties"/>
+			</fileset>
+		</copy>
+		<echo message="xxx is deployed" />
+	</target>
+
+</project>

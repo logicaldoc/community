@@ -1,0 +1,18 @@
+<!--
+ Describes the plugin archive
+  
+ @author Marco Meschieri
+ @version 6.0
+-->
+<assembly>
+	<id>plugin</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>WEB-INF/lib</outputDirectory>
+		</dependencySet>
+	</dependencySets>
+</assembly>

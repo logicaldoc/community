@@ -1,0 +1,45 @@
+
+D:\workspace-logicaldoc\community\logicaldoc\logicaldoc-gui>set MAVEN_OPTS=-Xmx3000m 
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building logicaldoc-gui 7.5.1
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-dependency-plugin:2.8:tree (default-cli) @ logicaldoc-gui ---
+[INFO] com.logicaldoc:logicaldoc-gui:jar:7.5.1
+[INFO] +- com.google.gwt:gwt-servlet:jar:2.6.1:provided
+[INFO] +- com.google.gwt:gwt-user:jar:2.6.1:provided
+[INFO] |  +- javax.validation:validation-api:jar:1.0.0.GA:provided
+[INFO] |  +- javax.validation:validation-api:jar:sources:1.0.0.GA:provided
+[INFO] |  \- org.json:json:jar:20090211:provided
+[INFO] +- com.googlecode.gwtupload:gwtupload:jar:1.0.3:compile
+[INFO] +- com.google.gwt:gwt-incubator:jar:2.1.0:compile
+[INFO] +- com.allen_sauer.gwt.dnd:gwt-dnd:jar:3.0.1:compile
+[INFO] +- org.timepedia.exporter:gwtexporter:jar:2.0.10:compile
+[INFO] +- gwtchismes:gwtchismes:jar:0.9.8:compile
+[INFO] +- com.smartgwt:smartgwt:jar:6.0p:compile
+[INFO] +- com.smartgwt:smartgwt-skins:jar:6.0p:provided
+[INFO] +- gdurelle.tagcloud:tagcloud:jar:0.4:compile
+[INFO] +- com.orange.links:gwt-links:jar:1.4.2:compile
+[INFO] +- org.slf4j:slf4j-log4j12:jar:1.7.7:compile
+[INFO] |  +- org.slf4j:slf4j-api:jar:1.7.7:compile
+[INFO] |  \- log4j:log4j:jar:1.2.17:compile
+[INFO] +- commons-codec:commons-codec:jar:1.6:compile
+[INFO] +- commons-fileupload:commons-fileupload:jar:1.2.1:compile
+[INFO] +- commons-digester:commons-digester:jar:1.8:compile
+[INFO] |  \- commons-logging:commons-logging:jar:1.1.1:compile
+[INFO] +- com.logicaldoc:logicaldoc-i18n:jar:7.5.1:compile
+[INFO] +- javax.servlet:servlet-api:jar:2.5:provided
+[INFO] +- commons-validator:commons-validator:jar:1.3.1:provided
+[INFO] +- commons-lang:commons-lang:jar:2.4:compile
+[INFO] +- commons-collections:commons-collections:jar:3.2:compile
+[INFO] +- commons-beanutils:commons-beanutils:jar:1.7.0:compile
+[INFO] \- commons-io:commons-io:jar:2.4:compile
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 2.373 s
+[INFO] Finished at: 2016-06-21T12:39:07+02:00
+[INFO] Final Memory: 14M/155M
+[INFO] ------------------------------------------------------------------------

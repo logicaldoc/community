@@ -1,0 +1,11 @@
+<ehcache name="webdav">
+ <diskStore path="java.io.tmpdir/webdav" />
+ <defaultCache maxElementsInMemory="100" eternal="false"
+  timeToIdleSeconds="120" timeToLiveSeconds="120" overflowToDisk="true"
+  diskSpoolBufferSizeMB="30" maxElementsOnDisk="10000000"
+  diskPersistent="false" diskExpiryThreadIntervalSeconds="120"
+  memoryStoreEvictionPolicy="LRU" />
+
+ <cache name="dav-resources" maxElementsInMemory="100" eternal="false"
+      overflowToDisk="true" timeToIdleSeconds="0" timeToLiveSeconds="2000" diskPersistent="false"/>
+</ehcache>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false" auto-import="false">
+  <class name="com.logicaldoc.core.security.Group" table="ld_group" where="ld_deleted=0">
+    <cache usage="read-write" />
+    <id name="id" type="long" column="ld_id" unsaved-value="0">
+      <generator class="hilo" />
+    </id>
+    <version name="recordVersion" column="ld_recordversion"  type="long" />   
+    <property name="lastModified" type="timestamp" column="ld_lastmodified" />
+    <property name="deleted" type="int" column="ld_deleted" not-null="true" />
+    <property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
+    <property name="name" type="string" column="ld_name" length="255" not-null="true" />
+    <property name="description" type="string" column="ld_description" length="255" />
+    <property name="type" type="int" column="ld_type" not-null="true" />
+    <!--  set name="users" table="ld_usergroup" lazy="true">
+      <key column="ld_groupid" />
+      <many-to-many column="ld_userid" class="com.logicaldoc.core.security.User" where="ld_deleted=0"/>
+    </set -->
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false">
+	<class name="com.logicaldoc.core.communication.SystemMessage" table="ld_systemmessage" where="ld_deleted=0">
+		<cache usage="read-write" />
+        <id name="id" type="long" column="ld_id" unsaved-value="0">
+            <generator class="hilo" />
+        </id>
+        <version name="recordVersion" column="ld_recordversion"  type="long" />   
+        <property name="lastModified" type="timestamp" column="ld_lastmodified" />   
+        <property name="deleted" type="int" column="ld_deleted" not-null="true" />
+        <property name="tenantId" type="long" column="ld_tenantid" not-null="true" />		
+        <property name="author" type="string" column="ld_author" length="255" />
+		<property name="messageText" type="string" column="ld_messagetext" length="2000" />
+		<property name="subject" type="string" column="ld_subject" length="255" />
+		<property name="sentDate" type="timestamp" column="ld_sentdate" not-null="true" />
+		<property name="dateScope" type="int" column="ld_datescope" />
+		<property name="prio" type="int" column="ld_prio" />
+		<property name="confirmation" type="int" column="ld_confirmation" />
+        <property name="lastNotified" type="timestamp" column="ld_lastnotified" />
+        <property name="status" type="int" column="ld_status" not-null="true" />
+        <property name="trials" type="int" column="ld_trials" />
+        <property name="type" type="int" column="ld_type" not-null="true" />
+        <property name="html" type="int" column="ld_html" not-null="true" />
+        <set name="recipients" table="ld_recipient" cascade="all">
+            <key column="ld_messageid" />
+            <composite-element class="com.logicaldoc.core.communication.Recipient">
+                 <property name="name" type="string" column="ld_name" not-null="true"/>
+                 <property name="address" type="string" column="ld_address" not-null="true"/>
+                 <property name="mode" type="string" column="ld_mode" not-null="true"/>
+                 <property name="type" type="int" column="ld_type" not-null="true"/>
+                 <property name="read" type="int" column="ld_read" not-null="true"/>
+            </composite-element>
+        </set>
+	</class>
+</hibernate-mapping>

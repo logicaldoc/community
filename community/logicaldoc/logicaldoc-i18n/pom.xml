@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.logicaldoc</groupId>
+		<artifactId>logicaldoc</artifactId>
+		<version>7.7.3</version>
+	</parent>
+	<artifactId>logicaldoc-i18n</artifactId>
+	<name>logicaldoc-i18n</name>
+	<packaging>jar</packaging>
+	<dependencies />
+</project>

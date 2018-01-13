@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+<plugin id="logicaldoc-dropbox" version="7.7.3" class="com.logicaldoc.dropbox.DropboxPlugin">
+	<requires>
+		<import plugin-id="logicaldoc-core" />
+	</requires>
+
+	<extension plugin-id="logicaldoc-core" point-id="DbInit" id="gdocsDbInit">
+		<parameter id="position" value="1500" />
+		<parameter id="name" value="logicaldoc-dropbox" />
+		<parameter id="sqlFile" value="sql/logicaldoc-dropbox.sql" />
+	</extension>
+	
+    <extension plugin-id="logicaldoc-core" point-id="Feature" id="feature80">
+	    <parameter id="name" value="Feature_80" />
+    </extension>
+</plugin>
