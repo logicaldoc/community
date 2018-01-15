@@ -34,9 +34,9 @@ This video shows step by step the installation process of LogicalDOC Enterprise 
 ```sh
 $ git clone [git-repo-url] logicaldoc-community
 $ cd logicaldoc-community
-$ cd poms
+$ cd build/poms
 $ mvn clean install
-$ cd ../community
+$ cd ../../community/logicaldoc
 $ mvn clean package
 ```
 
