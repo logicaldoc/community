@@ -28,7 +28,7 @@ This video shows step by step the installation process of LogicalDOC Enterprise 
 ### Windows
 This video shows step by step the installation process of LogicalDOC Enterprise version in Windows.
 
-[![Enterprise installation process in Windows](https://img.youtube.com/vi/w39hqC5mQ9M/0.jpg)](https://youtu.be/w39hqC5mQ9M "Enterprise installation process in Windows")
+[![Enterprise installation process in Windows](https://img.youtube.com/vi/mmshkU6_glQ/0.jpg)](https://youtu.be/mmshkU6_glQ "Enterprise installation process in Windows")
 
 ## Building from Source
 ```sh
