@@ -49,7 +49,7 @@ See also the file README.txt
  * [Install the Application on Ubuntu](https://docs.logicaldoc.com/en/installation/install-on-ubuntu/install-logicaldoc-ubuntu)
  * [LogicalDOC CE Migration Guide](https://wiki.logicaldoc.com/wiki/LogicalDOC_CE_Migration_Guide)
  * [Administrator's Guide](https://docs.logicaldoc.com/en/system/general-informations)
- * [User guide](https://docs.logicaldoc.com/en/entering-in-the-system)
+ * [User's Guide](https://docs.logicaldoc.com/en/entering-in-the-system)
  * [Developer's Guide](https://wiki.logicaldoc.com/wiki/Developer_Guide)
  * [Developers Manual](https://www.logicaldoc.com/documents/logicaldoc-devmanual.pdf)
  * [Web Services API](https://docs.logicaldoc.com/en/web-services-api)
