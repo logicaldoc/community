@@ -15,7 +15,7 @@ import com.logicaldoc.webservice.soap.AuthService;
 /**
  * Auth Web Service Implementation (SOAP)
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class SoapAuthService extends AbstractService implements AuthService {

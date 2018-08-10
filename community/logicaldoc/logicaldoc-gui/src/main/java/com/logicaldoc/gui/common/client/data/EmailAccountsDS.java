@@ -7,11 +7,11 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to retrieve all import folders. It is based on Xml parsing.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class EmailAccountsDS extends DataSource {
-	public EmailAccountsDS(boolean withEmpty) {
+	public EmailAccountsDS(boolean withEmpty, String type) {
 		setTitleField("email");
 		setRecordXPath("/list/account");
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -20,7 +20,7 @@ public class EmailAccountsDS extends DataSource {
 		DataSourceImageField enabled = new DataSourceImageField("eenabled");
 
 		setFields(id, email, enabled);
-		setDataURL("data/emailaccounts.xml");
+		setDataURL("data/emailaccounts.xml" + (type != null ? "?type=" + type : ""));
 		setClientOnly(true);
 	}
 }

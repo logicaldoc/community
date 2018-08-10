@@ -10,7 +10,7 @@
 
 		<echo message="Deploying ${pom.artifactId}" />
 
-		<exec executable="mvn.bat" resolveexecutable="true" searchpath="true">
+		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
 			<arg line="-o -Dmaven.test.skip=true install" />
 		</exec>
 
@@ -97,10 +97,19 @@
 		</tar>
 	</target>
 
-
 	<target name="po2prop" depends="init-all">
 		<echo>Produce the properties bak</echo>
-		<mkdir dir="target/properties" />
+		<mkdir dir="${i18n.root}${file.separator}target${file.separator}properties" />
+		<mkdir dir="${i18n.root}${file.separator}target${file.separator}po" />
+		
+		<if>
+        	<available file="${i18n.root}${file.separator}target${file.separator}launchpad-export.tar.gz"/>
+        	<then>
+        		<gunzip src="${i18n.root}${file.separator}target${file.separator}launchpad-export.tar.gz" />
+				<untar src="${i18n.root}${file.separator}target${file.separator}launchpad-export.tar" dest="${i18n.root}${file.separator}target${file.separator}po" />
+				<delete file="${i18n.root}${file.separator}target${file.separator}launchpad-export.tar" />
+        	</then>
+		</if>
 		
 		<for list="${bundles}" param="bundle">
 			<sequential>

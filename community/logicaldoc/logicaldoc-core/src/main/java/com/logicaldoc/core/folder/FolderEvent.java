@@ -3,7 +3,7 @@ package com.logicaldoc.core.folder;
 /**
  * Possible events in the folder's history
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.6
  */
 public enum FolderEvent {

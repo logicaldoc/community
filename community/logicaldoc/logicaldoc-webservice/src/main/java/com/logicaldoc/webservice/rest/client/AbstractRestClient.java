@@ -8,7 +8,7 @@ import com.logicaldoc.webservice.soap.endpoint.SoapAuthService;
 /**
  * Parent for all RESTful clients
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
 public abstract class AbstractRestClient {

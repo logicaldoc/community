@@ -42,7 +42,10 @@ public class UpdatePanel extends AdminPanel {
 
 	public UpdatePanel() {
 		super("updates");
+	}
 
+	@Override
+	public void onDraw() {
 		ContactingServer.get().show();
 
 		UpdateService.Instance.get().checkUpdate(Session.get().getInfo().getUserNo(),

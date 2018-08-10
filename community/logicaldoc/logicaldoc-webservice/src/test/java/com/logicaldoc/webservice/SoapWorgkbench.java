@@ -17,10 +17,12 @@ import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
+import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.model.WSUser;
 import com.logicaldoc.webservice.soap.client.SoapAuthClient;
 import com.logicaldoc.webservice.soap.client.SoapBookmarkClient;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
+import com.logicaldoc.webservice.soap.client.SoapDocumentMetadataClient;
 import com.logicaldoc.webservice.soap.client.SoapFolderClient;
 import com.logicaldoc.webservice.soap.client.SoapSearchClient;
 import com.logicaldoc.webservice.soap.client.SoapSecurityClient;
@@ -35,6 +37,8 @@ public class SoapWorgkbench {
 		SoapAuthClient auth = new SoapAuthClient(BASE + "/Auth");
 
 		SoapSystemClient systemClient = new SoapSystemClient(BASE + "/System");
+		
+		SoapDocumentMetadataClient metadataClient = new SoapDocumentMetadataClient(BASE + "/DocumentMetadata");
 
 		// Open a session
 		String sid = auth.login("admin", "12345678");
@@ -57,6 +61,8 @@ public class SoapWorgkbench {
 			// ratingStuff(sid);
 
 			// bookmarkStuff(sid);
+			
+			// metadataStuff(metadataClient, sid);
 
 			// WSFolder newFolder = new WSFolder();
 			// newFolder.setName("ddddd");
@@ -142,7 +148,7 @@ public class SoapWorgkbench {
 			auth.logout(sid);
 		}
 	}
-	
+
 	private static void folderStuff(String sid) throws Exception {
 		SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder", 1, false, 50);
 
@@ -181,7 +187,7 @@ public class SoapWorgkbench {
 		System.out.println("user id: " + userId);
 		securityClient.changePassword(sid, userId, null, "marco1982");
 
-		//securityClient.deleteUser(sid, 4);
+		// securityClient.deleteUser(sid, 4);
 
 		// WSUser user = securityClient.getUser(sid, 2L);
 		// user.setCity("Modena");
@@ -351,7 +357,6 @@ public class SoapWorgkbench {
 		SoapTagClient tagClient = new SoapTagClient(BASE + "/Tag");
 		List<String> tags = Arrays.asList(tagClient.getTags(sid));
 		System.out.println("Found tags " + tags);
-
 		for (String tag : tags) {
 			WSDocument[] docs = tagClient.findDocumentsByTag(sid, tag);
 			if (docs != null && docs.length > 0) {
@@ -371,6 +376,14 @@ public class SoapWorgkbench {
 				break;
 			}
 		}
+
+		String[] tgs = tagClient.getTagsPreset(sid);
+		if (tgs != null) {
+			tags = Arrays.asList(tagClient.getTagsPreset(sid));
+			System.out.println("Found tags in preset: " + tags);
+		} else
+			System.out.println("No tags in preset");
+
 	}
 
 	private static void searchStuff(String sid) throws Exception {
@@ -444,8 +457,10 @@ public class SoapWorgkbench {
 			System.out.println("hit fileName: " + hit.getFileName());
 			System.out.println("hit creation: " + hit.getCreation());
 			System.out.println("hit summary: " + hit.getSummary());
-			System.out.println("hit tags: " + hit.getTags().length +" "+ (hit.getTags()!=null ? Arrays.asList(hit.getTags()):""));
-			System.out.println(">> hit attributes: " + hit.getAttributes() !=null ? Arrays.asList(hit.getAttributes()).stream().map(h -> h.getName()).collect(Collectors.toList()) : "");
+			System.out.println("hit tags: " + hit.getTags().length + " "
+					+ (hit.getTags() != null ? Arrays.asList(hit.getTags()) : ""));
+			System.out.println(">> hit attributes: " + hit.getAttributes() != null ? Arrays.asList(hit.getAttributes())
+					.stream().map(h -> h.getName()).collect(Collectors.toList()) : "");
 			System.out.println("************************");
 		}
 
@@ -467,13 +482,13 @@ public class SoapWorgkbench {
 		// + " (" + lnk.getId() + ")");
 		// }
 
-//		 WSDocument wsDoc = documentClient.getDocument(sid, 639L);
-//		 wsDoc.setId(0);
-//		 wsDoc.setFileName("document test");
-//		 wsDoc.setCustomId("xxxxxxx2");
-//		 wsDoc.setFolderId(4L);
-//		 File file = new File("/C:/tmp/out.ods");
-//		 documentClient.create(sid, wsDoc, file);
+		// WSDocument wsDoc = documentClient.getDocument(sid, 639L);
+		// wsDoc.setId(0);
+		// wsDoc.setFileName("document test");
+		// wsDoc.setCustomId("xxxxxxx2");
+		// wsDoc.setFolderId(4L);
+		// File file = new File("/C:/tmp/out.ods");
+		// documentClient.create(sid, wsDoc, file);
 
 		// WSDocument[] docs = documentClient.list(sid, 14);
 		// for (WSDocument wsDocument : docs) {
@@ -483,24 +498,25 @@ public class SoapWorgkbench {
 
 		// documentClient.delete(sid, 32);
 
-//		WSDocument[] docs = documentClient.getDocuments(sid, new Long[] { 220856320L, 225771521L });
-//		for (WSDocument wsDocument : docs) {
-//			System.out.println("doc: " + wsDocument.getFileName());
-//		}
+		// WSDocument[] docs = documentClient.getDocuments(sid, new Long[] {
+		// 220856320L, 225771521L });
+		// for (WSDocument wsDocument : docs) {
+		// System.out.println("doc: " + wsDocument.getFileName());
+		// }
 
 		// WSDocument doc = documentClient.getDocument(sid, 1);
 		// System.out.println("rating: " + doc.getRating());
 		// doc.setRating(5);
 		// documentClient.update(sid, doc);
 		//
-//		 DataHandler data = documentClient.getContent(sid, 1);
-//		 doc.setRating(4);
-//		 doc = documentClient.create(sid, doc, data);
-//		 System.out.println("rating: " + doc.getRating());
+		// DataHandler data = documentClient.getContent(sid, 1);
+		// doc.setRating(4);
+		// doc = documentClient.create(sid, doc, data);
+		// System.out.println("rating: " + doc.getRating());
 
-		DataHandler data = documentClient.getContent(sid, 2021L);
-		System.out.println("data: " + data.toString());
-		data.writeTo(new FileOutputStream("c:\\tmp\\2021.pdf"));
+//		DataHandler data = documentClient.getContent(sid, 2021L);
+//		System.out.println("data: " + data.toString());
+//		data.writeTo(new FileOutputStream("c:\\tmp\\2021.pdf"));
 
 		// documentClient.lock(sid, 30);
 		// WSDocument doc = documentClient.getDocument(sid, 30);
@@ -630,5 +646,19 @@ public class SoapWorgkbench {
 		// System.out.println("Doc1: " + link.getDoc1());
 		// System.out.println("Doc2: " + link.getDoc2());
 		// }
+		
+		documentClient.createThumbnail(sid, 209223680L, "1.5");
+	}
+	
+	private static void metadataStuff(SoapDocumentMetadataClient metadataClient, String sid) throws Exception {
+		WSTemplate[] templates = metadataClient.listTemplates(sid);
+
+		for (WSTemplate wsTemplate : templates) {
+			System.out.println("\nProcessing template " + wsTemplate.getName());
+			for (WSAttribute a : wsTemplate.getAttributes()) {
+				System.out.println("attribute: " + a.getName());
+				System.out.println("position: " + a.getPosition());
+			}
+		}
 	}
 }

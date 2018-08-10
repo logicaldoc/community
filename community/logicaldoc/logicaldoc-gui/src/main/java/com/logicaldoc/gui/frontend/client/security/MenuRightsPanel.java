@@ -33,22 +33,22 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the security policies of a menu.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MenuRightsPanel extends VLayout {
 
-	private RightsDS dataSource;
-
 	private ListGrid list;
 
-	private VLayout container = new VLayout();
-
-	protected GUIMenu menu;
+	private GUIMenu menu;
 
 	public MenuRightsPanel(final GUIMenu menu) {
 		this.menu = menu;
+	}
 
+	@Override
+	public void onDraw() {
+		final VLayout container = new VLayout();
 		container.setMembersMargin(3);
 		addMember(container);
 
@@ -64,10 +64,8 @@ public class MenuRightsPanel extends VLayout {
 		list.setCanFreezeFields(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setAutoFetchData(true);
-		dataSource = new RightsDS(menu.getId(), false);
-		list.setDataSource(dataSource);
+		list.setDataSource(new RightsDS(menu.getId(), false));
 		list.setFields(entityId, entity);
-		container.addMember(list);
 		list.setCanEdit(true);
 		list.setEditEvent(ListGridEditEvent.CLICK);
 		list.setModalEditing(true);
@@ -81,6 +79,8 @@ public class MenuRightsPanel extends VLayout {
 				event.cancel();
 			}
 		});
+
+		container.addMember(list);
 
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(4);
@@ -186,13 +186,6 @@ public class MenuRightsPanel extends VLayout {
 		}
 
 		return tmp;
-	}
-
-	@Override
-	public void destroy() {
-		super.destroy();
-		if (dataSource != null)
-			dataSource.destroy();
 	}
 
 	/**

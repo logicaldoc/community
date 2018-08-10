@@ -1,12 +1,9 @@
 package com.logicaldoc.core.searchengine;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.SpellCheckResponse.Suggestion;
 import org.apache.solr.common.SolrDocument;
 
 import com.logicaldoc.core.folder.Folder;
@@ -16,7 +13,7 @@ import com.logicaldoc.core.security.Tenant;
  * Iterator on the collection of hits, plus some statistical informations about
  * the query. Attention: each hit's data is lazy loaded.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class Hits implements Iterator<Hit> {
@@ -83,11 +80,11 @@ public class Hits implements Iterator<Hit> {
 
 	public static Hit toHit(SolrDocument sdoc) {
 		Hit hit = new Hit();
-		
+
 		hit.setId(Long.parseLong((String) sdoc.get(HitField.ID.getName())));
-		if (sdoc.get(HitField.TENANT_ID.getName()) != null){
-			hit.setTenantId((Long)sdoc.getFieldValue(HitField.TENANT_ID.getName()));
-		}else
+		if (sdoc.get(HitField.TENANT_ID.getName()) != null) {
+			hit.setTenantId((Long) sdoc.getFieldValue(HitField.TENANT_ID.getName()));
+		} else
 			hit.setTenantId(Tenant.DEFAULT_ID);
 
 		if (sdoc.getFieldValue("score") != null) {
@@ -106,21 +103,6 @@ public class Hits implements Iterator<Hit> {
 		}
 
 		return hit;
-	}
-
-	/**
-	 * Retrieve a token->suggestion map.
-	 */
-	public Map<String, String> getSuggestions() {
-		Map<String, String> suggestions = new HashMap<String, String>();
-
-		if (rsp.getSpellCheckResponse() != null) {
-			List<Suggestion> list = rsp.getSpellCheckResponse().getSuggestions();
-			for (Suggestion suggestion : list)
-				suggestions.put(suggestion.getToken(), suggestion.getAlternatives().get(0));
-		}
-
-		return suggestions;
 	}
 
 	private static int createScore(float max, float score) {

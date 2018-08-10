@@ -6,12 +6,12 @@
                      /____/                 
 
 
-                      http://www.logicaldoc.com                     
+                      https://www.logicaldoc.com                     
 
                     LogicalDOC Community Edition
 
 
-You need JDK 1.7, Maven 3.0.3, Ant 1.7 to build this sources
+You need JDK 1.8, Maven 3.3.3, Ant 1.9.5 to build this sources
 
 0) Open a command shell to the folder where you unzipped the archive
 
@@ -27,4 +27,5 @@ You need JDK 1.7, Maven 3.0.3, Ant 1.7 to build this sources
 
 For more instructions regarding maven installation or better workspace organization
 you can read the LogicalDOC Developer's Manual
-http://www.logicaldoc.com/documents/logicaldoc-devmanual.pdf
+https://wiki.logicaldoc.com/wiki/Developer_Guide
+https://www.logicaldoc.com/documents/logicaldoc-devmanual.pdf

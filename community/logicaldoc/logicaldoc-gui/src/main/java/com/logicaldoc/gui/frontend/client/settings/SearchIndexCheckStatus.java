@@ -10,7 +10,7 @@ import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 /**
  * This is the form used to show the index check.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SearchIndexCheckStatus extends Window {

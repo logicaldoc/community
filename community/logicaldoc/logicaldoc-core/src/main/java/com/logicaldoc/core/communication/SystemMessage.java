@@ -9,7 +9,7 @@ import java.util.Set;
  * users.
  * 
  * @author Michael Scholz
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 1.0
  */
 public class SystemMessage extends Message {

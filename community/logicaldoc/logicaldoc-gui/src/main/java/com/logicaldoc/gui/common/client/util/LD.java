@@ -18,12 +18,13 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.layout.VStack;
 
 /**
  * This class contains useful methods for objects visualization.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class LD {
@@ -49,7 +50,7 @@ public class LD {
 		else
 			dialog.setWidth(300);
 
-		VStack container = new VStack();
+		VLayout container = new VLayout();
 		container.setWidth100();
 		container.setMembersMargin(5);
 		container.setMargin(3);

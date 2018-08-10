@@ -30,14 +30,12 @@ import de.novanic.eventservice.client.event.RemoteEventServiceFactory;
 /**
  * The Frontend entry point
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Frontend implements EntryPoint {
 
 	private static Frontend instance;
-
-	private MainPanel mainPanel;
 
 	/**
 	 * @return singleton Main instance
@@ -75,8 +73,6 @@ public class Frontend implements EntryPoint {
 		Window.enableScrolling(false);
 		Window.setMargin("0px");
 
-		mainPanel = MainPanel.get();
-
 		declareReloadTrigger(this);
 		declareSearchTag(this);
 		declareGetCurrentFolderId(this);
@@ -92,16 +88,7 @@ public class Frontend implements EntryPoint {
 			public void onSuccess(final GUIInfo info) {
 				CookiesManager.saveRelease(info);
 
-				I18N.init(info);
-
-				WindowUtils.setTitle(info, null);
-
-				Feature.init(info);
-				Session.get().setInfo(info);
-
-				WindowUtils.setFavicon(info);
-
-				Util.setupDensity(info);
+				init(info);
 
 				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), new AsyncCallback<GUISession>() {
 
@@ -116,7 +103,8 @@ public class Frontend implements EntryPoint {
 							SC.warn(I18N.message("accessdenied"));
 						} else {
 							Session.get().init(session);
-							I18N.setLocale(session.getUser().getLanguage());
+							init(info);
+							I18N.init(session);
 							showMain();
 							connectServerPush();
 							declareReloadTrigger(Frontend.this);
@@ -130,7 +118,7 @@ public class Frontend implements EntryPoint {
 	public void showMain() {
 		// Remove the loading frame
 		RootPanel.getBodyElement().removeChild(RootPanel.get("loadingwrapper-frontend").getElement());
-		mainPanel.show();
+		MainPanel.get().show();
 	}
 
 	/**
@@ -154,6 +142,19 @@ public class Frontend implements EntryPoint {
 
 	public void addTagInCloud(String tag, String weight, String link) {
 		TagsForm.searchTag(tag, false);
+	}
+
+	private void init(final GUIInfo info) {
+		I18N.init(info);
+
+		WindowUtils.setTitle(info, null);
+
+		Feature.init(info);
+		Session.get().setInfo(info);
+
+		WindowUtils.setFavicon(info);
+
+		Util.setupDensity(info);
 	}
 
 	/**

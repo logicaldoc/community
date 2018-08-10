@@ -25,7 +25,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the administration security menu
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SecurityMenu extends VLayout {

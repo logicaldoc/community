@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-dropbox" version="7.7.3" class="com.logicaldoc.dropbox.DropboxPlugin">
+<plugin id="logicaldoc-dropbox" version="8.0.0" class="com.logicaldoc.dropbox.DropboxPlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>

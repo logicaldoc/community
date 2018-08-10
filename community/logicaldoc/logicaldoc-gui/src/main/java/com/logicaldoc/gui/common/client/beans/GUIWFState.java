@@ -4,12 +4,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.util.Util;
 
 /**
  * Workflow State bean as used in the GUI
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class GUIWFState implements Serializable {
@@ -67,6 +66,10 @@ public class GUIWFState implements Serializable {
 	private String onCreation;
 
 	private String onAssignment;
+
+	private String display;
+
+	private String color;
 
 	public GUIWFState() {
 	}
@@ -257,5 +260,21 @@ public class GUIWFState implements Serializable {
 
 	public void setOnAssignment(String onAssignment) {
 		this.onAssignment = onAssignment;
+	}
+
+	public String getDisplay() {
+		return display;
+	}
+
+	public void setDisplay(String display) {
+		this.display = display;
+	}
+	
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}
 }

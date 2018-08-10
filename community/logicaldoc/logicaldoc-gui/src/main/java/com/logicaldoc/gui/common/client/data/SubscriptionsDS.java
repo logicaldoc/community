@@ -8,7 +8,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to retrieve the subscriptions of the current user.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SubscriptionsDS extends DataSource {

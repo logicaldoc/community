@@ -14,12 +14,16 @@ public class CookiesManager {
 
 	public static final String COOKIE_HITSLIST = "ldoc-hitslist";
 
+	public static final String COOKIE_HITSLIST_GROUPING = "ldoc-hitslist-grouping";
+	
 	public static final String COOKIE_HITSLIST_MODE = "ldoc-hitslist-mode";
 
 	public static final String COOKIE_HITSLIST_PREV_W = "ldoc-hitslist-prev-w";
 
 	public static final String COOKIE_DOCSLIST = "ldoc-docslist";
 
+	public static final String COOKIE_DOCSLIST_GROUPING = "ldoc-docslist-grouping";
+	
 	public static final String COOKIE_DOCSLIST_SORT = "ldoc-docslist-sort";
 
 	public static final String COOKIE_DOCSLIST_MAX = "ldoc-docslist-max";
@@ -85,6 +89,12 @@ public class CookiesManager {
 		}
 
 		try {
+			Offline.remove(COOKIE_HITSLIST_GROUPING);
+		} catch (Throwable t) {
+
+		}
+		
+		try {
 			Offline.remove(COOKIE_HITSLIST_PREV_W);
 		} catch (Throwable t) {
 
@@ -96,6 +106,12 @@ public class CookiesManager {
 
 		}
 
+		try {
+			Offline.remove(COOKIE_DOCSLIST_GROUPING);
+		} catch (Throwable t) {
+
+		}
+		
 		try {
 			Offline.remove(COOKIE_DOCSLIST_SORT);
 		} catch (Throwable t) {

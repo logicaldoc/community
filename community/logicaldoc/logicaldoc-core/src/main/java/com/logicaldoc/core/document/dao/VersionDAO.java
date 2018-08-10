@@ -8,7 +8,7 @@ import com.logicaldoc.core.document.Version;
 /**
  * This class is a DAO-service for versions.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 4.5
  */
 public interface VersionDAO extends PersistentObjectDAO<Version> {

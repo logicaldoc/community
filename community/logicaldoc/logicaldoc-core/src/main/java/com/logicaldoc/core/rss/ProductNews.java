@@ -25,7 +25,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * This task retrieve and store all feeds from an Url.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class ProductNews extends Task {

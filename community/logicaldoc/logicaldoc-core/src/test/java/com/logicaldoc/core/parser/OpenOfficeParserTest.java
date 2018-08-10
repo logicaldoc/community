@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
@@ -13,9 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
-import com.logicaldoc.core.parser.OpenOfficeParser;
-import com.logicaldoc.core.parser.Parser;
-import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.security.Tenant;
 
 public class OpenOfficeParserTest extends AbstractCoreTCase {
@@ -60,14 +58,13 @@ public class OpenOfficeParserTest extends AbstractCoreTCase {
 		String filename = file.getPath();
 
 		for (int i = 0; i < 10; i++) {
-			Parser parser = ParserFactory.getParser(filename, Tenant.DEFAULT_NAME);
+			Parser parser = ParserFactory.getParser(filename);
 			OpenOfficeParser p = (OpenOfficeParser) parser;
-			p.parse(file);
 
-			String content = p.getContent();
-			
+			String content = p.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+
 			System.out.println(content);
-			
+
 			assertNotNull(content);
 			assertTrue(StringUtils.isNotEmpty(content));
 

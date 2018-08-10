@@ -23,7 +23,7 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
 /**
  * This task enlists all non-indexed documents and performs the indexing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public class IndexerTask extends Task {

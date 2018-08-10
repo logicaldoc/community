@@ -25,7 +25,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
  * This panel shows the list of menus visible by the current user allowing for
  * security management.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MenusPanel extends VLayout {

@@ -13,7 +13,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 /**
  * Utility methods for documents grids
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class GridUtil {
@@ -87,6 +87,12 @@ public class GridUtil {
 				document.setDocRefType(record.getAttribute("docrefType"));
 			}
 
+			if (record.getAttributeAsInt("workflowStatus") != null)
+				document.setWorkflowStatus(record.getAttributeAsString("workflowStatus"));
+
+			if (record.getAttributeAsString("workflowStatusDisplay") != null)
+				document.setWorkflowStatusDisplay(record.getAttributeAsString("workflowStatusDisplay"));
+			
 			document.setIcon(record.getAttribute("icon"));
 			if (record.getAttributeAsDate("lastModified") != null)
 				document.setLastModified(record.getAttributeAsDate("lastModified"));
@@ -147,15 +153,15 @@ public class GridUtil {
 			record.setAttribute("version", doc.getVersion());
 			record.setAttribute("comment", doc.getComment());
 			record.setAttribute("workflowStatus", doc.getWorkflowStatus());
+			record.setAttribute("workflowStatusDisplay", doc.getWorkflowStatusDisplay());
 			record.setAttribute("startPublishing", doc.getStartPublishing());
 			record.setAttribute("stopPublishing", doc.getStopPublishing());
 			record.setAttribute("publishedStatus", doc.getPublished() == 1 ? "yes" : "no");
 			record.setAttribute("score", doc.getScore());
 			record.setAttribute("summary", doc.getSummary());
-			record.setAttribute("lockUserId", doc.getLockUserId());
 			record.setAttribute("folderId", doc.getFolder().getId());
 			record.setAttribute("folder", doc.getFolder().getName());
-			record.setAttribute("rating", "rating" + doc.getRating());
+			record.setAttribute("rating", doc.getRating());
 			record.setAttribute("template", doc.getTemplate());
 			record.setAttribute("lockUserId", doc.getLockUserId());
 			record.setAttribute("lockUser", doc.getLockUser());

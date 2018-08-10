@@ -7,7 +7,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Data source to retrieve notes put by users. It is based on Xml parsing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class NotesDS extends DataSource {

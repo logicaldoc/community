@@ -15,6 +15,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
+import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ItemClickEvent;
@@ -23,7 +25,7 @@ import com.smartgwt.client.widgets.menu.events.ItemClickHandler;
 /**
  * Allows the selection of a specific folder
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class FolderSelector extends TextItem {
@@ -55,7 +57,7 @@ public class FolderSelector extends TextItem {
 				setFolder(new Long(item.getAttributeAsString("folderId")), item.getAttributeAsString("name"));
 			}
 		});
-
+		
 		PickerIcon search = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {

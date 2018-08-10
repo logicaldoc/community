@@ -11,7 +11,7 @@ import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 /**
  * Entry-point for the Dropbox plug-in
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class DropboxPlugin extends LogicalDOCPlugin {

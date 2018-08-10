@@ -32,7 +32,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implements the
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SetupServiceImpl extends RemoteServiceServlet implements SetupService {

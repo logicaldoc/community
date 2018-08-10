@@ -47,7 +47,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for documents data.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentsDataServlet extends HttpServlet {
@@ -218,8 +218,8 @@ public class DocumentsDataServlet extends HttpServlet {
 								+ " A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,"
 								+ " A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,"
 								+ " A.startPublishing, A.stopPublishing, A.published, A.extResId,"
-								+ " B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages "
-								+ " from Document as A left outer join A.template as B ");
+								+ " B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages, "
+								+ " A.workflowStatusDisplay " + " from Document as A left outer join A.template as B ");
 				query.append(" where A.deleted = 0 and not A.status=" + AbstractDocument.DOC_ARCHIVED);
 				if (folderId != null)
 					query.append(" and A.folder.id=" + folderId);
@@ -227,9 +227,6 @@ public class DocumentsDataServlet extends HttpServlet {
 					query.append(" and A.indexed=" + request.getParameter("indexed"));
 				if (filename != null)
 					query.append(" and lower(A.fileName) like '%" + filename.toLowerCase() + "%' ");
-
-				if (StringUtils.isEmpty(sort))
-					query.append(" order by A.lastModified desc");
 
 				List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, null);
 				List<Document> documents = new ArrayList<Document>();
@@ -261,7 +258,7 @@ public class DocumentsDataServlet extends HttpServlet {
 						String aliasFileName = doc.getFileName();
 						String aliasType = doc.getType();
 						doc = dao.findById(aliasDocRef);
-						
+
 						if (doc != null) {
 							dao.initialize(doc);
 							doc.setId(aliasId);
@@ -300,6 +297,7 @@ public class DocumentsDataServlet extends HttpServlet {
 							doc.setLockUser((String) cols[29]);
 							doc.setPassword((String) cols[30]);
 							doc.setPages((Integer) cols[31]);
+							doc.setWorkflowStatusDisplay((String) cols[32]);
 
 							if (!extValues.isEmpty())
 								for (String name : attrs) {
@@ -368,12 +366,15 @@ public class DocumentsDataServlet extends HttpServlet {
 				writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
 				writer.print("<type><![CDATA[" + doc.getType() + "]]></type>");
 
-				writer.print("<rating>rating" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
+				writer.print("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
 				writer.print("<fileVersion><![CDATA[" + doc.getFileVersion() + "]]></fileVersion>");
 				writer.print("<comment><![CDATA[" + (doc.getComment() != null ? doc.getComment() : "")
 						+ "]]></comment>");
 				writer.print("<workflowStatus><![CDATA["
 						+ (doc.getWorkflowStatus() != null ? doc.getWorkflowStatus() : "") + "]]></workflowStatus>");
+				writer.print("<workflowStatusDisplay><![CDATA["
+						+ (doc.getWorkflowStatusDisplay() != null ? doc.getWorkflowStatusDisplay() : "")
+						+ "]]></workflowStatusDisplay>");
 				writer.print("<startPublishing>" + df.format(doc.getStartPublishing()) + "</startPublishing>");
 				if (doc.getStopPublishing() != null)
 					writer.print("<stopPublishing>" + df.format(doc.getStopPublishing()) + "</stopPublishing>");

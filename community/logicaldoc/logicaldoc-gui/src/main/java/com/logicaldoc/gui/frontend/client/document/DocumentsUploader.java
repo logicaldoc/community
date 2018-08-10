@@ -40,7 +40,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This popup window is used to upload documents to the server.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentsUploader extends Window {
@@ -95,7 +95,6 @@ public class DocumentsUploader extends Window {
 
 		VLayout layout = new VLayout();
 		layout.setMembersMargin(5);
-		layout.setMargin(2);
 		layout.setWidth100();
 
 		layout.addMember(form);

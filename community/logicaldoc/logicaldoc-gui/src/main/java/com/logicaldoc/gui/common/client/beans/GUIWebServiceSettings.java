@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Web Service and WebDAV Settings bean as used in the GUI.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class GUIWebServiceSettings implements Serializable {

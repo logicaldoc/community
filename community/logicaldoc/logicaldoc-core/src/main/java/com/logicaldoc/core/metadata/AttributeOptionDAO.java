@@ -8,7 +8,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
 /**
  * DAO for <code>AttributeOption</code> handling.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.1
  */
 public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption> {

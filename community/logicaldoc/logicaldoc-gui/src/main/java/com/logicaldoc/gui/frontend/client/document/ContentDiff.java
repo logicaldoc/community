@@ -9,7 +9,7 @@ import com.smartgwt.client.widgets.Window;
 /**
  * Show differences between two versions at file conten level
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0.1
  */
 public class ContentDiff extends Window {

@@ -12,6 +12,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -22,7 +23,6 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -42,16 +42,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows the list of users and a detail area.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GroupsPanel extends AdminPanel {
 
-	private ListGrid list;
-
-	private InfoPanel infoPanel;
-
-	private Layout listing;
+	private RefreshableListGrid list;
 
 	final static Canvas SELECT_GROUP = new HTMLPanel("&nbsp;" + I18N.message("selectgroup"));
 
@@ -61,7 +57,10 @@ public class GroupsPanel extends AdminPanel {
 
 	public GroupsPanel() {
 		super("groups");
+	}
 
+	@Override
+	public void onDraw() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
@@ -73,7 +72,10 @@ public class GroupsPanel extends AdminPanel {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				refresh();
+				list.refresh(new GroupsDS());
+				detailsContainer.removeMembers(detailsContainer.getMembers());
+				details = SELECT_GROUP;
+				detailsContainer.setMembers(details);
 			}
 		});
 		toolStrip.addSeparator();
@@ -115,24 +117,13 @@ public class GroupsPanel extends AdminPanel {
 			}
 		});
 		toolStrip.addFill();
-		
-		body.addMember(toolStrip);
-		refresh();
-	}
-
-	private void refresh() {
-		if (listing != null)
-			body.removeMember(listing);
-		if (detailsContainer != null)
-			body.removeMember(detailsContainer);
-
-		listing = new VLayout();
 
 		detailsContainer = new VLayout();
 
-		infoPanel = new InfoPanel("");
+		final InfoPanel infoPanel = new InfoPanel("");
 
 		// Initialize the listing panel as placeholder
+		final Layout listing = new VLayout();
 		listing.setAlign(Alignment.CENTER);
 		listing.setHeight("55%");
 		listing.setShowResizeBar(true);
@@ -146,7 +137,7 @@ public class GroupsPanel extends AdminPanel {
 		ListGridField description = new ListGridField("description", I18N.message("description"), 200);
 		description.setCanFilter(true);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
@@ -198,7 +189,7 @@ public class GroupsPanel extends AdminPanel {
 		details = SELECT_GROUP;
 		detailsContainer.setMembers(details);
 
-		body.addMembers(listing, detailsContainer);
+		body.addMembers(toolStrip, listing, detailsContainer);
 	}
 
 	/**

@@ -10,7 +10,7 @@ import com.logicaldoc.core.metadata.Attribute;
 /**
  * Basic concrete implementation of <code>AbstractDocument</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 1.0
  */
 public class Document extends AbstractDocument {
@@ -43,11 +43,15 @@ public class Document extends AbstractDocument {
 		setFileSize(docVO.getFileSize());
 		setIndexed(docVO.getIndexed());
 		setBarcoded(docVO.getBarcoded());
+		setSigned(docVO.getSigned());
+		setStamped(docVO.getStamped());
 		setDigest(docVO.getDigest());
 		setDocRef(docVO.getDocRef());
 		setFolder(docVO.getFolder());
 		setTemplate(docVO.getTemplate());
 		setPages(docVO.getPages());
+		setWorkflowStatus(docVO.getWorkflowStatus());
+		setWorkflowStatusDisplay(docVO.getWorkflowStatusDisplay());
 
 		setAttributes(new HashMap<String, Attribute>());
 		try {

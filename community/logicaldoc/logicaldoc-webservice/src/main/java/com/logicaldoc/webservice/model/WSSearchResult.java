@@ -7,7 +7,7 @@ import com.logicaldoc.util.SnippetStripper;
 /**
  * Represents a web service search result
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 @XmlType(name = "WSSearchResult")

@@ -8,7 +8,7 @@ import com.google.gwt.http.client.URL;
 /**
  * Collects various informations about the current request.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class RequestInfo {

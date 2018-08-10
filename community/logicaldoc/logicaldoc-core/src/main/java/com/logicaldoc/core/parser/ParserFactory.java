@@ -1,6 +1,5 @@
 package com.logicaldoc.core.parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -10,11 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import net.sf.jmimemagic.Magic;
-import net.sf.jmimemagic.MagicMatch;
-
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
@@ -25,7 +20,6 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.io.IOUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
@@ -42,13 +36,13 @@ public class ParserFactory {
 
 	/**
 	 * This is the map of registered parsers: key is the file extension, value
-	 * is the parser class
+	 * is the parser instance
 	 */
-	private static Map<String, Class> parsers = new HashMap<String, Class>();
+	private static Map<String, Parser> parsers = new HashMap<String, Parser>();
 
 	/**
 	 * The map of aliases. Key is the alias, value is the registered extension.
-	 * (eg. test->odt
+	 * (eg. test->odt(
 	 */
 	private static Map<String, String> aliases = new HashMap<String, String>();
 
@@ -59,53 +53,53 @@ public class ParserFactory {
 		parsers.clear();
 
 		// First of all register all standard parsers
-		parsers.put("doc", DOCParser.class);
-		parsers.put("dot", DOCParser.class);
+		parsers.put("doc", new DOCParser());
+		parsers.put("dot", new DOCParser());
 
-		parsers.put("htm", HTMLParser.class);
-		parsers.put("html", HTMLParser.class);
+		parsers.put("htm", new HTMLParser());
+		parsers.put("html", new HTMLParser());
 
-		parsers.put("pdf", PDFParser.class);
-		parsers.put("rtf", RTFParser.class);
+		parsers.put("pdf", new PDFParser());
+		parsers.put("rtf", new RTFParser());
 
 		// StarOffice, OpenOffice 1.0 - 1.1 extensions
-		parsers.put("sxw", OpenOfficeParser.class);
-		parsers.put("sxc", OpenOfficeParser.class);
-		parsers.put("sxi", OpenOfficeParser.class); // Presentation
+		parsers.put("sxw", new OpenOfficeParser());
+		parsers.put("sxc", new OpenOfficeParser());
+		parsers.put("sxi", new OpenOfficeParser()); // Presentation
 
 		// OpenOffice 2.3/3.0 extensions
-		parsers.put("odt", OpenOfficeParser.class);
-		parsers.put("ods", OpenOfficeParser.class);
-		parsers.put("odp", OpenOfficeParser.class);
+		parsers.put("odt", new OpenOfficeParser());
+		parsers.put("ods", new OpenOfficeParser());
+		parsers.put("odp", new OpenOfficeParser());
 
 		// OpenDocument template extensions
-		parsers.put("ott", OpenOfficeParser.class);
-		parsers.put("ots", OpenOfficeParser.class);
-		parsers.put("otp", OpenOfficeParser.class);
+		parsers.put("ott", new OpenOfficeParser());
+		parsers.put("ots", new OpenOfficeParser());
+		parsers.put("otp", new OpenOfficeParser());
 
 		// KOffice 1.6.x extensions
-		parsers.put("kwd", KOfficeParser.class);
-		parsers.put("ksp", KOfficeParser.class);
-		parsers.put("kpr", KOfficeParser.class);
+		parsers.put("kwd", new KOfficeParser());
+		parsers.put("ksp", new KOfficeParser());
+		parsers.put("kpr", new KOfficeParser());
 
 		// WordPerfect
-		parsers.put("wpd", WordPerfectParser.class);
+		parsers.put("wpd", new WordPerfectParser());
 
 		// AbiWord http://www.abisource.com/
-		parsers.put("abw", AbiWordParser.class);
-		parsers.put("zabw", ZABWParser.class); // Compressed AbiWord document
+		parsers.put("abw", new AbiWordParser());
+		parsers.put("zabw", new ZABWParser()); // Compressed AbiWord document
 
-		parsers.put("txt", TXTParser.class);
-		parsers.put("csv", TXTParser.class);
-		parsers.put("dbf", TXTParser.class);
-		parsers.put("xml", XMLParser.class);
-		parsers.put("xls", XLSParser.class);
-		parsers.put("xlt", XLSParser.class);
+		parsers.put("txt", new TXTParser());
+		parsers.put("csv", new TXTParser());
+		parsers.put("dbf", new TXTParser());
+		parsers.put("xml", new XMLParser());
+		parsers.put("xls", new XLSParser());
+		parsers.put("xlt", new XLSParser());
 
 		// MS Office 2003 Powerpoint
-		parsers.put("ppt", PPTParser.class);
-		parsers.put("pps", PPTParser.class);
-		parsers.put("pot", PPTParser.class);
+		parsers.put("ppt", new PPTParser());
+		parsers.put("pps", new PPTParser());
+		parsers.put("pot", new PPTParser());
 
 		// Acquire the 'Parse' extensions of the core plugin and add defined
 		// parsers
@@ -119,9 +113,10 @@ public class ParserFactory {
 				// Try to instantiate the parser
 				Object parser = clazz.newInstance();
 				if (!(parser instanceof Parser))
-					throw new Exception("The specified parser " + className + " doesn't implement Parser interface");
-				parsers.put(ext, clazz);
-				log.info("Added new parser " + className + " for extension " + ext);
+					throw new Exception(String.format("The specified parser %s doesn't implement Parser interface",
+							className));
+				parsers.put(ext, (Parser) parser);
+				log.info("Added new parser {} for extension {}", className, ext);
 			} catch (Throwable e) {
 				log.error(e.getMessage());
 			}
@@ -130,135 +125,45 @@ public class ParserFactory {
 		initAliases();
 	}
 
-	public static Parser getParser(File file, String filename, Locale locale, String encoding, long tenantId) {
-		Parser parser = detectParser(file, null, filename, locale, encoding, tenantId);
-		parser.parse(file);
-		return parser;
+	/**
+	 * Gets the proper parser and parse the given content
+	 */
+	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId) {
+		Parser parser = getParser(filename);
+		if (parser != null) {
+			TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			Tenant t = dao.findById(tenantId);
+			return parser.parse(input, filename, encoding, locale, t != null ? t.getName() : Tenant.DEFAULT_NAME);
+		} else
+			return "";
 	}
 
 	/**
-	 * Internal method containing the lookup logic. can be invoked with a File
-	 * OR an InputStream.
-	 * 
-	 * @param file
-	 * @param is
-	 * @param filename
-	 * @param locale
-	 * @param encoding
-	 * @return
+	 * Method containing the lookup logic.
 	 */
-	protected static Parser detectParser(File file, InputStream is, String filename, Locale locale, String encoding,
-			long tenantId) {
+	public static Parser getParser(String filename) {
 		if (parsers.isEmpty())
 			init();
 
-		String ext = filename != null ? FilenameUtils.getExtension(filename) : null;
-		if (StringUtils.isEmpty(ext) && file != null) {
-			String fileName = file.getName().toLowerCase();
-			ext = FilenameUtils.getExtension(fileName);
-		} else {
-			ext = ext.toLowerCase();
-		}
+		String ext = filename.contains(".") ? FilenameUtils.getExtension(filename.trim()) : filename.trim();
 		if (StringUtils.isEmpty(ext))
-			ext = "txt";
+			ext = ext.toLowerCase();
 
-		Parser parser = null;
-		Class parserClass = parsers.get(ext);
-		if (parserClass != null) {
-			try {
-				parser = (Parser) parserClass.newInstance();
-			} catch (Exception e) {
-				log.error(e.getMessage());
-				parser = new DummyParser();
-			}
-		} else {
-			log.info("No registered parser for extension " + ext + ". Search for alias.");
+		Parser parser = parsers.get(ext);
+		if (parser == null) {
+			log.info("No registered parser for extension {}. Search for an alias.", ext);
 
 			String alias = aliases.get(ext);
 			if (StringUtils.isNotEmpty(alias)) {
 				log.info("Found alias " + alias);
-				parserClass = parsers.get(alias);
-				if (parserClass != null) {
-					try {
-						parser = (Parser) parserClass.newInstance();
-					} catch (Exception e) {
-						log.error(e.getMessage());
-						parser = new DummyParser();
-					}
-				}
-			} else {
-				log.warn("No registered parser for extension " + ext);
-				try {
-					MagicMatch match = null;
-					if (file != null)
-						match = Magic.getMagicMatch(file, true);
-					else {
-						InputStream limited = IOUtil.getLimitedStream(is, 2048);
-						match = Magic.getMagicMatch(IOUtils.toByteArray(limited), true);
-					}
-					if ("text/plain".equals(match.getMimeType())) {
-						log.warn("Try to parse the file as plain text");
-						parser = new TXTParser();
-					} else {
-						parser = new DummyParser();
-					}
-				} catch (Exception e) {
-					log.error(e.getMessage());
-					parser = new DummyParser();
-				}
+				parser = parsers.get(alias);
 			}
 		}
-		parser.setFilename(filename);
-		parser.setLocale(locale);
-		parser.setEncoding(encoding);
 
-		if (tenantId != Tenant.DEFAULT_ID) {
-			TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-			Tenant tenant = dao.findById(tenantId);
-			parser.setTenant(tenant.getName());
-		}
-
-		return parser;
-	}
-
-	public static Parser getParser(InputStream is, String filename, Locale locale, String encoding, long tenantId) {
-		try {
-			Parser parser = detectParser(null, is, filename, locale, encoding, tenantId);
-			parser.parse(is);
-			return parser;
-		} finally {
-			try {
-				if (is != null)
-					is.close();
-			} catch (Throwable e) {
-
-			}
-		}
-	}
-
-	public static Parser getParser(String filename, String tenantName) {
-		if (parsers.isEmpty())
-			init();
-
-		String ext = FilenameUtils.getExtension(filename).toLowerCase();
-
-		Parser parser = null;
-		Class parserClass = parsers.get(ext);
-		if (parserClass != null) {
-			try {
-				parser = (Parser) parserClass.newInstance();
-			} catch (Exception e) {
-				log.error(e.getMessage());
-				parser = new TXTParser();
-			}
-		} else {
-			log.warn("No registered parser for extension " + ext);
+		if (parser == null) {
+			log.warn("Unable to find a parser for extension {}", ext);
 			parser = new DummyParser();
 		}
-		parser.setFilename(filename);
-
-		if (tenantName != null && !tenantName.equals(Tenant.DEFAULT_NAME))
-			parser.setTenant(tenantName);
 
 		return parser;
 	}
@@ -269,7 +174,7 @@ public class ParserFactory {
 		return parsers.keySet();
 	}
 
-	public static Map<String, Class> getParsers() {
+	public static Map<String, Parser> getParsers() {
 		if (parsers.isEmpty())
 			init();
 		return parsers;

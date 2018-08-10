@@ -34,13 +34,6 @@ public class AddTemplateAttributeDialog extends Window {
 	public AddTemplateAttributeDialog(TemplatePropertiesPanel panel) {
 		this.propertiesPanel = panel;
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
-
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("attributesets"));
 		setWidth(500);
@@ -51,6 +44,16 @@ public class AddTemplateAttributeDialog extends Window {
 		centerInPage();
 		setAutoSize(true);
 
+		addCloseClickHandler(new CloseClickHandler() {
+			@Override
+			public void onCloseClick(CloseClickEvent event) {
+				destroy();
+			}
+		});
+	}
+
+	@Override
+	public void onDraw() {
 		setAttributesList = new ListGrid();
 		setAttributesList.setEmptyMessage(I18N.message("notitemstoshow"));
 		setAttributesList.setWidth100();

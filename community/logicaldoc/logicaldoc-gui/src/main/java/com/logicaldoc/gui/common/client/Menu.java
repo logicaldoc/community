@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 /**
  * Stores the accessible menues
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Menu {
@@ -82,6 +82,8 @@ public class Menu {
 	public static final long BRANDING = -1150;
 
 	public static final long KEYSTORE = -1160;
+	
+	public static final long VIA = -1170;
 
 	public static final long CALENDAR_REPORT = -2060;
 
@@ -123,6 +125,7 @@ public class Menu {
 	
 	public static final long EXTERNAL_AUTHENTICATION = 1880;
 
+	
 	private static Set<Long> menues = new HashSet<Long>();
 
 	static public void init(GUIUser user) {

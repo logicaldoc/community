@@ -13,7 +13,7 @@ import com.logicaldoc.webdav.web.WebdavServlet;
 /**
  * This class provides initialisations needed by WebDAV-Plugin
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public class WebDAVPlugin extends LogicalDOCPlugin {

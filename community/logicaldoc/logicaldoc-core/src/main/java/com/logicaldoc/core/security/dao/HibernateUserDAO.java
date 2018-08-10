@@ -32,7 +32,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
 /**
  * Hibernate implementation of <code>UserDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 @SuppressWarnings("unchecked")

@@ -5,7 +5,7 @@ import com.logicaldoc.core.PersistentObject;
 /**
  * A generic contact represented by a set of personal informations.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
 public class Contact extends PersistentObject {

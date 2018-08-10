@@ -18,7 +18,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This popup window is used to handle Google Drive settings.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
 public class GDriveSettings extends Window {

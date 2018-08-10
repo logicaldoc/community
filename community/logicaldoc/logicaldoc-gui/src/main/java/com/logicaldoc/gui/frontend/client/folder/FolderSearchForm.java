@@ -18,7 +18,7 @@ import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.search.ConditionRow;
+import com.logicaldoc.gui.frontend.client.search.ParameterConditionRow;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
@@ -44,7 +44,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Shows a folders search form
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4.2
  */
 public abstract class FolderSearchForm extends VLayout {
@@ -177,7 +177,7 @@ public abstract class FolderSearchForm extends VLayout {
 		});
 	}
 
-	public void removeCondition(ConditionRow criteria) {
+	public void removeCondition(ParameterConditionRow criteria) {
 		conditionsLayout.removeMember(criteria);
 	}
 
@@ -196,7 +196,7 @@ public abstract class FolderSearchForm extends VLayout {
 	 * Add the old-style condition on the folder's name
 	 */
 	public void addNameCondition() {
-		ConditionRow row = new ConditionRow(null, false, new SearchOnEnter());
+		ParameterConditionRow row = new ParameterConditionRow(null, false, new SearchOnEnter());
 		row.setAttribute("name");
 		row.setWidth(getWidth() - 10);
 		row.reload();
@@ -204,7 +204,7 @@ public abstract class FolderSearchForm extends VLayout {
 	}
 
 	public void addCondition() {
-		ConditionRow row = new ConditionRow(selectedTemplate, false, new SearchOnEnter());
+		ParameterConditionRow row = new ParameterConditionRow(selectedTemplate, false, new SearchOnEnter());
 		row.setWidth(getWidth() - 10);
 		row.reload();
 		conditionsLayout.addMember(row);
@@ -251,7 +251,7 @@ public abstract class FolderSearchForm extends VLayout {
 		List<GUICriterion> list = new ArrayList<GUICriterion>();
 		if (conditionsLayout.getMembers() != null)
 			for (Canvas canvas : conditionsLayout.getMembers()) {
-				ConditionRow condition = (ConditionRow) canvas;
+				ParameterConditionRow condition = (ParameterConditionRow) canvas;
 				String fieldName = condition.getCriteriaFieldsItem().getValueAsString();
 				fieldName = fieldName.replaceAll(Constants.BLANK_PLACEHOLDER, " ");
 				if (fieldName.startsWith("_"))

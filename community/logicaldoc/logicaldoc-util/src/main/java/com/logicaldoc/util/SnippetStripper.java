@@ -4,7 +4,7 @@ package com.logicaldoc.util;
  * Useful class used to filter snippets from lucene, excluding those characters
  * that invalidate HTML page
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class SnippetStripper {

@@ -35,7 +35,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects details about a retention policy
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2
  */
 public class RetentionPolicyDetailsPanel extends VLayout implements FolderChangeListener {
@@ -225,7 +225,7 @@ public class RetentionPolicyDetailsPanel extends VLayout implements FolderChange
 						policiesPanel.showPolicyDetails(newPolicy);
 					}
 					if (policy.getId() == 0L)
-						policiesPanel.init();
+						policiesPanel.refresh();
 				}
 			});
 		}

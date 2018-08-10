@@ -32,7 +32,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for deleted documents data retrieval
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
 public class DeletedDocsDataServlet extends HttpServlet {

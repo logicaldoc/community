@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.calendar.events.EventClickHandler;
 /**
  * Represents a calendar containing events related to documents.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.3
  */
 public class DocumentCalendar extends Calendar {

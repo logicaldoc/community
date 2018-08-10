@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIInfo;
 /**
  * Stores the enabled features
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Feature {
@@ -40,8 +40,6 @@ public class Feature {
 	public static final int MESSAGES = 13;
 
 	public static final int INCREMENTAL_ARCHIVES = 14;
-
-	public static final int AOS = 15;
 
 	public static final int SCAN = 16;
 
@@ -100,8 +98,10 @@ public class Feature {
 	public static final int SMB_STORAGE = 44;
 
 	public static final int FORMAT_CONVERSION = 45;
-	
+
 	public static final int CLOUD_STORAGE = 46;
+
+	public static final int VIA = 47;
 
 	public static final int SHOW_DISABLED = 50;
 
@@ -124,7 +124,7 @@ public class Feature {
 	public static final int WEBDAV = 59;
 
 	public static final int EXPORT = 60;
-	
+
 	public static final int IMPORT_LOCAL_FOLDERS = 61;
 
 	public static final int PARAMETRIC_SEARCHES = 62;
@@ -153,7 +153,7 @@ public class Feature {
 
 	public static final int CALENDAR = 74;
 
-	public static final int CONNECTOR = 75;
+	public static final int FTP = 75;
 
 	public static final int BACKUP = 76;
 
@@ -188,7 +188,7 @@ public class Feature {
 	public static final int ZOHO = 92;
 
 	public static final int WEBDAV_BASIC = 93;
-	
+
 	public static final int TWO_FACTORS_AUTHENTICATION = 94;
 
 	private static Set<String> features = new HashSet<String>();

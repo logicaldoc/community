@@ -40,7 +40,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Shows document's standard properties and read-only data
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TenantBrandingPanel extends HLayout {

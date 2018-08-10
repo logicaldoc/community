@@ -29,7 +29,7 @@ import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
  * This is the form used to change the password of the current user, for example
  * when the password expired.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ChangePassword extends Window {

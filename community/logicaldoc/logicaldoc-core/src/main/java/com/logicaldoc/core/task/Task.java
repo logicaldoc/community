@@ -36,7 +36,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * A task is a long running sequence of operations
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
 public abstract class Task implements Runnable {

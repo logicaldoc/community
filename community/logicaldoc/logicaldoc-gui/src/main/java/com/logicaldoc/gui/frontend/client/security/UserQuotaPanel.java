@@ -16,7 +16,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 /**
  * Shows user's quota settings and values.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class UserQuotaPanel extends HLayout {

@@ -9,7 +9,7 @@ import com.logicaldoc.core.document.Document;
  * Implementations of this interface are specialized classes that produce
  * thumbnails for a specific type of document.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public interface ThumbnailBuilder {

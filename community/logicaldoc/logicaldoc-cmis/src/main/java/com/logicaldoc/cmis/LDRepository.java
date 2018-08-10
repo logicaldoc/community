@@ -144,7 +144,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * LogicalDOC implementation of a CMIS Repository
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5.1
  */
 public class LDRepository {
@@ -1384,12 +1384,11 @@ public class LDRepository {
 					filter = new HashSet<String>();
 					StringTokenizer st = new StringTokenizer(query, ",", false);
 					while (st.hasMoreTokens())
-						filter.add(st.nextToken());
+						filter.add(st.nextToken().trim());
 				}
 			}
-		} catch (Exception e1) {
+		} catch (Throwable e1) {
 			log.error("CMIS Exception creating filter", e1);
-			System.err.println(e1);
 		}
 
 		// Performs Full-text search
@@ -1416,7 +1415,7 @@ public class LDRepository {
 
 			opt.setExpression(expr);
 
-			// Not detect if the search must be applied to specific fields
+			// Now detect if the search must be applied to specific fields
 			if (where.contains("cmis:") || where.contains("ldoc:")) {
 				List<String> fields = new ArrayList<String>();
 				Pattern p = Pattern.compile("[(cmis),(ldoc)]+:\\w+");
@@ -1443,9 +1442,8 @@ public class LDRepository {
 					ObjectData result = compileObjectType(null, hit, filter, false, false, null);
 					list.add(result);
 				}
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				log.error("CMIS Exception populating data structure", e);
-				System.err.println(e);
 			}
 			// hasMoreItems = search.getEstimatedHitsNumber() > list.size();
 			hasMoreItems = search.getEstimatedHitsNumber() > max; // THIS Seems
@@ -1792,6 +1790,7 @@ public class LDRepository {
 						doc.getRating() != null ? doc.getRating() : 0);
 				addPropertyString(result, typeId, filter, TypeManager.PROP_FILEVERSION, doc.getFileVersion());
 				addPropertyString(result, typeId, filter, TypeManager.PROP_VERSION, doc.getVersion());
+				addPropertyString(result, typeId, filter, TypeManager.PROP_CUSTOMID, doc.getCustomId());
 
 				try {
 					addPropertyString(result, typeId, filter, TypeManager.PROP_TAGS, doc.getTgs());
@@ -1799,6 +1798,7 @@ public class LDRepository {
 					log.error(e.getMessage(), e);
 				}
 
+				
 				Template template = doc.getTemplate();
 				if (doc instanceof Version && ((Version) doc).getTemplateName() != null)
 					template = templateDao.findByName(((Version) doc).getTemplateName(), doc.getTenantId());

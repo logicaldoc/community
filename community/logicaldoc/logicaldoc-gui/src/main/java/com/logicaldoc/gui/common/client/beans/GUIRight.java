@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Bean for rights assignments
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIRight implements Serializable {
@@ -47,6 +47,10 @@ public class GUIRight implements Serializable {
 	private boolean subscription = false;
 
 	private boolean password = false;
+
+	private boolean move = false;
+
+	private boolean email = false;
 
 	private String name;
 
@@ -210,5 +214,21 @@ public class GUIRight implements Serializable {
 
 	public void setPassword(boolean password) {
 		this.password = password;
+	}
+
+	public boolean isMove() {
+		return move;
+	}
+
+	public void setMove(boolean move) {
+		this.move = move;
+	}
+
+	public boolean isEmail() {
+		return email;
+	}
+
+	public void setEmail(boolean email) {
+		this.email = email;
 	}
 }

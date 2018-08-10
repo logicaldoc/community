@@ -29,7 +29,7 @@ import com.logicaldoc.web.util.ServletUtil;
  * attribute docId in any scope and extracts the proper document's content. You
  * may specify the suffix to download the thumbnail or the tile.
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 4.5
  */
 public class ThumbnailServlet extends HttpServlet {

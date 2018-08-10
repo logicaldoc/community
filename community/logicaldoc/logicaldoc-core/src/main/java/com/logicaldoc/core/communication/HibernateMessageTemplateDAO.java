@@ -11,7 +11,7 @@ import com.logicaldoc.util.sql.SqlUtil;
 /**
  * Hibernate implementation of <code>MessageTemplateDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 @SuppressWarnings("unchecked")

@@ -13,7 +13,7 @@ import com.logicaldoc.core.document.DocumentNote;
 /**
  * Test case for document note DAO
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
 public class HibernateDocumentNoteDAOTest extends AbstractCoreTCase {

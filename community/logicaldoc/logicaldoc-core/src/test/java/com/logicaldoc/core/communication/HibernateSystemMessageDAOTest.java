@@ -18,7 +18,7 @@ import com.logicaldoc.core.communication.SystemMessageDAO;
 /**
  * Test case for <code>HibernateSystemMessageDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {

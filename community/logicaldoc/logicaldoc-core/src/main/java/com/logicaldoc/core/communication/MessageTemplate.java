@@ -9,7 +9,7 @@ import com.logicaldoc.util.LocaleUtil;
 /**
  * A template for messaging purposes.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class MessageTemplate extends PersistentObject {

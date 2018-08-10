@@ -10,6 +10,8 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.events.GroupStateChangedEvent;
+import com.smartgwt.client.widgets.grid.events.GroupStateChangedHandler;
 import com.smartgwt.client.widgets.grid.events.ViewStateChangedEvent;
 import com.smartgwt.client.widgets.grid.events.ViewStateChangedHandler;
 
@@ -21,8 +23,10 @@ import com.smartgwt.client.widgets.grid.events.ViewStateChangedHandler;
  */
 public class SearchHitsGrid extends DocumentsListGrid {
 
-	public SearchHitsGrid(int totalRecords) {
-		super(null, totalRecords);
+	private List<ListGridField> fields = new ArrayList<ListGridField>();
+
+	public SearchHitsGrid() {
+		super(null);
 		setShowRecordComponents(true);
 		setShowRecordComponentsByCell(true);
 		setSelectionType(SelectionStyle.SINGLE);
@@ -31,7 +35,6 @@ public class SearchHitsGrid extends DocumentsListGrid {
 		fieldsMap.get("type").setHidden(true);
 		fieldsMap.get("customId").setHidden(true);
 
-		final List<ListGridField> fields = new ArrayList<ListGridField>();
 		fields.add(fieldsMap.get("id"));
 		fields.add(fieldsMap.get("thumbnail"));
 		fields.add(fieldsMap.get("statusIcons"));
@@ -80,6 +83,8 @@ public class SearchHitsGrid extends DocumentsListGrid {
 			fields.add(fieldsMap.get("comment"));
 		if (!fields.contains(fieldsMap.get("workflowStatus")))
 			fields.add(fieldsMap.get("workflowStatus"));
+		if (!fields.contains(fieldsMap.get("workflowStatusDisp")))
+			fields.add(fieldsMap.get("workflowStatusDisp"));
 		if (!fields.contains(fieldsMap.get("startPublishing")))
 			fields.add(fieldsMap.get("startPublishing"));
 		if (!fields.contains(fieldsMap.get("stopPublishing")))
@@ -95,7 +100,18 @@ public class SearchHitsGrid extends DocumentsListGrid {
 		addViewStateChangedHandler(new ViewStateChangedHandler() {
 			@Override
 			public void onViewStateChanged(ViewStateChangedEvent event) {
-				CookiesManager.save(CookiesManager.COOKIE_HITSLIST, getViewState());
+				saveGridState();
+			}
+		});
+
+		/*
+		 * Save the grouping of the grid at every change
+		 */
+		addGroupStateChangedHandler(new GroupStateChangedHandler() {
+
+			@Override
+			public void onGroupStateChanged(GroupStateChangedEvent event) {
+				saveGridState();
 			}
 		});
 
@@ -105,10 +121,24 @@ public class SearchHitsGrid extends DocumentsListGrid {
 		addDrawHandler(new DrawHandler() {
 			@Override
 			public void onDraw(DrawEvent event) {
-				String previouslySavedState = CookiesManager.get(CookiesManager.COOKIE_HITSLIST);
-				if (previouslySavedState != null)
-					setViewState(previouslySavedState);
+				saveGridState();
 			}
 		});
+
+		loadGridState();
+	}
+
+	private void saveGridState() {
+		CookiesManager.save(CookiesManager.COOKIE_HITSLIST, getViewState());
+		CookiesManager.save(CookiesManager.COOKIE_HITSLIST_GROUPING, getGroupState());
+	}
+
+	private void loadGridState() {
+		String previouslySavedState = CookiesManager.get(CookiesManager.COOKIE_HITSLIST);
+		if (previouslySavedState != null)
+			setViewState(previouslySavedState);
+		String previouslySavedGroupState = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_GROUPING);
+		if (previouslySavedGroupState != null)
+			setGroupState(previouslySavedGroupState);
 	}
 }

@@ -8,7 +8,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Data source to retrieve calendar events.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public class CalendarEventsDS extends DataSource {

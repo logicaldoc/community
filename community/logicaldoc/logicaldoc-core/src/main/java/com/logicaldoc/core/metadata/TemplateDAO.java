@@ -7,7 +7,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
 /**
  * This class is a DAO-service for document templates.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
 public interface TemplateDAO extends PersistentObjectDAO<Template> {

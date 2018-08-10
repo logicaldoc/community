@@ -7,7 +7,7 @@ import com.logicaldoc.core.PersistentObject;
 /**
  * Represents one RSS message
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.1
  */
 public class FeedMessage extends PersistentObject {

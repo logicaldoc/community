@@ -14,7 +14,7 @@ import javax.mail.internet.InternetAddress;
 
 /**
  * @author Michael Scholz
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  */
 public class EMail extends Message {
 

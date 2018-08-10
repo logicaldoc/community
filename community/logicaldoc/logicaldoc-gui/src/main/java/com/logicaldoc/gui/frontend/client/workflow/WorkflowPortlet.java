@@ -7,8 +7,9 @@ import com.logicaldoc.gui.common.client.data.WorkflowTasksDS;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -17,11 +18,8 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.widgets.HeaderControl;
-import com.smartgwt.client.widgets.HeaderControl.HeaderIcon;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -40,14 +38,12 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * Portlet specialized in listing user workflow task records.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class WorkflowPortlet extends Portlet {
 
-	private WorkflowTasksDS dataSource;
-
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private int type = WorkflowDashboard.TASKS_ASSIGNED;
 
@@ -66,26 +62,22 @@ public class WorkflowPortlet extends Portlet {
 		setDragOpacity(30);
 
 		if (type == WorkflowDashboard.TASKS_ASSIGNED) {
-			setTitle(I18N.message("workflowtasksassigned"));
+			setTitle(AwesomeFactory.getIconHtml("tasks", I18N.message("workflowtasksassigned")));
 		} else if (type == WorkflowDashboard.TASKS_I_CAN_OWN) {
-			setTitle(I18N.message("workflowtaskspooled"));
+			setTitle(AwesomeFactory.getIconHtml("tasks", I18N.message("workflowtaskspooled")));
 		} else if (type == WorkflowDashboard.TASKS_SUSPENDED) {
-			setTitle(I18N.message("workflowtaskssuspended"));
+			setTitle(AwesomeFactory.getIconHtml("cogs", I18N.message("workflowtaskssuspended")));
 		} else if (type == WorkflowDashboard.TASKS_ADMIN) {
-			setTitle(I18N.message("workflowtasksadmin"));
+			setTitle(AwesomeFactory.getIconHtml("cogs", I18N.message("workflowtasksadmin")));
 		} else if (type == WorkflowDashboard.TASKS_SUPERVISOR) {
-			setTitle(I18N.message("workflowtaskssupervisor"));
+			setTitle(AwesomeFactory.getIconHtml("cogs", I18N.message("workflowtaskssupervisor")));
 		}
 
-		HeaderIcon portletIcon = ItemFactory.newHeaderIcon("blank.gif");
-		HeaderControl hcicon = new HeaderControl(portletIcon);
-		hcicon.setSize(16);
-		setHeaderControls(hcicon, HeaderControls.HEADER_LABEL);
-
-		refresh();
+		setHeaderControls(HeaderControls.HEADER_LABEL);
 	}
 
-	public void refresh() {
+	@Override
+	public void onDraw() {
 		ListGridField workflow = new ListGridField("workflow", I18N.message("workflow"), 100);
 		ListGridField id = new ListGridField("id", I18N.message("id"), 70);
 		id.setHidden(true);
@@ -118,10 +110,7 @@ public class WorkflowPortlet extends Portlet {
 		enddate.setCanFilter(false);
 		enddate.setHidden(true);
 
-		if (list != null)
-			removeItem(list);
-
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
@@ -130,8 +119,7 @@ public class WorkflowPortlet extends Portlet {
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setHeight100();
 		list.setBorder("0px");
-		dataSource = new WorkflowTasksDS(type, null);
-		list.setDataSource(dataSource);
+		list.setDataSource(new WorkflowTasksDS(type, null));
 		if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ADMIN
 				|| type == WorkflowDashboard.TASKS_SUPERVISOR)
 			list.setFields(workflow, tag, startdate, duedate, enddate, name, id, processId, documents, lastnote,
@@ -204,6 +192,10 @@ public class WorkflowPortlet extends Portlet {
 		});
 
 		addItem(list);
+	}
+
+	public void refresh() {
+		list.refresh(new WorkflowTasksDS(type, null));
 	}
 
 	private void showContextMenu() {

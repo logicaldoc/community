@@ -35,7 +35,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
  * A Document is written in a single language, this language defines the
  * full-text index in which the document's content will be stored.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public abstract class AbstractDocument extends ExtensibleObject implements TransactionalObject {
@@ -146,6 +146,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private Integer rating;
 
 	private String workflowStatus;
+	
+	private String workflowStatusDisplay;
 
 	private int published = 1;
 
@@ -354,6 +356,16 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	/**
+	 * Computes the title that is the filenamem without the extension
+	 */
+	public String getTitle() {
+		if (fileName != null && fileName.lastIndexOf('.') >= 0)
+			return fileName.substring(0, fileName.lastIndexOf('.'));
+		else
+			return fileName;
+	}
+
+	/**
 	 * The original file name
 	 */
 	public String getFileName() {
@@ -378,8 +390,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 					icon = "email_attach-sc.png";
 				else
 					icon = "email_attach.png";
-			if(docRef != null && docRef.longValue() != 0L && "pdf".equals(getDocRefType()))
-				icon = IconSelector.selectIcon("pdf", true);	
+			if (docRef != null && docRef.longValue() != 0L && "pdf".equals(getDocRefType()))
+				icon = IconSelector.selectIcon("pdf", true);
 		} catch (Exception e) {
 		}
 		return icon;
@@ -619,6 +631,14 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		this.workflowStatus = workflowStatus;
 	}
 
+	public String getWorkflowStatusDisplay() {
+		return workflowStatusDisplay;
+	}
+
+	public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
+		this.workflowStatusDisplay = workflowStatusDisplay;
+	}
+	
 	public int getPublished() {
 		return published;
 	}

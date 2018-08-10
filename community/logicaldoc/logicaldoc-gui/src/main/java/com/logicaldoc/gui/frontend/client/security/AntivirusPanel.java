@@ -22,7 +22,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel shows the Antivirus settings
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class AntivirusPanel extends VLayout {

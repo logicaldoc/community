@@ -13,6 +13,8 @@ import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.services.SearchEngineService;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.gui.frontend.client.settings.converters.FormatConvertersPanel;
+import com.logicaldoc.gui.frontend.client.settings.gui.GUISettingsPanel;
+import com.logicaldoc.gui.frontend.client.settings.messages.OutgoingEmailPanel;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -21,7 +23,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the administration system configurations menu
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class SettingsMenu extends VLayout {
@@ -81,6 +83,10 @@ public class SettingsMenu extends VLayout {
 		clientTools.setWidth100();
 		clientTools.setHeight(25);
 
+		Button via = new Button(I18N.message("via"));
+		via.setWidth100();
+		via.setHeight(25);
+		
 		Button parameters = new Button(I18N.message("parameters"));
 		parameters.setWidth100();
 		parameters.setHeight(25);
@@ -126,6 +132,13 @@ public class SettingsMenu extends VLayout {
 			}
 		});
 
+		via.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new VIASettingsPanel());
+			}
+		});
+		
 		if (Session.get().isDefaultTenant() && Feature.visible(Feature.FORMAT_CONVERSION)
 				&& Menu.enabled(Menu.FORMAT_CONVERTERS)) {
 			addMember(converters);
@@ -143,6 +156,14 @@ public class SettingsMenu extends VLayout {
 		if (Feature.enabled(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.KEYSTORE))
 			addMember(keystore);
 
+		if (Feature.visible(Feature.VIA) && Menu.enabled(Menu.VIA)) {
+			addMember(via);
+			if (!Feature.enabled(Feature.VIA)) {
+				via.setDisabled(true);
+				via.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+		
 		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PARAMETERS))
 			addMember(parameters);
 
@@ -185,18 +206,7 @@ public class SettingsMenu extends VLayout {
 		ocr.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				SettingService.Instance.get().loadOcrSettings(new AsyncCallback<GUIParameter[]>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIParameter[] settings) {
-						AdminScreen.get().setContent(new OCRSettingsPanel(settings));
-					}
-				});
+				AdminScreen.get().setContent(new OCRSettingsPanel());
 			}
 		});
 

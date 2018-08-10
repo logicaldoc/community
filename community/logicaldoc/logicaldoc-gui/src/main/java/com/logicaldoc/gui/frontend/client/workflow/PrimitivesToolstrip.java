@@ -11,7 +11,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Toolbar with the primitives of the Workflow.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class PrimitivesToolstrip extends ToolStrip {

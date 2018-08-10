@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.ServerException;
  * The client side stub for the Audit Service. This service allows folders and
  * documents subscription.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("audit")

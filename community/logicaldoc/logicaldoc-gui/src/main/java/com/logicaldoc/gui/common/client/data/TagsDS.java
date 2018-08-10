@@ -6,7 +6,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to retrieve all documents tags. It is based on Xml parsing.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TagsDS extends DataSource {

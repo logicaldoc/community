@@ -46,7 +46,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the FolderService
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class FolderServiceImpl extends RemoteServiceServlet implements FolderService {
@@ -141,9 +141,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		dao.deleteTree(folderId, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 	}
 
-	public static GUIFolder fromFolder(Folder folder){
+	public static GUIFolder fromFolder(Folder folder, boolean computePath) {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		
+
 		GUIFolder f = new GUIFolder();
 		f.setId(folder.getId());
 		f.setName(folder.getId() != Constants.DOCUMENTS_FOLDERID ? folder.getName() : "/");
@@ -162,8 +162,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		f.setColor(folder.getColor());
 		f.setQuotaThreshold(folder.getQuotaThreshold());
 		f.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList().toArray(new String[0]));
-		f.setPathExtended(dao.computePathExtended(folder.getId()));
-		
+		if (computePath)
+			f.setPathExtended(dao.computePathExtended(folder.getId()));
+
 		if (f.isWorkspace()) {
 			SequenceDAO seqDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
 			f.setDocumentsTotal(seqDao.getCurrentValue("wsdocs", folder.getId(), folder.getTenantId()));
@@ -173,14 +174,14 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		if (folder.getSecurityRef() != null) {
 			GUIFolder secRef = new GUIFolder();
 			secRef.setId(folder.getSecurityRef());
-			secRef.setPathExtended(dao.computePathExtended(folder.getSecurityRef()));
+			if (computePath)
+				secRef.setPathExtended(dao.computePathExtended(folder.getSecurityRef()));
 			f.setSecurityRef(secRef);
 		}
 
-
 		dao.initialize(folder);
-			
-	    if (folder.getTemplate() != null) {			
+
+		if (folder.getTemplate() != null) {
 			f.setTemplateId(folder.getTemplate().getId());
 			f.setTemplate(folder.getTemplate().getName());
 			f.setTemplateLocked(folder.getTemplateLocked());
@@ -192,21 +193,19 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			f.setTags(folder.getTagsAsWords().toArray(new String[folder.getTags().size()]));
 		else
 			f.setTags(new String[0]);
-		
+
 		/*
 		 * Count the children
 		 */
-		f.setDocumentCount(dao
-				.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid="
-						+ folder.getId() + " and not ld_status=" + AbstractDocument.DOC_ARCHIVED));
+		f.setDocumentCount(dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid="
+				+ folder.getId() + " and not ld_status=" + AbstractDocument.DOC_ARCHIVED));
 		f.setSubfolderCount(dao
 				.queryForInt("select count(ld_id) from ld_folder where not ld_id=ld_parentid and ld_deleted=0 and ld_parentid="
 						+ folder.getId()));
-		
+
 		return f;
 	}
-	
-	
+
 	public static GUIFolder getFolder(Session session, long folderId) throws ServerException {
 		if (session != null)
 			ServiceUtil.validateSession(session.getSid());
@@ -237,7 +236,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				folder = test;
 			}
 
-			GUIFolder f = fromFolder(folder);
+			GUIFolder f = fromFolder(folder, false);
 
 			if (session != null) {
 				Set<Permission> permissions = dao.getEnabledPermissions(folder.getId(), session.getUserId());
@@ -246,6 +245,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					permissionsList.add(permission.toString());
 				f.setPermissions(permissionsList.toArray(new String[permissionsList.size()]));
 			}
+		
+			
+			
 
 			Folder ref = folder;
 			if (folder.getSecurityRef() != null)
@@ -273,12 +275,13 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					right.setCalendar(fg.getCalendar() == 1 ? true : false);
 					right.setSubscription(fg.getSubscription() == 1 ? true : false);
 					right.setPassword(fg.getPassword() == 1 ? true : false);
+					right.setMove(fg.getMove() == 1 ? true : false);
+					right.setEmail(fg.getEmail() == 1 ? true : false);
 
 					rights[i] = right;
 					i++;
 				}
-			f.setRights(rights);
-
+			f.setRights(rights);	
 			return f;
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
@@ -419,18 +422,19 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		if (targetId == folderToMove.getId())
 			throw new SecurityException("Not Allowed");
 
-		// Check delete permission on the folder parent of folderToMove
+		// Check move permission on the folder parent of folderToMove
 		Folder sourceParent = folderDao.findById(folderToMove.getParentId());
-		boolean sourceParentDeleteEnabled = folderDao.isPermissionEnabled(Permission.DELETE, sourceParent.getId(),
+		boolean sourceParentDeleteEnabled = folderDao.isPermissionEnabled(Permission.MOVE, sourceParent.getId(),
 				session.getUserId());
 		if (!sourceParentDeleteEnabled)
-			throw new SecurityException("No rights to delete folder");
+			throw new SecurityException(String.format("User %s has not the MOVE permission on folder %s",session.getUsername(), sourceParent.getName()));
 
 		// Check addChild permission on destParentFolder
 		boolean addchildEnabled = folderDao.isPermissionEnabled(Permission.ADD, destParentFolder.getId(),
 				session.getUserId());
 		if (!addchildEnabled)
-			throw new SecurityException("AddChild Rights not granted to this user");
+			throw new SecurityException(String.format("User %s has not the ADD CHILD permission on folder %s",session.getUsername(), sourceParent.getName()));
+
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -468,7 +472,6 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		}
 	}
 
-	
 	@Override
 	public GUIFolder save(GUIFolder folder) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
@@ -598,7 +601,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 		boolean sqlerrors = false;
 		try {
-			log.info("Applying " + (rights != null ? rights.length : 0) + " rights to folder " + folder.getId());
+			log.info("Applying {} rights to folder {}", (rights != null ? rights.length : 0), folder.getId());
 
 			folder.setSecurityRef(null);
 			sqlerrors = false;
@@ -691,6 +694,16 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					fg.setPassword(1);
 				else
 					fg.setPassword(0);
+
+				if (isAdmin || right.isMove())
+					fg.setMove(1);
+				else
+					fg.setMove(0);
+
+				if (isAdmin || right.isEmail())
+					fg.setEmail(1);
+				else
+					fg.setEmail(0);
 			}
 
 			folder.getFolderGroups().clear();
@@ -734,11 +747,10 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			for (long id : docIds) {
 				Document doc = docDao.findById(id);
 
-				// The delete permission must be granted in the source folder
-				if (!folderDao.isPermissionEnabled(Permission.DELETE, doc.getFolder().getId(), session.getUserId()))
-					throw new AccessControlException(String.format(
-							"User %s has not the DELETE permission on folder %s", session.getUsername(), doc
-									.getFolder().getName()));
+				// The MOVE permission must be granted in the source folder
+				if (!folderDao.isPermissionEnabled(Permission.MOVE, doc.getFolder().getId(), session.getUserId()))
+					throw new AccessControlException(String.format("User %s has not the MOVE permission on folder %s",
+							session.getUsername(), doc.getFolder().getName()));
 
 				// Create the document history event
 				History transaction = new History();

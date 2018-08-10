@@ -25,7 +25,10 @@ public class AliasesPanel extends FolderDetailTab {
 
 	public AliasesPanel(final GUIFolder folder) {
 		super(folder, null);
+	}
 
+	@Override
+	protected void onDraw() {
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
 		ListGridField name = new ListGridField("name", I18N.message("name"), 200);

@@ -14,7 +14,7 @@ import com.logicaldoc.util.sql.SqlUtil;
 /**
  * Hibernate implementation of <code>FeedMessageDAO</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 @SuppressWarnings("unchecked")

@@ -9,7 +9,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 /**
  * Web Service Document Link.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.1
  */
 @XmlType(name = "WSLink")

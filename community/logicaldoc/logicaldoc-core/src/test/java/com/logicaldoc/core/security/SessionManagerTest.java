@@ -11,7 +11,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Test case for the <code>SessionManager</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.6
  */
 public class SessionManagerTest extends AbstractCoreTCase {

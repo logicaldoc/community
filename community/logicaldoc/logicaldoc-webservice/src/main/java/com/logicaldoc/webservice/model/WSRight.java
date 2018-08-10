@@ -8,7 +8,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
  * Useful class to associate a user or a group to a permission integer
  * representation.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 @XmlType(name = "WSRight")

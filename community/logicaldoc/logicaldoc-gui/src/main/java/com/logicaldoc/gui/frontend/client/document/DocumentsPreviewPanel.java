@@ -30,19 +30,13 @@ public class DocumentsPreviewPanel extends VLayout {
 	protected String widthCookieName = CookiesManager.COOKIE_DOCSLIST_PREV_W;
 
 	public DocumentsPreviewPanel() {
-		initGUI();
-	}
-
-	protected void initGUI() {
 		setAlign(Alignment.CENTER);
-
 		selectLabel = new Label("&nbsp;" + selectLabelString);
 		selectLabel.setOverflow(Overflow.HIDDEN);
-
+		
 		setInitialSize();
-
 		reset();
-
+		
 		addResizedHandler(new ResizedHandler() {
 			@Override
 			public void onResized(ResizedEvent event) {

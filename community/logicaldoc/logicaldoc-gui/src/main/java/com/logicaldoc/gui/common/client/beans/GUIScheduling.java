@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Representation of a task scheduling
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class GUIScheduling implements Serializable {

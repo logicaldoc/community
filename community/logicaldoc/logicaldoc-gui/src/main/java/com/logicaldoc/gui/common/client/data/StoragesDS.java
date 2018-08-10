@@ -7,7 +7,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to retrieve all the storages. It is based on Xml parsing.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.5.3
  */
 public class StoragesDS extends DataSource {

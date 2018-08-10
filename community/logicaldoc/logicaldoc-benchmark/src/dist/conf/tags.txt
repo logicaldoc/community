@@ -3,7 +3,7 @@
 |logo = [[File:Ldoc logo.png|LogicalDOC Logo]]
 |screenshot =<!-- Deleted image removed:  [[Image:ldoc screenshot.gif|300px]] -->
 |caption = LogicalDOC Screenshot
-|developer = Logical Objects Srl
+|developer = LogicalDOC Srl
 |operating_system = [[Cross-platform]]
 |genre = [[Enterprise Content Management|ECM]], [[Document Management System]],  [[Groupware]], [[Content Management Systems]], [[Open Source]]
 |license = Commercial Edition - [[Proprietary software|Proprietary]]<br /> Community Edition - [[LGPL]]

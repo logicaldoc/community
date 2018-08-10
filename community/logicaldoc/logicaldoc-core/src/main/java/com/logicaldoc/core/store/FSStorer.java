@@ -24,7 +24,7 @@ import com.logicaldoc.util.io.FileUtil;
  * the doc/ dir is appended, so if the docId=12345, the document's path will
  * be:123/45/doc.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class FSStorer extends AbstractStorer {

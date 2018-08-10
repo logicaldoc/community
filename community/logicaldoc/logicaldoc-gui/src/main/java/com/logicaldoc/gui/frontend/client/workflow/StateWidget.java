@@ -19,7 +19,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * Base visual representation of a Workflow object (a state or a transition).
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.3
  */
 public class StateWidget extends Label {
@@ -37,7 +37,8 @@ public class StateWidget extends Label {
 	private boolean readonly = false;
 
 	public StateWidget(Connection connection, DiagramController diagramController, GUITransition trans) {
-		super(trans.getText());
+		super(trans.getColor() != null ? "<span style='color:" + trans.getColor() + "'>" + trans.getText() + "</span>"
+				: trans.getText());
 
 		String name = trans.getText();
 		if (name != null) {
@@ -114,12 +115,12 @@ public class StateWidget extends Label {
 	/**
 	 * Constructor used by new transitions.
 	 */
-	public StateWidget(Connection connection, DiagramController diagramController, String name) {
-		this(connection, diagramController, new GUITransition(name));
+	public StateWidget(Connection connection, DiagramController diagramController, String name, String color) {
+		this(connection, diagramController, new GUITransition(name, color));
 	}
 
 	public StateWidget(DrawingPanel dp, GUIWFState state) {
-		this(null, dp.getDiagramController(), "<b>" + state.getName() + "</b>&nbsp;");
+		this(null, dp.getDiagramController(), "<b>" + state.getName() + "</b>&nbsp;", null);
 		this.wfState = state;
 		this.drawingPanel = dp;
 		this.diagramController = dp.getDiagramController();
@@ -141,6 +142,7 @@ public class StateWidget extends Label {
 		setOpacity(100);
 		setBackgroundColor("#FFFFFF");
 		setContents("<b>" + wfState.getName() + "</b>&nbsp;");
+
 		int type = wfState.getType();
 		if (type == GUIWFState.TYPE_END) {
 			setIcon("[SKIN]/endState.png");
@@ -161,6 +163,9 @@ public class StateWidget extends Label {
 			setAutoFit(true);
 			setAutoHeight();
 		}
+
+		if (wfState.getColor() != null)
+			setBorder("3px solid " + wfState.getColor());
 	}
 
 	public void edit() {

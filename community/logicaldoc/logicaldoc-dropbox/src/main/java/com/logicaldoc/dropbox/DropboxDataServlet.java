@@ -23,7 +23,7 @@ import com.logicaldoc.core.util.IconSelector;
 /**
  * This servlet is responsible for retrieving Dropbox entries.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class DropboxDataServlet extends HttpServlet {

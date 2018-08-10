@@ -7,7 +7,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Data source to retrieve all retention policies. It is based on Xml parsing.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2
  */
 public class RetentionPoliciesDS extends DataSource {

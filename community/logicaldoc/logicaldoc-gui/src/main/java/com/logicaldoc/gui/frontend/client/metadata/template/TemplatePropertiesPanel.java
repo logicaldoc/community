@@ -45,7 +45,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows all template properties.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class TemplatePropertiesPanel extends HLayout {
@@ -349,7 +349,8 @@ public class TemplatePropertiesPanel extends HLayout {
 
 		prepareTemplateForm();
 
-		prepareTemplateAttributes();
+		if (template.getId() != 0L)
+			prepareTemplateAttributes();
 
 		addMember(container);
 	}
@@ -372,7 +373,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", template.getDescription());
 		description.setDisabled(template.isReadonly());
 		description.setWidth(name.getWidth());
-		
+
 		PickerIcon computeStat = new PickerIcon(new Picker("[SKIN]/picker_refresh.png"), new FormItemClickHandler() {
 			public void onFormItemClick(final FormItemIconClickEvent event) {
 				event.getItem().setValue(I18N.message("computing") + "...");
@@ -416,21 +417,23 @@ public class TemplatePropertiesPanel extends HLayout {
 			template.setDescription((String) values.get("description"));
 		}
 
-		template.setAttributes(null);
-		ListGridRecord[] records = attributesList.getRecords();
-		int position = 0;
-		if (records != null) {
-			for (ListGridRecord rec : records) {
-				GUIAttribute att = new GUIAttribute();
-				att.setPosition(position++);
-				att.setName(rec.getAttributeAsString("name"));
-				att.setLabel(rec.getAttributeAsString("label"));
-				att.setType(Integer.parseInt(rec.getAttributeAsString("type")));
-				att.setSet(rec.getAttributeAsString("set"));
-				att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
-				att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
-				att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
-				template.appendAttribute(att);
+		if (template.getId() != 0L) {
+			template.setAttributes(null);
+			ListGridRecord[] records = attributesList.getRecords();
+			int position = 0;
+			if (records != null) {
+				for (ListGridRecord rec : records) {
+					GUIAttribute att = new GUIAttribute();
+					att.setPosition(position++);
+					att.setName(rec.getAttributeAsString("name"));
+					att.setLabel(rec.getAttributeAsString("label"));
+					att.setType(Integer.parseInt(rec.getAttributeAsString("type")));
+					att.setSet(rec.getAttributeAsString("set"));
+					att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
+					att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
+					att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
+					template.appendAttribute(att);
+				}
 			}
 		}
 

@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -17,7 +18,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -38,9 +38,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class StampUsersPanel extends VLayout {
 
-	private ListGrid list;
-
-	private InfoPanel infoPanel;
+	private RefreshableListGrid list;
 
 	private long stampId;
 
@@ -48,8 +46,11 @@ public class StampUsersPanel extends VLayout {
 		this.stampId = stampId;
 		setWidth100();
 		setHeight100();
+	}
 
-		infoPanel = new InfoPanel("");
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
 
 		HLayout buttons = new HLayout();
 		buttons.setHeight(25);
@@ -81,7 +82,7 @@ public class StampUsersPanel extends VLayout {
 
 					@Override
 					public void onSuccess(Void ret) {
-						initGrid();
+						list.refresh(new StampUsersDS(stampId));
 						user.clearValue();
 					}
 				});
@@ -90,15 +91,6 @@ public class StampUsersPanel extends VLayout {
 
 		userForm.setItems(user);
 		buttons.addMember(userForm);
-
-		setMembers(infoPanel, buttons);
-
-		initGrid();
-	}
-
-	private void initGrid() {
-		if (list != null && contains(list))
-			removeMember(list);
 
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
@@ -130,7 +122,7 @@ public class StampUsersPanel extends VLayout {
 		enabled.setImageURLSuffix(".gif");
 		enabled.setCanFilter(false);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -157,7 +149,7 @@ public class StampUsersPanel extends VLayout {
 			}
 		});
 
-		addMember(list, 1);
+		setMembers(infoPanel, list, buttons);
 	}
 
 	private void showContextMenu() {

@@ -25,7 +25,10 @@ public class AliasesPanel extends DocumentDetailTab {
 
 	public AliasesPanel(final GUIDocument document) {
 		super(document, null);
+	}
 
+	@Override
+	protected void onDraw() {
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
 

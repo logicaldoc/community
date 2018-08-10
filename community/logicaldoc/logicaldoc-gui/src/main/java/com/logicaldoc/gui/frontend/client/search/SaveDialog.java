@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This is the form used to save and update the current search
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SaveDialog extends Window {

@@ -31,7 +31,7 @@ import com.logicaldoc.webservice.model.WSUtil;
 /**
  * Basepoint for creating webservices implementations
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class AbstractService {
@@ -95,7 +95,7 @@ public class AbstractService {
 	protected void checkGroup(String sid, String group) throws Exception {
 		User user = validateSession(sid);
 		if (!user.isMemberOf(group)) {
-			String message = "User " + user.getUsername() + " doesn't belong to group " + group;
+			String message = String.format("User %s doesn't belong to group %s", user.getUsername(), group);
 			log.error(message);
 			throw new Exception(message);
 		}

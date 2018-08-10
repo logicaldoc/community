@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -29,7 +30,7 @@ import com.logicaldoc.util.StringUtil;
  * type.
  * 
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.5
  */
 public class XMLParser extends AbstractParser {
@@ -37,7 +38,8 @@ public class XMLParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(XMLParser.class);
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			StringBuffer content) {
 		try {
 			CharArrayWriter writer = new CharArrayWriter();
 			ExtractorHandler handler = new ExtractorHandler(writer);
@@ -47,10 +49,10 @@ public class XMLParser extends AbstractParser {
 			XMLReader reader = parser.getXMLReader();
 			reader.setContentHandler(handler);
 			reader.setErrorHandler(handler);
-			
+
 			// Exclude the entity resolver in order to fix the XXE vulnerability
 			reader.setEntityResolver(new EntityResolver() {
-				
+
 				@Override
 				public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 					return new InputSource(new StringReader(""));
@@ -65,13 +67,13 @@ public class XMLParser extends AbstractParser {
 				public void close() {
 				}
 			});
-			if (getEncoding() != null) {
+			if (encoding != null) {
 				try {
-					Charset.forName(getEncoding());
-					source.setEncoding(getEncoding());
+					Charset.forName(encoding);
+					source.setEncoding(encoding);
 				} catch (Exception e) {
-					log.warn("Unsupported encoding '" + getEncoding() + "', using default ("
-							+ System.getProperty("file.encoding") + ") instead.");
+					log.warn("Unsupported encoding '{}', using default ({}) instead.", encoding,
+							System.getProperty("file.encoding"));
 				}
 			}
 			reader.parse(source);

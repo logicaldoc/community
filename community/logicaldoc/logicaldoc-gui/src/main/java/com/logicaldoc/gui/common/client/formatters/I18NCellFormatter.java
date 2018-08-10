@@ -8,7 +8,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * Utility formatter for those cells that contains internationalized messages
  * (the content is an i18n message key).
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class I18NCellFormatter implements CellFormatter {

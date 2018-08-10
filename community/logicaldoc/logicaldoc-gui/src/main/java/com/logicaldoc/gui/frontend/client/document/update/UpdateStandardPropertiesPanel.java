@@ -28,7 +28,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Shows document's standard properties available for bulk update.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.3
  */
 public class UpdateStandardPropertiesPanel extends DocumentDetailTab {

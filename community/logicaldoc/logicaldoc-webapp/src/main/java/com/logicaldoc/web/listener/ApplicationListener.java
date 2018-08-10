@@ -34,7 +34,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * Listener that initializes relevant system stuffs during application startup
  * and session life cycle.
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
 public class ApplicationListener implements ServletContextListener, HttpSessionListener {

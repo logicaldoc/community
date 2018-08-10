@@ -19,7 +19,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This is the form used to edit note or annotation
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
 public class AnnotationEditor extends Window {

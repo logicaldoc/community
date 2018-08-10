@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Shows the charts pies.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class StatsPie extends HLayout {

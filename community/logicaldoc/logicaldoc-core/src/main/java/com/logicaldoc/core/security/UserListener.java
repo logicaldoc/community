@@ -9,7 +9,7 @@ import java.util.Map;
  * Each methods has access to a dictionary map that can be used through the
  * execution pipeline in order to carry needed informations among all listeners.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.1
  */
 public interface UserListener {

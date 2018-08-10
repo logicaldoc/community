@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * Test case for <code>WebConfigurator</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class LoggingConfiguratorTest {

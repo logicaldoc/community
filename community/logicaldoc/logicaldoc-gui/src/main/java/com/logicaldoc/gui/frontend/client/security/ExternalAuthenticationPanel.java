@@ -35,7 +35,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel shows the LDAP and Active Directory settings.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class ExternalAuthenticationPanel extends VLayout {

@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 /**
  * Definition of a generic observer on user's attributes.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public interface UserObserver {

@@ -10,7 +10,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 /**
  * Simple label showing a warning message.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MessageLabel extends Label {

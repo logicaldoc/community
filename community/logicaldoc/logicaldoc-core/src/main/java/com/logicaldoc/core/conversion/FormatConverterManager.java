@@ -144,14 +144,15 @@ public class FormatConverterManager {
 		try {
 			src = writeToFile(document, fileVersion);
 			if (src == null || src.length() == 0)
-				throw new IOException(String.format("Unexisting source file,  document: %s", document.getId() + " - "
-						+ fileName));
+				throw new IOException(String.format("Unexisting source file,  document: %s - %s", document.getId(),
+						fileName));
 
 			converter.convert(sid, document, src, dest);
 
 			if (dest == null || dest.length() == 0)
-				throw new IOException(String.format("The converter %s was unable to convert as pdf the document: %s",
-						converter.getClass().getSimpleName(), document.getId() + " - " + fileName));
+				throw new IOException(String.format(
+						"The converter %s was unable to convert as pdf the document: %s - %s", converter.getClass()
+								.getSimpleName(), document.getId(), fileName));
 
 			storer.store(dest, document.getId(), resource);
 		} finally {
@@ -230,8 +231,8 @@ public class FormatConverterManager {
 		try {
 			src = writeToFile(document, fileVersion);
 			if (src == null || src.length() == 0)
-				throw new IOException(String.format("Unexisting source file,  document: %s", document.getId() + " - "
-						+ fileName));
+				throw new IOException(String.format("Unexisting source file,  document: %s - %s", document.getId(),
+						fileName));
 
 			converter.convert(transaction != null ? transaction.getSessionId() : null, document, src, out);
 			if (out.length() <= 0)
@@ -377,6 +378,9 @@ public class FormatConverterManager {
 	 * used is defined in the configuration parameter converter.composeKey()
 	 */
 	public FormatConverter getConverter(String inFileName, String outFileName) {
+		if (getExtension(inFileName).equals(getExtension(outFileName)))
+			return new NoConversionConverter();
+
 		String inOutkey = composeKey(inFileName, outFileName);
 
 		List<FormatConverter> converters = getConverters().get(inOutkey);
@@ -403,18 +407,20 @@ public class FormatConverterManager {
 		return converter;
 	}
 
+	private String getExtension(String fileNameOrExtension) {
+		String ext = fileNameOrExtension;
+		if (fileNameOrExtension.contains("."))
+			ext = FilenameUtils.getExtension(fileNameOrExtension.toLowerCase());
+		return ext;
+	}
+
 	/**
 	 * Creates the key as <in_extension>-<out_extension>
 	 */
 	private String composeKey(String inFileName, String outFileName) {
-		String inExt = inFileName;
-		if (inFileName.contains("."))
-			inExt = FilenameUtils.getExtension(inFileName.toLowerCase());
-		String outExt = outFileName;
-		if (outExt.contains("."))
-			outExt = FilenameUtils.getExtension(outFileName.toLowerCase());
-		String inOutkey = inExt + "-" + outExt;
-		return inOutkey;
+		String inExt = getExtension(inFileName).toLowerCase();
+		String outExt = getExtension(outFileName).toLowerCase();
+		return inExt + "-" + outExt;
 	}
 
 	/**

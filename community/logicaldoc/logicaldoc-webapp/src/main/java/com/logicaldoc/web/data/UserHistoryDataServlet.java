@@ -26,7 +26,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for user history data.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class UserHistoryDataServlet extends HttpServlet {

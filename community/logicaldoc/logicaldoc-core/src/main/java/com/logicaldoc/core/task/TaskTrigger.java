@@ -15,7 +15,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * This trigger wraps both a SimpleTrigger and a CronTrigger
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, InitializingBean {

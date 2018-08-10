@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -38,36 +39,27 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Panel showing the list of export archives
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ImportArchivesList extends VLayout {
 
-	private Layout listing;
-
 	private Layout detailsContainer;
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private Canvas details = SELECT_ELEMENT;
-
-	private InfoPanel infoPanel;
 
 	final static Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectarchive"));
 
 	public ImportArchivesList() {
 		setWidth100();
-		infoPanel = new InfoPanel("");
-		refresh();
 	}
 
-	public void refresh() {
-		Canvas[] members = getMembers();
-		for (Canvas canvas : members) {
-			removeMember(canvas);
-		}
-
-		listing = new VLayout();
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
+		Layout listing = new VLayout();
 		detailsContainer = new VLayout();
 		details = SELECT_ELEMENT;
 
@@ -106,7 +98,7 @@ public class ImportArchivesList extends VLayout {
 		size.setType(ListGridFieldType.INTEGER);
 		size.setCanFilter(false);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -135,7 +127,10 @@ public class ImportArchivesList extends VLayout {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				refresh();
+				list.refresh(new ArchivesDS(GUIArchive.MODE_IMPORT, null, null, null));
+				detailsContainer.removeMembers(detailsContainer.getMembers());
+				details = SELECT_ELEMENT;
+				detailsContainer.setMembers(details);
 			}
 		});
 

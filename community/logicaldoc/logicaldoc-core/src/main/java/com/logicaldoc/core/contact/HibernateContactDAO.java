@@ -11,7 +11,7 @@ import com.logicaldoc.core.generic.HibernateGenericDAO;
 /**
  * Hibernate implementation of <code>ContactDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 @SuppressWarnings("unchecked")

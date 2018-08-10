@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This popup window is used to upload a checked-out document to the server.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentCheckin extends Window {

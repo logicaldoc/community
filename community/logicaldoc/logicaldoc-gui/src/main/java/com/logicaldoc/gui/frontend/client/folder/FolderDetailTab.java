@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 /**
  * Superclass for all tab panels in the folder details area
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public abstract class FolderDetailTab extends HLayout {

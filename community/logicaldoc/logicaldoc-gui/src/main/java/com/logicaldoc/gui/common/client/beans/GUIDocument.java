@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Representation of a single document handled by the GUI
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIDocument extends GUIExtensibleObject implements Serializable {
@@ -73,6 +73,8 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private String comment;
 
 	private String workflowStatus;
+	
+	private String workflowStatusDisplay;
 
 	private int published = 1;
 
@@ -344,6 +346,14 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.workflowStatus = workflowStatus;
 	}
 
+	public String getWorkflowStatusDisplay() {
+		return workflowStatusDisplay;
+	}
+
+	public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
+		this.workflowStatusDisplay = workflowStatusDisplay;
+	}
+	
 	public int getPublished() {
 		return published;
 	}

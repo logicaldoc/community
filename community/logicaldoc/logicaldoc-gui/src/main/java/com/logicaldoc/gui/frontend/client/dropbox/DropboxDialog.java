@@ -24,7 +24,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 /**
  * This is the form used to select an element in Dropbox
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class DropboxDialog extends Dialog {

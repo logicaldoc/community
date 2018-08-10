@@ -44,7 +44,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * The Setup entry point used for initial installation
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Setup implements EntryPoint {

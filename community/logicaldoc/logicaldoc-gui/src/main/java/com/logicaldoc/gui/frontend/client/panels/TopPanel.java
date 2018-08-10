@@ -9,7 +9,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 /**
  * The Login entry point
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TopPanel extends HLayout {

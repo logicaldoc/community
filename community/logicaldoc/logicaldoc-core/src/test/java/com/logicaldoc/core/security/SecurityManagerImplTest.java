@@ -15,7 +15,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 /**
  * Test case for the manager <code>SecurityManager<code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class SecurityManagerImplTest extends AbstractCoreTCase {

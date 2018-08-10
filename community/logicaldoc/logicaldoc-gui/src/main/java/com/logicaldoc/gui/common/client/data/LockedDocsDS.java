@@ -9,7 +9,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to handle locked documents grid lists.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.2
  */
 public class LockedDocsDS extends DataSource {

@@ -22,7 +22,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the settings of an incremental import configuration
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class IncrementalSettingsPanel extends VLayout {

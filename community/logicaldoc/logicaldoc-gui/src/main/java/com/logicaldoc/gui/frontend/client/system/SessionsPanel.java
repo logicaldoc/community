@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
@@ -17,7 +18,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -32,12 +32,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Displays a list list of user sessions, allowing the kill operation.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SessionsPanel extends VLayout {
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	public SessionsPanel() {
 		ToolStrip toolStrip = new ToolStrip();
@@ -49,17 +49,15 @@ public class SessionsPanel extends VLayout {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				removeMember(list);
-				refresh();
+				list.refresh(new SessionsDS());
 			}
 		});
 		toolStrip.addFill();
 		addMember(toolStrip);
-
-		refresh();
 	}
 
-	private void refresh() {
+	@Override
+	public void onDraw() {
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"), 250);
 
 		ListGridField node = new ListGridField("node", I18N.message("node"), 250);
@@ -89,7 +87,7 @@ public class SessionsPanel extends VLayout {
 		ListGridField statusLabel = new ListGridField("statusLabel", I18N.message("status"), 80);
 		statusLabel.setCanFilter(false);
 
-		list = new ListGrid() {
+		list = new RefreshableListGrid() {
 			@Override
 			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
 				if (getFieldName(colNum).equals("sid")) {
@@ -117,7 +115,6 @@ public class SessionsPanel extends VLayout {
 		list.setAutoFetchData(true);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setDataSource(new SessionsDS());
-		list.invalidateCache();
 		list.setFields(sid, statusLabel, username, tenant, created, renew, node, client);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {

@@ -10,7 +10,7 @@ import com.logicaldoc.core.security.Permission;
 /**
  * Instances of this class is a DAO-service for folder objects.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 6.0
  */
 public interface FolderDAO extends PersistentObjectDAO<Folder> {
@@ -165,6 +165,8 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	public boolean isPrintEnabled(long folderId, long userId);
 
 	public boolean isDownloadEnabled(long folderId, long userId);
+
+	public boolean isMoveEnabled(long folderId, long userId);
 
 	/**
 	 * This method checks if the given permission is enabled for a folder and an
@@ -424,7 +426,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param userId The user that performed the deletion
 	 * @param maxHits Optional defines the max number of returned hits
-	 * @return The folders list ordered by descending lastModified
+	 * @return The folders list
 	 */
 	public List<Folder> findDeleted(long userId, Integer maxHits);
 

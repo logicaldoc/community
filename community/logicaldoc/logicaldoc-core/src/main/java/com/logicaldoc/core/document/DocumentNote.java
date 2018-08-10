@@ -7,7 +7,7 @@ import com.logicaldoc.core.PersistentObject;
 /**
  * A note over a document
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
 public class DocumentNote extends PersistentObject {

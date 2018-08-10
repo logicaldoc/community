@@ -53,7 +53,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This is a mini-app to handle annotations
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2
  */
 public class AnnotationsWindow extends Window {

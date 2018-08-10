@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 /**
  * This window contains a form with the main settings of the workflow.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 7.0
  */
 public class WorkflowSettings extends Window {

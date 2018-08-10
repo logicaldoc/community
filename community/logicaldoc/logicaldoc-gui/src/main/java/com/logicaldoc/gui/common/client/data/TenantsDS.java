@@ -9,7 +9,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to retrieve all tenants. It is based on Xml parsing.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
 public class TenantsDS extends DataSource {

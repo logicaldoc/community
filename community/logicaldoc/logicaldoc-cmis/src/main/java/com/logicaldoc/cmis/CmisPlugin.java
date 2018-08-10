@@ -14,7 +14,7 @@ import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 /**
  * This class provides initializations needed by Cmis-Plugin
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5.1
  */
 public class CmisPlugin extends LogicalDOCPlugin {

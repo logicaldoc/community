@@ -8,7 +8,7 @@ import com.smartgwt.client.widgets.layout.PortalLayout;
 /**
  * User dashboard that displays several portlets like a portal page.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TagsDashboard extends PortalLayout {
@@ -27,8 +27,6 @@ public class TagsDashboard extends PortalLayout {
 		setCanDrop(false);
 		setColumnBorder("0px");
 
-		refresh();
-
 		addResizedHandler(new ResizedHandler() {
 
 			@Override
@@ -39,7 +37,8 @@ public class TagsDashboard extends PortalLayout {
 		});
 	}
 
-	public void refresh() {
+	@Override
+	public void onDraw() {
 		if (cloud != null)
 			removePortlet(cloud);
 
@@ -48,14 +47,14 @@ public class TagsDashboard extends PortalLayout {
 
 		if (tags != null)
 			removePortlet(tags);
-		
+
 		// Place the portlets
 		mostUsed = new MostUsedTagsPortlet();
 		addPortlet(mostUsed, 0, 0);
-		
+
 		tags = new TagsPortlet();
 		addPortlet(tags, 0, 1);
-		
+
 		cloud = new TagCloudDashlet(0);
 		addPortlet(cloud, 1, 0);
 

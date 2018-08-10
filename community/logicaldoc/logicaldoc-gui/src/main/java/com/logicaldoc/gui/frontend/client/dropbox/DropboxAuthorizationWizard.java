@@ -26,7 +26,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * This popup window is used to guide the user in authorize the LogicalDOC
  * application
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class DropboxAuthorizationWizard extends Window {

@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -48,34 +49,22 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 7.3
  */
 public class StampsPanel extends AdminPanel {
-
-	private Layout listing = new VLayout();
-
 	private Layout detailsContainer = new VLayout();
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private Canvas details = SELECT_STAMP;
-
-	private InfoPanel infoPanel;
 
 	final static Canvas SELECT_STAMP = new HTMLPanel("&nbsp;" + I18N.message("selectstamp"));
 
 	public StampsPanel() {
 		super("stamps");
-		infoPanel = new InfoPanel("");
-		init();
 	}
 
-	public void init() {
-		detailsContainer.clear();
-		listing.clear();
-		if (list != null)
-			listing.removeMember(list);
-		if (details != null && details instanceof StampDetailsPanel) {
-			detailsContainer.removeMember(details);
-			details = SELECT_STAMP;
-		}
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
+		Layout listing = new VLayout();
 
 		// Initialize the listing panel
 		listing.setAlign(Alignment.CENTER);
@@ -114,7 +103,7 @@ public class StampsPanel extends AdminPanel {
 		enabled.setImageURLSuffix(".gif");
 		enabled.setCanFilter(false);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -143,7 +132,7 @@ public class StampsPanel extends AdminPanel {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				init();
+				refresh();
 			}
 		});
 
@@ -199,6 +188,13 @@ public class StampsPanel extends AdminPanel {
 		detailsContainer.addMember(details);
 
 		body.setMembers(toolStrip, listing, detailsContainer);
+	}
+
+	public void refresh() {
+		list.refresh(new StampsDS(null, false));
+		detailsContainer.removeMembers(detailsContainer.getMembers());
+		details = SELECT_STAMP;
+		detailsContainer.setMembers(details);
 	}
 
 	private void showContextMenu() {

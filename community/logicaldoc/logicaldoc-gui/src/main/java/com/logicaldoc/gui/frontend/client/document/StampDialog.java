@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This popup window is used to apply a stamp
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 7.3
  */
 public class StampDialog extends Window {
@@ -84,7 +84,6 @@ public class StampDialog extends Window {
 					public void onSuccess(Void result) {
 						ContactingServer.get().hide();
 						Log.info(I18N.message("event.stamped"), null);
-						DocumentsPanel.get().refresh();
 						destroy();
 					}
 				});

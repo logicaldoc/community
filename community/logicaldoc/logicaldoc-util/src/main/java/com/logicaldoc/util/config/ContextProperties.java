@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A configuration utility used to retrieve and alter context properties
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class ContextProperties extends OrderedProperties {
@@ -205,6 +205,18 @@ public class ContextProperties extends OrderedProperties {
 			return defaultValue;
 		else
 			return Integer.parseInt(getProperty(property));
+	}
+
+	public long getLong(String property) {
+		return getLong(property, 0);
+	}
+
+	public long getLong(String property, long defaultValue) {
+		String v = getProperty(property);
+		if (v == null || v.isEmpty())
+			return defaultValue;
+		else
+			return Long.parseLong(getProperty(property));
 	}
 
 	public boolean getBoolean(String property) {

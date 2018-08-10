@@ -27,7 +27,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 /**
  * Test case for <code>HibernateFolderDAOTest</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class HibernateFolderDAOTest extends AbstractCoreTCase {
@@ -651,9 +651,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertTrue(permissions.contains(Permission.SECURITY));
 		Assert.assertTrue(permissions.contains(Permission.SIGN));
 		permissions = dao.getEnabledPermissions(6, 4);
-		Assert.assertEquals(7, permissions.size());
+		Assert.assertEquals(9, permissions.size());
 		Assert.assertTrue(permissions.contains(Permission.READ));
 		Assert.assertTrue(permissions.contains(Permission.WRITE));
+		Assert.assertTrue(permissions.contains(Permission.MOVE));
+		Assert.assertTrue(permissions.contains(Permission.EMAIL));
 		permissions = dao.getEnabledPermissions(999, 1);
 		Assert.assertEquals(Permission.all().size(), permissions.size());
 	}

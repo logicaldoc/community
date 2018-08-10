@@ -7,7 +7,7 @@ import com.logicaldoc.core.security.Tenant;
 /**
  * Represents a tag of a specific document
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
 public class Tag implements Comparable<Tag>, Serializable {

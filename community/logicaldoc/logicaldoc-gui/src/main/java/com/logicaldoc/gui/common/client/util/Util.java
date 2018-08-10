@@ -14,6 +14,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -98,7 +99,7 @@ public class Util {
 		return downloadURL(docId, null, false);
 	}
 
-	public static String displaydURL(Long docId, Long folderId) {
+	public static String displayURL(Long docId, Long folderId) {
 		String url = contextPath() + "display?";
 		if (docId != null)
 			url += Constants.DOC_ID + "=" + docId;
@@ -247,6 +248,10 @@ public class Util {
 		return imageHTML(imageName, "", null);
 	}
 
+	public static boolean isCommunity() {
+		return !Feature.enabled(Feature.ADDITIONAL_FORMATS);
+	}
+	
 	public static boolean isOfficeFile(String fileName) {
 		String tmp = fileName.toLowerCase();
 		for (String ext : OFFICE_EXTS) {
@@ -421,6 +426,8 @@ public class Util {
 	public static String formatSizeW7(Object value) {
 		if (value == null)
 			return null;
+		if (value instanceof Float)
+			return Util.formatSizeKB(((Float) value).doubleValue());
 		if (value instanceof Long)
 			return Util.formatSizeW7(((Long) value).doubleValue());
 		else if (value instanceof Integer)

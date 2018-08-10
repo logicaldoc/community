@@ -247,22 +247,16 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	// }
 
 	/**
-	 * LOGICALDOC
+	 * @LOGICALDOC
 	 * 
 	 * Decodes the header into a username and password.
 	 *
 	 * @throws BadCredentialsException if the Basic header is not present or is
 	 *         not valid Base64
 	 */
-	private String[] extractAndDecodeHeader(String header, HttpServletRequest request) throws IOException {				
-		/*
-		System.err.println("request: " +request);
-		String userAgent = request.getHeader("user-agent");		
-		System.err.println("userAgent: " +userAgent);
-		String userAgent2 = request.getHeader("User-Agent");
-		System.err.println("userAgent2: " +userAgent2); */
+	private String[] extractAndDecodeHeader(String header, HttpServletRequest request) throws IOException {
 		String userAgent = request.getHeader("user-agent");
-		if (userAgent != null && userAgent.contains("Chrome")) { // checking if Chrome
+		if (userAgent!=null && userAgent.contains("Chrome")) { // checking if Chrome
 			return extractAndDecodeHeaderChrome(header, request);
 		} else {
 			return extractAndDecodeHeaderAll(header, request);
@@ -270,7 +264,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	/**
-	 * LOGICALDOC
+	 * @LOGICALDOC
 	 * 
 	 * Decodes the header into a username and password. It assumes Chrome.
 	 *
@@ -297,7 +291,7 @@ public class BasicAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	/**
-	 * LOGICALDOC
+	 * @LOGICALDOC
 	 * 
 	 * Decodes the header into a username and password. All the browsers other
 	 * than Chrome

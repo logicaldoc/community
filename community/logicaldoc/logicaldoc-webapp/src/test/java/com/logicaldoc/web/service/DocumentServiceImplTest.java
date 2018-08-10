@@ -72,9 +72,16 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Assert.assertTrue(templateDao.store(template));
 
 		GUIAttribute[] extAttr = service.getAttributes(template.getId());
-		Assert.assertEquals("attr1", extAttr[0].getName());
-		Assert.assertEquals("v1", extAttr[0].getValue());
-		Assert.assertEquals(GUIAttribute.TYPE_STRING, extAttr[0].getType());
+		for (GUIAttribute at : extAttr) {
+			if ("attr1".equals(at.getName())) {
+				Assert.assertEquals(GUIAttribute.TYPE_STRING, at.getType());
+				Assert.assertEquals("v1", at.getValue());
+			}
+			if ("a2".equals(at.getName())) {
+				Assert.assertEquals(GUIAttribute.TYPE_INT, at.getType());
+				Assert.assertEquals((Long)23L, at.getIntValue());
+			}
+		}
 	}
 
 	@Test

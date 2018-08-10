@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -173,7 +174,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		List<Document> docs = new ArrayList<Document>();
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
-		log.debug("Uploading " + uploadedFilesMap.size() + " files");
+		log.debug("Uploading {} files", uploadedFilesMap.size());
 
 		Map<String, String> uploadedFileNames = UploadServlet.getReceivedFileNames(getThreadLocalRequest(),
 				session.getSid());
@@ -311,6 +312,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 							mail.setMessageText("<html><body>" + template.getFormattedBody(dictionary)
 									+ "</html></body>");
 
+							log.info("Notify the creation of new documents {} to {}", docs.toString(), mail
+									.getRecipients().toString());
 							EMailSender sender = new EMailSender(session.getTenantName());
 							sender.send(mail);
 						}
@@ -485,6 +488,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		templateDao.initialize(template);
 
 		GUIAttribute[] attributes = prepareGUIAttributes(template, null);
+		Arrays.sort(attributes, new Comparator<GUIAttribute>() {
+
+			@Override
+			public int compare(GUIAttribute o1, GUIAttribute o2) {
+				return new Integer(o1.getPosition()).compareTo(new Integer(o2.getPosition()));
+			}
+		});
 
 		return attributes;
 	}
@@ -505,6 +515,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					att.setMandatory(extAttr.getMandatory() == 1);
 					att.setEditor(extAttr.getEditor());
 					att.setStringValue(extAttr.getStringValue());
+					att.setIntValue(extAttr.getIntValue());
+					att.setBooleanValue(extAttr.getBooleanValue());
+					att.setDoubleValue(extAttr.getDoubleValue());
 
 					att.setOptions(new String[] { extAttr.getStringValue() });
 
@@ -585,7 +598,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				document.setIcon(aliasType + "-sc");
 			}
 
-			if (session != null) {
+			if (session != null && folder!=null) {
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 				Set<Permission> permissions = fdao.getEnabledPermissions(doc.getFolder().getId(), session.getUserId());
 				List<String> permissionsList = new ArrayList<String>();
@@ -598,74 +611,80 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	public static GUIDocument fromDocument(Document doc, GUIFolder folder, User sessionUser) {
+		boolean isFolder=doc.getType().startsWith("folder");
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		if (doc.getId() != 0L)
+		if (doc.getId() != 0L && !isFolder)
 			docDao.initialize(doc);
+
+		Document realDoc = doc;
 
 		GUIDocument document = new GUIDocument();
 		document.setId(doc.getId());
 		if (doc.getDocRef() != null && doc.getDocRef().longValue() != 0) {
+			realDoc = docDao.findById(doc.getDocRef());
+			docDao.initialize(realDoc);
 			document.setDocRef(doc.getDocRef());
 			document.setDocRefType(doc.getDocRefType());
 		}
-		document.setCustomId(doc.getCustomId());
-		if (doc.getTags().size() > 0)
-			document.setTags(doc.getTagsAsWords().toArray(new String[doc.getTags().size()]));
+		document.setCustomId(realDoc.getCustomId());
+		if (realDoc.getTags().size() > 0)
+			document.setTags(realDoc.getTagsAsWords().toArray(new String[realDoc.getTags().size()]));
 		else
 			document.setTags(new String[0]);
 		document.setType(doc.getType());
 		document.setFileName(doc.getFileName());
-		document.setVersion(doc.getVersion());
-		document.setCreation(doc.getCreation());
-		document.setCreator(doc.getCreator());
-		document.setDate(doc.getDate());
-		document.setPublisher(doc.getPublisher());
-		document.setFileVersion(doc.getFileVersion());
-		document.setLanguage(doc.getLanguage());
-		document.setTemplateId(doc.getTemplateId());
-		document.setLastModified(doc.getLastModified());
-		document.setLockUserId(doc.getLockUserId());
-		document.setLockUser(doc.getLockUser());
-		document.setComment(doc.getComment());
-		document.setStatus(doc.getStatus());
-		document.setWorkflowStatus(doc.getWorkflowStatus());
-		document.setImmutable(doc.getImmutable());
-		document.setFileSize(new Long(doc.getFileSize()).floatValue());
-		document.setStartPublishing(doc.getStartPublishing());
-		document.setStopPublishing(doc.getStopPublishing());
-		document.setPublished(doc.getPublished());
-		document.setSigned(doc.getSigned());
-		document.setStamped(doc.getStamped());
-		document.setBarcoded(doc.getBarcoded());
-		document.setIndexed(doc.getIndexed());
-		document.setExtResId(doc.getExtResId());
-		document.setPages(doc.getPages());
-		document.setNature(doc.getNature());
-		document.setFormId(doc.getFormId());
+		document.setVersion(realDoc.getVersion());
+		document.setCreation(realDoc.getCreation());
+		document.setCreator(realDoc.getCreator());
+		document.setDate(realDoc.getDate());
+		document.setPublisher(realDoc.getPublisher());
+		document.setFileVersion(realDoc.getFileVersion());
+		document.setLanguage(realDoc.getLanguage());
+		document.setTemplateId(realDoc.getTemplateId());
+		document.setLastModified(realDoc.getLastModified());
+		document.setLockUserId(realDoc.getLockUserId());
+		document.setLockUser(realDoc.getLockUser());
+		document.setComment(realDoc.getComment());
+		document.setStatus(realDoc.getStatus());
+		document.setWorkflowStatus(realDoc.getWorkflowStatus());
+		document.setWorkflowStatusDisplay(realDoc.getWorkflowStatusDisplay());
+		document.setImmutable(realDoc.getImmutable());
+		document.setFileSize(new Long(realDoc.getFileSize()).floatValue());
+		document.setStartPublishing(realDoc.getStartPublishing());
+		document.setStopPublishing(realDoc.getStopPublishing());
+		document.setPublished(realDoc.getPublished());
+		document.setSigned(realDoc.getSigned());
+		document.setStamped(realDoc.getStamped());
+		document.setBarcoded(realDoc.getBarcoded());
+		document.setIndexed(realDoc.getIndexed());
+		document.setExtResId(realDoc.getExtResId());
+		document.setPages(realDoc.getPages());
+		document.setNature(realDoc.getNature());
+		document.setFormId(realDoc.getFormId());
 		document.setIcon(FilenameUtils.getBaseName(doc.getIcon()));
-		document.setPasswordProtected(doc.isPasswordProtected());
+		document.setPasswordProtected(realDoc.isPasswordProtected());
 
-		if (doc.getRating() != null)
-			document.setRating(doc.getRating());
+		if (realDoc.getRating() != null)
+			document.setRating(realDoc.getRating());
 
-		if (doc.getCustomId() != null)
-			document.setCustomId(doc.getCustomId());
+		if (realDoc.getCustomId() != null)
+			document.setCustomId(realDoc.getCustomId());
 		else
 			document.setCustomId("");
 
-		if (doc.getTemplate() != null) {
-			document.setTemplate(doc.getTemplate().getName());
-			document.setTemplateId(doc.getTemplate().getId());
+		if (realDoc.getTemplate() != null) {
+			document.setTemplate(realDoc.getTemplate().getName());
+			document.setTemplateId(realDoc.getTemplate().getId());
 		}
 
-		if (sessionUser != null) {
+		if (sessionUser != null && !isFolder) {
 			BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 			document.setBookmarked(bDao.isDocBookmarkedByUser(document.getId(), sessionUser.getId()));
 			if (document.getDocRef() != null)
 				document.setBookmarked(bDao.isDocBookmarkedByUser(document.getDocRef(), sessionUser.getId()));
 		}
 
-		GUIAttribute[] attributes = prepareGUIAttributes(doc.getTemplate(), doc);
+		GUIAttribute[] attributes = prepareGUIAttributes(realDoc.getTemplate(), realDoc);
 		document.setAttributes(attributes);
 
 		if (folder != null) {
@@ -702,16 +721,17 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				version1.setTagsString(docVersion.getTgs());
 				version1.setType(docVersion.getType());
 				version1.setFileName(docVersion.getFileName());
-				version1.setVersion(docVersion.getVersion());
 				version1.setCreation(docVersion.getCreation());
 				version1.setCreator(docVersion.getCreator());
 				version1.setDate(docVersion.getDate());
 				version1.setPublisher(docVersion.getPublisher());
+				version1.setVersion(docVersion.getVersion());
 				version1.setFileVersion(docVersion.getFileVersion());
 				version1.setLanguage(docVersion.getLanguage());
 				version1.setTemplateId(docVersion.getTemplateId());
 				version1.setFileSize(new Float(docVersion.getFileSize()));
 				version1.setWorkflowStatus(docVersion.getWorkflowStatus());
+				version1.setWorkflowStatusDisplay(docVersion.getWorkflowStatusDisplay());
 				if (docVersion.getRating() != null)
 					version1.setRating(docVersion.getRating());
 				version1.setStartPublishing(docVersion.getStartPublishing());
@@ -745,11 +765,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				version2.setTagsString(docVersion.getTgs());
 				version2.setType(docVersion.getType());
 				version2.setFileName(docVersion.getFileName());
-				version2.setVersion(docVersion.getVersion());
 				version2.setCreation(docVersion.getCreation());
 				version2.setCreator(docVersion.getCreator());
 				version2.setDate(docVersion.getDate());
 				version2.setPublisher(docVersion.getPublisher());
+				version2.setVersion(docVersion.getVersion());
 				version2.setFileVersion(docVersion.getFileVersion());
 				version2.setLanguage(docVersion.getLanguage());
 				version2.setFileSize(new Float(docVersion.getFileSize()));
@@ -1006,6 +1026,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		docVO.setRating(document.getRating());
 		docVO.setComment(document.getComment());
 		docVO.setWorkflowStatus(document.getWorkflowStatus());
+		docVO.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
 		docVO.setStartPublishing(document.getStartPublishing());
 		docVO.setStopPublishing(document.getStopPublishing());
 		docVO.setPublished(document.getPublished());
@@ -1305,12 +1326,12 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			if (zipFile != null)
 				try {
 					FileUtils.forceDelete(zipFile);
-				} catch (IOException e) {
+				} catch (Throwable e) {
 				}
 			if (thumbnailFile != null)
 				try {
-					FileUtils.forceDelete(zipFile);
-				} catch (IOException e) {
+					FileUtils.forceDelete(thumbnailFile);
+				} catch (Throwable e) {
 				}
 		}
 	}

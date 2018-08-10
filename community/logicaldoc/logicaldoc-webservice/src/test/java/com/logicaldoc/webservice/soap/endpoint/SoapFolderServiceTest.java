@@ -19,7 +19,7 @@ import com.logicaldoc.webservice.model.WSRight;
 /**
  * Test case for <code>SoapFolderService</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class SoapFolderServiceTest extends AbstractWebServiceTestCase {

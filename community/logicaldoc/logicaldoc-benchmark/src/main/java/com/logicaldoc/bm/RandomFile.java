@@ -12,7 +12,7 @@ import com.sun.mail.iap.ByteArray;
 /**
  * Gives a random file from the docs in a source folder
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class RandomFile {

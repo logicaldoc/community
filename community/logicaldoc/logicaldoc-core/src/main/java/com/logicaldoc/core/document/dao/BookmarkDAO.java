@@ -8,7 +8,7 @@ import com.logicaldoc.core.document.Bookmark;
 /**
  * DAO service for bookmarks
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public interface BookmarkDAO extends PersistentObjectDAO<Bookmark> {

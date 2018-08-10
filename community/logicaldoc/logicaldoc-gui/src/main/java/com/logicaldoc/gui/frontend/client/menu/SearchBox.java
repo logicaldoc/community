@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 /**
  * This panel shows the quick search controls
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SearchBox extends TextItem {

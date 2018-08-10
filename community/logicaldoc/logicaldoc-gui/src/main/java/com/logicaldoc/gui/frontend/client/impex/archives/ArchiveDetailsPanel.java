@@ -11,7 +11,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects all archives details
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ArchiveDetailsPanel extends VLayout {

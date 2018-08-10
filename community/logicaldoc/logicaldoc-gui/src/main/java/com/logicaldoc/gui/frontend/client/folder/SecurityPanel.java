@@ -48,7 +48,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the security policies.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SecurityPanel extends FolderDetailTab {
@@ -63,10 +63,12 @@ public class SecurityPanel extends FolderDetailTab {
 
 	public SecurityPanel(final GUIFolder folder) {
 		super(folder, null);
+	}
 
+	@Override
+	protected void onDraw() {
 		container.setMembersMargin(3);
 		addMember(container);
-
 		refresh(folder);
 	}
 
@@ -76,45 +78,57 @@ public class SecurityPanel extends FolderDetailTab {
 		container.removeMembers(container.getMembers());
 
 		if (folder.getSecurityRef() != null) {
-			inheritInfoPanel = new HLayout();
-			inheritInfoPanel.setMembersMargin(5);
-			inheritInfoPanel.setStyleName("warn");
-			inheritInfoPanel.setWidth100();
-			inheritInfoPanel.setHeight(20);
+			FolderService.Instance.get().getFolder(folder.getSecurityRef().getId(), true,
+					new AsyncCallback<GUIFolder>() {
 
-			Label label = new Label(I18N.message("rightsinheritedfrom"));
-			label.setWrap(false);
+						@Override
+						public void onFailure(Throwable caught) {
+							Log.serverError(caught);
+						}
 
-			Label path = new Label("<b><span style='text-decoration: underline'>"
-					+ folder.getSecurityRef().getPathExtended() + "</span></b>");
-			path.setWrap(false);
-			path.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					FolderNavigator.get().openFolder(SecurityPanel.super.folder.getSecurityRef().getId());
-				}
-			});
+						@Override
+						public void onSuccess(final GUIFolder refFolder) {
+							inheritInfoPanel = new HLayout();
+							inheritInfoPanel.setMembersMargin(5);
+							inheritInfoPanel.setStyleName("warn");
+							inheritInfoPanel.setWidth100();
+							inheritInfoPanel.setHeight(20);
 
-			HTMLPane spacer = new HTMLPane();
-			spacer.setContents("<div>&nbsp;</div>");
-			spacer.setWidth("*");
-			spacer.setOverflow(Overflow.HIDDEN);
+							Label label = new Label(I18N.message("rightsinheritedfrom"));
+							label.setWrap(false);
 
-			Img closeImage = ItemFactory.newImgIcon("delete.png");
-			closeImage.setHeight("16px");
-			closeImage.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					inheritInfoPanel.setVisible(false);
-				}
-			});
-			closeImage.setCursor(Cursor.HAND);
-			closeImage.setTooltip(I18N.message("close"));
-			closeImage.setLayoutAlign(Alignment.RIGHT);
-			closeImage.setLayoutAlign(VerticalAlignment.CENTER);
+							Label path = new Label("<b><span style='text-decoration: underline'>"
+									+ refFolder.getPathExtended() + "</span></b>");
+							path.setWrap(false);
+							path.addClickHandler(new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									FolderNavigator.get().openFolder(refFolder.getId());
+								}
+							});
 
-			inheritInfoPanel.setMembers(label, path, spacer, closeImage);
-			container.addMember(inheritInfoPanel);
+							HTMLPane spacer = new HTMLPane();
+							spacer.setContents("<div>&nbsp;</div>");
+							spacer.setWidth("*");
+							spacer.setOverflow(Overflow.HIDDEN);
+
+							Img closeImage = ItemFactory.newImgIcon("delete.png");
+							closeImage.setHeight("16px");
+							closeImage.addClickHandler(new ClickHandler() {
+								@Override
+								public void onClick(ClickEvent event) {
+									inheritInfoPanel.setVisible(false);
+								}
+							});
+							closeImage.setCursor(Cursor.HAND);
+							closeImage.setTooltip(I18N.message("close"));
+							closeImage.setLayoutAlign(Alignment.RIGHT);
+							closeImage.setLayoutAlign(VerticalAlignment.CENTER);
+
+							inheritInfoPanel.setMembers(label, path, spacer, closeImage);
+							container.addMember(inheritInfoPanel, 0);
+						}
+					});
 		}
 
 		ListGridField entityId = new ListGridField("entityId", "entityId", 50);
@@ -140,7 +154,7 @@ public class SecurityPanel extends FolderDetailTab {
 		download.setType(ListGridFieldType.BOOLEAN);
 		download.setCanEdit(true);
 		download.setAutoFitWidth(true);
-
+		
 		ListGridField write = new ListGridField("write", I18N.message("write"), 60);
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
@@ -211,6 +225,16 @@ public class SecurityPanel extends FolderDetailTab {
 		password.setCanEdit(true);
 		password.setAutoFitWidth(true);
 
+		ListGridField move = new ListGridField("move", I18N.message("move"), 60);
+		move.setType(ListGridFieldType.BOOLEAN);
+		move.setCanEdit(true);
+		move.setAutoFitWidth(true);
+		
+		ListGridField email = new ListGridField("email", I18N.message("email"), 60);
+		email.setType(ListGridFieldType.BOOLEAN);
+		email.setCanEdit(true);
+		email.setAutoFitWidth(true);
+		
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
@@ -225,10 +249,12 @@ public class SecurityPanel extends FolderDetailTab {
 		fields.add(read);
 		fields.add(print);
 		fields.add(download);
+		fields.add(email);
 		fields.add(write);
 		fields.add(add);
 		fields.add(rename);
 		fields.add(delete);
+		fields.add(move);
 		fields.add(security);
 		fields.add(immutable);
 		fields.add(password);
@@ -345,8 +371,10 @@ public class SecurityPanel extends FolderDetailTab {
 				if (selectedRecord == null)
 					return;
 
-				// Check if the selected user is already present in the rights
-				// table
+				/*
+				 * Check if the selected user is already present in the rights
+				 * table
+				 */
 				ListGridRecord[] records = list.getRecords();
 				for (ListGridRecord test : records) {
 					if (test.getAttribute("entityId").equals(selectedRecord.getAttribute("usergroup"))) {
@@ -420,6 +448,8 @@ public class SecurityPanel extends FolderDetailTab {
 			right.setCalendar("true".equals(record.getAttributeAsString("calendar")));
 			right.setSubscription("true".equals(record.getAttributeAsString("subscription")));
 			right.setPassword("true".equals(record.getAttributeAsString("password")));
+			right.setMove("true".equals(record.getAttributeAsString("move")));
+			right.setEmail("true".equals(record.getAttributeAsString("email")));
 
 			tmp.add(right);
 		}

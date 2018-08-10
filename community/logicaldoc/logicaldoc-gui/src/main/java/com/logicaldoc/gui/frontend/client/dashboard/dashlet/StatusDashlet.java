@@ -8,8 +8,9 @@ import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
@@ -18,10 +19,8 @@ import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.HeaderControl;
-import com.smartgwt.client.widgets.HeaderControl.HeaderIcon;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
@@ -37,7 +36,7 @@ public class StatusDashlet extends Dashlet {
 
 	private DocumentsDS dataSource;
 
-	protected ListGrid list;
+	protected RefreshableListGrid list;
 
 	protected String eventCode;
 
@@ -46,41 +45,20 @@ public class StatusDashlet extends Dashlet {
 
 		this.eventCode = eventCode;
 
-		String icn = "page_white.png";
-		setTitle(I18N.message(eventCode + "docs"));
-		if (eventCode.equals(Constants.EVENT_CHECKEDOUT))
-			icn = "page_edit.png";
-		else if (eventCode.equals(Constants.EVENT_LOCKED))
-			icn = "page_white_lock.png";
-
 		HeaderControl refresh = new HeaderControl(HeaderControl.REFRESH, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				refresh();
+				list.refresh(getDataSource());
 			}
 		});
 
-		HeaderIcon portletIcon = ItemFactory.newHeaderIcon(icn);
-		HeaderControl hcicon = new HeaderControl(portletIcon);
-		hcicon.setSize(16);
-		setHeaderControls(hcicon, HeaderControls.HEADER_LABEL, refresh, HeaderControls.MAXIMIZE_BUTTON,
+		setHeaderControls(HeaderControls.HEADER_LABEL, refresh, HeaderControls.MAXIMIZE_BUTTON,
 				HeaderControls.CLOSE_BUTTON);
 
-		refresh();
+		init();
 	}
 
-	private void refresh() {
-		if (list != null)
-			removeItem(list);
-
-		int max = 20;
-		int status = Constants.DOC_UNLOCKED;
-
-		if (eventCode.equals(Constants.EVENT_CHECKEDOUT))
-			status = Constants.DOC_CHECKED_OUT;
-		else if (eventCode.equals(Constants.EVENT_LOCKED))
-			status = Constants.DOC_LOCKED;
-
+	private void init() {
 		ListGridField version = new ListGridField("version", I18N.message("version"), 70);
 		ListGridField lastModified = new ListGridField("lastModified", I18N.message("date"), 110);
 		lastModified.setAlign(Alignment.CENTER);
@@ -97,7 +75,7 @@ public class StatusDashlet extends Dashlet {
 		icon.setImageURLSuffix(".png");
 		icon.setCanFilter(false);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
@@ -106,7 +84,7 @@ public class StatusDashlet extends Dashlet {
 		list.setSelectionType(SelectionStyle.NONE);
 		list.setHeight100();
 		list.setBorder("0px");
-		list.setDataSource(new DocumentsDS(status, max));
+		list.setDataSource(getDataSource());
 		list.setFields(icon, fileName, version, lastModified);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
@@ -152,12 +130,19 @@ public class StatusDashlet extends Dashlet {
 						unread++;
 				}
 
+				String icn = "file";
+				if (eventCode.equals(Constants.EVENT_CHECKEDOUT))
+					icn = "edit";
+				else if (eventCode.equals(Constants.EVENT_LOCKED))
+					icn = "lock-alt";
+
 				int total = list.getTotalRows();
 				String title = I18N.message(eventCode + "docs", Integer.toString(total));
 				if (unread > 0)
 					title = "<b>" + title + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + I18N.message("newitems")
 							+ ": " + unread + "</b>";
-				setTitle(title);
+
+				setTitle(AwesomeFactory.getIconHtml(icn, title));
 
 				if (Constants.EVENT_LOCKED.equals(eventCode))
 					Session.get().getUser().setLockedDocs(total);
@@ -167,6 +152,19 @@ public class StatusDashlet extends Dashlet {
 		});
 
 		addItem(list);
+
+		getDataSource();
+	}
+
+	private DocumentsDS getDataSource() {
+		int max = 20;
+		int status = Constants.DOC_UNLOCKED;
+
+		if (eventCode.equals(Constants.EVENT_CHECKEDOUT))
+			status = Constants.DOC_CHECKED_OUT;
+		else if (eventCode.equals(Constants.EVENT_LOCKED))
+			status = Constants.DOC_LOCKED;
+		return new DocumentsDS(status, max);
 	}
 
 	@Override
@@ -194,7 +192,7 @@ public class StatusDashlet extends Dashlet {
 						public void onSuccess(Void result) {
 							Session.get().getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
 							list.removeSelectedData();
-							refresh();
+							list.refresh(getDataSource());
 						}
 					});
 				}

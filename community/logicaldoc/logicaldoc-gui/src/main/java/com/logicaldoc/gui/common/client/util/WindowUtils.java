@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 /**
  * Utilities for accessing the javascript Window object
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class WindowUtils {

@@ -8,7 +8,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to handle workflow trigger lists.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class WorkflowTriggersDS extends DataSource {

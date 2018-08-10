@@ -17,7 +17,7 @@ import com.logicaldoc.util.exec.Exec;
 /**
  * Takes care of images thumbnail builder
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {

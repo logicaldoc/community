@@ -11,7 +11,7 @@ import com.logicaldoc.webservice.model.WSSystemInfo;
 /**
  * Test case for <code>SoapSystemService</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class SoapSystemServiceTest extends AbstractWebServiceTestCase {

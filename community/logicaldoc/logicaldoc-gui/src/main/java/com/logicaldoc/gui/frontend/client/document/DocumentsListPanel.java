@@ -33,12 +33,10 @@ import com.smartgwt.client.widgets.menu.Menu;
 /**
  * This panel shows a selection of documents.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentsListPanel extends VLayout {
-	private DocumentsDS dataSource;
-
 	private DocumentsGrid grid;
 
 	private Cursor cursor;
@@ -47,51 +45,51 @@ public class DocumentsListPanel extends VLayout {
 
 	protected int visualizationMode = DocumentsGrid.MODE_LIST;
 
-	public DocumentsListPanel(GUIFolder folder, final Long hiliteDoc, Integer max, int page, int mode) {
-		dataSource = new DocumentsDS(folder.getId(), null, max, page, null, null);
+	public int getVisualizationMode() {
+		return visualizationMode;
+	}
 
-		if (mode == DocumentsGrid.MODE_LIST)
+	protected Long hiliteDocId = null;
+
+	public void updateData(GUIFolder folder, Integer max, final Long hiliteDocId) {
+		this.hiliteDocId = hiliteDocId;
+		DocumentsDS dataSource = new DocumentsDS(folder, null, max, grid.getGridCursor().getCurrentPage(), null, null,true);		
+		grid.fetchNewData(dataSource);
+		grid.getGridCursor().setTotalRecords(folder.getDocumentCount());
+	}
+
+	public DocumentsListPanel(GUIFolder folder, final Long hiliteDoc, Integer max, int visualizationMode) {
+		this.hiliteDocId = hiliteDoc;
+		this.visualizationMode = visualizationMode;
+ 
+		DocumentsDS dataSource = new DocumentsDS(folder, null, max, 1, null, null,true);
+		if (visualizationMode == DocumentsGrid.MODE_LIST)
 			grid = new NavigatorDocumentsGrid(dataSource, folder);
-		else if (mode == DocumentsGrid.MODE_GALLERY)
-			grid = new DocumentsTileGrid(folder, dataSource, folder.getDocumentCount());
-
-		grid.setCanDrag(folder.isDownload());
+		else if (visualizationMode == DocumentsGrid.MODE_GALLERY)
+			grid = new DocumentsTileGrid(folder, dataSource);
 
 		// Prepare a panel containing a title and the documents list
-		cursor = new Cursor(CookiesManager.COOKIE_DOCSLIST_MAX, page, true);
+		cursor = new Cursor(CookiesManager.COOKIE_DOCSLIST_MAX, true);
+		cursor.setTotalRecords(folder.getDocumentCount());
+		
 		cursor.registerMaxChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
-				DocumentsPanel.get().refresh(cursor.getMaxDisplayedRecords(), cursor.getCurrentPage(), null);
+				DocumentsPanel.get().refresh(cursor.getMaxDisplayedRecords(), null);
 			}
 		});
 		cursor.registerPageChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
-				DocumentsPanel.get().refresh(cursor.getMaxDisplayedRecords(), cursor.getCurrentPage(), null);
+				DocumentsPanel.get().refresh(cursor.getMaxDisplayedRecords(), null);
 			}
 		});
 
 		addMember(cursor);
 		addMember((Canvas) grid);
 
-		grid.setCursor(cursor);
+		grid.setGridCursor(cursor);
 
-		if (hiliteDoc != null) {
-			DocumentService.Instance.get().getById(hiliteDoc.longValue(), new AsyncCallback<GUIDocument>() {
-
-				@Override
-				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
-				}
-
-				@Override
-				public void onSuccess(GUIDocument doc) {
-					Session.get().setCurrentDocument(doc);
-				}
-			});
-		}
-		
 		grid.registerDoubleClickHandler(new DoubleClickHandler() {
 			@Override
 			public void onDoubleClick(DoubleClickEvent event) {
@@ -149,20 +147,36 @@ public class DocumentsListPanel extends VLayout {
 			@Override
 			public void onDataArrived(DataArrivedEvent event) {
 				if (hiliteDoc != null)
-					DocumentsListPanel.this.hiliteDocument(hiliteDoc);
+					DocumentsListPanel.this.hiliteDocument();
 			}
 		});
 	}
 
 	@Override
 	public void destroy() {
-		super.destroy();
-		if (dataSource != null)
-			dataSource.destroy();
+		if (grid != null)
+			grid.destroy();
 	}
 
-	public void hiliteDocument(long docId) {
-		grid.selectDocument(docId);
+	private void hiliteDocument() {
+		if (hiliteDocId != null) {
+			grid.selectDocument(hiliteDocId);
+			if (Session.get().getCurrentDocument() != null && Session.get().getCurrentDocument().getId() != hiliteDocId) {
+				DocumentService.Instance.get().getById(hiliteDocId.longValue(), new AsyncCallback<GUIDocument>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIDocument doc) {
+						Session.get().setCurrentDocument(doc);
+					}
+				});
+			}
+		}
+		hiliteDocId = null;
 	}
 
 	public DocumentsGrid getGrid() {

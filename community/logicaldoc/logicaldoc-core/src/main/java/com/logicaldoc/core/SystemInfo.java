@@ -25,17 +25,17 @@ public class SystemInfo {
 
 	protected String product = "LogicalDOC";
 
-	protected String release = "7.6.4";
+	protected String release = "7.8";
 
-	protected String year = "2006-2017";
+	protected String year = "2006-2018";
 
-	protected String help = "http://help.logicaldoc.com";
+	protected String help = "https://help.logicaldoc.com";
 
-	protected String bugs = "http://bugs.logicaldoc.com";
+	protected String bugs = "https://bugs.logicaldoc.com";
 
-	protected String url = "http://www.logicaldoc.com";
+	protected String url = "https://www.logicaldoc.com";
 
-	protected String forum = "http://forums.logicaldoc.com";
+	protected String forum = "https://forums.logicaldoc.com";
 
 	protected String vendor = "LogicalDOC";
 
@@ -203,10 +203,10 @@ public class SystemInfo {
 	}
 
 	protected SystemInfo() {
-}
-	
+	}
+
 	protected SystemInfo(long tenantId) {
-			this.tenantId = tenantId;
+		this.tenantId = tenantId;
 	}
 
 	public static SystemInfo get(long tenantId) {

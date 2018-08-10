@@ -70,6 +70,10 @@ public final class Constants {
 	public static final String PERMISSION_SUBSCRIPTION = "subscription";
 
 	public static final String PERMISSION_PASSWORD = "password";
+	
+	public static final String PERMISSION_MOVE = "move";
+	
+	public static final String PERMISSION_EMAIL = "email";
 
 	public static final int DOC_UNLOCKED = 0;
 

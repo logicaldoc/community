@@ -3,6 +3,8 @@ package com.logicaldoc.webservice.rest;
 import java.util.List;
 
 import javax.activation.DataHandler;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -17,6 +19,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 
+import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
@@ -139,5 +142,32 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/move")
-	public void move(@QueryParam("docId") long docId, @QueryParam("folderId") long folderId) throws Exception;	
+	public void move(@QueryParam("docId") long docId, @QueryParam("folderId") long folderId) throws Exception;
+	
+	
+	/**
+	 * Creates the thumbail of the given document; if the thumbnail was already created, nothing will happen
+	 * 
+	 * @param docId The document id
+	 * @param fileVersion The specific file version(it can be empty)
+	 * @throws Exception
+	 */
+	@PUT
+	@Path("/createThumbnail")
+	public void createThumbnail(
+			@QueryParam("docId") long docId,
+			@QueryParam("fileVersion") String fileVersion)	throws Exception;
+	
+	/**
+	 * Creates the PDF conversion of the given document; if the PDF conversion was already created, nothing will happen
+	 * 
+	 * @param docId The document id
+	 * @param fileVersion The specific file version(it can be empty)
+	 * @throws Exception
+	 */
+	@PUT
+	@Path("/createPdf")
+	public void createPdf(
+			@QueryParam("docId") long docId,
+			@QueryParam("fileVersion") String fileVersion)	throws Exception;
 }

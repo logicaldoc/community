@@ -16,7 +16,7 @@ import com.smartgwt.client.widgets.layout.Portlet;
 /**
  * This dialog allows the selection of a portlet
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.6
  */
 public class DashletSelector extends Window {
@@ -30,7 +30,6 @@ public class DashletSelector extends Window {
 		setTitle(I18N.message("dashletselector"));
 
 		setAutoSize(true);
-		setMembersMargin(5);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);

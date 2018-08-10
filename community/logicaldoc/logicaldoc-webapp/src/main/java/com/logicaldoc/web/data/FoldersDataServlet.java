@@ -30,7 +30,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for folders data.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class FoldersDataServlet extends HttpServlet {

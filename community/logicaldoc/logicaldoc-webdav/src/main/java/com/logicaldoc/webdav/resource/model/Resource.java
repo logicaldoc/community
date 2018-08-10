@@ -45,6 +45,8 @@ public interface Resource {
 
 	public boolean isWriteEnabled();
 
+	public boolean isMoveEnabled();
+	
 	public boolean isAddChildEnabled();
 
 	public void setDeleteEnabled(boolean deleteEnabled);

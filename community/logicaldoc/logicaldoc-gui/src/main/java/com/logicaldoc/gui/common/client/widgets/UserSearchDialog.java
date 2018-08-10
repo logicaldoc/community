@@ -24,7 +24,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This is a form used for quick user selection
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.6
  */
 public class UserSearchDialog extends Window {

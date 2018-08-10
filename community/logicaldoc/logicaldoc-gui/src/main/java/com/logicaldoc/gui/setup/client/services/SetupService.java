@@ -9,7 +9,7 @@ import com.logicaldoc.gui.setup.client.SetupInfo;
  * The client side stub for the Setup Service. This service allows the
  * installation of an instance of LogicalDOC.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("setup")

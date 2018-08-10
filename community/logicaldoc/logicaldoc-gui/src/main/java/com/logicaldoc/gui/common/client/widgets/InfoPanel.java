@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 /**
  * An useful panel to show informations to the user
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class InfoPanel extends HLayout {

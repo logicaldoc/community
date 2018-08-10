@@ -24,13 +24,17 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the history of a document
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class HistoryPanel extends DocumentDetailTab {
 
 	public HistoryPanel(final GUIDocument document) {
 		super(document, null);
+	}
+
+	@Override
+	protected void onDraw() {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
@@ -46,17 +50,18 @@ public class HistoryPanel extends DocumentDetailTab {
 		ListGridField fileName = new ListGridField("filename", I18N.message("filename"));
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"));
+		ListGridField ip = new ListGridField("ip", I18N.message("ip"));
 
 		final ListGrid list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setDataSource(new DocumentHistoryDS(document.getId(), null));
-		if(Menu.enabled(Menu.SESSIONS))
-			list.setFields(user, event, date, comment, version, fileName, path, sid);
+		if (Menu.enabled(Menu.SESSIONS))
+			list.setFields(user, event, date, comment, version, fileName, path, sid, ip);
 		else
 			list.setFields(user, event, date, comment, version, fileName, path);
-		
+
 		list.addDoubleClickHandler(new DoubleClickHandler() {
 			@Override
 			public void onDoubleClick(DoubleClickEvent event) {

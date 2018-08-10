@@ -14,30 +14,30 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Displays a list of plugins available for the application.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
 public class PluginsPanel extends VLayout {
 
-	private ListGrid list;
-
 	public PluginsPanel() {
 		setMembersMargin(3);
+	}
 
+	@Override
+	public void onDraw() {
 		ListGridField name = new ListGridField("name", I18N.message("name"), 250);
 		name.setCanEdit(false);
 
 		ListGridField version = new ListGridField("version", I18N.message("version"));
 		version.setCanEdit(false);
 
-		list = new ListGrid();
+		final ListGrid list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanEdit(false);
 		list.setWidth100();
 		list.setHeight100();
 		list.setAutoFetchData(true);
-		list.setShowFilterEditor(true);
-		list.setFilterOnKeypress(true);
+		list.setShowFilterEditor(false);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setFields(name, version);
 

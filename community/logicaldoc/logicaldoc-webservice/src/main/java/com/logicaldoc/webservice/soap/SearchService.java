@@ -14,7 +14,7 @@ import com.logicaldoc.webservice.model.WSSearchResult;
 /**
  * Search Web Service definition interface
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 @WSDoc(description = "search operations")

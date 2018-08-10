@@ -20,14 +20,17 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the history of a folder
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class HistoryPanel extends FolderDetailTab {
 
 	public HistoryPanel(final GUIFolder folder) {
 		super(folder, null);
+	}
 
+	@Override
+	protected void onDraw() {
 		ListGridField user = new ListGridField("user", I18N.message("user"), 100);
 		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
 		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
@@ -39,6 +42,7 @@ public class HistoryPanel extends FolderDetailTab {
 		ListGridField fileName = new ListGridField("filename", I18N.message("name"));
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"));
+		ListGridField ip = new ListGridField("ip", I18N.message("ip"));
 
 		final ListGrid list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -46,7 +50,7 @@ public class HistoryPanel extends FolderDetailTab {
 		list.setAutoFetchData(true);
 		list.setDataSource(new FolderHistoryDS(folder.getId()));
 		if (Menu.enabled(Menu.SESSIONS))
-			list.setFields(user, event, date, comment, fileName, path, sid);
+			list.setFields(user, event, date, comment, fileName, path, sid, ip);
 		else
 			list.setFields(user, event, date, comment, fileName, path);
 

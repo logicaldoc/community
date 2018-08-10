@@ -7,7 +7,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Data Source to handle user's contacts grid lists. It is based on Xml parsing.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ContactsDS extends DataSource {

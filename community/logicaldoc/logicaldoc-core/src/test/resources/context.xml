@@ -52,7 +52,7 @@
         </property>
     </bean>
     <!-- Hibernate SessionFactory -->
-    <bean id="SessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+    <bean id="SessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
         abstract="false" lazy-init="default" autowire="default">
         <property name="dataSource">
             <ref bean="DataSource" />
@@ -76,7 +76,7 @@
     </bean>
     <!--Transaction management -->
     <bean id="TransactionManager"
-        class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+        class="org.springframework.orm.hibernate5.HibernateTransactionManager"
         abstract="false" lazy-init="default" autowire="default">
         <property name="sessionFactory" ref="SessionFactory" />
     </bean>

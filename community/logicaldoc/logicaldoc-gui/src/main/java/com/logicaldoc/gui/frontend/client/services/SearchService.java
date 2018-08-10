@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 /**
  * Service responsible of Searches
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("search")

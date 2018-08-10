@@ -7,18 +7,21 @@ import com.smartgwt.client.widgets.tab.Tab;
 /**
  * Panel showing export archives control panel
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ImportArchivesPanel extends AdminPanel {
 
 	public ImportArchivesPanel() {
 		super("importarchives");
-
+	}
+	
+	@Override
+	public void onDraw(){
 		body.setMembers(new ImportArchivesList());
 
 		Tab bundlesTab = new Tab(I18N.message("incomingbundles"));
-		bundlesTab.setPane(new ImportFoldersList(this));
+		bundlesTab.setPane(new ImportArchiveFoldersList(this));
 		tabs.addTab(bundlesTab);
 	}
 

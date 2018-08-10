@@ -5,11 +5,11 @@
   <parent>
     <groupId>com.logicaldoc</groupId>
     <artifactId>logicaldoc-parent-pom</artifactId>
-    <version>85</version>
+    <version>87</version>
   </parent>
 	<groupId>com.logicaldoc</groupId>
 	<artifactId>logicaldoc</artifactId>
-	<version>7.7.3</version>
+	<version>8.0.0</version>
 	<packaging>pom</packaging>
 	<name>logicaldoc</name>
 	<description>
@@ -62,7 +62,7 @@
 			<name>Matteo Caruso</name>
 			<email>m.caruso@logicalobjects.it</email>
 			<id>matteo</id>
-			<organization>Logical Objects</organization>
+			<organization>LogicalDOC</organization>
 			<organizationUrl>http://www.logicalobjects.it</organizationUrl>
 			<roles>
 				<role>developer</role>
@@ -110,5 +110,6 @@
     <module>logicaldoc-gui</module>
     <module>logicaldoc-webapp</module>
     <module>logicaldoc-benchmark</module>
+    <module>logicaldoc-webservicesamples</module>
 	</modules>
 </project>

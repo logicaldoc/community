@@ -14,7 +14,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Extension of a Cmis servlet compliant with AtomPub
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5.1
  */
 public class CmisServlet extends CmisAtomPubServlet {

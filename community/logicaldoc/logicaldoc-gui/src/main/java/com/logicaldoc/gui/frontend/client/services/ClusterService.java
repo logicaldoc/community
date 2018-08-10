@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.ServerException;
  * The client side stub for the ClusterService Service. This service gives
  * access to the Clustering stuff.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 @RemoteServiceRelativePath("cluster")

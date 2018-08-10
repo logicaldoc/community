@@ -14,7 +14,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Extension of the standard CXF servlet that checks the enabled flag
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.6
  */
 public class WebserviceServlet extends CXFServlet {

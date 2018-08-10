@@ -17,7 +17,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 /**
  * Database initialization manager
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class PluginDbInit extends DBInit {

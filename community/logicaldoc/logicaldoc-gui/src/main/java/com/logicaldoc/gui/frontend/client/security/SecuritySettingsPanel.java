@@ -34,7 +34,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 /**
  * This panel shows general security parameters.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class SecuritySettingsPanel extends AdminPanel {
@@ -50,7 +50,10 @@ public class SecuritySettingsPanel extends AdminPanel {
 	public SecuritySettingsPanel(GUISecuritySettings settings) {
 		super("security");
 		this.settings = settings;
+	}
 
+	@Override
+	public void onDraw() {
 		DynamicForm securityForm = new DynamicForm();
 		securityForm.setValuesManager(vm);
 		securityForm.setTitleOrientation(TitleOrientation.TOP);

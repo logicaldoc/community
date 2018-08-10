@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -38,40 +39,34 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Panel showing the list of templates
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class TemplatesPanel extends VLayout {
-
-	private Layout listing;
-
 	protected Layout detailsContainer;
 
-	protected ListGrid list;
+	protected RefreshableListGrid list;
 
 	protected Canvas details = SELECT_TEMPLATE;
 
 	private InfoPanel infoPanel;
 
-	private ToolStrip toolStrip;
-
 	final static Canvas SELECT_TEMPLATE = new HTMLPanel("&nbsp;" + I18N.message("selecttemplate"));
 
 	public TemplatesPanel() {
 		setWidth100();
-
-		infoPanel = new InfoPanel("");
-
-		refresh();
 	}
 
-	protected void refresh() {
+	@Override
+	public void onDraw() {
 		Canvas[] members = getMembers();
 		for (Canvas canvas : members) {
 			removeMember(canvas);
 		}
 
-		listing = new VLayout();
+		infoPanel = new InfoPanel("");
+
+		final Layout listing = new VLayout();
 		detailsContainer = new VLayout();
 		details = SELECT_TEMPLATE;
 
@@ -94,7 +89,7 @@ public class TemplatesPanel extends VLayout {
 		ListGridField typeTemplate = new ListGridField("type", I18N.message("type"), 100);
 		typeTemplate.setHidden(true);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -112,7 +107,7 @@ public class TemplatesPanel extends VLayout {
 		listing.addMember(infoPanel);
 		listing.addMember(list);
 
-		toolStrip = new ToolStrip();
+		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
@@ -131,7 +126,10 @@ public class TemplatesPanel extends VLayout {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				refresh();
+				list.refresh(new TemplatesDS(false, null, GUITemplate.TYPE_DEFAULT));
+				detailsContainer.removeMembers(detailsContainer.getMembers());
+				details = SELECT_TEMPLATE;
+				detailsContainer.setMembers(details);
 			}
 		});
 

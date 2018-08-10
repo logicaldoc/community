@@ -29,7 +29,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		}
 	};
 
-	public static DocumentComparator SIZE_SORT = new DocumentComparator() {
+	public static DocumentComparator FILESIZE_SORT = new DocumentComparator() {
 		@Override
 		public int compare(AbstractDocument d1, AbstractDocument d2) {
 			return Long.valueOf(d1.getFileSize()).compareTo(d2.getFileSize());
@@ -197,8 +197,8 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 				comp = FILENAME_SORT;
 			else if ("id".equals(field))
 				comp = ID_SORT;
-			else if ("size".equals(field))
-				comp = SIZE_SORT;
+			else if ("fileSize".equals(field))
+				comp = FILESIZE_SORT;
 			else if ("version".equals(field))
 				comp = VERSION_SORT;
 			else if ("fileVersion".equals(field))

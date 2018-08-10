@@ -12,7 +12,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Utility class for tags handling
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class TagUtil {

@@ -13,7 +13,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 /**
  * Extended attribute of a document
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
 @XmlRootElement(name = "attribute")

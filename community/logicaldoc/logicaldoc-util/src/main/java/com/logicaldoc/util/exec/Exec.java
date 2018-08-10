@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class used to execute system commands
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.3
  */
 public class Exec {

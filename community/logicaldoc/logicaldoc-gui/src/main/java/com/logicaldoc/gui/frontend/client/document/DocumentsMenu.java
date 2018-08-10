@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.layout.events.SectionHeaderClickHandler;
 /**
  * The left menu
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentsMenu extends SectionStack {
@@ -101,7 +101,7 @@ public class DocumentsMenu extends SectionStack {
 
 	public void refresh(String sectionNameToExpand) {
 		if ("bookmarks".equals(sectionNameToExpand)) {
-			BookmarksPanel.get().reloadList();
+			BookmarksPanel.get().refresh();
 		} else if ("trash".equals(sectionNameToExpand)
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TRASH)) {
 			TrashPanel.get().refresh();

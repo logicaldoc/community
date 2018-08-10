@@ -11,7 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUIValue;
  * The client side stub for the Folder Service. This service allows r/w
  * operations on folders.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("folder")

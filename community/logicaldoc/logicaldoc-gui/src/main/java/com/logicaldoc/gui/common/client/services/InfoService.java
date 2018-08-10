@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 /**
  * Informations service
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0.0
  */
 @RemoteServiceRelativePath("info")

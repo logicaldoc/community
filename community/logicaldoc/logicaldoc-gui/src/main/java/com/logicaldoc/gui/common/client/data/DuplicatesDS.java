@@ -10,7 +10,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * Datasource to handle duplicates documents grid lists. It is based on Xml
  * parsing.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class DuplicatesDS extends DataSource {

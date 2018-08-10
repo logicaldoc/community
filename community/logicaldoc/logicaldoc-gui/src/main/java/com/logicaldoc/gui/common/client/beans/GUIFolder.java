@@ -8,11 +8,17 @@ import com.logicaldoc.gui.common.client.Constants;
 /**
  * Represents a folder from the GUI view
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
+	public static final int TYPE_ALIAS = 2;
+
+	public static final int TYPE_WORKSPACE = 1;
+
+	public static final int TYPE_DEFAULT = 0;
+	
 	private static final long serialVersionUID = 1L;
 
 	private long id;
@@ -113,6 +119,10 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	public boolean isDownload() {
 		return hasPermission(Constants.PERMISSION_DOWNLOAD);
+	}
+
+	public boolean isMove() {
+		return hasPermission(Constants.PERMISSION_MOVE);
 	}
 
 	public boolean isDelete() {

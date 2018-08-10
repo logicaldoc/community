@@ -84,7 +84,7 @@ public class BookmarkDialog extends Window {
 						@Override
 						public void onSuccess(Void ret) {
 							destroy();
-							BookmarksPanel.get().reloadList();
+							BookmarksPanel.get().refresh();
 						}
 					});
 				}

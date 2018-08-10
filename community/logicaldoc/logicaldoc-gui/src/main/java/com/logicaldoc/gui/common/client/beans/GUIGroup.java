@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Representation of a users group
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIGroup implements Serializable {

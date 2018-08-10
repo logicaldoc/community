@@ -20,7 +20,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet retrieves the options for extended attributes
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class AttributeOptionsDataServlet extends HttpServlet {

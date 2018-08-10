@@ -6,7 +6,7 @@
 	<parent>
 	  <groupId>com.logicaldoc</groupId>
 	  <artifactId>logicaldoc</artifactId>
-	  <version>7.7.3</version>
+	  <version>8.0.0</version>
 	</parent>
 
     <artifactId>logicaldoc-cmis</artifactId>
@@ -109,7 +109,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.3</version>
 				<configuration>
 					<descriptors>
 						<descriptor>
@@ -122,7 +121,7 @@
 						<id>make-assembly</id>
 						<phase>package</phase>
 						<goals>
-							<goal>attached</goal>
+							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>

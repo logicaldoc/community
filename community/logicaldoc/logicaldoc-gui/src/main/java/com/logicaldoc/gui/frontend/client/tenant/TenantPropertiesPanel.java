@@ -22,7 +22,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Shows document's standard properties and read-only data
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TenantPropertiesPanel extends HLayout {

@@ -15,7 +15,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 /**
  * Web Service Group. Useful class to create repository Groups.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 @XmlType(name = "WSGroup")

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Main starting point for all thumbnail builders
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8.1
  * 
  */

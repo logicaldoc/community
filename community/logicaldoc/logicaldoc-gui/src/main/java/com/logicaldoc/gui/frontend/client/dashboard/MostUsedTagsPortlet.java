@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUITag;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.search.TagsForm;
@@ -28,7 +29,7 @@ import com.smartgwt.client.widgets.layout.Portlet;
 /**
  * Portlet specialized in listing history records
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MostUsedTagsPortlet extends Portlet {
@@ -39,13 +40,13 @@ public class MostUsedTagsPortlet extends Portlet {
 
 	public MostUsedTagsPortlet() {
 		if (Feature.enabled(Feature.TAGS)) {
-			refresh();
+			init();
 		} else
 			addItem(new FeatureDisabled());
 	}
 
-	private void refresh() {
-		setTitle(I18N.message("mostusedtags"));
+	private void init() {
+		setTitle(AwesomeFactory.getIconHtml("tag", I18N.message("mostusedtags")));
 
 		HeaderControl refresh = new HeaderControl(HeaderControl.REFRESH, new ClickHandler() {
 			@Override
@@ -54,28 +55,43 @@ public class MostUsedTagsPortlet extends Portlet {
 			}
 		});
 
-		if (container != null)
-			removeItem(container);
-
-		HeaderIcon portletIcon = ItemFactory.newHeaderIcon("tag_blue.png");
-		HeaderControl hcicon = new HeaderControl(portletIcon);
-		hcicon.setSize(16);
-
-		setHeaderControls(hcicon, HeaderControls.HEADER_LABEL, refresh);
+		setHeaderControls(HeaderControls.HEADER_LABEL, refresh);
 
 		setCanDrag(false);
 		setCanDrop(false);
 		setDragAppearance(DragAppearance.OUTLINE);
 		setDragOpacity(30);
 
+		ListGridField word = new ListGridField("word", I18N.message("tag"), 150);
+		ListGridField count = new ListGridField("count", I18N.message("count"), 60);
+		list = new ListGrid();
+		list.setEmptyMessage(I18N.message("notitemstoshow"));
+		list.setWidth100();
+		list.setHeight100();
+		list.setFields(word, count);
+		list.setSelectionType(SelectionStyle.SINGLE);
+
 		container = new HLayout();
 		container.setWidth100();
 		container.setHeight100();
 		container.setAlign(Alignment.CENTER);
 		container.setMargin(10);
+		container.addMember(list);
 
 		addItem(container);
 
+		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
+			@Override
+			public void onCellDoubleClick(CellDoubleClickEvent event) {
+				ListGridRecord record = event.getRecord();
+				TagsForm.searchTag(record.getAttributeAsString("word"), false);
+			}
+		});
+
+		refresh();
+	}
+
+	private void refresh() {
 		TagService.Instance.get().getTagCloud(new AsyncCallback<GUITag[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -84,16 +100,6 @@ public class MostUsedTagsPortlet extends Portlet {
 
 			@Override
 			public void onSuccess(GUITag[] cloud) {
-				ListGridField word = new ListGridField("word", I18N.message("tag"), 150);
-				ListGridField count = new ListGridField("count", I18N.message("count"), 60);
-				list = new ListGrid();
-				list.setEmptyMessage(I18N.message("notitemstoshow"));
-				list.setWidth100();
-				list.setHeight100();
-				list.setFields(word, count);
-				list.setSelectionType(SelectionStyle.SINGLE);
-				container.addMember(list);
-
 				ListGridRecord[] records = new ListGridRecord[cloud.length];
 				for (int i = 0; i < cloud.length; i++) {
 					records[i] = new ListGridRecord();
@@ -101,14 +107,6 @@ public class MostUsedTagsPortlet extends Portlet {
 					records[i].setAttribute("count", cloud[i].getCount());
 				}
 				list.setRecords(records);
-
-				list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
-					@Override
-					public void onCellDoubleClick(CellDoubleClickEvent event) {
-						ListGridRecord record = event.getRecord();
-						TagsForm.searchTag(record.getAttributeAsString("word"), false);
-					}
-				});
 			}
 		});
 	}

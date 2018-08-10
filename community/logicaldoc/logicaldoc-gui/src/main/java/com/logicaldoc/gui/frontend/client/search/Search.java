@@ -9,12 +9,13 @@ import com.logicaldoc.gui.common.client.beans.GUIResult;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 
 /**
  * Collector for all searches
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Search {
@@ -29,8 +30,6 @@ public class Search {
 	private long time;
 
 	private boolean hasMore = false;
-
-	private String suggestion;
 
 	private long estimatedHits;
 
@@ -78,7 +77,6 @@ public class Search {
 			@Override
 			public void onSuccess(GUIResult result) {
 				try {
-					suggestion = result.getSuggestion();
 					time = result.getTime();
 					estimatedHits = result.getEstimatedHits();
 					hasMore = result.isHasMore();
@@ -88,6 +86,8 @@ public class Search {
 						observer.onSearchArrived();
 				} finally {
 					ContactingServer.get().hide();
+					SearchPanel.get().onDraw();
+					MainPanel.get().selectSearchTab();
 				}
 			}
 		});
@@ -111,10 +111,6 @@ public class Search {
 
 	public void setHasMore(boolean hasMore) {
 		this.hasMore = hasMore;
-	}
-
-	public String getSuggestion() {
-		return suggestion;
 	}
 
 	public long getEstimatedHits() {

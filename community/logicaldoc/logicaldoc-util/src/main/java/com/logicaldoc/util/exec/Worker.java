@@ -3,7 +3,7 @@ package com.logicaldoc.util.exec;
 /**
  * A simple thread that waits for completion of a given Process.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.1
  */
 public class Worker extends Thread {

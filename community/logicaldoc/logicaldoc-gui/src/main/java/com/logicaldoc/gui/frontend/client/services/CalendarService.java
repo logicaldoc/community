@@ -12,7 +12,7 @@ import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
  * The client side stub for the Calendar Service. This service allows the
  * handling of calendar events.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 @RemoteServiceRelativePath("calendar")

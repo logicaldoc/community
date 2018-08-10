@@ -10,8 +10,10 @@ public class AccountNotFoundException extends AuthenticationException {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String CODE = "notfound";
+
 	public AccountNotFoundException() {
-		super("notfound");
+		super(CODE);
 	}
 
 	public AccountNotFoundException(String message) {

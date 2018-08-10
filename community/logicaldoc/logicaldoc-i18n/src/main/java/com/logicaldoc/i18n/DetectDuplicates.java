@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Detects duplicated keys in the messages bundle
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  */
 public class DetectDuplicates {
 

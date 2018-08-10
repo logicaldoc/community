@@ -32,7 +32,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel implements the browser on the documents archive
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentsPanel extends HLayout implements FolderObserver, DocumentObserver {
@@ -46,8 +46,6 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	protected Canvas detailPanel;
 
 	protected static DocumentsPanel instance;
-
-	protected DocumentToolbar toolbar;
 
 	protected VLayout body = new VLayout();
 
@@ -66,53 +64,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	protected Integer max;
 
-	protected int mode = DocumentsGrid.MODE_LIST;
+	protected int visualizationMode = DocumentsGrid.MODE_LIST;
 
-	protected DocumentsPanel() {
-		// Register to folders events
-		FolderController.get().addObserver(this);
-
-		// Register to documents events
-		DocumentController.get().addObserver(this);
-
-		setWidth100();
-		setOverflow(Overflow.HIDDEN);
-
-		// Initialize the listing panel as placeholder
-		listingPanel = new Label("&nbsp;" + I18N.message("selectfolder"));
-		listing.setAlign(Alignment.CENTER);
-		listing.setHeight("51%");
-		listing.setShowResizeBar(true);
-		listing.addMember(listingPanel);
-
-		// Add a details panel under the listing one
-		detailPanel = new Label("&nbsp;" + I18N.message("selectfolderordoc"));
-		details.setAlign(Alignment.CENTER);
-		details.addMember(detailPanel);
-
-		toolbar = new DocumentToolbar();
-		toolbar.setWidth100();
-
-		body.addMember(toolbar);
-		body.addMember(listing);
-		body.addMember(details);
-		body.setShowResizeBar(true);
-		body.setResizeBarTarget("next");
-
-		documentsMenu = new DocumentsMenu();
-		previewPanel = new DocumentsPreviewPanel();
-
-		setMembers(documentsMenu, body, previewPanel);
-		setShowEdges(false);
-
-		previewPanel.addVisibilityChangedHandler(new VisibilityChangedHandler() {
-
-			@Override
-			public void onVisibilityChanged(VisibilityChangedEvent event) {
-				if (detailPanel instanceof DocumentDetailsPanel)
-					previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
-			}
-		});
+	private DocumentsPanel() {
 	}
 
 	public static DocumentsPanel get() {
@@ -136,15 +90,61 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		return instance;
 	}
 
+	@Override
+	public void onDraw() {
+		// Register to folders events
+		FolderController.get().addObserver(this);
+
+		// Register to documents events
+		DocumentController.get().addObserver(this);
+
+		setWidth100();
+		setOverflow(Overflow.HIDDEN);
+
+		// Initialize the listing panel as placeholder
+		listingPanel = new Label("&nbsp;" + I18N.message("selectfolder"));
+		listing.setAlign(Alignment.CENTER);
+		listing.setHeight("51%");
+		listing.setShowResizeBar(true);
+		listing.addMember(listingPanel);
+
+		// Add a details panel under the listing one
+		detailPanel = new Label("&nbsp;" + I18N.message("selectfolderordoc"));
+		details.setAlign(Alignment.CENTER);
+		details.addMember(detailPanel);
+
+		body.addMember(DocumentToolbar.get());
+		body.addMember(listing);
+		body.addMember(details);
+		body.setShowResizeBar(true);
+		body.setResizeBarTarget("next");
+
+		documentsMenu = new DocumentsMenu();
+		previewPanel = new DocumentsPreviewPanel();
+
+		setMembers(documentsMenu, body, previewPanel);
+		setShowEdges(false);
+
+		previewPanel.addVisibilityChangedHandler(new VisibilityChangedHandler() {
+
+			@Override
+			public void onVisibilityChanged(VisibilityChangedEvent event) {
+				if (detailPanel instanceof DocumentDetailsPanel)
+					previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
+			}
+		});
+	}
+
 	public void openInFolder(long folderId, Long docId) {
 		// Save the information about the document that will be hilighted by
-		// habler onFolderSelect
+		// handler onFolderSelect
 		if (docId != null)
 			hiliteDocId = docId;
 
+		MainPanel.get().selectDocumentsTab();
+		
 		documentsMenu.openFolder(folderId);
 		documentsMenu.expandSection(0);
-		MainPanel.get().selectDocumentsTab();
 		if (detailPanel != null && detailPanel instanceof DocumentDetailsPanel)
 			((DocumentDetailsPanel) detailPanel).selectDeafultTab();
 	}
@@ -198,7 +198,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 					details.addMember(detailPanel);
 				}
 
-				toolbar.update(result);
+				DocumentToolbar.get().update(result);
 				if (detailPanel instanceof DocumentDetailsPanel) {
 					((DocumentDetailsPanel) detailPanel).setDocument(result);
 					details.redraw();
@@ -211,30 +211,33 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void refresh() {
-		refresh(null, 1, null);
+		refresh(null, null);
 	}
 
-	public void refresh(Integer max, int page, Integer mode) {
+	public void refresh(Integer max, Integer visualizationMode) {
 		if (max != null && max > 0)
 			this.max = max;
+		if (visualizationMode != null)
+			this.visualizationMode = visualizationMode;
 
-		if (mode != null)
-			this.mode = mode;
-
-		updateListingPanel(folder, hiliteDocId, this.max, page, this.mode);
+		updateListingPanel(folder);
 
 		showFolderDetails();
-
-		hiliteDocId = null;
 	}
 
-	protected void updateListingPanel(GUIFolder folder, Long hiliteDocId, Integer max, int page, int mode) {
-		listing.removeMember(listingPanel);
-		listingPanel.destroy();
-		listingPanel = new DocumentsListPanel(folder, hiliteDocId, max, page, mode);
-		listing.addMember(listingPanel);
-		listing.redraw();
+	private void updateListingPanel(GUIFolder folder) {
+		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
+				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
+			((DocumentsListPanel) listingPanel).updateData(folder, max, this.hiliteDocId);
+		} else {
+			listing.removeMember(listingPanel);
+			listingPanel.destroy();
+			listingPanel = new DocumentsListPanel(folder, hiliteDocId, max, visualizationMode);
+			listing.addMember(listingPanel);
+			listing.redraw();
+		}
 
+		hiliteDocId = null;
 		previewPanel.reset();
 	}
 
@@ -292,11 +295,11 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public int getMode() {
-		return mode;
+		return visualizationMode;
 	}
 
 	public void setMode(int mode) {
-		this.mode = mode;
+		this.visualizationMode = mode;
 	}
 
 	public DocumentsPreviewPanel getPreviewPanel() {
@@ -325,7 +328,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 			details.addMember(detailPanel);
 		}
 
-		toolbar.update(document);
+		DocumentToolbar.get().update(document);
 		if (detailPanel instanceof DocumentDetailsPanel) {
 			((DocumentDetailsPanel) detailPanel).setDocument(document);
 			details.redraw();
@@ -405,6 +408,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	public void onFolderSelect(long folderId, Long docId) {
 		if (docId != null)
 			hiliteDocId = docId;
+
 		FolderService.Instance.get().getFolder(folderId, false, new AsyncCallback<GUIFolder>() {
 
 			@Override
@@ -414,7 +418,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 			@Override
 			public void onSuccess(GUIFolder folder) {
-				updateListingPanel(folder, hiliteDocId, max, 1, mode);
+				// Reset the cursor to the first page
+				((DocumentsListPanel) listingPanel).getGrid().getGridCursor().setCurrentPage(1);
+				updateListingPanel(folder);
 			}
 		});
 	}
@@ -422,6 +428,32 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	@Override
 	public void onFolderSelected(GUIFolder folder) {
 		this.folder = folder;
+		// Reset the cursor to the first page
+		if(listingPanel!=null && listingPanel instanceof DocumentsListPanel)
+			((DocumentsListPanel) listingPanel).getGrid().getGridCursor().setCurrentPage(1);
 		refresh();
+	}
+
+	@Override
+	public void destroy() {
+		FolderController.get().removeObserver(this);
+		DocumentController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		destroy();
+	}
+
+	@Override
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
 	}
 }

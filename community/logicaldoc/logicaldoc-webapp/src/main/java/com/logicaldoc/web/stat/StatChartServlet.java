@@ -29,7 +29,7 @@ import com.logicaldoc.web.util.ServletUtil;
 /**
  * This servlet generates the pie charts displayed in the statistics.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.2
  */
 public class StatChartServlet extends HttpServlet {

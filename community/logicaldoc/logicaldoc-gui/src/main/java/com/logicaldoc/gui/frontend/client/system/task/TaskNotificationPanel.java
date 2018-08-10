@@ -19,13 +19,10 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows notification settings for a task
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.1
  */
 public class TaskNotificationPanel extends VLayout {
-	private VLayout notificationsPane = new VLayout();
-
-	private DynamicForm notificationsForm;
 
 	private ChangedHandler changedHandler;
 
@@ -37,17 +34,14 @@ public class TaskNotificationPanel extends VLayout {
 		setWidth100();
 		this.changedHandler = changedHandler;
 		this.task = task;
-		setMembers(notificationsPane);
-		refreshNotifications();
 	}
 
-	private void refreshNotifications() {
-		if (notificationsForm != null && notificationsPane.contains(notificationsForm)) {
-			notificationsPane.removeMember(notificationsForm);
-			notificationsForm.destroy();
-		}
+	@Override
+	public void onDraw() {
+		VLayout notificationsPane = new VLayout();
+		setMembers(notificationsPane);
 
-		notificationsForm = new DynamicForm();
+		final DynamicForm notificationsForm = new DynamicForm();
 		notificationsForm.setColWidths(1, "*");
 		notificationsForm.setMargin(3);
 
@@ -88,6 +82,9 @@ public class TaskNotificationPanel extends VLayout {
 	}
 
 	boolean validate() {
+		if (recipients == null)
+			return true;
+
 		String[] ids = recipients.getValues();
 		GUIUser[] recipients = new GUIUser[ids != null ? ids.length : 0];
 

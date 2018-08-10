@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class manages I/O operations with files.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 4.0
  */
 public class FileUtil {
@@ -498,6 +498,43 @@ public class FileUtil {
 
 	public static byte[] toByteArray(File file, long start, long length) throws IOException {
 		return toByteArray(new RandomAccessFile(file, "r"), start, length);
+	}
+
+	/**
+	 * Copies the input file into the output at the given offset
+	 */
+	public static void copy(File input, File output, long offset) throws IOException {
+		RandomAccessFile inputRa = new RandomAccessFile(input, "r");
+		RandomAccessFile outputRa = new RandomAccessFile(output, "rw");
+		FileChannel sourceChannel = inputRa.getChannel();
+		FileChannel targetChannel = outputRa.getChannel();
+		try {
+			targetChannel.transferFrom(sourceChannel, offset, input.length());
+		} finally {
+			try {
+				sourceChannel.close();
+			} catch (Throwable e) {
+
+			}
+
+			try {
+				inputRa.close();
+			} catch (Throwable e) {
+
+			}
+
+			try {
+				targetChannel.close();
+			} catch (Throwable e) {
+
+			}
+
+			try {
+				outputRa.close();
+			} catch (Throwable e) {
+
+			}
+		}
 	}
 
 	/**

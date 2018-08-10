@@ -9,7 +9,7 @@ import com.logicaldoc.core.security.User;
  * object. For each value, is possible to define the type and if it is mandatory
  * or not.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 4.5.1
  */
 public class Attribute implements Comparable<Attribute> {

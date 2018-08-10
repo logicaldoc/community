@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Genaeric message to the user
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIMessage implements Serializable {

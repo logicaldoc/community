@@ -1,5 +1,6 @@
 package com.logicaldoc.core.automation;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -93,6 +94,14 @@ public class DocTool {
 		return ticket.getUrl();
 	}
 
+	public String displayFileSize(Long size) {
+		if (size == null || size.longValue() < 0)
+			return "0 Bytes";
+		final String[] units = new String[] { "Bytes", "KB", "MB", "GB", "TB" };
+		int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+	}
+
 	public void store(Document doc) {
 		store(doc, null);
 	}
@@ -150,14 +159,25 @@ public class DocTool {
 		return conversion;
 	}
 
-	private User getUser(String username) {
+	public User getUser(String username) {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		User user = StringUtils.isNotEmpty(username) ? userDao.findByUsername(username) : userDao
 				.findByUsername("_system");
 		return user;
 	}
 
-	private Folder createPath(Document doc, String targetPath) {
+	public String getPath(Document doc) {
+		if (doc == null)
+			return "";
+		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		String path = folderDao.computePathExtended(doc.getFolder().getId());
+		if (!path.endsWith("/"))
+			path += "/";
+		path += doc.getFileName();
+		return path;
+	}
+
+	public Folder createPath(Document doc, String targetPath) {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Folder parent = doc.getFolder();
 		if (targetPath.startsWith("/")) {

@@ -40,7 +40,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Shows a full-text search form
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class FulltextForm extends VLayout implements SearchObserver {

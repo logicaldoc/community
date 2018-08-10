@@ -12,7 +12,7 @@ import com.logicaldoc.webservice.model.WSRight;
 /**
  * Folder Web Service definition interface
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  * 
  */

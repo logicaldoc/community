@@ -46,9 +46,9 @@ public class ReportDetailsPanel extends VLayout {
 
 	private TabSet tabSet = new TabSet();
 
-	private ReportsPanel reportsPanel;
+	private CustomReportsPanel reportsPanel;
 
-	public ReportDetailsPanel(ReportsPanel reportsPanel) {
+	public ReportDetailsPanel(CustomReportsPanel reportsPanel) {
 		super();
 
 		this.reportsPanel = reportsPanel;

@@ -325,7 +325,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @param userId The user that performed the deletion
 	 * @param maxHits Optional defines the max number of returned hits
-	 * @return The documents list ordered by descending lastModified
+	 * @return The documents list
 	 */
 	public List<Document> findDeleted(long userId, Integer maxHits);
 

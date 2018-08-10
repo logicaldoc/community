@@ -28,7 +28,7 @@ import com.logicaldoc.webservice.model.WSUtil;
 /**
  * Test case for <code>SoapDocumentService</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class SoapDocumentServiceTest extends AbstractWebServiceTestCase {

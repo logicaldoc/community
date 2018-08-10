@@ -18,7 +18,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This popup window is used to upload a new workflow schema to the server.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.3
  */
 public class WorkflowUploader extends Window {

@@ -7,7 +7,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
 /**
  * Instances of this class is a DAO-service for Generic business entities.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public interface GenericDAO extends PersistentObjectDAO<Generic> {

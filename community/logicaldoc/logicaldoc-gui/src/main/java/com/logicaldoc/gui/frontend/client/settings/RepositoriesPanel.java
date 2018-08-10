@@ -22,7 +22,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 /**
  * This panel shows the Folders settings.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class RepositoriesPanel extends AdminPanel {
@@ -31,7 +31,10 @@ public class RepositoriesPanel extends AdminPanel {
 
 	public RepositoriesPanel() {
 		super("repositories");
+	}
 
+	@Override
+	public void onDraw() {
 		body.setMembers(new StoragesPanel());
 
 		// The Folders Tab

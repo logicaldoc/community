@@ -7,7 +7,7 @@ import com.logicaldoc.core.PersistentObject;
 /**
  * A sequence in the database
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
 public class Sequence extends PersistentObject {

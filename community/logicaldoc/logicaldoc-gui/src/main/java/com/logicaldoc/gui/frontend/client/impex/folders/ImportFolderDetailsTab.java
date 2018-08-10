@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 /**
  * Superclass for all tab panels in the import folders details area
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public abstract class ImportFolderDetailsTab extends HLayout {

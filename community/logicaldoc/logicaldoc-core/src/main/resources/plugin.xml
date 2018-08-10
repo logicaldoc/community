@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-core" version="7.7.3" class="com.logicaldoc.core.CorePlugin">
+<plugin id="logicaldoc-core" version="8.0.0" class="com.logicaldoc.core.CorePlugin">
   <extension-point id="DbInit">
     <parameter-def id="name" />
     <parameter-def id="sqlFile" />
@@ -179,6 +179,10 @@
 	<parameter id="locale" value="bg" />
 	<parameter id="analyzer" value="-" />
   </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Language" id="plLanguage">
+    <parameter id="locale" value="pl" />
+    <parameter id="analyzer" value="-" />
+  </extension>
 
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="jpgThumb">
     <parameter id="extension" value="jpg" />
@@ -301,6 +305,16 @@
 		<parameter id="in" value="png,gif,jpg,jpeg,tif,tiff,bmp,psd"/>
 		<parameter id="out" value="pdf"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.ImageConverter"/>
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="p7mConv">
+		<parameter id="in" value="p7m"/>
+		<parameter id="out" value="pdf"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.P7MConverter"/>
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="xmlConv">
+		<parameter id="in" value="xml"/>
+		<parameter id="out" value="pdf,html"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.XMLConverter"/>
   </extension>  
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="catchallConv">
 		<parameter id="in" value="*"/>

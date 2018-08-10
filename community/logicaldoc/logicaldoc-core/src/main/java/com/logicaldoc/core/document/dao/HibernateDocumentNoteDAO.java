@@ -18,7 +18,7 @@ import com.logicaldoc.util.Context;
 /**
  * Hibernate implementation of <code>DocumentNoteDAO</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
 @SuppressWarnings("unchecked")

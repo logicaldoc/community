@@ -5,7 +5,7 @@ import com.logicaldoc.core.document.AbstractHistory;
 /**
  * History entry due to an event on a folder.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class FolderHistory extends AbstractHistory {
@@ -31,6 +31,7 @@ public class FolderHistory extends AbstractHistory {
 		history.setUsername(getUsername());
 		history.setUserLogin(getUserLogin());
 		history.setNotifyEvent(isNotifyEvent());
+		history.setIp(getIp());
 
 		return history;
 	}

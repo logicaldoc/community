@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows the list of the user's contacts.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {

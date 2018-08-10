@@ -16,20 +16,36 @@ import java.util.StringTokenizer;
  * A class for retrieval of localized messages. All bundles declared in
  * ResourceBundle extension point. The first key match wins.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class I18N {
-	private I18N() {
+
+	/**
+	 * Index is the language ISO 639-2(3 digits) value is the corresponding
+	 * locale.
+	 */
+	private static Map<String, Locale> iso3LocaleMap;
+
+	static {
+		String[] languages = Locale.getISOLanguages();
+		iso3LocaleMap = new HashMap<String, Locale>(languages.length);
+		for (String language : languages) {
+			Locale locale = new Locale(language);
+			iso3LocaleMap.put(locale.getISO3Language().toLowerCase(), locale);
+		}
 	}
 
+	private I18N() {
+	}
+	
 	public static String message(String key) {
 		return message(key, Locale.getDefault());
 	}
 
 	public static String message(String key, String lang) {
-		if(lang==null)
-			lang="en";
+		if (lang == null)
+			lang = "en";
 		return message(key, new Locale(lang));
 	}
 
@@ -52,6 +68,20 @@ public class I18N {
 		return MessageFormat.format(msg, values);
 	}
 
+	public static Map<String, String> getMessages(Locale locale) {
+		Map<String, String> map = new HashMap<String, String>();
+		try {
+			ResourceBundle bundle = ResourceBundle.getBundle("i18n.messages", locale);
+			Enumeration<String> keys = bundle.getKeys();
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
+				map.put(key, bundle.getString(key));
+			}
+		} catch (Throwable t) {
+		}
+		return map;
+	}
+	
 	public static List<String> getLocales() {
 		List<String> locales = new ArrayList<String>();
 		Properties p = new Properties();
@@ -65,18 +95,14 @@ public class I18N {
 		}
 		return locales;
 	}
-
-	public static Map<String, String> getMessages(Locale locale) {
-		Map<String, String> map = new HashMap<String, String>();
-		try {
-			ResourceBundle bundle = ResourceBundle.getBundle("i18n.messages", locale);
-			Enumeration<String> keys = bundle.getKeys();
-			while (keys.hasMoreElements()) {
-				String key = keys.nextElement();
-				map.put(key, bundle.getString(key));
-			}
-		} catch (Throwable t) {
-		}
-		return map;
+	
+	/**
+	 * Get the locale corresponding to the ISO 639-2(3 digits)
+	 *  
+	 * @param iso3Code The 3 digit code
+	 * @return The localse
+	 */
+	public static Locale getLocaleISO3(String iso3Code) {
+		return iso3LocaleMap.get(iso3Code.toLowerCase());
 	}
 }

@@ -18,7 +18,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This is the form used to change registration data.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Registration extends Window {

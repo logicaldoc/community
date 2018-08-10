@@ -11,7 +11,7 @@ import com.logicaldoc.core.PersistentObject;
  * An extensible object is able to store an undeterminate number of attributes.
  * Each attribute has a name and a string value.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public abstract class ExtensibleObject extends PersistentObject {

@@ -22,6 +22,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -64,13 +65,15 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tab.Tab;
+import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
+import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * Panel showing the search and indexing infos.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class SearchIndexingPanel extends AdminPanel {
@@ -87,13 +90,9 @@ public class SearchIndexingPanel extends AdminPanel {
 
 	private ListGrid parsersList;
 
-	private ListGrid docsList;
+	private RefreshableListGrid docsList;
 
 	private ListGrid langsList;
-
-	private DocumentsDS dataSource;
-
-	private InfoPanel infoPanel;
 
 	private Tab indexingQueueTab;
 
@@ -101,7 +100,10 @@ public class SearchIndexingPanel extends AdminPanel {
 		super("searchandindexing");
 
 		this.searchEngine = searchEngine;
+	}
 
+	@Override
+	public void onDraw() {
 		fillSearchEngineTab(searchEngine);
 
 		Tab parsersInfoTab = fillParsersTab();
@@ -114,10 +116,17 @@ public class SearchIndexingPanel extends AdminPanel {
 		tabs.addTab(indexingQueueTab);
 	}
 
-	private Tab fillIndexingQueueTab(int maxValue) {
+	private Tab fillIndexingQueueTab(final int maxValue) {
 		Tab indexingQueueTab = new Tab(I18N.message("indexingqueue"));
-		refreshIndexingQueue(maxValue);
+		prepareIndexingQueuePanel(maxValue);
 		indexingQueueTab.setPane(indexingQueueTabPanel);
+		indexingQueueTab.addTabSelectedHandler(new TabSelectedHandler() {
+
+			@Override
+			public void onTabSelected(TabSelectedEvent event) {
+				refreshIndexingQueue(maxValue);
+			}
+		});
 		return indexingQueueTab;
 	}
 
@@ -705,7 +714,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		body.setMembers(searchEngineTabPanel);
 	}
 
-	private void refreshIndexingQueue(Integer maxValue) {
+	private void prepareIndexingQueuePanel(Integer maxValue) {
 		final IntegerItem max = ItemFactory.newValidateIntegerItem("max", "", maxValue, 1, null);
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
@@ -726,7 +735,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		});
 
 		// Prepare a panel containing a title and the documents number
-		infoPanel = new InfoPanel("");
+		final InfoPanel infoPanel = new InfoPanel("");
 
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
@@ -796,7 +805,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		lockUserId.setHidden(true);
 		lockUserId.setCanFilter(false);
 
-		docsList = new ListGrid() {
+		docsList = new RefreshableListGrid() {
 			@Override
 			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
 				if (record == null)
@@ -836,20 +845,15 @@ public class SearchIndexingPanel extends AdminPanel {
 		docsList.setSelectionType(SelectionStyle.MULTIPLE);
 		docsList.setShowFilterEditor(true);
 		docsList.setFilterOnKeypress(true);
-		dataSource = new DocumentsDS(null, null, maxValue, 1, 0, null);
-		docsList.setDataSource(dataSource);
 		docsList.setFields(locked, icon, filename, size, lastModified, version, publisher, published, creator, created,
 				customId);
 
-		if (indexingQueueTabPanel != null) {
-			indexingQueueTabPanel.removeMembers(indexingQueueTabPanel.getMembers());
-		} else {
-			indexingQueueTabPanel = new VLayout();
-			indexingQueueTabPanel.setWidth100();
-			indexingQueueTabPanel.setHeight100();
-		}
-
+		indexingQueueTabPanel = new VLayout();
 		indexingQueueTabPanel.setMembers(toolStrip, infoPanel, docsList);
+	}
+
+	private void refreshIndexingQueue(Integer maxValue) {
+		docsList.refresh(new DocumentsDS(null, null, maxValue, 1, 0, null, false));
 	}
 
 	private void showIndexQueueMenu() {

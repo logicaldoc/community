@@ -1,9 +1,8 @@
 package com.logicaldoc.gui.common.client.widgets;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.HTMLPane;
@@ -12,11 +11,12 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * An useful panel to show incoming messages to the user
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class IncomingMessage extends HLayout {
@@ -59,25 +59,25 @@ public class IncomingMessage extends HLayout {
 		spacer.setOverflow(Overflow.HIDDEN);
 
 		addMember(spacer);
-
-		closeImg = ItemFactory.newImgIcon("delete.png");
-		closeImg.setLayoutAlign(Alignment.RIGHT);
-		closeImg.setHeight("16px");
-		closeImg.setTooltip(I18N.message("close"));
-		closeImg.setCursor(Cursor.HAND);
-		closeImg.setLayoutAlign(VerticalAlignment.CENTER);
+		
+		ToolStripButton close = AwesomeFactory.newIconButton("times", "close");
+		close.setLayoutAlign(Alignment.RIGHT);
+		close.setHeight("16px");
+		close.setTooltip(I18N.message("close"));
+		close.setLayoutAlign(VerticalAlignment.CENTER);
+		
 		if (clickHandler != null)
-			closeImg.addClickHandler(clickHandler);
+			close.addClickHandler(clickHandler);
 		else
-			closeImg.addClickHandler(new ClickHandler() {
+			close.addClickHandler(new ClickHandler() {
 
 				@Override
 				public void onClick(ClickEvent event) {
 					destroy();
 				}
 			});
-
-		addMember(closeImg);
+		
+		addMember(close);
 	}
 
 	public void setClickHandler(ClickHandler clickHandler) {

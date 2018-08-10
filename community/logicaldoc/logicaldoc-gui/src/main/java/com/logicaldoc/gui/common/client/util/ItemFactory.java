@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
+import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIRetentionPolicy;
 import com.logicaldoc.gui.common.client.data.ArchivesDS;
@@ -41,11 +42,9 @@ import com.logicaldoc.gui.common.client.validators.SimpleTextValidator;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.MultiComboBoxLayoutStyle;
 import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.types.PickListItemIconPlacement;
 import com.smartgwt.client.widgets.DateChooser;
 import com.smartgwt.client.widgets.DateRangeDialog;
 import com.smartgwt.client.widgets.HeaderControl.HeaderIcon;
@@ -81,11 +80,12 @@ import com.smartgwt.client.widgets.form.validator.IsIntegerValidator;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * Collection of useful factory methods for form items.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ItemFactory {
@@ -206,7 +206,7 @@ public class ItemFactory {
 
 		TimeItem timeItem = new TimeItem();
 		timeItem.setHintStyle("hint");
-		timeItem.setWidth(50);
+		timeItem.setWidth(60);
 		TimeItem.setDefaultProperties(timeItem);
 
 		FloatItem floatItem = new FloatItem();
@@ -1253,6 +1253,7 @@ public class ItemFactory {
 		map.put("0", I18N.message("subject"));
 		map.put("1", I18N.message("sender"));
 		map.put("2", I18N.message("content"));
+		map.put("3", I18N.message("recipient"));
 		select.setValueMap(map);
 		return select;
 	}
@@ -1496,6 +1497,28 @@ public class ItemFactory {
 
 		selector.setValue("" + value);
 		selector.setDefaultValue("" + value);
+
+		return selector;
+	}
+
+	public static SelectItem newImportFolderProviderOption(String value) {
+		SelectItem selector = new SelectItem("provider", I18N.message("type"));
+		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		if (Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS))
+			opts.put(GUIImportFolder.PROVIDER_FILE, I18N.message("localfolder"));
+		if (Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS)) {
+			opts.put(GUIImportFolder.PROVIDER_SMB, I18N.message("smbshare"));
+			opts.put(GUIImportFolder.PROVIDER_FTP, I18N.message("fftp"));
+			opts.put(GUIImportFolder.PROVIDER_FTPS, I18N.message("ftps"));
+			opts.put(GUIImportFolder.PROVIDER_SFTP, I18N.message("sftp"));
+		}
+		selector.setValueMap(opts);
+
+		selector.setWrapTitle(false);
+		selector.setWidth(150);
+
+		selector.setValue(value);
+		selector.setDefaultValue(value);
 
 		return selector;
 	}

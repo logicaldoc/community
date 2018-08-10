@@ -9,7 +9,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 /**
  * Interface for DAOs that operate on persistent objects
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public interface PersistentObjectDAO<T extends PersistentObject> {

@@ -19,7 +19,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 /**
  * This popup window is used to start a workflow on the selected documents.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class WorkflowDialog extends Window {
@@ -63,14 +63,14 @@ public class WorkflowDialog extends Window {
 		addItem(form);
 	}
 
-	public void onStart(long[] ids) {
+	public void onStart(final long[] ids) {
 		if (!form.validate())
 			return;
 
 		ListGridRecord selection = workflow.getSelectedRecord();
 
-		WorkflowService.Instance.get().startWorkflow(selection.getAttributeAsString("name"), selection.getAttributeAsString("description"),
-				tag.getValueAsString(), ids, new AsyncCallback<Void>() {
+		WorkflowService.Instance.get().startWorkflow(selection.getAttributeAsString("name"),
+				selection.getAttributeAsString("description"), tag.getValueAsString(), ids, new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

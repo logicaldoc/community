@@ -10,7 +10,7 @@ import com.logicaldoc.core.document.Document;
  * implementations can be provided, and the configuration property
  * <b>searchengine</b> must qualify the concrete implementation to use.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public interface SearchEngine {

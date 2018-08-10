@@ -43,7 +43,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the notes on a document
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
 public class NotesPanel extends DocumentDetailTab {
@@ -58,9 +58,12 @@ public class NotesPanel extends DocumentDetailTab {
 
 	public NotesPanel(final GUIDocument document) {
 		super(document, null);
+	}
+
+	@Override
+	protected void onDraw() {
 		addMember(container);
 		container.setMembersMargin(2);
-
 		init();
 	}
 

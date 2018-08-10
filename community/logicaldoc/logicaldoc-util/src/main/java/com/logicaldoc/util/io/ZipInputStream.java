@@ -7,7 +7,7 @@ import java.io.InputStream;
  * Wrapper around a standard AutoDeleteZipInputStream that avoids the CRC
  * checks on stream closure.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.2
  */
 public class ZipInputStream extends InputStream {

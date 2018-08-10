@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -44,11 +45,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class AttributeSetsPanel extends VLayout {
 
-	private Layout listing;
-
 	protected Layout detailsContainer;
 
-	protected ListGrid list;
+	protected RefreshableListGrid list;
 
 	protected Canvas details = SELECT_SET;
 
@@ -60,19 +59,13 @@ public class AttributeSetsPanel extends VLayout {
 
 	public AttributeSetsPanel() {
 		setWidth100();
-
-		infoPanel = new InfoPanel("");
-
-		refresh();
 	}
 
-	protected void refresh() {
-		Canvas[] members = getMembers();
-		for (Canvas canvas : members) {
-			removeMember(canvas);
-		}
+	@Override
+	public void onDraw() {
+		infoPanel = new InfoPanel("");
 
-		listing = new VLayout();
+		final Layout listing = new VLayout();
 		detailsContainer = new VLayout();
 		details = SELECT_SET;
 
@@ -101,7 +94,7 @@ public class AttributeSetsPanel extends VLayout {
 		ListGridField signRequired = new ListGridField("signRequired", I18N.message("signrequired"), 100);
 		signRequired.setHidden(true);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -129,7 +122,10 @@ public class AttributeSetsPanel extends VLayout {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				refresh();
+				list.refresh(new AttributeSetsDS(false, GUITemplate.TYPE_DEFAULT));
+				detailsContainer.removeMembers(detailsContainer.getMembers());
+				details = SELECT_SET;
+				detailsContainer.setMembers(details);
 			}
 		});
 		toolStrip.addButton(refresh);

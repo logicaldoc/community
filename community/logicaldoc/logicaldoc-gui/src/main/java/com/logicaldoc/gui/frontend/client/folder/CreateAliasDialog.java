@@ -14,7 +14,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 /**
  * This is the form used to copy a folder into another path
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class CreateAliasDialog extends Dialog {

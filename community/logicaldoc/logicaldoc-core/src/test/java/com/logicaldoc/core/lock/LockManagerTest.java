@@ -14,7 +14,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Test case for <code>LockManager</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class LockManagerTest extends AbstractCoreTCase {

@@ -10,7 +10,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Simple panel to show the user that a feature is disabled.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class FeatureDisabled extends VLayout {

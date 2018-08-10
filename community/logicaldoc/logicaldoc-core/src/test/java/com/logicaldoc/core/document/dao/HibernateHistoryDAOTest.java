@@ -18,7 +18,7 @@ import com.logicaldoc.core.i18n.DateBean;
 /**
  * Test case for <code>HibernateHistoryDAO</code>
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
 public class HibernateHistoryDAOTest extends AbstractCoreTCase {
@@ -105,10 +105,14 @@ public class HibernateHistoryDAOTest extends AbstractCoreTCase {
 		history.setUserId(1);
 		history.setUsername("mario");
 		history.setEvent(DocumentEvent.STORED.toString());
+		history.setIp("127.0.0.1");
 		history.setComment("The document has been created.");
 
 		dao.store(history);
-
+		
+		history=dao.findById(history.getId());
+		Assert.assertEquals("127.0.0.1", history.getIp());
+		
 		Collection histories = dao.findByDocId(1);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(4, histories.size());

@@ -5,7 +5,7 @@ import com.logicaldoc.core.PersistentObject;
 /**
  * A rating over a document
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class Rating extends PersistentObject {

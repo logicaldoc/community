@@ -44,7 +44,7 @@ import com.logicaldoc.util.io.FileUtil;
 /**
  * Standard implementation that implements a local search engine
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class StandardSearchEngine implements SearchEngine {
@@ -181,11 +181,8 @@ public class StandardSearchEngine implements SearchEngine {
 		Locale locale = doc.getLocale();
 		if (locale == null)
 			locale = Locale.ENGLISH;
-		Parser parser = ParserFactory.getParser(content, doc.getFileName(), locale, null, doc.getTenantId());
-		if (parser == null)
-			return;
-
-		String contentString = parser.getContent();
+		 
+		String contentString = ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId());
 
 		addHit(doc, contentString);
 	}

@@ -8,7 +8,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * Datasource to handle folders and sub-folders in ShareFile. It is based on Xml
  * parsing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
 public class ShareFileDS extends DataSource {

@@ -30,7 +30,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects all tasks details
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  * 
  */
@@ -62,7 +62,10 @@ public class TaskDetailPanel extends VLayout {
 		setHeight100();
 		setWidth100();
 		setMembersMargin(10);
+	}
 
+	@Override
+	public void onDraw() {
 		savePanel = new HLayout();
 		savePanel.setHeight(20);
 		savePanel.setVisible(false);
@@ -145,6 +148,7 @@ public class TaskDetailPanel extends VLayout {
 		}
 
 		addMember(tabSet);
+		refresh();
 	}
 
 	public GUITask getTask() {

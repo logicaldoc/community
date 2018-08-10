@@ -22,7 +22,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * A manager for all supported languages. It's internals are initialized from
  * the extension point 'Language' of the core plugin.
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0.3
  */
 public class LanguageManager {

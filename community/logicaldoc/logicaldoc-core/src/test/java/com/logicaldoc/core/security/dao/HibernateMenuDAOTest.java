@@ -17,7 +17,7 @@ import com.logicaldoc.core.security.User;
 /**
  * Test case for <code>HibernateMenuDAOTest</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class HibernateMenuDAOTest extends AbstractCoreTCase {

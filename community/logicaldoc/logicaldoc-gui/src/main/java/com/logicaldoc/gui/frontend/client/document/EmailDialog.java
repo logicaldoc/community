@@ -55,10 +55,11 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 /**
  * This is the form used to send emails and download tickets
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class EmailDialog extends Window {
+
 	private long[] docIds;
 
 	private ValuesManager vm = new ValuesManager();

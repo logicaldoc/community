@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUISearchEngine;
 /**
  * The client side stub for the Search Engine Service.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("searchengine")

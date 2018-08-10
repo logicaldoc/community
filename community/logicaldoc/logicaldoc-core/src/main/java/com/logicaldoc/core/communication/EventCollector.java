@@ -123,7 +123,7 @@ public class EventCollector {
 
 		if (!rememberHistory(history))
 			return;
-
+		
 		if (history.getDocId() != null && history.getDocument() == null) {
 			DocumentDAO docDao = (DocumentDAO) com.logicaldoc.util.Context.get().getBean(DocumentDAO.class);
 			history.setDocument(docDao.findById(history.getDocId()));
@@ -143,11 +143,11 @@ public class EventCollector {
 		Runnable notifier = new Runnable() {
 			@Override
 			public void run() {
-				log.debug("Notify history " + history);
+				log.debug("Notify history {}", history);
 				for (EventListener listener : listeners) {
 					listener.newEvent(history);
 				}
-				log.debug("Finished notification of history " + history);
+				log.debug("Finished notification of history {}", history);
 			}
 		};
 

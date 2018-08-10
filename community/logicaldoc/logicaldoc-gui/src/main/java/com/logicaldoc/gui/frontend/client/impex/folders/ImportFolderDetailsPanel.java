@@ -27,7 +27,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects details about an import folder
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ImportFolderDetailsPanel extends VLayout {
@@ -202,6 +202,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 
 				@Override
 				public void onSuccess(GUIImportFolder share) {
+					Log.info("success - "+share.getPath()+" - "+share.getDisplayUrl());
 					savePanel.setVisible(false);
 					if (share != null) {
 						foldersPanel.updateRecord(share);

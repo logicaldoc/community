@@ -8,7 +8,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Utility methods for Locale handling
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class LocaleUtil {

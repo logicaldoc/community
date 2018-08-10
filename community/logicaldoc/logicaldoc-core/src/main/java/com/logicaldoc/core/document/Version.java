@@ -15,7 +15,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * This class represents versions.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
 public class Version extends AbstractDocument implements Comparable<Version> {

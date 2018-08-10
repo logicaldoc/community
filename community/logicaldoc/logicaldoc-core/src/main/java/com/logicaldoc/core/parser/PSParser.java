@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ import com.logicaldoc.util.StringUtil;
 
 /**
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.5
  */
 public class PSParser extends AbstractParser {
@@ -125,7 +126,7 @@ public class PSParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 			String version = "";

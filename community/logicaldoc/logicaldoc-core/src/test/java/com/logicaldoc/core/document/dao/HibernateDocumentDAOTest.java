@@ -34,7 +34,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
 /**
  * Test case for <code>HibernateDocumentDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class HibernateDocumentDAOTest extends AbstractCoreTCase {

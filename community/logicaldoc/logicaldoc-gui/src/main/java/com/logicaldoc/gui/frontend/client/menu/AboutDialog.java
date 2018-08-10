@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.layout.VStack;
 /**
  * This is the about dialog.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class AboutDialog extends Window {

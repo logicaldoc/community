@@ -24,7 +24,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for messages data.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MessagesDataServlet extends HttpServlet {

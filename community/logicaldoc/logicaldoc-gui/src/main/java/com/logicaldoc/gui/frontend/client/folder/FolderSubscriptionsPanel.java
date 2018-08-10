@@ -37,7 +37,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the subscriptions on a folder.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.3
  */
 public class FolderSubscriptionsPanel extends FolderDetailTab {
@@ -48,13 +48,16 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 
 	public FolderSubscriptionsPanel(final GUIFolder folder) {
 		super(folder, null);
-
-		container.setMembersMargin(3);
-		addMember(container);
-
-		refresh(folder);
 	}
 
+	
+	@Override
+	protected void onDraw() {
+		container.setMembersMargin(3);
+		addMember(container);
+		refresh(folder);
+	}
+	
 	private void refreshList() {
 		if (list != null)
 			container.removeMember(list);

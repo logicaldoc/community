@@ -9,8 +9,10 @@ import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
+import com.logicaldoc.gui.frontend.client.metadata.barcode.BarcodesSettingsPanel;
 import com.logicaldoc.gui.frontend.client.metadata.form.FormsPanel;
 import com.logicaldoc.gui.frontend.client.metadata.stamp.StampsPanel;
+import com.logicaldoc.gui.frontend.client.metadata.tag.TagsPanel;
 import com.logicaldoc.gui.frontend.client.metadata.template.TemplatesAndAttributesPanel;
 import com.logicaldoc.gui.frontend.client.services.CustomIdService;
 import com.logicaldoc.gui.frontend.client.services.TagService;
@@ -23,7 +25,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the administration document metadata and workflow menu
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class MetadataMenu extends VLayout {

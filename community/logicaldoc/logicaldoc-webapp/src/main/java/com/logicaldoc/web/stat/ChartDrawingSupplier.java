@@ -8,7 +8,7 @@ import org.jfree.chart.plot.DefaultDrawingSupplier;
 /**
  * This picks the body color for any section of a pie chart
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.3
  *
  */

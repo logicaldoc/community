@@ -4,8 +4,8 @@ package com.logicaldoc.core.document;
  * Registers an event on folder or document
  * 
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
- * @author Marco Meschieri - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
+ * @author Marco Meschieri - LogicalDOC
  */
 public class History extends AbstractHistory {
 
@@ -33,6 +33,7 @@ public class History extends AbstractHistory {
 		history.setFile(getFile());
 		history.setTenant(getTenant());
 		history.setNotifyEvent(isNotifyEvent());
+		history.setIp(getIp());
 
 		return history;
 	}

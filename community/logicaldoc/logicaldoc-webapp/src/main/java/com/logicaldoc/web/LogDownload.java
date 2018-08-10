@@ -3,6 +3,7 @@ package com.logicaldoc.web;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +35,7 @@ import com.logicaldoc.web.util.ServletUtil;
 /**
  * This servlet grant access to log files
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class LogDownload extends HttpServlet {
@@ -65,7 +67,7 @@ public class LogDownload extends HttpServlet {
 				response.setHeader("Cache-Control", "no-store");
 				response.setDateHeader("Expires", 0);
 
-				file = prepareAllSupportResources(response);
+				file = prepareAllSupportResources(request, response);
 			} else if (appender != null) {
 				response.setContentType("text/html");
 				LoggingConfigurator conf = new LoggingConfigurator();
@@ -117,7 +119,7 @@ public class LogDownload extends HttpServlet {
 	 * Prepare all the support resources in one single zip: all the logs, the
 	 * context.properties, the snapshot of the env variables.
 	 */
-	private File prepareAllSupportResources(HttpServletResponse response) {
+	private File prepareAllSupportResources(HttpServletRequest request, HttpServletResponse response) {
 		File tmp = null;
 
 		try {
@@ -136,25 +138,13 @@ public class LogDownload extends HttpServlet {
 						continue;
 
 					File logFile = new File(conf.getFile(appender, true));
-					FileInputStream in = new FileInputStream(logFile);
-
-					// name the file inside the zip file
-					out.putNextEntry(new ZipEntry(logFile.getName()));
-
-					// buffer size
-					byte[] b = new byte[1024];
-					int count;
-
-					while ((count = in.read(b)) > 0) {
-						out.write(b, 0, count);
-					}
-					in.close();
+					writeEntry(out, logFile.getName(), logFile);
 				}
 
 				/*
-				 * Now create a copy of the configuration and store it in the zip file
+				 * Now create a copy of the configuration and store it in the
+				 * zip file
 				 */
-				out.putNextEntry(new ZipEntry("context.properties"));
 				File buf = File.createTempFile("context", ".properties");
 				ContextProperties cp = Context.get().getProperties();
 				OrderedProperties prop = new OrderedProperties();
@@ -165,32 +155,53 @@ public class LogDownload extends HttpServlet {
 						prop.put(key, cp.get(key));
 				}
 				prop.store(new FileOutputStream(buf), "Support Request");
-				
-				FileInputStream in = new FileInputStream(buf);
-				byte[] b = new byte[1024];
-				int count;
-				while ((count = in.read(b)) > 0) {
-					out.write(b, 0, count);
-				}
-				in.close();
+
+				writeEntry(out, "context.properties", buf);
 				FileUtil.strongDelete(buf);
-				
+
 				/*
-				 * Now create a file with the environment 
+				 * Now create a file with the environment
 				 */
-				out.putNextEntry(new ZipEntry("environment.txt"));
-				String env=SystemUtil.printEnvironment();
+				String env = SystemUtil.printEnvironment();
 				buf = File.createTempFile("environment", ".txt");
 				FileUtil.writeFile(env, buf.getPath());
-				
-				in = new FileInputStream(buf);
-				b = new byte[1024];
-				count=0;
-				while ((count = in.read(b)) > 0) {
-					out.write(b, 0, count);
-				}
-				in.close();
+				writeEntry(out, "environment.txt", buf);
 				FileUtil.strongDelete(buf);
+
+				/*
+				 * Discover the tomcat's folder
+				 */
+				ServletContext context = getServletContext();
+				File tomcatFile = new File(context.getRealPath("/WEB-INF/web.xml"));
+				tomcatFile = tomcatFile.getParentFile().getParentFile().getParentFile().getParentFile();
+
+				/*
+				 * Now put the server.xml file
+				 */
+				File serverFile = new File(tomcatFile.getPath() + "/conf/server.xml");
+				writeEntry(out, "tomcat/server.xml", serverFile);
+
+				/*
+				 * Now put the most recent tomcat's logs
+				 */
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				String today = df.format(new Date());
+				File logsDir = new File(tomcatFile.getPath() + "/logs");
+				File[] files = logsDir.listFiles();
+				for (File file : files) {
+					if (file.isDirectory() || (!file.getName().toLowerCase().endsWith(".log")
+							&& !file.getName().toLowerCase().endsWith(".out")
+							&& !file.getName().toLowerCase().endsWith(".txt")))
+						continue;
+					
+					// store just the logs of today
+					if (file.getName().toLowerCase().endsWith(".out")
+							|| file.getName().toLowerCase().endsWith(today + ".log")
+							|| file.getName().toLowerCase().endsWith(today + ".txt"))
+						writeEntry(out, "tomcat/" + file.getName(), file);
+				}
+
+				prop.store(new FileOutputStream(buf), "Support Request");
 			} finally {
 				out.close();
 			}
@@ -199,6 +210,25 @@ public class LogDownload extends HttpServlet {
 		}
 
 		return tmp;
+	}
+
+	public void writeEntry(ZipOutputStream out, String entry, File file) throws FileNotFoundException, IOException {
+		FileInputStream in;
+		byte[] b;
+		int count;
+		in = new FileInputStream(file);
+
+		// name the file inside the zip file
+		out.putNextEntry(new ZipEntry(entry));
+
+		// buffer size
+		b = new byte[1024];
+		count = 0;
+
+		while ((count = in.read(b)) > 0)
+			out.write(b, 0, count);
+
+		in.close();
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

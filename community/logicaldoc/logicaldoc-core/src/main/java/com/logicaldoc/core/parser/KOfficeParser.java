@@ -2,6 +2,7 @@ package com.logicaldoc.core.parser;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -21,7 +22,7 @@ import com.logicaldoc.util.StringUtil;
 /**
  * Text extractor for KOffice 1.6 documents.
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 4.5.2
  */
 public class KOfficeParser extends AbstractParser {
@@ -68,7 +69,7 @@ public class KOfficeParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
 		try {
 			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 			saxParserFactory.setValidating(false);

@@ -8,7 +8,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * Datasource to handle folders and sub-folders in Dropbox. It is based on Xml
  * parsing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class DropboxDS extends DataSource {

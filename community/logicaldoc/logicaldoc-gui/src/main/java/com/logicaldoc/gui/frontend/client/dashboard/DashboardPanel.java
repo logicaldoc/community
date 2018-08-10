@@ -13,10 +13,20 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This is the dashboard container
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DashboardPanel extends VLayout {
+
+	public static final String WORKFLOW_ID = "workflow";
+
+	public static final String MESSAGES_ID = "messages";
+
+	public static final String TAGS_ID = "tags";
+
+	public static final String USER_ID = "user";
+
+	public static final String CALENDAR_ID = "calendar";
 
 	private static DashboardPanel instance;
 
@@ -32,27 +42,36 @@ public class DashboardPanel extends VLayout {
 
 	private Tab tagsTab = null;
 
+	private String defaultOpenTab = USER_ID;
+
 	private DashboardPanel() {
 		setOverflow(Overflow.HIDDEN);
-		
+	}
+
+	@Override
+	public void onDraw() {
+		initGUI();
+	}
+
+	private void initGUI() {
 		userTab = new Tab(I18N.message("user"));
-		userTab.setID("user");
+		userTab.setID(USER_ID);
 		userTab.setPane(new UserDashboard());
 
 		tagsTab = new Tab(I18N.message("tags"));
-		tagsTab.setID("tags");
+		tagsTab.setID(TAGS_ID);
 		tagsTab.setPane(new TagsDashboard());
-		
+
 		messagesTab = new Tab(I18N.message("messages"));
-		messagesTab.setID("messages");
+		messagesTab.setID(MESSAGES_ID);
 		messagesTab.setPane(new MessagesPanel());
 
 		workflowTab = new Tab(I18N.message("workflow"));
-		workflowTab.setID("workflow");
+		workflowTab.setID(WORKFLOW_ID);
 		workflowTab.setPane(new WorkflowDashboard());
 
 		calendarTab = new Tab(I18N.message("calendar"));
-		calendarTab.setID("calendar");
+		calendarTab.setID(CALENDAR_ID);
 		calendarTab.setPane(UserCalendarPanel.get());
 
 		tabSet.addTab(userTab);
@@ -82,6 +101,8 @@ public class DashboardPanel extends VLayout {
 		}
 
 		setMembers(tabSet);
+
+		tabSet.selectTab(defaultOpenTab);
 	}
 
 	public static DashboardPanel get() {
@@ -95,38 +116,54 @@ public class DashboardPanel extends VLayout {
 	}
 
 	public Tab getWorkflowTab() {
+		if (workflowTab == null)
+			initGUI();
 		return workflowTab;
 	}
 
 	public Tab getCalendarTab() {
+		if (calendarTab == null)
+			initGUI();
 		return calendarTab;
 	}
 
 	public Tab getMessagesTab() {
+		if (messagesTab == null)
+			initGUI();
 		return messagesTab;
 	}
 
 	public Tab getUserTab() {
+		if (userTab == null)
+			initGUI();
 		return userTab;
 	}
 
 	public void updateUserTab() {
-		tabSet.setTabPane("user", new UserDashboard());
-		tabSet.selectTab("user");
+		tabSet.setTabPane(USER_ID, new UserDashboard());
+		tabSet.selectTab(USER_ID);
 	}
 
 	public void updateTagsTab() {
-		tabSet.setTabPane("tags", new TagsDashboard());
-		tabSet.selectTab("tags");
+		tabSet.setTabPane(TAGS_ID, new TagsDashboard());
+		tabSet.selectTab(TAGS_ID);
 	}
 
 	public void updateMessageTab() {
-		tabSet.setTabPane("messages", new MessagesPanel());
-		tabSet.selectTab("messages");
+		tabSet.setTabPane(MESSAGES_ID, new MessagesPanel());
+		tabSet.selectTab(MESSAGES_ID);
 	}
 
 	public void updateWorkflowTab() {
-		tabSet.setTabPane("workflow", new WorkflowDashboard());
-		tabSet.selectTab("workflow");
+		tabSet.setTabPane(WORKFLOW_ID, new WorkflowDashboard());
+		tabSet.selectTab(WORKFLOW_ID);
+	}
+
+	public String getDefaultOpenTab() {
+		return defaultOpenTab;
+	}
+
+	public void setDefaultOpenTab(String defaultOpenTab) {
+		this.defaultOpenTab = defaultOpenTab;
 	}
 }

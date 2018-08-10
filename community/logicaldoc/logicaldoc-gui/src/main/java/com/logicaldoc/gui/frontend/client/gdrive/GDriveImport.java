@@ -32,7 +32,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * This popup window is used to show documents in Google Drive that can be
  * imported into LogicalDOC
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
 public class GDriveImport extends Window {

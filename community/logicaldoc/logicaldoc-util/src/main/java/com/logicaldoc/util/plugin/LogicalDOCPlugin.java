@@ -25,7 +25,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * framework ({@see org.java.plugin.PluginManager manager}, {@see
  * org.java.plugin.registry.PluginRegistry registry}) which it was loaded.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public abstract class LogicalDOCPlugin extends Plugin {

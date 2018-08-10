@@ -3,18 +3,18 @@ package com.logicaldoc.gui.common.client.widgets;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.logicaldoc.gui.common.client.log.EventPanel;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Window;
 
 /**
  * This is the window that must be showed to the user during a long LogicalDOC
  * computation.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class ToastNotification extends Window {
@@ -26,6 +26,7 @@ public class ToastNotification extends Window {
 		setShowHeaderIcon(false);
 		setShowResizer(false);
 		setShowFooter(false);
+		setShowTitle(false);
 		setAlign(Alignment.CENTER);
 		setMargin(0);
 		setMembersMargin(3);
@@ -38,19 +39,13 @@ public class ToastNotification extends Window {
 		centerInPage();
 		setVertical(true);
 
-		Label message = new Label(messageText);
-		message.setWrap(false);
+		HTMLFlow message = new HTMLFlow(AwesomeFactory.getIconHtml("info-circle", messageText));
 		message.setAlign(Alignment.CENTER);
-		message.setIcon(Util.imageUrl("info.gif"));
-		message.setIconSize(32);
 		message.setStyleName("contactingserver");
 		message.setLayoutAlign(Alignment.CENTER);
-		message.setLayoutAlign(VerticalAlignment.TOP);
+		message.setLayoutAlign(VerticalAlignment.CENTER);
 		message.setBackgroundColor("white");
-		message.setShowEdges(false);
-		message.setAutoFit(true);
 		message.setHeight(50);
-		message.setMargin(0);
 
 		addItem(message);
 

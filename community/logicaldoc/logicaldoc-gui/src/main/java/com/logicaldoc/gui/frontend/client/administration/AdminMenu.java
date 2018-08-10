@@ -16,7 +16,7 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 /**
  * The left menu in the administration area
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class AdminMenu extends SectionStack {

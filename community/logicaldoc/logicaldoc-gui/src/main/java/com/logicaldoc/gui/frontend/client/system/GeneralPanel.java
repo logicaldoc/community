@@ -9,14 +9,17 @@ import com.smartgwt.client.widgets.tab.Tab;
 /**
  * The bottom side of the general panel
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class GeneralPanel extends AdminPanel {
 
 	public GeneralPanel() {
 		super("general");
+	}
 
+	@Override
+	public void onDraw() {
 		tab.setPane(new StatsPanel());
 
 		Tab sessions = new Tab();

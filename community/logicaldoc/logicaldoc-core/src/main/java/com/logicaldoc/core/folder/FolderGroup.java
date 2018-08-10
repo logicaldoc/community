@@ -6,7 +6,7 @@ import com.logicaldoc.core.security.Permission;
  * This class represents security permissions for a group in relation to a
  * folder
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 6.0
  */
 public class FolderGroup {
@@ -45,6 +45,10 @@ public class FolderGroup {
 
 	private int print = 1;
 
+	private int move = 0;
+
+	private int email = 1;
+
 	private long groupId;
 
 	public FolderGroup(long groupId) {
@@ -73,6 +77,8 @@ public class FolderGroup {
 		mg.setCalendar(calendar);
 		mg.setSubscription(subscription);
 		mg.setPassword(password);
+		mg.setMove(move);
+		mg.setEmail(email);
 		return mg;
 	}
 
@@ -100,6 +106,8 @@ public class FolderGroup {
 		 * the same mask order.
 		 */
 		StringBuffer sb = new StringBuffer();
+		sb.append(getEmail() == 1 ? "1" : "0");
+		sb.append(getMove() == 1 ? "1" : "0");
 		sb.append(getPassword() == 1 ? "1" : "0");
 		sb.append(getPrint() == 1 ? "1" : "0");
 		sb.append(getSubscription() == 1 ? "1" : "0");
@@ -145,6 +153,8 @@ public class FolderGroup {
 		setSubscription(Permission.SUBSCRIPTION.match(permissions) ? 1 : 0);
 		setPrint(Permission.PRINT.match(permissions) ? 1 : 0);
 		setPassword(Permission.PASSWORD.match(permissions) ? 1 : 0);
+		setMove(Permission.MOVE.match(permissions) ? 1 : 0);
+		setEmail(Permission.EMAIL.match(permissions) ? 1 : 0);
 	}
 
 	public int getRead() {
@@ -289,5 +299,21 @@ public class FolderGroup {
 
 	public void setPassword(int password) {
 		this.password = password;
+	}
+
+	public int getEmail() {
+		return email;
+	}
+
+	public void setEmail(int email) {
+		this.email = email;
+	}
+
+	public int getMove() {
+		return move;
+	}
+
+	public void setMove(int move) {
+		this.move = move;
 	}
 }

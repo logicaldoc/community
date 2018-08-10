@@ -14,7 +14,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This represent a tag cloud using a 3-D ball.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TagCloud extends VLayout {

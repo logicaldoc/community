@@ -6,7 +6,7 @@ import java.util.EventListener;
  * Implementations of this listener are notified when changes occurs in the Task
  * state
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
 public interface TaskListener extends EventListener {

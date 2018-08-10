@@ -33,7 +33,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for locked documents data retrieval
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.2
  */
 public class LockedDocsDataServlet extends HttpServlet {

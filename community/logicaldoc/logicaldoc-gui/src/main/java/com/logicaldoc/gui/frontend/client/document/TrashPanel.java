@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
@@ -18,7 +19,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -31,12 +31,12 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the current user's garbage
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TrashPanel extends VLayout {
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private static TrashPanel instance;
 
@@ -48,19 +48,16 @@ public class TrashPanel extends VLayout {
 
 	public TrashPanel() {
 		setMembersMargin(3);
-		refresh();
 	}
 
-	public void refresh() {
-		if (list != null) {
-			removeMember(list);
-		}
-
+	@Override
+	public void onDraw() {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		ListGridField fileName = new ListGridField("filename", I18N.message("name"), 150);
+		ListGridField fileName = new ListGridField("filename", I18N.message("name"));
 		fileName.setCanFilter(true);
+		fileName.setWidth("*");
 
 		ListGridField icon = new ListGridField("icon", " ", 24);
 		icon.setType(ListGridFieldType.IMAGE);
@@ -76,13 +73,14 @@ public class TrashPanel extends VLayout {
 		lastModified.setType(ListGridFieldType.DATE);
 		lastModified.setCellFormatter(new DateCellFormatter(false));
 		lastModified.setCanFilter(false);
+		lastModified.setHidden(true);
 
 		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setCanFilter(true);
 		customId.setHidden(true);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setWidth100();
 		list.setHeight100();
@@ -102,6 +100,11 @@ public class TrashPanel extends VLayout {
 					event.cancel();
 				}
 			});
+	}
+
+	public void refresh() {
+		if (list != null)
+			list.refresh(new GarbageDS());
 	}
 
 	private void restoreDocument(final long id) {

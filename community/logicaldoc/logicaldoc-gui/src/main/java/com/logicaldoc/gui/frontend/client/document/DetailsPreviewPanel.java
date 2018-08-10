@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 /**
  * This panel shows the full preview of a document
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.7.1
  */
 public class DetailsPreviewPanel extends DocumentDetailTab {
@@ -18,7 +18,7 @@ public class DetailsPreviewPanel extends DocumentDetailTab {
 	}
 
 	@Override
-	public void onTabSelected() {
+	protected void onDraw() {
 		if (panel == null) {
 			panel = new com.logicaldoc.gui.common.client.widgets.PreviewPanel(document);
 			setMembers(panel);

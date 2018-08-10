@@ -36,7 +36,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for document uploads operations.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class UploadServlet extends UploadAction {
@@ -271,9 +271,9 @@ public class UploadServlet extends UploadAction {
 
 	protected void setUploadMax() {
 		ContextProperties config = Context.get().getProperties();
-		int maxUploadMB = 100;
+		long maxUploadMB = 100;
 		if (config.getProperty("upload.maxsize") != null)
-			maxUploadMB = Integer.parseInt(config.getProperty("upload.maxsize"));
+			maxUploadMB = Long.parseLong(config.getProperty("upload.maxsize"));
 
 		if (maxUploadMB > 0)
 			super.maxFileSize = maxUploadMB * 1024 * 1024;

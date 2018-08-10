@@ -1,16 +1,93 @@
 package com.logicaldoc.core;
 
-import com.logicaldoc.core.automation.SystemTool;
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+import org.jdom.Element;
+import org.jdom.ProcessingInstruction;
+import org.jdom.input.SAXBuilder;
+
 import com.logicaldoc.core.communication.EMailSender;
+import com.logicaldoc.util.io.FileUtil;
 
 public class Testbench {
 
 	public static void main(String[] args) throws Exception {
-		// Automation engine = new Automation(null, null, 1L);
+		SAXBuilder saxBuilder = new SAXBuilder();
+		org.jdom.Document doc = saxBuilder.build(new File("C:\\workspace\\invoicing\\PA\\IT01879020517_calot.xml"));
 
-		SystemTool tool = new SystemTool();
-		System.out.println("out> "+tool.execGetOutput("D:\\tmp\\hello.bat"));
-		
+		List<Object> contents = doc.getContent();
+		for (Object content : contents) {
+			if (content instanceof ProcessingInstruction) {
+				ProcessingInstruction pi = (ProcessingInstruction) content;
+				if ("text/xsl".equals(pi.getPseudoAttributeValue("type"))) {
+					File xsltTmp=File.createTempFile("xslt-", ".xsl");
+					try{
+						FileUtils.copyURLToFile(new URL(pi.getPseudoAttributeValue("href")), xsltTmp);
+						org.jdom.Document xsltDoc = saxBuilder.build(xsltTmp);
+						Element root = xsltDoc.getRootElement();
+						Element outputElem = root.getChild("output",root.getNamespace());
+						if(outputElem!=null){
+							System.out.println(outputElem.getAttributeValue("method"));
+						}
+					}finally{
+						FileUtil.strongDelete(xsltTmp);
+					}
+					
+//					Scanner scanner = null;
+//					try {
+//						scanner = new Scanner(new URL(pi.getPseudoAttributeValue("href")).openStream(),
+//								StandardCharsets.UTF_8.toString());
+//						scanner.useDelimiter("\\A");
+//						String styleContent = scanner.hasNext() ? scanner.next() : "";
+//						System.out.println(styleContent);
+//						
+//						org.jdom.Document doc = saxBuilder.build(new File("C:\\workspace\\invoicing\\PA\\IT01879020517_calot.xml"));10
+//					} finally {
+//						if (scanner != null)
+//							scanner.close();
+//					}
+				}
+			}
+		}
+
+		// try {
+		// // Create transformer factory
+		// TransformerFactory factory = TransformerFactory.newInstance();
+		//
+		// // Use the factory to create a template containing the xsl file
+		// Templates template = factory.newTemplates(new StreamSource(
+		// new
+		// FileInputStream("C:\\workspace\\invoicing\\PA\\fatturaordinaria_v1.2.1.xsl")));
+		//
+		// // Use the template to create a transformer
+		// Transformer xformer = template.newTransformer();
+		//
+		// // Prepare the input and output files
+		// Source source = new StreamSource(new
+		// FileInputStream("C:\\workspace\\invoicing\\PA\\IT01879020517_calot.xml"));
+		// Result result = new StreamResult(new
+		// FileOutputStream("C:\\tmp\\pa.html"));
+		//
+		// // Apply the xsl file to the source file and write the result
+		// // to the output file
+		// xformer.transform(source, result);
+		// } catch (FileNotFoundException e) {
+		// } catch (TransformerConfigurationException e) {
+		// // An error occurred in the XSL file
+		// } catch (TransformerException e) {
+		// // An error occurred while applying the XSL file
+		// // Get location of error in input file
+		// SourceLocator locator = e.getLocator();
+		// int col = locator.getColumnNumber();
+		// int line = locator.getLineNumber();
+		// String publicId = locator.getPublicId();
+		// String systemId = locator.getSystemId();
+		// }
+
+		// Automation engine = new Automation(null, null, 1L);
 
 		// String original="1234567€";
 		// System.out.println("original: "+original);

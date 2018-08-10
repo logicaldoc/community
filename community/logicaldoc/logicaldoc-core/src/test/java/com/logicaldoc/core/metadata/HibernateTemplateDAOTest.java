@@ -13,7 +13,7 @@ import com.logicaldoc.core.security.Tenant;
 /**
  * Test case for <code>HibernateTemplateDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public class HibernateTemplateDAOTest extends AbstractCoreTCase {

@@ -16,7 +16,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Central class to manage locks
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class LockManager {

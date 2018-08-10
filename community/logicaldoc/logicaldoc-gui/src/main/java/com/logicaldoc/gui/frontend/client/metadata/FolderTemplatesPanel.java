@@ -28,7 +28,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Shows the folder templates configuration.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.3
  */
 public class FolderTemplatesPanel extends AdminPanel {

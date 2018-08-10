@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * This abstract class defines the minimum requirements of persistent objects.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public abstract class PersistentObject {

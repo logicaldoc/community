@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * Models the field names that can be stored in the index
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public enum HitField {

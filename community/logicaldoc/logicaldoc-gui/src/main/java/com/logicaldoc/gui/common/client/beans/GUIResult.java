@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Collects the results of a search and store some search statistics
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIResult implements Serializable {
@@ -44,14 +44,6 @@ public class GUIResult implements Serializable {
 
 	public void setHits(GUIDocument[] hits) {
 		this.hits = hits;
-	}
-
-	public String getSuggestion() {
-		return suggestion;
-	}
-
-	public void setSuggestion(String suggestion) {
-		this.suggestion = suggestion;
 	}
 
 	public long getEstimatedHits() {

@@ -50,8 +50,8 @@ public class MessengerRemoteServiceImpl extends RemoteEventServiceServlet implem
 			DocumentEvent.MOVED.toString(), DocumentEvent.DELETED.toString(), DocumentEvent.RENAMED.toString(),
 			DocumentEvent.RESTORED.toString(), DocumentEvent.PASSWORD_PROTECTED.toString(),
 			DocumentEvent.MOVED.toString(), DocumentEvent.PASSWORD_UNPROTECTED.toString(),
-			FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(), FolderEvent.CHANGED.toString(),
-			FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString() }));
+			DocumentEvent.WORKFLOWSTATUS.toString(), FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(),
+			FolderEvent.CHANGED.toString(), FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(), }));
 
 	public void init() {
 	}
@@ -77,28 +77,37 @@ public class MessengerRemoteServiceImpl extends RemoteEventServiceServlet implem
 
 				GUIFolder folder = null;
 				if (event.getFolder() != null)
-					folder = FolderServiceImpl.fromFolder(event.getFolder());
+					folder = FolderServiceImpl.fromFolder(event.getFolder(), true);
 				else
 					folder = FolderServiceImpl.getFolder(null, event.getFolderId());
 				message.setFolder(folder);
 
 				GUIDocument document = null;
-				if (event.getDocument() != null)
-					document = DocumentServiceImpl.fromDocument(event.getDocument(), null, null);
-				else if (event.getDocId() != null) {
+				if (event.getDocument() != null) {
+					Document clone=(Document)event.getDocument().clone();
+					// Put ID 0 in order to convert to GUIDocument without picking up ifos from DB
+					clone.setId(0L);
+					document = DocumentServiceImpl.fromDocument(clone, null, null);
+					document.setId(event.getDocId());
+				} else if (event.getDocId() != null) {
 					DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 					Document d = docDao.findById(event.getDocId());
-					if (d != null)
-						document = DocumentServiceImpl.fromDocument(event.getDocument(), null, null);
-					else {
+					if (d != null) {
+						document = DocumentServiceImpl.fromDocument(d, null, null);
+					} else {
 						document = new GUIDocument();
 						document.setId(event.getDocId());
 						document.setFileName(event.getFilename());
 						document.setFolder(folder);
 					}
 				}
-				message.setDocument(document);
 
+				if(event.getEvent().equals(DocumentEvent.CHECKEDOUT.toString()) ||event.getEvent().equals(DocumentEvent.LOCKED.toString())){
+					document.setLockUser(event.getUsername());
+					document.setLockUserId(event.getUserId());
+				}
+				
+				message.setDocument(document);
 				sendToClient(message);
 			} catch (Throwable e) {
 				log.error(e.getMessage(), e);

@@ -15,7 +15,7 @@ import com.logicaldoc.core.security.User;
 /**
  * Test case for <code>HibernateVersionDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class HibernateVersionDAOTest extends AbstractCoreTCase {

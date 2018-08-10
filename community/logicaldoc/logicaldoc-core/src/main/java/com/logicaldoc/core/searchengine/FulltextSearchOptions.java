@@ -6,7 +6,7 @@ import java.util.Locale;
 /**
  * Search options specialization for the Full text search.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class FulltextSearchOptions extends SearchOptions {

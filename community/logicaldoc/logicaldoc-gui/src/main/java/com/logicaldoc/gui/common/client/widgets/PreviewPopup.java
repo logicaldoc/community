@@ -16,7 +16,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This popup window is used to show the document preview.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class PreviewPopup extends Window {

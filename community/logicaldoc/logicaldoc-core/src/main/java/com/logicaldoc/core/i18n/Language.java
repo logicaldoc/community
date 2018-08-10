@@ -20,7 +20,7 @@ import com.logicaldoc.core.searchengine.StandardSearchEngine;
 /**
  * Instances of this class represent a language supported by the LogicalDOC DMS
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0.3
  */
 public class Language implements Comparable<Language> {

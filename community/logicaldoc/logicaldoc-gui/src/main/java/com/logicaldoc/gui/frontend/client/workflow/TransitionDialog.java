@@ -18,7 +18,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This is the form used for the workflow transition settings
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class TransitionDialog extends Window {

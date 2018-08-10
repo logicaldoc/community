@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.ServerException;
 /**
  * The client side stub for the ShareFile Service.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
 @RemoteServiceRelativePath("sharefile")

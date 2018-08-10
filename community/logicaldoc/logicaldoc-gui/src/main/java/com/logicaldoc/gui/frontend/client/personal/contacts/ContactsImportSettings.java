@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This popup window is used to upload a new contacts file to the server.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0.1
  */
 public class ContactsImportSettings extends Window {

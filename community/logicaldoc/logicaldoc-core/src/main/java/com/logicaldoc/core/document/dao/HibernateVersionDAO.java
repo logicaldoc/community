@@ -21,7 +21,7 @@ import com.logicaldoc.util.io.FileUtil;
 /**
  * Hibernate implementation of <code>DocumentDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 @SuppressWarnings("unchecked")

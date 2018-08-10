@@ -165,13 +165,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@ApiResponses(value = { @ApiResponse(code = 401, message = "Authentication failed"),
 			@ApiResponse(code = 500, message = "Generic error, see the response message") })
 	public Response upload(@ApiParam(hidden = true) List<Attachment> attachments) throws Exception {
-		
-		log.error("upload");
-		
 		String sid = validateSession();
-		
-		log.error("Session validated: " + sid);
-		
 		try {
 			Long docId = null;
 			Long folderId = null;
@@ -182,26 +176,20 @@ public class RestDocumentService extends SoapDocumentService implements Document
 
 			for (Attachment att : attachments) {
 				Map<String, String> params = att.getContentDisposition().getParameters();
-				log.error("keys: {}", params.keySet());
-				log.error("name: {}", params.get("name"));
+				// log.debug("keys: {}", params.keySet());
+				// log.debug("name: {}", params.get("name"));
 
 				if ("docId".equals(params.get("name"))) {
 					docId = Long.parseLong(att.getObject(String.class));
-					log.error("docId: {}", docId);
 				} else if ("folderId".equals(params.get("name"))) {
 					folderId = Long.parseLong(att.getObject(String.class));
-					log.error("folderId: {}", folderId);
 				} else if ("release".equals(params.get("name"))) {
 					release = Boolean.parseBoolean(att.getObject(String.class));
-					log.error("release: {}", release);
 				} else if ("filename".equals(params.get("name"))) {
 					filename = att.getObject(String.class);
-					log.error("filename: {}", filename);
 				} else if ("language".equals(params.get("name"))) {
 					language = att.getObject(String.class);
-					log.error("language: {}", language);
 				} else if ("filedata".equals(params.get("name"))) {
-					log.error("filedata is present");
 					datah = att.getDataHandler();
 				}
 			}
@@ -353,5 +341,17 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			throws Exception {
 		String sid = validateSession();
 		super.move(sid, docId, folderId);
+	}
+
+	@Override
+	public void createThumbnail(long docId, String fileVersion) throws Exception {
+		String sid = validateSession();
+		super.createThumbnail(sid, docId, fileVersion);
+	}
+
+	@Override
+	public void createPdf(long docId, String fileVersion) throws Exception {
+		String sid = validateSession();
+		super.createPdf(sid, docId, fileVersion);
 	}
 }

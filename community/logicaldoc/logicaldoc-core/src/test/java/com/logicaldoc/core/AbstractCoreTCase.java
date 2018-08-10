@@ -27,7 +27,7 @@ import com.logicaldoc.util.io.FileUtil;
  * All LogicalDOC's tests must extend this test case in order to find a ready
  * and accessible database.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public abstract class AbstractCoreTCase {

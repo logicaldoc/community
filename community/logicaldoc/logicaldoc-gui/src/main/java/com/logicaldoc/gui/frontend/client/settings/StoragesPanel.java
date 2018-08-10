@@ -12,6 +12,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -45,7 +46,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This class shows the storagesGrid list and informations.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class StoragesPanel extends VLayout {
@@ -56,17 +57,18 @@ public class StoragesPanel extends VLayout {
 
 	public static final int OPERATION_CUMPUTESIZE = 2;
 
-	private ListGrid storagesGrid;
-
-	private ToolStrip toolStrip;
+	private RefreshableListGrid list;
 
 	public StoragesPanel() {
 		setWidth100();
 		setHeight100();
 		setMembersMargin(5);
 		setMargin(5);
+	}
 
-		toolStrip = new ToolStrip();
+	@Override
+	public void onDraw() {
+		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
@@ -118,23 +120,7 @@ public class StoragesPanel extends VLayout {
 		toolStrip.addButton(refresh);
 		toolStrip.addFill();
 
-		addMember(toolStrip);
-		refresh();
-	}
-
-	private static boolean isParameterAttribute(String name) {
-		if ("type".equals(name) || "id".equals(name) || "name".equals(name) || "path".equals(name)
-				|| "write".equals(name) || name.startsWith("_"))
-			return false;
-		else
-			return true;
-	}
-
-	private void refresh() {
-		if (storagesGrid != null)
-			removeMember(storagesGrid);
-
-		storagesGrid = new ListGrid() {
+		list = new RefreshableListGrid() {
 
 			@Override
 			protected Canvas getExpansionComponent(final ListGridRecord record) {
@@ -182,9 +168,9 @@ public class StoragesPanel extends VLayout {
 				return layout;
 			}
 		};
-		storagesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		storagesGrid.setSelectionType(SelectionStyle.SINGLE);
-		storagesGrid.setCanExpandRecords(true);
+		list.setEmptyMessage(I18N.message("notitemstoshow"));
+		list.setSelectionType(SelectionStyle.SINGLE);
+		list.setCanExpandRecords(true);
 
 		ListGridField id = new ListGridField("id", " ", 20);
 		ListGridField name = new ListGridField("name", I18N.message("name"), 100);
@@ -216,17 +202,16 @@ public class StoragesPanel extends VLayout {
 		write.setImageURLSuffix(".png");
 		write.setCanFilter(false);
 
-		storagesGrid.setFields(id, write, name, type, path);
-		storagesGrid.setDataSource(new StoragesDS(false, true));
-		storagesGrid.setAutoFetchData(true);
-		storagesGrid.addCellContextClickHandler(new CellContextClickHandler() {
+		list.setFields(id, write, name, type, path);
+		list.setAutoFetchData(true);
+		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
 				showContextMenu();
 				event.cancel();
 			}
 		});
-		storagesGrid.setEditorCustomizer(new ListGridEditorCustomizer() {
+		list.setEditorCustomizer(new ListGridEditorCustomizer() {
 			public FormItem getEditor(ListGridEditorContext context) {
 				ListGridField field = context.getEditField();
 				if (field.getName().equals("type")) {
@@ -235,11 +220,11 @@ public class StoragesPanel extends VLayout {
 
 						@Override
 						public void onChanged(ChangedEvent event) {
-							storagesGrid.getSelectedRecord().setAttribute("type", event.getValue().toString());
+							list.getSelectedRecord().setAttribute("type", event.getValue().toString());
 							onSave();
-							String state = storagesGrid.getViewState();
+							String state = list.getViewState();
 							refresh();
-							storagesGrid.setViewState(state);
+							list.setViewState(state);
 						}
 					});
 					return item;
@@ -248,7 +233,20 @@ public class StoragesPanel extends VLayout {
 			}
 		});
 
-		addMember(storagesGrid);
+		setMembers(toolStrip, list);
+		refresh();
+	}
+
+	private static boolean isParameterAttribute(String name) {
+		if ("type".equals(name) || "id".equals(name) || "name".equals(name) || "path".equals(name)
+				|| "write".equals(name) || name.startsWith("_"))
+			return false;
+		else
+			return true;
+	}
+
+	private void refresh() {
+		list.refresh(new StoragesDS(false, true));
 	}
 
 	/**
@@ -259,13 +257,13 @@ public class StoragesPanel extends VLayout {
 		makeWrite.setTitle(I18N.message("makedefwritestore"));
 		makeWrite.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] recs = storagesGrid.getRecords();
+				ListGridRecord[] recs = list.getRecords();
 				for (ListGridRecord rec : recs) {
 					rec.setAttribute("write", "blank");
-					storagesGrid.refreshRow(storagesGrid.getRowNum(rec));
+					list.refreshRow(list.getRowNum(rec));
 				}
-				storagesGrid.getSelectedRecord().setAttribute("write", "database_edit");
-				storagesGrid.refreshRow(storagesGrid.getRowNum(storagesGrid.getSelectedRecord()));
+				list.getSelectedRecord().setAttribute("write", "database_edit");
+				list.refreshRow(list.getRowNum(list.getSelectedRecord()));
 			}
 		});
 
@@ -273,7 +271,7 @@ public class StoragesPanel extends VLayout {
 		test.setTitle(I18N.message("testconnection"));
 		test.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord selection = storagesGrid.getSelectedRecord();
+				ListGridRecord selection = list.getSelectedRecord();
 				SettingService.Instance.get().testStorage(selection.getAttributeAsInt("id"),
 						new AsyncCallback<Boolean>() {
 
@@ -305,7 +303,7 @@ public class StoragesPanel extends VLayout {
 
 	private void onSave() {
 		final List<GUIParameter> settings = new ArrayList<GUIParameter>();
-		ListGridRecord[] records = storagesGrid.getRecords();
+		ListGridRecord[] records = list.getRecords();
 		for (ListGridRecord rec : records) {
 			String id = rec.getAttributeAsString("id").trim();
 			settings.add(new GUIParameter("store." + id + ".dir", rec.getAttributeAsString("path").trim()));
@@ -345,7 +343,7 @@ public class StoragesPanel extends VLayout {
 
 	private void onAddStorage() {
 		for (int i = 1; i < 99; i++) {
-			Record record = storagesGrid.getRecordList().find("id", Integer.toString(i));
+			Record record = list.getRecordList().find("id", Integer.toString(i));
 			if (record == null) {
 				ListGridRecord newStore = new ListGridRecord();
 				newStore.setAttribute("id", Integer.toString(i));
@@ -354,8 +352,8 @@ public class StoragesPanel extends VLayout {
 				newStore.setAttribute("encrypt", "false");
 				newStore.setAttribute("write", "blank");
 
-				storagesGrid.getDataSource().addData(newStore);
-				storagesGrid.redraw();
+				list.getDataSource().addData(newStore);
+				list.redraw();
 				break;
 			}
 		}

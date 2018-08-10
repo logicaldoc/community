@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.calendar.Calendar;
 /**
  * This panel shows the calendar events on a document
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public class DocumentCalendarPanel extends DocumentDetailTab {
@@ -29,7 +29,7 @@ public class DocumentCalendarPanel extends DocumentDetailTab {
 	}
 
 	@Override
-	public void onTabSelected() {
+	protected void onDraw() {
 		long docId = document.getId();
 		if (document.getDocRef() != null)
 			docId = document.getDocRef();

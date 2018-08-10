@@ -7,7 +7,7 @@ import com.logicaldoc.core.document.TagCloud;
 /**
  * This class is a TagCloud for WebServices API
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 @XmlType(name = "WSTagCloud")

@@ -10,15 +10,17 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.frontend.client.folder.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
  * Shows import folder's standard properties and read-only data
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
@@ -64,6 +66,10 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		form.setNumCols(2);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
+		SelectItem provider = ItemFactory.newImportFolderProviderOption(importFolder.getProvider());
+		provider.addChangedHandler(new VisibilityChecker());
+		provider.setRequired(true);
+
 		TextItem path = ItemFactory.newTextItem("path", "path", importFolder.getPath());
 		path.addChangedHandler(changedHandler);
 		path.setWidth(250);
@@ -71,6 +77,12 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 
 		TextItem domain = ItemFactory.newTextItem("domain", "domain", importFolder.getDomain());
 		domain.addChangedHandler(changedHandler);
+
+		TextItem server = ItemFactory.newTextItem("server", "server", importFolder.getHost());
+		server.addChangedHandler(changedHandler);
+
+		IntegerItem port = ItemFactory.newIntegerItem("port", "port", importFolder.getPort());
+		port.addChangedHandler(changedHandler);
 
 		TextItem username = ItemFactory.newTextItem("username", "username", importFolder.getUsername());
 		username.addChangedHandler(changedHandler);
@@ -89,12 +101,11 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		TextItem exclude = ItemFactory.newTextItem("exclude", "exclude", importFolder.getExcludes());
 		exclude.addChangedHandler(changedHandler);
 
-		if ("smb".equals(importFolder.getProvider()))
-			form.setItems(path, targetSelector, language, domain, username, password, include, exclude);
-		else
-			form.setItems(path, targetSelector, language, include, exclude);
+		form.setItems(provider, path, language, targetSelector, server, port, username, password, domain, include, exclude);
 
 		formsContainer.addMember(form);
+
+		onProviderChanged(importFolder.getProvider());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -102,6 +113,7 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
 		if (!form.hasErrors()) {
+			importFolder.setProvider((String) values.get("provider"));
 			importFolder.setPath((String) values.get("path"));
 			importFolder.setUsername((String) values.get("username"));
 			importFolder.setPassword((String) values.get("password"));
@@ -110,7 +122,39 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 			importFolder.setLanguage((String) values.get("language"));
 			importFolder.setIncludes((String) values.get("include"));
 			importFolder.setExcludes((String) values.get("exclude"));
+			importFolder.setHost((String) values.get("server"));
+			importFolder.setPort((Integer) values.get("port"));
 		}
 		return !form.hasErrors();
+	}
+
+	private void onProviderChanged(String provider) {
+		form.hideItem("server");
+		form.hideItem("port");
+		form.hideItem("username");
+		form.hideItem("password");
+		form.hideItem("domain");
+
+		if (provider.equals(GUIImportFolder.PROVIDER_FTP) || provider.equals(GUIImportFolder.PROVIDER_FTPS)
+				|| provider.equals(GUIImportFolder.PROVIDER_SFTP)) {
+			form.showItem("server");
+			form.showItem("port");
+			form.showItem("username");
+			form.showItem("password");
+		} else if (provider.equals(GUIImportFolder.PROVIDER_SMB)) {
+			form.showItem("domain");
+			form.showItem("username");
+			form.showItem("password");
+		}
+	}
+
+	private class VisibilityChecker implements ChangedHandler {
+
+		@Override
+		public void onChanged(ChangedEvent event) {
+			changedHandler.onChanged(event);
+			String type = event.getValue().toString();
+			onProviderChanged(type);
+		}
 	}
 }

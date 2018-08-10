@@ -19,7 +19,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This popup window is used to show the HTML content of a form
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
 public class FormEditor extends Window {

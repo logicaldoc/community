@@ -20,7 +20,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Some utility methods specialized in string manipulation
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class StringUtil {

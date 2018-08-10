@@ -51,7 +51,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * LogicalDOC implementation of the CMIS service
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5.1
  */
 public class LDCmisService extends AbstractCmisService {

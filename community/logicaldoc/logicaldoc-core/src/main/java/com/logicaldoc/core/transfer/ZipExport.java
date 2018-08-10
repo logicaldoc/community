@@ -35,8 +35,8 @@ import com.logicaldoc.util.Context;
  * Exports a folder hierarchy and all documents in it as a zip file. Can also be
  * used to export a selection of documents
  * 
- * @author Alessandro Gasparini - Logical Objects
- * @author Matteo Caruso - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
+ * @author Matteo Caruso - LogicalDOC
  */
 public class ZipExport {
 

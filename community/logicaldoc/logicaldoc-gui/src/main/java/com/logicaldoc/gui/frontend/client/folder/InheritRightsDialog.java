@@ -19,7 +19,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 /**
  * This is the form used to select a folder to inherit the rights from
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class InheritRightsDialog extends Dialog {

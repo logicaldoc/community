@@ -27,7 +27,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for users data.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class LanguagesDataServlet extends HttpServlet {

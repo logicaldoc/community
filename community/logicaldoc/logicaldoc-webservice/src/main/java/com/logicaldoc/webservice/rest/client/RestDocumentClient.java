@@ -258,4 +258,14 @@ public class RestDocumentClient extends AbstractRestClient {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getRatings(docId);
 	}
+	
+	public void createPdf(long docId, String fileVersion) throws Exception {
+		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+		proxy.createPdf(docId, fileVersion);
+	}
+	
+	public void createThumbnail(long docId, String fileVersion) throws Exception {
+		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+		proxy.createThumbnail(docId, fileVersion);
+	}
 }

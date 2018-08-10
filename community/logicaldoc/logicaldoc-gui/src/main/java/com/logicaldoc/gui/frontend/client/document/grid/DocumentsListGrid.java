@@ -12,17 +12,20 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
+import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.document.RatingDialog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -35,13 +38,11 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
-import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellClickEvent;
@@ -53,6 +54,7 @@ import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * Grid used to show a documents list in different contexts.
@@ -60,16 +62,68 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
-public class DocumentsListGrid extends ListGrid implements DocumentsGrid, DocumentObserver {
+public class DocumentsListGrid extends RefreshableListGrid implements DocumentsGrid, DocumentObserver {
 
 	protected Cursor cursor = null;
 
 	protected GUIFolder folder = null;
 
-	protected int totalRecords = 0;
-
 	// Stores all the possible fields we can use in a grid of documents
 	protected Map<String, ListGridField> fieldsMap = new HashMap<String, ListGridField>();
+
+	public DocumentsListGrid(GUIFolder folder) {
+		this.folder = folder;
+		setEmptyMessage(I18N.message("notitemstoshow"));
+		setCanFreezeFields(true);
+		setAutoFetchData(true);
+		setFilterOnKeypress(true);
+		setShowRecordComponents(true);
+		setShowRecordComponentsByCell(true);
+		setSaveLocally(true);
+		this.folder = folder;
+
+		if (folder != null)
+			setCanDrag(folder.isMove());
+
+		prepareFieldsMap();
+
+		addCellClickHandler(new CellClickHandler() {
+			@Override
+			public void onCellClick(CellClickEvent event) {
+				if ("rating".equals(getFieldName(event.getColNum()))) {
+					long id = Long.parseLong(getSelectedRecord().getAttribute("id"));
+					String ratingImageName = getSelectedRecord().getAttribute("rating");
+					final int docRating = Integer.parseInt(ratingImageName.replace("rating", ""));
+					DocumentService.Instance.get().getRating(id, new AsyncCallback<GUIRating>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							Log.serverError(caught);
+						}
+
+						@Override
+						public void onSuccess(GUIRating rating) {
+							if (rating != null) {
+								RatingDialog dialog = new RatingDialog(docRating, rating);
+								dialog.show();
+							}
+						}
+					});
+					event.cancel();
+				}
+			}
+		});
+
+		addDataArrivedHandler(new DataArrivedHandler() {
+			@Override
+			public void onDataArrived(DataArrivedEvent event) {
+				if (cursor != null) {
+					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
+				}
+			}
+		});
+
+		DocumentController.get().addObserver(this);
+	}
 
 	/**
 	 * Prepares the map that contains all the possible fields we can use
@@ -102,7 +156,7 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 		version.setCanFilter(true);
 		fieldsMap.put(version.getName(), version);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.getAttributeLabel("lastModified"), 110);
+		ListGridField lastModified = new ListGridField("lastModified", I18N.getAttributeLabel("lastModified"), 120);
 		lastModified.setAlign(Alignment.CENTER);
 		lastModified.setType(ListGridFieldType.DATE);
 		lastModified.setCellFormatter(new DateCellFormatter(false));
@@ -116,7 +170,7 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 		publisher.setCanSort(false);
 		fieldsMap.put(publisher.getName(), publisher);
 
-		ListGridField published = new ListGridField("published", I18N.message("published"), 110);
+		ListGridField published = new ListGridField("published", I18N.message("published"), 120);
 		published.setAlign(Alignment.CENTER);
 		published.setType(ListGridFieldType.DATE);
 		published.setCellFormatter(new DateCellFormatter(false));
@@ -130,7 +184,7 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 		creator.setCanSort(false);
 		fieldsMap.put(creator.getName(), creator);
 
-		ListGridField created = new ListGridField("created", I18N.message("created"), 110);
+		ListGridField created = new ListGridField("created", I18N.message("created"), 120);
 		created.setAlign(Alignment.CENTER);
 		created.setType(ListGridFieldType.DATE);
 		created.setCellFormatter(new DateCellFormatter(false));
@@ -148,7 +202,7 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 		fieldsMap.put(type.getName(), type);
 
 		ListGridField statusIcons = new ListGridField("statusIcons", " ");
-		statusIcons.setWidth(90);
+		statusIcons.setWidth(100);
 		statusIcons.setCanFilter(false);
 		statusIcons.setCanSort(false);
 		fieldsMap.put(statusIcons.getName(), statusIcons);
@@ -176,13 +230,17 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 
 		ListGridField rating = new ListGridField("rating", I18N.message("rating"), 95);
 		rating.setType(ListGridFieldType.IMAGE);
-		rating.setCanSort(false);
-		rating.setCanFilter(false);
+		rating.setCanSort(true);
+		rating.setCanFilter(true);
 		rating.setAlign(Alignment.CENTER);
-		rating.setImageURLPrefix(Util.imagePrefix());
-		rating.setImageURLSuffix(".png");
-		rating.setImageWidth(88);
 		rating.setHidden(true);
+		rating.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				return DocUtil.getRatingIcon((Integer) value);
+			}
+		});
 		fieldsMap.put(rating.getName(), rating);
 
 		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 70);
@@ -197,14 +255,25 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 		comment.setCanSort(true);
 		fieldsMap.put(comment.getName(), comment);
 
-		ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 100);
+		ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 130);
 		wfStatus.setHidden(true);
 		wfStatus.setCanFilter(true);
 		wfStatus.setCanSort(true);
 		wfStatus.setAlign(Alignment.LEFT);
+		wfStatus.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				String display = record.getAttributeAsString("workflowStatusDisplay");
+				if (display != null && !display.isEmpty())
+					return "<span style='color: " + display + ";'>" + value + "</span>";
+				else
+					return value != null ? value.toString() : "";
+			}
+		});
 		fieldsMap.put(wfStatus.getName(), wfStatus);
 
-		ListGridField startPublishing = new ListGridField("startPublishing", I18N.message("startpublishing"), 110);
+		ListGridField startPublishing = new ListGridField("startPublishing", I18N.message("startpublishing"), 120);
 		startPublishing.setAlign(Alignment.CENTER);
 		startPublishing.setType(ListGridFieldType.DATE);
 		startPublishing.setCellFormatter(new DateCellFormatter(false));
@@ -213,7 +282,7 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 		startPublishing.setHidden(true);
 		fieldsMap.put(startPublishing.getName(), startPublishing);
 
-		ListGridField stopPublishing = new ListGridField("stopPublishing", I18N.message("stoppublishing"), 110);
+		ListGridField stopPublishing = new ListGridField("stopPublishing", I18N.message("stoppublishing"), 120);
 		stopPublishing.setAlign(Alignment.CENTER);
 		stopPublishing.setType(ListGridFieldType.DATE);
 		stopPublishing.setCellFormatter(new DateCellFormatter(false));
@@ -291,59 +360,7 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 	}
 
 	public DocumentsListGrid() {
-		this(null, 0);
-	}
-
-	public DocumentsListGrid(GUIFolder folder, int totalRecords) {
-		this.totalRecords = totalRecords;
-		this.folder = folder;
-		setEmptyMessage(I18N.message("notitemstoshow"));
-		setCanFreezeFields(true);
-		setAutoFetchData(true);
-		setFilterOnKeypress(true);
-		setShowRecordComponents(true);
-		setShowRecordComponentsByCell(true);
-		setSaveLocally(true);
-
-		prepareFieldsMap();
-
-		addCellClickHandler(new CellClickHandler() {
-			@Override
-			public void onCellClick(CellClickEvent event) {
-				if ("rating".equals(getFieldName(event.getColNum()))) {
-					long id = Long.parseLong(getSelectedRecord().getAttribute("id"));
-					String ratingImageName = getSelectedRecord().getAttribute("rating");
-					final int docRating = Integer.parseInt(ratingImageName.replace("rating", ""));
-					DocumentService.Instance.get().getRating(id, new AsyncCallback<GUIRating>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(GUIRating rating) {
-							if (rating != null) {
-								RatingDialog dialog = new RatingDialog(docRating, rating);
-								dialog.show();
-							}
-						}
-					});
-					event.cancel();
-				}
-			}
-		});
-
-		addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				if (cursor != null) {
-					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
-					cursor.setTotalRecords(getTotalRecords());
-				}
-			}
-		});
-
-		DocumentController.get().addObserver(this);
+		this(null);
 	}
 
 	@Override
@@ -580,8 +597,13 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public void setCursor(Cursor cursor) {
-		this.cursor = cursor;
+	public void setGridCursor(Cursor gridCursor) {
+		this.cursor = gridCursor;
+	}
+
+	@Override
+	public Cursor getGridCursor() {
+		return cursor;
 	}
 
 	@Override
@@ -603,21 +625,15 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 			HLayout statusCanvas = new HLayout(3);
 			statusCanvas.setHeight(22);
 			statusCanvas.setWidth100();
+			statusCanvas.setMembersMargin(1);
 			statusCanvas.setAlign(Alignment.CENTER);
 
 			// Put the bookmark icon
 			{
-				ImgButton bookmarkedIcon = new ImgButton();
-				bookmarkedIcon.setShowDown(false);
-				bookmarkedIcon.setShowRollOver(false);
-				bookmarkedIcon.setLayoutAlign(Alignment.CENTER);
-				bookmarkedIcon.setHeight(16);
-				bookmarkedIcon.setWidth(16);
-
 				if (record.getAttribute("bookmarked") != null) {
 					Boolean bookmarked = record.getAttributeAsBoolean("bookmarked");
-					bookmarkedIcon.setSrc("[SKIN]/" + DocUtil.getBookmarkedIcon(bookmarked));
 					if (bookmarked != null && bookmarked) {
+						ToolStripButton bookmarkedIcon = AwesomeFactory.newIconButton("bookmark", "bookmarked");
 						statusCanvas.addMember(bookmarkedIcon);
 						bookmarkedIcon.setPrompt(I18N.message("bookmarked"));
 					}
@@ -626,22 +642,12 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 
 			// Put the indexing icon
 			{
-				ImgButton indexedIcon = new ImgButton();
-				indexedIcon.setShowDown(false);
-				indexedIcon.setShowRollOver(false);
-				indexedIcon.setLayoutAlign(Alignment.CENTER);
-				indexedIcon.setHeight(16);
-				indexedIcon.setWidth(16);
-
 				if (record.getAttribute("indexed") != null) {
 					Integer indexed = record.getAttributeAsInt("indexed");
-					indexedIcon.setSrc("[SKIN]/" + DocUtil.getIndexedIcon(indexed));
-
 					if (indexed != null && indexed.intValue() > 0) {
+						ToolStripButton indexedIcon = AwesomeFactory.newIndexedButton(indexed);
 						statusCanvas.addMember(indexedIcon);
-
 						if (indexed.intValue() == Constants.INDEX_INDEXED) {
-							indexedIcon.setPrompt(I18N.message("indexed"));
 							indexedIcon.addClickHandler(new ClickHandler() {
 								public void onClick(ClickEvent event) {
 									Long id = record.getAttributeAsLong("id");
@@ -649,8 +655,6 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 										WindowUtils.openUrl(Util.downloadURL(id) + "&downloadText=true");
 								}
 							});
-						} else if (indexed.intValue() == Constants.INDEX_SKIP) {
-							indexedIcon.setPrompt(I18N.message("notindexable"));
 						}
 					}
 				}
@@ -658,117 +662,73 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 
 			// Put the status icon
 			{
-				ImgButton statusIcon = new ImgButton();
-				statusIcon.setShowDown(false);
-				statusIcon.setShowRollOver(false);
-				statusIcon.setLayoutAlign(Alignment.CENTER);
-				statusIcon.setHeight(16);
-				statusIcon.setWidth(16);
-
 				if (record.getAttribute("status") != null) {
 					Integer status = record.getAttributeAsInt("status");
-					statusIcon.setSrc("[SKIN]/" + DocUtil.getLockedIcon(status));
-
 					if (status != null && status.intValue() > 0) {
+						ToolStripButton statusIcon = AwesomeFactory.newLockedButton(status,
+								record.getAttributeAsString("lockUser"));
 						statusCanvas.addMember(statusIcon);
-						if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
-							statusIcon.setPrompt(I18N.message("lockedby") + " "
-									+ record.getAttributeAsString("lockUser"));
 					}
 				}
 			}
 
 			// Put the immutable icon
 			{
-				ImgButton immutableIcon = new ImgButton();
-				immutableIcon.setShowDown(false);
-				immutableIcon.setShowRollOver(false);
-				immutableIcon.setLayoutAlign(Alignment.CENTER);
-				immutableIcon.setHeight(16);
-				immutableIcon.setWidth(16);
-
 				if (record.getAttribute("immutable") != null) {
 					Integer immutable = record.getAttributeAsInt("immutable");
-					immutableIcon.setSrc("[SKIN]/" + DocUtil.getImmutableIcon(immutable));
-
 					if (immutable != null && immutable.intValue() == 1) {
+						ToolStripButton immutableIcon = AwesomeFactory.newIconButton("hand-paper", "immutable");
 						statusCanvas.addMember(immutableIcon);
-						immutableIcon.setPrompt(I18N.message("immutable"));
 					}
 				}
 			}
 
 			// Put the password protection icon
 			{
-				ImgButton passwordIcon = new ImgButton();
-				passwordIcon.setShowDown(false);
-				passwordIcon.setShowRollOver(false);
-				passwordIcon.setLayoutAlign(Alignment.CENTER);
-				passwordIcon.setHeight(16);
-				passwordIcon.setWidth(16);
-
 				if (record.getAttribute("password") != null) {
 					Boolean password = record.getAttributeAsBoolean("password");
-					passwordIcon.setSrc("[SKIN]/" + DocUtil.getPasswordProtectedIcon(password));
-
 					if (password != null && password.booleanValue()) {
+						ToolStripButton passwordIcon = AwesomeFactory.newIconButton("key", "passwordprotected");
 						statusCanvas.addMember(passwordIcon);
-						passwordIcon.setPrompt(I18N.message("passwordprotected"));
 					}
 				}
 			}
 
 			// Put the signed icon
 			{
-				ImgButton signedIcon = new ImgButton();
-				signedIcon.setShowDown(false);
-				signedIcon.setShowRollOver(false);
-				signedIcon.setLayoutAlign(Alignment.CENTER);
-				signedIcon.setPrompt(I18N.message("signed"));
-				signedIcon.setHeight(16);
-				signedIcon.setWidth(16);
-
 				if (record.getAttribute("signed") != null) {
 					Integer signed = record.getAttributeAsInt("signed");
-					signedIcon.setSrc("[SKIN]/" + DocUtil.getSignedIcon(signed));
-					statusCanvas.addMember(signedIcon);
-					signedIcon.addClickHandler(new ClickHandler() {
+					if (signed != null && signed.intValue() == 1) {
+						ToolStripButton signedIcon = AwesomeFactory.newIconButton("badge-check ", "signed");
+						statusCanvas.addMember(signedIcon);
+						signedIcon.addClickHandler(new ClickHandler() {
 
-						@Override
-						public void onClick(ClickEvent event) {
-							Long docId = record.getAttributeAsLong("id");
-							if (record.getAttributeAsString("filename") != null
-									&& record.getAttributeAsString("filename").toLowerCase().endsWith(".pdf"))
-								DocUtil.download(docId, null);
-							else
-								DocUtil.downloadPdfConversion(docId, null);
-						}
-					});
+							@Override
+							public void onClick(ClickEvent event) {
+								Long docId = record.getAttributeAsLong("id");
+								if (record.getAttributeAsString("filename") != null
+										&& record.getAttributeAsString("filename").toLowerCase().endsWith(".pdf"))
+									DocUtil.download(docId, null);
+								else
+									DocUtil.downloadPdfConversion(docId, null);
+							}
+						});
+					}
 				}
 			}
 
 			// Put the stamped icon
 			{
-				ImgButton stampedIcon = new ImgButton();
-				stampedIcon.setShowDown(false);
-				stampedIcon.setShowRollOver(false);
-				stampedIcon.setLayoutAlign(Alignment.CENTER);
-				stampedIcon.setPrompt(I18N.message("stamped"));
-				stampedIcon.setHeight(16);
-				stampedIcon.setWidth(16);
-
 				if (record.getAttribute("stamped") != null) {
 					Integer stamped = record.getAttributeAsInt("stamped");
-					stampedIcon.setSrc("[SKIN]/" + DocUtil.getStampedIcon(stamped));
-
 					if (stamped != null && stamped.intValue() == 1) {
+						ToolStripButton stampedIcon = AwesomeFactory.newIconButton("tint", "stamped");
 						statusCanvas.addMember(stampedIcon);
 						if (Feature.enabled(Feature.STAMP)) {
 							stampedIcon.addClickHandler(new ClickHandler() {
 								public void onClick(ClickEvent event) {
 									final long id = record.getAttributeAsLong("id");
 									String fileVersion = record.getAttribute("fileVersion");
-
 									if (Session.get().getCurrentFolder().isDownload())
 										DocUtil.downloadPdfConversion(id, fileVersion);
 								}
@@ -871,26 +831,38 @@ public class DocumentsListGrid extends ListGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public void destroy() {
-		DocumentController.get().removeObserver(this);
-		super.destroy();
+	public GUIFolder getFolder() {
+		return folder;
 	}
 
 	@Override
-	protected void finalize() {
+	public void destroy() {
+		DocumentController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
 		destroy();
 	}
 
-	public int getTotalRecords() {
-		return totalRecords;
+	@Override
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
 	}
 
-	public void setTotalRecords(int totalRecords) {
-		this.totalRecords = totalRecords;
-	}
-	
 	@Override
-	public GUIFolder getFolder() {
-		return folder;
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
+	}
+
+	@Override
+	public void fetchNewData(DocumentsDS ds) {
+		if (ds.getFolder() != null) {
+			this.folder = ds.getFolder();
+			setCanDrag(folder.isMove());
+		}
+		refresh(ds);
 	}
 }

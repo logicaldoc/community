@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridEditEvent;
@@ -37,7 +38,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 /**
  * This panel shows the links of a document
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class LinksPanel extends DocumentDetailTab {
@@ -46,7 +47,10 @@ public class LinksPanel extends DocumentDetailTab {
 
 	public LinksPanel(final GUIDocument document) {
 		super(document, null);
+	}
 
+	@Override
+	protected void onDraw() {
 		ListGridField type = new ListGridField("type", I18N.message("type"), 100);
 		type.setCanEdit(true);
 
@@ -73,7 +77,7 @@ public class LinksPanel extends DocumentDetailTab {
 			}
 
 		};
-		treeGrid.setCanEdit(true);
+		treeGrid.setCanEdit(false);
 		treeGrid.setClosedIconSuffix("");
 		treeGrid.setCanFreezeFields(true);
 		treeGrid.setAutoFetchData(true);
@@ -109,70 +113,91 @@ public class LinksPanel extends DocumentDetailTab {
 					});
 				}
 			});
-
-			treeGrid.addCellContextClickHandler(new CellContextClickHandler() {
-				@Override
-				public void onCellContextClick(CellContextClickEvent event) {
-					Menu contextMenu = new Menu();
-
-					MenuItem delete = new MenuItem();
-					delete.setTitle(I18N.message("ddelete"));
-					delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-						public void onClick(MenuItemClickEvent event) {
-							ListGridRecord[] selection = treeGrid.getSelectedRecords();
-							if (selection == null || selection.length == 0)
-								return;
-							final long[] ids = new long[selection.length];
-							for (int i = 0; i < selection.length; i++) {
-								ids[i] = Long.parseLong(selection[i].getAttribute("linkId"));
-							}
-
-							LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-								@Override
-								public void execute(Boolean value) {
-									if (value) {
-										DocumentService.Instance.get().deleteLinks(ids, new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void result) {
-												TreeNode parent = treeGrid.getTree().getParent(
-														treeGrid.getSelectedRecord());
-												treeGrid.selectRecord(parent);
-												treeGrid.getTree().reloadChildren(parent);
-											}
-										});
-									}
-								}
-							});
-						}
-					});
-
-					MenuItem preview = new MenuItem();
-					preview.setTitle(I18N.message("preview"));
-					preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-						public void onClick(MenuItemClickEvent event) {
-							onPreview(treeGrid.getSelectedRecord());
-						}
-					});
-
-					MenuItem download = new MenuItem();
-					download.setTitle(I18N.message("download"));
-					download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-						public void onClick(MenuItemClickEvent event) {
-							onDownload(treeGrid.getSelectedRecord());
-						}
-					});
-
-					contextMenu.setItems(preview, download, delete);
-					contextMenu.showContextMenu();
-					event.cancel();
-				}
-			});
 		}
+
+		treeGrid.addCellContextClickHandler(new CellContextClickHandler() {
+			@Override
+			public void onCellContextClick(CellContextClickEvent event) {
+				final Menu contextMenu = new Menu();
+
+				final ListGridRecord[] selection = treeGrid.getSelectedRecords();
+				if (selection == null || selection.length == 0)
+					return;
+				final long[] ids = new long[selection.length];
+				for (int i = 0; i < selection.length; i++)
+					ids[i] = Long.parseLong(selection[i].getAttribute("linkId"));
+
+				final MenuItem delete = new MenuItem();
+				delete.setTitle(I18N.message("ddelete"));
+				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+					public void onClick(MenuItemClickEvent event) {
+
+						LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
+							@Override
+							public void execute(Boolean value) {
+								if (value) {
+									DocumentService.Instance.get().deleteLinks(ids, new AsyncCallback<Void>() {
+										@Override
+										public void onFailure(Throwable caught) {
+											Log.serverError(caught);
+										}
+
+										@Override
+										public void onSuccess(Void result) {
+											TreeNode parent = treeGrid.getTree()
+													.getParent(treeGrid.getSelectedRecord());
+											treeGrid.selectRecord(parent);
+											treeGrid.getTree().reloadChildren(parent);
+										}
+									});
+								}
+							}
+						});
+					}
+				});
+
+				final MenuItem preview = new MenuItem();
+				preview.setTitle(I18N.message("preview"));
+				preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+					public void onClick(MenuItemClickEvent event) {
+						onPreview(treeGrid.getSelectedRecord());
+					}
+				});
+
+				final MenuItem download = new MenuItem();
+				download.setTitle(I18N.message("download"));
+				download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+					public void onClick(MenuItemClickEvent event) {
+						onDownload(treeGrid.getSelectedRecord());
+					}
+				});
+
+				// Compute the folder ID of the referenced document
+				long folderId = selection[0].getAttributeAsLong("folderId1");
+				if (document.getFolder().getId() == folderId)
+					folderId = selection[0].getAttributeAsLong("folderId2");
+
+				FolderService.Instance.get().getFolder(folderId, false, new AsyncCallback<GUIFolder>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIFolder fld) {
+						if (fld == null)
+							return;
+						download.setEnabled(fld.isDownload());
+						delete.setEnabled(fld.isDelete());
+						contextMenu.setItems(preview, download, delete);
+						contextMenu.showContextMenu();
+					}
+				});
+
+				event.cancel();
+			}
+		});
 
 		treeGrid.addDoubleClickHandler(new DoubleClickHandler() {
 			@Override
@@ -180,12 +205,26 @@ public class LinksPanel extends DocumentDetailTab {
 				treeGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 					@Override
 					public void onCellDoubleClick(CellDoubleClickEvent event) {
-						ListGridRecord record = event.getRecord();
-						if (Session.get().getCurrentFolder().isDownload()
-								&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-							onDownload(record);
-						else
-							onPreview(record);
+						final ListGridRecord record = event.getRecord();
+
+						FolderService.Instance.get().getFolder(record.getAttributeAsLong("folderId"), false,
+								new AsyncCallback<GUIFolder>() {
+
+									@Override
+									public void onFailure(Throwable caught) {
+										Log.serverError(caught);
+									}
+
+									@Override
+									public void onSuccess(GUIFolder fld) {
+										if (fld.isDownload()
+												&& "download".equals(Session.get().getInfo()
+														.getConfig("gui.doubleclick")))
+											onDownload(record);
+										else
+											onPreview(record);
+									}
+								});
 					}
 				});
 			}

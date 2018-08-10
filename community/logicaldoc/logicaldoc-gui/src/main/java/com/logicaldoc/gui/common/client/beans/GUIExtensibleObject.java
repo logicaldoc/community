@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Main class for extensible objects
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIExtensibleObject implements Serializable {

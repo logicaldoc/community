@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * General administration panel with statistics
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class StatsPanel extends VLayout {
@@ -20,7 +20,10 @@ public class StatsPanel extends VLayout {
 	public StatsPanel() {
 		setWidth100();
 		setMembersMargin(10);
+	}
 
+	@Override
+	public void onDraw() {
 		SystemService.Instance.get().getStatistics(I18N.getLocale(), new AsyncCallback<GUIParameter[][]>() {
 
 			@Override

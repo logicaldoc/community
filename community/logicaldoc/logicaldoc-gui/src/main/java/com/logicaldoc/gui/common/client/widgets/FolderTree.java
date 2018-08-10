@@ -8,7 +8,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 /**
  * TreeGrid showing the folders
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class FolderTree extends TreeGrid {

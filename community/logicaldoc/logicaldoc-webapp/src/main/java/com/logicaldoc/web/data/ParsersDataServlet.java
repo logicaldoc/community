@@ -22,11 +22,10 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.web.util.ServiceUtil;
 
-
 /**
  * This servlet is responsible for parsers data.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class ParsersDataServlet extends HttpServlet {
@@ -66,7 +65,7 @@ public class ParsersDataServlet extends HttpServlet {
 				writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon(ext.toLowerCase()))
 						+ "</icon>");
 				writer.print("<extension>" + ext.toLowerCase() + "</extension>");
-				writer.print("<name><![CDATA[" + ParserFactory.getParsers().get(ext).getSimpleName() + "]]></name>");
+				writer.print("<name><![CDATA[" + ParserFactory.getParsers().get(ext).getClass().getSimpleName() + "]]></name>");
 
 				String aliasProp = config.getProperty("parser.alias." + ext.toLowerCase());
 				writer.print("<aliases><![CDATA[" + (aliasProp != null ? aliasProp : "") + "]]></aliases>");

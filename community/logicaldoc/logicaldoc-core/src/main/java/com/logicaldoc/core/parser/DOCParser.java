@@ -3,6 +3,7 @@ package com.logicaldoc.core.parser;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Locale;
 
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ import com.logicaldoc.util.StringUtil;
  * 
  * @author Michael Scholz
  * @author Sebastian Stein
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.5
  */
 public class DOCParser extends RTFParser {
@@ -28,9 +29,8 @@ public class DOCParser extends RTFParser {
 	protected static Logger log = LoggerFactory.getLogger(DOCParser.class);
 
 	@Override
-	public void parse(InputStream input) {
+	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant) {
 		try {
-
 			BufferedInputStream bis = new BufferedInputStream(input);
 			bis.mark(Integer.MAX_VALUE);
 
@@ -55,9 +55,10 @@ public class DOCParser extends RTFParser {
 			// Replace Control characters
 			if (tmp != null)
 				tmp = tmp.replaceAll("[\\p{Cntrl}&&[^\\n]]", " ");
-			content.append(StringUtil.writeToString(new StringReader(tmp)));
+			return StringUtil.writeToString(new StringReader(tmp));
 		} catch (Throwable e) {
 			log.warn("Failed to extract Word text content", e);
 		}
+		return "";
 	}
 }

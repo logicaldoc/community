@@ -25,7 +25,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for templates data.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TemplatesDataServlet extends HttpServlet {

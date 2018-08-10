@@ -11,7 +11,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * This class monitors the system load and notifies the listeners accordingly
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7.1
  */
 public class SystemLoadMonitor {

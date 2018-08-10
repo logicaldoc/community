@@ -17,7 +17,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * Extends the standard property placeholder to retrieve properties from the
  * database.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 1.0
  */
 public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {

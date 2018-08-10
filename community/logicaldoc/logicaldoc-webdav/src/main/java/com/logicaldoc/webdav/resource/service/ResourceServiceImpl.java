@@ -443,9 +443,9 @@ public class ResourceServiceImpl implements ResourceService {
 			if (!addchildEnabled)
 				throw new DavException(DavServletResponse.SC_FORBIDDEN, "AddChild Rights not granted to this user");
 
-			// verify the delete permission on parent folder
-			boolean deleteEnabled = parentFolder.isDeleteEnabled();
-			if (!deleteEnabled)
+			// verify the MOVE permission on parent folder
+			boolean moveEnabled = parentFolder.isMoveEnabled();
+			if (!moveEnabled)
 				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Delete Rights not granted to this user");
 
 			Folder folder = folderDAO.findById(Long.parseLong(destination.getID()));

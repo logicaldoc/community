@@ -19,7 +19,7 @@ import com.logicaldoc.util.Context;
 /**
  * CMIS Service factory
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5.1
  */
 public class ServiceFactory extends AbstractServiceFactory {

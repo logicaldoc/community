@@ -9,7 +9,7 @@ import com.logicaldoc.core.document.History;
 /**
  * DAO for <code>DocumentNote</code> handling.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
 public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {

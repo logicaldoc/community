@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * This panel collects all documents details needed by a bulk update or other
  * update operations.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class UpdatePanel extends VLayout {

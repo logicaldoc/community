@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * A document's rating.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class GUIRating implements Serializable {

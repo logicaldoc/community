@@ -19,7 +19,7 @@ import com.logicaldoc.util.sql.SqlUtil;
 /**
  * Hibernate implementation of <code>HistoryDAO</code>
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
 @SuppressWarnings("unchecked")

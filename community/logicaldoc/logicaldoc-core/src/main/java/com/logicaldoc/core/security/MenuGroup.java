@@ -3,7 +3,7 @@ package com.logicaldoc.core.security;
 /**
  * This class represents security permissions for a group in relation to a menu
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
 public class MenuGroup {

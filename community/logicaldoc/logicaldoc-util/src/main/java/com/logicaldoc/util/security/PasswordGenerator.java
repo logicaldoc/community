@@ -9,7 +9,7 @@ import java.util.Random;
  * 
  * See www.multicians.org/thvv/gpw.html for history and info. Tom Van Vleck
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public class PasswordGenerator {

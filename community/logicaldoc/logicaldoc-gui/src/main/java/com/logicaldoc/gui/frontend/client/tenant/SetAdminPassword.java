@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 /**
  * This is the form used to change the password of the tenant's administrator.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
 public class SetAdminPassword extends Window {

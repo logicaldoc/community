@@ -22,6 +22,7 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -38,7 +39,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows a list of versions of a document in a tabular way.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class VersionsPanel extends DocumentDetailTab {
@@ -47,6 +48,10 @@ public class VersionsPanel extends DocumentDetailTab {
 
 	public VersionsPanel(final GUIDocument document) {
 		super(document, null);
+	}
+
+	@Override
+	protected void onDraw() {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
@@ -60,19 +65,36 @@ public class VersionsPanel extends DocumentDetailTab {
 		date.setCellFormatter(new DateCellFormatter(false));
 		date.setCanFilter(false);
 		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
-		ListGridField fileName = new ListGridField("filename", I18N.message("filename"), 100);
-		fileName.setHidden(true);
+		ListGridField fileName = new ListGridField("filename", I18N.message("filename"), 200);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
 		type.setType(ListGridFieldType.TEXT);
 		type.setAlign(Alignment.CENTER);
+		type.setHidden(true);
+
+		ListGridField permalink = new ListGridField("permalink", I18N.message("permalink"), 90);
+		permalink.setAlign(Alignment.CENTER);
+		permalink.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				long docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
+				String fileVersion = record.getAttributeAsString("fileVersion");
+				String downloadUrl = Util.downloadURL(docId, fileVersion);
+				String perma = "<a href='" + downloadUrl + "'>" + I18N.message("download") + "</a>";
+				return perma;
+			}
+		});
 
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setDataSource(new VersionsDS(document.getId(), null, 100));
-		list.setFields(user, event, type, fileVersion, version, date, fileName, comment);
+		if (document.getFolder().isDownload())
+			list.setFields(user, event, fileName, type, fileVersion, version, date, permalink, comment);
+		else
+			list.setFields(user, event, fileName, type, fileVersion, version, date, comment);
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
@@ -88,8 +110,11 @@ public class VersionsPanel extends DocumentDetailTab {
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				prepareContextMenu().showContextMenu();
-				event.cancel();
+				ListGridField field = list.getField(event.getColNum());
+				if (!"permalink".equals(field.getName())) {
+					prepareContextMenu().showContextMenu();
+					event.cancel();
+				}
 			}
 		});
 
@@ -106,6 +131,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		exportButton.setAutoFit(true);
 		buttons.addMember(exportButton);
 		exportButton.addClickHandler(new ClickHandler() {
+
 			@Override
 			public void onClick(ClickEvent event) {
 				Util.exportCSV(list, true);
@@ -185,8 +211,8 @@ public class VersionsPanel extends DocumentDetailTab {
 
 							@Override
 							public void onSuccess(GUIVersion[] result) {
-								ContentDiff diffWinfow = new ContentDiff(result[0].getDocId(), result[0]
-										.getFileVersion(), result[1].getFileVersion());
+								ContentDiff diffWinfow = new ContentDiff(result[0].getDocId(),
+										result[0].getFileVersion(), result[1].getFileVersion());
 								diffWinfow.show();
 							}
 						});

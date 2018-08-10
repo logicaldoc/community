@@ -36,7 +36,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows the list of the attribute options
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class Options extends com.smartgwt.client.widgets.Window {

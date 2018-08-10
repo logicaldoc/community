@@ -9,7 +9,7 @@ import java.util.Map;
  * Each methods has access to a dictionary map that can be used through the
  * execution pipeline in order to carry needed informations among all listeners.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public interface DocumentListener {

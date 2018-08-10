@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This popup window is used to import a user in the selected tenant.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
 public class LdapImportDialog extends Window {

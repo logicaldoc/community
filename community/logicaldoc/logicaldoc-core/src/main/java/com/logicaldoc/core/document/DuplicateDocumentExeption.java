@@ -3,7 +3,7 @@ package com.logicaldoc.core.document;
 /**
  * Used to declare a duplicated insert
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
 public class DuplicateDocumentExeption extends Exception {

@@ -1,5 +1,6 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,8 +11,13 @@ import com.logicaldoc.core.document.TagCloud;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.generic.Generic;
+import com.logicaldoc.core.generic.GenericDAO;
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
@@ -127,6 +133,29 @@ public class SoapTagService extends AbstractService implements TagService {
 		for (int i = 0; i < tags.size(); i++) {
 			wsTags[i] = tags.get(i);
 		}
+		return wsTags;
+	}
+
+	@Override
+	public String[] getTagsPreset(String sid) throws Exception {
+		validateSession(sid);
+		Session session = SessionManager.get().get(sid);
+		List<String> tags = new ArrayList<String>();
+
+		ContextProperties config = Context.get().getProperties();
+		String mode = config.getProperty(session.getTenantName() + ".tag.mode");
+		if("preset".equals(mode)){
+			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
+			for (Generic generic : buf)
+				tags.add(generic.getSubtype());
+		}
+
+		String[] wsTags = new String[tags.size()];
+		for (int i = 0; i < tags.size(); i++) {
+			wsTags[i] = tags.get(i);
+		}
+		
 		return wsTags;
 	}
 

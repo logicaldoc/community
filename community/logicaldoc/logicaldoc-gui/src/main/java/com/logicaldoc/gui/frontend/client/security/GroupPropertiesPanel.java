@@ -16,7 +16,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 /**
  * Shows group's standard properties
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GroupPropertiesPanel extends HLayout {

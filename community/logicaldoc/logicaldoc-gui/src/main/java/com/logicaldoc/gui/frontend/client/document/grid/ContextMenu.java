@@ -47,7 +47,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This context menu is used for grids containing document records.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ContextMenu extends Menu {
@@ -136,7 +136,7 @@ public class ContextMenu extends Menu {
 				final long[] ids = new long[selection.length];
 				for (int i = 0; i < selection.length; i++)
 					ids[i] = selection[i].getId();
-				
+
 				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
 					@Override
 					public void execute(Boolean value) {
@@ -151,7 +151,8 @@ public class ContextMenu extends Menu {
 								public void onSuccess(Void result) {
 									grid.removeSelectedDocuments();
 									DocumentController.get().deleted(grid.getSelectedDocuments());
-									if(grid.getFolder()!=null && grid.getFolder().getId()==Session.get().getCurrentFolder().getId())
+									if (grid.getFolder() != null
+											&& grid.getFolder().getId() == Session.get().getCurrentFolder().getId())
 										DocumentsPanel.get().refresh();
 								}
 							});
@@ -394,11 +395,16 @@ public class ContextMenu extends Menu {
 					@Override
 					public void onSuccess(Void result) {
 						GUIDocument[] docs = grid.getSelectedDocuments();
-						for (GUIDocument doc : docs)
-							DocUtil.markCheckedOut(doc);
+						for (GUIDocument record : docs){
+							if (Session.get().getCurrentDocument() != null
+									&& Session.get().getCurrentDocument().getId() == record.getId()) {
+								DocUtil.markCheckedOut(Session.get().getCurrentDocument());
+							} else {
+								DocUtil.markCheckedOut(record);
+							}
+						}
 						grid.selectDocument(document.getId());
 						Log.info(I18N.message("documentcheckedout"), null);
-
 						WindowUtils.openUrl(Util.downloadURL(document.getId()));
 					}
 				});
@@ -482,11 +488,16 @@ public class ContextMenu extends Menu {
 					@Override
 					public void onSuccess(Void result) {
 						GUIDocument[] selection = grid.getSelectedDocuments();
-						for (GUIDocument doc : selection) {
-							doc.setBookmarked(true);
-							DocumentController.get().modified(doc);
+						for (GUIDocument record : selection) {
+							record.setBookmarked(true);
+							if (Session.get().getCurrentDocument() != null
+									&& Session.get().getCurrentDocument().getId() == record.getId()) {
+								Session.get().getCurrentDocument().setBookmarked(true);
+								DocumentController.get().modified(Session.get().getCurrentDocument());
+							} else {
+								DocumentController.get().modified(record);
+							}
 						}
-						// grid.updateBookmarked(true);
 						DocumentsPanel.get().getDocumentsMenu().refresh("bookmarks");
 					}
 				});
@@ -510,7 +521,13 @@ public class ContextMenu extends Menu {
 					public void onSuccess(Void result) {
 						for (GUIDocument record : selection) {
 							record.setIndexed(Constants.INDEX_SKIP);
-							DocumentController.get().modified(record);
+							if (Session.get().getCurrentDocument() != null
+									&& Session.get().getCurrentDocument().getId() == record.getId()) {
+								Session.get().getCurrentDocument().setIndexed(Constants.INDEX_SKIP);
+								DocumentController.get().modified(Session.get().getCurrentDocument());
+							} else {
+								DocumentController.get().modified(record);
+							}
 						}
 					}
 				});
@@ -534,7 +551,13 @@ public class ContextMenu extends Menu {
 					public void onSuccess(Void result) {
 						for (GUIDocument record : selection) {
 							record.setIndexed(Constants.INDEX_TO_INDEX);
-							DocumentController.get().modified(record);
+							if (Session.get().getCurrentDocument() != null
+									&& Session.get().getCurrentDocument().getId() == record.getId()) {
+								Session.get().getCurrentDocument().setIndexed(Constants.INDEX_TO_INDEX);
+								DocumentController.get().modified(Session.get().getCurrentDocument());
+							} else {
+								DocumentController.get().modified(record);
+							}
 						}
 					}
 				});
@@ -565,7 +588,13 @@ public class ContextMenu extends Menu {
 						ContactingServer.get().hide();
 						for (GUIDocument record : selection) {
 							record.setIndexed(Constants.INDEX_INDEXED);
-							DocumentController.get().modified(record);
+							if (Session.get().getCurrentDocument() != null
+									&& Session.get().getCurrentDocument().getId() == record.getId()) {
+								Session.get().getCurrentDocument().setIndexed(Constants.INDEX_INDEXED);
+								DocumentController.get().modified(Session.get().getCurrentDocument());
+							} else {
+								DocumentController.get().modified(record);
+							}
 						}
 					}
 				});
@@ -764,7 +793,7 @@ public class ContextMenu extends Menu {
 			preview.setEnabled(someSelection);
 			externalCall.setEnabled(someSelection);
 			cut.setEnabled(someSelection && !immutablesInSelection
-					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isDelete());
+					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isMove());
 			lock.setEnabled(someSelection && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
 			unlock.setEnabled(someSelection
@@ -795,13 +824,11 @@ public class ContextMenu extends Menu {
 									Constants.INDEX_TO_INDEX, selection)));
 			setPassword.setEnabled(justOneSelected && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-					&& folder.hasPermission(Constants.PERMISSION_PASSWORD)
-					&& !selection[0].isPasswordProtected());
+					&& folder.hasPermission(Constants.PERMISSION_PASSWORD) && !selection[0].isPasswordProtected());
 			unsetPassword.setEnabled(justOneSelected && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-					&& folder.hasPermission(Constants.PERMISSION_PASSWORD)
-					&& selection[0].isPasswordProtected());
-			sendMail.setEnabled(someSelection && folder.isDownload());
+					&& folder.hasPermission(Constants.PERMISSION_PASSWORD) && selection[0].isPasswordProtected());
+			sendMail.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_EMAIL));
 			checkout.setEnabled(someSelection && !immutablesInSelection && folder.isDownload() && folder.isWrite()
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
 			checkin.setEnabled(justOneSelected && !immutablesInSelection && folder.isWrite()

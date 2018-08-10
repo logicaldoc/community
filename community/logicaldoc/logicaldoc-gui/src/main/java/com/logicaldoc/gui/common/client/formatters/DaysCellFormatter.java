@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 /**
  * Utility formatter for those cells that contains a days number
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DaysCellFormatter implements CellFormatter {

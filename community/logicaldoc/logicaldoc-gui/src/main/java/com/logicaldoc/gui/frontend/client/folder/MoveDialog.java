@@ -15,7 +15,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 /**
  * This is the form used to move a folder into another path
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class MoveDialog extends Dialog {

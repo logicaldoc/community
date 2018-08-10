@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.ServerException;
 /**
  * The client side stub for the Dropbox Service.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 @RemoteServiceRelativePath("dropbox")

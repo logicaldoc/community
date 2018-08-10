@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.observer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 
@@ -15,7 +15,7 @@ public class UserController {
 
 	private static UserController instance = new UserController();
 
-	private List<UserObserver> observers = new ArrayList<UserObserver>();
+	private Set<UserObserver> observers = new HashSet<UserObserver>();
 
 	private UserController() {
 	}

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * GUI representation of a generic contact
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIContact implements Serializable {

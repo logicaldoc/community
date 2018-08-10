@@ -15,7 +15,7 @@ import com.smartgwt.client.types.OperatorId;
 /**
  * Fake Datasource to populate a filter builder for parametric searches.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentFieldsDS extends DataSource {

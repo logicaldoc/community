@@ -25,7 +25,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the ContactService
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
 public class ContactServiceImpl extends RemoteServiceServlet implements ContactService {

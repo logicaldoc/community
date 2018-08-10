@@ -33,13 +33,11 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the list of users in a group.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GroupUsersPanel extends VLayout {
 	private ListGrid list;
-
-	private InfoPanel infoPanel;
 
 	private long groupId;
 
@@ -47,8 +45,11 @@ public class GroupUsersPanel extends VLayout {
 		this.groupId = groupId;
 		setWidth100();
 		setHeight100();
+	}
 
-		infoPanel = new InfoPanel("");
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
 
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);

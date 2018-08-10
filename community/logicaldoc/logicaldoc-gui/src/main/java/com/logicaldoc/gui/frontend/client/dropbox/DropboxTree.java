@@ -13,7 +13,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 /**
  * TreeGrid showing the folders and files
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class DropboxTree extends TreeGrid {

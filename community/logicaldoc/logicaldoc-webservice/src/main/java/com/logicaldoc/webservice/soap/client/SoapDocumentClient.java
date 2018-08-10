@@ -204,6 +204,11 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
+	public void createThumbnail(String sid, long docId, String fileVersion) throws Exception {
+		client.createThumbnail(sid, docId, fileVersion);
+	}
+	
+	@Override
 	public void uploadResource(String sid, long docId, String fileVersion, String suffix, DataHandler content)
 			throws Exception {
 		client.uploadResource(sid, docId, fileVersion, suffix, content);

@@ -5,7 +5,7 @@ import com.logicaldoc.core.PersistentObject;
 /**
  * Represents an option for a multi-choice attribute
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class AttributeOption extends PersistentObject implements Comparable<AttributeOption> {

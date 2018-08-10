@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Representation of a task
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class GUITask implements Serializable {

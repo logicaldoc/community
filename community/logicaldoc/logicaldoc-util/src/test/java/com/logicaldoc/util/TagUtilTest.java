@@ -13,7 +13,7 @@ import com.logicaldoc.util.TagUtil;
 /**
  * Test case for TagUtil class
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class TagUtilTest {

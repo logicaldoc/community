@@ -22,7 +22,7 @@ import com.logicaldoc.core.ticket.Ticket;
 /**
  * Test case for <code>DocumentManagerImpl</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5
  */
 public class DocumentManagerImplTest extends AbstractCoreTCase {

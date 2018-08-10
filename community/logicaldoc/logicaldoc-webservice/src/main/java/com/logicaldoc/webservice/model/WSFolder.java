@@ -22,7 +22,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 /**
  * Web Service Folder. Useful class to create repository Folders.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 @XmlRootElement(name = "folder")
@@ -96,7 +96,7 @@ public class WSFolder implements Serializable {
 			buf.add(tag);
 		setTags(buf.toArray(new String[0]));
 	}
-	
+
 	public Collection<String> listAttributeNames() {
 		List<String> names = new ArrayList<String>();
 		for (WSAttribute att : getAttributes()) {
@@ -114,6 +114,10 @@ public class WSFolder implements Serializable {
 	}
 
 	public static WSFolder fromFolder(Folder folder) {
+		return fromFolder(folder, true);
+	}
+
+	public static WSFolder fromFolder(Folder folder, boolean withCollections) {
 		WSFolder wsFolder = new WSFolder();
 		wsFolder.setId(folder.getId());
 		wsFolder.setFoldRef(folder.getFoldRef());
@@ -128,35 +132,38 @@ public class WSFolder implements Serializable {
 		wsFolder.setTemplateLocked(folder.getTemplateLocked());
 		wsFolder.setHidden(folder.getHidden());
 		wsFolder.setStorage(folder.getStorage());
-		if(folder.getTags()!=null)
+
+		if (withCollections && folder.getTags() != null)
 			wsFolder.setTags(folder.getTagsAsWords().toArray(new String[0]));
 
-		if (folder.getTemplate() != null)
+		if (withCollections && folder.getTemplate() != null)
 			wsFolder.setTemplateId(folder.getTemplate().getId());
 
 		// Populate the attributes
-		WSAttribute[] attributes = new WSAttribute[0];
-		if (folder.getTemplate() != null && folder.getAttributes() != null && folder.getAttributes().size() > 0) {
-			attributes = new WSAttribute[folder.getAttributeNames().size()];
-			int i = 0;
-			for (String name : folder.getAttributeNames()) {
-				Attribute attr = folder.getAttribute(name);
-				WSAttribute attribute = new WSAttribute();
-				attribute.setName(name);
-				attribute.setMandatory(attr.getMandatory());
-				attribute.setPosition(attr.getPosition());
-				attribute.setValue(attr.getValue());
+		if (withCollections) {
+			WSAttribute[] attributes = new WSAttribute[0];
+			if (folder.getTemplate() != null && folder.getAttributes() != null && folder.getAttributes().size() > 0) {
+				attributes = new WSAttribute[folder.getAttributeNames().size()];
+				int i = 0;
+				for (String name : folder.getAttributeNames()) {
+					Attribute attr = folder.getAttribute(name);
+					WSAttribute attribute = new WSAttribute();
+					attribute.setName(name);
+					attribute.setMandatory(attr.getMandatory());
+					attribute.setPosition(attr.getPosition());
+					attribute.setValue(attr.getValue());
 
-				if (attr.getType() == Attribute.TYPE_USER) {
-					attribute.setIntValue(attr.getIntValue());
-					attribute.setStringValue(attr.getStringValue());
+					if (attr.getType() == Attribute.TYPE_USER) {
+						attribute.setIntValue(attr.getIntValue());
+						attribute.setStringValue(attr.getStringValue());
+					}
+
+					attribute.setType(attr.getType());
+					attributes[i++] = attribute;
 				}
-
-				attribute.setType(attr.getType());
-				attributes[i++] = attribute;
 			}
+			wsFolder.setAttributes(attributes);
 		}
-		wsFolder.setAttributes(attributes);
 
 		return wsFolder;
 	}

@@ -13,7 +13,7 @@ import com.logicaldoc.core.PersistentObject;
  * the security policies.
  * 
  * @author Michael Scholz
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
 public class Menu extends PersistentObject implements Comparable<Menu> {

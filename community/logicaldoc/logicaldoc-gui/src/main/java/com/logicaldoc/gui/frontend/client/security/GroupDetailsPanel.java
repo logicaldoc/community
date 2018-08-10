@@ -27,7 +27,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects all groups details
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  * 
  */

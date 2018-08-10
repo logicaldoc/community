@@ -18,7 +18,7 @@ import com.logicaldoc.util.sql.SqlUtil;
 /**
  * Hibernate implementation of <code>FolderHistoryDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 @SuppressWarnings("unchecked")

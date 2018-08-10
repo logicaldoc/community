@@ -8,7 +8,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * Datasource to retrieve all folders inside the impex/in folder. It is based on
  * Xml parsing.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ImpexFoldersDS extends DataSource {

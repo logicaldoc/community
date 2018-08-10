@@ -2,6 +2,7 @@ package com.logicaldoc.core.parser;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -25,7 +26,7 @@ import com.logicaldoc.util.StringUtil;
  * with extensions (odt, ods, odp) and templates (ott, ots, otp). Tested with
  * StarOffice documents (sxw, sxc, sxi)
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 4.5.2
  */
 public class OpenOfficeParser extends AbstractParser {
@@ -82,7 +83,7 @@ public class OpenOfficeParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
 		try {
 			try {
 				Thread.sleep(4000);

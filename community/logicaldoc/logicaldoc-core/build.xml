@@ -8,7 +8,7 @@
 
 		<echo message="Deploying ${pom.artifactId}" />
 
-		<exec executable="mvn.bat" resolveexecutable="true" searchpath="true">
+		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
 		  <arg line="-o -Dmaven.test.skip=true install"/>
 		</exec>
 		

@@ -14,7 +14,7 @@ import com.logicaldoc.core.security.UserHistory;
 /**
  * Test case for <code>HibernateUserHistoryDAO</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.0
  */
 public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {

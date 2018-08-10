@@ -15,7 +15,7 @@ import com.logicaldoc.webservice.model.WSRating;
 /**
  * Document Web Service definition interface
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 @WSDoc(description = "documents handling and CRUD operations")
@@ -529,6 +529,23 @@ public interface DocumentService {
 			throws Exception;
 
 	/**
+	 * Creates the thumbnail of the given document. If the thumbnail was already
+	 * created, nothing will happen.
+	 * 
+	 * @param sid Session identifier
+	 * @param docId The document id
+	 * @param fileVersion The specific file version(it can be empty)
+	 * @throws Exception
+	 */
+	@WebMethod
+	@WSDoc(description = "creates the thumbail of the given document; if the thumbnail was already created, nothing will happen")
+	public void createThumbnail(
+			@WebParam(name = "sid") String sid,
+			@WebParam(name = "docId") long docId,
+			@WSDoc(description = "the specific file version", required = false) @WebParam(name = "fileVersion") String fileVersion)
+			throws Exception;
+
+	/**
 	 * Creates a new download ticket
 	 * 
 	 * @param sid Session identifier
@@ -592,9 +609,10 @@ public interface DocumentService {
 	@WebMethod
 	@WSDoc(description = "deletes a note, only the author or the administrator can delete the note")
 	public void deleteNote(@WebParam(name = "sid") String sid, @WebParam(name = "noteId") long noteId) throws Exception;
-	
+
 	/**
-	 * Deletes a version of a document with the given identifiers. You can not delete the latest version of a document
+	 * Deletes a version of a document with the given identifiers. You can not
+	 * delete the latest version of a document
 	 * 
 	 * @param sid Session identifier
 	 * @param docId The document id
@@ -607,8 +625,9 @@ public interface DocumentService {
 	@WebResult(name = "latest-version")
 	@WSDoc(description = "deletes a version of a document with the given identifiers")
 	public String deleteVersion(@WebParam(name = "sid") String sid, @WebParam(name = "docId") long docId,
-			@WSDoc(description = "the version to retrieve, eg: '1.0', '2.3'") @WebParam(name = "version") String version) throws Exception;	
-	
+			@WSDoc(description = "the version to retrieve, eg: '1.0', '2.3'") @WebParam(name = "version") String version)
+			throws Exception;
+
 	/**
 	 * Gets the notes for the given document
 	 */

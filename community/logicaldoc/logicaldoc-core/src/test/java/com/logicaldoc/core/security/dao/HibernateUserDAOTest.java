@@ -20,7 +20,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
 /**
  * Test case for <code>HibernateUserDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class HibernateUserDAOTest extends AbstractCoreTCase {

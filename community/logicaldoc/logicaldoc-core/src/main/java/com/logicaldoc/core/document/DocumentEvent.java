@@ -3,7 +3,7 @@ package com.logicaldoc.core.document;
 /**
  * Possible events in the document's history
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.6
  */
 public enum DocumentEvent {
@@ -22,6 +22,7 @@ public enum DocumentEvent {
 	SENT("event.sent"),
 	BARCODED("event.barcoded"),
 	WORKFLOWSTATUS("event.workflowstatus"),
+	WORKFLOWAPPENDED("event.workflowappended"),
 	SHORTCUT_STORED("event.shortcut.stored"),
 	SHORTCUT_MOVED("event.shortcut.moved"),
 	SHORTCUT_DELETED("event.shortcut.deleted"),

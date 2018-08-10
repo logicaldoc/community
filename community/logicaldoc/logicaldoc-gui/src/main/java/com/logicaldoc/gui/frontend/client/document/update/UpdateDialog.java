@@ -34,7 +34,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * This popup window is used to allow the users to input the data for a bulk
  * update or other update operations
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.3
  */
 public class UpdateDialog extends Window {

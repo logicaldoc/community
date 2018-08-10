@@ -12,7 +12,7 @@ import com.logicaldoc.util.Context;
 /**
  * Superclass for history entries
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.0
  */
 public class AbstractHistory extends PersistentObject {
@@ -69,11 +69,14 @@ public class AbstractHistory extends PersistentObject {
 
 	// Not persistent
 	private Folder folder;
-	
-	// Not persistent, indicates if this event has to be notified by the events collector
+
+	// Not persistent, indicates if this event has to be notified by the events
+	// collector
 	private boolean notifyEvent = true;
-	
+
 	public static String ASPECT = "saveHistory";
+
+	private String ip;
 
 	public String getVersion() {
 		return version;
@@ -208,6 +211,8 @@ public class AbstractHistory extends PersistentObject {
 			setUser(session.getUser());
 			setSessionId(session.getSid());
 			setTenantId(session.getTenantId());
+			if (session.getClient() != null)
+				setIp(session.getClient().getAddress());
 		}
 	}
 
@@ -302,5 +307,13 @@ public class AbstractHistory extends PersistentObject {
 
 	public void setNotifyEvent(boolean notifyEvent) {
 		this.notifyEvent = notifyEvent;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 }

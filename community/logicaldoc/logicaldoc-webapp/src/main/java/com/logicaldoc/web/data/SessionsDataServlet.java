@@ -30,7 +30,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for sessions data.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class SessionsDataServlet extends HttpServlet {

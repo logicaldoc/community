@@ -2,6 +2,7 @@ package com.logicaldoc.core.parser;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Locale;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -19,7 +20,7 @@ import com.logicaldoc.util.StringUtil;
 /**
  * Text extractor for AbiWord documents.
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 4.5.2
  */
 public class AbiWordParser extends AbstractParser {
@@ -69,7 +70,7 @@ public class AbiWordParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
 		try {
 			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 			saxParserFactory.setValidating(false);

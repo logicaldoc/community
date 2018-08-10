@@ -38,7 +38,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * Displays the list of all workflow triggers on a folder.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class WorkflowTriggersPanel extends VLayout {
@@ -53,7 +53,10 @@ public class WorkflowTriggersPanel extends VLayout {
 
 	public WorkflowTriggersPanel(final GUIFolder folder) {
 		this.folder = folder;
+	}
 
+	@Override
+	protected void onDraw() {
 		refresh();
 
 		Button addTrigger = new Button(I18N.message("workflowtriggeradd"));
@@ -214,7 +217,6 @@ public class WorkflowTriggersPanel extends VLayout {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(false);
 		list.setDataSource(new WorkflowTriggersDS("" + folder.getId()));
-		list.invalidateCache();
 		list.setFields(workflow, template, checkin);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {

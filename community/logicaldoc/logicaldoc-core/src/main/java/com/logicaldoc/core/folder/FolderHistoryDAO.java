@@ -9,7 +9,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
 /**
  * DAO for <code>FolderHistory</code> handling.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 5.0
  */
 public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {

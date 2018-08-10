@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Informations about the session created on the server side.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUISession implements Serializable {

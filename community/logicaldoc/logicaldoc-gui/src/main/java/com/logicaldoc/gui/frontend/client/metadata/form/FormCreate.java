@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This popup window is used to create a new form.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
 public class FormCreate extends Window {
@@ -98,7 +98,7 @@ public class FormCreate extends Window {
 
 			@Override
 			public void onSuccess(GUIDocument form) {
-				grid.init();
+				grid.refresh();
 				destroy();
 			}
 		});

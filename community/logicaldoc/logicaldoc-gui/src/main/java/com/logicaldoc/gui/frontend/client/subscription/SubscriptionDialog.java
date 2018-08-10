@@ -24,7 +24,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 /**
  * This is the form used for subscribe a user to the events.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 7.5
  */
 public class SubscriptionDialog extends Window {

@@ -41,9 +41,9 @@ public class ReportUploader extends Window {
 
 	private DynamicForm form;
 
-	private ReportsPanel reportsPanel;
+	private CustomReportsPanel reportsPanel;
 
-	public ReportUploader(ReportsPanel reportsPanel, final GUIReport report) {
+	public ReportUploader(CustomReportsPanel reportsPanel, final GUIReport report) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		if (report != null)
 			setTitle(I18N.message("uploadnewdesign") + " - " + report.getName());

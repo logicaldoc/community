@@ -14,9 +14,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
-import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.sequence.SequenceDAO;
-import com.logicaldoc.util.Context;
 
 /**
  * This handler gets the j_successurl request parameter and use it's value to
@@ -46,7 +43,7 @@ public class LDAuthenticationSuccessHandler implements AuthenticationSuccessHand
 				successUrl.append("&");
 			else
 				successUrl.append("?");
-			
+
 			Session session = SessionManager.get().get(token.getSid());
 			if (session != null) {
 				successUrl.append("tenant=");
@@ -56,13 +53,6 @@ public class LDAuthenticationSuccessHandler implements AuthenticationSuccessHand
 			log.info("Authentication of {} was successful, redirecting to {}", authentication.getName(), successUrl);
 			response.setHeader(PARAM_SUCCESSURL, successUrl.toString());
 			response.sendRedirect(successUrl.toString());
-
-			// Remove the failed login counters
-			if (Context.get().getProperties().getBoolean("throttle.enabled", false)) {
-				SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
-				sDao.delete("loginfail-username-" + session.getUsername(), 0L, Tenant.SYSTEM_ID);
-				sDao.delete("loginfail-ip-" + request.getRemoteAddr(), 0L, Tenant.SYSTEM_ID);
-			}
 		}
 	}
 }

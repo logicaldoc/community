@@ -8,7 +8,7 @@
 
 		<echo message="Deploying ${pom.artifactId}" />
 
-		<exec executable="mvn.bat" resolveexecutable="true" searchpath="true">
+		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
 		  <arg line="-o -Dmaven.test.skip=true install"/>
 		</exec>
 		
@@ -20,6 +20,7 @@
 	<target name="deploy-resources">
 	    <copy todir="${logicaldoc.webroot}">
 	    	<fileset dir="war">
+	    	    <exclude name="fontawesome/"/>
 	    		<exclude name="common/"/>
 	    		<exclude name="WEB-INF/**"/>
                 <exclude name="*.jsp"/>

@@ -22,7 +22,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the TagService
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TagServiceImpl extends RemoteServiceServlet implements TagService {

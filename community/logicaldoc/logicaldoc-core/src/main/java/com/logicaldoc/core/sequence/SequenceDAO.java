@@ -10,7 +10,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
  * <b>Important:</b> Implementations of this interface must grant
  * synchronization.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
 public interface SequenceDAO extends PersistentObjectDAO<Sequence> {

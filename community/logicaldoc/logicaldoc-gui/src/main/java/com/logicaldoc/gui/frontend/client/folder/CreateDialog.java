@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 /**
  * This is the form used to create a new Folder
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7.1
  */
 public class CreateDialog extends Dialog {
@@ -43,8 +43,8 @@ public class CreateDialog extends Dialog {
 		centerInPage();
 		setPadding(3);
 
-		final boolean inheritOptionEnabled = "true".equals(Session.get().getInfo()
-				.getConfig("gui.security.inheritoption"));
+		final boolean inheritOptionEnabled = folder.getType() == 0
+				&& "true".equals(Session.get().getInfo().getConfig("gui.security.inheritoption"));
 
 		form = new DynamicForm();
 		form.setHeight100();
@@ -54,8 +54,8 @@ public class CreateDialog extends Dialog {
 		inheritSecurity.setName("inheritSecurity");
 		inheritSecurity.setTitle(I18N.message("inheritparentsec"));
 
-		TextItem name = ItemFactory.newTextItem("name", "name", folder.getType() == 0 ? I18N.message("newfolder")
-				: I18N.message("newworkspace"));
+		TextItem name = ItemFactory.newTextItem("name", "name",
+				folder.getType() == 0 ? I18N.message("newfolder") : I18N.message("newworkspace"));
 		name.setWidth(250);
 		name.setRequired(true);
 		name.addKeyPressHandler(new KeyPressHandler() {
@@ -96,7 +96,8 @@ public class CreateDialog extends Dialog {
 		if (form.validate()) {
 			folder.setName(form.getValueAsString("name").trim());
 			FolderService.Instance.get().create(folder,
-					!inheritOptionEnabled || "true".equals(form.getValueAsString("inheritSecurity")),
+					folder.getType() == 0
+							&& (!inheritOptionEnabled || "true".equals(form.getValueAsString("inheritSecurity"))),
 					new AsyncCallback<GUIFolder>() {
 
 						@Override
@@ -112,18 +113,15 @@ public class CreateDialog extends Dialog {
 							newNode.setAttribute("type", Long.toString(newFolder.getType()));
 
 							if (newFolder.getType() == 1) {
-								newNode.setAttribute(
-										"id",
+								newNode.setAttribute("id",
 										FolderNavigator.get().getRootNode().getAttributeAsString("id") + "-"
 												+ Long.toString(newFolder.getId()));
 								FolderNavigator.get().getTree().add(newNode, FolderNavigator.get().getTree().getRoot());
 							} else {
 								TreeNode selectedNode = (TreeNode) FolderNavigator.get().getSelectedRecord();
 
-								newNode.setAttribute(
-										"id",
-										selectedNode.getAttributeAsString("id") + "-"
-												+ Long.toString(newFolder.getId()));
+								newNode.setAttribute("id", selectedNode.getAttributeAsString("id") + "-"
+										+ Long.toString(newFolder.getId()));
 
 								if (!FolderNavigator.get().getTree().isOpen(selectedNode))
 									FolderNavigator.get().getTree().openFolder(selectedNode);

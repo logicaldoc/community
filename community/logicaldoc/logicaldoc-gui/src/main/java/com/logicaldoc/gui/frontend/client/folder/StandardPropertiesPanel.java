@@ -140,10 +140,10 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 		ColorItem color = ItemFactory.newColorItemPicker("color", "color", folder.getColor());
 		color.addChangedHandler(changedHandler);
 
-		LinkItem pathItem = ItemFactory.newLinkItem("path", folder.getPathExtended());
+		LinkItem pathItem = ItemFactory.newLinkItem("path", folder.getPathExtended() != null ? folder.getPathExtended()
+				: "");
 		pathItem.setTitle(I18N.message("path"));
-		pathItem.setValue(Util.displaydURL(null, folder.getId()));
-		pathItem.addChangedHandler(changedHandler);
+		pathItem.setValue(Util.displayURL(null, folder.getId()));
 		pathItem.setWidth(400);
 
 		LinkItem barcode = ItemFactory.newLinkItem("barcode", I18N.message("generatebarcode"));

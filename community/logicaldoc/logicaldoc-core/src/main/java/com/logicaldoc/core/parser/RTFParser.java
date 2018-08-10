@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
@@ -33,7 +34,7 @@ public class RTFParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(RTFParser.class);
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
 		try {
 			BufferedInputStream bis0 = new BufferedInputStream(input);
 			bis0.mark(Integer.MAX_VALUE);

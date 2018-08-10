@@ -19,7 +19,7 @@ import com.logicaldoc.i18n.I18N;
 /**
  * This servlet is responsible for document posts data.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class EventsDataServlet extends HttpServlet {

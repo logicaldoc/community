@@ -20,6 +20,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.logicaldoc.core.security.Client;
+import com.logicaldoc.core.security.LoginThrottle;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AccountDisabledException;
@@ -59,8 +60,9 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 		Client client = SessionManager.get().buildClient(httpReq);
 
 		// Check the passwords match
+		Session session = null;
 		try {
-			Session session = SessionManager.get().newSession(username, password, key, client);
+			session = SessionManager.get().newSession(username, password, key, client);
 
 			// Preferably clear the password in the user object before storing
 			// in authentication object
@@ -71,6 +73,9 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 			for (String role : groups) {
 				authorities.add(new SimpleGrantedAuthority(role));
 			}
+
+			// Clear the login failures
+			LoginThrottle.clearFailures(username, client.getAddress());
 
 			// Return an authenticated token, containing user data and
 			// authorities
@@ -94,6 +99,11 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 			String message = String.format("Security checks failed for user %s - %s", username, ae.getMessage());
 			log.warn(message);
 			throw new CredentialsExpiredException(ae.getMessage() != null ? ae.getMessage() : "badcredentials");
+		} finally {
+			if (session == null) {
+				// Register a new login failure
+				LoginThrottle.recordFailure(username, client.getAddress());
+			}
 		}
 	}
 

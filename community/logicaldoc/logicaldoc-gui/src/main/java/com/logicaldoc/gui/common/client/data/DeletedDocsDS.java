@@ -9,7 +9,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to handle deleted documents grid lists.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
 public class DeletedDocsDS extends DataSource {

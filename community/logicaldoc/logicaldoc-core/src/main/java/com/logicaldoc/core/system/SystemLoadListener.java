@@ -3,7 +3,7 @@ package com.logicaldoc.core.system;
 /**
  * Concrete implementations have to react to changes in the system load.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7.1
  */
 public interface SystemLoadListener {

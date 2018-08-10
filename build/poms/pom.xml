@@ -4,7 +4,7 @@
   <artifactId>logicaldoc-parent-pom</artifactId>
   <name>logicaldoc-parent-pom</name>
   <packaging>pom</packaging>
-  <version>85</version>
+  <version>87</version>
   <description>Parent pom definition</description>
   <scm>
     <connection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/build/poms/trunk</connection>
@@ -16,6 +16,7 @@
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-ssh</artifactId>
+        <version>3.0.0</version>
       </extension>
     </extensions>
     <plugins>
@@ -69,10 +70,10 @@
     </plugins>
   </build>
   <properties>
-    <spring.version>4.3.12.RELEASE</spring.version>
-    <spring-security.version>4.2.3.RELEASE</spring-security.version>
-    <hibernate.version>4.3.11.Final</hibernate.version>
-    <ehcache.version>2.9.1</ehcache.version>
+    <spring.version>4.3.14.RELEASE</spring.version>
+    <spring-security.version>4.2.4.RELEASE</spring-security.version>
+    <hibernate.version>5.2.12.Final</hibernate.version>
+    <ehcache.version>2.10.4</ehcache.version>
     <lucene.version>6.3.0</lucene.version>
     <solr.version>6.3.0</solr.version>
     <!--gwt.version>2.7.0</gwt.version-->
@@ -83,15 +84,31 @@
     <ant.version>1.8.2</ant.version>
     <httpclient.version>4.5.2</httpclient.version>
     <jackson.version>2.6.5</jackson.version>
-    <poi.version>3.16</poi.version> 
+    <poi.version>3.16</poi.version>
+    <jaxb.version>2.2.11</jaxb.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>javax.xml.bind</groupId>
+        <artifactId>jaxb-api</artifactId>
+        <version>${jaxb.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-core</artifactId>
+        <version>${jaxb.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.xml.bind</groupId>
+        <artifactId>jaxb-impl</artifactId>
+        <version>${jaxb.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.pdfbox</groupId>
         <artifactId>pdfbox</artifactId>
-        <version>2.0.7</version>
-      </dependency>      
+        <version>2.0.8</version>
+      </dependency>
       <dependency>
         <groupId>javax.activation</groupId>
         <artifactId>activation</artifactId>
@@ -159,7 +176,7 @@
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.2.1</version>
+        <version>1.2.2</version>
         <type>jar</type>
       </dependency>
       <dependency>
@@ -172,7 +189,7 @@
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
         <version>3.2.2</version>
-      </dependency>      
+      </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>mmons-collections4</artifactId>
@@ -247,7 +264,7 @@
       <dependency>
         <groupId>commons-net</groupId>
         <artifactId>commons-net</artifactId>
-        <version>3.3</version>
+        <version>3.6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
@@ -372,12 +389,12 @@
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-core</artifactId>
         <version>${spring-security.version}</version>
-      </dependency> 
+      </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-web</artifactId>
         <version>${spring-security.version}</version>
-      </dependency>    
+      </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-config</artifactId>
@@ -387,7 +404,7 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-jms</artifactId>
         <version>${spring.version}</version>
-      </dependency> 
+      </dependency>
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate</artifactId>
@@ -407,7 +424,7 @@
             <groupId>net.sf.ehcache</groupId>
             <artifactId>ehcache-core</artifactId>
           </exclusion>
-        </exclusions> 
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.hibernate</groupId>
@@ -564,14 +581,14 @@
       </dependency>
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
-          <artifactId>quartz</artifactId>
-          <version>2.2.1</version>
+        <artifactId>quartz</artifactId>
+        <version>2.2.1</version>
       </dependency>
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz-jobs</artifactId>
         <version>2.2.1</version>
-      </dependency> 
+      </dependency>
       <dependency>
         <groupId>com.google.gwt</groupId>
         <artifactId>gwt-servlet</artifactId>
@@ -703,35 +720,35 @@
         <version>${httpclient.version}</version>
       </dependency>
       <dependency>
-         <groupId>org.apache.httpcomponents</groupId>
-         <artifactId>httpcore</artifactId>
-         <version>4.4.4</version>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpcore</artifactId>
+        <version>4.4.4</version>
       </dependency>
       <dependency>
-         <groupId>com.fasterxml.jackson.jaxrs</groupId>
-         <artifactId>jackson-jaxrs-json-provider</artifactId>
-         <version>${jackson.version}</version>
-      </dependency>           
-      <dependency>
-         <groupId>com.fasterxml.jackson.core</groupId>
-         <artifactId>jackson-core</artifactId>
-         <version>${jackson.version}</version>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-json-provider</artifactId>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
-         <groupId>com.fasterxml.jackson.core</groupId>
-         <artifactId>jackson-databind</artifactId>
-         <version>${jackson.version}</version>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
       </dependency>
-		  <dependency>
-		     <groupId>com.fasterxml.jackson.core</groupId>
-		     <artifactId>jackson-annotations</artifactId>
-		     <version>${jackson.version}</version>
-		  </dependency>  
       <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.3.1</version>
-       </dependency>                
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.3.1</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <repositories>
@@ -757,7 +774,7 @@
       <name>Java.net Repository for Maven</name>
       <url>http://download.java.net/maven/2/</url>
       <layout>default</layout>
-    </repository>   
+    </repository>
     <repository>
       <id>smartgwt</id>
       <url>http://www.smartclient.com/maven2</url>
@@ -790,7 +807,7 @@
     <repository>
       <id>java.net</id>
       <url>https://maven.java.net/content/repositories/releases</url>
-    </repository>   
+    </repository>
   </repositories>
   <distributionManagement>
     <repository>

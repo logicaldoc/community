@@ -27,7 +27,7 @@ import com.logicaldoc.webservice.soap.SystemService;
 /**
  * System Web Service Implementation
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class SoapSystemService extends AbstractService implements SystemService {

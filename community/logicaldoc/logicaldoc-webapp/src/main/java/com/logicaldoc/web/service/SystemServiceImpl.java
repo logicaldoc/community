@@ -56,7 +56,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the SystemService
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class SystemServiceImpl extends RemoteServiceServlet implements SystemService {
@@ -497,7 +497,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 			// Search in the document/folder history
 			StringBuffer query = new StringBuffer(
-					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, '' as ip, A.ld_userlogin, A.ld_comment from ld_history A where A.ld_tenantid = "
+					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment from ld_history A where A.ld_tenantid = "
 							+ session.getTenantId());
 			if (userName != null && StringUtils.isNotEmpty(userName))
 				query.append(" and lower(A.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
@@ -524,7 +524,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			}
 
 			// Search in the folder history
-			query.append(" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, '' as ip, B.ld_userlogin, B.ld_comment from ld_folder_history B where B.ld_tenantid = "
+			query.append(" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment from ld_folder_history B where B.ld_tenantid = "
 					+ session.getTenantId());
 			if (userName != null && StringUtils.isNotEmpty(userName))
 				query.append(" and lower(B.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");

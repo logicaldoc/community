@@ -12,7 +12,7 @@ import com.logicaldoc.webservice.model.WSSystemInfo;
 /**
  * System Web Service definition interface
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 @WSDoc(description = "informations about the system")

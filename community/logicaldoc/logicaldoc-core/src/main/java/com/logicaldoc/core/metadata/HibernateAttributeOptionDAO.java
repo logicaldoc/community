@@ -14,7 +14,7 @@ import com.logicaldoc.util.sql.SqlUtil;
 /**
  * Hibernate implementation of <code>AttributeOptionDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 @SuppressWarnings("unchecked")

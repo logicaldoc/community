@@ -12,7 +12,7 @@ import com.logicaldoc.i18n.I18N;
 /**
  * This task takes care of calculating the documents digest
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class DigestProcessor extends Task {

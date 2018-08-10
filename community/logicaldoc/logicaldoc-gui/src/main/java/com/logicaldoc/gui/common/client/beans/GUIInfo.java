@@ -9,16 +9,16 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 /**
  * General product informations
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String release = "7.7.3";
+	private String release = "7.8";
 
-	private String year = "2006-2017";
+	private String year = "2006-2018";
 
 	private String userNo;
 

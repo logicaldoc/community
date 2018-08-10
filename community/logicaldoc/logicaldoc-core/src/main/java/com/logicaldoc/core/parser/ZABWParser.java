@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Text extractor for AbiWord compressed documents.
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.5
  */
 public class ZABWParser extends AbstractParser {
@@ -20,14 +21,13 @@ public class ZABWParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(ZABWParser.class);
 
 	@Override
-	public void parse(File file) {
-		String enc = "UTF-8";
+	public String parse(File file, String filename, String encoding, Locale locale, String tenant) {
+		String enc = encoding != null ? encoding : "UTF-8";
 		FileInputStream stream = null;
 		try {
 			stream = new FileInputStream(file);
 			GZIPInputStream gis = new GZIPInputStream(stream);
-			setEncoding(enc);
-			parse(gis);
+			return parse(gis, filename, enc, locale, tenant);
 		} catch (Exception ex) {
 			log.warn("Failed to extract Compressed AbiWord text content", ex);
 		} finally {
@@ -37,14 +37,14 @@ public class ZABWParser extends AbstractParser {
 			} catch (IOException e) {
 			}
 		}
+		return "";
 	}
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
 		try {
 			AbiWordParser parser = new AbiWordParser();
-			parser.parse(input);
-			content.append(parser.getContent());
+			content.append(parser.parse(input, filename, encoding, locale, tenant));
 		} catch (Exception e) {
 			log.warn("Failed to extract AbiWord Compressed zabw text content", e);
 		}

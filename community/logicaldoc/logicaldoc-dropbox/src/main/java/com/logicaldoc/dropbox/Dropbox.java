@@ -28,7 +28,7 @@ import com.dropbox.core.v2.files.SearchResult;
 /**
  * Our Dropbox facade
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class Dropbox {

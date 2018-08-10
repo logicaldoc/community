@@ -26,6 +26,7 @@
   </context-param>
   <session-config>
     <session-timeout>30</session-timeout>
+    <tracking-mode>COOKIE</tracking-mode>
   </session-config>
   <filter>
     <filter-name>CharsetFilter</filter-name>
@@ -323,6 +324,10 @@
     <servlet-class>com.logicaldoc.web.ConvertPdf</servlet-class>
   </servlet>
   <servlet>
+	<servlet-name>Display</servlet-name>
+	<servlet-class>com.logicaldoc.web.DisplayServlet</servlet-class>
+  </servlet>  
+  <servlet>
     <servlet-name>Webdav</servlet-name>
     <servlet-class>com.logicaldoc.webdav.web.WebdavServlet</servlet-class>
     <init-param>
@@ -366,7 +371,6 @@
     <servlet-name>TokenFiltersData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.TokenFiltersDataServlet</servlet-class>
   </servlet>
-  
   <servlet>
     <servlet-name>EventService</servlet-name>
     <servlet-class>de.novanic.eventservice.service.EventServiceImpl</servlet-class>
@@ -375,6 +379,10 @@
     <servlet-name>MessengerRemoteService</servlet-name>
     <servlet-class>com.logicaldoc.web.remote.MessengerRemoteServiceImpl</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>StoragesData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.StoragesDataServlet</servlet-class>
+  </servlet>  
  
   <servlet-mapping>
     <servlet-name>MessengerRemoteService</servlet-name>
@@ -384,7 +392,6 @@
     <servlet-name>EventService</servlet-name>
     <url-pattern>/frontend/gwteventservice</url-pattern>
   </servlet-mapping>   
-  
   <servlet-mapping>
     <servlet-name>ConversionFormatsData</servlet-name>
     <url-pattern>/data/conversionformats.xml</url-pattern>
@@ -685,6 +692,14 @@
     <servlet-name>DropboxService</servlet-name>
     <url-pattern>/frontend/dropbox</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+	<servlet-name>Display</servlet-name>
+	<url-pattern>/display</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>StoragesData</servlet-name>
+    <url-pattern>/data/storages.xml</url-pattern>
+  </servlet-mapping>    
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
     <welcome-file>index.html</welcome-file>

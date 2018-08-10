@@ -25,7 +25,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This popup window is used to show the HTML document in a WYSIWYG.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8.1
  */
 public class WebcontentEditor extends Window {

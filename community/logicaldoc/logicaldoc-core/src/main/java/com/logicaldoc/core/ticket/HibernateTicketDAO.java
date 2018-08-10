@@ -16,7 +16,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Hibernate implementation of <code>TicketDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 @SuppressWarnings("unchecked")

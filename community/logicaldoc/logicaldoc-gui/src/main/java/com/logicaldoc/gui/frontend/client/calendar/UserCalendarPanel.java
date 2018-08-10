@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * Calendar dashboard that displays the events in which the user is involved
  * into.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public class UserCalendarPanel extends VLayout {
@@ -37,14 +37,13 @@ public class UserCalendarPanel extends VLayout {
 	}
 
 	public UserCalendarPanel() {
-		initGUI();
-	}
-
-	private void initGUI() {
 		setWidth100();
 		setHeight100();
 		setMembersMargin(3);
+	}
 
+	@Override
+	public void onDraw() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
@@ -89,7 +88,6 @@ public class UserCalendarPanel extends VLayout {
 			choosenDate = calendar.getChosenDate();
 			choosenView = calendar.getCurrentViewName();
 		}
-
 		initCalendar();
 	}
 }

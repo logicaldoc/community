@@ -27,7 +27,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This is the form used to change file data of the current user.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Profile extends Window {

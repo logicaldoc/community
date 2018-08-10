@@ -4,7 +4,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
-import com.logicaldoc.gui.frontend.client.reports.custom.ReportsPanel;
+import com.logicaldoc.gui.frontend.client.reports.custom.CustomReportsPanel;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -13,7 +13,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the reports menu
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class ReportsMenu extends VLayout {
@@ -27,7 +27,7 @@ public class ReportsMenu extends VLayout {
 		lastChanges.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new LastChangesPanel());
+				AdminScreen.get().setContent(new LastChangesReport());
 			}
 		});
 		if (Menu.enabled(Menu.LAST_CHANGES))
@@ -39,7 +39,7 @@ public class ReportsMenu extends VLayout {
 		lockedDocs.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new LockedDocsPanel());
+				AdminScreen.get().setContent(new LockedDocsReport());
 			}
 		});
 		if (Menu.enabled(Menu.LOCKED_DOCS))
@@ -51,7 +51,7 @@ public class ReportsMenu extends VLayout {
 		deletedDocs.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new DeletedDocsPanel());
+				AdminScreen.get().setContent(new DeletedDocsReport());
 			}
 		});
 		if (Menu.enabled(Menu.DELETED_DOCS))
@@ -63,7 +63,7 @@ public class ReportsMenu extends VLayout {
 		archivedDocs.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new ArchivedDocsPanel());
+				AdminScreen.get().setContent(new ArchivedDocsReport());
 			}
 		});
 
@@ -81,7 +81,7 @@ public class ReportsMenu extends VLayout {
 		duplicates.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new DuplicatesPanel());
+				AdminScreen.get().setContent(new DuplicatesReport());
 			}
 		});
 
@@ -91,7 +91,7 @@ public class ReportsMenu extends VLayout {
 		deletedFolders.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new DeletedFoldersPanel());
+				AdminScreen.get().setContent(new DeletedFoldersReport());
 			}
 		});
 		if (Menu.enabled(Menu.DELETED_FOLDERS))
@@ -103,7 +103,7 @@ public class ReportsMenu extends VLayout {
 		calendar.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new CalendarReportPanel());
+				AdminScreen.get().setContent(new CalendarReport());
 			}
 		});
 
@@ -113,7 +113,7 @@ public class ReportsMenu extends VLayout {
 		customreports.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new ReportsPanel());
+				AdminScreen.get().setContent(new CustomReportsPanel());
 			}
 		});
 

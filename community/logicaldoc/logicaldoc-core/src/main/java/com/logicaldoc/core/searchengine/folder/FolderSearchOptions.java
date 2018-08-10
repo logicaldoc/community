@@ -5,7 +5,7 @@ import com.logicaldoc.core.searchengine.SearchOptions;
 /**
  * Search options specialization for the folder search.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class FolderSearchOptions extends SearchOptions {

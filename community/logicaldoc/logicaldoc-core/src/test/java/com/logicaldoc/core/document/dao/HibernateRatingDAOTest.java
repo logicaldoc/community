@@ -13,7 +13,7 @@ import com.logicaldoc.core.document.Rating;
 /**
  * Test case for <code>HibernateRatingDAOTest</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class HibernateRatingDAOTest extends AbstractCoreTCase {

@@ -14,7 +14,7 @@ import com.logicaldoc.core.rss.FeedMessage;
 /**
  * Test case for <code>HibernateFeedMessageDAO</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class HibernateFeedMessageDAOTest extends AbstractCoreTCase {

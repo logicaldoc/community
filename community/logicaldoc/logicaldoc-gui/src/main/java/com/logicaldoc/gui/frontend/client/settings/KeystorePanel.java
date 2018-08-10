@@ -5,14 +5,14 @@ import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.tenant.TenantKeystorePanel;
 
 /**
- * Handles the keystore of the current tenant.
+ * Handles the settings of the Virtual Agent.
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since 7.7.3
+ * @since 7.8
  */
 public class KeystorePanel extends AdminPanel {
 	public KeystorePanel() {
-		super("keystore");
+		super("virtualagent");
 		body.setMembers(new TenantKeystorePanel(Session.get().getTenantId()));
 	}
 }

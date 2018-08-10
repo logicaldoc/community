@@ -3,6 +3,7 @@ package com.logicaldoc.gui.common.client.util;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
@@ -92,72 +93,102 @@ public class DocUtil {
 
 	public static String getIndexedIcon(Integer indexed) {
 		if (indexed == null)
-			return "blank.png";
-
-		if (indexed.intValue() == Constants.INDEX_INDEXED) {
-			return "indexed.png";
-		} else if (indexed.intValue() == Constants.INDEX_SKIP) {
-			return "unindexable.png";
-		} else
-			return "blank.png";
+			return "";
+		String html = AwesomeFactory.getIconHtml("database");
+		if (indexed == Constants.INDEX_SKIP) {
+			html = "<span class='fa-layers fa-fw'>" + html;
+			html += "<i class='" + AwesomeFactory.getCssClassPrefix()
+					+ " fa-times' data-fa-transform='grow-8' style='color: red'></i></span>";
+		}
+		return html;
 	}
 
 	public static String getLockedIcon(Integer locked) {
 		if (locked == null)
-			return "blank.png";
+			return "";
 
 		if (locked.intValue() == Constants.DOC_LOCKED) {
-			return "lock.png";
+			return AwesomeFactory.getIconHtml("lock-alt");
 		} else if (locked.intValue() == Constants.DOC_CHECKED_OUT) {
-			return "page_edit.png";
+			return AwesomeFactory.getIconHtml("edit");
 		} else
-			return "blank.png";
+			return "";
 	}
 
 	public static String getImmutableIcon(Integer immutable) {
 		if (immutable == null)
-			return "blank.png";
+			return "";
 
 		if (immutable.intValue() == 1)
-			return "stop.png";
+			return AwesomeFactory.getIconHtml("hand-paper");
 
-		return "blank.png";
+		return "";
 	}
 
 	public static String getPasswordProtectedIcon(Boolean password) {
 		if (password == null)
-			return "blank.png";
+			return "";
 
 		if (password.booleanValue())
-			return "key.png";
+			return AwesomeFactory.getIconHtml("key");
 
-		return "blank.png";
+		return "";
 	}
 
 	public static String getSignedIcon(Integer signed) {
 		if (signed == null)
-			return "blank.png";
+			return "";
 
 		if (signed.intValue() == 1)
-			return "rosette.png";
+			return AwesomeFactory.getIconHtml("badge-check");
 
-		return "blank.png";
+		return "";
 	}
 
 	public static String getStampedIcon(Integer stamped) {
 		if (stamped == null)
-			return "blank.png";
+			return "";
 
 		if (stamped.intValue() == 1)
-			return "stamp.png";
+			return AwesomeFactory.getIconHtml("tint");
 
-		return "blank.png";
+		return "";
 	}
 
 	public static String getBookmarkedIcon(boolean bookmarked) {
 		if (bookmarked)
-			return "heart.png";
+			return AwesomeFactory.getIconHtml("bookmark");
 		else
-			return "blank.png";
+			return "";
+	}
+
+	public static String getRatingIcon(Integer rating) {
+		String html = "";
+		if (rating != null)
+			for (int i = 1; i <= rating; i++) {
+				html += AwesomeFactory.getIconHtml("star");
+			}
+		return html;
+	}
+
+	public static String getFolderIcon(boolean open, int type, String name) {
+		String html = "";
+
+		if (type == GUIFolder.TYPE_WORKSPACE)
+			html = AwesomeFactory.getIconHtml("cube", name);
+		else if (type == GUIFolder.TYPE_ALIAS) {
+			html = "<div><span class='fa-layers fa-fw'>";
+			html += "<i class='" + AwesomeFactory.getCssClassPrefix() + " fa-lg fa-fw fa-"
+					+ (open ? "folder-open" : "folder") + "'></i>";
+			html += "<i class='fas fa-lg fa-fw fa-share' data-fa-transform='shrink-10 down-2 right-2'></i></span>&nbsp;&nbsp;&nbsp;";
+			html += name + "</div>";
+		} else {
+			if (open)
+				html = AwesomeFactory.getIconHtml("folder-open", name);
+			else
+				html = AwesomeFactory.getIconHtml("folder", name);
+		}
+
+		return html;
 	}
 }

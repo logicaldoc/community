@@ -10,7 +10,7 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
 /**
  * The left menu in the search area
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SearchMenu extends SectionStack {

@@ -32,7 +32,7 @@ import com.logicaldoc.web.util.ServletUtil;
  * This servlet is responsible for document downloads. It searches for the
  * attribute docId in any scope and extracts the proper document's content.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class DownloadServlet extends HttpServlet {

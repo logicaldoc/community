@@ -18,6 +18,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.util.Context;
@@ -33,13 +34,13 @@ public class WSUtil {
 			wsDoc.setLanguage(document.getLanguage());
 			wsDoc.setComment(document.getComment());
 			wsDoc.setWorkflowStatus(document.getWorkflowStatus());
+			wsDoc.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
 			if (document.getTemplate() != null)
 				wsDoc.setTemplateId(document.getTemplate().getId());
 			wsDoc.setImmutable(document.getImmutable());
 			if (document.getFolder() != null)
 				wsDoc.setFolderId(document.getFolder().getId());
-			if (document.getIndexed() != WSDocument.INDEX_INDEXED)
-				wsDoc.setIndexed(document.getIndexed());
+			wsDoc.setIndexed(document.getIndexed());
 			wsDoc.setVersion(document.getVersion());
 			wsDoc.setFileVersion(document.getFileVersion());
 			wsDoc.setPublisher(document.getPublisher());
@@ -173,6 +174,7 @@ public class WSUtil {
 		doc.setFolder(folder);
 		doc.setComment(wsDoc.getComment());
 		doc.setWorkflowStatus(wsDoc.getWorkflowStatus());
+		doc.setWorkflowStatusDisplay(wsDoc.getWorkflowStatusDisplay());
 		doc.setLocale(LocaleUtil.toLocale(wsDoc.getLanguage()));
 		doc.setTagsFromWords(tagsSet);
 		doc.setTemplate(template);
@@ -250,5 +252,156 @@ public class WSUtil {
 			}
 		}
 		return null;
+	}
+
+	public static WSAttributeSet toWSAttributeSet(AttributeSet attributeSet) {
+		WSAttributeSet wsAttributeSet = new WSAttributeSet();
+
+		try {
+			wsAttributeSet.setId(attributeSet.getId());
+			wsAttributeSet.setName(attributeSet.getName());
+			wsAttributeSet.setDescription(attributeSet.getDescription());
+			wsAttributeSet.setLastModified(convertDateToString(attributeSet.getLastModified()));
+
+			// Populate extended attributes
+			WSAttribute[] attributes = new WSAttribute[0];
+			if (attributeSet.getAttributes() != null && attributeSet.getAttributes().size() > 0) {
+				attributes = new WSAttribute[attributeSet.getAttributeNames().size()];
+				int i = 0;
+				for (String name : attributeSet.getAttributeNames()) {
+					Attribute attr = attributeSet.getAttribute(name);
+					WSAttribute attribute = new WSAttribute();
+					attribute.setName(name);
+					attribute.setLabel(attr.getLabel());
+					attribute.setMandatory(attr.getMandatory());
+					attribute.setPosition(attr.getPosition());
+					attribute.setType(attr.getType());
+					attribute.setStringValue(attr.getStringValue());
+					attribute.setIntValue(attr.getIntValue());
+					attribute.setDoubleValue(attr.getDoubleValue());
+					attribute.setDateValue(convertDateToString(attr.getDateValue()));
+					attribute.setEditor(attr.getEditor());
+					attribute.setSetId(attr.getSetId());
+					attributes[i++] = attribute;
+				}
+				wsAttributeSet.setAttributes(attributes);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
+		return wsAttributeSet;
+	}
+
+	public static AttributeSet toAttributeSet(WSAttributeSet wsSet) {
+		AttributeSet set = new AttributeSet();
+
+		try {
+			set.setId(wsSet.getId());
+			set.setName(wsSet.getName());
+			set.setDescription(wsSet.getDescription());
+
+			Map<String, Attribute> attributes = null;
+			if (wsSet.getAttributes() != null && wsSet.getAttributes().length > 0) {
+				set.getAttributes().clear();
+				attributes = new HashMap<String, Attribute>();
+				for (int i = 0; i < wsSet.getAttributes().length; i++) {
+					Attribute att = new Attribute();
+					att.setLabel(wsSet.getAttributes()[i].getLabel());
+					att.setMandatory(wsSet.getAttributes()[i].getMandatory());
+					att.setPosition(wsSet.getAttributes()[i].getPosition());
+					att.setType(wsSet.getAttributes()[i].getType());
+					att.setStringValue(wsSet.getAttributes()[i].getStringValue());
+					att.setIntValue(wsSet.getAttributes()[i].getIntValue());
+					att.setDoubleValue(wsSet.getAttributes()[i].getDoubleValue());
+					att.setDateValue(convertStringToDate(wsSet.getAttributes()[i].getStringValue()));
+					att.setEditor(wsSet.getAttributes()[i].getEditor());
+					att.setSetId(wsSet.getAttributes()[i].getSetId());
+					attributes.put(wsSet.getAttributes()[i].getName(), att);
+				}
+				set.setAttributes(attributes);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
+		return set;
+	}
+
+	public static Template toTemplate(WSTemplate wsTemplate) {
+		Template template = new Template();
+
+		try {
+			template.setId(wsTemplate.getId());
+			template.setName(wsTemplate.getName());
+			template.setDescription(wsTemplate.getDescription());
+
+			Map<String, Attribute> attributes = null;
+			if (wsTemplate.getAttributes() != null && wsTemplate.getAttributes().length > 0) {
+				template.getAttributes().clear();
+				attributes = new HashMap<String, Attribute>();
+				for (int i = 0; i < wsTemplate.getAttributes().length; i++) {
+					Attribute att = new Attribute();
+					att.setLabel(wsTemplate.getAttributes()[i].getLabel());
+					att.setMandatory(wsTemplate.getAttributes()[i].getMandatory());
+					att.setPosition(wsTemplate.getAttributes()[i].getPosition());
+					att.setType(wsTemplate.getAttributes()[i].getType());
+					att.setStringValue(wsTemplate.getAttributes()[i].getStringValue());
+					att.setIntValue(wsTemplate.getAttributes()[i].getIntValue());
+					att.setDoubleValue(wsTemplate.getAttributes()[i].getDoubleValue());
+					att.setDateValue(convertStringToDate(wsTemplate.getAttributes()[i].getStringValue()));
+					att.setEditor(wsTemplate.getAttributes()[i].getEditor());
+					att.setSetId(wsTemplate.getAttributes()[i].getSetId());
+					attributes.put(wsTemplate.getAttributes()[i].getName(), att);
+				}
+				template.setAttributes(attributes);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
+		return template;
+	}
+
+	public static WSTemplate toWFTemplate(Template template) {
+		WSTemplate wsTemplate = new WSTemplate();
+
+		try {
+			wsTemplate.setId(template.getId());
+			wsTemplate.setName(template.getName());
+			wsTemplate.setDescription(template.getDescription());
+			wsTemplate.setLastModified(convertDateToString(template.getLastModified()));
+
+			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
+
+			// Populate extended attributes
+			WSAttribute[] attributes = new WSAttribute[0];
+			if (template.getAttributes() != null && template.getAttributes().size() > 0) {
+				attributes = new WSAttribute[template.getAttributeNames().size()];
+				int i = 0;
+				for (String name : template.getAttributeNames()) {
+					Attribute attr = template.getAttribute(name);
+					WSAttribute attribute = new WSAttribute();
+					attribute.setName(name);
+					attribute.setLabel(attr.getLabel());
+					attribute.setMandatory(attr.getMandatory());
+					attribute.setPosition(attr.getPosition());
+					attribute.setType(attr.getType());
+					attribute.setStringValue(attr.getStringValue());
+					attribute.setIntValue(attr.getIntValue());
+					attribute.setDoubleValue(attr.getDoubleValue());
+					attribute.setDateValue(convertDateToString(attr.getDateValue()));
+					attribute.setEditor(attr.getEditor());
+					attribute.setSetId(attr.getSetId());
+					attributes[i++] = attribute;
+				}
+				wsTemplate.setAttributes(attributes);
+			}
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
+		return wsTemplate;
 	}
 }

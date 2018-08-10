@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Implementation of a Stamp
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
 public class GUIStamp implements Serializable {

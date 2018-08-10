@@ -125,6 +125,9 @@ body {
 }
 </style>
 
+<script src="./fontawesome/svg-with-js/js/fontawesome-all.js"></script>
+<link rel="stylesheet" href="./fontawesome/web-fonts-with-css/css/fontawesome-all.css" />
+
 <link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style.css" TYPE="text/css" />
 <link id="favicon" rel="shortcut icon" type="image/png" href='' />
 <script type="text/javascript">		

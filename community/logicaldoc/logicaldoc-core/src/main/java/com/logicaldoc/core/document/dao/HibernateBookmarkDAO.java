@@ -10,7 +10,7 @@ import com.logicaldoc.core.document.Bookmark;
 /**
  * Hibernate implementation of <code>BookmarkDAO</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 @SuppressWarnings("unchecked")

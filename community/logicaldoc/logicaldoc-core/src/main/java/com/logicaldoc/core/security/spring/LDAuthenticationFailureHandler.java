@@ -12,13 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 
-import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.User;
-import com.logicaldoc.core.security.UserHistory;
-import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.core.security.dao.UserHistoryDAO;
-import com.logicaldoc.core.sequence.SequenceDAO;
-import com.logicaldoc.util.Context;
+import com.logicaldoc.core.security.authentication.AccountNotFoundException;
+import com.logicaldoc.core.security.authentication.WrongPasswordException;
 
 /**
  * This handler gets the j_failureurl request parameter and use it's value to
@@ -38,7 +33,6 @@ public class LDAuthenticationFailureHandler implements AuthenticationFailureHand
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-
 		StringBuffer failureUrl = new StringBuffer(request.getContextPath());
 		failureUrl.append("/");
 		if (request.getParameter(PARAM_FAILUREURL) != null)
@@ -48,34 +42,29 @@ public class LDAuthenticationFailureHandler implements AuthenticationFailureHand
 		else
 			failureUrl.append("?");
 		failureUrl.append("failure=");
-		failureUrl.append(exception.getMessage());
 
-		Cookie failureCookie = new Cookie(COOKIE_LDOC_FAILURE, exception.getMessage());
-		response.addCookie(failureCookie);
+		String failureReason = exception.getMessage();
 
+		/*
+		 * Mask the not found as a wrong password, in order to avoid
+		 * vulnerability "Username Enumeration Weakness"<br>
+		 * https://www.zeroscience.mk/en/vulnerabilities/ZSL-2018-5451.php
+		 */
+		if (AccountNotFoundException.CODE.equals(failureReason))
+			failureReason = WrongPasswordException.CODE;
+		failureUrl.append(failureReason);
+
+		try {
+			Cookie failureCookie = new Cookie(COOKIE_LDOC_FAILURE, failureReason);
+			response.addCookie(failureCookie);
+		} catch (Throwable t) {
+
+		}
+		
 		String username = request.getParameter("j_username");
-		log.warn("Authentication of '" + username + "' was unsuccesful");
+		log.warn("Authentication of {} was unsuccesful", username);
 
-		// Record the failed login attempt
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = uDao.findByUsername(username);
-		if (user == null) {
-			user = new User();
-			user.setUsername(username);
-			user.setName(username);
-		}
-		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		dao.createUserHistory(user, UserHistory.EVENT_USER_LOGIN_FAILED, request.getRemoteAddr(),
-				request.getRemoteAddr(), null);
-
-		// Update the failed login counters
-		if ("true".equals(Context.get().getProperties().getProperty("throttle.enabled"))) {
-			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
-			sDao.next("loginfail-username-" + username, 0L, Tenant.SYSTEM_ID);
-			sDao.next("loginfail-ip-" + request.getRemoteAddr(), 0L, Tenant.SYSTEM_ID);
-		}
-
-		log.info("Redirecting to " + failureUrl.toString());
+		log.info("Redirecting to {}", failureUrl.toString());
 		response.sendRedirect(failureUrl.toString());
 	}
 }

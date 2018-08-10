@@ -15,7 +15,7 @@ import com.logicaldoc.core.ticket.TicketDAO;
 /**
  * Test case for <code>HibernateTicketDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class HibernateTicketDAOTest extends AbstractCoreTCase {

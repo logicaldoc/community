@@ -5,7 +5,7 @@ import java.util.Set;
 /**
  * Manager for security objects like users and groups
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public interface SecurityManager {

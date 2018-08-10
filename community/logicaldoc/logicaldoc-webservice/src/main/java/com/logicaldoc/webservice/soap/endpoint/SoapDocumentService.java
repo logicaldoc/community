@@ -38,6 +38,7 @@ import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.document.dao.HistoryDAO;
 import com.logicaldoc.core.document.dao.RatingDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
+import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
@@ -62,7 +63,7 @@ import com.logicaldoc.webservice.soap.DocumentService;
 /**
  * Document Web Service Implementation (SOAP)
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class SoapDocumentService extends AbstractService implements DocumentService {
@@ -288,6 +289,28 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
+	public void createThumbnail(String sid, long docId, String fileVersion) throws Exception {
+		validateSession(sid);
+		try {
+			ThumbnailManager manager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);
+			Storer storer = (Storer) Context.get().getBean(Storer.class);
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = docDao.findById(docId);
+			
+			String resource = storer.getResourceName(doc, fileVersion, "thumbnail");
+			if (!storer.exists(docId, resource))
+				manager.createTumbnail(doc, fileVersion, sid);
+			
+			resource = storer.getResourceName(doc, fileVersion, "tile");
+			if (!storer.exists(docId, resource))
+				manager.createTile(doc, fileVersion, sid);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	@Override
 	public void uploadResource(String sid, long docId, String fileVersion, String suffix, DataHandler content)
 			throws Exception {
 		User user = validateSession(sid);
@@ -397,7 +420,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document doc = docDao.findById(docId);
-		checkPermission(Permission.DELETE, user, doc.getFolder().getId());
+		checkPermission(Permission.MOVE, user, doc.getFolder().getId());
 		checkPublished(user, doc);
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);

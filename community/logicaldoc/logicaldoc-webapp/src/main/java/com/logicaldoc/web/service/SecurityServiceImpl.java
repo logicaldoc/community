@@ -34,6 +34,7 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.rss.dao.FeedMessageDAO;
 import com.logicaldoc.core.security.Group;
+import com.logicaldoc.core.security.LoginThrottle;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.MenuGroup;
 import com.logicaldoc.core.security.Session;
@@ -74,7 +75,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the SecurityService
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SecurityServiceImpl extends RemoteServiceServlet implements SecurityService {
@@ -961,18 +962,17 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.username.wait", 0));
 			Date oldestDate = cal.getTime();
 			if (max > 0)
-				seqs.addAll(dao
-						.findByWhere(
-								"_entity.name like 'loginfail-username-%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
-								new Object[] { max, oldestDate }, null, null));
+				seqs.addAll(dao.findByWhere("_entity.name like '" + LoginThrottle.LOGINFAIL_USERNAME
+						+ "%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
+						new Object[] { max, oldestDate }, null, null));
 
 			max = config.getInt("throttle.ip.max", 0);
 			cal = Calendar.getInstance();
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.ip.wait", 0));
 			oldestDate = cal.getTime();
 			if (max > 0)
-				seqs.addAll(dao.findByWhere(
-						"_entity.name like 'loginfail-ip-%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
+				seqs.addAll(dao.findByWhere("_entity.name like '" + LoginThrottle.LOGINFAIL_IP
+						+ "%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
 						new Object[] { max, oldestDate }, null, null));
 
 			GUISequence[] ret = new GUISequence[seqs.size()];

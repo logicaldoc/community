@@ -15,7 +15,7 @@ import com.logicaldoc.core.security.Group;
 /**
  * Test case for <code>HibernateGroupDAOTest</code>
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.0
  */
 public class HibernateGroupDAOTest extends AbstractCoreTCase {

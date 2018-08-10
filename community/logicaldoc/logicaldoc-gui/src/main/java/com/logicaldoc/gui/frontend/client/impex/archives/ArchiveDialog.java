@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This is the form used to create a new Archive
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ArchiveDialog extends Window {

@@ -36,7 +36,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects all the folder details
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class FolderDetailsPanel extends VLayout implements FolderObserver {
@@ -435,5 +435,17 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	@Override
 	protected void finalize() throws Throwable {
 		destroy();
+	}
+
+	@Override
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
 	}
 }

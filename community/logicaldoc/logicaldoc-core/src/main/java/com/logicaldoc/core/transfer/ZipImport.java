@@ -25,6 +25,8 @@ import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.util.UserUtil;
@@ -36,7 +38,7 @@ import com.logicaldoc.util.io.ZipUtil;
  * All folders in the zip will be replicated.
  * 
  * @author Sebastian Stein
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  */
 public class ZipImport {
 
@@ -125,6 +127,10 @@ public class ZipImport {
 		transaction.setUser(user);
 		transaction.setSessionId(sessionId);
 
+		Session session = SessionManager.get().get(sessionId);
+		if(transaction!=null)
+			transaction.setSession(session);
+		
 		if (file.isDirectory()) {
 			// creates a logicaldoc folder
 			Folder folderVO = new Folder();
@@ -146,6 +152,9 @@ public class ZipImport {
 				history.setComment("");
 				history.setUser(user);
 				history.setSessionId(sessionId);
+				if(session!=null)
+					history.setSession(session);
+				
 
 				Document doc = (Document) docVo.clone();
 				doc.setId(0L);

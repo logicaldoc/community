@@ -1,20 +1,18 @@
 package com.logicaldoc.gui.frontend.client.system;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.PropertiesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.ClusterService;
-import com.logicaldoc.gui.frontend.client.services.ClusterServiceAsync;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -30,22 +28,19 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows the list of configuration parameters.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class ScopedPropertiesPanel extends VLayout {
 
-	private ListGrid list;
-
-	private Layout listing = new VLayout();
+	private RefreshableListGrid list;
 
 	public ScopedPropertiesPanel() {
 		setWidth100();
+	}
 
-		listing.setAlign(Alignment.CENTER);
-		listing.setHeight100();
-		initListGrid();
-
+	@Override
+	public void onDraw() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
@@ -56,19 +51,10 @@ public class ScopedPropertiesPanel extends VLayout {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				initListGrid();
+				list.refresh(new PropertiesDS());
 			}
 		});
 		toolStrip.addFill();
-
-		setMembers(toolStrip, listing);
-	}
-
-	private void initListGrid() {
-		if (list != null) {
-			listing.removeMember(list);
-			list.destroy();
-		}
 
 		ListGridField name = new ListGridField("name", I18N.message("setting"), 210);
 		name.setCanFilter(true);
@@ -88,7 +74,7 @@ public class ScopedPropertiesPanel extends VLayout {
 			}
 		});
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanExpandRecords(false);
 		list.setShowRecordComponents(true);
@@ -101,6 +87,9 @@ public class ScopedPropertiesPanel extends VLayout {
 		list.setDataSource(new PropertiesDS());
 		list.setFields(scope, name, value);
 
+		Layout listing = new VLayout();
+		listing.setAlign(Alignment.CENTER);
+		listing.setHeight100();
 		listing.addMember(list);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
@@ -110,6 +99,8 @@ public class ScopedPropertiesPanel extends VLayout {
 				event.cancel();
 			}
 		});
+
+		setMembers(toolStrip, listing);
 	}
 
 	private void showContextMenu() {

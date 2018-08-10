@@ -13,7 +13,7 @@ import com.smartgwt.client.types.DateDisplayFormat;
 /**
  * Retrieves i18n resources
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class I18N {

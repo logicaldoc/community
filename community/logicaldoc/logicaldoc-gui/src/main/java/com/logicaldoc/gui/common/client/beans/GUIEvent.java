@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Simple bean storing GUI events
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIEvent implements Comparable<GUIEvent> {

@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * A simple bean collecting all needed setup informations
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SetupInfo implements Serializable {

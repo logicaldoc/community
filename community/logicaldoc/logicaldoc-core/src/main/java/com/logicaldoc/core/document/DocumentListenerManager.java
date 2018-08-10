@@ -16,7 +16,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * A manager for document listeners. It's internals are initialized from the
  * extension point 'DocumentListener' of the core plugin.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public class DocumentListenerManager {

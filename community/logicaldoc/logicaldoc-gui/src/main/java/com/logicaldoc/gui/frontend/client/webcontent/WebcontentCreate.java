@@ -24,7 +24,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This popup window is used to create a new web content.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public class WebcontentCreate extends Window {

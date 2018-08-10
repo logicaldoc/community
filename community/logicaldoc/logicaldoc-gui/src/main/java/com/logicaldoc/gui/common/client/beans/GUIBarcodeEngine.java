@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Representation of a barcode engine handled by the GUI
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.1
  */
 public class GUIBarcodeEngine implements Serializable {

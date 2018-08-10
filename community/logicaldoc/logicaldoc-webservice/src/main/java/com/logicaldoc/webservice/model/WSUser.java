@@ -16,7 +16,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 /**
  * Web Service User. Useful class to create repository Users.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 @XmlType(name = "WSUser")

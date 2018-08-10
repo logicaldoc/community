@@ -26,7 +26,7 @@ import com.logicaldoc.util.event.SystemEventStatus;
 /**
  * Utility class collecting static methods related to spring's context.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public class Context implements ApplicationContextAware, ApplicationListener {

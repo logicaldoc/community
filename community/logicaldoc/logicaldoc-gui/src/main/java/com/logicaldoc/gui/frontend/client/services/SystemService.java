@@ -15,7 +15,7 @@ import com.logicaldoc.gui.common.client.beans.GUIValue;
  * The client side stub for the System Service. This service allows the
  * management of various system settings.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("system")

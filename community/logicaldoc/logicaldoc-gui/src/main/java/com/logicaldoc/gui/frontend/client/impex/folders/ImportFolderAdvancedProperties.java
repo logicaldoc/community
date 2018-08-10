@@ -24,7 +24,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 /**
  * Shows import folder's advanced properties and read-only data
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {

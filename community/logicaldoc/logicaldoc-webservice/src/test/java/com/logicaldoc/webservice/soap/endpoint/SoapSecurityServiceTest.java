@@ -18,7 +18,7 @@ import com.logicaldoc.webservice.model.WSUser;
 /**
  * Test case for <code>SoapSecurityService</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class SoapSecurityServiceTest extends AbstractWebServiceTestCase {
@@ -42,7 +42,7 @@ public class SoapSecurityServiceTest extends AbstractWebServiceTestCase {
 
 	@Test
 	public void testListUsers() throws Exception {
-		WSUser[] users = securityServiceImpl.listUsers("");
+		WSUser[] users = securityServiceImpl.listUsers("",null);
 		Assert.assertNotNull(users);
 		Assert.assertEquals(5, users.length);
 		List<WSUser> usersList = Arrays.asList(users);

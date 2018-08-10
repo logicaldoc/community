@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.Constants;
  * This class represents an event in a calendar. An event is always associated
  * to a selection of documents and users.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public class GUICalendarEvent implements Serializable {

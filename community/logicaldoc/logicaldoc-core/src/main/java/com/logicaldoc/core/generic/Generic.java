@@ -13,7 +13,7 @@ import com.logicaldoc.core.metadata.ExtensibleObject;
  * 
  * Each Generic is identified by a type and subtype
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public class Generic extends ExtensibleObject implements Comparable<Generic> {

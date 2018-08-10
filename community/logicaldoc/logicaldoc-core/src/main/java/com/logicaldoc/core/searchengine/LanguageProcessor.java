@@ -12,7 +12,7 @@ import com.logicaldoc.core.searchengine.analyzer.FilteredAnalyzer;
  * Processor that takes care to store the language field of an incoming hit into
  * a thread local variable. This information will be used at analisys time.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class LanguageProcessor extends UpdateRequestProcessor {

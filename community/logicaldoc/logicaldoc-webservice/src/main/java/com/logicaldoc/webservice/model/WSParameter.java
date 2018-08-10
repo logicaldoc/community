@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * Useful class that contains a correspondence between a name and a value.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 @XmlType(name = "WSParameter")

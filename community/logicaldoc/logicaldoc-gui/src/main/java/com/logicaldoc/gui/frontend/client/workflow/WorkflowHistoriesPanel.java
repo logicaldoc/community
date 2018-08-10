@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
@@ -38,9 +39,42 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class WorkflowHistoriesPanel extends VLayout {
 
-	private ListGrid historiesGrid = new ListGrid();
+	private RefreshableListGrid historiesGrid = new RefreshableListGrid();
+
+	private Long wfInstanceId;
+
+	private Long wfTemplateId;
+
+	private boolean showComment = true;
 
 	public WorkflowHistoriesPanel(Long wfInstanceId, Long wfTemplateId, boolean showComment) {
+		this.wfInstanceId = wfInstanceId;
+		this.wfTemplateId = wfTemplateId;
+		this.showComment = showComment;
+	}
+
+	public ListGrid getHistoriesGrid() {
+		return historiesGrid;
+	}
+
+	public Long getWfTemplateId() {
+		return wfTemplateId;
+	}
+
+	public void setWfTemplateId(Long wfTemplateId) {
+		this.wfTemplateId = wfTemplateId;
+	}
+
+	public Long getWfInstanceId() {
+		return wfInstanceId;
+	}
+
+	public void setWfInstanceId(Long wfInstanceId) {
+		this.wfInstanceId = wfInstanceId;
+	}
+
+	@Override
+	public void onDraw() {
 		ListGridField historyId = new ListGridField("id", I18N.message("id"), 60);
 		historyId.setHidden(true);
 
@@ -74,7 +108,8 @@ public class WorkflowHistoriesPanel extends VLayout {
 		historiesGrid.setWidth100();
 		historiesGrid.sort("date", SortDirection.ASCENDING);
 		historiesGrid.setBorder("1px solid #E1E1E1");
-		historiesGrid.setDataSource(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null));
+		if (wfInstanceId != null && wfTemplateId != null)
+			historiesGrid.setDataSource(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null));
 		if (Menu.enabled(Menu.SESSIONS))
 			historiesGrid.setFields(historyId, historyEvent, historyName, historyDate, historyUser, historyComment,
 					historyFilename, transition, documentId, historySid);
@@ -116,6 +151,18 @@ public class WorkflowHistoriesPanel extends VLayout {
 		});
 
 		setMembers(historiesGrid, buttons);
+	}
+
+	public void refresh() {
+		if (historiesGrid.getDataSource() != null) {
+			historiesGrid.getDataSource().destroy();
+			historiesGrid.invalidateCache();
+		}
+
+		if (wfInstanceId != null && wfTemplateId != null) {
+			historiesGrid.refresh(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null));
+			historiesGrid.fetchData();
+		}
 	}
 
 	private void showHistoryContextMenu() {

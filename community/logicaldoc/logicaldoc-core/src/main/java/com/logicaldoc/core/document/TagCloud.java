@@ -3,7 +3,7 @@ package com.logicaldoc.core.document;
 /**
  * This class is a TagCloud
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 4.0
  */
 public class TagCloud implements Comparable<TagCloud> {

@@ -6,7 +6,7 @@ import com.logicaldoc.core.PersistentObject;
  * Represents a document link. It represents a link between two documents
  * (document1 and document2). Every link can be of a certain type.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
 public class DocumentLink extends PersistentObject {

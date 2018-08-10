@@ -1,4 +1,4 @@
-The LogicalDOC development team is pleased to announce the availability of LogicalDOC CE 7.7.3
+The LogicalDOC Development Team is glad to announce the availability of LogicalDOC CE 8.0
 
 You can get this distribution in various formats from the LD's website: 
 https://www.logicaldoc.com/download-logicaldoc-community
@@ -9,18 +9,24 @@ LogicalDOC uses the latest technology to build web applications: Google GWT. Tha
 
 LogicalDOC Community Edition is free (libre) software (FLOSS) and allows organizations and individuals to centralize the management, storage, retrieval and distribution of documents.
 
+Other features of interest:
+Applications for Android and iOS available for free in the respective stores
+Support WebDAV Protocol
+Support CMIS Protocol (AtomPub)
+SOAP and REST Web-Service interfaces
+Ability to define your own types of documents by specifying custom fields
+Native versioning of documents
+and so on...
+
 For a complete list of features, take a look at https://www.logicaldoc.com/features
 
-New Feature:
-* New Skin
-* Ability to change the interface density
-* Option to convert an alias to a document
 
-Improvements:
-* Compliance with new Dropbox API v2
-* New flag in SMTP settings to comply with strict anti-spam mailserver rules
-* Hibernate upgrade to 4.3.11
-* Upgraded Spring to release 4.3.12 
+Improvements in this version:
+#871	Support for the polish language - User Interface
+#872	Permalink to the specific document version - User Interface
+#873	Introduction of vectorial icons for a more professional interface - User Interface
+#874	Compatibility with Java10 - Core
+#869	DocumentMetadata web service moved from Enterprise to Community - Web Services
 
 
 See also the file CHANGELOG.txt for more details

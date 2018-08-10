@@ -6,7 +6,7 @@ import com.logicaldoc.gui.frontend.client.folder.FolderSearchForm;
 /**
  * Shows a folders search form
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class FoldersForm extends FolderSearchForm {

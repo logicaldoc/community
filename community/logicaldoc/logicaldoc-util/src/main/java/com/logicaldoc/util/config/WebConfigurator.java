@@ -9,7 +9,7 @@ import org.jdom.Namespace;
 /**
  * Configurator for the web.xml file
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @author Sebastian Wenzky
  * @since 3.0
  */

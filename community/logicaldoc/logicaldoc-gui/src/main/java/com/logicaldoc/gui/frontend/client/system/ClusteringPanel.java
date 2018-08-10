@@ -25,12 +25,10 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * The Clustering console.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class ClusteringPanel extends AdminPanel {
-
-	private TabSet tabs = new TabSet();
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -105,7 +103,7 @@ public class ClusteringPanel extends AdminPanel {
 
 		clusterForm.setItems(enabled, id, name, multicastip, baseport, host, port, context, save);
 		body.setMembers(clusterForm);
-
+		
 		Tab channels = new Tab();
 		channels.setTitle(I18N.message("channels"));
 		channels.setPane(new ChannelsPanel());

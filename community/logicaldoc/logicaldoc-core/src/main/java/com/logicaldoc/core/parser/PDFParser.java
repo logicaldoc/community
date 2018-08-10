@@ -4,10 +4,8 @@ import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
@@ -23,59 +21,19 @@ import org.slf4j.LoggerFactory;
  * external library: PDFBox. Created on 4. November 2003, 18:09
  * 
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.5
  */
 public class PDFParser extends AbstractParser {
-
-	private String author;
-
-	private String title;
-
-	private String sourceDate;
-
-	private String tags;
 
 	protected static Logger log = LoggerFactory.getLogger(PDFParser.class);
 
 	private static int count = Integer.MAX_VALUE;
 
-	/**
-	 * @return Returns the author.
-	 */
-	public String getAuthor() {
-		return author;
-	}
-
-	/**
-	 * @return the sourceDate.
-	 */
-	public String getSourceDate() {
-		return sourceDate;
-	}
-
-	/**
-	 * @return the tags.
-	 */
-	public String getTags() {
-		return tags;
-	}
-
-	/**
-	 * @return Returns the title.
-	 */
-	public String getTitle() {
-		return title;
-	}
-
 	@Override
-	public void internalParse(InputStream input) {
-		author = "";
-		title = "";
-		sourceDate = "";
-		tags = "";
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			StringBuffer content) {
 		PDDocument pdfDocument = null;
-
 		try {
 			pdfDocument = PDDocument.load(input);
 
@@ -97,10 +55,10 @@ public class PDFParser extends AbstractParser {
 					throw new Exception("Can not get pdf document for parsing");
 
 				// Strip text from the entire document
-				parseDocument(pdfDocument);
+				parseDocument(pdfDocument, content);
 
 				// Now parse the forms
-				parseForm(pdfDocument);
+				parseForm(pdfDocument, content);
 			}
 		} catch (Throwable ex) {
 			log.error(ex.getMessage(), ex);
@@ -123,39 +81,11 @@ public class PDFParser extends AbstractParser {
 	/**
 	 * Extract text and metadata from the main document
 	 */
-	protected void parseDocument(PDDocument pdfDocument) {
+	protected void parseDocument(PDDocument pdfDocument, StringBuffer content) {
 		try {
 			PDDocumentInformation information = pdfDocument.getDocumentInformation();
 			if (information == null) {
 				throw new Exception("Can not get information from pdf document");
-			}
-
-			author = information.getAuthor();
-			if (author == null) {
-				author = "";
-			}
-
-			title = information.getTitle();
-			if (title == null) {
-				title = "";
-			}
-
-			try {
-				Calendar calendar = information.getCreationDate();
-				Date date = calendar.getTime();
-				sourceDate = DateFormat.getDateInstance().format(date);
-				// In Italian it will be like 27-giu-2007
-				// sourceDate =
-				// DateFormat.getDateInstance(DateFormat.SHORT,
-				// Locale.ENGLISH).format(date);
-			} catch (Throwable e) {
-				log.debug("Bad date format " + e.getMessage());
-				sourceDate = "";
-			}
-
-			tags = information.getKeywords();
-			if (tags == null) {
-				tags = "";
 			}
 
 			/*
@@ -177,7 +107,6 @@ public class PDFParser extends AbstractParser {
 					content.append(writer.toString());
 				} catch (Throwable tw) {
 					log.error("Exception reading pdf document: " + tw.getMessage());
-					author = "";
 				} finally {
 					try {
 						writer.close();
@@ -194,7 +123,7 @@ public class PDFParser extends AbstractParser {
 	/**
 	 * Extract the text from the form fields
 	 */
-	private void parseForm(PDDocument pdfDocument) throws IOException {
+	private void parseForm(PDDocument pdfDocument, StringBuffer content) throws IOException {
 		PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
 		PDAcroForm acroForm = docCatalog.getAcroForm();
 

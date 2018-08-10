@@ -10,7 +10,7 @@ import com.logicaldoc.core.task.Task;
 /**
  * This task optimises all indexes
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
 public class IndexOptimizer extends Task {

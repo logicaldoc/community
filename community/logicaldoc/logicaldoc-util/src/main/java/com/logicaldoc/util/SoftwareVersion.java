@@ -3,7 +3,7 @@ package com.logicaldoc.util;
 /**
  * Models a generic sofwtare version
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8.1
  */
 public class SoftwareVersion implements Comparable<SoftwareVersion> {

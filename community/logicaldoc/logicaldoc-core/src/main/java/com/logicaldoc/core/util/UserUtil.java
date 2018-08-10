@@ -11,7 +11,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Various utilities about users.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class UserUtil {

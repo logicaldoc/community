@@ -13,7 +13,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 /**
  * TreeGrid showing the folders and files
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
 public class ShareFileTree extends TreeGrid {

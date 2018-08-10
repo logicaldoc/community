@@ -11,7 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUITenant;
  * The client side stub for the Tenant Service. This service allows r/w
  * operations on tenants.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
 @RemoteServiceRelativePath("tenant")

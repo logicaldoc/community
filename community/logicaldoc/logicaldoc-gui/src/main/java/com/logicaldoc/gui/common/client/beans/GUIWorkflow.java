@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Workflow bean as used in the GUI
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class GUIWorkflow implements Serializable {

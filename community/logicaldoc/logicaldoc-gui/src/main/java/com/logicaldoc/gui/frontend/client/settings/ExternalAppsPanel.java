@@ -14,6 +14,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
+import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
@@ -28,6 +29,8 @@ import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 
@@ -35,7 +38,7 @@ import com.smartgwt.client.widgets.tab.Tab;
  * This panel shows the Web Service and WebDAV settings, and also the external
  * applications.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class ExternalAppsPanel extends AdminPanel {
@@ -58,8 +61,6 @@ public class ExternalAppsPanel extends AdminPanel {
 
 	private GUIParameter ghost = null;
 
-	private GUIParameter tesseract = null;
-
 	private CheckboxItem extCallParamUser;
 
 	private CheckboxItem extCallParamTitle;
@@ -70,8 +71,20 @@ public class ExternalAppsPanel extends AdminPanel {
 
 	private GUIParameter keytool = null;
 
+	private GUIParameter ftpEnabled = null;
+
+	private GUIParameter ftpPort = null;
+
+	private GUIParameter ftpSsl = null;
+
+	private GUIParameter ftpKeystoreFile = null;
+
+	private GUIParameter ftpKeystoreAlias = null;
+
+	private GUIParameter ftpKeystorePassword = null;
+
 	public ExternalAppsPanel(GUIParameter[] settings) {
-		super("clienandextapps");
+		super("externalapps");
 
 		for (GUIParameter parameter : settings) {
 			if (parameter.getName().startsWith("webservice"))
@@ -90,14 +103,24 @@ public class ExternalAppsPanel extends AdminPanel {
 				convert = parameter;
 			else if (parameter.getName().equals("command.gs"))
 				ghost = parameter;
-			else if (parameter.getName().equals("command.tesseract"))
-				tesseract = parameter;
 			else if (parameter.getName().equals("command.openssl"))
 				openssl = parameter;
 			else if (parameter.getName().equals("command.pdftohtml"))
 				pdftohtml = parameter;
 			else if (parameter.getName().equals("command.keytool"))
 				keytool = parameter;
+			else if (parameter.getName().equals("ftp.enabled"))
+				ftpEnabled = parameter;
+			else if (parameter.getName().equals("ftp.port"))
+				ftpPort = parameter;
+			else if (parameter.getName().equals("ftp.ssl"))
+				ftpSsl = parameter;
+			else if (parameter.getName().equals("ftp.keystore.file"))
+				ftpKeystoreFile = parameter;
+			else if (parameter.getName().equals("ftp.keystore.alias"))
+				ftpKeystoreAlias = parameter;
+			else if (parameter.getName().equals("ftp.keystore.password"))
+				ftpKeystorePassword = parameter;
 		}
 
 		Tab webService = new Tab();
@@ -202,6 +225,95 @@ public class ExternalAppsPanel extends AdminPanel {
 			webDavForm.setItems(wdUrl, wdbUrl);
 		webDav.setPane(webDavForm);
 
+		// FTP Service status
+		RadioGroupItem ftpEnabledItem = ItemFactory.newBooleanSelector("ftpEnabled", "enabled");
+		ftpEnabledItem.setRequired(true);
+		ftpEnabledItem.setWrapTitle(false);
+		ftpEnabledItem.setValue(ftpEnabled.getValue().equals("true") ? "yes" : "no");
+		ftpEnabledItem.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				onFtpChanges();
+			}
+		});
+
+		// FTP port
+		IntegerItem ftpPortItem = ItemFactory.newIntegerItem("ftpPort", "port", 21);
+		ftpPortItem.setRequired(true);
+		ftpPortItem.setWrapTitle(false);
+		ftpPortItem.setWidth(80);
+		ftpPortItem.setValue(Integer.parseInt(ftpPort.getValue()));
+		ftpPortItem.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				onFtpChanges();
+			}
+		});
+
+		// FTP security
+		RadioGroupItem ftpSslItem = ItemFactory.newBooleanSelector("ftpSsl", "encryptionftps");
+		ftpSslItem.setRequired(true);
+		ftpSslItem.setWrapTitle(false);
+		ftpSslItem.setValue(ftpSsl.getValue().equals("true") ? "yes" : "no");
+		ftpSslItem.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				onFtpChanges();
+			}
+		});
+		TextItem ftpKeystoreFileItem = ItemFactory.newTextItem("ftpKeystoreFile", "keystore",
+				ftpKeystoreFile.getValue());
+		ftpKeystoreFileItem.setRequired(false);
+		ftpKeystoreFileItem.setWrapTitle(false);
+		ftpKeystoreFileItem.setWidth(400);
+		ftpKeystoreFileItem.setValue(ftpKeystoreFile.getValue());
+		ftpKeystoreFileItem.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				onFtpChanges();
+			}
+		});
+		TextItem ftpKeystoreAliasItem = ItemFactory.newTextItem("ftpKeystoreAlias", "keystorealias",
+				ftpKeystoreAlias.getValue());
+		ftpKeystoreAliasItem.setRequired(false);
+		ftpKeystoreAliasItem.setWrapTitle(false);
+		ftpKeystoreAliasItem.setValue(ftpKeystoreAlias.getValue());
+		ftpKeystoreAliasItem.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				onFtpChanges();
+			}
+		});
+		TextItem ftpKeystorePasswordItem = ItemFactory.newTextItem("ftpKeystorePassword", "keystorepassword",
+				ftpKeystorePassword.getValue());
+		ftpKeystorePasswordItem.setRequired(false);
+		ftpKeystorePasswordItem.setWrapTitle(false);
+		ftpKeystorePasswordItem.setValue(ftpKeystorePassword.getValue());
+		ftpKeystorePasswordItem.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				onFtpChanges();
+			}
+		});
+
+		Tab ftp = new Tab();
+		ftp.setTitle(I18N.message("fftp"));
+		DynamicForm ftpForm = new DynamicForm();
+		ftpForm.setValuesManager(vm);
+		ftpForm.setTitleOrientation(TitleOrientation.LEFT);
+		ftpForm.setNumCols(2);
+		ftpForm.setColWidths(1, "*");
+		ftpForm.setPadding(5);
+		ftpForm.setItems(ftpEnabledItem, ftpPortItem, ftpSslItem, ftpKeystoreFileItem, ftpKeystoreAliasItem,
+				ftpKeystorePasswordItem);
+		ftp.setPane(ftpForm);
+
 		DynamicForm extAppForm = new DynamicForm();
 		extAppForm.setValuesManager(vm);
 		extAppForm.setTitleOrientation(TitleOrientation.LEFT);
@@ -211,8 +323,6 @@ public class ExternalAppsPanel extends AdminPanel {
 		convertCommand.setWidth(400);
 		TextItem ghostCommand = ItemFactory.newTextItem("ghostCommand", "Ghostscript", ghost.getValue());
 		ghostCommand.setWidth(400);
-		TextItem tesseractCommand = ItemFactory.newTextItem("tesseractCommand", "Tesseract", tesseract.getValue());
-		tesseractCommand.setWidth(400);
 		TextItem pdftohtmlCommand = ItemFactory.newTextItem("pdftohtmlCommand", "Pdftohtml", pdftohtml.getValue());
 		pdftohtmlCommand.setWidth(400);
 		TextItem opensslCommand = ItemFactory.newTextItem("opensslCommand", "OpenSSL", openssl.getValue());
@@ -220,8 +330,7 @@ public class ExternalAppsPanel extends AdminPanel {
 		TextItem keytoolCommand = ItemFactory.newTextItem("keytoolCommand", "Keytool", keytool.getValue());
 		keytoolCommand.setWidth(400);
 
-		extAppForm.setItems(convertCommand, ghostCommand, tesseractCommand, pdftohtmlCommand, opensslCommand,
-				keytoolCommand);
+		extAppForm.setItems(convertCommand, ghostCommand, pdftohtmlCommand, opensslCommand, keytoolCommand);
 
 		if (Session.get().isDefaultTenant()) {
 			body.setMembers(extAppForm);
@@ -247,6 +356,12 @@ public class ExternalAppsPanel extends AdminPanel {
 			tabs.addTab(webDav);
 			if (!Feature.enabled(Feature.WEBDAV))
 				webDav.setPane(new FeatureDisabled());
+		}
+
+		if (Feature.visible(Feature.FTP)) {
+			tabs.addTab(ftp);
+			if (!Feature.enabled(Feature.FTP))
+				ftp.setPane(new FeatureDisabled());
 		}
 
 		if (Feature.visible(Feature.EXTERNAL_CALL)) {
@@ -281,10 +396,18 @@ public class ExternalAppsPanel extends AdminPanel {
 						ExternalAppsPanel.this.wdCache.setValue(values.get("wdCache").equals("yes") ? "true" : "false");
 						ExternalAppsPanel.this.convert.setValue(values.get("convertCommand").toString());
 						ExternalAppsPanel.this.ghost.setValue(values.get("ghostCommand").toString());
-						ExternalAppsPanel.this.tesseract.setValue(values.get("tesseractCommand").toString());
 						ExternalAppsPanel.this.openssl.setValue(values.get("opensslCommand").toString());
 						ExternalAppsPanel.this.pdftohtml.setValue(values.get("pdftohtmlCommand").toString());
 						ExternalAppsPanel.this.keytool.setValue(values.get("keytoolCommand").toString());
+
+						ExternalAppsPanel.this.ftpEnabled.setValue(values.get("ftpEnabled").equals("yes") ? "true"
+								: "false");
+						ExternalAppsPanel.this.ftpPort.setValue(values.get("ftpPort").toString());
+						ExternalAppsPanel.this.ftpSsl.setValue(values.get("ftpSsl").equals("yes") ? "true"
+								: "false");
+						ExternalAppsPanel.this.ftpKeystoreFile.setValue(values.get("ftpKeystoreFile").toString());
+						ExternalAppsPanel.this.ftpKeystoreAlias.setValue(values.get("ftpKeystoreAlias").toString());
+						ExternalAppsPanel.this.ftpKeystorePassword.setValue(values.get("ftpKeystorePassword").toString());
 					}
 
 					List<GUIParameter> params = new ArrayList<GUIParameter>();
@@ -293,13 +416,18 @@ public class ExternalAppsPanel extends AdminPanel {
 					params.add(ExternalAppsPanel.this.wdCache);
 					params.add(ExternalAppsPanel.this.convert);
 					params.add(ExternalAppsPanel.this.ghost);
-					params.add(ExternalAppsPanel.this.tesseract);
 					params.add(ExternalAppsPanel.this.openssl);
 					params.add(ExternalAppsPanel.this.pdftohtml);
 					params.add(ExternalAppsPanel.this.keytool);
 					params.add(ExternalAppsPanel.this.cmisEnabled);
 					params.add(ExternalAppsPanel.this.cmisChangelog);
 					params.add(ExternalAppsPanel.this.cmisMaxItems);
+					params.add(ExternalAppsPanel.this.ftpEnabled);
+					params.add(ExternalAppsPanel.this.ftpPort);
+					params.add(ExternalAppsPanel.this.ftpSsl);
+					params.add(ExternalAppsPanel.this.ftpKeystoreFile);
+					params.add(ExternalAppsPanel.this.ftpKeystoreAlias);
+					params.add(ExternalAppsPanel.this.ftpKeystorePassword);
 
 					// External Call
 					try {
@@ -362,6 +490,10 @@ public class ExternalAppsPanel extends AdminPanel {
 			// In demo mode you cannot alter the client configurations
 			save.setDisabled(true);
 		}
+	}
+
+	protected void onFtpChanges() {
+		ToastNotification.showNotification(I18N.message("needrestart"));
 	}
 
 	private Tab prepareExternalCall(GUIParameter[] settings) {

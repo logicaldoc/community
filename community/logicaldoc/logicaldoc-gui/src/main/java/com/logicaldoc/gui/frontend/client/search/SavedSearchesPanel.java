@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the saved searches of the user
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SavedSearchesPanel extends VLayout {
@@ -39,6 +39,10 @@ public class SavedSearchesPanel extends VLayout {
 	}
 
 	private SavedSearchesPanel() {
+	}
+	
+	@Override
+	public void onDraw() {
 		ListGridField name = new ListGridField("name", I18N.message("name"), 100);
 		ListGridField type = new ListGridField("type", I18N.message("type"), 70);
 		ListGridField description = new ListGridField("description", I18N.message("description"));

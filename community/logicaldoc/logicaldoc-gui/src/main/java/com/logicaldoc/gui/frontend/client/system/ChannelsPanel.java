@@ -2,10 +2,10 @@ package com.logicaldoc.gui.frontend.client.system;
 
 import com.logicaldoc.gui.common.client.data.ChannelsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -15,17 +15,18 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Displays a list of cluster channels.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class ChannelsPanel extends VLayout {
-	private ListGrid list;
-
-	private Layout listing = new VLayout();
+	private RefreshableListGrid list;
 
 	public ChannelsPanel() {
 		setMembersMargin(3);
+	}
 
+	@Override
+	public void onDraw() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
@@ -36,21 +37,13 @@ public class ChannelsPanel extends VLayout {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				initListGrid();
+				list.refresh(new ChannelsDS());
 			}
 		});
 		toolStrip.addFill();
 
+		Layout listing = new VLayout();
 		setMembers(toolStrip, listing);
-		
-		initListGrid();
-	}
-
-	private void initListGrid() {
-		if (list != null) {
-			listing.removeMember(list);
-			list.destroy();
-		}
 
 		ListGridField name = new ListGridField("name", I18N.message("channel"), 150);
 		name.setCanEdit(false);
@@ -59,7 +52,7 @@ public class ChannelsPanel extends VLayout {
 		members.setCanEdit(false);
 		members.setWidth("*");
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanEdit(false);
 		list.setWidth100();
@@ -68,7 +61,7 @@ public class ChannelsPanel extends VLayout {
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setFields(name, members);
 		list.setDataSource(new ChannelsDS());
-		
+
 		listing.addMember(list);
 	}
 }

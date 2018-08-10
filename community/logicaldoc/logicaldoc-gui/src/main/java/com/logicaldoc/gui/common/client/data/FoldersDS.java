@@ -3,13 +3,14 @@ package com.logicaldoc.gui.common.client.data;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
  * Datasource to handle folders and sub-folders structures. It is based on Xml
  * parsing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class FoldersDS extends DataSource {
@@ -30,7 +31,7 @@ public class FoldersDS extends DataSource {
 		setTitleField("name");
 		setRecordXPath("/list/folder");
 		DataSourceTextField name = new DataSourceTextField("name", I18N.message("name"), 255);
-		
+
 		DataSourceTextField color = new DataSourceTextField("color", I18N.message("color"), 255);
 
 		DataSourceTextField recordId = new DataSourceTextField("id", I18N.message("id"));
@@ -43,7 +44,7 @@ public class FoldersDS extends DataSource {
 		DataSourceTextField foldRef = new DataSourceTextField("foldRef");
 		foldRef.setHidden(true);
 
-		DataSourceTextField type = new DataSourceTextField("type", I18N.message("type"));
+		DataSourceIntegerField type = new DataSourceIntegerField("type", I18N.message("type"));
 		type.setRequired(true);
 
 		DataSourceFloatField size = new DataSourceFloatField("size", I18N.message("size"));

@@ -5,7 +5,7 @@
 	<class name="com.logicaldoc.core.document.Document" table="ld_document" where="ld_deleted=0">
 		<cache usage="read-write" />
 		<id name="id" type="long" column="ld_id" unsaved-value="0">
-			<generator class="hilo" />
+			<generator class="org.hibernate.id.MultipleHiLoPerTableGenerator" />
 		</id>
         <version name="recordVersion" column="ld_recordversion"  type="long" />  
         <property name="lastModified" type="timestamp" column="ld_lastmodified" />
@@ -43,6 +43,7 @@
         <property name="deleteUserId" type="long" column="ld_deleteuserid" />
         <property name="rating" type="int" column="ld_rating"/>
         <property name="workflowStatus" type="string" column="ld_workflowstatus" length="1000" />
+        <property name="workflowStatusDisplay" type="string" column="ld_workflowstatusdisp" length="1000" />
         <property name="published" type="int" column="ld_published"/>
         <property name="startPublishing" type="timestamp" column="ld_startpublishing" />
         <property name="stopPublishing" type="timestamp" column="ld_stoppublishing" />

@@ -40,10 +40,12 @@ public class SignaturePanel extends DocumentDetailTab {
 
 	public SignaturePanel(final GUIDocument document) {
 		super(document, null);
+	}
 
+	@Override
+	protected void onDraw() {
 		container.setMembersMargin(3);
 		addMember(container);
-
 		refresh(document);
 	}
 

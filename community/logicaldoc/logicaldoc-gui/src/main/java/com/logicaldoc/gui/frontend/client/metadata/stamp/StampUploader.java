@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This popup window is used to upload a new stamp
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
 public class StampUploader extends Window {

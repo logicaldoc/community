@@ -9,7 +9,7 @@ import com.logicaldoc.core.task.Task;
  * This task generate all data needed by the tag cloud panel and the tags
  * drop-down lists.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public class TagsProcessor extends Task {

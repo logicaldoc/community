@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is for handling with jar-files.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 4.0
  */
 public class JarUtil {

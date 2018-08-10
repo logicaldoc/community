@@ -16,7 +16,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Scheduling configuration for a Task
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
 public class TaskScheduling {

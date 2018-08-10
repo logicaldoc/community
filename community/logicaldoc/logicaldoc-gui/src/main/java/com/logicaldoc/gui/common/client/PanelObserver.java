@@ -3,7 +3,7 @@ package com.logicaldoc.gui.common.client;
 /**
  * A listener on relevant events on the main panel.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public interface PanelObserver {

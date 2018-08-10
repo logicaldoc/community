@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Setting for the dashlet visualization.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.6
  */
 public class GUIDashlet implements Serializable {

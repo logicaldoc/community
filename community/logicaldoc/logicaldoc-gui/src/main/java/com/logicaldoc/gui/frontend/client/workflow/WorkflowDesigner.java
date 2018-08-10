@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Where the workflow diagram is drawn
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class WorkflowDesigner extends AdminPanel {

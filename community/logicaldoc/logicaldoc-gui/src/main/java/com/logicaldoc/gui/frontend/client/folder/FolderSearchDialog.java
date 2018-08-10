@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This is a form used for quick folder selection
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4.2
  */
 public class FolderSearchDialog extends Window {

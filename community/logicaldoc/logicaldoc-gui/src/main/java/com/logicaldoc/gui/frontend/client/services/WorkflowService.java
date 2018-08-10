@@ -18,6 +18,11 @@ public interface WorkflowService extends RemoteService {
 	public GUIWorkflow get(String workflowName) throws ServerException;
 
 	/**
+	 * Loads a given workflow to display a completion diagram
+	 */
+	public GUIWorkflow getCompletionDiagram(String workflowName, String processInstanceId) throws ServerException;
+
+	/**
 	 * Deletes a given workflow
 	 */
 	public void delete(String workflowName) throws ServerException;

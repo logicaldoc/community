@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * User dashboard that displays several portlets like a portal page.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class UserDashboard extends VLayout {
@@ -32,7 +32,10 @@ public class UserDashboard extends VLayout {
 	public UserDashboard() {
 		setWidth100();
 		setHeight100();
+	}
 
+	@Override
+	public void onDraw() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
@@ -60,14 +63,7 @@ public class UserDashboard extends VLayout {
 		});
 
 		toolStrip.addFill();
-		addMember(toolStrip, 0);
-
-		refresh();
-	}
-
-	public void refresh() {
-		if (portal != null)
-			removeMember(portal);
+		
 
 		portal = new PortalLayout();
 		portal.setShowColumnMenus(false);
@@ -102,7 +98,8 @@ public class UserDashboard extends VLayout {
 					if (portlets[col][row][index] != null)
 						portal.addPortlet(portlets[col][row][index], col, row, index);
 
-		addMember(portal, 1);
+		addMember(toolStrip);
+		addMember(portal);
 	}
 
 	public static UserDashboard get() {

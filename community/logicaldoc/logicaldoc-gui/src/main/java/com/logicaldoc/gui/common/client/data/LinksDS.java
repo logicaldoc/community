@@ -7,18 +7,20 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to handle documents grid lists. It is based on Xml parsing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class LinksDS extends DataSource {
 	public LinksDS(long docId) {
 		setID("LinksDS");
-		
+
 		setTitleField("title");
 		setRecordXPath("/list/link");
 		DataSourceTextField title = new DataSourceTextField("title");
 		DataSourceTextField linkId = new DataSourceTextField("linkId");
 		DataSourceTextField folderId = new DataSourceTextField("folderId");
+		DataSourceTextField folderId1 = new DataSourceTextField("folderId1");
+		DataSourceTextField folderId2 = new DataSourceTextField("folderId2");
 		DataSourceTextField documentId = new DataSourceTextField("documentId");
 		documentId.setPrimaryKey(true);
 		documentId.setHidden(true);
@@ -32,10 +34,10 @@ public class LinksDS extends DataSource {
 		parent.setRequired(true);
 		parent.setForeignKey("LinksDS.documentId");
 		parent.setRootValue("/");
-		
-		setFields(linkId, parent, folderId, documentId, title, icon, direction, type);
+
+		setFields(linkId, parent, folderId, documentId, title, icon, direction, type, folderId1, folderId2);
 		setClientOnly(true);
-		
+
 		setDataURL("data/links.xml?docId=" + docId);
 		setClientOnly(false);
 	}

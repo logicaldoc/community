@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 /**
  * Shows the clipboard content
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ClipboardWindow extends Window {

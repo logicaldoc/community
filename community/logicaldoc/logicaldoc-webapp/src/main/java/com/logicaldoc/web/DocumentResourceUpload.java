@@ -29,7 +29,7 @@ import com.logicaldoc.web.util.ServletUtil;
  * This servlet is responsible for document resource upload. It receives the
  * document resource and uploads it in LogicalDOC, inside the document's folder.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 4.5
  */
 public class DocumentResourceUpload extends HttpServlet {

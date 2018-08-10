@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -13,18 +14,20 @@ import org.springframework.jdbc.core.RowMapper;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
  * Search specialization for Folder searches.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class FolderSearch extends Search {
@@ -32,14 +35,40 @@ public class FolderSearch extends Search {
 	public FolderSearch() {
 	}
 
+	/**
+	 * Retrieve the maximum number of folder ids to use in a query (in the IN
+	 * clause).
+	 */
+	private long getQueryMaxFolderIds() {
+		ContextProperties config = Context.get().getProperties();
+		long max = config.getLong("query.maxfolderids", Long.MAX_VALUE);
+		if (max <= 0)
+			max = Long.MAX_VALUE;
+		return max;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws Exception {
-		Object[] params = prepareExpression();
+		Collection<Long> accessibleFolderIds = findAccessibleFolderIds();
+		Object[] params = prepareExpression(accessibleFolderIds);
 		options.setParameters(params);
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		hits.addAll((List<Hit>) dao.query(options.getExpression(), params, new HitMapper(), options.getMaxHits()));
+		// Execute the search
+		List<Hit> folders = (List<Hit>) dao.query(options.getExpression(), params, new HitMapper(),
+				options.getMaxHits());
+
+		if (accessibleFolderIds.size() <= getQueryMaxFolderIds()) {
+			// Security checks were already considered in the search query
+			hits = folders;
+		} else {
+			// Due to high IDs number we have to apply security checks
+			hits.clear();
+
+			// Filter the folders with the accessible IDs
+			hits = folders.stream().filter(f -> accessibleFolderIds.contains(f.getId())).collect(Collectors.toList());
+		}
 
 		moreHitsPresent = hits.size() >= options.getMaxHits();
 		if (moreHitsPresent)
@@ -51,7 +80,7 @@ public class FolderSearch extends Search {
 	/**
 	 * Utility method that prepares the query expression
 	 */
-	private Object[] prepareExpression() {
+	private Object[] prepareExpression(Collection<Long> accessibleFolderIds) {
 		if (StringUtils.isNotEmpty(options.getExpression()))
 			return options.getParameters();
 
@@ -63,19 +92,19 @@ public class FolderSearch extends Search {
 			query.append("(");
 
 		// Find all real folders
-		query.append("select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref ");
+		query.append("select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid ");
 		query.append(" from ld_folder A ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
 
-		appendWhereClause(false, params, query);
+		appendWhereClause(false, params, query, accessibleFolderIds);
 
 		if (options.getRetrieveAliases() == 1) {
 			// Append all aliases
-			query.append(") UNION (select A.ld_id, A.ld_parentid, A.ld_name, REF.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref ");
+			query.append(") UNION (select A.ld_id, A.ld_parentid, A.ld_name, REF.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid ");
 			query.append(" from ld_folder A ");
 			query.append(" join ld_folder REF on A.ld_foldref=REF.ld_id ");
 			query.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
-			appendWhereClause(true, params, query);
+			appendWhereClause(true, params, query, accessibleFolderIds);
 			query.append(")");
 		}
 
@@ -96,7 +125,8 @@ public class FolderSearch extends Search {
 	 * @param params
 	 * @param query
 	 */
-	private void appendWhereClause(boolean searchAliases, ArrayList<Object> params, StringBuffer query) {
+	private void appendWhereClause(boolean searchAliases, ArrayList<Object> params, StringBuffer query,
+			Collection<Long> accessibleFolderIds) {
 		String tableAlias = "A";
 		if (searchAliases)
 			tableAlias = "REF";
@@ -154,17 +184,14 @@ public class FolderSearch extends Search {
 		else
 			query.append(" and A.ld_foldref is null ");
 
-		UserDAO userDAO = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = userDAO.findById(options.getUserId());
-		userDAO.initialize(user);
-
 		/*
 		 * Filter on the folders the user can access
 		 */
-		Collection<Long> accessibleFolderIds = getAccessibleFolderIds(user);
-		if (!accessibleFolderIds.isEmpty()) {
+		if (!accessibleFolderIds.isEmpty() && accessibleFolderIds.size() <= getQueryMaxFolderIds()) {
 			/*
-			 *  Oracle cannot handle more than 1000 elements in a single in clause
+			 * This approach pre-calculate the accessible IDs and puts them in
+			 * IN clauses.<br /> Oracle cannot handle more than 1000 elements in
+			 * a single in clause so the whole list is partitioned
 			 */
 			query.append(" and ( ");
 			List<List<Long>> folderId = org.apache.commons.collections4.ListUtils.partition(new ArrayList<Long>(
@@ -178,7 +205,6 @@ public class FolderSearch extends Search {
 				query.append(") ");
 				i++;
 			}
-
 			query.append(" ) ");
 		}
 
@@ -334,7 +360,11 @@ public class FolderSearch extends Search {
 		}
 	}
 
-	private Collection<Long> getAccessibleFolderIds(User user) {
+	private Collection<Long> findAccessibleFolderIds() {
+		UserDAO userDAO = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDAO.findById(options.getUserId());
+		userDAO.initialize(user);
+
 		Collection<Long> ids = new HashSet<Long>();
 		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -386,6 +416,15 @@ public class FolderSearch extends Search {
 			hit.setCreation(rs.getTimestamp(5));
 			hit.setComment(rs.getString(4));
 			hit.setPublished(1);
+			
+			if (rs.getLong(10) != 0){
+				hit.setTemplateId(rs.getLong(10));
+				hit.setTemplateName(rs.getString(9));
+				Template t=new Template();
+				t.setId(rs.getLong(10));
+				t.setName(rs.getString(9));
+				hit.setTemplate(t);
+			}
 
 			return hit;
 		}

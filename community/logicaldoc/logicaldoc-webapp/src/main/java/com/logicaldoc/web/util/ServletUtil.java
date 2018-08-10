@@ -430,9 +430,9 @@ public class ServletUtil {
 			history.setFilename(doc.getFileName());
 			history.setFolderId(doc.getFolder().getId());
 			history.setUser(user);
-			if (session != null)
-				history.setSessionId(session.getSid());
-			else {
+			if (session != null){
+				history.setSession(session);
+			}else {
 				history.setSessionId(sid);
 			}
 

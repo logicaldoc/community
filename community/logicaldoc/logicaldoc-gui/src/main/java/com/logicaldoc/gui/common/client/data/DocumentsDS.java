@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.DataSourceField;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
@@ -17,12 +18,20 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Data Source to handle documents grid lists. It is based on Xml parsing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentsDS extends DataSource {
 
-	private static final Integer DEFAULT_MAX = 100;
+	public static final Integer DEFAULT_MAX = 100;
+
+	private GUIFolder folder = null;
+
+	public DocumentsDS(GUIFolder folder, String fileFilter, Integer max, int page, Integer indexed, Integer barcoded,
+			boolean sort) {
+		this(folder != null ? folder.getId() : null, fileFilter, max, page, indexed, barcoded, sort);
+		this.folder = folder;
+	}
 
 	/**
 	 * Constructor.
@@ -34,16 +43,17 @@ public class DocumentsDS extends DataSource {
 	 * @param indexed The indexed flag
 	 * @param barcoded The barcoded flag
 	 */
-	public DocumentsDS(Long folderId, String fileFilter, Integer max, int page, Integer indexed, Integer barcoded) {
+	private DocumentsDS(Long folderId, String fileFilter, Integer max, int page, Integer indexed, Integer barcoded,
+			boolean sort) {
 		prepareFields();
 
 		if (barcoded == null) {
-			String sort = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_SORT);
+			String sortSpec = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_SORT);
 			setDataURL("data/documents.xml?locale=" + Session.get().getUser().getLanguage() + "&folderId="
 					+ (folderId != null ? folderId : "") + "&filename=" + (fileFilter != null ? fileFilter : "")
 					+ "&max=" + (max != null ? max : DEFAULT_MAX) + "&indexed="
 					+ (indexed != null ? indexed.toString() : "") + "&page=" + page
-					+ (sort != null && !sort.isEmpty() ? "&sort=" + sort : ""));
+					+ (sortSpec != null && !sortSpec.isEmpty() ? "&sort=" + sortSpec : ""));
 		} else
 			setDataURL("data/tobarcode.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
 	}
@@ -96,9 +106,11 @@ public class DocumentsDS extends DataSource {
 		DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
 		DataSourceIntegerField status = new DataSourceIntegerField("status");
 		status.setHidden(true);
-		DataSourceImageField rating = new DataSourceImageField("rating");
+		DataSourceIntegerField rating = new DataSourceIntegerField("rating");
 		DataSourceTextField comment = new DataSourceTextField("comment");
 		DataSourceTextField wfStatus = new DataSourceTextField("workflowStatus");
+		DataSourceTextField wfStatusDisplay = new DataSourceTextField("workflowStatusDisplay");
+		wfStatusDisplay.setHidden(true);
 		DataSourceTextField publishedStatus = new DataSourceTextField("publishedStatus");
 		publishedStatus.setHidden(true);
 		DataSourceDateTimeField startPublishing = new DataSourceDateTimeField("startPublishing");
@@ -133,6 +145,7 @@ public class DocumentsDS extends DataSource {
 		fields.add(fileVersion);
 		fields.add(comment);
 		fields.add(wfStatus);
+		fields.add(wfStatusDisplay);
 		fields.add(publishedStatus);
 		fields.add(startPublishing);
 		fields.add(stopPublishing);
@@ -149,5 +162,9 @@ public class DocumentsDS extends DataSource {
 
 		setFields(fields.toArray(new DataSourceField[0]));
 		setClientOnly(true);
+	}
+
+	public GUIFolder getFolder() {
+		return folder;
 	}
 }

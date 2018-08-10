@@ -30,7 +30,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for document tags data.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class TagsDataServlet extends HttpServlet {
@@ -77,7 +77,7 @@ public class TagsDataServlet extends HttpServlet {
 			HashMap<String, Long> tgs = new HashMap<String, Long>();
 
 			if (("preset".equals(firstLetter) || "preset".equals(mode)) && "true".equals(editing)) {
-				// We have to return the preset only, since the user is editing
+				// We have to return the preset only, because the user is editing
 				// a document
 				GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 				List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());

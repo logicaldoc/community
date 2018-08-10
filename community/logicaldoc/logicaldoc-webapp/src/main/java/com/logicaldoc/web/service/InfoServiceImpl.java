@@ -44,7 +44,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the InfoService
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class InfoServiceImpl extends RemoteServiceServlet implements InfoService {

@@ -9,7 +9,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 /**
  * Auth Web Service definition interface
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 @WSDoc(description = "authentication operations")

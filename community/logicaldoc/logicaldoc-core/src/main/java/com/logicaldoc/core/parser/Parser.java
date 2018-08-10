@@ -9,53 +9,11 @@ import java.util.Locale;
  */
 public interface Parser {
 
-	public String getVersion();
-
-	public String getContent();
-
-	public String getAuthor();
-
-	public String getSourceDate();
-
-	public String getTags();
-
-	public String getTitle();
-
-	/**
-	 * The original file name of the content to be parsed
-	 */
-	public String getFilename();
-
-	public void setFilename(String filename);
-
-	/**
-	 * The locale of the content to be parsed
-	 */
-	public Locale getLocale();
-
-	public void setLocale(Locale locale);
-
-	/**
-	 * The character encoding of the content to be parsed
-	 */
-	public String getEncoding();
-
-	public void setEncoding(String encoding);
-	
-	/**
-	 * The tenant name
-	 */
-	public String getTenant();
-
-	public void setTenant(String tenant);
-
 	/**
 	 * Same as the other method that accept an input stream, use this when you
 	 * have a file rather than a stream.
-	 * 
-	 * @param file
 	 */
-	public void parse(File file);
+	public String parse(File file, String filename, String encoding, Locale locale, String tenant);
 
 	/**
 	 * Extracts content for the text content of the given binary document. The
@@ -85,5 +43,5 @@ public interface Parser {
 	 * 
 	 * @param input binary document from which to extract text
 	 */
-	public void parse(InputStream input);
+	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant);
 }

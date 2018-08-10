@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.ImportFolderService;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -43,43 +44,31 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Panel showing the details of an import folder
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class ImportFoldersPanel extends AdminPanel {
 
-	private Layout listing = new VLayout();
-
 	private Layout detailsContainer = new VLayout();
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private Canvas details = SELECT_FOLDER;
-
-	private InfoPanel infoPanel;
 
 	final static Canvas SELECT_FOLDER = new HTMLPanel("&nbsp;" + I18N.message("selectimportfolder"));
 
 	public ImportFoldersPanel() {
 		super("importfolders");
-
-		infoPanel = new InfoPanel("");
-		init();
 	}
 
-	public void init() {
-		detailsContainer.clear();
-		listing.clear();
-		if (list != null)
-			listing.removeMember(list);
-		if (details != null && details instanceof ImportFolderDetailsPanel) {
-			detailsContainer.removeMember(details);
-			details = SELECT_FOLDER;
-		}
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
 
 		// Initialize the listing panel
+		Layout listing = new VLayout();
 		listing.setAlign(Alignment.CENTER);
-		listing.setHeight("70%");
+		listing.setHeight("60%");
 		listing.setShowResizeBar(true);
 
 		ListGridField id = new ListGridField("id", 50);
@@ -88,7 +77,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		ListGridField src = new ListGridField("src", I18N.message("source"), 300);
 		src.setCanFilter(true);
 
-		ListGridField type = new ListGridField("type", I18N.message("type"), 50);
+		ListGridField type = new ListGridField("type", I18N.message("type"), 120);
 		type.setCanFilter(false);
 
 		ListGridField enabled = new ListGridField("eenabled", " ", 24);
@@ -100,7 +89,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		enabled.setImageURLSuffix(".gif");
 		enabled.setCanFilter(false);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -128,13 +117,13 @@ public class ImportFoldersPanel extends AdminPanel {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				init();
+				refresh();
 			}
 		});
 
-		ToolStripButton addLocal = new ToolStripButton();
-		addLocal.setTitle(I18N.message("addlocalfolder"));
-		addLocal.addClickHandler(new ClickHandler() {
+		ToolStripButton addImportFolder = new ToolStripButton();
+		addImportFolder.setTitle(I18N.message("addimportfolder"));
+		addImportFolder.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				list.deselectAllRecords();
@@ -143,32 +132,8 @@ public class ImportFoldersPanel extends AdminPanel {
 				showShareDetails(share);
 			}
 		});
-		if (Feature.visible(Feature.IMPORT_LOCAL_FOLDERS)) {
-			toolStrip.addButton(addLocal);
-			if (!Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS)) {
-				addLocal.setDisabled(true);
-				addLocal.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		ToolStripButton addRemote = new ToolStripButton();
-		addRemote.setTitle(I18N.message("addremotefolder"));
-		addRemote.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				list.deselectAllRecords();
-				GUIImportFolder share = new GUIImportFolder();
-				share.setProvider("smb");
-				showShareDetails(share);
-			}
-		});
-		if (Feature.visible(Feature.IMPORT_REMOTE_FOLDERS)) {
-			toolStrip.addButton(addRemote);
-			if (!Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS)) {
-				addRemote.setDisabled(true);
-				addRemote.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
+		if (Feature.enabled(Feature.IMPORT_LOCAL_FOLDERS) || Feature.enabled(Feature.IMPORT_REMOTE_FOLDERS))
+			toolStrip.addButton(addImportFolder);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -210,6 +175,13 @@ public class ImportFoldersPanel extends AdminPanel {
 		detailsContainer.addMember(details);
 
 		body.setMembers(toolStrip, listing, detailsContainer);
+	}
+
+	public void refresh() {
+		list.refresh(new ImportFoldersDS(false));
+		detailsContainer.removeMembers(detailsContainer.getMembers());
+		details = SELECT_FOLDER;
+		detailsContainer.setMembers(details);
 	}
 
 	private void showContextMenu() {
@@ -368,10 +340,21 @@ public class ImportFoldersPanel extends AdminPanel {
 			list.selectRecord(record);
 		}
 
-		record.setAttribute("src", importFolder.getPath());
+		record.setAttribute("src",  importFolder.getDisplayUrl());
+		
 		record.setAttribute("eenabled", importFolder.getEnabled() == 1 ? "0" : "2");
-		record.setAttribute("type",
-				"smb".equals(importFolder.getProvider()) ? I18N.message("remote") : I18N.message("local"));
+
+		String type = I18N.message("localfolder");
+		if ("smb".equals(importFolder.getProvider()))
+			type = I18N.message("smbshare");
+		else if ("ftp".equals(importFolder.getProvider()))
+			type = I18N.message("fftp");
+		else if ("ftps".equals(importFolder.getProvider()))
+			type = I18N.message("ftps");
+		else if ("sftp".equals(importFolder.getProvider()))
+			type = I18N.message("sftp");
+
+		record.setAttribute("type", type);
 
 		list.refreshRow(list.getRecordIndex(record));
 	}

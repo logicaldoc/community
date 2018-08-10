@@ -17,7 +17,7 @@ import com.logicaldoc.util.Context;
 /**
  * Search specialization for the Tag search.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class TagSearch extends Search {
@@ -52,7 +52,8 @@ public class TagSearch extends Search {
 		query.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");
 		query.append(" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
 		query.append(" A.ld_stoppublishing, A.ld_published, ");
-		query.append(" B.ld_name, A.ld_folderid, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, A.ld_stamped, A.ld_password ");
+		query.append(" B.ld_name, A.ld_folderid, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
+		query.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp ");
 		query.append(" from ld_document A ");
 		query.append(" join ld_folder B on A.ld_folderid=B.ld_id ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
@@ -65,7 +66,8 @@ public class TagSearch extends Search {
 		query.append(" REF.ld_indexed, REF.ld_lockuserid, REF.ld_filename, REF.ld_status, REF.ld_signed, REF.ld_type, ");
 		query.append(" REF.ld_rating, REF.ld_fileversion, REF.ld_comment, REF.ld_workflowstatus, A.ld_startpublishing, ");
 		query.append(" A.ld_stoppublishing, A.ld_published, ");
-		query.append(" B.ld_name, A.ld_folderid, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, REF.ld_stamped, REF.ld_password ");
+		query.append(" B.ld_name, A.ld_folderid, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
+		query.append(" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp ");
 		query.append(" from ld_document A ");
 		query.append(" join ld_folder B on A.ld_folderid=B.ld_id ");
 		query.append(" join ld_document REF on A.ld_docref=REF.ld_id ");
@@ -178,6 +180,7 @@ public class TagSearch extends Search {
 			hit.setDocRefType(rs.getString(31));
 			hit.setStamped(rs.getInt(32));
 			hit.setPassword(rs.getString(33));
+			hit.setWorkflowStatusDisplay(rs.getString(34));
 
 			return hit;
 		}

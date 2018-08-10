@@ -21,7 +21,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 /**
  * This panel shows the Parameters settings.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class ParametersPanel extends AdminPanel {

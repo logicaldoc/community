@@ -16,7 +16,7 @@ import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
@@ -25,7 +25,6 @@ import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
 import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
-import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.widgets.Canvas;
@@ -51,31 +50,29 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows a list of search results in a tabular way.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class HitsListPanel extends VLayout implements SearchObserver, DocumentObserver, FolderObserver {
 
-	protected DocumentsGrid grid;
+	protected DocumentsGrid grid = null;
 
 	protected ToolStrip toolStrip;
 
 	private Cursor cursor;
 
-	private int mode = DocumentsGrid.MODE_LIST;
+	private int visualizationMode = DocumentsGrid.MODE_LIST;
 
 	public HitsListPanel() {
 		if (CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE) != null)
-			mode = Integer.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE).toString());
-		initialize(mode);
+			visualizationMode = Integer.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE).toString());
 		Search.get().addObserver(this);
 		DocumentController.get().addObserver(this);
 		FolderController.get().addObserver(this);
+		initialize();
 	}
 
-	protected void initialize(int mode) {
-		this.mode = mode;
-
+	private void initialize() {
 		if (grid != null)
 			removeMember((Canvas) grid);
 
@@ -87,13 +84,10 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		ListGridField id = new ListGridField("id", 60);
 		id.setHidden(true);
 
-		if (mode == DocumentsGrid.MODE_LIST)
-			grid = new SearchHitsGrid(Search.get().getLastResult().length);
-		else if (mode == DocumentsGrid.MODE_GALLERY)
-			grid = new DocumentsTileGrid(null, null, Search.get().getLastResult().length);
-
-		if (options.getType() == GUISearchOptions.TYPE_FULLTEXT)
-			grid.setCanExpandRows();
+		if (visualizationMode == DocumentsGrid.MODE_LIST)
+			grid = new SearchHitsGrid();
+		else if (visualizationMode == DocumentsGrid.MODE_GALLERY)
+			grid = new DocumentsTileGrid(null, null);
 
 		grid.registerSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
@@ -183,23 +177,9 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 		addMember(cursor);
 
-		// Prepare a stack for 2 sections the Title with search time and the
-		// list of hits
-		NumberFormat format = NumberFormat.getFormat("#.###");
-
-		String stats = I18N.message(
-				"aboutresults",
-				new String[] { "" + Search.get().getEstimatedHits(),
-						format.format((double) Search.get().getTime() / (double) 1000) });
-		stats += " (<b>" + format.format((double) Search.get().getTime() / (double) 1000) + "</b> "
-				+ I18N.message("seconds").toLowerCase() + ")";
-
-		cursor.setMessage(stats);
-
-		GUIDocument[] result = Search.get().getLastResult();
-		grid.setDocuments(result);
-
 		addMember((Canvas) grid);
+
+		onSearchArrived();
 	}
 
 	/**
@@ -217,9 +197,8 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
-		ToolStripButton showSnippets = new ToolStripButton();
-		showSnippets.setIcon(ItemFactory.newImgIcon("page_white_text.png").getSrc());
-		showSnippets.setTooltip(I18N.message("showsnippets"));
+
+		ToolStripButton showSnippets = AwesomeFactory.newToolStripButton("file", "showsnippets");
 		showSnippets.setDisabled(optionsType != GUISearchOptions.TYPE_FULLTEXT);
 		toolStrip.addButton(showSnippets);
 		showSnippets.addClickHandler(new ClickHandler() {
@@ -229,9 +208,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			}
 		});
 
-		ToolStripButton save = new ToolStripButton();
-		save.setIcon(ItemFactory.newImgIcon("disk.png").getSrc());
-		save.setTooltip(I18N.message("save"));
+		ToolStripButton save = AwesomeFactory.newToolStripButton("save", "save");
 		save.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -249,10 +226,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			}
 		}
 
-		ToolStripButton print = new ToolStripButton();
-		print.setIcon(ItemFactory.newImgIcon("printer.png").getSrc());
-		print.setTooltip(I18N.message("print"));
-		print.setAutoFit(true);
+		ToolStripButton print = AwesomeFactory.newToolStripButton("print", "print");
 		print.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				Canvas.printComponents(new Object[] { grid });
@@ -261,12 +235,8 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		toolStrip.addSeparator();
 		toolStrip.addButton(print);
 
-		toolStrip.addSeparator();
 		if (Feature.visible(Feature.EXPORT_CSV)) {
-			ToolStripButton export = new ToolStripButton();
-			export.setIcon(ItemFactory.newImgIcon("table_row_insert.png").getSrc());
-			export.setTooltip(I18N.message("export"));
-			export.setAutoFit(true);
+			ToolStripButton export = AwesomeFactory.newToolStripButton("angle-double-down", "export");
 			toolStrip.addButton(export);
 			export.addClickHandler(new ClickHandler() {
 				@Override
@@ -280,10 +250,8 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			}
 		}
 
-		ToolStripButton download = new ToolStripButton();
-		download.setIcon(ItemFactory.newImgIcon("download.png").getSrc());
-		download.setTooltip(I18N.message("download"));
-		download.setAutoFit(true);
+		toolStrip.addSeparator();
+		ToolStripButton download = AwesomeFactory.newToolStripButton("download", "download");
 		toolStrip.addButton(download);
 		download.addClickHandler(new ClickHandler() {
 			@Override
@@ -300,12 +268,12 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			}
 		});
 
-		final ToolStripButton toggle = new ToolStripButton();
+		final ToolStripButton toggle = AwesomeFactory.newToolStripButton("toggle-on", "closeseleftpanel");
 		if (SearchMenu.get().getWidth() > 0) {
-			toggle.setIcon(ItemFactory.newImgIcon("application_side_contract.png").getSrc());
+			toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
 			toggle.setTooltip(I18N.message("closeseleftpanel"));
 		} else {
-			toggle.setIcon(ItemFactory.newImgIcon("application_side_expand.png").getSrc());
+			toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 			toggle.setTooltip(I18N.message("openleftpanel"));
 		}
 		toggle.addClickHandler(new ClickHandler() {
@@ -313,10 +281,10 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			public void onClick(ClickEvent event) {
 				SearchPanel.get().toggleMenu();
 				if (SearchPanel.get().isMenuOpened()) {
-					toggle.setIcon(ItemFactory.newImgIcon("application_side_contract.png").getSrc());
+					toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
 					toggle.setTooltip(I18N.message("closeseleftpanel"));
 				} else {
-					toggle.setIcon(ItemFactory.newImgIcon("application_side_expand.png").getSrc());
+					toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 					toggle.setTooltip(I18N.message("openleftpanel"));
 				}
 			}
@@ -324,22 +292,18 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		toolStrip.addSeparator();
 		toolStrip.addButton(toggle);
 
-		final ToolStripButton list = new ToolStripButton();
-		list.setTooltip(I18N.message("list"));
-		list.setIcon(ItemFactory.newImgIcon("application_view_list.png").getSrc());
-		list.setActionType(SelectionType.RADIO);
+		final ToolStripButton list = AwesomeFactory.newToolStripButton("bars", "list");
 		list.setRadioGroup("mode");
 		list.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_LIST);
-				initialize(DocumentsGrid.MODE_LIST);
+				HitsListPanel.this.visualizationMode = DocumentsGrid.MODE_LIST;
+				initialize();
 			}
 		});
 
-		final ToolStripButton gallery = new ToolStripButton();
-		gallery.setTooltip(I18N.message("gallery"));
-		gallery.setIcon(ItemFactory.newImgIcon("application_view_tile.png").getSrc());
+		final ToolStripButton gallery = AwesomeFactory.newToolStripButton("images", "gallery");
 		gallery.setActionType(SelectionType.RADIO);
 		gallery.setRadioGroup("mode");
 		gallery.addClickHandler(new ClickHandler() {
@@ -347,18 +311,17 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			public void onClick(ClickEvent event) {
 				if (Session.get().getCurrentFolder() != null)
 					CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_GALLERY);
-				initialize(DocumentsGrid.MODE_GALLERY);
+				HitsListPanel.this.visualizationMode = DocumentsGrid.MODE_GALLERY;
+				initialize();
 			}
 		});
 
-		final ToolStripButton togglePreview = new ToolStripButton();
-		togglePreview.setIcon(ItemFactory.newImgIcon("application_side_expand.png").getSrc());
-		togglePreview.setTooltip(I18N.message("closepreview"));
+		final ToolStripButton togglePreview = AwesomeFactory.newToolStripButton("toggle-on", "closepreview");
 		try {
 			// Retrieve the saved preview width
 			String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
 			if (Integer.parseInt(w) <= 0) {
-				togglePreview.setIcon(ItemFactory.newImgIcon("application_side_contract.png").getSrc());
+				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 				togglePreview.setTooltip(I18N.message("openpreview"));
 			}
 		} catch (Throwable t) {
@@ -369,18 +332,18 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				if (SearchPanel.get().getPreviewPanel().isVisible()
 						&& SearchPanel.get().getPreviewPanel().getWidth() > 0) {
 					SearchPanel.get().getPreviewPanel().setWidth(0);
-					togglePreview.setIcon(ItemFactory.newImgIcon("application_side_contract.png").getSrc());
+					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 					togglePreview.setTooltip(I18N.message("openpreview"));
 				} else {
 					SearchPanel.get().getPreviewPanel().setWidth(350);
 					SearchPanel.get().getPreviewPanel().setDocument(grid.getSelectedDocument());
-					togglePreview.setIcon(ItemFactory.newImgIcon("application_side_expand.png").getSrc());
+					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
 					togglePreview.setTooltip(I18N.message("closepreview"));
 				}
 			}
 		});
 
-		if (mode == DocumentsGrid.MODE_LIST)
+		if (visualizationMode == DocumentsGrid.MODE_LIST)
 			list.setSelected(true);
 		else
 			gallery.setSelected(true);
@@ -388,23 +351,10 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		toolStrip.addSeparator();
 		toolStrip.addButton(list);
 		toolStrip.addButton(gallery);
+		toolStrip.addSeparator();
 		toolStrip.addButton(togglePreview);
 
 		toolStrip.addFill();
-
-		if (Search.get().getSuggestion() != null) {
-			ToolStripButton repeat = new ToolStripButton(I18N.message("searchinstaed") + " <b>"
-					+ Search.get().getSuggestion() + "</b>");
-			repeat.setAutoFit(true);
-			repeat.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					Search.get().getOptions().setExpression(Search.get().getSuggestion());
-					Search.get().search();
-				}
-			});
-			toolStrip.addButton(repeat);
-		}
 
 		addMember(toolStrip);
 	}
@@ -415,11 +365,29 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 	@Override
 	public void onSearchArrived() {
-		initialize(mode);
-		MainPanel.get().selectSearchTab();
-		if (Search.get().isHasMore()) {
+		/**
+		 * Update the cursor. Prepare a stack for 2 sections the Title with
+		 * search time and the list of hits
+		 */
+		NumberFormat format = NumberFormat.getFormat("#.###");
+
+		String stats = I18N.message(
+				"aboutresults",
+				new String[] { "" + Search.get().getEstimatedHits(),
+						format.format((double) Search.get().getTime() / (double) 1000) });
+		stats += " (<b>" + format.format((double) Search.get().getTime() / (double) 1000) + "</b> "
+				+ I18N.message("seconds").toLowerCase() + ")";
+		cursor.setMessage(stats);
+
+		GUISearchOptions options = Search.get().getOptions();
+		if (options.getType() == GUISearchOptions.TYPE_FULLTEXT)
+			grid.setCanExpandRows();
+		GUIDocument[] result = Search.get().getLastResult();
+		if (result != null)
+			grid.setDocuments(result);
+
+		if (Search.get().isHasMore())
 			Log.warn(I18N.message("possiblemorehits"), I18N.message("possiblemorehitsdetail"));
-		}
 	}
 
 	@Override
@@ -556,14 +524,26 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	}
 
 	@Override
+	public void destroy() {
+		DocumentController.get().removeObserver(this);
+		FolderController.get().removeObserver(this);
+		Search.get().removeObserver(this);
+	}
+
+	@Override
 	protected void finalize() throws Throwable {
 		destroy();
 	}
 
 	@Override
-	public void destroy() {
-		DocumentController.get().removeObserver(this);
-		FolderController.get().removeObserver(this);
-		Search.get().addObserver(this);
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
 	}
 }

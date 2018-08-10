@@ -3,7 +3,7 @@ package com.logicaldoc.util.sql;
 /**
  * This class contains methods about SQL handling
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 4.5
  */
 public class SqlUtil {

@@ -9,7 +9,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
 /**
  * Test case for <code>StringUtil</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class StringUtilTest {

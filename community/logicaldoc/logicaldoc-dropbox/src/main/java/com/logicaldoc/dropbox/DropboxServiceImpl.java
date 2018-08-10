@@ -39,7 +39,7 @@ import com.logicaldoc.util.Context;
 /**
  * Implementation of the DropboxService
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxService {

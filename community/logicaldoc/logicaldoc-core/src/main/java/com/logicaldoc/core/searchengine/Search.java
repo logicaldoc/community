@@ -46,8 +46,6 @@ public abstract class Search {
 
 	protected User searchUser;
 
-	protected String suggestion;
-
 	public static Search get(SearchOptions opt) {
 		// Acquire the 'Search' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
@@ -106,7 +104,7 @@ public abstract class Search {
 		}
 
 		if (options == null)
-			log.error("Unable to find a search definition of type " + type);
+			log.error("Unable to find a search definition of type {}", type);
 
 		return options;
 	}
@@ -121,7 +119,7 @@ public abstract class Search {
 	 */
 	public final List<Hit> search() {
 		log.info("Launch search");
-		log.info("Expression: " + options.getExpression());
+		log.info("Expression: {}", options.getExpression());
 
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		searchUser = uDao.findById(options.getUserId());
@@ -130,12 +128,11 @@ public abstract class Search {
 			return hits;
 		} else {
 			uDao.initialize(searchUser);
-			log.info("Search User: " + searchUser.getUsername());
+			log.info("Search User: {}", searchUser.getUsername());
 		}
 
 		Date start = new Date();
 		hits.clear();
-		suggestion = null;
 		moreHitsPresent = false;
 
 		try {
@@ -161,7 +158,7 @@ public abstract class Search {
 			}
 			idsString.append(")");
 
-			log.debug("Start searching for extended attributes: " + attrs);
+			log.debug("Start searching for extended attributes: {}", attrs);
 
 			// Search for extended attributes, key is docId-name
 			final Map<String, Attribute> extAtt = new HashMap<String, Attribute>();
@@ -207,7 +204,7 @@ public abstract class Search {
 
 		Date finish = new Date();
 		execTime = finish.getTime() - start.getTime();
-		log.info("Search finished in " + execTime + "ms");
+		log.info("Search finished in {} ms", execTime);
 
 		return hits;
 	}
@@ -247,9 +244,5 @@ public abstract class Search {
 
 	public void setOptions(SearchOptions options) {
 		this.options = options;
-	}
-
-	public String getSuggestion() {
-		return suggestion;
 	}
 }

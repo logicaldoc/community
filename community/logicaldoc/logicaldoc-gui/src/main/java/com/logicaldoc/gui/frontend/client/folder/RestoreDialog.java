@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
 /**
  * This is the form used to restore a selection of documents.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2.1
  */
 public class RestoreDialog extends Dialog {

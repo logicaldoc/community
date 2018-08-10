@@ -38,7 +38,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * Panel showing the list of scheduled tasks
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TasksPanel extends AdminPanel {
@@ -187,76 +187,7 @@ public class TasksPanel extends AdminPanel {
 		contextMenu.showContextMenu();
 	}
 
-	public void init() {
-		results.setShowResizeBar(true);
-		results.setHeight("60%");
-		body.addMember(results);
-
-		detailPanel = new Label("&nbsp;" + I18N.message("selecttask"));
-		details = new VLayout();
-		details.setAlign(Alignment.CENTER);
-		details.addMember(detailPanel);
-		body.addMember(details);
-
-		reload();
-
-		/*
-		 * Create the timer that synchronize the view
-		 */
-		timer = new Timer() {
-			public void run() {
-				SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<GUITask[]>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUITask[] tasks) {
-						for (GUITask guiTask : tasks) {
-							Progressbar p = progresses.get(guiTask.getName());
-							if (p == null)
-								continue;
-
-							if (guiTask.isIndeterminate()) {
-								p.setPercentDone(0);
-							} else {
-								p.setPercentDone(guiTask.getCompletionPercentage());
-							}
-							p.redraw();
-
-							for (ListGridRecord record : list.getRecords()) {
-								if (record.getAttribute("name").equals(guiTask.getName())
-										&& guiTask.getStatus() != GUITask.STATUS_IDLE) {
-									record.setAttribute("runningIcon", "running_task");
-									record.setAttribute("completion", guiTask.getCompletionPercentage());
-									list.refreshRow(list.getRecordIndex(record));
-									break;
-								} else if (record.getAttribute("name").equals(guiTask.getName())
-										&& guiTask.getStatus() == GUITask.STATUS_IDLE) {
-									record.setAttribute("runningIcon", "idle_task");
-									record.setAttribute("completion", guiTask.getCompletionPercentage());
-									list.refreshRow(list.getRecordIndex(record));
-									break;
-								}
-							}
-						}
-					}
-				});
-			}
-		};
-
-		timer.scheduleRepeating(5 * 1000);
-	}
-
-	private void reload() {
-		if (list != null) {
-			results.removeMember(list);
-			list.clear();
-			list.invalidateCache();
-			list.destroy();
-		}
-
+	private void prepareTasksGrid() {
 		list = new ListGrid() {
 			@Override
 			protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
@@ -420,6 +351,68 @@ public class TasksPanel extends AdminPanel {
 							});
 			}
 		});
+	}
+
+	public void init() {
+		results.setShowResizeBar(true);
+		results.setHeight("60%");
+		body.addMember(results);
+
+		detailPanel = new Label("&nbsp;" + I18N.message("selecttask"));
+		details = new VLayout();
+		details.setAlign(Alignment.CENTER);
+		details.addMember(detailPanel);
+		body.addMember(details);
+
+		prepareTasksGrid();
+
+		/*
+		 * Create the timer that synchronize the view
+		 */
+		timer = new Timer() {
+			public void run() {
+				SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<GUITask[]>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUITask[] tasks) {
+						for (GUITask guiTask : tasks) {
+							Progressbar p = progresses.get(guiTask.getName());
+							if (p == null)
+								continue;
+
+							if (guiTask.isIndeterminate()) {
+								p.setPercentDone(0);
+							} else {
+								p.setPercentDone(guiTask.getCompletionPercentage());
+							}
+							p.redraw();
+
+							for (ListGridRecord record : list.getRecords()) {
+								if (record.getAttribute("name").equals(guiTask.getName())
+										&& guiTask.getStatus() != GUITask.STATUS_IDLE) {
+									record.setAttribute("runningIcon", "running_task");
+									record.setAttribute("completion", guiTask.getCompletionPercentage());
+									list.refreshRow(list.getRecordIndex(record));
+									break;
+								} else if (record.getAttribute("name").equals(guiTask.getName())
+										&& guiTask.getStatus() == GUITask.STATUS_IDLE) {
+									record.setAttribute("runningIcon", "idle_task");
+									record.setAttribute("completion", guiTask.getCompletionPercentage());
+									list.refreshRow(list.getRecordIndex(record));
+									break;
+								}
+							}
+						}
+					}
+				});
+			}
+		};
+
+		timer.scheduleRepeating(5 * 1000);
 	}
 
 	@Override

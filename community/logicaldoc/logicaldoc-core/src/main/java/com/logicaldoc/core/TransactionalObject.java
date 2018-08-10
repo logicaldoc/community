@@ -4,7 +4,7 @@ package com.logicaldoc.core;
  * Implementations of this interface are objects that may partecipate into a
  * transaction.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  * 
  */

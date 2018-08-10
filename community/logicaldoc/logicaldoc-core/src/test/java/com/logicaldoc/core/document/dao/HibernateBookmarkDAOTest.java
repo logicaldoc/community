@@ -14,7 +14,7 @@ import com.logicaldoc.core.document.Bookmark;
 /**
  * Test case for <code>HibernateBookmarkDAOTest</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class HibernateBookmarkDAOTest extends AbstractCoreTCase {

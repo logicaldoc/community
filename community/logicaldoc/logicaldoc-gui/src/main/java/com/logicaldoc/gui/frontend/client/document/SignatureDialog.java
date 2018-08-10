@@ -80,6 +80,7 @@ public class SignatureDialog extends Window {
 								@Override
 								public void onSuccess(Void arg) {
 									destroy();
+									Log.info(I18N.message("event.signed"), null);
 									ContactingServer.get().hide();
 								}
 							});

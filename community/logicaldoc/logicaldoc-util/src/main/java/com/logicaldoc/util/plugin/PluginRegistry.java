@@ -33,7 +33,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * must be personalized as needed. The used implementation can be specified with
  * the 'logicaldoc.app.pluginregistry' system property.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 public abstract class PluginRegistry {

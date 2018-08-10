@@ -14,7 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.BookmarkDAO;
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.i18n.Language;
 import com.logicaldoc.core.i18n.LanguageManager;
 import com.logicaldoc.core.metadata.Attribute;
@@ -40,7 +42,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the SearchService
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SearchServiceImpl extends RemoteServiceServlet implements SearchService {
@@ -78,11 +80,10 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 			try {
 				search.search();
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
 			}
 
-			result.setSuggestion(search.getSuggestion());
 			result.setEstimatedHits(search.getEstimatedHitsNumber());
 
 			List<Hit> hits = search.getHits();
@@ -93,9 +94,17 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 			BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 			List<Long> bookmarks = bDao.findBookmarkedDocs(session.getUserId());
 
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			List<GUIDocument> guiResults = new ArrayList<GUIDocument>();
 			for (Hit hit : hits) {
-				GUIDocument h = DocumentServiceImpl.fromDocument(hit, null, null);
+				GUIDocument h = null;
+				if (hit.getType().startsWith("folder")) {
+					h = DocumentServiceImpl.fromDocument(hit, null, null);
+				} else {
+					Document doc = docDao.findById(hit.getId());
+					h = DocumentServiceImpl.fromDocument(doc, null, null);
+				}
+
 				h.setScore(hit.getScore());
 				h.setSummary(hit.getSummary());
 				h.setBookmarked(bookmarks.contains(hit.getId()) || bookmarks.contains(hit.getDocRef()));

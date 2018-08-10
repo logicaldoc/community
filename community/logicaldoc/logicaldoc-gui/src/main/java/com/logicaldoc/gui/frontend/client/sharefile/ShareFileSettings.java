@@ -20,7 +20,7 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 /**
  * This popup window is used to handle ShareFile settings.
  * 
- * @author Marco Meschieri - Logical Objects since 7.2.1
+ * @author Marco Meschieri - LogicalDOC since 7.2.1
  */
 public class ShareFileSettings extends Window {
 	private SubmitItem save;

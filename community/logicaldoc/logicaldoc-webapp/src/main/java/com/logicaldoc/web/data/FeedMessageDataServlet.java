@@ -23,7 +23,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for feed message data.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class FeedMessageDataServlet extends HttpServlet {

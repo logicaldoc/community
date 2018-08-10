@@ -17,7 +17,7 @@ import javax.crypto.spec.DESedeKeySpec;
 /**
  * Utility class to encrypt/decrypt strings
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class StringEncrypter {

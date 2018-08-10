@@ -45,7 +45,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Shows a parametric search form
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ParametricForm extends VLayout {
@@ -194,12 +194,12 @@ public class ParametricForm extends VLayout {
 		});
 	}
 
-	public void removeCondition(ConditionRow condition) {
+	public void removeCondition(ParameterConditionRow condition) {
 		conditionsLayout.removeMember(condition);
 	}
 
 	public void addCondition() {
-		ConditionRow row = new ConditionRow(selectedTemplate, true, new KeyPressHandler() {
+		ParameterConditionRow row = new ParameterConditionRow(selectedTemplate, true, new KeyPressHandler() {
 
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
@@ -254,7 +254,7 @@ public class ParametricForm extends VLayout {
 		List<GUICriterion> list = new ArrayList<GUICriterion>();
 		if (conditionsLayout.getMembers() != null)
 			for (Canvas canvas : conditionsLayout.getMembers()) {
-				ConditionRow condition = (ConditionRow) canvas;
+				ParameterConditionRow condition = (ParameterConditionRow) canvas;
 				String fieldName = condition.getCriteriaFieldsItem().getValueAsString();
 				if (fieldName == null || fieldName.isEmpty())
 					continue;

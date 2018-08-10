@@ -26,7 +26,7 @@ import com.logicaldoc.util.Context;
 /**
  * Various methods related to the user session
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ServiceUtil {

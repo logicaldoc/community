@@ -6,12 +6,22 @@ import java.util.Date;
 /**
  * An Import Folder representation
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIImportFolder implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	public static String PROVIDER_SMB = "smb";
+
+	public static String PROVIDER_FILE = "file";
+
+	public static String PROVIDER_FTP = "ftp";
+
+	public static String PROVIDER_FTPS = "ftps";
+
+	public static String PROVIDER_SFTP = "sftp";
 
 	private long id = 0;
 
@@ -52,8 +62,12 @@ public class GUIImportFolder implements Serializable {
 	private Date startDate;
 
 	private int updatePolicy = 0;
-	
+
 	private boolean inheritRights = true;
+
+	private Integer port = null;
+
+	private String host;
 
 	public GUIImportFolder() {
 		super();
@@ -225,5 +239,49 @@ public class GUIImportFolder implements Serializable {
 
 	public void setInheritRights(boolean inheritRights) {
 		this.inheritRights = inheritRights;
+	}
+
+	public Integer getPort() {
+		return port;
+	}
+
+	public void setPort(Integer port) {
+		this.port = port;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	/**
+	 * Composes the displayable importFolder's url.
+	 */
+	public String getDisplayUrl() {
+		String url = "";
+		if (PROVIDER_FILE.equals(getProvider())) {
+			if (getPath() == null || getPath().isEmpty())
+				url += getPath();
+		} else if (PROVIDER_SMB.equals(getProvider())) {
+			String path = getPath().replaceAll("/", "\\\\");
+			if (!path.startsWith("\\"))
+				path = "\\" + path;
+			url += path;
+		} else {
+			url += getProvider();
+			url += "://";
+			url += getHost();
+			if (getPort() != null && getPort() > 0) {
+				url += ":";
+				url += getPort();
+			}
+			if (!getPath().startsWith("/"))
+				url += "/";
+			url += getPath();
+		}
+		return url;
 	}
 }

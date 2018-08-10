@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.frontend.client.impex.folders.ImportFolderDetailsPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
@@ -38,47 +38,33 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Panel showing the list of export archives
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class IncrementalArchivesList extends VLayout {
 
-	private Layout listing;
-
 	protected Layout detailsContainer;
 
-	protected ListGrid list;
+	protected RefreshableListGrid list;
 
 	protected Canvas details = SELECT_ELEMENT;
-
-	private InfoPanel infoPanel;
 
 	final static Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectconfig"));
 
 	protected int archivesType = GUIArchive.TYPE_DEFAULT;
 
-	public IncrementalArchivesList(int archsType) {
+	public IncrementalArchivesList(int archivesType) {
 		setWidth100();
-		infoPanel = new InfoPanel("");
-		refresh(archsType);
+		this.archivesType = archivesType;
 	}
 
-	public void refresh(int archsType) {
-		Canvas[] members = getMembers();
-		for (Canvas canvas : members) {
-			removeMember(canvas);
-		}
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
 
-		this.archivesType = archsType;
-
-		listing = new VLayout();
+		VLayout listing = new VLayout();
 		detailsContainer = new VLayout();
 		details = SELECT_ELEMENT;
-
-		if (details != null && details instanceof ImportFolderDetailsPanel) {
-			detailsContainer.removeMember(details);
-			details = SELECT_ELEMENT;
-		}
 
 		// Initialize the listing panel
 		listing.setAlign(Alignment.CENTER);
@@ -97,7 +83,7 @@ public class IncrementalArchivesList extends VLayout {
 		frequency.setCellFormatter(new DaysCellFormatter());
 		frequency.setCanFilter(false);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -110,7 +96,7 @@ public class IncrementalArchivesList extends VLayout {
 		list.setCanFreezeFields(true);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
-		list.setDataSource(new IncrementalArchivesDS(this.archivesType));
+		list.setDataSource(new IncrementalArchivesDS(archivesType));
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -181,6 +167,18 @@ public class IncrementalArchivesList extends VLayout {
 		detailsContainer.addMember(details);
 
 		setMembers(toolStrip, listing, detailsContainer);
+	}
+
+	public void refresh() {
+		list.refresh(new IncrementalArchivesDS(archivesType));
+		detailsContainer.removeMembers(detailsContainer.getMembers());
+		details = SELECT_ELEMENT;
+		detailsContainer.setMembers(details);
+	}
+
+	public void refresh(int archivesType) {
+		this.archivesType = archivesType;
+		refresh();
 	}
 
 	private void showContextMenu() {

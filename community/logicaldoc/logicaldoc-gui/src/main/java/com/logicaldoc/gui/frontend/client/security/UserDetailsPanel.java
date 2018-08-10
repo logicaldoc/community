@@ -32,7 +32,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects all user details
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  * 
  */

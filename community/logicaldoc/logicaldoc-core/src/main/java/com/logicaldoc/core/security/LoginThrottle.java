@@ -1,0 +1,135 @@
+package com.logicaldoc.core.security;
+
+import java.util.Date;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.ibm.icu.util.Calendar;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authentication.IPBlockedException;
+import com.logicaldoc.core.security.authentication.UsernameBlockedException;
+import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.dao.UserHistoryDAO;
+import com.logicaldoc.core.sequence.Sequence;
+import com.logicaldoc.core.sequence.SequenceDAO;
+import com.logicaldoc.util.Context;
+import com.logicaldoc.util.config.ContextProperties;
+
+/**
+ * Utility methods to prevent brute force attacks
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 7.6.3
+ */
+public class LoginThrottle {
+	private static final String THROTTLE_ENABLED = "throttle.enabled";
+
+	public static final String LOGINFAIL_IP = "loginfail-ip-";
+
+	public static final String LOGINFAIL_USERNAME = "loginfail-username-";
+
+	protected static Logger log = LoggerFactory.getLogger(LoginThrottle.class);
+
+	/**
+	 * Clears the failures for the given username and or password
+	 */
+	public static void clearFailures(String username, String ip) {
+		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
+			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+			if (StringUtils.isNotEmpty(username))
+				sDao.delete(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
+			if (StringUtils.isNotEmpty(ip))
+				sDao.delete(LOGINFAIL_IP + ip, 0L, Tenant.SYSTEM_ID);
+		}
+	}
+
+	/**
+	 * Saves the login failure in the database
+	 */
+	public static void recordFailure(String username, String ip) {
+
+		// Update the failed login counters
+		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
+			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+			if (StringUtils.isNotEmpty(username)) {
+				sDao.next(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
+			}
+			if (StringUtils.isNotEmpty(ip))
+				sDao.next(LOGINFAIL_IP + ip, 0L, Tenant.SYSTEM_ID);
+		}
+
+		// Record the failed login attempt
+		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = uDao.findByUsername(username);
+		if (user == null) {
+			user = new User();
+			user.setUsername(username);
+			user.setName(username);
+		}
+		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		dao.createUserHistory(user, UserHistory.EVENT_USER_LOGIN_FAILED, ip, ip, null);
+	}
+
+	/**
+	 * Performs anti brute force attack checks
+	 */
+	public static void checkLoginThrottle(String username, String ip) throws AuthenticationException {
+		ContextProperties config = Context.get().getProperties();
+		if (!Context.get().getProperties().getBoolean(THROTTLE_ENABLED))
+			return;
+
+		if ("admin".equals(username) && ("127.0.0.1".equals(ip) || "::1".equals(ip)))
+			return;
+
+		log.debug("Take anti brute force attack countermeasures");
+
+		// Check if the username and/or ip is temporarily blocked
+		SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+
+		Calendar cal = Calendar.getInstance();
+		int wait = config.getInt("throttle.username.wait", 0);
+		int maxTrials = config.getInt("throttle.username.max", 0);
+		if (maxTrials > 0 && wait > 0) {
+			String counterName = LOGINFAIL_USERNAME + username;
+			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
+			if (seq != null) {
+				long count = seq.getValue();
+				if (count >= maxTrials) {
+					cal.add(Calendar.MINUTE, -wait);
+					Date oldestDate = cal.getTime();
+					if (oldestDate.before(seq.getLastModified())) {
+						log.warn("Possible brute force attack detected for username " + username);
+						throw new UsernameBlockedException();
+					} else {
+						log.info("Login block for username " + username + " expired");
+						sDao.delete(seq.getId());
+					}
+				}
+			}
+		}
+
+		cal = Calendar.getInstance();
+		wait = config.getInt("throttle.ip.wait", 0);
+		maxTrials = config.getInt("throttle.ip.max", 0);
+		if (maxTrials > 0 && wait > 0) {
+			String counterName = LOGINFAIL_IP + ip;
+			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
+			if (seq != null) {
+				long count = seq.getValue();
+				if (count >= maxTrials) {
+					cal.add(Calendar.MINUTE, -wait);
+					Date oldestDate = cal.getTime();
+					if (oldestDate.before(seq.getLastModified())) {
+						log.warn("Possible brute force attack detected for IP " + ip);
+						throw new IPBlockedException();
+					} else {
+						log.info("Login block for IP " + ip + " expired");
+						sDao.delete(seq.getId());
+					}
+				}
+			}
+		}
+	}
+}

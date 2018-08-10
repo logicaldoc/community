@@ -13,7 +13,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -24,7 +23,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the task scheduling settings.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class TaskSchedulingPanel extends VLayout {
@@ -41,9 +40,9 @@ public class TaskSchedulingPanel extends VLayout {
 
 	private SpinnerItem maxDuration;
 
-	private IntegerItem initialDelay;
+	private SpinnerItem initialDelay;
 
-	private IntegerItem repeatInterval;
+	private SpinnerItem repeatInterval;
 
 	private TextItem seconds;
 
@@ -66,9 +65,8 @@ public class TaskSchedulingPanel extends VLayout {
 	}
 
 	private DynamicForm reloadForm() {
-		if (form != null) {
+		if (form != null)
 			removeMember(form);
-		}
 
 		form = new DynamicForm();
 		form.setValuesManager(vm);
@@ -103,24 +101,28 @@ public class TaskSchedulingPanel extends VLayout {
 			max = task.getScheduling().getMaxLength() / 60;
 		maxDuration = ItemFactory.newSpinnerItem("maxDuration", "maxduration", max);
 		maxDuration.setWidth(80);
-		maxDuration.setName("maxDuration");
 		maxDuration.setHint(I18N.message("minutes").toLowerCase());
 		maxDuration.setStep(10);
 		maxDuration.setMin(0);
 		maxDuration.addChangedHandler(changedHandler);
 
 		// Initial delay
-		initialDelay = ItemFactory.newValidateIntegerItem("initialDelay", "initialdelay", null, 1, null);
-		initialDelay.setDefaultValue(new Integer(Long.toString(task.getScheduling().getDelay())));
+		initialDelay = ItemFactory.newSpinnerItem("initialDelay", "initialdelay", task.getScheduling().getDelay());
+		initialDelay.setWidth(80);
 		initialDelay.setVisible(simplePolicy);
+		initialDelay.setStep(10);
+		initialDelay.setMin(0);
 		initialDelay.addChangedHandler(changedHandler);
 		initialDelay.setHint(I18N.message("seconds").toLowerCase());
 		initialDelay.setHintStyle("hint");
 		initialDelay.setRequired(true);
 
 		// Repeat interval
-		repeatInterval = ItemFactory.newValidateIntegerItem("repeatInterval", "repeatinterval", null, 1, null);
-		repeatInterval.setDefaultValue(new Integer(Long.toString(task.getScheduling().getInterval())));
+		repeatInterval = ItemFactory.newSpinnerItem("repeatInterval", "repeatinterval", task.getScheduling().getInterval());
+		repeatInterval.setWidth(80);
+		repeatInterval.setVisible(simplePolicy);
+		repeatInterval.setStep(60);
+		repeatInterval.setMin(0);
 		repeatInterval.setVisible(simplePolicy);
 		repeatInterval.addChangedHandler(changedHandler);
 		repeatInterval.setHint(I18N.message("seconds").toLowerCase());

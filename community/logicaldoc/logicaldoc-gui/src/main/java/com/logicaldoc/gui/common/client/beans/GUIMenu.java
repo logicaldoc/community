@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Represents a Menu from the GUI view
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIMenu implements Serializable {

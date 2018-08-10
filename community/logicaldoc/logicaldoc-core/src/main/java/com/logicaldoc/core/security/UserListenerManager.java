@@ -16,7 +16,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * A manager for user listeners. It's internals are initialized from the
  * extension point 'UserListener' of the core plugin.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.1
  */
 public class UserListenerManager {

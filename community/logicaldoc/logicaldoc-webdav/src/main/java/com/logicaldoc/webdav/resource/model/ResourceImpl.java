@@ -69,6 +69,8 @@ public class ResourceImpl implements Resource {
 	private Boolean addChildEnabled;
 
 	private Boolean downloadEnabled;
+	
+	private Boolean moveEnabled;
 
 	DavSession session;
 
@@ -221,6 +223,11 @@ public class ResourceImpl implements Resource {
 		return this.deleteEnabled;
 	}
 
+	public boolean isMoveEnabled() {
+		initPermissions();
+		return this.moveEnabled;
+	}
+	
 	public boolean isRenameEnabled() {
 		initPermissions();
 		return this.renameEnabled;
@@ -287,6 +294,7 @@ public class ResourceImpl implements Resource {
 			renameEnabled = false;
 			addChildEnabled = false;
 			downloadEnabled = true;
+			moveEnabled = true;
 		} else {
 			permissions = fdao.getEnabledPermissions(fid, personRequest);
 			writeEnabled = permissions.contains(Permission.WRITE);
@@ -294,6 +302,7 @@ public class ResourceImpl implements Resource {
 			renameEnabled = permissions.contains(Permission.RENAME);
 			addChildEnabled = permissions.contains(Permission.ADD);
 			downloadEnabled = permissions.contains(Permission.DOWNLOAD);
+			moveEnabled = permissions.contains(Permission.MOVE);
 		}
 	}
 

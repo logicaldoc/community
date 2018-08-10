@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 /**
  * Show differences between two versions at metadata level
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MetadataDiff extends Window {
@@ -56,8 +56,8 @@ public class MetadataDiff extends Window {
 		records.add(new DiffRecord(I18N.message("publishedon"), I18N.formatDate(version1.getDate()), I18N
 				.formatDate(version2.getDate())));
 		records.add(new DiffRecord(I18N.message("publisher"), version1.getPublisher(), version2.getPublisher()));
-		records.add(new DiffRecord(I18N.message("size"), Util.formatSizeKB(version1.getFileSize()), Util
-				.formatSizeKB(version2.getFileSize())));
+		records.add(new DiffRecord(I18N.message("size"), Util.formatSizeBytes((double) version1.getFileSize()), Util
+				.formatSizeBytes((double) version2.getFileSize())));
 		records.add(new DiffRecord(I18N.message("folder"),
 				version1.getFolder().getId() == Constants.DOCUMENTS_FOLDERID ? "/" : version1.getFolder().getName(),
 				version2.getFolder().getId() == Constants.DOCUMENTS_FOLDERID ? "/" : version2.getFolder().getName()));

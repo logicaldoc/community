@@ -30,7 +30,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the MessageService
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MessageServiceImpl extends RemoteServiceServlet implements MessageService {

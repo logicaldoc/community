@@ -14,7 +14,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 /**
  * An useful panel to show informations to the user
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.2
  */
 public class Cursor extends ToolStrip {
@@ -28,13 +28,13 @@ public class Cursor extends ToolStrip {
 	private SpinnerItem pageItem;
 
 	public Cursor() {
-		this(null, 1, false);
+		this(null, false);
 	}
 
 	/**
 	 * ID of the message to be used to compose the email
 	 */
-	public Cursor(String maxDisplayedRecordsCookieName, int currentPage, boolean enabledPagination) {
+	public Cursor(String maxDisplayedRecordsCookieName, boolean enabledPagination) {
 		setHeight(20);
 		this.maxCookieName = maxDisplayedRecordsCookieName;
 
@@ -67,7 +67,7 @@ public class Cursor extends ToolStrip {
 
 		addFormItem(maxItem);
 		if (enabledPagination) {
-			pageItem = ItemFactory.newSpinnerItem("page", "page", currentPage, 1, 1);
+			pageItem = ItemFactory.newSpinnerItem("page", "page", 1, 1, 1);
 			pageItem.setHint("");
 			pageItem.setSaveOnEnter(true);
 			pageItem.setImplicitSave(true);
@@ -87,7 +87,12 @@ public class Cursor extends ToolStrip {
 		if (pageItem == null)
 			return;
 		int max = getMaxDisplayedRecords();
-		int pages = (int) Math.ceil(totalRecords / max) + 1;
+		int pages = (int) Math.ceil((double) totalRecords / (double) max);
+		if (pages == 0)
+			pages = 1;
+		if (getCurrentPage() > pages)
+			setCurrentPage(pages);
+
 		pageItem.setMax(pages);
 		pageItem.setHint("/" + pages);
 	}
@@ -106,9 +111,16 @@ public class Cursor extends ToolStrip {
 		return Integer.parseInt(pageItem.getValue().toString());
 	}
 
+	public void setCurrentPage(int page) {
+		if (pageItem == null)
+			return;
+		pageItem.setValue(page);
+	}
+
 	private void onMaxChange() {
 		if (maxItem.validate() && maxCookieName != null) {
 			CookiesManager.save(maxCookieName, maxItem.getValueAsString());
+			setCurrentPage(1);
 		}
 	}
 

@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.PreviewTile;
@@ -23,17 +24,16 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
+import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.EditorExitEvent;
 import com.smartgwt.client.widgets.form.fields.events.EditorExitHandler;
-import com.smartgwt.client.widgets.form.fields.events.IconClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.IconClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -43,7 +43,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Shows document's standard properties and read-only data
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class StandardPropertiesPanel extends DocumentDetailTab {
@@ -133,7 +133,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 						+ Util.formatSizeBytes(document.getFileSize()) + ")");
 
 		TextItem fileName = ItemFactory.newTextItem("fileName", "filename", document.getFileName());
-		
+
 		/*
 		 * Due to a bug in the skin, when you edit the field if the save panel
 		 * appears, the cursor goes to the end of the text or to the next item.
@@ -162,13 +162,13 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(document.getPathExtended(), 40));
 		folder.setTitle(I18N.message("folder"));
-		folder.setValue(Util.displaydURL(null, document.getFolder().getId()));
+		folder.setValue(Util.displayURL(null, document.getFolder().getId()));
 		folder.setTooltip(document.getPathExtended());
 		folder.setWrap(false);
 		folder.setWidth(DEFAULT_ITEM_WIDTH);
 
 		String downloadUrl = Util.downloadURL(document.getDocRef() != null ? document.getDocRef() : document.getId());
-		String displayUrl = Util.displaydURL(document.getDocRef() != null ? document.getDocRef() : document.getId(),
+		String displayUrl = Util.displayURL(document.getDocRef() != null ? document.getDocRef() : document.getId(),
 				null);
 		String perma = "<a href='" + downloadUrl + "'>" + I18N.message("download") + "</a> | " + "<a href='"
 				+ displayUrl + "'>" + I18N.message("details") + "</a>";
@@ -207,13 +207,14 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 		List<FormItem> items = new ArrayList<FormItem>();
 
-		FormItemIcon ratingIcon = ItemFactory.newItemIcon("rating" + document.getRating() + ".png");
-		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "rating", "");
-		rating.setIcons(ratingIcon);
-		rating.setIconWidth(88);
+		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "rating",
+				document.getRating() > 0 ? DocUtil.getRatingIcon(document.getRating())
+						: I18N.message("ratethisdocument"));
 		if (updateEnabled)
-			rating.addIconClickHandler(new IconClickHandler() {
-				public void onIconClick(IconClickEvent event) {
+			rating.addClickHandler(new ClickHandler() {
+
+				@Override
+				public void onClick(ClickEvent event) {
 					DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<GUIRating>() {
 						@Override
 						public void onFailure(Throwable caught) {

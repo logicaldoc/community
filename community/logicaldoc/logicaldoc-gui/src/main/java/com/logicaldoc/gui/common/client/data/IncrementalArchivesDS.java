@@ -9,7 +9,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * Datasource to handle imcremental export archives grid lists. It is based on
  * Xml parsing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class IncrementalArchivesDS extends DataSource {

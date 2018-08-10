@@ -2,6 +2,7 @@ package com.logicaldoc.core.parser.wordperfect;
 
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,8 @@ public class WordPerfectParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(WordPerfectParser.class);
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			StringBuffer content) {
 		try {
 			WPStringExtractor extractor = new WPStringExtractor();
 			String text = extractor.extract(input).trim();

@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.3
  */
-public class AdminPanel extends VLayout {
+public abstract class AdminPanel extends VLayout {
 	protected VLayout body = new VLayout();
 	
 	protected TabSet tabs = new TabSet();

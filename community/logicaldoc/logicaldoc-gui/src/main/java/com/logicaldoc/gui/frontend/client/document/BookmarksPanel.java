@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.Alignment;
@@ -18,7 +19,6 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -31,12 +31,12 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the current user's bookmarks
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class BookmarksPanel extends VLayout {
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private static BookmarksPanel instance;
 
@@ -48,24 +48,23 @@ public class BookmarksPanel extends VLayout {
 
 	public BookmarksPanel() {
 		setMembersMargin(3);
-		reloadList();
 	}
 
-	public void reloadList() {
-		if (list != null)
-			removeMember(list);
-
+	@Override
+	public void onDraw() {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
 		LengthRangeValidator validator = new LengthRangeValidator();
 		validator.setMin(1);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"), 90);
+		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setValidators(validator);
+		name.setWidth("*");
 
 		ListGridField description = new ListGridField("description", I18N.message("description"));
 		description.setValidators(validator);
+		description.setHidden(true);
 
 		ListGridField icon = new ListGridField("icon", " ", 24);
 		icon.setType(ListGridFieldType.IMAGE);
@@ -77,7 +76,7 @@ public class BookmarksPanel extends VLayout {
 		icon.setCanEdit(false);
 		icon.setCanFilter(false);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanEdit(false);
 		list.setEditEvent(ListGridEditEvent.DOUBLECLICK);
@@ -190,7 +189,7 @@ public class BookmarksPanel extends VLayout {
 			download.setEnabled(false);
 			openInFolder.setEnabled(false);
 		}
-		
+
 		if (folder != null && !folder.isDownload())
 			download.setEnabled(false);
 		else if (folder == null) {
@@ -205,8 +204,9 @@ public class BookmarksPanel extends VLayout {
 		contextMenu.showContextMenu();
 	}
 
-	public void reload() {
-		list.fetchData();
+	public void refresh() {
+		if (list != null)
+			list.refresh(new BookmarksDS());
 	}
 
 	private void download() {

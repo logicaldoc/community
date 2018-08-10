@@ -9,7 +9,7 @@ import com.logicaldoc.util.Context;
 /**
  * A bookmark over a document
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  * 
  */

@@ -12,7 +12,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
  * The client side stub for the Settings Service. This service allows the
  * management of various application settings.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("setting")
@@ -73,11 +73,6 @@ public interface SettingService extends RemoteService {
 	 * Saves email settings (SMTP connection)
 	 */
 	public void saveEmailSettings(GUIEmailSettings settings) throws ServerException;
-
-	/**
-	 * Loads the OCR settings
-	 */
-	public GUIParameter[] loadOcrSettings() throws ServerException;
 
 	/**
 	 * Load the GUI settings

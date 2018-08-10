@@ -10,10 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.After;
@@ -22,12 +19,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
-import com.logicaldoc.core.parser.PDFParser;
-import com.logicaldoc.core.parser.Parser;
-import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.security.Tenant;
 
-public class PDFParserTest extends AbstractCoreTCase{
+public class PDFParserTest extends AbstractCoreTCase {
 
 	private long startTime;
 
@@ -73,7 +67,7 @@ public class PDFParserTest extends AbstractCoreTCase{
 		File file = new File(inputFile);
 		String filename = file.getPath();
 
-		Parser parser = ParserFactory.getParser(filename, Tenant.DEFAULT_NAME);
+		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
 		// pdfp.parse(file);
 		//
@@ -98,10 +92,10 @@ public class PDFParserTest extends AbstractCoreTCase{
 		file = new File(inputFile);
 		filename = file.getPath();
 
-		parser = ParserFactory.getParser(filename, Tenant.DEFAULT_NAME);
+		parser = ParserFactory.getParser(filename);
 		pdfp = (PDFParser) parser;
-		pdfp.parse(file);
-		Assert.assertTrue(pdfp.getContent().contains("adequate"));
+		String content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+		Assert.assertTrue(content.contains("adequate"));
 	}
 
 	@Test
@@ -111,11 +105,11 @@ public class PDFParserTest extends AbstractCoreTCase{
 		String filename = file.getPath();
 
 		for (int i = 0; i < 300; i++) {
-			Parser parser = ParserFactory.getParser(filename, Tenant.DEFAULT_NAME);
+			Parser parser = ParserFactory.getParser(filename);
 			PDFParser pdfp = (PDFParser) parser;
-			pdfp.parse(file);
-			
-			assertTrue(pdfp.getContent().startsWith("1: prova"));
+			String content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+
+			assertTrue(content.startsWith("1: prova"));
 		}
 	}
 
@@ -129,17 +123,17 @@ public class PDFParserTest extends AbstractCoreTCase{
 		for (int i = 0; i < 10; i++) {
 			Parser parser = null;
 			if (i % 2 == 0)
-				parser = ParserFactory.getParser(filename1, Tenant.DEFAULT_NAME);
+				parser = ParserFactory.getParser(filename1);
 			else
-				parser = ParserFactory.getParser(filename2, Tenant.DEFAULT_NAME);
+				parser = ParserFactory.getParser(filename2);
 
 			PDFParser pdfp = (PDFParser) parser;
 			if (i % 2 == 0) {
-				pdfp.parse(file1);
-				assertEquals(28385, parser.getContent().length());
+				String content = pdfp.parse(file1, filename1, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+				assertEquals(28385, content.length());
 			} else {
-				pdfp.parse(file2);
-				assertEquals(8759, parser.getContent().length());
+				String content = pdfp.parse(file2, filename2, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+				assertEquals(8759, content.length());
 			}
 		}
 	}
@@ -157,34 +151,10 @@ public class PDFParserTest extends AbstractCoreTCase{
 		File file = new File(inputFile);
 		String filename = file.getPath();
 
-		Parser parser = ParserFactory.getParser(filename, Tenant.DEFAULT_NAME);
+		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-		pdfp.parse(file);
+		String content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 
-		String title = pdfp.getTitle();
-		System.out.println("title: " + title);
-		assertTrue(StringUtils.isNotEmpty(title));
-		assertEquals("Microsoft Word - Systems Ltd.doc", title);
-
-		String author = pdfp.getAuthor();
-		System.out.println("author: " + author);
-		assertTrue(StringUtils.isNotEmpty(author));
-		assertEquals("adham", author);
-
-		// Testing for SourceDate
-		String sourceDate = pdfp.getSourceDate();
-		System.out.println("sourceDate: " + sourceDate);
-		assertTrue(StringUtils.isNotEmpty(sourceDate));
-
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.set(Calendar.DAY_OF_MONTH, 27);
-		calendar.set(Calendar.MONTH, 5);
-		calendar.set(Calendar.YEAR, 2006);
-		Date date = calendar.getTime();
-		String testDate = DateFormat.getDateInstance().format(date);
-		assertEquals(testDate, sourceDate);
-
-		String content = pdfp.getContent();
 		assertNotNull(content);
 		assertTrue(StringUtils.isNotEmpty(content));
 
@@ -211,16 +181,10 @@ public class PDFParserTest extends AbstractCoreTCase{
 		File file = new File(inputFile);
 		String filename = file.getPath();
 
-		Parser parser = ParserFactory.getParser(filename, Tenant.DEFAULT_NAME);
+		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-		pdfp.parse(file);
+		String content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 
-		String author = pdfp.getAuthor();
-		System.out.println("author: " + author);
-		assertTrue(StringUtils.isNotEmpty(author));
-		assertEquals("wael", author);
-
-		String content = pdfp.getContent();
 		assertNotNull(content);
 		assertTrue(StringUtils.isNotEmpty(content));
 
@@ -234,21 +198,18 @@ public class PDFParserTest extends AbstractCoreTCase{
 		File file = new File(inputFile);
 		String filename = file.getPath();
 
-		Parser parser = ParserFactory.getParser(filename, Tenant.DEFAULT_NAME);
+		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-		pdfp.parse(file);
-
-		String content = pdfp.getContent();
+		String content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 
 		inputFile = "src/test/resources/fillablePDF1.pdf";
 		file = new File(inputFile);
 		filename = file.getPath();
 
-		parser = ParserFactory.getParser(filename, Tenant.DEFAULT_NAME);
+		parser = ParserFactory.getParser(filename);
 		pdfp = (PDFParser) parser;
-		pdfp.parse(file);
+		content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 		
-		content = pdfp.getContent();
 		System.out.println(content);
 
 	}

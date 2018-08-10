@@ -2,7 +2,7 @@ package com.logicaldoc.core.communication;
 
 /**
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  */
 public class EMailAttachment {
 

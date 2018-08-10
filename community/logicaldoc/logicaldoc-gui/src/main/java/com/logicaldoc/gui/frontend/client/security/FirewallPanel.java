@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel shows the firewall settings.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class FirewallPanel extends VLayout {
@@ -151,7 +151,7 @@ public class FirewallPanel extends VLayout {
 
 			@Override
 			public void onSuccess(Void params) {
-				if (user != null)
+				if (user == null)
 					Log.info(I18N.message("settingssaved"), null);
 			}
 		});

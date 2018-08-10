@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.impex.folders.ImportFolderDetailsPanel;
 import com.logicaldoc.gui.frontend.client.services.RetentionPoliciesService;
@@ -45,31 +46,29 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Panel showing the list of retention policies
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2
  */
 public class RetentionPoliciesPanel extends AdminPanel {
 
-	private Layout listing = new VLayout();
-
 	private Layout detailsContainer = new VLayout();
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private Canvas details = SELECT_POLICY;
-
-	private InfoPanel infoPanel;
 
 	final static Canvas SELECT_POLICY = new HTMLPanel("&nbsp;" + I18N.message("selectpolicy"));
 
 	public RetentionPoliciesPanel() {
 		super("retentionpolicies");
-		infoPanel = new InfoPanel("");
-		init();
 	}
 
-	public void init() {
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
 		detailsContainer.clear();
+
+		Layout listing = new VLayout();
 		listing.clear();
 		if (list != null)
 			listing.removeMember(list);
@@ -138,7 +137,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		enabled.setImageURLSuffix(".gif");
 		enabled.setCanFilter(false);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -169,7 +168,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				init();
+				refresh();
 			}
 		});
 
@@ -367,5 +366,12 @@ public class RetentionPoliciesPanel extends AdminPanel {
 		record.setAttribute("action", "" + policy.getAction());
 
 		list.refreshRow(list.getRecordIndex(record));
+	}
+
+	public void refresh() {
+		list.refresh(new RetentionPoliciesDS());
+		detailsContainer.removeMembers(detailsContainer.getMembers());
+		details = SELECT_POLICY;
+		detailsContainer.setMembers(details);
 	}
 }

@@ -1,7 +1,9 @@
 package com.logicaldoc.core.parser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.Locale;
 
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
@@ -14,7 +16,7 @@ import com.logicaldoc.util.StringUtil;
  * Parser for Office 2003 worksheets
  * 
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.5
  */
 public class XLSParser extends AbstractParser {
@@ -22,10 +24,13 @@ public class XLSParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(XLSParser.class);
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			StringBuffer content) {
+		ExcelExtractor extractor = null;
 		try {
 			POIFSFileSystem fs = new POIFSFileSystem(input);
-			String tmp = new ExcelExtractor(fs).getText();
+			extractor = new ExcelExtractor(fs);
+			String tmp = extractor.getText();
 
 			// Replace Control characters
 			if (tmp != null)
@@ -34,6 +39,12 @@ public class XLSParser extends AbstractParser {
 			content.append(StringUtil.writeToString(new StringReader(tmp)));
 		} catch (Exception e) {
 			log.warn("Failed to extract Excel text content", e);
+		} finally {
+			if (extractor != null)
+				try {
+					extractor.close();
+				} catch (IOException e) {
+				}
 		}
 	}
 }

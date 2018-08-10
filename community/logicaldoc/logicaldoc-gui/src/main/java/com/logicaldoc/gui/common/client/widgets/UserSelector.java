@@ -13,7 +13,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
  * This widget allows for the selection of a user with the possibility to search
  * in groups
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.6
  */
 public class UserSelector extends SelectItem {

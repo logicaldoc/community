@@ -14,7 +14,7 @@ import com.logicaldoc.core.metadata.AttributeOptionDAO;
 /**
  * Test case for <code>HibernateAttributeOptionDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class HibernateAttributeOptionDAOTest extends AbstractCoreTCase {

@@ -7,7 +7,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
 /**
  * This is a DAO service for MessageTemplate.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate> {

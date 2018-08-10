@@ -17,7 +17,7 @@ import com.logicaldoc.core.i18n.DateBean;
 /**
  * Test case for <code>HibernateFolderFolderHistoryDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {

@@ -33,7 +33,7 @@ import com.logicaldoc.util.security.PasswordGenerator;
 /**
  * This class allows the user to recover a password.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class PswRecovery extends HttpServlet {

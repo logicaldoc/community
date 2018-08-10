@@ -5,7 +5,7 @@ import com.google.gwt.core.client.EntryPoint;
 /**
  * The Common entry point
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Common implements EntryPoint {

@@ -24,23 +24,50 @@ import com.logicaldoc.webservice.soap.SecurityService;
 /**
  * Security Web Service Implementation
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class SoapSecurityService extends AbstractService implements SecurityService {
 	protected static Logger log = LoggerFactory.getLogger(SoapSecurityService.class);
 
 	@Override
-	public WSUser[] listUsers(String sid) throws Exception {
-		checkAdministrator(sid);
+	public WSUser[] listUsers(String sid, String group) throws Exception {
 		User user = validateSession(sid);
 
 		try {
 			List<WSUser> users = new ArrayList<WSUser>();
 			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
-			for (User usr : dao.findAll(user.getTenantId()))
-				if (usr.getType() == User.TYPE_DEFAULT)
-					users.add(WSUser.fromUser(usr));
+			if (StringUtils.isEmpty(group)) {
+				for (User usr : dao.findAll(user.getTenantId())) {
+					dao.initialize(user);
+					if (usr.getType() == User.TYPE_DEFAULT)
+						users.add(WSUser.fromUser(usr));
+				}
+			} else {
+				GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+				Group grp = gDao.findByName(group, user.getTenantId());
+				gDao.initialize(grp);
+				for (User usr : grp.getUsers()) {
+					dao.initialize(user);
+					if (usr.getType() == User.TYPE_DEFAULT)
+						users.add(WSUser.fromUser(usr));
+				}
+			}
+
+			// Remove sensible informations in case of non admin user
+			if (!user.isMemberOf("admin"))
+				for (WSUser usr : users) {
+					usr.setUsername(null);
+					usr.setEmail(null);
+					usr.setEmail2(null);
+					usr.setPassword(null);
+					usr.setPasswordmd4(null);
+					usr.setPostalcode(null);
+					usr.setStreet(null);
+					usr.setTelephone(null);
+					usr.setTelephone2(null);
+				}
+
 			return users.toArray(new WSUser[0]);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);

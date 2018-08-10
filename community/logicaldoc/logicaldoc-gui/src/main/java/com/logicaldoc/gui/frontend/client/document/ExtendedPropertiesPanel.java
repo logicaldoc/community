@@ -35,7 +35,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 /**
  * Shows document's standard properties and read-only data
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ExtendedPropertiesPanel extends DocumentDetailTab {

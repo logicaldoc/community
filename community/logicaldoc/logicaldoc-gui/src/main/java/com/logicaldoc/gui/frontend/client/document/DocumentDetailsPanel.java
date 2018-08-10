@@ -42,7 +42,7 @@ import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 /**
  * This panel collects all documents details
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
@@ -329,7 +329,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				previewPanel.onTabSelected();
 			}
 		});
-		
+
 		if (Feature.visible(Feature.NOTES)) {
 			tabSet.addTab(notesTab);
 			notesTab.setDisabled(!Feature.enabled(Feature.NOTES));
@@ -703,5 +703,17 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	@Override
 	public void destroy() {
 		DocumentController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
 	}
 }

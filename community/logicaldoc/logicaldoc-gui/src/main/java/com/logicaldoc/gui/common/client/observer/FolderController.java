@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.observer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 
@@ -15,7 +15,7 @@ public class FolderController {
 
 	private static FolderController instance = new FolderController();
 
-	private List<FolderObserver> observers = new ArrayList<FolderObserver>();
+	private Set<FolderObserver> observers = new HashSet<FolderObserver>();
 
 	private FolderController() {
 	}
@@ -25,13 +25,15 @@ public class FolderController {
 	}
 
 	public synchronized void addObserver(FolderObserver observer) {
-		if (observer != null && !observers.contains(observer))
+		if (observer != null && !observers.contains(observer)) {
 			observers.add(observer);
+		}
 	}
 
 	public synchronized void removeObserver(FolderObserver observer) {
-		if (observer != null && observers.contains(observer))
+		if (observer != null && observers.contains(observer)) {
 			observers.remove(observer);
+		}
 	}
 
 	public void selected(GUIFolder folder) {
@@ -65,7 +67,7 @@ public class FolderController {
 			} catch (Throwable t) {
 			}
 	}
-	
+
 	public void moved(GUIFolder folder) {
 		for (FolderObserver observer : observers)
 			try {

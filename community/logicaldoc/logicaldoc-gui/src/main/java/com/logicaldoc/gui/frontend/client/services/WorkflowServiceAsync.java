@@ -51,4 +51,6 @@ public interface WorkflowServiceAsync {
 
 	void removeDocument(String instanceId, long docId, AsyncCallback<Void> callback);
 
+	void getCompletionDiagram(String workflowName, String processInstanceId, AsyncCallback<GUIWorkflow> callback);
+
 }

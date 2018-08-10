@@ -21,7 +21,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * <b>Important:</b> Only tasks defined in the Task extension point will be
  * considered
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
 public class TaskManager {

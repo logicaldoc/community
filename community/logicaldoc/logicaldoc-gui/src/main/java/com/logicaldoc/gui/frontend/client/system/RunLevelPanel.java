@@ -47,7 +47,10 @@ public class RunLevelPanel extends VLayout {
 		setHeight100();
 
 		setMembersMargin(10);
+	}
 
+	@Override
+	public void onDraw() {
 		ToolStrip toolbar = new ToolStrip();
 		toolbar.setWidth100();
 		ToolStripButton save = new ToolStripButton(I18N.message("save"));

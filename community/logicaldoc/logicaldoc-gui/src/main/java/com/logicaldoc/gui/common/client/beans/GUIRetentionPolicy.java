@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Implementation of a retention policy for the GUI
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.2
  */
 public class GUIRetentionPolicy implements Serializable {

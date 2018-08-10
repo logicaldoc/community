@@ -31,7 +31,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Workflow Tools
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class WorkflowToolstrip extends ToolStrip {

@@ -12,16 +12,19 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the history of a user
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class UserHistoryPanel extends VLayout {
 
-	private UserHistoryDS dataSource;
-
-	private ListGrid listGrid;
+	private long userId;
 
 	public UserHistoryPanel(long userId) {
+		this.userId = userId;
+	}
+
+	@Override
+	public void onDraw() {
 		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
 		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
 		date.setAlign(Alignment.CENTER);
@@ -31,21 +34,13 @@ public class UserHistoryPanel extends VLayout {
 		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"), 200);
 		ListGridField ip = new ListGridField("ip", I18N.message("ip"), 100);
-		
-		listGrid = new ListGrid();
+
+		ListGrid listGrid = new ListGrid();
 		listGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		listGrid.setCanFreezeFields(true);
 		listGrid.setAutoFetchData(true);
-		dataSource = new UserHistoryDS(userId);
-		listGrid.setDataSource(dataSource);
-		listGrid.setFields(event, date, ip,sid,comment);
+		listGrid.setDataSource(new UserHistoryDS(userId));
+		listGrid.setFields(event, date, ip, sid, comment);
 		addMember(listGrid);
-	}
-
-	@Override
-	public void destroy() {
-		super.destroy();
-		if (dataSource != null)
-			dataSource.destroy();
 	}
 }

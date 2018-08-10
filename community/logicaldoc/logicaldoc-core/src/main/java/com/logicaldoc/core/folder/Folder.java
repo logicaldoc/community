@@ -23,7 +23,7 @@ import com.logicaldoc.core.metadata.Template;
  * <p>
  * Folders have a type: 0 for standard folders, 1 for workspaces.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @version 6.0
  */
 public class Folder extends ExtensibleObject implements Comparable<Folder> {
@@ -96,9 +96,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	private String tgs;
 
-	public Folder(String name) {
-		this.name = name;
-	}
+	private String path;
 
 	public Folder() {
 	}
@@ -450,5 +448,17 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		else
 			str += "," + recipient;
 		setQuotaAlertRecipients(str);
+	}
+	
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getPath() {
+		return path;
+	}
+	
+	public Folder(String name) {
+		this.name = name;
 	}
 }

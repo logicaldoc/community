@@ -27,7 +27,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects all template details
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class TemplateDetailsPanel extends VLayout {

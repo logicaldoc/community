@@ -19,6 +19,7 @@ import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.ColorPickerItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -39,7 +40,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This is the form used for the workflow task settings.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class TaskDialog extends Window {
@@ -152,25 +153,29 @@ public class TaskDialog extends Window {
 
 		DynamicForm taskForm = new DynamicForm();
 		taskForm.setTitleOrientation(TitleOrientation.TOP);
-		taskForm.setNumCols(1);
+		taskForm.setNumCols(2);
 		taskForm.setValuesManager(vm);
 		TextItem taskName = ItemFactory.newTextItem("taskName", "name", this.state.getName());
 		taskName.setRequired(true);
-		taskName.setWidth(250);
+		taskName.setWidth(220);
+
+		ColorPickerItem taskColor = ItemFactory.newColorItemPicker("taskColor", "color", this.state.getDisplay());
+
 		TextAreaItem taskDescr = ItemFactory.newTextAreaItem("taskDescr", "description", this.state.getDescription());
 		taskDescr.setWidth(350);
 		taskDescr.setWrapTitle(false);
-
+		taskDescr.setColSpan(2);
+		
 		boolean isHumanInteraction = isHumanInteraction();
 		RadioGroupItem humanInteraction = ItemFactory.newBooleanSelector("humanInteraction", "humaninteraction");
 		humanInteraction.setValue(isHumanInteraction ? "yes" : "no");
 		humanInteraction.setDefaultValue(isHumanInteraction ? "yes" : "no");
 
 		if (state.getType() == GUIWFState.TYPE_TASK) {
-			taskForm.setFields(taskName, humanInteraction, taskDescr);
-			taskForm.setNumCols(2);
+			taskForm.setNumCols(3);
+			taskForm.setFields(taskName, taskColor, humanInteraction, taskDescr);
 		} else
-			taskForm.setFields(taskName, taskDescr);
+			taskForm.setFields(taskName, taskColor, taskDescr);
 
 		propertiesPanel.addMember(taskForm);
 
@@ -434,6 +439,7 @@ public class TaskDialog extends Window {
 			return;
 
 		TaskDialog.this.state.setName((String) values.get("taskName"));
+		TaskDialog.this.state.setDisplay((String) values.get("taskColor"));
 		TaskDialog.this.state.setDescription((String) values.get("taskDescr"));
 
 		if (state.getType() == GUIWFState.TYPE_TASK) {

@@ -28,7 +28,7 @@ import com.logicaldoc.webservice.soap.FolderService;
 /**
  * Folder Web Service Implementation
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class SoapFolderService extends AbstractService implements FolderService {
@@ -41,6 +41,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		try {
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			log.debug("folder.getParentId(): {}", folder.getParentId());
 			Folder parentFolder = folderDao.findById(folder.getParentId());
 			if (parentFolder == null)
 				throw new Exception("A parent folder with id " + folder.getParentId() + " was not found.");
@@ -69,7 +70,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 				}
 			}
 			folderVO.setTagsFromWords(tagsSet);
-			
+
 			folder.updateAttributes(folderVO);
 
 			Folder f = folderDao.create(parentFolder, folderVO, true, transaction);
@@ -80,14 +81,14 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			}
 
 			WSFolder createdFolder = WSFolder.fromFolder(f);
-			log.info("Created folder " + createdFolder.getName());
+			log.info("Created folder {}", createdFolder.getName());
 			return createdFolder;
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new RuntimeException(t.getMessage(), t);
 		}
 	}
-	
+
 	@Override
 	public WSFolder createAlias(String sid, long parentId, long foldRef) throws Exception {
 		User user = validateSession(sid);
@@ -98,7 +99,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			if (parentFolder == null)
 				throw new Exception("A parent folder with id " + parentId + " was not found.");
 			checkPermission(Permission.ADD, user, parentFolder.getId());
-			
+
 			// Add a folder history entry
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(user);
@@ -114,7 +115,6 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			throw new RuntimeException(t.getMessage(), t);
 		}
 	}
-	
 
 	@Override
 	public long createFolder(String sid, long parentId, String name) throws Exception {
@@ -518,7 +518,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 				}
 			}
 			fld.setTagsFromWords(tagsSet);
-			
+
 			folder.updateAttributes(fld);
 
 			// Add a folder history entry
@@ -569,16 +569,15 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			}
 
 			if (workspace == null) {
-				log.debug("Path " + path + " will be created in the Default workspace");
+				log.debug("Path {} will be created in the Default workspace", path);
 				parent = folderDao.findDefaultWorkspace(user.getTenantId());
 				folderDao.initialize(parent);
 			}
 		}
 
 		Folder folder = folderDao.createPath(parent, path, true, transaction);
-		folderDao.initialize(folder);
-		
-		return WSFolder.fromFolder(folder);
+
+		return WSFolder.fromFolder(folder, false);
 	}
 
 	@Override

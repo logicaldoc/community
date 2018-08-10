@@ -8,7 +8,7 @@ import com.logicaldoc.core.rss.FeedMessage;
 /**
  * This class is a DAO-service for feed messages.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @version 6.1
  */
 public interface FeedMessageDAO extends PersistentObjectDAO<FeedMessage> {

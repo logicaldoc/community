@@ -97,6 +97,17 @@ public interface TagService {
 	public String[] getTags(@WebParam(name = "sid") String sid) throws Exception;
 
 	/**
+	 * Retrieves all the tags in the preset(if the input mode is preset).
+	 * 
+	 * @param sid Session Identifier
+	 * @return The tags in the preset
+	 */
+	@WebMethod
+	@WebResult(name = "tag")
+	@WSDoc(description = "retrieves all the tags specified in the preset, empty if input mode is free")
+	public String[] getTagsPreset(@WebParam(name = "sid") String sid) throws Exception;
+
+	/**
 	 * Retrieves all tag clouds in the repository.
 	 * 
 	 * @param sid Session Identifier

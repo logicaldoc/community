@@ -20,7 +20,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for contacts data.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
 public class ContactsDataServlet extends HttpServlet {

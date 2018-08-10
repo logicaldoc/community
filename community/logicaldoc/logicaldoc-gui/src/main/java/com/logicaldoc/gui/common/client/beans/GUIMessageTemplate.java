@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * 
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class GUIMessageTemplate implements Serializable {

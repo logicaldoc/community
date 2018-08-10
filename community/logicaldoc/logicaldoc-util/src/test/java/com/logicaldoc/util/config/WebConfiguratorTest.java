@@ -13,7 +13,7 @@ import com.logicaldoc.util.io.FileUtil;
 /**
  * Test case for <code>WebConfigurator</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class WebConfiguratorTest {

@@ -13,6 +13,8 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.events.GroupStateChangedEvent;
+import com.smartgwt.client.widgets.grid.events.GroupStateChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SortChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SortEvent;
 import com.smartgwt.client.widgets.grid.events.ViewStateChangedEvent;
@@ -27,7 +29,7 @@ import com.smartgwt.client.widgets.grid.events.ViewStateChangedHandler;
 public class NavigatorDocumentsGrid extends DocumentsListGrid {
 
 	public NavigatorDocumentsGrid(DocumentsDS ds, GUIFolder folder) {
-		super(folder, folder.getDocumentCount());
+		super(folder);
 		setDataSource(ds);
 		setSelectionType(SelectionStyle.MULTIPLE);
 
@@ -123,8 +125,7 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 
 			@Override
 			public void onSortChanged(SortEvent event) {
-				CookiesManager.save(CookiesManager.COOKIE_DOCSLIST, getViewState());
-				saveSorting();
+				saveGridState();
 				if (Session.get().getCurrentFolder() != null)
 					FolderNavigator.get().selectFolder(Session.get().getCurrentFolder().getId());
 			}
@@ -136,7 +137,18 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 		addViewStateChangedHandler(new ViewStateChangedHandler() {
 			@Override
 			public void onViewStateChanged(ViewStateChangedEvent event) {
-				CookiesManager.save(CookiesManager.COOKIE_DOCSLIST, getViewState());
+				saveGridState();
+			}
+		});
+
+		/*
+		 * Save the group state of the grid at every group change
+		 */
+		addGroupStateChangedHandler(new GroupStateChangedHandler() {
+
+			@Override
+			public void onGroupStateChanged(GroupStateChangedEvent event) {
+				saveGridState();
 			}
 		});
 
@@ -146,14 +158,14 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 		addDrawHandler(new DrawHandler() {
 			@Override
 			public void onDraw(DrawEvent event) {
-				String previouslySavedState = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST);
-				if (previouslySavedState != null)
-					setViewState(previouslySavedState);
+				loadGridState();
 			}
 		});
+		
+		loadGridState();
 	}
 
-	private String saveSorting() {
+	private void saveGridState() {
 		SortSpecifier[] sortSpecifiers = getSort();
 		String sort = "";
 		if (sortSpecifiers != null)
@@ -164,7 +176,16 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 				sort += "ascending".equals(spec.getSortDirection().toString().toLowerCase()) ? " asc" : " desc";
 			}
 		CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_SORT, sort);
-		return sort;
+		CookiesManager.save(CookiesManager.COOKIE_DOCSLIST, getViewState());
+		CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_GROUPING, getGroupState());
 	}
 
+	private void loadGridState() {
+		String previouslySavedState = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST);
+		if (previouslySavedState != null)
+			setViewState(previouslySavedState);
+		String previouslySavedGroupState = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_GROUPING);
+		if (previouslySavedGroupState != null)
+			setGroupState(previouslySavedGroupState);
+	}
 }

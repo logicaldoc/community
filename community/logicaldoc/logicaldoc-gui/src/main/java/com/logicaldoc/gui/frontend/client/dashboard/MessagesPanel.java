@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
@@ -10,8 +9,8 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
-import com.logicaldoc.gui.frontend.client.services.MessageServiceAsync;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ContentsType;
@@ -42,12 +41,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows the list of system messages and allows the selection.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MessagesPanel extends VLayout {
 
-	private ListGrid grid;
+	private RefreshableListGrid grid;
 
 	private Layout listing;
 
@@ -56,22 +55,10 @@ public class MessagesPanel extends VLayout {
 	public MessagesPanel() {
 		setWidth100();
 		setHeight100();
-
-		// Initialize the listing panel as placeholder
-		refresh();
 	}
 
-	private void refresh() {
-		if (grid != null) {
-			listing.removeMember(grid);
-			grid.destroy();
-		}
-
-		if (body != null) {
-			removeMember(body);
-			body.destroy();
-		}
-
+	@Override
+	public void onDraw() {
 		listing = new VLayout();
 		listing.setHeight("75%");
 		listing.setShowResizeBar(true);
@@ -100,7 +87,7 @@ public class MessagesPanel extends VLayout {
 		sent.setCellFormatter(new DateCellFormatter(false));
 		sent.setCanFilter(false);
 
-		grid = new ListGrid() {
+		grid = new RefreshableListGrid() {
 			@Override
 			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
 				if (getFieldName(colNum).equals("subject")) {
@@ -205,6 +192,11 @@ public class MessagesPanel extends VLayout {
 		setMembers(listing, body);
 	}
 
+	private void refresh() {
+		grid.refresh(new MessagesDS());
+		body.setContents(" ");
+	}
+
 	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
@@ -233,7 +225,6 @@ public class MessagesPanel extends VLayout {
 								@Override
 								public void onSuccess(Void result) {
 									grid.removeSelectedData();
-									// list.deselectAllRecords();
 								}
 							});
 						}

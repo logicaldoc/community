@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * GUI representation of an e-mail to be sent
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIEmail implements Serializable {

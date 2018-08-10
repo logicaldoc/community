@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -24,7 +25,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.util.Assert;
 
-import com.ibm.icu.util.Calendar;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.RunLevel;
@@ -59,7 +59,7 @@ import com.logicaldoc.util.sql.SqlUtil;
 /**
  * Hibernate implementation of <code>DocumentDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
 @SuppressWarnings("unchecked")
@@ -118,7 +118,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			doc.setLockUserId(transaction.getUserId());
 			transaction.setEvent(DocumentEvent.ARCHIVED.toString());
 			store(doc, transaction);
-			log.debug("Archived document " + docId);
+			log.debug("Archived document {}", docId);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			result = false;
@@ -363,7 +363,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			// Use unique filename in the same folder
 			setUniqueFilename(doc);
-			
+
 			// Save the document
 			saveOrUpdate(doc);
 			try {
@@ -395,7 +395,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return result;
 	}
 
-	
 	/**
 	 * Avoid file name duplications in the same folder
 	 */
@@ -436,7 +435,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		while (fileNames.contains(doc.getFileName().toLowerCase()))
 			doc.setFileName(baseName + "(" + (counter++) + ")" + ext);
 	}
-	
+
 	@Override
 	public void updateDigest(Document doc) {
 		String resource = storer.getResourceName(doc, doc.getFileVersion(), null);
@@ -587,7 +586,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				query.append(" AND D.ld_tag='" + SqlUtil.doubleQuotes(tag.toLowerCase()) + "' ");
 
 				System.out.println(query);
-				
+
 				List<Long> docIds = (List<Long>) queryForList(query.toString(), Long.class);
 				ids.addAll(docIds);
 			}
@@ -910,7 +909,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		List<Document> results = new ArrayList<Document>();
 		try {
 			String query = "select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid from ld_document where ld_deleted=1 and ld_deleteuserid = "
-					+ userId + " order by ld_lastmodified desc";
+					+ userId;
 
 			@SuppressWarnings("rawtypes")
 			RowMapper docMapper = new BeanPropertyRowMapper() {
@@ -1202,13 +1201,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<String> findDuplicatedDigests(Long tenantId, Long folderId) {
 		// First of all, find all duplicates digests.
-		StringBuffer digestQuery = new StringBuffer(
-				"select ld_digest from ld_document where ld_deleted = 0 ");
-		if(tenantId!=null){
+		StringBuffer digestQuery = new StringBuffer("select ld_digest from ld_document where ld_deleted = 0 ");
+		if (tenantId != null) {
 			digestQuery.append(" and ld_tenantid = ");
 			digestQuery.append(Long.toString(tenantId));
 		}
-		
+
 		if (folderId != null) {
 			List<Long> tree = folderDAO.findIdsByParentId(folderId);
 			if (!tree.contains(folderId))
@@ -1217,8 +1215,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			digestQuery.append(tree.stream().map(id -> id.toString()).collect(Collectors.joining(", ")));
 			digestQuery.append(" ) ");
 		}
-		digestQuery
-				.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");
+		digestQuery.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");
 
 		return (List<String>) query(digestQuery.toString(), null, new RowMapper<String>() {
 			public String mapRow(ResultSet rs, int rowNum) throws SQLException {

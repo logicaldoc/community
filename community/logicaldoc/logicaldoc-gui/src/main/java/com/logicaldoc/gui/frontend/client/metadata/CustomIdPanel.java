@@ -47,9 +47,15 @@ public class CustomIdPanel extends AdminPanel {
 
 	private VLayout sequencesPanel;
 
+	private GUICustomId[] schemesData;
+
 	public CustomIdPanel(GUICustomId[] schemesData) {
 		super("customid");
+		this.schemesData = schemesData;
+	}
 
+	@Override
+	public void onDraw() {
 		if (Feature.enabled(Feature.CUSTOMID))
 			body.setMembers(setupSchemesPanel(schemesData, GUICustomId.CUSTOMID_SCHEME));
 
@@ -174,31 +180,6 @@ public class CustomIdPanel extends AdminPanel {
 		});
 		toolStrip.addButton(refresh);
 
-		sequencesPanel = new VLayout();
-		sequencesPanel.setMembers(toolStrip);
-		refreshSequences();
-
-		return sequencesPanel;
-	}
-
-	private void refreshSequences() {
-		CustomIdService.Instance.get().loadSequences(new AsyncCallback<GUISequence[]>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(GUISequence[] sequences) {
-				setupSequencesGrid(sequences);
-			}
-		});
-	}
-
-	private void setupSequencesGrid(GUISequence[] data) {
-		if (sequences != null)
-			sequencesPanel.removeMember(sequences);
-
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setWidth(60);
 		id.setCanEdit(false);
@@ -229,22 +210,6 @@ public class CustomIdPanel extends AdminPanel {
 		sequences.setFields(template);
 		sequences.setSelectionType(SelectionStyle.SINGLE);
 		sequences.setModalEditing(true);
-
-		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
-		if (data != null)
-			for (GUISequence cid : data) {
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("template", Util.strip(cid.getTemplate()));
-				record.setAttribute("frequency", I18N.message(cid.getFrequency()));
-				record.setAttribute("year", cid.getYear());
-				record.setAttribute("month", cid.getMonth());
-				record.setAttribute("folder", cid.getFolder());
-				record.setAttribute("id", cid.getId());
-				record.setAttribute("value", cid.getValue());
-				records.add(record);
-			}
-		sequences.setData(records.toArray(new ListGridRecord[0]));
-
 		sequences.setFields(id, frequency, template, folder, value);
 
 		sequences.addEditCompleteHandler(new EditCompleteHandler() {
@@ -273,7 +238,38 @@ public class CustomIdPanel extends AdminPanel {
 			}
 		});
 
-		sequencesPanel.addMember(sequences);
+		sequencesPanel = new VLayout();
+		sequencesPanel.setMembers(toolStrip, sequences);
+
+		refreshSequences();
+		return sequencesPanel;
+	}
+
+	private void refreshSequences() {
+		CustomIdService.Instance.get().loadSequences(new AsyncCallback<GUISequence[]>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Log.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUISequence[] data) {
+				List<ListGridRecord> records = new ArrayList<ListGridRecord>();
+				if (data != null)
+					for (GUISequence cid : data) {
+						ListGridRecord record = new ListGridRecord();
+						record.setAttribute("template", Util.strip(cid.getTemplate()));
+						record.setAttribute("frequency", I18N.message(cid.getFrequency()));
+						record.setAttribute("year", cid.getYear());
+						record.setAttribute("month", cid.getMonth());
+						record.setAttribute("folder", cid.getFolder());
+						record.setAttribute("id", cid.getId());
+						record.setAttribute("value", cid.getValue());
+						records.add(record);
+					}
+				sequences.setData(records.toArray(new ListGridRecord[0]));
+			}
+		});
 	}
 
 	private void showSchemeContextMenu(final ListGrid schemes) {

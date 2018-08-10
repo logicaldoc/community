@@ -43,7 +43,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the tags list with each tag count.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class TagsForm extends VLayout {
@@ -104,8 +104,6 @@ public class TagsForm extends VLayout {
 		vocabularyForm.setItems(items.toArray(new FormItem[0]));
 
 		otherCharForm = new DynamicForm();
-		otherCharForm.setNumCols(3);
-		otherCharForm.setHeight(1);
 		otherCharForm.setWidth(1);
 
 		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
@@ -118,10 +116,10 @@ public class TagsForm extends VLayout {
 
 		TextItem otherChar = ItemFactory.newTextItem("otherchar", "otherchar", null);
 		otherChar.setRequired(true);
+		otherChar.setWrapTitle(false);
+		otherChar.setIcons(searchPicker);
 		otherChar.setLength(1);
 		otherChar.setWidth(50);
-		otherChar.setEndRow(false);
-		otherChar.setIcons(searchPicker);
 
 		FormItem searchinhits = ItemFactory.newYesNoSelectItem(SEARCHINHITS, SEARCHINHITS);
 		searchinhits.setValue("false");

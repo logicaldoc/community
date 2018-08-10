@@ -27,7 +27,7 @@ import com.logicaldoc.util.Context;
 /**
  * Search specialization for the Full text search.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class FulltextSearch extends Search {
@@ -99,6 +99,7 @@ public class FulltextSearch extends Search {
 			hit.setTenantId(rs.getLong(31));
 			hit.setStamped(rs.getInt(33));
 			hit.setPassword(rs.getString(34));
+			hit.setWorkflowStatusDisplay(rs.getString(35));
 
 			return hit;
 		}
@@ -238,7 +239,7 @@ public class FulltextSearch extends Search {
 		richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
 		richQuery
 				.append(" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		richQuery.append(" A.ld_stamped, A.ld_password ");
+		richQuery.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp ");
 		richQuery.append(" from ld_document A ");
 		richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 		richQuery.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
@@ -267,7 +268,7 @@ public class FulltextSearch extends Search {
 		richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
 		richQuery
 				.append(" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		richQuery.append(" REF.ld_stamped, REF.ld_password ");
+		richQuery.append(" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp ");
 		richQuery.append(" from ld_document A  ");
 		richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 		richQuery.append(" join ld_document REF on A.ld_docref=REF.ld_id ");
@@ -314,18 +315,6 @@ public class FulltextSearch extends Search {
 			if ((searchUser.isMemberOf("admin") && opt.getFolderId() == null)
 					|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId())))
 				hits.add(hit);
-		}
-
-		/*
-		 * Check for suggestions
-		 */
-		if (results != null) {
-			Map<String, String> suggestions = (Map<String, String>) results.getSuggestions();
-			if (!results.getSuggestions().isEmpty()) {
-				suggestion = options.getExpression();
-				for (String token : results.getSuggestions().keySet())
-					suggestion = suggestion.replaceFirst(token, suggestions.get(token));
-			}
-		}
+		} 
 	}
 }

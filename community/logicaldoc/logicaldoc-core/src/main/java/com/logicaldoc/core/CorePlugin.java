@@ -13,7 +13,7 @@ import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 /**
  * Plugin class for the Core plugin
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
 public class CorePlugin extends LogicalDOCPlugin {

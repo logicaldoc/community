@@ -1,8 +1,6 @@
 package com.logicaldoc.gui.frontend.client.panels;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -11,7 +9,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.logicaldoc.gui.common.client.Menu;
-import com.logicaldoc.gui.common.client.PanelObserver;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.SessionObserver;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
@@ -32,11 +29,10 @@ import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.logicaldoc.gui.frontend.client.services.CalendarServiceAsync;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.logicaldoc.gui.frontend.client.services.WorkflowServiceAsync;
-import com.smartgwt.client.types.Side;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -46,7 +42,7 @@ import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 /**
  * This is the main panel that collects all other GUI panels
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class MainPanel extends VLayout implements SessionObserver {
@@ -65,8 +61,6 @@ public class MainPanel extends VLayout implements SessionObserver {
 
 	private IncomingMessage incomingMessage = null;
 
-	private List<PanelObserver> observers = new ArrayList<PanelObserver>();
-
 	public static MainPanel get() {
 		if (instance == null)
 			instance = new MainPanel();
@@ -74,23 +68,16 @@ public class MainPanel extends VLayout implements SessionObserver {
 	}
 
 	private MainPanel() {
+		setOverflow(Overflow.HIDDEN);
+	}
+
+	@Override
+	public void onDraw() {
+		Session.get().addSessionObserver(this);
+
 		setWidth100();
 		setHeight100();
 
-		Session.get().addSessionObserver(this);
-	}
-
-	public void addObjserver(PanelObserver observer) {
-		observers.add(observer);
-	}
-
-	private void initGUI() {
-		Layout topPanel = new TopPanel();
-
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight("*");
 		documentsTab = new Tab(I18N.message("documents"));
 		documentsTab.setName("documents");
 		searchTab = new Tab(I18N.message("search"));
@@ -99,26 +86,6 @@ public class MainPanel extends VLayout implements SessionObserver {
 		dashboardTab.setName("dashboard");
 		administrationTab = new Tab(I18N.message("administration"));
 		administrationTab.setName("administration");
-
-		addMember(topPanel);
-
-		incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(), new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				MainPanel.this.getIncomingMessage().setVisible(false);
-			}
-		});
-
-		incomingMessage.setVisible(Session.get().getIncomingMessage() != null
-				&& !Session.get().getIncomingMessage().isEmpty());
-
-		addMember(incomingMessage);
-		MainMenu mainMenu = new MainMenu(true);
-		addObjserver(mainMenu);
-		addMember(mainMenu);
-		addMember(tabSet);
-		addMember(new StatusBar(true));
 
 		Window.addResizeHandler(new ResizeHandler() {
 			public void onResize(ResizeEvent event) {
@@ -136,11 +103,10 @@ public class MainPanel extends VLayout implements SessionObserver {
 
 			@Override
 			public void onTabSelected(TabSelectedEvent event) {
-				for (PanelObserver observer : observers) {
-					observer.onTabSeleted(event.getTab().getName());
-				}
+				MainMenu.get().onTabSeleted(event.getTab().getName());
 			}
 		};
+
 		documentsTab.addTabSelectedHandler(selectionHandler);
 		searchTab.addTabSelectedHandler(selectionHandler);
 		dashboardTab.addTabSelectedHandler(selectionHandler);
@@ -149,7 +115,18 @@ public class MainPanel extends VLayout implements SessionObserver {
 
 	@Override
 	public void onUserLoggedIn(final GUIUser user) {
-		initGUI();
+		incomingMessage = new IncomingMessage(Session.get().getIncomingMessage(), new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				MainPanel.this.getIncomingMessage().setVisible(false);
+			}
+		});
+
+		incomingMessage.setVisible(
+				Session.get().getIncomingMessage() != null && !Session.get().getIncomingMessage().isEmpty());
+
+		setMembers(new TopPanel(), incomingMessage, MainMenu.get(), tabSet, new StatusBar(true));
 
 		long welcomeScreen = Menu.DASHBOARD;
 		if (user.getWelcomeScreen() != null)
@@ -176,7 +153,8 @@ public class MainPanel extends VLayout implements SessionObserver {
 		}
 
 		RequestInfo loc = WindowUtils.getRequestInfo();
-		if ((loc.getParameter("folderId") != null || loc.getParameter("docId") != null) && Menu.enabled(Menu.DOCUMENTS)) {
+		if ((loc.getParameter("folderId") != null || loc.getParameter("docId") != null)
+				&& Menu.enabled(Menu.DOCUMENTS)) {
 			/*
 			 * The user clicked on a permanent link so we have to open the
 			 * Documents tab
@@ -226,7 +204,7 @@ public class MainPanel extends VLayout implements SessionObserver {
 		if (Session.get().getInfo().getAlerts() != null && user.isMemberOf("admin")) {
 			String alerts = "";
 			for (GUIMessage warning : Session.get().getInfo().getAlerts()) {
-				if (warning.getPriority() == GUIMessage.PRIO_WARN && warning.isShowInGUI()){
+				if (warning.getPriority() == GUIMessage.PRIO_WARN && warning.isShowInGUI()) {
 					if (!"".equals(alerts))
 						alerts += " -- ";
 					alerts += warning.getMessage();
@@ -252,31 +230,27 @@ public class MainPanel extends VLayout implements SessionObserver {
 	}
 
 	public void selectUserTab() {
-		DashboardPanel dp = DashboardPanel.get();
-		dp.getTabSet().selectTab(DashboardPanel.get().getUserTab());
-		dashboardTab.setPane(dp);
-		tabSet.selectTab(dashboardTab);
+		selectDashboardTab();
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.USER_ID);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.USER_ID);
 	}
 
 	public void selectWorkflowTab() {
-		DashboardPanel dp = DashboardPanel.get();
-		dp.getTabSet().selectTab(DashboardPanel.get().getWorkflowTab());
-		dashboardTab.setPane(dp);
-		tabSet.selectTab(dashboardTab);
+		selectDashboardTab();
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.WORKFLOW_ID);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.WORKFLOW_ID);
 	}
 
 	public void selectMessagesTab() {
-		DashboardPanel dp = DashboardPanel.get();
-		dp.getTabSet().selectTab(DashboardPanel.get().getMessagesTab());
-		dashboardTab.setPane(dp);
-		tabSet.selectTab(dashboardTab);
+		selectDashboardTab();
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.MESSAGES_ID);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.MESSAGES_ID);
 	}
 
 	public void selectCalendarTab() {
-		DashboardPanel dp = DashboardPanel.get();
-		dp.getTabSet().selectTab(DashboardPanel.get().getCalendarTab());
-		dashboardTab.setPane(dp);
-		tabSet.selectTab(dashboardTab);
+		selectDashboardTab();
+		DashboardPanel.get().setDefaultOpenTab(DashboardPanel.CALENDAR_ID);
+		DashboardPanel.get().getTabSet().selectTab(DashboardPanel.CALENDAR_ID);
 	}
 
 	public boolean isOnDocumentsTab() {

@@ -15,13 +15,20 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Main log panel
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class LogPanel extends VLayout {
-	public LogPanel(String appender) {
-		setHeight100();
+	
+	private String appender;
 
+	public LogPanel(String appender) {
+		this.appender = appender;
+		setHeight100();
+	}
+
+	@Override
+	public void onDraw() {
 		final HTMLPane htmlPane = new HTMLPane();
 		htmlPane.setWidth100();
 		htmlPane.setHeight100();
@@ -58,6 +65,5 @@ public class LogPanel extends VLayout {
 		toolStrip.addFill();
 		addMember(toolStrip);
 		addMember(htmlPane);
-		draw();
 	}
 }

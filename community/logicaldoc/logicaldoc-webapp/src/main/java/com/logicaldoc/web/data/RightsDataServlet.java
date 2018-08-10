@@ -29,7 +29,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * This servlet is responsible for rights data.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class RightsDataServlet extends HttpServlet {
@@ -132,6 +132,8 @@ public class RightsDataServlet extends HttpServlet {
 					writer.print("<subscription>" + (folderGroup.getSubscription() == 1 ? true : false)
 							+ "</subscription>");
 					writer.print("<password>" + (folderGroup.getPassword() == 1 ? true : false) + "</password>");
+					writer.print("<move>" + (folderGroup.getMove() == 1 ? true : false) + "</move>");
+					writer.print("<email>" + (folderGroup.getEmail() == 1 ? true : false) + "</email>");
 					writer.print("<type>" + group.getType() + "</type>");
 					writer.print("</right>");
 				}

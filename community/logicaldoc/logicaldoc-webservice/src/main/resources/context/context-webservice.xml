@@ -118,6 +118,14 @@
             <entry key="mtom-enabled" value="${webservice.mtom}" />
         </jaxws:properties>
     </jaxws:endpoint>
+	<jaxws:endpoint id="documentMetadata"
+		implementor="com.logicaldoc.webservice.soap.endpoint.SoapDocumentMetadataService"
+		address="/DocumentMetadata">
+		<jaxws:properties>
+			<entry key="mtom-enabled" value="${webservice.mtom}" />
+		</jaxws:properties>
+	</jaxws:endpoint>    
+    
     <!-- ############################## -->
     <!-- ###### JAX-RS (RESTful) ###### -->
     <!-- ############################## -->

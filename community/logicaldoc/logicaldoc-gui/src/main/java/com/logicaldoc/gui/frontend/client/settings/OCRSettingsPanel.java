@@ -1,5 +1,9 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -9,6 +13,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
+import com.logicaldoc.gui.frontend.client.services.OCRService;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
@@ -16,6 +21,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -25,20 +31,34 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 /**
  * This panel shows the OCR settings.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class OCRSettingsPanel extends AdminPanel {
 
+	// Stores the engine's parameters
+	private DynamicForm engineForm = null;
+
 	private ValuesManager vm = new ValuesManager();
 
-	private TextItem tesseract;
-
-	private TextItem advancedOcrPath;
-
-	public OCRSettingsPanel(GUIParameter[] settings) {
+	public OCRSettingsPanel() {
 		super("ocr");
 
+		OCRService.Instance.get().loadSettings(new AsyncCallback<GUIParameter[]>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Log.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(GUIParameter[] params) {
+				initGUI(params);
+			}
+		});
+	}
+
+	private void initGUI(final GUIParameter[] params) {
 		DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.LEFT);
@@ -71,23 +91,22 @@ public class OCRSettingsPanel extends AdminPanel {
 		timeout.setWrapTitle(false);
 		timeout.setHint(I18N.message("seconds"));
 
+		// Deduct the list of available OCR engines
+		Map<String, String> engines = new HashMap<String, String>();
+		for (GUIParameter param : params)
+			if (param.getName().startsWith("ocr.engine."))
+				engines.put(param.getValue(), param.getValue());
+
 		final RadioGroupItem engine = ItemFactory.newBooleanSelector("ocr_engine", "engine");
 		engine.setRequired(true);
-		engine.setValueMap("default", "advanced");
-		engine.setValue(settings[6].getValue());
+		engine.setValueMap(engines);
 		engine.addChangedHandler(new ChangedHandler() {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
-				onEngineChanged(event.getValue().toString());
+				initEngineForm(event.getValue().toString(), params);
 			}
 		});
-
-		tesseract = ItemFactory.newTextItem("command_tesseract", "Tesseract", null);
-		tesseract.setWidth(350);
-
-		advancedOcrPath = ItemFactory.newTextItem("advancedocr_path", "Advanced OCR path", null);
-		advancedOcrPath.setWidth(350);
 
 		IntegerItem ocrrendres = ItemFactory.newIntegerItem("ocr_rendres", I18N.message("ocrrendres"), null);
 		ocrrendres.setRequired(true);
@@ -105,7 +124,7 @@ public class OCRSettingsPanel extends AdminPanel {
 		batch.setWrapTitle(false);
 		batch.setHint("pages");
 
-		for (GUIParameter param : settings) {
+		for (GUIParameter param : params) {
 			if (param.getName().endsWith("ocr.enabled"))
 				enabled.setValue(param.getValue().equals("true") ? "yes" : "no");
 			else if (param.getName().endsWith("ocr.resolution.threshold"))
@@ -126,105 +145,126 @@ public class OCRSettingsPanel extends AdminPanel {
 				excludes.setValue(param.getValue());
 			else if (param.getName().endsWith("ocr.engine"))
 				engine.setValue(param.getValue());
-			else if (param.getName().endsWith("command.tesseract"))
-				tesseract.setValue(param.getValue());
-			else if (param.getName().endsWith("advancedocr.path"))
-				advancedOcrPath.setValue(param.getValue());
 		}
 
-		if (Session.get().isDefaultTenant())
-			form.setItems(enabled, timeout, includes, excludes, textThreshold, resolutionThreshold, ocrrendres,
-					barcoderendres, batch, engine, tesseract, advancedOcrPath);
-		else
-			form.setItems(enabled, includes, excludes, textThreshold, resolutionThreshold);
+		List<FormItem> items = new ArrayList<FormItem>();
+		items.add(enabled);
+
+		if (Session.get().isDefaultTenant()) {
+			items.addAll(Arrays.asList(timeout, includes, excludes, textThreshold, resolutionThreshold, ocrrendres,
+					barcoderendres, batch, engine));
+		} else
+			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold));
+		form.setItems(items.toArray(new FormItem[0]));
 
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(new ClickHandler() {
-			@SuppressWarnings("unchecked")
 			public void onClick(ClickEvent event) {
-				Map<String, Object> values = (Map<String, Object>) vm.getValues();
-
-				if (vm.validate()) {
-					GUIParameter[] params = new GUIParameter[12];
-
-					params[1] = new GUIParameter(Session.get().getTenantName() + ".ocr.includes", (String) values
-							.get("ocr_includes"));
-					params[2] = new GUIParameter(Session.get().getTenantName() + ".ocr.excludes", (String) values
-							.get("ocr_excludes"));
-					if (values.get("ocr_text_threshold") instanceof Integer)
-						params[3] = new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
-								((Integer) values.get("ocr_text_threshold")).toString());
-					else
-						params[3] = new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
-								(String) values.get("ocr_text_threshold"));
-
-					if (values.get("ocr_resolution_threshold") instanceof Integer)
-						params[4] = new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
-								((Integer) values.get("ocr_resolution_threshold")).toString());
-					else
-						params[4] = new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
-								(String) values.get("ocr_resolution_threshold"));
-
-					if (Session.get().isDefaultTenant()) {
-						if (values.get("ocr_timeout") instanceof Integer)
-							params[5] = new GUIParameter("ocr.timeout", ((Integer) values.get("ocr_timeout"))
-									.toString());
-						else
-							params[5] = new GUIParameter("ocr.timeout", (String) values.get("ocr_timeout"));
-
-						if (values.get("ocr_rendres") instanceof Integer)
-							params[6] = new GUIParameter("ocr.rendres", ((Integer) values.get("ocr_rendres"))
-									.toString());
-						else
-							params[6] = new GUIParameter("ocr.rendres", (String) values.get("ocr_rendres"));
-
-						if (values.get("ocr_rendres_barcode") instanceof Integer)
-							params[7] = new GUIParameter("ocr.rendres.barcode", ((Integer) values
-									.get("ocr_rendres_barcode")).toString());
-						else
-							params[7] = new GUIParameter("ocr.rendres.barcode", (String) values
-									.get("ocr_rendres_barcode"));
-
-						if (values.get("ocr_batch") instanceof Integer)
-							params[11] = new GUIParameter("ocr.batch", ((Integer) values.get("ocr_batch")).toString());
-						else
-							params[11] = new GUIParameter("ocr.batch", (String) values.get("ocr_batch"));
-
-						params[8] = new GUIParameter("ocr.engine", (String) values.get("ocr_engine"));
-						params[9] = new GUIParameter("command.tesseract", (String) values.get("command_tesseract"));
-						params[10] = new GUIParameter("advancedocr.path", (String) values.get("advancedocr_path"));
-					}
-
-					SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
-
-						@Override
-						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(Void ret) {
-							Log.info(I18N.message("settingssaved"), null);
-						}
-					});
-				}
+				onSave();
 			}
 		});
 
-		onEngineChanged(engine.getValueAsString());
-
 		body.setMembers(form);
+		if (Session.get().isDefaultTenant())
+			initEngineForm(engine.getValueAsString(), params);
 		addMember(save);
 	}
 
-	private void onEngineChanged(String engine) {
-		if ("default".equals(engine)) {
-			tesseract.show();
-			advancedOcrPath.hide();
-		} else {
-			tesseract.hide();
-			advancedOcrPath.show();
+	private void initEngineForm(String engine, GUIParameter[] params) {
+		if (engineForm != null)
+			body.removeMember(engineForm);
+
+		engineForm = new DynamicForm();
+		engineForm.setValuesManager(vm);
+		engineForm.setTitleOrientation(TitleOrientation.LEFT);
+		engineForm.setNumCols(2);
+		engineForm.setColWidths(1, "*");
+		engineForm.setPadding(5);
+
+		List<FormItem> items = new ArrayList<FormItem>();
+		for (GUIParameter p : params) {
+			if (p.getName().startsWith("ocr." + engine + ".")) {
+				String title = p.getName().substring(p.getName().lastIndexOf('.') + 1);
+				TextItem paramItem = ItemFactory.newTextItem(p.getName().replace('.', '_'), title, p.getValue());
+				paramItem.setTitle(title);
+				paramItem.setWidth(350);
+				items.add(paramItem);
+			}
+		}
+		engineForm.setItems(items.toArray(new FormItem[0]));
+
+		body.addMember(engineForm, 1);
+	}
+
+	private void onSave() {
+		@SuppressWarnings("unchecked")
+		Map<String, Object> values = (Map<String, Object>) vm.getValues();
+
+		if (vm.validate()) {
+			List<GUIParameter> params = new ArrayList<GUIParameter>();
+
+			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.includes", (String) values
+					.get("ocr_includes")));
+			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.excludes", (String) values
+					.get("ocr_excludes")));
+			if (values.get("ocr_text_threshold") instanceof Integer)
+				params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold", ((Integer) values
+						.get("ocr_text_threshold")).toString()));
+			else
+				params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold", (String) values
+						.get("ocr_text_threshold")));
+
+			if (values.get("ocr_resolution_threshold") instanceof Integer)
+				params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
+						((Integer) values.get("ocr_resolution_threshold")).toString()));
+			else
+				params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
+						(String) values.get("ocr_resolution_threshold")));
+
+			if (Session.get().isDefaultTenant()) {
+				if (values.get("ocr_timeout") instanceof Integer)
+					params.add(new GUIParameter("ocr.timeout", ((Integer) values.get("ocr_timeout")).toString()));
+				else
+					params.add(new GUIParameter("ocr.timeout", (String) values.get("ocr_timeout")));
+
+				if (values.get("ocr_rendres") instanceof Integer)
+					params.add(new GUIParameter("ocr.rendres", ((Integer) values.get("ocr_rendres")).toString()));
+				else
+					params.add(new GUIParameter("ocr.rendres", (String) values.get("ocr_rendres")));
+
+				if (values.get("ocr_rendres_barcode") instanceof Integer)
+					params.add(new GUIParameter("ocr.rendres.barcode", ((Integer) values.get("ocr_rendres_barcode"))
+							.toString()));
+				else
+					params.add(new GUIParameter("ocr.rendres.barcode", (String) values.get("ocr_rendres_barcode")));
+
+				if (values.get("ocr_batch") instanceof Integer)
+					params.add(new GUIParameter("ocr.batch", ((Integer) values.get("ocr_batch")).toString()));
+				else
+					params.add(new GUIParameter("ocr.batch", (String) values.get("ocr_batch")));
+
+				String engine = (String) values.get("ocr_engine");
+				params.add(new GUIParameter("ocr.engine", engine));
+
+				for (String name : values.keySet()) {
+					if (name.startsWith("ocr_" + engine + "_"))
+						params.add(new GUIParameter(name.replace('_', '.'), values.get(name).toString()));
+				}
+			}
+
+			SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					Log.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void ret) {
+					Log.info(I18N.message("settingssaved"), null);
+				}
+			});
 		}
 	}
 }

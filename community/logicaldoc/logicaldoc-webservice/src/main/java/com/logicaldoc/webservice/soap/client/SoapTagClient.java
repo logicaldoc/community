@@ -25,7 +25,7 @@ public class SoapTagClient extends SoapClient<TagService> implements TagService 
 	public SoapTagClient(String endpoint) throws IOException {
 		super(endpoint, TagService.class, -1, true, -1);
 	}
-	
+
 	@Override
 	public void setDocumentTags(String sid, long docId, String[] tags) throws Exception {
 		client.setDocumentTags(sid, docId, tags);
@@ -38,7 +38,7 @@ public class SoapTagClient extends SoapClient<TagService> implements TagService 
 
 	@Override
 	public String[] getDocumentTags(String sid, long docId) throws Exception {
-return client.getDocumentTags(sid, docId);
+		return client.getDocumentTags(sid, docId);
 	}
 
 	@Override
@@ -74,6 +74,11 @@ return client.getDocumentTags(sid, docId);
 	@Override
 	public WSFolder[] findFoldersByTag(String sid, String tag) throws Exception {
 		return client.findFoldersByTag(sid, tag);
+	}
+
+	@Override
+	public String[] getTagsPreset(String sid) throws Exception {
+		return client.getTagsPreset(sid);
 	}
 
 }

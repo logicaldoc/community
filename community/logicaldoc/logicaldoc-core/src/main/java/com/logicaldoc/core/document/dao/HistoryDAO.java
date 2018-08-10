@@ -11,7 +11,7 @@ import com.logicaldoc.core.document.History;
  * DAO for <code>History</code> handling.
  * 
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  */
 public interface HistoryDAO extends PersistentObjectDAO<History> {
 	/**

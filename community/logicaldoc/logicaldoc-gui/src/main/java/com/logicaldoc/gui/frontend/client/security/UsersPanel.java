@@ -15,6 +15,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationDialog;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -27,7 +28,6 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -47,16 +47,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows the list of users and a detail area.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class UsersPanel extends AdminPanel {
 
-	private ListGrid list;
-
-	private InfoPanel infoPanel;
-
-	private Layout listing;
+	private RefreshableListGrid list;
 
 	private Layout detailsContainer = null;
 
@@ -66,7 +62,10 @@ public class UsersPanel extends AdminPanel {
 
 	public UsersPanel() {
 		super("users");
+	}
 
+	@Override
+	public void onDraw() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
@@ -78,7 +77,10 @@ public class UsersPanel extends AdminPanel {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				refresh();
+				list.refresh(new UsersDS(null, true));
+				details = SELECT_USER;
+				detailsContainer.removeMembers(detailsContainer.getMembers());
+				detailsContainer.setMembers(details);
 			}
 		});
 		toolStrip.addSeparator();
@@ -121,21 +123,11 @@ public class UsersPanel extends AdminPanel {
 		});
 		toolStrip.addFill();
 
-		body.addMember(toolStrip);
-		refresh();
-	}
-
-	private void refresh() {
-		if (listing != null)
-			body.removeMember(listing);
-		if (detailsContainer != null)
-			body.removeMember(detailsContainer);
-
-		listing = new VLayout();
+		final Layout listing = new VLayout();
 
 		detailsContainer = new VLayout();
 
-		infoPanel = new InfoPanel("");
+		final InfoPanel infoPanel = new InfoPanel("");
 
 		// Initialize the listing panel as placeholder
 		listing.setAlign(Alignment.CENTER);
@@ -175,7 +167,7 @@ public class UsersPanel extends AdminPanel {
 		ListGridField groups = new ListGridField("groups", I18N.message("groups"), 200);
 		groups.setCanFilter(true);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
@@ -228,7 +220,7 @@ public class UsersPanel extends AdminPanel {
 			}
 		});
 
-		body.addMembers(listing, detailsContainer);
+		body.addMembers(toolStrip, listing, detailsContainer);
 	}
 
 	/**

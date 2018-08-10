@@ -12,7 +12,7 @@ import com.logicaldoc.core.AbstractCoreTCase;
 /**
  * Test case for <code>HibernateContactDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
 public class HibernateContactDAOTest extends AbstractCoreTCase {

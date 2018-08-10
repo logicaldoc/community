@@ -19,8 +19,8 @@ public class SoapSecurityClient extends SoapClient<SecurityService> implements S
 	}
 
 	@Override
-	public WSUser[] listUsers(String sid) throws Exception {
-		return client.listUsers(sid);
+	public WSUser[] listUsers(String sid, String group) throws Exception {
+		return client.listUsers(sid, group);
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class SoapSecurityClient extends SoapClient<SecurityService> implements S
 	public WSUser getUserByUsername(String sid, String username) throws Exception {
 		return client.getUserByUsername(sid, username);
 	}
-	
+
 	@Override
 	public WSGroup getGroup(String sid, long groupId) throws Exception {
 		return client.getGroup(sid, groupId);

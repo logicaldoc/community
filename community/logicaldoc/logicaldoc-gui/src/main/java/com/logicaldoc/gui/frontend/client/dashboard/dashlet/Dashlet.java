@@ -16,7 +16,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * A small window inside the dashboard.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.6
  */
 public class Dashlet extends Portlet {

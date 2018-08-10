@@ -29,7 +29,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the TemplateService
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class TemplateServiceImpl extends RemoteServiceServlet implements TemplateService {

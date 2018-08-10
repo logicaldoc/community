@@ -11,7 +11,7 @@ import com.logicaldoc.gui.common.client.Session;
  * GUI representation of an external call represented by an additional context
  * menu item
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public class GUIExternalCall implements Serializable {

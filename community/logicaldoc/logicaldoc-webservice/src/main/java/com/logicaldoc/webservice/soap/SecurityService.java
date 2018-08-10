@@ -12,7 +12,7 @@ import com.logicaldoc.webservice.model.WSUser;
 /**
  * Security Web Service definition interface
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 @WSDoc(description = "users and groups handling")
@@ -29,7 +29,7 @@ public interface SecurityService {
 	@WebMethod
 	@WebResult(name = "user")
 	@WSDoc(description = "gets all existing users")
-	public WSUser[] listUsers(@WebParam(name = "sid") String sid) throws Exception;
+	public WSUser[] listUsers(@WebParam(name = "sid") String sid, @WSDoc(description = "if not null, all the users that belong to this group will be returned") @WebParam(name = "group") String group) throws Exception;
 
 	/**
 	 * Gets group metadata of all existing groups.

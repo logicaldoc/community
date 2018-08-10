@@ -36,7 +36,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * SMTP E-Mail sender service
  * 
  * @author Michael Scholz
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  */
 public class EMailSender {
 	private static Logger log = LoggerFactory.getLogger(EMailSender.class);

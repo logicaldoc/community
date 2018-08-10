@@ -58,8 +58,8 @@ public class LinksDataServlet extends HttpServlet {
 
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			StringBuffer query = new StringBuffer(
-					"select A.id, B.folder.id, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type "
-							+ "from DocumentLink A, Document B where A.deleted = 0 and B.deleted = 0 ");
+					"select A.id, B.folder.id, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
+			query.append(" A.document1.folder.id, A.document2.folder.id from DocumentLink A, Document B where A.deleted = 0 and B.deleted = 0 ");
 			query.append(" and ((A.document1.id = B.id and A.document1.id = " + parentDocId + ")");
 			query.append(" or  (A.document2.id = B.id and A.document2.id = " + parentDocId + ")");
 			query.append(")");
@@ -81,6 +81,8 @@ public class LinksDataServlet extends HttpServlet {
 				writer.print("<folderId>" + cols[1] + "</folderId>");
 				writer.print("<type>" + cols[2] + "</type>");
 				writer.print("<parent>" + parent + "</parent>");
+				writer.print("<folderId1>" + cols[9] + "</folderId1>");
+				writer.print("<folderId2>" + cols[10] + "</folderId2>");
 				if (parentDocId.longValue() == (Long) cols[3]) {
 					writer.print("<documentId>" + parent + "-" + cols[6] + "</documentId>");
 					writer.print("<filename><![CDATA[" + (String) cols[7] + "]]></filename>");

@@ -207,7 +207,7 @@ public class FormDetailsPanel extends VLayout {
 				public void onSuccess(GUIDocument newForm) {
 					savePanel.setVisible(false);
 					if (form.getId() == 0L)
-						formsPanel.init();
+						formsPanel.refresh();
 					else if (newForm != null) {
 						formsPanel.updateRecord(newForm);
 						formsPanel.showFormDetails(newForm);

@@ -45,9 +45,9 @@ public class ReportParametersForm extends Window {
 
 	private GUIAttribute[] parameters;
 
-	private ReportsPanel panel;
+	private CustomReportsPanel panel;
 
-	public ReportParametersForm(GUIReport form, ReportsPanel panel) {
+	public ReportParametersForm(GUIReport form, CustomReportsPanel panel) {
 		this.report = form;
 		this.panel = panel;
 

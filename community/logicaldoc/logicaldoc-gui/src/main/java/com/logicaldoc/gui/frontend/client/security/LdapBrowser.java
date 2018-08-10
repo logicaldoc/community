@@ -36,7 +36,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel is used to perform user searches in the LDAP repositories
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
 public class LdapBrowser extends VLayout {
@@ -57,7 +57,10 @@ public class LdapBrowser extends VLayout {
 
 	public LdapBrowser() {
 		setWidth100();
+	}
 
+	@Override
+	public void onDraw() {
 		DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
 		form.setAlign(Alignment.LEFT);
@@ -88,7 +91,7 @@ public class LdapBrowser extends VLayout {
 		search.setWidth100();
 		search.setMargin(10);
 
-		ListGridField usernameField = new ListGridField("username", I18N.message("username"), 80);
+		ListGridField usernameField = new ListGridField("username", I18N.message("username"), 100);
 		usernameField.setCanFilter(true);
 
 		ListGridField nameField = new ListGridField("name", I18N.message("name"), 150);

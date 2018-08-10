@@ -11,13 +11,12 @@ import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
+import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.core.Rectangle;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
@@ -27,17 +26,14 @@ import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.FormItemIcon;
-import com.smartgwt.client.widgets.form.fields.PickerIcon;
-import com.smartgwt.client.widgets.form.fields.PickerIcon.Picker;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 public class RatingDialog extends Window {
@@ -81,89 +77,74 @@ public class RatingDialog extends Window {
 		ratingForm.setNumCols(1);
 		ratingForm.setValuesManager(vm);
 
-		FormItemIcon ratingIcon = ItemFactory.newItemIcon("rating" + this.docRating + ".png");
-		StaticTextItem actualRating = ItemFactory.newStaticTextItem("actualrating", "actualrating", "");
-		actualRating.setIcons(ratingIcon);
-		actualRating.setEndRow(true);
-		actualRating.setIconWidth(88);
+		StaticTextItem actualRating = ItemFactory.newStaticTextItem("actualrating", "actualrating",
+				DocUtil.getRatingIcon(documentRating));
 
 		final StaticTextItem totalVotes = ItemFactory.newStaticTextItem("totalvotes", "totalvotes", this.rating
-				.getCount().toString());
+				.getCount().toString() + "&nbsp;&nbsp;" + AwesomeFactory.getIconHtml("eye"));
 		totalVotes.setWrapTitle(false);
 		totalVotes.setWrap(false);
 		totalVotes.setEndRow(true);
 		totalVotes.setAlign(Alignment.LEFT);
+		totalVotes.setPrompt(I18N.message("showvoters"));
+		totalVotes.addClickHandler(new ClickHandler() {
 
-		final PickerIcon searchPicker = new PickerIcon(new Picker("[SKIN]/actions/search.png"),
-				new FormItemClickHandler() {
-					public void onFormItemClick(FormItemIconClickEvent event) {
+			@Override
+			public void onClick(ClickEvent event) {
+				ListGridField vote = new ListGridField("vote", I18N.message("vote"), 94);
+				vote.setAlign(Alignment.CENTER);
+				vote.setCellFormatter(new CellFormatter() {
 
-						ListGridField vote = new ListGridField("vote", I18N.message("vote"), 94);
-						vote.setAlign(Alignment.CENTER);
-						vote.setType(ListGridFieldType.IMAGE);
-						vote.setImageURLPrefix(Util.imagePrefix() + "/rating");
-						vote.setImageURLSuffix(".png");
-						vote.setImageWidth(90);
-
-						ListGridField user = new ListGridField("user", I18N.message("user"), 140);
-						ListGridField date = new ListGridField("date", I18N.message("date"));
-						date.setAlign(Alignment.CENTER);
-						date.setCellFormatter(new DateCellFormatter(true));
-
-						ListGrid votesGrid = new ListGrid();
-						votesGrid.setWidth100();
-						votesGrid.setHeight100();
-						votesGrid.setAutoFetchData(true);
-						votesGrid.setDataSource(new RatingsDS(rating.getDocId()));
-						votesGrid.setFields(date, user, vote);
-
-						final Window dialog = new Window();
-						dialog.setAutoCenter(true);
-						dialog.setIsModal(true);
-						dialog.setShowHeader(false);
-						dialog.setShowEdges(false);
-						dialog.setWidth(340);
-						dialog.setHeight(200);
-						dialog.setCanDragResize(true);
-						dialog.setDismissOnEscape(true);
-						dialog.addItem(votesGrid);
-						dialog.addDoubleClickHandler(new DoubleClickHandler() {
-
-							@Override
-							public void onDoubleClick(DoubleClickEvent event) {
-								dialog.destroy();
-							}
-						});
-
-						dialog.show();
-
-						// get global coordinates of the clicked picker icon
-						Rectangle iconRect = totalVotes.getIconPageRect(event.getIcon());
-						dialog.moveTo(iconRect.getLeft(), iconRect.getTop());
-
+					@Override
+					public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+						return DocUtil.getRatingIcon((Integer) value);
 					}
 				});
-		searchPicker.setPrompt(I18N.message("showvoters"));
-		totalVotes.setIcons(searchPicker);
-		totalVotes.setIconHSpace(2);
+
+				ListGridField user = new ListGridField("user", I18N.message("user"), 140);
+				ListGridField date = new ListGridField("date", I18N.message("date"));
+				date.setAlign(Alignment.CENTER);
+				date.setCellFormatter(new DateCellFormatter(true));
+
+				ListGrid votesGrid = new ListGrid();
+				votesGrid.setWidth100();
+				votesGrid.setHeight100();
+				votesGrid.setAutoFetchData(true);
+				votesGrid.setDataSource(new RatingsDS(rating.getDocId()));
+				votesGrid.setFields(date, user, vote);
+
+				final Window dialog = new Window();
+				dialog.setAutoCenter(true);
+				dialog.setIsModal(true);
+				dialog.setShowHeader(false);
+				dialog.setShowEdges(false);
+				dialog.setWidth(340);
+				dialog.setHeight(200);
+				dialog.setCanDragResize(true);
+				dialog.setDismissOnEscape(true);
+				dialog.addItem(votesGrid);
+				dialog.addDoubleClickHandler(new DoubleClickHandler() {
+
+					@Override
+					public void onDoubleClick(DoubleClickEvent event) {
+						dialog.destroy();
+					}
+				});
+
+				dialog.show();
+			}
+		});
 
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		for (int i = 1; i <= 5; i++)
-			map.put("" + i, "" + i);
+			map.put("" + i, DocUtil.getRatingIcon(i));
 
 		final SelectItem yourVote = new SelectItem("stars", I18N.message("yourvote"));
 		yourVote.setWrapTitle(false);
 		yourVote.setWidth(120);
 		yourVote.setValueMap(map);
 		yourVote.setPickListWidth(90);
-
-		LinkedHashMap<String, String> valueIcons = new LinkedHashMap<String, String>();
-		for (int i = 1; i <= 5; i++)
-			valueIcons.put("" + i, "rating" + i);
-		yourVote.setImageURLPrefix(Util.imagePrefix());
-		yourVote.setImageURLSuffix(".png");
-		yourVote.setValueIcons(valueIcons);
-		yourVote.setValueIconWidth(80);
+		yourVote.setPickListHeight(130);
 
 		ButtonItem vote = new ButtonItem();
 		vote.setTitle(I18N.message("vote"));

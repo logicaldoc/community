@@ -37,7 +37,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 /**
  * This panel shows the subscriptions on a document.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1.3
  */
 public class DocumentSubscriptionsPanel extends DocumentDetailTab {
@@ -48,6 +48,10 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 
 	public DocumentSubscriptionsPanel(final GUIDocument document) {
 		super(document, null);
+	}
+
+	@Override
+	protected void onDraw() {
 		addMember(container);
 		refresh();
 	}

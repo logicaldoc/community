@@ -3,6 +3,7 @@ package com.logicaldoc.gui.common.client.log;
 import com.logicaldoc.gui.common.client.beans.GUIEvent;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -18,7 +19,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 /**
  * Shows the events list
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class EventsWindow extends Window {
@@ -38,7 +39,7 @@ public class EventsWindow extends Window {
 		});
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, trash, HeaderControls.CLOSE_BUTTON);
-		setTitle(I18N.message("lastevents"));
+		setTitle(AwesomeFactory.getIconHtml("clipboard-list", "lastevents"));
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);

@@ -29,7 +29,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel is used to show the user a list of search results
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SearchPanel extends HLayout implements SearchObserver, DocumentObserver {
@@ -48,26 +48,41 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	private SearchPreviewPanel previewPanel;
 
+	private boolean drawn = false;
+
 	private SearchPanel() {
-		Search.get().addObserver(this);
-
-		DocumentController.get().addObserver(this);
-
 		setWidth100();
 		setOverflow(Overflow.HIDDEN);
 
+		Search.get().addObserver(this);
+		DocumentController.get().addObserver(this);
+	}
+
+	public static SearchPanel get() {
+		if (instance == null)
+			instance = new SearchPanel();
+		return instance;
+	}
+
+	@Override
+	public void onDraw() {
+		if (drawn)
+			return;
+		drawn = true;
+	
 		// Prepare the collapsable menu
 		SearchMenu searchMenu = SearchMenu.get();
 		searchMenu.setWidth(350);
 		searchMenu.setShowResizeBar(true);
 
+		
 		// Initialize the listing panel as placeholder
 		listingPanel = new HitsListPanel();
 		content.setAlign(Alignment.CENTER);
 		content.setHeight("51%");
 		content.setShowResizeBar(true);
 		content.addMember(listingPanel);
-
+		
 		// Add a details panel under the listing one
 		detailPanel = new Label("&nbsp;" + I18N.message("selectahit"));
 		details.setAlign(Alignment.CENTER);
@@ -87,16 +102,10 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 					previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
 			}
 		});
-
+		
 		setMembers(searchMenu, body, previewPanel);
 
 		setShowEdges(false);
-	}
-
-	public static SearchPanel get() {
-		if (instance == null)
-			instance = new SearchPanel();
-		return instance;
 	}
 
 	public void onSelectedDocumentHit(long id) {
@@ -221,7 +230,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	public void onDocumentMoved(GUIDocument document) {
 		// Nothing to do
 	}
-	
+
 	@Override
 	public void onDocumentCheckedIn(GUIDocument document) {
 		onDocumentModified(document);
@@ -245,5 +254,27 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	@Override
 	public void onDocumentStored(GUIDocument document) {
 
+	}
+
+	@Override
+	public void destroy() {
+		DocumentController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		destroy();
+	}
+
+	@Override
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
 	}
 }

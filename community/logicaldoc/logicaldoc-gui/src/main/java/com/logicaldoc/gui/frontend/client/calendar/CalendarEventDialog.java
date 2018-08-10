@@ -58,7 +58,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This is the form used for editing a calendar event.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public class CalendarEventDialog extends Window {

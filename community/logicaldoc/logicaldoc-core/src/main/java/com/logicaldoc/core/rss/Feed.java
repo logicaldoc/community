@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Stores an RSS feed
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.1
  */
 public class Feed {

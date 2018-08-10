@@ -9,7 +9,7 @@ import com.logicaldoc.core.security.UserHistory;
 /**
  * DAO for <code>UserHistory</code> handling.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.0
  */
 public interface UserHistoryDAO extends PersistentObjectDAO<UserHistory> {

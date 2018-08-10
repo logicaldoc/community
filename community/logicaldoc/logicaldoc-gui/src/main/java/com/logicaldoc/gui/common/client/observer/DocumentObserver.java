@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 /**
  * Listener on documents events
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public interface DocumentObserver {

@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FormService;
@@ -45,45 +46,34 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class FormsPanel extends AdminPanel {
 
-	private Layout listing = new VLayout();
-
 	private Layout detailsContainer = new VLayout();
 
-	private ListGrid list;
+	private RefreshableListGrid list;
 
 	private Canvas details = SELECT_FORM;
-
-	private InfoPanel infoPanel;
 
 	final static Canvas SELECT_FORM = new HTMLPanel("&nbsp;" + I18N.message("selectform"));
 
 	public FormsPanel() {
 		super("forms");
-		infoPanel = new InfoPanel("");
-		init();
 	}
 
-	public void init() {
-		detailsContainer.clear();
-		listing.clear();
-		if (list != null)
-			listing.removeMember(list);
-		if (details != null && details instanceof FormDetailsPanel) {
-			detailsContainer.removeMember(details);
-			details = SELECT_FORM;
-		}
-
+	@Override
+	public void onDraw() {
 		// Initialize the listing panel
+		Layout listing = new VLayout();
 		listing.setAlign(Alignment.CENTER);
 		listing.setHeight("60%");
 		listing.setShowResizeBar(true);
+
+		final InfoPanel infoPanel = new InfoPanel("");
 
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -112,7 +102,7 @@ public class FormsPanel extends AdminPanel {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				init();
+				refresh();
 			}
 		});
 
@@ -260,5 +250,12 @@ public class FormsPanel extends AdminPanel {
 		form.setId(Long.parseLong(record.getAttributeAsString("id")));
 		form.setFileName(record.getAttributeAsString("name"));
 		return form;
+	}
+
+	public void refresh() {
+		list.refresh(new FormsDS());
+		detailsContainer.removeMembers(detailsContainer.getMembers());
+		details = SELECT_FORM;
+		detailsContainer.setMembers(details);
 	}
 }

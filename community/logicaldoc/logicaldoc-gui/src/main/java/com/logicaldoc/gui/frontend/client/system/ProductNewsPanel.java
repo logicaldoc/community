@@ -34,19 +34,21 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows the list of feed messages and allows the selection.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public class ProductNewsPanel extends AdminPanel {
 
 	private ListGrid list;
 
-	private Layout listing = new VLayout();
-
 	public ProductNewsPanel() {
 		super("task.name.ProductNews");
+	}
 
+	@Override
+	public void onDraw() {
 		// Initialize the listing panel as placeholder
+		final Layout listing = new VLayout();
 		listing.setAlign(Alignment.CENTER);
 		listing.setHeight100();
 		initListGrid();
@@ -117,15 +119,6 @@ public class ProductNewsPanel extends AdminPanel {
 		});
 		toolStrip.addFill();
 
-		body.setMembers(toolStrip, listing);
-	}
-
-	private void initListGrid() {
-		if (list != null) {
-			listing.removeMember(list);
-			list.destroy();
-		}
-
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
@@ -186,6 +179,12 @@ public class ProductNewsPanel extends AdminPanel {
 						"location=no,status=no,toolbar=no,menubar=no,resizable=yes,scrollbars=yes");
 			}
 		});
+
+		body.setMembers(toolStrip, listing);
+	}
+
+	private void initListGrid() {
+
 	}
 
 	private void showContextMenu() {

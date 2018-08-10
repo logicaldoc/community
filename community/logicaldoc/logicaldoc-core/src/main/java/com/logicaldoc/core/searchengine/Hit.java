@@ -5,7 +5,7 @@ import com.logicaldoc.core.document.Document;
 /**
  * Search result
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 5.2
  */
 public class Hit extends Document implements Comparable<Hit> {

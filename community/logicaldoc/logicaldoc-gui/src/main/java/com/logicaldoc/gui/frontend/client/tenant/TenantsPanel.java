@@ -44,16 +44,12 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows the list of tenants and a details area.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
 public class TenantsPanel extends AdminPanel {
 
 	private ListGrid list;
-
-	private InfoPanel infoPanel;
-
-	private Layout listing = new VLayout();
 
 	private Layout detailsContainer = new VLayout();
 
@@ -63,10 +59,14 @@ public class TenantsPanel extends AdminPanel {
 
 	public TenantsPanel() {
 		super("tenants");
+	}
 
-		infoPanel = new InfoPanel("");
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
 
 		// Initialize the listing panel as placeholder
+		final Layout listing = new VLayout();
 		listing.setAlign(Alignment.CENTER);
 		listing.setHeight("50%");
 		listing.setShowResizeBar(true);
@@ -284,5 +284,4 @@ public class TenantsPanel extends AdminPanel {
 		contextMenu.setItems(password, delete);
 		contextMenu.showContextMenu();
 	}
-
 }

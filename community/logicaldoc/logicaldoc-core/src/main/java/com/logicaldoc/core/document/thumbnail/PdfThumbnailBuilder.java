@@ -18,7 +18,7 @@ import com.logicaldoc.util.io.FileUtil;
 /**
  * This builder generates the thumbnail for a Pdf document.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class PdfThumbnailBuilder extends ImageThumbnailBuilder {

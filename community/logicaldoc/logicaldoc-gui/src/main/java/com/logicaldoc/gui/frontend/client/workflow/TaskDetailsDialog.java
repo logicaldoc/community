@@ -38,6 +38,7 @@ import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.HTMLPane;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
@@ -71,7 +72,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * This popup window is used to visualize the details of a selected task in a
  * specific workflow instance.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class TaskDetailsDialog extends Window {
@@ -128,7 +129,7 @@ public class TaskDetailsDialog extends Window {
 
 		setTitle(I18N.message("workflow"));
 		setWidth(700);
-		setHeight(400);
+		setHeight(420);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -209,6 +210,10 @@ public class TaskDetailsDialog extends Window {
 		workflowTitle.setWrapTitle(false);
 		workflowTitle.setShowTitle(false);
 
+		StaticTextItem workflowInstanceId = ItemFactory.newStaticTextItem("workflowInstanceId", I18N.message("id"),
+				workflow.getId());
+		workflowInstanceId.setShouldSaveValue(false);
+		
 		StaticTextItem workflowName = ItemFactory.newStaticTextItem("workflowName", I18N.message("name"),
 				workflow.getName());
 		workflowName.setShouldSaveValue(false);
@@ -227,7 +232,7 @@ public class TaskDetailsDialog extends Window {
 		if (workflow.getEndDate() != null)
 			endDate.setValue(I18N.formatDate((Date) workflow.getEndDate()));
 
-		workflowForm.setItems(workflowTitle, workflowName, workflowTag, workflowDescription, startDate, endDate);
+		workflowForm.setItems(workflowTitle, workflowInstanceId, workflowName, workflowTag, workflowDescription, startDate, endDate);
 		sxLayout.addMember(workflowForm);
 
 		// Task section
@@ -277,8 +282,9 @@ public class TaskDetailsDialog extends Window {
 		HLayout spacer = new HLayout();
 		spacer.setHeight(5);
 
-		Button reassignButton = new Button(I18N.message("workflowtaskreassign"));
+		IButton reassignButton = new IButton(I18N.message("workflowtaskreassign"));
 		reassignButton.setAutoFit(true);
+		reassignButton.setMargin(2);
 		reassignButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
 			@Override
@@ -337,7 +343,7 @@ public class TaskDetailsDialog extends Window {
 			}
 		});
 
-		Button takeButton = new Button(I18N.message("workflowtasktake"));
+		IButton takeButton = new IButton(I18N.message("workflowtasktake"));
 		takeButton.setAutoFit(true);
 		takeButton.setMargin(2);
 		takeButton.setVisible(!(workflow.getSelectedTask().getPooledActors() == null || workflow.getSelectedTask()
@@ -365,7 +371,7 @@ public class TaskDetailsDialog extends Window {
 			}
 		});
 
-		Button turnBackButton = new Button(I18N.message("workflowtaskturnback"));
+		IButton turnBackButton = new IButton(I18N.message("workflowtaskturnback"));
 		turnBackButton.setAutoFit(true);
 		turnBackButton.setMargin(2);
 		turnBackButton.setVisible(!(workflow.getSelectedTask().getPooledActors() == null || workflow.getSelectedTask()
@@ -404,11 +410,36 @@ public class TaskDetailsDialog extends Window {
 			}
 		});
 
+		IButton completionDiagram = new IButton(I18N.message("completiondiagram"));
+		completionDiagram.setAutoFit(true);
+		completionDiagram.setMargin(2);
+		completionDiagram.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+			@Override
+			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+				WorkflowService.Instance.get().getCompletionDiagram(wfl.getName(), wfl.getId(), new AsyncCallback<GUIWorkflow>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+					}
+					
+					@Override
+					public void onSuccess(GUIWorkflow workflow) {
+						WorkflowCompletionWindow diagramWindow = new WorkflowCompletionWindow(workflow);
+						diagramWindow.show();		
+					}
+				});
+				
+			}
+		});
+				
 		if (workflow.getSelectedTask().getEndDate() == null) {
 			buttonsPanel.addMember(spacer);
 			buttonsPanel.addMember(reassignButton);
 			buttonsPanel.addMember(takeButton);
 			buttonsPanel.addMember(turnBackButton);
+			buttonsPanel.addMember(spacer);
+			buttonsPanel.addMember(completionDiagram);
 
 			if (workflow.getSelectedTask().getTaskState().equals("started")
 					&& workflow.getSelectedTask().getOwner() != null) {
@@ -464,8 +495,12 @@ public class TaskDetailsDialog extends Window {
 
 			buttonsPanel.addMember(spacer);
 			buttonsPanel.addMember(taskEndedForm);
+			
+			buttonsPanel.addMember(spacer);
+			buttonsPanel.addMember(completionDiagram);
 		}
 
+		
 		form.addMember(sxLayout);
 
 		workflowTab.setPane(form);

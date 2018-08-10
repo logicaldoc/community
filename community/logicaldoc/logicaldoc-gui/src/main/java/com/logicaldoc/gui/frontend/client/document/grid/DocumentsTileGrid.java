@@ -1,9 +1,13 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
@@ -34,7 +38,7 @@ import com.smartgwt.client.widgets.viewer.DetailViewerField;
 /**
  * Grid used to show a documents gallery during navigation or searches.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.0
  */
 public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, DocumentObserver {
@@ -42,7 +46,9 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	private GUIFolder folder = null;
 
-	public DocumentsTileGrid(GUIFolder folder, final DataSource ds, final int totalRecords) {
+	private List<DetailViewerField> fields = new ArrayList<DetailViewerField>();
+
+	public DocumentsTileGrid(GUIFolder folder, final DataSource ds) {
 		this.folder = folder;
 		setTileWidth(200);
 		setTileHeight(250);
@@ -50,6 +56,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		setSelectionType(SelectionStyle.MULTIPLE);
 		setShowAllRecords(false);
 		setCanReorderTiles(false);
+		setCanDrag(folder.isMove());
 		setWidth100();
 
 		DetailViewerField thumbnail = new DetailViewerField("thumbnail");
@@ -69,8 +76,8 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 						if (!record.getAttributeAsBoolean("password") || DocumentProtectionManager.isUnprotected(docId))
 							return Util.tileImageHTML(docId, null, null, tileSize);
 						else
-							return Util.imageHTML("blank.png", null, "width:" + tileSize + "px height:" + tileSize
-									+ "px");
+							return Util.imageHTML("blank.png", null,
+									"width:" + tileSize + "px height:" + tileSize + "px");
 					}
 				} catch (Throwable e) {
 					return "";
@@ -92,32 +99,27 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 					html += "<table align='center' border='0' cellspacing='0'><tr>";
 
 					// The status row
-					html += "<td>"
-							+ Util.imageHTML(DocUtil.getBookmarkedIcon(record.getAttributeAsBoolean("bookmarked")))
-							+ "</td>";
-					html += "<td>" + Util.imageHTML(DocUtil.getIndexedIcon(record.getAttributeAsInt("indexed")))
-							+ "</td>";
+					if (record.getAttributeAsBoolean("bookmarked"))
+						html += "<td>" + DocUtil.getBookmarkedIcon(record.getAttributeAsBoolean("bookmarked"))
+								+ "</td>";
+					html += "<td>" + DocUtil.getIndexedIcon(record.getAttributeAsInt("indexed")) + "</td>";
 
 					// The locked icon
 					if (record.getAttribute("status") != null) {
 						Integer status = record.getAttributeAsInt("status");
 						if (status != null && status.intValue() > 0) {
-							String alt = null;
+							String alt = "";
 							if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
 								alt = I18N.message("lockedby") + " " + record.getAttributeAsString("lockUser");
-							html += "<td>" + Util.imageHTML(DocUtil.getLockedIcon(status), alt, null) + "</td>";
+							html += "<td><span title='" + alt + "'>" + DocUtil.getLockedIcon(status) + "</span></td>";
 						}
 					}
 
-					html += "<td>"
-							+ Util.imageHTML(DocUtil.getPasswordProtectedIcon(record.getAttributeAsBoolean("password")))
+					html += "<td>" + DocUtil.getPasswordProtectedIcon(record.getAttributeAsBoolean("password"))
 							+ "</td>";
-					html += "<td>" + Util.imageHTML(DocUtil.getImmutableIcon(record.getAttributeAsInt("immutable")))
-							+ "</td>";
-					html += "<td>" + Util.imageHTML(DocUtil.getSignedIcon(record.getAttributeAsInt("signed")))
-							+ "</td>";
-					html += "<td>" + Util.imageHTML(DocUtil.getStampedIcon(record.getAttributeAsInt("stamped")))
-							+ "</td>";
+					html += "<td>" + DocUtil.getImmutableIcon(record.getAttributeAsInt("immutable")) + "</td>";
+					html += "<td>" + DocUtil.getSignedIcon(record.getAttributeAsInt("signed")) + "</td>";
+					html += "<td>" + DocUtil.getStampedIcon(record.getAttributeAsInt("stamped")) + "</td>";
 					html += "</tr></table>";
 
 					return html;
@@ -127,7 +129,9 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			}
 		});
 
-		setFields(thumbnail, filename);
+		fields.add(thumbnail);
+		fields.add(filename);
+		setFields(fields.toArray(new DetailViewerField[0]));
 
 		if (ds == null) {
 			/*
@@ -144,7 +148,6 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			public void onDataArrived(DataArrivedEvent event) {
 				if (cursor != null) {
 					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
-					cursor.setTotalRecords(totalRecords);
 				}
 
 				sortByProperty("filename", true);
@@ -339,11 +342,6 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public void setCursor(Cursor cursor) {
-		this.cursor = cursor;
-	}
-
-	@Override
 	public void onDocumentSelected(GUIDocument document) {
 	}
 
@@ -414,18 +412,51 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public void destroy() {
-		DocumentController.get().removeObserver(this);
-		super.destroy();
+	public GUIFolder getFolder() {
+		return folder;
 	}
 
 	@Override
-	protected void finalize() {
+	public void destroy() {
+		DocumentController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
 		destroy();
 	}
-	
+
 	@Override
-	public GUIFolder getFolder() {
-		return folder;
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
+	}
+
+	@Override
+	public void fetchNewData(DocumentsDS ds) {
+		if (ds.getFolder() != null) {
+			this.folder = ds.getFolder();
+			setCanDrag(folder.isMove());
+		}
+		getDataSource().destroy();
+		setDataSource(ds, fields.toArray(new DetailViewerField[0]));
+		fetchData();
+		redraw();
+	}
+
+	@Override
+	public void setGridCursor(Cursor gridCursor) {
+		this.cursor = gridCursor;
+	}
+
+	@Override
+	public Cursor getGridCursor() {
+		return cursor;
 	}
 }

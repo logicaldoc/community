@@ -28,7 +28,7 @@ import com.logicaldoc.util.Context;
 /**
  * Repository of all current user sessions.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.6
  */
 public class SessionManager extends ConcurrentHashMap<String, Session> {
@@ -103,9 +103,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 					sessionDao.store(dbSession);
 				}
 			}
-		} catch (org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException fe1) {
+		} catch (org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException fe1) {
 			// May happen, forget it.
-		} catch (org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException fe2) {
+		} catch (org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException fe2) {
 			// May happen, forget it.
 		} catch (Throwable t) {
 			log.warn(t.getMessage(), t);

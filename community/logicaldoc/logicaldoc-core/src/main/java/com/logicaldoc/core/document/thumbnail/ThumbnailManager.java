@@ -23,7 +23,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 /**
  * Manager class used to handle document thumbnails
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class ThumbnailManager {

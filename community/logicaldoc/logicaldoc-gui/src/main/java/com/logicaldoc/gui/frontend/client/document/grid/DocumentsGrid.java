@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.grid;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
@@ -10,7 +11,7 @@ import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 /**
  * Shows a view on a collecion of documents
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * 
  * @since 7.0
  */
@@ -110,7 +111,9 @@ public interface DocumentsGrid {
 	/**
 	 * Defines the cursor widget this grid will have to interact to
 	 */
-	public void setCursor(Cursor cursor);
+	public void setGridCursor(Cursor cursor);
+	
+	public Cursor getGridCursor();
 
 	/**
 	 * Defines the handler for double clicks. Implementations must check if the
@@ -133,4 +136,12 @@ public interface DocumentsGrid {
 	public void registerDataArrivedHandler(DataArrivedHandler handler);
 
 	public GUIFolder getFolder();
+	
+	public void destroy();
+	
+	
+	/**
+	 * Replace the actual data with a new source.
+	 */
+	public void fetchNewData(DocumentsDS ds);
 }

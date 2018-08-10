@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * A user's bookmark
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIBookmark implements Serializable {

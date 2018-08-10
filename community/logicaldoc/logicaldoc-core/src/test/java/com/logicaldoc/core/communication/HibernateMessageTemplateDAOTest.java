@@ -14,7 +14,7 @@ import com.logicaldoc.core.AbstractCoreTCase;
 /**
  * Test case for <code>HibernateMessageTemplateDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class HibernateMessageTemplateDAOTest extends AbstractCoreTCase {

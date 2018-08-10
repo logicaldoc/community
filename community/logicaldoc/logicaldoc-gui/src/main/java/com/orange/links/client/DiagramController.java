@@ -9,6 +9,7 @@ import com.allen_sauer.gwt.dnd.client.DragController;
 import com.allen_sauer.gwt.dnd.client.DragEndEvent;
 import com.allen_sauer.gwt.dnd.client.DragHandlerAdapter;
 import com.allen_sauer.gwt.dnd.client.DragStartEvent;
+import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Position;
@@ -36,6 +37,7 @@ import com.logicaldoc.gui.frontend.client.workflow.StateWidget;
 import com.orange.links.client.canvas.BackgroundCanvas;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.canvas.MultiBrowserDiagramCanvas;
+import com.orange.links.client.connection.AbstractConnection;
 import com.orange.links.client.connection.Connection;
 import com.orange.links.client.connection.ConnectionFactory;
 import com.orange.links.client.event.ChangeOnDiagramEvent;
@@ -92,7 +94,8 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	 * running in development mode or in the web mode
 	 */
 	public static int refreshRate = 80;
-		//GWT.isScript() ? 25 : 50;
+
+	// GWT.isScript() ? 25 : 50;
 
 	private DiagramCanvas topCanvas;
 
@@ -106,7 +109,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 	private HandlerManager handlerManager;
 
-	private boolean showGrid=false;
+	private boolean showGrid = false;
 
 	private ContextMenu canvasMenu;
 
@@ -186,7 +189,6 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		ContextMenu.disableBrowserContextMenu(widgetPanel.asWidget().getElement());
 		ContextMenu.disableBrowserContextMenu(topCanvas.asWidget().getElement());
 	}
-
 
 	protected void initMouseHandlers(final DiagramCanvas canvas) {
 		canvas.addDomHandler(new MouseMoveHandler() {
@@ -272,13 +274,16 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget, String name) {
 		Connection c = drawConnection(ConnectionFactory.ARROW, startWidget, endWidget);
 		functionsMap.get(startWidget).put(endWidget, c);
-		StateWidget widget = new StateWidget(c, this, name != null ? name : I18N.message("transitionname"));
+		StateWidget widget = new StateWidget(c, this, name != null ? name : I18N.message("transitionname"), null);
 		addDecoration(widget, c);
 		return c;
 	}
 
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget, GUITransition transition) {
 		Connection c = drawConnection(ConnectionFactory.ARROW, startWidget, endWidget);
+		if (transition.getColor() != null)
+			((AbstractConnection) c).connectionColor = CssColor.make(transition.getColor());
+
 		functionsMap.get(startWidget).put(endWidget, c);
 		StateWidget widget = new StateWidget(c, this, transition);
 		addDecoration(widget, c);
@@ -731,7 +736,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 			if (functionUnderMouse != null) {
 				Widget widgetSelected = functionUnderMouse.asWidget();
 				if (startFunctionWidget != widgetSelected) {
-					Connection c = drawStraightArrowConnection(startFunctionWidget, widgetSelected, (String)null);
+					Connection c = drawStraightArrowConnection(startFunctionWidget, widgetSelected, (String) null);
 					fireEvent(new TieLinkEvent(startFunctionWidget, widgetSelected, c));
 				}
 			}
@@ -920,7 +925,7 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 			if (link.type != null && link.type.equals("straight")) {
 				c = drawStraightConnection(w1, w2);
 			} else {
-				c = drawStraightArrowConnection(w1, w2, (String)null);
+				c = drawStraightArrowConnection(w1, w2, (String) null);
 			}
 			if (link.decoration != null) {
 				addDecoration(saveFactory.getDecorationByType(link.decoration.identifier, link.decoration.content), c);

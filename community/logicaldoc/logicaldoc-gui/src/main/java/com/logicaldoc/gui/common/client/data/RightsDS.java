@@ -8,7 +8,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 /**
  * Datasource to handle rights on a folder. It is based on Xml parsing
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class RightsDS extends DataSource {
@@ -35,10 +35,12 @@ public class RightsDS extends DataSource {
 		DataSourceBooleanField calendar = new DataSourceBooleanField("calendar");
 		DataSourceBooleanField subscription = new DataSourceBooleanField("subscription");
 		DataSourceBooleanField password = new DataSourceBooleanField("password");
+		DataSourceBooleanField move = new DataSourceBooleanField("move");
+		DataSourceBooleanField email = new DataSourceBooleanField("email");
 		DataSourceTextField type = new DataSourceTextField("type");
 
-		setFields(entityId, entity, read, print, write, delete, add, workflow, sign, _import, export, rename,
-				immutable, security, password, archive, type, download, calendar, subscription);
+		setFields(entityId, entity, read, print, write, delete, move, add, workflow, sign, _import, export, rename,
+				immutable, security, password, archive, type, download, email, calendar, subscription);
 		setClientOnly(true);
 		setDataURL("data/rights.xml?" + (folder ? "folderId" : "menuId") + "=" + id + "&locale=" + I18N.getLocale());
 	}

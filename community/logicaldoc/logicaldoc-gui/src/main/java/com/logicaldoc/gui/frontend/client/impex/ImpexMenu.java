@@ -3,9 +3,9 @@ package com.logicaldoc.gui.frontend.client.impex;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
-import com.logicaldoc.gui.frontend.client.impex.accounts.EmailAccountsPanel;
 import com.logicaldoc.gui.frontend.client.impex.archives.ExportArchivesPanel;
 import com.logicaldoc.gui.frontend.client.impex.archives.ImportArchivesPanel;
+import com.logicaldoc.gui.frontend.client.impex.email.EmailAccountsPanel;
 import com.logicaldoc.gui.frontend.client.impex.folders.ImportFoldersPanel;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -15,7 +15,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the administration of import/export features.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class ImpexMenu extends VLayout {

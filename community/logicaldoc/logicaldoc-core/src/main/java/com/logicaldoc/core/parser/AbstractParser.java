@@ -21,87 +21,22 @@ import com.logicaldoc.util.Context;
 /**
  * Abstract implementation of a Parser
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5
  */
 public abstract class AbstractParser implements Parser {
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractParser.class);
 
-	protected StringBuffer content = new StringBuffer();
-
-	protected String filename;
-
-	protected Locale locale;
-
-	protected String encoding;
-
-	protected String tenant = Tenant.DEFAULT_NAME;
-
 	@Override
-	public String getAuthor() {
-		return "";
-	}
-
-	@Override
-	public String getContent() {
-		return content.toString();
-	}
-
-	@Override
-	public String getTags() {
-		return "";
-	}
-
-	@Override
-	public String getSourceDate() {
-		return "";
-	}
-
-	@Override
-	public String getTitle() {
-		return "";
-	}
-
-	@Override
-	public String getVersion() {
-		return "";
-	}
-
-	public String getFilename() {
-		return filename;
-	}
-
-	public void setFilename(String filename) {
-		this.filename = filename;
-	}
-
-	public Locale getLocale() {
-		return locale;
-	}
-
-	public void setLocale(Locale locale) {
-		this.locale = locale;
-	}
-
-	public String getEncoding() {
-		return encoding;
-	}
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}
-
-	@Override
-	public void parse(File file) {
-		String enc = "UTF-8";
+	public String parse(File file, String filename, String encoding, Locale locale, String tenant) {
 		InputStream is = null;
 		try {
 			is = new FileInputStream(file);
-			setEncoding(enc);
-			parse(is);
+			return parse(is, filename, encoding, locale, tenant);
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());
+			return "";
 		} finally {
 			if (is != null)
 				try {
@@ -112,22 +47,24 @@ public abstract class AbstractParser implements Parser {
 	}
 
 	@Override
-	public void parse(final InputStream input) {
+	public String parse(final InputStream input, String filename, String encoding, Locale locale, String tenant) {
 		log.debug("Parse started");
-		content = new StringBuffer();
+		StringBuffer content = new StringBuffer();
+
+		Locale lcl = locale != null ? locale : Locale.ENGLISH;
+		String tnt = locale != null ? tenant : Tenant.DEFAULT_NAME;
 
 		long timeout = 0;
 
 		try {
-			timeout = Context.get().getProperties().getInt(getTenant() + ".parser.timeout", 120);
+			timeout = Context.get().getProperties().getInt(tenant + ".parser.timeout", 120);
 		} catch (Throwable e) {
-			e.printStackTrace();
 			log.warn(e.getMessage());
 		}
 
 		if (timeout <= 0)
 			try {
-				internalParse(input);
+				internalParse(input, filename, encoding, lcl, tnt, content);
 			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
 			}
@@ -136,8 +73,9 @@ public abstract class AbstractParser implements Parser {
 			ExecutorService executor = Executors.newSingleThreadExecutor();
 			String ret = null;
 			try {
-				ret = executor.invokeAll(Arrays.asList(new InternalParseTask(input)), timeout, TimeUnit.SECONDS).get(0)
-						.get();
+				ret = executor
+						.invokeAll(Arrays.asList(new InternalParseTask(input, filename, encoding, lcl, tnt, content)),
+								timeout, TimeUnit.SECONDS).get(0).get();
 			} catch (Throwable e) {
 				log.warn(e.getMessage(), e);
 			}
@@ -145,7 +83,10 @@ public abstract class AbstractParser implements Parser {
 				log.warn("Parse timed out");
 			executor.shutdownNow();
 		}
+
 		log.debug("Parse Finished");
+
+		return content.toString();
 	}
 
 	/**
@@ -154,13 +95,30 @@ public abstract class AbstractParser implements Parser {
 	class InternalParseTask implements Callable<String> {
 		private InputStream is;
 
-		InternalParseTask(InputStream is) {
+		private String filename;
+
+		private String encoding;
+
+		private Locale locale;
+
+		private String tenant;
+
+		private StringBuffer content;
+
+		public InternalParseTask(InputStream is, String filename, String encoding, Locale locale, String tenant,
+				StringBuffer content) {
+			super();
 			this.is = is;
+			this.filename = filename;
+			this.encoding = encoding;
+			this.locale = locale;
+			this.tenant = tenant;
+			this.content = content;
 		}
 
 		public String call() throws Exception {
 			try {
-				internalParse(is);
+				internalParse(is, filename, encoding, locale, tenant, content);
 				return "completed";
 			} catch (InterruptedException e) {
 				log.warn("Parse timed out");
@@ -172,15 +130,6 @@ public abstract class AbstractParser implements Parser {
 	/**
 	 * Invoked by the parse method
 	 */
-	abstract protected void internalParse(InputStream is) throws Exception;
-
-	@Override
-	public String getTenant() {
-		return tenant;
-	}
-
-	@Override
-	public void setTenant(String tenant) {
-		this.tenant = tenant;
-	}
+	abstract protected void internalParse(InputStream is, String filename, String encoding, Locale locale,
+			String tenant, StringBuffer output) throws Exception;
 }

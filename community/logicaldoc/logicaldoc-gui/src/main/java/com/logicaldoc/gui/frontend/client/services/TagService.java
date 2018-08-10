@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUITag;
 /**
  * Tag handling service
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("tag")

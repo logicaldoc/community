@@ -35,7 +35,7 @@ import com.logicaldoc.web.util.ServletUtil;
 /**
  * Implementation of the SettingService
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class SettingServiceImpl extends RemoteServiceServlet implements SettingService {
@@ -68,7 +68,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 
 			log.info("Email settings data loaded successfully.");
 		} catch (Exception e) {
-			log.error("Exception loading Email settings data: " + e.getMessage(), e);
+			log.error("Exception loading Email settings data: {}", e.getMessage(), e);
 		}
 
 		return emailSettings;
@@ -108,7 +108,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 
 			log.info("Email settings data written successfully.");
 		} catch (Exception e) {
-			log.error("Exception writing Email settings data: " + e.getMessage(), e);
+			log.error("Exception writing Email settings data: {}", e.getMessage(), e);
 		}
 	}
 
@@ -143,7 +143,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 					|| name.startsWith("ssl.") || name.contains(".tagcloud.") || name.startsWith("throttle.")
 					|| name.contains("security.") || name.contains("parser.") || name.startsWith("quota.")
 					|| name.equals("initialized") || name.startsWith("converter.") || name.startsWith("firewall.")
-					|| name.contains(".2fa."))
+					|| name.contains(".2fa.") || name.startsWith("ftp."))
 				continue;
 
 			sortedSet.add(key.toString());
@@ -169,7 +169,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 		for (Object key : conf.keySet()) {
 			if (key.toString().equals("webservice.enabled") || key.toString().startsWith("webdav")
 					|| key.toString().startsWith("cmis") || key.toString().startsWith("command.")
-					|| key.toString().startsWith("openoffice")
+					|| key.toString().startsWith("openoffice") || key.toString().startsWith("ftp.")
 					|| key.toString().startsWith(session.getTenantName() + ".extcall.")) {
 				GUIParameter p = new GUIParameter(key.toString(), conf.getProperty(key.toString()));
 				params.add(p);
@@ -196,7 +196,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 
 			conf.write();
 
-			log.info("Successfully saved " + counter + " parameters");
+			log.info("Successfully saved {} parameters", counter);
 		} catch (Throwable e) {
 			ServiceUtil.throwServerException(session, log, e);
 		}
@@ -222,33 +222,6 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 			ServiceUtil.throwServerException(session, log, e);
 		}
 		return values.toArray(new GUIParameter[0]);
-	}
-
-	@Override
-	public GUIParameter[] loadOcrSettings() throws ServerException {
-		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SESSIONS);
-
-		ContextProperties conf = Context.get().getProperties();
-
-		GUIParameter[] params = new GUIParameter[12];
-		params[0] = new GUIParameter("ocr.enabled", conf.getProperty("ocr.enabled"));
-		params[1] = new GUIParameter(session.getTenantName() + ".ocr.resolution.threshold", conf.getProperty(session
-				.getTenantName() + ".ocr.resolution.threshold"));
-		params[2] = new GUIParameter(session.getTenantName() + ".ocr.text.threshold", conf.getProperty(session
-				.getTenantName() + ".ocr.text.threshold"));
-		params[3] = new GUIParameter(session.getTenantName() + ".ocr.includes", conf.getProperty(session
-				.getTenantName() + ".ocr.includes"));
-		params[4] = new GUIParameter(session.getTenantName() + ".ocr.excludes", conf.getProperty(session
-				.getTenantName() + ".ocr.excludes"));
-		params[5] = new GUIParameter("ocr.timeout", conf.getProperty("ocr.timeout"));
-		params[6] = new GUIParameter("ocr.engine", conf.getProperty("ocr.engine"));
-		params[7] = new GUIParameter("command.tesseract", conf.getProperty("command.tesseract"));
-		params[8] = new GUIParameter("advancedocr.path", conf.getProperty("advancedocr.path"));
-		params[9] = new GUIParameter("ocr.rendres", conf.getProperty("ocr.rendres"));
-		params[10] = new GUIParameter("ocr.rendres.barcode", conf.getProperty("ocr.rendres.barcode"));
-		params[11] = new GUIParameter("ocr.batch", conf.getProperty("ocr.batch"));
-
-		return params;
 	}
 
 	@Override
@@ -328,7 +301,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 			mail.setSubject("test");
 			mail.setMessageText("test");
 
-			log.info("Sending test email to " + email);
+			log.info("Sending test email to {}", email);
 			sender.send(mail);
 			log.info("Test email sent");
 			return true;
@@ -343,7 +316,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 		ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
 			Storer storer = StorerManager.get().newStorer(id);
-			log.info("Testing storer " + storer);
+			log.info("Testing storer {}", storer);
 			return storer.test();
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);

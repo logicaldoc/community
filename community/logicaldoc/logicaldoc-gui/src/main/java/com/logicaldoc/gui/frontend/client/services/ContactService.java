@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIContact;
  * The client side stub for the Contact Service. This service allows r/w
  * operations on contacts.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("contact")

@@ -382,12 +382,11 @@ public class StampDetailsPanel extends VLayout {
 				public void onSuccess(GUIStamp newStamp) {
 					savePanel.setVisible(false);
 					if (stamp.getId() == 0L)
-						stampsPanel.init();
+						stampsPanel.refresh();
 					else if (newStamp != null) {
 						stampsPanel.updateRecord(newStamp);
 						stampsPanel.showStampDetails(newStamp);
 					}
-
 				}
 			});
 		}

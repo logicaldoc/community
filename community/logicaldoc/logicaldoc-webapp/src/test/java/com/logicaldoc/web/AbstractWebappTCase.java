@@ -37,7 +37,7 @@ import com.logicaldoc.web.service.SecurityServiceImpl;
  * All LogicalDOC's tests must extend this test case in order to find a ready
  * and accessible database.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public abstract class AbstractWebappTCase {

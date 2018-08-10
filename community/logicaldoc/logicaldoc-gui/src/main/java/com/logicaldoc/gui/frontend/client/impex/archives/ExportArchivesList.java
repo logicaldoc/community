@@ -12,6 +12,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -40,20 +41,16 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Panel showing the list of export archives
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ExportArchivesList extends VLayout {
 
-	protected Layout listing;
-
 	protected Layout detailsContainer;
 
-	protected ListGrid list;
+	protected RefreshableListGrid list;
 
 	protected Canvas details = SELECT_ELEMENT;
-
-	private InfoPanel infoPanel;
 
 	final static Canvas SELECT_ELEMENT = new HTMLPanel("&nbsp;" + I18N.message("selectarchive"));
 
@@ -61,22 +58,17 @@ public class ExportArchivesList extends VLayout {
 
 	protected boolean showHistory = false;
 
-	public ExportArchivesList(int archsType, boolean history) {
+	public ExportArchivesList(int archivesType, boolean showHistory) {
 		setWidth100();
-		infoPanel = new InfoPanel("");
-		refresh(archsType, history);
+		this.archivesType = archivesType;
+		this.showHistory = showHistory;
 	}
 
-	public void refresh(int archivesType, boolean history) {
-		Canvas[] members = getMembers();
-		for (Canvas canvas : members) {
-			removeMember(canvas);
-		}
+	@Override
+	public void onDraw() {
+		final InfoPanel infoPanel = new InfoPanel("");
 
-		this.archivesType = archivesType;
-		this.showHistory = history;
-
-		listing = new VLayout();
+		VLayout listing = new VLayout();
 		detailsContainer = new VLayout();
 		details = SELECT_ELEMENT;
 
@@ -125,7 +117,7 @@ public class ExportArchivesList extends VLayout {
 		ListGridField aosManager = new ListGridField("aosmanager", I18N.message("aosmanager"), 110);
 		aosManager.setCanFilter(true);
 
-		list = new ListGrid();
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
@@ -163,7 +155,7 @@ public class ExportArchivesList extends VLayout {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				refresh(ExportArchivesList.this.archivesType, ExportArchivesList.this.showHistory);
+				refresh();
 			}
 		});
 
@@ -350,5 +342,22 @@ public class ExportArchivesList extends VLayout {
 						showDetails(Long.parseLong(record.getAttributeAsString("id")), true);
 					}
 				});
+	}
+
+	public void refresh(int archivesType, boolean showHistory) {
+		this.archivesType = archivesType;
+		this.showHistory = showHistory;
+		refresh();
+	}
+
+	public void refresh() {
+		if (archivesType == GUIArchive.TYPE_STORAGE && showHistory)
+			list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, archivesType, GUIArchive.STATUS_FINALIZED, Session
+					.get().getUser().getId()));
+		else
+			list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, archivesType, null, Session.get().getUser().getId()));
+		detailsContainer.removeMembers(detailsContainer.getMembers());
+		details = SELECT_ELEMENT;
+		detailsContainer.setMembers(details);
 	}
 }

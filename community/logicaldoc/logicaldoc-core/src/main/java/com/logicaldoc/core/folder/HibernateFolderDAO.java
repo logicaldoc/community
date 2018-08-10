@@ -47,7 +47,7 @@ import com.logicaldoc.util.sql.SqlUtil;
 /**
  * Hibernate implementation of <code>FolderDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @SuppressWarnings("unchecked")
@@ -407,6 +407,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public boolean isDownloadEnabled(long id, long userId) {
 		return isPermissionEnabled(Permission.DOWNLOAD, id, userId);
+	}
+
+	@Override
+	public boolean isMoveEnabled(long id, long userId) {
+		return isPermissionEnabled(Permission.MOVE, id, userId);
 	}
 
 	@Override
@@ -802,7 +807,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			}
 
 			StringBuffer query = new StringBuffer(
-					"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD");
+					"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL");
 			query.append(" from ld_foldergroup A");
 			query.append(" where ");
 			query.append(" A.ld_folderid=" + id);
@@ -863,7 +868,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 						permissions.add(Permission.PRINT);
 					if (rs.getInt("LDPASSWORD") == 1)
 						permissions.add(Permission.PASSWORD);
-
+					if (rs.getInt("LDMOVE") == 1)
+						permissions.add(Permission.MOVE);
+					if (rs.getInt("LDEMAIL") == 1)
+						permissions.add(Permission.EMAIL);
 				}
 			} finally {
 				if (rs != null)
@@ -1057,7 +1065,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			records = jdbcUpdate("update ld_folder set ld_securityref = ?, ld_lastmodified = ? where not ld_id = ? "
 					+ " and ld_id in " + treeIdsString, securityRef, new Date(), rootId);
 
-			log.warn("Applied rights to " + records + " folders in tree " + rootId);
+			log.warn("Applied rights to {} folders in tree {}", records, rootId);
 
 			/*
 			 * Delete all the specific rights associated to the folders in the
@@ -1065,7 +1073,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 */
 			jdbcUpdate("delete from ld_foldergroup where not ld_folderid = ? and ld_folderid in " + treeIdsString,
 					rootId);
-			log.warn("Removed " + records + " specific rights in tree " + rootId);
+			log.warn("Removed {} specific rights in tree {}", records, rootId);
 
 			if (getSessionFactory().getCache() != null)
 				getSessionFactory().getCache().evictEntityRegions();
@@ -1164,6 +1172,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				fg.setAdd(1);
 				fg.setDelete(1);
 				fg.setDownload(1);
+				fg.setEmail(1);
 				fg.setPermissions(1);
 				fg.setRead(1);
 				fg.setSecurity(1);
@@ -1222,6 +1231,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 					folderVO.setType(Folder.TYPE_DEFAULT);
 					dir = create(folder, folderVO, inheritSecurity,
 							transaction != null ? (FolderHistory) transaction.clone() : null);
+					flush();
 				} catch (CloneNotSupportedException e) {
 				}
 			} else {
@@ -1502,9 +1512,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (folder.getTags() != null)
 				folder.getTags().size();
 
-			for (String attribute : folder.getAttributes().keySet()) {
-				folder.getAttributes().get(attribute).getValue();
-			}
+			if (folder.getAttributes() != null)
+				for (String attribute : folder.getAttributes().keySet())
+					folder.getAttributes().get(attribute).getValue();
 		} catch (Throwable t) {
 		}
 	}
@@ -1514,7 +1524,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		List<Folder> results = new ArrayList<Folder>();
 		try {
 			String query = "select ld_id, ld_name, ld_lastmodified from ld_folder where ld_deleted=1 and ld_deleteuserid = "
-					+ userId + " order by ld_lastmodified desc";
+					+ userId;
 
 			@SuppressWarnings("rawtypes")
 			RowMapper mapper = new BeanPropertyRowMapper() {

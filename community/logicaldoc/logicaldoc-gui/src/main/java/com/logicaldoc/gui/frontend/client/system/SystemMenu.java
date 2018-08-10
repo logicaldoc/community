@@ -27,7 +27,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * This panel shows the administration system menu
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class SystemMenu extends VLayout {

@@ -40,6 +40,7 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
@@ -55,7 +56,7 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
 /**
  * Basic Implementation of <code>DocumentManager</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 3.5
  */
 public class DocumentManagerImpl implements DocumentManager {
@@ -323,18 +324,21 @@ public class DocumentManagerImpl implements DocumentManager {
 		// Parses the file where it is already stored
 		Locale locale = doc.getLocale();
 		String resource = storer.getResourceName(doc, fileVersion, null);
-		Parser parser = ParserFactory.getParser(storer.getStream(doc.getId(), resource), doc.getFileName(), locale,
-				null, doc.getTenantId());
+		Parser parser = ParserFactory.getParser(doc.getFileName());
 
-		log.debug("Using parser " + parser.getClass().getName() + " to parse document " + doc.getId());
+		log.debug("Using parser {} to parse document {}", parser.getClass().getName(), doc.getId());
 
 		// and gets some fields
 		if (parser != null) {
-			content = parser.getContent();
+			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			content = parser.parse(storer.getStream(doc.getId(), resource), doc.getFileName(), null, locale, tDao
+					.findById(doc.getTenantId()).getName());
 		}
+
 		if (content == null) {
 			content = "";
 		}
+
 		return content;
 	}
 

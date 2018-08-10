@@ -7,7 +7,7 @@ import com.logicaldoc.core.PersistentObjectDAO;
 /**
  * Instances of this class is a DAO-service for Contact business entities.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
 public interface ContactDAO extends PersistentObjectDAO<Contact> {

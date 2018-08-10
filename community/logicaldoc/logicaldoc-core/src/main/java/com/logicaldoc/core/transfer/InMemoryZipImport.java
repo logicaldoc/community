@@ -26,7 +26,7 @@ import com.logicaldoc.util.io.ZipUtil;
  * folders in the zip will be replicated. Also, if required the parsing of
  * documents is executed for the extraction of the tags of the documents.
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 4.5.2
  */
 public class InMemoryZipImport extends ZipImport {

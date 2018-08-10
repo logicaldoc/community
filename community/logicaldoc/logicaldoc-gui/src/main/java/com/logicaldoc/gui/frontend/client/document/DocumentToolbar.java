@@ -18,8 +18,8 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.calendar.CalendarEventDialog;
@@ -37,73 +37,84 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * The toolbar to handle some documents aspects
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DocumentToolbar extends ToolStrip implements FolderObserver {
-	protected ToolStripButton refresh = new ToolStripButton();
 
-	protected ToolStripButton download = new ToolStripButton();
+	protected ToolStripButton refresh = AwesomeFactory.newToolStripButton("sync-alt", "refresh");
 
-	protected ToolStripButton rss = new ToolStripButton();
+	protected ToolStripButton download = AwesomeFactory.newToolStripButton("download", "download");
 
-	protected ToolStripButton pdf = new ToolStripButton();
+	protected ToolStripButton rss = AwesomeFactory.newToolStripButton("rss", "rssfeed");
 
-	protected ToolStripButton add = new ToolStripButton();
+	protected ToolStripButton pdf = AwesomeFactory.newToolStripButton("file-pdf", "exportpdf");
 
-	protected ToolStripButton addForm = new ToolStripButton();
+	protected ToolStripButton convert = AwesomeFactory.newToolStripButton("copy", "convert");
 
-	protected ToolStripButton dropSpot = new ToolStripButton();
+	protected ToolStripButton add = AwesomeFactory.newToolStripButton("upload", "adddocuments");
 
-	protected ToolStripButton subscribe = new ToolStripButton();
+	protected ToolStripButton addForm = AwesomeFactory.newToolStripButton("file-alt", "addform");
 
-	protected ToolStripButton scan = new ToolStripButton();
+	protected ToolStripButton subscribe = AwesomeFactory.newToolStripButton("envelope", "subscribe");
 
-	protected ToolStripButton convert = new ToolStripButton();
+	protected ToolStripButton dropSpot = AwesomeFactory.newToolStripButton("eye-dropper", "dropspot");
 
-	protected ToolStripButton bulkUpdate = new ToolStripButton();
+	protected ToolStripButton scan = AwesomeFactory.newToolStripButton("image", "scandocument");
 
-	protected ToolStripButton bulkCheckout = new ToolStripButton();
+	protected ToolStripButton archive = AwesomeFactory.newToolStripButton("archive", "sendtoexparchive");
 
-	protected ToolStripButton stamp = new ToolStripButton();
+	protected ToolStripButton startWorkflow = AwesomeFactory.newToolStripButton("cogs", "startworkflow");
 
-	protected ToolStripButton sign = new ToolStripButton();
+	protected ToolStripButton addCalendarEvent = AwesomeFactory.newToolStripButton("calendar-plus", "newcalendarevent");
 
-	protected ToolStripButton archive = new ToolStripButton();
+	protected ToolStripButton list = AwesomeFactory.newToolStripButton("bars", "list");
 
-	protected ToolStripButton startWorkflow = new ToolStripButton();
+	protected ToolStripButton gallery = AwesomeFactory.newToolStripButton("images", "gallery");
 
-	protected ToolStripButton addCalendarEvent = new ToolStripButton();
+	protected ToolStripButton office = AwesomeFactory.newToolStripButton("windows", "editwithoffice");
 
-	protected ToolStripButton print = new ToolStripButton();
+	protected ToolStripButton bulkUpdate = AwesomeFactory.newToolStripButton("edit", "bulkupdate");
 
-	protected ToolStripButton export = new ToolStripButton();
+	protected ToolStripButton stamp = AwesomeFactory.newToolStripButton("tint", "stamp");
 
-	protected ToolStripButton office = new ToolStripButton();
+	protected ToolStripButton sign = AwesomeFactory.newToolStripButton("badge-check", "sign");
 
-	protected ToolStripButton list = new ToolStripButton();
+	protected ToolStripButton bulkCheckout = AwesomeFactory.newToolStripButton("check", "bulkcheckout");
 
-	protected ToolStripButton gallery = new ToolStripButton();
+	protected ToolStripButton filter = AwesomeFactory.newToolStripButton("filter", "filter");
 
-	protected ToolStripButton togglePreview = new ToolStripButton();
+	protected ToolStripButton print = AwesomeFactory.newToolStripButton("print", "print");
+
+	protected ToolStripButton export = AwesomeFactory.newToolStripButton("angle-double-down", "export");
+
+	protected ToolStripButton togglePreview = AwesomeFactory.newToolStripButton("toggle-on", "closepreview");
 
 	protected GUIDocument document;
 
-	public DocumentToolbar() {
+	private static DocumentToolbar instance = null;
+
+	public static DocumentToolbar get() {
+		if (instance == null)
+			instance = new DocumentToolbar();
+		return instance;
+	}
+
+	private DocumentToolbar() {
+		setWidth100();
+
 		GUIFolder folder = Session.get().getCurrentFolder();
 		boolean downloadEnabled = folder != null && folder.isDownload();
 		boolean writeEnabled = folder != null && folder.isWrite();
 		boolean signEnabled = folder != null && folder.hasPermission(Constants.PERMISSION_SIGN);
 
 		prepareButtons(downloadEnabled, writeEnabled, signEnabled);
-
 		update(null);
+
 		FolderController.get().addObserver(this);
 	}
 
 	protected void prepareButtons(boolean downloadEnabled, boolean writeEnabled, boolean signEnabled) {
-		refresh.setTooltip(I18N.message("refresh"));
-		refresh.setIcon(ItemFactory.newImgIcon("arrow_refresh_small.png").getSrc());
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -116,7 +127,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		addSeparator();
 
 		download.setTooltip(I18N.message("download"));
-		download.setIcon(ItemFactory.newImgIcon("download.png").getSrc());
+		download.setTitle("<i class='fal fa-download fa-lg' aria-hidden='true'></i>");
+
 		download.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -136,8 +148,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		rss.setIcon(ItemFactory.newImgIcon("feed_add.png").getSrc());
-		rss.setTooltip(I18N.message("rssfeed"));
 		rss.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -146,8 +156,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		pdf.setIcon(ItemFactory.newImgIcon("pdf.png").getSrc());
-		pdf.setTooltip(I18N.message("exportpdf"));
 		pdf.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -167,8 +175,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		convert.setIcon(ItemFactory.newImgIcon("page_white_gear.png").getSrc());
-		convert.setTooltip(I18N.message("convert"));
 		convert.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -178,8 +184,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		add.setIcon(ItemFactory.newImgIcon("page_white_add.png").getSrc());
-		add.setTooltip(I18N.message("adddocuments"));
 		add.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -189,8 +193,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		addForm.setIcon(ItemFactory.newImgIcon("application_form_add.png").getSrc());
-		addForm.setTooltip(I18N.message("addform"));
 		addForm.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -200,8 +202,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		subscribe.setIcon(ItemFactory.newImgIcon("subscription_add.png").getSrc());
-		subscribe.setTooltip(I18N.message("subscribe"));
 		subscribe.setDisabled(true);
 		subscribe.addClickHandler(new ClickHandler() {
 			@Override
@@ -215,8 +215,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		dropSpot.setIcon(ItemFactory.newImgIcon("drive_add.png").getSrc());
-		dropSpot.setTooltip("Drop Spot");
 		dropSpot.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -224,8 +222,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		scan.setIcon(ItemFactory.newImgIcon("image_add.png").getSrc());
-		scan.setTooltip(I18N.message("scandocument"));
 		scan.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -236,8 +232,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		archive.setIcon(ItemFactory.newImgIcon("server_add.png").getSrc());
-		archive.setTooltip(I18N.message("sendtoexparchive"));
 		archive.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -250,8 +244,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		startWorkflow.setIcon(ItemFactory.newImgIcon("cog_go.png").getSrc());
-		startWorkflow.setTooltip(I18N.message("startworkflow"));
 		startWorkflow.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -264,8 +256,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		addCalendarEvent.setIcon(ItemFactory.newImgIcon("calendar_add.png").getSrc());
-		addCalendarEvent.setTooltip(I18N.message("newcalendarevent"));
 		addCalendarEvent.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -292,21 +282,17 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		list.setTooltip(I18N.message("list"));
-		list.setIcon(ItemFactory.newImgIcon("application_view_list.png").getSrc());
 		list.setActionType(SelectionType.RADIO);
 		list.setRadioGroup("mode");
 		list.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_LIST);
-				DocumentsPanel.get().refresh(null, 1, DocumentsGrid.MODE_LIST);
+				DocumentsPanel.get().refresh(null, DocumentsGrid.MODE_LIST);
 			}
 		});
 		list.setDisabled(Session.get().getCurrentFolder() == null);
 
-		gallery.setTooltip(I18N.message("gallery"));
-		gallery.setIcon(ItemFactory.newImgIcon("application_view_tile.png").getSrc());
 		gallery.setActionType(SelectionType.RADIO);
 		gallery.setRadioGroup("mode");
 		gallery.addClickHandler(new ClickHandler() {
@@ -314,7 +300,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			public void onClick(ClickEvent event) {
 				if (Session.get().getCurrentFolder() != null)
 					CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_GALLERY);
-				DocumentsPanel.get().refresh(null, 1, DocumentsGrid.MODE_GALLERY);
+				DocumentsPanel.get().refresh(null, DocumentsGrid.MODE_GALLERY);
 			}
 		});
 		gallery.setDisabled(Session.get().getCurrentFolder() == null);
@@ -390,8 +376,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		}
 
-		office.setTooltip(I18N.message("editwithoffice"));
-		office.setIcon(ItemFactory.newImgIcon("page_white_office.png").getSrc());
+		office.setTitle("<i class='fab fa-windows fa-lg fa-lg' aria-hidden='true'></i>");
 		office.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -403,8 +388,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		bulkUpdate.setIcon(ItemFactory.newImgIcon("application_form_edit.png").getSrc());
-		bulkUpdate.setTooltip(I18N.message("bulkupdate"));
 		bulkUpdate.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -417,8 +400,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		stamp.setIcon(ItemFactory.newImgIcon("stamp.png").getSrc());
-		stamp.setTooltip(I18N.message("stamp"));
 		stamp.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -431,8 +412,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		sign.setIcon(ItemFactory.newImgIcon("rosette.png").getSrc());
-		sign.setTooltip(I18N.message("sign"));
 		sign.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -445,8 +424,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		bulkCheckout.setIcon(ItemFactory.newImgIcon("page_edit.png").getSrc());
-		bulkCheckout.setTooltip(I18N.message("bulkcheckout"));
 		bulkCheckout.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -549,9 +526,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		}
 
 		addSeparator();
-		ToolStripButton filter = new ToolStripButton();
-		filter.setIcon(ItemFactory.newImgIcon("filter.png").getSrc());
-		filter.setTooltip(I18N.message("filter"));
 		filter.setActionType(SelectionType.CHECKBOX);
 		addButton(filter);
 		filter.addClickHandler(new ClickHandler() {
@@ -561,10 +535,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		addSeparator();
-		print.setIcon(ItemFactory.newImgIcon("printer.png").getSrc());
-		print.setTooltip(I18N.message("print"));
-		print.setAutoFit(true);
 		addButton(print);
 		print.addClickHandler(new ClickHandler() {
 			@Override
@@ -574,10 +544,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		});
 
 		if (Feature.visible(Feature.EXPORT_CSV)) {
-			addSeparator();
-			export.setIcon(ItemFactory.newImgIcon("table_row_insert.png").getSrc());
-			export.setTooltip(I18N.message("export"));
-			export.setAutoFit(true);
 			addButton(export);
 			export.addClickHandler(new ClickHandler() {
 				@Override
@@ -591,13 +557,11 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		}
 
-		togglePreview.setIcon(ItemFactory.newImgIcon("application_side_expand.png").getSrc());
-		togglePreview.setTooltip(I18N.message("closepreview"));
 		try {
 			// Retrieve the saved preview width
 			String w = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_PREV_W);
 			if (Integer.parseInt(w) <= 0) {
-				togglePreview.setIcon(ItemFactory.newImgIcon("application_side_contract.png").getSrc());
+				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 				togglePreview.setTooltip(I18N.message("openpreview"));
 			}
 		} catch (Throwable t) {
@@ -608,12 +572,12 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				if (DocumentsPanel.get().getPreviewPanel().isVisible()
 						&& DocumentsPanel.get().getPreviewPanel().getWidth() > 0) {
 					DocumentsPanel.get().getPreviewPanel().setWidth(0);
-					togglePreview.setIcon(ItemFactory.newImgIcon("application_side_contract.png").getSrc());
+					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 					togglePreview.setTooltip(I18N.message("openpreview"));
 				} else {
 					DocumentsPanel.get().getPreviewPanel().setWidth(350);
 					DocumentsPanel.get().getPreviewPanel().setDocument(document);
-					togglePreview.setIcon(ItemFactory.newImgIcon("application_side_expand.png").getSrc());
+					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
 					togglePreview.setTooltip(I18N.message("closepreview"));
 				}
 			}
@@ -622,6 +586,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		addSeparator();
 		addButton(list);
 		addButton(gallery);
+		addSeparator();
 		addButton(togglePreview);
 	}
 
@@ -750,5 +715,27 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	@Override
 	public void onFolderMoved(GUIFolder folder) {
 		// Nothing to do
+	}
+
+	@Override
+	public void destroy() {
+		FolderController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		destroy();
+	}
+
+	@Override
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
 	}
 }

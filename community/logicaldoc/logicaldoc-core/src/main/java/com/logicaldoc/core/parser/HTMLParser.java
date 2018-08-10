@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -30,7 +31,7 @@ import com.logicaldoc.util.StringUtil;
  * Text extractor for HyperText Markup Language (HTML).
  * 
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.5
  */
 public class HTMLParser extends AbstractParser {
@@ -40,17 +41,17 @@ public class HTMLParser extends AbstractParser {
 	 */
 	protected static Logger log = LoggerFactory.getLogger(HTMLParser.class);
 
-	public void parse(File file) {
+	public String parse(File file, String filename, String encoding, Locale locale, String tenant) {
 		FileInputStream fis = null;
 		try {
 			fis = new FileInputStream(file);
 			String enc = getCharEncoding(fis);
 			fis = new FileInputStream(file);
-			setEncoding(enc);
-			parse(fis);
-		} catch (Exception ex) {
+			return parse(fis, filename, enc, locale, tenant);
+		} catch (Throwable ex) {
 			log.warn("Failed to extract HTML text content", ex);
 		}
+		return "";
 	}
 
 	private String getCharEncoding(FileInputStream fis) throws IOException {
@@ -77,7 +78,8 @@ public class HTMLParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			StringBuffer content) {
 		try {
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer transformer = factory.newTransformer();
@@ -97,8 +99,8 @@ public class HTMLParser extends AbstractParser {
 			SAXResult result = new SAXResult(new DefaultHandler());
 
 			Reader reader;
-			if (getEncoding() != null) {
-				reader = new InputStreamReader(input, getEncoding());
+			if (encoding != null) {
+				reader = new InputStreamReader(input, encoding);
 			} else {
 				reader = new InputStreamReader(input);
 			}

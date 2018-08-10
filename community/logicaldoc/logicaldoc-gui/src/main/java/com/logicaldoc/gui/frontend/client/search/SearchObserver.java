@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 /**
  * Listener on search events
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public interface SearchObserver {

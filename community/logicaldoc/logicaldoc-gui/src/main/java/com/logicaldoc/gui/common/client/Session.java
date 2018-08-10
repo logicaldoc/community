@@ -29,7 +29,7 @@ import com.smartgwt.client.util.SC;
 /**
  * Represents a client work session
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Session implements DocumentObserver {
@@ -184,7 +184,7 @@ public class Session implements DocumentObserver {
 
 	public void setCurrentFolder(GUIFolder folder) {
 		this.currentFolder = folder;
-		WindowUtils.setTitle(Session.get().getInfo(), folder.getPathExtended());
+		WindowUtils.setTitle(Session.get().getInfo(), folder.getPathExtended() != null ? folder.getPathExtended() : "");
 		FolderController.get().selected(folder);
 	}
 

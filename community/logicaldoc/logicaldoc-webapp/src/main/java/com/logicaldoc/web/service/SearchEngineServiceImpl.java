@@ -26,7 +26,7 @@ import com.logicaldoc.web.util.ServiceUtil;
 /**
  * Implementation of the SearchEngineService
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class SearchEngineServiceImpl extends RemoteServiceServlet implements SearchEngineService {

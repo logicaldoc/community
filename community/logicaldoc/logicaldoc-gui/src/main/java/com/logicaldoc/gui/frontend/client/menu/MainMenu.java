@@ -9,7 +9,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.PanelObserver;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -23,6 +22,7 @@ import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.services.SecurityService;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -79,15 +79,26 @@ import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
 /**
  * Main program menu
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class MainMenu extends ToolStrip implements FolderObserver, DocumentObserver, PanelObserver {
+public class MainMenu extends ToolStrip implements FolderObserver, DocumentObserver {
 
 	private ToolStripMenuButton tools;
 
-	public MainMenu(boolean quickSearch) {
+	private static MainMenu instance = null;
+
+	public static MainMenu get() {
+		if (instance == null)
+			instance = new MainMenu();
+		return instance;
+	}
+
+	private MainMenu() {
 		super();
+
+		FolderController.get().addObserver(this);
+		DocumentController.get().addObserver(this);
 
 		setWidth100();
 
@@ -110,10 +121,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		userInfo.setWrap(false);
 		addMember(userInfo);
 
-		ToolStripButton exitButton = new ToolStripButton();
-		exitButton.setIcon("[SKIN]/actions/close.png");
+		ToolStripButton exitButton = AwesomeFactory.newToolStripButton("power-off", "exit");
 		exitButton.setActionType(SelectionType.CHECKBOX);
-		exitButton.setTooltip(I18N.message("exit"));
 		exitButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -162,11 +171,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			addSeparator();
 		}
 
-		if (quickSearch)
-			addFormItem(new SearchBox());
-
-		FolderController.get().addObserver(this);
-		DocumentController.get().addObserver(this);
+		addFormItem(new SearchBox());
 
 		onFolderSelected(Session.get().getCurrentFolder());
 	}
@@ -884,7 +889,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		items.add(profile);
 		items.add(changePswd);
 
-		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) && Session.get().getTenantConfigAsBoolean("2fa.enabled"))
+		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION)
+				&& Session.get().getTenantConfigAsBoolean("2fa.enabled"))
 			items.add(twofactorsauth);
 
 		if (Feature.enabled(Feature.DIGITAL_SIGNATURE))
@@ -1059,7 +1065,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	}
 
-	@Override
+	/**
+	 * Invoked when a tab of the main panel is selected
+	 */
 	public void onTabSeleted(String panel) {
 		if ("documents".equals(panel)) {
 			onFolderSelected(Session.get().getCurrentFolder());
@@ -1070,5 +1078,28 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			tools = getToolsMenu(null, null);
 			addMember(tools, 2);
 		}
+	}
+	
+	@Override
+	public void destroy() {
+		FolderController.get().removeObserver(this);
+		DocumentController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		destroy();
+	}
+
+	@Override
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
 	}
 }

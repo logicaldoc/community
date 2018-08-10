@@ -25,7 +25,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * A single user session with it's unique identifier and the reference to the
  * user
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.6.0
  */
 public class Session extends PersistentObject implements Comparable<Session> {

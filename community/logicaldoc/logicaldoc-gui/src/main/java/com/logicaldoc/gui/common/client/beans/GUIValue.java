@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * General purpose value bean
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIValue implements Serializable {

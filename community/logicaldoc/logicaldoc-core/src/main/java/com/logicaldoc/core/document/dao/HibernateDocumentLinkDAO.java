@@ -11,7 +11,7 @@ import com.logicaldoc.core.document.DocumentLink;
 /**
  * Hibernate implementation of <code>DocumentLinkDAO</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
 @SuppressWarnings("unchecked")

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 
@@ -26,7 +27,7 @@ public class RemoteMessageListener implements RemoteEventListener {
 				"event.locked", "event.unlocked", "event.immutable", "event.signed", "event.stamped",
 				"event.password.protected", "event.password.unprotected", "event.stored", "event.moved",
 				"event.deleted", "event.folder.renamed", "event.folder.changed", "event.folder.deleted",
-				"event.folder.created", "event.folder.moved"));
+				"event.folder.created", "event.folder.moved", "event.workflowstatus"));
 	}
 
 	@Override
@@ -40,7 +41,8 @@ public class RemoteMessageListener implements RemoteEventListener {
 						|| "event.immutable".equals(event.getEvent()) || "event.signed".equals(event.getEvent())
 						|| "event.stamped".equals(event.getEvent())
 						|| "event.password.protected".equals(event.getEvent())
-						|| "event.password.unprotected".equals(event.getEvent())) {
+						|| "event.password.unprotected".equals(event.getEvent())
+						|| "event.workflowstatus".equals(event.getEvent())) {
 					DocumentController.get().modified(event.getDocument());
 				} else if ("event.stored".equals(event.getEvent())) {
 					DocumentController.get().stored(event.getDocument());

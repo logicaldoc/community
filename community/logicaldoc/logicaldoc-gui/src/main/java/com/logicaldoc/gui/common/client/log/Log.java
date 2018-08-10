@@ -12,7 +12,7 @@ import com.smartgwt.client.util.SC;
 /**
  * Represents a client work session
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Log {

@@ -11,7 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUIIncrementalArchive;
  * The client side stub for the Impex Service. This service allows r/w
  * operations on export archives.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("impex")

@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Model of an email account.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class GUIEmailAccount implements Serializable {
@@ -63,6 +63,8 @@ public class GUIEmailAccount implements Serializable {
 	private int format = FORMAT_EML;
 
 	private GUIFolder target = null;
+
+	private String type;
 
 	private GUIEmailRule[] rules;
 
@@ -221,5 +223,13 @@ public class GUIEmailAccount implements Serializable {
 
 	public void setStartDate(Date startDate) {
 		this.startDate = startDate;
+	}
+	
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }

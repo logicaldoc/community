@@ -18,7 +18,7 @@ import com.logicaldoc.webservice.doc.WSDoc;
 /**
  * Web Service Document. Useful class to create repository Documents.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 @XmlRootElement(name = "document")
@@ -175,6 +175,9 @@ public class WSDocument implements Serializable {
 
 	@WSDoc(required = false, description = "Current workflow's status where the document is in")
 	private String workflowStatus;
+
+	@WSDoc(required = false, description = "Current workflow's status display informations")
+	private String workflowStatusDisplay;
 
 	@WSDoc(required = false, description = "If it is not set to <b>1</b>, the document is marked as not published")
 	private int published = 1;
@@ -540,6 +543,14 @@ public class WSDocument implements Serializable {
 		this.workflowStatus = workflowStatus;
 	}
 
+	public String getWorkflowStatusDisplay() {
+		return workflowStatusDisplay;
+	}
+
+	public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
+		this.workflowStatusDisplay = workflowStatusDisplay;
+	}
+	
 	public int getPublished() {
 		return published;
 	}

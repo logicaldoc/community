@@ -30,7 +30,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
 /**
  * This panel collects all tenant details
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.9
  */
 public class TenantDetailsPanel extends VLayout {

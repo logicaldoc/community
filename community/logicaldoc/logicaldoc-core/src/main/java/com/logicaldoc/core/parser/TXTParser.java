@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import com.logicaldoc.util.io.IOUtil;
  * Class for parsing text (*.txt) files.
  * 
  * @author Michael Scholz
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 3.5
  */
 public class TXTParser extends AbstractParser {
@@ -30,14 +31,15 @@ public class TXTParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(TXTParser.class);
 
 	@Override
-	public void parse(File file) {
+	public String parse(File file, String filename, String encoding, Locale locale, String tenant) {
 		FileInputStream fis = null;
 		BufferedInputStream bis = null;
 		try {
 			fis = new FileInputStream(file);
 			bis = new BufferedInputStream(fis);
 
-			if (StringUtils.isEmpty(getEncoding())) {
+			String enc = encoding;
+			if (StringUtils.isEmpty(enc)) {
 				// Determine the most probable encoding
 				try {
 					CharsetDetector cd = new CharsetDetector();
@@ -45,13 +47,13 @@ public class TXTParser extends AbstractParser {
 					CharsetMatch cm = cd.detect();
 					if (cm != null) {
 						if (Charset.isSupported(cm.getName()))
-							setEncoding(cm.getName());
+							enc = cm.getName();
 					}
 				} catch (Throwable th) {
 					log.warn("Error during TXT fileNameCharset detection", th);
 				}
 			}
-			parse(bis);
+			return parse(bis, filename, enc, locale, tenant);
 		} catch (Throwable ex) {
 			log.warn("Failed to extract TXT text content", ex);
 		} finally {
@@ -64,23 +66,25 @@ public class TXTParser extends AbstractParser {
 				log.warn(e.getMessage(), e);
 			}
 		}
+		return "";
 	}
 
 	@Override
-	public void internalParse(InputStream input) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			StringBuffer content) {
 		try {
 			if (input != null)
-				content.append(StringUtil.writeToString(getLimitedStream(input), getEncoding()));
+				content.append(StringUtil.writeToString(getLimitedStream(input, tenant), encoding));
 		} catch (UnsupportedEncodingException e) {
-			log.warn("Unsupported encoding '" + getEncoding() + "', using default ("
-					+ System.getProperty("file.encoding") + ") instead.");
+			log.warn("Unsupported encoding '{}', using default ({}) instead.", encoding,
+					System.getProperty("file.encoding"));
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
 		}
 	}
 
-	private InputStream getLimitedStream(InputStream input) {
-		long maxBytes = Context.get().getProperties().getInt(getTenant() + ".parser.txt.maxsize", 1024) * 1024L;
+	private InputStream getLimitedStream(InputStream input, String tenant) {
+		long maxBytes = Context.get().getProperties().getInt(tenant + ".parser.txt.maxsize", 1024) * 1024L;
 		return IOUtil.getLimitedStream(input, maxBytes);
 	}
 }

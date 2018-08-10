@@ -18,7 +18,7 @@ import com.smartgwt.client.widgets.layout.VStack;
 /**
  * In this panel the graphical design of the workflow takes place.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class DrawingPanel extends VStack {
@@ -27,16 +27,18 @@ public class DrawingPanel extends VStack {
 
 	private DiagramController controller;
 
+	private GUIWorkflow workflow;
+
 	// stateId - widget instance
 	private Map<String, StateWidget> widgets = new HashMap<String, StateWidget>();
 
-	public DrawingPanel(WorkflowDesigner designer) {
+	public DrawingPanel(GUIWorkflow workflow) {
 		super();
+		this.workflow = workflow;
 		setMembersMargin(5);
 		setOverflow(Overflow.SCROLL);
 		setWidth100();
 		setHeight100();
-		this.workflowDesigner = designer;
 
 		controller = new DiagramController(2000, 2000);
 		controller.showGrid(false);
@@ -50,6 +52,14 @@ public class DrawingPanel extends VStack {
 				controller.unsynchronizedShapes();
 			}
 		});
+
+		if (workflow != null)
+			redraw();
+	}
+
+	public DrawingPanel(WorkflowDesigner designer) {
+		this(designer.getWorkflow());
+		this.workflowDesigner = designer;
 	}
 
 	public WorkflowDesigner getWorkflowDesigner() {
@@ -60,12 +70,16 @@ public class DrawingPanel extends VStack {
 		return controller;
 	}
 
+	@Override
 	public void redraw() {
 		controller.clearDiagram();
 
-		GUIWorkflow workflow = workflowDesigner.getWorkflow();
 		if (workflow.getStates() == null)
 			return;
+
+		GUIWorkflow workflow = this.workflow;
+		if (workflowDesigner != null)
+			workflow = workflowDesigner.getWorkflow();
 
 		try {
 			// Put all the states

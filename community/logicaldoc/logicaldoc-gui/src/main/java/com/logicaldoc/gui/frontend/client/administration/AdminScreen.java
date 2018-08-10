@@ -9,7 +9,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 /**
  * Represents the Administration Screen
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class AdminScreen extends HLayout {
@@ -20,10 +20,19 @@ public class AdminScreen extends HLayout {
 
 	private Canvas content;
 
+	public static AdminScreen get() {
+		if (instance == null)
+			instance = new AdminScreen();
+		return instance;
+	}
+
 	private AdminScreen() {
 		setWidth100();
 		setOverflow(Overflow.HIDDEN);
+	}
 
+	@Override
+	public void onDraw() {
 		// Prepare the collapsible menu
 		AdminMenu leftMenu = AdminMenu.get();
 		leftMenu.setWidth(290);
@@ -43,12 +52,6 @@ public class AdminScreen extends HLayout {
 		}
 		this.content = content;
 		rightPanel.addMember(this.content);
-	}
-
-	public static AdminScreen get() {
-		if (instance == null)
-			instance = new AdminScreen();
-		return instance;
 	}
 
 	public Canvas getContent() {

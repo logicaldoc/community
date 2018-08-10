@@ -19,7 +19,7 @@ import com.logicaldoc.util.MimeType;
 /**
  * 
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.5
  */
 public class HttpUpload {

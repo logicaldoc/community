@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * Simple test to check the system infos
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.1
  */
 public class SystemInfoTest extends AbstractCoreTCase {

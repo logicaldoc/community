@@ -22,7 +22,7 @@ import com.smartgwt.client.widgets.tree.TreeNode;
 /**
  * This is the form used to apply a folder template
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class ApplyTemplateDialog extends Dialog {

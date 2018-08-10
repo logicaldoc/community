@@ -10,14 +10,17 @@ import com.smartgwt.client.widgets.tab.Tab;
 /**
  * Panel showing export archives control panel.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class ExportArchivesPanel extends AdminPanel {
 
 	public ExportArchivesPanel() {
 		super("exportarchives");
+	}
 
+	@Override
+	public void onDraw() {
 		body.setMembers(new ExportArchivesList(GUIArchive.TYPE_DEFAULT, false));
 
 		Tab incremetalTab = new Tab(I18N.message("incrementalarchives"));

@@ -3,7 +3,7 @@ package com.logicaldoc.gui.common.client;
 /**
  * Thrown in case of error on the server
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 7.1
  */
 public class ServerException extends Exception {

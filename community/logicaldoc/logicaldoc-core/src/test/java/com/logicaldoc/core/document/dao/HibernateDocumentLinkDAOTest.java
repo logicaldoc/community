@@ -14,7 +14,7 @@ import com.logicaldoc.core.document.DocumentLink;
 /**
  * Test case for <code>HibernateDocumentLinkDAO</code>
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
 public class HibernateDocumentLinkDAOTest extends AbstractCoreTCase {

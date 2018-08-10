@@ -24,7 +24,7 @@ import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
  * This is the form used to change the password of a user from the
  * administration interface.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SetPassword extends Window {

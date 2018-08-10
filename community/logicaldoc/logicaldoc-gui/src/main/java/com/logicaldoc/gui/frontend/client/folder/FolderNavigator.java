@@ -18,6 +18,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
+import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.RequestInfo;
@@ -56,16 +57,18 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
+import com.smartgwt.client.widgets.tree.events.FolderClosedEvent;
+import com.smartgwt.client.widgets.tree.events.FolderClosedHandler;
+import com.smartgwt.client.widgets.tree.events.FolderOpenedEvent;
+import com.smartgwt.client.widgets.tree.events.FolderOpenedHandler;
 
 /**
  * The panel that shows the workspaces/folders navigation tree
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class FolderNavigator extends TreeGrid implements FolderObserver {
-
-	private static final String TYPE_ALIAS = "2";
 
 	private static FolderNavigator instance = new FolderNavigator();
 
@@ -94,6 +97,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		setCanAcceptDrop(true);
 		setCanAcceptDroppedRecords(true);
 		setSaveLocally(true);
+		setIconSize(1);
 
 		addDragStartHandler(new DragStartHandler() {
 
@@ -192,8 +196,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 														@Override
 														public void onSuccess(Void result) {
-															DocumentsPanel.get().onFolderSelected(
-																	Session.get().getCurrentFolder());
+															DocumentsPanel.get()
+																	.onFolderSelected(Session.get().getCurrentFolder());
 															Log.debug("Drag&Drop operation completed.");
 														}
 													});
@@ -215,10 +219,15 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		name.setCellFormatter(new CellFormatter() {
 			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
 				String val = value + "";
+
 				String color = record.getAttributeAsString("color");
 				if (color != null)
 					val += "<span style='margin-left: 4px; width:20px; background-color:" + color
 							+ ";'>&nbsp;&nbsp;</span>";
+
+				val = DocUtil.getFolderIcon(
+						record.getAttributeAsBoolean("opened") != null && record.getAttributeAsBoolean("opened"),
+						record.getAttributeAsInt("type"), val);
 				return val;
 			}
 		});
@@ -234,7 +243,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 					contextMenu.showContextMenu();
 				} else {
 					FolderService.Instance.get().getFolder(
-							Long.parseLong(getSelectedRecord().getAttributeAsString("folderId")), true,
+							Long.parseLong(getSelectedRecord().getAttributeAsString("folderId")), false,
 							new AsyncCallback<GUIFolder>() {
 
 								@Override
@@ -258,11 +267,57 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		addCellClickHandler(new CellClickHandler() {
 			@Override
 			public void onCellClick(CellClickEvent event) {
-				selectFolder(Long.parseLong(event.getRecord().getAttributeAsString("folderId")));
+				long selectedFolderId = event.getRecord().getAttributeAsLong("folderId");
+				selectFolder(selectedFolderId);
 
 				// Expand the selected node if it is not already expanded
 				TreeNode selectedNode = (TreeNode) getSelectedRecord();
-				getTree().openFolder(selectedNode);
+				openFolder(selectedNode);
+			}
+		});
+
+		/*
+		 * To refresh the folder's decoration and in case of need we add a
+		 * listener that closes all the previously opened branches.
+		 */
+		addFolderOpenedHandler(new FolderOpenedHandler() {
+
+			@Override
+			public void onFolderOpened(FolderOpenedEvent event) {
+				event.getNode().setAttribute("opened", true);
+				updateData(event.getNode());
+
+				if (Session.get().getConfigAsBoolean("gui.folder.autoclose")) {
+					TreeNode selectedNode = event.getNode();
+					long selectedFolderId = selectedNode.getAttributeAsLong("folderId");
+
+					// Expand the selected node if it is not already expanded
+					TreeNode parentNode = getTree().getParent(selectedNode);
+					TreeNode[] children = getTree().getChildren(parentNode);
+					if (children != null)
+						for (TreeNode child : children) {
+							if (child.getAttributeAsLong("folderId") == selectedFolderId)
+								continue;
+							else {
+								getTree().closeAll(child);
+								child.setAttribute("opened", false);
+								updateData(child);
+							}
+						}
+				}
+			}
+
+		});
+
+		/*
+		 * To refresh the folder's decoration
+		 */
+		addFolderClosedHandler(new FolderClosedHandler() {
+
+			@Override
+			public void onFolderClosed(FolderClosedEvent event) {
+				event.getNode().setAttribute("opened", false);
+				updateData(event.getNode());
 			}
 		});
 
@@ -275,6 +330,10 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		});
 
 		FolderController.get().addObserver(this);
+	}
+
+	protected String getOriginalIcon(Record record, boolean defaultState) {
+		return super.getIcon(record, defaultState);
 	}
 
 	/**
@@ -303,8 +362,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	 * 
 	 * @param folderId The folder's identifier
 	 */
-	public void selectFolder(long folderId) {
-		FolderService.Instance.get().getFolder(folderId, true, new AsyncCallback<GUIFolder>() {
+	public void selectFolder(final long folderId) {
+		FolderService.Instance.get().getFolder(folderId, false, new AsyncCallback<GUIFolder>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -315,6 +374,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			@Override
 			public void onSuccess(GUIFolder result) {
 				if (result != null) {
+					result.setPathExtended(getPath(folderId));
 					Session.get().setCurrentFolder(result);
 				}
 			}
@@ -518,7 +578,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		sendToExpArchive.setTitle(I18N.message("sendtoexparchive"));
 		sendToExpArchive.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmarchive"), new BooleanCallback() {
+				LD.ask(I18N.message("question"), I18N.message("confirmputinexparchive"), new BooleanCallback() {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
@@ -551,14 +611,21 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			rename.setEnabled(false);
 		}
 
-		if (!folder.hasPermission(Constants.PERMISSION_EXPORT) || !folder.hasPermission(Constants.PERMISSION_DOWNLOAD)) {
+		if (!folder.hasPermission(Constants.PERMISSION_EXPORT)
+				|| !folder.hasPermission(Constants.PERMISSION_DOWNLOAD)) {
 			exportZip.setEnabled(false);
 		}
 
-		// Avoid alterations of the Default workspace
-		if ((folder.isDefaultWorkspace() && !TYPE_ALIAS.equals(getSelectedRecord().getAttribute("type")))
+		// Avoid alterations of the Default workspace and check DELETE
+		// permission
+		if ((folder.isDefaultWorkspace() && GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"))
 				|| !folder.hasPermission(Constants.PERMISSION_DELETE)) {
 			delete.setEnabled(false);
+		}
+
+		// Avoid alterations of the Default workspace and check MOVE permission
+		if ((folder.isDefaultWorkspace() && GUIFolder.TYPE_ALIAS != getSelectedRecord().getAttributeAsInt("type"))
+				|| !folder.hasPermission(Constants.PERMISSION_DELETE)) {
 			move.setEnabled(false);
 		}
 
@@ -639,11 +706,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			@Override
 			public void onSuccess(Long count) {
-				LD.ask(I18N.message("question"),
-						count.longValue() == 0L ? (I18N.message(selectedIds.length == 1 ? "confirmdeletefolder"
-								: "confirmdeletefolders")) : (I18N
-								.message(selectedIds.length == 1 ? "confirmdeletefolderarchdocs"
-										: "confirmdeletefoldersarchdocs")), new BooleanCallback() {
+				LD.ask(I18N.message("question"), count.longValue() == 0L
+						? (I18N.message(selectedIds.length == 1 ? "confirmdeletefolder" : "confirmdeletefolders"))
+						: (I18N.message(selectedIds.length == 1 ? "confirmdeletefolderarchdocs"
+								: "confirmdeletefoldersarchdocs")),
+						new BooleanCallback() {
 							@Override
 							public void execute(Boolean value) {
 								if (value) {
@@ -830,20 +897,28 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		});
 	}
 
-	public String getPath(long folderId) {
-		TreeNode selectedNode = getTree().find("folderId", Long.toString(folderId));
+	public String getNodePath(TreeNode leafNode) {
 		String path = "";
-		if (selectedNode == null)
+		if (leafNode == null)
 			return path;
 
-		TreeNode[] parents = getTree().getParents(selectedNode);
+		TreeNode[] parents = getTree().getParents(leafNode);
 		if (parents != null && parents.length > 0)
 			for (int i = parents.length - 1; i >= 0; i--) {
 				if (parents[i].getName() != null && !"/".equals(parents[i].getName()))
 					path += "/" + parents[i].getName();
 			}
-		path += "/" + (selectedNode.getName().equals("/") ? "" : selectedNode.getName());
+		path += "/" + (leafNode.getName().equals("/") ? "" : leafNode.getName());
 		return path;
+	}
+
+	public String getCurrentPath() {
+		return getNodePath(getSelectedRecord());
+	}
+
+	public String getPath(long folderId) {
+		TreeNode selectedNode = getTree().find("folderId", Long.toString(folderId));
+		return getNodePath(selectedNode);
 	}
 
 	public void reload() {
@@ -1068,14 +1143,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	@Override
 	protected String getIcon(Record record, boolean defaultState) {
-		String defaultIcon = super.getIcon(record, defaultState);
-		if ("1".equals(record.getAttribute("type"))) {
-			return Util.imageUrl("cube_blue16.png");
-		} else if (TYPE_ALIAS.equals(record.getAttribute("type"))) {
-			return defaultIcon.contains("closed") ? Util.imageUrl("folder_alias_closed.png") : Util
-					.imageUrl("folder_alias_open.png");
-		}
-		return defaultIcon;
+		return "blank.gif";
 	}
 
 	@Override
@@ -1214,5 +1282,17 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	@Override
 	protected void finalize() throws Throwable {
 		destroy();
+	}
+
+	@Override
+	protected void onUnload() {
+		destroy();
+		super.onUnload();
+	}
+
+	@Override
+	protected void onDestroy() {
+		destroy();
+		super.onDestroy();
 	}
 }

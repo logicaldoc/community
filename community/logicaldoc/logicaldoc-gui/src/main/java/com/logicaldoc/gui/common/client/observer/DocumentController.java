@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.common.client.observer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
@@ -16,7 +16,7 @@ public class DocumentController {
 
 	private static DocumentController instance = new DocumentController();
 
-	private List<DocumentObserver> observers = new ArrayList<DocumentObserver>();
+	private Set<DocumentObserver> observers = new HashSet<DocumentObserver>();
 
 	private DocumentController() {
 	}
@@ -26,13 +26,15 @@ public class DocumentController {
 	}
 
 	public synchronized void addObserver(DocumentObserver observer) {
-		if (observer != null && !observers.contains(observer))
+		if (observer != null && !observers.contains(observer)) {
 			observers.add(observer);
+		}
 	}
 
 	public synchronized void removeObserver(DocumentObserver observer) {
-		if (observer != null && observers.contains(observer))
+		if (observer != null && observers.contains(observer)) {
 			observers.remove(observer);
+		}
 	}
 
 	public void selected(GUIDocument document) {

@@ -26,7 +26,7 @@ import com.logicaldoc.webservice.soap.SearchService;
 /**
  * Search Web Service Implementation
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
 public class SoapSearchService extends AbstractService implements SearchService {

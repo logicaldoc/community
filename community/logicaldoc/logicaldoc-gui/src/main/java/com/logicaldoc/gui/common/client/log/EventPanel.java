@@ -3,30 +3,26 @@ package com.logicaldoc.gui.common.client.log;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
 import com.logicaldoc.gui.common.client.beans.GUIEvent;
-import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * Small panel showing the last event message. If the user clicks it, a list of
  * all recent events is displayed.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class EventPanel extends HLayout {
+
 	private static EventPanel instance;
 
 	private Label statusLabel;
-
-	private Img log;
-
-	private Img close;
 
 	private EventPanel() {
 		setHeight(20);
@@ -35,8 +31,7 @@ public class EventPanel extends HLayout {
 		setMargin(2);
 		setMembersMargin(2);
 
-		log = ItemFactory.newImgIcon("logging.png");
-		log.setTooltip(I18N.message("lastevents"));
+		ToolStripButton log = AwesomeFactory.newIconButton("clipboard-list", "lastevents");
 		log.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -46,16 +41,6 @@ public class EventPanel extends HLayout {
 			}
 		});
 
-		close = ItemFactory.newImgIcon("delete.png");
-		close.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setVisible(false);
-			}
-		});
-		close.setVisible(false);
-
-		addMember(close);
 		addMember(log);
 	}
 
@@ -119,22 +104,6 @@ public class EventPanel extends HLayout {
 		event.setSeverity(GUIEvent.INFO);
 		EventsWindow.get().addEvent(event);
 		setVisible(true);
-	}
-
-	public boolean isShowLog() {
-		return log != null && log.isVisible();
-	}
-
-	public void setShowLog(boolean showLog) {
-		this.log.setVisible(showLog);
-	}
-
-	public boolean isShowClose() {
-		return close != null && close.isVisible();
-	}
-
-	public void setShowClose(boolean showClose) {
-		this.close.setVisible(showClose);
 	}
 
 	public void cleanLabel() {

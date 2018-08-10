@@ -13,7 +13,7 @@ import java.io.OutputStream;
 /**
  * Utiliry class for classpath resources IO issues
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 4.5
  */
 public class ResourceUtil {

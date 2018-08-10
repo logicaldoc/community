@@ -17,7 +17,7 @@ import com.logicaldoc.gui.common.client.beans.GUIVersion;
  * The client side stub for the Document Service. This service allows r/w
  * operations on documents.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 @RemoteServiceRelativePath("document")

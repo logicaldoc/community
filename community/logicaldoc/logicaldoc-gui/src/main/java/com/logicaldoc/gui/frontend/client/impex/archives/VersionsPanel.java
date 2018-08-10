@@ -35,7 +35,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * This panel shows a list of versions of an archive in a tabular way.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class VersionsPanel extends VLayout {

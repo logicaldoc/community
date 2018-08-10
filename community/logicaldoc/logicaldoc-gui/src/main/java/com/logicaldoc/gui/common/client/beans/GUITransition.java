@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Representation of a workflow transition.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class GUITransition implements Serializable {
@@ -13,6 +13,8 @@ public class GUITransition implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String text;
+
+	private String color;
 
 	private GUIWFState targetState;
 
@@ -25,6 +27,11 @@ public class GUITransition implements Serializable {
 
 	public GUITransition(String text) {
 		this.text = text;
+	}
+
+	public GUITransition(String text, String color) {
+		this.text = text;
+		this.color = color;
 	}
 
 	public GUITransition(String text, GUIWFState targetState) {
@@ -62,5 +69,13 @@ public class GUITransition implements Serializable {
 
 	public void setOnChosen(String onChosen) {
 		this.onChosen = onChosen;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}
 }

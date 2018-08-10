@@ -8,7 +8,7 @@ import org.apache.solr.update.processor.UpdateRequestProcessorFactory;
 /**
  * Basic factory needed to instantiate the LanguageProcessor
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.5
  */
 public class LanguageProcessorFactory extends UpdateRequestProcessorFactory {

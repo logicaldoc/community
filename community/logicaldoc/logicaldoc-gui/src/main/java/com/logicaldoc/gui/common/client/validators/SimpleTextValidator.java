@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.form.validator.RegExpValidator;
  * Tipical validator for codes, you can use only alfanumeric chars plus the
  * underscore
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class SimpleTextValidator extends RegExpValidator {

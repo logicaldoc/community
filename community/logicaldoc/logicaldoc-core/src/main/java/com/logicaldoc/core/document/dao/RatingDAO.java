@@ -9,7 +9,7 @@ import com.logicaldoc.core.document.Rating;
 /**
  * DAO service for ratings.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 public interface RatingDAO extends PersistentObjectDAO<Rating> {

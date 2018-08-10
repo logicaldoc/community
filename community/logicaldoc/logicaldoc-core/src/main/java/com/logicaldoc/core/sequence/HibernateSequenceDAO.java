@@ -14,7 +14,7 @@ import com.logicaldoc.util.sql.SqlUtil;
  * implemented ad Generics whose type is 'sequence' and subtype is the sequence
  * name.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 @SuppressWarnings("unchecked")

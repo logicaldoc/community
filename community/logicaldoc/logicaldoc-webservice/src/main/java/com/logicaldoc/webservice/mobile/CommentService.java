@@ -30,7 +30,7 @@ import com.logicaldoc.webservice.AbstractService;
 /**
  * Adds new comments on a document.
  * 
- * @author Alessandro Gasparini - Logical Objects
+ * @author Alessandro Gasparini - LogicalDOC
  * @since 6.8.4
  */
 public class CommentService extends AbstractService {

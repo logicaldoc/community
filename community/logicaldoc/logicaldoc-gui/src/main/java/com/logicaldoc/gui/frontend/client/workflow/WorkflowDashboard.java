@@ -13,7 +13,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 /**
  * Workflow dashboard that displays several portlets like a portal page.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
 public class WorkflowDashboard extends VLayout {
@@ -42,7 +42,10 @@ public class WorkflowDashboard extends VLayout {
 
 	public WorkflowDashboard() {
 		setWidth100();
+	}
 
+	@Override
+	public void onDraw() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
@@ -68,11 +71,6 @@ public class WorkflowDashboard extends VLayout {
 		});
 		toolStrip.addFill();
 
-		addMember(toolStrip, 0);
-
-		if (portalLayout != null)
-			removeMember(portalLayout);
-
 		portalLayout = new PortalLayout();
 		portalLayout.setShowColumnMenus(false);
 		portalLayout.setShowEdges(false);
@@ -93,7 +91,9 @@ public class WorkflowDashboard extends VLayout {
 			supervisorTasks = new WorkflowPortlet(this, TASKS_SUPERVISOR);
 			portalLayout.addPortlet(supervisorTasks, 1, 1);
 		}
-		addMember(portalLayout, 1);
+		
+		addMember(toolStrip);
+		addMember(portalLayout);
 	}
 
 	public void refresh() {

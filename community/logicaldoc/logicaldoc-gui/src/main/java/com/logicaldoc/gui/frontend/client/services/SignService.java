@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIKeystore;
  * The client side stub for the Sign Service. This service gives all needed
  * methods to handle documents signature.
  * 
- * @author Matteo Caruso - Logical Objects
+ * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
 @RemoteServiceRelativePath("sign")

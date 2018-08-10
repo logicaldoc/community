@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -26,7 +25,7 @@ import com.logicaldoc.util.config.ContextProperties;
 /**
  * Hibernate implementation of <code>PersistentObjectDAO</code>
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
 public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> implements PersistentObjectDAO<T> {
@@ -90,7 +89,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return entity;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public T findById(long id) {
 		T entity = null;
@@ -247,6 +245,55 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return sessionFactory.getCurrentSession();
 	}
 
+	/**
+	 * Parses a SQL query and inserts the hits to the SQL processor to restrict
+	 * the maximum number of returned records. The syntax varies depending on
+	 * the current DBMS.
+	 * 
+	 * @param srcQuery The source query to parse
+	 * @param maxRows Max number of rows.
+	 * @return The modified qery
+	 */
+	private String insertTopClause(String srcQuery, Integer maxRows) {
+		if (maxRows == null || maxRows.intValue() <= 0)
+			return srcQuery;
+
+		String outQuery = srcQuery;
+		if (isMySQL() || isPostgreSQL()) {
+			/*
+			 * At the end of the query we have to insert the LIMIT clause:
+			 * 
+			 * SELECT column_name(s) FROM table_name WHERE condition LIMIT
+			 * number;
+			 */
+			if (srcQuery.endsWith(";"))
+				outQuery = srcQuery.substring(0, srcQuery.length() - 1);
+			outQuery += " LIMIT " + maxRows;
+		} else if (isSqlServer()) {
+			/*
+			 * After the SELECT have to put the TOP clause:
+			 * 
+			 * SELECT TOP number column_name(s) FROM table_name WHERE condition;
+			 */
+			if (srcQuery.startsWith("SELECT"))
+				outQuery = outQuery.replaceFirst("SELECT", "SELECT TOP " + maxRows + " ");
+			else if (srcQuery.startsWith("select"))
+				outQuery = outQuery.replaceFirst("select", "select TOP " + maxRows + " ");
+		} else if (isOracle()) {
+			/*
+			 * In the WHERE we have to put the ROWNUM condition:
+			 * 
+			 * SELECT column_name(s) FROM table_name WHERE ROWNUM <= number;
+			 */
+			if (srcQuery.contains("WHERE"))
+				outQuery = outQuery.replaceFirst("WHERE", "where ROWNUM <= " + maxRows + " and ");
+			if (srcQuery.contains("where"))
+				outQuery = outQuery.replaceFirst("where", "where ROWNUM <= " + maxRows + " and ");
+		}
+
+		return outQuery;
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public List query(String sql, Object[] args, RowMapper rowMapper, Integer maxRows) {
@@ -254,18 +301,15 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
 
-			// DataSource dataSource =
-			// SessionFactoryUtils.getDataSource(getSessionFactory());
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			if (maxRows != null)
 				jdbcTemplate.setMaxRows(maxRows);
 			if (args != null)
-				list = jdbcTemplate.query(sql, args, rowMapper);
+				list = jdbcTemplate.query(insertTopClause(sql, maxRows), args, rowMapper);
 			else
-				list = jdbcTemplate.query(sql, rowMapper);
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+				list = jdbcTemplate.query(insertTopClause(sql, maxRows), rowMapper);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
 		}
 		return list;
 	}
@@ -281,13 +325,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			if (maxRows != null)
 				jdbcTemplate.setMaxRows(maxRows);
 			if (args != null)
-				list = jdbcTemplate.queryForList(sql, args, elementType);
+				list = jdbcTemplate.queryForList(insertTopClause(sql, maxRows), args, elementType);
 			else
-				list = jdbcTemplate.queryForList(sql, elementType);
-		} catch (Exception e) {
-
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+				list = jdbcTemplate.queryForList(insertTopClause(sql, maxRows), elementType);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
 		}
 		return list;
 	}
@@ -301,13 +343,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			if (maxRows != null)
 				jdbcTemplate.setMaxRows(maxRows);
 			if (args != null)
-				rs = jdbcTemplate.queryForRowSet(sql, args);
+				rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows), args);
 			else
-				rs = jdbcTemplate.queryForRowSet(sql);
-		} catch (Exception e) {
-
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+				rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows));
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
 		}
 		return rs;
 	}
@@ -417,6 +457,10 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected boolean isMySQL() {
 		return "mysql".equals(getDbms());
+	}
+
+	protected boolean isPostgreSQL() {
+		return "postgresql".equals(getDbms());
 	}
 
 	protected boolean isOracle() {

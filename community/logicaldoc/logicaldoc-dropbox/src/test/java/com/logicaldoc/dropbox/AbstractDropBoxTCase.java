@@ -26,7 +26,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Abstract test case for the Calendar module. This class initialises a test
  * database and prepares the spring test context.
  * 
- * @author Marco Meschieri - Logical Objects
+ * @author Marco Meschieri - LogicalDOC
  * @since 6.7
  */
 public abstract class AbstractDropBoxTCase {
