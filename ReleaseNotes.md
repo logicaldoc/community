@@ -22,18 +22,18 @@ For a complete list of features, take a look at https://www.logicaldoc.com/featu
 
 
 Some changes since v8.3.4:
-New REST web-services: DocumentMetadata, System and many new methods for document and folders management
-1009 - Support for .jfif image files ([#1009](https://bugs.logicaldoc.com/ticket/1009)) 
-1013 - Control labels of the preview are garbled, tangled ([#1013](https://bugs.logicaldoc.com/ticket/1013))
-1019 - Versions tab empty when filename contains the ampersign ([#1019](https://bugs.logicaldoc.com/ticket/1019))
-1020 - Checkout and Lock does not work properly on alias (link) documents ([#1020](https://bugs.logicaldoc.com/ticket/1020))
-1001 - Extended attributes of type Folder ([#1001](https://bugs.logicaldoc.com/ticket/1001))
-1008 - Save documents grid layout on a per folder basis ([#1008](https://bugs.logicaldoc.com/ticket/1008))
-997 - configurable delimiters for the worddelimiter search filter ([#997](https://bugs.logicaldoc.com/ticket/997))
-1004 - The administrator can force the interface settings of a user and replicate the same to a selection of users ([#1004](https://bugs.logicaldoc.com/ticket/1004))
-992 - Maximum number of download criteria for Download Tickets (Web-service) ([#992](https://bugs.logicaldoc.com/ticket/992))
-993	- Reports of current download tickets ([#993](https://bugs.logicaldoc.com/ticket/993))
-996	- The calculation of documents tagged by word does not work ([#996](https://bugs.logicaldoc.com/ticket/996)) 
++ New REST web-services: DocumentMetadata, System and many new methods for document and folders management
++ Support for .jfif image files ([#1009](https://bugs.logicaldoc.com/ticket/1009)) 
++ Control labels of the preview are garbled, tangled ([#1013](https://bugs.logicaldoc.com/ticket/1013))
++ Versions tab empty when filename contains the ampersign ([#1019](https://bugs.logicaldoc.com/ticket/1019))
++ Checkout and Lock does not work properly on alias (link) documents ([#1020](https://bugs.logicaldoc.com/ticket/1020))
++ Extended attributes of type Folder ([#1001](https://bugs.logicaldoc.com/ticket/1001))
++ Save documents grid layout on a per folder basis ([#1008](https://bugs.logicaldoc.com/ticket/1008))
++ configurable delimiters for the worddelimiter search filter ([#997](https://bugs.logicaldoc.com/ticket/997))
++ The administrator can force the interface settings of a user and replicate the same to a selection of users ([#1004](https://bugs.logicaldoc.com/ticket/1004))
++ Maximum number of download criteria for Download Tickets (Web-service) ([#992](https://bugs.logicaldoc.com/ticket/992))
++ Reports of current download tickets ([#993](https://bugs.logicaldoc.com/ticket/993))
++ The calculation of documents tagged by word does not work ([#996](https://bugs.logicaldoc.com/ticket/996)) 
 	
 
 The LogicalDOC documentation is available at the following address
