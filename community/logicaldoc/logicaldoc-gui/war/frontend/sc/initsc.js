@@ -1,1 +1,0 @@
-if(typeof isomorphicDir == 'undefined'){isomorphicDir = "sc/";}

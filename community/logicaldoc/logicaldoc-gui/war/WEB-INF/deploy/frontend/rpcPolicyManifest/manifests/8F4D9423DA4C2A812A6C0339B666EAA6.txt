@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.SearchEngineService
-path: 817BF0E5EFD5548F2D49D0B46CE11F19.gwt.rpc

@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.login.client.services.LoginService
-path: 8EBD1AB0AD97B448FB3F1C76A1CC1CC8.gwt.rpc

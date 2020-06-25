@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.ContactService
-path: 97782B8B3031D6755809C32EB1CE6931.gwt.rpc

@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.AutomationService
-path: 8A84C2C96E1E94EB4FCACAFE9298255A.gwt.rpc

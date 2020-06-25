@@ -1,4 +1,0 @@
-# Module setup
-# RPC service class, partial path of RPC policy file
-com.logicaldoc.gui.setup.client.services.SetupService, D12D98AF8C9675A2A927C459E60FCD9C.gwt.rpc
-com.logicaldoc.gui.common.client.services.InfoService, A6445F1FD5BBF4A99039840F89E3F56B.gwt.rpc

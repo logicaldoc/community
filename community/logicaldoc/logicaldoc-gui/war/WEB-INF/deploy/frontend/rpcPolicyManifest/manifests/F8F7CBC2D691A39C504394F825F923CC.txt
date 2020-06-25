@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.SplitService
-path: A6703E7E22A2ED42F3486C2CD2C87EB9.gwt.rpc

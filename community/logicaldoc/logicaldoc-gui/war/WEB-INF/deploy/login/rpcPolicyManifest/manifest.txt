@@ -1,4 +1,0 @@
-# Module login
-# RPC service class, partial path of RPC policy file
-com.logicaldoc.gui.login.client.services.LoginService, 8EBD1AB0AD97B448FB3F1C76A1CC1CC8.gwt.rpc
-com.logicaldoc.gui.common.client.services.InfoService, A6445F1FD5BBF4A99039840F89E3F56B.gwt.rpc

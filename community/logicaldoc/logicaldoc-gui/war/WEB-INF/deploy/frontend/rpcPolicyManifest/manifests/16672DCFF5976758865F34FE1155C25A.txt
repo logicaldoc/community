@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.VIAService
-path: 1D4921520F541B8A5B2DF1F00F750576.gwt.rpc

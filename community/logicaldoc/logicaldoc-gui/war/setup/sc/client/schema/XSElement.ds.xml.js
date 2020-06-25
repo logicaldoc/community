@@ -1,9 +1,0 @@
-isc.DataSource.create({
-    inheritsFrom:"DataSource",
-    Constructor:"XSElement",
-    allowAdvancedCriteria:true,
-    addGlobalId:false,
-    ID:"XSElement",
-    fields:[
-    ]
-})

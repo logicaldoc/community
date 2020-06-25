@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.ZohoService
-path: AD56BFA414D3010303F3BF3D5E415A12.gwt.rpc

@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.AuditService
-path: 99E39DDBD4C8FBAEAF94F319CB9D762B.gwt.rpc

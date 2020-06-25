@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.SyndicationService
-path: 78CF63D474A4F79182D30FA1101B2D95.gwt.rpc
