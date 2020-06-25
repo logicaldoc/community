@@ -60,6 +60,13 @@ LogicalDOC Community Edition is supported by developers and technical enthusiast
  * If the question does not already exist, create a new post. 
  * Please provide as much detailed information as possible with the issue report. We need to know the version of LogicalDOC, Operating System, browser and whatever you think might help us to understand the problem or question.
 
+## Docker images
+An official Docker project for LogicalDOC Community is available at https://hub.docker.com/r/logicaldoc/logicaldoc-ce/ other Docker projects with different configurations and settings are available from https://hub.docker.com/u/logicaldoc/
+
+## Supported databases
+LogicalDOC Community supports the following database engines: MySQL, MariaDB, Oracle, MS SQL, PostgreSQL (experimental).
+In addition, it can work with an embedded Java database: HSQLDB can be used directly, although that is not recommended for production. 
+
 ## License
 [LogicalDOC Community Edition](https://www.logicaldoc.com/download-logicaldoc-community) is made available to the Open Source community under the [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html).
 The LogicalDOC source code is available for the entire community, which is free to use, modify and redistribute under the premises of such license.
