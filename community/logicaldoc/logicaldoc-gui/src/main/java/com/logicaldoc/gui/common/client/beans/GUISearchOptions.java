@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.Session;
 
 /**
  * Search options
@@ -78,6 +79,12 @@ public class GUISearchOptions implements Serializable {
 
 	/** Creates a new instance of SearchOptions */
 	public GUISearchOptions() {
+		try {
+			if (Session.get() != null)
+				maxHits = Session.get().getConfigAsInt("search.hits");
+		} catch (Throwable t) {
+
+		}
 	}
 
 	public Long getTemplate() {

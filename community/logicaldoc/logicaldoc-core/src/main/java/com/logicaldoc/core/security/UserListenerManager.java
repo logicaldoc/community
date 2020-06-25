@@ -54,10 +54,10 @@ public class UserListenerManager {
 			try {
 				Class clazz = Class.forName(className);
 				// Try to instantiate the listener
-				Object listener = clazz.newInstance();
+				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof UserListener))
-					throw new Exception("The specified listener " + className
-							+ " doesn't implement UserListener interface");
+					throw new Exception(
+							"The specified listener " + className + " doesn't implement UserListener interface");
 				listeners.add((UserListener) listener);
 				log.info("Added new user listener " + className + " position "
 						+ ext.getParameter("position").valueAsString());
@@ -69,6 +69,8 @@ public class UserListenerManager {
 
 	/**
 	 * The ordered list of listeners
+	 * 
+	 * @return list of listeners
 	 */
 	public List<UserListener> getListeners() {
 		if (listeners == null)

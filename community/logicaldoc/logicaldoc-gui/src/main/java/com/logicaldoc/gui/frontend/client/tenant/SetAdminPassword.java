@@ -34,19 +34,14 @@ public class SetAdminPassword extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("changepassword"));
-		setWidth(300);
-		setHeight(125);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setMembersMargin(5);
 		setAutoSize(true);
 
 		final ValuesManager vm = new ValuesManager();
 		final DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
-		form.setWidth(350);
-		form.setMargin(5);
 
 		MatchesFieldValidator equalsValidator = new MatchesFieldValidator();
 		equalsValidator.setOtherField(NEWPASSWORDAGAIN);

@@ -6,13 +6,15 @@ import java.util.Set;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 
 /**
- * Stores the accessible menues
+ * Stores the accessible menus
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Menu {
 
+	public static final long DOWNLOAD_TICKETS = -7;
+	
 	public static final long DELETED_FOLDERS = -6;
 
 	public static final long DELETED_DOCS = -5;
@@ -26,16 +28,30 @@ public class Menu {
 	public static final long ADMINISTRATION = 2;
 
 	public static final long DOCUMENTS = 1500;
-
+	
 	public static final long HISTORY = 1600;
 
 	public static final long TRASH = 1602;
+	
+	public static final long VERSIONS = 1603;
 
 	public static final long ALIASES = 1605;
+	
+	public static final long DOCUMENT_CALENDAR = 1606;
+	
+	public static final long SIGNATURE = 1607;
+	
+	public static final long DOCUMENT_OCR = 1608;
+	
+	public static final long DASHBOARD_CALENDAR = 1526;
 
 	public static final long SEARCH = 1510;
 
 	public static final long DASHBOARD = 1520;
+	
+	public static final long MESSAGES = 1525;
+	
+	public static final long CHAT = 1527;
 
 	public static final long CONTACTS = 1530;
 
@@ -52,7 +68,11 @@ public class Menu {
 	public static final long SETTINGS = 7;
 
 	public static final long IMPEX = 8;
+	
+	public static final long INDEX = 10;
 
+	public static final long FOLDER_INTERFACE = 11;
+	
 	public static final long CUSTOM_ID = 17;
 
 	public static final long METADATA = 25;
@@ -75,7 +95,7 @@ public class Menu {
 
 	public static final long SUBSCRIPTIONS = -1120;
 
-	public static final long UPDATES = -1130;
+	public static final long UPDATES_AND_PATCHES = -1130;
 
 	public static final long TENANTS = -1140;
 
@@ -84,6 +104,10 @@ public class Menu {
 	public static final long KEYSTORE = -1160;
 	
 	public static final long VIA = -1170;
+	
+	public static final long COMPARATORS = 1660;
+	
+	public static final long AUTOMATION = 1570;
 
 	public static final long CALENDAR_REPORT = -2060;
 
@@ -125,17 +149,24 @@ public class Menu {
 	
 	public static final long EXTERNAL_AUTHENTICATION = 1880;
 
+	public static final long SINGLE_SIGNON = 1875;
 	
-	private static Set<Long> menues = new HashSet<Long>();
+	public static final long RESTART = -1190;
+	
+	public static final long SYNDICATION = 2000;
+	
+	public static final long ZONAL_OCR = 2100;
+	
+	private static Set<Long> menus = new HashSet<Long>();
 
 	static public void init(GUIUser user) {
-		menues.clear();
-		for (long menu : user.getMenues()) {
-			menues.add(menu);
+		menus.clear();
+		for (long menu : user.getMenus()) {
+			menus.add(menu);
 		}
 	}
 
 	public static boolean enabled(long menu) {
-		return menues.contains(menu);
+		return menus.contains(menu);
 	}
 }

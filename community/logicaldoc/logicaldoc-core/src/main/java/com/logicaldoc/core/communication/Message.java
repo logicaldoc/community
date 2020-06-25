@@ -26,20 +26,39 @@ public abstract class Message extends PersistentObject {
 
 	private String subject = "";
 
-	// When the message was sent
+	/**
+	 * When the message was sent
+	 */
 	private Date sentDate = new Date();
 
-	// When the message was received
+	/**
+	 * When the message was received
+	 */
 	private Date receivedDate = new Date();
-	
+
 	private int type = TYPE_SYSTEM;
 
 	protected Set<Recipient> recipients = new HashSet<Recipient>();
 
-	// The locale in which the message is written
+	/**
+	 * The locale in which the message is written
+	 */
 	protected Locale locale;
 
 	protected int html = 0;
+
+	/**
+	 * A flag that can be used to specify if the message has to be notified to
+	 */
+	protected boolean notify = true;
+
+	public boolean isNotify() {
+		return notify;
+	}
+
+	public void setNotify(boolean notify) {
+		this.notify = notify;
+	}
 
 	public String getMessageText() {
 		return messageText;

@@ -152,7 +152,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 		this.folderId = folderId;
 	}
 
-	public int isSearchInSubPath() {
+	public int getSearchInSubPath() {
 		return searchInSubPath;
 	}
 
@@ -263,7 +263,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 		wopt.setFolderId(opt.getFolderId());
 		wopt.setSearchInSubPath(opt.isSearchInSubPath() ? 1 : 0);
 		wopt.setMaxHits(opt.getMaxHits());
-		wopt.setRetrieveAliases(opt.getRetrieveAliases());
+		wopt.setRetrieveAliases(opt.isRetrieveAliases() ? 1 : 0);
 		wopt.setTemplate(opt.getTemplate());
 		wopt.setCaseSensitive(opt.isCaseSensitive() ? 1 : 0);
 		if (opt.getFilterIds() != null && opt.getFilterIds() != null)
@@ -306,7 +306,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 			so.setFolderId(folderId);
 			so.setMaxHits(maxHits);
 			so.setName(name);
-			so.setRetrieveAliases(retrieveAliases);
+			so.setRetrieveAliases(retrieveAliases == 1);
 			so.setSearchInSubPath(searchInSubPath == 1);
 			so.setTopOperator(topOperator);
 			so.setTemplate(getTemplate());

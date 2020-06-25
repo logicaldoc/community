@@ -35,6 +35,10 @@ public class VirtualHostHelper {
 	}
 
 	/**
+	 * Gets the name of the web application
+	 * 
+	 * @param request the HTTP request
+	 * 
 	 * @return WebApp name : ie : logicaldoc
 	 */
 	public static String getWebAppName(ServletRequest request) {
@@ -47,6 +51,10 @@ public class VirtualHostHelper {
 	}
 
 	/**
+	 * Gets the server's URL
+	 * 
+	 * @param request the HTTP request
+	 * 
 	 * @return Server URL as : protocol://serverName:port/
 	 */
 	public static String getServerURL(ServletRequest request) {
@@ -74,6 +82,11 @@ public class VirtualHostHelper {
 	}
 
 	/**
+	 * Gets the server's URL
+	 * 
+	 * @param request the HTTP request
+	 * @param local if the url must be local
+	 * 
 	 * @return Server URL as : protocol://serverName:port/
 	 */
 	public static String getServerURL(ServletRequest request, boolean local) {
@@ -138,6 +151,10 @@ public class VirtualHostHelper {
 	}
 
 	/**
+	 * Gets the base URL
+	 * 
+	 * @param request the HTTP request
+	 * 
 	 * @return base URL as protocol://serverName:port/webappName/
 	 */
 	public static String getBaseURL(ServletRequest request) {

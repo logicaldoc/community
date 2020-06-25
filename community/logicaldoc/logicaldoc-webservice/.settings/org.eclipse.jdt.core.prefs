@@ -1,9 +1,6 @@
-#Wed Jun 27 18:04:10 CEST 2018
-org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.8
-eclipse.preferences.version=1
-encoding/src/main/java=iso-8859-1
-org.eclipse.jdt.core.compiler.source=1.8
-encoding/src/test/resources=iso-8859-1
-encoding/src/main/resources=iso-8859-1
+#Wed Jun 03 12:38:30 CEST 2020
 encoding/src/test/java=iso-8859-1
-org.eclipse.jdt.core.compiler.compliance=1.8
+encoding/src/test/resources=iso-8859-1
+eclipse.preferences.version=1
+encoding/src/main/resources=iso-8859-1
+encoding/src/main/java=iso-8859-1

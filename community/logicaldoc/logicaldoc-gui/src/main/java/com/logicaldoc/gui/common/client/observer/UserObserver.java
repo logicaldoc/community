@@ -11,6 +11,12 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 public interface UserObserver {
 	/**
 	 * Invoked when some changes on the user happens
+	 * 
+	 * @param user the user that has been changed
 	 */
 	public void onUserChanged(GUIUser user);
+
+	public void onUserLogin(String username);
+
+	public void onUserLogout(String username);
 }

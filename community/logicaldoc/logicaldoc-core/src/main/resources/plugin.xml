@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-core" version="8.0.0" class="com.logicaldoc.core.CorePlugin">
+<plugin id="logicaldoc-core" version="8.4.2" class="com.logicaldoc.core.CorePlugin">
   <extension-point id="DbInit">
     <parameter-def id="name" />
     <parameter-def id="sqlFile" />
@@ -192,6 +192,10 @@
     <parameter id="extension" value="jpeg" />
     <parameter id="class" value="com.logicaldoc.core.document.thumbnail.ImageThumbnailBuilder" />
   </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="jfifThumb">
+    <parameter id="extension" value="jfif" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.ImageThumbnailBuilder" />
+  </extension>  
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="gifThumb">
     <parameter id="extension" value="gif" />
     <parameter id="class" value="com.logicaldoc.core.document.thumbnail.ImageThumbnailBuilder" />
@@ -220,7 +224,30 @@
     <parameter id="extension" value="pdf" />
     <parameter id="class" value="com.logicaldoc.core.document.thumbnail.PdfThumbnailBuilder" />
   </extension>
-
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="mp3Thumb">
+    <parameter id="extension" value="mp3" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.Mp3ThumbnailBuilder" />
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="mp4Thumb">
+    <parameter id="extension" value="mp4" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.VideoThumbnailBuilder" />
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="aviThumb">
+    <parameter id="extension" value="avi" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.VideoThumbnailBuilder" />
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="mwvThumb">
+    <parameter id="extension" value="mwv" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.VideoThumbnailBuilder" />
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="mkvThumb">
+    <parameter id="extension" value="mkv" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.VideoThumbnailBuilder" />
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="movThumb">
+    <parameter id="extension" value="mov" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.VideoThumbnailBuilder" />
+  </extension> 
 
   <extension plugin-id="logicaldoc-core" point-id="Search" id="fulltextSearch">
     <parameter id="type" value="0" />
@@ -271,8 +298,8 @@
   <extension plugin-id="logicaldoc-core" point-id="Task" id="taskDigestProcessor">
 	<parameter id="name" value="DigestProcessor" />
   </extension>
-  <extension plugin-id="logicaldoc-core" point-id="Task" id="taskProductNews">
-	<parameter id="name" value="ProductNews" />
+  <extension plugin-id="logicaldoc-core" point-id="Task" id="taskPathCalculator">
+	<parameter id="name" value="PathCalculator" />
   </extension>
   
   <extension plugin-id="logicaldoc-core" point-id="TokenFilter" id="tfStemmer">
@@ -281,11 +308,11 @@
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="TokenFilter" id="tfWordDelim">
 	<parameter id="name" value="worddelimiter" />
-	<parameter id="factory" value="org.apache.lucene.analysis.miscellaneous.WordDelimiterFilterFactory.WordDelimiterFilterFactory" />
+	<parameter id="factory" value="org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilterFactory" />
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="TokenFilter" id="tfNGram">
 	<parameter id="name" value="ngram" />
-	<parameter id="factory" value="org.apache.lucene.analysis.miscellaneous.WordDelimiterFilterFactory.WordDelimiterFilterFactory" />
+	<parameter id="factory" value="org.apache.lucene.analysis.ngram.NGramFilterFactory" />
   </extension>
   
   <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspUniquenessFilename">
@@ -299,10 +326,13 @@
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspEventsGathering">
     <parameter id="code" value="eventsGathering" />
-  </extension>  
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspStoring">
+    <parameter id="code" value="storing" />
+  </extension>
   
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="imageConv">
-		<parameter id="in" value="png,gif,jpg,jpeg,tif,tiff,bmp,psd"/>
+		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd"/>
 		<parameter id="out" value="pdf"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.ImageConverter"/>
   </extension>
@@ -315,10 +345,15 @@
 		<parameter id="in" value="xml"/>
 		<parameter id="out" value="pdf,html"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.XMLConverter"/>
-  </extension>  
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="zipConv">
+		<parameter id="in" value="zip"/>
+		<parameter id="out" value="pdf,txt"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.ZipConverter"/>
+  </extension>    
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="catchallConv">
 		<parameter id="in" value="*"/>
 		<parameter id="out" value="pdf"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.NotAvailableConverter"/>
-  </extension>
+  </extension>  
 </plugin>

@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.common.client.websockets.WebsocketsMessageService
+path: 626EDDA8DDC03EFAA2BA817CE6E82971.gwt.rpc

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.0.0</version>
+		<version>8.4.2</version>
 	</parent>
 	<artifactId>logicaldoc-webapp</artifactId>
 	<name>logicaldoc-webapp</name>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
+			<version>18.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
@@ -75,6 +75,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-el</groupId>
 			<artifactId>commons-el</artifactId>
 		</dependency>
@@ -109,16 +114,20 @@
 			<artifactId>commons-beanutils</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-pool</groupId>
-			<artifactId>commons-pool</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-pool2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
@@ -139,6 +148,7 @@
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>jdom</groupId>
@@ -179,19 +189,18 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.31</version>
+			<version>8.0.18</version>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0.2</version>
+			<groupId>com.oracle.jdbc</groupId>
+			<artifactId>ojdbc8</artifactId>
+			<version>12.2.0.1</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>sqljdbc4</artifactId>
-			<version>4.2</version>
-			<type>jar</type>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>7.2.2.jre8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -381,11 +390,12 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
-		</dependency>	
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptors>
@@ -485,20 +495,16 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<unzip
-									src="target/${project.artifactId}-${project.version}.war"
-									dest="target/war" />
-								<delete
-									dir="target/war/WEB-INF/classes/com/logicaldoc/gui" />
+								<unzip src="target/${project.artifactId}-${project.version}.war" dest="target/war" />
+								<delete dir="target/war/WEB-INF/classes/com/logicaldoc/gui" />
 								<delete dir="target/war/work" />
 								<delete dir="target/war/META-INF" />
 								<delete>
 									<fileset dir="target/war/WEB-INF/lib"
-										includes="gwt-user*,smartgwt-skin*,logicaldoc-webapp*,gwtevent*,guava-14*" />
+										includes="gwt-user*,smartgwt-skin*,logicaldoc-webapp*,gwtevent*,guava-14*,guava-16*" />
 								</delete>
 								<copy file="src/main/resources/context.properties"
-									tofile="target/war/WEB-INF/classes/context.properties"
-									overwrite="true" />
+									tofile="target/war/WEB-INF/classes/context.properties" overwrite="true" />
 								<unzip dest="target/war">
 									<fileset dir="target/war">
 										<include name="*-plugin.zip" />
@@ -509,9 +515,7 @@
 										<include name="*-plugin.zip" />
 									</fileset>
 								</delete>
-								<zip
-									destfile="target/${project.artifactId}-${project.version}.war"
-									basedir="target/war" />
+								<zip destfile="target/${project.artifactId}-${project.version}.war" basedir="target/war" />
 							</tasks>
 						</configuration>
 					</execution>

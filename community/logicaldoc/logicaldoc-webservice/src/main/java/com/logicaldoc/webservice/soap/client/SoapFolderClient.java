@@ -78,8 +78,8 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public boolean isWriteable(String sid, long folderId) throws Exception {
-		return client.isWriteable(sid, folderId);
+	public boolean isWritable(String sid, long folderId) throws Exception {
+		return client.isWritable(sid, folderId);
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.Tenant;
@@ -116,8 +117,10 @@ public abstract class Search {
 	 * Perform the search
 	 * 
 	 * @return The list of hits
+	 * 
+	 * @throws SearchException raised in case of error during the search
 	 */
-	public final List<Hit> search() {
+	public final List<Hit> search() throws SearchException {
 		log.info("Launch search");
 		log.info("Expression: {}", options.getExpression());
 
@@ -135,11 +138,7 @@ public abstract class Search {
 		hits.clear();
 		moreHitsPresent = false;
 
-		try {
-			internalSearch();
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-		}
+		internalSearch();
 
 		ContextProperties config = Context.get().getProperties();
 		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
@@ -164,29 +163,44 @@ public abstract class Search {
 			final Map<String, Attribute> extAtt = new HashMap<String, Attribute>();
 
 			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			StringBuffer query = new StringBuffer(
-					"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue ");
-			query.append(" from ld_document_ext where ld_docid in ");
+			StringBuffer query = new StringBuffer();
+
+			if (hits.get(0).getType().startsWith("folder")) {
+				query.append(
+						"select ld_folderid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
+				query.append(" from ld_folder_ext where ld_folderid in ");
+			} else {
+				query.append(
+						"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
+				query.append(" from ld_document_ext where ld_docid in ");
+			}
+
 			query.append(idsString);
 			query.append(" and ld_name in ");
 			query.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')").replaceAll(",", "','")
 					.replaceAll(" ", ""));
-			ddao.query(query.toString(), null, new RowMapper<Long>() {
-				@Override
-				public Long mapRow(ResultSet rs, int row) throws SQLException {
-					Long docId = rs.getLong(1);
-					String name = rs.getString(2);
 
-					Attribute ext = new Attribute();
-					ext.setStringValue(rs.getString(4));
-					ext.setIntValue(rs.getLong(5));
-					ext.setDoubleValue(rs.getDouble(6));
-					ext.setDateValue(rs.getDate(7));
-					ext.setType(rs.getInt(3));
-					extAtt.put(docId + "-" + name, ext);
-					return null;
-				}
-			}, null);
+			try {
+				ddao.query(query.toString(), null, new RowMapper<Long>() {
+					@Override
+					public Long mapRow(ResultSet rs, int row) throws SQLException {
+						Long docId = rs.getLong(1);
+						String name = rs.getString(2);
+
+						Attribute ext = new Attribute();
+						ext.setStringValue(rs.getString(4));
+						ext.setIntValue(rs.getLong(5));
+						ext.setDoubleValue(rs.getDouble(6));
+						ext.setDateValue(rs.getDate(7));
+						ext.setStringValues(rs.getString(8));
+						ext.setType(rs.getInt(3));
+						extAtt.put(docId + "-" + name, ext);
+						return null;
+					}
+				}, null);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
 
 			for (Hit h : hits) {
 				for (String name : attrs) {
@@ -213,7 +227,7 @@ public abstract class Search {
 	 * Concrete implementations must give a particular search algorithm that
 	 * populates the hits list.
 	 */
-	protected abstract void internalSearch() throws Exception;
+	protected abstract void internalSearch() throws SearchException;
 
 	public List<Hit> getHits() {
 		return hits;
@@ -233,6 +247,8 @@ public abstract class Search {
 
 	/**
 	 * Query execution time in milliseconds
+	 * 
+	 * @return the execution time expressed in milliseconds
 	 */
 	public long getExecTime() {
 		return execTime;

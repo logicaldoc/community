@@ -1,16 +1,18 @@
 package com.logicaldoc.core.document.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentNote;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.util.Context;
@@ -21,7 +23,6 @@ import com.logicaldoc.util.Context;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
-@SuppressWarnings("unchecked")
 public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<DocumentNote> implements DocumentNoteDAO {
 
 	public HibernateDocumentNoteDAO() {
@@ -30,7 +31,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public boolean store(DocumentNote note, History transaction) {
+	public boolean store(DocumentNote note, DocumentHistory transaction) throws PersistenceException {
 		boolean result = super.store(note);
 		if (!result)
 			return false;
@@ -61,25 +62,30 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public List<DocumentNote> findByDocId(long docId) {
-		return findByWhere("_entity.docId =" + docId, null, null);
+	public List<DocumentNote> findByDocId(long docId, String fileVersion) {
+		try {
+			if (StringUtils.isEmpty(fileVersion))
+				return findByWhere("_entity.docId = " + docId, null, null);
+			else
+				return findByWhere("_entity.docId = ?1 and _entity.fileVersion = ?2",
+						new Object[] { docId, fileVersion }, null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<DocumentNote>();
+		}
 	}
 
 	@Override
 	public List<DocumentNote> findByUserId(long userId) {
-		return findByWhere("_entity.userId =" + userId, "order by _entity.date desc", null);
+		try {
+			return findByWhere("_entity.userId =" + userId, "order by _entity.date desc", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<DocumentNote>();
+		}
 	}
 
-	@Override
-	public void deleteContentAnnotations(long docId) {
-		List<DocumentNote> notes = findByDocId(docId);
-		for (DocumentNote note : notes)
-			if (note.getPage() != 0)
-				delete(note.getId());
-		markToIndex(docId);
-	}
-
-	private void markToIndex(long docId) {
+	private void markToIndex(long docId) throws PersistenceException {
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document doc = documentDao.findById(docId);
 		if (doc != null && doc.getIndexed() == AbstractDocument.INDEX_INDEXED) {
@@ -90,10 +96,31 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public boolean delete(long id, int code) {
-		DocumentNote note=findById(id);
-		if(note!=null)
+	public boolean delete(long id, int code) throws PersistenceException {
+		DocumentNote note = findById(id);
+		if (note != null)
 			markToIndex(note.getDocId());
 		return super.delete(id, code);
+	}
+
+	@Override
+	public int copyAnnotations(long docId, String oldFileVersion, String newFileVersion) throws PersistenceException {
+		List<DocumentNote> oldNotes = findByDocId(docId, oldFileVersion);
+		int count=0;
+		for (DocumentNote oldNote : oldNotes) {
+			if (oldNote.getPage() > 0)
+				continue;
+
+			try {
+				DocumentNote newNote = (DocumentNote) oldNote.clone();
+				newNote.setId(0L);
+				newNote.setFileVersion(newFileVersion);
+				store(newNote);
+				count++;
+			} catch (CloneNotSupportedException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+		return count;
 	}
 }

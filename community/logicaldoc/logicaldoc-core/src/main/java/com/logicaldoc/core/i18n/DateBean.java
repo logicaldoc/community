@@ -33,6 +33,10 @@ public class DateBean extends Date {
 	/**
 	 * This method creates the Date object for a compact string in the format
 	 * yyyyMMdd HH:mm:ss or yyyyHHdd.
+	 * 
+	 * @param compactString compact text representation of the date
+	 * 
+	 * @return the date
 	 */
 	public static Date dateFromCompactString(String compactString) {
 		SimpleDateFormat targetFormat = new SimpleDateFormat("yyyyMMdd HHmmss");
@@ -50,6 +54,7 @@ public class DateBean extends Date {
 	 * This method formats a a date into format yyyymmdd.
 	 * 
 	 * @param date the date to be converted
+	 * 
 	 * @return a string containing the converted date
 	 */
 	public static String toCompactString(Date date) {
@@ -61,7 +66,9 @@ public class DateBean extends Date {
 	 * This method formats a string with format dd.mm.yyyy into format yyyymmdd.
 	 * 
 	 * @param date string containing the date to be converted
+	 * @param dateFormat format of the date
 	 * @param lang from which language it should be converted
+	 * 
 	 * @return a string containing the converted date
 	 */
 	public static String toCompactString(String date, String dateFormat, String lang) {
@@ -78,6 +85,7 @@ public class DateBean extends Date {
 	 * @param formatIn current format of the string
 	 * @param formatOut format the string should be converted to
 	 * @param dateIn the string containing a date in the formatIn
+	 * 
 	 * @return returns the converted string in the formatOut
 	 */
 	public static String convertDate(String formatIn, String formatOut, String dateIn) {

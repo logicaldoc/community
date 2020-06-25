@@ -1,5 +1,6 @@
 package com.logicaldoc.core.lock;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Tenant;
@@ -30,11 +32,18 @@ public class LockManager {
 
 	/**
 	 * Gets all the transaction ids associated to the locks
+	 * 
+	 * @return the lists of transactions
 	 */
 	@SuppressWarnings("unchecked")
 	public List<String> getAllTransactions() {
-		return genericDao.queryForList(
-				"select ld_string1 from ld_generic where ld_type='lock' and ld_string1 is not null", String.class);
+		try {
+			return genericDao.queryForList(
+					"select ld_string1 from ld_generic where ld_type='lock' and ld_string1 is not null", String.class);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<String>();
+		}
 	}
 
 	/**
@@ -82,7 +91,12 @@ public class LockManager {
 		if (lock != null && transactionId.equals(lock.getString1())) {
 			lock.setDate1(null);
 			lock.setString1(null);
-			genericDao.store(lock);
+
+			try {
+				genericDao.store(lock);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -91,7 +105,7 @@ public class LockManager {
 		Generic lock = genericDao.findByAlternateKey(LOCK, getSubType(lockName), null, Tenant.DEFAULT_ID);
 		try {
 			if (lock == null) {
-				log.debug("Lock " + lockName + " not found");
+				log.debug("Lock {} not found", lockName);
 				lock = new Generic(LOCK, getSubType(lockName));
 				lock.setString1(transactionId);
 				lock.setDate1(today);
@@ -102,7 +116,7 @@ public class LockManager {
 			Date ldDate = cal.getTime();
 
 			if (lock.getDate1() == null || lock.getDate1().before(ldDate)) {
-				log.info("Lock " + lockName + " expired");
+				log.debug("Lock {} expired", lockName);
 				lock.setDate1(today);
 				lock.setString1(transactionId);
 			}
@@ -114,7 +128,11 @@ public class LockManager {
 			} else
 				return false;
 		} finally {
-			genericDao.store(lock);
+			try {
+				genericDao.store(lock);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 		}
 	}
 

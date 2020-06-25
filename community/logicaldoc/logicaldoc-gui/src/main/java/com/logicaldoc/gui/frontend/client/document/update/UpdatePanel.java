@@ -2,11 +2,13 @@ package com.logicaldoc.gui.frontend.client.document.update;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.frontend.client.document.ExtendedPropertiesPanel;
+import com.logicaldoc.gui.frontend.client.document.DocumentExtendedPropertiesPanel;
+import com.logicaldoc.gui.frontend.client.document.DocumentOCRPanel;
 import com.logicaldoc.gui.frontend.client.document.PublishingPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.Side;
@@ -33,17 +35,21 @@ public class UpdatePanel extends VLayout {
 
 	protected Layout extendedPropertiesTabPanel;
 
+	protected Layout ocrTabPanel;
+
 	protected Layout retentionPoliciesTabPanel;
 
 	protected Layout notificationTabPanel;
 
 	protected UpdateStandardPropertiesPanel propertiesPanel;
 
-	protected ExtendedPropertiesPanel extendedPropertiesPanel;
+	protected DocumentExtendedPropertiesPanel extendedPropertiesPanel;
 
 	protected PublishingPanel retentionPoliciesPanel;
 
 	protected UpdateNotificationPanel notificationPanel;
+
+	protected DocumentOCRPanel ocrPanel;
 
 	protected TabSet tabSet = new TabSet();
 
@@ -54,6 +60,8 @@ public class UpdatePanel extends VLayout {
 	protected Tab retentionPoliciesTab;
 
 	protected Tab notificationTab;
+
+	protected Tab ocrTab;
 
 	public UpdatePanel(GUIDocument metadata, boolean showNotificationPanel) {
 		super();
@@ -72,6 +80,8 @@ public class UpdatePanel extends VLayout {
 				document.setTemplate(currentFolder.getTemplate());
 				document.setAttributes(currentFolder.getAttributes());
 			}
+
+			document.setOcrTemplateId(currentFolder.getOcrTemplateId());
 		}
 
 		setHeight100();
@@ -102,6 +112,12 @@ public class UpdatePanel extends VLayout {
 		extendedPropertiesTabPanel.setHeight100();
 		extendedPropertiesTab.setPane(extendedPropertiesTabPanel);
 
+		ocrTab = new Tab(I18N.message("ocr"));
+		ocrTabPanel = new HLayout();
+		ocrTabPanel.setWidth100();
+		ocrTabPanel.setHeight100();
+		ocrTab.setPane(ocrTabPanel);
+
 		retentionPoliciesTab = new Tab(I18N.message("publishing"));
 		retentionPoliciesTabPanel = new HLayout();
 		retentionPoliciesTabPanel.setWidth100();
@@ -124,10 +140,12 @@ public class UpdatePanel extends VLayout {
 
 		tabSet.addTab(propertiesTab);
 		tabSet.addTab(extendedPropertiesTab);
-		if (Feature.enabled(Feature.RETENTION_POLICIES)
-				&& (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN) || Session.get().getUser()
-						.isMemberOf(Constants.GROUP_PUBLISHER)))
+		if (Feature.enabled(Feature.RETENTION_POLICIES) && (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
+				|| Session.get().getUser().isMemberOf(Constants.GROUP_PUBLISHER)))
 			tabSet.addTab(retentionPoliciesTab);
+
+		if (Menu.enabled(Menu.DOCUMENT_OCR))
+			tabSet.addTab(ocrTab);
 
 		if (showNotificationPanel)
 			tabSet.addTab(notificationTab);
@@ -148,6 +166,22 @@ public class UpdatePanel extends VLayout {
 		propertiesPanel = new UpdateStandardPropertiesPanel(document);
 		propertiesTabPanel.addMember(propertiesPanel);
 
+		ChangedHandler nothingToDo = new ChangedHandler() {
+			@Override
+			public void onChanged(ChangedEvent event) {
+
+			}
+		};
+
+		ChangedHandler templateChangedHandler = new ChangedHandler() {
+			@Override
+			public void onChanged(ChangedEvent event) {
+				document.setOcrTemplateId(null);
+				document.setBarcodeTemplateId(null);
+				ocrPanel.refresh(document.getTemplateId());
+			}
+		};
+		
 		/*
 		 * Prepare the extended properties tab
 		 */
@@ -156,15 +190,19 @@ public class UpdatePanel extends VLayout {
 			if (extendedPropertiesTabPanel.contains(extendedPropertiesPanel))
 				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
 		}
-
-		ChangedHandler nothingToDo = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-
-			}
-		};
-		extendedPropertiesPanel = new ExtendedPropertiesPanel(document, nothingToDo);
+		extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, nothingToDo, templateChangedHandler);
 		extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
+
+		/*
+		 * Prepare the OCR settings tab
+		 */
+		if (ocrPanel != null) {
+			ocrPanel.destroy();
+			if (ocrTabPanel.contains(ocrPanel))
+				ocrTabPanel.removeMember(ocrPanel);
+		}
+		ocrPanel = new DocumentOCRPanel(document, nothingToDo, false);
+		ocrTabPanel.addMember(ocrPanel);
 
 		/*
 		 * Prepare the retention policies tab
@@ -197,14 +235,17 @@ public class UpdatePanel extends VLayout {
 		boolean stdValid = propertiesPanel.validate();
 		boolean extValid = extendedPropertiesPanel.validate();
 		boolean publishingValid = retentionPoliciesPanel.validate();
+		boolean ocrValid = ocrPanel.validate();
 		notificationPanel.validate();
 
 		if (!stdValid)
-			tabSet.selectTab(0);
+			tabSet.selectTab(propertiesTab);
 		else if (!extValid)
-			tabSet.selectTab(1);
+			tabSet.selectTab(extendedPropertiesTab);
 		else if (!publishingValid)
-			tabSet.selectTab(2);
-		return stdValid && extValid && publishingValid;
+			tabSet.selectTab(retentionPoliciesTab);
+		else if (!ocrValid)
+			tabSet.selectTab(ocrTab);
+		return stdValid && extValid && publishingValid && ocrValid;
 	}
 }

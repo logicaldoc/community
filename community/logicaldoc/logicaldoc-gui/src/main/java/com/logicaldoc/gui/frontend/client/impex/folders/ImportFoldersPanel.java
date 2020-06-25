@@ -244,8 +244,8 @@ public class ImportFoldersPanel extends AdminPanel {
 		enable.setTitle(I18N.message("enable"));
 		enable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ImportFolderService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")),
-						true, new AsyncCallback<Void>() {
+				ImportFolderService.Instance.get().changeStatus(Long.parseLong(record.getAttributeAsString("id")), true,
+						new AsyncCallback<Void>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
@@ -329,6 +329,8 @@ public class ImportFoldersPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param importFolder the import folder to update
 	 */
 	public void updateRecord(GUIImportFolder importFolder) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, importFolder.getId()));
@@ -340,13 +342,13 @@ public class ImportFoldersPanel extends AdminPanel {
 			list.selectRecord(record);
 		}
 
-		record.setAttribute("src",  importFolder.getDisplayUrl());
-		
+		record.setAttribute("src", importFolder.getDisplayUrl());
+
 		record.setAttribute("eenabled", importFolder.getEnabled() == 1 ? "0" : "2");
 
 		String type = I18N.message("localfolder");
-		if ("smb".equals(importFolder.getProvider()))
-			type = I18N.message("smbshare");
+		if (importFolder.getProvider().startsWith("smb"))
+			type = I18N.message(importFolder.getProvider() + "share");
 		else if ("ftp".equals(importFolder.getProvider()))
 			type = I18N.message("fftp");
 		else if ("ftps".equals(importFolder.getProvider()))

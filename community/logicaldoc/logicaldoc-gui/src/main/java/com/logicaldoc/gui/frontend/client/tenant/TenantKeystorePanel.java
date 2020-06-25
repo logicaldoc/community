@@ -188,7 +188,7 @@ public class TenantKeystorePanel extends VLayout {
 		TextItem width = ItemFactory.newTextItem("width", "width", keystore.getSignWidth());
 		width.setWidth(300);
 
-		final ColorItem color = ItemFactory.newColorItemPicker("color", "color", keystore.getSignFontColor());
+		final ColorItem color = ItemFactory.newColorItemPicker("color", "color", keystore.getSignFontColor(), true, null);
 
 		final RadioGroupItem visual = ItemFactory.newBooleanSelector("visual", "visual");
 		visual.setValue(keystore.isSignVisual() ? "yes" : "no");

@@ -1,11 +1,13 @@
 package com.logicaldoc.core.document.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentLink;
 
 /**
@@ -14,7 +16,6 @@ import com.logicaldoc.core.document.DocumentLink;
  * @author Matteo Caruso - LogicalDOC
  * @since 4.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<DocumentLink> implements DocumentLinkDAO {
 	public HibernateDocumentLinkDAO() {
 		super(DocumentLink.class);
@@ -42,7 +43,13 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 			query.append(type);
 			query.append("'");
 		}
-		return findByWhere(query.toString(), new Object[] { docId, docId }, null, null);
+
+		try {
+			return findByWhere(query.toString(), new Object[] { docId, docId }, null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<DocumentLink>();
+		}
 	}
 
 	@Override
@@ -55,7 +62,13 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 		query.append(type);
 		query.append("'");
 
-		List<DocumentLink> links = findByWhere(query.toString(), new Object[] { docId1, docId2 }, null, null);
+		List<DocumentLink> links = new ArrayList<DocumentLink>();
+		try {
+			links = findByWhere(query.toString(), new Object[] { docId1, docId2 }, null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
 		if (!links.isEmpty())
 			link = links.iterator().next();
 		return link;
@@ -63,9 +76,48 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 
 	@Override
 	public boolean delete(long id, int code) {
+		if (!checkStoringAspect())
+			return false;
+
 		DocumentLink link = findById(id);
-		if (link != null)
+		if (link != null) {
+			long docId1 = link.getDocument1() != null ? link.getDocument1().getId() : 0;
+			long docId2 = link.getDocument2() != null ? link.getDocument2().getId() : 0;
+
 			getCurrentSession().delete(link);
+
+			flush();
+
+			updateLinksCount(docId1);
+			updateLinksCount(docId2);
+		}
 		return true;
+	}
+
+	@Override
+	public boolean store(DocumentLink entity) throws PersistenceException {
+		boolean newLink = entity.getId() == 0L;
+		boolean result = super.store(entity);
+
+		flush();
+
+		if (newLink && result) {
+			if (entity.getDocument1() != null)
+				updateLinksCount(entity.getDocument1().getId());
+			if (entity.getDocument2() != null)
+				updateLinksCount(entity.getDocument2().getId());
+		}
+
+		return result;
+	}
+
+	private void updateLinksCount(long docId) {
+		try {
+			jdbcUpdate(
+					"update ld_document set ld_links = (select count(*) from ld_link  where ld_deleted=0 and (ld_docid1="
+							+ docId + " or ld_docid2=" + docId + ")) where ld_id=" + docId);
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
+		}
 	}
 }

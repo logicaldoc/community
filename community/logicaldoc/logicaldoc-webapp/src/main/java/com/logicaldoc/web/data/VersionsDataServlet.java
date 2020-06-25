@@ -72,10 +72,11 @@ public class VersionsDataServlet extends HttpServlet {
 					"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName, A.customId, A.fileSize, A.type, A.templateName ");
 			if (request.getParameter("docId") != null) {
 				query.append(" from Version A where A.deleted = 0 and A.docId = ?1 ");
-				parameters.add(new Long(request.getParameter("docId")));
+				parameters.add(Long.parseLong(request.getParameter("docId")));
 			} else {
 				query.append(" from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) ");
-				query.append(" and B.id =" + request.getParameter("archiveId"));
+				query.append(" and B.id = ?1");
+				parameters.add(Long.parseLong(request.getParameter("archiveId")));
 			}
 			query.append(" order by A.versionDate desc ");
 
@@ -100,7 +101,7 @@ public class VersionsDataServlet extends HttpServlet {
 				writer.print("<date>" + df.format((Date) cols[5]) + "</date>");
 				writer.print("<comment><![CDATA[" + (cols[6] == null ? "" : cols[6]) + "]]></comment>");
 				writer.print("<docid>" + cols[7] + "</docid>");
-				writer.print("<filename>" + (String) cols[8] + "</filename>");
+				writer.print("<filename><![CDATA[" + (String) cols[8] + "]]></filename>");
 				writer.print("<customid><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></customid>");
 				writer.print("<size>" + cols[10] + "</size>");
 				writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[11]))

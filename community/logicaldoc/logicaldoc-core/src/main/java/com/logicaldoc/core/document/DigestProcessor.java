@@ -50,10 +50,11 @@ public class DigestProcessor extends Task {
 		processed = 0;
 		try {
 			// First of all find documents to be processed
-			size = documentDao
-					.queryForLong("select count(*) from ld_document where ld_deleted = 0 and ld_docref is null and ld_digest is null");
+			size = documentDao.queryForLong(
+					"select count(*) from ld_document where ld_deleted = 0 and ld_docref is null and ld_digest is null");
 
-			Integer max = config.getProperty("digest.batch") != null ? new Integer(config.getProperty("digest.batch"))
+			Integer max = config.getProperty("digest.batch") != null
+					? Integer.parseInt(config.getProperty("digest.batch"))
 					: null;
 
 			if (max != null && max.intValue() < size && max.intValue() > 0)
@@ -64,8 +65,8 @@ public class DigestProcessor extends Task {
 
 			log.info("Found a total of " + size + " documents to be processed");
 
-			List<Long> ids = documentDao.findIdsByWhere(
-					"_entity.docRef is null and _entity.digest is null and deleted = 0", null, max);
+			List<Long> ids = documentDao
+					.findIdsByWhere("_entity.docRef is null and _entity.digest is null and deleted = 0", null, max);
 			for (Long id : ids) {
 				try {
 					log.debug("Processing document " + id);

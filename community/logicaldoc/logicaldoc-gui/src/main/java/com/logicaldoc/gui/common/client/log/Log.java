@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.log;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.RequestTimeoutException;
 import com.logicaldoc.gui.common.client.InvalidSessionException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.Session;
@@ -42,7 +43,9 @@ public class Log {
 			EventPanel.get().error(I18N.message("servererror") + ": " + message, message);
 			GWT.log("Server error: " + message, caught);
 
-			if (caught instanceof InvalidSessionException) {
+			if (caught instanceof RequestTimeoutException) {
+				SC.warn(I18N.message("timeout"));
+			} else if (caught instanceof InvalidSessionException) {
 				// Redirect to the module's login page
 				Session.get().close();
 				String base = GWT.getHostPageBaseURL();
@@ -79,7 +82,7 @@ public class Log {
 	public static void info(String message) {
 		info(message, null);
 	}
-	
+
 	public static void info(String message, String detail) {
 		try {
 			GWT.log("info: " + message, null);

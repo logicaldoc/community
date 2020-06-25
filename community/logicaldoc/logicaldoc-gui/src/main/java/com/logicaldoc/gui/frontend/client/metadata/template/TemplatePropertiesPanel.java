@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
+import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
@@ -22,14 +23,12 @@ import com.smartgwt.client.widgets.events.DropCompleteHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
-import com.smartgwt.client.widgets.form.fields.PickerIcon.Picker;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -94,6 +93,8 @@ public class TemplatePropertiesPanel extends HLayout {
 			att.setType(Integer.parseInt(rec.getAttributeAsString("type")));
 			att.setSet(rec.getAttributeAsString("set"));
 			att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
+			att.setHidden(rec.getAttributeAsBoolean("hidden"));
+			att.setMultiple(rec.getAttributeAsBoolean("multiple"));
 			att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
 			att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
 
@@ -125,8 +126,8 @@ public class TemplatePropertiesPanel extends HLayout {
 		attributesList.setSelectionType(SelectionStyle.MULTIPLE);
 		attributesList.setCanEdit(false);
 		attributesList.setShowRowNumbers(true);
-		attributesList.setCanReorderRecords(true);
-		attributesList.setCanAcceptDroppedRecords(true);
+		attributesList.setCanReorderRecords(!template.isReadonly());
+		attributesList.setCanAcceptDroppedRecords(!template.isReadonly());
 		attributesList.setAutoFetchData(true);
 		attributesList.setShowRecordComponents(true);
 		attributesList.setShowRecordComponentsByCell(true);
@@ -158,44 +159,31 @@ public class TemplatePropertiesPanel extends HLayout {
 		ListGridField mandatory = new ListGridField("mandatory", I18N.message("mandatory"));
 		mandatory.setCanEdit(false);
 		mandatory.setCanSort(false);
-		mandatory.setWidth(80);
+		mandatory.setWidth(90);
+
+		ListGridField hidden = new ListGridField("hidden", I18N.message("hidden"));
+		hidden.setCanEdit(false);
+		hidden.setCanSort(false);
+		hidden.setWidth(80);
+
+		ListGridField multiple = new ListGridField("multiple", I18N.message("multiple"));
+		multiple.setCanEdit(false);
+		multiple.setCanSort(false);
+		multiple.setWidth(80);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setCanEdit(false);
 		type.setCanSort(false);
 		type.setWidth(60);
-		type.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if (value == null)
-					return "";
-				int intValue = new Integer(value.toString());
-				switch (intValue) {
-				case GUIAttribute.TYPE_STRING:
-					return I18N.message("string");
-				case GUIAttribute.TYPE_INT:
-					return I18N.message("integer");
-				case GUIAttribute.TYPE_DOUBLE:
-					return I18N.message("decimal");
-				case GUIAttribute.TYPE_DATE:
-					return I18N.message("date");
-				case GUIAttribute.TYPE_BOOLEAN:
-					return I18N.message("boolean");
-				case GUIAttribute.TYPE_USER:
-					return I18N.message("user");
-				}
-				return value.toString();
-			}
-		});
+		type.setCellFormatter(new AttributeTypeFormatter());
 
 		attributesList.addDropCompleteHandler(new DropCompleteHandler() {
 
 			@Override
 			public void onDropComplete(DropCompleteEvent event) {
 				List<String> attributes = new ArrayList<String>();
-				ListGridRecord[] records = attributesList.getRecords();
-				for (ListGridRecord record : records) {
+				for (int i = 0; i < attributesList.getTotalRows(); i++) {
+					ListGridRecord record = attributesList.getRecord(i);
 					attributes.add(record.getAttributeAsString("name"));
 				}
 
@@ -204,7 +192,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 		});
 
-		attributesList.setFields(name, label, type, mandatory, set);
+		attributesList.setFields(name, label, type, mandatory, hidden, multiple, set);
 
 		Button addAttributes = new Button(I18N.message("addattributes"));
 		addAttributes.setMargin(2);
@@ -220,13 +208,17 @@ public class TemplatePropertiesPanel extends HLayout {
 
 		SectionStack attributesStack = new SectionStack();
 		attributesStack.setHeight100();
-		attributesStack.setWidth(500);
+		attributesStack.setWidth(680);
 
 		SectionStackSection section = new SectionStackSection("<b>" + I18N.message("attributes") + "</b>");
 		section.setCanCollapse(false);
 		section.setExpanded(true);
 
-		section.setItems(attributesList, addAttributes);
+		if (template.isReadonly())
+			section.setItems(attributesList);
+		else
+			section.setItems(attributesList, addAttributes);
+
 		attributesStack.setSections(section);
 		attributesStack.draw();
 
@@ -304,7 +296,47 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 		});
 
-		contextMenu.setItems(makeMandatory, makeOptional, delete);
+		MenuItem makeHidden = new MenuItem();
+		makeHidden.setTitle(I18N.message("makehidden"));
+		makeHidden.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				final ListGridRecord[] selection = attributesList.getSelectedRecords();
+				if (selection == null || selection.length == 0)
+					return;
+				final String[] names = new String[selection.length];
+				for (int i = 0; i < selection.length; i++) {
+					names[i] = selection[i].getAttribute("name");
+					template.getAttribute(names[i]).setHidden(true);
+				}
+
+				fillAttributesList();
+
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			}
+		});
+
+		MenuItem makeVisible = new MenuItem();
+		makeVisible.setTitle(I18N.message("makevisible"));
+		makeVisible.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				final ListGridRecord[] selection = attributesList.getSelectedRecords();
+				if (selection == null || selection.length == 0)
+					return;
+				final String[] names = new String[selection.length];
+				for (int i = 0; i < selection.length; i++) {
+					names[i] = selection[i].getAttribute("name");
+					template.getAttribute(names[i]).setHidden(false);
+				}
+
+				fillAttributesList();
+
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			}
+		});
+
+		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeHidden, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -315,8 +347,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		if (template == null)
 			return;
 
-		GUIAttribute[] attributes = template.getAttributes();
-
+		GUIAttribute[] attributes = template.getAttributesOrderedByPosition();
 		if (attributes == null)
 			return;
 
@@ -330,6 +361,8 @@ public class TemplatePropertiesPanel extends HLayout {
 			record.setAttribute("type", att.getType());
 			record.setAttribute("editor", att.getEditor());
 			record.setAttribute("mandatory", att.isMandatory());
+			record.setAttribute("hidden", att.isHidden());
+			record.setAttribute("multiple", att.isMultiple());
 			attributesList.getRecordList().add(record);
 		}
 	}
@@ -372,9 +405,8 @@ public class TemplatePropertiesPanel extends HLayout {
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", template.getDescription());
 		description.setDisabled(template.isReadonly());
-		description.setWidth(name.getWidth());
 
-		PickerIcon computeStat = new PickerIcon(new Picker("[SKIN]/picker_refresh.png"), new FormItemClickHandler() {
+		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, new FormItemClickHandler() {
 			public void onFormItemClick(final FormItemIconClickEvent event) {
 				event.getItem().setValue(I18N.message("computing") + "...");
 				TemplateService.Instance.get().countDocuments(template.getId(), new AsyncCallback<Long>() {
@@ -392,6 +424,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 		});
 		computeStat.setPrompt(I18N.message("calculatestats"));
+
 		StaticTextItem docs = ItemFactory.newStaticTextItem("docs", "documents", "-");
 		docs.setIconHSpace(2);
 		docs.setIconWidth(16);
@@ -422,7 +455,8 @@ public class TemplatePropertiesPanel extends HLayout {
 			ListGridRecord[] records = attributesList.getRecords();
 			int position = 0;
 			if (records != null) {
-				for (ListGridRecord rec : records) {
+				for (int i = 0; i < attributesList.getTotalRows(); i++) {
+					ListGridRecord rec = attributesList.getRecord(i);
 					GUIAttribute att = new GUIAttribute();
 					att.setPosition(position++);
 					att.setName(rec.getAttributeAsString("name"));
@@ -432,6 +466,8 @@ public class TemplatePropertiesPanel extends HLayout {
 					att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
 					att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
 					att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
+					att.setHidden(rec.getAttributeAsBoolean("hidden"));
+					att.setMultiple(rec.getAttributeAsBoolean("multiple"));
 					template.appendAttribute(att);
 				}
 			}

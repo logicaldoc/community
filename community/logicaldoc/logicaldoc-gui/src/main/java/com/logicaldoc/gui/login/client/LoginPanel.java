@@ -102,8 +102,8 @@ public class LoginPanel extends VLayout {
 		spacer10.setWidth(10);
 
 		// Prepare the logo to show on the top of the page
-		Img logoTop = ItemFactory.newBrandImg(info.getBranding().isLogoOemCustomized() ? "logo_head.png"
-				: "logo_oem.png", info);
+		Img logoTop = ItemFactory
+				.newBrandImg(info.getBranding().isLogoOemCustomized() ? "logo_head.png" : "logo_oem.png", info);
 		logoTop.setWidth(205);
 		logoTop.setHeight(40);
 
@@ -117,8 +117,8 @@ public class LoginPanel extends VLayout {
 		top.setMembers(logoTop);
 
 		// Prepare the logo to show in the login form
-		Img logoLogin = ItemFactory.newBrandImg(
-				!info.getBranding().isLogoOemCustomized() ? "logo.png" : "logo_oem.png", info);
+		Img logoLogin = ItemFactory.newBrandImg(!info.getBranding().isLogoOemCustomized() ? "logo.png" : "logo_oem.png",
+				info);
 		logoLogin.setWidth(205);
 		logoLogin.setHeight(40);
 		logoLogin.setAlign(Alignment.CENTER);
@@ -268,17 +268,21 @@ public class LoginPanel extends VLayout {
 			formItems.add(secretKey);
 			formItems.add(spacerItem12);
 		}
-		formItems.add(language);
-		formItems.add(spacerItem12);
+
+		if ("true".equals(info.getConfig("gui.login.lang"))) {
+			formItems.add(language);
+			formItems.add(spacerItem12);
+		}
+
 		if (saveLoginEnabled)
 			formItems.add(rememberMe);
 		formItems.add(signIn);
 
 		form.setItems(formItems.toArray(new FormItem[0]));
 
-		HTMLFlow lostPassword = new HTMLFlow("<div><a href=\"javascript:showLostDialog('"
-				+ info.getBranding().getProductName() + "')\" class='login-lost'>" + I18N.message("lostpassword")
-				+ "</a></div>");
+		HTMLFlow lostPassword = new HTMLFlow(
+				"<div><a href=\"javascript:showLostDialog('" + info.getBranding().getProductName()
+						+ "')\" class='login-lost'>" + I18N.message("lostpassword") + "</a></div>");
 		lostPassword.setLayoutAlign(Alignment.RIGHT);
 		lostPassword.setHoverDelay(0);
 		lostPassword.setMargin(0);
@@ -309,7 +313,11 @@ public class LoginPanel extends VLayout {
 		inputsForm.setMargin(0);
 		inputsForm.setWidth(FORM_WIDTH);
 		inputsForm.setStyleName("control-group");
-		inputsForm.setMembers(logoLogin, spacer15, form, lostPassword, licensing);
+
+		if ("true".equals(info.getConfig("gui.lostpassword.show")))
+			inputsForm.setMembers(logoLogin, spacer15, form, lostPassword, licensing);
+		else
+			inputsForm.setMembers(logoLogin, spacer15, form, licensing);
 
 		// Panel containing the login form
 		VLayout loginForm = new VLayout();
@@ -367,8 +375,8 @@ public class LoginPanel extends VLayout {
 		String url = "mobile".equals(Util.getJavascriptVariable("j_layout")) ? (Util.contextPath() + "login.jsp")
 				: (Util.contextPath() + "login-mobile.jsp");
 		url += "?tenant=" + Util.detectTenant();
-		String label = "mobile".equals(Util.getJavascriptVariable("j_layout")) ? I18N.message("viewclassicweb") : I18N
-				.message("viewmobileweb");
+		String label = "mobile".equals(Util.getJavascriptVariable("j_layout")) ? I18N.message("viewclassicweb")
+				: I18N.message("viewmobileweb");
 
 		/*
 		 * A link to the alternative login page
@@ -458,7 +466,8 @@ public class LoginPanel extends VLayout {
 
 		CookiesManager.removeLogin();
 
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, Util.contextPath() + "j_spring_security_check");
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
+				Util.contextPath() + "j_spring_security_check");
 		builder.setHeader("Content-type", "application/x-www-form-urlencoded");
 		try {
 			String data = "j_username=" + URL.encodeQueryString((String) username.getValue());
@@ -484,7 +493,7 @@ public class LoginPanel extends VLayout {
 				}
 			});
 		} catch (RequestException e) {
-			SC.warn("Login request error: " + e.getMessage());
+			SC.warn("Login request error: {}", e.getMessage());
 		}
 	}
 

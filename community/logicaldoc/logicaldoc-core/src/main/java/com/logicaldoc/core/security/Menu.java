@@ -1,6 +1,8 @@
 package com.logicaldoc.core.security;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.logicaldoc.core.PersistentObject;
@@ -18,23 +20,51 @@ import com.logicaldoc.core.PersistentObject;
  */
 public class Menu extends PersistentObject implements Comparable<Menu> {
 
-	public static long ROOT = 1;
+	public static final long ROOT = 1;
 
-	public static long ADMINISTRATION = 2;
-	
-	public static long SECURITY = 9;
-	
-	public static long DOCUMENTS = 1500;
+	public static final long ADMINISTRATION = 2;
 
-	public static long SESSIONS = 1601;
-	
-	public static long SETTINGS = 7;
-	
-	public static long PARAMETERS = 100;
-	
-	public static long ADMIN_SESSIONS = 71;
-	
-	public static long LOGS = 72;
+	public static final long FRONTEND = 5;
+
+	public static final long SETTINGS = 7;
+
+	public static final long SECURITY = 9;
+
+	public static final long MAINMENU = 110;
+
+	public static final long DOCUMENTS = 1500;
+
+	public static final long SEARCH = 1510;
+
+	public static final long DASHBOARD = 1520;
+
+	public static final long MESSAGES = 1525;
+
+	public static final long SESSIONS = 1601;
+
+	public static final long VERSIONS = 1603;
+
+	public static final long ALIASES = 1605;
+
+	public static final long PARAMETERS = 100;
+
+	public static final long ADMIN_SESSIONS = 71;
+
+	public static final long LOGS = 72;
+
+	public static final long SUBSCRIPTIONS = -1120;
+
+	public static final long PERSONAL = 40;
+
+	public static final long CONTACTS = 1530;
+
+	public static final long CHAT = 1527;
+
+	public static final long INTERFACE_DENSITY = 1535;
+
+	public static final List<Long> admittedGuestMenuIds = Arrays
+			.asList(new Long[] { ROOT, DOCUMENTS, FRONTEND, DOCUMENTS, VERSIONS, ALIASES, SEARCH, DASHBOARD, MESSAGES,
+					MAINMENU, SUBSCRIPTIONS, PERSONAL, CHAT, INTERFACE_DENSITY });
 
 	private long id = 0;
 
@@ -131,7 +161,9 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	}
 
 	/**
-	 * Adds a new element, substituting a precedin one with the same groupId.
+	 * Adds a new element, substituting a previous one with the same groupId.
+	 * 
+	 * @param mg the menu group
 	 */
 	public void addMenuGroup(MenuGroup mg) {
 		MenuGroup m = getMenuGroup(mg.getGroupId());
@@ -165,9 +197,9 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 
 	@Override
 	public int compareTo(Menu o) {
-		int comparation = Integer.compare(this.position, o.position);
-		if (comparation != 0)
-			return comparation;
+		int comparison = Integer.compare(this.position, o.position);
+		if (comparison != 0)
+			return comparison;
 		return this.name.compareTo(o.name);
 	}
 

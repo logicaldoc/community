@@ -71,7 +71,8 @@ public class Dropbox {
 	 * Generates the authorization URL where the user has to allow LogicalDOC
 	 * and gets an authorization code to be used then with finishAuthorization.
 	 * 
-	 * @param locale
+	 * @param locale the user's locale 
+	 * 
 	 * @return The page to be shown to the user to allow the app to access
 	 */
 	public String startAuthorization(Locale locale) {
@@ -86,7 +87,7 @@ public class Dropbox {
 	 * 
 	 * @param authorizationCode The authorization code that the user see in the
 	 *        authorization page
-	 * @param locale
+
 	 * @return The access token
 	 */
 	public String finishAuthorization(String authorizationCode) {

@@ -3,17 +3,18 @@ package com.logicaldoc.core.security;
 import java.util.ArrayList;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 
+import junit.framework.Assert;
+
 /**
- * Test case for the manager <code>SecurityManager<code>
+ * Test case for the manager <code>SecurityManager</code>.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
@@ -36,7 +37,7 @@ public class SecurityManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testAssignUsersToGroup() {
+	public void testAssignUsersToGroup() throws PersistenceException {
 		ArrayList<User> users = new ArrayList<User>();
 		users.add(userDAO.findByUsername("test"));
 		users.add(userDAO.findByUsername("admin"));
@@ -63,7 +64,7 @@ public class SecurityManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testRemoveAllUsersFromGroup() {
+	public void testRemoveAllUsersFromGroup() throws PersistenceException {
 		// create a new group which extends author
 		Group authorGroup = groupDAO.findByName("author", 1);
 
@@ -116,7 +117,7 @@ public class SecurityManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testAssignUserToGroups() {
+	public void testAssignUserToGroups() throws PersistenceException {
 		User user = new User();
 		user.setUsername("zzz");
 		user.setDecodedPassword("xxxpwd");

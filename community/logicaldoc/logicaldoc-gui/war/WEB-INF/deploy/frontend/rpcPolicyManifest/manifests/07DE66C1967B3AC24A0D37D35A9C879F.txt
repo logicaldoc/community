@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.TagService
+path: F6449A3CEACBE9A043E50227120E09B2.gwt.rpc

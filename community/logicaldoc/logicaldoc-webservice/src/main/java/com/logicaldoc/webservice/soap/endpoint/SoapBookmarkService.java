@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.dao.BookmarkDAO;
 import com.logicaldoc.core.security.User;
@@ -80,7 +81,11 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 		bmark.setType(bookmark.getType());
 		bmark.setUserId(user.getId());
 
-		bDao.store(bmark);
+		try {
+			bDao.store(bmark);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		return WSBookmark.fromBookmark(bmark);
 	}

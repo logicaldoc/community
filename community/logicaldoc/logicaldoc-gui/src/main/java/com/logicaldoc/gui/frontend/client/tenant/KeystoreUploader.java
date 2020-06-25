@@ -1,9 +1,5 @@
 package com.logicaldoc.gui.frontend.client.tenant;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIKeystore;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -20,6 +16,10 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import gwtupload.client.IUploadStatus.Status;
+import gwtupload.client.IUploader;
+import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload a new workflow schema to the server.

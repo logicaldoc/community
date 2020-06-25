@@ -40,7 +40,7 @@ $ cd ../../community/logicaldoc
 $ mvn clean package
 ```
 
-See also the file README.txt
+See also the file Build_this_Sources.md
 
 ## Documentation
  * [LogicalDOC Knowledge Center](https://docs.logicaldoc.com)

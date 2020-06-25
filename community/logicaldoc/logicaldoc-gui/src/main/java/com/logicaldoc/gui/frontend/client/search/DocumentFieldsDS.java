@@ -53,7 +53,8 @@ public class DocumentFieldsDS extends DataSource {
 		fileSize.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
 				OperatorId.NOT_EQUAL);
 
-		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified", I18N.message("lastmodified"));
+		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified",
+				I18N.message("lastmodified"));
 		lastModified.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN);
 
 		DataSourceDateTimeField published = new DataSourceDateTimeField("date", I18N.message("publishedon"));
@@ -67,7 +68,8 @@ public class DocumentFieldsDS extends DataSource {
 				OperatorId.NOT_EQUAL);
 
 		DataSourceIntegerField rating = new DataSourceIntegerField("rating", I18N.message("rating"));
-		rating.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS, OperatorId.NOT_EQUAL);
+		rating.setValidOperators(OperatorId.GREATER_THAN, OperatorId.LESS_THAN, OperatorId.EQUALS,
+				OperatorId.NOT_EQUAL);
 
 		DataSourceTextField tags = new DataSourceTextField("tags", I18N.message("tags"));
 		tags.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS);
@@ -94,14 +96,21 @@ public class DocumentFieldsDS extends DataSource {
 		DataSourceIntegerField publishedStatus = new DataSourceIntegerField("published", I18N.message("published"));
 		publishedStatus.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL);
 
+		DataSourceTextField tmplt = new DataSourceTextField("template", I18N.message("template"));
+		tmplt.setValidOperators(OperatorId.IS_NULL);
+
 		setFields(id, filename, fileSize, publisher, version, lastModified, published, created, creator, customId,
-				extension, rating, tags, comment, notes, wfStatus, publishedStatus, startPublishing, stopPublishing);
+				extension, rating, tags, comment, notes, wfStatus, publishedStatus, startPublishing, stopPublishing,
+				tmplt);
 
 		/*
 		 * Define extended attributes
 		 */
 		if (template != null && template.getAttributes() != null)
 			for (GUIAttribute att : template.getAttributes()) {
+				if (att.isHidden())
+					continue;
+
 				DataSourceField field = null;
 				String name = "_" + att.getName().replaceAll(" ", Constants.BLANK_PLACEHOLDER);
 				String titl = att.getLabel() + " (" + template.getName() + ")";
@@ -123,6 +132,11 @@ public class DocumentFieldsDS extends DataSource {
 					field = new DataSourceIntegerField();
 					field.setValidOperators(OperatorId.EQUALS);
 					name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_BOOLEAN;
+				} else if (att.getType() == GUIAttribute.TYPE_USER || att.getType() == GUIAttribute.TYPE_FOLDER) {
+					field = new DataSourceIntegerField();
+					field.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL, OperatorId.IS_NULL,
+							OperatorId.NOT_NULL);
+					name = name + Constants.BLANK_PLACEHOLDER + "type:" + att.getType();
 				} else {
 					field = new DataSourceTextField();
 					field.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,

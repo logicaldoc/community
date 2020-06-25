@@ -70,7 +70,11 @@ public class RestBookmarkClient extends AbstractRestClient {
 	}
 
 	/**
-	 * Retrieves all the bookmarks of the current user.
+	 * Retrieves all the bookmarks of the current user
+	 * 
+	 * @return array of bookmarks
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/getBookmarks")

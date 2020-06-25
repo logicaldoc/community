@@ -1,9 +1,5 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -19,6 +15,10 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import gwtupload.client.IUploadStatus.Status;
+import gwtupload.client.IUploader;
+import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload a checked-out document to the server.

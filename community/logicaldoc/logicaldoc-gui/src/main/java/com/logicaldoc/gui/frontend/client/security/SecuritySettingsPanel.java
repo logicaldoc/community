@@ -12,10 +12,8 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -86,7 +84,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 		ignorelogincase.setValue(settings.isIgnoreLoginCase() ? "yes" : "no");
 		ignorelogincase.setWrapTitle(false);
 		ignorelogincase.setRequired(true);
-
+		
+		final RadioGroupItem allowSid = ItemFactory.newBooleanSelector("allowsid", I18N.message("allowsidinrequest"));
+		allowSid.setValue(settings.isAllowSidInRequest() ? "yes" : "no");
+		allowSid.setWrapTitle(false);
+		allowSid.setRequired(true);
+		allowSid.setDisabled(Session.get().isDemo());
+		
 		final RadioGroupItem forceSsl = ItemFactory.newBooleanSelector("forcessl", I18N.message("forcessl"));
 		forceSsl.setValue(settings.isForceSsl() ? "yes" : "no");
 		forceSsl.setWrapTitle(false);
@@ -94,13 +98,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 		forceSsl.setDisabled(Session.get().isDemo());
 
 		if (Session.get().isDefaultTenant())
-			securityForm.setFields(pwdSize, pwdExp, savelogin, ignorelogincase, forceSsl);
+			securityForm.setFields(pwdSize, pwdExp, savelogin, ignorelogincase, allowSid, forceSsl);
 		else
 			securityForm.setFields(pwdSize, pwdExp, savelogin);
 		body.setMembers(securityForm);
 
 		Tab menus = new Tab();
-		menus.setTitle(I18N.message("menues"));
+		menus.setTitle(I18N.message("menus"));
 		menus.setPane(new MenusPanel());
 		tabs.addTab(menus);
 
@@ -123,6 +127,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 							: false);
 
 					SecuritySettingsPanel.this.settings.setEnableAnonymousLogin(values.get("enableanonymous").equals(
+							"yes") ? true : false);
+					SecuritySettingsPanel.this.settings.setAllowSidInRequest(values.get("allowsid").equals(
 							"yes") ? true : false);
 					SecuritySettingsPanel.this.settings.setAnonymousKey((String) values.get("anonymousKey"));
 
@@ -156,13 +162,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 													+ I18N.message("settingsaffectnewsessions"), null);
 
 									if (restartRequired.booleanValue())
-										SC.warn(I18N.message("needrestart"), new BooleanCallback() {
-
-											@Override
-											public void execute(Boolean value) {
-												WindowUtils.reload();
-											}
-										});
+										SC.warn(I18N.message("needrestart"));
 								}
 							});
 				}
@@ -212,7 +212,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 				} else {
 					GUIUser u = new GUIUser();
 					u.setId(Long.parseLong(anonymousUser.getSelectedRecord().getAttribute("id")));
-					u.setUserName(anonymousUser.getSelectedRecord().getAttribute("username"));
+					u.setUsername(anonymousUser.getSelectedRecord().getAttribute("username"));
 					SecuritySettingsPanel.this.settings.setAnonymousUser(u);
 				}
 			}

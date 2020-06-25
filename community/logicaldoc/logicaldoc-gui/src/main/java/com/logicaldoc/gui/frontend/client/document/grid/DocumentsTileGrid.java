@@ -459,4 +459,9 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	public Cursor getGridCursor() {
 		return cursor;
 	}
+	
+	@Override
+	public void loadGridLayout(GUIFolder folder) {
+		// Function not supported byt the tiles visualization
+	}
 }

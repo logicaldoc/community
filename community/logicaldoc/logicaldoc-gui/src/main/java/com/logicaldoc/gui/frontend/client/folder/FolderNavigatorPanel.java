@@ -8,6 +8,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.frontend.client.document.DocumentsUploader;
+import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -29,15 +30,17 @@ public class FolderNavigatorPanel extends VLayout implements FolderObserver {
 
 	private ToolStripButton addDocuments;
 
+	private Cursor cursor = null;
+
 	public static FolderNavigatorPanel get() {
-		if (instance == null)
+		if (instance == null) {
 			instance = new FolderNavigatorPanel();
+			FolderController.get().addObserver(instance);
+		}
 		return instance;
 	}
 
 	private FolderNavigatorPanel() {
-		FolderController.get().addObserver(this);
-
 		newFolder = new ToolStripButton(I18N.message("newfolder"));
 		newFolder.addClickHandler(new ClickHandler() {
 			@Override
@@ -74,7 +77,7 @@ public class FolderNavigatorPanel extends VLayout implements FolderObserver {
 		folderToolbar.addButton(addDocuments);
 		folderToolbar.addButton(newWorkspace);
 
-		setMembers(folderToolbar, FolderNavigator.get());
+		setMembers(folderToolbar, cursor, FolderNavigator.get());
 	}
 
 	@Override

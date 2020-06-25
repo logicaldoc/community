@@ -1,6 +1,6 @@
 package com.logicaldoc.core.folder;
 
-import com.logicaldoc.core.document.AbstractHistory;
+import com.logicaldoc.core.History;
 
 /**
  * History entry due to an event on a folder.
@@ -8,7 +8,7 @@ import com.logicaldoc.core.document.AbstractHistory;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
-public class FolderHistory extends AbstractHistory {
+public class FolderHistory extends History {
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
@@ -19,6 +19,7 @@ public class FolderHistory extends AbstractHistory {
 		history.setUser(getUser());
 		history.setEvent(getEvent());
 		history.setComment(getComment());
+		history.setReason(getReason());
 		history.setVersion(getVersion());
 		history.setPath(getPath());
 		history.setPathOld(getPathOld());

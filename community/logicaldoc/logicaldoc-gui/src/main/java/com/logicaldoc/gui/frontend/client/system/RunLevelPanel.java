@@ -87,11 +87,14 @@ public class RunLevelPanel extends VLayout {
 	protected void onSave() {
 		final List<GUIParameter> settings = new ArrayList<GUIParameter>();
 		settings.add(new GUIParameter("runlevel", currentRunlevel.getValueAsString()));
+		settings.add(new GUIParameter("runlevel.back", currentRunlevel.getValueAsString()));
 		for (ListGridRecord rec : aspects.getRecords()) {
 			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".default", rec
 					.getAttributeAsString("default")));
 			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".bulkload", rec
 					.getAttributeAsString("bulkload")));
+			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".slave", rec
+					.getAttributeAsString("slave")));
 			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".devel", rec
 					.getAttributeAsString("devel")));
 			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".demo", rec
@@ -117,6 +120,7 @@ public class RunLevelPanel extends VLayout {
 	private SectionStack prepareAspectsTable() {
 		ListGridField id = new ListGridField("id", I18N.message("aspect"), 300);
 		id.setCanEdit(false);
+		id.setCanSort(false);
 		id.setAutoFitWidth(true);
 		id.setCellFormatter(new CellFormatter() {
 
@@ -130,30 +134,40 @@ public class RunLevelPanel extends VLayout {
 		_default.setType(ListGridFieldType.BOOLEAN);
 		_default.setCanEdit(true);
 		_default.setAutoFitWidth(true);
-
+		_default.setCanSort(false);
+		
 		ListGridField bulkload = new ListGridField("bulkload", I18N.message("bulkload"), 60);
 		bulkload.setType(ListGridFieldType.BOOLEAN);
 		bulkload.setCanEdit(true);
 		bulkload.setAutoFitWidth(true);
+		bulkload.setCanSort(false);
 
+		ListGridField slave = new ListGridField("slave", I18N.message("slave"), 60);
+		slave.setType(ListGridFieldType.BOOLEAN);
+		slave.setCanEdit(true);
+		slave.setAutoFitWidth(true);
+		slave.setCanSort(false);
+		
 		ListGridField devel = new ListGridField("devel", I18N.message("devel"), 60);
 		devel.setType(ListGridFieldType.BOOLEAN);
 		devel.setCanEdit(true);
 		devel.setAutoFitWidth(true);
+		devel.setCanSort(false);
 
 		ListGridField demo = new ListGridField("demo", I18N.message("demo"), 60);
 		demo.setType(ListGridFieldType.BOOLEAN);
 		demo.setCanEdit(true);
 		demo.setAutoFitWidth(true);
+		demo.setCanSort(false);
 
 		aspects = new ListGrid();
 		aspects.setEmptyMessage(I18N.message("notitemstoshow"));
 		aspects.setCanFreezeFields(true);
 		aspects.setAutoFetchData(true);
 		aspects.setDataSource(new AspectsDS());
-		aspects.setFields(id, _default, bulkload, devel, demo);
+		aspects.setFields(id, _default, bulkload, slave, devel, demo);
 		aspects.setHeaderHeight(44);
-		aspects.setHeaderSpans(new HeaderSpan(I18N.message("runlevels"), new String[] { "default", "bulkload", "devel",
+		aspects.setHeaderSpans(new HeaderSpan(I18N.message("runlevels"), new String[] { "default", "bulkload", "slave", "devel",
 				"demo" }));
 
 		SectionStack stack = new SectionStack();

@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
 import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
@@ -23,8 +23,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionChangedHandler;
 import com.smartgwt.client.widgets.grid.events.SelectionEvent;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -37,6 +35,7 @@ import com.smartgwt.client.widgets.menu.Menu;
  * @since 6.0
  */
 public class DocumentsListPanel extends VLayout {
+
 	private DocumentsGrid grid;
 
 	private Cursor cursor;
@@ -49,29 +48,19 @@ public class DocumentsListPanel extends VLayout {
 		return visualizationMode;
 	}
 
-	protected Long hiliteDocId = null;
-
-	public void updateData(GUIFolder folder, Integer max, final Long hiliteDocId) {
-		this.hiliteDocId = hiliteDocId;
-		DocumentsDS dataSource = new DocumentsDS(folder, null, max, grid.getGridCursor().getCurrentPage(), null, null,true);		
-		grid.fetchNewData(dataSource);
-		grid.getGridCursor().setTotalRecords(folder.getDocumentCount());
-	}
-
-	public DocumentsListPanel(GUIFolder folder, final Long hiliteDoc, Integer max, int visualizationMode) {
-		this.hiliteDocId = hiliteDoc;
+	public DocumentsListPanel(GUIFolder folder, Integer max, int visualizationMode) {
 		this.visualizationMode = visualizationMode;
- 
-		DocumentsDS dataSource = new DocumentsDS(folder, null, max, 1, null, null,true);
+
+		DocumentsDS dataSource = new DocumentsDS(folder, null, max, 1, null, false, false, true);
 		if (visualizationMode == DocumentsGrid.MODE_LIST)
 			grid = new NavigatorDocumentsGrid(dataSource, folder);
 		else if (visualizationMode == DocumentsGrid.MODE_GALLERY)
 			grid = new DocumentsTileGrid(folder, dataSource);
 
 		// Prepare a panel containing a title and the documents list
-		cursor = new Cursor(CookiesManager.COOKIE_DOCSLIST_MAX, true);
+		cursor = new Cursor(CookiesManager.COOKIE_DOCSLIST_MAX, true, false);
 		cursor.setTotalRecords(folder.getDocumentCount());
-		
+
 		cursor.registerMaxChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
@@ -142,41 +131,19 @@ public class DocumentsListPanel extends VLayout {
 					event.cancel();
 			}
 		});
+	}
 
-		grid.registerDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				if (hiliteDoc != null)
-					DocumentsListPanel.this.hiliteDocument();
-			}
-		});
+	public void updateData(GUIFolder folder, Integer max) {
+		DocumentsDS dataSource = new DocumentsDS(folder, null, max, grid.getGridCursor().getCurrentPage(), null, false,
+				false, true);
+		grid.fetchNewData(dataSource);
+		grid.loadGridLayout(folder);
 	}
 
 	@Override
 	public void destroy() {
 		if (grid != null)
 			grid.destroy();
-	}
-
-	private void hiliteDocument() {
-		if (hiliteDocId != null) {
-			grid.selectDocument(hiliteDocId);
-			if (Session.get().getCurrentDocument() != null && Session.get().getCurrentDocument().getId() != hiliteDocId) {
-				DocumentService.Instance.get().getById(hiliteDocId.longValue(), new AsyncCallback<GUIDocument>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIDocument doc) {
-						Session.get().setCurrentDocument(doc);
-					}
-				});
-			}
-		}
-		hiliteDocId = null;
 	}
 
 	public DocumentsGrid getGrid() {

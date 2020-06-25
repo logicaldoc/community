@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.menu;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -10,9 +11,11 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUICriterion;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
+import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -42,6 +45,7 @@ import com.logicaldoc.gui.frontend.client.personal.CertificateDialog;
 import com.logicaldoc.gui.frontend.client.personal.ChangePassword;
 import com.logicaldoc.gui.frontend.client.personal.Profile;
 import com.logicaldoc.gui.frontend.client.personal.contacts.Contacts;
+import com.logicaldoc.gui.frontend.client.search.Search;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationDialog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
@@ -65,9 +69,15 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
@@ -87,6 +97,10 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	private ToolStripMenuButton tools;
 
 	private static MainMenu instance = null;
+
+	private SelectItem searchType = new SelectItem();
+
+	private TextItem searchBox = new TextItem();
 
 	public static MainMenu get() {
 		if (instance == null)
@@ -117,7 +131,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		addFill();
 
-		Label userInfo = new Label(I18N.message("loggedin") + " <b>" + Session.get().getUser().getUserName() + "</b>");
+		Label userInfo = new Label(I18N.message("loggedin") + " <b>" + Session.get().getUser().getUsername() + "</b>");
 		userInfo.setWrap(false);
 		addMember(userInfo);
 
@@ -135,7 +149,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		if (Feature.enabled(Feature.MULTI_TENANT)) {
 			if (Session.get().getUser().isMemberOf("admin")
-					&& Session.get().getUser().getTenantId() == Constants.TENANT_DEFAULTID) {
+					&& Session.get().getUser().getTenant().getTenantId() == Constants.TENANT_DEFAULTID) {
 				SelectItem tenantItem = ItemFactory.newTenantSelector();
 				tenantItem.setShowTitle(false);
 				tenantItem.setValue(Long.toString(Session.get().getInfo().getTenant().getId()));
@@ -162,7 +176,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				});
 				addFormItem(tenantItem);
 			} else {
-				Label tenantInfo = new Label(Session.get().getInfo().getTenant().getDisplayName());
+				Label tenantInfo = new Label(Session.get().getUser().getTenant().getDisplayName());
 				tenantInfo.setWrap(false);
 				tenantInfo.setAutoWidth();
 				addMember(tenantInfo);
@@ -171,23 +185,99 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			addSeparator();
 		}
 
-		addFormItem(new SearchBox());
+		prepareSearchBox();
 
 		onFolderSelected(Session.get().getCurrentFolder());
+	}
+
+	private void onSearch() {
+		GUISearchOptions options = new GUISearchOptions();
+
+		options.setMaxHits(Session.get().getConfigAsInt("search.hits"));
+
+		String field = searchType.getValueAsString();
+		String value = searchBox.getValueAsString().trim();
+		if ("fulltext".equals(field)) {
+			options.setType(GUISearchOptions.TYPE_FULLTEXT);
+			options.setExpression(value);
+			options.setExpressionLanguage(I18N.getLocale());
+			options.setType(GUISearchOptions.TYPE_FULLTEXT);
+			options.setFields(Constants.FULLTEXT_DEFAULT_FIELDS);
+			options.setCriteria(null);
+		} else {
+			options.setType(GUISearchOptions.TYPE_PARAMETRIC);
+			options.setTopOperator("matchall");
+			GUICriterion criterion = new GUICriterion();
+			criterion.setField(field);
+			criterion.setOperator("contains");
+			if ("id".equals(field)) {
+				criterion.setOperator("equals");
+				try {
+					criterion.setLongValue(Long.parseLong(value));
+				} catch (Throwable t) {
+					criterion.setLongValue(0L);
+				}
+			} else
+				criterion.setStringValue(value);
+			options.setCriteria(new GUICriterion[] { criterion });
+		}
+
+		Search.get().setOptions(options);
+		Search.get().search();
+	}
+
+	private void prepareSearchBox() {
+		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
+			public void onFormItemClick(FormItemIconClickEvent event) {
+				onSearch();
+			}
+		});
+
+		searchBox.setShowTitle(false);
+		searchBox.setDefaultValue(I18N.message("search") + "...");
+		searchBox.setWidth(160);
+		searchBox.addKeyPressHandler(new KeyPressHandler() {
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				if (event.getKeyName() == null)
+					return;
+				if (Constants.KEY_ENTER.equals(event.getKeyName().toLowerCase())) {
+					onSearch();
+				}
+			}
+		});
+		searchBox.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+			@Override
+			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+				if ((I18N.message("search") + "...").equals(event.getItem().getValue())) {
+					event.getItem().setValue("");
+				}
+			}
+		});
+
+		LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
+		valueMap.put("fulltext", I18N.message("fulltext"));
+		valueMap.put("filename", I18N.message("filename"));
+		valueMap.put("id", I18N.message("id"));
+		valueMap.put("customId", I18N.message("customid"));
+		searchType.setWidth(130);
+		searchType.setShowTitle(false);
+		searchType.setValueMap(valueMap);
+		searchType.setValue("fulltext");
+
+		addFormItem(searchBox);
+
+		if (Feature.enabled(Feature.PARAMETRIC_SEARCHES)) {
+			searchType.setIcons(searchPicker);
+			addFormItem(searchType);
+		} else
+			searchBox.setIcons(searchPicker);
 	}
 
 	private ToolStripMenuButton getFileMenu() {
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
-
-		MenuItem dropSpotItem = new MenuItem("Drop Spot");
-		dropSpotItem.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				Util.openDropSpot();
-			}
-		});
 
 		MenuItem exitItem = new MenuItem(I18N.message("exit"));
 		exitItem.addClickHandler(new ClickHandler() {
@@ -196,12 +286,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				onLogout();
 			}
 		});
-
-		if (Feature.enabled(Feature.DROP_SPOT)
-				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS))
-			menu.setItems(dropSpotItem, exitItem);
-		else
-			menu.setItems(exitItem);
+		menu.setItems(exitItem);
 		ToolStripMenuButton menuButton = new ToolStripMenuButton(I18N.message("file"), menu);
 		menuButton.setWidth(100);
 		return menuButton;
@@ -318,8 +403,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		menu.setItems(edit, create);
 		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
 				&& folder.isWrite() && Util.isTextFile(document.getFileName()));
-		create.setEnabled(folder != null && folder.isDownload() && folder.isWrite()
-				&& MainPanel.get().isOnDocumentsTab());
+		create.setEnabled(
+				folder != null && folder.isDownload() && folder.isWrite() && MainPanel.get().isOnDocumentsTab());
 
 		MenuItem textcontentItems = new MenuItem(I18N.message("textcontent"));
 		textcontentItems.setSubmenu(menu);
@@ -364,7 +449,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 								@Override
 								public void onSuccess(String authorizationUrl) {
-									DropboxAuthorizationWizard wizard = new DropboxAuthorizationWizard(authorizationUrl);
+									DropboxAuthorizationWizard wizard = new DropboxAuthorizationWizard(
+											authorizationUrl);
 									wizard.show();
 								}
 							});
@@ -400,7 +486,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 								@Override
 								public void onSuccess(String authorizationUrl) {
-									DropboxAuthorizationWizard wizard = new DropboxAuthorizationWizard(authorizationUrl);
+									DropboxAuthorizationWizard wizard = new DropboxAuthorizationWizard(
+											authorizationUrl);
 									wizard.show();
 								}
 							});
@@ -694,8 +781,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		menu.setItems(importDocs, exportDocs, edit, settings);
 
-		importDocs.setEnabled(folder != null && folder.isDownload() && folder.isWrite()
-				&& Feature.enabled(Feature.ZOHO) && MainPanel.get().isOnDocumentsTab());
+		importDocs.setEnabled(folder != null && folder.isDownload() && folder.isWrite() && Feature.enabled(Feature.ZOHO)
+				&& MainPanel.get().isOnDocumentsTab());
 		exportDocs.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.ZOHO));
 		settings.setEnabled(Feature.enabled(Feature.ZOHO));
 		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
@@ -841,7 +928,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		changePswd.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				ChangePassword cp = new ChangePassword(Session.get().getUser());
+				ChangePassword cp = new ChangePassword();
 				cp.show();
 			}
 		});
@@ -893,7 +980,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				&& Session.get().getTenantConfigAsBoolean("2fa.enabled"))
 			items.add(twofactorsauth);
 
-		if (Feature.enabled(Feature.DIGITAL_SIGNATURE))
+		if (Feature.enabled(Feature.DIGITAL_SIGNATURE)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.SIGNATURE))
 			items.add(getCertificateMenu());
 
 		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CONTACTS))
@@ -1067,9 +1155,11 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	/**
 	 * Invoked when a tab of the main panel is selected
+	 * 
+	 * @param tab name of the selected tab
 	 */
-	public void onTabSeleted(String panel) {
-		if ("documents".equals(panel)) {
+	public void onTabSeleted(String tab) {
+		if ("documents".equals(tab)) {
 			onFolderSelected(Session.get().getCurrentFolder());
 		} else {
 			if (tools != null)
@@ -1079,7 +1169,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			addMember(tools, 2);
 		}
 	}
-	
+
 	@Override
 	public void destroy() {
 		FolderController.get().removeObserver(this);

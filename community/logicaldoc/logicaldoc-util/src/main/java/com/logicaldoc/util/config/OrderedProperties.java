@@ -22,12 +22,11 @@ public class OrderedProperties extends Properties {
 
 	private static final long serialVersionUID = 1L;
 
-	
 	@Override
-    public synchronized Enumeration<Object> keys() {
-        return Collections.enumeration(new TreeSet<Object>(super.keySet()));
-    }
-	
+	public synchronized Enumeration<Object> keys() {
+		return Collections.enumeration(new TreeSet<Object>(super.keySet()));
+	}
+
 	/**
 	 * Overrides the original store() method and sorts the output
 	 * 
@@ -81,8 +80,7 @@ public class OrderedProperties extends Properties {
 		StringBuffer buf = new StringBuffer();
 
 		for (int i = 0; i < orig.length(); i++) {
-			//Escape only if it is not the sequence '\\u'
-			if (orig.charAt(i) == '\\' && ((i < orig.length()-1) && orig.charAt(i+1) != 'u')) {
+			if (orig.charAt(i) == '\\') {
 				buf.append("\\\\");
 			} else {
 				buf.append(orig.charAt(i));
@@ -94,6 +92,8 @@ public class OrderedProperties extends Properties {
 
 	/**
 	 * All the keys but alphabetically ordered
+	 * 
+	 * @return the ordered collection of all the keys 
 	 */
 	public List<String> getKeys() {
 		Vector<String> keys = new Vector<String>();

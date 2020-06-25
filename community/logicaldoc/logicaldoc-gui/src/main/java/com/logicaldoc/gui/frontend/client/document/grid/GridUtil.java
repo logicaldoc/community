@@ -1,12 +1,11 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
@@ -49,6 +48,7 @@ public class GridUtil {
 			document.setTemplate(record.getAttribute("template"));
 			document.setVersion(record.getAttribute("version"));
 			document.setFileVersion(record.getAttribute("fileVersion"));
+			document.setLanguage(record.getAttribute("language"));
 
 			document.setPublisher(record.getAttributeAsString("publisher"));
 
@@ -92,7 +92,7 @@ public class GridUtil {
 
 			if (record.getAttributeAsString("workflowStatusDisplay") != null)
 				document.setWorkflowStatusDisplay(record.getAttributeAsString("workflowStatusDisplay"));
-			
+
 			document.setIcon(record.getAttribute("icon"));
 			if (record.getAttributeAsDate("lastModified") != null)
 				document.setLastModified(record.getAttributeAsDate("lastModified"));
@@ -137,7 +137,6 @@ public class GridUtil {
 			record.setAttribute("filename", doc.getFileName());
 			record.setAttribute("size", doc.getFileSize());
 			record.setAttribute("icon", doc.getIcon());
-			record.setAttribute("version", doc.getVersion());
 			record.setAttribute("lastModified", doc.getLastModified());
 			record.setAttribute("published", doc.getDate());
 			record.setAttribute("publisher", doc.getPublisher());
@@ -169,12 +168,14 @@ public class GridUtil {
 			record.setAttribute("status", doc.getStatus());
 			record.setAttribute("bookmarked", doc.isBookmarked());
 			record.setAttribute("extResId", doc.getExtResId());
+			record.setAttribute("language", doc.getLanguage());
+			record.setAttribute("links", doc.getLinks());
 
 			String[] extNames = Session.get().getInfo().getConfig("search.extattr").split(",");
 			for (String name : extNames) {
-				Object value = doc.getValue(name);
-				if (value instanceof Date)
-					value = I18N.formatDateShort((Date) value);
+				GUIAttribute att = doc.getAttribute(name);
+				Object value = (att != null && att.getStringValues() != null) ? att.getStringValues()
+						: doc.getValue(name);
 				record.setAttribute("ext_" + name, value);
 			}
 		}

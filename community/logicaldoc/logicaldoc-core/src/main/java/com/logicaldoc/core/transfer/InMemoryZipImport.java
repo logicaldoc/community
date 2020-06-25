@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
@@ -79,7 +79,7 @@ public class InMemoryZipImport extends ZipImport {
 					doc.setFileName(fileName);
 					doc.setFolder(folder);
 
-					History history = new History();
+					DocumentHistory history = new DocumentHistory();
 					history.setEvent(DocumentEvent.STORED.toString());
 					history.setComment("");
 					history.setUser(user);

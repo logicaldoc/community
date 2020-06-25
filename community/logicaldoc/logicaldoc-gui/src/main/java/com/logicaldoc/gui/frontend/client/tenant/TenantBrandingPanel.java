@@ -81,7 +81,7 @@ public class TenantBrandingPanel extends HLayout {
 			imp.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					PackageUploader uploader = new PackageUploader(TenantBrandingPanel.this);
+					BrandingPackageUploader uploader = new BrandingPackageUploader(TenantBrandingPanel.this);
 					uploader.show();
 				}
 			});
@@ -96,7 +96,6 @@ public class TenantBrandingPanel extends HLayout {
 			});
 
 			ToolStripButton customCss = new ToolStripButton(I18N.message("customcss"));
-			customCss.setAutoDraw(true);
 			customCss.addClickHandler(new ClickHandler() {
 
 				@Override

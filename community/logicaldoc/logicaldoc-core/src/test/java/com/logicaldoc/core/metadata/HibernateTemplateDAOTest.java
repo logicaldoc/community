@@ -2,13 +2,14 @@ package com.logicaldoc.core.metadata;
 
 import java.util.Collection;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateTemplateDAO</code>
@@ -20,8 +21,6 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 
 	private TemplateDAO dao;
 
-	private AttributeSetDAO setDao;
-
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -29,14 +28,18 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentDAO
 		dao = (TemplateDAO) context.getBean("TemplateDAO");
-
-		setDao = (AttributeSetDAO) context.getBean("AttributeSetDAO");
 	}
 
 	@Test
-	public void testDelete() {
-		Assert.assertTrue(dao.delete(1));
-		Template template = dao.findById(1);
+	public void testDelete() throws PersistenceException {
+		try {
+			Assert.assertFalse(dao.delete(1));
+		} catch (PersistenceException e) {
+			Assert.assertTrue(true);
+		}
+		
+		Assert.assertTrue(dao.delete(-1L));
+		Template template = dao.findById(-1L);
 		Assert.assertNull(template);
 	}
 
@@ -51,6 +54,7 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 	public void testFindById() {
 		Template template = dao.findById(1);
 		Assert.assertNotNull(template);
+		dao.initialize(template);
 		Assert.assertEquals(1, template.getId());
 		Assert.assertEquals("test1", template.getName());
 		Assert.assertTrue(template.getAttributes().containsKey("attr1"));
@@ -61,6 +65,7 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 
 		template = dao.findById(-1);
 		Assert.assertNotNull(template);
+		dao.initialize(template);
 		Assert.assertEquals(-1, template.getId());
 		Assert.assertEquals("default", template.getName());
 		Assert.assertTrue(template.getAttributes().containsKey("object"));
@@ -70,6 +75,7 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 	public void testFindByName() {
 		Template template = dao.findByName("test1", Tenant.DEFAULT_ID);
 		Assert.assertNotNull(template);
+		dao.initialize(template);
 		Assert.assertEquals(1, template.getId());
 		Assert.assertEquals("test1", template.getName());
 
@@ -81,15 +87,16 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		Template template = new Template();
 		template.setName("test3");
 		template.setValue("a1", "v1");
 		template.setValue("a2", "v2");
 		template.setValue("object", "value");
-		
+
 		Assert.assertTrue(dao.store(template));
 		template = dao.findById(template.getId());
+		dao.initialize(template);
 		Assert.assertEquals("test3", template.getName());
 		Assert.assertTrue(template.getAttributes().containsKey("a1"));
 		Assert.assertTrue(template.getAttributes().containsKey("a2"));

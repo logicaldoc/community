@@ -6,11 +6,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 
 public interface DocumentServiceAsync {
+	
 	void getVersionsById(long id1, long id2, AsyncCallback<GUIVersion[]> callback);
 
 	void getAttributes(long templateId, AsyncCallback<GUIAttribute[]> callback);
@@ -52,7 +54,7 @@ public interface DocumentServiceAsync {
 
 	void markHistoryAsRead(String event, AsyncCallback<Void> callback);
 
-	void markIndexable(long[] docIds, AsyncCallback<Void> callback);
+	void markIndexable(long[] docIds, int policy, AsyncCallback<Void> callback);
 
 	void markUnindexable(long[] docIds, AsyncCallback<Void> callback);
 
@@ -75,7 +77,7 @@ public interface DocumentServiceAsync {
 
 	void deleteVersions(long[] ids, AsyncCallback<GUIDocument> callback);
 
-	void createEmpty(GUIDocument vo, AsyncCallback<GUIDocument> callback);
+	void createWithContent(GUIDocument vo, String content, AsyncCallback<GUIDocument> callback);
 
 	void indexDocuments(Long[] docIds, AsyncCallback<Void> callback);
 
@@ -91,7 +93,7 @@ public interface DocumentServiceAsync {
 
 	void unarchiveDocuments(long[] docIds, AsyncCallback<Void> callback);
 
-	void createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
+	void createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate, Integer maxDownloads,
 			AsyncCallback<String> callback);
 
 	void setPassword(long docId, String password, AsyncCallback<Void> callback);
@@ -120,4 +122,18 @@ public interface DocumentServiceAsync {
 	void replaceAlias(long aliasId, AsyncCallback<GUIDocument> callback);
 
 	void deDuplicate(Long folderId, boolean retainNewest, AsyncCallback<Void> callback);
+
+	void replaceFile(long docId, String fileVersion, String comment, AsyncCallback<Void> callback);
+
+	void promoteVersion(long docId, String version, AsyncCallback<GUIDocument> callback);
+
+	void getNotes(long docId, String fileVersion, AsyncCallback<GUIDocumentNote[]> callback);
+
+	void saveNotes(long docId, GUIDocumentNote[] notes, AsyncCallback<Void> callback);
+
+	void deleteTicket(long ticketId, AsyncCallback<Void> callback);
+
+	void enableTicket(long ticketId, AsyncCallback<Void> callback);
+
+	void disableTicket(long ticketId, AsyncCallback<Void> callback);
 }

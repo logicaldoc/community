@@ -37,7 +37,6 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 public class RatingDialog extends Window {
-	private int docRating;
 
 	private GUIRating rating = null;
 
@@ -45,7 +44,6 @@ public class RatingDialog extends Window {
 
 	public RatingDialog(int documentRating, GUIRating rat) {
 		super();
-		this.docRating = documentRating;
 		this.rating = rat;
 
 		addCloseClickHandler(new CloseClickHandler() {
@@ -80,8 +78,8 @@ public class RatingDialog extends Window {
 		StaticTextItem actualRating = ItemFactory.newStaticTextItem("actualrating", "actualrating",
 				DocUtil.getRatingIcon(documentRating));
 
-		final StaticTextItem totalVotes = ItemFactory.newStaticTextItem("totalvotes", "totalvotes", this.rating
-				.getCount().toString() + "&nbsp;&nbsp;" + AwesomeFactory.getIconHtml("eye"));
+		final StaticTextItem totalVotes = ItemFactory.newStaticTextItem("totalvotes", "totalvotes",
+				this.rating.getCount().toString() + "&nbsp;&nbsp;" + AwesomeFactory.getIconHtml("eye"));
 		totalVotes.setWrapTitle(false);
 		totalVotes.setWrap(false);
 		totalVotes.setEndRow(true);

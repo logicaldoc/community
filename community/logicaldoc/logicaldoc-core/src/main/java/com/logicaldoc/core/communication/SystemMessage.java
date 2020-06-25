@@ -108,6 +108,7 @@ public class SystemMessage extends Message {
 		cloned.setTenantId(getTenantId());
 		cloned.setTrials(getTrials());
 		cloned.setType(getType());
+		cloned.setNotify(isNotify());
 
 		return cloned;
 	}

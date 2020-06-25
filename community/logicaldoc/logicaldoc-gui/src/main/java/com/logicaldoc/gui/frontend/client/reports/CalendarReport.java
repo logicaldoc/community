@@ -93,7 +93,7 @@ public class CalendarReport extends AdminPanel {
 
 		TextItem subtype = ItemFactory.newTextItem("subtype", "subtype", null);
 
-		SelectItem statusSelector = ItemFactory.newEventStatusSelector("status", "status");
+		SelectItem statusSelector = ItemFactory.newCalendarEventStatusSelector("status", "status");
 
 		// Max results
 		TextItem displayMax = ItemFactory.newTextItem("displayMax", "displaymax", null);

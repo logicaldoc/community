@@ -17,17 +17,18 @@ public class GUISecuritySettings implements Serializable {
 	private int pwdExpiration;
 
 	private boolean saveLogin = false;
-	
+
 	private boolean ignoreLoginCase = false;
 
 	private boolean enableAnonymousLogin = false;
 
 	private boolean forceSsl = false;
 
+	private boolean allowSidInRequest = false;
+
 	private GUIUser anonymousUser = null;
-	
+
 	private String anonymousKey = null;
-	
 
 	public int getPwdSize() {
 		return pwdSize;
@@ -91,5 +92,13 @@ public class GUISecuritySettings implements Serializable {
 
 	public void setAnonymousKey(String anonymousKey) {
 		this.anonymousKey = anonymousKey;
+	}
+
+	public boolean isAllowSidInRequest() {
+		return allowSidInRequest;
+	}
+
+	public void setAllowSidInRequest(boolean allowSidInRequest) {
+		this.allowSidInRequest = allowSidInRequest;
 	}
 }

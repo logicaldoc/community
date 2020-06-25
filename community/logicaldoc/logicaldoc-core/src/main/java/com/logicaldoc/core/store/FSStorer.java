@@ -63,11 +63,24 @@ public class FSStorer extends AbstractStorer {
 	}
 
 	@Override
-	public long store(InputStream stream, long docId, String resource) {
-		if (!isEnabled()) {
-			log.warn("Storer not enabled");
-			return 0L;
-		}
+	public void store(File file, long docId, String resource) throws IOException {
+		// Do not store 0 byte files
+		if (file.length() == 0L)
+			throw new IOException("Do not store 0 byte file");
+
+		if (!isEnabled())
+			throw new IOException("Storer not enabled");
+
+		File dir = getContainer(docId);
+		FileUtils.forceMkdir(dir);
+		File dest = new File(new StringBuilder(dir.getPath()).append("/").append(resource).toString());
+		FileUtil.copyFile(file, dest);
+	}
+
+	@Override
+	public void store(InputStream stream, long docId, String resource) throws IOException {
+		if (!isEnabled())
+			throw new IOException("Storer not enabled");
 
 		File file = null;
 		try {
@@ -75,28 +88,36 @@ public class FSStorer extends AbstractStorer {
 			FileUtils.forceMkdir(dir);
 			file = new File(new StringBuilder(dir.getPath()).append("/").append(resource).toString());
 			FileUtil.writeFile(stream, file.getPath());
+		} catch (IOException e) {
+			throw e;
 		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			return -1;
+			throw new IOException(e.getMessage(), e);
 		} finally {
 			try {
 				stream.close();
 			} catch (IOException e) {
 			}
 		}
-		return file.length();
 	}
 
 	@Override
-	public InputStream getStream(long docId, String resource) {
+	public void writeToFile(long docId, String resource, File out) throws IOException {
+		File container = getContainer(docId);
+		File file = new File(container, resource);
+		FileUtil.copyFile(file, out);
+	}
+
+	@Override
+	public InputStream getStream(long docId, String resource) throws IOException {
 		File container = getContainer(docId);
 		File file = new File(container, resource);
 
 		try {
 			return new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+		} catch (IOException e) {
+			throw e;
 		} catch (Throwable e) {
-			log.error(e.getMessage());
-			return null;
+			throw new IOException(e.getMessage(), e);
 		}
 	}
 
@@ -111,16 +132,10 @@ public class FSStorer extends AbstractStorer {
 	}
 
 	@Override
-	public byte[] getBytes(long docId, String resource, long start, long length) {
+	public byte[] getBytes(long docId, String resource, long start, long length) throws IOException {
 		File container = getContainer(docId);
 		File file = new File(container, resource);
-
-		try {
-			return FileUtil.toByteArray(file, start, length);
-		} catch (Throwable e) {
-			log.error(e.getMessage());
-			return null;
-		}
+		return FileUtil.toByteArray(file, start, length);
 	}
 
 	@Override

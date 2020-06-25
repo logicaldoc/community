@@ -30,13 +30,12 @@ public class DOCParser extends RTFParser {
 
 	@Override
 	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant) {
-		try {
-			BufferedInputStream bis = new BufferedInputStream(input);
+		try (BufferedInputStream bis = new BufferedInputStream(input)) {
 			bis.mark(Integer.MAX_VALUE);
 
 			String tmp = "";
-			try {
-				tmp = new WordExtractor(bis).getText();
+			try (WordExtractor extractor = new WordExtractor(bis)) {
+				tmp = extractor.getText();
 			} catch (Throwable e) {
 				// Maybe the document to be parsed is not a Word file.
 				// Try to evaluate it as a RTF file.

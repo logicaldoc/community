@@ -24,6 +24,7 @@
         <copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
             <fileset dir="target/classes">
                 <include name="com/logicaldoc/core/**" />
+                <include name="org/**" />
                 <exclude name="com/logicaldoc/core/security/dao/HibernateTenant*" />
                 <exclude name="com/logicaldoc/core/security/authentication/AuthenticationChain*" />
             </fileset>
@@ -42,4 +43,20 @@
             </fileset>
         </copy>
     </target>
+    
+    
+    <target name="deploy-doctool" depends="init-all" description="Copy classes into a deployed webapp">
+        <property environment="env" />
+        <property id="properties" file="build.properties" />
+
+        <copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
+            <fileset dir="target/classes">
+                <include name="com/logicaldoc/core/automation/DocTool*" />
+                <exclude name="com/logicaldoc/core/security/dao/HibernateTenant*" />
+                <exclude name="com/logicaldoc/core/security/authentication/AuthenticationChain*" />
+            </fileset>
+        </copy>
+    </target>
+    
+        
 </project>

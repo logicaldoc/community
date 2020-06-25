@@ -16,7 +16,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.PreviewTile;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewTile;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.TitleOrientation;
@@ -32,8 +32,6 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.events.EditorExitEvent;
-import com.smartgwt.client.widgets.form.fields.events.EditorExitHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -108,53 +106,35 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		if (document.getDocRef() != null)
 			id.setTooltip(I18N.message("thisisalias") + ": " + document.getDocRef());
 
-		StaticTextItem creation = ItemFactory.newStaticTextItem(
-				"creation",
-				"createdon",
-				Util.padLeft(
-						I18N.formatDate((Date) document.getCreation()) + " " + I18N.message("by") + " "
-								+ document.getCreator(), 40));
+		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon", Util.padLeft(
+				I18N.formatDate((Date) document.getCreation()) + " " + I18N.message("by") + " " + document.getCreator(),
+				40));
 		creation.setTooltip(I18N.formatDate((Date) document.getCreation()) + " " + I18N.message("by") + " "
 				+ document.getCreator());
 
-		StaticTextItem published = ItemFactory.newStaticTextItem(
-				"date",
-				"publishedon",
-				Util.padLeft(
-						I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " "
-								+ document.getPublisher(), 40));
-		published.setTooltip(I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " "
-				+ document.getPublisher());
-
-		StaticTextItem size = ItemFactory.newStaticTextItem(
-				"size",
-				"size",
+		StaticTextItem published = ItemFactory.newStaticTextItem("date", "publishedon", Util.padLeft(
+				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher(),
+				40));
+		published.setTooltip(
+				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
+		StaticTextItem size = ItemFactory.newStaticTextItem("size", "size",
 				Util.formatSizeW7(document.getFileSize().doubleValue()) + " ("
 						+ Util.formatSizeBytes(document.getFileSize()) + ")");
 
 		TextItem fileName = ItemFactory.newTextItem("fileName", "filename", document.getFileName());
-
-		/*
-		 * Due to a bug in the skin, when you edit the field if the save panel
-		 * appears, the cursor goes to the end of the text or to the next item.
-		 * So we use the ExitorExit event, it's safer.
-		 */
-		fileName.addEditorExitHandler(new EditorExitHandler() {
-
-			@Override
-			public void onEditorExit(EditorExitEvent event) {
-				changedHandler.onChanged(null);
-			}
-		});
+		fileName.addChangedHandler(changedHandler);
 		fileName.setRequired(true);
 		fileName.setWidth(DEFAULT_ITEM_WIDTH);
 		fileName.setDisabled(!updateEnabled || !document.getFolder().isRename());
 
 		StaticTextItem wfStatus = ItemFactory.newStaticTextItem("wfStatus", "workflowstatus",
 				document.getWorkflowStatus());
+		if (document.getWorkflowStatusDisplay() != null)
+			wfStatus.setValue("<span style='color:" + document.getWorkflowStatusDisplay() + "'>"
+					+ document.getWorkflowStatus() + "</span>");
 
-		StaticTextItem version = ItemFactory.newStaticTextItem("version", "fileversion", document.getFileVersion()
-				+ " (" + document.getVersion() + ")");
+		StaticTextItem version = ItemFactory.newStaticTextItem("version", "fileversion",
+				document.getFileVersion() + " (" + document.getVersion() + ")");
 		version.setValue(version.getValue());
 		String comment = document.getComment();
 		if (comment != null && !"".equals(comment))
@@ -259,6 +239,10 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 						newTagItem.clearValue();
 
 						if (!"".equals(input)) {
+							// replace the escapes \, with a string so the
+							// tokenizer will work propertly
+							input = input.replace("\\,", "__comma__");
+
 							String[] tokens = input.split("\\,");
 
 							int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
@@ -267,6 +251,9 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 							List<String> tags = new ArrayList<String>();
 							for (String token : tokens) {
 								String t = token.trim();
+
+								// Restore the commas inside the tag
+								t = t.replace("__comma__", ",");
 
 								if (t.length() < min || t.length() > max) {
 									containsInvalid = true;
@@ -293,7 +280,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 							changedHandler.onChanged(null);
 
 							if (containsInvalid)
-								SC.warn(I18N.message("sometagaddedbecauseinvalid"));
+								SC.warn(I18N.message("sometagaddedbecauseinvalid", "" + min, "" + max));
 						}
 					}
 				}

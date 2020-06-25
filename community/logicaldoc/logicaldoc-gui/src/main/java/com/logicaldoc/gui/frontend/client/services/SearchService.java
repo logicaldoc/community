@@ -3,6 +3,8 @@ package com.logicaldoc.gui.frontend.client.services;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIResult;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
@@ -19,35 +21,42 @@ public interface SearchService extends RemoteService {
 	/**
 	 * Performs a search against the database
 	 * 
-	 * @param sid The current user session
 	 * @param options The search options
+	 * 
 	 * @return Result hits and statistics
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public GUIResult search(GUISearchOptions options) throws ServerException;
 
 	/**
 	 * Saves the search options in the user's working dir
 	 * 
-	 * @param sid The current user session
 	 * @param options The search options
+	 * 
 	 * @return true if the operation was successful and there were no duplicates
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public boolean save(GUISearchOptions options) throws ServerException;
 
 	/**
 	 * Deletes a previously saved search
 	 * 
-	 * @param sid The current user session
 	 * @param names The saved search names
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public void delete(String[] names) throws ServerException;
 
 	/**
 	 * Loads a saved search
 	 * 
-	 * @param sid The current user session
 	 * @param name The saved search name
-	 * @return
+	 * 
+	 * @return the options
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public GUISearchOptions load(String name) throws ServerException;
 
@@ -57,6 +66,7 @@ public interface SearchService extends RemoteService {
 		public static SearchServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(SearchService.class);
+				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
 			return instance;
 		}

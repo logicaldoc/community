@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.ChatService
+path: 22EE4CABCDF88CB01AF30474544C9394.gwt.rpc

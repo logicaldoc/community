@@ -39,16 +39,17 @@ public class DeletedFoldersDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(DeletedFoldersDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			final Session session = ServiceUtil.validateSession(request);
 
 			Long parentId = request.getParameter("parentId") != null ? Long.parseLong(request.getParameter("parentId"))
 					: null;
 
-			Long deleteUserId = StringUtils.isNotEmpty(request.getParameter("userId")) ? Long.parseLong(request
-					.getParameter("userId")) : null;
+			Long deleteUserId = StringUtils.isNotEmpty(request.getParameter("userId"))
+					? Long.parseLong(request.getParameter("userId"))
+					: null;
 
 			Integer max = request.getParameter("max") != null ? Integer.parseInt(request.getParameter("max")) : null;
 
@@ -68,7 +69,7 @@ public class DeletedFoldersDataServlet extends HttpServlet {
 			writer.write("<list>");
 
 			StringBuffer query = new StringBuffer(
-					"select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid ");
+					"select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid, ld_deleteuser ");
 			query.append(" from ld_folder ");
 			query.append(" where ld_tenantid = ");
 			query.append(Long.toString(session.getTenantId()));
@@ -100,6 +101,7 @@ public class DeletedFoldersDataServlet extends HttpServlet {
 					folder.setLastModified(new Date(rs.getTimestamp(4).getTime()));
 					folder.setDeleteUserId(rs.getLong(5));
 					folder.setParentId(rs.getLong(6));
+					folder.setDeleteUser(rs.getString(7));
 					return folder;
 				}
 			}, max);
@@ -114,6 +116,8 @@ public class DeletedFoldersDataServlet extends HttpServlet {
 				writer.print("<name><![CDATA[" + fld.getName() + "]]></name>");
 				writer.print("<lastModified>" + df.format(fld.getLastModified()) + "</lastModified>");
 				writer.print("<deleteUserId>" + fld.getDeleteUserId() + "</deleteUserId>");
+				writer.print("<deleteUser><![CDATA[" + (fld.getDeleteUser() != null ? fld.getDeleteUser() : "")
+						+ "]]></deleteUser>");
 				writer.print("<parentId>" + fld.getParentId() + "</parentId>");
 				writer.print("<type>" + fld.getType() + "</type>");
 				writer.print("</folder>");

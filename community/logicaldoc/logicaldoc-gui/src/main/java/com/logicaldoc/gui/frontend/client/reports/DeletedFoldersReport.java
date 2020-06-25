@@ -8,10 +8,10 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
-import com.logicaldoc.gui.frontend.client.folder.FolderSelector;
 import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -136,6 +136,9 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		lastModified.setCanFilter(false);
 		lastModified.setCanGroupBy(false);
 
+		ListGridField deleteUser = new ListGridField("deleteUser", I18N.message("deletedby"), 200);
+		deleteUser.setCanFilter(true);
+		
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowRecordComponents(true);
@@ -143,9 +146,10 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		list.setCanFreezeFields(false);
 		list.setAutoFetchData(true);
 		list.setFilterOnKeypress(true);
+		list.setShowFilterEditor(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 
-		list.setFields(id, icon, name, lastModified);
+		list.setFields(id, icon, name, lastModified, deleteUser);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
@@ -34,8 +35,10 @@ public class ChangePassword extends Window {
 
 	private static final String NEWPASSWORD = "newpassword";
 
-	public ChangePassword(final GUIUser user) {
+	public ChangePassword() {
 		super();
+
+		GUIUser user = Session.get().getUser();
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("changepassword"));
@@ -93,8 +96,9 @@ public class ChangePassword extends Window {
 
 					apply.setDisabled(true);
 
-					SecurityService.Instance.get().changePassword(user.getId(), vm.getValueAsString(PASSWORD),
-							vm.getValueAsString(NEWPASSWORD), true, new AsyncCallback<Integer>() {
+					SecurityService.Instance.get().changePassword(user.getId(), user.getId(),
+							vm.getValueAsString(PASSWORD), vm.getValueAsString(NEWPASSWORD), false,
+							new AsyncCallback<Integer>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -115,7 +119,7 @@ public class ChangePassword extends Window {
 										else
 											SC.warn(I18N.message("genericerror"));
 									} else {
-
+										SC.say(I18N.message("yourpasswordhaschanged"));
 										Log.info(I18N.message("event.user.passwordchanged"), null);
 									}
 

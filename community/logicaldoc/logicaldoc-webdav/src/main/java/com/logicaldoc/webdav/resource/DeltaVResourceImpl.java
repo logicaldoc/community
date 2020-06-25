@@ -13,7 +13,6 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.property.DavProperty;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
-import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.HrefProperty;
 import org.apache.jackrabbit.webdav.version.DeltaVConstants;
 import org.apache.jackrabbit.webdav.version.DeltaVResource;
@@ -142,7 +141,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 				supportedReports.addReportType(ReportType.LOCATE_BY_HISTORY);
 			}
 
-			properties.add(new DefaultDavProperty(DeltaVConstants.CREATOR_DISPLAYNAME, resource.getAuthor()));
+			// properties.add(new DefaultDavProperty(DeltaVConstants.CREATOR_DISPLAYNAME, resource.getAuthor()));
 		}
 	}
 

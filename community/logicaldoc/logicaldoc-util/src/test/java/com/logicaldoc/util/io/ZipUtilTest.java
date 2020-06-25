@@ -3,13 +3,14 @@ package com.logicaldoc.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import junit.framework.Assert;
+import java.util.zip.ZipEntry;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class ZipUtilTest {
 
@@ -30,6 +31,21 @@ public class ZipUtilTest {
 			}
 	}
 
+	@Test
+	public void testListZipEntries() throws IOException {
+		File file = new File("target/test.zip");
+		FileUtil.copyResource("/test.zip", file);
+
+		ZipUtil zipUtil = new ZipUtil();
+		List<ZipEntry> entries = zipUtil.listZipEntries(file);
+
+		for (ZipEntry zipEntry : entries) {
+			System.out.println(zipEntry.getName()+" "+zipEntry.getSize()+" "+zipEntry.getLastModifiedTime());
+		}
+		
+		Assert.assertEquals(3, entries.size());
+	}
+	
 	@Test
 	public void testListEntries() throws IOException {
 		File file = new File("target/test.zip");

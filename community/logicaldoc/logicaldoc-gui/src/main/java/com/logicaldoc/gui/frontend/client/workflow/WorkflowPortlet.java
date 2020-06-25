@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.data.WorkflowTasksDS;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
@@ -17,6 +18,7 @@ import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
@@ -71,6 +73,8 @@ public class WorkflowPortlet extends Portlet {
 			setTitle(AwesomeFactory.getIconHtml("cogs", I18N.message("workflowtasksadmin")));
 		} else if (type == WorkflowDashboard.TASKS_SUPERVISOR) {
 			setTitle(AwesomeFactory.getIconHtml("cogs", I18N.message("workflowtaskssupervisor")));
+		} else if (type == WorkflowDashboard.TASKS_INVOLVED) {
+			setTitle(AwesomeFactory.getIconHtml("cogs", I18N.message("workflowsinvolvedin")));
 		}
 
 		setHeaderControls(HeaderControls.HEADER_LABEL);
@@ -120,8 +124,9 @@ public class WorkflowPortlet extends Portlet {
 		list.setHeight100();
 		list.setBorder("0px");
 		list.setDataSource(new WorkflowTasksDS(type, null));
+		list.sort("startdate", SortDirection.ASCENDING);
 		if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ADMIN
-				|| type == WorkflowDashboard.TASKS_SUPERVISOR)
+				|| type == WorkflowDashboard.TASKS_SUPERVISOR || type == WorkflowDashboard.TASKS_INVOLVED)
 			list.setFields(workflow, tag, startdate, duedate, enddate, name, id, processId, documents, lastnote,
 					documentIds, pooledAssignees);
 		else
@@ -144,7 +149,7 @@ public class WorkflowPortlet extends Portlet {
 							public void onSuccess(GUIWorkflow result) {
 								if (result != null) {
 									TaskDetailsDialog workflowDetailsDialog = new TaskDetailsDialog(workflowDashboard,
-											result);
+											result, type == WorkflowDashboard.TASKS_INVOLVED);
 									workflowDetailsDialog.show();
 								}
 							}
@@ -166,7 +171,8 @@ public class WorkflowPortlet extends Portlet {
 				@Override
 				public void onDataArrived(DataArrivedEvent event) {
 					int total = list.getTotalRows();
-					Session.get().getUser().setActiveTasks(total);
+					Session.get().getUser().setAssignedTasks(total);
+					UserController.get().changed(Session.get().getUser());
 				}
 			});
 
@@ -197,8 +203,8 @@ public class WorkflowPortlet extends Portlet {
 	public void refresh() {
 		list.refresh(new WorkflowTasksDS(type, null));
 	}
-
-	private void showContextMenu() {
+	
+		private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
 		final ListGridRecord selection = list.getSelectedRecord();

@@ -233,6 +233,8 @@ public class IncrementalArchivesList extends VLayout {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param incremental the archive to update
 	 */
 	public void updateRecord(GUIIncrementalArchive incremental) {
 		ListGridRecord record = list.getSelectedRecord();

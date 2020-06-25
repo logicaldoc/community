@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
@@ -21,6 +22,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
 import com.logicaldoc.gui.common.client.InvalidSessionException;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 
 /**
@@ -42,7 +44,11 @@ public class ServiceUtil {
 	/**
 	 * Throws a runtime exception id the given session is invalid
 	 * 
-	 * @throws InvalidSessionException
+	 * @param sid identifier of the session
+	 * 
+	 * @return the session
+	 * 
+	 * @throws InvalidSessionException the session does not exist or is expired
 	 */
 	public static Session validateSession(String sid) throws InvalidSessionException {
 		Session session = SessionManager.get().get(sid);
@@ -55,10 +61,19 @@ public class ServiceUtil {
 	}
 
 	/**
-	 * Checks if a specific menu is accessible by the user in the current session
+	 * Checks if a specific menu is accessible by the user in the current
+	 * session
+	 * 
+	 * @param request the HTTP request
+	 * @param menuIds identifiers of the menus
+	 * 
+	 * @return the current session
+	 * 
+	 * @throws InvalidSessionException the session does not exist or is expired
+	 * @throws AccessDeniedException the user cannot access any menu
 	 */
-	public static Session checkEvenOneMenu(HttpServletRequest request, long... menuIds) throws InvalidSessionException,
-			AccessDeniedException {
+	public static Session checkEvenOneMenu(HttpServletRequest request, long... menuIds)
+			throws InvalidSessionException, AccessDeniedException {
 		Session session = validateSession(request);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		for (long menuId : menuIds) {
@@ -66,19 +81,28 @@ public class ServiceUtil {
 				return session;
 		}
 
-		String message = "User " + session.getUsername() + " cannot access the menues " + Arrays.asList(menuIds);
+		String message = String.format("User %s cannot access the menus %s", session.getUsername(),
+				Arrays.asList(menuIds));
 		throw new AccessDeniedException(message);
 	}
 
 	/**
 	 * Check if a specific menu is accessible by the user in the current session
+	 * 
+	 * @param request the HTTP request
+	 * @param menuId identifier of the menus
+	 * 
+	 * @return the curent session
+	 * 
+	 * @throws InvalidSessionException the session does not exist or is expired
+	 * @throws AccessDeniedException the user cannot access any menu
 	 */
-	public static Session checkMenu(HttpServletRequest request, long menuId) throws InvalidSessionException,
-			AccessDeniedException {
+	public static Session checkMenu(HttpServletRequest request, long menuId)
+			throws InvalidSessionException, AccessDeniedException {
 		Session session = validateSession(request);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, session.getUserId())) {
-			String message = "User " + session.getUsername() + " cannot access the menu " + menuId;
+			String message = String.format("User %s cannot access the menu %s", session.getUsername(), menuId);
 			throw new AccessDeniedException(message);
 		}
 		return session;
@@ -87,8 +111,8 @@ public class ServiceUtil {
 	public static void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
-			String message = "User " + user.getUsername() + " doesn't have permission " + permission.getName()
-					+ " on folder " + folderId;
+			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
+					permission.getName(), folderId);
 			throw new AccessDeniedException(message);
 		}
 	}
@@ -131,12 +155,25 @@ public class ServiceUtil {
 			}
 		}
 
-		message = message.replaceAll("com.logicaldoc.", "").replaceAll("java.lang.", "");
+		if (message != null)
+			message = message.replaceAll("com.logicaldoc.", "").replaceAll("java.lang.", "");
+
+		if (t != null && (t instanceof org.hibernate.TransactionException
+				|| t instanceof org.hibernate.HibernateException || t instanceof PersistenceException
+				|| t instanceof org.springframework.transaction.TransactionSystemException)) {
+			message = I18N.message("dberrorretry", session.getUser().getLocale());
+		}
+
 		throw new ServerException(message);
 	}
 
 	/**
 	 * To always deal with dates and not Timestamps
+	 * 
+	 * @param src the source date
+	 * 
+	 * @return if <code>src</code> is instance of {@link Timestamp} it will be
+	 *         converted to plain {@link Date}
 	 */
 	public static Date convertToDate(Date src) {
 		if (src == null)

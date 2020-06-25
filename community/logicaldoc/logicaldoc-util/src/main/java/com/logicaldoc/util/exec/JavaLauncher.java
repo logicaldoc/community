@@ -24,6 +24,10 @@ public class JavaLauncher {
 	 * @param classpath - the java classpath
 	 * @param jvmargs - arguments for the jvm
 	 * @param properties - any system properties
+	 * 
+	 * @throws Exception An error happened during execution
+	 * 
+	 * @return the launched process
 	 */
 	public static Process exec(String mainClass, String classpath, String[] jvmargs, String[] properties)
 			throws Exception {
@@ -69,7 +73,7 @@ public class JavaLauncher {
 			return proc;
 
 		} catch (Exception e) {
-			log.error("Failed to launch java program: " + e.getMessage());
+			log.error("Failed to launch java program: {}", e.getMessage());
 			throw new Exception("Failed to launch java program: " + e.getMessage());
 		}
 
@@ -80,7 +84,9 @@ public class JavaLauncher {
 	 * 
 	 * @param pathToJar - absolute path to your jar
 	 * @param jvmargs - arguments for the java virtual machine
-	 * @return Process
+	 * @return Process The launched process
+	 * 
+	 * @throws Exception An error happened during execution
 	 */
 	public static Process execJar(String pathToJar, String[] jvmargs) throws Exception {
 		String jvm = findJVM();
@@ -179,7 +185,7 @@ public class JavaLauncher {
 	/**
 	 * Demo - Launch a java program.
 	 * 
-	 * @param args
+	 * @param args the invocation arguments
 	 */
 	public static void main(String[] args) {
 

@@ -128,4 +128,13 @@ public class RestTagService extends SoapTagService implements TagService {
 		String sid = validateSession();
 		return super.findFoldersByTag(sid, tag);
 	}
+
+	@Override
+	@GET
+	@Path("/getTagsPreset")
+	@ApiOperation(value = "Retrieves all the tags in the preset", notes = "Retrieves all the tags specified in the preset, empty if input mode is free")	
+	public String[] getTagsPreset() throws Exception {
+		String sid = validateSession();
+		return super.getTagsPreset(sid);
+	}
 }

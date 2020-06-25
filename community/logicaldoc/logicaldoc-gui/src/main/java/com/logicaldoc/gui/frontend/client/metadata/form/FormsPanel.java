@@ -226,6 +226,8 @@ public class FormsPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param form updates the form document
 	 */
 	public void updateRecord(GUIDocument form) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, form.getId()));

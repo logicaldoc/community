@@ -169,6 +169,8 @@ public class MenuRightsPanel extends VLayout {
 
 	/**
 	 * Create an array of all rights defined
+	 * 
+	 * @return array of rights
 	 */
 	public GUIRight[] getRights() {
 		ListGridRecord[] records = list.getRecords();
@@ -189,7 +191,9 @@ public class MenuRightsPanel extends VLayout {
 	}
 
 	/**
-	 * Prepares the context menu.
+	 * Prepares the context menu
+	 * 
+	 * @return the context menu
 	 */
 	private Menu setupContextMenu() {
 		Menu contextMenu = new Menu();
@@ -198,7 +202,7 @@ public class MenuRightsPanel extends VLayout {
 		deleteItem.setTitle(I18N.message("ddelete"));
 		deleteItem.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] selection = list.getSelection();
+				ListGridRecord[] selection = list.getSelectedRecords();
 				if (selection == null || selection.length == 0)
 					return;
 

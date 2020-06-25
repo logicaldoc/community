@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.ClusterService
+path: 8CE1CC1134EF85B8B93A4E46D307326B.gwt.rpc

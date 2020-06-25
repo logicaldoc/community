@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.folder.FolderEvent;
-import com.logicaldoc.core.security.UserHistory;
+import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.i18n.I18N;
 
 /**
@@ -29,8 +29,8 @@ public class EventsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(EventsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			String locale = request.getParameter("locale");
 			boolean folder = Boolean.parseBoolean(request.getParameter("folder"));
@@ -66,13 +66,10 @@ public class EventsDataServlet extends HttpServlet {
 				}
 
 			if (user) {
-				String[] events = new String[] { UserHistory.EVENT_USER_LOGIN, UserHistory.EVENT_USER_LOGIN_FAILED, UserHistory.EVENT_USER_DELETED,
-						UserHistory.EVENT_USER_LOGOUT, UserHistory.EVENT_USER_PASSWORDCHANGED,
-						UserHistory.EVENT_USER_TIMEOUT, UserHistory.EVENT_FILE_CONVERSION, UserHistory.EVENT_USER_2FACHANGED};
-				for (String event : events) {
+				for (UserEvent event : UserEvent.values()) {
 					writer.print("<event>");
-					writer.print("<code>" + event + "</code>");
-					writer.print("<label><![CDATA[" + I18N.message(event, locale) + "]]></label>");
+					writer.print("<code>" + event.toString() + "</code>");
+					writer.print("<label><![CDATA[" + I18N.message(event.toString(), locale) + "]]></label>");
 					writer.print("<type>user</type>");
 					writer.print("</event>");
 				}

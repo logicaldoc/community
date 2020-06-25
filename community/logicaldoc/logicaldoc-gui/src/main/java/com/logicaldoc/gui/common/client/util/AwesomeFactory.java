@@ -14,11 +14,27 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class AwesomeFactory {
 	/**
 	 * Creates a ToolStripButton using font-awesome icon
+	 * 
+	 * @param icon the icon file name
+	 * @param toolTip the message to display when the user moves the cursor over
+	 *        the button
+	 * 
+	 * @return the new button
 	 */
 	public static ToolStripButton newToolStripButton(String icon, String toolTip) {
 		return newToolStripButton(icon, toolTip, null);
 	}
 
+	/**
+	 * Creates a ToolStripButton using font-awesome icon
+	 * 
+	 * @param icon the icon file name
+	 * @param toolTip the message to display when the user moves the cursor over
+	 *        the button
+	 * @param text title of the button
+	 * 
+	 * @return the new button
+	 */
 	public static ToolStripButton newToolStripButton(String icon, String toolTip, String text) {
 		ToolStripButton button = new ToolStripButton();
 		button.setTooltip(I18N.message(toolTip));
@@ -30,6 +46,12 @@ public class AwesomeFactory {
 	/**
 	 * Creates a ToolStripButton using font-awesome icon useful for small icons
 	 * (16x16)
+	 * 
+	 * @param icon the icon file name
+	 * @param toolTip the message to display when the user moves the cursor over
+	 *        the button
+	 * 
+	 * @return the new button
 	 */
 	public static ToolStripButton newIconButton(String icon, String toolTip) {
 		return newIconButton(icon, toolTip, null);
@@ -38,6 +60,13 @@ public class AwesomeFactory {
 	/**
 	 * Creates a ToolStripButton using font-awesome icon useful for small icons
 	 * (16x16)
+	 * 
+	 * @param icon the icon file name
+	 * @param toolTip the message to display when the user moves the cursor over
+	 *        the button
+	 * @param text title of the button
+	 * 
+	 * @return the new button
 	 */
 	public static ToolStripButton newIconButton(String icon, String toolTip, String text) {
 		ToolStripButton button = AwesomeFactory.newToolStripButton(icon, toolTip, text);
@@ -57,7 +86,7 @@ public class AwesomeFactory {
 		String prompt = "";
 		if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
 			prompt = I18N.message("lockedby") + " " + user;
-		
+
 		button.setPrompt(prompt);
 
 		return button;
@@ -81,16 +110,15 @@ public class AwesomeFactory {
 		if (text == null || text.isEmpty())
 			return "<i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-spinner' aria-hidden='true'></i>";
 		else
-			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-fw fa-spinner' aria-hidden='true'></i>&nbsp;" + text
-					+ "</div>";
+			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon
+					+ " fa-lg fa-fw fa-spinner' aria-hidden='true'></i>&nbsp;" + text + "</div>";
 	}
-	
-	
+
 	public static String getIconHtml(String icon, String text) {
 		if (text == null || text.isEmpty())
 			return "<i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg' aria-hidden='true'></i>";
 		else
-			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-fw' aria-hidden='true'></i> " + text
-					+ "</div>";
+			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-fw' aria-hidden='true'></i> "
+					+ text + "</div>";
 	}
 }

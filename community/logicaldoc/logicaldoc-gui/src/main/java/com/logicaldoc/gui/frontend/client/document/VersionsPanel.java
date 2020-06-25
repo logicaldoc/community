@@ -13,7 +13,8 @@ import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
+import com.logicaldoc.gui.frontend.client.document.note.VersionNotesWindow;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -210,9 +211,8 @@ public class VersionsPanel extends DocumentDetailTab {
 							}
 
 							@Override
-							public void onSuccess(GUIVersion[] result) {
-								ContentDiff diffWinfow = new ContentDiff(result[0].getDocId(),
-										result[0].getFileVersion(), result[1].getFileVersion());
+							public void onSuccess(GUIVersion[] versions) {
+								ComparisonWindow diffWinfow = new ComparisonWindow(versions[0], versions[1]);
 								diffWinfow.show();
 							}
 						});
@@ -233,6 +233,34 @@ public class VersionsPanel extends DocumentDetailTab {
 		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				onPreview(document, selection[0]);
+			}
+		});
+
+		MenuItem promote = new MenuItem();
+		promote.setTitle(I18N.message("promote"));
+		promote.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				LD.ask(I18N.message("question"), I18N.message("promotequestion"), new BooleanCallback() {
+					@Override
+					public void execute(Boolean value) {
+						if (value) {
+							DocumentService.Instance.get().promoteVersion(document.getId(),
+									selection[0].getAttributeAsString("version"), new AsyncCallback<GUIDocument>() {
+
+										@Override
+										public void onFailure(Throwable caught) {
+											Log.serverError(caught);
+										}
+
+										@Override
+										public void onSuccess(GUIDocument document) {
+											DocumentController.get().checkedIn(document);
+											destroy();
+										}
+									});
+						}
+					}
+				});
 			}
 		});
 
@@ -274,23 +302,47 @@ public class VersionsPanel extends DocumentDetailTab {
 			}
 		});
 
+		MenuItem replaceFile = new MenuItem();
+		replaceFile.setTitle(I18N.message("replacefile"));
+		replaceFile.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				ReplaceVersionFile dialog = new ReplaceVersionFile(document,
+						selection[0].getAttributeAsString("fileVersion"));
+				dialog.show();
+			}
+		});
+
+		MenuItem notes = new MenuItem();
+		notes.setTitle(I18N.message("notes"));
+		notes.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				VersionNotesWindow versionNotes = new VersionNotesWindow(document,
+						selection[0].getAttributeAsString("fileVersion"));
+				versionNotes.show();
+			}
+		});
+
 		compareMetadata.setEnabled(selection != null && selection.length == 2);
-		compareContent
-				.setEnabled(Feature.enabled(Feature.CONTENT_DIFF) && (selection != null && selection.length == 2));
+		compareContent.setEnabled(Feature.enabled(Feature.COMPARISON) && (selection != null && selection.length == 2));
 		delete.setEnabled(deleteEnabled && selection != null && selection.length > 0);
+		replaceFile.setEnabled(updateEnabled && selection != null && selection.length == 1);
+		promote.setEnabled(updateEnabled && selection != null && selection.length == 1);
 
 		if (selection == null || selection.length < 1) {
 			preview.setEnabled(false);
 			download.setEnabled(false);
 			delete.setEnabled(false);
+			replaceFile.setEnabled(false);
+			promote.setEnabled(false);
 			compareMetadata.setEnabled(false);
 			compareContent.setEnabled(false);
+			notes.setEnabled(false);
 		}
 
-		if (Feature.visible(Feature.CONTENT_DIFF))
-			contextMenu.setItems(preview, download, compareMetadata, compareContent, delete);
+		if (Feature.visible(Feature.COMPARISON))
+			contextMenu.setItems(preview, download, notes, compareMetadata, compareContent, delete, promote, replaceFile);
 		else
-			contextMenu.setItems(preview, download, compareMetadata, delete);
+			contextMenu.setItems(preview, download, notes, compareMetadata, delete, promote, replaceFile);
 
 		return contextMenu;
 	}

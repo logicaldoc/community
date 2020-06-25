@@ -11,13 +11,15 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @since 6.0
  */
 public abstract class FolderDetailTab extends HLayout {
+
 	protected GUIFolder folder;
 
 	protected ChangedHandler changedHandler;
 
 	/**
+	 * Constructor
 	 * 
-	 * @param document The document this instance refers to
+	 * @param folder The folder panel refers to
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        folder
 	 */

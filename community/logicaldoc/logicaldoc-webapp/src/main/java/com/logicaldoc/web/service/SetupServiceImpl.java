@@ -217,7 +217,18 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 		if (!info.getDbEngine().toLowerCase().contains("oracle")
 				&& !info.getDbEngine().toLowerCase().contains("hsqldb")) {
 			String dbName = info.getDbUrl().substring(info.getDbUrl().lastIndexOf('/') + 1);
-			String adminjdbcUrl = info.getDbUrl().substring(0, info.getDbUrl().lastIndexOf('/'));
+
+			if (dbName.contains("?"))
+				dbName = dbName.substring(0, dbName.indexOf('?'));
+			log.warn("Detected dabase name {}", dbName);
+
+			String queryString = "";
+			if (info.getDbUrl().contains("?"))
+				queryString = info.getDbUrl().substring(info.getDbUrl().indexOf('?'));
+			log.warn("Detected query string {}", queryString);
+
+			String adminjdbcUrl = info.getDbUrl().substring(0, info.getDbUrl().lastIndexOf('/')) + queryString;
+			log.warn("Using adminUrl {}", adminjdbcUrl);
 			if (StringUtils.isNotEmpty(dbName))
 				try {
 					PluginDbInit init = new PluginDbInit();

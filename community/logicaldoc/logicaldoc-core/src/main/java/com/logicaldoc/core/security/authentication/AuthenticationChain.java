@@ -26,7 +26,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @author Sebastian Wenzky
  * @since 4.5
  */
-public class AuthenticationChain implements Authenticator {
+public class AuthenticationChain extends AbstractAuthenticator {
 
 	private static Logger log = LoggerFactory.getLogger(AuthenticationChain.class);
 

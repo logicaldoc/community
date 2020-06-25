@@ -1,6 +1,8 @@
 package com.logicaldoc.core.document.dao;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -11,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -24,7 +27,6 @@ import com.logicaldoc.util.io.FileUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> implements VersionDAO {
 
 	private Storer storer;
@@ -38,13 +40,24 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	@Override
 	public List<Version> findByDocId(long docId) {
-		return findByWhere(" _entity.docId=" + docId, "order by _entity.versionDate desc", null);
+		try {
+			return findByWhere(" _entity.docId=" + docId, "order by _entity.versionDate desc", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<Version>();
+		}
+
 	}
 
 	@Override
 	public Version findByVersion(long docId, String version) {
-		List<Version> versions = findByWhere(" _entity.docId=" + docId + " and _entity.version='" + version + "'",
-				null, null);
+		List<Version> versions = new ArrayList<Version>();
+		try {
+			versions = findByWhere(" _entity.docId=" + docId + " and _entity.version='" + version + "'", null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
 		if (!versions.isEmpty())
 			return versions.get(0);
 		else
@@ -53,14 +66,20 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 	@Override
 	public Version findByFileVersion(long docId, String fileVersion) {
-		List<Version> versions = findByWhere(" _entity.docId=" + docId + " and _entity.fileVersion='" + fileVersion + "'",
-				"order by _entity.date asc", null);
+		List<Version> versions = new ArrayList<Version>();
+		try {
+			versions = findByWhere(" _entity.docId=" + docId + " and _entity.fileVersion='" + fileVersion + "'",
+					"order by _entity.date asc", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
 		if (!versions.isEmpty())
 			return versions.get(0);
 		else
 			return null;
 	}
-	
+
 	@Override
 	public void initialize(Version version) {
 		refresh(version);
@@ -74,7 +93,10 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	public boolean store(Version version) {
 		boolean result = true;
 		try {
-			super.store(version);
+			result = super.store(version);
+			if (!result)
+				return false;
+
 			// Checks the context property 'document.maxversions'
 			ContextProperties bean = new ContextProperties();
 			int maxVersions = bean.getInt("document.maxversions");
@@ -145,6 +167,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 			try {
 				in = storer.getStream(version.getDocId(), resource);
 				version.setDigest(FileUtil.computeDigest(in));
+			} catch (IOException e) {
+				log.error("Cannot retrieve the content of version {}", version, e);
 			} finally {
 				if (in != null)
 					try {
@@ -163,6 +187,10 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	@Override
 	public boolean delete(long versionId, int delCode) {
 		assert (delCode != 0);
+
+		if (!checkStoringAspect())
+			return false;
+
 		boolean result = true;
 		try {
 			Version ver = (Version) findById(versionId);

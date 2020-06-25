@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.grid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
@@ -31,11 +33,13 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
+import com.smartgwt.client.data.SortSpecifier;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
+import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -80,7 +84,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		setShowRecordComponents(true);
 		setShowRecordComponentsByCell(true);
 		setSaveLocally(true);
-		this.folder = folder;
 
 		if (folder != null)
 			setCanDrag(folder.isMove());
@@ -119,6 +122,20 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				if (cursor != null) {
 					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
 				}
+
+				if (Session.get().getHiliteDocId() != null) {
+					// Add the sorting by order first
+					SortSpecifier specifier = getSortSpecifier("order");
+					if (specifier == null) {
+						SortSpecifier[] sortSpecs = getSort();
+						SortSpecifier[] newSpecs = new SortSpecifier[sortSpecs != null ? sortSpecs.length + 1 : 1];
+						newSpecs[0] = new SortSpecifier("order", SortDirection.DESCENDING);
+						for (int i = 1; i < newSpecs.length; i++)
+							newSpecs[i] = sortSpecs[i - 1];
+						setSort(newSpecs);
+					}
+					selectDocument(Session.get().getHiliteDocId());
+				}
 			}
 		});
 
@@ -129,7 +146,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	 * Prepares the map that contains all the possible fields we can use
 	 */
 	private void prepareFieldsMap() {
-		ListGridField id = new ListGridField("id", I18N.getAttributeLabel("id"), 50);
+		ListGridField id = new ListGridField("id", I18N.getAttributeLabel("id"), 60);
 		id.setHidden(true);
 		fieldsMap.put(id.getName(), id);
 
@@ -202,7 +219,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		fieldsMap.put(type.getName(), type);
 
 		ListGridField statusIcons = new ListGridField("statusIcons", " ");
-		statusIcons.setWidth(100);
+		statusIcons.setWidth(110);
 		statusIcons.setCanFilter(false);
 		statusIcons.setCanSort(false);
 		fieldsMap.put(statusIcons.getName(), statusIcons);
@@ -243,6 +260,22 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		});
 		fieldsMap.put(rating.getName(), rating);
 
+		final LinkedHashMap<String, String> languages = I18N.getSupportedLanguages(false);
+
+		ListGridField language = new ListGridField("language", I18N.message("language"), 100);
+		language.setType(ListGridFieldType.TEXT);
+		language.setCanFilter(false);
+		language.setAlign(Alignment.CENTER);
+		language.setHidden(true);
+		language.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				return languages.get(record.getAttribute("language"));
+			}
+		});
+		fieldsMap.put(language.getName(), language);
+
 		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 70);
 		fileVersion.setHidden(false);
 		fileVersion.setCanFilter(true);
@@ -255,7 +288,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		comment.setCanSort(true);
 		fieldsMap.put(comment.getName(), comment);
 
-		ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 130);
+		ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 150);
 		wfStatus.setHidden(true);
 		wfStatus.setCanFilter(true);
 		wfStatus.setCanSort(true);
@@ -354,6 +387,26 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 						100);
 				ext.setHidden(true);
 				ext.setCanFilter(true);
+				ext.setCanSort(true);
+
+				GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
+				if (attDef != null) {
+					if (attDef.getType() == GUIAttribute.TYPE_DATE) {
+						ext.setWidth(90);
+						ext.setAlign(Alignment.CENTER);
+						ext.setType(ListGridFieldType.DATE);
+						ext.setCellFormatter(new DateCellFormatter(true));
+						ext.setCanFilter(false);
+					} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
+						ext.setAlign(Alignment.RIGHT);
+						ext.setType(ListGridFieldType.INTEGER);
+						ext.setCanFilter(false);
+					} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
+						ext.setAlign(Alignment.RIGHT);
+						ext.setType(ListGridFieldType.FLOAT);
+						ext.setCanFilter(false);
+					}
+				}
 				fieldsMap.put(ext.getName(), ext);
 			}
 		}
@@ -518,9 +571,12 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	public void selectDocument(long docId) {
 		deselectAll();
 		RecordList rlist = getDataAsRecordList();
-		Record record = rlist.find("id", Long.toString(docId));
-		if (record != null)
+		Record record = rlist.find("id", docId);
+		if (record != null) {
 			selectSingleRecord(record);
+			scrollToRow(rlist.indexOf(record));
+			Session.get().setHiliteDocId(null);
+		}
 	}
 
 	@Override
@@ -644,7 +700,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			{
 				if (record.getAttribute("indexed") != null) {
 					Integer indexed = record.getAttributeAsInt("indexed");
-					if (indexed != null && indexed.intValue() > 0) {
+					if (indexed != null && indexed.intValue() != Constants.INDEX_TO_INDEX
+							&& indexed.intValue() != Constants.INDEX_TO_INDEX_METADATA) {
 						ToolStripButton indexedIcon = AwesomeFactory.newIndexedButton(indexed);
 						statusCanvas.addMember(indexedIcon);
 						if (indexed.intValue() == Constants.INDEX_INDEXED) {
@@ -738,6 +795,17 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				}
 			}
 
+			// Put the links icon
+			{
+				if (record.getAttribute("links") != null) {
+					Integer links = record.getAttributeAsInt("links");
+					if (links != null && links.intValue() > 0) {
+						ToolStripButton stampedIcon = AwesomeFactory.newIconButton("link", "withlinks");
+						statusCanvas.addMember(stampedIcon);
+					}
+				}
+			}
+
 			return statusCanvas;
 		} else {
 			return null;
@@ -798,18 +866,18 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	@Override
 	public void onDocumentsDeleted(GUIDocument[] documents) {
-		if (documents != null)
+		if (documents != null) {
 			for (GUIDocument doc : documents) {
 				try {
 					Record record = findRecord(doc.getId());
 					if (record != null)
 						removeData(record);
 				} catch (Throwable t) {
-
 				}
 			}
-		RecordList recordList = getDataAsRecordList();
-		cursor.setMessage(I18N.message("showndocuments", "" + recordList.getLength()));
+			RecordList recordList = getDataAsRecordList();
+			cursor.setMessage(I18N.message("showndocuments", "" + recordList.getLength()));
+		}
 	}
 
 	@Override
@@ -864,5 +932,19 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			setCanDrag(folder.isMove());
 		}
 		refresh(ds);
+	}
+
+	@Override
+	public void loadGridLayout(GUIFolder folder) {
+		String previouslySavedState = folder != null ? folder.getGrid() : null;
+		if (previouslySavedState == null || previouslySavedState.isEmpty())
+			previouslySavedState = Session.get().getUser().getDocsGrid();
+		if (previouslySavedState != null && !previouslySavedState.isEmpty())
+			try {
+				setViewState(previouslySavedState);
+			} catch (Throwable t) {
+			}
+		if (folder != null && getGridCursor() != null)
+			getGridCursor().setTotalRecords(folder.getDocumentCount());
 	}
 }

@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.CalendarService
+path: 4904B16EF91C4303A376E73F968A2D4C.gwt.rpc

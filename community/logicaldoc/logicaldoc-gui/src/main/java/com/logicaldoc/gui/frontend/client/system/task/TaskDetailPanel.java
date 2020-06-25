@@ -6,17 +6,10 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.logicaldoc.gui.frontend.client.system.LogPanel;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -25,7 +18,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This panel collects all tasks details
@@ -36,7 +28,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class TaskDetailPanel extends VLayout {
 
-	private TabSet tabSet = new TabSet();
+	private EditingTabSet tabSet;
 
 	private Layout schedulingTabPanel;
 
@@ -52,8 +44,6 @@ public class TaskDetailPanel extends VLayout {
 
 	private TaskNotificationPanel notificationPanel;
 
-	private HLayout savePanel;
-
 	private TasksPanel tasksPanel;
 
 	public TaskDetailPanel(TasksPanel tasksPanel) {
@@ -66,30 +56,12 @@ public class TaskDetailPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		savePanel = new HLayout();
-		savePanel.setHeight(20);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
-		Button saveButton = new Button(I18N.message("save"));
-		saveButton.setAutoFit(true);
-		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
+		tabSet = new EditingTabSet(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				onSave();
 			}
-		});
-		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("70%");
-		spacer.setOverflow(Overflow.HIDDEN);
-
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				SystemService.Instance.get().getTaskByName(task.getName(), I18N.getLocale(),
@@ -102,20 +74,11 @@ public class TaskDetailPanel extends VLayout {
 							@Override
 							public void onSuccess(GUITask task) {
 								setTask(task);
-								savePanel.setVisible(false);
+								tabSet.hideSave();
 							}
 						});
 			}
-		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		savePanel.addMember(saveButton);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		addMember(savePanel);
+		}  );
 
 		Tab schedulingTab = new Tab(I18N.message("scheduling"));
 		schedulingTabPanel = new HLayout();
@@ -161,8 +124,7 @@ public class TaskDetailPanel extends VLayout {
 	}
 
 	private void refresh() {
-		if (savePanel != null)
-			savePanel.setVisible(false);
+		tabSet.hideSave();
 
 		/*
 		 * Prepare the scheduling tab
@@ -205,7 +167,7 @@ public class TaskDetailPanel extends VLayout {
 	}
 
 	public void onModified() {
-		savePanel.setVisible(true);
+		tabSet.displaySave();
 	}
 
 	public void onSave() {
@@ -220,7 +182,7 @@ public class TaskDetailPanel extends VLayout {
 				public void onSuccess(GUITask task) {
 					if (task != null) {
 						tasksPanel.updateSelectedRecord(task);
-						savePanel.setVisible(false);
+						tabSet.hideSave();
 					} else {
 						Log.error(I18N.message("genericerror"), null, null);
 					}

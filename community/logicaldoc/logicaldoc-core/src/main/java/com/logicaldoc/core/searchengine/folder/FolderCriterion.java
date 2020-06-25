@@ -19,7 +19,7 @@ public class FolderCriterion implements Serializable {
 
 	private String fieldName = "id";
 
-	public final static String OPERATOR_EQUAL = "equals";
+	public final static String OPERATOR_EQUALS = "equals";
 
 	public final static String OPERATOR_NOTEQUAL = "notequal";
 
@@ -31,13 +31,17 @@ public class FolderCriterion implements Serializable {
 
 	public final static String OPERATOR_LESSER = "lessthan";
 
+	public final static String OPERATOR_NULL = "null";
+
+	public final static String OPERATOR_NOTNULL = "notnull";
+
 	public final static String OPERATOR_IN = "in";
 
 	public final static String OPERATOR_INORSUBFOLDERS = "inorsubfolders";
 
 	private String composition = "and";
 
-	private String operator = OPERATOR_EQUAL;
+	private String operator = OPERATOR_EQUALS;
 
 	public final static int TYPE_LANGUAGE = 100;
 
@@ -68,9 +72,9 @@ public class FolderCriterion implements Serializable {
 		typeBinding.put("lastModified", Attribute.TYPE_DATE);
 
 		typeBinding.put("id", Attribute.TYPE_INT);
-		
+
 		typeBinding.put("folder", TYPE_FOLDER);
-		
+
 		typeBinding.put("template", TYPE_TEMPLATE);
 	}
 
@@ -139,12 +143,17 @@ public class FolderCriterion implements Serializable {
 		this.operator = operator;
 	}
 
-	public boolean isNull() {
+	public boolean isEmpty() {
+		if (OPERATOR_NULL.equals(operator))
+			return false;
+
 		if ((getType() == Attribute.TYPE_STRING && StringUtils.isEmpty(getStringValue().trim()))
 				|| (getType() == Attribute.TYPE_INT && getLongValue() == null)
 				|| (getType() == Attribute.TYPE_DOUBLE && getDoubleValue() == null)
 				|| (getType() == Attribute.TYPE_DATE && getDateValue() == null)
 				|| (getType() == Attribute.TYPE_BOOLEAN && getLongValue() == null)
+				|| (getType() == Attribute.TYPE_USER && getLongValue() == null)
+				|| (getType() == Attribute.TYPE_FOLDER && getLongValue() == null)
 				|| (getType() == TYPE_FOLDER && getLongValue() == null)
 				|| (getType() == TYPE_TEMPLATE && getLongValue() == null)
 				|| (getType() == TYPE_LANGUAGE && getStringValue() == null))
@@ -165,14 +174,11 @@ public class FolderCriterion implements Serializable {
 				setStringValue((String) value);
 			break;
 		case Attribute.TYPE_INT:
-			if (value instanceof Integer)
-				setLongValue(new Long((Integer) value));
-			else
-				setLongValue((Long) value);
-			break;
+		case Attribute.TYPE_FOLDER:
+		case Attribute.TYPE_USER:
 		case Attribute.TYPE_BOOLEAN:
 			if (value instanceof Integer)
-				setLongValue(new Long((Integer) value));
+				setLongValue(((Integer) value).longValue());
 			else
 				setLongValue((Long) value);
 			break;
@@ -180,9 +186,9 @@ public class FolderCriterion implements Serializable {
 			if (value instanceof Double)
 				setDoubleValue((Double) value);
 			else if (value instanceof Long)
-				setDoubleValue(new Double((Long) value));
+				setDoubleValue(((Long) value).doubleValue());
 			else
-				setDoubleValue(new Double((Float) value));
+				setDoubleValue(((Float) value).doubleValue());
 			break;
 		case Attribute.TYPE_DATE:
 			setDateValue((Date) value);

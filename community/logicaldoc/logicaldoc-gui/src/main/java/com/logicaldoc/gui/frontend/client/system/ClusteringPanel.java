@@ -20,7 +20,6 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * The Clustering console.

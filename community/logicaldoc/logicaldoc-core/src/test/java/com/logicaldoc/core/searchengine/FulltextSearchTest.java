@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
+
+import junit.framework.Assert;
 
 public class FulltextSearchTest extends AbstractCoreTCase {
 

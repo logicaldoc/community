@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
@@ -14,10 +15,11 @@ import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
+import com.logicaldoc.gui.frontend.client.document.grid.NavigatorDocumentsGrid;
 import com.logicaldoc.gui.frontend.client.folder.FolderDetailsPanel;
+import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.Offline;
@@ -55,18 +57,20 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	protected DocumentsPreviewPanel previewPanel;
 
-	public DocumentsMenu getDocumentsMenu() {
-		return documentsMenu;
-	}
-
-	// The document that must be hilighted
-	protected Long hiliteDocId = null;
-
 	protected Integer max;
 
 	protected int visualizationMode = DocumentsGrid.MODE_LIST;
 
+	protected boolean initialized = false;
+
 	private DocumentsPanel() {
+		setWidth100();
+		setOverflow(Overflow.HIDDEN);
+		setShowEdges(false);
+	}
+
+	public DocumentsMenu getDocumentsMenu() {
+		return documentsMenu;
 	}
 
 	public static DocumentsPanel get() {
@@ -92,14 +96,14 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	@Override
 	public void onDraw() {
+		if (initialized)
+			return;
+
 		// Register to folders events
 		FolderController.get().addObserver(this);
 
 		// Register to documents events
 		DocumentController.get().addObserver(this);
-
-		setWidth100();
-		setOverflow(Overflow.HIDDEN);
 
 		// Initialize the listing panel as placeholder
 		listingPanel = new Label("&nbsp;" + I18N.message("selectfolder"));
@@ -113,17 +117,24 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		details.setAlign(Alignment.CENTER);
 		details.addMember(detailPanel);
 
-		body.addMember(DocumentToolbar.get());
-		body.addMember(listing);
-		body.addMember(details);
-		body.setShowResizeBar(true);
-		body.setResizeBarTarget("next");
+		// The two rows: listing and details
+		VLayout listingAndDetails = new VLayout();
+		listingAndDetails.setMembers(listing, details);
+		listingAndDetails.setShowResizeBar(true);
+		listingAndDetails.setResizeBarTarget("next");
 
-		documentsMenu = new DocumentsMenu();
 		previewPanel = new DocumentsPreviewPanel();
 
-		setMembers(documentsMenu, body, previewPanel);
-		setShowEdges(false);
+		// The listing plus the preview
+		HLayout bodyPanel = new HLayout();
+		bodyPanel.setWidth100();
+		bodyPanel.setMembers(listingAndDetails, previewPanel);
+
+		body.setMembers(DocumentToolbar.get(), bodyPanel);
+
+		documentsMenu = new DocumentsMenu();
+
+		setMembers(documentsMenu, body);
 
 		previewPanel.addVisibilityChangedHandler(new VisibilityChangedHandler() {
 
@@ -133,20 +144,19 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 					previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
 			}
 		});
+
+		initialized = true;
 	}
 
 	public void openInFolder(long folderId, Long docId) {
-		// Save the information about the document that will be hilighted by
-		// handler onFolderSelect
-		if (docId != null)
-			hiliteDocId = docId;
+		if (!initialized)
+			onDraw();
 
 		MainPanel.get().selectDocumentsTab();
-		
-		documentsMenu.openFolder(folderId);
+		FolderNavigator.get().openFolder(folderId, docId);
 		documentsMenu.expandSection(0);
 		if (detailPanel != null && detailPanel instanceof DocumentDetailsPanel)
-			((DocumentDetailsPanel) detailPanel).selectDeafultTab();
+			((DocumentDetailsPanel) detailPanel).selectDefaultTab();
 	}
 
 	public void openInFolder(long docId) {
@@ -162,6 +172,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 			@Override
 			public void onSuccess(GUIDocument result) {
+				DocumentController.get().selected(result);
 				GUIFolder folder = result.getFolder();
 				if (folder != null) {
 					openInFolder(folder.getId(), result.getId());
@@ -198,7 +209,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 					details.addMember(detailPanel);
 				}
 
-				DocumentToolbar.get().update(result);
+				DocumentToolbar.get().update(result, null);
 				if (detailPanel instanceof DocumentDetailsPanel) {
 					((DocumentDetailsPanel) detailPanel).setDocument(result);
 					details.redraw();
@@ -222,22 +233,30 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 		updateListingPanel(folder);
 
-		showFolderDetails();
+		/*
+		 * Launch the refresh of the details panel in another thread because the
+		 * synchronous invocation makes the observers notification's thread to
+		 * stop.
+		 */
+		Timer timer = new Timer() {
+			public void run() {
+				showFolderDetails();
+			}
+		};
+		timer.schedule(100);
 	}
 
 	private void updateListingPanel(GUIFolder folder) {
 		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
-			((DocumentsListPanel) listingPanel).updateData(folder, max, this.hiliteDocId);
+			((DocumentsListPanel) listingPanel).updateData(folder, max);
 		} else {
 			listing.removeMember(listingPanel);
 			listingPanel.destroy();
-			listingPanel = new DocumentsListPanel(folder, hiliteDocId, max, visualizationMode);
+			listingPanel = new DocumentsListPanel(folder, max, visualizationMode);
 			listing.addMember(listingPanel);
 			listing.redraw();
 		}
-
-		hiliteDocId = null;
 		previewPanel.reset();
 	}
 
@@ -245,16 +264,12 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	 * Shows folders data in the details area.
 	 */
 	public void showFolderDetails() {
-		if (hiliteDocId != null)
-			selectDocument(hiliteDocId, false);
-		else {
-			if (detailPanel != null)
-				details.removeMember(detailPanel);
-			detailPanel.destroy();
-			detailPanel = new FolderDetailsPanel(folder);
-			details.addMember(detailPanel);
-			details.redraw();
-		}
+		if (detailPanel != null)
+			details.removeMember(detailPanel);
+		detailPanel.destroy();
+		detailPanel = new FolderDetailsPanel(folder);
+		details.addMember(detailPanel);
+		details.redraw();
 	}
 
 	public void toggleFilters() {
@@ -328,7 +343,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 			details.addMember(detailPanel);
 		}
 
-		DocumentToolbar.get().update(document);
+		DocumentToolbar.get().update(document, null);
 		if (detailPanel instanceof DocumentDetailsPanel) {
 			((DocumentDetailsPanel) detailPanel).setDocument(document);
 			details.redraw();
@@ -401,35 +416,11 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		// Nothing to do
 	}
 
-	/**
-	 * Shows the documents list under the folder with the given folderId and
-	 * highlights the document with the given docId
-	 */
-	public void onFolderSelect(long folderId, Long docId) {
-		if (docId != null)
-			hiliteDocId = docId;
-
-		FolderService.Instance.get().getFolder(folderId, false, new AsyncCallback<GUIFolder>() {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
-			}
-
-			@Override
-			public void onSuccess(GUIFolder folder) {
-				// Reset the cursor to the first page
-				((DocumentsListPanel) listingPanel).getGrid().getGridCursor().setCurrentPage(1);
-				updateListingPanel(folder);
-			}
-		});
-	}
-
 	@Override
 	public void onFolderSelected(GUIFolder folder) {
 		this.folder = folder;
 		// Reset the cursor to the first page
-		if(listingPanel!=null && listingPanel instanceof DocumentsListPanel)
+		if (listingPanel != null && listingPanel instanceof DocumentsListPanel)
 			((DocumentsListPanel) listingPanel).getGrid().getGridCursor().setCurrentPage(1);
 		refresh();
 	}
@@ -455,5 +446,16 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	protected void onDestroy() {
 		destroy();
 		super.onDestroy();
+	}
+
+	public String getDocsGridViewState() {
+		if (listingPanel != null && listingPanel instanceof DocumentsListPanel) {
+			DocumentsListPanel docsListingPanel = (DocumentsListPanel) listingPanel;
+			if (docsListingPanel.getGrid() instanceof NavigatorDocumentsGrid)
+				return ((NavigatorDocumentsGrid) docsListingPanel.getGrid()).getViewState();
+			else
+				return null;
+		} else
+			return null;
 	}
 }

@@ -13,12 +13,22 @@ import com.logicaldoc.core.PersistentObjectDAO;
 public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate> {
 
 	/**
-	 * Finds the templates by given language.
+	 * Finds the templates by given language
+	 * 
+	 * @param language the language
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return collection of templates 
 	 */
 	public List<MessageTemplate> findByLanguage(String language, long tenantId);
 
 	/**
-	 * Finds the templates by given name.
+	 * Finds the templates by given name, you may have the same name but for different languages.
+	 * 
+	 * @param name name of the template
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return collection of templates
 	 */
 	public List<MessageTemplate> findByName(String name, long tenantId);
 
@@ -26,9 +36,9 @@ public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate>
 	 * Finds the template by the alternate key. If the template is not found for
 	 * the specified language, the 'en' will be used instead.
 	 * 
-	 * @param name Name of the template
-	 * @param language The language, if null 'en' will be used instead
-	 * @param tenantId The tenant
+	 * @param name name of the template
+	 * @param language the language, if null 'en' will be used instead
+	 * @param tenantId the tenant
 	 * 
 	 * @return The found template or the 'en' if none was found
 	 */
@@ -37,11 +47,11 @@ public interface MessageTemplateDAO extends PersistentObjectDAO<MessageTemplate>
 	/**
 	 * Finds the templates by the type.
 	 * 
-	 * @param type Type of the template
-	 * @param language The language
-	 * @param tenantId The tenant
+	 * @param type type of the template
+	 * @param language the language
+	 * @param tenantId the tenant
 	 * 
-	 * @return The found templates
+	 * @return the found templates
 	 */
 	public List<MessageTemplate> findByTypeAndLanguage(String type, String language, long tenantId);
 }

@@ -17,7 +17,7 @@ import org.hsqldb.lib.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.dao.HistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.dao.MenuDAO;
@@ -55,9 +55,9 @@ public class FolderHistoryDataServlet extends HttpServlet {
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
-			HistoryDAO dao = (HistoryDAO) Context.get().getBean(HistoryDAO.class);
+			DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			StringBuffer query = new StringBuffer(
-					"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id from FolderHistory A where A.deleted = 0 ");
+					"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason from FolderHistory A where A.deleted = 0 ");
 			if (request.getParameter("id") != null)
 				query.append(" and A.folderId=" + request.getParameter("id"));
 
@@ -84,6 +84,7 @@ public class FolderHistoryDataServlet extends HttpServlet {
 				writer.print("<path><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></path>");
 				if (showSid)
 					writer.print("<sid><![CDATA[" + (cols[6] == null ? "" : cols[6]) + "]]></sid>");
+				writer.print("<reason><![CDATA[" + (cols[7] == null ? "" : cols[7]) + "]]></reason>");
 				writer.print("</history>");
 			}
 			writer.write("</list>");

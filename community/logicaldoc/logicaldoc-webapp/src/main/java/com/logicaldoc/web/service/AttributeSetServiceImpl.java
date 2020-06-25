@@ -3,6 +3,7 @@ package com.logicaldoc.web.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,10 +45,16 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 
 	@Override
 	public void delete(long setId) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
-		dao.delete(setId);
+		try {
+			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			boolean deleted = dao.delete(setId);
+			if (!deleted)
+				throw new Exception("Attribute Set has not been deleted");
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
 	}
 
 	@Override
@@ -73,7 +80,9 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				}
 
 				option.setPosition(i);
-				dao.store(option);
+				boolean stored = dao.store(option);
+				if (!stored)
+					throw new Exception(String.format("Options have not been %s", setId != 0L ? "updated" : "stored"));
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -90,7 +99,9 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 			for (AttributeOption option : options)
 				for (String value : values)
 					if (value.equals(option.getValue())) {
-						dao.delete(option.getId());
+						boolean deleted = dao.delete(option.getId());
+						if (!deleted)
+							throw new Exception("Option has not been deleted");
 						break;
 					}
 		} catch (Throwable t) {
@@ -127,6 +138,10 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 						att.setSetId(attributeSet.getId());
 						att.setPosition(attribute.getPosition());
 						att.setMandatory(attribute.isMandatory() ? 1 : 0);
+						att.setHidden(attribute.isHidden() ? 1 : 0);
+						att.setMultiple(attribute.isMultiple() ? 1 : 0);
+						att.setParent(attribute.getParent());
+						att.setStringValues(attribute.getStringValues());
 						att.setType(attribute.getType());
 						att.setLabel(attribute.getLabel());
 						att.setEditor(attribute.getEditor());
@@ -150,7 +165,9 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 			if (attrs.size() > 0)
 				attSet.setAttributes(attrs);
 
-			dao.store(attSet);
+			boolean stored = dao.store(attSet);
+			if (!stored)
+				throw new Exception(String.format("Attribute Set has not been %s", attributeSet.getId() != 0L ? "updated" : "stored"));
 
 			attributeSet.setId(attSet.getId());
 		} catch (Throwable t) {
@@ -193,10 +210,14 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				Attribute extAttr = attributeSet.getAttributes().get(attrName);
 				GUIAttribute att = new GUIAttribute();
 				att.setName(attrName);
+				att.setParent(extAttr.getParent());
+				att.setStringValues(extAttr.getStringValues());
 				att.setSet(attributeSet.getName());
 				att.setSetId(attributeSet.getId());
 				att.setPosition(extAttr.getPosition());
 				att.setMandatory(extAttr.getMandatory() == 1 ? true : false);
+				att.setHidden(extAttr.getHidden() == 1 ? true : false);
+				att.setMultiple(extAttr.getMultiple() == 1 ? true : false);
 				att.setType(extAttr.getType());
 				if (StringUtils.isEmpty(extAttr.getLabel()))
 					att.setLabel(attrName);
@@ -234,8 +255,11 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				attributes[i] = att;
 				i++;
 			}
-			if (attributes.length > 0)
+
+			if (attributes.length > 0) {
+				Arrays.sort(attributes);
 				attSet.setAttributes(attributes);
+			}
 
 			return attSet;
 		} catch (Throwable t) {

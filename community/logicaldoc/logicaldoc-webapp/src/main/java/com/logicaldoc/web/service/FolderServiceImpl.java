@@ -3,6 +3,7 @@ package com.logicaldoc.web.service;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -18,8 +19,8 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -41,6 +42,7 @@ import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.web.data.FoldersDataServlet;
 import com.logicaldoc.web.util.ServiceUtil;
 
 /**
@@ -95,7 +97,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				history.setSession(session);
 				history.setEvent(FolderEvent.PERMISSION.toString());
 
-				fdao.applyRithtToTree(folder.getId(), history);
+				fdao.applyRightToTree(folder.getId(), history);
 			} else {
 				saveRules(session, f, session.getUserId(), folder.getRights());
 			}
@@ -143,6 +145,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	public static GUIFolder fromFolder(Folder folder, boolean computePath) {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		dao.initialize(folder);
 
 		GUIFolder f = new GUIFolder();
 		f.setId(folder.getId());
@@ -160,8 +163,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		f.setStorage(folder.getStorage());
 		f.setMaxVersions(folder.getMaxVersions());
 		f.setColor(folder.getColor());
+		f.setGrid(folder.getGrid());
 		f.setQuotaThreshold(folder.getQuotaThreshold());
 		f.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsList().toArray(new String[0]));
+		f.setOcrTemplateId(folder.getOcrTemplateId());
+		f.setBarcodeTemplateId(folder.getBarcodeTemplateId());
 		if (computePath)
 			f.setPathExtended(dao.computePathExtended(folder.getId()));
 
@@ -179,8 +185,6 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			f.setSecurityRef(secRef);
 		}
 
-		dao.initialize(folder);
-
 		if (folder.getTemplate() != null) {
 			f.setTemplateId(folder.getTemplate().getId());
 			f.setTemplate(folder.getTemplate().getName());
@@ -194,19 +198,53 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		else
 			f.setTags(new String[0]);
 
-		/*
-		 * Count the children
-		 */
-		f.setDocumentCount(dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid="
-				+ folder.getId() + " and not ld_status=" + AbstractDocument.DOC_ARCHIVED));
-		f.setSubfolderCount(dao
-				.queryForInt("select count(ld_id) from ld_folder where not ld_id=ld_parentid and ld_deleted=0 and ld_parentid="
-						+ folder.getId()));
-
 		return f;
 	}
 
+	@Override
+	public int[] computeStats(long folderId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			return new int[] { countDocs(folderId), countChildren(folderId) };
+		} catch (Throwable t) {
+			return (int[]) ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	private static int countDocs(long folderId) {
+		int count = 0;
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+		try {
+			count = dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid="
+					+ folderId + " and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+		}
+		return count;
+	}
+
+	private static int countChildren(long folderId) {
+		int count = 0;
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+		try {
+			count = dao.queryForInt(
+					"select count(ld_id) from ld_folder where not ld_id=ld_parentid and ld_deleted=0 and ld_parentid="
+							+ folderId);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+		}
+
+		return count;
+	}
+
 	public static GUIFolder getFolder(Session session, long folderId) throws ServerException {
+		return getFolder(session, folderId, false);
+	}
+
+	public static GUIFolder getFolder(Session session, long folderId, boolean computePath) throws ServerException {
 		if (session != null)
 			ServiceUtil.validateSession(session.getSid());
 		try {
@@ -236,7 +274,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				folder = test;
 			}
 
-			GUIFolder f = fromFolder(folder, false);
+			GUIFolder f = fromFolder(folder, computePath);
 
 			if (session != null) {
 				Set<Permission> permissions = dao.getEnabledPermissions(folder.getId(), session.getUserId());
@@ -245,17 +283,16 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					permissionsList.add(permission.toString());
 				f.setPermissions(permissionsList.toArray(new String[permissionsList.size()]));
 			}
-		
-			
-			
 
 			Folder ref = folder;
 			if (folder.getSecurityRef() != null)
 				ref = dao.findById(folder.getSecurityRef());
+			dao.initialize(ref);
 
 			int i = 0;
-			GUIRight[] rights = new GUIRight[(ref != null && ref.getFolderGroups() != null) ? ref.getFolderGroups()
-					.size() : 0];
+			GUIRight[] rights = new GUIRight[(ref != null && ref.getFolderGroups() != null)
+					? ref.getFolderGroups().size()
+					: 0];
 			if (ref != null && ref.getFolderGroups() != null)
 				for (FolderGroup fg : ref.getFolderGroups()) {
 					GUIRight right = new GUIRight();
@@ -277,11 +314,12 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					right.setPassword(fg.getPassword() == 1 ? true : false);
 					right.setMove(fg.getMove() == 1 ? true : false);
 					right.setEmail(fg.getEmail() == 1 ? true : false);
+					right.setAutomation(fg.getAutomation() == 1 ? true : false);
 
 					rights[i] = right;
 					i++;
 				}
-			f.setRights(rights);	
+			f.setRights(rights);
 			return f;
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
@@ -291,7 +329,8 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	}
 
 	@Override
-	public GUIFolder getFolder(long folderId, boolean computePath) throws ServerException {
+	public GUIFolder getFolder(long folderId, boolean computePath, boolean computeDocs, boolean computeSubfolders)
+			throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
@@ -300,6 +339,10 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			GUIFolder folder = getFolder(session, folderId);
 			if (folder == null)
 				return null;
+			if (computeDocs)
+				folder.setDocumentCount(countDocs(folder.getId()));
+			if (computeSubfolders)
+				folder.setSubfolderCount(countChildren(folder.getId()));
 
 			if (computePath) {
 				String pathExtended = dao.computePathExtended(folderId);
@@ -320,9 +363,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 						GUIFolder f = new GUIFolder(parent.getId());
 						f.setName("/");
 						f.setParentId(parent.getId());
+						if (computeSubfolders)
+							f.setSubfolderCount(countChildren(f.getId()));
 						path[j] = f;
 					} else
-						path[j] = getFolder(parent.getId(), false);
+						path[j] = getFolder(parent.getId(), false, false, computeSubfolders);
 					parent = list.get(0);
 					j++;
 				}
@@ -427,14 +472,15 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		boolean sourceParentDeleteEnabled = folderDao.isPermissionEnabled(Permission.MOVE, sourceParent.getId(),
 				session.getUserId());
 		if (!sourceParentDeleteEnabled)
-			throw new SecurityException(String.format("User %s has not the MOVE permission on folder %s",session.getUsername(), sourceParent.getName()));
+			throw new SecurityException(String.format("User %s has not the MOVE permission on folder %s",
+					session.getUsername(), sourceParent.getName()));
 
 		// Check addChild permission on destParentFolder
 		boolean addchildEnabled = folderDao.isPermissionEnabled(Permission.ADD, destParentFolder.getId(),
 				session.getUserId());
 		if (!addchildEnabled)
-			throw new SecurityException(String.format("User %s has not the ADD CHILD permission on folder %s",session.getUsername(), sourceParent.getName()));
-
+			throw new SecurityException(String.format("User %s has not the ADD CHILD permission on folder %s",
+					session.getUsername(), sourceParent.getName()));
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -475,7 +521,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	@Override
 	public GUIFolder save(GUIFolder folder) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-
+		
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
 			Folder f = folderDao.findById(folder.getId());
@@ -520,6 +566,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			f.setQuotaThreshold(folder.getQuotaThreshold());
 			f.setQuotaAlertRecipients(folder.getQuotaAlertRecipientsAsString());
 			f.setColor(folder.getColor());
+			f.setGrid(folder.getGrid());
+			f.setOcrTemplateId(folder.getOcrTemplateId());
+			f.setBarcodeTemplateId(folder.getBarcodeTemplateId());
 
 			updateExtendedAttributes(f, folder);
 
@@ -568,6 +617,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			else
 				f = folderDao.create(folderDao.findById(newFolder.getParentId()), folderVO, inheritSecurity,
 						transaction);
+
+			if (f == null)
+				throw new Exception("Folder not stored");
 
 			return getFolder(session, f.getId());
 		} catch (Throwable t) {
@@ -704,6 +756,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					fg.setEmail(1);
 				else
 					fg.setEmail(0);
+
+				if (isAdmin || right.isAutomation())
+					fg.setAutomation(1);
+				else
+					fg.setAutomation(0);
 			}
 
 			folder.getFolderGroups().clear();
@@ -753,7 +810,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 							session.getUsername(), doc.getFolder().getName()));
 
 				// Create the document history event
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
 
 				// Check if the selected document is a shortcut
@@ -794,7 +851,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			for (long id : docIds) {
 				Document doc = docDao.findById(id);
 				// Create the document history event
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
 				transaction.setEvent(DocumentEvent.STORED.toString());
 				transaction.setComment("");
@@ -828,7 +885,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			for (long id : docIds) {
 				Document doc = docDao.findById(id);
 				// Create the document history event
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
 				transaction.setEvent(DocumentEvent.SHORTCUT_STORED.toString());
 				transaction.setComment("");
@@ -871,18 +928,21 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		if (f.getTemplateId() != null) {
 			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			Template template = templateDao.findById(f.getTemplateId());
+			templateDao.initialize(template);
+
 			folder.setTemplate(template);
 			folder.setTemplateLocked(f.getTemplateLocked());
 			folder.getAttributes().clear();
 
 			if (f.getAttributes() != null && f.getAttributes().length > 0) {
 				for (GUIAttribute attr : f.getAttributes()) {
-					Attribute templateAttribute = template.getAttributes().get(attr.getName());
+					Attribute templateAttribute = template.getAttributes()
+							.get(attr.getParent() != null ? attr.getParent() : attr.getName());
 					// This control is necessary because, changing
 					// the template, the values of the old template
 					// attributes keys remains on the form value
 					// manager,
-					// so the GUIDocument contains also the old
+					// so the GUIFolder contains also the old
 					// template attributes keys that must be
 					// skipped.
 					if (templateAttribute == null)
@@ -912,7 +972,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 						} else if (templateType == GUIAttribute.TYPE_BOOLEAN) {
 							extAttr.setValue(attr.getBooleanValue());
 							extAttr.setType(Attribute.TYPE_BOOLEAN);
-						} else if (templateType == GUIAttribute.TYPE_USER) {
+						} else if (templateType == GUIAttribute.TYPE_USER || templateType == GUIAttribute.TYPE_FOLDER) {
 							extAttr.setIntValue(attr.getIntValue());
 							extAttr.setStringValue(attr.getStringValue());
 						}
@@ -942,7 +1002,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 								extAttr.setStringValue((String) attr.getValue());
 							else
 								extAttr.setStringValue(null);
-						} else if (templateType == Attribute.TYPE_USER) {
+						} else if (templateType == Attribute.TYPE_USER || templateType == Attribute.TYPE_FOLDER) {
 							if (attr.getValue() != null) {
 								extAttr.setStringValue((String) attr.getStringValue());
 								extAttr.setIntValue((Long) attr.getIntValue());
@@ -953,10 +1013,13 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 						}
 					}
 
-					extAttr.setLabel(attr.getLabel());
+					extAttr.setParent(attr.getParent());
+					extAttr.setLabel(templateAttribute.getLabel());
 					extAttr.setType(templateType);
-					extAttr.setPosition(attr.getPosition());
-					extAttr.setMandatory(attr.isMandatory() ? 1 : 0);
+					extAttr.setPosition(templateAttribute.getPosition());
+					extAttr.setMandatory(templateAttribute.getMandatory());
+					extAttr.setHidden(templateAttribute.getHidden());
+					extAttr.setMultiple(templateAttribute.getMultiple());
 
 					folder.getAttributes().put(attr.getName(), extAttr);
 				}
@@ -968,48 +1031,88 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	}
 
 	private static GUIAttribute[] prepareGUIAttributes(Template template, Folder folder) {
-		try {
-			GUIAttribute[] attributes = new GUIAttribute[template.getAttributeNames().size()];
-			int i = 0;
-			for (String attrName : template.getAttributeNames()) {
-				Attribute extAttr = template.getAttributes().get(attrName);
-				GUIAttribute att = new GUIAttribute();
-				att.setName(attrName);
-				att.setPosition(extAttr.getPosition());
-				att.setLabel(extAttr.getLabel());
-				att.setMandatory(extAttr.getMandatory() == 1);
-				att.setEditor(extAttr.getEditor());
+		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		tDao.initialize(template);
 
-				// If the case, populate the options
-				if (att.getEditor() == Attribute.EDITOR_LISTBOX) {
-					String buf = (String) extAttr.getStringValue();
-					List<String> list = new ArrayList<String>();
-					if (buf != null) {
-						StringTokenizer st = new StringTokenizer(buf, ",");
-						while (st.hasMoreElements()) {
-							String val = (String) st.nextElement();
-							if (!list.contains(val))
-								list.add(val);
+		List<GUIAttribute> attributes = new ArrayList<GUIAttribute>();
+		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
+			return new GUIAttribute[0];
+		try {
+			if (template != null) {
+				for (String attrName : template.getAttributeNames()) {
+					Attribute templateExtAttr = template.getAttributes().get(attrName);
+					GUIAttribute att = new GUIAttribute();
+					att.setName(attrName);
+					att.setSetId(templateExtAttr.getSetId());
+					att.setPosition(templateExtAttr.getPosition());
+					att.setLabel(templateExtAttr.getLabel());
+					att.setMandatory(templateExtAttr.getMandatory() == 1);
+					att.setHidden(templateExtAttr.getHidden() == 1);
+					att.setMultiple(templateExtAttr.getMultiple() == 1);
+					att.setParent(templateExtAttr.getParent());
+					att.setStringValues(templateExtAttr.getStringValues());
+					att.setEditor(templateExtAttr.getEditor());
+					att.setStringValue(templateExtAttr.getStringValue());
+					att.setIntValue(templateExtAttr.getIntValue());
+					att.setBooleanValue(templateExtAttr.getBooleanValue());
+					att.setDoubleValue(templateExtAttr.getDoubleValue());
+					att.setDateValue(templateExtAttr.getDateValue());
+					att.setOptions(new String[] { templateExtAttr.getStringValue() });
+
+					if (folder != null) {
+						Attribute attribute = folder.getAttribute(attrName);
+						if (attribute != null) {
+							att.setStringValues(attribute.getStringValues());
+							att.setStringValue(attribute.getStringValue());
+							att.setIntValue(attribute.getIntValue());
+							att.setBooleanValue(attribute.getBooleanValue());
+							att.setDoubleValue(attribute.getDoubleValue());
+							att.setDateValue(attribute.getDateValue());
+						} else
+							att.setValue(templateExtAttr.getValue());
+					}
+
+					// Normalize dates
+					if (att.getValue() instanceof Date)
+						att.setValue(ServiceUtil.convertToDate((Date) att.getValue()));
+
+					att.setType(templateExtAttr.getType());
+					attributes.add(att);
+
+					if (att.isMultiple() && folder != null) {
+						// Get the other values
+						List<Attribute> values = folder.getValueAttributes(att.getName());
+						if (values.size() > 1) {
+							// Skip the parent attribute
+							values.remove(0);
+
+							// Create the GUI attributes for the values
+							for (Attribute valAttribute : values) {
+								GUIAttribute valAtt = (GUIAttribute) att.clone();
+								valAtt.setName(valAttribute.getName());
+								valAtt.setParent(att.getName());
+								valAtt.setMultiple(false);
+								valAtt.setPosition(att.getPosition());
+								valAtt.setPosition(att.getPosition());
+								valAtt.setBooleanValue(valAttribute.getBooleanValue());
+								valAtt.setDateValue(valAttribute.getDateValue());
+								valAtt.setDoubleValue(valAttribute.getDoubleValue());
+								valAtt.setIntValue(valAttribute.getIntValue());
+								valAtt.setStringValue(valAttribute.getStringValue());
+								valAtt.setStringValues(null);
+
+								// Normalize dates
+								if (valAtt.getValue() instanceof Date)
+									valAtt.setValue(ServiceUtil.convertToDate((Date) valAtt.getValue()));
+								attributes.add(valAtt);
+							}
 						}
 					}
-					att.setOptions(list.toArray(new String[0]));
 				}
-
-				if (folder != null) {
-					if (folder.getValue(attrName) != null)
-						att.setValue(folder.getValue(attrName));
-				} else
-					att.setValue(extAttr.getValue());
-
-				if (att.getValue() instanceof Date)
-					att.setValue(ServiceUtil.convertToDate((Date) att.getValue()));
-
-				att.setType(extAttr.getType());
-
-				attributes[i] = att;
-				i++;
 			}
-			return attributes;
+
+			Collections.sort(attributes);
+			return attributes.toArray(new GUIAttribute[0]);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			return null;
@@ -1059,6 +1162,52 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
 			fdao.applyTagsToTree(parentId, transaction);
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public void setFolderPagination(long folderId, Integer startRecord, Integer pageSize) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		if (pageSize != null && startRecord != null) {
+			session.getDictionary().put(FoldersDataServlet.FOLDER_PAGE_SIZE + ":" + folderId, pageSize);
+			session.getDictionary().put(FoldersDataServlet.FOLDER_START_RECORD + ":" + folderId, startRecord);
+		} else {
+			session.getDictionary().remove(FoldersDataServlet.FOLDER_PAGE_SIZE + ":" + folderId);
+			session.getDictionary().remove(FoldersDataServlet.FOLDER_START_RECORD + ":" + folderId);
+		}
+	}
+
+	@Override
+	public void applyGridLayout(long folderId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+			/*
+			 * Just apply the current security settings to the whole subtree
+			 */
+			FolderHistory history = new FolderHistory();
+			history.setSession(session);
+
+			fdao.applyGridToTree(folderId, history);
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public void applyOCR(long parentId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderHistory transaction = new FolderHistory();
+			transaction.setSession(session);
+			fdao.applyOCRToTree(parentId, transaction);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}

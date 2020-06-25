@@ -103,13 +103,15 @@ public class MenusPanel extends VLayout {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param user the user to update
 	 */
 	public void updateRecord(GUIUser user) {
 		ListGridRecord record = menus.getSelectedRecord();
 		if (record == null)
 			record = new ListGridRecord();
 
-		record.setAttribute("username", user.getUserName());
+		record.setAttribute("username", user.getUsername());
 		record.setAttribute("name", user.getName());
 		record.setAttribute("firstName", user.getFirstName());
 		record.setAttribute("email", user.getEmail());

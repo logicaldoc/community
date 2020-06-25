@@ -1,6 +1,7 @@
 package com.logicaldoc.webdav.resource.service;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,11 +14,12 @@ import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
@@ -37,9 +39,9 @@ import com.logicaldoc.webdav.resource.model.ResourceImpl;
 import com.logicaldoc.webdav.session.DavSession;
 
 /**
+ * Base implementation of a ResourceService
  * 
  * @author Sebastian Wenzky
- * 
  */
 public class ResourceServiceImpl implements ResourceService {
 
@@ -103,15 +105,15 @@ public class ResourceServiceImpl implements ResourceService {
 		resource.setCreationDate(document.getCreation());
 		resource.setLastModified(document.getDate());
 		resource.isFolder(false);
-		resource.setCheckedOut(document.getStatus() == Document.DOC_CHECKED_OUT
-				|| document.getStatus() == Document.DOC_LOCKED);
+		resource.setCheckedOut(
+				document.getStatus() == Document.DOC_CHECKED_OUT || document.getStatus() == Document.DOC_LOCKED);
 		resource.setVersionLabel(document.getVersion());
 		resource.setAuthor(document.getPublisher());
 		resource.setDocRef(document.getDocRef());
 		resource.setFolderID(new Long(document.getFolder().getId()).toString());
 		resource.setSession(session);
-		resource.setLocked(document.getStatus() == Document.DOC_LOCKED
-				|| document.getStatus() == Document.DOC_CHECKED_OUT);
+		resource.setLocked(
+				document.getStatus() == Document.DOC_LOCKED || document.getStatus() == Document.DOC_CHECKED_OUT);
 		resource.setLockUser(document.getLockUser());
 
 		if (session != null && (Long) session.getObject("id") != null) {
@@ -159,7 +161,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public Resource getResource(String requestPath, DavSession session) throws DavException {
-		log.trace("Find DAV resource: " + requestPath);
+		log.trace("Find DAV resource: {}", requestPath);
 
 		long userId = 0;
 		String currentStablePath = "";
@@ -188,7 +190,7 @@ public class ResourceServiceImpl implements ResourceService {
 			if (path.equals("/") && name.equals("")) {
 				folder = folderDAO.findRoot(session.getTenantId());
 			} else
-				folder = folderDAO.findByPath(path + "/" + name, session.getTenantId());
+				folder = folderDAO.findByPathExtended(path + "/" + name, session.getTenantId());
 
 			// if this resource request is a folder
 			if (folder != null)
@@ -218,8 +220,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	/**
-	 * @see com.logicaldoc.webdav.resource.service.ResourceService#getParentResource(java.lang.String,
-	 *      long)
+	 * @see ResourceService#getChildByName(Resource, String)
 	 */
 	public Resource getParentResource(String resourcePath, long userId, DavSession session) {
 		log.debug("Find parent DAV resource: " + resourcePath);
@@ -253,7 +254,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if ("/".equals(resourcePath.trim()) && "".equals(name))
 			folder = folderDAO.findRoot(tenantId);
 		else
-			folder = folderDAO.findByPath(resourcePath + "/" + name, tenantId);
+			folder = folderDAO.findByPathExtended(resourcePath + "/" + name, tenantId);
 
 		return marshallFolder(folder, userId, session);
 
@@ -292,7 +293,13 @@ public class ResourceServiceImpl implements ResourceService {
 
 			Folder newFolder = new Folder(name);
 			newFolder.setTenantId(session.getTenantId());
-			Folder createdFolder = folderDAO.create(parentFolder, newFolder, true, transaction);
+			Folder createdFolder;
+			try {
+				createdFolder = folderDAO.create(parentFolder, newFolder, true, transaction);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+				throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			}
 			return this.marshallFolder(createdFolder, parentResource.getRequestedPerson(), session);
 		}
 
@@ -308,7 +315,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			try {
 				// Create the document history event
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSessionId(sid);
 				transaction.setEvent(DocumentEvent.STORED.toString());
 				transaction.setComment("");
@@ -353,7 +360,7 @@ public class ResourceServiceImpl implements ResourceService {
 				throw new DavException(DavServletResponse.SC_FORBIDDEN, "The document is immutable");
 
 			// Create the document history event
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setUser(user);
 			transaction.setComment("");
@@ -421,7 +428,7 @@ public class ResourceServiceImpl implements ResourceService {
 		documentDAO.initialize(document);
 
 		// Create the document history event
-		History transaction = new History();
+		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId(sid);
 		transaction.setUser(user);
 
@@ -432,7 +439,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 			// we are doing a file rename
 			try {
-				documentManager.rename(document, source.getName(), transaction);
+				documentManager.rename(document.getId(), source.getName(), transaction);
 			} catch (Throwable e) {
 				log.warn(e.getMessage(), e);
 			}
@@ -471,11 +478,10 @@ public class ResourceServiceImpl implements ResourceService {
 		if (currentFolder.getType() == Folder.TYPE_WORKSPACE)
 			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot move nor rename a workspace");
 		folderDAO.initialize(currentFolder);
-		
+
 		long currentParentFolder = currentFolder.getParentId();
 		long destinationParentFolder = Long.parseLong(destination.getID());
 
-		
 		// distinction between folder move and folder rename
 		if (currentParentFolder != destinationParentFolder) {
 			// Folder Move
@@ -520,12 +526,20 @@ public class ResourceServiceImpl implements ResourceService {
 			transaction.setUser(user);
 			transaction.setEvent(FolderEvent.RENAMED.toString());
 			transaction.setSessionId(sid);
-			folderDAO.store(currentFolder, transaction);
+			try {
+				folderDAO.store(currentFolder, transaction);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 
 			if (destination != null)
 				currentFolder.setParentId(Long.parseLong(destination.getID()));
-
-			folderDAO.store(currentFolder);
+			try {
+				folderDAO.store(currentFolder);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+				throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			}
 			return this.marshallFolder(currentFolder, source.getRequestedPerson(), session);
 		}
 	}
@@ -559,7 +573,7 @@ public class ResourceServiceImpl implements ResourceService {
 				if (!parent.isDeleteEnabled())
 					throw new DavException(DavServletResponse.SC_FORBIDDEN, "No rights to delete on parent resource.");
 
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setUser(user);
 				transaction.setSessionId(sid);
 				transaction.setUser(user);
@@ -611,7 +625,7 @@ public class ResourceServiceImpl implements ResourceService {
 					throw new DavException(DavServletResponse.SC_FORBIDDEN, "The document is immutable");
 
 				// Create the document history event
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSessionId(sid);
 				transaction.setEvent(DocumentEvent.STORED.toString());
 				transaction.setComment("");
@@ -661,12 +675,16 @@ public class ResourceServiceImpl implements ResourceService {
 
 		InputStream is = null;
 
-		if (version == null || version.equals("")) {
-			String res = storer.getResourceName(document, null, null);
-			is = storer.getStream(document.getId(), res);
-		} else {
-			String res = storer.getResourceName(document, resource.getVersionLabel(), null);
-			is = storer.getStream(document.getId(), res);
+		try {
+			if (version == null || version.equals("")) {
+				String res = storer.getResourceName(document, null, null);
+				is = storer.getStream(document.getId(), res);
+			} else {
+				String res = storer.getResourceName(document, resource.getVersionLabel(), null);
+				is = storer.getStream(document.getId(), res);
+			}
+		} catch (IOException e) {
+			throw new DavResourceIOException(e.getMessage());
 		}
 		return is;
 	}
@@ -686,7 +704,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 		try {
 			// Create the document history event
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
 			transaction.setComment("");
@@ -744,7 +762,7 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 			// Create the document history event
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setUser(user);
 

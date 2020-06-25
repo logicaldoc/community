@@ -12,8 +12,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * Shows the quota details.
@@ -54,7 +52,6 @@ public class QuotaPanel extends AdminPanel {
 		});
 
 		IButton save = new IButton(I18N.message("save"));
-		save.setAutoDraw(true);
 		save.setMinWidth(80);
 		save.addClickHandler(new ClickHandler() {
 

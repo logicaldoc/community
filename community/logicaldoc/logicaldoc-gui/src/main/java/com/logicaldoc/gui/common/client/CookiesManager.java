@@ -12,18 +12,14 @@ import com.smartgwt.client.util.Offline;
  */
 public class CookiesManager {
 
-	public static final String COOKIE_HITSLIST = "ldoc-hitslist";
-
 	public static final String COOKIE_HITSLIST_GROUPING = "ldoc-hitslist-grouping";
-	
+
 	public static final String COOKIE_HITSLIST_MODE = "ldoc-hitslist-mode";
 
 	public static final String COOKIE_HITSLIST_PREV_W = "ldoc-hitslist-prev-w";
 
-	public static final String COOKIE_DOCSLIST = "ldoc-docslist";
-
 	public static final String COOKIE_DOCSLIST_GROUPING = "ldoc-docslist-grouping";
-	
+
 	public static final String COOKIE_DOCSLIST_SORT = "ldoc-docslist-sort";
 
 	public static final String COOKIE_DOCSLIST_MAX = "ldoc-docslist-max";
@@ -48,6 +44,8 @@ public class CookiesManager {
 
 	public static final String COOKIE_FAILURE = "ldoc-failure";
 
+	public static final String COOKIE_JSESSIONID = "JSESSIONID";
+
 	/**
 	 * Removes the cookies that store the session ID
 	 */
@@ -55,6 +53,7 @@ public class CookiesManager {
 		try {
 			Offline.remove(COOKIE_SID);
 			Cookies.removeCookie(COOKIE_SID);
+			Cookies.removeCookie(COOKIE_JSESSIONID);
 		} catch (Throwable t) {
 
 		}
@@ -83,37 +82,7 @@ public class CookiesManager {
 		}
 
 		try {
-			Offline.remove(COOKIE_HITSLIST);
-		} catch (Throwable t) {
-
-		}
-
-		try {
-			Offline.remove(COOKIE_HITSLIST_GROUPING);
-		} catch (Throwable t) {
-
-		}
-		
-		try {
 			Offline.remove(COOKIE_HITSLIST_PREV_W);
-		} catch (Throwable t) {
-
-		}
-
-		try {
-			Offline.remove(COOKIE_DOCSLIST);
-		} catch (Throwable t) {
-
-		}
-
-		try {
-			Offline.remove(COOKIE_DOCSLIST_GROUPING);
-		} catch (Throwable t) {
-
-		}
-		
-		try {
-			Offline.remove(COOKIE_DOCSLIST_SORT);
 		} catch (Throwable t) {
 
 		}
@@ -135,6 +104,7 @@ public class CookiesManager {
 		} catch (Throwable t) {
 
 		}
+
 		try {
 			Offline.remove(COOKIE_PASSWORD);
 		} catch (Throwable t) {
@@ -154,32 +124,20 @@ public class CookiesManager {
 
 	/**
 	 * Gets a cookie
+	 * 
+	 * @param cookieName name of the cookie
+	 * 
+	 * @return value of the cookie
 	 */
 	public static String get(String cookieName) {
 		return (String) Offline.get(cookieName);
 	}
 
 	/**
-	 * Retrieves the Session ID stored in the browser
-	 */
-	public static String getSid() {
-		String sid = null;
-		try {
-			sid = Cookies.getCookie(COOKIE_SID);
-		} catch (Throwable t) {
-		}
-
-		try {
-			if (sid == null)
-				sid = Offline.get(COOKIE_SID).toString();
-		} catch (Throwable t) {
-		}
-
-		return sid;
-	}
-
-	/**
 	 * Saves the cookie
+	 * 
+	 * @param cookieName name of the cookie
+	 * @param value value of the cookie
 	 */
 	public static void save(String cookieName, String value) {
 		Offline.put(cookieName, value);
@@ -190,7 +148,9 @@ public class CookiesManager {
 	}
 
 	/**
-	 * Stores the release information
+	 * Stores the release information in the browser
+	 * 
+	 * @param info the User Interface informations
 	 */
 	public static void saveRelease(GUIInfo info) {
 		Cookies.setCookie(COOKIE_VERSION, info.getRelease(), null, null, null, true);
@@ -214,7 +174,9 @@ public class CookiesManager {
 	}
 
 	/**
-	 * Retrieve the failure of the lat login
+	 * Retrieve the failure of the last login
+	 * 
+	 * @return the failure reason
 	 */
 	public static String getFailure() {
 		return Cookies.getCookie(COOKIE_FAILURE);
@@ -222,6 +184,11 @@ public class CookiesManager {
 
 	/**
 	 * Saves the login informations
+	 * 
+	 * @param saveLoginEnabled if the 'save login' checkbox must be enabled
+	 * @param rememberMe if the 'remember me' option must be enabled
+	 * @param username the username
+	 * @param password the password
 	 */
 	public static void saveLogin(boolean saveLoginEnabled, boolean rememberMe, String username, String password) {
 		if (saveLoginEnabled) {

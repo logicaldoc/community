@@ -60,13 +60,15 @@ import com.smartgwt.client.widgets.layout.SectionStackSection;
  */
 public class EmailDialog extends Window {
 
+	private static final String SIGNATURE_SEPARATOR = "--";
+
 	private long[] docIds;
 
 	private ValuesManager vm = new ValuesManager();
 
 	private ListGrid recipientsGrid;
 
-	final RichTextItem message = new RichTextItem();
+	private RichTextItem message;
 
 	final SelectItem from = ItemFactory.newEmailFromSelector("from", null);
 
@@ -103,12 +105,11 @@ public class EmailDialog extends Window {
 		form.setTitleOrientation(TitleOrientation.LEFT);
 		form.setNumCols(2);
 
-		final TextItem subject = ItemFactory.newTextItem("subject", "subject", docTitle);
+		final TextItem subject = ItemFactory.newTextItemForAutomation("subject", "subject", docTitle, null);
 		subject.setRequired(true);
 		subject.setWidth(350);
 
-		message.setName("message");
-		message.setTitle(I18N.message("message"));
+		message=ItemFactory.newRichTextItemForAutomation("message", "message", null, null);
 		message.setWidth("*");
 		message.setHeight(200);
 		message.setColSpan(2);
@@ -126,8 +127,7 @@ public class EmailDialog extends Window {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
-				if (messageTemplate.getValueAsString() != null
-						&& !"".equals(messageTemplate.getValueAsString() != null)) {
+				if (messageTemplate.getValueAsString() != null && !"".equals(messageTemplate.getValueAsString())) {
 					MessageService.Instance.get().getTemplate(Long.parseLong(messageTemplate.getValueAsString()),
 							new AsyncCallback<GUIMessageTemplate>() {
 
@@ -138,6 +138,8 @@ public class EmailDialog extends Window {
 
 								@Override
 								public void onSuccess(GUIMessageTemplate t) {
+									Log.info(t.getSubject());
+									
 									subject.setValue(t.getSubject());
 									message.setValue(t.getBody());
 									updateSignature();
@@ -166,8 +168,10 @@ public class EmailDialog extends Window {
 				if ((ticket.getValue() != null && ticket.getValueAsBoolean()) || !Feature.enabled(Feature.PDF)) {
 					pdf.setValue(false);
 					pdf.hide();
+					appendDownloadTicketPlaceholder();
 				} else {
 					pdf.show();
+					removeDownloadTicketPlaceholder();
 				}
 			}
 		});
@@ -201,6 +205,7 @@ public class EmailDialog extends Window {
 
 					List<String> to = new ArrayList<String>();
 					List<String> cc = new ArrayList<String>();
+					List<String> bcc = new ArrayList<String>();
 					ListGridRecord[] records = recipientsGrid.getRecords();
 					for (int i = 0; i < records.length; i++) {
 						if (!recipientsGrid.validateCell(i, "email"))
@@ -211,8 +216,10 @@ public class EmailDialog extends Window {
 							continue;
 						if ("to".equals(record.getAttribute("type")))
 							to.add(record.getAttribute("email").trim());
-						else
+						else if ("cc".equals(record.getAttribute("type")))
 							cc.add(record.getAttribute("email").trim());
+						else
+							bcc.add(record.getAttribute("email").trim());
 					}
 
 					if (to.isEmpty() && cc.isEmpty()) {
@@ -232,6 +239,11 @@ public class EmailDialog extends Window {
 						ccs.add(new GUIContact(email));
 					mail.setCcs(ccs.toArray(new GUIContact[0]));
 
+					List<GUIContact> bccs = new ArrayList<GUIContact>();
+					for (String email : bcc)
+						bccs.add(new GUIContact(email));
+					mail.setBccs(bccs.toArray(new GUIContact[0]));
+
 					ContactingServer.get().show();
 
 					DocumentService.Instance.get().sendAsEmail(mail, Session.get().getUser().getLanguage(),
@@ -249,8 +261,8 @@ public class EmailDialog extends Window {
 									ContactingServer.get().hide();
 									send.enable();
 									if ("ok".equals(result)) {
-										ToastNotification.showNotification(I18N.message("messagesent") + ". "
-												+ I18N.message("documentcopysent"));
+										ToastNotification.showNotification(
+												I18N.message("messagesent") + ". " + I18N.message("documentcopysent"));
 									} else {
 										EventPanel.get().error(I18N.message("messagenotsent"), null);
 									}
@@ -281,13 +293,35 @@ public class EmailDialog extends Window {
 					public void onSuccess(GUIMessageTemplate[] templates) {
 						LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 						map.put("", "");
-						for (GUIMessageTemplate t : templates) {
+						for (GUIMessageTemplate t : templates)
 							map.put("" + t.getId(), t.getName());
-						}
 						messageTemplate.setValueMap(map);
 						messageTemplate.setValue("");
 					}
 				});
+	}
+
+	private String getMessageWithoutSignature() {
+		String currentMessage = message.getValue() != null ? message.getValue().toString() : "";
+		int index = currentMessage.lastIndexOf(SIGNATURE_SEPARATOR);
+		if (index > 0)
+			currentMessage = currentMessage.substring(0, index);
+		return currentMessage;
+	}
+
+	private void appendDownloadTicketPlaceholder() {
+		removeDownloadTicketPlaceholder();
+		String messageBody = getMessageWithoutSignature();
+		messageBody += "<br />$downloadTicket<br />";
+		message.setValue(messageBody);
+		updateSignature();
+	}
+
+	private void removeDownloadTicketPlaceholder() {
+		String messageBody = getMessageWithoutSignature().replaceAll("(<br />)?\\$downloadTicket(<br />)?", "")
+				.replaceAll("\\$downloadTicket", "");
+		message.setValue(messageBody);
+		updateSignature();
 	}
 
 	/**
@@ -298,16 +332,12 @@ public class EmailDialog extends Window {
 		if (!from.getValue().equals(Session.get().getUser().getEmail()))
 			sgn = Session.get().getUser().getEmailSignature2();
 
-		String currentMessage = message.getValue() != null ? message.getValue().toString() : "";
-		String signatureSeparator = "--";
-		int index = currentMessage.lastIndexOf(signatureSeparator);
-		if (index > 0)
-			currentMessage = currentMessage.substring(0, index);
+		String currentMessage = getMessageWithoutSignature();
 
 		if (!currentMessage.endsWith("<br />"))
 			currentMessage += "<br /><br />";
 
-		message.setValue(currentMessage + signatureSeparator + "<br />" + (sgn != null ? sgn : ""));
+		message.setValue(currentMessage + SIGNATURE_SEPARATOR + "<br />" + (sgn != null ? sgn : ""));
 	}
 
 	private SectionStack prepareRecipientsGrid() {
@@ -315,6 +345,7 @@ public class EmailDialog extends Window {
 		sectionStack.setWidth100();
 		sectionStack.setHeight(150);
 		sectionStack.setMargin(6);
+
 		SectionStackSection section = new SectionStackSection("<b>" + I18N.message("recipients") + "</b>");
 		section.setCanCollapse(false);
 		section.setExpanded(true);
@@ -463,5 +494,4 @@ public class EmailDialog extends Window {
 		newRecords[records.length].setAttribute("email", "");
 		recipientsGrid.setRecords(newRecords);
 	}
-
 }

@@ -1,12 +1,5 @@
 package com.logicaldoc.core.document;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
-import org.hibernate.LazyInitializationException;
-
-import com.logicaldoc.core.metadata.Attribute;
-
 /**
  * Basic concrete implementation of <code>AbstractDocument</code>
  * 
@@ -15,68 +8,23 @@ import com.logicaldoc.core.metadata.Attribute;
  */
 public class Document extends AbstractDocument {
 	// Useful but not persisted
-	public Long templateId;
+	private Long templateId;
 
 	public Document() {
 	}
 
 	/**
-	 * Copies in the current instance the attributes of the passed values
-	 * object, but NOT the ID.
+	 * Clones the document but does not replicate the CustomID
 	 */
-	public void copyAttributes(Document docVO) {
-		setTenantId(docVO.getTenantId());
-		setCustomId(docVO.getCustomId());
-		setImmutable(docVO.getImmutable());
-		setVersion(docVO.getVersion());
-		setFileVersion(docVO.getFileVersion());
-		setDate(docVO.getDate());
-		setPublisher(docVO.getPublisher());
-		setPublisherId(docVO.getPublisherId());
-		setCreator(docVO.getCreator());
-		setCreatorId(docVO.getCreatorId());
-		setStatus(docVO.getStatus());
-		setType(docVO.getType());
-		setLockUserId(docVO.getLockUserId());
-		setLanguage(docVO.getLanguage());
-		setFileName(docVO.getFileName());
-		setFileSize(docVO.getFileSize());
-		setIndexed(docVO.getIndexed());
-		setBarcoded(docVO.getBarcoded());
-		setSigned(docVO.getSigned());
-		setStamped(docVO.getStamped());
-		setDigest(docVO.getDigest());
-		setDocRef(docVO.getDocRef());
-		setFolder(docVO.getFolder());
-		setTemplate(docVO.getTemplate());
-		setPages(docVO.getPages());
-		setWorkflowStatus(docVO.getWorkflowStatus());
-		setWorkflowStatusDisplay(docVO.getWorkflowStatusDisplay());
-
-		setAttributes(new HashMap<String, Attribute>());
-		try {
-			for (String name : docVO.getAttributes().keySet()) {
-				getAttributes().put(name, docVO.getAttributes().get(name));
-			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
-		}
-
-		try {
-			setTags(new HashSet<Tag>());
-			for (Tag tag : docVO.getTags()) {
-				getTags().add(tag);
-			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
-		}
-	}
-
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		Document cloned = new Document();
 		cloned.copyAttributes((Document) this);
 		cloned.setId(getId());
+		cloned.setOcrd(getOcrd());
+		cloned.setOcrTemplateId(getOcrTemplateId());
+		cloned.setBarcoded(getBarcoded());
+		cloned.setBarcodeTemplateId(getBarcodeTemplateId());
 		if (getIndexed() != INDEX_INDEXED)
 			cloned.setIndexed(getIndexed());
 		cloned.setCustomId(null);

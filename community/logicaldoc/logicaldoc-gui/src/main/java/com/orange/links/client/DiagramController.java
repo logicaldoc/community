@@ -95,8 +95,6 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	 */
 	public static int refreshRate = 80;
 
-	// GWT.isScript() ? 25 : 50;
-
 	private DiagramCanvas topCanvas;
 
 	private DragController dragController;
@@ -162,13 +160,15 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 	/**
 	 * Initialize the controller diagram. Use this constructor to start your
-	 * diagram. A code sample is : <br/>
-	 * <br/>
+	 * diagram. A code sample is : <br>
+	 * <br>
 	 * <code>
-	 * 		DiagramController controller = new DiagramController(400,400);<br/>
+	 * 		DiagramController controller = new DiagramController(400,400);<br>
 	 * 		RootPanel.get().add(controller.getView());
-	 * </code> <br/>
+	 * </code>
 	 * 
+	 * @param canvasWidth width expressed in pixels
+	 * @param canvasHeight height expressed in pixels
 	 */
 	public DiagramController(int canvasWidth, int canvasHeight) {
 		this.canvasWidth = canvasWidth;
@@ -269,6 +269,8 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	 * 
 	 * @param startWidget Start widget
 	 * @param endWidget End Widget
+	 * @param name name of the arrow
+	 * 
 	 * @return the created new connection between the two widgets
 	 */
 	public Connection drawStraightArrowConnection(Widget startWidget, Widget endWidget, String name) {
@@ -329,6 +331,8 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 	 * @param w the widget to add
 	 * @param left left margin with the absolute panel
 	 * @param top top margin with the absolute panel
+	 * 
+	 * @return the shape
 	 */
 	public FunctionShape addWidget(final Widget w, int left, int top) {
 
@@ -468,6 +472,8 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 
 	/**
 	 * OUR personalization to allow dragging into SmartGWT
+	 * 
+	 * @param widget widget to alter
 	 */
 	public void makeDraggable(final Canvas widget) {
 		widget.setCanDrag(true);
@@ -872,10 +878,6 @@ public class DiagramController implements HasNewFunctionHandlers, HasTieLinkHand
 		return connections.getUnsynchronizedDrawables();
 	}
 
-	/**
-	 * 
-	 * 
-	 */
 	public DiagramModel getDiagramModel() {
 		DiagramModel diagramRepresentation = new DiagramModel();
 		diagramRepresentation.setDiagramProperties(this.canvasWidth, this.canvasHeight, this.showGrid);

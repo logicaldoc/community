@@ -40,9 +40,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.dao.HistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.util.Context;
@@ -67,20 +68,23 @@ public class LDCmisService extends AbstractCmisService {
 
 	private String sid = null;
 
-	private HistoryDAO historyDao = null;
+	private DocumentHistoryDAO historyDao = null;
 
 	/* To avoid refetching it several times per session. */
 	protected String cachedChangeLogToken;
 
 	/**
-	 * Constructor.
+	 * Constructor
+	 * 
+	 * @param context the call context
+	 * @param sid identifier of the session
 	 */
 	public LDCmisService(CallContext context, String sid) {
 		this.context = context;
 		this.sid = sid;
 
 		try {
-			historyDao = (HistoryDAO) Context.get().getBean(HistoryDAO.class);
+			historyDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			Session session = SessionManager.get().get(sid);
@@ -142,38 +146,86 @@ public class LDCmisService extends AbstractCmisService {
 	 * @return The getTime() of the latest date
 	 */
 	protected String getLatestChangeLogToken(String repositoryId) {
+		log.debug("** getLatestChangeLogToken: {}", repositoryId);
 		try {
 			ContextProperties settings = Context.get().getProperties();
-			if (!"true".equals(settings.getProperty("cmis.changelog")))
+			if (!"true".equals(settings.getProperty("cmis.changelog"))) {
 				return null;
+			}
 
 			LDRepository repo = repositories.get(repositoryId);
+			
+			String tenantIdStr = Long.toString(repo.getRoot().getTenantId());
 
 			StringBuffer query = new StringBuffer(
-					"select max(ld_date) from ld_history where ld_deleted=0 and ld_tenantid=");
-			query.append(Long.toString(repo.getRoot().getTenantId()));
-			query.append(" and ld_event in ('");
+					"SELECT MAX(ld_date) FROM ld_history WHERE ld_deleted=0 AND ld_tenantid=");
+			query.append(tenantIdStr);
+			query.append(" AND ld_event IN ('");
 			query.append(DocumentEvent.STORED);
 			query.append("','");
-			query.append(DocumentEvent.CHECKEDIN);
+			query.append(DocumentEvent.CHECKEDIN); 
 			query.append("','");
-			query.append(DocumentEvent.CHANGED);
-			query.append("','");
+//			query.append(DocumentEvent.CHANGED);// this happens when metadata are changed, it is not so relevant for LDSynch so to improve performance we commented it
+//			query.append("','");
+			query.append(DocumentEvent.MOVED);
+			query.append("','");			
 			query.append(DocumentEvent.RENAMED);
 			query.append("','");
 			query.append(DocumentEvent.DELETED);
 			query.append("')");
+			//log.debug("Query: {}", query.toString());
 
 			Timestamp latestDate = (Timestamp) historyDao.queryForObject(query.toString(), Timestamp.class);
-			if (latestDate == null)
+			
+
+			StringBuffer query2 = new StringBuffer(
+					"SELECT MAX(ld_date) FROM ld_folder_history WHERE ld_deleted=0 AND ld_tenantid=");
+			query2.append(tenantIdStr);
+			query2.append(" AND ld_event IN ('");
+			query2.append(FolderEvent.CREATED);
+			query2.append("','");
+			query2.append(FolderEvent.RENAMED);
+			query2.append("','");
+			query2.append(FolderEvent.MOVED);
+			query2.append("','");			
+			query2.append(FolderEvent.DELETED);
+			query2.append("')");
+			//log.debug("Query: {}", query2.toString());
+
+			Timestamp latestFolderDate = (Timestamp) historyDao.queryForObject(query2.toString(), Timestamp.class);
+			
+			if (latestDate == null && latestFolderDate == null) {
+				//log.debug("latestDate == null, return 0");
 				return "0";
-			else
-				return Long.toString(latestDate.getTime());
+			} else {
+//				log.debug("latestDate.getTime(): {}" ,latestDate.getTime());
+//				return Long.toString(latestDate.getTime());
+				
+				log.debug("latestDate.getTime(): {}", latestDate.getTime());
+				log.debug("latestFolderDate.getTime(): {}", latestFolderDate.getTime());
+				Timestamp myDate = getLatestTimestamp(latestDate, latestFolderDate);
+				
+				log.debug("myDate.getTime(): {}" ,myDate.getTime());
+				return Long.toString(myDate.getTime());
+			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			throw new CmisRuntimeException(e.toString(), e);
 		}
 	}
+
+	private Timestamp getLatestTimestamp(Timestamp date1, Timestamp date2) {
+		
+		if (date1 != null && date2 == null) 
+			return date1;
+		if (date1 == null && date2 != null) 
+			return date2;
+		if (date1.after(date2))
+			return date1;
+		
+		return date2;
+	}
+	
 
 	@Override
 	public TypeDefinitionList getTypeChildren(String repositoryId, String typeId, Boolean includePropertyDefinitions,
@@ -328,8 +380,8 @@ public class LDCmisService extends AbstractCmisService {
 	public Properties getPropertiesOfLatestVersion(String repositoryId, String objectId, String versionSeriesId,
 			Boolean major, String filter, ExtensionsData extension) {
 		validateSession();
-		ObjectData object = getRepository().getObject(getCallContext(), objectId, versionSeriesId, filter, false,
-				false, null);
+		ObjectData object = getRepository().getObject(getCallContext(), objectId, versionSeriesId, filter, false, false,
+				null);
 
 		return object.getProperties();
 	}
@@ -359,7 +411,7 @@ public class LDCmisService extends AbstractCmisService {
 			ContentStream contentStream, String checkinComment, List<String> policies, Acl addAces, Acl removeAces,
 			ExtensionsData extension) {
 		validateSession();
-		getRepository().checkIn(objectId, major, contentStream, checkinComment);
+		getRepository().checkIn(objectId, major, contentStream, properties, checkinComment);
 	}
 
 	@Override
@@ -410,7 +462,8 @@ public class LDCmisService extends AbstractCmisService {
 		}
 
 		if (repo == null)
-			throw new CmisPermissionDeniedException("Repository " + getCallContext().getRepositoryId() + " not found !");
+			throw new CmisPermissionDeniedException(
+					"Repository " + getCallContext().getRepositoryId() + " not found !");
 
 		return repo;
 	}
@@ -425,8 +478,8 @@ public class LDCmisService extends AbstractCmisService {
 	}
 
 	@Override
-	public String createDocumentFromSource(String repositoryId, String sourceId, Properties properties,
-			String folderId, VersioningState versioningState, List<String> policies, Acl addAces, Acl removeAces,
+	public String createDocumentFromSource(String repositoryId, String sourceId, Properties properties, String folderId,
+			VersioningState versioningState, List<String> policies, Acl addAces, Acl removeAces,
 			ExtensionsData extension) {
 		validateSession();
 		return getRepository().createDocumentFromSource(getCallContext(), sourceId, folderId);
@@ -436,14 +489,15 @@ public class LDCmisService extends AbstractCmisService {
 	public void setContentStream(String repositoryId, Holder<String> objectId, Boolean overwriteFlag,
 			Holder<String> changeToken, ContentStream contentStream, ExtensionsData extension) {
 		validateSession();
-		checkOut(repositoryId, objectId, extension, new Holder(false));
+		log.debug("setContentStream {}", objectId);
+		checkOut(repositoryId, objectId, extension, new Holder<Boolean>(false));
 		checkIn(repositoryId, objectId, false, null, contentStream, "", null, null, null, extension);
-		// checkOut(repositoryId, objectId, extension, new Holder(false));
 	}
 
 	@Override
 	public ObjectList getContentChanges(String repositoryId, Holder<String> changeLogToken, Boolean includeProperties,
-			String filter, Boolean includePolicyIds, Boolean includeAcl, BigInteger maxItems, ExtensionsData extension) {
+			String filter, Boolean includePolicyIds, Boolean includeAcl, BigInteger maxItems,
+			ExtensionsData extension) {
 		log.debug("getContentChanges " + changeLogToken.getValue() + "|" + filter + " | "
 				+ new Date(Long.parseLong(changeLogToken.getValue())));
 
@@ -459,4 +513,9 @@ public class LDCmisService extends AbstractCmisService {
 		}
 	}
 
+	@Override
+	public ObjectData getFolderParent(String repositoryId, String folderId, String filter, ExtensionsData extension) {
+		validateSession();
+		return getRepository().getFolderParent(getCallContext(), folderId);
+	}
 }

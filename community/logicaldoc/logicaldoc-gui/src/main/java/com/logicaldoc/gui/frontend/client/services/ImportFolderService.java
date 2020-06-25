@@ -3,6 +3,8 @@ package com.logicaldoc.gui.frontend.client.services;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 
@@ -13,32 +15,63 @@ import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 @RemoteServiceRelativePath("importfolder")
 public interface ImportFolderService extends RemoteService {
 	/**
-	 * Deletes a given folder
+	 * Deletes a given import folder
+	 * 
+	 * @param id identifier of the import folder
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public void delete(long id) throws ServerException;
 
 	/**
 	 * Creates or updates an import folder
+	 * 
+	 * @param importFolder the import folder to save
+	 * 
+	 * @return the saved import folder
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIImportFolder save(GUIImportFolder share) throws ServerException;
+	public GUIImportFolder save(GUIImportFolder importFolder) throws ServerException;
 
 	/**
 	 * Loads a given import folder from the database
+	 * 
+	 * @param id identifier of the import folder
+	 * 
+	 * @return the import folder retrieved by the server application 
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIImportFolder getImportFolder(long id) throws ServerException;
 
 	/**
-	 * Test the connection to the given import folder
+	 * Tests the connection to the given import folder
+	 * 
+	 * @param id identifier of the import folder
+	 * 
+	 * @return if the import folder has been connected and able to work
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public boolean test(long id) throws ServerException;
 
 	/**
 	 * Changes a importFolder enabled/disabled status
+	 * 
+	 * @param id identifier of the import folder
+	 * @param enabled flag to enable / disable the import folder
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public void changeStatus(long id, boolean enabled) throws ServerException;
 
 	/**
 	 * Cleans the cache
+	 * 
+	 * @param id identifier of the import folder
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public void resetCache(long id) throws ServerException;
 
@@ -48,6 +81,7 @@ public interface ImportFolderService extends RemoteService {
 		public static ImportFolderServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(ImportFolderService.class);
+				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
 			return instance;
 		}

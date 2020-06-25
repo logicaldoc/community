@@ -113,7 +113,12 @@ public class StateWidget extends Label {
 	}
 
 	/**
-	 * Constructor used by new transitions.
+	 * Constructor used by new transitions
+	 * 
+	 * @param connection the connection
+	 * @param diagramController the controller
+	 * @param name the name of the widget
+	 * @param color the color
 	 */
 	public StateWidget(Connection connection, DiagramController diagramController, String name, String color) {
 		this(connection, diagramController, new GUITransition(name, color));
@@ -170,13 +175,13 @@ public class StateWidget extends Label {
 
 	public void edit() {
 		if (isTask() || isEnd()) {
-			TaskDialog dialog = new TaskDialog(StateWidget.this);
+			TaskEditor dialog = new TaskEditor(StateWidget.this);
 			dialog.show();
 		} else if (isJoin() || isFork()) {
 			StatusDialog dialog = new StatusDialog(StateWidget.this);
 			dialog.show();
 		} else {
-			TransitionDialog dialog = new TransitionDialog(StateWidget.this);
+			TransitionEditor dialog = new TransitionEditor(StateWidget.this);
 			dialog.show();
 		}
 	}

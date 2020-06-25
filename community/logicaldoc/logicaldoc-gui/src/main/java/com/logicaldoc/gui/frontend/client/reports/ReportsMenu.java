@@ -5,6 +5,7 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.reports.custom.CustomReportsPanel;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -20,6 +21,7 @@ public class ReportsMenu extends VLayout {
 	public ReportsMenu() {
 		setMargin(10);
 		setMembersMargin(5);
+		setOverflow(Overflow.AUTO);
 
 		Button lastChanges = new Button(I18N.message("lastchanges"));
 		lastChanges.setWidth100();
@@ -107,6 +109,16 @@ public class ReportsMenu extends VLayout {
 			}
 		});
 
+		Button downloadTickets = new Button(I18N.message("downloadtickets"));
+		downloadTickets.setWidth100();
+		downloadTickets.setHeight(25);
+		downloadTickets.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new DownloadTicketsReport());
+			}
+		});
+
 		Button customreports = new Button(I18N.message("customreports"));
 		customreports.setWidth100();
 		customreports.setHeight(25);
@@ -132,6 +144,9 @@ public class ReportsMenu extends VLayout {
 				calendar.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
+
+		if (Menu.enabled(Menu.DOWNLOAD_TICKETS))
+			addMember(downloadTickets);
 
 		if (Feature.visible(Feature.CUSTOM_REPORTS)) {
 			addMember(customreports);

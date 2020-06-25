@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.util.sql.SqlUtil;
@@ -21,7 +22,6 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.4
  */
-@SuppressWarnings("unchecked")
 public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<FolderHistory> implements FolderHistoryDAO {
 
 	private HibernateFolderHistoryDAO() {
@@ -36,12 +36,22 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 
 	@Override
 	public List<FolderHistory> findByFolderId(long folderId) {
-		return findByWhere("_entity.folderId =" + folderId, "order by _entity.date asc", null);
+		try {
+			return findByWhere("_entity.folderId =" + folderId, "order by _entity.date asc", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<FolderHistory>();
+		}
 	}
 
 	@Override
 	public List<FolderHistory> findNotNotified(Integer max) {
-		return findByWhere("_entity.notified = 0", "order by _entity.date asc", max);
+		try {
+			return findByWhere("_entity.notified = 0", "order by _entity.date asc", max);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<FolderHistory>();
+		}
 	}
 
 	@Override
@@ -70,11 +80,16 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 		if (event != null && StringUtils.isNotEmpty(event))
 			query += " and lower(_entity.event) like '" + SqlUtil.doubleQuotes(event.toLowerCase()) + "'";
 
-		return findByWhere(query, "order by _entity.date asc", null);
+		try {
+			return findByWhere(query, "order by _entity.date asc", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<FolderHistory>();
+		}
 	}
 
 	@Override
-	public boolean store(FolderHistory entity) {
+	public boolean store(FolderHistory entity) throws PersistenceException {
 		// Write only if the history is enabled
 		if (RunLevel.current().aspectEnabled(FolderHistory.ASPECT)) {
 			boolean ret = super.store(entity);
@@ -86,9 +101,10 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	}
 
 	@Override
-	public List<FolderHistory> findByPath(String pathExpression, Date olderDate, Collection<String> events, Integer max) {
-		StringBuffer query = new StringBuffer("(_entity.path like '" + pathExpression + "' or _entity.pathOld like '"
-				+ pathExpression + "') ");
+	public List<FolderHistory> findByPath(String pathExpression, Date olderDate, Collection<String> events,
+			Integer max) {
+		StringBuffer query = new StringBuffer(
+				"(_entity.path like '" + pathExpression + "' or _entity.pathOld like '" + pathExpression + "') ");
 		List<Object> params = new ArrayList<Object>();
 		if (olderDate != null) {
 			query.append(" and _entity.date >= ?1 ");
@@ -105,7 +121,12 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 			query.append(" and _entity.event in " + eventsStr);
 		}
 
-		return findByWhere(query.toString(), params.toArray(new Object[0]), "order by _entity.date asc", max);
+		try {
+			return findByWhere(query.toString(), params.toArray(new Object[0]), "order by _entity.date asc", max);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<FolderHistory>();
+		}
 	}
 
 	@Override
@@ -120,6 +141,11 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 			values.add(oldestDate);
 		}
 
-		return findByWhere(query, values.toArray(new Object[0]), "order by _entity.date asc", null);
+		try {
+			return findByWhere(query, values.toArray(new Object[0]), "order by _entity.date asc", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<FolderHistory>();
+		}
 	}
 }

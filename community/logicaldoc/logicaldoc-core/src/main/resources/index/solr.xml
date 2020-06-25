@@ -10,7 +10,7 @@
  
   <shardHandlerFactory name="shardHandlerFactory"
     class="HttpShardHandlerFactory">
-    <int name="socketTimeout">${socketTimeout:0}</int>
-    <int name="connTimeout">${connTimeout:0}</int>
+    <int name="socketTimeout">${socketTimeout:1000}</int>
+    <int name="connTimeout">${connTimeout:1000}</int>
   </shardHandlerFactory>
 </solr>

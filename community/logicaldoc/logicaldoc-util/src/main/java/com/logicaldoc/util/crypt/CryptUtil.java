@@ -139,7 +139,7 @@ public class CryptUtil {
 	}
 
 	/**
-	 * This method encodes a given string using the SHA algorythm
+	 * This method encodes a given string using the SHA algorithm
 	 * 
 	 * @param original String to encode.
 	 * @return Encoded string.
@@ -190,6 +190,10 @@ public class CryptUtil {
 
 	/**
 	 * Converts a string into a MD4 hash suitable for the NTLM v1 authentication
+	 * 
+	 * @param original the original string
+	 * 
+	 * @return the MD4 hash
 	 */
 	public static String hashNTLM1(String original) {
 		try {

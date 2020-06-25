@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +33,12 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	}
 
 	/**
-	 * Template method that invokes {@link #convert(null, null, File, File)}
+	 * Template method that invokes {@link #convert(String, Document, File, File)}
 	 */
 	public final void convert(File src, File dest) throws IOException {
 		this.convert(null, null, src, dest);
 	}
-	
+
 	/**
 	 * If the converter is enabled it invokes the
 	 * {@link #internalConvert(String, Document, File, File)}
@@ -54,14 +56,26 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	 */
 	abstract protected void internalConvert(String sid, Document document, File src, File dest) throws IOException;
 
+	protected ContextProperties config() {
+		ContextProperties config = null;
+		try {
+			config = (ContextProperties) Context.get().getBean(ContextProperties.class);
+		} catch (Throwable t) {
+			try {
+				config = new ContextProperties();
+			} catch (Throwable e) {
+			}
+		}
+		return config;
+	}
+	
 	@Override
 	public void loadParameters() {
 		try {
-			ContextProperties config = Context.get().getProperties();
 			List<String> params = getParameterNames();
 			for (String param : params) {
 				String key = getParameterPropertyName(param);
-				parameters.put(param, config.getProperty(key));
+				parameters.put(param, config().getProperty(key));
 			}
 		} catch (Throwable t) {
 		}
@@ -69,16 +83,14 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 
 	@Override
 	public boolean isEnabled() {
-		ContextProperties config = (ContextProperties) Context.get().getBean(ContextProperties.class);
-		return config.getBoolean(getParameterPropertyName("enabled"), false);
+		return config().getBoolean(getParameterPropertyName("enabled"), false);
 	}
 
 	@Override
 	public void setEnabled(boolean enabled) {
-		ContextProperties config = (ContextProperties) Context.get().getBean(ContextProperties.class);
-		config.setProperty(getParameterPropertyName("enabled"), "" + enabled);
+		config().setProperty(getParameterPropertyName("enabled"), "" + enabled);
 		try {
-			config.write();
+			config().write();
 		} catch (IOException e) {
 			log.warn(e.getMessage());
 		}
@@ -106,5 +118,27 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	@Override
 	public int hashCode() {
 		return this.getClass().getSimpleName().hashCode();
+	}
+	
+	/**
+	 * Gets the extension for the given filename, if an alias is found then the
+	 * value of the alias is returned as well. For instance if in the settings
+	 * you have <code>converter.alias.eft=txt</code> then a file named test.eft
+	 * will be considered a txt.
+	 * 
+	 * @param fileNameOrExtension file name or just the extension
+	 * 
+	 * @return the real extension to use
+	 */
+	public static String getExtension(String fileNameOrExtension) {
+		String ext = fileNameOrExtension;
+		if (fileNameOrExtension.contains("."))
+			ext = FilenameUtils.getExtension(fileNameOrExtension.toLowerCase());
+
+		String alias = Context.get().getProperties().getProperty("converter.alias." + ext);
+		if (StringUtils.isNotEmpty(alias))
+			ext = alias;
+
+		return ext.toLowerCase();
 	}
 }

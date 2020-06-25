@@ -6,21 +6,16 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.Side;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -28,7 +23,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This panel collects details about a form
@@ -41,9 +35,7 @@ public class FormDetailsPanel extends VLayout {
 
 	private Layout propertiesTabPanel;
 
-	private HLayout savePanel;
-
-	private TabSet tabSet = new TabSet();
+	private EditingTabSet tabSet;
 
 	private FormsPanel formsPanel;
 
@@ -58,31 +50,29 @@ public class FormDetailsPanel extends VLayout {
 		setHeight100();
 		setWidth100();
 		setMembersMargin(10);
+	}
 
-		savePanel = new HLayout();
-		savePanel.setHeight(20);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
-		Button saveButton = new Button(I18N.message("save"));
-		saveButton.setAutoFit(true);
-		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
+	private void refresh() {
+		vm.clearErrors(false);
+		vm.clearValues();
+		vm.resetValues();
+
+		if (form1 != null)
+			form1.destroy();
+		/*
+		 * Prepare the standard properties tab
+		 */
+		if (tabSet != null) {
+			tabSet.hideSave();
+			removeMember(tabSet);
+		}
+
+		tabSet = new EditingTabSet(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				onSave();
 			}
-		});
-		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("70%");
-		spacer.setOverflow(Overflow.HIDDEN);
-
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (form.getId() != 0) {
@@ -101,42 +91,9 @@ public class FormDetailsPanel extends VLayout {
 					GUIDocument newForm = new GUIDocument();
 					setForm(newForm);
 				}
-				savePanel.setVisible(false);
+				tabSet.hideSave();
 			}
 		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		savePanel.addMember(saveButton);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		addMember(savePanel);
-	}
-
-	private void refresh() {
-		vm.clearErrors(false);
-		vm.clearValues();
-		vm.resetValues();
-
-		if (form1 != null)
-			form1.destroy();
-
-		if (savePanel != null)
-			savePanel.setVisible(false);
-
-		/*
-		 * Prepare the standard properties tab
-		 */
-		if (tabSet != null)
-			removeMember(tabSet);
-
-		tabSet = new TabSet();
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight100();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		propertiesTabPanel = new HLayout();
@@ -165,13 +122,18 @@ public class FormDetailsPanel extends VLayout {
 		name.setRequired(true);
 		name.setDisabled(form.getId() != 0L);
 
+		TextAreaItem css = ItemFactory.newTextAreaItem("css", "customcss", form.getComment());
+		css.addChangedHandler(changedHandler);
+		css.setColSpan(2);
+		css.setWidth(400);
+
 		SelectItem template = ItemFactory.newTemplateSelector(true, null);
 		template.addChangedHandler(changedHandler);
 		template.setMultiple(false);
 		if (form.getTemplateId() != null)
 			template.setValue(form.getTemplateId().toString());
 
-		form1.setItems(name, template);
+		form1.setItems(name, template, css);
 		propertiesTabPanel.setMembers(form1);
 	}
 
@@ -185,7 +147,7 @@ public class FormDetailsPanel extends VLayout {
 	}
 
 	public void onModified() {
-		savePanel.setVisible(true);
+		tabSet.displaySave();
 	}
 
 	public void onSave() {
@@ -196,6 +158,7 @@ public class FormDetailsPanel extends VLayout {
 			else
 				form.setTemplateId(null);
 			form.setNature(Constants.NATURE_FORM);
+			form.setComment(vm.getValueAsString("css"));
 
 			DocumentService.Instance.get().save(form, new AsyncCallback<GUIDocument>() {
 				@Override
@@ -205,7 +168,7 @@ public class FormDetailsPanel extends VLayout {
 
 				@Override
 				public void onSuccess(GUIDocument newForm) {
-					savePanel.setVisible(false);
+					tabSet.hideSave();
 					if (form.getId() == 0L)
 						formsPanel.refresh();
 					else if (newForm != null) {

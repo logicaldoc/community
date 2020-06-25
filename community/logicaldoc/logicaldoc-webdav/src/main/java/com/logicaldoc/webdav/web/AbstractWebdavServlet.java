@@ -5,11 +5,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
@@ -53,10 +56,11 @@ import com.logicaldoc.webdav.session.DavSession;
 import com.logicaldoc.webdav.session.DavSessionImpl;
 
 /**
- * <code>AbstractWebdavServlet</code>
- * <p/>
+ * A base for building a WebDAV servlet
  */
 abstract public class AbstractWebdavServlet extends HttpServlet implements DavConstants {
+
+	protected static ServletContext context;
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractWebdavServlet.class);
 
@@ -65,37 +69,38 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * Checks if the precondition for this request and resource is valid.
 	 * 
-	 * @param request
-	 * @param resource
-	 * @return
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * 
+	 * @return if the precondition is valid
 	 */
 	abstract protected boolean isPreconditionValid(WebdavRequest request, DavResource resource);
 
 	/**
-	 * Returns the <code>DavLocatorFactory</code>.
+	 * Returns the <code>DavLocatorFactory</code>
 	 * 
 	 * @return the locator factory
 	 */
 	abstract public DavLocatorFactory getLocatorFactory();
 
 	/**
-	 * Sets the <code>DavLocatorFactory</code>.
+	 * Sets the <code>DavLocatorFactory</code>
 	 * 
-	 * @param locatorFactory
+	 * @param locatorFactory local factory
 	 */
 	abstract public void setLocatorFactory(DavLocatorFactory locatorFactory);
 
 	/**
-	 * Returns the <code>DavResourceFactory</code>.
+	 * Returns the <code>DavResourceFactory</code>
 	 * 
 	 * @return the resource factory
 	 */
 	abstract public DavResourceFactory getResourceFactory();
 
 	/**
-	 * Sets the <code>DavResourceFactory</code>.
+	 * Sets the <code>DavResourceFactory</code>
 	 * 
-	 * @param resourceFactory
+	 * @param resourceFactory resource factory
 	 */
 	abstract public void setResourceFactory(DavResourceFactory resourceFactory);
 
@@ -108,12 +113,13 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	abstract public String getAuthenticateHeaderValue();
 
 	/**
-	 * Service the given request.
+	 * Service the given request
 	 * 
-	 * @param request
-	 * @param response
-	 * @throws ServletException
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * 
+	 * @throws ServletException error inside the servlet container
+	 * @throws IOException generic I/O error
 	 */
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		log.debug("Received WebDAV request");
@@ -125,7 +131,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			// 'VERSION-CONTROL' and 'REPORT'.
 			int methodCode = DavMethods.getMethodCode(request.getMethod());
 
-			log.debug("method " + request.getMethod() + " " + methodCode);
+			log.debug("method {} {}", request.getMethod(), methodCode);
 
 			boolean noCache = DavMethods.isDeltaVMethod(webdavRequest)
 					&& !(DavMethods.DAV_VERSION_CONTROL == methodCode || DavMethods.DAV_REPORT == methodCode);
@@ -171,7 +177,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				}
 			} catch (Throwable e) {
 				if (e instanceof UnsupportedOperationException) {
-					log.warn("Unsupported Operation: " + request.getMethod() + " " + methodCode);
+					log.warn("Unsupported Operation: {} {}", request.getMethod(), methodCode);
 				} else {
 					log.error(e.getMessage(), e);
 					throw new RuntimeException(e);
@@ -190,13 +196,15 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * Executes the respective method in the given webdav context
 	 * 
-	 * @param request
-	 * @param response
-	 * @param method
-	 * @param resource
-	 * @throws ServletException
-	 * @throws IOException
-	 * @throws DavException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param method the HTTP method
+	 * 
+	 * @param resource the DAV resource
+	 * 
+	 * @throws ServletException error inside the servlet container
+	 * @throws IOException generic I/O error
+	 * @throws DavException generic error in the WebDAV communication
 	 */
 	protected boolean execute(WebdavRequest request, WebdavResponse response, int method, DavResource resource)
 			throws ServletException, IOException, DavException {
@@ -266,10 +274,11 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The HEAD method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
 	 */
 	protected void doHead(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException {
 		log.debug("head");
@@ -279,10 +288,11 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The GET method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
 	 */
 	protected void doGet(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException {
 		log.debug("get");
@@ -290,19 +300,20 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		try {
 			spoolResource(request, response, resource, true);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 	}
 
 	/**
-	 * @param request
-	 * @param response
-	 * @param resource
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
 	 * @param sendContent
-	 * @throws IOException
+	 * 
+	 * @throws IOException generic I/O error
 	 */
-	private void spoolResource(WebdavRequest request, WebdavResponse response, DavResource resource, boolean sendContent)
-			throws IOException {
+	private void spoolResource(WebdavRequest request, WebdavResponse response, DavResource resource,
+			boolean sendContent) throws IOException {
 
 		if (!resource.exists()) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -332,28 +343,29 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The PROPFIND method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
 	 */
-	protected void doPropFind(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
+	protected void doPropFind(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
+
 		log.debug("doPropFind");
 		if (log.isDebugEnabled())
-			log.debug("[READ] FINDING "
-					+ (resource.isCollection() ? "DOCUMENTS WITHIN THE FOLDER " : "JUST THE DOCUMENT ")
-					+ resource.getDisplayName());
+			log.debug("[READ] FINDING {} {}",
+					(resource.isCollection() ? "DOCUMENTS WITHIN THE FOLDER" : "JUST THE DOCUMENT"),
+					resource.getDisplayName());
 
 		if (!resource.exists()) {
-			log.warn("Resource not found: " + resource.getResourcePath());
+			log.warn("Resource not found: {}", resource.getResourcePath());
 			response.sendError(DavServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
 		DavPropertyNameSet requestProperties = request.getPropFindProperties();
 
-		int depth = request.getDepth(DEPTH_INFINITY);
 		if (log.isDebugEnabled()) {
 			DavPropertyNameIterator iter = requestProperties.iterator();
 			StringBuffer sb = new StringBuffer("Requested properties: ");
@@ -366,6 +378,16 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		int propfindType = request.getPropFindType();
 
+		int depth = Context.get().getProperties().getInt("webdav.depth", 1);
+		String headerDepth = request.getHeader("Depth");
+		if (StringUtils.isNotEmpty(headerDepth)) {
+			if ("infinity".equals(headerDepth))
+				depth = request.getDepth(DEPTH_INFINITY);
+			else {
+				depth = Integer.parseInt(headerDepth);
+			}
+		}
+
 		MultiStatus mstatus = new MultiStatus();
 		mstatus.addResourceProperties(resource, requestProperties, propfindType, depth);
 
@@ -375,10 +397,11 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The PROPPATCH method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
 	 */
 	@SuppressWarnings("rawtypes")
 	protected void doPropPatch(WebdavRequest request, WebdavResponse response, DavResource resource)
@@ -400,32 +423,34 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The POST method. Delegate to PUT
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
-	 * @throws DavException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doPost(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
-		log.debug("doPut");
+	protected void doPost(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
+		log.debug("************doPost*****************");
 		doPut(request, response, resource);
 	}
 
 	/**
 	 * The PUT method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
-	 * @throws DavException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doPut(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
+	protected void doPut(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
 		log.debug("************doPut*****************");
 		if (log.isDebugEnabled())
-			log.debug("[ADD] Document " + resource.getDisplayName());
+			log.debug("[ADD] Document {}", resource.getDisplayName());
 
 		try {
 			DavResource parentResource = resource.getCollection();
@@ -456,18 +481,19 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The MKCOL method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
-	 * @throws DavException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doMkCol(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
+	protected void doMkCol(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
 
 		log.debug("doMkCol");
 		if (log.isDebugEnabled())
-			log.debug("[ADD] Directory " + resource.getDisplayName());
+			log.debug("[ADD] Directory {}", resource.getDisplayName());
 		try {
 			DavResource parentResource = resource.getCollection();
 			if (parentResource == null || !parentResource.exists() || !parentResource.isCollection()) {
@@ -494,20 +520,21 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The DELETE method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
-	 * @throws DavException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doDelete(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
+	protected void doDelete(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
 
 		log.debug("doDelete");
 		try {
 			if (log.isDebugEnabled())
-				log.debug("[DELETE]" + (resource.isCollection() ? " FOLDER" : " DOCUMENT") + " "
-						+ resource.getDisplayName());
+				log.debug("[DELETE] {} {}", (resource.isCollection() ? " FOLDER" : " DOCUMENT"),
+						resource.getDisplayName());
 
 			DavResource parent = resource.getCollection();
 			if (parent != null) {
@@ -524,14 +551,15 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The COPY method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
-	 * @throws DavException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doCopy(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
+	protected void doCopy(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
 		log.debug("doCopy");
 		// only depth 0 and infinity is allowed
 		int depth = request.getDepth(DEPTH_INFINITY);
@@ -559,14 +587,15 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The MOVE method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws IOException
-	 * @throws DavException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doMove(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
+	protected void doMove(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
 
 		log.debug("doMove");
 		WebdavRequest webdavRequest = new WebdavRequestImpl(request, getLocatorFactory());
@@ -604,7 +633,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * {@link DavServletResponse#SC_NO_CONTENT} indicates an error.
 	 * 
 	 * @param destResource destination resource to be validated.
-	 * @param request
+	 * @param request the HTTP request
+	 * 
 	 * @return status code indicating whether the destination is valid.
 	 */
 	private int validateDestination(DavResource destResource, WebdavRequest request) throws DavException {
@@ -643,12 +673,12 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The OPTION method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
 	 */
-	protected void doOptions(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
+	protected void doOptions(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
 		log.debug("doOptions");
 
 		response.addHeader(DavConstants.HEADER_DAV, resource.getComplianceClass());
@@ -683,8 +713,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		((VersionableResource) resource).addVersionControl();
 	}
 
-	protected void doLock(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException,
-			DavException {
+	protected void doLock(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
 		log.debug("doLock - interpreting as checkout");
 		doCheckout(request, response, resource);
 	}
@@ -692,23 +722,25 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The UNLOCK method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws DavException
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doUnlock(WebdavRequest request, WebdavResponse response, DavResource resource) throws DavException,
-			IOException {
+	protected void doUnlock(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws DavException, IOException {
 		doUncheckout(request, response, resource);
 	}
 
 	/**
 	 * The EVENT_CHECKEDOUT method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
 	 * @throws DavException
 	 * @throws IOException
 	 */
@@ -725,14 +757,15 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The EVENT_CHECKEDIN method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws DavException
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doCheckin(WebdavRequest request, WebdavResponse response, DavResource resource) throws DavException,
-			IOException {
+	protected void doCheckin(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws DavException, IOException {
 		log.debug("doCheckin");
 
 		response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
@@ -741,14 +774,15 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The REPORT method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws DavException
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
-	protected void doReport(WebdavRequest request, WebdavResponse response, DavResource resource) throws DavException,
-			IOException {
+	protected void doReport(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws DavException, IOException {
 		log.debug("doReport");
 
 		ReportInfo info = request.getReportInfo();
@@ -769,11 +803,12 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * The EVENT_UNCHECKOUT method
 	 * 
-	 * @param request
-	 * @param response
-	 * @param resource
-	 * @throws DavException
-	 * @throws IOException
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param resource the DAV resource
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws DavException error in the DAV communication
 	 */
 	protected void doUncheckout(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws DavException, IOException {
@@ -789,9 +824,10 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	/**
 	 * Return a new <code>InputContext</code> used for adding resource members
 	 * 
-	 * @param request
-	 * @param in
-	 * @return
+	 * @param request the DAV request
+	 * @param in the stream of the request
+	 * 
+	 * @return the input context
 	 * @see #spoolResource(WebdavRequest, WebdavResponse, DavResource, boolean)
 	 */
 	protected InputContext getInputContext(DavServletRequest request, InputStream in) {
@@ -802,14 +838,26 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * Return a new <code>OutputContext</code> used for spooling resource
 	 * properties and the resource content
 	 * 
-	 * @param response
-	 * @param out
-	 * @return
+	 * @param response the DAV response
+	 * @param out stream of the output
+	 * 
+	 * @return the output context
+	 * 
 	 * @see #doPut(WebdavRequest, WebdavResponse, DavResource)
 	 * @see #doPost(WebdavRequest, WebdavResponse, DavResource)
 	 * @see #doMkCol(WebdavRequest, WebdavResponse, DavResource)
 	 */
 	protected OutputContext getOutputContext(DavServletResponse response, OutputStream out) {
 		return new OutputContextImpl(response, out);
+	}
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+		super.init(config);
+		context = config.getServletContext();
+	}
+
+	public static ServletContext getContext() {
+		return context;
 	}
 }

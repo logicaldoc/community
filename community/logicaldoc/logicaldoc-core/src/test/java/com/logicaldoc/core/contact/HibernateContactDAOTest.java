@@ -2,12 +2,12 @@ package com.logicaldoc.core.contact;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateContactDAO</code>

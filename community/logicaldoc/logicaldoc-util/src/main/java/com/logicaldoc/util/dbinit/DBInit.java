@@ -122,7 +122,7 @@ public class DBInit {
 		SqlFile sFile = new SqlFile(file, "Cp1252", false);
 		try {
 			sFile.setContinueOnError(true);
-			sFile.setConnection(con);			
+			sFile.setConnection(con);
 			sFile.execute();
 		} catch (SqlToolError e) {
 			throw new SQLException(e.getMessage());
@@ -148,19 +148,23 @@ public class DBInit {
 	}
 
 	/**
-	 * This method returns the state of the connection.
+	 * This method returns the state of the connection to the database.
+	 * 
+	 * @return checks true if the database is up and running and well connected
 	 */
 	public boolean isConnected() {
 		try {
 			return !con.isClosed();
 		} catch (Exception ex) {
-			log.debug("db-connection is open:" + ex.getMessage(), ex);
+			log.debug("db-connection is open: {}", ex.getMessage(), ex);
 			return false;
 		}
 	}
 
 	/**
-	 * This method tests a connection.
+	 * This method tests a connection to the database
+	 * 
+	 * @return true if the database can be connected
 	 */
 	public boolean testConnection() {
 		boolean result = false;

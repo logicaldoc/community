@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 
 import javax.sql.DataSource;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlTool.SqlToolException;
@@ -19,6 +17,8 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.logicaldoc.util.io.FileUtil;
+
+import junit.framework.Assert;
 
 /**
  * Abstract test case for the Core module. This class initialises a test

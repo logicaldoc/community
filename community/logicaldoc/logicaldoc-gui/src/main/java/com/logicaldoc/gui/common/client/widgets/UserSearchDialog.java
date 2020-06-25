@@ -80,7 +80,6 @@ public class UserSearchDialog extends Window {
 		grid.setEmptyMessage(I18N.message("notitemstoshow"));
 		grid.setCanFreezeFields(true);
 		grid.setAutoFetchData(true);
-		grid.setAutoDraw(true);
 		grid.setData(lastResult);
 
 		grid.addDoubleClickHandler(new DoubleClickHandler() {
@@ -119,7 +118,7 @@ public class UserSearchDialog extends Window {
 					ListGridRecord record = new ListGridRecord();
 					lastResult[i] = record;
 					record.setAttribute("id", hit.getId());
-					record.setAttribute("username", hit.getUserName());
+					record.setAttribute("username", hit.getUsername());
 					record.setAttribute("firstname", hit.getFirstName());
 					record.setAttribute("lastname", hit.getName());
 				}

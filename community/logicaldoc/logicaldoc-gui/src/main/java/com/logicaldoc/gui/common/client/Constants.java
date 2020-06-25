@@ -26,6 +26,8 @@ public final class Constants {
 	public static final long TENANT_DEFAULTID = 1L;
 
 	public static final String TENANT_DEFAULTNAME = "default";
+	
+	public static final String TENANT_DEFAULTDISPLAYNAME = "Default";
 
 	public final static String TIME_MINUTE = "minute";
 
@@ -75,6 +77,8 @@ public final class Constants {
 	
 	public static final String PERMISSION_EMAIL = "email";
 
+	public static final String PERMISSION_AUTOMATION = "automation";
+	
 	public static final int DOC_UNLOCKED = 0;
 
 	public static final int DOC_CHECKED_OUT = 1;
@@ -98,6 +102,8 @@ public final class Constants {
 	public static final String GROUP_ADMIN = "admin";
 
 	public static final String GROUP_PUBLISHER = "publisher";
+	
+	public static final String GROUP_GUEST = "guest";
 
 	public final static String EVENT_LOCKED = "event.locked";
 
@@ -111,6 +117,8 @@ public final class Constants {
 
 	public final static int INDEX_TO_INDEX = 0;
 
+	public final static int INDEX_TO_INDEX_METADATA = 3;
+	
 	public final static int INDEX_INDEXED = 1;
 
 	// The document is un-indexable
@@ -133,20 +141,6 @@ public final class Constants {
 	public static final String FOLDER_ID = "folderId";
 
 	public static final String DOC_ID = "docId";
-
-	public final static int DASHLET_CHECKOUT = 1;
-
-	public final static int DASHLET_CHECKIN = 2;
-
-	public final static int DASHLET_LOCKED = 3;
-
-	public final static int DASHLET_DOWNLOADED = 4;
-
-	public final static int DASHLET_CHANGED = 5;
-
-	public final static int DASHLET_LAST_NOTES = 6;
-
-	public final static int DASHLET_TAGCLOUD = 7;
 
 	public static final String[] AUDIT_DEFAULT_EVENTS = new String[] { "event.stored", "event.changed",
 			"event.checkedin" };

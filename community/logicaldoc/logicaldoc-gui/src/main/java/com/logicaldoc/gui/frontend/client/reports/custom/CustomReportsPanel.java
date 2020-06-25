@@ -2,7 +2,6 @@ package com.logicaldoc.gui.frontend.client.reports.custom;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
@@ -15,8 +14,8 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -253,7 +252,7 @@ public class CustomReportsPanel extends AdminPanel {
 	}
 
 	private boolean canUploadDesign() {
-		return Session.get().getUser().getTenantId() == Constants.TENANT_DEFAULTID
+		return Session.get().getUser().getTenant().isDefault()
 				&& Session.get().getUser().isMemberOf("admin");
 	}
 
@@ -433,6 +432,8 @@ public class CustomReportsPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param report the report to update
 	 */
 	public void updateRecord(GUIReport report) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, report.getId()));

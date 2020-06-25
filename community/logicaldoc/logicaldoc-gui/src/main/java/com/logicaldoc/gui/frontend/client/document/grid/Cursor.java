@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 
 /**
- * An useful panel to show informations to the user
+ * A cursor to browse among pages
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1.2
@@ -28,13 +28,17 @@ public class Cursor extends ToolStrip {
 	private SpinnerItem pageItem;
 
 	public Cursor() {
-		this(null, false);
+		this(null, false, false);
 	}
 
 	/**
 	 * ID of the message to be used to compose the email
+	 * 
+	 * @param maxDisplayedRecordsCookieName name of the cookies to save the max number of displayed records
+	 * @param enabledPagination if the pagination must be enabled
+	 * @param compactView if the compact vidualization must be used
 	 */
-	public Cursor(String maxDisplayedRecordsCookieName, boolean enabledPagination) {
+	public Cursor(String maxDisplayedRecordsCookieName, boolean enabledPagination, boolean compactView) {
 		setHeight(20);
 		this.maxCookieName = maxDisplayedRecordsCookieName;
 
@@ -50,13 +54,12 @@ public class Cursor extends ToolStrip {
 				mx = (String) Offline.get(maxDisplayedRecordsCookieName);
 		}
 
-		maxItem = ItemFactory.newSpinnerItem("max", "display", Integer.parseInt(mx), 10, (Integer) null);
+		maxItem = ItemFactory.newSpinnerItem("max", "display", Integer.parseInt(mx), 2, (Integer) null);
 		maxItem.setValue(Integer.parseInt(mx));
 		maxItem.setWidth(70);
 		maxItem.setStep(20);
 		maxItem.setSaveOnEnter(true);
 		maxItem.setImplicitSave(true);
-		maxItem.setHint(I18N.message("elements"));
 		maxItem.addChangedHandler(new ChangedHandler() {
 
 			@Override
@@ -64,6 +67,11 @@ public class Cursor extends ToolStrip {
 				onMaxChange();
 			}
 		});
+		if (compactView) {
+			maxItem.setShowTitle(false);
+		} else {
+			maxItem.setHint(I18N.message("elements"));
+		}
 
 		addFormItem(maxItem);
 		if (enabledPagination) {

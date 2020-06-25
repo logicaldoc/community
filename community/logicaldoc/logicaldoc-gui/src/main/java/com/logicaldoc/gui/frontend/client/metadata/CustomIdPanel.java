@@ -5,14 +5,14 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.beans.GUICustomId;
+import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
-import com.logicaldoc.gui.frontend.client.services.CustomIdService;
+import com.logicaldoc.gui.frontend.client.services.SchemeService;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
@@ -47,9 +47,9 @@ public class CustomIdPanel extends AdminPanel {
 
 	private VLayout sequencesPanel;
 
-	private GUICustomId[] schemesData;
+	private GUIScheme[] schemesData;
 
-	public CustomIdPanel(GUICustomId[] schemesData) {
+	public CustomIdPanel(GUIScheme[] schemesData) {
 		super("customid");
 		this.schemesData = schemesData;
 	}
@@ -57,15 +57,15 @@ public class CustomIdPanel extends AdminPanel {
 	@Override
 	public void onDraw() {
 		if (Feature.enabled(Feature.CUSTOMID))
-			body.setMembers(setupSchemesPanel(schemesData, GUICustomId.CUSTOMID_SCHEME));
+			body.setMembers(setupSchemesPanel(schemesData, GUIScheme.CUSTOMID_SCHEME));
 
 		Tab autonamingTab = new Tab();
 		autonamingTab.setTitle(I18N.message("autonaming"));
-		autonamingTab.setPane(setupSchemesPanel(schemesData, GUICustomId.AUTONAMING_SCHEME));
+		autonamingTab.setPane(setupSchemesPanel(schemesData, GUIScheme.AUTONAMING_SCHEME));
 
 		Tab autofoldingTab = new Tab();
 		autofoldingTab.setTitle(I18N.message("autofolding"));
-		autofoldingTab.setPane(setupSchemesPanel(schemesData, GUICustomId.AUTOFOLDING_SCHEME));
+		autofoldingTab.setPane(setupSchemesPanel(schemesData, GUIScheme.AUTOFOLDING_SCHEME));
 
 		Tab sequencesTab = new Tab();
 		sequencesTab.setTitle(I18N.message("sequences"));
@@ -78,7 +78,7 @@ public class CustomIdPanel extends AdminPanel {
 		tabs.addTab(sequencesTab);
 	}
 
-	private VLayout setupSchemesPanel(GUICustomId[] data, String type) {
+	private VLayout setupSchemesPanel(GUIScheme[] data, String type) {
 		ListGridField template = new ListGridField("templateName", I18N.message("template"));
 		template.setWidth(120);
 		template.setCanEdit(false);
@@ -93,10 +93,14 @@ public class CustomIdPanel extends AdminPanel {
 			}
 		});
 
-		final ListGridField regenerate = new ListGridField("regenerate", I18N.message("regenerateaftercheckin"));
-		regenerate.setWidth(150);
-		regenerate.setType(ListGridFieldType.BOOLEAN);
+		final ListGridField evaluateAtCheckin = new ListGridField("evaluateAtCheckin", I18N.message("evaluateatcheckin"));
+		evaluateAtCheckin.setWidth(150);
+		evaluateAtCheckin.setType(ListGridFieldType.BOOLEAN);
 
+		final ListGridField evaluateAtUpdate = new ListGridField("evaluateAtUpdate", I18N.message("evaluateatupdate"));
+		evaluateAtUpdate.setWidth(150);
+		evaluateAtUpdate.setType(ListGridFieldType.BOOLEAN);
+		
 		final ListGrid customIds = new ListGrid();
 		customIds.setEmptyMessage(I18N.message("notitemstoshow"));
 		customIds.setShowAllRecords(true);
@@ -109,7 +113,7 @@ public class CustomIdPanel extends AdminPanel {
 
 		List<ListGridRecord> records = new ArrayList<ListGridRecord>();
 		if (data != null)
-			for (GUICustomId cid : data) {
+			for (GUIScheme cid : data) {
 				if (!type.equals(cid.getType()))
 					continue;
 				ListGridRecord record = new ListGridRecord();
@@ -117,13 +121,14 @@ public class CustomIdPanel extends AdminPanel {
 				record.setAttribute("templateName", Util.strip(cid.getTemplateName()));
 				if (cid.getScheme() != null)
 					record.setAttribute("scheme", cid.getScheme());
-				record.setAttribute("regenerate", cid.isRegenerate());
+				record.setAttribute("evaluateAtCheckin", cid.isEvaluateAtCheckin());
+				record.setAttribute("evaluateAtUpdate", cid.isEvaluateAtUpdate());
 				record.setAttribute("type", cid.getType());
 				records.add(record);
 			}
 		customIds.setData(records.toArray(new ListGridRecord[0]));
 
-		customIds.setFields(template, scheme, regenerate);
+		customIds.setFields(template, scheme, evaluateAtCheckin, evaluateAtUpdate);
 
 		customIds.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -136,14 +141,15 @@ public class CustomIdPanel extends AdminPanel {
 		customIds.addEditCompleteHandler(new EditCompleteHandler() {
 			@Override
 			public void onEditComplete(EditCompleteEvent event) {
-				GUICustomId cid = new GUICustomId();
+				GUIScheme cid = new GUIScheme();
 				ListGridRecord record = customIds.getRecord(event.getRowNum());
 				cid.setTemplateId(Long.parseLong(record.getAttribute("templateId")));
-				cid.setRegenerate(record.getAttributeAsBoolean("regenerate"));
+				cid.setEvaluateAtCheckin(record.getAttributeAsBoolean("evaluateAtCheckin"));
+				cid.setEvaluateAtUpdate(record.getAttributeAsBoolean("evaluateAtUpdate"));
 				cid.setScheme(record.getAttributeAsString("scheme"));
 				cid.setType(record.getAttributeAsString("type"));
 
-				CustomIdService.Instance.get().save(cid, new AsyncCallback<Void>() {
+				SchemeService.Instance.get().save(cid, new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -216,7 +222,7 @@ public class CustomIdPanel extends AdminPanel {
 			@Override
 			public void onEditComplete(EditCompleteEvent event) {
 				ListGridRecord record = sequences.getRecord(event.getRowNum());
-				CustomIdService.Instance.get().resetSequence(Long.parseLong(record.getAttribute("id")),
+				SchemeService.Instance.get().resetSequence(Long.parseLong(record.getAttribute("id")),
 						(Integer) record.getAttributeAsInt("value"), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -246,7 +252,7 @@ public class CustomIdPanel extends AdminPanel {
 	}
 
 	private void refreshSequences() {
-		CustomIdService.Instance.get().loadSequences(new AsyncCallback<GUISequence[]>() {
+		SchemeService.Instance.get().loadSequences(new AsyncCallback<GUISequence[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Log.serverError(caught);
@@ -284,7 +290,7 @@ public class CustomIdPanel extends AdminPanel {
 					public void execute(Boolean value) {
 						if (value) {
 							final ListGridRecord record = schemes.getSelectedRecord();
-							CustomIdService.Instance.get().delete(
+							SchemeService.Instance.get().delete(
 									Long.parseLong(record.getAttributeAsString("templateId")),
 									record.getAttributeAsString("type"), new AsyncCallback<Void>() {
 
@@ -296,8 +302,8 @@ public class CustomIdPanel extends AdminPanel {
 										@Override
 										public void onSuccess(Void ret) {
 											schemes.getSelectedRecord().setAttribute("scheme", (String) null);
-											schemes.getSelectedRecord().setAttribute("regenerate", false);
-											schemes.refreshRow(schemes.getRecordIndex(record));
+											schemes.getSelectedRecord().setAttribute("evaluateAtCheckin", false);
+											schemes.getSelectedRecord().setAttribute("evaluateAtUpdate", false);
 											schemes.refreshRow(schemes.getRecordIndex(record));
 										}
 									});
@@ -325,7 +331,7 @@ public class CustomIdPanel extends AdminPanel {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
-							CustomIdService.Instance.get().deleteSequence(id, new AsyncCallback<Void>() {
+							SchemeService.Instance.get().deleteSequence(id, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
 									Log.serverError(caught);

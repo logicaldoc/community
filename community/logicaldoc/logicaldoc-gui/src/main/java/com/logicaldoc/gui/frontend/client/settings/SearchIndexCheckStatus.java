@@ -20,26 +20,22 @@ public class SearchIndexCheckStatus extends Window {
 		
 		setWidth100();
 		setHeight100();
-		setMembersMargin(5);
-		setMargin(5);
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("checkfulltextindex"));
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setAutoSize(true);
 	
 
 		final DynamicForm form = new DynamicForm();
 		form.setHeight100();
 		form.setWidth100();
-		form.setMargin(5);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
 		final TextAreaItem status = new TextAreaItem();
-		status.setWidth(440);
-		status.setHeight(490);
+		status.setWidth(700);
+		status.setHeight("100%");
 		status.setValue(result);
 		status.setShowTitle(false);
 

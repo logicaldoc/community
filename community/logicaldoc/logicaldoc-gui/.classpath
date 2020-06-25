@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
   <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
   <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
   <classpathentry kind="output" path="war/WEB-INF/classes"/>
   <classpathentry kind="var" path="M2_REPO/javax/validation/validation-api/1.0.0.GA/validation-api-1.0.0.GA.jar" sourcepath="M2_REPO/javax/validation/validation-api/1.0.0.GA/validation-api-1.0.0.GA-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/validation/validation-api/1.0.0.GA/validation-api-1.0.0.GA-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-servlet/2.6.1/gwt-servlet-2.6.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-user/2.6.1/gwt-user-2.6.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/json/json/20090211/json-20090211.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-servlet/2.8.2/gwt-servlet-2.8.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-user/2.8.2/gwt-user-2.8.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/jsinterop/jsinterop-annotations/1.0.2/jsinterop-annotations-1.0.2.jar" sourcepath="M2_REPO/com/google/jsinterop/jsinterop-annotations/1.0.2/jsinterop-annotations-1.0.2-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/jsinterop/jsinterop-annotations/1.0.2/jsinterop-annotations-1.0.2-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/w3c/css/sac/1.3/sac-1.3.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/googlecode/gwtupload/gwtupload/1.0.3/gwtupload-1.0.3.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-fileupload/commons-fileupload/1.2.2/commons-fileupload-1.2.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.5/commons-io-2.5.jar"/>
@@ -18,13 +20,16 @@
   <classpathentry kind="var" path="M2_REPO/com/allen_sauer/gwt/dnd/gwt-dnd/3.0.1/gwt-dnd-3.0.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/timepedia/exporter/gwtexporter/2.0.10/gwtexporter-2.0.10.jar"/>
   <classpathentry kind="var" path="M2_REPO/gwtchismes/gwtchismes/0.9.8/gwtchismes-0.9.8.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/smartgwt/smartgwt/6.1p20170719/smartgwt-6.1p20170719.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/smartgwt/smartgwt-skins/6.1p20170719/smartgwt-skins-6.1p20170719.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/smartgwt/smartgwt/12.0p/smartgwt-12.0p.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/smartgwt/smartgwt-skins/12.0p/smartgwt-skins-12.0p.jar"/>
   <classpathentry kind="var" path="M2_REPO/gdurelle/tagcloud/tagcloud/0.4/tagcloud-0.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/orange/links/gwt-links/1.4.2/gwt-links-1.4.2.jar"/>
-  <classpathentry kind="var" path="M2_REPO/de/novanic/gwteventservice/gwteventservice/1.2.1/gwteventservice-1.2.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/de/novanic/gwteventservice/eventservice-rpc/1.2.1/eventservice-rpc-1.2.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/de/novanic/gwteventservice/eventservice/1.2.1/eventservice-1.2.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/wisepersist/gwt-ace/1.0.3/gwt-ace-1.0.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava/18.0/guava-18.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/findbugs/jsr305/2.0.3/jsr305-2.0.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/findbugs/annotations/2.0.3/annotations-2.0.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava-gwt/18.0/guava-gwt-18.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/sksamuel/gwt/gwt-websockets/1.0.4/gwt-websockets-1.0.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.7.7/slf4j-log4j12-1.7.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>

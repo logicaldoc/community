@@ -9,13 +9,14 @@ import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -36,6 +37,7 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -132,23 +134,14 @@ public class LockedDocsReport extends AdminPanel {
 		icon.setCanFilter(false);
 		icon.setCanGroupBy(false);
 
-		ListGridField immutable = new ListGridField("immutable", " ", 24);
-		immutable.setType(ListGridFieldType.IMAGE);
-		immutable.setCanSort(false);
-		immutable.setAlign(Alignment.CENTER);
-		immutable.setShowDefaultContextMenu(false);
-		immutable.setImageURLPrefix(Util.imagePrefix());
-		immutable.setImageURLSuffix(".png");
-		immutable.setCanFilter(false);
-
 		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
 		version.setAlign(Alignment.CENTER);
-		version.setCanFilter(true);
+		version.setCanFilter(false);
 		version.setCanGroupBy(false);
 
 		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 55);
 		fileVersion.setAlign(Alignment.CENTER);
-		fileVersion.setCanFilter(true);
+		fileVersion.setCanFilter(false);
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
@@ -168,24 +161,22 @@ public class LockedDocsReport extends AdminPanel {
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setHidden(true);
 		customId.setCanGroupBy(false);
+		customId.setCanFilter(true);
 
 		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
 		filename.setCanFilter(true);
-
-		ListGridField locked = new ListGridField("locked", " ", 24);
-		locked.setType(ListGridFieldType.IMAGE);
-		locked.setCanSort(false);
-		locked.setAlign(Alignment.CENTER);
-		locked.setShowDefaultContextMenu(false);
-		locked.setImageURLPrefix(Util.imagePrefix());
-		locked.setImageURLSuffix(".png");
-		locked.setCanFilter(false);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
 		type.setType(ListGridFieldType.TEXT);
 		type.setAlign(Alignment.CENTER);
 		type.setHidden(true);
 		type.setCanGroupBy(false);
+		type.setCanFilter(true);
+
+		ListGridField statusIcons = new ListGridField("statusIcons", " ");
+		statusIcons.setWidth(110);
+		statusIcons.setCanFilter(false);
+		statusIcons.setCanSort(false);
 
 		list = new RefreshableListGrid() {
 			@Override
@@ -200,6 +191,45 @@ public class LockedDocsReport extends AdminPanel {
 					return super.getCellCSSText(record, rowNum, colNum);
 				}
 			}
+
+			@Override
+			protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
+				String fieldName = this.getFieldName(colNum);
+
+				if (fieldName.equals("statusIcons")) {
+					HLayout statusCanvas = new HLayout(3);
+					statusCanvas.setHeight(22);
+					statusCanvas.setWidth100();
+					statusCanvas.setMembersMargin(1);
+					statusCanvas.setAlign(Alignment.CENTER);
+
+					// Put the status icon
+					{
+						if (record.getAttribute("status") != null) {
+							Integer status = record.getAttributeAsInt("status");
+							if (status != null && status.intValue() > 0) {
+								ToolStripButton statusIcon = AwesomeFactory.newLockedButton(status,
+										record.getAttributeAsString("username"));
+								statusCanvas.addMember(statusIcon);
+							}
+						}
+					}
+
+					// Put the immutable icon
+					{
+						if (record.getAttribute("immutable") != null) {
+							Integer immutable = record.getAttributeAsInt("immutable");
+							if (immutable != null && immutable.intValue() == 1) {
+								ToolStripButton immutableIcon = AwesomeFactory.newIconButton("hand-paper", "immutable");
+								statusCanvas.addMember(immutableIcon);
+							}
+						}
+					}
+					return statusCanvas;
+				} else {
+					return null;
+				}
+			}
 		};
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowRecordComponents(true);
@@ -208,8 +238,8 @@ public class LockedDocsReport extends AdminPanel {
 		list.setAutoFetchData(true);
 		list.setFilterOnKeypress(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
-		list.setFields(locked, immutable, icon, filename, version, fileVersion, size, lastModified, user, customId,
-				type);
+		list.setShowFilterEditor(true);
+		list.setFields(statusIcons, icon, filename, version, fileVersion, size, lastModified, user, customId, type);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override

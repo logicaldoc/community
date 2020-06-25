@@ -94,9 +94,9 @@ public abstract class Task implements Runnable {
 		this.name = name;
 	}
 
-	private void setStatus(int status) {
+	private synchronized void setStatus(int status) {
 		if (status != STATUS_IDLE && status != STATUS_RUNNING && status != STATUS_STOPPING)
-			throw new InvalidParameterException("Invalid status  value");
+			throw new InvalidParameterException("Invalid status value");
 		boolean needNotification = this.status != status;
 		this.status = status;
 		if (needNotification)
@@ -108,7 +108,7 @@ public abstract class Task implements Runnable {
 	/**
 	 * Increments the progress by one and detects system overload.
 	 */
-	protected void next() {
+	protected synchronized void next() {
 		setProgress(progress + 1);
 
 		// Reset the timeout
@@ -119,7 +119,7 @@ public abstract class Task implements Runnable {
 			boolean overload = false;
 
 			Random random = new Random();
-			while (systemLoadMonitor.isAverageCpuOverLoaded()) {
+			while (systemLoadMonitor.isAverageCpuOverLoaded() && !interruptRequested) {
 				if (overload == false) {
 					overload = true;
 					log.info("Execution paused because of system overload");
@@ -132,6 +132,8 @@ public abstract class Task implements Runnable {
 					Thread.sleep((1 + random.nextInt(20)) * 1000);
 				} catch (Throwable e) {
 				}
+
+				checkExpiration();
 			}
 
 			if (overload)
@@ -139,9 +141,9 @@ public abstract class Task implements Runnable {
 		}
 	}
 
-	protected void setProgress(long progress) {
+	protected synchronized void setProgress(long progress) {
 		try {
-			if (progress > size || progress < 0)
+			if (progress > getSize() || progress < 0)
 				return;
 
 			boolean needNotification = this.progress != progress;
@@ -152,9 +154,19 @@ public abstract class Task implements Runnable {
 		} catch (Throwable t) {
 			// Nothing to do
 		} finally {
-			// Check it time was expired, and request interruption if the case
-			if (getScheduling().isExpired())
-				interrupt();
+			checkExpiration();
+		}
+	}
+
+	/**
+	 * Checks if the time has been expired and in that case interrupts the
+	 * elaboration.
+	 */
+	private void checkExpiration() {
+		// Check if time was expired, and request interruption if the case
+		if (getScheduling().isExpired()) {
+			log.warn("The timeout has been reached, the elaboration is being interrupted");
+			interrupt();
 		}
 	}
 
@@ -167,16 +179,16 @@ public abstract class Task implements Runnable {
 
 		System.gc();
 		if (!getScheduling().isEnabled()) {
-			log.debug("Task " + getName() + " is disabled");
+			log.debug("Task {} is disabled", getName());
 			return;
 		}
 
 		if (getStatus() != STATUS_IDLE) {
-			log.debug("Task " + getName() + " is already running");
+			log.debug("Task {} is already running", getName());
 			return;
 		}
 
-		log.info("Task " + getName() + " started");
+		log.info("Task {} started", getName());
 		interruptRequested = false;
 		setStatus(STATUS_RUNNING);
 		getScheduling().setPreviousFireTime(new Date());
@@ -205,7 +217,7 @@ public abstract class Task implements Runnable {
 			setStatus(STATUS_IDLE);
 			interruptRequested = false;
 			saveWork();
-			log.info("Task " + getName() + " finished");
+			log.info("Task {} finished", getName());
 			if (isSendActivityReport() && StringUtils.isNotEmpty(getReportRecipients()))
 				notifyReport();
 			transactionId = null;
@@ -223,6 +235,8 @@ public abstract class Task implements Runnable {
 
 	/**
 	 * The the total size of the processing(number of units of work)
+	 * 
+	 * @return total number of steps
 	 */
 	public long getSize() {
 		return size;
@@ -233,7 +247,13 @@ public abstract class Task implements Runnable {
 	}
 
 	/**
-	 * The task status(one of STATUS_IDLE or STATUS_RUNNING)
+	 * The task status.
+	 * 
+	 * @see #STATUS_IDLE
+	 * @see #STATUS_RUNNING
+	 * @see #STATUS_STOPPING
+	 * 
+	 * @return the status
 	 */
 	public int getStatus() {
 		return status;
@@ -241,6 +261,8 @@ public abstract class Task implements Runnable {
 
 	/**
 	 * The current processing step
+	 * 
+	 * @return the current step
 	 */
 	public long getProgress() {
 		return progress;
@@ -248,6 +270,8 @@ public abstract class Task implements Runnable {
 
 	/**
 	 * The percentage of completion(1-100)
+	 * 
+	 * @return a percentage(1-100)
 	 */
 	public int getCompletionPercentage() {
 		if (isIndeterminate()) {
@@ -256,14 +280,16 @@ public abstract class Task implements Runnable {
 			else
 				return 1;
 		} else {
-			if (size == 0)
+			if (getSize() == 0)
 				return 0;
-			return (int) (Math.round(((double) progress / (double) size) * 100));
+			return (int) (Math.round(((double) progress / (double) getSize()) * 100));
 		}
 	}
 
 	/**
-	 * Check if the task is currently running
+	 * Check if the task is currently running 
+	 *
+	 * @return true if the task is running({@link #STATUS_RUNNING})
 	 */
 	public boolean isRunning() {
 		return status == STATUS_RUNNING;
@@ -279,6 +305,8 @@ public abstract class Task implements Runnable {
 
 	/**
 	 * Scheduling policies
+	 * 
+	 * @return the scheduling policies
 	 */
 	public TaskScheduling getScheduling() {
 		if (scheduling == null) {
@@ -337,7 +365,7 @@ public abstract class Task implements Runnable {
 			// Send the email
 			try {
 				sender.send(email, "task.report", dictionary);
-				log.info("Report sent to: " + recipient.getEmail());
+				log.info("Report sent to: {}", recipient.getEmail());
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
@@ -346,6 +374,10 @@ public abstract class Task implements Runnable {
 
 	/**
 	 * Implementations may compose a locale specific report.
+	 * 
+	 * @param locale the locale to use for the report
+	 * 
+	 * @return the report's body
 	 */
 	protected String prepareReport(Locale locale) {
 		return null;
@@ -363,12 +395,16 @@ public abstract class Task implements Runnable {
 	 * Concrete implementations must override this method declaring if the task
 	 * is indeterminate. An indeterminate task is not able to compute it's time
 	 * length
+	 * 
+	 * @return true if the task is indeterminate
 	 */
 	abstract public boolean isIndeterminate();
 
 	/**
 	 * Concrete implementations must override this method declaring if the task
 	 * supports multiple instances running concurrently.
+	 * 
+	 * @return true if the task is concurrent
 	 */
 	abstract public boolean isConcurrent();
 
@@ -397,8 +433,8 @@ public abstract class Task implements Runnable {
 	/**
 	 * Saves the task configuration
 	 * 
-	 * @throws ParseException
-	 * @throws IOException
+	 * @throws ParseException raised if the configuration cannot be parsed
+	 * @throws IOException raised if the configuration cannot be written
 	 */
 	public void save() throws IOException, ParseException {
 		getScheduling().save();
@@ -426,5 +462,9 @@ public abstract class Task implements Runnable {
 
 	public void setSystemLoadMonitor(SystemLoadMonitor systemLoadMonitor) {
 		this.systemLoadMonitor = systemLoadMonitor;
+	}
+
+	public boolean isInterruptRequested() {
+		return interruptRequested;
 	}
 }

@@ -19,11 +19,15 @@ public interface Storer extends Comparable<Storer> {
 
 	/**
 	 * The unique identifier
+	 * 
+	 * @return the storer identifier
 	 */
 	public int getId();
 
 	/**
 	 * Sets the unique identifier
+	 * 
+	 * @param id the storer identifier
 	 */
 	public void setId(int id);
 
@@ -36,15 +40,23 @@ public interface Storer extends Comparable<Storer> {
 	 * @param stream Document as InputStream
 	 * @param docId The document identifier
 	 * @param resource Name of the resource to be stored
-	 * @return Size of the stored resource, or < 0 if the storage was not
-	 *         possible
+	 * 
+	 * @throws IOException the content cannot be stored
 	 */
-	public long store(InputStream stream, long docId, String resource);
+	public void store(InputStream stream, long docId, String resource) throws IOException;
 
 	/**
+	 * Stores a file
+	 * 
 	 * @see store(InputStream stream, long docId, String resource)
+	 * 
+	 * @param file the file to store
+	 * @param docId identifier of the document
+	 * @param resource name of the resource
+	 * 
+	 * @throws IOException the content cannot be stored
 	 */
-	public long store(File file, long docId, String resource);
+	public void store(File file, long docId, String resource) throws IOException;
 
 	/**
 	 * Deletes all resources of a document from the storage.
@@ -89,7 +101,8 @@ public interface Storer extends Comparable<Storer> {
 	 * @param docId The document's identifier
 	 * @param fileVersion If specified, lists the resources for that specific
 	 *        file version only
-	 * @return
+	 * 
+	 * @return list of resource names
 	 */
 	public List<String> listResources(long docId, String fileVersion);
 
@@ -117,7 +130,9 @@ public interface Storer extends Comparable<Storer> {
 	 * 
 	 * @param docId The document identifier
 	 * @param resource Name of the resource
-	 * @param file File that will receive the resource's content
+	 * @param out File that will receive the resource's content
+	 * 
+	 * @throws IOException error writing the file or reading the resource
 	 */
 	public void writeToFile(long docId, String resource, File out) throws IOException;
 
@@ -129,8 +144,11 @@ public interface Storer extends Comparable<Storer> {
 	 * @param output The output stream
 	 * @param start Index of the starting byte
 	 * @param length Total packet length
+	 * 
+	 * @throws IOException error writing the stream or reading the resource
 	 */
-	public void writeToStream(long docId, String resource, OutputStream output, long start, long length) throws IOException;
+	public void writeToStream(long docId, String resource, OutputStream output, long start, long length)
+			throws IOException;
 
 	/**
 	 * Writes the specified resource in an output stream
@@ -138,6 +156,8 @@ public interface Storer extends Comparable<Storer> {
 	 * @param docId The document's identifier
 	 * @param resource Name of the resource
 	 * @param output The output stream
+	 * 
+	 * @throws IOException error writing the stream or reading the resource
 	 */
 	public void writeToStream(long docId, String resource, OutputStream output) throws IOException;
 
@@ -148,8 +168,10 @@ public interface Storer extends Comparable<Storer> {
 	 * @param resource Name of the resource
 	 * 
 	 * @return The document file's content
+	 * 
+	 * @throws IOException cannot open the stream 
 	 */
-	public InputStream getStream(long docId, String resource);
+	public InputStream getStream(long docId, String resource) throws IOException;
 
 	/**
 	 * Obtains the document's raw bytes for the specified resource
@@ -158,8 +180,10 @@ public interface Storer extends Comparable<Storer> {
 	 * @param resource Name of the resource
 	 * 
 	 * @return The document file's bytes
+	 * 
+	 * @throws IOException cannot open the resource to get the bytes
 	 */
-	public byte[] getBytes(long docId, String resource);
+	public byte[] getBytes(long docId, String resource) throws IOException;
 
 	/**
 	 * Obtains the document's raw bytes for the specified resource
@@ -170,8 +194,10 @@ public interface Storer extends Comparable<Storer> {
 	 * @param length Total packet length
 	 * 
 	 * @return The document file's bytes
+	 * 
+	 * @throws IOException cannot open the resource to get the bytes
 	 */
-	public byte[] getBytes(long docId, String resource, long start, long length);
+	public byte[] getBytes(long docId, String resource, long start, long length) throws IOException;
 
 	/**
 	 * Obtains the document's content as string for the specified resource
@@ -185,27 +211,47 @@ public interface Storer extends Comparable<Storer> {
 
 	/**
 	 * Computes the total size of the documents repository(in bytes)
+	 * 
+	 * @return sum of the sizes of all the documents expressed in bytes
 	 */
 	public long getTotalSize();
 
 	/**
 	 * Implementations should return the list of the required parameters. A
-	 * parameter is stored in the context as storer.<id>.parameter = value
+	 * parameter is stored in the context as storer.<b>id</b>.parameter = value
+	 * 
+	 * @return list of parameter names
 	 */
 	public List<String> getParameterNames();
 
 	/**
 	 * Returns the map of parameters
+	 * 
+	 * @return a map with settings <b>setting_name</b> - <b>setting_value</b>
 	 */
 	public Map<String, String> getParameters();
 
 	/**
 	 * Tests if the storer can read and write
+	 * 
+	 * @return if the storer can read and write
 	 */
 	public boolean test();
 
 	/**
 	 * Tests if the storer is enabled
+	 * 
+	 * @return if the storer is enabled
 	 */
 	public boolean isEnabled();
+
+	/**
+	 * Initialization method
+	 */
+	public void init();
+
+	/**
+	 * Destroy method
+	 */
+	public void destroy();
 }

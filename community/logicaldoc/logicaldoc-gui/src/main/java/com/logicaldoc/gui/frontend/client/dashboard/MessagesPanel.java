@@ -3,10 +3,13 @@ package com.logicaldoc.gui.frontend.client.dashboard;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
+import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.MessagesDS;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.observer.UserController;
+import com.logicaldoc.gui.common.client.observer.UserObserver;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
@@ -21,7 +24,6 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -44,7 +46,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class MessagesPanel extends VLayout {
+public class MessagesPanel extends VLayout implements UserObserver {
 
 	private RefreshableListGrid grid;
 
@@ -55,6 +57,7 @@ public class MessagesPanel extends VLayout {
 	public MessagesPanel() {
 		setWidth100();
 		setHeight100();
+		UserController.get().addObserver(this);
 	}
 
 	@Override
@@ -193,8 +196,10 @@ public class MessagesPanel extends VLayout {
 	}
 
 	private void refresh() {
-		grid.refresh(new MessagesDS());
-		body.setContents(" ");
+		if (grid != null) {
+			grid.refresh(new MessagesDS());
+			body.setContents(" ");
+		}
 	}
 
 	private void showContextMenu() {
@@ -235,5 +240,30 @@ public class MessagesPanel extends VLayout {
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();
+	}
+
+	@Override
+	public void onUserChanged(GUIUser user) {
+		refresh();
+	}
+
+	@Override
+	public void onUserLogin(String username) {
+
+	}
+
+	@Override
+	public void onUserLogout(String username) {
+
+	}
+
+	@Override
+	public void destroy() {
+		UserController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		UserController.get().removeObserver(this);
 	}
 }

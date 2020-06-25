@@ -22,8 +22,8 @@ import com.logicaldoc.util.config.ContextProperties;
  * 
  * In addition, this class makes available methods to manage the plug-in's
  * properties stored in file plugin.properties, and allows access to the plug-in
- * framework ({@see org.java.plugin.PluginManager manager}, {@see
- * org.java.plugin.registry.PluginRegistry registry}) which it was loaded.
+ * framework (see org.java.plugin.PluginManager manager), {see
+ * org.java.plugin.registry.PluginRegistry registry) which it was loaded.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
@@ -96,7 +96,9 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	}
 
 	/**
-	 * Retrieves the path of the plugin jar archive
+	 * Retrieves the path where the plugins jar archives are stored
+	 * 
+	 * @return the path where the plugins jar archives are stored
 	 */
 	public String getPluginPath() {
 		String path = getManager().getPathResolver().resolvePath(getDescriptor(), "/").toString();
@@ -135,6 +137,8 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	/**
 	 * Returns the data directory for this plugin, that is
 	 * {conf.plugindir}/{pluginName}. It will be created in not existing.
+	 * 
+	 * @return the folder for the data of the plugin
 	 */
 	public File getDataDirectory() {
 		String pluginName = getPluginName();
@@ -147,14 +151,18 @@ public abstract class LogicalDOCPlugin extends Plugin {
 
 	/**
 	 * Concrete implementations of this method must insert first installation
-	 * logic such as database initialisation.
+	 * logic such as database initialization.
+	 * 
+	 * @throws Exception raised if some errors happened during the installation
 	 */
 	protected void install() throws Exception {
 	}
 
 	/**
 	 * Concrete implementations of this method must insert startup
-	 * initialisations.
+	 * initializations.
+	 * 
+	 * @throws Exception raised if some errors happened during the startup
 	 */
 	protected void start() throws Exception {
 	}

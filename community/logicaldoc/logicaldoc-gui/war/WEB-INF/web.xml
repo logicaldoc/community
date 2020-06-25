@@ -648,16 +648,6 @@
 
     <servlet-mapping>
         <servlet-name>MockServlet</servlet-name>
-        <url-pattern>/doc_rss</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>MockServlet</servlet-name>
-        <url-pattern>/folder_rss</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>MockServlet</servlet-name>
         <url-pattern>/zip-export</url-pattern>
     </servlet-mapping>
 

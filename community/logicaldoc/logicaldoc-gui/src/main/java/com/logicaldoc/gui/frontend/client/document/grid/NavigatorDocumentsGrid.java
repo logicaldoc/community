@@ -3,22 +3,13 @@ package com.logicaldoc.gui.frontend.client.document.grid;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
-import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
-import com.smartgwt.client.data.SortSpecifier;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.events.GroupStateChangedEvent;
-import com.smartgwt.client.widgets.grid.events.GroupStateChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SortChangedHandler;
-import com.smartgwt.client.widgets.grid.events.SortEvent;
-import com.smartgwt.client.widgets.grid.events.ViewStateChangedEvent;
-import com.smartgwt.client.widgets.grid.events.ViewStateChangedHandler;
 
 /**
  * Grid of documents displayed in the Navigator
@@ -53,7 +44,6 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 			fieldsMap.get("filename").setHidden(true);
 			fields.add(fieldsMap.get("filename"));
 		}
-
 		if (!fields.contains(fieldsMap.get("lastModified"))) {
 			fieldsMap.get("lastModified").setHidden(true);
 			fields.add(fieldsMap.get("lastModified"));
@@ -118,74 +108,23 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 			fieldsMap.get("stopPublishing").setHidden(true);
 			fields.add(fieldsMap.get("stopPublishing"));
 		}
+		if (!fields.contains(fieldsMap.get("language"))) {
+			fieldsMap.get("language").setHidden(true);
+			fields.add(fieldsMap.get("language"));
+		}
 
 		setFields(fields.toArray(new ListGridField[0]));
 
-		addSortChangedHandler(new SortChangedHandler() {
-
-			@Override
-			public void onSortChanged(SortEvent event) {
-				saveGridState();
-				if (Session.get().getCurrentFolder() != null)
-					FolderNavigator.get().selectFolder(Session.get().getCurrentFolder().getId());
-			}
-		});
-
 		/*
-		 * Save the layout of the grid at every change
-		 */
-		addViewStateChangedHandler(new ViewStateChangedHandler() {
-			@Override
-			public void onViewStateChanged(ViewStateChangedEvent event) {
-				saveGridState();
-			}
-		});
-
-		/*
-		 * Save the group state of the grid at every group change
-		 */
-		addGroupStateChangedHandler(new GroupStateChangedHandler() {
-
-			@Override
-			public void onGroupStateChanged(GroupStateChangedEvent event) {
-				saveGridState();
-			}
-		});
-
-		/*
-		 * Restore any previously saved view state for this grid.
+		 * Restore any previously saved view state for this grid
 		 */
 		addDrawHandler(new DrawHandler() {
 			@Override
 			public void onDraw(DrawEvent event) {
-				loadGridState();
+				loadGridLayout(folder);
 			}
 		});
-		
-		loadGridState();
-	}
 
-	private void saveGridState() {
-		SortSpecifier[] sortSpecifiers = getSort();
-		String sort = "";
-		if (sortSpecifiers != null)
-			for (SortSpecifier spec : sortSpecifiers) {
-				if (!sort.isEmpty())
-					sort += ",";
-				sort += spec.getField();
-				sort += "ascending".equals(spec.getSortDirection().toString().toLowerCase()) ? " asc" : " desc";
-			}
-		CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_SORT, sort);
-		CookiesManager.save(CookiesManager.COOKIE_DOCSLIST, getViewState());
-		CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_GROUPING, getGroupState());
-	}
-
-	private void loadGridState() {
-		String previouslySavedState = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST);
-		if (previouslySavedState != null)
-			setViewState(previouslySavedState);
-		String previouslySavedGroupState = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_GROUPING);
-		if (previouslySavedGroupState != null)
-			setGroupState(previouslySavedGroupState);
+		loadGridLayout(folder);
 	}
 }

@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
+import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.frontend.client.dashboard.dashlet.TagCloudDashlet;
 import com.smartgwt.client.widgets.events.ResizedEvent;
 import com.smartgwt.client.widgets.events.ResizedHandler;
@@ -55,7 +56,12 @@ public class TagsDashboard extends PortalLayout {
 		tags = new TagsPortlet();
 		addPortlet(tags, 0, 1);
 
-		cloud = new TagCloudDashlet(0);
+		GUIDashlet tagsDashlet=new GUIDashlet();
+		tagsDashlet.setName("tagcloud");
+		tagsDashlet.setTitle("tagcloud");
+		tagsDashlet.setType("content");
+		tagsDashlet.setId(0L);
+		cloud = new TagCloudDashlet(tagsDashlet);
 		addPortlet(cloud, 1, 0);
 
 		cloud.refresh();

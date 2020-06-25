@@ -2,8 +2,6 @@ package com.logicaldoc.core.document.dao;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,6 +9,8 @@ import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.security.User;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateVersionDAO</code>

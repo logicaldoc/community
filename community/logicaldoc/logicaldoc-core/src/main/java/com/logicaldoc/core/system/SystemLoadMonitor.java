@@ -52,6 +52,8 @@ public class SystemLoadMonitor {
 	 * <li>first value: the 'average cpu usage' for the whole system</li>
 	 * <li>second value: the 'average cpu usage' for the JVM process</li>
 	 * </ol>
+	 * 
+	 * @return average CPU load infos
 	 */
 	public int[] getAverageCpuLoad() {
 		return averageCpuLoad;
@@ -60,6 +62,8 @@ public class SystemLoadMonitor {
 	/**
 	 * Check if the 'recent' CPU load is over the limit defined in 'load.cpumax'
 	 * config parameter.
+	 * 
+	 * @return if the CPU is overloaded
 	 */
 	public boolean isCpuOverLoaded() {
 		int cpumax = config.getInt("load.cpumax", 50);
@@ -75,6 +79,8 @@ public class SystemLoadMonitor {
 	 * <li>first value: the 'recent cpu usage' for the whole system</li>
 	 * <li>second value: the 'recent cpu usage' for the JVM process</li>
 	 * </ol>
+	 * 
+	 * @return current CPU load infos
 	 */
 	public int[] getCpuLoad() {
 		return new int[] { 0, 0 };
@@ -83,6 +89,8 @@ public class SystemLoadMonitor {
 	/**
 	 * Check if the 'average' CPU load is over the limit defined in
 	 * 'system.cpuload.max' config parameter.
+	 * 
+	 * @return if the CPU is overloaded
 	 */
 	public boolean isAverageCpuOverLoaded() {
 		int cpumax = config.getInt("load.cpumax", 50);

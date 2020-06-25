@@ -16,8 +16,9 @@ public abstract class EmailAccountDetailsTab extends VLayout {
 	protected ChangedHandler changedHandler;
 
 	/**
+	 * Constructor.
 	 * 
-	 * @param document The importFolder this instance refers to
+	 * @param account The email account this instance refers to
 	 * @param changedHandler The handler to be invoked in case of changes in the
 	 *        importFolder
 	 */

@@ -24,15 +24,14 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	public List<SystemMessage> findByRecipient(String recipient, int type, Integer read);
 
 	/**
-	 * This methods gets the number of messages for the specified recipient and
-	 * type, and optionally a specified read flag
+	 * This methods gets the number of unread messages for the specified
+	 * recipient and type.
 	 * 
 	 * @param recipient The recipient name
 	 * @param type The message type
-	 * @param read Optional flag
 	 * @return The number of messages
 	 */
-	public int getCount(String recipient, int type, Integer read);
+	public int getUnreadCount(String recipient, int type);
 
 	/**
 	 * Removes all system expired messages for the specified recipient
@@ -51,7 +50,7 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	/**
 	 * This method selects all the messages for the specified type
 	 * 
-	 * @param recipient The recipient name
+	 * @param type type of the message
 	 * @return The list of messages with the given type
 	 */
 	public List<SystemMessage> findByType(int type);
@@ -60,7 +59,7 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * This method selects all the messages for the specified mode
 	 * 
 	 * @param mode The message mode
-	 * @return The list of messages with the given mode
+	 * @return The list of messages of the given mode
 	 */
 	public List<SystemMessage> findByMode(String mode);
 
@@ -71,6 +70,8 @@ public interface SystemMessageDAO extends PersistentObjectDAO<SystemMessage> {
 	 * 
 	 * @param type The message type
 	 * @param maxTrials The maximum number of sending trials
+	 * 
+	 * @return The list of messages of the given type
 	 */
 	public List<SystemMessage> findMessagesToBeSent(int type, int maxTrials);
 }

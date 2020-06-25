@@ -80,7 +80,7 @@ public class TagsForm extends VLayout {
 
 		HLayout vocabulary = new HLayout();
 		vocabulary.setMargin(5);
-		vocabulary.setMembersMargin(10);		
+		vocabulary.setMembersMargin(10);
 		vocabulary.setHeight(1);
 
 		vocabularyForm = new DynamicForm();
@@ -172,7 +172,7 @@ public class TagsForm extends VLayout {
 
 	private void executeSearch(ListGridRecord record) {
 		searchTag(record.getAttributeAsString("word"),
-				new Boolean(otherCharForm.getValueAsString(SEARCHINHITS)).booleanValue());
+				Boolean.parseBoolean(otherCharForm.getValueAsString(SEARCHINHITS)));
 	}
 
 	private void showContextMenu(boolean admin) {
@@ -264,6 +264,9 @@ public class TagsForm extends VLayout {
 
 	/**
 	 * Launches the search for one tag
+	 * 
+	 * @param word the tag to search
+	 * @param searchInHits if the search must be done in the current hits
 	 */
 	public static void searchTag(String word, boolean searchInHits) {
 		MainPanel.get().selectSearchTab();

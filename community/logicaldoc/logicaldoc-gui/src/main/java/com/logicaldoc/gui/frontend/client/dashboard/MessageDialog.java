@@ -65,28 +65,35 @@ public class MessageDialog extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("sendmessage"));
+		setWidth(580);
+		setHeight(570);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
-		setWidth(450);
-		setHeight(510);
 		centerInPage();
+		setPadding(5);
+		setAutoSize(false);
 
+		int formColumns=2;
+		form.setWidth100();
 		form.setMargin(3);
 		form.setTitleOrientation(TitleOrientation.TOP);
-		form.setNumCols(1);
+		form.setNumCols(formColumns);
 
 		TextItem subject = ItemFactory.newTextItem("subject", "subject", "");
 		subject.setRequired(true);
-		subject.setWidth(250);
+		subject.setWidth("*");
+		subject.setColSpan(formColumns);
 
 		final TextAreaItem message = ItemFactory.newTextAreaItem("message", "message", null);
-		message.setHeight(60);
-		message.setWidth(400);
+		message.setHeight(160);
+		message.setWidth("*");
+		message.setColSpan(formColumns);
 
 		final CheckboxItem confirmation = new CheckboxItem();
 		confirmation.setName("confirmation");
 		confirmation.setTitle(I18N.message("confirmation"));
+		confirmation.setEndRow(true);
 
 		IntegerItem validity = ItemFactory.newIntegerItem("validity", I18N.message("validity"), 1);
 		IntegerRangeValidator integerRangeValidator = new IntegerRangeValidator();
@@ -100,7 +107,6 @@ public class MessageDialog extends Window {
 		send.setTitle(I18N.message("send"));
 		send.setAutoFit(true);
 		send.setMargin(3);
-		send.setHeight(30);
 		send.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				form.validate();
@@ -143,6 +149,8 @@ public class MessageDialog extends Window {
 
 		HLayout buttons = new HLayout();
 		buttons.setMembers(send);
+		buttons.setHeight(30);
+		buttons.setWidth100();
 
 		SectionStack recipientsStack = prepareRecipientsGrid();
 

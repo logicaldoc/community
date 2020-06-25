@@ -239,7 +239,7 @@ public class VIASettingsPanel extends AdminPanel {
 		separator.setHeight(20);
 		separator.setWidth100();
 
-		layout.setMembers(settingsForm, separator, emailForm, buttons);
+		layout.setMembers(settingsForm, separator, emailForm, separator, buttons);
 
 		body.addMember(layout);
 	}

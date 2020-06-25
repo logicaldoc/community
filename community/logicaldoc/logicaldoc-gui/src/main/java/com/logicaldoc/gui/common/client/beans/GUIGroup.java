@@ -13,15 +13,17 @@ public class GUIGroup implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private long id;
-
+	
 	private String name = "";
+	
+	private String source;
 
 	private String description = "";
 
 	public static int TYPE_DEFAULT = 0;
 
 	public static int TYPE_USER = 1;
-
+	
 	private int type = TYPE_DEFAULT;
 
 	// Optional group from which to import policies
@@ -65,5 +67,13 @@ public class GUIGroup implements Serializable {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

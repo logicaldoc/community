@@ -60,7 +60,7 @@ public class ChangePassword extends Window {
 
 		PasswordItem password = new PasswordItem();
 		password.setName(PASSWORD);
-		password.setTitle(I18N.message(PASSWORD));
+		password.setTitle(I18N.message("currentpassword"));
 		password.setRequired(true);
 
 		MatchesFieldValidator equalsValidator = new MatchesFieldValidator();
@@ -99,7 +99,7 @@ public class ChangePassword extends Window {
 					}
 
 					loginService.changePassword(user.getId(), vm.getValueAsString(PASSWORD),
-							vm.getValueAsString(NEWPASSWORD), true, new AsyncCallback<Integer>() {
+							vm.getValueAsString(NEWPASSWORD), new AsyncCallback<Integer>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -120,6 +120,7 @@ public class ChangePassword extends Window {
 									} else {
 										// Close the popup
 										ChangePassword.this.destroy();
+										SC.say(I18N.message("yourpasswordhaschanged"));
 										Log.info(I18N.message("event.user.passwordchanged"), null);
 									}
 								}

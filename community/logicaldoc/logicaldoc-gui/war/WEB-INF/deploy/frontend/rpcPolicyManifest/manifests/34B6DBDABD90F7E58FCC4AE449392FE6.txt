@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.MessageService
+path: 647D591E89D16B3AF47A1EF34FEC7B62.gwt.rpc

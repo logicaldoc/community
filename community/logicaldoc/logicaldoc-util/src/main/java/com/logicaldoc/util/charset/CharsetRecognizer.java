@@ -13,8 +13,6 @@ package com.logicaldoc.util.charset;
  * state pertaining to a specific match or detect operation.
  * The WILL be shared by multiple instances of CharsetDetector.
  * They encapsulate const charset-specific information.
- * 
- * @internal
  */
 abstract class CharsetRecognizer {
     /**
@@ -39,9 +37,9 @@ abstract class CharsetRecognizer {
      * @param det  The CharsetDetector, which contains the input text
      *             to be checked for being in this charset.
      * @return     Two values packed into one int  (Damn java, anyhow)
-     *             <br/>
+     *             <br>
      *             bits 0-7:  the match confidence, ranging from 0-100
-     *             <br/>
+     *             <br>
      *             bits 8-15: The match reason, an enum-like value.
      */
     abstract int         match(CharsetDetector det);

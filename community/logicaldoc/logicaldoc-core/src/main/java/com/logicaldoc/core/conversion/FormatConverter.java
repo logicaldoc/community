@@ -22,7 +22,8 @@ public interface FormatConverter {
 	 * @param src The source file
 	 * @param dest The converted file, the extension of it's filename defines
 	 *        the output format
-	 * @throws IOException
+	 *        
+	 * @throws IOException raised if the conversion resulted in an error
 	 */
 	public void convert(File src, File dest) throws IOException;
 
@@ -34,7 +35,8 @@ public interface FormatConverter {
 	 * @param src The source file
 	 * @param dest The converted file, the extension of it's filename defines
 	 *        the output format
-	 * @throws IOException
+	 *        
+	 * @throws IOException raised if the conversion resulted in an error
 	 */
 	public void convert(String sid, Document document, File src, File dest) throws IOException;
 
@@ -42,16 +44,24 @@ public interface FormatConverter {
 	 * Implementations should return the list of the required parameters. A
 	 * parameter is stored in the context as converter.SimpleClassName.parameter
 	 * = value
+	 * 
+	 * @return list of the configuration parameters
 	 */
 	public List<String> getParameterNames();
 
 	/**
 	 * Returns the map of parameters
+	 * 
+	 * @return map <b>param_name</b> = <b>param_value</b>
 	 */
 	public Map<String, String> getParameters();
 
 	/**
 	 * Gets the value of a parameter
+	 * 
+	 * @param name name of the configuration parameter
+	 * 
+	 * @return the value of the configuration parameter
 	 */
 	public String getParameter(String name);
 
@@ -62,11 +72,15 @@ public interface FormatConverter {
 
 	/**
 	 * Checks if the converter is enabled or not
+	 * 
+	 * @return if the converter is enabled
 	 */
 	public boolean isEnabled();
 
 	/**
 	 * Enables or disables the converter
+	 * 
+	 * @param enabled the enabled flag
 	 */
 	public void setEnabled(boolean enabled);
 }

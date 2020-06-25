@@ -7,13 +7,16 @@ import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -72,17 +75,51 @@ public class BarcodeQueuePanel extends VLayout {
 		toolStrip.setWidth100();
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
-		toolStrip.addButton(display);
-		toolStrip.addFormItem(max);
 		display.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (max.validate()) {
 					maxRecords = (Integer) max.getValue();
-					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, 0,false));
+					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false, false));
 				}
 			}
 		});
+
+		ToolStripButton reschedule = new ToolStripButton();
+		reschedule.setTitle(I18N.message("rescheduleallprocessing"));
+		reschedule.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				LD.ask(I18N.message("rescheduleallprocessing"), I18N.message("rescheduleallprocessingask"),
+						new BooleanCallback() {
+
+							@Override
+							public void execute(Boolean value) {
+								if (value)
+									BarcodeService.Instance.get().rescheduleAll(new AsyncCallback<Void>() {
+
+										@Override
+										public void onFailure(Throwable caught) {
+											Log.serverError(caught);
+										}
+
+										@Override
+										public void onSuccess(Void ret) {
+											Log.info(I18N.message("docsrescheduledprocessing"), null);
+											maxRecords = (Integer) max.getValue();
+											list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false,
+													false));
+										}
+									});
+							}
+						});
+			}
+		});
+
+		toolStrip.addButton(display);
+		toolStrip.addFormItem(max);
+		toolStrip.addSeparator();
+		toolStrip.addButton(reschedule);
 
 		// Prepare a panel containing a title and the documents number
 		infoPanel = new InfoPanel("");
@@ -204,7 +241,7 @@ public class BarcodeQueuePanel extends VLayout {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new DocumentsDS(null, null, maxRecords, 1, null, 0, false));
+		list.setDataSource(new DocumentsDS(null, null, maxRecords, 1, null, true, false, false));
 		list.setFields(locked, immutable, icon, filename, size, lastModified, version, publisher, published, creator,
 				created, customId);
 
@@ -215,6 +252,19 @@ public class BarcodeQueuePanel extends VLayout {
 		final ListGridRecord[] selection = list.getSelectedRecords();
 
 		Menu contextMenu = new Menu();
+
+		MenuItem openInFolder = new MenuItem();
+		openInFolder.setTitle(I18N.message("openinfolder"));
+		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				ListGridRecord record = list.getSelectedRecord();
+				if (record == null)
+					return;
+
+				DocumentsPanel.get().openInFolder(record.getAttributeAsLong("id"));
+			}
+		});
+
 		MenuItem markUnprocessable = new MenuItem();
 		markUnprocessable.setTitle(I18N.message("markunprocessable"));
 		markUnprocessable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
@@ -242,7 +292,7 @@ public class BarcodeQueuePanel extends VLayout {
 			}
 		});
 
-		contextMenu.setItems(markUnprocessable);
+		contextMenu.setItems(markUnprocessable, openInFolder);
 		contextMenu.showContextMenu();
 	}
 }

@@ -13,12 +13,15 @@ import java.util.Date;
  */
 public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
+	public static final String[] FORBIDDEN_NAMES = new String[] { "date", "fileName", "fileSize", "creation", "creator",
+			"version", "fileVersion", "published", "publisher", "name", "description" };
+
 	private static final long serialVersionUID = 1L;
 
 	public static final int TYPE_STRING_PRESET = -1;
 
 	public static final int TYPE_STRING_TEXTAREA = -2;
-	
+
 	public static final int TYPE_STRING = 0;
 
 	public static final int TYPE_INT = 1;
@@ -31,12 +34,14 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	public static final int TYPE_BOOLEAN = 5;
 
+	public static final int TYPE_FOLDER = 6;
+
 	public static final int EDITOR_DEFAULT = 0;
 
 	public static final int EDITOR_LISTBOX = 1;
 
 	public static final int EDITOR_TEXTAREA = 2;
-	
+
 	private int editor = EDITOR_DEFAULT;
 
 	private String stringValue;
@@ -53,6 +58,12 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	private boolean mandatory = false;
 
+	private boolean hidden = false;
+
+	private boolean multiple = false;
+
+	private String parent;
+
 	private int position = 0;
 
 	private String name;
@@ -65,6 +76,16 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	// Optional array of possible values
 	private String[] options;
+
+	private String stringValues;
+
+	public static boolean isForbidden(String name) {
+		for (String forbidden : FORBIDDEN_NAMES) {
+			if (forbidden.equals(name))
+				return true;
+		}
+		return false;
+	}
 
 	public String getStringValue() {
 		return stringValue;
@@ -125,6 +146,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 			return getBooleanValue();
 		case TYPE_USER:
 			return getIntValue();
+		case TYPE_FOLDER:
+			return getIntValue();
 		}
 		return null;
 	}
@@ -143,7 +166,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 			setIntValue((Long) value);
 		} else if (value instanceof Integer) {
 			this.type = TYPE_INT;
-			setIntValue(new Long(((Integer) value).intValue()));
+			setIntValue(Long.parseLong(value.toString()));
 		} else if (value instanceof Boolean) {
 			this.type = TYPE_BOOLEAN;
 			setBooleanValue((Boolean) value);
@@ -154,9 +177,13 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 			this.type = TYPE_DATE;
 			setDateValue((Date) value);
 		} else if (value instanceof GUIUser) {
-			this.type = TYPE_USER;
 			setIntValue(((GUIUser) value).getId());
 			setStringValue(((GUIUser) value).getFullName());
+			this.type = TYPE_USER;
+		} else if (value instanceof GUIFolder) {
+			setIntValue(((GUIFolder) value).getId());
+			setStringValue(((GUIFolder) value).getName());
+			this.type = TYPE_FOLDER;
 		} else if (value == null) {
 			setStringValue(null);
 			setDoubleValue(null);
@@ -164,8 +191,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 			setDateValue(null);
 			setBooleanValue(null);
 		} else {
-			throw new IllegalArgumentException("Not a String, Long, Double, Boolean, Date or User value: "
-					+ value.getClass().getName());
+			throw new IllegalArgumentException(
+					"Not a String, Long, Double, Boolean, Date, User or Folder value: " + value.getClass().getName());
 		}
 	}
 
@@ -178,7 +205,9 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	}
 
 	/**
-	 * This is the position of the attribute into the attributes list.
+	 * This is the position of the attribute into the attributes list
+	 * 
+	 * @return the position
 	 */
 	public int getPosition() {
 		return position;
@@ -190,7 +219,10 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	@Override
 	public int compareTo(GUIAttribute o) {
-		return new Integer(getPosition()).compareTo(o.getPosition());
+		if (o.getPosition() == getPosition())
+			return getName().compareTo(o.getName());
+		else
+			return Integer.valueOf(getPosition()).compareTo(o.getPosition());
 	}
 
 	public String getName() {
@@ -254,5 +286,67 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		if (getLabel() != null && !"".equals(getLabel()))
 			display = getLabel();
 		return display;
+	}
+
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+
+	public boolean isMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
+	}
+
+	public String getParent() {
+		return parent;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
+	}
+
+	public GUIAttribute clone() {
+		GUIAttribute newAttr = new GUIAttribute();
+		newAttr.setBooleanValue(booleanValue);
+		newAttr.setDateValue(dateValue);
+		newAttr.setEditor(editor);
+		newAttr.setDoubleValue(doubleValue);
+		newAttr.setHidden(hidden);
+		newAttr.setIntValue(intValue);
+		newAttr.setLabel(label);
+		newAttr.setMandatory(mandatory);
+		newAttr.setMultiple(multiple);
+		newAttr.setName(name);
+		newAttr.setOptions(options);
+		newAttr.setPosition(position);
+		newAttr.setSet(set);
+		newAttr.setSetId(setId);
+		newAttr.setStringValue(stringValue);
+		newAttr.setParent(parent);
+		newAttr.setOptions(options);
+		newAttr.setStringValues(stringValues);
+		newAttr.setType(type);
+
+		return newAttr;
+	}
+
+	@Override
+	public String toString() {
+		return getName() + "=" + getValue();
+	}
+
+	public String getStringValues() {
+		return stringValues;
+	}
+
+	public void setStringValues(String stringValues) {
+		this.stringValues = stringValues;
 	}
 }

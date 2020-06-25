@@ -12,7 +12,7 @@ import com.logicaldoc.gui.frontend.client.tenant.TenantKeystorePanel;
  */
 public class KeystorePanel extends AdminPanel {
 	public KeystorePanel() {
-		super("virtualagent");
+		super("keystore");
 		body.setMembers(new TenantKeystorePanel(Session.get().getTenantId()));
 	}
 }

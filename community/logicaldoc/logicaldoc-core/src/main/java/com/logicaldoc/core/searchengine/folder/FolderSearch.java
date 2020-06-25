@@ -6,22 +6,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.Search;
+import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -35,52 +35,44 @@ public class FolderSearch extends Search {
 	public FolderSearch() {
 	}
 
-	/**
-	 * Retrieve the maximum number of folder ids to use in a query (in the IN
-	 * clause).
-	 */
-	private long getQueryMaxFolderIds() {
-		ContextProperties config = Context.get().getProperties();
-		long max = config.getLong("query.maxfolderids", Long.MAX_VALUE);
-		if (max <= 0)
-			max = Long.MAX_VALUE;
-		return max;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public void internalSearch() throws Exception {
-		Collection<Long> accessibleFolderIds = findAccessibleFolderIds();
-		Object[] params = prepareExpression(accessibleFolderIds);
+	public void internalSearch() throws SearchException {
+		UserDAO userDAO = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDAO.findById(options.getUserId());
+		userDAO.initialize(user);
+
+		Object[] params = prepareExpression();
 		options.setParameters(params);
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		// Execute the search
-		List<Hit> folders = (List<Hit>) dao.query(options.getExpression(), params, new HitMapper(),
-				options.getMaxHits());
+		List<Hit> folders;
+		try {
+			folders = (List<Hit>) dao.query(options.getExpression(), params, new HitMapper(), null);
+		} catch (PersistenceException e) {
+			throw new SearchException(e);
+		}
+		estimatedHitsNumber = folders.size();
 
-		if (accessibleFolderIds.size() <= getQueryMaxFolderIds()) {
-			// Security checks were already considered in the search query
-			hits = folders;
-		} else {
-			// Due to high IDs number we have to apply security checks
-			hits.clear();
-
-			// Filter the folders with the accessible IDs
-			hits = folders.stream().filter(f -> accessibleFolderIds.contains(f.getId())).collect(Collectors.toList());
+		// Traverse the results checking visibility and count
+		Collection<Long> accessibleFolderIds = findAccessibleFolderIds(user);
+		for (Hit folder : folders) {
+			if (accessibleFolderIds.contains(folder.getId())
+					|| (accessibleFolderIds.isEmpty() && user.isMemberOf("admin")))
+				hits.add(folder);
+			if (hits.size() >= options.getMaxHits())
+				break;
 		}
 
-		moreHitsPresent = hits.size() >= options.getMaxHits();
-		if (moreHitsPresent)
-			estimatedHitsNumber = hits.size() + 1;
-		else
+		if (hits.size() < options.getMaxHits())
 			estimatedHitsNumber = hits.size();
 	}
 
 	/**
 	 * Utility method that prepares the query expression
 	 */
-	private Object[] prepareExpression(Collection<Long> accessibleFolderIds) {
+	private Object[] prepareExpression() {
 		if (StringUtils.isNotEmpty(options.getExpression()))
 			return options.getParameters();
 
@@ -88,30 +80,32 @@ public class FolderSearch extends Search {
 
 		StringBuffer query = new StringBuffer();
 
-		if (options.getRetrieveAliases() == 1)
+		if (options.isRetrieveAliases())
 			query.append("(");
 
 		// Find all real folders
-		query.append("select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid ");
+		query.append(
+				"select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid ");
 		query.append(" from ld_folder A ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
 
-		appendWhereClause(false, params, query, accessibleFolderIds);
+		appendWhereClause(false, params, query);
 
-		if (options.getRetrieveAliases() == 1) {
+		if (options.isRetrieveAliases()) {
 			// Append all aliases
-			query.append(") UNION (select A.ld_id, A.ld_parentid, A.ld_name, REF.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid ");
+			query.append(
+					") UNION (select A.ld_id, A.ld_parentid, A.ld_name, REF.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid ");
 			query.append(" from ld_folder A ");
 			query.append(" join ld_folder REF on A.ld_foldref=REF.ld_id ");
 			query.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
-			appendWhereClause(true, params, query, accessibleFolderIds);
+			appendWhereClause(true, params, query);
 			query.append(")");
 		}
 
 		options.setExpression(query.toString());
 
-		log.info("executing query=" + query.toString());
-		log.info("with parameters=" + params);
+		log.info("executing query {}", query.toString());
+		log.info("with parameters {}", params);
 
 		return params.toArray();
 	}
@@ -125,8 +119,7 @@ public class FolderSearch extends Search {
 	 * @param params
 	 * @param query
 	 */
-	private void appendWhereClause(boolean searchAliases, ArrayList<Object> params, StringBuffer query,
-			Collection<Long> accessibleFolderIds) {
+	private void appendWhereClause(boolean searchAliases, ArrayList<Object> params, StringBuffer query) {
 		String tableAlias = "A";
 		if (searchAliases)
 			tableAlias = "REF";
@@ -141,7 +134,7 @@ public class FolderSearch extends Search {
 		if (((FolderSearchOptions) options).getCriteria() != null)
 			for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
 				if (criterion.isExtendedAttribute()) {
-					if (!criterion.isNull()) {
+					if (!criterion.isEmpty()) {
 						counter++;
 						query.append(", ld_folder_ext C" + counter);
 						if ("or".equals(options.getTopOperator()))
@@ -164,6 +157,17 @@ public class FolderSearch extends Search {
 		if (options.getTemplate() != null)
 			query.append(" and " + tableAlias + ".ld_templateid=" + options.getTemplate());
 
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderSearchOptions fOptions = (FolderSearchOptions) options;
+		if (fOptions.getFolderId() != null) {
+			query.append(" and ");
+			if (fOptions.isSearchInSubPath()) {
+				String path = dao.computePath(fOptions.getFolderId());
+				query.append(tableAlias + ".ld_path like '" + path + "/%'");
+			} else
+				query.append(tableAlias + ".ld_parentid = " + fOptions.getFolderId());
+		}
+
 		String composition = null;
 		if ("not".equals(options.getTopOperator())) {
 			composition = "and not";
@@ -175,8 +179,8 @@ public class FolderSearch extends Search {
 		 * If a top operator was specified, it will overwrite all criteria
 		 * operators
 		 */
-		if (composition != null && ((FolderSearchOptions) options).getCriteria() != null)
-			for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria())
+		if (composition != null && fOptions.getCriteria() != null)
+			for (FolderCriterion criterion : fOptions.getCriteria())
 				criterion.setComposition(composition);
 
 		if (searchAliases)
@@ -184,37 +188,13 @@ public class FolderSearch extends Search {
 		else
 			query.append(" and A.ld_foldref is null ");
 
-		/*
-		 * Filter on the folders the user can access
-		 */
-		if (!accessibleFolderIds.isEmpty() && accessibleFolderIds.size() <= getQueryMaxFolderIds()) {
-			/*
-			 * This approach pre-calculate the accessible IDs and puts them in
-			 * IN clauses.<br /> Oracle cannot handle more than 1000 elements in
-			 * a single in clause so the whole list is partitioned
-			 */
-			query.append(" and ( ");
-			List<List<Long>> folderId = org.apache.commons.collections4.ListUtils.partition(new ArrayList<Long>(
-					accessibleFolderIds), 1000);
-			int i = 0;
-			for (List<Long> list : folderId) {
-				if (i > 0)
-					query.append(" or ");
-				query.append(" A.ld_id in (");
-				query.append(list.toString().replace('[', ' ').replace(']', ' '));
-				query.append(") ");
-				i++;
-			}
-			query.append(" ) ");
-		}
-
 		// Now add all criteria
 		boolean first = true;
 		counter = 0;
 
-		if (options != null && ((FolderSearchOptions) options).getCriteria() != null)
-			for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
-				if (criterion.isNull() || criterion.getType() == FolderCriterion.TYPE_FOLDER)
+		if (options != null && fOptions.getCriteria() != null)
+			for (FolderCriterion criterion : fOptions.getCriteria()) {
+				if (criterion.isEmpty())
 					continue;
 
 				if (first) {
@@ -233,17 +213,19 @@ public class FolderSearch extends Search {
 					if (!"or".equals(options.getTopOperator()) || counter == 0)
 						counter++;
 					query.append("(C" + counter + ".ld_folderid=" + tableAlias + ".ld_id");
-					query.append(" and C" + counter + ".ld_name='");
+					query.append(" and (C" + counter + ".ld_name='");
 					query.append(criterion.getFieldName());
-					query.append("' and ");
+					query.append("' or C" + counter + ".ld_name like '");
+					query.append(criterion.getFieldName());
+					query.append("-%') and ");
 					columnName = "C" + counter + ".";
 					switch (criterion.getType()) {
 					case Attribute.TYPE_STRING:
 						columnName += "ld_stringvalue";
 						break;
 					case Attribute.TYPE_INT:
-						columnName += "ld_intvalue";
-						break;
+					case Attribute.TYPE_USER:
+					case Attribute.TYPE_FOLDER:
 					case Attribute.TYPE_BOOLEAN:
 						columnName += "ld_intvalue";
 						break;
@@ -267,78 +249,138 @@ public class FolderSearch extends Search {
 				case Attribute.TYPE_STRING:
 					if (options.isCaseSensitive()) {
 						String val = SqlUtil.doubleQuotes(criterion.getStringValue());
-						if (FolderCriterion.OPERATOR_EQUAL.equals(criterion.getOperator()))
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
 							query.append(columnName + " = '" + val + "'");
 						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
 							query.append("(not " + columnName + " = '" + val + "')");
-						else if ("contains".equals(criterion.getOperator()))
+						else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
 							query.append(columnName + " like '%" + val + "%'");
-						else if ("notcontains".equals(criterion.getOperator()))
-							query.append(" (" + columnName + " is null or not (" + columnName + " like '%" + val
-									+ "%'))");
+						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
+							query.append(
+									" (" + columnName + " is null or not (" + columnName + " like '%" + val + "%'))");
+						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
+							query.append(columnName + " is null ");
+						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
+							query.append(columnName + " is not null ");
 					} else {
 						String val = SqlUtil.doubleQuotes(criterion.getStringValue().toLowerCase());
-						if (FolderCriterion.OPERATOR_EQUAL.equals(criterion.getOperator()))
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
 							query.append("lower(" + columnName + ") = '" + val + "'");
 						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
 							query.append("(not lower(" + columnName + ") = '" + val + "')");
-						else if ("contains".equals(criterion.getOperator()))
+						else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
 							query.append("lower(" + columnName + ") like '%" + val + "%'");
-						else if ("notcontains".equals(criterion.getOperator()))
+						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
 							query.append(" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val
 									+ "%')");
+						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
+							query.append(columnName + " is null ");
 						break;
 					}
 					break;
 				case Attribute.TYPE_INT:
-					params.add(criterion.getLongValue());
-					if (FolderCriterion.OPERATOR_EQUAL.equals(criterion.getOperator()))
-						query.append(columnName + " = ?");
-					else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-						query.append("(not " + columnName + " = ?)");
-					else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-						query.append(columnName + " > ?");
-					else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-						query.append(columnName + " < ?");
+					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is null ");
+					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is not null ");
+					} else {
+						params.add(criterion.getLongValue());
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+							query.append(columnName + " = ?");
+						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+							query.append("(not " + columnName + " = ?)");
+						else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
+							query.append(columnName + " > ?");
+						else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
+							query.append(columnName + " < ?");
+					}
+					break;
+				case Attribute.TYPE_FOLDER:
+				case Attribute.TYPE_USER:
+					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is null ");
+					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is not null ");
+					} else {
+						params.add(criterion.getLongValue());
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+							query.append(columnName + " = ?");
+						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+							query.append("(not " + columnName + " = ?)");
+					}
 					break;
 				case Attribute.TYPE_BOOLEAN:
-					if (criterion.getLongValue() == null)
-						params.add(null);
-					else
+					if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator())) {
 						params.add(criterion.getLongValue());
-					query.append(columnName + " = ?");
+						query.append(columnName + " = ?");
+					} else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is null ");
+					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is not null ");
+					}
 					break;
 				case Attribute.TYPE_DOUBLE:
-					params.add(criterion.getDoubleValue());
-					if (FolderCriterion.OPERATOR_EQUAL.equals(criterion.getOperator()))
-						query.append(columnName + " = ?");
-					else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-						query.append("(not " + columnName + " = ?)");
-					else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-						query.append(columnName + " > ?");
-					else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-						query.append(columnName + " < ?");
+					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is null ");
+					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is not null ");
+					} else {
+						params.add(criterion.getDoubleValue());
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+							query.append(columnName + " = ?");
+						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+							query.append("(not " + columnName + " = ?)");
+						else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
+							query.append(columnName + " > ?");
+						else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
+							query.append(columnName + " < ?");
+					}
 					break;
 				case Attribute.TYPE_DATE:
-					params.add(criterion.getSqlDateValue());
-					if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-						query.append(columnName + " > ?");
-					else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-						query.append(columnName + " < ?");
+					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is null ");
+					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is not null ");
+					} else {
+						params.add(criterion.getSqlDateValue());
+						if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
+							query.append(columnName + " > ?");
+						else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
+							query.append(columnName + " < ?");
+					}
 					break;
 				case FolderCriterion.TYPE_TEMPLATE:
-					params.add(criterion.getLongValue());
-					if (FolderCriterion.OPERATOR_EQUAL.equals(criterion.getOperator()))
-						query.append(columnName + " = ?");
-					else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-						query.append("(not " + columnName + " = ?)");
+					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is null ");
+					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is not null ");
+					} else {
+						params.add(criterion.getLongValue());
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+							query.append(columnName + " = ?");
+						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+							query.append("(not " + columnName + " = ?)");
+					}
 					break;
 				case FolderCriterion.TYPE_LANGUAGE:
-					String val2 = criterion.getStringValue();
-					if (FolderCriterion.OPERATOR_EQUAL.equals(criterion.getOperator()))
-						query.append(columnName + " = '" + val2 + "'");
-					else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-						query.append("(not " + columnName + " = '" + val2 + "')");
+					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is null ");
+					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+						query.append(columnName + " is not null ");
+					} else {
+						String val2 = criterion.getStringValue();
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+							query.append(columnName + " = '" + val2 + "'");
+						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+							query.append("(not " + columnName + " = '" + val2 + "')");
+					}
+					break;
+				case FolderCriterion.TYPE_FOLDER:
+					if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
+						String path = dao.computePath(criterion.getLongValue());
+						query.append(tableAlias + ".ld_path like '" + path + "/%'");
+					} else
+						query.append(columnName + " = " + criterion.getLongValue());
 					break;
 				}
 
@@ -360,11 +402,7 @@ public class FolderSearch extends Search {
 		}
 	}
 
-	private Collection<Long> findAccessibleFolderIds() {
-		UserDAO userDAO = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = userDAO.findById(options.getUserId());
-		userDAO.initialize(user);
-
+	private Collection<Long> findAccessibleFolderIds(User user) {
 		Collection<Long> ids = new HashSet<Long>();
 		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -372,9 +410,9 @@ public class FolderSearch extends Search {
 		if (((FolderSearchOptions) options).getCriteria() != null)
 			for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
 				if (criterion.getType() == FolderCriterion.TYPE_FOLDER) {
-					if (!criterion.isNull()) {
+					if (!criterion.isEmpty()) {
 						if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
-							ids.addAll(folderDAO.findFolderIdByUserId(user.getId(), criterion.getLongValue(), true));
+							ids.addAll(folderDAO.findFolderIdByUserIdInPath(user.getId(), criterion.getLongValue()));
 						} else if (folderDAO.isReadEnabled(criterion.getLongValue(), user.getId())) {
 							ids.add(criterion.getLongValue());
 						}
@@ -387,7 +425,7 @@ public class FolderSearch extends Search {
 		 * collect all accessible folders.
 		 */
 		if (ids.isEmpty() && !user.isMemberOf("admin"))
-			ids = folderDAO.findFolderIdByUserId(options.getUserId(), null, true);
+			ids = folderDAO.findFolderIdByUserIdInPath(options.getUserId(), null);
 
 		return ids;
 	}
@@ -416,11 +454,11 @@ public class FolderSearch extends Search {
 			hit.setCreation(rs.getTimestamp(5));
 			hit.setComment(rs.getString(4));
 			hit.setPublished(1);
-			
-			if (rs.getLong(10) != 0){
+
+			if (rs.getLong(10) != 0) {
 				hit.setTemplateId(rs.getLong(10));
 				hit.setTemplateName(rs.getString(9));
-				Template t=new Template();
+				Template t = new Template();
 				t.setId(rs.getLong(10));
 				t.setName(rs.getString(9));
 				hit.setTemplate(t);

@@ -1,12 +1,17 @@
 package com.logicaldoc.gui.frontend.client.impex;
 
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Menu;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.impex.archives.ExportArchivesPanel;
 import com.logicaldoc.gui.frontend.client.impex.archives.ImportArchivesPanel;
+import com.logicaldoc.gui.frontend.client.impex.converters.FormatConvertersPanel;
 import com.logicaldoc.gui.frontend.client.impex.email.EmailAccountsPanel;
 import com.logicaldoc.gui.frontend.client.impex.folders.ImportFoldersPanel;
+import com.logicaldoc.gui.frontend.client.impex.syndication.SyndicationsPanel;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -23,6 +28,7 @@ public class ImpexMenu extends VLayout {
 	public ImpexMenu() {
 		setMargin(10);
 		setMembersMargin(5);
+		setOverflow(Overflow.AUTO);
 
 		Button importFolders = new Button(I18N.message("importfolders"));
 		importFolders.setWidth100();
@@ -90,6 +96,44 @@ public class ImpexMenu extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				AdminScreen.get().setContent(new ExportArchivesPanel());
+			}
+		});
+
+		Button converters = new Button(I18N.message("formatconverters"));
+		converters.setWidth100();
+		converters.setHeight(25);
+
+		if (Session.get().isDefaultTenant() && Feature.visible(Feature.FORMAT_CONVERSION)
+				&& Menu.enabled(Menu.FORMAT_CONVERTERS)) {
+			addMember(converters);
+			if (!Feature.enabled(Feature.FORMAT_CONVERSION)) {
+				converters.setDisabled(true);
+				converters.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+
+		converters.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new FormatConvertersPanel());
+			}
+		});
+
+		Button syndication = new Button(I18N.message("syndication"));
+		syndication.setWidth100();
+		syndication.setHeight(25);
+
+		if (Feature.visible(Feature.SYNDICATION) && Menu.enabled(Menu.SYNDICATION)) {
+			addMember(syndication);
+			if (!Feature.enabled(Feature.SYNDICATION)) {
+				syndication.setDisabled(true);
+				syndication.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+		syndication.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new SyndicationsPanel());
 			}
 		});
 	}

@@ -47,7 +47,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
 	protected boolean caseSensitive = true;
 
-	protected int retrieveAliases = 0;
+	protected boolean retrieveAliases = true;
 
 	/**
 	 * Optional set of document ids. If specified only documents inside this set
@@ -79,7 +79,11 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		this.parameters = parameters;
 	}
 
-	/** Creates a new instance of SearchOptions */
+	/**
+	 * Creates a new instance of SearchOptions
+	 * 
+	 * @param type the type of search
+	 */
 	public SearchOptions(int type) {
 		this.type = type;
 	}
@@ -193,14 +197,6 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		this.caseSensitive = caseSensitive;
 	}
 
-	public int getRetrieveAliases() {
-		return retrieveAliases;
-	}
-
-	public void setRetrieveAliases(int retrieveAliases) {
-		this.retrieveAliases = retrieveAliases;
-	}
-
 	public Long getFolderId() {
 		return folderId;
 	}
@@ -223,5 +219,13 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
 	public void setTenantId(Long tenantId) {
 		this.tenantId = tenantId;
+	}
+
+	public boolean isRetrieveAliases() {
+		return retrieveAliases;
+	}
+
+	public void setRetrieveAliases(boolean retrieveAliases) {
+		this.retrieveAliases = retrieveAliases;
 	}
 }

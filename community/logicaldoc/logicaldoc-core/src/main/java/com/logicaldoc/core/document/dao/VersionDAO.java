@@ -13,7 +13,7 @@ import com.logicaldoc.core.document.Version;
  */
 public interface VersionDAO extends PersistentObjectDAO<Version> {
 	/**
-	 * This method finds a version by the document's ID an the version code. <
+	 * This method finds a version by the document's ID an the version code.
 	 * 
 	 * @param docId ID of the document
 	 * @param version the version code
@@ -52,7 +52,7 @@ public interface VersionDAO extends PersistentObjectDAO<Version> {
 	/**
 	 * Updates the version's digest (SHA-1)
 	 * 
-	 * @param doc The version to be processed
+	 * @param version The version to be processed
 	 */
 	public void updateDigest(Version version);
 }

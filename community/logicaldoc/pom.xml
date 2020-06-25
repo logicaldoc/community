@@ -1,115 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-  <parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.logicaldoc</groupId>
+        <artifactId>logicaldoc-parent-pom</artifactId>
+        <version>94</version>
+    </parent>
     <groupId>com.logicaldoc</groupId>
-    <artifactId>logicaldoc-parent-pom</artifactId>
-    <version>87</version>
-  </parent>
-	<groupId>com.logicaldoc</groupId>
-	<artifactId>logicaldoc</artifactId>
-	<version>8.0.0</version>
-	<packaging>pom</packaging>
-	<name>logicaldoc</name>
-	<description>
-    LogicalDOC is an open-source enterprise class
-    Document Management System developed by
-    LogicalDOC Srl, based on the Java Platform.
-  </description>
-  <organization>
-		<name>LogicalDOC</name>
-		<url>http://www.logicaldoc.com</url>
-	</organization>
-  <url>http://www.logicaldoc.com</url>
-  <issueManagement>
-    <system>Mantis</system>
-    <url>http://bugs.logicaldoc.com</url>
-  </issueManagement>
-  <licenses>
-    <license>
-      <name>LGPLv3</name>
-      <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
-    </license>
-  </licenses>
-  <inceptionYear>2008</inceptionYear>
-	<developers>
-		<developer>
-			<name>Marco Meschieri</name>
-			<email>m.meschieri@logicaldoc.com</email>
-			<id>marco</id>
-			<organization>LogicalDOC</organization>
-			<organizationUrl>http://www.logicaldoc.com</organizationUrl>
-			<roles>
-				<role>designer</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<name>Alessandro Gasparini</name>
-			<email>a.gasparini@logicaldoc.com</email>
-			<id>alessandro</id>
-			<organization>LogicalDOC</organization>
-			<organizationUrl>http://www.logicaldoc.com</organizationUrl>
-			<roles>
-				<role>designer</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-    <developer>
-			<name>Matteo Caruso</name>
-			<email>m.caruso@logicalobjects.it</email>
-			<id>matteo</id>
-			<organization>LogicalDOC</organization>
-			<organizationUrl>http://www.logicalobjects.it</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
-			<name>Sebastian Wenzky</name>
-			<id>cheffilet</id>
-			<organization>Krypthonas.de</organization>
-			<organizationUrl>http://www.krypthonas.de</organizationUrl>
-			<roles>
-			    <role>designer</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+0</timezone>
-		</developer>		
-		<developer>
-			<name>Jesús Marín</name>
-			<id>jesus</id>
-			<organization>A.P.L. software</organization>
-			<organizationUrl>http://www.aplsoftware.com</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>+0</timezone>
-		</developer>
-	</developers>
-	
-	<scm>
-    <connection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/community/logicaldoc/trunk</connection>
-    <developerConnection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/community/logicaldoc/trunk</developerConnection>
-    <url>http://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/logicaldoc/trunk</url>
-  </scm>
-
-	<modules>
-		<module>logicaldoc-util</module>
-		<module>logicaldoc-core</module>
-		<module>logicaldoc-webservice</module>
-    <module>logicaldoc-webservicedoc</module>
-		<module>logicaldoc-webdav</module>
-    <module>logicaldoc-cmis</module>
-    <module>logicaldoc-dropbox</module>
-		<module>logicaldoc-i18n</module>
-    <module>logicaldoc-gui</module>
-    <module>logicaldoc-webapp</module>
-    <module>logicaldoc-benchmark</module>
-    <module>logicaldoc-webservicesamples</module>
-	</modules>
+    <artifactId>logicaldoc</artifactId>
+    <version>8.4.2</version>
+    <packaging>pom</packaging>
+    <name>logicaldoc</name>
+    <description>LogicalDOC is an open-source enterprise class Document Management System developed by LogicalDOC Srl, based on the Java Platform.</description>
+    <organization>
+        <name>LogicalDOC</name>
+        <url>http://www.logicaldoc.com</url>
+    </organization>
+    <url>http://www.logicaldoc.com</url>
+    <issueManagement>
+        <system>Mantis</system>
+        <url>http://bugs.logicaldoc.com</url>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>LGPLv3</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+        </license>
+    </licenses>
+    <inceptionYear>2008</inceptionYear>
+    <developers>
+        <developer>
+            <name>Marco Meschieri</name>
+            <email>m.meschieri@logicaldoc.com</email>
+            <id>marco</id>
+            <organization>LogicalDOC</organization>
+            <organizationUrl>http://www.logicaldoc.com</organizationUrl>
+            <roles>
+                <role>designer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <name>Alessandro Gasparini</name>
+            <email>a.gasparini@logicaldoc.com</email>
+            <id>alessandro</id>
+            <organization>LogicalDOC</organization>
+            <organizationUrl>http://www.logicaldoc.com</organizationUrl>
+            <roles>
+                <role>designer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <name>Matteo Caruso</name>
+            <email>m.caruso@logicalobjects.it</email>
+            <id>matteo</id>
+            <organization>Logical Objects</organization>
+            <organizationUrl>http://www.logicalobjects.it</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <name>Sebastian Wenzky</name>
+            <id>cheffilet</id>
+            <organization>Krypthonas.de</organization>
+            <organizationUrl>http://www.krypthonas.de</organizationUrl>
+            <roles>
+                <role>designer</role>
+                <role>developer</role>
+            </roles>
+            <timezone>+0</timezone>
+        </developer>
+        <developer>
+            <name>Jesús Marín</name>
+            <id>jesus</id>
+            <organization>A.P.L. software</organization>
+            <organizationUrl>http://www.aplsoftware.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+0</timezone>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/community/logicaldoc/trunk</connection>
+        <developerConnection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/community/logicaldoc/trunk</developerConnection>
+        <url>http://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/logicaldoc/trunk</url>
+    </scm>
+    <modules>
+        <module>logicaldoc-util</module>
+        <module>logicaldoc-core</module>
+        <module>logicaldoc-webservice</module>
+        <module>logicaldoc-webservicedoc</module>
+        <module>logicaldoc-webdav</module>
+        <module>logicaldoc-cmis</module>
+        <module>logicaldoc-dropbox</module>
+        <module>logicaldoc-i18n</module>
+        <module>logicaldoc-gui</module>
+        <module>logicaldoc-webapp</module>
+        <module>logicaldoc-webservicesamples</module>
+    </modules>
 </project>

@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.panels;
 
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -59,19 +60,22 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 
 		messagesCounter.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				MainPanel.get().selectMessagesTab();
+				if (Menu.enabled(Menu.MESSAGES))
+					MainPanel.get().selectMessagesTab();
 			}
 		});
 
 		workflowsCounter.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				MainPanel.get().selectWorkflowTab();
+				if (Feature.enabled(Feature.WORKFLOW))
+					MainPanel.get().selectWorkflowTab();
 			}
 		});
 
 		eventsCounter.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				MainPanel.get().selectCalendarTab();
+				if (Menu.enabled(Menu.DASHBOARD_CALENDAR))
+					MainPanel.get().selectCalendarTab();
 			}
 		});
 
@@ -79,11 +83,11 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 		addMember(lockedCounter);
 		addMember(checkoutCounter);
 
-		if (Feature.enabled(Feature.MESSAGES)) {
+		if (Feature.enabled(Feature.MESSAGES) && Menu.enabled(Menu.MESSAGES)) {
 			addMember(messagesCounter);
 		}
 
-		if (Feature.enabled(Feature.CALENDAR)) {
+		if (Feature.enabled(Feature.CALENDAR) && Menu.enabled(Menu.DASHBOARD_CALENDAR)) {
 			addMember(eventsCounter);
 		}
 
@@ -109,8 +113,8 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 
 	@Override
 	public void onRemove(GUIDocument entry) {
-		clipboardCounter.setTitle(AwesomeFactory.getIconHtml("clipboard",
-				Integer.toString(Clipboard.getInstance().size())));
+		clipboardCounter
+				.setTitle(AwesomeFactory.getIconHtml("clipboard", Integer.toString(Clipboard.getInstance().size())));
 	}
 
 	@Override
@@ -118,8 +122,18 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 		lockedCounter.setTitle(AwesomeFactory.getIconHtml("lock-alt", Integer.toString(user.getLockedDocs())));
 		checkoutCounter.setTitle(AwesomeFactory.getIconHtml("edit", Integer.toString(user.getCheckedOutDocs())));
 		messagesCounter.setTitle(AwesomeFactory.getIconHtml("envelope", Integer.toString(user.getUnreadMessages())));
-		workflowsCounter.setTitle(AwesomeFactory.getIconHtml("tasks", Integer.toString(user.getActiveTasks())));
+		workflowsCounter.setTitle(AwesomeFactory.getIconHtml("tasks", Integer.toString(user.getAssignedTasks())));
 		eventsCounter.setTitle(AwesomeFactory.getIconHtml("calendar", Integer.toString(user.getUpcomingEvents())));
+	}
+
+	@Override
+	public void onUserLogin(String username) {
+
+	}
+
+	@Override
+	public void onUserLogout(String username) {
+
 	}
 
 	@Override

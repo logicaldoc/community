@@ -76,14 +76,14 @@ public class AbstractService {
 			throw new Exception("WebServices are disabled");
 
 		if (sid == null || !SessionManager.get().isOpen(sid)) {
-			throw new Exception("Invalid session " + sid);
+			throw new Exception(String.format("Invalid session %s", sid));
 		} else {
 			SessionManager.get().renew(sid);
 		}
 		String username = SessionManager.get().get(sid).getUsername();
 		User user = userDao.findByUsername(username);
 		if (user == null)
-			throw new Exception("User " + username + "not found");
+			throw new Exception(String.format("User %s not found", username));
 		else
 			userDao.initialize(user);
 		return user;
@@ -112,7 +112,7 @@ public class AbstractService {
 		User user = validateSession(sid);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, user.getId())) {
-			String message = "User " + user.getUsername() + " cannot access menu " + menuId;
+			String message = String.format("User %s cannot access menu %s", user.getUsername(), menuId);
 			log.error(message);
 			throw new Exception(message);
 		}
@@ -121,8 +121,8 @@ public class AbstractService {
 	protected void checkPermission(Permission permission, User user, long folderId) throws Exception {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
-			String message = "User " + user.getUsername() + " doesn't have permission " + permission.getName()
-					+ " on folder " + folderId;
+			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
+					permission.getName(), folderId);
 			log.error(message);
 			throw new Exception(message);
 		}
@@ -131,7 +131,8 @@ public class AbstractService {
 	protected void checkMenu(User user, long menuId) throws Exception {
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, user.getId())) {
-			String message = "User " + user.getUsername() + " doesn't have read permission on menu " + menuId;
+			String message = String.format("User %s doesn't have read permission on menu %s", user.getUsername(),
+					menuId);
 			log.error(message);
 			throw new Exception(message);
 		}
@@ -144,7 +145,8 @@ public class AbstractService {
 	protected void checkReadEnable(User user, long folderId) throws Exception {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isReadEnabled(folderId, user.getId())) {
-			String message = "User " + user.getUsername() + " doesn't have read permission on folder " + folderId;
+			String message = String.format("User %s doesn't have read permission on folder %s", user.getUsername(),
+					folderId);
 			log.error(message);
 			throw new Exception(message);
 		}
@@ -153,7 +155,8 @@ public class AbstractService {
 	protected void checkDownloadEnable(User user, long folderId) throws Exception {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(Permission.DOWNLOAD, folderId, user.getId())) {
-			String message = "User " + user.getUsername() + " doesn't have download permission on folder " + folderId;
+			String message = String.format("User %s doesn't have download permission on folder %s", user.getUsername(),
+					folderId);
 			log.error(message);
 			throw new Exception(message);
 		}
@@ -201,6 +204,7 @@ public class AbstractService {
 	 * <li>Session attribute sid</li>
 	 * <li>Request cookie ldoc-sid</li>
 	 * <li>SecurityContextHolder</li>
+	 * </ol>
 	 * 
 	 * @return The current Session ID
 	 */
@@ -245,5 +249,21 @@ public class AbstractService {
 
 	public boolean isValidateSession() {
 		return validateSession;
+	}
+
+	/**
+	 * Utility method that logs the error and rethrows the same exception
+	 * 
+	 * @param log the logger to print to
+	 * @param exception the exception representing the error
+	 * 
+	 * @throws Throwable the passed exception
+	 */
+	protected void logAndRethrow(Logger log, Throwable exception) throws Exception {
+		log.error(exception.getMessage(), exception);
+		if (exception instanceof Exception)
+			throw (Exception) exception;
+		else
+			throw new Exception(exception);
 	}
 }

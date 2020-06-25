@@ -75,7 +75,7 @@ public class PswRecovery extends HttpServlet {
 			ticketId = (String) session.getAttribute("ticketId");
 		}
 
-		log.debug("Recover password for ticket with ticketId=" + ticketId);
+		log.debug("Recover password for ticket with ticketId={}", ticketId);
 
 		try {
 			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
@@ -84,7 +84,7 @@ public class PswRecovery extends HttpServlet {
 			if ((ticket != null) && ticket.getType() == Ticket.PSW_RECOVERY) {
 
 				if (ticket.isTicketExpired()) {
-					response.getWriter().println("Request not valid");
+					response.getWriter().println("Request has exprired");
 					return;
 				}
 
@@ -110,9 +110,10 @@ public class PswRecovery extends HttpServlet {
 					} catch (Throwable t) {
 					}
 
-					String password = new PasswordGenerator().generate(pswdSize);
+					String password = PasswordGenerator.generate(pswdSize);
 					user.setDecodedPassword(password);
 					user.setPasswordChanged(new Date());
+					user.setPasswordExpired(1);
 
 					boolean stored = userDao.store(user);
 					if (stored) {
@@ -137,7 +138,7 @@ public class PswRecovery extends HttpServlet {
 						EMailSender sender = new EMailSender(tenant);
 						sender.send(email, "psw.rec1", dictionary);
 
-						response.getWriter().println("A message was sent to " + user.getEmail());
+						response.getWriter().println(String.format("A message was sent to %s", user.getEmail()));
 
 						ticket.setCount(ticket.getCount() + 1);
 						ticketDao.store(ticket);
@@ -146,10 +147,10 @@ public class PswRecovery extends HttpServlet {
 					}
 				} catch (Throwable e) {
 					log.error(e.getMessage(), e);
-					response.getWriter().println("Request not valid");
+					response.getWriter().println("Request not correctly processed");
 				}
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 		}
 	}

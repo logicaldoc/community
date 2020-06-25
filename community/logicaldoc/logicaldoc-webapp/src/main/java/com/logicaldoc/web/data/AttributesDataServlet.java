@@ -35,8 +35,8 @@ public class AttributesDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(AttributesDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -174,17 +174,26 @@ public class AttributesDataServlet extends HttpServlet {
 			writer.print("<type>" + Attribute.TYPE_INT + "</type>");
 			writer.print("</attribute>");
 
+			writer.print("<attribute>");
+			writer.print("<name>language</name>");
+			writer.print("<label><![CDATA[" + I18N.message("language", locale) + "]]></label>");
+			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+			writer.print("</attribute>");
+			
 			/*
 			 * Iterate over the collection of extended attributes
 			 */
 			Map<String, Attribute> attributes = dao.findAttributes(session.getTenantId(), null);
 			for (String name : attributes.keySet()) {
+				Attribute attribute = attributes.get(name);
+				if (attribute.getHidden() == 1)
+					continue;
+
 				writer.print("<attribute>");
 				writer.print("<name><![CDATA[ext_" + name + "]]></name>");
 				writer.print("<label><![CDATA["
-						+ (StringUtils.isNotEmpty(attributes.get(name).getLabel()) ? attributes.get(name).getLabel()
-								: "") + "]]></label>");
-				writer.print("<type>" + attributes.get(name).getType() + "</type>");
+						+ (StringUtils.isNotEmpty(attribute.getLabel()) ? attribute.getLabel() : "") + "]]></label>");
+				writer.print("<type>" + attribute.getType() + "</type>");
 				writer.print("</attribute>");
 			}
 

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationChain;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.dao.SessionDAO;
@@ -50,6 +51,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	private SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();
 
+	private List<SessionListener> listeners = new ArrayList<SessionListener>();
+
 	private SessionManager() {
 		timeoutWatchDog.start();
 		log.info("Starting the session timeout watchdog");
@@ -62,6 +65,15 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	/**
 	 * Creates a new session by authenticated the given user and stores it in
 	 * the pool of opened sessions
+	 * 
+	 * @param username the username
+	 * @param password the passowrd
+	 * @param key the secret key
+	 * @param client client informations
+	 * 
+	 * @return the session created after the successful login
+	 *
+	 * @throws AuthenticationException raised in case of failed login
 	 */
 	public synchronized Session newSession(String username, String password, String key, Client client)
 			throws AuthenticationException {
@@ -69,23 +81,65 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		if (user == null)
 			return null;
 		else {
-			Session session = new Session(user, password, key, client);
-			put(session.getSid(), session);
-			log.warn("Created new session {} for user {}", session.getSid(), username);
-			cleanClosedSessions();
-
-			storeSession(session);
-			return session;
+			return createSession(user, password, key, client);
 		}
 	}
 
 	/**
 	 * Creates a new session by authenticated the given user and stores it in
 	 * the pool of opened sessions
+	 * 
+	 * @param username the username
+	 * @param password the passowrd
+	 * @param client client informations
+	 * 
+	 * @return the session created after the successful login
+	 *
+	 * @throws AuthenticationException raised in case of failed login
 	 */
 	public synchronized Session newSession(String username, String password, Client client)
 			throws AuthenticationException {
 		return newSession(username, password, null, client);
+	}
+
+	/**
+	 * Creates a new session by authenticated the given user and stores it in
+	 * the pool of opened sessions
+	 * 
+	 * @param username the username
+	 * @param password the passowrd
+	 * @param key the secret key
+	 * @param client client informations
+	 * 
+	 * @return the session created after the successful login
+	 */
+	private synchronized Session createSession(User user, String password, String key, Client client) {
+		Session session = new Session(user, password, key, client);
+		put(session.getSid(), session);
+		log.warn("Created new session {} for user {}", session.getSid(), user.getUsername());
+		cleanClosedSessions();
+		storeSession(session);
+		for (SessionListener listener : listeners)
+			try {
+				listener.onSessionCreated(session);
+			} catch (Throwable t) {
+				log.warn(t.getMessage(), t);
+			}
+
+		return session;
+	}
+
+	/**
+	 * Creates a new session by authenticated the given user and stores it in
+	 * the pool of opened sessions
+	 * 
+	 * @param user the user
+	 * @param client client informations
+	 * 
+	 * @return the session created after the successful login
+	 */
+	public synchronized Session createSession(User user, Client client) throws AuthenticationException {
+		return createSession(user, null, null, client);
 	}
 
 	private void storeSession(Session session) {
@@ -114,20 +168,34 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	/**
 	 * Kills an existing session
+	 * 
+	 * @param sid identifier of the session to kill
 	 */
 	public void kill(String sid) {
 		Session session = get(sid);
 		if (session != null) {
 			session.setClosed();
-			log.warn("Killed session " + sid);
+			log.warn("Killed session {}", sid);
 			storeSession(session);
+			for (SessionListener listener : listeners)
+				try {
+					listener.onSessionClosed(sid);
+				} catch (Throwable t) {
+					log.warn(t.getMessage(), t);
+				}
 		}
 	}
 
 	@Override
 	public Session remove(Object sid) {
 		kill((String) sid);
-		sessionDao.delete(get(sid).getId());
+
+		try {
+			sessionDao.delete(get(sid).getId());
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
+		}
+
 		return super.remove(sid);
 	}
 
@@ -165,6 +233,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * and is in state OPEN
 	 * 
 	 * @param sid The session identifier
+	 * 
 	 * @return true only if the session exists and is OPEN
 	 */
 	public boolean isOpen(String sid) {
@@ -183,6 +252,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	/**
 	 * Gets the session of the given client
+	 * 
+	 * @param clientId identifier of the client
+	 * 
+	 * @return the session
 	 */
 	public Session getByClientId(String clientId) {
 		if (clientId == null)
@@ -198,6 +271,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	/**
 	 * Counts the total number of opened sessions
+	 * 
+	 * @return number of opened sessions
 	 */
 	public int countOpened() {
 		return sessionDao.countSessions(null, Session.STATUS_OPEN);
@@ -205,6 +280,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	/**
 	 * Counts the total number of opened sessions per tenant
+	 * 
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return number of opened sessions
 	 */
 	public int countOpened(long tenantId) {
 		return sessionDao.countSessions(tenantId, Session.STATUS_OPEN);
@@ -213,6 +292,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	/**
 	 * Returns the list of sessions of the current node ordered by ascending
 	 * status and creation date.
+	 * 
+	 * @return list of sessions
 	 */
 	public List<Session> getSessions() {
 		List<Session> sessions = new ArrayList<Session>(values());
@@ -222,7 +303,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	/**
 	 * Clean method that removes all closed sessions that exceed the number of
-	 * MAX_CLOSED_SESSIONS
+	 * {@value #MAX_CLOSED_SESSIONS}
 	 */
 	private void cleanClosedSessions() {
 		List<String> garbage = new ArrayList<String>();
@@ -239,7 +320,11 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Gets the Session returned by <code>getSid(request)</code>
+	 * Gets the Session with the identifier returned by {@link #getSessionId(HttpServletRequest)}
+	 * 
+	 * @param request the HTTP request
+	 * 
+	 * @return the found session, can be null
 	 */
 	public Session getSession(HttpServletRequest request) {
 		String sid = getSessionId(request);
@@ -259,8 +344,10 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * <li>Request parameter <code>PARAM_SID</code></li>
 	 * <li>Cookie <code>COOKIE_SID</code></li>
 	 * <li>Spring SecurityContextHolder</li>
+	 * </ol>
 	 * 
 	 * @param request The current request to inspect
+	 * 
 	 * @return The SID if any
 	 */
 	public String getSessionId(HttpServletRequest request) {
@@ -298,8 +385,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * Saves the session identifier in the request and session attribute
 	 * <code>PARAM_SID</code> and Cookie <code>COOKIE_SID</code>
 	 * 
-	 * @param request
-	 * @param sid
+	 * @param request the HTTP request
+	 * @param response the HTTP response
+	 * @param sid identifier of the session
 	 */
 	public void saveSid(HttpServletRequest request, HttpServletResponse response, String sid) {
 		request.setAttribute(PARAM_SID, sid);
@@ -312,7 +400,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Removes the Sid
+	 * Removes the Sid from the http request
+	 * 
+	 * @param request the HTTP request
 	 */
 	public void removeSid(HttpServletRequest request) {
 		if (request != null) {
@@ -328,6 +418,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	/**
 	 * Retrieves the session ID of the current thread execution
+	 * 
+	 * @return the identifier of the session
 	 */
 	public static String getCurrentSid() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -348,6 +440,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * credentials and remote IP.
 	 * 
 	 * @param req The request to process
+	 * 
 	 * @return The client
 	 */
 	public Client buildClient(HttpServletRequest req) {
@@ -446,5 +539,14 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	public void setSessionDao(SessionDAO sessionDao) {
 		this.sessionDao = sessionDao;
+	}
+
+	public synchronized void addListener(SessionListener listener) {
+		if (!listeners.contains(listener))
+			listeners.add(listener);
+	}
+
+	public synchronized void removeListener(SessionListener listener) {
+		listeners.remove(listener);
 	}
 }

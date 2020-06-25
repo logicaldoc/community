@@ -85,7 +85,7 @@ public class MenuGroup {
 
 	@Override
 	public int hashCode() {
-		return new Long(groupId).hashCode();
+		return Long.valueOf(groupId).hashCode();
 	}
 
 	/**

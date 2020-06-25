@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
   <abortOnConfigurationError>${solr.abortOnConfigurationError:true}</abortOnConfigurationError>
-  <luceneMatchVersion>6.3.0</luceneMatchVersion>
+  <luceneMatchVersion>7.4.0</luceneMatchVersion>
   <dataDir>${solr.data.dir:}</dataDir>
   <directoryFactory name="DirectoryFactory" 
                     class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}" />

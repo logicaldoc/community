@@ -36,7 +36,7 @@ public class DocumentAliasesDataServlet extends HttpServlet {
 
 			Long docId = null;
 			if (StringUtils.isNotEmpty(request.getParameter("docId")))
-				docId = new Long(request.getParameter("docId"));
+				docId = Long.parseLong(request.getParameter("docId"));
 
 			response.setContentType("text/xml");
 			response.setCharacterEncoding("UTF-8");
@@ -52,17 +52,37 @@ public class DocumentAliasesDataServlet extends HttpServlet {
 			Context context = Context.get();
 			DocumentDAO dao = (DocumentDAO) context.getBean(DocumentDAO.class);
 			FolderDAO folderDAO = (FolderDAO) context.getBean(FolderDAO.class);
-			Collection<Long> ids = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
-
+			Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
+			
 			StringBuffer query = new StringBuffer(
 					"select id, fileName, folder.id from Document where deleted = 0 and docRef = " + docId);
 
 			User user = ServiceUtil.getSessionUser(request);
 			if (!user.isMemberOf("admin")) {
-				query.append(" and folder.id in ");
-				query.append(ids.toString().replace('[', ' ').replace(']', ' '));
+				if (dao.isOracle()) {
+					/*
+					 * In Oracle The limit of 1000 elements applies to sets of
+					 * single items: (x) IN ((1), (2), (3), ...). There is no
+					 * limit if the sets contain two or more items: (x, 0) IN
+					 * ((1,0), (2,0), (3,0), ...):
+					 */
+					query.append(" and (folder.id,0) in ( ");
+					boolean firstItem = true;
+					for (Long folderId : accessibleFolderIds) {
+						if (!firstItem)
+							query.append(",");
+						query.append("(");
+						query.append(folderId);
+						query.append(",0)");
+						firstItem = false;
+					}
+					query.append(" )");
+				}else {				
+					query.append(" and folder.id in ");
+					query.append(accessibleFolderIds.toString().replace('[', '(').replace(']', ')'));
+				}
 			}
-
+			
 			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, null);
 
 			/*

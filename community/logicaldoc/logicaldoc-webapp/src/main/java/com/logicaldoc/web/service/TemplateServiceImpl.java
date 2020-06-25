@@ -40,10 +40,16 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 	@Override
 	public void delete(long templateId) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		dao.delete(templateId);
+		try {
+			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			boolean deleted = dao.delete(templateId);
+			if (!deleted)
+				throw new Exception("Template has not been deleted");
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
 	}
 
 	@Override
@@ -77,17 +83,20 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			Map<String, Attribute> attrs = new HashMap<String, Attribute>();
 			if (template.getAttributes() != null && template.getAttributes().length > 0) {
 				templ.getAttributes().clear();
-				int position = 0;
 				for (GUIAttribute attribute : template.getAttributes()) {
 					if (attribute != null) {
 						Attribute att = new Attribute();
-						att.setPosition(position++);
 						att.setMandatory(attribute.isMandatory() ? 1 : 0);
+						att.setHidden(attribute.isHidden() ? 1 : 0);
+						att.setMultiple(attribute.isMultiple() ? 1 : 0);
+						att.setParent(attribute.getParent());
 						att.setType(attribute.getType());
 						att.setLabel(attribute.getLabel());
 						att.setEditor(attribute.getEditor());
 						att.setStringValue(attribute.getStringValue());
+						att.setStringValues(attribute.getStringValues());
 						att.setSetId(attribute.getSetId());
+						att.setPosition(attribute.getPosition());
 						if (StringUtils.isEmpty(attribute.getLabel()))
 							att.setLabel(attribute.getName());
 						if (attribute.getValue() instanceof String)
@@ -107,7 +116,10 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			if (attrs.size() > 0)
 				templ.setAttributes(attrs);
 
-			dao.store(templ);
+			boolean stored = dao.store(templ);
+			if (!stored)
+				throw new Exception(
+						String.format("Template has not been %s", templ.getId() != 0L ? "updated" : "stored"));
 
 			template.setId(templ.getId());
 		} catch (Throwable t) {
@@ -127,6 +139,8 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			if (template == null)
 				return null;
 
+			dao.initialize(template);
+
 			GUITemplate templ = new GUITemplate();
 			templ.setId(templateId);
 			templ.setName(template.getName());
@@ -140,32 +154,42 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			GUIAttribute[] attributes = new GUIAttribute[template.getAttributeNames().size()];
 			int i = 0;
 			for (String attrName : template.getAttributeNames()) {
-				Attribute extAttr = template.getAttributes().get(attrName);
+				Attribute templateExtAttr = template.getAttributes().get(attrName);
+				AttributeSet aSet = sets.get(templateExtAttr.getSetId());
+				Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
+
 				GUIAttribute att = new GUIAttribute();
 				att.setName(attrName);
-				att.setSetId(extAttr.getSetId());
-				att.setSet(sets.get(extAttr.getSetId()) != null ? sets.get(extAttr.getSetId()).getName() : null);
-				att.setPosition(extAttr.getPosition());
-				att.setMandatory(extAttr.getMandatory() == 1 ? true : false);
-				att.setType(extAttr.getType());
-				if (StringUtils.isEmpty(extAttr.getLabel()))
+				att.setSetId(templateExtAttr.getSetId());
+				att.setSet(aSet != null ? aSet.getName() : null);
+				att.setPosition(templateExtAttr.getPosition());
+				att.setMandatory(templateExtAttr.getMandatory() == 1 ? true : false);
+				att.setHidden(templateExtAttr.getHidden() == 1 ? true : false);
+				att.setMultiple(templateExtAttr.getMultiple() == 1 ? true : false);
+				att.setParent(templateExtAttr.getParent());
+				att.setStringValues(templateExtAttr.getStringValues());
+				att.setType(templateExtAttr.getType());
+				if (StringUtils.isEmpty(templateExtAttr.getLabel()))
 					att.setLabel(attrName);
 				else
-					att.setLabel(extAttr.getLabel());
-				if (extAttr.getValue() instanceof String)
-					att.setStringValue(extAttr.getStringValue());
-				else if (extAttr.getValue() instanceof Long)
-					att.setIntValue(extAttr.getIntValue());
-				else if (extAttr.getValue() instanceof Double)
-					att.setDoubleValue(extAttr.getDoubleValue());
-				else if (extAttr.getValue() instanceof Date)
-					att.setDateValue(ServiceUtil.convertToDate(extAttr.getDateValue()));
-				else if (extAttr.getValue() instanceof Boolean)
-					att.setBooleanValue(extAttr.getBooleanValue());
+					att.setLabel(templateExtAttr.getLabel());
+				if (templateExtAttr.getValue() instanceof String)
+					att.setStringValue(templateExtAttr.getStringValue());
+				else if (templateExtAttr.getValue() instanceof Long)
+					att.setIntValue(templateExtAttr.getIntValue());
+				else if (templateExtAttr.getValue() instanceof Double)
+					att.setDoubleValue(templateExtAttr.getDoubleValue());
+				else if (templateExtAttr.getValue() instanceof Date)
+					att.setDateValue(ServiceUtil.convertToDate(templateExtAttr.getDateValue()));
+				else if (templateExtAttr.getValue() instanceof Boolean)
+					att.setBooleanValue(templateExtAttr.getBooleanValue());
 
-				att.setEditor(extAttr.getEditor());
-				if (extAttr.getType() == Attribute.TYPE_USER || extAttr.getEditor() == Attribute.EDITOR_LISTBOX) {
-					String buf = (String) extAttr.getStringValue();
+				att.setEditor(templateExtAttr.getEditor());
+				if (templateExtAttr.getType() == Attribute.TYPE_USER
+						|| templateExtAttr.getEditor() == Attribute.EDITOR_LISTBOX) {
+
+					String buf = setExtAttr != null ? (String) setExtAttr.getStringValue()
+							: (String) templateExtAttr.getStringValue();
 					List<String> list = new ArrayList<String>();
 					if (buf != null) {
 						if (buf.contains(",")) {

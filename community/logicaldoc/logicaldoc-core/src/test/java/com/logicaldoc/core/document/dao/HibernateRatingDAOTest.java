@@ -2,13 +2,14 @@ package com.logicaldoc.core.document.dao;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Rating;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateRatingDAOTest</code>
@@ -30,7 +31,7 @@ public class HibernateRatingDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		Rating rat1 = dao.findById(1);
 		dao.initialize(rat1);
 		rat1.setVote(4);

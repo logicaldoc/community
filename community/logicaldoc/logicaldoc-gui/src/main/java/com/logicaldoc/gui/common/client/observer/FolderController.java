@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.log.Log;
 
 /**
  * Implements the Observer pattern to distribute events on the folders
@@ -37,42 +38,53 @@ public class FolderController {
 	}
 
 	public void selected(GUIFolder folder) {
-		for (FolderObserver observer : observers)
-			try {
-				observer.onFolderSelected(folder);
-			} catch (Throwable t) {
-			}
+		synchronized (observers) {
+			for (FolderObserver observer : observers)
+				try {
+					observer.onFolderSelected(folder);
+				} catch (Throwable t) {
+					Log.error(t.getMessage(), null, t);
+				}
+		}
 	}
 
 	public void modified(GUIFolder folder) {
-		for (FolderObserver observer : observers)
-			try {
-				observer.onFolderChanged(folder);
-			} catch (Throwable t) {
-			}
+		synchronized (observers) {
+			for (FolderObserver observer : observers)
+				try {
+					observer.onFolderChanged(folder);
+				} catch (Throwable t) {
+				}
+		}
 	}
 
 	public void deleted(GUIFolder folder) {
-		for (FolderObserver observer : observers)
-			try {
-				observer.onFolderDeleted(folder);
-			} catch (Throwable t) {
-			}
+		synchronized (observers) {
+			for (FolderObserver observer : observers)
+				try {
+					observer.onFolderDeleted(folder);
+				} catch (Throwable t) {
+				}
+		}
 	}
 
 	public void created(GUIFolder folder) {
-		for (FolderObserver observer : observers)
-			try {
-				observer.onFolderCreated(folder);
-			} catch (Throwable t) {
-			}
+		synchronized (observers) {
+			for (FolderObserver observer : observers)
+				try {
+					observer.onFolderCreated(folder);
+				} catch (Throwable t) {
+				}
+		}
 	}
 
 	public void moved(GUIFolder folder) {
-		for (FolderObserver observer : observers)
-			try {
-				observer.onFolderMoved(folder);
-			} catch (Throwable t) {
-			}
+		synchronized (observers) {
+			for (FolderObserver observer : observers)
+				try {
+					observer.onFolderMoved(folder);
+				} catch (Throwable t) {
+				}
+		}
 	}
 }

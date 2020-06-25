@@ -173,11 +173,11 @@ public class StoragesPanel extends VLayout {
 		list.setCanExpandRecords(true);
 
 		ListGridField id = new ListGridField("id", " ", 20);
-		ListGridField name = new ListGridField("name", I18N.message("name"), 100);
+		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		path.setWidth("100%");
 		path.setCanEdit(true);
-		ListGridField type = new ListGridField("type", I18N.message("type"), 110);
+		ListGridField type = new ListGridField("type", I18N.message("type"), 150);
 		type.setCanEdit(true);
 		type.setCellFormatter(new CellFormatter() {
 
@@ -221,10 +221,8 @@ public class StoragesPanel extends VLayout {
 						@Override
 						public void onChanged(ChangedEvent event) {
 							list.getSelectedRecord().setAttribute("type", event.getValue().toString());
+							list.collapseRecord(list.getSelectedRecord());
 							onSave();
-							String state = list.getViewState();
-							refresh();
-							list.setViewState(state);
 						}
 					});
 					return item;
@@ -322,7 +320,7 @@ public class StoragesPanel extends VLayout {
 			}
 		}
 
-		SettingService.Instance.get().saveSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveStorageSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -334,9 +332,10 @@ public class StoragesPanel extends VLayout {
 				Log.info(I18N.message("settingssaved"), null);
 
 				// Replicate the settings in the current session
-				for (GUIParameter setting : settings) {
+				for (GUIParameter setting : settings)
 					Session.get().setConfig(setting.getName(), setting.getValue());
-				}
+				
+				refresh();
 			}
 		});
 	}

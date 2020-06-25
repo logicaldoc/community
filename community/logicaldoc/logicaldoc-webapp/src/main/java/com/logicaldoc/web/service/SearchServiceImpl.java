@@ -102,7 +102,12 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 					h = DocumentServiceImpl.fromDocument(hit, null, null);
 				} else {
 					Document doc = docDao.findById(hit.getId());
-					h = DocumentServiceImpl.fromDocument(doc, null, null);
+					if (doc != null) {
+						h = DocumentServiceImpl.fromDocument(doc, null, null);
+					} else {
+						log.debug("Unexisting document {}", hit.getId());
+						continue;
+					}
 				}
 
 				h.setScore(hit.getScore());
@@ -119,6 +124,8 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 					Attribute e = hit.getAttributes().get(name);
 					GUIAttribute ext = new GUIAttribute();
 					ext.setName(name);
+					ext.setHidden(e.getHidden() == 1);
+					ext.setMultiple(e.getMultiple() == 1);
 					ext.setSetId(e.getSetId());
 					ext.setDateValue(e.getDateValue());
 					ext.setStringValue(e.getStringValue());
@@ -126,6 +133,8 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 					ext.setDoubleValue(e.getDoubleValue());
 					ext.setBooleanValue(e.getBooleanValue());
 					ext.setType(e.getType());
+					ext.setParent(e.getParent());
+					ext.setStringValues(e.getStringValues());
 					extList.add(ext);
 				}
 				h.setAttributes(extList.toArray(new GUIAttribute[0]));
@@ -167,7 +176,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 				log.error(e.getMessage());
 			}
 
-			log.debug("Saved query " + opt.getName());
+			log.debug("Saved query {}", opt.getName());
 			return true;
 		} catch (Throwable t) {
 			return (Boolean) ServiceUtil.throwServerException(session, log, t);
@@ -215,7 +224,9 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 	/**
 	 * Load all the search options associated to all the searches saved for the
-	 * current user.
+	 * current user
+	 * 
+	 * @param session the current session
 	 * 
 	 * @return the list of search options
 	 */
@@ -273,15 +284,11 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 			List<GUICriterion> criteria = new ArrayList<GUICriterion>();
 			for (FolderCriterion crit : ((FolderSearchOptions) searchOptions).getCriteria()) {
 				GUICriterion criterion = new GUICriterion();
-
 				criterion.setField(crit.getFieldName());
-				if (crit.isExtendedAttribute())
-					criterion.setField(crit.getFieldName() + " type:" + crit.getType());
-
 				if (crit.getType() == Attribute.TYPE_DATE)
 					criterion.setDateValue(crit.getDateValue());
 				else if (crit.getType() == Attribute.TYPE_INT || crit.getType() == FolderCriterion.TYPE_FOLDER
-						|| crit.getType() == Attribute.TYPE_BOOLEAN)
+						|| crit.getType() == Attribute.TYPE_USER || crit.getType() == Attribute.TYPE_BOOLEAN)
 					criterion.setLongValue(crit.getLongValue());
 				else if (crit.getType() == Attribute.TYPE_DOUBLE)
 					criterion.setDoubleValue(crit.getDoubleValue());
@@ -310,7 +317,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		searchOptions.setName(options.getName());
 		searchOptions.setUserId(options.getUserId());
 		searchOptions.setCaseSensitive(options.getCaseSensitive() == 1);
-		searchOptions.setRetrieveAliases(options.getRetrieveAliases());
+		searchOptions.setRetrieveAliases(options.getRetrieveAliases() == 1);
 		searchOptions.setFolderId(options.getFolder());
 		searchOptions.setSearchInSubPath(options.isSearchInSubPath());
 		searchOptions.setTemplate(options.getTemplate());
@@ -342,11 +349,11 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 				c.setOperator(operator);
 
 				if (crit.getLongValue() != null) {
-					c.setValue(crit.getLongValue());
+					c.setLongValue(crit.getLongValue());
 				} else if (crit.getDateValue() != null) {
-					c.setValue(crit.getDateValue());
+					c.setDateValue(crit.getDateValue());
 				} else if (crit.getDoubleValue() != null) {
-					c.setValue(crit.getDoubleValue());
+					c.setDoubleValue(crit.getDoubleValue());
 				} else {
 					c.setValue(crit.getStringValue());
 				}

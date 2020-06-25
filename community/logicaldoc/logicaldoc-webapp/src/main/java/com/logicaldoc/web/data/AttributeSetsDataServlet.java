@@ -31,14 +31,14 @@ public class AttributeSetsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(AttributeSetsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
 			Integer type = null;
 			if (request.getParameter("type") != null)
-				type = new Integer(request.getParameter("type"));
+				type = Integer.parseInt(request.getParameter("type"));
 
 			response.setContentType("text/xml");
 			response.setCharacterEncoding("UTF-8");
@@ -70,7 +70,7 @@ public class AttributeSetsDataServlet extends HttpServlet {
 			 * Iterate over the collection of templates
 			 */
 			for (AttributeSet set : sets) {
-	
+
 				writer.print("<attributeset>");
 				writer.print("<id>" + set.getId() + "</id>");
 				writer.print("<name><![CDATA[" + set.getName() + "]]></name>");

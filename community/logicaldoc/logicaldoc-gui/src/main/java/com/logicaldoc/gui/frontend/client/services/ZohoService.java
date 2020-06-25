@@ -3,6 +3,8 @@ package com.logicaldoc.gui.frontend.client.services;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
@@ -22,27 +24,29 @@ public interface ZohoService extends RemoteService {
 	/**
 	 * Exports documents and folders into Zoho
 	 * 
-	 * @param sid The session ID
-	 * @param targetPath the target path in Zoho (must be a folder)
+	 * @param targetFolderId the target path in Zoho (must be a folder)
 	 * @param folderIds Ids of the folders to be imported (all subfolders and
 	 *        docs will be imported as well
 	 * @param docIds Ids of the documents to be imported
-	 * @return
-	 * @throws ServerException
+	 * 
+	 * @return true if the import was successful
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public boolean exportDocuments(String targetFolderId, long[] folderIds, long[] docIds) throws ServerException;
 
 	/**
 	 * Exports documents and folders from Zoho into LogicalDOC
 	 * 
-	 * @param sid The session ID
 	 * @param targetFolder ID of the root folder that will receive the imported
 	 *        elements
 	 * @param folderCompositeIds array of the identifiers of the Zoho folder
 	 *        each one is a tokenized string folder_name:folder_id
-	 * @param docIds Ids of the documents in Zoho to be imported
-	 * @return
-	 * @throws ServerException
+	 * @param documentIds identifiers of the documents in Zoho to be imported
+	 * 
+	 * @return number of imported files
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public int importDocuments(long targetFolder, String[] folderCompositeIds, String[] documentIds)
 			throws ServerException;
@@ -52,26 +56,32 @@ public interface ZohoService extends RemoteService {
 	 * 
 	 * @param docId ID of the document to upload
 	 * 
-	 * @returns The resourceId of the uploaded document
+	 * @return The resourceId of the uploaded document
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public String upload(long docId) throws ServerException;
 
 	/**
-	 * Deletes a document in Zoho.
+	 * Deletes a document in Zoho
 	 * 
-	 * @param docId ID of the document to delete
+	 * @param resourceId identifier of the document to delete
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public void delete(String resourceId) throws ServerException;
 
 	/**
 	 * Performs the check-in of a Zoho's document into the LogicalDOC
-	 * repository.
+	 * repository
 	 * 
-	 * @param docId ID of the document to update
+	 * @param docId identifier of the document to update
 	 * @param comment The comment left for the checkin
 	 * @param major If this is a major or minor release
 	 * 
 	 * @return The checked-in document
+	 * 
+	 * @throws ServerException error in the server application
 	 */
 	public GUIDocument checkin(long docId, String comment, boolean major) throws ServerException;
 
@@ -81,6 +91,7 @@ public interface ZohoService extends RemoteService {
 		public static ZohoServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(ZohoService.class);
+				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
 			return instance;
 		}

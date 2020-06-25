@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.TwoFactorsAuthenticationService
+path: 292A25C543A9725252A9BEBB2E2FCBF0.gwt.rpc

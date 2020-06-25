@@ -29,8 +29,8 @@ public class Feature {
 
 	public static final int PDF = 8;
 
-	public static final int RSS = 9;
-
+	public static final int LICENSE = 9;
+	
 	public static final int EMAIL_IMPORT = 10;
 
 	public static final int TRASH = 11;
@@ -41,6 +41,8 @@ public class Feature {
 
 	public static final int INCREMENTAL_ARCHIVES = 14;
 
+	public static final int SINGLE_SIGNON = 15;
+	
 	public static final int SCAN = 16;
 
 	public static final int AUDIT = 17;
@@ -62,9 +64,9 @@ public class Feature {
 	public static final int INDEX_LANGUAGES = 25;
 
 	public static final int TASK_REPORT_NOTIFICATION = 26;
-
-	public static final int PRODUCT_NEWS = 27;
-
+	
+	public static final int SPLIT = 27;
+	
 	public static final int BULK_UPDATE = 28;
 
 	public static final int CMIS = 29;
@@ -77,7 +79,7 @@ public class Feature {
 
 	public static final int WEBCONTENT = 33;
 
-	public static final int CONTENT_DIFF = 34;
+	public static final int COMPARISON = 34;
 
 	public static final int UPDATES = 35;
 
@@ -91,6 +93,8 @@ public class Feature {
 
 	public static final int SHOW_LICENSEE = 40;
 
+	public static final int PATCHES = 41;
+	
 	public static final int FOLDER_TEMPLATE = 42;
 
 	public static final int GDRIVE = 43;
@@ -102,6 +106,10 @@ public class Feature {
 	public static final int CLOUD_STORAGE = 46;
 
 	public static final int VIA = 47;
+	
+	public static final int AUTOMATION = 48;
+	
+	public static final int ZONAL_OCR = 49;
 
 	public static final int SHOW_DISABLED = 50;
 
@@ -190,6 +198,10 @@ public class Feature {
 	public static final int WEBDAV_BASIC = 93;
 
 	public static final int TWO_FACTORS_AUTHENTICATION = 94;
+	
+	public static final int CHAT = 95;
+	
+	public static final int SYNDICATION = 96;
 
 	private static Set<String> features = new HashSet<String>();
 
@@ -215,6 +227,8 @@ public class Feature {
 
 	/**
 	 * Check if a disabled feature must be visible(ad disabled) or hidden
+	 * 
+	 * @return if the show is disabled
 	 */
 	public static boolean showDisabled() {
 		return enabled(SHOW_DISABLED);
@@ -222,6 +236,8 @@ public class Feature {
 
 	/**
 	 * Check if the licensee must be shown
+	 * 
+	 * @return if the licensee must be shown
 	 */
 	public static boolean showLicensee() {
 		return enabled(SHOW_DISABLED);

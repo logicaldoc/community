@@ -4,16 +4,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.ReportService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.Side;
-import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -23,7 +15,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This panel collects details about a Report
@@ -42,9 +33,7 @@ public class ReportDetailsPanel extends VLayout {
 
 	private Label logLabel;
 
-	private HLayout savePanel;
-
-	private TabSet tabSet = new TabSet();
+	private EditingTabSet tabSet;
 
 	private CustomReportsPanel reportsPanel;
 
@@ -56,30 +45,12 @@ public class ReportDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		savePanel = new HLayout();
-		savePanel.setHeight(20);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
-		Button saveButton = new Button(I18N.message("save"));
-		saveButton.setAutoFit(true);
-		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
+		tabSet = new EditingTabSet(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				onSave();
 			}
-		});
-		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("70%");
-		spacer.setOverflow(Overflow.HIDDEN);
-
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (report.getId() != 0) {
@@ -98,24 +69,9 @@ public class ReportDetailsPanel extends VLayout {
 					GUIReport newreport = new GUIReport();
 					setReport(newreport);
 				}
-				savePanel.setVisible(false);
+				tabSet.hideSave();
 			}
 		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		savePanel.addMember(saveButton);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		addMember(savePanel);
-
-		tabSet = new TabSet();
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight100();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		standardTabPanel = new HLayout();
@@ -135,8 +91,7 @@ public class ReportDetailsPanel extends VLayout {
 	}
 
 	private void refresh() {
-		if (savePanel != null)
-			savePanel.setVisible(false);
+		tabSet.hideSave();
 
 		/*
 		 * Prepare the standard properties tab
@@ -178,7 +133,7 @@ public class ReportDetailsPanel extends VLayout {
 	}
 
 	public void onModified() {
-		savePanel.setVisible(true);
+		tabSet.displaySave();
 	}
 
 	private boolean validate() {
@@ -198,7 +153,7 @@ public class ReportDetailsPanel extends VLayout {
 
 				@Override
 				public void onSuccess(GUIReport report) {
-					savePanel.setVisible(false);
+					tabSet.hideSave();
 					if (report != null) {
 						reportsPanel.updateRecord(report);
 						reportsPanel.showReportDetails(report);

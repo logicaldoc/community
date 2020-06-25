@@ -1,5 +1,6 @@
 package com.logicaldoc.core.security.dao;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -14,16 +15,19 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserGroup;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.UserListener;
 import com.logicaldoc.core.security.UserListenerManager;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -55,38 +59,47 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		return "true".equals(Context.get().getProperties().getProperty("login.ignorecase"));
 	}
 
-	/**
-	 * @see com.logicaldoc.core.security.dao.UserDAO#delete(long)
-	 */
+	@Override
 	public boolean delete(long userId, int code) {
 		return delete(userId, null);
 	}
 
-	/**
-	 * @see com.logicaldoc.core.security.dao.UserDAO#findByName(java.lang.String)
-	 */
+	@Override
 	public List<User> findByName(String name) {
-		return findByWhere("lower(_entity.name) like ?1", new Object[] { name.toLowerCase() }, null, null);
+		try {
+			return findByWhere("lower(_entity.name) like ?1", new Object[] { name.toLowerCase() }, null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<User>();
+		}
 	}
 
 	@Override
 	public User findByUsername(String username) {
 		User user = null;
-		List<User> coll = findByWhere("_entity.username = ?1", new Object[] { username }, null, null);
-		if (coll.size() > 0)
-			user = coll.iterator().next();
-		initialize(user);
+		try {
+			List<User> coll = findByWhere("_entity.username = ?1", new Object[] { username }, null, null);
+			if (coll.size() > 0)
+				user = coll.iterator().next();
+			initialize(user);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		return user;
 	}
 
 	@Override
 	public User findByUsernameIgnoreCase(String username) {
 		User user = null;
-		List<User> coll = findByWhere("lower(_entity.username) = ?1", new Object[] { username.toLowerCase() }, null,
-				null);
-		if (coll.size() > 0)
-			user = coll.iterator().next();
-		initialize(user);
+		try {
+			List<User> coll = findByWhere("lower(_entity.username) = ?1", new Object[] { username.toLowerCase() }, null,
+					null);
+			if (coll.size() > 0)
+				user = coll.iterator().next();
+			initialize(user);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		return user;
 	}
 
@@ -94,42 +107,66 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 * @see com.logicaldoc.core.security.dao.UserDAO#findByUsername(java.lang.String)
 	 */
 	public List<User> findByLikeUsername(String username) {
-		return findByWhere("_entity.username like ?1", new Object[] { username }, null, null);
+		try {
+			return findByWhere("_entity.username like ?1", new Object[] { username }, null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<User>();
+		}
 	}
 
-	/**
-	 * @see com.logicaldoc.core.security.dao.UserDAO#findByUsernameAndName(java.lang.String,
-	 *      java.lang.String)
-	 */
+	@Override
 	public List<User> findByUsernameAndName(String username, String name) {
-		return findByWhere("lower(_entity.name) like ?1 and _entity.username like ?2",
-				new Object[] { name.toLowerCase(), username }, null, null);
+		try {
+			return findByWhere("lower(_entity.name) like ?1 and _entity.username like ?2",
+					new Object[] { name.toLowerCase(), username }, null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<User>();
+		}
 	}
 
-	/**
-	 * @see com.logicaldoc.core.security.dao.UserDAO#store(com.logicaldoc.core.security.User)
-	 */
+	@Override
 	public boolean store(User user) {
 		return store(user, null);
 	}
 
 	@Override
 	public boolean store(User user, UserHistory transaction) {
+		if (!checkStoringAspect())
+			return false;
+
 		boolean result = true;
 		boolean newUser = user.getId() == 0;
 
 		try {
-			if (user.getId() == 0L)
-				if (findByUsernameIgnoreCase(user.getUsername()) != null)
-					throw new Exception("Another user exists with the same username " + user.getUsername()
-							+ " (perhaps with different case)");
+			if ("admin".equals(user.getUsername()) && user.getType() != User.TYPE_DEFAULT)
+				throw new Exception("User admin must be default type");
+			if (newUser && findByUsernameIgnoreCase(user.getUsername()) != null)
+				throw new Exception(
+						String.format("Another user exists with the same username %s (perhaps with different case)",
+								user.getUsername()));
+
+			if (user.getType() == User.TYPE_SYSTEM)
+				user.setType(User.TYPE_DEFAULT);
+
+			if (user.isReadonly()) {
+				GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+				Group guestGroup = gDao.findByName("guest", user.getTenantId());
+				Group userGroup = user.getUserGroup();
+				user.removeGroupMemberships(null);
+				user.addGroup(userGroup);
+				user.addGroup(guestGroup);
+			}
 
 			Map<String, Object> dictionary = new HashMap<String, Object>();
 
 			log.debug("Invoke listeners before store");
-			for (UserListener listener : userListenerManager.getListeners()) {
+			for (UserListener listener : userListenerManager.getListeners())
 				listener.beforeStore(user, transaction, dictionary);
-			}
+
+			if (newUser)
+				user.setCreation(new Date());
 
 			saveOrUpdate(user);
 			initialize(user);
@@ -143,8 +180,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				grp.setType(Group.TYPE_USER);
 				grp.setTenantId(user.getTenantId());
 				groupDAO.store(grp);
-
-				saveUserHistory(user, transaction);
 			}
 			if (!user.getGroups().contains(grp)) {
 				user.getGroups().add(grp);
@@ -152,30 +187,45 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				saveOrUpdate(user);
 			}
 
+			log.debug("Invoke listeners after store");
+			for (UserListener listener : userListenerManager.getListeners())
+				listener.afterStore(user, transaction, dictionary);
+
 			if (newUser) {
 				// Save default dashlets
-				Generic dash = new Generic("usersetting", "dashlet-1", user.getId());
+				Generic dash = new Generic("usersetting", "dashlet-checkout", user.getId());
 				dash.setInteger1(1L);
 				dash.setInteger2(0L);
 				dash.setInteger3(0L);
 				dash.setString1("0");
 				dash.setTenantId(user.getTenantId());
 				genericDAO.store(dash);
-				dash = new Generic("usersetting", "dashlet-3", user.getId());
+				dash = new Generic("usersetting", "dashlet-locked", user.getId());
 				dash.setInteger1(3L);
 				dash.setInteger2(0L);
 				dash.setInteger3(1L);
 				dash.setString1("0");
 				dash.setTenantId(user.getTenantId());
 				genericDAO.store(dash);
-				dash = new Generic("usersetting", "dashlet-6", user.getId());
+				dash = new Generic("usersetting", "dashlet-notes", user.getId());
 				dash.setInteger1(6L);
 				dash.setInteger2(1L);
 				dash.setInteger3(0L);
 				dash.setString1("0");
 				dash.setTenantId(user.getTenantId());
 				genericDAO.store(dash);
-			}
+
+				/*
+				 * Save an history to record the user creation
+				 */
+				UserHistory createdHistory = new UserHistory();
+				if (transaction != null)
+					createdHistory = (UserHistory) transaction.clone();
+				createdHistory.setEvent(UserEvent.CREATED.toString());
+				createdHistory.setComment(user.getUsername());
+				saveUserHistory(user, createdHistory);
+			} else if (transaction != null)
+				saveUserHistory(user, transaction);
 
 			// If the admin password was changed the 'adminpasswd' also has to
 			// be updated
@@ -184,9 +234,15 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				config.setProperty("adminpasswd", user.getPassword());
 				config.write();
 			}
+
+			if (user.isReadonly()) {
+				for (Group group : user.getGroups())
+					groupDAO.fixGuestPermissions(group);
+			}
 		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+			if (e instanceof AuthenticationException)
+				throw (AuthenticationException) e;
+			log.error(e.getMessage(), e);
 			result = false;
 		}
 
@@ -214,8 +270,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			if (!user.getPassword().equals(CryptUtil.cryptString(password)))
 				result = false;
 		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			result = false;
 		}
 		return result;
@@ -230,8 +285,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			else
 				result = validateUser(findByUsernameIgnoreCase(username));
 		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			result = false;
 		}
 		return result;
@@ -239,7 +293,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	private boolean validateUser(User user) {
 		// Check the password match
-		if ((user == null) || user.getType() != User.TYPE_DEFAULT)
+		if (user == null || (user.getType() != User.TYPE_DEFAULT && user.getType() != User.TYPE_READONLY))
 			return false;
 
 		// Check if the user is enabled
@@ -297,8 +351,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				return (lastChange.before(date));
 			}
 		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return true;
 		}
 		return false;
@@ -306,13 +359,35 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public int count(Long tenantId) {
-		String query = "select count(*) from ld_user where ld_type=0 and not(ld_deleted=1) "
+		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_DEFAULT + " and not(ld_deleted=1) "
 				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
-		return queryForInt(query);
+
+		try {
+			return queryForInt(query);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return 0;
+		}
+	}
+
+	@Override
+	public int countGuests(Long tenantId) {
+		String query = "select count(*) from ld_user where ld_type=" + User.TYPE_READONLY + " and not(ld_deleted=1) "
+				+ (tenantId != null ? " and ld_tenantid=" + tenantId : "");
+
+		try {
+			return queryForInt(query);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return 0;
+		}
 	}
 
 	@Override
 	public boolean delete(long userId, UserHistory transaction) {
+		if (!checkStoringAspect())
+			return false;
+
 		boolean result = true;
 
 		try {
@@ -333,8 +408,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 			saveUserHistory(user, transaction);
 		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			result = false;
 		}
 
@@ -348,7 +422,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		transaction.setUser(user);
 		transaction.setNotified(0);
 
-		userHistoryDAO.store(transaction);
+		try {
+			userHistoryDAO.store(transaction);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	public UserHistoryDAO getUserHistoryDAO() {
@@ -382,10 +460,16 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (!user.getUserGroups().isEmpty()) {
 			List<Long> groupIds = user.getUserGroups().stream().map(u -> u.getGroupId()).collect(Collectors.toList());
 			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-			List<Group> groups = gDao.findByWhere(
-					"_entity.id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")", null, null);
-			for (Group group : groups)
-				user.getGroups().add(group);
+
+			try {
+				List<Group> groups = gDao.findByWhere(
+						"_entity.id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")", null,
+						null);
+				for (Group group : groups)
+					user.getGroups().add(group);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -417,14 +501,24 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	@Override
 	public Set<User> findByGroup(long groupId) {
-		List<Long> docIds = queryForList("select ld_userid from ld_usergroup where ld_groupid=" + groupId, Long.class);
+		List<Long> docIds = new ArrayList<Long>();
+		try {
+			docIds = queryForList("select ld_userid from ld_usergroup where ld_groupid=" + groupId, Long.class);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		Set<User> set = new HashSet<User>();
 		if (!docIds.isEmpty()) {
 			String query = "_entity.id in (" + StringUtil.arrayToString(docIds.toArray(new Long[0]), ",") + ")";
-			List<User> users = findByWhere(query, null, null, null);
-			for (User user : users) {
-				if (user.getDeleted() == 0 && !set.contains(user))
-					set.add(user);
+
+			try {
+				List<User> users = findByWhere(query, null, null, null);
+				for (User user : users) {
+					if (user.getDeleted() == 0 && !set.contains(user))
+						set.add(user);
+				}
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
 			}
 		}
 		return set;

@@ -46,6 +46,8 @@ public enum HitField {
 
 	/**
 	 * HitField list suitable for searches
+	 * 
+	 * @return list of fields in a single string representation
 	 */
 	public static String searchList() {
 		Set<HitField> fields = all();

@@ -20,9 +20,9 @@ public interface DocumentListener {
 	 * @param transaction Transaction informations
 	 * @param dictionary Dictionary of the execution pipeline
 	 * 
-	 * @throws Exception
+	 * @throws Exception raised if something went wrong
 	 */
-	public void beforeStore(Document document, History transaction, Map<String, Object> dictionary) throws Exception;
+	public void beforeStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary) throws Exception;
 
 	/**
 	 * Called after a document is stored in the database
@@ -31,9 +31,9 @@ public interface DocumentListener {
 	 * @param transaction Transaction informations
 	 * @param dictionary Dictionary of the execution pipeline
 	 * 
-	 * @throws Exception
+	 * @throws Exception raised if something went wrong
 	 */
-	public void afterStore(Document document, History transaction, Map<String, Object> dictionary) throws Exception;
+	public void afterStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary) throws Exception;
 
 	/**
 	 * Called before a document is checked in
@@ -42,9 +42,9 @@ public interface DocumentListener {
 	 * @param transaction Transaction informations
 	 * @param dictionary Dictionary of the execution pipeline
 	 * 
-	 * @throws Exception
+	 * @throws Exception raised if something went wrong
 	 */
-	public void beforeCheckin(Document document, History transaction, Map<String, Object> dictionary) throws Exception;
+	public void beforeCheckin(Document document, DocumentHistory transaction, Map<String, Object> dictionary) throws Exception;
 
 	/**
 	 * Called after a document is checked in
@@ -53,7 +53,7 @@ public interface DocumentListener {
 	 * @param transaction Transaction informations
 	 * @param dictionary Dictionary of the execution pipeline
 	 * 
-	 * @throws Exception
+	 * @throws Exception raised if something went wrong
 	 */
-	public void afterCheckin(Document document, History transaction, Map<String, Object> dictionary) throws Exception;
+	public void afterCheckin(Document document, DocumentHistory transaction, Map<String, Object> dictionary) throws Exception;
 }

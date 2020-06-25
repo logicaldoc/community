@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * GUI representation of an impex archive
+ * GUI representation of an import/export archive
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
@@ -76,6 +76,8 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * The archive name. Also alternative identifier.
+	 * 
+	 * @return the name
 	 */
 	public String getName() {
 		return name;
@@ -87,6 +89,8 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * The archive description
+	 * 
+	 * @return description of the archive
 	 */
 	public String getDescription() {
 		return description;
@@ -98,6 +102,8 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * The archive's creation date
+	 * 
+	 * @return the date when the archive was created
 	 */
 	public Date getCreation() {
 		return creation;
@@ -110,11 +116,13 @@ public class GUIArchive implements Serializable {
 	/**
 	 * The archive status
 	 * 
-	 * @see Archive#ASSIGNED_TASK
-	 * @see Archive#STATUS_CLOSED
-	 * @see Archive#TASKS_ADMIN
-	 * @see Archive#TASKS_SUPERVISOR
-	 * @see Archive#STATUS_ERROR
+	 * @see #STATUS_OPENED
+	 * @see #STATUS_CLOSED
+	 * @see #STATUS_FINALIZED
+	 * @see #STATUS_READYTOSIGN
+	 * @see #STATUS_ERROR
+	 * 
+	 * @return the status
 	 */
 	public int getStatus() {
 		return status;
@@ -126,7 +134,9 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * Archive dimension in bytes, that is the sum of sizes of all document plus
-	 * the size of all metadata files.
+	 * the size of all metadata files
+	 * 
+	 * @return the total size in bytes
 	 */
 	public long getSize() {
 		return size;
@@ -139,9 +149,10 @@ public class GUIArchive implements Serializable {
 	/**
 	 * The archive type
 	 * 
-	 * @see Archive#TYPE_DEFAULT
-	 * @see Archive#TYPE_STORAGE
+	 * @see #TYPE_DEFAULT
+	 * @see #TYPE_STORAGE
 	 * 
+	 * @return the type
 	 */
 	public int getType() {
 		return type;
@@ -153,6 +164,8 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * The archive creator id
+	 * 
+	 * @return identifier of the creator
 	 */
 	public long getCreatorId() {
 		return creatorId;
@@ -164,6 +177,8 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * The archive creator name
+	 * 
+	 * @return name of the creator
 	 */
 	public String getCreatorName() {
 		return creatorName;
@@ -175,6 +190,8 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * The archive closer id
+	 * 
+	 * @return identifier of the user that closed the archive
 	 */
 	public Long getCloserId() {
 		return closerId;
@@ -186,6 +203,8 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * The archive closer name
+	 * 
+	 * @return name of the user that closed the archive
 	 */
 	public String getCloserName() {
 		return closerName;
@@ -197,6 +216,8 @@ public class GUIArchive implements Serializable {
 
 	/**
 	 * The archive's closure date
+	 * 
+	 * @return the date when the archive has been closed
 	 */
 	public Date getClosure() {
 		return closure;

@@ -73,12 +73,10 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private String comment;
 
 	private String workflowStatus;
-	
+
 	private String workflowStatusDisplay;
 
 	private int published = 1;
-
-	private int barcoded = 0;
 
 	private Date startPublishing = new Date();
 
@@ -104,6 +102,30 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private boolean passwordProtected = false;
 
+	private int links = 0;
+
+	/**
+	 * Identifier of the Zonal OCR template to use to process this document
+	 */
+	private Long ocrTemplateId = null;
+
+	/**
+	 * Indicates if the document has been processed by the zonal OCR: <b>0</b> =
+	 * to process, <b>1</b> = processed
+	 */
+	private int ocrd = 0;
+
+	/**
+	 * Identifier of the barcode template to use to process this document
+	 */
+	private Long barcodeTemplateId = null;
+
+	/**
+	 * Indicates if the document has been processed by the barcodes processor: <b>0</b> =
+	 * to process, <b>1</b> = processed
+	 */
+	private int barcoded = 0;
+	
 	public long getId() {
 		return id;
 	}
@@ -271,7 +293,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return new Long(getId()).hashCode();
+		return Long.valueOf(getId()).hashCode();
 	}
 
 	public String getIcon() {
@@ -353,7 +375,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
 		this.workflowStatusDisplay = workflowStatusDisplay;
 	}
-	
+
 	public int getPublished() {
 		return published;
 	}
@@ -516,5 +538,37 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setBookmarked(boolean bookmarked) {
 		this.bookmarked = bookmarked;
+	}
+
+	public int getLinks() {
+		return links;
+	}
+
+	public void setLinks(int links) {
+		this.links = links;
+	}
+
+	public Long getOcrTemplateId() {
+		return ocrTemplateId;
+	}
+
+	public void setOcrTemplateId(Long ocrTemplateId) {
+		this.ocrTemplateId = ocrTemplateId;
+	}
+
+	public int getOcrd() {
+		return ocrd;
+	}
+
+	public void setOcrd(int ocrd) {
+		this.ocrd = ocrd;
+	}
+
+	public Long getBarcodeTemplateId() {
+		return barcodeTemplateId;
+	}
+
+	public void setBarcodeTemplateId(Long barcodeTemplateId) {
+		this.barcodeTemplateId = barcodeTemplateId;
 	}
 }

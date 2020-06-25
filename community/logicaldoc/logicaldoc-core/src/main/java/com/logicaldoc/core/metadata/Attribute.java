@@ -2,6 +2,7 @@ package com.logicaldoc.core.metadata;
 
 import java.util.Date;
 
+import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.User;
 
 /**
@@ -26,9 +27,16 @@ public class Attribute implements Comparable<Attribute> {
 
 	public static final int TYPE_BOOLEAN = 5;
 
+	public static final int TYPE_FOLDER = 6;
+
 	public static final int EDITOR_DEFAULT = 0;
 
 	public static final int EDITOR_LISTBOX = 1;
+
+	/*
+	 * Not persistent
+	 */
+	private String name;
 
 	private String label;
 
@@ -42,6 +50,8 @@ public class Attribute implements Comparable<Attribute> {
 
 	private int type = TYPE_STRING;
 
+	private int hidden = 0;
+
 	private int mandatory = 0;
 
 	private int position = 0;
@@ -52,6 +62,18 @@ public class Attribute implements Comparable<Attribute> {
 	 * Reference to the Attribute Set
 	 */
 	private Long setId;
+
+	private int multiple = 0;
+
+	/**
+	 * Name of a parent attribute
+	 */
+	private String parent;
+
+	/**
+	 * String representation of the multiple string values
+	 */
+	private String stringValues;
 
 	public String getStringValue() {
 		return stringValue;
@@ -125,6 +147,8 @@ public class Attribute implements Comparable<Attribute> {
 			return getDateValue();
 		case TYPE_USER:
 			return getIntValue();
+		case TYPE_FOLDER:
+			return getIntValue();
 		case TYPE_BOOLEAN:
 			if (getIntValue() == null)
 				return null;
@@ -145,7 +169,7 @@ public class Attribute implements Comparable<Attribute> {
 			setStringValue((String) value);
 		} else if (value instanceof Integer) {
 			this.type = TYPE_INT;
-			setIntValue(new Long((Integer) value));
+			setIntValue(Long.valueOf((Integer) value));
 		} else if (value instanceof Long) {
 			this.type = TYPE_INT;
 			setIntValue((Long) value);
@@ -159,19 +183,23 @@ public class Attribute implements Comparable<Attribute> {
 			this.type = TYPE_USER;
 			this.intValue = ((User) value).getId();
 			this.stringValue = ((User) value).getFullName();
+		} else if (value instanceof Folder) {
+			this.type = TYPE_FOLDER;
+			this.intValue = ((Folder) value).getId();
+			this.stringValue = ((Folder) value).getName();
 		} else if (value instanceof Boolean) {
 			this.type = TYPE_BOOLEAN;
 			this.intValue = ((Boolean) value).booleanValue() ? 1L : 0L;
 		} else {
-			throw new IllegalArgumentException("No a String, Long, Double, Date, Boolean or User value");
+			throw new IllegalArgumentException("No a String, Long, Double, Date, Boolean, User, Folder value");
 		}
 	}
 
 	/**
 	 * Whether an attribute value is mandatory or not.
 	 * 
-	 * @return If 0, the attribute value is not mandatory; if 1, the attribute
-	 *         value is mandatory.
+	 * @return If <b>0</b>, the attribute value is not mandatory; if <b>1</b>,
+	 *         the attribute value is mandatory.
 	 */
 	public int getMandatory() {
 		return mandatory;
@@ -182,7 +210,9 @@ public class Attribute implements Comparable<Attribute> {
 	}
 
 	/**
-	 * This is the position of the attribute into the attributes list.
+	 * This is the position of the attribute into the attributes list
+	 * 
+	 * @return the attribute's position
 	 */
 	public int getPosition() {
 		return position;
@@ -194,7 +224,7 @@ public class Attribute implements Comparable<Attribute> {
 
 	@Override
 	public int compareTo(Attribute o) {
-		return new Integer(getPosition()).compareTo(o.getPosition());
+		return Integer.valueOf(getPosition()).compareTo(o.getPosition());
 	}
 
 	public String getLabel() {
@@ -213,21 +243,12 @@ public class Attribute implements Comparable<Attribute> {
 		this.editor = editor;
 	}
 
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		Attribute clone = new Attribute();
-		clone.setStringValue(stringValue);
-		clone.setDateValue(dateValue);
-		clone.setDoubleValue(doubleValue);
-		clone.setIntValue(intValue);
-		clone.setLabel(label);
-		clone.setMandatory(mandatory);
-		clone.setPosition(position);
-		clone.setEditor(editor);
-		clone.setType(type);
-		clone.setSetId(setId);
+	public int getHidden() {
+		return hidden;
+	}
 
-		return clone;
+	public void setHidden(int hidden) {
+		this.hidden = hidden;
 	}
 
 	public Long getSetId() {
@@ -236,5 +257,59 @@ public class Attribute implements Comparable<Attribute> {
 
 	public void setSetId(Long setId) {
 		this.setId = setId;
+	}
+
+	public int getMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(int multiple) {
+		this.multiple = multiple;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Attribute clone = new Attribute();
+		clone.setStringValue(stringValue);
+		clone.setStringValues(stringValues);
+		clone.setDateValue(dateValue);
+		clone.setDoubleValue(doubleValue);
+		clone.setIntValue(intValue);
+		clone.setLabel(label);
+		clone.setMandatory(mandatory);
+		clone.setHidden(hidden);
+		clone.setMultiple(multiple);
+		clone.setPosition(position);
+		clone.setEditor(editor);
+		clone.setType(type);
+		clone.setSetId(setId);
+		clone.setParent(parent);
+		clone.setName(name);
+
+		return clone;
+	}
+
+	public String getParent() {
+		return parent;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getStringValues() {
+		return stringValues;
+	}
+
+	public void setStringValues(String stringValues) {
+		this.stringValues = stringValues;
 	}
 }

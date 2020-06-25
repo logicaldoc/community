@@ -1,19 +1,28 @@
 package com.logicaldoc.core.automation;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.nio.file.Paths;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.RuntimeSingleton;
 import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.security.Tenant;
@@ -22,29 +31,15 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**
- * Represents a Facade on Velocity
+ * Represents the automation scripting engine
  * 
- * @author Marco Meschieri - LogicalDOC since <product_release>
+ * @author Marco Meschieri - LogicalDOC
  */
 public class Automation {
-
-	private static final String CLASS_TOOL = "ClassTool";
-
-	public static final String DIC_I18N = "I18N";
-
-	public static final String DOC_TOOL = "DocTool";
-
-	public static final String FOLDER_TOOL = "FolderTool";
 
 	public static final String CURRENT_DATE = "CURRENT_DATE";
 
 	public static final String PRODUCT = "product";
-
-	public static final String DATE_TOOL = "DateTool";
-
-	public static final String SYSTEM_TOOL = "SystemTool";
-
-	public static final String MAIL_TOOL = "MailTool";
 
 	public static final String LOCALE = "locale";
 
@@ -52,15 +47,59 @@ public class Automation {
 
 	public static final String TENANT_ID = "tenantId";
 
-	public static final String LOG = "log";
+	public static final String DICTIONARY = "dictionary";
+
+	public static final String KEYS = "keys";
+
+	public static final String CONTEXT = "context";
+
+	public static final String PARAMETERS = "parameters";
+
+	public static final String PARAMETERS_NAMES = "parametersnames";
 
 	private static Logger log = LoggerFactory.getLogger(Automation.class);
 
-	private String logTag = "ScriptEngine";
+	private String logTag = "AutomationEngine";
 
 	private Locale locale = Locale.ENGLISH;
 
 	private long tenantId = Tenant.DEFAULT_ID;
+
+	public static synchronized void initialize() {
+		try {
+			if (!RuntimeSingleton.isInitialized()) {
+				RuntimeSingleton.setProperty(RuntimeConstants.SET_NULL_ALLOWED, true);
+
+				try {
+					RuntimeSingleton.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
+							Log4JLogChute.class.getName());
+				} catch (Throwable t) {
+					log.warn(t.getMessage());
+				}
+
+				try {
+					RuntimeSingleton.setProperty(Log4JLogChute.RUNTIME_LOG_LOG4J_LOGGER, Automation.class.getName());
+				} catch (Throwable t) {
+					log.warn(t.getMessage());
+				}
+
+				RuntimeSingleton.init();
+
+				log.info("Automation has been initialized");
+			}
+		} catch (Throwable t) {
+			log.error("Unable to initialize the automation engine", t);
+		}
+	}
+
+	public Automation() {
+		super();
+	}
+
+	public Automation(String logTag) {
+		super();
+		this.logTag = logTag;
+	}
 
 	public Automation(String logTag, Locale locale, long tenantId) {
 		super();
@@ -70,92 +109,177 @@ public class Automation {
 	}
 
 	/**
-	 * Evaluate a given expression. The dictionary will automatically contain
-	 * the following keys:
+	 * Prepares the dictionary for the automation's execution. All the classes
+	 * marked with @AutomationDictionary will be added and the keys of
+	 * customDictionary will be merged. Moreover, these additional keys will be
+	 * included.
+	 * 
 	 * <ol>
 	 * <li>product: name of the product</li>
 	 * <li>locale: the default locale</li>
+	 * <li>nl: the new line</li>
 	 * <li>CURRENT_DATE: the actual date</li>
-	 * <li>DateTool</li>
-	 * <li>I18N</li>
-	 * <li>DocTool</li>
-	 * <li>FolderTool</li>
+	 * <li>tenantId</li>
+	 * <li>dictionary: the map of all the variables</li>
+	 * <li>serverUrl</li>
+	 * <li>tenantId</li>
 	 * </ol>
 	 * 
-	 * @param expression The string expression to process
-	 * @param dictionary The dictionary to use
-	 * @return The processed result
+	 * @param clientDictionary Custom keys provided by the client
+	 * @return The complete dictionary to use
 	 */
-	public String evaluate(String expression, Map<String, Object> dictionary) {
-		Map<String, Object> extendedDictionary = new HashMap<String, Object>();
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
+		if (clientDictionary == null)
+			clientDictionary = new ConcurrentHashMap<String, Object>();
+		ConcurrentHashMap<String, Object> dictionary = new ConcurrentHashMap<String, Object>();
 
-		// This is needed to handle new lines
-		extendedDictionary.put("nl", "\n");
+		/*
+		 * Scan the classpath to add all the @AutomationDictionary classes
+		 */
+		ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(true);
+		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
+		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
+			String beanClassName = bd.getBeanClassName();
+			Class beanClass = null;
+			try {
+				beanClass = Class.forName(beanClassName);
+			} catch (ClassNotFoundException e) {
+				log.error(e.getMessage(), e);
+			}
 
-		// The tenant ID
-		extendedDictionary.put(TENANT_ID, this.tenantId);
+			if (beanClass == null)
+				continue;
+
+			String key = beanClass.getSimpleName();
+			AutomationDictionary annotation = (AutomationDictionary) beanClass
+					.getAnnotation(AutomationDictionary.class);
+			if (StringUtils.isNotEmpty(annotation.key()))
+				key = annotation.key();
+
+			try {
+				Object instance = beanClass.getDeclaredConstructor().newInstance();
+				dictionary.put(key, instance);
+			} catch (Throwable e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+
+		/*
+		 * Add some standard entries
+		 */
 
 		// The product name
-		extendedDictionary.put(PRODUCT, SystemInfo.get(tenantId).getProduct());
+		dictionary.put(PRODUCT, SystemInfo.get(tenantId).getProduct());
+
+		// This is needed to handle new lines
+		dictionary.put("nl", "\n");
+
+		// The tenant ID
+		if (!dictionary.containsKey(TENANT_ID))
+			dictionary.put(TENANT_ID, this.tenantId);
 
 		// This is the locale
-		if (!dictionary.containsKey(LOCALE))
-			dictionary.put(LOCALE, locale);
+		if (!clientDictionary.containsKey(LOCALE))
+			clientDictionary.put(LOCALE, this.locale);
 
 		// This is needed to format dates
-		DateTool dateTool = new DateTool(I18N.getMessages((Locale) dictionary.get(LOCALE)).get("format_date"), I18N
-				.getMessages((Locale) dictionary.get(LOCALE)).get("format_dateshort"));
-		extendedDictionary.put(DATE_TOOL, dateTool);
+		DateTool dateTool = new DateTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
+				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_dateshort"));
+		dictionary.put(DateTool.class.getSimpleName(), dateTool);
 
 		// Put the current date
-		extendedDictionary.put(CURRENT_DATE, new Date());
+		dictionary.put(CURRENT_DATE, new Date());
 
 		// Localized messages map
-		extendedDictionary.put(DIC_I18N, new I18NTool(I18N.getMessages((Locale) dictionary.get(LOCALE))));
-
-		// This is needed to print document's URL
-		extendedDictionary.put(DOC_TOOL, new DocTool());
-
-		// This is needed to print folder's URL
-		extendedDictionary.put(FOLDER_TOOL, new FolderTool());
-
-		// Utility functions for manipulating classes and resources
-		extendedDictionary.put(CLASS_TOOL, new ClassTool());
-
-		// System Utility functions
-		extendedDictionary.put(SYSTEM_TOOL, new SystemTool());
-
-		// Mail utilities
-		extendedDictionary.put(MAIL_TOOL, new MailTool());
-
-		// Access to the system log
-		extendedDictionary.put(LOG, new LogTool());
+		dictionary.put(I18N.class.getSimpleName(),
+				new I18NTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE))));
 
 		if (Context.get() != null)
-			dictionary.put(SERVER_URL, Context.get().getProperties().get("server.url"));
+			clientDictionary.put(SERVER_URL, Context.get().getProperties().get("server.url"));
 		else
 			try {
-				dictionary.put(SERVER_URL, new ContextProperties().getProperty("server.url"));
+				clientDictionary.put(SERVER_URL, new ContextProperties().getProperty("server.url"));
 			} catch (IOException e1) {
 
 			}
 
-		if (dictionary != null)
-			extendedDictionary.putAll(dictionary);
+		/*
+		 * Merge the client dictionary
+		 */
+		if (clientDictionary != null && !clientDictionary.isEmpty()) {
+			for (String key : clientDictionary.keySet())
+				if (key != null && clientDictionary.get(key) != null)
+					dictionary.put(key, clientDictionary.get(key));
+		}
 
+		// Put some static classes
+		dictionary.put(Paths.class.getSimpleName(), Paths.class);
+		dictionary.put(Math.class.getSimpleName(), Math.class);
+
+		// Put a copy of all the keys(if we would traverse the keyset of the
+		// dictionary we would get concurrent modification exception
+		Set<String> keySet = dictionary.keySet().stream().collect(Collectors.toSet());
+		dictionary.put(KEYS, keySet);
+
+		// Add a reference to the dictionary itself
+		dictionary.put(DICTIONARY, dictionary);
+
+		// Put the application context
+		if (Context.get() != null)
+			dictionary.put(CONTEXT, Context.get());
+
+		return dictionary;
+	}
+
+	private VelocityContext prepareContext(Map<String, Object> extendedDictionary) {
+		initialize();
+
+		VelocityContext context = new VelocityContext(extendedDictionary);
+
+		return context;
+	}
+
+	/**
+	 * Evaluate a given expression. The given dictionary will be integrated by
+	 * {@link Automation#prepareDictionary(Map)}:
+	 * 
+	 * @param expression The string expression to process
+	 * @param clientDictionary The dictionary to use
+	 * @return The processed result
+	 */
+	public String evaluate(String expression, Map<String, Object> clientDictionary) {
 		StringWriter writer = new StringWriter();
 		try {
 			if (StringUtils.isNotEmpty(expression)) {
-				VelocityContext context = new VelocityContext(extendedDictionary);
-				Velocity.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, Log4JLogChute.class.getName());
-				Velocity.setProperty("runtime.log.logsystem.log4j.logger", Automation.class.getName());
+				VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
+
 				Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine",
 						expression.replace("\n", "${nl}"));
 			}
 			return writer.toString();
 		} catch (Throwable e) {
-			log.error("Error in this script: " + expression, e);
+			log.error("Error in this script: {}", expression, e);
 			return expression;
+		}
+	}
+
+	/**
+	 * Evaluate a given expression. The given dictionary will be integrated by
+	 * {@link Automation#prepareDictionary(Map)}
+	 * 
+	 * @param clientDictionary dictionary to be passed to the engine
+	 * @param reader the reader on the automation code
+	 * @param writer the writer that will receive the output
+	 */
+	public void evaluate(Map<String, Object> clientDictionary, Reader reader, Writer writer) {
+		try {
+			if (reader != null) {
+				VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
+				Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", reader);
+			}
+		} catch (Throwable e) {
+			log.error("Error in the script", e);
 		}
 	}
 }

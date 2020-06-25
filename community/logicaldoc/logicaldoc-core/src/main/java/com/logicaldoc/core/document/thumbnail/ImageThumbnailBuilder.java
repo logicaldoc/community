@@ -21,7 +21,7 @@ import com.logicaldoc.util.exec.Exec;
  * @since 4.5
  */
 public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
-	protected static Logger log = LoggerFactory.getLogger(AbstractThumbnailBuilder.class);
+	protected static Logger log = LoggerFactory.getLogger(ImageThumbnailBuilder.class);
 
 	@Override
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest, int size, int quality)

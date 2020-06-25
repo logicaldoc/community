@@ -190,6 +190,8 @@ public class TenantsPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param tenant the tenant to update
 	 */
 	public void updateRecord(GUITenant tenant) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, tenant.getId()));

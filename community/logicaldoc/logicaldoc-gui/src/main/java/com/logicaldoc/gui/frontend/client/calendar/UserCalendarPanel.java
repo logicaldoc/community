@@ -65,7 +65,7 @@ public class UserCalendarPanel extends VLayout {
 	}
 
 	private void initCalendar() {
-		calendar = new DocumentCalendar(null, choosenDate, new AsyncCallback<Void>() {
+		calendar = new EventsCalendar(null, choosenDate, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

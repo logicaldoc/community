@@ -21,10 +21,11 @@ public class UserHistoryDS extends DataSource {
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 		DataSourceTextField event = new DataSourceTextField("event");
 		DataSourceTextField comment = new DataSourceTextField("comment");
+		DataSourceTextField reason = new DataSourceTextField("reason");
 		DataSourceTextField sid = new DataSourceTextField("sid");
 		DataSourceTextField ip = new DataSourceTextField("id");
 
-		setFields(user, date, event, ip, comment, sid, folderId);
+		setFields(user, date, event, ip, comment, reason, sid, folderId);
 		setClientOnly(true);
 		setDataURL("data/userhistory.xml?id=" + userId + "&locale=" + I18N.getLocale());
 	}

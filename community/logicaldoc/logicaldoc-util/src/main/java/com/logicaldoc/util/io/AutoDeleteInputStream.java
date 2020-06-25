@@ -1,10 +1,10 @@
 package com.logicaldoc.util.io;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
-import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Wrapper around a standard InputStream that deletes the file after closing.
@@ -16,6 +16,12 @@ public class AutoDeleteInputStream extends InputStream {
 	private InputStream wrappedStream;
 
 	private File file;
+
+	public AutoDeleteInputStream(File file) throws FileNotFoundException {
+		super();
+		this.file = file;
+		this.wrappedStream = new FileInputStream(file);
+	}
 
 	public AutoDeleteInputStream(InputStream wrappedStream, File file) {
 		super();

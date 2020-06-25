@@ -24,7 +24,8 @@ public interface ThumbnailBuilder {
 	 * @param size The thumbnail size
 	 * @param dest The destination thumbnail file
 	 * @param quality Compression quality(0..100, 100 is maximum quality)
-	 * @throws IOException
+
+	 * @throws IOException raised when the image cannot be written
 	 */
 	public void buildThumbnail(String sid, Document document, String fileVersion, File src,	File dest, int size, int quality) throws IOException;
 }

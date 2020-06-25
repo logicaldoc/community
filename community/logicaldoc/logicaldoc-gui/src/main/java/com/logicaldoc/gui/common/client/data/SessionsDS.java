@@ -13,13 +13,17 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  */
 public class SessionsDS extends DataSource {
 	public SessionsDS() {
+		this(null);
+	}
+
+	public SessionsDS(Integer status) {
 		setTitleField("sid");
 		setRecordXPath("/list/session");
 
 		DataSourceTextField sid = new DataSourceTextField("sid");
 		sid.setPrimaryKey(true);
 
-		DataSourceTextField status = new DataSourceTextField("status");
+		DataSourceTextField stat = new DataSourceTextField("status");
 		DataSourceTextField statusLabel = new DataSourceTextField("statusLabel");
 		DataSourceTextField username = new DataSourceTextField("username");
 		DataSourceTextField tenant = new DataSourceTextField("tenant");
@@ -28,8 +32,8 @@ public class SessionsDS extends DataSource {
 		DataSourceTextField client = new DataSourceTextField("client");
 		DataSourceTextField _node = new DataSourceTextField("node");
 
-		setFields(sid, status, statusLabel, username, tenant, created, renew, client, _node);
-		String url = "data/sessions.xml?locale=" + I18N.getLocale();
+		setFields(sid, stat, statusLabel, username, tenant, created, renew, client, _node);
+		String url = "data/sessions.xml?locale=" + I18N.getLocale() + (status != null ? "&status=" + status : "");
 		setDataURL(url);
 		setClientOnly(true);
 	}

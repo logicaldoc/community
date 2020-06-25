@@ -70,6 +70,8 @@ public class XMLBean {
 
 	/**
 	 * Creates new XMLBean from an input stream; XMLBean is read-only!!!
+	 * 
+	 * @param is contents of the XML structure
 	 */
 	public XMLBean(InputStream is) {
 		docInputStream = is;
@@ -77,8 +79,10 @@ public class XMLBean {
 		initDocument();
 	}
 
+	/**
+	 * Initializes the SAX builder
+	 */
 	private void initDocument() {
-
 		try {
 			SAXBuilder builder = new SAXBuilder(false);
 			if (docPath != null) {
@@ -114,6 +118,8 @@ public class XMLBean {
 
 	/**
 	 * Returns the root element.
+	 * 
+	 * @return the root element
 	 */
 	public Element getRootElement() {
 		return root;
@@ -123,7 +129,8 @@ public class XMLBean {
 	 * Returns a child element.
 	 * 
 	 * @param elemname Name of the child.
-	 * @return Child
+	 * 
+	 * @return the child element
 	 */
 	public Element getChild(String elemname) {
 
@@ -216,11 +223,15 @@ public class XMLBean {
 
 	/**
 	 * This method returns the text of all children in the format
-	 * childname<separator1>childtext<separator2>.
+	 * childname&lt;separator1&gt;childtext&lt;separator2&gt;
 	 * 
-	 * @param elemname Name of the root element.
-	 * @param attribute Name of the attribute which must root element have.
-	 * @param value Value of the attribute.
+	 * @param elemname Name of the root element
+	 * @param attribute Name of the attribute which must root element have
+	 * @param value Value of the attribute
+	 * @param separator1 string used as first separator
+	 * @param separator2 string used as second separator
+	 * 
+	 * @return the children's text
 	 */
 	@SuppressWarnings("rawtypes")
 	public String getAllChildText(String elemname, String attribute, String value, String separator1, String separator2) {
@@ -247,7 +258,7 @@ public class XMLBean {
 	}
 
 	/**
-	 * Returns an elementattribute.
+	 * Returns an element attribute.
 	 * 
 	 * @param elem Name of the element.
 	 * @param attrib Name of the attribute.
@@ -296,6 +307,8 @@ public class XMLBean {
 	/**
 	 * This method saves the xml-file connected by XMLBean. NOTE: only call this
 	 * on an XMLBean _NOT_ created from an InputStream!
+	 * 
+	 * @return true if the file has been completely written
 	 */
 	public boolean writeXMLDoc() {
 		// it might be that we do not have an ordinary file,
@@ -364,7 +377,11 @@ public class XMLBean {
 	}
 
 	/**
-	 * Returns a list of all elements with the given elementname.
+	 * Returns a list of all elements with the given element.
+	 * 
+	 * @param elemname  name of the element
+	 * 
+	 * @return list of the children elements
 	 */
 	@SuppressWarnings("rawtypes")
 	public List getAllChild(String elemname) {
@@ -378,7 +395,13 @@ public class XMLBean {
 
 	/**
 	 * Returns a list of all children with the specific name and the specific
-	 * attribute value;
+	 * attribute value
+	 * 
+	 * @param elemname name of the element
+	 * @param attribute name of the attribute
+	 * @param value value of the attribute
+	 * 
+	 * @return the list of children
 	 */
 	@SuppressWarnings("rawtypes")
 	public List getAllChild(String elemname, String attribute, String value) {
@@ -407,7 +430,8 @@ public class XMLBean {
 	 * Removes an element.
 	 * 
 	 * @param elemname Tag name of the element.
-	 * @return
+	 * 
+	 * @return true if the deletion has been successful
 	 */
 	public boolean removeChild(String elemname) {
 		return root.removeChild(elemname);

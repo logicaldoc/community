@@ -16,13 +16,13 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.ibm.icu.util.Calendar;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
@@ -32,7 +32,6 @@ import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.generic.Generic;
-import com.logicaldoc.core.rss.dao.FeedMessageDAO;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.LoginThrottle;
 import com.logicaldoc.core.security.Menu;
@@ -41,6 +40,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.MenuDAO;
@@ -49,7 +49,6 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.sequence.Sequence;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.util.UserUtil;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIExternalCall;
@@ -63,7 +62,6 @@ import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.services.SecurityService;
-import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.WebConfigurator;
@@ -111,6 +109,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		ten.setQuotaThreshold(tenant.getQuotaThreshold());
 		ten.setQuotaAlertRecipients(tenant.getQuotaAlertRecipientsAsList().toArray(new String[0]));
 		ten.setMaxUsers(tenant.getMaxUsers());
+		ten.setMaxGuests(tenant.getMaxGuests());
 		ten.setEnabled(tenant.getEnabled() == 1);
 		ten.setExpire(tenant.getExpire());
 
@@ -125,11 +124,15 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 	/**
 	 * Used internally by login procedures, instantiates a new GUISession by a
-	 * given authenticated user.
+	 * given authenticated user
+	 * 
+	 * @param sess the current session
+	 * @param locale the current locale
+	 * 
+	 * @return session details
 	 */
 	public GUISession loadSession(Session sess, String locale) {
 		try {
-			GUIUser guiUser = new GUIUser();
 			GUISession session = new GUISession();
 			session.setSid(sess.getSid());
 
@@ -139,48 +142,26 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 			User user = sess.getUser();
 
-			guiUser.setFirstName(user.getFirstName());
-			guiUser.setName(user.getName());
-			guiUser.setId(user.getId());
-			guiUser.setTenantId(user.getTenantId());
+			GUIUser guiUser = getUser(user.getId());
+
 			if (StringUtils.isEmpty(locale) || "null".equals(locale)) {
 				guiUser.setLanguage(user.getLanguage());
+				locale = user.getLanguage();
 			} else {
 				guiUser.setLanguage(locale);
 			}
 
-			GUIInfo info = new InfoServiceImpl().getInfo(guiUser.getLanguage(), sess.getTenantName());
+			GUIInfo info = new InfoServiceImpl().getInfo(locale, sess.getTenantName(), true);
 			session.setInfo(info);
 
-			guiUser.setName(user.getName());
-			guiUser.setEmail(user.getEmail());
-			guiUser.setEmail2(user.getEmail2());
-			guiUser.setEmailSignature(user.getEmailSignature());
-			guiUser.setEmailSignature2(user.getEmailSignature2());
-
-			GUIGroup[] groups = new GUIGroup[user.getGroups().size()];
-			int i = 0;
-			for (Group g : user.getGroups()) {
-				groups[i] = new GUIGroup();
-				groups[i].setId(g.getId());
-				groups[i].setName(g.getName());
-				groups[i].setDescription(g.getDescription());
-				i++;
-			}
-			guiUser.setGroups(groups);
-
-			guiUser.setUserName(user.getUsername());
 			guiUser.setPasswordExpired(false);
-
-			guiUser.setLockedDocs(documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_LOCKED).size());
-			guiUser.setCheckedOutDocs(documentDao.findByLockUserAndStatus(user.getId(),
-					AbstractDocument.DOC_CHECKED_OUT).size());
-			guiUser.setUnreadMessages(messageDao.getCount(user.getUsername(), SystemMessage.TYPE_SYSTEM, 0));
-
+			guiUser.setLockedDocs(
+					documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_LOCKED).size());
+			guiUser.setCheckedOutDocs(
+					documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_CHECKED_OUT).size());
+			guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), SystemMessage.TYPE_SYSTEM));
 			guiUser.setQuota(user.getQuota());
 			guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
-			guiUser.setWelcomeScreen(user.getWelcomeScreen());
-			guiUser.setDefaultWorkspace(user.getDefaultWorkspace());
 			guiUser.setCertDN(user.getCertDN());
 			guiUser.setCertExpire(user.getCertExpire());
 			guiUser.setSecondFactor(user.getSecondFactor());
@@ -190,8 +171,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			session.setLoggedIn(true);
 
 			MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-			List<Long> menues = mdao.findMenuIdByUserId(sess.getUserId());
-			guiUser.setMenues((Long[]) menues.toArray(new Long[0]));
+			List<Long> menus = mdao.findMenuIdByUserId(sess.getUserId());
+			guiUser.setMenus((Long[]) menus.toArray(new Long[0]));
 
 			loadDashlets(guiUser);
 
@@ -199,23 +180,18 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			 * Prepare an incoming message, if any
 			 */
 			ContextProperties config = Context.get().getProperties();
-			String incomingMessage = config.getProperty(sess.getTenantName() + ".gui.welcome");
-			if (StringUtils.isNotEmpty(incomingMessage)) {
-				Map<String, String> map = new HashMap<String, String>();
-				map.put("user", user.getFullName());
-				incomingMessage = StrSubstitutor.replace(incomingMessage, map);
-			}
+			String welcomeMessage = config.getProperty(sess.getTenantName() + ".gui.welcome");
+			if (StringUtils.isNotEmpty(welcomeMessage)) {
+				Map<String, Object> dictionary = new HashMap<String, Object>();
+				dictionary.put(Automation.LOCALE, user.getLocale());
+				dictionary.put(Automation.TENANT_ID, sess.getTenantId());
+				dictionary.put("session", sess);
+				dictionary.put("user", session.getUser());
 
-			// In case of news overwrite the incoming message
-			if (guiUser.isMemberOf(Constants.GROUP_ADMIN) && info.isEnabled("Feature_27")) {
-				// Check if there are incoming messages not already read
-				FeedMessageDAO feedMessageDao = (FeedMessageDAO) Context.get().getBean(FeedMessageDAO.class);
-				if (feedMessageDao.checkNotRead())
-					incomingMessage = I18N.message("productnewsmessage", user.getLocale());
+				Automation automation = new Automation("incomingmessage");
+				welcomeMessage = automation.evaluate(welcomeMessage, dictionary);
+				session.setWelcomeMessage(welcomeMessage != null ? welcomeMessage.trim() : null);
 			}
-
-			if (StringUtils.isNotEmpty(incomingMessage))
-				session.setIncomingMessage(incomingMessage);
 
 			// Define the current locale
 			sess.getDictionary().put(ServiceUtil.LOCALE, user.getLocale());
@@ -226,14 +202,14 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			/*
 			 * Prepare the external command
 			 */
-			String tenant = sess.getTenantName();
-			if (info.isEnabled("Feature_31") && "true".equals(config.getProperty(tenant + ".extcall.enabled"))) {
+			String tenantName = sess.getTenantName();
+			if (info.isEnabled("Feature_31") && "true".equals(config.getProperty(tenantName + ".extcall.enabled"))) {
 				GUIExternalCall externalCall = new GUIExternalCall();
-				externalCall.setName(config.getProperty(tenant + ".extcall.name"));
-				externalCall.setBaseUrl(config.getProperty(tenant + ".extcall.baseurl"));
-				externalCall.setSuffix(config.getProperty(tenant + ".extcall.suffix"));
-				externalCall.setTargetWindow(config.getProperty(tenant + ".extcall.window"));
-				externalCall.setParametersStr(config.getProperty(tenant + ".extcall.params"));
+				externalCall.setName(config.getProperty(tenantName + ".extcall.name"));
+				externalCall.setBaseUrl(config.getProperty(tenantName + ".extcall.baseurl"));
+				externalCall.setSuffix(config.getProperty(tenantName + ".extcall.suffix"));
+				externalCall.setTargetWindow(config.getProperty(tenantName + ".extcall.window"));
+				externalCall.setParametersStr(config.getProperty(tenantName + ".extcall.params"));
 				session.setExternalCall(externalCall);
 			}
 
@@ -265,7 +241,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				return;
 
 			FileUtils.forceDelete(UserUtil.getUserResource(session.getUserId(), "temp"));
-			log.info("User " + session.getUsername() + " logged out and closed session " + session.getSid());
+			log.info("User {} logged out and closed session {}", session.getUsername(), session.getSid());
 			kill(session.getSid());
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -273,7 +249,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	}
 
 	@Override
-	public int changePassword(long userId, String oldPassword, String newPassword, boolean notify) {
+	public int changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
+			boolean notify) {
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 			User user = userDao.findById(userId);
@@ -303,14 +280,20 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			// The password was changed
 			user.setDecodedPassword(newPassword);
 			user.setPasswordChanged(new Date());
-			user.setPasswordExpired(0);
 			user.setRepass("");
 
 			// Add a user history entry
 			history = new UserHistory();
 			history.setUser(user);
-			history.setEvent(UserHistory.EVENT_USER_PASSWORDCHANGED);
+			history.setEvent(UserEvent.PASSWORDCHANGED.toString());
 			history.setComment("");
+
+			/*
+			 * If the credentials must be notified, we have to mark the password
+			 * as expired for security reasons, so the user will change it at
+			 * first login.
+			 */
+			user.setPasswordExpired(notify || requestorUserId == null || !requestorUserId.equals(userId) ? 1 : 0);
 
 			boolean stored = userDao.store(user, history);
 
@@ -334,13 +317,18 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	@Override
 	public void addUserToGroup(long groupId, long userId) throws ServerException {
 		ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		User user = userDao.findById(userId, true);
 		user.addGroup(groupDao.findById(groupId));
-		userDao.store(user);
-		userDao.initialize(user);
+		try {
+			userDao.store(user);
+			userDao.initialize(user);
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
 	}
 
 	@Override
@@ -370,7 +358,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		// Create the user history event
 		UserHistory transaction = new UserHistory();
 		transaction.setSession(session);
-		transaction.setEvent(UserHistory.EVENT_USER_DELETED);
+		transaction.setEvent(UserEvent.DELETED.toString());
 		transaction.setComment("");
 		transaction.setUser(userDao.findById(userId));
 
@@ -388,6 +376,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			grp.setId(groupId);
 			grp.setDescription(group.getDescription());
 			grp.setName(group.getName());
+			grp.setSource(group.getSource());
 			return grp;
 		}
 
@@ -399,42 +388,44 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			SequenceDAO seqDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
 
 			User user = userDao.findById(userId);
 			if (user != null) {
 				userDao.initialize(user);
 
-				GUIUser usr = new GUIUser();
-				usr.setId(userId);
-				usr.setTenantId(user.getTenantId());
-				usr.setAddress(user.getStreet());
-				usr.setCell(user.getTelephone2());
-				usr.setPhone(user.getTelephone());
-				usr.setCity(user.getCity());
-				usr.setCountry(user.getCountry());
-				usr.setEmail(user.getEmail());
-				usr.setEmail2(user.getEmail2());
-				usr.setEnabled(user.getEnabled() == 1);
-				usr.setFirstName(user.getFirstName());
-				usr.setLanguage(user.getLanguage());
-				usr.setName(user.getName());
-				usr.setPostalCode(user.getPostalcode());
-				usr.setState(user.getState());
-				usr.setUserName(user.getUsername());
-				usr.setPasswordExpires(user.getPasswordExpires() == 1);
-				usr.setPasswordExpired(user.getPasswordExpired() == 1);
-				usr.setWelcomeScreen(user.getWelcomeScreen());
-				usr.setDefaultWorkspace(user.getDefaultWorkspace());
-				usr.setIpWhitelist(user.getIpWhiteList());
-				usr.setIpBlacklist(user.getIpBlackList());
-				usr.setEmailSignature(user.getEmailSignature());
-				usr.setEmailSignature2(user.getEmailSignature2());
-				usr.setCertExpire(user.getCertExpire());
-				usr.setCertDN(user.getCertDN());
-				usr.setSecondFactor(user.getSecondFactor());
-				usr.setKey(user.getKey());
+				GUIUser guiUser = new GUIUser();
+				guiUser.setId(userId);
+				guiUser.setTenant(getTenant(user.getTenantId()));
+				guiUser.setAddress(user.getStreet());
+				guiUser.setCell(user.getTelephone2());
+				guiUser.setPhone(user.getTelephone());
+				guiUser.setCity(user.getCity());
+				guiUser.setCountry(user.getCountry());
+				guiUser.setEmail(user.getEmail());
+				guiUser.setEmail2(user.getEmail2());
+				guiUser.setEnabled(user.getEnabled() == 1);
+				guiUser.setFirstName(user.getFirstName());
+				guiUser.setLanguage(user.getLanguage());
+				guiUser.setName(user.getName());
+				guiUser.setPostalCode(user.getPostalcode());
+				guiUser.setState(user.getState());
+				guiUser.setUsername(user.getUsername());
+				guiUser.setPasswordExpires(user.getPasswordExpires() == 1);
+				guiUser.setPasswordExpired(user.getPasswordExpired() == 1);
+				guiUser.setWelcomeScreen(user.getWelcomeScreen());
+				guiUser.setDefaultWorkspace(user.getDefaultWorkspace());
+				guiUser.setIpWhitelist(user.getIpWhiteList());
+				guiUser.setIpBlacklist(user.getIpBlackList());
+				guiUser.setEmailSignature(user.getEmailSignature());
+				guiUser.setEmailSignature2(user.getEmailSignature2());
+				guiUser.setCertExpire(user.getCertExpire());
+				guiUser.setCertDN(user.getCertDN());
+				guiUser.setSecondFactor(user.getSecondFactor());
+				guiUser.setKey(user.getKey());
+				guiUser.setType(user.getType());
+				guiUser.setDocsGrid(user.getDocsGrid());
+				guiUser.setHitsGrid(user.getHitsGrid());
 
 				GUIGroup[] grps = new GUIGroup[user.getGroups().size()];
 				int i = 0;
@@ -444,22 +435,24 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					grps[i].setName(group.getName());
 					grps[i].setDescription(group.getDescription());
 					grps[i].setType(group.getType());
+					grps[i].setSource(group.getSource());
 					i++;
 				}
-				usr.setGroups(grps);
+				guiUser.setGroups(grps);
 
-				usr.setQuota(user.getQuota());
+				guiUser.setQuota(user.getQuota());
 
-				usr.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
+				guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
 
-				Tenant tenant = tenantDao.findById(user.getTenantId());
+				guiUser.setTenant(getTenant(user.getTenantId()));
 
 				ContextProperties config = Context.get().getProperties();
-				usr.setPasswordMinLenght(Integer.parseInt(config.getProperty(tenant.getName() + ".password.size")));
+				guiUser.setPasswordMinLenght(
+						Integer.parseInt(config.getProperty(guiUser.getTenant().getName() + ".password.size")));
 
-				loadDashlets(usr);
+				loadDashlets(guiUser);
 
-				return usr;
+				return guiUser;
 			}
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
@@ -469,17 +462,29 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 	/**
 	 * Retrieves the dashlets configuration
+	 * 
+	 * @param usr current user
 	 */
 	protected static void loadDashlets(GUIUser usr) {
+		DashletServiceImpl dashletService = new DashletServiceImpl();
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		List<GUIDashlet> dashlets = new ArrayList<GUIDashlet>();
 		Map<String, Generic> map = userDao.findUserSettings(usr.getId(), "dashlet");
 		for (Generic generic : map.values()) {
-			dashlets.add(new GUIDashlet(generic.getInteger1().intValue(), generic.getInteger2().intValue(), generic
-					.getInteger3().intValue(), generic.getString1() != null ? Integer.parseInt(generic.getString1())
-					: 0));
-		}
+			String name = generic.getSubtype().substring(generic.getSubtype().indexOf('-') + 1);
 
+			try {
+				GUIDashlet dashlet = dashletService.get(name);
+				if (dashlet != null) {
+					dashlet.setColumn(generic.getInteger2().intValue());
+					dashlet.setRow(generic.getInteger3().intValue());
+					dashlet.setIndex(generic.getString1() != null ? Integer.parseInt(generic.getString1()) : 0);
+					dashlets.add(dashlet);
+				}
+			} catch (Throwable t) {
+
+			}
+		}
 		usr.setDashlets(dashlets.toArray(new GUIDashlet[0]));
 	}
 
@@ -493,7 +498,11 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		for (long id : userIds) {
 			User user = userDao.findById(id, true);
 			user.removeGroup(group.getId());
-			userDao.store(user);
+			try {
+				userDao.store(user);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -501,32 +510,41 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	public GUIGroup saveGroup(GUIGroup group) throws ServerException {
 		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
-		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-		Group grp;
-		if (group.getId() != 0) {
-			grp = groupDao.findById(group.getId());
-			groupDao.initialize(grp);
+		try {
+			GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			Group grp;
+			if (group.getId() != 0) {
+				grp = groupDao.findById(group.getId());
+				groupDao.initialize(grp);
 
-			grp.setName(group.getName());
-			grp.setDescription(group.getDescription());
-			if (group.getInheritGroupId() == null || group.getInheritGroupId().longValue() == 0) {
-				groupDao.store(grp);
+				grp.setName(group.getName());
+				grp.setDescription(group.getDescription());
+				boolean stored = false;
+				if (group.getInheritGroupId() == null || group.getInheritGroupId().longValue() == 0) {
+					stored = groupDao.store(grp);
+				} else {
+					stored = groupDao.insert(grp, group.getInheritGroupId().longValue());
+				}
+				if (!stored)
+					throw new Exception("Group has not been updated");
 			} else {
-				groupDao.insert(grp, group.getInheritGroupId().longValue());
+				grp = new Group();
+				grp.setTenantId(session.getTenantId());
+				grp.setName(group.getName());
+				grp.setDescription(group.getDescription());
+				boolean stored = groupDao.store(grp);
+				if (!stored)
+					throw new Exception("Group has not been stored");
+
+				if (group.getInheritGroupId() != null && group.getInheritGroupId().longValue() != 0)
+					groupDao.inheritACLs(grp, group.getInheritGroupId().longValue());
 			}
-		} else {
-			grp = new Group();
-			grp.setTenantId(session.getTenantId());
-			grp.setName(group.getName());
-			grp.setDescription(group.getDescription());
-			groupDao.store(grp);
 
-			if (group.getInheritGroupId() != null && group.getInheritGroupId().longValue() != 0)
-				groupDao.inheritACLs(grp.getId(), group.getInheritGroupId().longValue());
+			group.setId(grp.getId());
+			return group;
+		} catch (Throwable t) {
+			return (GUIGroup) ServiceUtil.throwServerException(session, log, t);
 		}
-
-		group.setId(grp.getId());
-		return group;
 	}
 
 	@Override
@@ -565,9 +583,10 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			usr.setStreet(user.getAddress());
 			usr.setTelephone(user.getPhone());
 			usr.setTelephone2(user.getCell());
-			usr.setUsername(user.getUserName());
+			usr.setUsername(user.getUsername());
 			usr.setEnabled(user.isEnabled() ? 1 : 0);
 			usr.setPasswordExpires(user.isPasswordExpires() ? 1 : 0);
+			usr.setPasswordExpired(user.isPasswordExpired() ? 1 : 0);
 			usr.setWelcomeScreen(user.getWelcomeScreen());
 			usr.setIpWhiteList(user.getIpWhitelist());
 			usr.setIpBlackList(user.getIpBlacklist());
@@ -576,16 +595,19 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			usr.setQuota(user.getQuota());
 			usr.setSecondFactor(StringUtils.isEmpty(user.getSecondFactor()) ? null : user.getSecondFactor());
 			usr.setKey(user.getKey());
+			usr.setType(user.getType());
+			usr.setDocsGrid(user.getDocsGrid());
+			usr.setHitsGrid(user.getHitsGrid());
 
 			if (createNew) {
-				User existingUser = userDao.findByUsername(user.getUserName());
+				User existingUser = userDao.findByUsername(user.getUsername());
 				if (existingUser != null) {
-					log.warn("Tried to create duplicate username " + user.getUserName());
+					log.warn("Tried to create duplicate username {}", user.getUsername());
 					user.setWelcomeScreen(-99);
 					return user;
 				}
 
-				// Generate an initial password
+				// Generate an initial password(that must be changed)
 				ContextProperties pbean = Context.get().getProperties();
 				int minsize = 8;
 				try {
@@ -593,27 +615,22 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				} catch (Throwable t) {
 
 				}
-				decodedPassword = new PasswordGenerator().generate(minsize);
+				decodedPassword = PasswordGenerator.generate(minsize);
 				usr.setDecodedPassword(decodedPassword);
-
-				if (user.isPasswordExpired()) {
-					/*
-					 * We want the user to change his password at the first
-					 * login
-					 */
-					usr.setPasswordChanged(new Date(10000));
-					usr.setPasswordExpired(1);
-				} else
-					usr.setPasswordChanged(new Date());
+				usr.setPasswordExpired(1);
+				usr.setPasswordChanged(new Date());
 			}
 
-			boolean stored = userDao.store(usr);
+			UserHistory transaction = new UserHistory();
+			transaction.setSession(session);
+			transaction.setEvent(UserEvent.UPDATED.toString());
+			boolean stored = userDao.store(usr, transaction);
 			if (!stored)
 				throw new Exception("User not stored");
 			user.setId(usr.getId());
 
 			GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-			usr.removeAllGroups();
+			usr.removeGroupMemberships(null);
 			long[] ids = new long[user.getGroups().length];
 			for (int i = 0; i < user.getGroups().length; i++) {
 				ids[i] = user.getGroups()[i].getId();
@@ -625,7 +642,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			groupDao.initialize(adminGroup);
 
 			// The admin user must be always member of admin group
-			if ("admin".equals(user.getUserName()) && !user.isMemberOf("admin")) {
+			if ("admin".equals(user.getUsername()) && !user.isMemberOf("admin")) {
 				usr.addGroup(adminGroup);
 				userDao.store(usr);
 			}
@@ -649,7 +666,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	 * 
 	 * @param user The created user
 	 * @param password The decoded password
-	 * @throws Exception
+	 * 
+	 * @throws Exception a generic error
 	 */
 	private void notifyAccount(User user, String password) throws Exception {
 		EMail email;
@@ -712,8 +730,45 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			usr.setDefaultWorkspace(user.getDefaultWorkspace());
 			usr.setEmailSignature(user.getEmailSignature());
 			usr.setEmailSignature2(user.getEmailSignature2());
+			usr.setDocsGrid(user.getDocsGrid());
+			usr.setHitsGrid(user.getHitsGrid());
 
-			userDao.store(usr);
+			UserHistory transaction = new UserHistory();
+			transaction.setSession(session);
+			transaction.setEvent(UserEvent.UPDATED.toString());
+			boolean stored = userDao.store(usr, transaction);
+			if (!stored)
+				throw new Exception("Profile has not been updated");
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+
+		return user;
+	}
+
+	@Override
+	public GUIUser saveInterfaceSettings(GUIUser user) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+
+		try {
+			// Disallow the editing of other users if you do not have access to
+			// the Security
+			if (user.getId() != session.getUserId())
+				ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+			User usr = userDao.findById(user.getId());
+			userDao.initialize(usr);
+
+			usr.setWelcomeScreen(user.getWelcomeScreen());
+			usr.setDefaultWorkspace(user.getDefaultWorkspace());
+			usr.setDocsGrid(user.getDocsGrid());
+			usr.setHitsGrid(user.getHitsGrid());
+
+			boolean stored = userDao.store(usr);
+			if (!stored)
+				throw new Exception("Interface settings have not been updated");
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -751,12 +806,13 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			securitySettings
 					.setPwdSize(Integer.parseInt(pbean.getProperty(session.getTenantName() + ".password.size")));
 			if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ".gui.savelogin")))
-				securitySettings.setSaveLogin("true".equals(pbean.getProperty(session.getTenantName()
-						+ ".gui.savelogin")));
+				securitySettings
+						.setSaveLogin("true".equals(pbean.getProperty(session.getTenantName() + ".gui.savelogin")));
 			securitySettings.setIgnoreLoginCase("true".equals(pbean.getProperty("login.ignorecase")));
+			securitySettings.setAllowSidInRequest(pbean.getBoolean("security.acceptsid", false));
 			if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ".anonymous.enabled")))
-				securitySettings.setEnableAnonymousLogin("true".equals(pbean.getProperty(session.getTenantName()
-						+ ".anonymous.enabled")));
+				securitySettings.setEnableAnonymousLogin(
+						"true".equals(pbean.getProperty(session.getTenantName() + ".anonymous.enabled")));
 			if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ".anonymous.key")))
 				securitySettings.setAnonymousKey(pbean.getProperty(session.getTenantName() + ".anonymous.key"));
 			if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ".anonymous.user"))) {
@@ -769,7 +825,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 			log.debug("Security settings data loaded successfully.");
 		} catch (Exception e) {
-			log.error("Exception loading Security settings data: " + e.getMessage(), e);
+			log.error("Exception loading Security settings data: {}", e.getMessage(), e);
 		}
 
 		return securitySettings;
@@ -788,6 +844,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				conf.setProperty("password.ttl", Integer.toString(settings.getPwdExpiration()));
 				conf.setProperty("login.ignorecase", Boolean.toString(settings.isIgnoreLoginCase()));
 				conf.setProperty("ssl.required", Boolean.toString(settings.isForceSsl()));
+				conf.setProperty("security.acceptsid", Boolean.toString(settings.isAllowSidInRequest()));
 
 				// Update the web.xml
 				try {
@@ -807,7 +864,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			conf.setProperty(session.getTenantName() + ".anonymous.key", settings.getAnonymousKey().trim());
 
 			if (settings.getAnonymousUser() != null)
-				conf.setProperty(session.getTenantName() + ".anonymous.user", settings.getAnonymousUser().getUserName());
+				conf.setProperty(session.getTenantName() + ".anonymous.user",
+						settings.getAnonymousUser().getUsername());
 
 			conf.write();
 
@@ -822,7 +880,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	private boolean saveRules(Session session, Menu menu, long userId, GUIRight[] rights) throws Exception {
 		MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!mdao.isReadEnable(Menu.SECURITY, session.getUserId()))
-			throw new Exception("User " + session.getUsername() + " not allowed to save security settings");
+			throw new Exception(String.format("User %s not allowed to save security settings", session.getUsername()));
 
 		GroupDAO gdao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 
@@ -934,7 +992,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				public GUIUser mapRow(ResultSet rs, int row) throws SQLException {
 					GUIUser user = new GUIUser();
 					user.setId(rs.getLong(1));
-					user.setUserName(rs.getString(2));
+					user.setUsername(rs.getString(2));
 					user.setName(rs.getString(3));
 					user.setFirstName(rs.getString(4));
 					return user;
@@ -962,8 +1020,9 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.username.wait", 0));
 			Date oldestDate = cal.getTime();
 			if (max > 0)
-				seqs.addAll(dao.findByWhere("_entity.name like '" + LoginThrottle.LOGINFAIL_USERNAME
-						+ "%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
+				seqs.addAll(dao.findByWhere(
+						"_entity.name like '" + LoginThrottle.LOGINFAIL_USERNAME
+								+ "%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
 						new Object[] { max, oldestDate }, null, null));
 
 			max = config.getInt("throttle.ip.max", 0);
@@ -971,8 +1030,9 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.ip.wait", 0));
 			oldestDate = cal.getTime();
 			if (max > 0)
-				seqs.addAll(dao.findByWhere("_entity.name like '" + LoginThrottle.LOGINFAIL_IP
-						+ "%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
+				seqs.addAll(dao.findByWhere(
+						"_entity.name like '" + LoginThrottle.LOGINFAIL_IP
+								+ "%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
 						new Object[] { max, oldestDate }, null, null));
 
 			GUISequence[] ret = new GUISequence[seqs.size()];
@@ -999,10 +1059,53 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		try {
 			SequenceDAO dao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
 			for (long id : ids) {
-				dao.delete(id);
+				boolean deleted = dao.delete(id);
+				if (!deleted)
+					throw new Exception("Sequence has not been deleted");
 			}
 		} catch (Throwable e) {
 			ServiceUtil.throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public void replicateUsersSettings(long masterUserId, Long[] userIds, boolean gui, boolean groups)
+			throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		try {
+			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			User masterUser = userDao.findById(masterUserId);
+			userDao.initialize(masterUser);
+			Set<Group> masterGroups = masterUser.getGroups();
+
+			for (Long userId : userIds) {
+				User user = userDao.findById(userId);
+				userDao.initialize(user);
+
+				if (gui) {
+					user.setDefaultWorkspace(masterUser.getDefaultWorkspace());
+					user.setWelcomeScreen(masterUser.getWelcomeScreen());
+					user.setDocsGrid(masterUser.getDocsGrid());
+					user.setHitsGrid(masterUser.getHitsGrid());
+				}
+
+				if (groups && !user.isReadonly()) {
+					user.removeGroupMemberships(null);
+					for (Group grp : masterGroups) {
+						if (!grp.isUserGroup())
+							user.addGroup(grp);
+					}
+				}
+
+				UserHistory transaction = new UserHistory();
+				transaction.setSession(session);
+				transaction.setComment(String.format("Settings replicated from %s", masterUser.getUsername()));
+				userDao.store(user, transaction);
+
+				log.info("Replicated the settings to user {}", user.getName());
+			}
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
 		}
 	}
 }

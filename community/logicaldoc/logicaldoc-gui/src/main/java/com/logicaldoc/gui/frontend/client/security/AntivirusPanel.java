@@ -27,11 +27,33 @@ import com.smartgwt.client.widgets.tab.TabSet;
  */
 public class AntivirusPanel extends VLayout {
 
-	public AntivirusPanel(GUIParameter[] settings) {
+	public AntivirusPanel() {
 		setWidth100();
 		setMembersMargin(5);
 		setMargin(5);
-		
+	}
+
+	@Override
+	protected void onDraw() {
+		String tenant = Session.get().getTenantName();
+		SettingService.Instance.get()
+				.loadSettingsByNames(new String[] { "antivirus.command", tenant + ".antivirus.enabled",
+						tenant + ".antivirus.includes", tenant + ".antivirus.excludes", tenant + ".antivirus.timeout" },
+						new AsyncCallback<GUIParameter[]>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								Log.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIParameter[] parameters) {
+								initGUI(parameters);
+							}
+						});
+
+	}
+
+	private void initGUI(GUIParameter[] settings) {
 		final DynamicForm form = new DynamicForm();
 		form.setTitleOrientation(TitleOrientation.LEFT);
 		form.setAlign(Alignment.LEFT);
@@ -71,14 +93,14 @@ public class AntivirusPanel extends VLayout {
 			public void onClick(ClickEvent event) {
 				if (form.validate()) {
 					GUIParameter[] params = new GUIParameter[Session.get().isDefaultTenant() ? 4 : 3];
-					params[0] = new GUIParameter(Session.get().getTenantName() + ".antivirus.enabled", ""
-							+ ("yes".equals(form.getValueAsString("enabled"))));
-					params[1] = new GUIParameter(Session.get().getTenantName() + ".antivirus.excludes", form
-							.getValueAsString("excludes").trim());
-					params[2] = new GUIParameter(Session.get().getTenantName() + ".antivirus.includes", form
-							.getValueAsString("includes").trim());
-					params[3] = new GUIParameter(Session.get().getTenantName() + ".antivirus.timeout", form
-							.getValueAsString("timeout").trim());
+					params[0] = new GUIParameter(Session.get().getTenantName() + ".antivirus.enabled",
+							"" + ("yes".equals(form.getValueAsString("enabled"))));
+					params[1] = new GUIParameter(Session.get().getTenantName() + ".antivirus.excludes",
+							form.getValueAsString("excludes").trim());
+					params[2] = new GUIParameter(Session.get().getTenantName() + ".antivirus.includes",
+							form.getValueAsString("includes").trim());
+					params[3] = new GUIParameter(Session.get().getTenantName() + ".antivirus.timeout",
+							form.getValueAsString("timeout").trim());
 
 					if (Session.get().isDefaultTenant())
 						params[4] = new GUIParameter("antivirus.command", form.getValueAsString("command").trim());

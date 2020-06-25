@@ -1,15 +1,11 @@
 package com.logicaldoc.gui.frontend.client.reports.custom;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.folder.FolderSelector;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.ReportService;
 import com.smartgwt.client.types.HeaderControls;
@@ -22,6 +18,10 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import gwtupload.client.IUploadStatus.Status;
+import gwtupload.client.IUploader;
+import gwtupload.client.MultiUploader;
 
 /**
  * Uploads and creates a new Report

@@ -2,13 +2,14 @@ package com.logicaldoc.core.generic;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateGenericDAO</code>
@@ -30,7 +31,7 @@ public class HibernateGenericDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		Assert.assertNotNull(dao.findById(1L));
 		dao.delete(1L);
 		Assert.assertNull(dao.findById(1L));
@@ -63,7 +64,7 @@ public class HibernateGenericDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		Generic generic = new Generic();
 		generic.setType("xx");
 		generic.setSubtype("xxx");

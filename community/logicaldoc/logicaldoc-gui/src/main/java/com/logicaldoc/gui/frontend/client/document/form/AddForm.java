@@ -2,13 +2,11 @@ package com.logicaldoc.gui.frontend.client.document.form;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
-import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FormService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
@@ -75,27 +73,15 @@ public class AddForm extends Window {
 		final GUIDocument frm = new GUIDocument();
 		frm.setFolder(Session.get().getCurrentFolder());
 		frm.setFormId(formId);
+		frm.setAttributes(null);
 		frm.setFileName(form.getValueAsString("title").trim() + ".pdf");
 		frm.setLanguage(I18N.getDefaultLocaleForDoc());
 
 		if (templateIdString != null && !templateIdString.isEmpty()) {
 			frm.setTemplateId(Long.parseLong(templateIdString));
-
-			DocumentService.Instance.get().getAttributes(Long.parseLong(templateIdString),
-					new AsyncCallback<GUIAttribute[]>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
-						}
-
-						@Override
-						public void onSuccess(GUIAttribute[] attributes) {
-							frm.setAttributes(attributes);
-							FillForm fillForm = new FillForm(frm);
-							fillForm.show();
-							destroy();
-						}
-					});
+			FillForm fillForm = new FillForm(frm);
+			fillForm.show();
+			destroy();
 		} else {
 			FormService.Instance.get().create(frm, new AsyncCallback<GUIDocument>() {
 				@Override

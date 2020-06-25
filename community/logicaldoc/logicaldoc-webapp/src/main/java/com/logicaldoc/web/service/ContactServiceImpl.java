@@ -53,18 +53,18 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 		ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
-			Contact con = dao.findById(contact.getId());
-			if (con == null)
-				con = new Contact();
-			con.setEmail(contact.getEmail());
-			con.setFirstName(contact.getFirstName());
-			con.setLastName(contact.getLastName());
-			con.setCompany(contact.getCompany());
-			con.setAddress(contact.getAddress());
-			con.setPhone(contact.getPhone());
-			con.setMobile(contact.getMobile());
-			con.setUserId(contact.getUserId());
-			dao.store(con);
+			Contact cnt = dao.findById(contact.getId());
+			if (cnt == null)
+				cnt = new Contact();
+			cnt.setEmail(contact.getEmail());
+			cnt.setFirstName(contact.getFirstName());
+			cnt.setLastName(contact.getLastName());
+			cnt.setCompany(contact.getCompany());
+			cnt.setAddress(contact.getAddress());
+			cnt.setPhone(contact.getPhone());
+			cnt.setMobile(contact.getMobile());
+			cnt.setUserId(contact.getUserId());
+			dao.store(cnt);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 		}

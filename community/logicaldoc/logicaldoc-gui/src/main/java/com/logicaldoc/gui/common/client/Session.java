@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -18,8 +17,8 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
+import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.services.InfoService;
-import com.logicaldoc.gui.common.client.services.InfoServiceAsync;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
@@ -35,8 +34,6 @@ import com.smartgwt.client.util.SC;
 public class Session implements DocumentObserver {
 	private static Session instance;
 
-	private InfoServiceAsync service = (InfoServiceAsync) GWT.create(InfoService.class);
-
 	private GUIInfo info;
 
 	private GUISession session;
@@ -45,11 +42,15 @@ public class Session implements DocumentObserver {
 
 	private GUIDocument currentDocument;
 
+	private Long hiliteDocId;
+
 	private Set<SessionObserver> sessionObservers = new HashSet<SessionObserver>();
 
 	private Timer timer;
 
 	private boolean showThumbnail = true;
+
+	private static int missedPingCount = 0;
 
 	public static Session get() {
 		if (instance == null)
@@ -74,9 +75,13 @@ public class Session implements DocumentObserver {
 
 	public String getIncomingMessage() {
 		if (session != null)
-			return session.getIncomingMessage();
+			return session.getWelcomeMessage();
 		else
 			return null;
+	}
+
+	public boolean isFolderPagination() {
+		return getConfigAsBoolean("gui.folder.pagination");
 	}
 
 	public void close() {
@@ -95,78 +100,73 @@ public class Session implements DocumentObserver {
 	}
 
 	public void init(final GUISession session) {
+		InfoService.Instance.get().getSessionInfo(new AsyncCallback<GUIParameter[]>() {
 
-		// Retrieve again the Info from the server (may be it is enriched by the
-		// enterprise)
-		service.getInfo(session.getUser().getLanguage(), session.getInfo().getTenant().getName(),
-				new AsyncCallback<GUIInfo>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				SC.warn(caught.getMessage());
+			}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						SC.warn(caught.getMessage());
+			@Override
+			public void onSuccess(GUIParameter[] parameters) {
+				Session.get().session = session;
+				Session.get().info = session.getInfo();
+
+				I18N.setLocale(session.getUser().getLanguage());
+
+				Menu.init(session.getUser());
+
+				if (session.isLoggedIn()) {
+					for (SessionObserver listener : sessionObservers) {
+						listener.onUserLoggedIn(session.getUser());
+					}
+					boolean validSession = true;
+					GUIUser user = getUser();
+					for (GUIParameter parameter : parameters) {
+						if (parameter.getName().equals("messages"))
+							user.setMessages(Integer.parseInt(parameter.getValue()));
+						else if (parameter.getName().equals("workflows"))
+							user.setAssignedTasks(Integer.parseInt(parameter.getValue()));
+						else if (parameter.getName().equals("events"))
+							user.setUpcomingEvents(Integer.parseInt(parameter.getValue()));
+						else if (parameter.getName().equals("valid"))
+							validSession = Boolean.parseBoolean(parameter.getValue());
 					}
 
-					@Override
-					public void onSuccess(GUIInfo info) {
-						try {
-							session.setInfo(info);
-							Session.get().session = session;
-							Session.get().info = session.getInfo();
-							I18N.init(session);
-							Menu.init(session.getUser());
+					UserController.get().changed(user);
 
-							if (session.isLoggedIn()) {
-								for (SessionObserver listener : sessionObservers) {
-									listener.onUserLoggedIn(session.getUser());
-								}
-							}
+					if (!validSession)
+						onInvalidSession();
 
-							if (info.getSessionHeartbeat() > 0) {
-								/*
-								 * Create the timer that synchronizes the
-								 * session info
-								 */
-								timer = new Timer() {
-									public void run() {
-										service.getSessionInfo(new AsyncCallback<GUIParameter[]>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												// do nothing
-											}
-
-											@Override
-											public void onSuccess(GUIParameter[] parameters) {
-												boolean validSession = true;
-												if (parameters.length > 0) {
-													GUIUser user = getUser();
-													for (GUIParameter parameter : parameters) {
-														if (parameter.getName().equals("messages"))
-															user.setMessages(Integer.parseInt(parameter.getValue()));
-														else if (parameter.getName().equals("workflows"))
-															user.setActiveTasks(Integer.parseInt(parameter.getValue()));
-														else if (parameter.getName().equals("events"))
-															user.setUpcomingEvents(Integer.parseInt(parameter
-																	.getValue()));
-														else if (parameter.getName().equals("valid"))
-															validSession = Boolean.parseBoolean(parameter.getValue());
-													}
-												}
-
-												if (!validSession)
-													onInvalidSession();
-											}
-										});
+					if (session.getInfo().getSessionHeartbeat() > 0) {
+						/*
+						 * Create the timer that synchronizes the session info
+						 */
+						timer = new Timer() {
+							public void run() {
+								InfoService.Instance.get().ping(new AsyncCallback<Boolean>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										missedPingCount++;
+										if (missedPingCount >= 3)
+											onInvalidSession();
 									}
-								};
 
-								timer.scheduleRepeating(info.getSessionHeartbeat() * 1000);
+									@Override
+									public void onSuccess(Boolean active) {
+										missedPingCount = 0;
+										if (!active)
+											onInvalidSession();
+									}
+								});
 							}
-						} catch (Throwable caught) {
-							Log.serverError(caught);
-						}
-					}
-				});
+						};
 
+						timer.scheduleRepeating(session.getInfo().getSessionHeartbeat() * 1000);
+					}
+				}
+			}
+		});
 	}
 
 	public void onInvalidSession() {
@@ -174,8 +174,12 @@ public class Session implements DocumentObserver {
 		SessionTimeout.get().show();
 	}
 
-	public void addSessionObserver(SessionObserver observer) {
+	public void addObserver(SessionObserver observer) {
 		sessionObservers.add(observer);
+	}
+
+	public void removeObserver(SessionObserver observer) {
+		sessionObservers.remove(observer);
 	}
 
 	public GUIFolder getCurrentFolder() {
@@ -225,8 +229,20 @@ public class Session implements DocumentObserver {
 		return info.getTenant().getId() == Constants.TENANT_DEFAULTID;
 	}
 
+	/**
+	 * Checks if the current user belongs to the <b>admin</b> group
+	 * 
+	 * @return true if the current user belongs to the <b>admin</b> group
+	 */
+	public boolean isAdmin() {
+		return getUser() != null && getUser().isMemberOf(Constants.GROUP_ADMIN);
+	}
+
 	public String getConfig(String name) {
-		return info.getConfig(name);
+		if (info != null)
+			return info.getConfig(name);
+		else
+			return null;
 	}
 
 	public String getTenantConfig(String name) {
@@ -238,6 +254,10 @@ public class Session implements DocumentObserver {
 
 	public int getConfigAsInt(String name) {
 		return Integer.parseInt(getConfig(name));
+	}
+
+	public long getConfigAsLong(String name) {
+		return Long.parseLong(getConfig(name));
 	}
 
 	public boolean getConfigAsBoolean(String name) {
@@ -282,8 +302,9 @@ public class Session implements DocumentObserver {
 				CookiesManager.removeSid();
 
 				try {
+					String tenant = Session.get().getUser().getTenant().getName();
 					Session.get().close();
-					Util.redirectToLoginUrl();
+					Util.redirectToLoginUrl(tenant);
 				} catch (Throwable t) {
 
 				}
@@ -332,5 +353,13 @@ public class Session implements DocumentObserver {
 	@Override
 	public void onDocumentUnlocked(GUIDocument document) {
 		getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
+	}
+
+	public Long getHiliteDocId() {
+		return hiliteDocId;
+	}
+
+	public void setHiliteDocId(Long hiliteDocId) {
+		this.hiliteDocId = hiliteDocId;
 	}
 }

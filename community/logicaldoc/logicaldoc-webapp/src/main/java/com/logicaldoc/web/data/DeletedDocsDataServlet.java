@@ -42,16 +42,17 @@ public class DeletedDocsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(DeletedDocsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			final Session session = ServiceUtil.validateSession(request);
 
 			Long folderId = request.getParameter("folderId") != null ? Long.parseLong(request.getParameter("folderId"))
 					: null;
 
-			Long deleteUserId = StringUtils.isNotEmpty(request.getParameter("userId")) ? Long.parseLong(request
-					.getParameter("userId")) : null;
+			Long deleteUserId = StringUtils.isNotEmpty(request.getParameter("userId"))
+					? Long.parseLong(request.getParameter("userId"))
+					: null;
 
 			Integer max = request.getParameter("max") != null ? Integer.parseInt(request.getParameter("max")) : null;
 
@@ -72,7 +73,8 @@ public class DeletedDocsDataServlet extends HttpServlet {
 
 			StringBuffer query = new StringBuffer(
 					"select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_fileversion, A.ld_lastmodified, ");
-			query.append(" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_folderid, B.ld_name, A.ld_creation, A.ld_deleteuserid ");
+			query.append(
+					" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_folderid, B.ld_name, A.ld_creation, A.ld_deleteuserid, A.ld_deleteuser ");
 			query.append(" from ld_document A ");
 			query.append(" left outer join ld_folder B on A.ld_folderid=B.ld_id ");
 			query.append(" where A.ld_tenantid=");
@@ -116,6 +118,7 @@ public class DeletedDocsDataServlet extends HttpServlet {
 
 					doc.setCreation(new Date(rs.getTimestamp(12).getTime()));
 					doc.setDeleteUserId(rs.getLong(13));
+					doc.setDeleteUser(rs.getString(14));
 
 					return doc;
 				}
@@ -140,11 +143,10 @@ public class DeletedDocsDataServlet extends HttpServlet {
 				writer.print("<created>" + df.format(doc.getCreation()) + "</created>");
 				writer.print("<size>" + doc.getFileSize() + "</size>");
 				writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-				if (doc.getImmutable() == 0)
-					writer.print("<immutable>blank</immutable>");
-				else if (doc.getImmutable() == 1)
-					writer.print("<immutable>stop</immutable>");
+				writer.print("<immutable>" + doc.getImmutable() + "</immutable>");
 				writer.print("<deleteUserId>" + doc.getDeleteUserId() + "</deleteUserId>");
+				writer.print("<deleteUser><![CDATA[" + (doc.getDeleteUser() != null ? doc.getDeleteUser() : "")
+						+ "]]></deleteUser>");
 				writer.print("<folderId>" + doc.getFolder().getId() + "</folderId>");
 				writer.print("<folder><![CDATA[" + doc.getFolder().getName() + "]]></folder>");
 				writer.print("<type>" + doc.getType() + "</type>");

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,8 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.History;
+import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
@@ -47,6 +50,7 @@ public class ExportZip extends HttpServlet {
 		Session session = ServletUtil.validateSession(request);
 
 		try {
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
@@ -63,12 +67,15 @@ public class ExportZip extends HttpServlet {
 				level = "all";
 			}
 
-			long[] docIds = null;
+			ArrayList<Long> docIds = new ArrayList<Long>();
 			if (request.getParameterValues("docId") != null && request.getParameterValues("docId").length > 0) {
 				String[] ids = request.getParameterValues("docId");
-				docIds = new long[ids.length];
 				for (int i = 0; i < ids.length; i++) {
-					docIds[i] = Long.parseLong(ids[i]);
+					Document doc = docDao.findDocument(Long.parseLong(ids[i]));
+					Long docId = Long.parseLong(ids[i]);
+					if (doc != null && folderDao.isDownloadEnabled(doc.getFolder().getId(), userId)
+							&& !docIds.contains(docId))
+						docIds.add(docId);
 				}
 			}
 
@@ -82,15 +89,15 @@ public class ExportZip extends HttpServlet {
 
 			ByteArrayOutputStream bos = null;
 
-			if (docIds != null && docIds.length > 0) {
+			if (docIds != null && docIds.size() > 0) {
 				// Create the document history event
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSessionId(session.getSid());
 				transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
 				if (user != null)
 					transaction.setUser(user);
 
-				bos = exporter.process(docIds, false, transaction);
+				bos = exporter.process(docIds.toArray(new Long[0]), false, transaction);
 			} else {
 				FolderHistory transaction = new FolderHistory();
 				transaction.setUserId(userId.longValue());

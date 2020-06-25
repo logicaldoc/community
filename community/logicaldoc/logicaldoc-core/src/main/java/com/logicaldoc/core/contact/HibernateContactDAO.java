@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.generic.HibernateGenericDAO;
 
 /**
@@ -14,7 +15,6 @@ import com.logicaldoc.core.generic.HibernateGenericDAO;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> implements ContactDAO {
 
 	public HibernateContactDAO() {
@@ -37,8 +37,13 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 			sb.append(" _entity.userId = ?1 ");
 		if (email != null)
 			sb.append(" and _entity.email = ?2 ");
-		
-		return findByWhere(sb.toString(), params.isEmpty() ? null : params.toArray(new Object[0]),
-				"order by _entity.firstName, _entity.lastName", null);
+
+		try {
+			return findByWhere(sb.toString(), params.isEmpty() ? null : params.toArray(new Object[0]),
+					"order by _entity.firstName, _entity.lastName", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<Contact>();
+		}
 	}
 }

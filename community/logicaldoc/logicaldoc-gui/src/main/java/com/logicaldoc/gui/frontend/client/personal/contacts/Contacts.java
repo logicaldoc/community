@@ -179,7 +179,6 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
-		list.setAutoDraw(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);

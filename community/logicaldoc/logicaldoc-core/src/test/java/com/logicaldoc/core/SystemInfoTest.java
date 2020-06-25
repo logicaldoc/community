@@ -2,9 +2,9 @@ package com.logicaldoc.core;
 
 import java.io.UnsupportedEncodingException;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 /**
  * Simple test to check the system infos

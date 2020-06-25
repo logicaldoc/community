@@ -36,8 +36,8 @@ public class UsersDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(UsersDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -82,7 +82,7 @@ public class UsersDataServlet extends HttpServlet {
 			 * Iterate over records composing the response XML document
 			 */
 			for (User user : users) {
-				if (user.getType() != User.TYPE_DEFAULT)
+				if (user.getType() == User.TYPE_SYSTEM)
 					continue;
 
 				userDao.initialize(user);
@@ -94,23 +94,23 @@ public class UsersDataServlet extends HttpServlet {
 					writer.print("<eenabled>0</eenabled>");
 				else if (user.getEnabled() == 0)
 					writer.print("<eenabled>2</eenabled>");
+				writer.print("<guest>" + user.isReadonly() + "</guest>");
 				writer.print("<name><![CDATA[" + (user.getName() == null ? "" : user.getName()) + "]]></name>");
 				writer.print("<firstName><![CDATA[" + (user.getFirstName() == null ? "" : user.getFirstName())
 						+ "]]></firstName>");
-				writer.print("<label><![CDATA[" + (user.getFullName() == null ? "" : user.getFullName())
-						+ "]]></label>");
+				writer.print(
+						"<label><![CDATA[" + (user.getFullName() == null ? "" : user.getFullName()) + "]]></label>");
 				writer.print("<email><![CDATA[" + (user.getEmail() == null ? "" : user.getEmail()) + "]]></email>");
-				writer.print("<phone><![CDATA[" + (user.getTelephone() == null ? "" : user.getTelephone())
-						+ "]]></phone>");
-				writer.print("<cell><![CDATA[" + (user.getTelephone2() == null ? "" : user.getTelephone2())
-						+ "]]></cell>");
+				writer.print(
+						"<phone><![CDATA[" + (user.getTelephone() == null ? "" : user.getTelephone()) + "]]></phone>");
+				writer.print(
+						"<cell><![CDATA[" + (user.getTelephone2() == null ? "" : user.getTelephone2()) + "]]></cell>");
 				if (user.getUserGroup() != null)
 					writer.print("<usergroup><![CDATA[" + user.getUserGroup().getId() + "]]></usergroup>");
 
 				String[] groups = user.getGroupNames();
 				groups = Arrays.stream(user.getGroupNames()).filter(g -> !g.startsWith("_user_"))
 						.toArray(String[]::new);
-
 				writer.print("<groups><![CDATA[" + StringUtil.arrayToString(groups, ", ") + "]]></groups>");
 				writer.print("</user>");
 			}

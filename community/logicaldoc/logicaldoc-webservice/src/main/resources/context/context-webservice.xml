@@ -197,5 +197,24 @@
         <jaxrs:providers>
             <ref bean="jsonProvider"/>
       </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server id="restSystem" address="/rest/system">
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestSystemService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider"/>
+      </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server id="restSystem" address="/rest/documentMetadata">
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestDocumentMetadataService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider"/>
+      </jaxrs:providers>
     </jaxrs:server>    
+            
 </beans>

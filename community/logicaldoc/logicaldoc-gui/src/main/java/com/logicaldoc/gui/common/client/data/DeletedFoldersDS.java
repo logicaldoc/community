@@ -25,9 +25,10 @@ public class DeletedFoldersDS extends DataSource {
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 		DataSourceTextField parentIdField = new DataSourceTextField("parentId");
-		DataSourceImageField deletedUserId = new DataSourceImageField("deletedUserId");
-
-		setFields(id, name, lastModified, icon, parentIdField, deletedUserId);
+		DataSourceImageField deleteUserId = new DataSourceImageField("deleteUserId");
+		DataSourceTextField deleteUser = new DataSourceTextField("deleteUser");
+		
+		setFields(id, name, lastModified, icon, parentIdField, deleteUser, deleteUserId);
 		setClientOnly(true);
 
 		String url = "data/deletedfolders.xml?1=1";

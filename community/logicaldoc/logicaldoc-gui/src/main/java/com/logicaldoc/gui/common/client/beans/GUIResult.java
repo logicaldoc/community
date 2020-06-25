@@ -20,8 +20,6 @@ public class GUIResult implements Serializable {
 
 	private GUIDocument[] hits = new GUIDocument[0];
 
-	private String suggestion;
-
 	public long getTime() {
 		return time;
 	}

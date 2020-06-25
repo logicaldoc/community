@@ -3,14 +3,12 @@ package com.logicaldoc.util.csv;
 /**
  * CSVFile is a class used to handle <a href="http://en.wikipedia.org/wiki/Comma-separated_values">Comma-Separated Values</a> files.
  * <p>
- * It is abstract because it is the base class used for {@link CSVFileReader} and {@link CSVFileWriter}
+ * It is abstract because it is the base class used for CSVFileReader and CSVFleWriter
  * so you should use one of these (or both) according on what you need to do.
- * <p>
- * The simplest example for using the classes contained in this package is {@link CSVFileExample}, that simply
- * converts one CSV file into another one that makes use of a different notation for field separator
- * and text qualifier.<br>
- * The example just comprises the following lines:
- * <p>
+ * </p>
+ * 
+ * Example of usage:
+ * 
  * <pre>
  * import java.util.*;
  * import java.io.*;
@@ -22,7 +20,7 @@ package com.logicaldoc.util.csv;
  * 		CSVFileReader in = new CSVFileReader("csv_in.txt", ';', '"');
  * 		CSVFileWriter out = new CSVFileWriter("csv_out.txt", ',', '\'');
  *
- *     Vector<String> fields = in.readFields();
+ *     Vector&lt;String&gt; fields = in.readFields();
  *     while(fields!=null) {
  *       out.writeFields(fields);
  *       fields = in.readFields();
@@ -35,8 +33,7 @@ package com.logicaldoc.util.csv;
  * }
  * </pre>
  *
- * @author  Fabrizio Fazzino
- * @version %I%, %G%
+ * @since 8.1
  */
 public abstract class CSVFile {
 
@@ -122,6 +119,4 @@ public abstract class CSVFile {
   public char getTextQualifier() {
     return textQualifier;
   }
-
 }
-

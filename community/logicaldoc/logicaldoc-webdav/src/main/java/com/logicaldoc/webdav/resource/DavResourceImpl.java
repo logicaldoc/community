@@ -95,10 +95,12 @@ public class DavResourceImpl implements DavResource, Serializable {
 	/**
 	 * Create a new {@link DavResource}.
 	 * 
-	 * @param locator
-	 * @param factory
-	 * @param session
+	 * @param locator resource locator
+	 * @param factory resource factory
+	 * @param session current session
+	 * @param config configuration
 	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
 			ResourceConfig config) throws DavException {
@@ -111,14 +113,15 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	/**
-	 * Create a new {@link DavResource}.
+	 * Create a new {@link DavResource}
 	 * 
-	 * @param locator
-	 * @param factory
-	 * @param session
-	 * @param config
-	 * @param isCollection
-	 * @throws DavException
+	 * @param locator resource locator
+	 * @param factory resource factory
+	 * @param session current session
+	 * @param config configuration
+	 * @param isCollection is the resource folder?
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
 			ResourceConfig config, boolean isCollection) throws DavException {
@@ -229,7 +232,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * 
 	 * @see DavResource#spool(OutputContext)
 	 * @see ResourceConfig#getIOManager()
-	 * @throws IOException if the export fails.
+	 *
+	 * @throws IOException if the export fails
 	 */
 	public void spool(OutputContext outputContext) throws IOException {
 		if (exists() && outputContext != null) {
@@ -322,7 +326,14 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	/**
-	 * @see DavResource#alterProperties(DavPropertySet, DavPropertyNameSet)
+	 * @see DavResource#alterProperties(List)
+	 *
+	 * @param setProperties DAV properties
+	 * @param removePropertyNames DAV properties names
+	 * 
+	 * @return the status
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
 			throws DavException {
@@ -336,6 +347,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	/**
 	 * @see DavResource#getCollection()
+	 * 
+	 * @return the resource
 	 */
 	public DavResource getCollection() {
 		DavResource parent = null;
@@ -363,6 +376,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	/**
 	 * @see DavResource#getMembers()
+	 * 
+	 * @return an iterator
 	 */
 	public DavResourceIterator getMembers() {
 		if (list != null)
@@ -386,8 +401,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 						currentFilePath = currentFilePath + "/" + resource.getName();
 					}
 
-					DavResourceLocator resourceLocator = locator.getFactory().createResourceLocator(
-							locator.getPrefix(), "", currentFilePath, false);
+					DavResourceLocator resourceLocator = locator.getFactory().createResourceLocator(locator.getPrefix(),
+							"", currentFilePath, false);
 
 					DavResource childRes = factory.createResource(resourceLocator, session);
 
@@ -431,8 +446,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 				throw new DavException(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 			}
 		} catch (Exception e) {
-			// log.error(e.getMessage(), e);
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -554,14 +568,16 @@ public class DavResourceImpl implements DavResource, Serializable {
 		} catch (DavException de) {
 			throw de;
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 
 	/**
-	 * @param type
-	 * @param scope
+	 * Checks if a resource can be locked
+	 * 
+	 * @param type the type
+	 * @param scope the scope
+	 * 
 	 * @return true if type is {@link Type#WRITE} and scope is
 	 *         {@link Scope#EXCLUSIVE}
 	 * @see DavResource#isLockable(org.apache.jackrabbit.webdav.lock.Type,
@@ -574,6 +590,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 	/**
 	 * @see DavResource#hasLock(org.apache.jackrabbit.webdav.lock.Type,
 	 *      org.apache.jackrabbit.webdav.lock.Scope)
+	 * 
+	 * @return if there is a lock
 	 */
 	public boolean hasLock(Type type, Scope scope) {
 		return resource.isCheckedOut() == true;
@@ -581,6 +599,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	/**
 	 * @see DavResource#getLock(Type, Scope)
+	 * 
+	 * @return the active lock
 	 */
 	public ActiveLock getLock(Type type, Scope scope) {
 		return new DefaultActiveLock();
@@ -588,6 +608,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	/**
 	 * @see org.apache.jackrabbit.webdav.DavResource#getLocks()
+	 * 
+	 * @return the active locks
 	 */
 	public ActiveLock[] getLocks() {
 		return new ActiveLock[] {};
@@ -595,6 +617,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	/**
 	 * @see DavResource#lock(LockInfo)
+	 * 
+	 * @return the active lock
 	 */
 	public ActiveLock lock(LockInfo lockInfo) throws DavException {
 		throw new UnsupportedOperationException();
@@ -631,6 +655,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	/**
 	 * @see org.apache.jackrabbit.webdav.DavResource#getSession()
+	 * 
+	 * @return the session
 	 */
 	public org.apache.jackrabbit.webdav.DavSession getSession() {
 		throw new UnsupportedOperationException();
@@ -646,14 +672,21 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	/**
+	 * Gets the customized factory
 	 * 
-	 * @return
+	 * @return the customized factory
 	 */
 	protected DavResourceFactory getCostumizedFactory() {
 		return this.factory;
 	}
 
 	/**
+	 * 
+	 * @param inputCtx input context
+	 * @param systemId identifier of the system
+	 * 
+	 * @return the import context
+	 * 
 	 * @see org.apache.jackrabbit.webdav.simple.DavResourceImpl#getImportContext(InputContext,
 	 *      String)
 	 */

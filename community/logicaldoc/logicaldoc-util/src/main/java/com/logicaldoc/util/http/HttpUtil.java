@@ -87,8 +87,8 @@ public class HttpUtil {
 
 				if (StringUtils.isNotEmpty(proxyUser)) {
 					CredentialsProvider credentialProvider = new BasicCredentialsProvider();
-					credentialProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(proxyUser,
-							proxyPassword));
+					credentialProvider.setCredentials(AuthScope.ANY,
+							new UsernamePasswordCredentials(proxyUser, proxyPassword));
 					clientBuilder.setRoutePlanner(routePlanner);
 				}
 			}

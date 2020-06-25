@@ -32,12 +32,17 @@ public class DocumentHistoryDS extends DataSource {
 		init(url + "&max=" + (max != null ? max : MAX));
 	}
 
+	public DocumentHistoryDS(String url) {
+		init(url);
+	}
+	
 	private void init(String url) {
 		setRecordXPath("/list/history");
 		DataSourceTextField user = new DataSourceTextField("user");
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 		DataSourceTextField event = new DataSourceTextField("event");
 		DataSourceTextField comment = new DataSourceTextField("comment");
+		DataSourceTextField reason = new DataSourceTextField("reason");
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceTextField version = new DataSourceTextField("version");
 		DataSourceImageField icon = new DataSourceImageField("icon");
@@ -48,7 +53,7 @@ public class DocumentHistoryDS extends DataSource {
 		DataSourceTextField path = new DataSourceTextField("path");
 		DataSourceTextField sid = new DataSourceTextField("sid");
 
-		setFields(user, filename, date, event, comment, version, icon, _new, documentId, folderId, userId, path, sid);
+		setFields(user, filename, date, event, comment, reason, version, icon, _new, documentId, folderId, userId, path, sid);
 		setClientOnly(true);
 
 		setDataURL(url);

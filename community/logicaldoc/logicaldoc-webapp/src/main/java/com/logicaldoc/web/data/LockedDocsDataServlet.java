@@ -26,7 +26,6 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
-import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServiceUtil;
 
@@ -43,8 +42,8 @@ public class LockedDocsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(LockedDocsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			final Session session = ServiceUtil.validateSession(request);
 
@@ -68,7 +67,8 @@ public class LockedDocsDataServlet extends HttpServlet {
 
 			StringBuffer query = new StringBuffer(
 					"select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_lastmodified, ");
-			query.append(" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_immutable, A.ld_folderid, A.ld_status, A.ld_lockuserid, ");
+			query.append(
+					" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_immutable, A.ld_folderid, A.ld_status, A.ld_lockuserid, ");
 			query.append(" B.ld_firstname, B.ld_name, A.ld_fileversion ");
 			query.append(" from ld_document A ");
 			query.append(" left outer join ld_user B on A.ld_lockuserid=B.ld_id ");
@@ -108,7 +108,7 @@ public class LockedDocsDataServlet extends HttpServlet {
 					doc.setComment(rs.getString(13) + " " + rs.getString(14));
 
 					doc.setFileVersion(rs.getString(15));
-					
+
 					return doc;
 				}
 			}, null);
@@ -130,18 +130,10 @@ public class LockedDocsDataServlet extends HttpServlet {
 				writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");
 				writer.print("<size>" + doc.getFileSize() + "</size>");
 				writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-				if (doc.getImmutable() == 0)
-					writer.print("<immutable>blank</immutable>");
-				else if (doc.getImmutable() == 1)
-					writer.print("<immutable>stop</immutable>");
+				writer.print("<immutable>" + doc.getImmutable() + "</immutable>");
 				writer.print("<folderId>" + doc.getFolder().getId() + "</folderId>");
 				writer.print("<type>" + doc.getType() + "</type>");
-				if (doc.getStatus() == Constants.DOC_LOCKED)
-					writer.print("<locked>lock</locked>");
-				else if (doc.getStatus() == Constants.DOC_CHECKED_OUT)
-					writer.print("<locked>page_edit</locked>");
-				else
-					writer.print("<locked>blank</locked>");
+				writer.print("<status>" + doc.getStatus() + "</status>");
 				writer.print("<userId>" + doc.getLockUserId() + "</userId>");
 				if (doc.getComment() != null)
 					writer.print("<username>" + doc.getComment() + "</username>");

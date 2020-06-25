@@ -232,11 +232,12 @@ public class TasksPanel extends AdminPanel {
 		label.setCellFormatter(new CellFormatter() {
 			@Override
 			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return I18N.messageWithDefault("task.name." + record.getAttributeAsString("name"), "");
+				return I18N.messageWithDefault("task.name." + record.getAttributeAsString("name"), record.getAttributeAsString("name"));
 			}
 		});
 
-		ListGridField description = new ListGridField("description", I18N.message("description"), 250);
+		ListGridField description = new ListGridField("description", I18N.message("description"));
+		description.setWidth("*");
 		description.setCanFilter(true);
 		description.setCanSort(false);
 		description.setCellFormatter(new CellFormatter() {
@@ -442,6 +443,8 @@ public class TasksPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with the new task data
+	 * 
+	 * @param task the task to update
 	 */
 	public void updateSelectedRecord(GUITask task) {
 		list.getSelectedRecord().setAttribute("scheduling", task.getSchedulingLabel());

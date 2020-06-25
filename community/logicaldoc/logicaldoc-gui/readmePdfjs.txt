@@ -1,16 +1,34 @@
-- Move pdf.js and pdf.worker.js into the root
+- Move pdf.js and pdf.worker.js and .map counterparts into the root
 
-- Edit pdf.worker.js and comment the line:
-var DEFAULT_URL = 'compressed.tracemonkey-pldi-09.pdf';
-
-- Search the reference to pdf.worker.js and replace with this configuration:
-function configure(PDFJS) {
-  PDFJS.imageResourcesPath = './images/';
-  PDFJS.workerSrc = './pdf.worker.js';
-  PDFJS.cMapUrl = './cmaps/';
-  PDFJS.cMapPacked = true;
+- Edit pdf.worker.js and comment the lines:
+if (data.fieldType === 'Sig') {
+  _this2.setFlags(_util.AnnotationFlag.HIDDEN);
 }
 
+
+In viewer.js:
+
+Replace
+cMapUrl: {
+    value: '../web/cmaps/',
+with
+cMapUrl: {
+    value: './cmaps/',
+    
+Replace    
+workerSrc: {
+    value: '../build/pdf.worker.js',    
+with    
+workerSrc: {
+    value: './pdf.worker.js',
+    
+    
+Comment
+defaultUrl: {
+    value: 'compressed.tracemonkey-pldi-09.pdf',
+    kind: OptionKind.VIEWER
+  },    
+    
 - copy the HTML part of viewer.html into index.jsp
 
  

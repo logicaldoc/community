@@ -18,6 +18,8 @@ public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption>
 	 * 
 	 * @param setId ID of the attribute set
 	 * @param attribute Name of the attribute (optional)
+	 * 
+	 * @return if all went ok
 	 */
 	public boolean deleteBySetIdAndAttribute(long setId, String attribute);
 	

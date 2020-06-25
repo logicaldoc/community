@@ -40,7 +40,7 @@ public class ResourceConfig implements Serializable {
 
 	public PropertyManager getPropertyManager() {
 		if (propManager == null) {
-			log.debug("ResourceConfig: missing property-manager > " + "building default.");
+			log.debug("ResourceConfig: missing property-manager > building default.");
 			propManager = PropertyManagerImpl.getDefaultManager();
 		}
 		return propManager;
@@ -48,7 +48,7 @@ public class ResourceConfig implements Serializable {
 
 	public ItemFilter getItemFilter() {
 		if (itemFilter == null) {
-			log.debug("ResourceConfig: missing resource filter > " + "building DefaultItemFilter ");
+			log.debug("ResourceConfig: missing resource filter > building DefaultItemFilter ");
 			itemFilter = new DefaultItemFilter();
 		}
 		return itemFilter;

@@ -25,6 +25,8 @@ public class GUIHistory implements Serializable {
 	private String event = "";
 
 	private String comment = "";
+	
+	private String reason = "";
 
 	private String fileName = null;
 
@@ -150,5 +152,13 @@ public class GUIHistory implements Serializable {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
 	}
 }

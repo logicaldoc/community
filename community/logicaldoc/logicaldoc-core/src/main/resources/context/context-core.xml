@@ -26,8 +26,12 @@
    </bean>
    
    <!-- Storer -->
-   <bean id="Storer" abstract="false" autowire="default" class="${store}" lazy-init="default">
+   <bean id="StorerManager" class="com.logicaldoc.core.store.StorerManager">
       <property name="config" ref="ContextProperties" />
+   </bean>
+   <bean id="Storer" abstract="false" autowire="default" class="${store}" lazy-init="default" init-method="init" destroy-method="destroy">
+      <property name="config" ref="ContextProperties" />
+      <property name="manager" ref="StorerManager" />
    </bean>
    
    <!-- SearchEngine -->
@@ -98,9 +102,9 @@
          </bean>
       </property>
    </bean>
-   <bean id="HistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="DocumentHistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateHistoryDAO" lazy-init="default">
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateDocumentHistoryDAO" lazy-init="default">
             <property name="sessionFactory" ref="SessionFactory" />
          </bean>
       </property>
@@ -119,7 +123,7 @@
          <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateDocumentDAO" lazy-init="default">
             <property name="sessionFactory" ref="SessionFactory" />
             <property name="noteDAO" ref="DocumentNoteDAO" />
-            <property name="historyDAO" ref="HistoryDAO" />
+            <property name="documentHistoryDAO" ref="DocumentHistoryDAO" />
             <property name="versionDAO" ref="VersionDAO" />
             <property name="tenantDAO" ref="TenantDAO" />
             <property name="folderDAO" ref="FolderDAO" />
@@ -193,20 +197,12 @@
       <property name="target">
          <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateUserHistoryDAO" lazy-init="default">
             <property name="sessionFactory" ref="SessionFactory" />
-            <property name="config" ref="ContextProperties" />
          </bean>
       </property>
    </bean>
    <bean id="BookmarkDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
          <bean abstract="false" autowire="default" class="com.logicaldoc.core.document.dao.HibernateBookmarkDAO" lazy-init="default">
-            <property name="sessionFactory" ref="SessionFactory" />
-         </bean>
-      </property>
-   </bean>
-   <bean id="FeedMessageDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
-      <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.rss.dao.HibernateFeedMessageDAO" lazy-init="default">
             <property name="sessionFactory" ref="SessionFactory" />
          </bean>
       </property>
@@ -242,26 +238,29 @@
             <property name="groupDao" ref="GroupDAO" />
             <property name="folderDao" ref="FolderDAO" />
             <property name="templateDao" ref="TemplateDAO" />
+            <property name="dashletDao" ref="DashletDAO" />
             <property name="messageTemplateDao" ref="MessageTemplateDAO" />
             <property name="attributeSetDao" ref="AttributeSetDAO" />
          </bean>
       </property>
    </bean>
-   <!-- Managers -->
-   <bean id="SecurityManager" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+   <bean id="DashletDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
-         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.SecurityManagerImpl" lazy-init="default">
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.dashlet.HibernateDashletDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
+      </property>
+   </bean>
+   
+   <!-- Managers -->   
+   <bean id="SecurityManager" abstract="false" autowire="default" class="com.logicaldoc.core.security.SecurityManagerImpl" lazy-init="default">
             <property name="userDAO" ref="UserDAO" />
             <property name="groupDAO" ref="GroupDAO" />
             <property name="menuDAO" ref="MenuDAO" />
             <property name="folderDAO" ref="FolderDAO" />
             <property name="documentDAO" ref="DocumentDAO" />
-         </bean>
-      </property>
-   </bean>
-   <bean id="DocumentManager" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
-      <property name="target">
-         <bean class="com.logicaldoc.core.document.DocumentManagerImpl">
+   </bean>   
+   <bean id="DocumentManager" class="com.logicaldoc.core.document.DocumentManagerImpl">
             <property name="config" ref="ContextProperties" />
             <property name="documentDAO" ref="DocumentDAO" />
             <property name="documentNoteDAO" ref="DocumentNoteDAO" />
@@ -273,11 +272,9 @@
             <property name="storer" ref="Storer" />
             <property name="indexer" ref="SearchEngine" />
             <property name="listenerManager" ref="DocumentListenerManager" />
-         </bean>
-      </property>
-   </bean>
+   </bean>   
    <bean id="TaskManager" class="com.logicaldoc.core.task.TaskManager" />
-   <bean id="DocumentListenerManager" class="com.logicaldoc.core.document.DocumentListenerManager" />
+   <bean id="DocumentListenerManager" class="com.logicaldoc.core.document.DocumentListenerManager" init-method="init"/>
    <bean id="UserListenerManager" class="com.logicaldoc.core.security.UserListenerManager" />
    <bean id="ThumbnailManager" class="com.logicaldoc.core.document.thumbnail.ThumbnailManager">
       <property name="storer" ref="Storer" />
@@ -388,23 +385,6 @@
       <property name="jobDetail" ref="StatsCollectorJob" />
       <property name="config" ref="ContextProperties" />
    </bean>
-   <bean id="ProductNews" class="com.logicaldoc.core.rss.ProductNews">
-      <property name="feedMessageDao" ref="FeedMessageDAO" />
-      <property name="config" ref="ContextProperties" />
-      <property name="userDao" ref="UserDAO" />
-      <property name="lockManager" ref="LockManager" />
-      <property name="systemLoadMonitor" ref="SystemLoadMonitor" />
-   </bean>
-   <bean id="ProductNewsJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-      <property name="targetObject" ref="ProductNews" />
-      <property name="targetMethod" value="run" />
-      <property name="concurrent" value="false" />
-   </bean>
-   <bean id="ProductNewsTrigger" class="com.logicaldoc.core.task.TaskTrigger">
-      <property name="task" ref="ProductNews" />
-      <property name="jobDetail" ref="ProductNewsJob" />
-      <property name="config" ref="ContextProperties" />
-   </bean>
    <bean id="DigestProcessor" class="com.logicaldoc.core.document.DigestProcessor">
       <property name="documentDao" ref="DocumentDAO" />
       <property name="config" ref="ContextProperties" />
@@ -423,6 +403,25 @@
       <property name="jobDetail" ref="DigestProcessorJob" />
       <property name="config" ref="ContextProperties" />
    </bean>
+   
+   <bean id="PathCalculator" class="com.logicaldoc.core.folder.PathCalculator">
+      <property name="folderDao" ref="FolderDAO" />
+      <property name="config" ref="ContextProperties" />
+      <property name="sender" ref="EMailSender" />
+      <property name="userDao" ref="UserDAO" />
+      <property name="lockManager" ref="LockManager" />
+      <property name="systemLoadMonitor" ref="SystemLoadMonitor" />
+   </bean>
+   <bean id="PathCalculatorJob" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+      <property name="targetObject" ref="PathCalculator" />
+      <property name="targetMethod" value="run" />
+      <property name="concurrent" value="false" />
+   </bean>
+   <bean id="PathCalculatorTrigger" class="com.logicaldoc.core.task.TaskTrigger">
+      <property name="task" ref="PathCalculator" />
+      <property name="jobDetail" ref="PathCalculatorJob" />
+      <property name="config" ref="ContextProperties" />
+   </bean>   
    
    <!-- Authentication -->
    <bean id="DefaultAuthenticator" class="com.logicaldoc.core.security.authentication.DefaultAuthenticator">

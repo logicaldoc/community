@@ -4,12 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateMessageTemplateDAO</code>

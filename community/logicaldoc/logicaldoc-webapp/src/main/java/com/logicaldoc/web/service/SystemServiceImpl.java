@@ -1,5 +1,6 @@
 package com.logicaldoc.web.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.PluginDescriptor;
 import org.slf4j.Logger;
@@ -24,11 +26,10 @@ import org.springframework.jdbc.core.RowMapper;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.SystemInfo;
-import com.logicaldoc.core.document.dao.HistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
-import com.logicaldoc.core.rss.FeedMessage;
-import com.logicaldoc.core.rss.dao.FeedMessageDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
@@ -216,25 +217,32 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			notIndexed.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
 			parameters[1][0] = notIndexed;
 
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexabledocs", null, session.getTenantId());
+			GUIParameter notIndexableDocs = new GUIParameter();
+			notIndexableDocs.setName("notindexabledocs");
+			notIndexableDocs.setLabel("notindexable");
+			notIndexableDocs.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters[1][1] = notIndexableDocs;
+
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexeddocs", null, session.getTenantId());
 			GUIParameter indexed = new GUIParameter();
 			indexed.setName("indexed");
 			indexed.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[1][1] = indexed;
+			parameters[1][2] = indexed;
 
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deleteddocs", null, session.getTenantId());
 			GUIParameter deletedDocs = new GUIParameter();
 			deletedDocs.setName("docstrash");
 			deletedDocs.setLabel("trash");
 			deletedDocs.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[1][2] = deletedDocs;
+			parameters[1][3] = deletedDocs;
 
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "archiveddocs", null, session.getTenantId());
 			GUIParameter archivedDocs = new GUIParameter();
 			archivedDocs.setName("archiveddocs");
 			archivedDocs.setLabel("archiveds");
 			archivedDocs.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[1][3] = archivedDocs;
+			parameters[1][4] = archivedDocs;
 
 			/*
 			 * Folders statistics
@@ -309,9 +317,9 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 					scheduling.setSimple(true);
 					scheduling.setDelay(tsk.getScheduling().getDelaySeconds());
 					scheduling.setInterval(tsk.getScheduling().getIntervalSeconds());
-					task.setSchedulingLabel(I18N.message("each", locale) + " "
-							+ tsk.getScheduling().getIntervalSeconds() + " "
-							+ I18N.message("seconds", locale).toLowerCase());
+					task.setSchedulingLabel(
+							I18N.message("each", locale) + " " + tsk.getScheduling().getIntervalSeconds() + " "
+									+ I18N.message("seconds", locale).toLowerCase());
 				} else {
 					scheduling.setSimple(false);
 					scheduling.setSeconds(tsk.getScheduling().getSeconds());
@@ -340,7 +348,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 						if (user != null) {
 							GUIUser u = new GUIUser();
 							u.setId(user.getId());
-							u.setUserName(user.getUsername());
+							u.setUsername(user.getUsername());
 							u.setName(user.getName());
 							u.setFirstName(user.getFirstName());
 							task.addReportRecipient(u);
@@ -442,9 +450,9 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 					tsk.getScheduling().setDelay(task.getScheduling().getDelay() * 1000);
 					tsk.getScheduling().setInterval(task.getScheduling().getInterval() * 1000);
 					tsk.getScheduling().setIntervalSeconds(task.getScheduling().getInterval());
-					task.setSchedulingLabel(I18N.message("each", locale) + " "
-							+ tsk.getScheduling().getIntervalSeconds() + " "
-							+ I18N.message("seconds", locale).toLowerCase());
+					task.setSchedulingLabel(
+							I18N.message("each", locale) + " " + tsk.getScheduling().getIntervalSeconds() + " "
+									+ I18N.message("seconds", locale).toLowerCase());
 				} else {
 					tsk.getScheduling().setMode(TaskTrigger.MODE_CRON);
 					tsk.getScheduling().setSeconds(task.getScheduling().getSeconds());
@@ -487,17 +495,45 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public GUIHistory[] search(String userName, Date from, Date till, int maxResult, String historySid, String[] event)
-			throws ServerException {
+	public GUIHistory[] search(String userName, Date from, Date till, int maxResult, String historySid, String[] event,
+			Long rootFolderId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		HistoryDAO dao = (HistoryDAO) Context.get().getBean(HistoryDAO.class);
+		StringBuffer folderPredicate = new StringBuffer();
+		if (rootFolderId != null) {
+			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			Collection<Long> tree = fDao.findFolderIdInTree(rootFolderId, false);
+			if (fDao.isOracle()) {
+				/*
+				 * In Oracle The limit of 1000 elements applies to sets of
+				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
+				 * if the sets contain two or more items: (x, 0) IN ((1,0),
+				 * (2,0), (3,0), ...):
+				 */
+				folderPredicate.append(" and (A.ld_folderid,0) in ( ");
+				boolean firstItem = true;
+				for (Long folderId : tree) {
+					if (!firstItem)
+						folderPredicate.append(",");
+					folderPredicate.append("(");
+					folderPredicate.append(folderId);
+					folderPredicate.append(",0)");
+					firstItem = false;
+				}
+				folderPredicate.append(" )");
+			} else {
+				folderPredicate.append(" and A.ld_folderid in ");
+				folderPredicate.append(tree.toString().replace('[', '(').replace(']', ')'));
+			}
+		}
+
+		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		List<GUIHistory> histories = new ArrayList<GUIHistory>();
 		try {
 
 			// Search in the document/folder history
 			StringBuffer query = new StringBuffer(
-					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment from ld_history A where A.ld_tenantid = "
+					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason from ld_history A where A.ld_tenantid = "
 							+ session.getTenantId());
 			if (userName != null && StringUtils.isNotEmpty(userName))
 				query.append(" and lower(A.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
@@ -508,6 +544,9 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			}
 			if (till != null) {
 				query.append(" and A.ld_date < '" + new Timestamp(till.getTime()) + "'");
+			}
+			if (rootFolderId != null) {
+				query.append(folderPredicate.toString());
 			}
 			if (event.length > 0) {
 				boolean first = true;
@@ -524,8 +563,9 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			}
 
 			// Search in the folder history
-			query.append(" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment from ld_folder_history B where B.ld_tenantid = "
-					+ session.getTenantId());
+			query.append(
+					" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment, B.ld_reason from ld_folder_history B where B.ld_tenantid = "
+							+ session.getTenantId());
 			if (userName != null && StringUtils.isNotEmpty(userName))
 				query.append(" and lower(B.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
 			if (historySid != null && StringUtils.isNotEmpty(historySid))
@@ -535,6 +575,9 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			}
 			if (till != null) {
 				query.append(" and B.ld_date < '" + new Timestamp(till.getTime()) + "'");
+			}
+			if (rootFolderId != null) {
+				query.append(folderPredicate.toString().replace('A', 'B'));
 			}
 			if (event.length > 0) {
 				boolean first = true;
@@ -551,40 +594,45 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			}
 
 			// Search in the user history
-			query.append(" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment from ld_user_history C where C.ld_tenantid = "
-					+ session.getTenantId());
-			if (userName != null && StringUtils.isNotEmpty(userName))
-				query.append(" and lower(C.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
-			if (historySid != null && StringUtils.isNotEmpty(historySid))
-				query.append(" and C.ld_sessionid='" + historySid + "' ");
-			if (from != null) {
-				query.append(" and C.ld_date > '" + new Timestamp(from.getTime()) + "'");
-			}
-			if (till != null) {
-				query.append(" and C.ld_date < '" + new Timestamp(till.getTime()) + "'");
-			}
-			if (event.length > 0) {
-				boolean first = true;
-				for (String e : event) {
-					if (first)
-						query.append(" and (");
-					else
-						query.append(" or ");
-
-					query.append(" C.ld_event = '" + SqlUtil.doubleQuotes(e) + "'");
-					first = false;
+			if (rootFolderId == null) {
+				query.append(
+						" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment, C.ld_reason from ld_user_history C where C.ld_tenantid = "
+								+ session.getTenantId());
+				if (userName != null && StringUtils.isNotEmpty(userName))
+					query.append(
+							" and lower(C.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
+				if (historySid != null && StringUtils.isNotEmpty(historySid))
+					query.append(" and C.ld_sessionid='" + historySid + "' ");
+				if (from != null) {
+					query.append(" and C.ld_date > '" + new Timestamp(from.getTime()) + "'");
 				}
-				query.append(" ) ");
+				if (till != null) {
+					query.append(" and C.ld_date < '" + new Timestamp(till.getTime()) + "'");
+				}
+				if (event.length > 0) {
+					boolean first = true;
+					for (String e : event) {
+						if (first)
+							query.append(" and (");
+						else
+							query.append(" or ");
+
+						query.append(" C.ld_event = '" + SqlUtil.doubleQuotes(e) + "'");
+						first = false;
+					}
+					query.append(" ) ");
+				}
 			}
 
 			if (Arrays.asList(SystemInfo.get().getFeatures()).contains("Feature_19")) {
 
 				// Search in the workflow history
-				query.append(" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment from ld_workflowhistory D where D.ld_tenantid = "
-						+ session.getTenantId());
+				query.append(
+						" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment, D.ld_reason from ld_workflowhistory D where D.ld_tenantid = "
+								+ session.getTenantId());
 				if (userName != null && StringUtils.isNotEmpty(userName))
-					query.append(" and lower(D.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase())
-							+ "%'");
+					query.append(
+							" and lower(D.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
 				if (historySid != null && StringUtils.isNotEmpty(historySid))
 					query.append(" and D.ld_sessionid='" + historySid + "' ");
 				if (from != null) {
@@ -592,6 +640,9 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 				}
 				if (till != null) {
 					query.append(" and D.ld_date < '" + new Timestamp(till.getTime()) + "'");
+				}
+				if (rootFolderId != null) {
+					query.append(folderPredicate.toString().replace('A', 'D'));
 				}
 				if (event.length > 0) {
 					boolean first = true;
@@ -631,6 +682,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 					history.setIp(rs.getString(10));
 					history.setUserLogin(rs.getString(11));
 					history.setComment(rs.getString(12));
+					history.setReason(rs.getString(13));
 
 					return history;
 				}
@@ -697,56 +749,6 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	}
 
 	@Override
-	public void markFeedMsgAsRead(long[] ids) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		try {
-			Context context = Context.get();
-			FeedMessageDAO dao = (FeedMessageDAO) context.getBean(FeedMessageDAO.class);
-			for (long id : ids) {
-				FeedMessage message = dao.findById(id);
-				dao.initialize(message);
-				message.setRead(1);
-				dao.store(message);
-			}
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
-	}
-
-	@Override
-	public void markFeedMsgAsNotRead(long[] ids) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
-
-		try {
-			Context context = Context.get();
-			FeedMessageDAO dao = (FeedMessageDAO) context.getBean(FeedMessageDAO.class);
-			for (long id : ids) {
-				FeedMessage message = dao.findById(id);
-				dao.initialize(message);
-				message.setRead(0);
-				dao.store(message);
-			}
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-		}
-	}
-
-	@Override
-	public void deleteFeedMessages(long[] ids) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
-
-		try {
-			Context context = Context.get();
-			FeedMessageDAO dao = (FeedMessageDAO) context.getBean(FeedMessageDAO.class);
-			for (long id : ids) {
-				dao.delete(id);
-			}
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-		}
-	}
-
-	@Override
 	public GUIValue[] getPlugins() throws ServerException {
 		ServiceUtil.validateSession(getThreadLocalRequest());
 
@@ -790,9 +792,30 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 		try {
 			ContextProperties conf = Context.get().getProperties();
-			conf.setProperty("runlevel", RunLevel.DEFAULT.toString());
+			String prevRunLevel = conf.getProperty("runlevel.back", RunLevel.DEFAULT.toString());
+			conf.setProperty("runlevel", prevRunLevel);
 			conf.write();
 			log.info("Update confirmed");
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+		}
+	}
+
+	@Override
+	public void restart() throws ServerException {
+		ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			SecurityServiceImpl secService = new SecurityServiceImpl();
+			secService.logout();
+
+			ContextProperties config = Context.get().getProperties();
+			File restartFile = new File(config.getProperty("LDOCHOME") + "/updates/restart");
+			if (restartFile.exists())
+				FileUtils.deleteQuietly(restartFile);
+			restartFile.getParentFile().mkdirs();
+			if (!restartFile.createNewFile())
+				throw new ServerException("Unable to write file " + restartFile.getAbsolutePath());
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 		}

@@ -14,14 +14,15 @@ import com.logicaldoc.core.document.Document;
  * @since 6.5
  */
 public interface SearchEngine {
-	
+
 	/**
 	 * Adds a new Hit into the index
 	 * 
-	 * @param document
-	 * @param content
-	 * @return
-	 * @throws Exception
+	 * @param document The document to add into the index
+	 * @param content The extracted body text
+	 * 
+	 * @throws Exception is an error happens and the document cannot be added to
+	 *         the index
 	 */
 	public void addHit(Document document, String content) throws Exception;
 
@@ -30,7 +31,9 @@ public interface SearchEngine {
 	 * 
 	 * @param content Stream of the document's file
 	 * @param document The document that we want to add
-	 * @throws Exception
+	 * 
+	 * @throws Exception is an error happens and the document cannot be added to
+	 *         the index
 	 */
 	public void addHit(Document document, InputStream content) throws Exception;
 
@@ -42,6 +45,8 @@ public interface SearchEngine {
 
 	/**
 	 * Launch the check on the Index
+	 * 
+	 * @return the output of the check
 	 */
 	public String check();
 
@@ -64,12 +69,20 @@ public interface SearchEngine {
 	/**
 	 * Search for hits.<br>
 	 * Attention: The hits will be populated with just the fields stored in the
-	 * index.
+	 * index
+	 * 
+	 * @param expression the search expression
+	 * @param filters a set of filter expressions, optional
+	 * @param expressionLanguage the language in which the
+	 *        <code>expression</code> is writted
+	 * @param rows maximum number elements to be returned
+	 * 
+	 * @return the hits
 	 */
 	public Hits search(String expression, String[] filters, String expressionLanguage, Integer rows);
 
 	/**
-	 * Close all indexing operations, shuts down the engine.
+	 * Closes all indexing operations, shuts down the engine.
 	 */
 	public void close();
 
@@ -89,11 +102,13 @@ public interface SearchEngine {
 	/**
 	 * Returns the number of indexed documents in all indexes. Used for
 	 * statistical output.
+	 * 
+	 * @return the total number of entries in the index
 	 */
 	public long getCount();
 
 	/**
-	 * Drops the fulltext index
+	 * Drops the full-text index
 	 */
 	public void dropIndex();
 
@@ -105,6 +120,8 @@ public interface SearchEngine {
 
 	/**
 	 * Service method to get access from the internal core
+	 * 
+	 * @return the search server representation
 	 */
 	public Object getServer();
 }

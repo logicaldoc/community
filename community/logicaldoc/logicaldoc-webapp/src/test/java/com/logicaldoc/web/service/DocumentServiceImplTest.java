@@ -2,22 +2,21 @@ package com.logicaldoc.web.service;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentNote;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.document.dao.BookmarkDAO;
 import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.document.dao.DocumentLinkDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
-import com.logicaldoc.core.document.dao.HistoryDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
@@ -26,6 +25,8 @@ import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.web.AbstractWebappTCase;
+
+import junit.framework.Assert;
 
 public class DocumentServiceImplTest extends AbstractWebappTCase {
 
@@ -42,7 +43,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	private BookmarkDAO bookDao;
 
-	private HistoryDAO historyDao;
+	private DocumentHistoryDAO documentHistoryDao;
 
 	@Before
 	public void setUp() throws Exception {
@@ -52,8 +53,8 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
 		linkDao = (DocumentLinkDAO) context.getBean("DocumentLinkDAO");
 		noteDao = (DocumentNoteDAO) context.getBean("DocumentNoteDAO");
+		documentHistoryDao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
 		bookDao = (BookmarkDAO) context.getBean("BookmarkDAO");
-		historyDao = (HistoryDAO) context.getBean("HistoryDAO");
 	}
 
 	@Test
@@ -64,7 +65,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	}
 
 	@Test
-	public void testGetAttributes() throws ServerException {
+	public void testGetAttributes() throws ServerException, PersistenceException {
 		Template template = new Template();
 		template.setName("test3");
 		template.setValue("attr1", "v1");
@@ -79,7 +80,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			}
 			if ("a2".equals(at.getName())) {
 				Assert.assertEquals(GUIAttribute.TYPE_INT, at.getType());
-				Assert.assertEquals((Long)23L, at.getIntValue());
+				Assert.assertEquals((Long) 23L, at.getIntValue());
 			}
 		}
 	}
@@ -172,21 +173,21 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testDeleteNotes() throws ServerException {
-		List<DocumentNote> notes = noteDao.findByDocId(1);
+		List<DocumentNote> notes = noteDao.findByDocId(1, "1.0");
 		Assert.assertNotNull(notes);
 		Assert.assertEquals(2, notes.size());
 		Assert.assertEquals("message for note 1", notes.get(0).getMessage());
 
 		service.deleteNotes(new long[] { 1 });
 
-		notes = noteDao.findByDocId(1);
+		notes = noteDao.findByDocId(1, "1.0");
 		Assert.assertNotNull(notes);
 		Assert.assertEquals(1, notes.size());
 	}
 
 	@Test
 	public void testAddNote() throws ServerException {
-		List<DocumentNote> notes = noteDao.findByDocId(1L);
+		List<DocumentNote> notes = noteDao.findByDocId(1L, "1.0");
 		Assert.assertNotNull(notes);
 		Assert.assertEquals(2, notes.size());
 
@@ -196,9 +197,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Assert.assertNotNull(note);
 		Assert.assertEquals("pippo", note.getMessage());
 
-		notes = noteDao.findByDocId(1L);
+		notes = noteDao.findByDocId(1L, "1.0");
 		Assert.assertNotNull(notes);
-		Assert.assertEquals(3, notes.size());
+		Assert.assertEquals(2, notes.size());
 	}
 
 	@Test
@@ -212,18 +213,18 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		service.unlock(new long[] { 1, 2 });
 
-		doc = docDao.findById(1);
+		doc = docDao.findDocument(1);
 		Assert.assertNotNull(doc);
 		Assert.assertNull(doc.getLockUserId());
-		doc = docDao.findById(2);
+		doc = docDao.findDocument(2);
 		Assert.assertNotNull(doc);
 		Assert.assertNull(doc.getLockUserId());
 
 		service.lock(new long[] { 1, 2 }, "comment");
 
-		doc = docDao.findById(1);
+		doc = docDao.findDocument(1);
 		Assert.assertEquals(1L, doc.getLockUserId().longValue());
-		doc = docDao.findById(2);
+		doc = docDao.findDocument(2);
 		Assert.assertEquals(1L, doc.getLockUserId().longValue());
 	}
 
@@ -244,7 +245,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	}
 
 	@Test
-	public void testRestore() throws ServerException {
+	public void testRestore() throws ServerException, PersistenceException {
 		docDao.delete(4);
 		Assert.assertNull(docDao.findById(4));
 		service.restore(new Long[] { 4L }, 5);
@@ -273,7 +274,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Assert.assertEquals("bookmarkTest", book.getTitle());
 		Assert.assertEquals("bookDescr", book.getDescription());
 
-		service.deleteBookmarks(new long[] { 1, bookmark.getId() });
+		service.deleteBookmarks(new long[] { bookmark.getId() });
 
 		book = bookDao.findById(1);
 		Assert.assertNull(book);
@@ -283,14 +284,14 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testMarkHistoryAsRead() throws ServerException {
-		List<History> histories = historyDao.findByUserIdAndEvent(1, "data test 01", null);
+		List<DocumentHistory> histories = documentHistoryDao.findByUserIdAndEvent(1, "data test 01", null);
 		Assert.assertEquals(2, histories.size());
 		Assert.assertEquals(1, histories.get(0).getIsNew());
 		Assert.assertEquals(1, histories.get(1).getIsNew());
 
 		service.markHistoryAsRead("data test 01");
 
-		histories = historyDao.findByUserIdAndEvent(1, "data test 01", null);
+		histories = documentHistoryDao.findByUserIdAndEvent(1, "data test 01", null);
 		Assert.assertEquals(2, histories.size());
 		Assert.assertEquals(0, histories.get(0).getIsNew());
 		Assert.assertEquals(0, histories.get(1).getIsNew());
@@ -319,7 +320,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Assert.assertNotNull(doc3);
 		Assert.assertEquals(AbstractDocument.INDEX_SKIP, doc3.getIndexed());
 
-		service.markIndexable(new long[] { 1, 3 });
+		service.markIndexable(new long[] { 1, 3 }, AbstractDocument.INDEX_TO_INDEX);
 
 		doc1 = docDao.findById(1);
 		Assert.assertNotNull(doc1);

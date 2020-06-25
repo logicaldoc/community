@@ -47,13 +47,19 @@ public class FolderFieldsDS extends DataSource {
 		DataSourceTextField tags = new DataSourceTextField("tags", I18N.message("tags"));
 		tags.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS);
 
-		setFields(id, folderName, description, created, creator, tags);
+		DataSourceIntegerField tmplt = new DataSourceIntegerField("template", I18N.message("template"));
+		tmplt.setValidOperators(OperatorId.IS_NULL);
+
+		setFields(id, folderName, description, created, creator, tags, tmplt);
 
 		/*
 		 * Define extended attributes
 		 */
 		if (template != null && template.getAttributes() != null)
 			for (GUIAttribute att : template.getAttributes()) {
+				if (att.isHidden())
+					continue;
+
 				DataSourceField field = null;
 				String name = "_" + att.getName().replaceAll(" ", Constants.BLANK_PLACEHOLDER);
 				String titl = att.getLabel() + " (" + template.getName() + ")";
@@ -75,6 +81,11 @@ public class FolderFieldsDS extends DataSource {
 					field = new DataSourceIntegerField();
 					field.setValidOperators(OperatorId.EQUALS);
 					name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_BOOLEAN;
+				} else if (att.getType() == GUIAttribute.TYPE_USER || att.getType() == GUIAttribute.TYPE_FOLDER) {
+					field = new DataSourceIntegerField();
+					field.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL, OperatorId.IS_NULL,
+							OperatorId.NOT_NULL);
+					name = name + Constants.BLANK_PLACEHOLDER + "type:" + att.getType();
 				} else {
 					field = new DataSourceTextField();
 					field.setValidOperators(OperatorId.ICONTAINS, OperatorId.INOT_CONTAINS, OperatorId.EQUALS,

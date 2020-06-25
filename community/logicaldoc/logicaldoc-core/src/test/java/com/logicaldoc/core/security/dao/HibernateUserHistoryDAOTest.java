@@ -2,14 +2,15 @@ package com.logicaldoc.core.security.dao;
 
 import java.util.Collection;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
 import com.logicaldoc.core.security.UserHistory;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateUserHistoryDAO</code>
@@ -32,7 +33,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		Collection<UserHistory> histories = (Collection<UserHistory>) dao.findByUserId(1);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
@@ -61,11 +62,11 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		UserHistory userHistory = new UserHistory();
 		userHistory.setDate(DateBean.dateFromCompactString("20061220"));
 		userHistory.setUsername("sebastian");
-		userHistory.setUserId(3);
+		userHistory.setUserId(3L);
 		userHistory.setEvent("first test User History store");
 
 		Assert.assertTrue(dao.store(userHistory));
@@ -73,7 +74,7 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 		UserHistory newUserHistory = new UserHistory();
 		newUserHistory.setDate(DateBean.dateFromCompactString("20061220"));
 		newUserHistory.setUsername("sebastian");
-		newUserHistory.setUserId(3);
+		newUserHistory.setUserId(3L);
 		newUserHistory.setEvent("second test User History store");
 
 		Assert.assertTrue(dao.store(newUserHistory));

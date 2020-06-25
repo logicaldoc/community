@@ -5,7 +5,7 @@ import java.util.Date;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.frontend.client.calendar.DocumentCalendar;
+import com.logicaldoc.gui.frontend.client.calendar.EventsCalendar;
 import com.smartgwt.client.types.ViewName;
 import com.smartgwt.client.widgets.calendar.Calendar;
 
@@ -34,7 +34,7 @@ public class DocumentCalendarPanel extends DocumentDetailTab {
 		if (document.getDocRef() != null)
 			docId = document.getDocRef();
 
-		calendar = new DocumentCalendar(docId, null, new AsyncCallback<Void>() {
+		calendar = new EventsCalendar(docId, null, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

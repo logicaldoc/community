@@ -38,7 +38,13 @@ public interface BookmarkService {
 			throws Exception;
 
 	/**
-	 * Retrieves all the bookmarks of the current user.
+	 * Retrieves all the bookmarks of the current user
+	 * 
+	 * @param sid identifier of the session
+	 * 
+	 * @return array of bookmarks
+	 * 
+	 * @throws Exception error in the server application 
 	 */
 	@WebMethod
 	@WebResult(name = "bookmark")

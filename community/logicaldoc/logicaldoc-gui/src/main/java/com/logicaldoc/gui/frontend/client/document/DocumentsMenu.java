@@ -2,9 +2,10 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
-import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
+import com.logicaldoc.gui.frontend.client.folder.FolderCursor;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigatorPanel;
 import com.smartgwt.client.types.VisibilityMode;
 import com.smartgwt.client.widgets.events.ResizedEvent;
@@ -50,6 +51,9 @@ public class DocumentsMenu extends SectionStack {
 		browser = new SectionStackSection(I18N.message("browser"));
 		browser.setName("browser");
 		browser.setCanCollapse(true);
+		if (Session.get().isFolderPagination())
+			browser.setControls(FolderCursor.get());
+
 		browser.setItems(FolderNavigatorPanel.get());
 		if (showBrowser)
 			addSection(browser);
@@ -106,9 +110,5 @@ public class DocumentsMenu extends SectionStack {
 				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.TRASH)) {
 			TrashPanel.get().refresh();
 		}
-	}
-
-	public void openFolder(long folderId) {
-		FolderNavigator.get().openFolder(folderId);
 	}
 }

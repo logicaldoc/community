@@ -23,7 +23,12 @@ import com.logicaldoc.webservice.doc.util.GenericsUtils;
 public class JavaLanguageVariableFactory {
 
 	/**
-	 * create a variable from a field which is @XmlElement annotated
+	 * Creates a variable from a field which is @XmlElement annotated
+	 * 
+	 * @param field the field
+	 * 
+	 * @return the variable
+	 * 
 	 */
 	public static JavaLanguageVariable createVariableFromField(Field field) {
 		JavaLanguageVariable variable = new JavaLanguageVariable();
@@ -62,7 +67,11 @@ public class JavaLanguageVariableFactory {
 	}
 
 	/**
-	 * create variables from parameters which are @WebParam annotated
+	 * Creates variables from parameters which are @WebParam annotated
+	 * 
+	 * @param method the method
+	 * 
+	 * @return list of variables
 	 */
 	public static List<JavaLanguageVariable> createVariablesFromMethodParamaters(Method method) {
 		List<JavaLanguageVariable> variables = new ArrayList<JavaLanguageVariable>();
@@ -78,7 +87,11 @@ public class JavaLanguageVariableFactory {
 	}
 
 	/**
-	 * create a variable from a method's return which is @WebResult annotated
+	 * Creates a variable from a method's return which is @WebResult annotated
+	 * 
+	 * @param method the method
+	 * 
+	 * @return the vaiable
 	 */
 	public static JavaLanguageVariable createVariableFromMethodReturn(Method method) {
 
@@ -130,5 +143,4 @@ public class JavaLanguageVariableFactory {
 		else
 			return annotation.required();
 	}
-
 }

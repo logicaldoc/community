@@ -110,8 +110,11 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 							key = value.toString().split(",");
 						List<String> labels = new ArrayList<String>();
 						for (String string : key) {
-							labels.add(I18N.message(string + ".short"));
+							if (string.trim().isEmpty())
+								continue;
+							labels.add(I18N.message(string.trim() + ".short"));
 						}
+
 						String str = labels.toString().substring(1);
 						return str.substring(0, str.length() - 1);
 					} else

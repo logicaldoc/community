@@ -4,6 +4,7 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -32,13 +33,13 @@ public class LockedDocsDS extends DataSource {
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 		DataSourceTextField fileName = new DataSourceTextField("filename");
 		DataSourceTextField digest = new DataSourceTextField("digest");
-		DataSourceImageField immutable = new DataSourceImageField("immutable");
+		DataSourceIntegerField immutable = new DataSourceIntegerField("immutable");
 		DataSourceTextField folderId = new DataSourceTextField("folderId");
 		DataSourceTextField type = new DataSourceTextField("type");
-		DataSourceImageField locked = new DataSourceImageField("locked");
+		DataSourceIntegerField status = new DataSourceIntegerField("status");
 
 		setFields(id, userIdItem, username, size, version, fileVersion, lastModified, customId, icon, fileName, digest,
-				immutable, folderId, type, locked);
+				immutable, folderId, type, status);
 		setClientOnly(true);
 
 		String url = "data/lockeddocs.xml";

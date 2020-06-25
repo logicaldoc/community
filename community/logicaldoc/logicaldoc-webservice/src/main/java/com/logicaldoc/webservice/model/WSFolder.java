@@ -71,6 +71,9 @@ public class WSFolder implements Serializable {
 	@WSDoc(description = "the referenced folder, used in case of folder alias", required = false)
 	private Long foldRef = null;
 
+	@WSDoc(description = "another folder to inherit the security from", required = false)
+	private Long securityRef;
+
 	@WSDoc(description = "array of attributes", required = false)
 	private WSAttribute[] attributes = new WSAttribute[0];
 
@@ -79,6 +82,12 @@ public class WSFolder implements Serializable {
 
 	@WSDoc(required = false, description = "tags applied to the document")
 	private String[] tags = new String[0];
+
+	@WSDoc(required = false, description = "identifier of the Zonal OCR template to use to process the documents inside this folder")
+	private Long ocrTemplateId = null;
+
+	@WSDoc(required = false, description = "identifier of the barcode template to use to process the documents inside this folder")
+	private Long barcodeTemplateId = null;
 
 	public void addAttribute(WSAttribute att) {
 		List<WSAttribute> buf = (List<WSAttribute>) Arrays.asList(getAttributes());
@@ -132,6 +141,9 @@ public class WSFolder implements Serializable {
 		wsFolder.setTemplateLocked(folder.getTemplateLocked());
 		wsFolder.setHidden(folder.getHidden());
 		wsFolder.setStorage(folder.getStorage());
+		wsFolder.setSecurityRef(folder.getSecurityRef());
+		wsFolder.setOcrTemplateId(folder.getOcrTemplateId());
+		wsFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
 
 		if (withCollections && folder.getTags() != null)
 			wsFolder.setTags(folder.getTagsAsWords().toArray(new String[0]));
@@ -150,10 +162,14 @@ public class WSFolder implements Serializable {
 					WSAttribute attribute = new WSAttribute();
 					attribute.setName(name);
 					attribute.setMandatory(attr.getMandatory());
+					attribute.setHidden(attr.getHidden());
+					attribute.setMultiple(attr.getMultiple());
+					attribute.setParent(attr.getParent());
 					attribute.setPosition(attr.getPosition());
 					attribute.setValue(attr.getValue());
+					attribute.setStringValues(attr.getStringValues());
 
-					if (attr.getType() == Attribute.TYPE_USER) {
+					if (attr.getType() == Attribute.TYPE_USER || attr.getType() == Attribute.TYPE_FOLDER) {
 						attribute.setIntValue(attr.getIntValue());
 						attribute.setStringValue(attr.getStringValue());
 					}
@@ -179,6 +195,9 @@ public class WSFolder implements Serializable {
 					for (int i = 0; i < attributes.length; i++) {
 						Attribute extAttribute = new Attribute();
 						extAttribute.setMandatory(attributes[i].getMandatory());
+						extAttribute.setHidden(attributes[i].getHidden());
+						extAttribute.setMultiple(attributes[i].getMultiple());
+						extAttribute.setParent(attributes[i].getParent());
 						extAttribute.setPosition(attributes[i].getPosition());
 						extAttribute.setIntValue(attributes[i].getIntValue());
 						extAttribute.setStringValue(attributes[i].getStringValue());
@@ -302,6 +321,14 @@ public class WSFolder implements Serializable {
 		return foldRef;
 	}
 
+	public Long getSecurityRef() {
+		return securityRef;
+	}
+
+	public void setSecurityRef(Long securityRef) {
+		this.securityRef = securityRef;
+	}
+
 	public void setFoldRef(Long foldRef) {
 		this.foldRef = foldRef;
 	}
@@ -320,5 +347,21 @@ public class WSFolder implements Serializable {
 
 	public void setTags(String[] tags) {
 		this.tags = tags;
+	}
+
+	public Long getOcrTemplateId() {
+		return ocrTemplateId;
+	}
+
+	public void setOcrTemplateId(Long ocrTemplateId) {
+		this.ocrTemplateId = ocrTemplateId;
+	}
+
+	public Long getBarcodeTemplateId() {
+		return barcodeTemplateId;
+	}
+
+	public void setBarcodeTemplateId(Long barcodeTemplateId) {
+		this.barcodeTemplateId = barcodeTemplateId;
 	}
 }

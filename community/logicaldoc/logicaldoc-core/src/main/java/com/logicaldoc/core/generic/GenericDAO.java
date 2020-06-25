@@ -14,12 +14,12 @@ public interface GenericDAO extends PersistentObjectDAO<Generic> {
 	/**
 	 * Finds a Generic by it's alternate key
 	 * 
-	 * @param type The exact type
-	 * @param subtype The exact subtype
-	 * @param subtype The qualifier (optional)
-	 * @param tenantId ID of the owning tenant
+     * @param type The type(you can use like jollies and can be null)
+	 * @param subtype The sub-type(you can use like jollies and can be null)
+	 * @param tenantId ID of the owning tenant (optional)
+	 * @param qualifier the qualifier, can be null
 	 * 
-	 * @return Wanted generic or null.
+	 * @return Wanted generic or null
 	 */
 	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId);
 
@@ -29,8 +29,8 @@ public interface GenericDAO extends PersistentObjectDAO<Generic> {
 	 * 
 	 * @param type The type(you can use like jollies and can be null)
 	 * @param subtype The sub-type(you can use like jollies and can be null)
-	 * @param subtype The qualifier (optional)
 	 * @param tenantId ID of the owning tenant (optional)
+	 * @param qualifier the qualifier, can be null
 	 * 
 	 * @return The collection of found Generics
 	 */

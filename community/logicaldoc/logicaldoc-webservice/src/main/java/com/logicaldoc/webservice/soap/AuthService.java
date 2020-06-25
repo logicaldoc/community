@@ -20,7 +20,10 @@ public interface AuthService {
 	 * 
 	 * @param username The username
 	 * @param password The password
+	 * 
 	 * @return The newly created session identifier(sid)
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WSDoc(description = "starts a new session; returns the session identifier(SID)")
@@ -38,6 +41,10 @@ public interface AuthService {
 
 	/**
 	 * Checks if a SID is valid
+	 * 
+	 * @param sid identifier of the session
+	 * 
+	 * @return if the session is valid
 	 */
 	@WebMethod
 	@WSDoc(description = "checks if a SID is valid; returns true only if the session is valid")
@@ -45,6 +52,8 @@ public interface AuthService {
 
 	/**
 	 * Renews a session
+	 * 
+	 * @param sid identifier of the session
 	 */
 	@WebMethod
 	@WSDoc(description = "renews an existing session")

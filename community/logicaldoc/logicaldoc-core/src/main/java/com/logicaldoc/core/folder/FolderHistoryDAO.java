@@ -17,7 +17,8 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	/**
 	 * This method selects all histories of a given user.
 	 * 
-	 * @param userId
+	 * @param userId identifier of the user
+	 * 
 	 * @return list of histories ordered by date
 	 */
 	public List<FolderHistory> findByUserId(long userId);
@@ -26,6 +27,7 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * This method selects all histories of a given folder.
 	 * 
 	 * @param folderId ID of the folder
+	 * 
 	 * @return list of histories ordered by date
 	 */
 	public List<FolderHistory> findByFolderId(long folderId);
@@ -45,7 +47,8 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	/**
 	 * This method selects all histories not notified yet.
 	 * 
-	 * @return max Optional maximum number of records
+	 * @param max Optional maximum number of records
+	 * 
 	 * @return list of histories ordered by date
 	 */
 	public List<FolderHistory> findNotNotified(Integer max);
@@ -56,6 +59,7 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * 
 	 * @param userId The user identifier
 	 * @param event The history event
+	 * 
 	 * @return list of histories ordered by date
 	 */
 	public List<FolderHistory> findByUserIdAndEvent(long userId, String event);
@@ -65,9 +69,10 @@ public interface FolderHistoryDAO extends PersistentObjectDAO<FolderHistory> {
 	 * 
 	 * @param pathExpression The path expression (like /Default/acme%)
 	 * @param oldestDate The older date for the retrieved histories
-	 * @events events Optional list of event codes to be used as filter
+	 * @param events Optional list of event codes to be used as filter
 	 * @param max Optional maximum number of records
-	 * @return
+	 * 
+	 * @return The list of histories that matched the given criteria
 	 */
 	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events, Integer max);
 

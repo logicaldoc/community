@@ -46,19 +46,23 @@ public class HTMLLayout extends Layout {
 	 * set to false which means there will be no location information output by
 	 * this layout. If the the option is set to true, then the file name and
 	 * line number of the statement at the origin of the log statement will be
-	 * output.
+	 * output
 	 * 
 	 * <p>
 	 * If you are embedding this layout within an
 	 * {@link org.apache.log4j.net.SMTPAppender} then make sure to set the
-	 * <b>LocationInfo</b> option of that appender as well.
+	 * <b>LocationInfo</b> option of that appender as well
+	 * 
+	 * @param flag the flag
 	 */
 	public void setLocationInfo(boolean flag) {
 		locationInfo = flag;
 	}
 
 	/**
-	 * Returns the current value of the <b>LocationInfo</b> option.
+	 * Returns the current value of the <b>LocationInfo</b> option
+	 * 
+	 * @return the <b>LocationInfo</b> options
 	 */
 	public boolean getLocationInfo() {
 		return locationInfo;
@@ -66,31 +70,36 @@ public class HTMLLayout extends Layout {
 
 	/**
 	 * The <b>Title</b> option takes a String value. This option sets the
-	 * document title of the generated HTML document.
+	 * document title of the generated HTML document. <br>
 	 * 
-	 * <p>
 	 * Defaults to 'Log4J Log Messages'.
+	 * 
+	 * @param title the title
 	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
 
 	/**
-	 * Returns the current value of the <b>Title</b> option.
+	 * Returns the current value of the <b>Title</b> option
+	 * 
+	 * @return the title
 	 */
 	public String getTitle() {
 		return title;
 	}
 
 	/**
-	 * Returns the content type output by this layout, i.e "text/html".
+	 * Returns the content type output by this layout, i.e "text/html"
+	 * 
+	 * @return the content type
 	 */
 	public String getContentType() {
 		return "text/html";
 	}
 
 	/**
-	 * No options to activate.
+	 * No options to activate
 	 */
 	public void activateOptions() {
 	}
@@ -152,7 +161,8 @@ public class HTMLLayout extends Layout {
 		sbuf.append("</tr>" + Layout.LINE_SEP);
 
 		if (event.getNDC() != null) {
-			sbuf.append("<tr><td bgcolor=\"#EEEEEE\" style=\"font-size : xx-small;\" colspan=\"6\" title=\"Nested Diagnostic Context\">");
+			sbuf.append(
+					"<tr><td bgcolor=\"#EEEEEE\" style=\"font-size : xx-small;\" colspan=\"6\" title=\"Nested Diagnostic Context\">");
 			sbuf.append("NDC: " + Transform.escapeTags(event.getNDC()));
 			sbuf.append("</td></tr>" + Layout.LINE_SEP);
 		}
@@ -188,12 +198,15 @@ public class HTMLLayout extends Layout {
 	}
 
 	/**
-	 * Returns appropriate HTML headers.
+	 * Returns appropriate HTML headers
+	 * 
+	 * @return the HTML headers
 	 */
 	public String getHeader() {
 		StringBuffer sbuf = new StringBuffer();
-		sbuf.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">"
-				+ Layout.LINE_SEP);
+		sbuf.append(
+				"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">"
+						+ Layout.LINE_SEP);
 		sbuf.append("<html>" + Layout.LINE_SEP);
 		sbuf.append("<head>" + Layout.LINE_SEP);
 		sbuf.append("<title>" + title + "</title>" + Layout.LINE_SEP);
@@ -225,7 +238,9 @@ public class HTMLLayout extends Layout {
 	}
 
 	/**
-	 * Returns the appropriate HTML footers.
+	 * Returns the appropriate HTML footers
+	 * 
+	 * @return the footer
 	 */
 	public String getFooter() {
 		StringBuffer sbuf = new StringBuffer();
@@ -237,7 +252,9 @@ public class HTMLLayout extends Layout {
 
 	/**
 	 * The HTML layout handles the throwable contained in logging events. Hence,
-	 * this method return <code>false</code>.
+	 * this method return <code>false</code>
+	 * 
+	 * @return the flag
 	 */
 	public boolean ignoresThrowable() {
 		return false;

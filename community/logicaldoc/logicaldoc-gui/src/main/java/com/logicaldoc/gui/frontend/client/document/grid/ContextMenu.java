@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIExternalCall;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
@@ -20,17 +21,20 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
+import com.logicaldoc.gui.frontend.client.document.ComparisonWindow;
 import com.logicaldoc.gui.frontend.client.document.ConversionDialog;
 import com.logicaldoc.gui.frontend.client.document.DocumentCheckin;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.DownloadTicketDialog;
 import com.logicaldoc.gui.frontend.client.document.EmailDialog;
 import com.logicaldoc.gui.frontend.client.document.SendToArchiveDialog;
-import com.logicaldoc.gui.frontend.client.document.SignatureDialog;
-import com.logicaldoc.gui.frontend.client.document.StampDialog;
 import com.logicaldoc.gui.frontend.client.document.WorkflowDialog;
+import com.logicaldoc.gui.frontend.client.document.signature.SignatureDialog;
+import com.logicaldoc.gui.frontend.client.document.split.SplitDialog;
+import com.logicaldoc.gui.frontend.client.document.stamp.StampDialog;
+import com.logicaldoc.gui.frontend.client.folder.AutomationDialog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.AutoComplete;
 import com.smartgwt.client.util.BooleanCallback;
@@ -66,7 +70,7 @@ public class ContextMenu extends Menu {
 				} else {
 					String url = GWT.getHostPageBaseURL() + "zip-export?folderId=" + folder.getId();
 					for (GUIDocument record : selection) {
-						if ("true".equals(record.getAttribute("password").toString())) {
+						if (record.isPasswordProtected()) {
 							SC.warn(I18N.message("somedocsprotected"));
 							break;
 						}
@@ -110,18 +114,7 @@ public class ContextMenu extends Menu {
 					return;
 				Clipboard.getInstance().clear();
 				for (int i = 0; i < selection.length; i++) {
-					long id = selection[i].getId();
-
-					GUIDocument document = new GUIDocument();
-					document.setId(id);
-					document.setIcon(selection[i].getIcon());
-					document.setLastModified(selection[i].getLastModified());
-					document.setDate(selection[i].getDate());
-					document.setVersion(selection[i].getVersion());
-					document.setFileVersion(selection[i].getFileVersion());
-					document.setFileName(selection[i].getFileName());
-
-					Clipboard.getInstance().add(document);
+					Clipboard.getInstance().add(selection[i]);
 					Clipboard.getInstance().setLastAction(Clipboard.COPY);
 				}
 			}
@@ -149,11 +142,13 @@ public class ContextMenu extends Menu {
 
 								@Override
 								public void onSuccess(Void result) {
-									grid.removeSelectedDocuments();
-									DocumentController.get().deleted(grid.getSelectedDocuments());
+									// If the data grid is big the records
+									// deletion doesn't work, so refresh the
+									// screen.
 									if (grid.getFolder() != null
 											&& grid.getFolder().getId() == Session.get().getCurrentFolder().getId())
 										DocumentsPanel.get().refresh();
+									DocumentController.get().deleted(grid.getSelectedDocuments());
 								}
 							});
 						}
@@ -195,7 +190,35 @@ public class ContextMenu extends Menu {
 
 					@Override
 					public void onSuccess(Void result) {
+						for (GUIDocument doc : selection) {
+							doc.setLinks(doc.getLinks() + 1);
+							DocumentController.get().modified(doc);
+						}
+
+						for (GUIDocument doc : Clipboard.getInstance()) {
+							doc.setLinks(doc.getLinks() + 1);
+							DocumentController.get().modified(doc);
+						}
+
 						Clipboard.getInstance().clear();
+
+						/**
+						 * For some reason if the link target is already shown
+						 * in the details panel it must be reloaded or further
+						 * inputs will be lost.
+						 */
+						DocumentService.Instance.get().getById(grid.getSelectedDocument().getId(),
+								new AsyncCallback<GUIDocument>() {
+									@Override
+									public void onFailure(Throwable caught) {
+										Log.serverError(caught);
+									}
+
+									@Override
+									public void onSuccess(GUIDocument doc) {
+										Session.get().setCurrentDocument(doc);
+									}
+								});
 					}
 				});
 			}
@@ -282,7 +305,7 @@ public class ContextMenu extends Menu {
 		unsetPassword.setTitle(I18N.message("unsetpassword"));
 		unsetPassword.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				if (Session.get().getUser().isMemberOf("admin")) {
+				if (Session.get().isAdmin()) {
 					DocumentService.Instance.get().unsetPassword(selection[0].getId(), "", new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
@@ -394,18 +417,10 @@ public class ContextMenu extends Menu {
 
 					@Override
 					public void onSuccess(Void result) {
-						GUIDocument[] docs = grid.getSelectedDocuments();
-						for (GUIDocument record : docs){
-							if (Session.get().getCurrentDocument() != null
-									&& Session.get().getCurrentDocument().getId() == record.getId()) {
-								DocUtil.markCheckedOut(Session.get().getCurrentDocument());
-							} else {
-								DocUtil.markCheckedOut(record);
-							}
-						}
+						DocUtil.markCheckedOut(document);
+						WindowUtils.openUrl(Util.downloadURL(document.getId()));
 						grid.selectDocument(document.getId());
 						Log.info(I18N.message("documentcheckedout"), null);
-						WindowUtils.openUrl(Util.downloadURL(document.getId()));
 					}
 				});
 			}
@@ -541,26 +556,58 @@ public class ContextMenu extends Menu {
 				if (selection == null || selection.length == 0)
 					return;
 
-				DocumentService.Instance.get().markIndexable(selectionIds, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						for (GUIDocument record : selection) {
-							record.setIndexed(Constants.INDEX_TO_INDEX);
-							if (Session.get().getCurrentDocument() != null
-									&& Session.get().getCurrentDocument().getId() == record.getId()) {
-								Session.get().getCurrentDocument().setIndexed(Constants.INDEX_TO_INDEX);
-								DocumentController.get().modified(Session.get().getCurrentDocument());
-							} else {
-								DocumentController.get().modified(record);
+				DocumentService.Instance.get().markIndexable(selectionIds, Constants.INDEX_TO_INDEX,
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								Log.serverError(caught);
 							}
-						}
-					}
-				});
+
+							@Override
+							public void onSuccess(Void result) {
+								for (GUIDocument record : selection) {
+									record.setIndexed(Constants.INDEX_TO_INDEX);
+									if (Session.get().getCurrentDocument() != null
+											&& Session.get().getCurrentDocument().getId() == record.getId()) {
+										Session.get().getCurrentDocument().setIndexed(Constants.INDEX_TO_INDEX);
+										DocumentController.get().modified(Session.get().getCurrentDocument());
+									} else {
+										DocumentController.get().modified(record);
+									}
+								}
+							}
+						});
+			}
+		});
+
+		MenuItem markIndexableMetadataOnly = new MenuItem();
+		markIndexableMetadataOnly.setTitle(I18N.message("markindexablemetadataonly"));
+		markIndexableMetadataOnly.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				if (selection == null || selection.length == 0)
+					return;
+
+				DocumentService.Instance.get().markIndexable(selectionIds, Constants.INDEX_TO_INDEX_METADATA,
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								Log.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+								for (GUIDocument record : selection) {
+									record.setIndexed(Constants.INDEX_TO_INDEX_METADATA);
+									if (Session.get().getCurrentDocument() != null
+											&& Session.get().getCurrentDocument().getId() == record.getId()) {
+										Session.get().getCurrentDocument().setIndexed(Constants.INDEX_TO_INDEX_METADATA);
+										DocumentController.get().modified(Session.get().getCurrentDocument());
+									} else {
+										DocumentController.get().modified(record);
+									}
+								}
+							}
+						});
 			}
 		});
 
@@ -617,9 +664,8 @@ public class ContextMenu extends Menu {
 				GUIDocument selection = grid.getSelectedDocument();
 				if (selection == null)
 					return;
-				long docId = selection.getId();
 
-				StampDialog dialog = new StampDialog(new long[] { docId });
+				StampDialog dialog = new StampDialog(grid);
 				dialog.show();
 			}
 		});
@@ -667,6 +713,24 @@ public class ContextMenu extends Menu {
 			}
 		});
 
+		MenuItem automation = new MenuItem(I18N.message("executeautomation"));
+		automation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				ListGrid list = (ListGrid) DocumentsPanel.get().getDocumentsGrid();
+				ListGridRecord[] selection = list.getSelectedRecords();
+				if (selection == null || selection.length == 0)
+					return;
+
+				final Long[] ids = new Long[selection.length];
+				for (int j = 0; j < selection.length; j++)
+					ids[j] = selection[j].getAttributeAsLong("id");
+
+				AutomationDialog dialog = new AutomationDialog(folder.getId(), ids);
+				dialog.show();
+			}
+		});
+
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
 		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
@@ -703,6 +767,26 @@ public class ContextMenu extends Menu {
 			}
 		});
 
+		MenuItem compare = new MenuItem(I18N.message("compare"));
+		compare.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				GUIVersion version1 = new GUIVersion();
+				version1.setDocId(selection[0].getId());
+				version1.setFileVersion(selection[0].getFileVersion());
+				version1.setFileName(selection[0].getFileName());
+
+				GUIVersion version2 = new GUIVersion();
+				version2.setDocId(selection[1].getId());
+				version2.setFileVersion(selection[1].getFileVersion());
+				version2.setFileName(selection[1].getFileName());
+
+				ComparisonWindow diff = new ComparisonWindow(version1, version2);
+				diff.show();
+			}
+		});
+
 		MenuItem replaceAlias = new MenuItem(I18N.message("replacealias"));
 		replaceAlias.addClickHandler(new ClickHandler() {
 
@@ -732,8 +816,6 @@ public class ContextMenu extends Menu {
 			}
 		});
 
-		MenuItem more = new MenuItem(I18N.message("more"));
-
 		MenuItem externalCall = new MenuItem();
 		final GUIExternalCall extCall = Session.get().getSession().getExternalCall();
 		if (extCall != null) {
@@ -754,6 +836,16 @@ public class ContextMenu extends Menu {
 			});
 		}
 
+		MenuItem split = new MenuItem(I18N.message("split"));
+		split.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				SplitDialog dialog = new SplitDialog(selection[0]);
+				dialog.show();
+			}
+		});
+
 		setItems(download, preview, cut, copy, delete, bookmark, sendMail, links, office, checkout, checkin, lock,
 				unlock);
 		if (!Feature.visible(Feature.OFFICE))
@@ -763,22 +855,33 @@ public class ContextMenu extends Menu {
 		if (Feature.enabled(Feature.EXTERNAL_CALL) && extCall != null)
 			addItem(externalCall);
 
+		MenuItem more = new MenuItem(I18N.message("more"));
 		addItem(more);
 
+		Menu indexingMenu = new Menu();
+		indexingMenu.setItems(indexSelection, markIndexable, markIndexableMetadataOnly, markUnindexable);
+		MenuItem indexing = new MenuItem(I18N.message("indexing"));
+		indexing.setSubmenu(indexingMenu);
+
 		Menu moreMenu = new Menu();
-		moreMenu.setItems(indexSelection, markIndexable, markUnindexable, immutable, setPassword, unsetPassword,
-				downloadTicket, replaceAlias);
+		moreMenu.setItems(indexing, immutable, setPassword, unsetPassword, downloadTicket, replaceAlias);
 
 		if (Feature.visible(Feature.FORMAT_CONVERSION))
 			moreMenu.addItem(convert);
+		if (Feature.visible(Feature.COMPARISON))
+			moreMenu.addItem(compare);
 		if (Feature.visible(Feature.DIGITAL_SIGNATURE))
 			moreMenu.addItem(sign);
 		if (Feature.visible(Feature.STAMP))
 			moreMenu.addItem(stamp);
+		if (Feature.visible(Feature.SPLIT))
+			moreMenu.addItem(split);
 		if (Feature.visible(Feature.IMPEX))
 			moreMenu.addItem(sendToExpArchive);
 		if (Feature.visible(Feature.WORKFLOW))
 			moreMenu.addItem(startWorkflow);
+		if (Feature.visible(Feature.AUTOMATION))
+			moreMenu.addItem(automation);
 
 		more.setSubmenu(moreMenu);
 
@@ -794,22 +897,19 @@ public class ContextMenu extends Menu {
 			externalCall.setEnabled(someSelection);
 			cut.setEnabled(someSelection && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isMove());
-			lock.setEnabled(someSelection && !immutablesInSelection
-					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
-			unlock.setEnabled(someSelection
-					&& !immutablesInSelection
-					&& (checkStatusInSelection(Constants.DOC_LOCKED, selection) || checkStatusInSelection(
-							Constants.DOC_CHECKED_OUT, selection)));
-			immutable.setEnabled(someSelection && !immutablesInSelection
-					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
-					&& folder.hasPermission(Constants.PERMISSION_IMMUTABLE));
+			unlock.setEnabled(
+					someSelection && !immutablesInSelection && (checkStatusInSelection(Constants.DOC_LOCKED, selection)
+							|| checkStatusInSelection(Constants.DOC_CHECKED_OUT, selection)));
+			immutable.setEnabled(
+					someSelection && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
+							&& folder.hasPermission(Constants.PERMISSION_IMMUTABLE));
 			sign.setEnabled(someSelection && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
 					&& folder.hasPermission(Constants.PERMISSION_SIGN) && Feature.enabled(Feature.DIGITAL_SIGNATURE)
 					&& Session.get().getUser().getCertDN() != null);
-			stamp.setEnabled(someSelection && !immutablesInSelection
-					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isWrite()
-					&& Feature.enabled(Feature.STAMP));
+			stamp.setEnabled(
+					someSelection && !immutablesInSelection && checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
+							&& folder.isWrite() && Feature.enabled(Feature.STAMP));
 			delete.setEnabled(someSelection && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isDelete());
 			links.setEnabled(!Clipboard.getInstance().isEmpty() && folder.isWrite());
@@ -817,11 +917,11 @@ public class ContextMenu extends Menu {
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isWrite());
 			markUnindexable.setEnabled(someSelection && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isWrite());
-			indexSelection
-					.setEnabled(someSelection
-							&& !immutablesInSelection
-							&& (checkIndexedStatusInSelection(Constants.INDEX_INDEXED, selection) || checkIndexedStatusInSelection(
-									Constants.INDEX_TO_INDEX, selection)));
+			indexSelection.setEnabled(someSelection && !immutablesInSelection
+					&& (checkIndexedStatusInSelection(Constants.INDEX_INDEXED, selection)
+							|| checkIndexedStatusInSelection(Constants.INDEX_TO_INDEX, selection)
+							|| checkIndexedStatusInSelection(Constants.INDEX_TO_INDEX_METADATA, selection))
+					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.INDEX));
 			setPassword.setEnabled(justOneSelected && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
 					&& folder.hasPermission(Constants.PERMISSION_PASSWORD) && !selection[0].isPasswordProtected());
@@ -829,7 +929,9 @@ public class ContextMenu extends Menu {
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
 					&& folder.hasPermission(Constants.PERMISSION_PASSWORD) && selection[0].isPasswordProtected());
 			sendMail.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_EMAIL));
-			checkout.setEnabled(someSelection && !immutablesInSelection && folder.isDownload() && folder.isWrite()
+			checkout.setEnabled(justOneSelected && !immutablesInSelection && folder.isDownload() && folder.isWrite()
+					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
+			lock.setEnabled(someSelection && !immutablesInSelection && folder.isWrite()
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
 			checkin.setEnabled(justOneSelected && !immutablesInSelection && folder.isWrite()
 					&& checkStatusInSelection(Constants.DOC_CHECKED_OUT, selection));
@@ -848,6 +950,16 @@ public class ContextMenu extends Menu {
 			startWorkflow.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_WORKFLOW)
 					&& Feature.enabled(Feature.WORKFLOW));
 			replaceAlias.setEnabled(justOneSelected && folder.isWrite() && selection[0].getDocRef() != null);
+			split.setEnabled(
+					justOneSelected && selection[0].getFileName().toLowerCase().endsWith(".pdf") && folder.isWrite());
+
+			if ((selection != null && selection.length == 2) && Feature.enabled(Feature.COMPARISON)) {
+				String fileName1 = selection[0].getFileName().toLowerCase();
+				String fileName2 = selection[1].getFileName().toLowerCase();
+				compare.setEnabled(Util.getExtension(fileName1).equalsIgnoreCase(Util.getExtension(fileName2)));
+			} else
+				compare.setEnabled(false);
+
 		}
 	}
 
@@ -856,7 +968,7 @@ public class ContextMenu extends Menu {
 			if (doc.getStatus() != status) {
 				return false;
 			} else if (status == Constants.DOC_CHECKED_OUT && doc.getLockUserId() != Session.get().getUser().getId()
-					&& !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
+					&& !Session.get().isAdmin()) {
 				return false;
 			}
 		}

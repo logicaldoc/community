@@ -6,13 +6,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.i18n.DateBean;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateFolderFolderHistoryDAO</code>
@@ -35,7 +36,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		Collection<FolderHistory> histories = (Collection<FolderHistory>) dao.findByUserId(1);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
@@ -98,17 +99,17 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 
 	@SuppressWarnings("rawtypes")
 	@Test
-	public void testCreateFolderHistory() {
+	public void testCreateFolderHistory() throws PersistenceException {
 		FolderHistory history = new FolderHistory();
 		history.setDocId(1L);
-		history.setFolderId(5);
+		history.setFolderId(5L);
 		history.setFilename("pippo");
 		history.setVersion("2.0");
 
 		history.setPath("/" + "paperino");
 
 		history.setDate(new Date());
-		history.setUserId(1);
+		history.setUserId(1L);
 		history.setUsername("mario");
 		history.setEvent(FolderEvent.CREATED.toString());
 		history.setComment("The folder has been created.");
@@ -121,22 +122,22 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		FolderHistory history = new FolderHistory();
 		history.setDocId(1L);
-		history.setFolderId(5);
+		history.setFolderId(5L);
 		history.setDate(DateBean.dateFromCompactString("20061220"));
 		history.setUsername("sebastian");
-		history.setUserId(3);
+		history.setUserId(3L);
 		history.setEvent("test FolderHistory store");
 
 		Assert.assertTrue(dao.store(history));
 
 		FolderHistory folderFolderHistory = new FolderHistory();
-		folderFolderHistory.setFolderId(5);
+		folderFolderHistory.setFolderId(5L);
 		folderFolderHistory.setDate(DateBean.dateFromCompactString("20061220"));
 		folderFolderHistory.setUsername("sebastian");
-		folderFolderHistory.setUserId(3);
+		folderFolderHistory.setUserId(3L);
 		folderFolderHistory.setEvent("test FolderHistory store");
 
 		Assert.assertTrue(dao.store(folderFolderHistory));
@@ -155,7 +156,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 		}
 
 		Assert.assertTrue(hStored.equals(folderFolderHistory));
-		Assert.assertEquals(hStored.getFolderId(), 5);
+		Assert.assertEquals(hStored.getFolderId(), new Long(5));
 		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
 		Assert.assertEquals(hStored.getUsername(), "sebastian");
 		Assert.assertEquals(hStored.getEvent(), "test FolderHistory store");
@@ -163,7 +164,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 
 	@SuppressWarnings("rawtypes")
 	@Test
-	public void testFindNotNotified() {
+	public void testFindNotNotified() throws PersistenceException {
 		Collection histories = dao.findNotNotified(null);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());

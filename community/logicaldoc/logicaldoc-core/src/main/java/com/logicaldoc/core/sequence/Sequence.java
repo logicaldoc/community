@@ -14,7 +14,7 @@ public class Sequence extends PersistentObject {
 
 	private String name;
 
-	private Long objectId;
+	private long objectId = 0L;
 
 	private Date lastReset = new Date();
 
@@ -26,14 +26,6 @@ public class Sequence extends PersistentObject {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Long getObjectId() {
-		return objectId;
-	}
-
-	public void setObjectId(Long objectId) {
-		this.objectId = objectId;
 	}
 
 	public Date getLastReset() {
@@ -50,5 +42,13 @@ public class Sequence extends PersistentObject {
 
 	public void setValue(long value) {
 		this.value = value;
+	}
+
+	public long getObjectId() {
+		return objectId;
+	}
+
+	public void setObjectId(long objectId) {
+		this.objectId = objectId;
 	}
 }

@@ -42,7 +42,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			List<WSTemplate> templates = new ArrayList<WSTemplate>();
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			for (Template template : dao.findAll(user.getTenantId()))
-				templates.add(WSUtil.toWFTemplate(template));
+				templates.add(WSUtil.toWSTemplate(template));
 			return templates.toArray(new WSTemplate[0]);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
@@ -57,7 +57,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			Template template = dao.findByName(name, user.getTenantId());
 			if (template != null)
-				return WSUtil.toWFTemplate(template);
+				return WSUtil.toWSTemplate(template);
 			else
 				return null;
 		} catch (Throwable t) {
@@ -73,7 +73,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			Template template = dao.findById(templateId);
 			if (template != null)
-				return WSUtil.toWFTemplate(template);
+				return WSUtil.toWSTemplate(template);
 			else
 				return null;
 		} catch (Throwable t) {
@@ -94,6 +94,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 
 			if (template.getId() != 0) {
 				templ = dao.findById(template.getId());
+				dao.initialize(templ);
 				templ.setName(template.getName());
 				templ.setDescription(template.getDescription());
 			}
@@ -109,6 +110,9 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						Attribute att = new Attribute();
 						att.setPosition(attribute.getPosition());
 						att.setMandatory(attribute.getMandatory());
+						att.setHidden(attribute.getHidden());
+						att.setMultiple(attribute.getMultiple());
+						att.setParent(attribute.getParent());
 						att.setLabel(attribute.getLabel());
 						if (StringUtils.isEmpty(attribute.getLabel()))
 							att.setLabel(attribute.getName());
@@ -269,6 +273,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 
 			if (attributeSet.getId() != 0) {
 				set = dao.findById(attributeSet.getId());
+				dao.initialize(set);
 				set.setName(attributeSet.getName());
 				set.setDescription(attributeSet.getDescription());
 			}
@@ -284,6 +289,9 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						Attribute att = new Attribute();
 						att.setPosition(attribute.getPosition());
 						att.setMandatory(attribute.getMandatory());
+						att.setHidden(attribute.getHidden());
+						att.setMultiple(attribute.getMultiple());
+						att.setParent(attribute.getParent());
 						att.setLabel(attribute.getLabel());
 						if (StringUtils.isEmpty(attribute.getLabel()))
 							att.setLabel(attribute.getName());

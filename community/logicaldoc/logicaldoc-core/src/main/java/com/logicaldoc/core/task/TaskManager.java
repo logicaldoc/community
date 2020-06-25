@@ -20,11 +20,13 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * <p>
  * <b>Important:</b> Only tasks defined in the Task extension point will be
  * considered
+ * </p>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 3.5.0
  */
 public class TaskManager {
+	
 	protected static Logger log = LoggerFactory.getLogger(TaskManager.class);
 
 	public void registerTasks() {
@@ -46,7 +48,7 @@ public class TaskManager {
 	 */
 	private void registerTask(String taskName) {
 		// Add the scheduled trigger
-		log.info("Append the task " + taskName + " to the scheduler");
+		log.info("Append the task {} to the scheduler", taskName);
 		ContextConfigurator contextConfig = new ContextConfigurator();
 		contextConfig.addTrigger(taskName + "Trigger");
 	}
@@ -54,6 +56,8 @@ public class TaskManager {
 	/**
 	 * Retrieves the collection of all defined tasks: the ones enlisted in the
 	 * Task extension point.
+	 * 
+	 * @return collection of tasks
 	 */
 	public Collection<Task> getTasks() {
 		List<Task> tasks = new ArrayList<Task>();

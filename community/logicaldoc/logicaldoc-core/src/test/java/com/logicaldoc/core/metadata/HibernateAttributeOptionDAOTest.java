@@ -8,8 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
-import com.logicaldoc.core.metadata.AttributeOption;
-import com.logicaldoc.core.metadata.AttributeOptionDAO;
 
 /**
  * Test case for <code>HibernateAttributeOptionDAO</code>

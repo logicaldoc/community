@@ -5,7 +5,10 @@
 	<class name="com.logicaldoc.core.document.Document" table="ld_document" where="ld_deleted=0">
 		<cache usage="read-write" />
 		<id name="id" type="long" column="ld_id" unsaved-value="0">
-			<generator class="org.hibernate.id.MultipleHiLoPerTableGenerator" />
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+			    <param name="segment_value">ld_document</param>
+			    <param name="optimizer">org.hibernate.id.enhanced.HiLoOptimizer</param>
+			</generator>
 		</id>
         <version name="recordVersion" column="ld_recordversion"  type="long" />  
         <property name="lastModified" type="timestamp" column="ld_lastmodified" />
@@ -30,9 +33,11 @@
 		<property name="fileName" type="string" column="ld_filename" length="255" />
 		<property name="fileSize" type="long" column="ld_filesize" />        
 		<property name="indexed" type="int" column="ld_indexed" not-null="true"/>
+		<property name="barcodeTemplateId" type="long" column="ld_barcodetemplateid" />
 		<property name="barcoded" type="int" column="ld_barcoded" not-null="true"/>
 		<property name="signed" type="int" column="ld_signed" not-null="true"/>
         <property name="stamped" type="int" column="ld_stamped" not-null="true"/>
+        <property name="links" type="int" column="ld_links" not-null="true"/>
 		<property name="digest" type="string" column="ld_digest" length="255" />
 		<property name="exportStatus" type="int" column="ld_exportstatus" not-null="true"/>
 		<property name="exportId" type="long" column="ld_exportid" />
@@ -41,6 +46,7 @@
         <property name="docRef" type="long" column="ld_docref" />
         <property name="docRefType" type="string" column="ld_docreftype" length="255"/>
         <property name="deleteUserId" type="long" column="ld_deleteuserid" />
+        <property name="deleteUser" type="string" column="ld_deleteuser" length="255"/>
         <property name="rating" type="int" column="ld_rating"/>
         <property name="workflowStatus" type="string" column="ld_workflowstatus" length="1000" />
         <property name="workflowStatusDisplay" type="string" column="ld_workflowstatusdisp" length="1000" />
@@ -54,6 +60,8 @@
         <property name="nature" type="int" column="ld_nature" not-null="true"/>
         <property name="formId" type="long" column="ld_formid" />
         <property name="password" type="string" column="ld_password" length="255" />
+        <property name="ocrTemplateId" type="long" column="ld_ocrtemplateid" />
+        <property name="ocrd" type="int" column="ld_ocrd" not-null="true"/>
 
 		<many-to-one name="folder" class="com.logicaldoc.core.folder.Folder" column="ld_folderid" />
         
@@ -67,17 +75,21 @@
 		   </composite-element>
         </set>
         
-		<map name="attributes" table="ld_document_ext" lazy="true" cascade="all" order-by="ld_position asc">
+		<map name="attributes" table="ld_document_ext" lazy="true" cascade="all" order-by="ld_position asc, ld_name asc">
 		   <key column="ld_docid" />
 		   <map-key type="string" column="ld_name" length="255"/>
 		   <composite-element class="com.logicaldoc.core.metadata.Attribute">
 		   	   <property name="label" type="string" column="ld_label" length="255"/>
+		   	   <property name="parent" type="string" column="ld_parent" length="255"/>
                <property name="setId" type="long" column="ld_setid" />
     	       <property name="mandatory" type="int" column="ld_mandatory" not-null="true"/>
+    	       <property name="hidden" type="int" column="ld_hidden" not-null="true"/>
+    	       <property name="multiple" type="int" column="ld_multiple" not-null="true"/>
     	       <property name="type" type="int" column="ld_type" not-null="true"/>
     	       <property name="editor" type="int" column="ld_editor" not-null="true"/>
                <property name="position" type="int" column="ld_position" not-null="true"/>
                <property name="stringValue" type="string" column="ld_stringvalue" length="4000"/>
+               <property name="stringValues" type="string" column="ld_stringvalues" length="4000" />
                <property name="intValue" type="long" column="ld_intvalue"/>
                <property name="doubleValue" type="double" column="ld_doublevalue"/>
                <property name="dateValue" type="timestamp" column="ld_datevalue"/>

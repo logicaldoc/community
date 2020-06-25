@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="javax.servlet.http.*" %>
+<%@ page import="java.util.*" %>
+<%@ page import="com.logicaldoc.core.security.*" %>
 <%! static String MODULE="login"; %>
 <%! static String LOGIN_PAGE="login.jsp"; %>
 <%@ include file="header.jsp" %>
@@ -12,6 +15,16 @@
 	var j_failureurl=j_loginurl;
 	var j_layout='desktop';
 </script>
+
+<%
+  if(request.getSession(false) != null) {
+    Object sid = session.getAttribute("cas-sid");
+    if(sid!=null && SessionManager.get().isOpen(sid.toString())) {
+        response.sendRedirect(request.getContextPath()+"/frontend.jsp");
+        return;
+    }
+  }
+%>
 
 
 <%@ include file="body.jsp" %>

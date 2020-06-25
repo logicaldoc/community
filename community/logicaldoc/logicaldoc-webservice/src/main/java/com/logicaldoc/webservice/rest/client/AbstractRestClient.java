@@ -28,8 +28,8 @@ public abstract class AbstractRestClient {
 	 * Constructor
 	 * 
 	 * @param endpoint Connection URL
-	 * @param password 
-	 * @param userPassw 
+	 * @param username the username 
+	 * @param password the password
 	 */
 	public AbstractRestClient(String endpoint, String username, String password) {
 		this.endpoint = endpoint;
@@ -42,12 +42,12 @@ public abstract class AbstractRestClient {
 	 * Constructor
 	 * 
 	 * @param endpoint  Connection URL
-	 * @param username
-	 * @param password
+	 * @param username the suername
+	 * @param password the password
 	 * @param timeout Timeout for the RESTful requests
 	 */	
-	public AbstractRestClient(String endpoint2, String username, String password, int timeout) {
-		this(endpoint2, username, password);
+	public AbstractRestClient(String endpoint, String username, String password, int timeout) {
+		this(endpoint, username, password);
 		this.timeout = timeout;
 	}
 

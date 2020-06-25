@@ -4,6 +4,7 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -32,14 +33,15 @@ public class DeletedDocsDS extends DataSource {
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceTextField digest = new DataSourceTextField("digest");
-		DataSourceImageField immutable = new DataSourceImageField("immutable");
+		DataSourceIntegerField immutable = new DataSourceIntegerField("immutable");
 		DataSourceTextField fid = new DataSourceTextField("folderId");
 		DataSourceTextField type = new DataSourceTextField("type");
 		DataSourceImageField locked = new DataSourceImageField("locked");
-		DataSourceImageField deletedUserId = new DataSourceImageField("deletedUserId");
+		DataSourceImageField deleteUserId = new DataSourceImageField("deleteUserId");
+		DataSourceTextField deleteUser = new DataSourceTextField("deleteUser");
 
-		setFields(id, userIdItem, username, size, version, fileVersion, lastModified, customId, icon, filename,
-				digest, immutable, fid, deletedUserId, type, locked);
+		setFields(id, userIdItem, username, size, version, fileVersion, lastModified, customId, icon, filename, digest,
+				immutable, fid, deleteUserId, deleteUser, type, locked);
 		setClientOnly(true);
 
 		String url = "data/deleteddocs.xml?1=1";

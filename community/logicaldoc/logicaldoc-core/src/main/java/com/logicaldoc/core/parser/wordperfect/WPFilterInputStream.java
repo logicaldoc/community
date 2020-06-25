@@ -9,8 +9,8 @@ import org.apache.commons.lang.ArrayUtils;
 
 /**
  * A FilterInputStream that processes bytes that have a special meaning in
- * WordPerfect documents. Processed characters are: <tt>0x80</tt> (space
- * character in WP 6), <tt>0xA9</tt> (hyphen in WP 6) and <tt>0xAC</tt>
+ * WordPerfect documents. Processed characters are: <code>0x80</code> (space
+ * character in WP 6), <code>0xA9</code> (hyphen in WP 6) and <code>0xAC</code>
  * (word break indicator).
  * 
  * <p>
@@ -288,13 +288,16 @@ public class WPFilterInputStream extends FilterInputStream {
 	/**
 	 * Fills the supplied byte array with bytes read from the specified
 	 * InputStream. This method will only stop reading when the byte array has
-	 * been filled completely, or when the end of the stream has been reached.
+	 * been filled completely, or when the end of the stream has been reached
 	 * 
 	 * @param in
 	 *            The InputStream to read the bytes from.
 	 * @param byteArray
-	 *            The byte array to fill with bytes.
-	 * @return The number of bytes written to the byte array.
+	 *            The byte array to fill with bytes
+	 *            
+	 * @return The number of bytes written to the byte array
+	 * 
+	 * @throws IOException if an error happens retrieving the stream
 	 */
 	public int fillByteArray(InputStream in, byte[] byteArray) throws IOException {
 		int result = 0;

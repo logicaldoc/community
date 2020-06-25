@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
+import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -25,7 +26,6 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.store.Storer;
-import com.logicaldoc.core.util.MailUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServletUtil;

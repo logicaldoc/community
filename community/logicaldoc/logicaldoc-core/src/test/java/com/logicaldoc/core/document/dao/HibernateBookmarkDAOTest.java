@@ -3,13 +3,14 @@ package com.logicaldoc.core.document.dao;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Bookmark;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateBookmarkDAOTest</code>
@@ -31,7 +32,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		Bookmark book1 = dao.findById(1);
 		dao.initialize(book1);
 		book1.setDescription("pippo");
@@ -83,7 +84,7 @@ public class HibernateBookmarkDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindByUserIdAndTargetId() {
+	public void testFindByUserIdAndTargetId() throws PersistenceException {
 		Bookmark bookmark = dao.findByUserIdAndDocId(1, 1);
 		Assert.assertNotNull(bookmark);
 		bookmark = dao.findByUserIdAndDocId(1, 2);

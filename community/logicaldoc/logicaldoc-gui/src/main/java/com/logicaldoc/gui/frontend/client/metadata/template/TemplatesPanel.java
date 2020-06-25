@@ -234,6 +234,8 @@ public class TemplatesPanel extends VLayout {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param template the template to update
 	 */
 	public void updateRecord(GUITemplate template) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, template.getId()));

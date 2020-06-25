@@ -12,7 +12,7 @@ public interface SystemServiceAsync {
 
 	void getStatistics(String locale, AsyncCallback<GUIParameter[][]> callback);
 
-	void search(String userName, Date from, Date till, int maxResult, String historySid, String[] event,
+	void search(String userName, Date from, Date till, int maxResult, String historySid, String[] event, Long rootFolderId,
 			AsyncCallback<GUIHistory[]> callback);
 
 	void loadTasks(String locale, AsyncCallback<GUITask[]> callback);
@@ -31,13 +31,9 @@ public interface SystemServiceAsync {
 
 	void setGUILanguageStatus(String language, boolean active, AsyncCallback<Void> callback);
 
-	void deleteFeedMessages(long[] ids, AsyncCallback<Void> callback);
-
-	void markFeedMsgAsNotRead(long[] ids, AsyncCallback<Void> callback);
-
-	void markFeedMsgAsRead(long[] ids, AsyncCallback<Void> callback);
-
 	void getPlugins(AsyncCallback<GUIValue[]> callback);
 
 	void confirmUpdate(AsyncCallback<Void> callback);
+
+	void restart(AsyncCallback<Void> callback);
 }

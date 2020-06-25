@@ -64,7 +64,7 @@ public class Login implements EntryPoint {
 		Window.enableScrolling(false);
 		Window.setMargin("0px");
 
-		InfoService.Instance.get().getInfo(I18N.getLocale(), tenant, new AsyncCallback<GUIInfo>() {
+		InfoService.Instance.get().getInfo(I18N.getLocale(), tenant, true, new AsyncCallback<GUIInfo>() {
 			@Override
 			public void onFailure(Throwable error) {
 				SC.warn(error.getMessage());
@@ -111,6 +111,8 @@ public class Login implements EntryPoint {
 
 	/**
 	 * Declares the javascript function used to display the lost password popup
+	 * 
+	 * @param login the login module
 	 */
 	public static native void declareShowLostDialog(Login login) /*-{
 		$wnd.showLostDialog = function(productName) {

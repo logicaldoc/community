@@ -15,12 +15,14 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 6.1
  */
 public class UserUtil {
+	
 	/**
 	 * This method retrieves the user folder. If not exists, it creates the
-	 * folder. The folder is: <conf.userdir>/<id>
+	 * folder. The folder is: <b>conf.userdir</b>/<b>id</b>
 	 * 
 	 * @param id The user identifier
-	 * @return
+	 * 
+	 * @return the user's data folder
 	 */
 	public static File getUserHome(long id) {
 		File root = getUsersDir();
@@ -38,11 +40,12 @@ public class UserUtil {
 	/**
 	 * This method retrieves a user resource (file or folder). If the resource
 	 * is a folder and not exists, it creates the folder. The folder will be:
-	 * <conf.userdir>/<id>/<path>
+	 * <b>conf.userdir</b>/<b>id</b>/<b>path</b>
 	 * 
 	 * @param id The user identifier
 	 * @param path The resource path
-	 * @return
+	 * 
+	 * @return the user's resource
 	 */
 	public static File getUserResource(long id, String path) {
 		File root = getUserHome(id);
@@ -60,7 +63,9 @@ public class UserUtil {
 
 	/**
 	 * This method retrieves the users root folder. If not exists, it creates
-	 * the folder. The folder is: <conf.userdir>
+	 * the folder. The folder is: <b>conf.userdir</b>
+	 * 
+	 * @return the root folder that contains the users data folders
 	 */
 	public static File getUsersDir() {
 		File userpath = new File("");

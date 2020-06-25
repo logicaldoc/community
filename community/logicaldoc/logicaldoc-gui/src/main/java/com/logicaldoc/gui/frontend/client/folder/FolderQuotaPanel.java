@@ -108,17 +108,17 @@ public class FolderQuotaPanel extends FolderDetailTab {
 			if (values.get("documentsquota") == null)
 				folder.setQuotaDocs(null);
 			else
-				folder.setQuotaDocs(new Long(values.get("documentsquota").toString()));
+				folder.setQuotaDocs(Long.parseLong(values.get("documentsquota").toString()));
 
 			if (values.get("sizequota") == null)
 				folder.setQuotaSize(null);
 			else
-				folder.setQuotaSize(new Long(values.get("sizequota").toString()));
+				folder.setQuotaSize(Long.parseLong(values.get("sizequota").toString()));
 
 			if (values.get("quotaThreshold") == null)
 				folder.setQuotaThreshold(null);
 			else
-				folder.setQuotaThreshold(new Integer(values.get("quotaThreshold").toString()));
+				folder.setQuotaThreshold(Integer.parseInt(values.get("quotaThreshold").toString()));
 
 			folder.clearQuotaAlertRecipients();
 			String[] usernames = recipients.getValues();

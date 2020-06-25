@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 
 import javax.sql.DataSource;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlTool.SqlToolException;
@@ -29,6 +27,8 @@ import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.service.SecurityServiceImpl;
+
+import junit.framework.Assert;
 
 /**
  * Abstract test case for the Webapp module. This class initialises a test

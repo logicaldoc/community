@@ -17,7 +17,8 @@ public interface UserHistoryDAO extends PersistentObjectDAO<UserHistory> {
 	/**
 	 * This method selects all histories of a given user.
 	 * 
-	 * @param userId
+	 * @param userId identifier of the suer
+	 * 
 	 * @return list of histories ordered by date
 	 */
 	public List<UserHistory> findByUserId(long userId);

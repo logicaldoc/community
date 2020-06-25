@@ -7,7 +7,7 @@ public class Recipient {
 	public final static int TYPE_SYSTEM = 0;
 
 	public final static int TYPE_EMAIL = 1;
-	
+
 	public final static String MODE_EMAIL_TO = "TO";
 
 	public final static String MODE_EMAIL_CC = "CC";
@@ -28,6 +28,12 @@ public class Recipient {
 	private int type = TYPE_SYSTEM;
 
 	private int read = 0;
+
+	public Recipient(String name, String address) {
+		super();
+		this.name = name;
+		this.address = address;
+	}
 
 	public Recipient() {
 	}

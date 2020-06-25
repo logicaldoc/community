@@ -69,8 +69,8 @@ public class RestDocumentClient extends AbstractRestClient {
 
 		Attachment docAttachment = new AttachmentBuilder().id("document").object(jsonStr).mediaType("application/json")
 				.contentDisposition(new ContentDisposition("form-data; name=\"document\"")).build();
-		Attachment fileAttachment = new Attachment("content", new FileInputStream(packageFile), new ContentDisposition(
-				"form-data; name=\"content\"; filename=\"" + packageFile.getName() + "\""));
+		Attachment fileAttachment = new Attachment("content", new FileInputStream(packageFile),
+				new ContentDisposition("form-data; name=\"content\"; filename=\"" + packageFile.getName() + "\""));
 
 		List<Attachment> atts = new LinkedList<Attachment>();
 		atts.add(docAttachment);
@@ -217,23 +217,38 @@ public class RestDocumentClient extends AbstractRestClient {
 
 	/**
 	 * Adds a new note for the given document
+	 * 
+	 * @param noteId identifier of the note
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	public void deleteNote(long noteId) throws Exception {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.deleteNote(noteId);
 	}
-	
+
 	/**
 	 * Adds a new note for the given document
+	 * 
+	 * @param docId identifier of the document
+	 * @param version document's version
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	public void deleteVersion(long docId, String version) throws Exception {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.deleteVersion(docId, version);
-	}	
+	}
 
 	/**
 	 * Gets the notes for the given document
+	 * 
+	 * @param docId identifier of the document
+	 * 
+	 * @return array of ratings
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	public WSNote[] getNotes(long docId) throws Exception {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
@@ -243,6 +258,13 @@ public class RestDocumentClient extends AbstractRestClient {
 
 	/**
 	 * Puts a new rating on the given document
+	 * 
+	 * @param docId identifier of the document
+	 * @param vote the vote
+	 * 
+	 * @return the rating
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	public WSRating rateDocument(long docId, int vote) throws Exception {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
@@ -252,18 +274,24 @@ public class RestDocumentClient extends AbstractRestClient {
 
 	/**
 	 * Gets all the ratings of the given document
+	 * 
+	 * @param docId identifier of the document
+	 *
+	 * @return array of ratings
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	public WSRating[] getRatings(long docId) throws Exception {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		return proxy.getRatings(docId);
 	}
-	
+
 	public void createPdf(long docId, String fileVersion) throws Exception {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.createPdf(docId, fileVersion);
 	}
-	
+
 	public void createThumbnail(long docId, String fileVersion) throws Exception {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 		proxy.createThumbnail(docId, fileVersion);

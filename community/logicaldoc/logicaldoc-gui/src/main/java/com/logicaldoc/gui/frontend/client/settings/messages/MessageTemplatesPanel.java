@@ -8,14 +8,18 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.ValueCallback;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
+import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.events.DoubleClickEvent;
+import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -24,6 +28,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -40,6 +45,10 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class MessageTemplatesPanel extends VLayout {
 
 	private ListGrid list;
+
+	private HLayout rollOverCanvas;
+
+	private ListGridRecord rollOverRecord;
 
 	private SelectItem langSelector;
 
@@ -69,24 +78,25 @@ public class MessageTemplatesPanel extends VLayout {
 
 		ToolStripButton add = new ToolStripButton();
 		add.setAutoFit(true);
-		add.setTitle(I18N.message("addtemplate"));
+		add.setTitle(I18N.message("addmessagetemplate"));
 		add.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				langSelector.setValue("en");
 				TextItem item = ItemFactory.newSimpleTextItem("name", "", null);
 				item.setRequired(true);
-				LD.askforValue(I18N.message("newtemplate"), I18N.message("name"), null, item, new ValueCallback() {
-					@Override
-					public void execute(String value) {
-						ListGridRecord record = new ListGridRecord();
-						record.setAttribute("id", "-1");
-						record.setAttribute("type", "user");
-						record.setAttribute("name", value);
-						list.getRecordList().addAt(record, 0);
-						list.startEditing(0);
-					}
-				});
+				LD.askforValue(I18N.message("newmessagetemplate"), I18N.message("name"), null, item,
+						new ValueCallback() {
+							@Override
+							public void execute(String value) {
+								ListGridRecord record = new ListGridRecord();
+								record.setAttribute("id", "-1");
+								record.setAttribute("type", "user");
+								record.setAttribute("name", value);
+								list.getRecordList().addAt(record, 0);
+								list.startEditing(0);
+							}
+						});
 			}
 		});
 
@@ -124,12 +134,43 @@ public class MessageTemplatesPanel extends VLayout {
 		ListGridField body = new ListGridField("body", I18N.message("body"));
 		body.setWidth("*");
 		body.setRequired(false);
-		body.setEditorType(new TextAreaItem());
 
-		list = new ListGrid();
+		list = new ListGrid() {
+			@Override
+			protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
+				rollOverRecord = this.getRecord(rowNum);
+
+				if (rollOverCanvas == null) {
+					rollOverCanvas = new HLayout(3);
+					rollOverCanvas.setSnapTo("R");
+					rollOverCanvas.setWidth(50);
+					rollOverCanvas.setHeight(22);
+
+					ImgButton editImg = new ImgButton();
+					editImg.setShowDown(false);
+					editImg.setShowRollOver(false);
+					editImg.setLayoutAlign(Alignment.CENTER);
+					editImg.setSrc("[SKIN]/actions/edit.png");
+					editImg.setPrompt(I18N.message("edit"));
+					editImg.setHeight(16);
+					editImg.setWidth(16);
+					editImg.addClickHandler(new ClickHandler() {
+						public void onClick(ClickEvent event) {
+							onEdit();
+						}
+					});
+
+					rollOverCanvas.addMember(editImg);
+				}
+				return rollOverCanvas;
+
+			}
+		};
+		list.setShowRollOverCanvas(true);
+		list.setShowRollUnderCanvas(false);
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
-		list.setCanEdit(true);
+		list.setCanEdit(false);
 		list.setWidth100();
 		list.setHeight100();
 		list.setFields(name);
@@ -149,12 +190,25 @@ public class MessageTemplatesPanel extends VLayout {
 			}
 		});
 
+		list.addDoubleClickHandler(new DoubleClickHandler() {
+
+			@Override
+			public void onDoubleClick(DoubleClickEvent event) {
+				onEdit();
+			}
+		});
+
 		// Initialize with english language
 		langSelector.setValue("en");
 
 		setMembers(hint, toolStrip, list);
 
 		reload();
+	}
+
+	private void onEdit() {
+		MessageTemplateEditor editor = new MessageTemplateEditor(rollOverRecord);
+		editor.show();
 	}
 
 	/**

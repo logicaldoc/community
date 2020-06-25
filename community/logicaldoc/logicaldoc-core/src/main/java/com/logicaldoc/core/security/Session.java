@@ -154,26 +154,26 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	}
 
 	protected void setExpired() {
-		log.warn("Session " + getSid() + " expired");
+		log.warn("Session {} expired", getSid());
 		logWarn("Session expired");
 
 		this.status = STATUS_EXPIRED;
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		userHistoryDAO.createUserHistory(user, UserHistory.EVENT_USER_TIMEOUT, null, null, sid);
+		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT.toString(), null, null, sid);
 	}
 
 	public void setClosed() {
-		log.info("Session " + getSid() + " was closed");
+		log.info("Session {} was closed", getSid());
 		logInfo("Session closed");
 
 		this.status = STATUS_CLOSED;
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		userHistoryDAO.createUserHistory(user, UserHistory.EVENT_USER_LOGOUT, null, null, sid);
+		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, null, sid);
 	}
 
-	Session() {
+	private Session() {
 
 	}
 
@@ -212,10 +212,10 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		}
 
 		// Add a user history entry
-		userHistoryDAO.createUserHistory(user, UserHistory.EVENT_USER_LOGIN, comment,
+		userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), comment,
 				client != null ? client.getAddress() : null, sid);
 
-		log.info("Session " + getSid() + " has been started");
+		log.info("Session {} has been started", getSid());
 		logInfo("Session started");
 	}
 
@@ -230,7 +230,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	@Override
 	public int compareTo(Session o) {
-		int compare = new Integer(status).compareTo(new Integer(o.status));
+		int compare = Integer.valueOf(status).compareTo(Integer.valueOf(o.status));
 		if (compare == 0)
 			compare = o.getCreation().compareTo(creation);
 		return compare;
@@ -401,7 +401,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 	@Override
 	protected Object clone() throws CloneNotSupportedException {
-		Session clone=new Session();
+		Session clone = new Session();
 		clone.setId(getId());
 		clone.setTenantId(getTenantId());
 		clone.setTenantName(tenantName);
@@ -415,7 +415,5 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		clone.setClient(client);
 		return clone;
 	}
-	
-	
-	
+
 }

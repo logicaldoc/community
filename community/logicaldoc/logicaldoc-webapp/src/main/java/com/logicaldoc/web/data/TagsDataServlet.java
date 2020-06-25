@@ -15,10 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
@@ -40,8 +37,8 @@ public class TagsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(TagsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -62,22 +59,19 @@ public class TagsDataServlet extends HttpServlet {
 			String editing = request.getParameter("editing");
 
 			// Check if the data must be collected for a specific document
-			Document doc = null;
-			if (request.getParameter("docId") != null) {
-				doc = docDao.findDocument(Long.parseLong(request.getParameter("docId")));
-				docDao.initialize(doc);
-			}
+			Long docId = null;
+			if (request.getParameter("docId") != null)
+				docId = Long.parseLong(request.getParameter("docId"));
 
-			Folder folder = null;
-			if (request.getParameter("folderId") != null) {
-				folder = fDao.findFolder(Long.parseLong(request.getParameter("folderId")));
-				fDao.initialize(folder);
-			}
+			Long folderId = null;
+			if (request.getParameter("folderId") != null)
+				folderId = Long.parseLong(request.getParameter("folderId"));
 
 			HashMap<String, Long> tgs = new HashMap<String, Long>();
 
 			if (("preset".equals(firstLetter) || "preset".equals(mode)) && "true".equals(editing)) {
-				// We have to return the preset only, because the user is editing
+				// We have to return the preset only, because the user is
+				// editing
 				// a document
 				GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 				List<Generic> buf = gDao.findByTypeAndSubtype("tag", null, null, session.getTenantId());
@@ -89,26 +83,28 @@ public class TagsDataServlet extends HttpServlet {
 				tgs = (HashMap<String, Long>) docDao.findTags(null, session.getTenantId());
 			}
 
-			if (doc != null) {
+			if (docId != null) {
+				List<String> tags = docDao.findTags(docId);
 
 				/*
 				 * In case a document was specified we have to enrich the list
 				 * with the document's tags
 				 */
-				for (Tag tag : doc.getTags())
-					if (!tgs.containsKey(tag.getTag()))
-						tgs.put(tag.getTag(), 1L);
+				for (String tag : tags)
+					if (!tgs.containsKey(tag))
+						tgs.put(tag, 1L);
 			}
 
-			if (folder != null) {
+			if (folderId != null) {
+				List<String> tags = fDao.findTags(folderId);
 
 				/*
 				 * In case a folder was specified we have to enrich the list
 				 * with the folder's tags
 				 */
-				for (Tag tag : folder.getTags())
-					if (!tgs.containsKey(tag.getTag()))
-						tgs.put(tag.getTag(), 1L);
+				for (String tag : tags)
+					if (!tgs.containsKey(tag))
+						tgs.put(tag, 1L);
 			}
 
 			PrintWriter writer = response.getWriter();

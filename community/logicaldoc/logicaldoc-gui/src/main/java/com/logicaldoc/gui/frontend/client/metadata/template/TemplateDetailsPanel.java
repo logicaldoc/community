@@ -4,16 +4,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.Side;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -22,7 +19,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This panel collects all template details
@@ -31,15 +27,14 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 6.0
  */
 public class TemplateDetailsPanel extends VLayout {
+
 	protected GUITemplate template;
 
 	protected Layout propertiesTabPanel;
 
 	protected TemplatePropertiesPanel propertiesPanel;
 
-	protected HLayout savePanel;
-
-	private TabSet tabSet = new TabSet();
+	protected EditingTabSet tabSet;
 
 	private TemplatesPanel templatesPanel;
 
@@ -51,11 +46,6 @@ public class TemplateDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		savePanel = new HLayout();
-		savePanel.setHeight(20);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
 		Button saveButton = new Button(I18N.message("save"));
 		saveButton.setAutoFit(true);
 		saveButton.setMargin(2);
@@ -72,9 +62,12 @@ public class TemplateDetailsPanel extends VLayout {
 		spacer.setWidth("70%");
 		spacer.setOverflow(Overflow.HIDDEN);
 
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
+		tabSet = new EditingTabSet(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				onSave();
+			}
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (template.getId() != 0) {
@@ -92,20 +85,8 @@ public class TemplateDetailsPanel extends VLayout {
 				} else {
 					setTemplate(new GUITemplate());
 				}
-				savePanel.setVisible(false);
 			}
 		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		savePanel.addMember(saveButton);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		addMember(savePanel);
-
-		tabSet = new TabSet();
 		tabSet.setTabBarPosition(Side.TOP);
 		tabSet.setTabBarAlign(Side.LEFT);
 		tabSet.setWidth100();
@@ -122,8 +103,7 @@ public class TemplateDetailsPanel extends VLayout {
 	}
 
 	protected void refresh() {
-		if (savePanel != null)
-			savePanel.setVisible(false);
+		disableSave();
 
 		/*
 		 * Prepare the standard properties tab
@@ -154,12 +134,16 @@ public class TemplateDetailsPanel extends VLayout {
 		refresh();
 	}
 
-	public void onModified() {
-		savePanel.setVisible(true);
+	private void disableSave() {
+		tabSet.hideSave();
 	}
 
-	public HLayout getSavePanel() {
-		return savePanel;
+	private void enableSave() {
+		tabSet.displaySave();
+	}
+
+	public void onModified() {
+		enableSave();
 	}
 
 	protected boolean validate() {
@@ -179,7 +163,6 @@ public class TemplateDetailsPanel extends VLayout {
 
 				@Override
 				public void onSuccess(GUITemplate result) {
-					savePanel.setVisible(false);
 					templatesPanel.updateRecord(result);
 					setTemplate(result);
 				}

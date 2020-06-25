@@ -7,14 +7,13 @@ import java.util.Arrays;
  *                   Match is determined mostly by the input data adhering to the
  *                   encoding scheme for the charset, and, optionally,
  *                   frequency-of-occurence of characters.
- * <p/>
+ * <p>
  *                   Instances of this class are singletons, one per encoding
  *                   being recognized.  They are created in the main
  *                   CharsetDetector class and kept in the global list of available
  *                   encodings to be checked.  The specific encoding being recognized
  *                   is determined by subclass.
- * 
- * @internal                  
+ * </p>                 
  */
 abstract class CharsetRecog_mbcs extends CharsetRecognizer {
 
@@ -32,9 +31,9 @@ abstract class CharsetRecog_mbcs extends CharsetRecognizer {
      * @param det  The CharsetDetector, which contains the input text
      *             to be checked for being in this charset.
      * @return     Two values packed into one int  (Damn java, anyhow)
-     *             <br/>
+     *             <br>
      *             bits 0-7:  the match confidence, ranging from 0-100
-     *             <br/>
+     *             <br>
      *             bits 8-15: The match reason, an enum-like value.
      */
     int match(CharsetDetector det, int [] commonChars) {
@@ -529,7 +528,5 @@ abstract class CharsetRecog_mbcs extends CharsetRecognizer {
          {
              return "zh";
          }
-     }
-     
-     
+     }    
 }

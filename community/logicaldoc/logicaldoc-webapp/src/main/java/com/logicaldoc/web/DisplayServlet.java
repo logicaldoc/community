@@ -62,7 +62,7 @@ public class DisplayServlet extends HttpServlet {
 				User user = uDao.findByUsername(username);
 
 				FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-				Folder folder = fDao.findByPath(folderPath, user.getTenantId());
+				Folder folder = fDao.findByPathExtended(folderPath, user.getTenantId());
 				redirectUrl += FOLDER_ID + "=" + folder.getId();
 			}
 

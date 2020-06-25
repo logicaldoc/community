@@ -15,7 +15,7 @@ public interface StampServiceAsync {
 
 	void saveImage(long stampId, AsyncCallback<Void> callback);
 
-	void applyStamp(long[] docIds, long stampId, AsyncCallback<Void> callback);
+	void applyStamp(long[] docIds, GUIStamp stamp, AsyncCallback<Void> callback);
 
 	void removeUsers(long[] userIds, long stampId, AsyncCallback<Void> callback);
 

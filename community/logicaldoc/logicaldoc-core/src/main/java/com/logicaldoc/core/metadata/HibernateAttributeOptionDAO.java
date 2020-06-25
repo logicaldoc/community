@@ -18,8 +18,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @since 7.1
  */
 @SuppressWarnings("unchecked")
-public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<AttributeOption> implements
-		AttributeOptionDAO {
+public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<AttributeOption>
+		implements AttributeOptionDAO {
 
 	public HibernateAttributeOptionDAO() {
 		super(AttributeOption.class);
@@ -47,11 +47,11 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 			if (StringUtils.isEmpty(attribute))
 				coll = (List<AttributeOption>) findByQuery(
 						"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 order by _opt.position asc",
-						new Object[] { new Long(setId) }, null);
+						new Object[] { Long.valueOf(setId) }, null);
 			else
 				coll = (List<AttributeOption>) findByQuery(
 						"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 and _opt.attribute = ?2 order by _opt.position asc",
-						new Object[] { new Long(setId), attribute }, null);
+						new Object[] { Long.valueOf(setId), attribute }, null);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 		}
@@ -60,6 +60,9 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 
 	@Override
 	public boolean delete(long id, int code) {
+		if (!checkStoringAspect())
+			return false;
+
 		AttributeOption option = findById(id);
 		del(option, code);
 
@@ -76,7 +79,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 	@Override
 	public void deleteOrphaned(long setId, Collection<String> currentAttributes) {
 		try {
-			if (currentAttributes == null || currentAttributes.isEmpty())
+			if (currentAttributes == null || currentAttributes.isEmpty() || !checkStoringAspect())
 				return;
 			StringBuffer buf = new StringBuffer();
 			for (String name : currentAttributes) {

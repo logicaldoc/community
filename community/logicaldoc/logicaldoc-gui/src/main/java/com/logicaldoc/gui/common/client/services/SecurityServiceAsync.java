@@ -13,7 +13,7 @@ public interface SecurityServiceAsync {
 
 	void logout(AsyncCallback<Void> callback);
 
-	void changePassword(long userId, String oldPassword, String newPassword, boolean notify,
+	void changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword, boolean notify,
 			AsyncCallback<Integer> callback);
 
 	void deleteUser(long userId, AsyncCallback<Void> callback);
@@ -51,4 +51,9 @@ public interface SecurityServiceAsync {
 	void loadBlockedEntities(AsyncCallback<GUISequence[]> callback);
 
 	void removeBlockedEntities(long[] id, AsyncCallback<Void> callback);
+
+	void saveInterfaceSettings(GUIUser user, AsyncCallback<GUIUser> callback);
+
+	void replicateUsersSettings(long masterUserId, Long[] userIds, boolean gui, boolean groups,
+			AsyncCallback<Void> callback);
 }

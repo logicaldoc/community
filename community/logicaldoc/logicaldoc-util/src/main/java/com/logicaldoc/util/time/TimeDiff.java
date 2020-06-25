@@ -9,10 +9,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.StringUtils;
 
 public class TimeDiff {
-	/**
-	 * (For testing purposes)
-	 * 
-	 */
+
 	public static void main(String[] args) {
 		Date d1 = new Date();
 		try {
@@ -26,8 +23,8 @@ public class TimeDiff {
 		long[] diff = TimeDiff.getTimeDifference(d0, d1);
 
 		System.out.printf(
-				"Time difference is %d day(s), %d hour(s), %d minute(s), %d second(s) and %d millisecond(s)\n",
-				diff[0], diff[1], diff[2], diff[3], diff[4]);
+				"Time difference is %d day(s), %d hour(s), %d minute(s), %d second(s) and %d millisecond(s)\n", diff[0],
+				diff[1], diff[2], diff[3], diff[4]);
 		System.out.printf("Just the number of days = %d\n", TimeDiff.getTimeDifference(d0, d1, TimeDiff.TimeField.DAY));
 	}
 
@@ -52,6 +49,7 @@ public class TimeDiff {
 	 * 
 	 * @param d1 Date one
 	 * @param d2 Date two
+	 *
 	 * @return The fields day, hour, minute, second and millisecond
 	 */
 	public static long[] getTimeDifference(Date d1, Date d2) {
@@ -97,6 +95,7 @@ public class TimeDiff {
 	 * Prints the duration in the format HH:MM:ss.SSS
 	 * 
 	 * @param diffMillis Duration expressed in milliseconds
+	 *
 	 * @return The formatted output
 	 */
 	public static String printDuration(long diffMillis) {

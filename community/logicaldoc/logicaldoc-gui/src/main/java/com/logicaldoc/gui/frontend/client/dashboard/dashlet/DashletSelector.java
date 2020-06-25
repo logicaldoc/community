@@ -1,7 +1,11 @@
 package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.frontend.client.services.DashletService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
@@ -59,18 +63,31 @@ public class DashletSelector extends Window {
 					for (int row = 0; row < portlets[column].length; row++)
 						size[column] += portlets[column][row].length;
 
-				// Find the column with less dashlets
-				int smallerColumn = 0;
-				int smallerSize = 9999;
-				for (int i = 0; i < size.length; i++) {
-					if (size[i] < smallerSize) {
-						smallerColumn = i;
-						smallerSize = size[i];
+				DashletService.Instance.get().get(form.getValueAsString("dashlet"), new AsyncCallback<GUIDashlet>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
 					}
-				}
-
-				Dashlet dashlet = Dashlet.getDashlet(Integer.parseInt(form.getValueAsString("dashlet")));
-				DashletSelector.this.portal.addPortlet(dashlet, smallerColumn, 0);
+					
+					@Override
+					public void onSuccess(GUIDashlet guiDashlet) {
+						// Find the column with less dashlets
+						int smallerColumn = 0;
+						int smallerSize = 9999;
+						for (int i = 0; i < size.length; i++) {
+							if (size[i] < smallerSize) {
+								smallerColumn = i;
+								smallerSize = size[i];
+							}
+						}
+						
+						guiDashlet.setColumn(smallerColumn);
+						guiDashlet.setIndex(0);
+						guiDashlet.setRow(0);
+						Dashlet dashlet = Dashlet.getDashlet(guiDashlet);
+						DashletSelector.this.portal.addPortlet(dashlet, smallerColumn, 0);	
+					}
+				});
 			}
 		});
 

@@ -1,12 +1,10 @@
 package com.logicaldoc.gui.frontend.client.document;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
@@ -18,13 +16,18 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
+import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.DropSpotPopup;
+import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.logicaldoc.gui.frontend.client.calendar.CalendarEventDialog;
 import com.logicaldoc.gui.frontend.client.document.form.AddForm;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
+import com.logicaldoc.gui.frontend.client.document.signature.SignatureDialog;
+import com.logicaldoc.gui.frontend.client.document.stamp.StampDialog;
 import com.logicaldoc.gui.frontend.client.document.update.UpdateDialog;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
@@ -46,7 +49,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	protected ToolStripButton download = AwesomeFactory.newToolStripButton("download", "download");
 
-	protected ToolStripButton rss = AwesomeFactory.newToolStripButton("rss", "rssfeed");
+	protected ToolStripButton saveLayout = AwesomeFactory.newToolStripButton("save", "savelayoutinuserprofile");
 
 	protected ToolStripButton pdf = AwesomeFactory.newToolStripButton("file-pdf", "exportpdf");
 
@@ -109,7 +112,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		boolean signEnabled = folder != null && folder.hasPermission(Constants.PERMISSION_SIGN);
 
 		prepareButtons(downloadEnabled, writeEnabled, signEnabled);
-		update(null);
+		update(null, folder);
 
 		FolderController.get().addObserver(this);
 	}
@@ -125,9 +128,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		refresh.setDisabled(Session.get().getCurrentFolder() == null);
 		addButton(refresh);
 		addSeparator();
-
-		download.setTooltip(I18N.message("download"));
-		download.setTitle("<i class='fal fa-download fa-lg' aria-hidden='true'></i>");
 
 		download.addClickHandler(new ClickHandler() {
 			@Override
@@ -148,14 +148,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		});
 
-		rss.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Window.open(Util.contextPath() + "doc_rss?docId=" + document.getId() + "&locale=" + I18N.getLocale(),
-						"_blank", "");
-			}
-		});
-
 		pdf.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -169,7 +161,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				} else {
 					String url = Util.contextPath() + "convertpdf?open=true&docId=";
 					for (long id : selection)
-						url += Long.toString(id) + "|";
+						url += Long.toString(id) + ",";
 					WindowUtils.openUrl(url, "_blank");
 				}
 			}
@@ -218,17 +210,14 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		dropSpot.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.openDropSpot();
+				DropSpotPopup.openDropSpot();
 			}
 		});
 
 		scan.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Map<String, String> params = new HashMap<String, String>();
-				params.put("targetFolderId", "" + Session.get().getCurrentFolder().getId());
-
-				WindowUtils.openUrl(Util.webstartURL("scan", params), "_self");
+				Util.openScan();
 			}
 		});
 
@@ -270,7 +259,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				calEvent.setCreatorId(Session.get().getUser().getId());
 				GUIUser user = new GUIUser();
 				user.setId(Session.get().getUser().getId());
-				user.setUserName(Session.get().getUser().getUserName());
+				user.setUsername(Session.get().getUser().getUsername());
 				user.setFirstName(Session.get().getUser().getFirstName());
 				user.setName(Session.get().getUser().getName());
 				calEvent.addParticipant(user);
@@ -303,7 +292,9 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				DocumentsPanel.get().refresh(null, DocumentsGrid.MODE_GALLERY);
 			}
 		});
-		gallery.setDisabled(Session.get().getCurrentFolder() == null);
+		gallery.setDisabled(
+				Session.get().getCurrentFolder() == null || !Session.get().getConfigAsBoolean("gui.galleryenabled"));
+		gallery.setVisible(Session.get().getConfigAsBoolean("gui.galleryenabled"));
 
 		int mode = DocumentsGrid.MODE_LIST;
 		if (CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_MODE) != null
@@ -351,8 +342,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		addSeparator();
 		addButton(add);
 
-		if (Feature.visible(Feature.DROP_SPOT)
-				&& !"embedded".equals(Session.get().getInfo().getConfig("gui.dropspot.mode"))) {
+		if (Feature.visible(Feature.DROP_SPOT)) {
 			addButton(dropSpot);
 			if (!Feature.enabled(Feature.DROP_SPOT)) {
 				dropSpot.setDisabled(true);
@@ -385,6 +375,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 				WindowUtils.openUrl("ldedit:" + GWT.getHostPageBaseURL() + "ldedit?action=edit&sid="
 						+ Session.get().getSid() + "&docId=" + document.getId());
+				ToastNotification.showNotification(I18N.message("officeaddinhintlauncher"));
 			}
 		});
 
@@ -407,7 +398,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				if (grid.getSelectedCount() == 0)
 					return;
 
-				StampDialog dialog = new StampDialog(grid.getSelectedIds());
+				StampDialog dialog = new StampDialog(grid);
 				dialog.show();
 			}
 		});
@@ -436,12 +427,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				for (GUIDocument doc : docs)
 					if (doc.getStatus() == 0 && doc.getImmutable() == 0)
 						unlockedIds.add(doc.getId());
-
-				Map<String, String> params = new HashMap<String, String>();
-				params.put("folderId", "" + Session.get().getCurrentFolder().getId());
-				params.put("docIds", unlockedIds.toString().replace('[', ' ').replace(']', ' ').trim());
-
-				WindowUtils.openUrl(Util.webstartURL("bulk-checkout", params), "_self");
+				Util.openBulkCheckout(unlockedIds);
 			}
 		});
 
@@ -451,14 +437,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (!Feature.enabled(Feature.AUDIT)) {
 				subscribe.setDisabled(true);
 				subscribe.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.RSS)) {
-			addButton(rss);
-			if (!Feature.enabled(Feature.RSS)) {
-				rss.setDisabled(true);
-				rss.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
 
@@ -557,6 +535,14 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		}
 
+		saveLayout.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				saveGridState();
+			}
+		});
+		addButton(saveLayout);
+
 		try {
 			// Retrieve the saved preview width
 			String w = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_PREV_W);
@@ -591,11 +577,16 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	}
 
 	/**
-	 * Updates the toolbar state on the basis of the passed document
+	 * Updates the toolbar state on the basis of the passed document and/or
+	 * folder
+	 * 
+	 * @param document the currently selected document
+	 * @param folder the currently selected folder
 	 */
-	public void update(final GUIDocument document) {
+	public void update(final GUIDocument document, GUIFolder folder) {
 		try {
-			GUIFolder folder = Session.get().getCurrentFolder();
+			if (folder == null)
+				folder = Session.get().getCurrentFolder();
 			boolean downloadEnabled = folder != null && folder.isDownload();
 			boolean writeEnabled = folder != null && folder.isWrite();
 			boolean signEnabled = folder != null && folder.hasPermission(Constants.PERMISSION_SIGN);
@@ -605,7 +596,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			if (document != null) {
 				download.setDisabled(!downloadEnabled);
 				office.setDisabled(!downloadEnabled);
-				rss.setDisabled(!Feature.enabled(Feature.RSS) || !downloadEnabled);
 				pdf.setDisabled(!Feature.enabled(Feature.PDF) || !downloadEnabled);
 				if (!pdf.isDisabled())
 					pdf.setTooltip(I18N.message("exportpdf"));
@@ -629,8 +619,8 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				else if (document.getType() != null)
 					isOfficeFile = Util.isOfficeFileType(document.getType());
 
-				office.setDisabled(!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !downloadEnabled
-						|| (folder != null && !folder.hasPermission(Constants.PERMISSION_WRITE)));
+				office.setDisabled(
+						!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !downloadEnabled || !writeEnabled);
 				if (document.getStatus() != Constants.DOC_UNLOCKED
 						&& !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 					if (document.getLockUserId() != null
@@ -640,7 +630,6 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				office.setTooltip(I18N.message("editwithoffice"));
 			} else {
 				download.setDisabled(true);
-				rss.setDisabled(true);
 				pdf.setDisabled(true);
 				convert.setDisabled(true);
 				subscribe.setDisabled(true);
@@ -659,8 +648,9 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				refresh.setDisabled(false);
 				add.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE));
 				dropSpot.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE)
-						|| !Feature.enabled(Feature.DROP_SPOT));
-				addForm.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.FORM));
+						|| !folder.hasPermission(Constants.PERMISSION_IMPORT) || !Feature.enabled(Feature.DROP_SPOT));
+				addForm.setDisabled(
+						!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.FORM));
 				scan.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.SCAN));
 				archive.setDisabled(document == null || !folder.hasPermission(Constants.PERMISSION_ARCHIVE)
 						|| !Feature.enabled(Feature.IMPEX));
@@ -688,13 +678,12 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				togglePreview.setDisabled(false);
 			}
 		} catch (Throwable t) {
-
 		}
 	}
 
 	@Override
 	public void onFolderSelected(GUIFolder folder) {
-		update(null);
+		update(null, folder);
 	}
 
 	@Override
@@ -717,25 +706,19 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		// Nothing to do
 	}
 
-	@Override
-	public void destroy() {
-		FolderController.get().removeObserver(this);
-	}
+	private void saveGridState() {
+		Session.get().getUser().setDocsGrid(DocumentsPanel.get().getDocsGridViewState());
+		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<GUIUser>() {
 
-	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
+			@Override
+			public void onSuccess(GUIUser usr) {
 
-	@Override
-	protected void onUnload() {
-		destroy();
-		super.onUnload();
-	}
+			}
 
-	@Override
-	protected void onDestroy() {
-		destroy();
-		super.onDestroy();
+			@Override
+			public void onFailure(Throwable e) {
+
+			}
+		});
 	}
 }

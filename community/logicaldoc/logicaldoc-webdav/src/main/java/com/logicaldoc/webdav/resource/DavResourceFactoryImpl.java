@@ -77,7 +77,6 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 				resource = createNullResource(locator, session, isCollection);
 			} else {
 				repositoryResource.setVersionLabel(version);
-
 				repositoryResource.setRequestedPerson(Long.parseLong(session.getObject("id").toString()));
 				resource = new VersionControlledResourceImpl(locator, this, session, resourceConfig, repositoryResource);
 			}
@@ -110,7 +109,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	/**
 	 * Puts an entry in the cache
 	 * 
-	 * @param key The entry ID as <userid>;<path>
+	 * @param session The curent DAV session
 	 * @param resource The entry to be cached
 	 */
 	public void putInCache(DavSession session, DavResource resource) {
@@ -131,7 +130,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	/**
 	 * Retrieves an entry from cache
 	 * 
-	 * @param key The entry ID as <userid>;<path>
+	 * @param key The entry ID as <b>userid</b>;<b>path</b>
 	 * @return The cached entry
 	 */
 	private DavResource getFromCache(DavSession session, String path) {

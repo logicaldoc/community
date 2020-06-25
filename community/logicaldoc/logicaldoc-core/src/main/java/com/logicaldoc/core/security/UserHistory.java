@@ -1,7 +1,6 @@
 package com.logicaldoc.core.security;
 
-import com.logicaldoc.core.document.AbstractHistory;
-import com.logicaldoc.core.folder.FolderHistory;
+import com.logicaldoc.core.History;
 
 /**
  * History entry due to an event on a user.
@@ -9,25 +8,18 @@ import com.logicaldoc.core.folder.FolderHistory;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.0
  */
-public class UserHistory extends AbstractHistory {
+public class UserHistory extends History {
 
-	// Events on users
-	public final static String EVENT_USER_LOGIN = "event.user.login";
-
-	public final static String EVENT_USER_LOGIN_FAILED = "event.user.login.failed";
-
-	public final static String EVENT_USER_LOGOUT = "event.user.logout";
-
-	public final static String EVENT_USER_TIMEOUT = "event.user.timeout";
-
-	public final static String EVENT_USER_PASSWORDCHANGED = "event.user.passwordchanged";
+	public String author;
 	
-	public final static String EVENT_USER_2FACHANGED = "event.user.2fachanged";
+	public String getAuthor() {
+		return author;
+	}
 
-	public final static String EVENT_USER_DELETED = "event.user.deleted";
-	
-	public final static String EVENT_FILE_CONVERSION = "event.user.fileconversion";
-	
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		UserHistory history = new UserHistory();
@@ -37,6 +29,7 @@ public class UserHistory extends AbstractHistory {
 		history.setUser(getUser());
 		history.setEvent(getEvent());
 		history.setComment(getComment());
+		history.setReason(getReason());
 		history.setVersion(getVersion());
 		history.setPath(getPath());
 		history.setPathOld(getPathOld());
@@ -50,6 +43,7 @@ public class UserHistory extends AbstractHistory {
 		history.setUserLogin(getUserLogin());
 		history.setNotifyEvent(isNotifyEvent());
 		history.setIp(getIp());
+		history.setAuthor(getAuthor());
 
 		return history;
 	}

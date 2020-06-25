@@ -25,7 +25,7 @@ public class AdminScreen extends HLayout {
 			instance = new AdminScreen();
 		return instance;
 	}
-
+	
 	private AdminScreen() {
 		setWidth100();
 		setOverflow(Overflow.HIDDEN);
@@ -35,7 +35,7 @@ public class AdminScreen extends HLayout {
 	public void onDraw() {
 		// Prepare the collapsible menu
 		AdminMenu leftMenu = AdminMenu.get();
-		leftMenu.setWidth(290);
+		leftMenu.setWidth(340);
 		leftMenu.setShowResizeBar(true);
 
 		addMember(leftMenu);

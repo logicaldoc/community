@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import com.google.gwt.user.client.ui.Widget;
 import com.logicaldoc.gui.common.client.beans.GUITransition;
 import com.logicaldoc.gui.common.client.beans.GUIWFState;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.orange.links.client.connection.Connection;
+import com.orange.links.client.shapes.DrawableSet;
 import com.orange.links.client.shapes.FunctionShape;
 import com.orange.links.client.shapes.Point;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -153,28 +151,31 @@ public class WorkflowDesigner extends AdminPanel {
 
 		// Collect all the transitions as drawn in the designer
 		iter = getDrawingPanel().getDiagramController().getShapes().iterator();
-		Map<Widget, Map<Widget, Connection>> functionsMap = getDrawingPanel().getDiagramController().getFunctionsMap();
 		while (iter.hasNext()) {
 			FunctionShape shape = iter.next();
 			StateWidget srcWidget = (StateWidget) shape.getWidget();
 
+			DrawableSet<Connection> connections = shape.getConnections();
 			List<GUITransition> transitions = new ArrayList<GUITransition>();
-			Map<Widget, Connection> map = functionsMap.get(srcWidget);
-			for (Entry<Widget, Connection> entry : map.entrySet()) {
-				StateWidget targetWidget = (StateWidget) entry.getKey();
-				Connection connection = entry.getValue();
-				GUITransition transition = ((StateWidget) connection.getDecoration().getWidget()).getTransition();
-				transition.setTargetState(targetWidget.getWfState());
-				transitions.add(transition);
+			for (Connection connection : connections) {
+				StateWidget start = (StateWidget) ((FunctionShape) connection.getStartShape()).getWidget();
+				if (!start.equals(srcWidget))
+					continue;
 
+				StateWidget end = (StateWidget) ((FunctionShape) connection.getEndShape()).getWidget();
+				GUITransition transition = ((StateWidget) connection.getDecoration().getWidget()).getTransition();
+				transition.setTargetState(end.getWfState());
+				transitions.add(transition);
 				StringBuffer sb = new StringBuffer("");
 				for (Point point : connection.getMovablePoints()) {
 					sb.append("" + point.getLeft());
 					sb.append("," + point.getTop());
 					sb.append(";");
 				}
+
 				transition.setPoints(sb.toString());
 			}
+
 			srcWidget.getWfState().setTransitions(transitions.toArray(new GUITransition[0]));
 		}
 

@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
@@ -44,8 +45,7 @@ public class FolderSearchDialog extends Window {
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setPadding(3);
-		setMembersMargin(3);
+		setMembersMargin(0);
 
 		form = new FolderSearchForm() {
 			@Override

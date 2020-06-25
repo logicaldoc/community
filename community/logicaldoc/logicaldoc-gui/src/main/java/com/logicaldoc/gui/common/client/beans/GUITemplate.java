@@ -3,8 +3,15 @@ package com.logicaldoc.gui.common.client.beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
+/**
+ * This user interface bean to model a document template
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 6.0
+ */
 public class GUITemplate implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -88,6 +95,20 @@ public class GUITemplate implements Serializable {
 	}
 
 	public GUIAttribute[] getAttributes() {
+		return attributes;
+	}
+
+	public GUIAttribute[] getAttributesOrderedByPosition() {
+		if (attributes == null)
+			return null;
+
+		Arrays.sort(attributes, new Comparator<GUIAttribute>() {
+
+			@Override
+			public int compare(GUIAttribute arg0, GUIAttribute arg1) {
+				return Integer.valueOf(arg0.getPosition()).compareTo(Integer.valueOf(arg1.getPosition()));
+			}
+		});
 		return attributes;
 	}
 

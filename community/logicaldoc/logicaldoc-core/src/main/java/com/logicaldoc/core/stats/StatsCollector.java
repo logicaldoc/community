@@ -17,6 +17,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.DocumentEvent;
@@ -25,7 +26,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.UserHistory;
+import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.task.Task;
@@ -69,6 +70,11 @@ public class StatsCollector extends Task {
 	}
 
 	@Override
+	public long getSize() {
+		return 8;
+	}
+
+	@Override
 	protected void runTask() throws Exception {
 		log.info("Start statistics collection");
 
@@ -106,10 +112,15 @@ public class StatsCollector extends Task {
 		String regOrganization = config.getProperty("reg.organization");
 		String regWebsite = config.getProperty("reg.website");
 
+		next();
+		if (interruptRequested)
+			return;
+
 		/*
 		 * Collect users data
 		 */
 		int users = userDao.count(null);
+		int guests = userDao.countGuests(null);
 		int groups = groupDAO.count();
 		log.debug("Collected users data");
 
@@ -141,6 +152,10 @@ public class StatsCollector extends Task {
 		plugindir = FileUtils.sizeOfDirectory(pluginsDir);
 		saveStatistic("plugindir", plugindir, Tenant.SYSTEM_ID);
 
+		next();
+		if (interruptRequested)
+			return;
+
 		long dbdir = 0;
 
 		/*
@@ -148,9 +163,9 @@ public class StatsCollector extends Task {
 		 */
 		try {
 			if ("mysql".equals(documentDAO.getDbms()))
-				dbdir = documentDAO
-						.queryForLong("select sum(data_length+index_length) from information_schema.tables where table_schema=database();");
-			else if ("oracle".equals(documentDAO.getDbms()))
+				dbdir = documentDAO.queryForLong(
+						"select sum(data_length+index_length) from information_schema.tables where table_schema=database();");
+			else if (documentDAO.isOracle())
 				dbdir = documentDAO.queryForLong("SELECT sum(bytes) FROM user_segments");
 			else if ("postgresql".equals(documentDAO.getDbms()))
 				dbdir = documentDAO.queryForLong("select pg_database_size(current_database())");
@@ -175,6 +190,9 @@ public class StatsCollector extends Task {
 		saveStatistic("logdir", logdir, Tenant.SYSTEM_ID);
 
 		log.info("Saved repository statistics");
+		next();
+		if (interruptRequested)
+			return;
 
 		/*
 		 * Collect documents statistics
@@ -183,12 +201,15 @@ public class StatsCollector extends Task {
 		long totaldocs = docStats[3];
 		long archiveddocs = docStats[4];
 		long docdir = docStats[5];
-
+		
 		List<Tenant> tenants = tenantDAO.findAll();
 		for (Tenant tenant : tenants)
 			extractDocStats(tenant.getId());
 
 		log.info("Saved documents statistics");
+		next();
+		if (interruptRequested)
+			return;
 
 		/*
 		 * Collect folders statistics
@@ -202,6 +223,9 @@ public class StatsCollector extends Task {
 			extractFldStats(tenant.getId());
 
 		log.info("Saved folder statistics");
+		next();
+		if (interruptRequested)
+			return;
 
 		/*
 		 * Collect sizing statistics
@@ -218,6 +242,9 @@ public class StatsCollector extends Task {
 		saveStatistic("lastrun", new Date(), Tenant.SYSTEM_ID);
 
 		log.info("Statistics collected");
+		next();
+		if (interruptRequested)
+			return;
 
 		try {
 			log.debug("Package collected statistics");
@@ -230,8 +257,8 @@ public class StatsCollector extends Task {
 			postParams.add(new BasicNameValuePair("userno", userno != null ? userno : ""));
 			postParams.add(new BasicNameValuePair("product_release", release != null ? release : ""));
 			postParams.add(new BasicNameValuePair("email", email != null ? email : ""));
-			postParams.add(new BasicNameValuePair("product", StatsCollector.product != null ? StatsCollector.product
-					: ""));
+			postParams.add(
+					new BasicNameValuePair("product", StatsCollector.product != null ? StatsCollector.product : ""));
 			postParams.add(new BasicNameValuePair("product_name",
 					StatsCollector.productName != null ? StatsCollector.productName : ""));
 
@@ -249,6 +276,7 @@ public class StatsCollector extends Task {
 
 			// Sizing
 			postParams.add(new BasicNameValuePair("users", Integer.toString(users)));
+			postParams.add(new BasicNameValuePair("guests", Integer.toString(guests)));
 			postParams.add(new BasicNameValuePair("groups", Integer.toString(groups)));
 			postParams.add(new BasicNameValuePair("docs", Long.toString(totaldocs)));
 			postParams.add(new BasicNameValuePair("archived_docs", Long.toString(archiveddocs)));
@@ -260,6 +288,9 @@ public class StatsCollector extends Task {
 			postParams.add(new BasicNameValuePair("votes", Long.toString(votes)));
 
 			collectFeatureUsageStats(postParams);
+			next();
+			if (interruptRequested)
+				return;
 
 			/*
 			 * General usage
@@ -268,32 +299,32 @@ public class StatsCollector extends Task {
 
 			Date lastLogin = null;
 			try {
-				lastLogin = (Date) documentDAO.queryForObject(
-						"select max(ld_date) from ld_user_history where ld_deleted=0 and ld_event='"
-								+ UserHistory.EVENT_USER_LOGIN + "'", Date.class);
+				lastLogin = (Date) documentDAO
+						.queryForObject("select max(ld_date) from ld_user_history where ld_deleted=0 and ld_event='"
+								+ UserEvent.LOGIN.toString() + "'", Date.class);
 			} catch (Throwable t) {
-				log.warn("Unable to retrieve last login statistics - " + t.getMessage());
+				log.warn("Unable to retrieve last login statistics - {}", t.getMessage());
 			}
 			postParams.add(new BasicNameValuePair("last_login", lastLogin != null ? isoDf.format(lastLogin) : ""));
 
 			Date lastCreation = null;
 			try {
-				lastCreation = (Date) documentDAO.queryForObject(
-						"select max(ld_date) from ld_history where ld_deleted=0 and ld_event='" + DocumentEvent.STORED
-								+ "'", Date.class);
+				lastCreation = (Date) documentDAO
+						.queryForObject("select max(ld_date) from ld_history where ld_deleted=0 and ld_event='"
+								+ DocumentEvent.STORED + "'", Date.class);
 			} catch (Throwable t) {
-				log.warn("Unable to retrieve last creation statistics - " + t.getMessage());
+				log.warn("Unable to retrieve last creation statistics - {}", t.getMessage());
 			}
-			postParams.add(new BasicNameValuePair("last_creation", lastCreation != null ? isoDf.format(lastCreation)
-					: ""));
+			postParams.add(
+					new BasicNameValuePair("last_creation", lastCreation != null ? isoDf.format(lastCreation) : ""));
 
 			/*
 			 * Quotas
 			 */
 			postParams.add(new BasicNameValuePair("docdir", Long.toString(docdir)));
 			postParams.add(new BasicNameValuePair("indexdir", Long.toString(indexdir)));
-			postParams.add(new BasicNameValuePair("quota", Long.toString(docdir + indexdir + userdir + importdir
-					+ exportdir + plugindir + dbdir + logdir)));
+			postParams.add(new BasicNameValuePair("quota",
+					Long.toString(docdir + indexdir + userdir + importdir + exportdir + plugindir + dbdir + logdir)));
 
 			/*
 			 * Registration
@@ -310,24 +341,18 @@ public class StatsCollector extends Task {
 			CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
 
 			// Execute request
-			CloseableHttpResponse response = null;
-			try {
-				response = httpclient.execute(post);
+			try (CloseableHttpResponse response = httpclient.execute(post)) {
 				int responseStatusCode = response.getStatusLine().getStatusCode();
 				// log status code
-				log.debug("Response status code: " + responseStatusCode);
-				if (responseStatusCode != 200) {
+				log.debug("Response status code: {}", responseStatusCode);
+				if (responseStatusCode != 200)
 					throw new IOException(HttpUtil.getBodyString(response));
-				}
-			} finally {
-				if (response != null)
-					try {
-						response.close();
-					} catch (IOException e) {
-					}
 			}
 
 			log.info("Statistics packaged");
+			next();
+			if (interruptRequested)
+				return;
 		} catch (Throwable t) {
 			log.warn("Troubles packaging the statistics");
 			log.debug("Unable to send statistics", t);
@@ -377,7 +402,8 @@ public class StatsCollector extends Task {
 
 		long workflow_histories = 0;
 		try {
-			workflow_histories = folderDAO.queryForLong("SELECT COUNT(ld_id) FROM ld_workflowhistory where ld_deleted=0");
+			workflow_histories = folderDAO
+					.queryForLong("SELECT COUNT(ld_id) FROM ld_workflowhistory where ld_deleted=0");
 		} catch (Throwable t) {
 			log.warn("Unable to calculate workflow statistics - {}", t.getMessage());
 		}
@@ -457,31 +483,65 @@ public class StatsCollector extends Task {
 	 *         <li>totaldocs</li>
 	 *         <li>archiveddocs</li>
 	 *         <li>docdir (total size of the whole repository)</li>
+	 *         <li>notindexabledocs</li>
 	 *         </ol>
 	 */
 	private long[] extractDocStats(long tenantId) {
-		long[] stats = new long[6];
-		stats[0] = documentDAO
-				.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = 0 and A.ld_deleted = 0 "
-						+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
-						+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
-		stats[1] = documentDAO
-				.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = 1 and A.ld_deleted = 0 "
-						+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
-						+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
-		stats[2] = documentDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_deleted  > 0 "
-				+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		long[] stats = new long[7];
+		stats[0] = 0;
+		try {
+			stats[0] = documentDAO.queryForLong(
+					"SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = 0 and A.ld_deleted = 0 "
+							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
+							+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		stats[1] = 0;
+		try {
+			stats[1] = documentDAO.queryForLong(
+					"SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = 1 and A.ld_deleted = 0 "
+							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
+							+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		stats[2] = 0;
+		try {
+			stats[2] = documentDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_deleted  > 0 "
+					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
 		if (tenantId != Tenant.SYSTEM_ID) {
 			stats[3] = documentDAO.count(tenantId, true, true);
 		} else {
 			stats[3] = documentDAO.count(null, true, true);
 		}
-		stats[4] = documentDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_status = "
-				+ AbstractDocument.DOC_ARCHIVED
-				+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
-		stats[5] = documentDAO
-				.queryForLong("SELECT SUM(A.ld_filesize) from ld_version A where A.ld_version = A.ld_fileversion "
-						+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+
+		stats[4] = 0;
+		try {
+			stats[4] = documentDAO.queryForLong(
+					"SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_status = " + AbstractDocument.DOC_ARCHIVED
+							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		stats[5] = documentDAO.computeTotalSize(tenantId, null, true);
+
+		stats[6] = 0;
+		try {
+			stats[6] = documentDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_document A where A.ld_indexed = "
+					+ AbstractDocument.INDEX_SKIP + " and A.ld_deleted = 0 "
+					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "") + " and not A.ld_status="
+					+ AbstractDocument.DOC_ARCHIVED);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		saveStatistic("notindexeddocs", stats[0], tenantId);
 		saveStatistic("indexeddocs", stats[1], tenantId);
@@ -489,6 +549,7 @@ public class StatsCollector extends Task {
 		saveStatistic("totaldocs", stats[3], tenantId);
 		saveStatistic("archiveddocs", stats[4], tenantId);
 		saveStatistic("docdir", stats[5], tenantId);
+		saveStatistic("notindexabledocs", stats[6], tenantId);
 
 		return stats;
 	}
@@ -508,16 +569,32 @@ public class StatsCollector extends Task {
 	 */
 	private long[] extractFldStats(long tenantId) {
 		long[] stats = new long[4];
-		stats[0] = folderDAO
-				.queryForLong("SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted = 0 and A.ld_id in (select B.ld_folderid FROM ld_document B where B.ld_deleted = 0) "
-						+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
 
-		stats[1] = folderDAO
-				.queryForLong("SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted = 0 and A.ld_id not in (select B.ld_folderid FROM ld_document B where B.ld_deleted = 0) "
-						+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		stats[0] = 0;
+		try {
+			stats[0] = folderDAO.queryForLong(
+					"SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted = 0 and A.ld_id in (select B.ld_folderid FROM ld_document B where B.ld_deleted = 0) "
+							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
-		stats[2] = folderDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted  > 0 "
-				+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		stats[1] = 0;
+		try {
+			stats[1] = folderDAO.queryForLong(
+					"SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted = 0 and A.ld_id not in (select B.ld_folderid FROM ld_document B where B.ld_deleted = 0) "
+							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		stats[2] = 0;
+		try {
+			stats[2] = folderDAO.queryForLong("SELECT COUNT(A.ld_id) FROM ld_folder A where A.ld_deleted  > 0 "
+					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		saveStatistic("withdocs", stats[0], tenantId);
 		saveStatistic("empty", stats[1], tenantId);
@@ -548,12 +625,16 @@ public class StatsCollector extends Task {
 		else
 			gen.setInteger1(((Integer) val).longValue());
 
-		genericDAO.store(gen);
+		try {
+			genericDAO.store(gen);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	@Override
 	public boolean isIndeterminate() {
-		return true;
+		return false;
 	}
 
 	@Override

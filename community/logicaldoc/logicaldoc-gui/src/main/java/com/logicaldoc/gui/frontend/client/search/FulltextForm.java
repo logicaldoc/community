@@ -13,7 +13,7 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.folder.FolderSelector;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
@@ -71,7 +71,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		DynamicForm form1 = new DynamicForm();
 		form1.setValuesManager(vm);
-		form1.setTitleOrientation(TitleOrientation.LEFT);
+		form1.setTitleOrientation(TitleOrientation.TOP);
 		form1.setNumCols(3);
 
 		PickerIcon searchPicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
@@ -117,14 +117,17 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			@Override
 			public void onChanged(ChangedEvent event) {
 				if (event.getValue() != null && !"".equals((String) event.getValue()))
-					prepareFields(new Long((String) event.getValue()));
+					prepareFields(Long.parseLong((String) event.getValue()));
 				else
 					prepareFields(null);
 			}
 		});
 
 		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders"));
-		subfolders.setEndRow(true);
+
+		CheckboxItem aliases = new CheckboxItem("aliases", I18N.message("retrievealiases"));
+		aliases.setValue(true);
+		aliases.setEndRow(true);
 
 		folder = new FolderSelector(null, true);
 		folder.setColSpan(3);
@@ -147,8 +150,8 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		publicationDateRange.setEndRow(true);
 		publicationDateRange.setColSpan(3);
 
-		form1.setItems(expression, language, searchinhits, folder, subfolders, sizeOperator, size, creationDateRange,
-				publicationDateRange, template);
+		form1.setItems(expression, language, searchinhits, folder, subfolders, aliases, sizeOperator, size,
+				creationDateRange, publicationDateRange, template);
 
 		addMember(form1);
 
@@ -182,7 +185,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			options.setExpressionLanguage(options.getLanguage());
 		}
 
-		Long size = vm.getValueAsString("size") != null ? new Long(vm.getValueAsString("size")) : null;
+		Long size = vm.getValueAsString("size") != null ? Long.parseLong(vm.getValueAsString("size")) : null;
 		if (size != null) {
 			if (LESSTHAN.equals(vm.getValueAsString("sizeOperator")))
 				options.setSizeMax(size * 1024);
@@ -231,9 +234,10 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		options.setFolder(folder.getFolderId());
 		options.setFolderName(folder.getFolderName());
 
-		options.setSearchInSubPath(new Boolean(vm.getValueAsString("subfolders")).booleanValue());
+		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
 
-		if (new Boolean(vm.getValueAsString(SEARCHINHITS)).booleanValue()) {
+		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
+		if (Boolean.parseBoolean(vm.getValueAsString(SEARCHINHITS))) {
 			GUIDocument[] docs = Search.get().getLastResult();
 			Long[] ids = new Long[docs.length];
 			int i = 0;
@@ -290,7 +294,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			@Override
 			public void onSuccess(GUIAttribute[] result) {
 				for (GUIAttribute att : result) {
-					if (att.getType() == GUIAttribute.TYPE_STRING || att.getType() == GUIAttribute.TYPE_USER) {
+					if (att.getType() == GUIAttribute.TYPE_STRING && !att.isHidden()) {
 						fieldsMap.put("ext_" + att.getName(), att.getDisplayName());
 					}
 				}

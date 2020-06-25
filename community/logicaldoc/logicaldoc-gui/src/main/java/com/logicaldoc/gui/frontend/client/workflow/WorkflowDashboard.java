@@ -28,6 +28,8 @@ public class WorkflowDashboard extends VLayout {
 
 	public static int TASKS_SUPERVISOR = 4;
 
+	public static int TASKS_INVOLVED = 5;
+
 	private static WorkflowDashboard instance;
 
 	private WorkflowPortlet assignedTasks = null;
@@ -37,6 +39,11 @@ public class WorkflowDashboard extends VLayout {
 	private WorkflowPortlet adminTasks = null;
 
 	private WorkflowPortlet supervisorTasks = null;
+
+	/*
+	 * Portlet that shows the workflows the current user was involved in.
+	 */
+	private WorkflowPortlet involvedTasks = null;
 
 	private PortalLayout portalLayout = null;
 
@@ -84,6 +91,7 @@ public class WorkflowDashboard extends VLayout {
 		portalLayout.addPortlet(assignedTasks, 0, 0);
 		canOwnTasks = new WorkflowPortlet(this, TASKS_I_CAN_OWN);
 		portalLayout.addPortlet(canOwnTasks, 0, 1);
+		
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 			adminTasks = new WorkflowPortlet(this, TASKS_ADMIN);
 			portalLayout.addPortlet(adminTasks, 1, 0);
@@ -92,6 +100,9 @@ public class WorkflowDashboard extends VLayout {
 			portalLayout.addPortlet(supervisorTasks, 1, 1);
 		}
 		
+		involvedTasks = new WorkflowPortlet(this, TASKS_INVOLVED);
+		portalLayout.addPortlet(involvedTasks, 1, 1);
+
 		addMember(toolStrip);
 		addMember(portalLayout);
 	}
@@ -105,6 +116,8 @@ public class WorkflowDashboard extends VLayout {
 			adminTasks.refresh();
 		if (supervisorTasks != null)
 			supervisorTasks.refresh();
+		if (involvedTasks != null)
+			involvedTasks.refresh();
 	}
 
 	public static WorkflowDashboard get() {

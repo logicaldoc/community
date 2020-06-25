@@ -157,7 +157,7 @@ public class FirewallPanel extends VLayout {
 		});
 	}
 
-	boolean validate() {
+	public boolean validate() {
 		String whitelist = vm.getValueAsString("whitelist");
 		String blacklist = vm.getValueAsString("blacklist");
 		user.setIpWhitelist(whitelist != null ? whitelist.replace('\n', ',').replaceAll(" ", "") : null);

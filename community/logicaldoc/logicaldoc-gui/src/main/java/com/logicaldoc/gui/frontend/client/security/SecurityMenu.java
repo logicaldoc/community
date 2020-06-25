@@ -7,16 +7,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUILdapSettings;
-import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
+import com.logicaldoc.gui.frontend.client.security.ldap.LDAPServersPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationSettings;
-import com.logicaldoc.gui.frontend.client.services.LdapService;
-import com.logicaldoc.gui.frontend.client.services.SettingService;
+import com.logicaldoc.gui.frontend.client.security.user.UsersPanel;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -33,6 +32,7 @@ public class SecurityMenu extends VLayout {
 	public SecurityMenu() {
 		setMargin(10);
 		setMembersMargin(5);
+		setOverflow(Overflow.AUTO);
 
 		Button users = new Button(I18N.message("users"));
 		users.setWidth100();
@@ -65,6 +65,10 @@ public class SecurityMenu extends VLayout {
 		Button bruteForcePrevention = new Button(I18N.message("buteforceattack"));
 		bruteForcePrevention.setWidth100();
 		bruteForcePrevention.setHeight(25);
+
+		Button singleSingon = new Button(I18N.message("singlesignon"));
+		singleSingon.setWidth100();
+		singleSingon.setHeight(25);
 
 		List<Button> buttons = new ArrayList<Button>();
 		buttons.add(users);
@@ -104,12 +108,20 @@ public class SecurityMenu extends VLayout {
 			}
 		}
 
-		if (Feature.visible(Feature.LDAP) && Session.get().isDefaultTenant()
-				&& Menu.enabled(Menu.EXTERNAL_AUTHENTICATION)) {
+		if (Feature.visible(Feature.LDAP) && Menu.enabled(Menu.EXTERNAL_AUTHENTICATION)) {
 			buttons.add(extAuth);
 			if (!Feature.enabled(Feature.LDAP) || Session.get().isDemo()) {
 				extAuth.setDisabled(true);
 				extAuth.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+
+		if (Feature.visible(Feature.SINGLE_SIGNON) && Session.get().isDefaultTenant()
+				&& Menu.enabled(Menu.SINGLE_SIGNON)) {
+			buttons.add(singleSingon);
+			if (!Feature.enabled(Feature.SINGLE_SIGNON) || Session.get().isDemo()) {
+				singleSingon.setDisabled(true);
+				singleSingon.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
 
@@ -165,19 +177,7 @@ public class SecurityMenu extends VLayout {
 		extAuth.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				LdapService.Instance.get().loadSettings(new AsyncCallback<GUILdapSettings>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUILdapSettings settings) {
-						AdminScreen.get().setContent(new ExternalAuthenticationPanel(settings));
-					}
-
-				});
+				AdminScreen.get().setContent(new LDAPServersPanel());
 			}
 		});
 
@@ -188,25 +188,17 @@ public class SecurityMenu extends VLayout {
 			}
 		});
 
+		singleSingon.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new SingleSignonPanel());
+			}
+		});
+
 		antivirus.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				String tenant = Session.get().getTenantName();
-
-				SettingService.Instance.get().loadSettingsByNames(
-						new String[] { "antivirus.command", tenant + ".antivirus.enabled",
-								tenant + ".antivirus.includes", tenant + ".antivirus.excludes",
-								tenant + ".antivirus.timeout" }, new AsyncCallback<GUIParameter[]>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUIParameter[] parameters) {
-								AdminScreen.get().setContent(new AntivirusPanel(parameters));
-							}
-						});
+				AdminScreen.get().setContent(new AntivirusPanel());
 			}
 		});
 	}

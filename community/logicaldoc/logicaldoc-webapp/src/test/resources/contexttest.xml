@@ -35,25 +35,16 @@
   <bean id="Context" class="com.logicaldoc.util.Context" abstract="false" lazy-init="default" autowire="default"
      />
 
-  <!-- DataSource -->
-  <bean id="DataSource" class="org.apache.commons.dbcp.BasicDataSource">
-    <property name="driverClassName">
-      <value>org.hsqldb.jdbcDriver</value>
-    </property>
-    <property name="url">
-      <value>jdbc:hsqldb:mem:logicaldoc</value>
-    </property>
-    <property name="username">
-      <value>sa</value>
-    </property>
-    <property name="password">
-      <value></value>
-    </property>
-    <property name="initialSize" value="3" />
-    <property name="validationQuery">
-      <value></value>
-    </property>
-  </bean>
+    <!-- DataSource -->
+    <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
+        <property name="jdbcUrl" value="jdbc:hsqldb:mem:logicaldoc" />
+        <property name="username" value="sa" />
+        <property name="password" value="" />
+    </bean>    
+    <bean id="DataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+    	<constructor-arg ref="HikariConfig" />
+  	</bean>
 
 	<!-- Hibernate SessionFactory -->
 	<bean id="SessionFactory"

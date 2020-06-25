@@ -28,9 +28,9 @@ public class DocumentProtectionManager {
 	}
 
 	/**
-	 * Controls the document and sks the user for a password(if needed).
+	 * Controls the document and asks the user for a password(if needed).
 	 * 
-	 * @param docId
+	 * @param docId identifier of the document
 	 * @param handler Optional handler to react something when the documents
 	 *        gets unlocked
 	 */

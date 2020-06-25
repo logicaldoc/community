@@ -2,13 +2,13 @@ package com.logicaldoc.core.security.dao;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.security.Session;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateSessionDAO</code>

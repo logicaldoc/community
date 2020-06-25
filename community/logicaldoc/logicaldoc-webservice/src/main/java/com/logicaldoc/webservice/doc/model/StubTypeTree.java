@@ -5,11 +5,11 @@ import java.util.Set;
 
 /**
  * A tree-like structure indicating the inheritance of java classes involved in
- * the stubs <br/>
+ * the stubs <br>
  * 
  * <b>Important</b>: B.class is considered the child type of A.class, if and
- * only if <br/>
- * a. A.class is assignable from B.class in terms of Java language<br/>
+ * only if <br>
+ * a. A.class is assignable from B.class in terms of Java language<br>
  * b. and A.class is annotated as @XmlSeeAlso(B.class)
  * 
  */

@@ -1,10 +1,5 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import gwtupload.client.IFileInput.FileInputType;
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,11 +26,17 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import gwtupload.client.IFileInput.FileInputType;
+import gwtupload.client.IUploadStatus.Status;
+import gwtupload.client.IUploader;
+import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload documents to the server.
@@ -61,7 +62,7 @@ public class DocumentsUploader extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("adddocuments"));
 		setWidth(460);
-		setHeight(245);
+		setHeight(265);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -75,8 +76,8 @@ public class DocumentsUploader extends Window {
 		customExternalDropZone.getElement().getStyle().setBorderStyle(BorderStyle.DASHED);
 		customExternalDropZone.getElement().getStyle().setBorderWidth(1, Unit.PX);
 		customExternalDropZone.getElement().getStyle().setPadding(10, Unit.PX);
-		multiUploader = new MultiUploader(FileInputType.CUSTOM.with(
-				(Widget) new Button(I18N.message("clickmeordropfiles"))).withZone(customExternalDropZone));
+		multiUploader = new MultiUploader(FileInputType.CUSTOM
+				.with((Widget) new Button(I18N.message("clickmeordropfiles"))).withZone(customExternalDropZone));
 		multiUploader.addOnFinishUploadHandler(onFinishUploaderHandler);
 		multiUploader.addOnStartUploadHandler(onStartUploaderHandler);
 		multiUploader.setFileInputPrefix("LDOC");
@@ -144,6 +145,10 @@ public class DocumentsUploader extends Window {
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
 
+		final StaticTextItem fileNameWaring = ItemFactory.newStaticTextItem("fileNameWarning",
+				I18N.message("attention"), I18N.message("filenamewarning"));
+		fileNameWaring.setRequired(true);
+
 		final SelectItem charset = ItemFactory.newCharsetSelector("charset");
 		charset.setHidden(true);
 
@@ -174,16 +179,13 @@ public class DocumentsUploader extends Window {
 			zipItem.setValue(false);
 		}
 
-		SelectItem template = ItemFactory.newTemplateSelector(true, null);
-		template.setMultiple(false);
-
 		zipItem.addChangeHandler(new ChangeHandler() {
 			public void onChange(ChangeEvent event) {
 				zipImport = !zipImport;
 			}
 		});
 
-		form.setItems(zipItem, charset, immediateIndexing);
+		form.setItems(zipItem, charset, immediateIndexing, fileNameWaring);
 	}
 
 	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
@@ -216,6 +218,7 @@ public class DocumentsUploader extends Window {
 		metadata.setTemplate(folder.getTemplate());
 		metadata.setAttributes(folder.getAttributes());
 		metadata.setTags(folder.getTags());
+		metadata.setOcrTemplateId(folder.getOcrTemplateId());
 
 		UpdateDialog bulk = new UpdateDialog(null, metadata, UpdateDialog.CONTEXT_UPLOAD, false);
 		bulk.setZip(getImportZip());

@@ -35,7 +35,6 @@ public class Registration extends Window {
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setMembersMargin(5);
 		setAutoSize(true);
 
 		final DynamicForm form = new DynamicForm();

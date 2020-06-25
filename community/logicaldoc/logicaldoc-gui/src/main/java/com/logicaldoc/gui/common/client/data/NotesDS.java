@@ -11,7 +11,20 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 6.0
  */
 public class NotesDS extends DataSource {
-	public NotesDS(Long userIdentifier, Long documentIdentifier, Integer pageNumber) {
+	public NotesDS(String url) {
+		prepareFields();
+		setDataURL(url);
+	}
+
+	public NotesDS(Long userIdentifier, Long documentIdentifier, String fileVersion, Integer pageNumber) {
+		prepareFields();
+		setDataURL("data/notes.xml?1=1" + (userIdentifier != null ? "&" + "userId=" + userIdentifier : "")
+				+ (documentIdentifier != null ? "&" + "docId=" + documentIdentifier : "")
+				+ (pageNumber != null ? "&" + "page=" + pageNumber : "")
+				+ (fileVersion != null ? "&" + "fileVersion=" + fileVersion : ""));
+	}
+
+	private void prepareFields() {
 		setRecordXPath("/list/post");
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
@@ -23,16 +36,13 @@ public class NotesDS extends DataSource {
 		docId.setHidden(true);
 		DataSourceTextField user = new DataSourceTextField("user");
 		DataSourceTextField message = new DataSourceTextField("message");
-		DataSourceTextField snippet = new DataSourceTextField("snippet");
 		DataSourceTextField page = new DataSourceTextField("page");
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 		DataSourceTextField docFilename = new DataSourceTextField("docFilename");
+		DataSourceTextField color = new DataSourceTextField("color");
+		DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
 
-		setFields(id, page, userId, user, message, date, docId, docFilename, snippet);
+		setFields(id, page, userId, user, message, date, docId, docFilename, fileVersion, color);
 		setClientOnly(true);
-
-		setDataURL("data/notes.xml?1=1" + (userIdentifier != null ? "&" + "userId=" + userIdentifier : "")
-				+ (documentIdentifier != null ? "&" + "docId=" + documentIdentifier : "")
-				+ (pageNumber != null ? "&" + "page=" + pageNumber : ""));
 	}
 }

@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
  */
 public class DetailsPreviewPanel extends DocumentDetailTab {
 
-	private com.logicaldoc.gui.common.client.widgets.PreviewPanel panel = null;
+	private com.logicaldoc.gui.common.client.widgets.preview.PreviewPanel panel = null;
 
 	public DetailsPreviewPanel(final GUIDocument document) {
 		super(document, null);
@@ -20,7 +20,7 @@ public class DetailsPreviewPanel extends DocumentDetailTab {
 	@Override
 	protected void onDraw() {
 		if (panel == null) {
-			panel = new com.logicaldoc.gui.common.client.widgets.PreviewPanel(document);
+			panel = new com.logicaldoc.gui.common.client.widgets.preview.PreviewPanel(document);
 			setMembers(panel);
 		}
 	}

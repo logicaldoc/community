@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.MessageTemplate;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.core.communication.Recipient;
@@ -45,7 +46,15 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 		Context context = Context.get();
 		SystemMessageDAO dao = (SystemMessageDAO) context.getBean(SystemMessageDAO.class);
 		for (long id : ids) {
-			dao.delete(id);
+			boolean deleted = false;
+			try {
+				deleted = dao.delete(id);
+			} catch (PersistenceException e) {
+				deleted = false;
+				log.error(e.getMessage(), e);
+			}
+			if (!deleted)
+				throw new ServerException("Messages have not been deleted");
 		}
 	}
 
@@ -117,7 +126,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 		}
 	}
 
-	private void saveMessage(GUIMessage message, Session session, long recipientId) {
+	private void saveMessage(GUIMessage message, Session session, long recipientId) throws ServerException {
 		Context context = Context.get();
 		SystemMessageDAO dao = (SystemMessageDAO) context.getBean(SystemMessageDAO.class);
 		UserDAO uDao = (UserDAO) context.getBean(UserDAO.class);
@@ -145,7 +154,15 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 		m.setPrio(message.getPriority());
 		m.setConfirmation(message.isConfirmation() ? 1 : 0);
 
-		dao.store(m);
+		boolean stored = false;
+		try {
+			stored = dao.store(m);
+		} catch (PersistenceException e) {
+			stored=false;
+			log.error(e.getMessage(), e);
+		}
+		if (!stored)
+			throw new ServerException("Message has not been saved");
 	}
 
 	@Override
@@ -208,7 +225,9 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 				template.setSubject(t.getSubject());
 				template.setBody(t.getBody());
 				template.setType(t.getType());
-				dao.store(template);
+				boolean stored = dao.store(template);
+				if (!stored)
+					throw new Exception("Templates have not been saved");
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -226,7 +245,9 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 			for (long id : ids) {
 				MessageTemplate template = dao.findById(id);
 				if (template != null && !"en".equals(template.getLanguage())) {
-					dao.delete(id);
+					boolean deleted = dao.delete(id);
+					if (!deleted)
+						throw new Exception("Templates have not been saved");
 				}
 			}
 		} catch (Throwable t) {
@@ -245,7 +266,9 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 			for (MessageTemplate template : templates) {
 				if (template.getType().equals(MessageTemplate.TYPE_SYSTEM))
 					continue;
-				dao.delete(template.getId());
+				boolean deleted = dao.delete(template.getId());
+				if (!deleted)
+					throw new Exception("Templates have not been saved");
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);

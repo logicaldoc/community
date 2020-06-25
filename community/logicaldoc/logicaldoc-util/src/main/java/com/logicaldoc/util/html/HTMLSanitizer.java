@@ -2,6 +2,7 @@ package com.logicaldoc.util.html;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
 
@@ -18,7 +19,7 @@ public class HTMLSanitizer {
 		Whitelist whiteList = Whitelist.relaxed().preserveRelativeLinks(true);
 		whiteList = whiteList.addTags("head", "html", "style", "body", "fieldsMap", "area");
 		whiteList = whiteList.addAttributes(":all", "name", "class", "style", "id", "src", "type", "cellpadding",
-				"cellspacing", "alt", "title", "shape", "coords", "width", "height");
+				"cellspacing", "alt", "title", "shape", "coords", "width", "height", "dir");
 		whiteList = whiteList.addProtocols("img", "src", "http", "https", "data", "cid");
 
 		return Jsoup.clean(unsafeHtmlContent, whiteList);
@@ -30,5 +31,11 @@ public class HTMLSanitizer {
 		String sanitized = Jsoup.clean(unsafeHtmlContent, "", whiteList, outputSettings);
 		sanitized = StringEscapeUtils.unescapeHtml(sanitized);
 		return sanitized;
+	}
+
+	public static String stripIframes(String htmlContent) {
+		Document doc = Jsoup.parse(htmlContent, "UTF-8");
+		doc.select("iframe").remove();
+		return doc.text();
 	}
 }

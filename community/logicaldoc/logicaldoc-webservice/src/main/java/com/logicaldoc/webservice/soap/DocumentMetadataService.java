@@ -17,8 +17,10 @@ public interface DocumentMetadataService {
 	 * Gets metadata of all existing templates.
 	 * 
 	 * @param sid Session identifier
+	 * 
 	 * @return The list of all templates
-	 * @throws Exception
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "template")
 	@WebMethod
@@ -30,8 +32,10 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param sid Session identifier
 	 * @param name The template's name
+	 * 
 	 * @return A value object containing the template's metadata.
-	 * @throws Exception
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "template")
 	@WebMethod
@@ -44,8 +48,10 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param sid Session identifier
 	 * @param templateId The template's id
-	 * @return A value object containing the template's metadata.
-	 * @throws Exception
+	 * 
+	 * @return A value object containing the template's metadata
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "template")
 	@WebMethod
@@ -59,8 +65,10 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param sid Session identifier (need to be administrator)
 	 * @param template value object containing the template's metadata
+	 * 
 	 * @return The ID of the new template
-	 * @throws Exception
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "templateId")
 	@WebMethod
@@ -69,11 +77,12 @@ public interface DocumentMetadataService {
 			throws Exception;
 
 	/**
-	 * Deletes an existing template with the given identifier.
+	 * Deletes an existing template with the given identifier
 	 * 
 	 * @param sid Session identifier (need to be administrator)
 	 * @param templateId The template's id
-	 * @throws Exception
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WSDoc(description = "deletes an existing template")
@@ -85,7 +94,8 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param sid Session identifier
 	 * @return The list of all attribute sets
-	 * @throws Exception
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "attributeSet")
 	@WebMethod
@@ -97,8 +107,10 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param sid Session identifier
 	 * @param name The attribute set's name
-	 * @return A value object containing the attribute set's metadata.
-	 * @throws Exception
+	 * 
+	 * @return A value object containing the attribute set's metadata
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "attributeSet")
 	@WebMethod
@@ -111,8 +123,10 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param sid Session identifier
 	 * @param setId The attribute set's id
-	 * @return A value object containing the attribute set's metadata.
-	 * @throws Exception
+	 * 
+	 * @return A value object containing the attribute set's metadata
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "attributeSet")
 	@WebMethod
@@ -126,10 +140,12 @@ public interface DocumentMetadataService {
 	 * metadata.
 	 * 
 	 * @param sid Session identifier (need to be administrator)
-	 * @param attribute set's value object containing the attribute set's
+	 * @param attributeSet set's value object containing the attribute set's
 	 *        metadata
+	 * 
 	 * @return The ID of the new attribute set
-	 * @throws Exception
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "setId")
 	@WebMethod
@@ -142,7 +158,8 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param sid Session identifier (need to be administrator)
 	 * @param setId The attribute set's id
-	 * @throws Exception
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WSDoc(description = "deletes an existing attribute set")
@@ -157,7 +174,7 @@ public interface DocumentMetadataService {
 	 * @param attribute The attribute's name
 	 * @param values The attribute's options
 	 * 
-	 * @throws Exception
+	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WSDoc(description = "saves the options for the given attribute")
@@ -171,9 +188,10 @@ public interface DocumentMetadataService {
 	 * @param sid Session identifier
 	 * @param setId The attribute set's id
 	 * @param attribute The attribute's name
+	 * 
 	 * @return the list of all the attribute's options
 	 * 
-	 * @throws Exception
+	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the options for the given attribute")

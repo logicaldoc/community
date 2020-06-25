@@ -3,19 +3,11 @@ package com.logicaldoc.util.charset;
 /**
  * This class matches UTF-16 and UTF-32, both big- and little-endian. The
  * BOM will be used if it is present.
- * 
- * @internal
  */
 abstract class CharsetRecog_Unicode extends CharsetRecognizer {
 
-    /* (non-Javadoc)
-     * @see com.ibm.icu.text.CharsetRecognizer#getName()
-     */
     abstract String getName();
 
-    /* (non-Javadoc)
-     * @see com.ibm.icu.text.CharsetRecognizer#match(com.ibm.icu.text.CharsetDetector)
-     */
     abstract int match(CharsetDetector det);
     
     static class CharsetRecog_UTF_16_BE extends CharsetRecog_Unicode

@@ -22,11 +22,12 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 public class DocumentListenerManager {
 	protected static Logger log = LoggerFactory.getLogger(DocumentListenerManager.class);
 
-	private List<DocumentListener> listeners = null;
+	private List<DocumentListener> listeners = new ArrayList<DocumentListener>();
 
 	@SuppressWarnings("rawtypes")
-	public void init() {
-		listeners = new ArrayList<DocumentListener>();
+	public synchronized void init() {
+		if (!listeners.isEmpty())
+			return;
 
 		// Acquire the 'DocumentListener' extensions of the core plugin
 		PluginRegistry registry = PluginRegistry.getInstance();
@@ -55,10 +56,11 @@ public class DocumentListenerManager {
 			try {
 				Class clazz = Class.forName(className);
 				// Try to instantiate the listener
-				Object listener = clazz.newInstance();
+				@SuppressWarnings("unchecked")
+				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof DocumentListener))
-					throw new Exception("The specified listener " + className
-							+ " doesn't implement DocumentListener interface");
+					throw new Exception(
+							"The specified listener " + className + " doesn't implement DocumentListener interface");
 				listeners.add((DocumentListener) listener);
 				log.info("Added new document listener " + className + " position "
 						+ ext.getParameter("position").valueAsString());
@@ -70,9 +72,11 @@ public class DocumentListenerManager {
 
 	/**
 	 * The ordered list of listeners
+	 * 
+	 * @return the list of listeners
 	 */
 	public List<DocumentListener> getListeners() {
-		if (listeners == null)
+		if (listeners.isEmpty())
 			init();
 		return listeners;
 	}

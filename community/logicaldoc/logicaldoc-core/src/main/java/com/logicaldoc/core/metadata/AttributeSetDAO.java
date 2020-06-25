@@ -45,7 +45,7 @@ public interface AttributeSetDAO extends PersistentObjectDAO<AttributeSet> {
 	 * Gets the map of attributes defined in the given tenant or set
 	 * 
 	 * @param tenantId The tenant ID
-	 * @param setname Optional set ID
+	 * @param setId Optional set ID
 	 * @return map of attributes
 	 */
 	public Map<String, Attribute> findAttributes(long tenantId, Long setId);

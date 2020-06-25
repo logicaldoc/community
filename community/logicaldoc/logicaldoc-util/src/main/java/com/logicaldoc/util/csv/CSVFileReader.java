@@ -12,12 +12,14 @@ import java.util.Vector;
  * CSVFileReader is a class derived from CSVFile used to parse an existing CSV
  * file.
  * <p>
- * Adapted from a C++ original that is Copyright (C) 1999 Lucent Technologies.<br>
+ * Adapted from a C++ original that is Copyright (C) 1999 Lucent
+ * Technologies.<br>
  * Excerpted from 'The Practice of Programming' by Brian Kernighan and Rob Pike.
  * <p>
- * Included by permission of the <a href="http://tpop.awl.com/">Addison-Wesley</a>
- * web site, which says: <cite>"You may use this code for any purpose, as long
- * as you leave the copyright notice and book citation attached"</cite>.
+ * Included by permission of the
+ * <a href="http://tpop.awl.com/">Addison-Wesley</a> web site, which says:
+ * <cite>"You may use this code for any purpose, as long as you leave the
+ * copyright notice and book citation attached"</cite>.
  * 
  * @author Brian Kernighan and Rob Pike (C++ original)
  * @author Ian F. Darwin (translation into Java and removal of I/O)
@@ -38,8 +40,10 @@ public class CSVFileReader extends CSVFile {
 	 * that will be read.
 	 * 
 	 * @param inputFileName The name of the CSV file to be opened for reading
+	 * 
 	 * @throws FileNotFoundException If the file to be read does not exist
-	 * @throws UnsupportedEncodingException
+	 * @throws UnsupportedEncodingException If the CSV contains elements not
+	 *         compatible with the UTF-8 encoding
 	 */
 	public CSVFileReader(String inputFileName) throws FileNotFoundException, UnsupportedEncodingException {
 		super();
@@ -52,8 +56,10 @@ public class CSVFileReader extends CSVFile {
 	 * 
 	 * @param inputFileName The name of the CSV file to be opened for reading
 	 * @param sep The field separator to be used; overwrites the default one
+	 * 
 	 * @throws FileNotFoundException If the file to be read does not exist
-	 * @throws UnsupportedEncodingException
+	 * @throws UnsupportedEncodingException If the CSV contains elements not
+	 *         compatible with the UTF-8 encoding
 	 */
 	public CSVFileReader(String inputFileName, char sep) throws FileNotFoundException, UnsupportedEncodingException {
 		super(sep);
@@ -67,11 +73,13 @@ public class CSVFileReader extends CSVFile {
 	 * @param inputFileName The name of the CSV file to be opened for reading
 	 * @param sep The field separator to be used; overwrites the default one
 	 * @param qual The text qualifier to be used; overwrites the default one
+	 * 
 	 * @throws FileNotFoundException If the file to be read does not exist
-	 * @throws UnsupportedEncodingException
+	 * @throws UnsupportedEncodingException If the CSV contains elements not
+	 *         compatible with the UTF-8 encodings
 	 */
-	public CSVFileReader(String inputFileName, char sep, char qual) throws FileNotFoundException,
-			UnsupportedEncodingException {
+	public CSVFileReader(String inputFileName, char sep, char qual)
+			throws FileNotFoundException, UnsupportedEncodingException {
 		super(sep, qual);
 		InputStreamReader isr = new InputStreamReader(new FileInputStream(inputFileName), "UTF-8");
 		in = new BufferedReader(isr);
@@ -124,7 +132,11 @@ public class CSVFileReader extends CSVFile {
 	}
 
 	/**
-	 * Handles a quoted field.
+	 * Handles a quoted field
+	 * 
+	 * @param s the field value
+	 * @param sb The current string buffer
+	 * @param i the current column
 	 * 
 	 * @return index of next separator
 	 */
@@ -154,7 +166,11 @@ public class CSVFileReader extends CSVFile {
 	}
 
 	/**
-	 * Handles an unquoted field.
+	 * Handles an unquoted field
+	 * 
+	 * @param s the field value
+	 * @param sb The current string buffer
+	 * @param i the current column
 	 * 
 	 * @return index of next separator
 	 */

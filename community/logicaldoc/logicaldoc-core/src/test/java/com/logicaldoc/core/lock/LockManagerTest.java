@@ -1,7 +1,5 @@
 package com.logicaldoc.core.lock;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,6 +8,8 @@ import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.config.ContextProperties;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>LockManager</code>

@@ -9,7 +9,7 @@ import com.logicaldoc.core.metadata.ExtensibleObject;
 /**
  * Instances of this class represents generic informations in the database. Use
  * this Business entity to store configurations or stuffs like this.
- * <p/>
+ * <br>
  * 
  * Each Generic is identified by a type and subtype
  * 
@@ -28,6 +28,8 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 	private String string2;
 
 	private String string3;
+
+	private String string4;
 
 	private Long integer1;
 
@@ -182,5 +184,13 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 
 	public void setQualifier(Long qualifier) {
 		this.qualifier = qualifier;
+	}
+
+	public String getString4() {
+		return string4;
+	}
+
+	public void setString4(String string4) {
+		this.string4 = string4;
 	}
 }

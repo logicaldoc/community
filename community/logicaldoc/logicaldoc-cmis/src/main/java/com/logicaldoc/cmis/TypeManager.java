@@ -229,9 +229,9 @@ public class TypeManager {
 		type.addPropertyDefinition(createPropDef(PropertyIds.LAST_MODIFIED_BY, "Last Modified By", "Last Modified By",
 				PropertyType.STRING, Cardinality.SINGLE, Updatability.READONLY, false, false));
 
-		type.addPropertyDefinition(createPropDef(PropertyIds.LAST_MODIFICATION_DATE, "Last Modification Date",
-				"Last Modification Date", PropertyType.DATETIME, Cardinality.SINGLE, Updatability.READONLY, false,
-				false));
+		type.addPropertyDefinition(
+				createPropDef(PropertyIds.LAST_MODIFICATION_DATE, "Last Modification Date", "Last Modification Date",
+						PropertyType.DATETIME, Cardinality.SINGLE, Updatability.READONLY, false, false));
 
 		type.addPropertyDefinition(createPropDef(PropertyIds.CHANGE_TOKEN, "Change Token", "Change Token",
 				PropertyType.STRING, Cardinality.SINGLE, Updatability.READONLY, false, false));
@@ -267,9 +267,9 @@ public class TypeManager {
 		type.addPropertyDefinition(createPropDef(PropertyIds.IS_MAJOR_VERSION, "Is Major Version", "Is Major Version",
 				PropertyType.BOOLEAN, Cardinality.SINGLE, Updatability.READONLY, false, false));
 
-		type.addPropertyDefinition(createPropDef(PropertyIds.IS_LATEST_MAJOR_VERSION, "Is Latest Major Version",
-				"Is Latest Major Version", PropertyType.BOOLEAN, Cardinality.SINGLE, Updatability.READONLY, false,
-				false));
+		type.addPropertyDefinition(
+				createPropDef(PropertyIds.IS_LATEST_MAJOR_VERSION, "Is Latest Major Version", "Is Latest Major Version",
+						PropertyType.BOOLEAN, Cardinality.SINGLE, Updatability.READONLY, false, false));
 
 		type.addPropertyDefinition(createPropDef(PropertyIds.VERSION_LABEL, "Version Label", "Version Label",
 				PropertyType.STRING, Cardinality.SINGLE, Updatability.READONLY, false, true));
@@ -292,8 +292,9 @@ public class TypeManager {
 		type.addPropertyDefinition(createPropDef(PropertyIds.CHECKIN_COMMENT, "Checkin Comment", "Checkin Comment",
 				PropertyType.STRING, Cardinality.SINGLE, Updatability.READONLY, false, false));
 
-		type.addPropertyDefinition(createPropDef(PropertyIds.CONTENT_STREAM_LENGTH, "Content Stream Length",
-				"Content Stream Length", PropertyType.INTEGER, Cardinality.SINGLE, Updatability.READONLY, false, false));
+		type.addPropertyDefinition(
+				createPropDef(PropertyIds.CONTENT_STREAM_LENGTH, "Content Stream Length", "Content Stream Length",
+						PropertyType.INTEGER, Cardinality.SINGLE, Updatability.READONLY, false, false));
 
 		type.addPropertyDefinition(createPropDef(PropertyIds.CONTENT_STREAM_MIME_TYPE, "MIME Type", "MIME Type",
 				PropertyType.STRING, Cardinality.SINGLE, Updatability.READONLY, false, false));
@@ -341,7 +342,19 @@ public class TypeManager {
 	}
 
 	/**
-	 * Creates a property definition object.
+	 * Creates a property definition object
+	 * 
+	 * @param id identifier of the property
+	 * 
+	 * @param displayName name to display
+	 * @param description property's description
+	 * @param datatype type or data
+	 * @param cardinality the cardinality
+	 * @param updateability  if the property can be updated
+	 * @param inherited if the property has been inherited
+	 * @param required if the property is mandatory
+	 * 
+	 * @return the property definition
 	 */
 	private static PropertyDefinition<?> createPropDef(String id, String displayName, String description,
 			PropertyType datatype, Cardinality cardinality, Updatability updateability, boolean inherited,
@@ -394,7 +407,11 @@ public class TypeManager {
 	}
 
 	/**
-	 * Adds a type to collection with inheriting base type properties.
+	 * Adds a type to collection with inheriting base type properties
+	 * 
+	 * @param type the type
+	 * 
+	 * @return if the type has been added
 	 */
 	public boolean addType(TypeDefinition type) {
 		if (type == null) {
@@ -467,7 +484,16 @@ public class TypeManager {
 	}
 
 	/**
-	 * CMIS getTypesChildren.
+	 * CMIS getTypesChildren
+	 * 
+	 * @param context the call context
+	 * @param typeId identifier of the type
+	 * @param includePropertyDefinitions if the property definition must be
+	 *        included
+	 * @param maxItems maximum number of items
+	 * @param skipCount if the counting of children must be avoided
+	 * 
+	 * @return list of definitions
 	 */
 	public TypeDefinitionList getTypesChildren(CallContext context, String typeId, boolean includePropertyDefinitions,
 			BigInteger maxItems, BigInteger skipCount) {
@@ -529,7 +555,14 @@ public class TypeManager {
 	}
 
 	/**
-	 * CMIS getTypesDescendants.
+	 * CMIS getTypesDescendants
+	 * 
+	 * @param context call context
+	 * @param typeId id of the type
+	 * @param depth depth specification
+	 * @param includePropertyDefinitions if the properties definition must be included
+	 *  
+	 * @return list of definitions
 	 */
 	public List<TypeDefinitionContainer> getTypesDescendants(CallContext context, String typeId, BigInteger depth,
 			Boolean includePropertyDefinitions) {
@@ -562,7 +595,13 @@ public class TypeManager {
 	}
 
 	/**
-	 * Gathers the type descendants tree.
+	 * Gathers the type descendants tree
+	 * 
+	 * @param depth depth specifications
+	 * @param tc the container
+	 * @param includePropertyDefinitions if the property definitions must be included
+	 * 
+	 * @return the definition container
 	 */
 	private TypeDefinitionContainer getTypesDescendants(int depth, TypeDefinitionContainer tc,
 			boolean includePropertyDefinitions) {
@@ -579,8 +618,8 @@ public class TypeManager {
 			if (tc.getChildren() != null) {
 				result.setChildren(new ArrayList<TypeDefinitionContainer>());
 				for (TypeDefinitionContainer tdc : tc.getChildren()) {
-					result.getChildren().add(
-							getTypesDescendants(depth < 0 ? -1 : depth - 1, tdc, includePropertyDefinitions));
+					result.getChildren()
+							.add(getTypesDescendants(depth < 0 ? -1 : depth - 1, tdc, includePropertyDefinitions));
 				}
 			}
 		}
@@ -589,7 +628,11 @@ public class TypeManager {
 	}
 
 	/**
-	 * For internal use.
+	 * For internal use
+	 * 
+	 * @param typeId identifier of the type
+	 * 
+	 * @return the type definition
 	 */
 	public TypeDefinition getType(String typeId) {
 		TypeDefinitionContainer tc = types.get(typeId);
@@ -601,7 +644,12 @@ public class TypeManager {
 	}
 
 	/**
-	 * CMIS getTypeDefinition.
+	 * CMIS getTypeDefinition
+	 * 
+	 * @param context call context
+	 * @param typeId identifier of the type
+	 * 
+	 * @return definition of the type
 	 */
 	public TypeDefinition getTypeDefinition(CallContext context, String typeId) {
 		TypeDefinitionContainer tc = types.get(typeId);

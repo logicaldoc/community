@@ -8,6 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -15,7 +16,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
@@ -152,7 +153,7 @@ public class CalendarEventDialog extends Window {
 			records[i] = new ListGridRecord();
 			records[i].setAttribute("id", calendarEvent.getParticipants()[i].getId());
 			records[i].setAttribute("name", calendarEvent.getParticipants()[i].getFullName());
-			records[i].setAttribute("username", calendarEvent.getParticipants()[i].getUserName());
+			records[i].setAttribute("username", calendarEvent.getParticipants()[i].getUsername());
 		}
 		list.setRecords(records);
 
@@ -165,7 +166,11 @@ public class CalendarEventDialog extends Window {
 				if (selection == null || selection.length == 0)
 					return;
 				for (ListGridRecord rec : selection) {
-					CalendarEventDialog.this.calendarEvent.removeParticipant(rec.getAttributeAsLong("id"));
+					if (rec.getAttribute("id").startsWith("g-"))
+						CalendarEventDialog.this.calendarEvent
+								.removeParticipantGroup(Long.parseLong(rec.getAttribute("id").substring(2)));
+					else
+						CalendarEventDialog.this.calendarEvent.removeParticipant(rec.getAttributeAsLong("id"));
 				}
 
 				list.removeSelectedData();
@@ -178,6 +183,7 @@ public class CalendarEventDialog extends Window {
 
 		DynamicForm form = new DynamicForm();
 		form.setTitleOrientation(TitleOrientation.LEFT);
+		form.setNumCols(4);
 		final SelectItem newUser = ItemFactory.newUserSelector("user", "adduser", null, true);
 		newUser.addChangedHandler(new ChangedHandler() {
 			@Override
@@ -186,34 +192,33 @@ public class CalendarEventDialog extends Window {
 				if (selectedRecord == null)
 					return;
 
-				// Check if the selected user is already present in the list
-				ListGridRecord[] records = list.getRecords();
-				for (ListGridRecord test : records) {
-					if (test.getAttribute("id").equals(selectedRecord.getAttribute("id"))) {
-						newUser.clearValue();
-						return;
-					}
-				}
-
-				// Update the table
-				ListGridRecord record = new ListGridRecord();
 				String id = selectedRecord.getAttribute("id");
 				String label = selectedRecord.getAttribute("label");
 				String username = selectedRecord.getAttribute("username");
-				record.setAttribute("id", id);
-				record.setAttribute("name", label);
-				record.setAttribute("username", username);
-				list.addData(record);
 
-				GUIUser user = new GUIUser();
-				user.setId(Long.parseLong(id));
-				user.setUserName(username);
-				user.setFirstName(label);
-				CalendarEventDialog.this.calendarEvent.addParticipant(user);
+				addParticipant(list, id, username, label);
 				newUser.clearValue();
 			}
 		});
-		form.setItems(newUser);
+
+		final SelectItem newGroup = ItemFactory.newGroupSelector("group", "addgroup");
+		newGroup.addChangedHandler(new ChangedHandler() {
+			@Override
+			public void onChanged(ChangedEvent event) {
+				ListGridRecord selectedRecord = newGroup.getSelectedRecord();
+				if (selectedRecord == null)
+					return;
+
+				String id = "g-" + selectedRecord.getAttribute("id");
+				String label = I18N.message("group") + ": " + selectedRecord.getAttribute("name");
+				String username = selectedRecord.getAttribute("name");
+				
+				addParticipant(list, id, username, label);
+				newGroup.clearValue();
+			}
+		});
+
+		form.setItems(newUser, newGroup);
 
 		Tab participantsTab = new Tab();
 		participantsTab.setTitle(I18N.message("participants"));
@@ -375,9 +380,10 @@ public class CalendarEventDialog extends Window {
 		Tab details = new Tab();
 		details.setTitle(I18N.message("details"));
 
+		final int formColumns = 6;
 		detailsForm.setHeight100();
 		detailsForm.setTitleOrientation(TitleOrientation.TOP);
-		detailsForm.setNumCols(6);
+		detailsForm.setNumCols(formColumns);
 		detailsForm.setValuesManager(vm);
 
 		TextItem title = ItemFactory.newTextItem("title", "title", calendarEvent.getTitle());
@@ -498,7 +504,7 @@ public class CalendarEventDialog extends Window {
 		if (calendarEvent.getCompletionDate() != null)
 			completionDate.setValue(calendarEvent.getCompletionDate());
 
-		SelectItem status = ItemFactory.newEventStatusSelector("status", "status");
+		SelectItem status = ItemFactory.newCalendarEventStatusSelector("status", "status");
 		status.setTitleOrientation(TitleOrientation.LEFT);
 		status.setWrapTitle(false);
 		status.setValue(Integer.toString(calendarEvent.getStatus()));
@@ -518,8 +524,8 @@ public class CalendarEventDialog extends Window {
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description",
 				calendarEvent.getDescription());
 		description.setWidth("*");
-		description.setHeight(100);
-		description.setColSpan(5);
+		description.setHeight("*");
+		description.setColSpan(formColumns);
 		description.setCanEdit(!readOnly);
 
 		detailsForm.setFields(title, type, subType, ItemFactory.newRowSpacer(), startDate, startTime, expirationDate,
@@ -568,8 +574,8 @@ public class CalendarEventDialog extends Window {
 					try {
 						calendarEvent.setExpirationDate(df.parse(str + " " + vm.getValue("expirationTime").toString()));
 					} catch (Throwable t) {
-						calendarEvent.setExpirationDate(df.parse(str + " "
-								+ dfTime.format((Date) vm.getValue("expirationTime"))));
+						calendarEvent.setExpirationDate(
+								df.parse(str + " " + dfTime.format((Date) vm.getValue("expirationTime"))));
 					}
 			}
 
@@ -656,5 +662,36 @@ public class CalendarEventDialog extends Window {
 				}
 			}
 		});
+	}
+
+	private void addParticipant(final ListGrid list, String id, String username, String name) {
+		// Check if the selected user is already present in the list
+		ListGridRecord[] records = list.getRecords();
+		for (ListGridRecord test : records) {
+			if (test.getAttribute("id").equals(id))
+				return;
+		}
+
+		// Update the table
+		ListGridRecord record = new ListGridRecord();
+
+		record.setAttribute("id", id);
+		record.setAttribute("name", name);
+		record.setAttribute("username", username);
+		list.addData(record);
+		
+		if (id.startsWith("g-")) {
+			GUIGroup group = new GUIGroup();
+			group.setId(Long.parseLong(id.substring(2)));
+			group.setName(username);
+			group.setDescription(name);
+			CalendarEventDialog.this.calendarEvent.addParticipant(group);
+		} else {
+			GUIUser user = new GUIUser();
+			user.setId(Long.parseLong(id));
+			user.setUsername(username);
+			user.setFirstName(name);
+			CalendarEventDialog.this.calendarEvent.addParticipant(user);
+		}
 	}
 }

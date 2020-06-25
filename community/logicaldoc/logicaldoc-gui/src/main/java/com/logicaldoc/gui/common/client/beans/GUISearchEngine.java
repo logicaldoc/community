@@ -16,9 +16,13 @@ public class GUISearchEngine implements Serializable {
 
 	private boolean locked;
 
-	private String includePatters;
+	private String includePatterns;
 
-	private String excludePatters = "*.exe,*.bin,*.iso,*.zip,*.rar";
+	private String excludePatterns;
+
+	private String includePatternsMetadata;
+
+	private String excludePatternsMetadata = "*.exe,*.bin,*.iso,*.zip,*.rar";
 
 	private Integer batch = 200;
 
@@ -29,6 +33,26 @@ public class GUISearchEngine implements Serializable {
 	private Integer maxTextFileSize;
 
 	private String dir;
+
+	private String sorting;
+
+	private int threads = 2;
+
+	public int getThreads() {
+		return threads;
+	}
+
+	public void setThreads(int threads) {
+		this.threads = threads;
+	}
+
+	public String getSorting() {
+		return sorting;
+	}
+
+	public void setSorting(String sorting) {
+		this.sorting = sorting;
+	}
 
 	public String getLanguages() {
 		return languages;
@@ -47,19 +71,19 @@ public class GUISearchEngine implements Serializable {
 	}
 
 	public String getIncludePatters() {
-		return includePatters;
+		return includePatterns;
 	}
 
-	public void setIncludePatters(String includePatters) {
-		this.includePatters = includePatters;
+	public void setIncludePatterns(String includePatterns) {
+		this.includePatterns = includePatterns;
 	}
 
 	public String getExcludePatters() {
-		return excludePatters;
+		return excludePatterns;
 	}
 
-	public void setExcludePatters(String excludePatters) {
-		this.excludePatters = excludePatters;
+	public void setExcludePatterns(String excludePatterns) {
+		this.excludePatterns = excludePatterns;
 	}
 
 	public Integer getBatch() {
@@ -100,5 +124,21 @@ public class GUISearchEngine implements Serializable {
 
 	public void setMaxTextFileSize(Integer maxTextFileSize) {
 		this.maxTextFileSize = maxTextFileSize;
+	}
+
+	public String getIncludePattersMetadata() {
+		return includePatternsMetadata;
+	}
+
+	public void setIncludePatternsMetadata(String includePatternsMetadata) {
+		this.includePatternsMetadata = includePatternsMetadata;
+	}
+
+	public String getExcludePatternsMetadata() {
+		return excludePatternsMetadata;
+	}
+
+	public void setExcludePatternsMetadata(String excludePattersMetadata) {
+		this.excludePatternsMetadata = excludePattersMetadata;
 	}
 }

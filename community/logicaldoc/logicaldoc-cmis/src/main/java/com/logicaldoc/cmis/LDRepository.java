@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -23,7 +24,6 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.Ace;
 import org.apache.chemistry.opencmis.commons.data.Acl;
@@ -109,20 +109,22 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.HistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
+import com.logicaldoc.core.folder.FolderHistoryDAO;
 import com.logicaldoc.core.i18n.Language;
 import com.logicaldoc.core.i18n.LanguageManager;
 import com.logicaldoc.core.metadata.Attribute;
@@ -131,6 +133,7 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.searchengine.FulltextSearchOptions;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.Search;
+import com.logicaldoc.core.searchengine.SearchException;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -189,7 +192,8 @@ public class LDRepository {
 
 	private DocumentDAO documentDao;
 
-	private HistoryDAO historyDao;
+	private DocumentHistoryDAO historyDao;
+	private FolderHistoryDAO folderHistoryDao;
 
 	private TemplateDAO templateDao;
 
@@ -207,9 +211,8 @@ public class LDRepository {
 	 */
 	public LDRepository(Folder root, String sid) {
 		// check root folder
-		if (root == null) {
+		if (root == null)
 			throw new IllegalArgumentException("Invalid root folder!");
-		}
 
 		userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -217,7 +220,8 @@ public class LDRepository {
 		documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		versionDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
-		historyDao = (HistoryDAO) Context.get().getBean(HistoryDAO.class);
+		historyDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		folderHistoryDao = (FolderHistoryDAO) Context.get().getBean(FolderHistoryDAO.class);
 
 		ContextProperties config = Context.get().getProperties();
 
@@ -269,8 +273,8 @@ public class LDRepository {
 		capabilities.setCapabilityRendition(CapabilityRenditions.READ);
 
 		ContextProperties settings = Context.get().getProperties();
-		capabilities.setCapabilityChanges("true".equals(settings.getProperty("cmis.changelog")) ? CapabilityChanges.ALL
-				: CapabilityChanges.NONE);
+		capabilities.setCapabilityChanges(
+				"true".equals(settings.getProperty("cmis.changelog")) ? CapabilityChanges.ALL : CapabilityChanges.NONE);
 
 		repositoryInfo.setCapabilities(capabilities);
 
@@ -343,9 +347,9 @@ public class LDRepository {
 		repoInfo.setExtensions(extensions);
 	}
 
-	private static PermissionDefinition createPermission(String permission, String description) {
+	private static PermissionDefinition createPermission(String id, String description) {
 		PermissionDefinitionDataImpl pd = new PermissionDefinitionDataImpl();
-		pd.setPermission(permission);
+		pd.setId(id);
 		pd.setDescription(description);
 
 		return pd;
@@ -360,18 +364,26 @@ public class LDRepository {
 	}
 
 	/**
-	 * Adds a user to the repository.
+	 * Adds a user to the repository
+	 * 
+	 * @param user the username
+	 * @param readOnly if the user must be read-only
 	 */
 	public void addUser(String user, boolean readOnly) {
-		if ((user == null) || (user.length() == 0)) {
+		if ((user == null) || (user.length() == 0))
 			return;
-		}
 
 		userMap.put(user, readOnly);
 	}
 
 	/**
-	 * CMIS getRepositoryInfo.
+	 * CMIS getRepositoryInfo
+	 * 
+	 * @param context call context
+	 * @param latestChangeLogToken a token that indicates the time stamp of the
+	 *        last update
+	 * 
+	 * @return the repository representation
 	 */
 	public RepositoryInfo getRepositoryInfo(CallContext context, String latestChangeLogToken) {
 		debug("getRepositoryInfo");
@@ -383,7 +395,16 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS getTypesChildren.
+	 * CMIS getTypesChildren
+	 * 
+	 * @param context call context
+	 * @param typeId identifier of the type
+	 * @param includePropertyDefinitions id the property definitions must be
+	 *        included
+	 * @param maxItems maximum number of children
+	 * @param skipCount if the children must be counted
+	 * 
+	 * @return the list of type definitions
 	 */
 	public TypeDefinitionList getTypesChildren(CallContext context, String typeId, boolean includePropertyDefinitions,
 			BigInteger maxItems, BigInteger skipCount) {
@@ -393,7 +414,12 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS getTypeDefinition.
+	 * CMIS getTypeDefinition
+	 * 
+	 * @param context call context
+	 * @param typeId identifier of the type
+	 * 
+	 * @return the type definition
 	 */
 	public TypeDefinition getTypeDefinition(CallContext context, String typeId) {
 		debug("getTypeDefinition " + typeId);
@@ -407,7 +433,15 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS getTypesDescendants.
+	 * CMIS getTypesDescendants
+	 * 
+	 * @param context the call context
+	 * @param typeId identifier of the type
+	 * @param depth a depth specification
+	 * @param includePropertyDefinitions if property definitions must be
+	 *        included
+	 * 
+	 * @return the list of type definitions
 	 */
 	public List<TypeDefinitionContainer> getTypesDescendants(CallContext context, String typeId, BigInteger depth,
 			Boolean includePropertyDefinitions) {
@@ -429,7 +463,7 @@ public class LDRepository {
 			if (doc == null)
 				throw new CmisObjectNotFoundException("Document '" + sourceId + "' is unknown!");
 
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.STORED.toString());
 			transaction.setUser(getSessionUser());
@@ -444,7 +478,16 @@ public class LDRepository {
 	}
 
 	/**
-	 * Create dispatch for AtomPub.
+	 * Create dispatch for AtomPub
+	 * 
+	 * @param context call context
+	 * @param properties the properties
+	 * @param folderId identifier of the parent folder
+	 * @param contentStream stream of the document to create
+	 * @param versioningState state of the version
+	 * @param objectInfos informations
+	 * 
+	 * @return the newly created object
 	 */
 	public ObjectData create(CallContext context, Properties properties, String folderId, ContentStream contentStream,
 			VersioningState versioningState, ObjectInfoHandler objectInfos) {
@@ -454,9 +497,8 @@ public class LDRepository {
 		String typeId = getTypeId(properties);
 
 		TypeDefinition type = types.getType(typeId);
-		if (type == null) {
+		if (type == null)
 			throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
-		}
 
 		String objectId = null;
 		if (type.getBaseTypeId() == BaseTypeId.CMIS_DOCUMENT) {
@@ -471,7 +513,15 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS createDocument.
+	 * CMIS createDocument
+	 * 
+	 * @param context call context
+	 * @param properties the folder's properties
+	 * @param folderId identifier of the parent folder
+	 * @param contentStream binary content of the file to create
+	 * @param versioningState state of the version
+	 * 
+	 * @return the new document's identifier
 	 */
 	public String createDocument(CallContext context, Properties properties, String folderId,
 			ContentStream contentStream, VersioningState versioningState) {
@@ -483,9 +533,8 @@ public class LDRepository {
 		try {
 
 			// check properties
-			if ((properties == null) || (properties.getProperties() == null)) {
+			if ((properties == null) || (properties.getProperties() == null))
 				throw new CmisInvalidArgumentException("Properties must be set!");
-			}
 
 			// // check versioning state
 			// if (versioningState != null && VersioningState.NONE !=
@@ -496,17 +545,15 @@ public class LDRepository {
 			// check type
 			String typeId = getTypeId(properties);
 			TypeDefinition type = types.getType(typeId);
-			if (type == null) {
+			if (type == null)
 				throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
-			}
 
 			User user = getSessionUser();
 
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
-			if (name == null) {
+			if (name == null)
 				throw new CmisNameConstraintViolationException("Name is not valid!");
-			}
 
 			String fileName = getStringProperty(properties, PropertyIds.CONTENT_STREAM_FILE_NAME);
 			if (fileName == null)
@@ -516,15 +563,13 @@ public class LDRepository {
 				if (name.lastIndexOf('.') > 0)
 					name = fileName.substring(0, name.lastIndexOf('.'));
 			}
-			if (!isValidName(fileName)) {
+			if (!isValidName(fileName))
 				throw new CmisNameConstraintViolationException("File name is not valid!");
-			}
 
 			// get parent Folder
 			Folder parent = getFolder(folderId);
-			if (parent == null) {
+			if (parent == null)
 				throw new CmisObjectNotFoundException("Parent is not a folder!");
-			}
 
 			Document document = new Document();
 			updateDocumentMetadata(document, properties, true);
@@ -533,12 +578,12 @@ public class LDRepository {
 			document.setFolder(getFolder(folderId));
 			document.setLanguage(user.getLanguage());
 
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUser(user);
 			transaction.setSessionId(sid);
 
-			document = documentManager.create(new BufferedInputStream(contentStream.getStream(), BUFFER_SIZE),
-					document, transaction);
+			document = documentManager.create(new BufferedInputStream(contentStream.getStream(), BUFFER_SIZE), document,
+					transaction);
 
 			return getId(document);
 		} catch (Throwable t) {
@@ -547,7 +592,13 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS createFolder.
+	 * CMIS moveObject
+	 * 
+	 * @param context call context
+	 * @param properties the folder's properties
+	 * @param folderId identifier of the parent folder
+	 * 
+	 * @return the created folder's identifier
 	 */
 	public String createFolder(CallContext context, Properties properties, String folderId) {
 		debug("createFolder " + folderId);
@@ -557,28 +608,24 @@ public class LDRepository {
 		try {
 
 			// check properties
-			if ((properties == null) || (properties.getProperties() == null)) {
+			if ((properties == null) || (properties.getProperties() == null))
 				throw new CmisInvalidArgumentException("Properties must be set!");
-			}
 
 			// check type
 			String typeId = getTypeId(properties);
 			TypeDefinition type = types.getType(typeId);
-			if (type == null) {
+			if (type == null)
 				throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
-			}
 
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
-			if (!isValidName(name)) {
+			if (!isValidName(name))
 				throw new CmisNameConstraintViolationException("Name is not valid.");
-			}
 
 			// get parent File
 			Folder parent = getFolder(folderId);
-			if (parent == null) {
+			if (parent == null)
 				throw new CmisObjectNotFoundException("Parent is not a folder!");
-			}
 
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(getSessionUser());
@@ -596,7 +643,14 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS moveObject.
+	 * CMIS moveObject
+	 * 
+	 * @param context call context
+	 * @param objectId identifier of the file/folder
+	 * @param targetFolderId identifier of the target folder
+	 * @param objectInfos informations
+	 * 
+	 * @return the moved object
 	 */
 	public ObjectData moveObject(CallContext context, Holder<String> objectId, String targetFolderId,
 			ObjectInfoHandler objectInfos) {
@@ -610,18 +664,16 @@ public class LDRepository {
 			validatePermission(objectId.getValue(), context, Permission.DOWNLOAD);
 
 			Folder target = getFolder(targetFolderId);
-			if (target == null) {
+			if (target == null)
 				throw new CmisInvalidArgumentException(String.format("Target folder %s not found!", targetFolderId));
-			}
 
 			Object object = getObject(objectId.getValue());
-			if (object == null) {
+			if (object == null)
 				throw new CmisInvalidArgumentException(
 						String.format("Source object %s not found!", objectId.getValue()));
-			}
 
 			if (object instanceof Document) {
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setUser(getSessionUser());
 				transaction.setSessionId(sid);
 				try {
@@ -666,7 +718,7 @@ public class LDRepository {
 					throw new Exception("Unable to delete folder");
 			} else {
 				Document doc = (Document) object;
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setUser(user);
 				transaction.setEvent(FolderEvent.DELETED.toString());
 				transaction.setSessionId(sid);
@@ -699,18 +751,20 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS deleteObject.
+	 * CMIS deleteObject
+	 * 
+	 * @param context call context
+	 * @param objectId identifier of the file/folder
 	 */
 	public void deleteObject(CallContext context, String objectId) {
 		debug("deleteObject " + objectId);
-		validatePermission(objectId, context, Permission.WRITE);
+		validatePermission(objectId, context, Permission.DELETE);
 
 		try {
 			// get the file or folder
 			PersistentObject object = getObject(objectId);
-			if (object == null) {
+			if (object == null)
 				throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId));
-			}
 
 			if (object instanceof Folder) {
 				Folder folder = (Folder) object;
@@ -718,9 +772,8 @@ public class LDRepository {
 				List<Folder> folders = folderDao.findByParentId(folder.getId());
 
 				// check if it is a folder and if it is empty
-				if (!docs.isEmpty() || !folders.isEmpty()) {
+				if (!docs.isEmpty() || !folders.isEmpty())
 					throw new CmisConstraintException(String.format("Folder %s is not empty!", objectId));
-				}
 			}
 
 			if (!delete(object))
@@ -731,32 +784,28 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS deleteTree.
+	 * CMIS deleteTree
+	 * 
+	 * @param context call context
+	 * @param folderId identifier of the folder
+	 * @param continueOnFailure if the execution must continue even in presence
+	 *        of an issue
+	 * 
+	 * @return informations about the failure
 	 */
 	public FailedToDeleteData deleteTree(CallContext context, String folderId, Boolean continueOnFailure) {
 		debug("deleteTree " + folderId);
-		validatePermission(folderId, context, Permission.WRITE);
+		validatePermission(folderId, context, Permission.DELETE);
 
 		boolean cof = (continueOnFailure == null ? false : continueOnFailure.booleanValue());
 
 		// get the document or folder
 		PersistentObject object = getObject(folderId);
-		if (object == null) {
+		if (object == null)
 			throw new CmisObjectNotFoundException(String.format("Object %s not found!", folderId));
-		}
 
 		FailedToDeleteDataImpl result = new FailedToDeleteDataImpl();
 		result.setIds(new ArrayList<String>());
-
-		// if it is a folder, remove it recursively
-		// if (file.isDirectory()) {
-		// deleteFolder(file, cof, result);
-		// } else {
-		// getPropertiesFile(file).delete();
-		// if (!file.delete()) {
-		// result.getIds().add(getId(file));
-		// }
-		// }
 
 		try {
 			if (object instanceof Folder) {
@@ -764,7 +813,7 @@ public class LDRepository {
 				deleteFolder(folder, cof, result);
 			} else {
 				Document doc = (Document) object;
-				History transaction = new History();
+				DocumentHistory transaction = new DocumentHistory();
 				transaction.setUser(getSessionUser());
 				transaction.setEvent(FolderEvent.DELETED.toString());
 				transaction.setSessionId(sid);
@@ -780,7 +829,14 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS updateProperties.
+	 * CMIS updateProperties
+	 * 
+	 * @param context the call context
+	 * @param objectId identifier of the object
+	 * @param properties the properties
+	 * @param objectInfos informations
+	 * 
+	 * @return the updated object
 	 */
 	public ObjectData updateProperties(CallContext context, Holder<String> objectId, Properties properties,
 			ObjectInfoHandler objectInfos) {
@@ -807,9 +863,8 @@ public class LDRepository {
 
 		try {
 			// check id
-			if ((objectId == null)) {
+			if ((objectId == null))
 				throw new CmisInvalidArgumentException("Object Id must be set.");
-			}
 
 			ObjectInfoImpl info = new ObjectInfoImpl();
 			PersistentObject object = getObject(objectId);
@@ -824,22 +879,22 @@ public class LDRepository {
 	}
 
 	public void checkOut(Holder<String> objectId, Holder<Boolean> contentCopied) {
-		debug("checkOut " + objectId.getValue());
+		//debug("checkOut " + objectId.getValue());
+		log.debug("checkOut {}", objectId);
 		validatePermission(objectId.getValue(), null, Permission.WRITE);
 
 		try {
 			// get the document
 			PersistentObject object = getObject(objectId.getValue());
-			if (object == null) {
+			if (object == null)
 				throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId.getValue()));
-			}
-			if (!(object instanceof Document)) {
+
+			if (!(object instanceof Document))
 				throw new CmisObjectNotFoundException(
 						String.format("Object %s is not a Document!", objectId.getValue()));
-			}
 
 			// Create the document history event
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
 			transaction.setComment("");
@@ -861,12 +916,11 @@ public class LDRepository {
 		try {
 			// get the document
 			PersistentObject object = getObject(objectId);
-			if (object == null) {
+			if (object == null)
 				throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId));
-			}
-			if (!(object instanceof Document)) {
+
+			if (!(object instanceof Document))
 				throw new CmisObjectNotFoundException(String.format("Object %s is not a Document!", objectId));
-			}
 
 			Document doc = (Document) object;
 
@@ -875,7 +929,7 @@ public class LDRepository {
 				throw new CmisPermissionDeniedException("You can't change the checkout status on this object!");
 
 			// Create the document history event
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.UNLOCKED.toString());
 			transaction.setComment("");
@@ -889,8 +943,10 @@ public class LDRepository {
 		}
 	}
 
-	public void checkIn(Holder<String> objectId, Boolean major, ContentStream contentStream, String checkinComment) {
-		debug("checkin " + objectId);
+	public void checkIn(Holder<String> objectId, Boolean major, ContentStream contentStream, Properties properties,
+			String checkinComment) {
+		//debug("checkin " + objectId);
+		log.debug("checkin {}", objectId);
 		validatePermission(objectId.getValue(), null, Permission.WRITE);
 
 		try {
@@ -907,25 +963,39 @@ public class LDRepository {
 
 			if (doc.getStatus() == Document.DOC_CHECKED_OUT
 					&& ((getSessionUser().getId() != doc.getLockUserId()) && (!getSessionUser().isMemberOf("admin")))) {
-				throw new CmisPermissionDeniedException(String.format("You can't do a checkin on object %s!",
-						objectId.getValue()));
+				throw new CmisPermissionDeniedException(
+						String.format("You can't do a checkin on object %s!", objectId.getValue()));
 			}
 
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
 			transaction.setUser(getSessionUser());
 			transaction.setComment(checkinComment);
 
-			documentManager
-					.checkin(doc.getId(), contentStream.getStream(), doc.getFileName(), major, null, transaction);
+			if (properties != null) {
+				updateDocumentMetadata(doc, properties, false);
+			}
+
+			documentManager.checkin(doc.getId(), contentStream.getStream(), doc.getFileName(), major, null,
+					transaction);
 		} catch (Throwable t) {
 			catchError(t);
 		}
 	}
 
 	/**
-	 * CMIS getObject.
+	 * CMIS getObject
+	 * 
+	 * @param context the call context
+	 * @param objectId identifier of the file/foler
+	 * @param versionServicesId version specification
+	 * @param filter optional filter
+	 * @param includeAllowableActions if the allowable actions must be included
+	 * @param includeAcl if the ACL must be included
+	 * @param objectInfos informations
+	 * 
+	 * @return the file/folder
 	 */
 	public ObjectData getObject(CallContext context, String objectId, String versionServicesId, String filter,
 			Boolean includeAllowableActions, Boolean includeAcl, ObjectInfoHandler objectInfos) {
@@ -961,7 +1031,19 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS getObjectByPath.
+	 * CMIS getObjectByPath
+	 * 
+	 * @param context the call context
+	 * @param path path of the file/folder
+	 * @param filter the filter(optional)
+	 * @param includeAllowableActions if the allowable actions must be included
+	 * @param includeRelationships if the relationship must be included
+	 * @param renditionFilter the rendition filter(optional)
+	 * @param includePolicyIds if the policies must be included
+	 * @param includeAcl if the ACL must be included
+	 * @param extension the extension
+	 * 
+	 * @return the file/folder at the given path
 	 */
 	public ObjectData getObjectByPath(CallContext context, String path, String filter, Boolean includeAllowableActions,
 			IncludeRelationships includeRelationships, String renditionFilter, Boolean includePolicyIds,
@@ -978,7 +1060,7 @@ public class LDRepository {
 			debug("using normalized path " + fullPath);
 
 			// Try to check if the path is a folder
-			Folder folder = folderDao.findByPath(fullPath, getSessionUser().getTenantId());
+			Folder folder = folderDao.findByPathExtended(fullPath, getSessionUser().getTenantId());
 
 			ObjectData out = null;
 
@@ -988,7 +1070,7 @@ public class LDRepository {
 			} else {
 				// Not a folder, probably a file
 				String parentPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
-				folder = folderDao.findByPath(parentPath, getSessionUser().getTenantId());
+				folder = folderDao.findByPathExtended(parentPath, getSessionUser().getTenantId());
 				if (folder == null) {
 					out = null;
 				}
@@ -1008,9 +1090,9 @@ public class LDRepository {
 				}
 			}
 
-			if (out == null) {
+			if (out == null)
 				throw new CmisObjectNotFoundException("Object not found!");
-			} else
+			else
 				return out;
 		} catch (Throwable t) {
 			return (ObjectData) catchError(t);
@@ -1018,7 +1100,12 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS getAllowableActions.
+	 * CMIS getAllowableActions
+	 * 
+	 * @param context the call context
+	 * @param objectId identifier of the file/folder
+	 * 
+	 * @return the allowable actions
 	 */
 	public AllowableActions getAllowableActions(CallContext context, String objectId) {
 		debug("getAllowableActions");
@@ -1026,7 +1113,12 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS getACL.
+	 * CMIS getACL
+	 * 
+	 * @param context the call context
+	 * @param objectId identifier of the file/folder
+	 * 
+	 * @return the ACL
 	 */
 	public Acl getAcl(CallContext context, String objectId) {
 		debug("getAcl");
@@ -1036,7 +1128,14 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS getContentStream.
+	 * CMIS getContentStream
+	 * 
+	 * @param context the call context
+	 * @param objectId identifier of the file/folder
+	 * @param offset not supported, leave null
+	 * @param length not supported, leave null
+	 * 
+	 * @return the stream
 	 */
 	public ContentStream getContentStream(CallContext context, String objectId, BigInteger offset, BigInteger length) {
 		debug("getContentStream " + objectId + " offset:" + offset + " length:" + length);
@@ -1061,7 +1160,7 @@ public class LDRepository {
 			stream = new BufferedInputStream(is, BUFFER_SIZE);
 
 			// Create the document history event
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
 			transaction.setComment("");
@@ -1080,7 +1179,7 @@ public class LDRepository {
 			}
 
 			try {
-				HistoryDAO historyDAO = (HistoryDAO) Context.get().getBean(HistoryDAO.class);
+				DocumentHistoryDAO historyDAO = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 				historyDAO.store(transaction);
 			} catch (Throwable t) {
 				log.warn(t.getMessage(), t);
@@ -1099,25 +1198,6 @@ public class LDRepository {
 		}
 	}
 
-	// private byte[] getBytes(InputStream is) throws IOException {
-	//
-	// int len;
-	// int size = 1024;
-	// byte[] buf;
-	//
-	// if (is instanceof ByteArrayInputStream) {
-	// size = is.available();
-	// buf = new byte[size];
-	// len = is.read(buf, 0, size);
-	// } else {
-	// ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	// buf = new byte[size];
-	// while ((len = is.read(buf, 0, size)) != -1)
-	// bos.write(buf, 0, len);
-	// buf = bos.toByteArray();
-	// }
-	// return buf;
-	// }
 
 	private Object catchError(Throwable t) {
 		if (t instanceof CmisObjectNotFoundException)
@@ -1134,7 +1214,18 @@ public class LDRepository {
 	}
 
 	/**
-	 * CMIS getChildren.
+	 * CMIS getChildren
+	 * 
+	 * @param context the call context
+	 * @param folderId identifier of the folder
+	 * @param filter optional filter
+	 * @param includeAllowableActions if the allowable actions must be included
+	 * @param includePathSegment if the path segment
+	 * @param maxItems maximum number of items
+	 * @param skipCount skip the count of children
+	 * @param objectInfos informations
+	 * 
+	 * @return the list of children
 	 */
 	public ObjectInFolderList getChildren(CallContext context, String folderId, String filter,
 			Boolean includeAllowableActions, Boolean includePathSegment, BigInteger maxItems, BigInteger skipCount,
@@ -1240,35 +1331,44 @@ public class LDRepository {
 
 	private Folder getFolder(String folderId) {
 		PersistentObject object = getObject(folderId);
-		if (!(object instanceof Folder)) {
+		if (!(object instanceof Folder))
 			throw new CmisObjectNotFoundException("Not a folder!");
-		}
 		return (Folder) object;
 	}
 
 	private AbstractDocument getDocument(String documentId) {
 		PersistentObject object = getObject(documentId);
-		if (!(object instanceof AbstractDocument)) {
+		if (!(object instanceof AbstractDocument))
 			throw new CmisObjectNotFoundException("Not a document!");
-		}
 		return (AbstractDocument) object;
 	}
 
 	/**
-	 * CMIS getFolderParent.
+	 * CMIS getFolderParent
+	 * 
+	 * @param context the call context
+	 * @param folderId identifier of the folder
+	 * 
+	 * @return the parent object
 	 */
-	public ObjectData getFolderParent(CallContext context, String folderId, String filter, ObjectInfoHandler objectInfos) {
-		List<ObjectParentData> parents = getObjectParents(context, folderId, filter, false, false, objectInfos);
-
-		if (parents.size() == 0) {
-			throw new CmisInvalidArgumentException("The root folder has no parent!");
-		}
-
-		return parents.get(0).getObject();
+	public ObjectData getFolderParent(CallContext context, String folderId) {
+		Folder folder = getFolder(folderId);
+		if (folder != null)
+			folder = getFolder(ID_PREFIX_FLD + folder.getParentId());
+		return compileObjectType(context, folder, null, false, false, null);
 	}
 
 	/**
-	 * CMIS getObjectParents.
+	 * CMIS getObjectParents
+	 * 
+	 * @param context the call context
+	 * @param objectId identifier of the file/folder
+	 * @param filter an optional filter
+	 * @param includeAllowableActions if the allowable actions must be included
+	 * @param includeRelativePathSegment if the path segment must be included
+	 * @param objectInfos informations
+	 * 
+	 * @return list of parents
 	 */
 	@SuppressWarnings("unchecked")
 	public List<ObjectParentData> getObjectParents(CallContext context, String objectId, String filter,
@@ -1288,14 +1388,12 @@ public class LDRepository {
 			PersistentObject object = getObject(objectId);
 
 			// don't climb above the root folder
-			if (root.equals(object)) {
+			if (root.equals(object))
 				return Collections.emptyList();
-			}
 
 			// set object info of the the object
-			if (context.isObjectInfoRequired()) {
+			if (context.isObjectInfoRequired())
 				compileObjectType(context, object, null, false, false, objectInfos);
-			}
 
 			Folder parent;
 			if (object instanceof AbstractDocument)
@@ -1313,7 +1411,6 @@ public class LDRepository {
 					result.setRelativePathSegment(((Document) object).getFileName());
 				else
 					result.setRelativePathSegment(((Folder) object).getName());
-
 			}
 
 			return Collections.singletonList((ObjectParentData) result);
@@ -1432,7 +1529,12 @@ public class LDRepository {
 
 			// Execute the search
 			Search search = Search.get(opt);
-			List<Hit> hits = search.search();
+			List<Hit> hits = new ArrayList<Hit>();
+			try {
+				hits = search.search();
+			} catch (SearchException e1) {
+				log.error(e1.getMessage(), e1);
+			}
 
 			// Populate CMIS data structure
 			try {
@@ -1459,8 +1561,8 @@ public class LDRepository {
 			String filename = "%" + expr + "%";
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null,
-					getSessionUser().getId(), max);
+			List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, getSessionUser().getId(),
+					max);
 
 			for (int i = 0; i < docs.size(); i++) {
 				// Check permissions on the documents found
@@ -1504,9 +1606,14 @@ public class LDRepository {
 	}
 
 	/**
-	 * Removes a folder and its content.
+	 * Removes a folder and its content
 	 * 
-	 * @throws
+	 * @param folder the folder to delete
+	 * @param continueOnFailure if the execution must be finished even in
+	 *        presence of an error
+	 * @param ftd informations about the failure
+	 * 
+	 * @return if the execution has been done successfully
 	 */
 	private boolean deleteFolder(Folder folder, boolean continueOnFailure, FailedToDeleteDataImpl ftd) {
 		boolean success = true;
@@ -1546,15 +1653,23 @@ public class LDRepository {
 	 *         otherwise
 	 */
 	private static boolean isValidName(String name) {
-		if ((name == null) || (name.length() == 0) || (name.indexOf('/') != -1)) {
+		if ((name == null) || (name.length() == 0) || (name.indexOf('/') != -1))
 			return false;
-		}
 
 		return true;
 	}
 
 	/**
-	 * Compiles an object type object from a document or folder.
+	 * Compiles an object type object from a document or folder
+	 * 
+	 * @param context the call context
+	 * @param object the persistent object
+	 * @param filter optional filter
+	 * @param includeAllowableActions if the allowable actions must be included
+	 * @param includeAcl if the ACL must be included
+	 * @param objectInfos informations
+	 * 
+	 * @return the object
 	 */
 	private ObjectData compileObjectType(CallContext context, PersistentObject object, Set<String> filter,
 			boolean includeAllowableActions, boolean includeAcl, ObjectInfoHandler objectInfos) {
@@ -1583,12 +1698,17 @@ public class LDRepository {
 	}
 
 	/**
-	 * Gathers all base properties of a document or folder.
+	 * Gathers all base properties of a document or folder
+	 * 
+	 * @param object the persistent object(Folder or Document)
+	 * @param orgfilter list of optional filters
+	 * @param objectInfo informations
+	 * 
+	 * @return the compiled properties
 	 */
 	private Properties compileProperties(PersistentObject object, Set<String> orgfilter, ObjectInfoImpl objectInfo) {
-		if (object == null) {
+		if (object == null)
 			throw new IllegalArgumentException("Object must not be null!");
-		}
 
 		// copy filter
 		Set<String> filter = (orgfilter == null ? null : new HashSet<String>(orgfilter));
@@ -1733,9 +1853,6 @@ public class LDRepository {
 					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_LATEST_VERSION, true);
 					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION,
 							doc.getVersion() != null ? doc.getVersion().endsWith(".0") : true);
-					// addPropertyBoolean(result, typeId, filter,
-					// PropertyIds.IS_LATEST_MAJOR_VERSION,
-					// doc.getVersion().endsWith(".0"));
 				} else {
 					Version ver = (Version) doc;
 					AbstractDocument d = getDocument(ID_PREFIX_DOC + ver.getDocId());
@@ -1744,9 +1861,6 @@ public class LDRepository {
 							d.getVersion().equals(ver.getVersion()));
 					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION,
 							ver.getVersion().endsWith(".0"));
-					// addPropertyBoolean(result, typeId, filter,
-					// PropertyIds.IS_LATEST_MAJOR_VERSION,
-					// doc.getVersion().endsWith(".0"));
 				}
 				addPropertyString(result, typeId, filter, PropertyIds.VERSION_LABEL, doc.getVersion());
 				addPropertyId(result, typeId, filter, PropertyIds.VERSION_SERIES_ID, getId(doc));
@@ -1798,7 +1912,6 @@ public class LDRepository {
 					log.error(e.getMessage(), e);
 				}
 
-				
 				Template template = doc.getTemplate();
 				if (doc instanceof Version && ((Version) doc).getTemplateName() != null)
 					template = templateDao.findByName(((Version) doc).getTemplateName(), doc.getTenantId());
@@ -1827,8 +1940,8 @@ public class LDRepository {
 								stringValue = df.format(attribute.getDateValue());
 								break;
 							case Attribute.TYPE_DOUBLE:
-								stringValue = attribute.getDoubleValue() != null ? attribute.getDoubleValue()
-										.toString() : null;
+								stringValue = attribute.getDoubleValue() != null ? attribute.getDoubleValue().toString()
+										: null;
 								break;
 							case Attribute.TYPE_INT:
 								stringValue = Long.toString(attribute.getIntValue());
@@ -1890,6 +2003,8 @@ public class LDRepository {
 	 * @param create True if we are updating metadata for creating a new element
 	 */
 	private void updateDocumentMetadata(AbstractDocument doc, Properties properties, boolean create) {
+		log.debug("updateDocumentMetadata doc: {}", doc);
+		log.debug("updateDocumentMetadata properties: {}", properties);
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
 		// get the property definitions
@@ -1900,18 +2015,15 @@ public class LDRepository {
 			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
 
 			// do we know that property?
-			if (propType == null) {
+			if (propType == null)
 				throw new CmisConstraintException("Property '" + p.getId() + "' is unknown!");
-			}
 
 			// can it be set?
-			if ((propType.getUpdatability() == Updatability.READONLY)) {
+			if ((propType.getUpdatability() == Updatability.READONLY))
 				throw new CmisConstraintException("Property '" + p.getId() + "' is readonly!");
-			}
 
-			if (propType.getUpdatability() == Updatability.ONCREATE && !create) {
+			if (propType.getUpdatability() == Updatability.ONCREATE && !create)
 				throw new CmisConstraintException("Property '" + p.getId() + "' can only be set on create!");
-			}
 
 			if ((p.getId().equals(PropertyIds.CONTENT_STREAM_FILE_NAME) || p.getId().equals(PropertyIds.NAME))
 					&& StringUtils.isNotEmpty((String) p.getFirstValue())) {
@@ -1979,7 +2091,7 @@ public class LDRepository {
 					case Attribute.TYPE_BOOLEAN:
 						if (StringUtils.isNotEmpty(stringValue))
 							doc.setValue(attributeName,
-									new Boolean("1".equals(stringValue) || "true".equals(stringValue)));
+									Boolean.valueOf(("1".equals(stringValue) || "true".equals(stringValue))));
 						else
 							doc.setValue(attributeName, (Boolean) null);
 						break;
@@ -2027,9 +2139,8 @@ public class LDRepository {
 	private Properties update(PersistentObject object, Properties oldProperties, Properties properties) {
 		PropertiesImpl result = new PropertiesImpl();
 
-		if (properties == null) {
+		if (properties == null)
 			throw new CmisConstraintException("No properties!");
-		}
 
 		String typeId = object instanceof Document ? TypeManager.DOCUMENT_TYPE_ID : TypeManager.FOLDER_TYPE_ID;
 
@@ -2104,7 +2215,7 @@ public class LDRepository {
 		addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
 
 		if (object instanceof Document) {
-			History transaction = new History();
+			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.CHANGED.toString());
@@ -2114,14 +2225,19 @@ public class LDRepository {
 			try {
 				documentManager.update(actualDoc, doc, transaction);
 			} catch (Throwable e) {
-				throw new CmisStorageException("Storage error during update", e);
+				throw new CmisStorageException("Storage error during document update", e);
 			}
 		} else {
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);
 			transaction.setEvent(FolderEvent.CHANGED.toString());
-			folderDao.store(folder, transaction);
+
+			try {
+				folderDao.store(folder, transaction);
+			} catch (Throwable e) {
+				throw new CmisStorageException("Storage error during folder update", e);
+			}
 		}
 
 		return result;
@@ -2354,8 +2470,8 @@ public class LDRepository {
 					&& doc.getLockUserId().longValue() == getSessionUser().getId() && write);
 			addAction(aas, Action.CAN_CANCEL_CHECK_OUT,
 					doc.getStatus() != Document.DOC_UNLOCKED
-							&& (doc.getLockUserId().longValue() == getSessionUser().getId() || getSessionUser()
-									.isMemberOf("admin")));
+							&& (doc.getLockUserId().longValue() == getSessionUser().getId()
+									|| getSessionUser().isMemberOf("admin")));
 		} else {
 			addAction(aas, Action.CAN_GET_CONTENT_STREAM, true);
 		}
@@ -2373,7 +2489,11 @@ public class LDRepository {
 	}
 
 	/**
-	 * Compiles the ACL for a file or folder.
+	 * Compiles the ACL for a file or folder
+	 * 
+	 * @param object the persistent object
+	 * 
+	 * @return the ACL
 	 */
 	private Acl compileAcl(PersistentObject object) {
 		AccessControlListImpl result = new AccessControlListImpl();
@@ -2381,8 +2501,11 @@ public class LDRepository {
 
 		for (Map.Entry<String, Boolean> ue : userMap.entrySet()) {
 			// create principal
-			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl();
-			principal.setPrincipalId(ue.getKey());
+//			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl();
+//			principal.setPrincipalId(ue.getKey());
+			
+			// create principal
+			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl(ue.getKey());
 
 			// create ACE
 			AccessControlEntryImpl entry = new AccessControlEntryImpl();
@@ -2500,8 +2623,9 @@ public class LDRepository {
 		}
 	}
 
-	private boolean checkPermission(PersistentObject object, CallContext context, Permission permission) {
+	private boolean checkPermission(PersistentObject object, long userId, Permission permission) {
 		long id = root.getId();
+
 		if (object != null)
 			if (object instanceof Folder) {
 				id = object.getId();
@@ -2513,6 +2637,21 @@ public class LDRepository {
 				id = ((Document) object).getFolder().getId();
 			}
 
+		boolean enabled = folderDao.isReadEnabled(id, userId);
+
+		if (enabled && permission != null) {
+			if (object instanceof Folder && id == Folder.ROOTID) {
+				// The root is just readable
+				enabled = enabled && permission.equals(Permission.READ);
+			} else {
+				enabled = enabled && folderDao.isPermissionEnabled(permission, id, userId);
+			}
+		}
+
+		return enabled;
+	}
+
+	private boolean checkPermission(PersistentObject object, CallContext context, Permission permission) {
 		long userId = 0;
 		if (sid != null) {
 			if (SessionManager.get().getStatus(sid) != Session.STATUS_OPEN)
@@ -2524,25 +2663,14 @@ public class LDRepository {
 			User user = userDao.findByUsername(context.getUsername());
 			userId = user.getId();
 		}
-
-		boolean enabled = folderDao.isReadEnabled(id, userId);
-
-		if (enabled && permission != null) {
-			if (object instanceof Folder && id == Folder.ROOTID) {
-				// The root is just readable
-				enabled = enabled && permission.equals(Permission.READ);
-			} else {
-				enabled = enabled && folderDao.isPermissionEnabled(permission, id, userId);
-			}
-		}
-		return enabled;
+		return checkPermission(object, userId, permission);
 	}
 
 	private void validatePermission(String objectId, CallContext context, Permission permission)
 			throws CmisPermissionDeniedException {
 		if (!checkPermission(objectId != null ? getObject(objectId) : null, context, permission)) {
-			CmisPermissionDeniedException exception = new CmisPermissionDeniedException("Permission "
-					+ (permission != null ? permission.getName() : "") + " not granted on " + objectId);
+			CmisPermissionDeniedException exception = new CmisPermissionDeniedException(
+					"Permission " + (permission != null ? permission.getName() : "") + " not granted on " + objectId);
 			if (log.isDebugEnabled())
 				log.error(exception.getMessage(), exception);
 			throw exception;
@@ -2550,7 +2678,8 @@ public class LDRepository {
 	}
 
 	private void debug(String msg) {
-		debug(msg, null);
+		//debug(msg, null);
+		log.debug("<{}> {}", id, msg);
 	}
 
 	private void debug(String msg, Throwable t) {
@@ -2612,9 +2741,11 @@ public class LDRepository {
 		this.templateDao = templateDao;
 	}
 
-	public ObjectList getContentChanges(Holder<String> changeLogToken, int max) throws CmisPermissionDeniedException {
+	public ObjectList getContentChangesXXXX(Holder<String> changeLogToken, int max) throws CmisPermissionDeniedException {
+		
 		if (changeLogToken == null)
 			throw new CmisInvalidArgumentException("Missing change log token holder");
+		
 		long minDate;
 
 		try {
@@ -2629,14 +2760,21 @@ public class LDRepository {
 		query.append("','");
 		query.append(DocumentEvent.CHECKEDIN);
 		query.append("','");
-		query.append(DocumentEvent.CHANGED);
-		query.append("','");
+//		query.append(DocumentEvent.CHANGED);
+//		query.append("','");
 		query.append(DocumentEvent.RENAMED);
 		query.append("','");
 		query.append(DocumentEvent.DELETED);
 		query.append("')");
-		List<History> entries = historyDao.findByWhere(query.toString(), new Object[] { getRoot().getTenantId(),
-				new Date(minDate) }, "order by _entity.date", max);
+
+		List<DocumentHistory> entries = new ArrayList<DocumentHistory>();
+
+		try {
+			entries = historyDao.findByWhere(query.toString(),
+					new Object[] { getRoot().getTenantId(), new Date(minDate) }, "order by _entity.date", max);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		ObjectListImpl ol = new ObjectListImpl();
 		boolean hasMoreItems = entries.size() > max;
@@ -2646,9 +2784,10 @@ public class LDRepository {
 
 		List<ObjectData> ods = new ArrayList<ObjectData>(entries.size());
 		Date date = null;
-		for (History logEntry : entries) {
+		for (DocumentHistory logEntry : entries) {
 			ObjectDataImpl od = new ObjectDataImpl();
 			ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
+			
 			// change type
 			String eventId = logEntry.getEvent();
 			ChangeType changeType;
@@ -2664,34 +2803,230 @@ public class LDRepository {
 				continue;
 			}
 			cei.setChangeType(changeType);
+			
 			// change time
 			GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
 			date = logEntry.getDate();
 			changeTime.setTime(date);
 			cei.setChangeTime(changeTime);
 			od.setChangeEventInfo(cei);
+			
 			// properties: id, doc type
 			PropertiesImpl properties = new PropertiesImpl();
 			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, ID_PREFIX_DOC + logEntry.getDocId()));
-			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, ObjectType.DOCUMENT_BASETYPE_ID));
+			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value()));
 			od.setProperties(properties);
 			ods.add(od);
 		}
+
 		ol.setObjects(ods);
 		ol.setNumItems(BigInteger.valueOf(-1));
-		// BigInteger.valueOf(ods.size()));
-		// BigInteger.valueOf(-1));
+
 		String latestChangeLogToken = date == null ? null : String.valueOf(date.getTime());
 		changeLogToken.setValue(latestChangeLogToken);
 
 		return ol;
 	}
+	
+	public ObjectList getContentChanges(Holder<String> changeLogToken, int max) throws CmisPermissionDeniedException {
+		
+		log.debug("getContentChanges {}", changeLogToken.getValue());
+		
+		if (changeLogToken == null) 
+			throw new CmisInvalidArgumentException("Missing change log token holder");
+		
+		long minDate;
+
+		try {
+			minDate = Long.parseLong(changeLogToken.getValue());
+		} catch (NumberFormatException e) {
+			throw new CmisInvalidArgumentException("Invalid change log token");
+		}
+		
+		ObjectListImpl ol = new ObjectListImpl();
+		
+		List<ObjectData> odsDocs = getDocumentLastChanges(minDate, max);
+		List<ObjectData> odsFolders = getFolderLastChanges(minDate, max);
+		
+		//put together the 2 lists
+		List<ObjectData> complex = new ArrayList<ObjectData>();
+		complex.addAll(odsDocs);
+		complex.addAll(odsFolders);
+		
+//	    log.debug("Before sort");
+//	    for (ObjectData objectData : complex) {
+//	    	log.debug("ChangeTime {}", objectData.getChangeEventInfo().getChangeTime().getTime());
+//		}		
+		
+		// sort the content of list complex by date
+		Collections.sort(complex, new Comparator<ObjectData>() {
+			public int compare(ObjectData o1, ObjectData o2) {
+				return o1.getChangeEventInfo().getChangeTime().getTime()
+						.compareTo(o2.getChangeEventInfo().getChangeTime().getTime());
+			}
+		});
+		
+//	    log.debug("After sort");
+//	    for (ObjectData objectData : complex) {
+//	    	log.debug("ChangeTime {} {} {} {}", objectData.getChangeEventInfo().getChangeType(), objectData.getId() ,objectData.getChangeEventInfo().getChangeTime().getTime(), objectData.getChangeEventInfo().getChangeTime().getTime().getTime());
+//		}
+	    
+	    boolean hasMoreItems = complex.size() > max;
+        if (hasMoreItems) {
+        	complex = complex.subList(0, max);
+        }
+
+		ol.setObjects(complex);
+		
+		Date date = null;
+		if (complex.size() > 0) {
+			//ol.setNumItems(BigInteger.valueOf(complex.size()));
+			ol.setNumItems(BigInteger.valueOf(-1));
+			//ol.setHasMoreItems(true);
+			ol.setHasMoreItems(Boolean.valueOf(hasMoreItems));
+			date = ((ObjectData)complex.get(complex.size() -1)).getChangeEventInfo().getChangeTime().getTime();
+// 			log.debug("date {}", date);
+// 			log.debug("date.getTime {}", date.getTime());
+		} else {
+			ol.setHasMoreItems(Boolean.valueOf(false));
+			ol.setNumItems(BigInteger.ZERO);
+		}
+
+		String latestChangeLogToken = date == null ? null : String.valueOf(date.getTime());
+		log.debug("latestChangeLogToken {}", latestChangeLogToken);
+		changeLogToken.setValue(latestChangeLogToken);
+
+		return ol;
+	}
+	
+	public List<ObjectData> getDocumentLastChanges(long minDate, int max) {
+		
+		StringBuffer query = new StringBuffer(" _entity.tenantId=?1 and _entity.date >= ?2 ");
+		query.append(" and _entity.event in ('");
+		query.append(DocumentEvent.STORED);
+		query.append("','");
+		query.append(DocumentEvent.CHECKEDIN);
+		query.append("','");
+		query.append(DocumentEvent.MOVED);
+		query.append("','");		
+		query.append(DocumentEvent.RENAMED);
+		query.append("','");
+		query.append(DocumentEvent.DELETED);
+		query.append("')");
+
+		List<DocumentHistory> entries = new ArrayList<DocumentHistory>();
+
+		try {
+			entries = historyDao.findByWhere(query.toString(),
+					new Object[] { getRoot().getTenantId(), new Date(minDate) }, "order by _entity.date", max);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		List<ObjectData> ods = new ArrayList<ObjectData>(entries.size());
+		Date date = null;
+		for (DocumentHistory logEntry : entries) {
+			ObjectDataImpl od = new ObjectDataImpl();
+			ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
+			
+			// change type
+			String eventId = logEntry.getEvent();
+			ChangeType changeType;
+			if (DocumentEvent.STORED.toString().equals(eventId)) {
+				changeType = ChangeType.CREATED;
+			} else if (DocumentEvent.CHECKEDIN.toString().equals(eventId)
+					|| DocumentEvent.RENAMED.toString().equals(eventId)
+					|| DocumentEvent.MOVED.toString().equals(eventId)) {
+				changeType = ChangeType.UPDATED;
+			} else if (DocumentEvent.DELETED.toString().equals(eventId)) {
+				changeType = ChangeType.DELETED;
+			} else {
+				continue;
+			}
+			cei.setChangeType(changeType);
+			
+			// change time
+			GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
+			date = logEntry.getDate();
+			changeTime.setTime(date);
+			cei.setChangeTime(changeTime);
+			od.setChangeEventInfo(cei);
+			
+			// properties: id, doc type
+			PropertiesImpl properties = new PropertiesImpl();
+			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, ID_PREFIX_DOC + logEntry.getDocId()));
+			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value()));
+			od.setProperties(properties);
+			ods.add(od);
+		}
+		return ods;
+	}
+	
+	
+	public List<ObjectData> getFolderLastChanges(long minDate, int max) {
+		
+		StringBuffer query = new StringBuffer(" _entity.tenantId=?1 and _entity.date >= ?2 ");
+		query.append(" and _entity.event in ('");
+		query.append(FolderEvent.CREATED);
+		query.append("','");
+		query.append(FolderEvent.RENAMED);
+		query.append("','");
+		query.append(FolderEvent.MOVED);
+		query.append("','");		
+		query.append(FolderEvent.DELETED);
+		query.append("')");
+
+		List<FolderHistory> entries = new ArrayList<FolderHistory>();
+
+		try {
+			entries = folderHistoryDao.findByWhere(query.toString(),
+					new Object[] { getRoot().getTenantId(), new Date(minDate) }, "order by _entity.date", max);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		List<ObjectData> ods = new ArrayList<ObjectData>(entries.size());
+		Date date = null;
+		for (FolderHistory logEntry : entries) {
+			ObjectDataImpl od = new ObjectDataImpl();
+			ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
+			
+			// change type
+			String eventId = logEntry.getEvent();
+			ChangeType changeType;
+			if (FolderEvent.CREATED.toString().equals(eventId)) {
+				changeType = ChangeType.CREATED;
+			} else if (FolderEvent.RENAMED.toString().equals(eventId) || FolderEvent.MOVED.toString().equals(eventId) ) {
+				changeType = ChangeType.UPDATED;
+			} else if (FolderEvent.DELETED.toString().equals(eventId)) {
+				changeType = ChangeType.DELETED;
+			} else {
+				continue;
+			}
+			cei.setChangeType(changeType);
+			
+			// change time
+			GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
+			date = logEntry.getDate();
+			changeTime.setTime(date);
+			cei.setChangeTime(changeTime);
+			od.setChangeEventInfo(cei);
+			
+			// properties: id, doc type
+			PropertiesImpl properties = new PropertiesImpl();
+			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, ID_PREFIX_FLD + logEntry.getFolderId()));
+			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_FOLDER.value()));
+			od.setProperties(properties);
+			ods.add(od);
+		}
+		return ods;
+	}	
 
 	public Folder getRoot() {
 		return root;
 	}
 
-	public void setHistoryDao(HistoryDAO historyDao) {
+	public void setHistoryDao(DocumentHistoryDAO historyDao) {
 		this.historyDao = historyDao;
 	}
 }

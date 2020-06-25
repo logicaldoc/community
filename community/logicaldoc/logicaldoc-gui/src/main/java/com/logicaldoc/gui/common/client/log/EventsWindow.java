@@ -4,14 +4,18 @@ import com.logicaldoc.gui.common.client.beans.GUIEvent;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SortDirection;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.events.DoubleClickEvent;
+import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -81,6 +85,20 @@ public class EventsWindow extends Window {
 		grid.setFields(date, severityLabel, detail);
 		grid.setCanResizeFields(true);
 		addItem(grid);
+		
+		
+		grid.addDoubleClickHandler(new DoubleClickHandler() {
+			
+			@Override
+			public void onDoubleClick(DoubleClickEvent event) {
+				LD.askForValue(I18N.message("detail"), I18N.message("detail"),
+						grid.getSelectedRecord().getAttributeAsString("detail"), new ValueCallback() {
+							@Override
+							public void execute(final String value) {
+							}
+						});	
+			}
+		});
 	}
 
 	public void addEvent(GUIEvent event) {

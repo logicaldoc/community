@@ -20,11 +20,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
-import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
@@ -65,7 +61,7 @@ public class CertificateDialog extends Window {
 
 		layout = new VLayout();
 		layout.setWidth100();
-		layout.setHeight(40);
+		layout.setHeight100();
 
 		DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
@@ -74,33 +70,10 @@ public class CertificateDialog extends Window {
 		form.setNumCols(2);
 		form.setMinWidth(450);
 
-		
-		
-		TextItem password = ItemFactory.newPasswordItem("password", "password", null);
-		password.setRequired(true);
-		password.setWrapTitle(false);
-		LengthRangeValidator minSizeValidator = new LengthRangeValidator();
-		minSizeValidator.setMin(6);
-		password.setValidators(minSizeValidator);
-
-		PasswordItem passwordAgain = ItemFactory.newPasswordItem("passwordagain", "passwordagain", null);
-		passwordAgain.setRequired(true);
-		passwordAgain.setWrapTitle(false);
-		MatchesFieldValidator matchValidator = new MatchesFieldValidator();
-		matchValidator.setOtherField("passwordagain");
-		matchValidator.setErrorMessage(I18N.message("passwordnotmatch"));
-		password.setValidators(minSizeValidator, matchValidator);
-
-		StaticTextItem details = ItemFactory.newStaticTextItem("details", "details", Session.get().getUser()
-				.getCertDN()
+		StaticTextItem details = ItemFactory.newStaticTextItem("details", "details", Session.get().getUser().getCertDN()
 				+ " " + I18N.message("validtill") + ": " + I18N.formatDate(Session.get().getUser().getCertExpire()));
 		details.setColSpan(2);
 		details.setWrap(true);
-
-		StaticTextItem hint = ItemFactory.newStaticTextItem("hint", "hint", I18N.message("typepasscert"));
-		hint.setWrap(false);
-		hint.setColSpan(2);
-		hint.setShowTitle(false);
 
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(5);
@@ -113,33 +86,32 @@ public class CertificateDialog extends Window {
 			public void onClick(ClickEvent event) {
 				if (vm.validate()) {
 					ContactingServer.get().show();
-					SignService.Instance.get().generateNewCertificate(vm.getValueAsString("password"),
-							new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
-									Log.serverError(caught);
-								}
+					SignService.Instance.get().generateNewCertificate(new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							ContactingServer.get().hide();
+							Log.serverError(caught);
+						}
 
-								@Override
-								public void onSuccess(Void arg) {
-									ContactingServer.get().hide();
-									SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
-											new AsyncCallback<GUIUser>() {
+						@Override
+						public void onSuccess(Void arg) {
+							ContactingServer.get().hide();
+							SecurityService.Instance.get().getUser(Session.get().getUser().getId(),
+									new AsyncCallback<GUIUser>() {
 
-												@Override
-												public void onFailure(Throwable caught) {
-													Log.serverError(caught);
-												}
+										@Override
+										public void onFailure(Throwable caught) {
+											Log.serverError(caught);
+										}
 
-												@Override
-												public void onSuccess(GUIUser user) {
-													Session.get().setUser(user);
-													refresh();
-												}
-											});
-								}
-							});
+										@Override
+										public void onSuccess(GUIUser user) {
+											Session.get().setUser(user);
+											refresh();
+										}
+									});
+						}
+					});
 				}
 			}
 		});
@@ -179,8 +151,6 @@ public class CertificateDialog extends Window {
 		});
 
 		if (crtAlreadyGenerated) {
-			password.setRequired(false);
-			passwordAgain.setRequired(false);
 			form.setItems(details);
 			layout.addMember(form);
 			buttons.setMembers(delete);
@@ -189,8 +159,6 @@ public class CertificateDialog extends Window {
 			label.setHeight(50);
 			label.setWrap(false);
 			layout.addMember(label);
-			form.setItems(hint, password, passwordAgain);
-			layout.addMember(form);
 			buttons.setMembers(createNew);
 		}
 		layout.addMember(buttons);

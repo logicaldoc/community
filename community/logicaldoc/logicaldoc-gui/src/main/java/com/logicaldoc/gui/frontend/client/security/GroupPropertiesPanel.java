@@ -58,9 +58,10 @@ public class GroupPropertiesPanel extends HLayout {
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(group.getId()));
 
 		TextItem name = ItemFactory.newSimpleTextItem("name", "name", group.getName());
-		if(readonly || group.getId() != 0){
-			//In case of already existing group we do not need to enforce any validation
-			name=ItemFactory.newTextItem("name", "name", group.getName());
+		if (readonly || group.getId() != 0) {
+			// In case of already existing group we do not need to enforce any
+			// validation
+			name = ItemFactory.newTextItem("name", "name", group.getName());
 			name.setDisabled(true);
 		}
 		name.setRequired(true);
@@ -76,15 +77,9 @@ public class GroupPropertiesPanel extends HLayout {
 		inherit.setVisible(!readonly);
 		if (!readonly)
 			inherit.addChangedHandler(changedHandler);
-		if (group.getId() == 0) {
-			// In the beginning we need to specify an inherit group
-			inherit.setRequired(true);
-			inherit.setValue("3");
-		}
 
 		form1.setItems(id, name, description, inherit);
 		addMember(form1);
-
 	}
 
 	@SuppressWarnings("unchecked")

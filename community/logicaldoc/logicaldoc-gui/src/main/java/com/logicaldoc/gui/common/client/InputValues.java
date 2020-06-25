@@ -17,7 +17,7 @@ public class InputValues {
 	private static Map<String, List<Object>> savedInputs = new HashMap<String, List<Object>>();
 
 	public static void saveInput(String name, Object value) {
-		if (value == null)
+		if (value == null || !Session.get().getConfigAsBoolean("gui.saveinputs"))
 			return;
 
 		List<Object> inputs = savedInputs.get(name);

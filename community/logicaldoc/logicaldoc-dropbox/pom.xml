@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.0.0</version>
+		<version>8.4.2</version>
 	</parent>
 	<artifactId>logicaldoc-dropbox</artifactId>
 	<name>logicaldoc-dropbox</name>
@@ -82,10 +82,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+			<scope>test</scope>
+		</dependency>		
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>

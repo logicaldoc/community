@@ -60,7 +60,7 @@ public class Language implements Comparable<Language> {
 
 	/**
 	 * Populates the field stopWords reading the resource
-	 * /stopwords/stopwords_<locale>.txt
+	 * /stopwords/stopwords_<b>locale</b>.txt
 	 */
 	void loadStopwords() {
 		try {

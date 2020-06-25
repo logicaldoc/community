@@ -87,7 +87,7 @@ public class SubscriptionDialog extends Window {
 		notifyon.setValue((events == null || events.length == 0) ? "all" : "selection");
 
 		final SelectItem event;
-		event = ItemFactory.newEventsSelector("event", I18N.message("event"), true, false, false);
+		event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, false, false);
 		event.setEndRow(true);
 		event.setDisabled(events == null || events.length == 0);
 		if (events != null)
@@ -120,7 +120,7 @@ public class SubscriptionDialog extends Window {
 				} else
 					eventsStr = null;
 
-				AuditService.Instance.get().update(selectedIds, option.equals("current"), events,
+				AuditService.Instance.get().update(selectedIds, "current".equals(option), events,
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -152,6 +152,9 @@ public class SubscriptionDialog extends Window {
 
 	/**
 	 * Constructor used to subscribe a user to folders or documents
+	 * 
+	 * @param folderId identifier of the folder
+	 * @param docIds identifier of the documents
 	 */
 	public SubscriptionDialog(final Long folderId, final long[] docIds) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -195,9 +198,9 @@ public class SubscriptionDialog extends Window {
 
 		final SelectItem event;
 		if (folderId != null)
-			event = ItemFactory.newEventsSelector("event", I18N.message("event"), true, false, false);
+			event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, false, false);
 		else
-			event = ItemFactory.newEventsSelector("event", I18N.message("event"), false, false, false);
+			event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, false, false, false);
 		event.setEndRow(true);
 		event.setDisabled(true);
 

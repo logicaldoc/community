@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.TemplateService
+path: B89B9264A3C38B4C12B520B1300ABD5E.gwt.rpc

@@ -22,7 +22,7 @@ public class GUISession implements Serializable {
 
 	private GUIExternalCall externalCall;
 
-	private String incomingMessage;
+	private String welcomeMessage;
 
 	public GUIUser getUser() {
 		return user;
@@ -56,12 +56,12 @@ public class GUISession implements Serializable {
 		this.info = info;
 	}
 
-	public String getIncomingMessage() {
-		return incomingMessage;
+	public String getWelcomeMessage() {
+		return welcomeMessage;
 	}
 
-	public void setIncomingMessage(String incomingMessage) {
-		this.incomingMessage = incomingMessage;
+	public void setWelcomeMessage(String welcomeMessage) {
+		this.welcomeMessage = welcomeMessage;
 	}
 
 	public GUIExternalCall getExternalCall() {

@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.logicaldoc</groupId>
         <artifactId>logicaldoc</artifactId>
-        <version>8.0.0</version>
+        <version>8.4.1</version>
     </parent>
     <artifactId>logicaldoc-webservicedoc</artifactId>
     <name>logicaldoc-webservicedoc</name>
@@ -22,13 +22,6 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-<!--         <dependency> -->
-<!--             <groupId>com.logicaldoc</groupId> -->
-<!--             <artifactId>logicaldoc-webservice</artifactId> -->
-<!--             <version>${project.version}</version> -->
-<!--             <scope>provided</scope> -->
-<!--         </dependency>         -->
-
         <dependency>
             <groupId>com.logicaldoc</groupId>
             <artifactId>logicaldoc-webservice</artifactId>
@@ -89,6 +82,12 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>provided</scope>
         </dependency>
+        
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<scope>provided</scope>
+		</dependency>        
 
     
         <!-- Swagger dependencies -->
@@ -177,15 +176,15 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.3</version>
                 <configuration>
                     <descriptors>
-                        <descriptor> src/main/assembly/assemblyplugin.xml 
-                        </descriptor>
+                        <descriptor>src/main/assembly/assemblyplugin.xml</descriptor>
                     </descriptors>
                 </configuration>
                 <executions>
@@ -193,7 +192,7 @@
                         <id>make-assembly</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>attached</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>

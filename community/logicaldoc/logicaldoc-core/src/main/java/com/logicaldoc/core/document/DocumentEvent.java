@@ -21,6 +21,7 @@ public enum DocumentEvent {
 	DELETED("event.deleted"),
 	SENT("event.sent"),
 	BARCODED("event.barcoded"),
+	ZONALOCRD("event.zonalocrd"),
 	WORKFLOWSTATUS("event.workflowstatus"),
 	WORKFLOWAPPENDED("event.workflowappended"),
 	SHORTCUT_STORED("event.shortcut.stored"),
@@ -41,8 +42,11 @@ public enum DocumentEvent {
 	PASSWORD_UNPROTECTED("event.password.unprotected"),
 	RATING_NEW("event.rating.new"),
 	CONVERTED("event.converted"),
-	VERSION_DELETED("event.version.deleted");
-
+	VERSION_DELETED("event.version.deleted"),
+	VERSION_REPLACED("event.version.replaced"),
+	COMPARED("event.compared"),
+	COPYED("event.copyed");
+	
     private String event;
 
 	DocumentEvent(String event) {

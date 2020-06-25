@@ -3,16 +3,17 @@ package com.logicaldoc.core.security.dao;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateMenuDAOTest</code>
@@ -35,7 +36,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		Menu menu = new Menu();
 		menu.setName("text");
 		menu.setParentId(2);
@@ -70,7 +71,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		Assert.assertTrue(dao.delete(99));
 		Menu menu = dao.findById(99);
 		Assert.assertNull(menu);
@@ -155,7 +156,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 	public void testFindByParentId() {
 		List<Menu> menus = dao.findByParentId(2);
 		Assert.assertNotNull(menus);
-		Assert.assertEquals(29, menus.size());
+		Assert.assertEquals(30, menus.size());
 
 		// Try with unexisting parent
 		menus = dao.findByParentId(999);
@@ -185,7 +186,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 	public void testFindMenuIdByUserId() {
 		Collection<Long> ids = dao.findMenuIdByUserId(4);
 		Assert.assertNotNull(ids);
-		Assert.assertEquals(11, ids.size());
+		Assert.assertEquals(18, ids.size());
 		Assert.assertTrue(ids.contains(104L));
 		Assert.assertTrue(ids.contains(1200L));
 
@@ -253,7 +254,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testRestore() {
+	public void testRestore() throws PersistenceException {
 		Menu menu = dao.findById(1000);
 		Assert.assertNull(menu);
 		menu = dao.findById(1100);
@@ -323,7 +324,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 		Menu menu = dao.findById(1041);
 		Assert.assertTrue(null == menu.getSecurityRef());
 
-		Assert.assertTrue(dao.applyRithtToTree(101));
+		Assert.assertTrue(dao.applyRightToTree(101));
 		menu = dao.findById(104);
 		Assert.assertTrue(101 == menu.getSecurityRef());
 		menu = dao.findById(1041);

@@ -41,7 +41,8 @@
     <security:authentication-manager id="AuthenticationManager">
         <security:authentication-provider ref='LDAuthenticationProvider' />
     </security:authentication-manager>
-    <bean id="LDAnonymousLoginFilter" class="com.logicaldoc.core.security.spring.LDAnonymousLoginFilter" />
+    <bean id="AnonymousLoginFilter" class="com.logicaldoc.core.security.spring.AnonymousLoginFilter" />
+    <bean id="SessionIdFilter" class="com.logicaldoc.core.security.spring.SessionIdFilter" />
     <bean id="LDSecurityContextRepository"
         class="com.logicaldoc.core.security.spring.LDSecurityContextRepository" />
     <security:authentication-manager id="AdminAuthenticationManager">
@@ -89,6 +90,9 @@
             access="isAuthenticated()" />
         <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
     </security:http>
+    
+    <security:http pattern="/services/rest/auth/**" security="none" />
+    
     <security:http pattern="/services/rest/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
         access-decision-manager-ref="LDAccessDecisionManager"
@@ -101,8 +105,10 @@
         <!-- Protected areas -->
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
+           
         <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
     </security:http>
+    
     <security:http pattern="/webdav/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
         access-decision-manager-ref="LDAccessDecisionManager"
@@ -132,34 +138,6 @@
         <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
     </security:http>    
     <security:http pattern="/service/cmis/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
-    </security:http>
-    <security:http pattern="/doc_rss/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
-    </security:http>
-    <security:http pattern="/folder_rss/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
         access-decision-manager-ref="LDAccessDecisionManager"
         authentication-manager-ref="AuthenticationManager"
@@ -208,7 +186,12 @@
         authentication-manager-ref="AuthenticationManager"
         security-context-repository-ref="LDSecurityContextRepository">
         
-        <security:headers disabled="true" />
+        <security:headers>
+            <!-- security:header name="Content-Security-Policy" value="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src http://localhost:9080 'unsafe-inline' 'unsafe-eval'; frame-ancestors *; style-src * 'unsafe-inline';" / -->
+            <security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; object-src none; img-src * data: blob: 'unsafe-inline'; frame-src 'self' https://*.google.com https://*.zoho.com ; frame-ancestors *; style-src * 'unsafe-inline';" />
+            <security:frame-options policy="SAMEORIGIN"/>
+            <security:xss-protection block="true"/>
+        </security:headers> 
         <security:csrf disabled="true" />
         
         <!-- Protected areas -->
@@ -231,7 +214,9 @@
         <!-- Exclude the default session management -->
         <!-- security:session-management session-fixation-protection="none" / -->
         <!-- Some session-related custom filters -->
-        <security:custom-filter ref="LDAnonymousLoginFilter"
+        <security:custom-filter ref="SessionIdFilter"
+            before="PRE_AUTH_FILTER" />
+        <security:custom-filter ref="AnonymousLoginFilter"
             before="ANONYMOUS_FILTER" />
     </security:http>
 </beans>

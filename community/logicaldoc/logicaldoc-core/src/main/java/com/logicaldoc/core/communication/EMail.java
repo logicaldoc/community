@@ -12,6 +12,8 @@ import java.util.StringTokenizer;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import com.logicaldoc.core.folder.Folder;
+
 /**
  * @author Michael Scholz
  * @author Marco Meschieri - LogicalDOC
@@ -22,18 +24,25 @@ public class EMail extends Message {
 
 	private String username = "";
 
+	/**
+	 * Name of the folder inside the mail server
+	 */
 	private String folder = "";
 
-	// Refers to the original email id
+	/**
+	 * Refers to the original email id
+	 */
 	private String emailId = "";
 
-	// The e-mail account used to fetch this message
+	/**
+	 * The e-mail account used to fetch this message
+	 */
 	private long accountId;
 
 	private Map<Integer, EMailAttachment> attachments = new HashMap<Integer, EMailAttachment>();
 
 	private Recipient from;
-	
+
 	private Recipient replyTo;
 
 	private Set<Recipient> recipientsCC = new HashSet<Recipient>();
@@ -47,6 +56,18 @@ public class EMail extends Message {
 	private Set<String> images = new HashSet<String>();
 
 	private int attachmentsCount = 0;
+
+	private int signed = 0;
+
+	/**
+	 * Indicates if the image must be discarded by the elaboration
+	 */
+	private boolean skip = false;
+
+	/**
+	 * Folder where the document representing this email will be saved in
+	 */
+	private Folder targetFolder;
 
 	public EMail() {
 	}
@@ -152,18 +173,18 @@ public class EMail extends Message {
 	}
 
 	public void parseRecipients(String str) {
-		parse(str, recipients);
+		parseRecipients(str, recipients);
 	}
 
 	public void parseRecipientsCC(String str) {
-		parse(str, recipientsCC);
+		parseRecipients(str, recipientsCC);
 	}
 
 	public void parseRecipientsBCC(String str) {
-		parse(str, recipientsBCC);
+		parseRecipients(str, recipientsBCC);
 	}
 
-	private void parse(String str, Collection<Recipient> recipients) {
+	private void parseRecipients(String str, Collection<Recipient> recipients) {
 		StringTokenizer st = new StringTokenizer(str.trim().toLowerCase(), ", ;", false);
 		recipients.clear();
 		while (st.hasMoreTokens()) {
@@ -222,5 +243,33 @@ public class EMail extends Message {
 
 	public void setFrom(Recipient from) {
 		this.from = from;
+	}
+
+	public boolean isSigned() {
+		return signed == 1;
+	}
+
+	public int getSigned() {
+		return signed;
+	}
+
+	public void setSigned(int signed) {
+		this.signed = signed;
+	}
+
+	public boolean isSkip() {
+		return skip;
+	}
+
+	public void setSkip(boolean skip) {
+		this.skip = skip;
+	}
+
+	public Folder getTargetFolder() {
+		return targetFolder;
+	}
+
+	public void setTargetFolder(Folder targetFolder) {
+		this.targetFolder = targetFolder;
 	}
 }

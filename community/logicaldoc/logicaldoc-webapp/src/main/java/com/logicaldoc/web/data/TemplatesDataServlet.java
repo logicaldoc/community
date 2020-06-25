@@ -44,7 +44,7 @@ public class TemplatesDataServlet extends HttpServlet {
 
 			Integer type = null;
 			if (request.getParameter("type") != null)
-				type = new Integer(request.getParameter("type"));
+				type = Integer.parseInt(request.getParameter("type"));
 
 			List<Long> templateIds = new ArrayList<Long>();
 			if (StringUtils.isNotEmpty(folderId)) {

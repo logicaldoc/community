@@ -1,3 +1,33 @@
+insert into ld_attributeset
+			(ld_id, ld_lastmodified, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
+values (-1,CURRENT_TIMESTAMP,0,'default','default',1,0,1,1);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,0,0,'source', 'Source', 0, -1, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,0,1,'sourceAuthor', 'Author', 0, -1, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,0,2,'sourceId', 'Original ID', 0, -1, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,0,3,'sourceType', 'Type', 0, -1, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,0,4,'object', 'Object', 0, -1, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,0,5,'coverage', 'Coverage', 0, -1, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,0,6,'recipient', 'Recipient', 0, -1, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,3,7,'sourceDate', 'Date', 0, -1, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+values (-1,0,3,7,'multi', 'Multi', 0, -1, 0, 1);
+
+insert into ld_template
+			(ld_id, ld_lastmodified, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
+values (-1,CURRENT_TIMESTAMP,0,'default','default',0,0,1,1);
+
+insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
+select -1, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple from ld_attributeset_ext where ld_setid=-1;
+
+
 insert into ld_tenant(ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_recordversion)
 values     (2,CURRENT_TIMESTAMP,0,2,'tenant2','Tenant 2',0,1,1);
 
@@ -118,8 +148,8 @@ values     (10,'2008-10-22 00:00:00',0,1,'testGroup','Group for tests',0,1);
 
 insert into ld_template (ld_id, ld_lastmodified,ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid,ld_recordversion)
 values (1, '2008-11-07 00:00:00',0,'test1','test1_desc',0,0,1,1);
-insert into ld_template_ext (ld_templateid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor)
-values (1, 0, 0, 0, 'val1', 'attr1',0);
+insert into ld_template_ext (ld_templateid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple)
+values (1, 0, 0, 0, 'val1', 'attr1',0,0,0);
 insert into ld_template (ld_id, ld_lastmodified,ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid,ld_recordversion)
 values (2, '2008-11-07 00:00:00',0,'test2','test2_desc',0,0,1,1);
 
@@ -138,76 +168,77 @@ insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_t
 values (1201,CURRENT_TIMESTAMP,0,'ABC',1200,0,'2012-01-08 00:00:00','test description',0,1,1,5,0);
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templateid,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
 values (1202,CURRENT_TIMESTAMP,0,'xyz',1201,0,1,0,1,1,6,0);
-insert into ld_folder_ext (ld_folderid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor)
-values (1202, 0, 0, 0, 'test_val_1', 'val1',0);
+insert into ld_folder_ext (ld_folderid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple)
+values (1202, 0, 0, 0, 'test_val_1', 'val1',0,0,0);
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_deleteuserid,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
 values (1204,CURRENT_TIMESTAMP,1,'deleted',1201,0,0,3,1,1,7,0);
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
 values (1210,CURRENT_TIMESTAMP,0,'ölard',4,0,0,1,1,8,0);
 
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email)
-values (6,2,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email)
-values (6,3,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email)
-values (6,-3,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
+values (6,2,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
+values (6,3,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
+values (6,-3,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0);
 
 insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1200, 1, 'ftag1');
 insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1200, 1, 'ftag2');
 
 insert into ld_document
-           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_fileversion,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_digest)
-values     (1,6,'2008-10-22 00:00:00',0,0,'a','1.0','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'PDF',3,'en','pippo',1356,1,0,'',1,0,0,1,1,1,5,0,0,'xx');
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_fileversion,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_digest,ld_links,ld_ocrd)
+values     (1,6,'2008-10-22 00:00:00',0,0,'a','1.0','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'PDF',3,'en','pippo',1356,1,0,'',1,0,0,1,1,1,5,0,0,'xx',0,0);
 
 insert into ld_document
-           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_docref,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (2,6,'2008-10-22 00:00:00',0,0,'b','2.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'PDF',3,'en','pluto',122345,0,0,'',1,0,1,0,1,1,1,5,0,0);
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_docref,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (2,6,'2008-10-22 00:00:00',0,0,'b','2.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'PDF',3,'en','pluto',122345,0,0,'',1,0,1,0,1,1,1,5,0,0,0,0);
 
 insert into ld_document
-           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_digest)
-values     (3,6,'2010-04-02 00:00:00',0,0,'c','testDocV1','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'PDF',3,'en','pluto',122345,1,0,'',1,0,1,0,1,1,1,5,0,0,'xx');
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_fileversion,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_digest,ld_links,ld_ocrd)
+values     (3,6,'2010-04-02 00:00:00',0,0,'c','1.3','1.3','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'PDF',3,'en','pluto',122345,0,0,'',1,0,1,0,1,1,1,5,0,0,'xx',0,0);
 
 insert into ld_document
-           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (4,6,'2010-04-04 00:00:00',1,0,'d','testDocV2','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'TXT',3,'en','pippo',122345,1,0,'',1,0,1,0,1,1,1,5,0,0);
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (4,6,'2010-04-04 00:00:00',1,0,'d','testDocV2','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'TXT',3,'en','pippo',122345,1,0,'',1,0,1,0,1,1,1,5,0,0,0,0);
 
 insert into ld_document
-           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (5,8,'2010-04-01 00:00:00',1,0,'f','testDoc5','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'DOC',3,'en','paperino',122345,1,0,'',1,0,2,0,1,1,1,5,0,0);
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (5,8,'2010-04-01 00:00:00',1,0,'f','testDoc5','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'DOC',3,'en','paperino',122345,1,0,'',1,0,2,0,1,1,1,5,0,0,0,0);
 
 insert into ld_document
-           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (6,8,'2010-04-01 00:00:00',1,0,'g','testDoc6','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'TIFF',3,'en','topolino',122345,1,0,'',1,0,2,0,1,1,1,5,0,0);
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (6,8,'2010-04-01 00:00:00',1,0,'g','testDoc6','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'TIFF',3,'en','topolino',122345,1,0,'',1,0,2,0,1,1,1,5,0,0,0,0);
+
 
 insert into ld_ticket
-           (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion)
-values     (1,'2008-10-22 00:00:00',0,'1',1,1,0,'2011-01-01 00:00:00','2011-01-02 00:00:00',0,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion, ld_enabled)
+values     (1,'2008-10-22 00:00:00',0,'1',1,1,0,'2011-01-01 00:00:00','2011-01-02 00:00:00',0,1,1,1);
 
 insert into ld_ticket
-           (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion)
-values     (2,'2008-10-22 00:00:00',0,'2',2,3,0,'2011-01-01 00:00:00','2011-01-02 00:00:00',0,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion, ld_enabled)
+values     (2,'2008-10-22 00:00:00',0,'2',2,3,0,'2011-01-01 00:00:00','2011-01-02 00:00:00',0,1,1,1);
 
 insert into ld_ticket
-           (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion)
-values     (3,'2008-12-22 00:00:00',0,'3',1,3,0,'2011-01-01 00:00:00','2011-01-02 00:00:00',0,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion, ld_enabled)
+values     (3,'2008-12-22 00:00:00',0,'3',1,3,0,'2011-01-01 00:00:00','2011-01-02 00:00:00',0,1,1,1);
 
-insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (1,1,'testVer01','testVer01','testUser',1,'2006-12-19 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,22658,5,'',1,0,0,1,1,1,5,0,0);
+insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (1,1,'testVer01','testVer01','testUser',1,'2006-12-19 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,22658,5,'',1,0,0,1,1,1,5,0,0,0,0);
 
-insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (2,1,'testVer02','fileVer02','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0);
+insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (2,1,'testVer02','fileVer02','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0,0,0);
 
-insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (10,3,'1.0','1.0','testUser',1,'2006-12-19 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0);
+insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (10,3,'1.0','1.0','testUser',1,'2006-12-19 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0,0,0);
 
-insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (11,3,'1.1','1.0','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0);
+insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (11,3,'1.1','1.0','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0,0,0);
 
-insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (12,3,'1.2','1.2','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0);
+insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd)
+values     (12,3,'1.2','1.2','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0,0,0);
 
-insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature)
-values     (13,3,'1.3','1.3','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0);
+insert into ld_version(ld_id, ld_documentid, ld_version, ld_fileversion, ld_username, ld_userid, ld_versiondate, ld_comment, ld_lastmodified, ld_deleted, ld_immutable, ld_creation, ld_publisherid, ld_indexed, ld_signed, ld_status, ld_filesize, ld_folderid,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_filename,ld_links,ld_ocrd)
+values     (13,3,'1.3','1.3','testUser',1,'2006-12-20 00:00:00','testComment','2009-02-09 00:00:00',0,0,'2009-02-09 00:00:00',1,0,0,0,0,5,'',1,0,0,1,1,1,5,0,0,'pippo.pdf',0,0);
 
 
 insert into ld_tag(ld_docid, ld_tenantid, ld_tag)
@@ -295,8 +326,8 @@ values   (4,'2008-10-22 00:00:00',0,2,1,'',1,1);
 
 insert into ld_generic(ld_id, ld_lastmodified, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1, ld_integer2, ld_double1, ld_double2, ld_date1, ld_date2,ld_tenantid,ld_recordversion)
 values(1, '2008-11-19 00:00:00',0,'a','a1','str1','str2',0,1,1.5,1.6,'2008-11-20 00:00:00','2008-11-20 00:00:00',1,1);
-insert into ld_generic_ext(ld_genid, ld_mandatory, ld_type, ld_position, ld_stringvalue, ld_name, ld_editor)
-values(1, 0, 0, 0, 'val1','att1',0);
+insert into ld_generic_ext(ld_genid, ld_mandatory, ld_type, ld_position, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple)
+values(1, 0, 0, 0, 'val1','att1',0,0,0);
 insert into ld_generic(ld_id, ld_lastmodified, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1, ld_integer2, ld_double1, ld_double2, ld_date1, ld_date2,ld_tenantid,ld_recordversion)
 values(2, '2008-11-19 00:00:00',0,'a','a2','str1','str2',10,11,1.5,1.6,'2008-11-20 00:00:00','2008-11-20 00:00:00',1,1);
 insert into ld_generic(ld_id, ld_lastmodified, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1, ld_integer2, ld_double1, ld_double2, ld_date1, ld_date2,ld_tenantid,ld_recordversion)
@@ -330,15 +361,6 @@ insert into ld_bookmark
 		(ld_id, ld_lastmodified, ld_deleted, ld_userid, ld_docid, ld_title, ld_description, ld_position, ld_type,ld_tenantid,ld_recordversion)
 values		(4,'2010-04-19 00:00:00',1,2,2,'book4','this is a bookmark 4',4,0,1,1);
 
-insert into ld_feedmessage (ld_id, ld_lastmodified,ld_deleted, ld_guid, ld_title, ld_description, ld_pubdate, ld_read,ld_tenantid,ld_recordversion)
-values (1,'2011-02-08 00:00:00',0,'feed1_guid', 'feed1','feed1_desc','2012-02-05 00:00:00',1,1,1);
-
-insert into ld_feedmessage (ld_id, ld_lastmodified,ld_deleted, ld_guid, ld_title, ld_description, ld_pubdate, ld_read,ld_tenantid,ld_recordversion)
-values (2,'2011-02-08 00:00:00',0,'feed2_guid', 'feed2','feed2_desc','2012-02-02 00:00:00',1,1,1);
-
-insert into ld_feedmessage (ld_id, ld_lastmodified,ld_deleted, ld_guid, ld_title, ld_description, ld_pubdate, ld_read,ld_tenantid,ld_recordversion)
-values (3,'2011-02-08 00:00:00',0,'feed3_guid', 'feed3','feed3_desc','2011-01-10 00:00:00',0,1,1);
-
 insert into ld_rating
 		(ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_userid, ld_vote,ld_tenantid,ld_recordversion)
 values		(1,'2011-02-18 00:00:00',0,1,1,1,1,1);
@@ -355,17 +377,17 @@ insert into ld_rating
 		(ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_userid, ld_vote,ld_tenantid,ld_recordversion)
 values		(4,'2011-02-18 00:00:00',1,2,2,4,1,1);
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message, ld_tenantid,ld_recordversion,ld_page)
-values(1, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 1',1,1,0);
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message, ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
+values(1, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 1',1,1,0,80,0.5,0.5,0.15,0.10,'1.0');
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page)
-values(2, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 2',1,1,1);
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
+values(2, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 2',1,1,1,80,0.5,0.5,0.15,0.10,'1.0');
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page)
-values(3, '2011-04-18 00:00:00',0,4,'John',3,'2011-04-18 00:00:00','message for note 3',1,1,0);
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
+values(3, '2011-04-18 00:00:00',0,4,'John',3,'2011-04-18 00:00:00','message for note 3',1,1,0,80,0.5,0.5,0.15,0.10,'1.0');
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page)
-values(4, '2011-04-18 00:00:00',1,1,'Admin',1,'2011-04-18 00:00:00','message for note 4',1,1,0);
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
+values(4, '2011-04-18 00:00:00',1,1,'Admin',1,'2011-04-18 00:00:00','message for note 4',1,1,0,80,0.5,0.5,0.15,0.10,'1.0');
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_deleted, ld_name, ld_language, ld_body, ld_subject,ld_tenantid,ld_recordversion)
 values(100, '2012-04-18 00:00:00',0,'test1','en', 'body $username $xxx','subject $xxx',1,1);
@@ -386,9 +408,9 @@ values(3, CURRENT_TIMESTAMP, 0, 1, 'Alessandro', 'alessandro@acme.com',1,1);
 
 insert into ld_template
 			(ld_id, ld_lastmodified, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
-values (100,CURRENT_TIMESTAMP,0,'email','email',0,0,1,1);
-insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_stringvalue, ld_name, ld_label, ld_editor)
-values (100,0,0,0,'','sendername', 'Sender Name', 0);
+values (50,CURRENT_TIMESTAMP,0,'email','email',0,0,1,1);
+insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_stringvalue, ld_name, ld_label, ld_editor, ld_hidden, ld_multiple)
+values (50,0,0,0,'','sendername', 'Sender Name', 0, 0, 0);
 
 insert into ld_sequence(ld_id, ld_lastmodified, ld_deleted, ld_tenantid,ld_recordversion,ld_name,ld_value, ld_objectid)
 values(1, '2010-04-23 00:00:00',0,1,1,'customid-year_seq',5,0);

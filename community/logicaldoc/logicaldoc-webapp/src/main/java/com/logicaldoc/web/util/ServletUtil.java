@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletException;
@@ -31,13 +30,15 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hsqldb.lib.StringUtil;
+import org.jfree.util.Log;
 
 import com.ibm.icu.util.Calendar;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.History;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.HistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.Session;
@@ -64,8 +65,6 @@ public class ServletUtil {
 
 	private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 
-	private static Set<String> localAddresses = null;
-
 	public static Session validateSession(HttpServletRequest request) throws ServletException {
 		try {
 			String sid = SessionManager.get().getSessionId(request);
@@ -86,8 +85,15 @@ public class ServletUtil {
 	}
 
 	/**
-	 * Checks if a specific menu is accessible by the user in the current
-	 * session
+	 * Checks if at least one of the given menus is accessible by the user in
+	 * the current session
+	 * 
+	 * @param request the HTTP request
+	 * @param menuIds identifiers of the menus
+	 * 
+	 * @return if at least one of the menus is accessible
+	 * 
+	 * @throws ServletException error in the servlet container
 	 */
 	public static Session checkEvenOneMenu(HttpServletRequest request, long... menuIds) throws ServletException {
 		Session session = validateSession(request);
@@ -97,26 +103,28 @@ public class ServletUtil {
 				return session;
 		}
 
-		String message = "User " + session.getUsername() + " cannot access the menues " + Arrays.asList(menuIds);
+		String message = "User " + session.getUsername() + " cannot access the menus " + Arrays.asList(menuIds);
 		throw new ServletException(message);
 	}
 
 	/**
 	 * Downloads a plugin resource
 	 * 
-	 * @param request
-	 * @param response
+	 * @param request the HTTP request
+	 * @param response server's response
 	 * @param pluginName name of the plug-in
-	 * @param resourcePath Relative path ot the plug-in's resource
-	 * @param fileName Optional file name
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws ServletException
-	 * @throws InvalidSessionException
+	 * @param resourcePath Relative path of the plug-in's resource
+	 * @param fileName Optional file name to give to the downloaded content
+	 * @param sid identifier of the session
+	 * 
+	 * @throws FileNotFoundException cannot find the plugin dir
+	 * @throws IOException generic I/O error
+	 * @throws ServletException error in the servlet container
+	 * @throws InvalidSessionException the session is unexisting or not valid
 	 */
 	public static void downloadPluginResource(HttpServletRequest request, HttpServletResponse response, String sid,
-			String pluginName, String resourcePath, String fileName) throws FileNotFoundException, IOException,
-			ServletException, InvalidSessionException {
+			String pluginName, String resourcePath, String fileName)
+			throws FileNotFoundException, IOException, ServletException, InvalidSessionException {
 
 		if (sid != null)
 			try {
@@ -161,7 +169,6 @@ public class ServletUtil {
 			os.close();
 			is.close();
 		}
-
 	}
 
 	/**
@@ -175,12 +182,17 @@ public class ServletUtil {
 	 * @param docId Id of the document
 	 * @param fileVersion name of the file version; if null the latest version
 	 *        will be returned
-	 * @param suffix of the linked document's resource
-	 * @throws ServletException
+	 * @param fileName name of the file
+	 * @param suffix suffix of the linked document's resource
+	 * @param user current user
+	 * 
+	 * @throws ServletException error in the servlet container
+	 * @throws FileNotFoundException resource's file not found
+	 * @throws IOException generic I/O error
 	 */
 	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
-			long docId, String fileVersion, String fileName, String suffix, User user) throws FileNotFoundException,
-			IOException, ServletException {
+			long docId, String fileVersion, String fileName, String suffix, User user)
+			throws FileNotFoundException, IOException, ServletException {
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
 		ContextProperties config = Context.get().getProperties();
@@ -246,7 +258,6 @@ public class ServletUtil {
 				&& (StringUtil.isEmpty(suffix) || (!"thumb.jpg".endsWith(suffix) && !"tile.jpg".endsWith(suffix)));
 
 		response.setContentType(contentType);
-		response.setHeader("Content-Length", Long.toString(length));
 		setContentDisposition(request, response, filename);
 
 		// Prepare some variables. The full Range represents the complete file.
@@ -342,36 +353,17 @@ public class ServletUtil {
 
 			if (ranges.isEmpty() || ranges.get(0) == full || ranges.get(0).length == length) {
 				// Return full file.
-				Range r = full;
-				response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
-
 				if (acceptsGzip) {
 					// The browser accepts GZIP, so GZIP the content.
 					response.setHeader("Content-Encoding", "gzip");
 					output = new GZIPOutputStream(output, DEFAULT_BUFFER_SIZE);
-				} else {
-					// Content length is not directly predictable in case of
-					// GZIP.
-					// So only add it if there is no means of GZIP, else browser
-					// will hang.
-					response.setHeader("Content-Length", String.valueOf(r.length));
 				}
 
-				// Copy full range
-				InputStream is = storer.getStream(docId, resource);
-				try {
-					if (is != null && output != null) {
-						IOUtils.copy(is, output, DEFAULT_BUFFER_SIZE);
-					}
-				} finally {
-					if (is != null)
-						IOUtils.closeQuietly(is);
-				}
+				storer.writeToStream(docId, resource, output);
 			} else if (ranges.size() == 1) {
 				// Return single part of file.
 				Range r = ranges.get(0);
 				response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
-				response.setHeader("Content-Length", String.valueOf(r.length));
 				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
 
 				// Copy single part range.
@@ -424,15 +416,15 @@ public class ServletUtil {
 
 		if (saveHistory) {
 			// Add an history entry to track the download of the document
-			History history = new History();
+			DocumentHistory history = new DocumentHistory();
 			history.setDocId(doc.getId());
 			history.setVersion(doc.getVersion());
 			history.setFilename(doc.getFileName());
 			history.setFolderId(doc.getFolder().getId());
 			history.setUser(user);
-			if (session != null){
+			if (session != null) {
 				history.setSession(session);
-			}else {
+			} else {
 				history.setSessionId(sid);
 			}
 
@@ -448,14 +440,15 @@ public class ServletUtil {
 			 * session. So we will not save if there is another view in the same
 			 * session asked since 30 seconds.
 			 */
-			HistoryDAO hdao = (HistoryDAO) Context.get().getBean(HistoryDAO.class);
-			List<History> oldHistories = hdao.findByUserIdAndEvent(user.getId(), history.getEvent(), session.getSid());
+			DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+			List<DocumentHistory> oldHistories = hdao.findByUserIdAndEvent(user.getId(), history.getEvent(),
+					session.getSid());
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(history.getDate());
 			cal.add(Calendar.SECOND, -30);
 			Date oldestDate = cal.getTime();
 
-			History latestHistory = null;
+			DocumentHistory latestHistory = null;
 			Date latestDate = null;
 			if (!oldHistories.isEmpty()) {
 				latestHistory = oldHistories.get(oldHistories.size() - 1);
@@ -465,7 +458,11 @@ public class ServletUtil {
 
 			if (latestHistory == null || oldestDate.getTime() > latestDate.getTime()
 					|| !latestHistory.getDocId().equals(history.getDocId())) {
-				hdao.store(history);
+				try {
+					hdao.store(history);
+				} catch (PersistenceException e) {
+					Log.warn(e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -482,12 +479,12 @@ public class ServletUtil {
 	 * @param file file to serve
 	 * @param fileName client file name
 	 * 
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 * @throws ServletException
+	 * @throws FileNotFoundException cannot find the file to download
+	 * @throws IOException generic I/O error
+	 * @throws ServletException error in the servlet container
 	 */
-	public static void downloadFile(HttpServletRequest request, HttpServletResponse response, File file, String fileName)
-			throws FileNotFoundException, IOException, ServletException {
+	public static void downloadFile(HttpServletRequest request, HttpServletResponse response, File file,
+			String fileName) throws FileNotFoundException, IOException, ServletException {
 
 		String filename = fileName;
 		if (filename == null)
@@ -520,6 +517,12 @@ public class ServletUtil {
 
 	/**
 	 * Sets the correct Content-Disposition header into the response
+	 * 
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * @param filename name of the file
+	 * 
+	 * @throws UnsupportedEncodingException error trying to encode the response
 	 */
 	public static void setContentDisposition(HttpServletRequest request, HttpServletResponse response, String filename)
 			throws UnsupportedEncodingException {
@@ -543,9 +546,14 @@ public class ServletUtil {
 					+ "?=";
 		}
 
-		boolean asAttachment = request.getParameter("open") == null;
-		response.setHeader("Content-Disposition", (asAttachment ? "attachment" : "inline") + "; filename=\""
-				+ encodedFileName + "\"");
+		boolean asAttachment = true;
+		if (request.getParameter("open") != null)
+			asAttachment = !"true".equals(request.getParameter("open"));
+		else if (request.getAttribute("open") != null)
+			asAttachment = !"true".equals(request.getAttribute("open"));
+
+		response.setHeader("Content-Disposition",
+				(asAttachment ? "attachment" : "inline") + "; filename=\"" + encodedFileName + "\"");
 
 		// Headers required by Internet Explorer
 		response.setHeader("Pragma", "public");
@@ -559,9 +567,11 @@ public class ServletUtil {
 	 * 
 	 * @param request the current request
 	 * @param response the document is written to this object
-	 * @param docId Id of the document
-	 * @param version name of the version; if null the latest version will
-	 *        returned
+	 * @param docId identifier of the document
+	 * @param user current user
+	 * 
+	 * @throws FileNotFoundException cannot find the file to download
+	 * @throws IOException generic I/O error
 	 */
 	public static void downloadDocumentText(HttpServletRequest request, HttpServletResponse response, long docId,
 			User user) throws FileNotFoundException, IOException {
@@ -613,15 +623,21 @@ public class ServletUtil {
 	 * 
 	 * @param request the current request
 	 * @param response the document is written to this object
+	 * @param sid identifier of the session
 	 * @param docId Id of the document
 	 * @param fileVersion name of the file version; if null the latest version
 	 *        will be returned
-	 * @throws ServletException
-	 * @throws NumberFormatException
+	 * @param fileName name of the file
+	 * @param user current user
+	 * 
+	 * @throws FileNotFoundException the document's file cannot be found
+	 * @throws IOException generic I/O exception retrieving the document's file
+	 * @throws ServletException error in the servlet container
+	 * @throws NumberFormatException error if docId is not a number
 	 */
 	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
-			String docId, String fileVersion, String fileName, User user) throws FileNotFoundException, IOException,
-			NumberFormatException, ServletException {
+			String docId, String fileVersion, String fileName, User user)
+			throws FileNotFoundException, IOException, NumberFormatException, ServletException {
 		downloadDocument(request, response, sid, Integer.parseInt(docId), fileVersion, fileName, null, user);
 	}
 
@@ -640,7 +656,8 @@ public class ServletUtil {
 	 *        will returned
 	 * @param docVersion id of the doc version; if null the latest version will
 	 *        returned
-	 * @throws Exception
+	 * 
+	 * @throws Exception a generic error
 	 */
 	@SuppressWarnings("unchecked")
 	public static void uploadDocumentResource(HttpServletRequest request, String docId, String suffix,
@@ -669,7 +686,8 @@ public class ServletUtil {
 				InputStream is = null;
 				try {
 					is = item.getInputStream();
-					storer.store(item.getInputStream(), Long.parseLong(docId), storer.getResourceName(doc, ver, suffix));
+					storer.store(item.getInputStream(), Long.parseLong(docId),
+							storer.getResourceName(doc, ver, suffix));
 				} finally {
 					if (is != null)
 						is.close();
@@ -680,11 +698,12 @@ public class ServletUtil {
 	}
 
 	/**
-	 * Returns true if the given accept header accepts the given value.
+	 * Returns true if the given accept header accepts the given value
 	 * 
-	 * @param acceptHeader The accept header.
-	 * @param toAccept The value to be accepted.
-	 * @return True if the given accept header accepts the given value.
+	 * @param acceptHeader The accept header
+	 * @param toAccept The value to be accepted
+	 * 
+	 * @return True if the given accept header accepts the given value
 	 */
 	private static boolean accepts(String acceptHeader, String toAccept) {
 		String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
@@ -699,12 +718,12 @@ public class ServletUtil {
 	 * to the given end index as a long. If the substring is empty, then -1 will
 	 * be returned
 	 * 
-	 * @param value The string value to return a substring as long for.
-	 * @param beginIndex The begin index of the substring to be returned as
-	 *        long.
-	 * @param endIndex The end index of the substring to be returned as long.
+	 * @param value The string value to return a substring as long for
+	 * @param beginIndex The begin index of the substring to be returned as long
+	 * @param endIndex The end index of the substring to be returned as long
+	 * 
 	 * @return A substring of the given string value as long or -1 if substring
-	 *         is empty.
+	 *         is empty
 	 */
 	private static long sublong(String value, int beginIndex, int endIndex) {
 		String substring = value.substring(beginIndex, endIndex);
@@ -712,7 +731,7 @@ public class ServletUtil {
 	}
 
 	/**
-	 * This class represents a byte range.
+	 * This class represents a byte range
 	 */
 	protected static class Range {
 		long start;

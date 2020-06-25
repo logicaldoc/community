@@ -33,10 +33,6 @@
 			<bean class="com.logicaldoc.webdav.io.handler.DefaultHandler">
 				<property name="resourceService" ref="ResourceService" />
 			</bean>
-			<!--
-				No list injections on 2.0 available, so we use a more strange way
-				for set up
-			-->
 		</property>
 	</bean>
 

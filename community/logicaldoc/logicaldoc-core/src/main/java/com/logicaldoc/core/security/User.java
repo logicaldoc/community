@@ -33,6 +33,8 @@ public class User extends PersistentObject implements Serializable {
 
 	public static int TYPE_SYSTEM = 1;
 
+	public static int TYPE_READONLY = 2;
+
 	public static int SOURCE_DEFAULT = 0;
 
 	public static int SOURCE_LDAP = 1;
@@ -83,10 +85,13 @@ public class User extends PersistentObject implements Serializable {
 
 	private int type = TYPE_DEFAULT;
 
+	// Not persisted
 	private Set<Group> groups = new HashSet<Group>();
 
+	// Not persisted
 	private long[] groupIds;
 
+	// Not persisted
 	private String[] groupNames;
 
 	private int enabled = 1;
@@ -118,12 +123,12 @@ public class User extends PersistentObject implements Serializable {
 	/**
 	 * When the certificate expires
 	 */
-	private Date certExpire = null;
+	private Date certExpire;
 
 	/**
 	 * The distinguished name of the certificate
 	 */
-	private String certDN = null;
+	private String certDN;
 
 	private Long defaultWorkspace;
 
@@ -138,6 +143,18 @@ public class User extends PersistentObject implements Serializable {
 	private String key;
 
 	protected Set<UserGroup> userGroups = new HashSet<UserGroup>();
+
+	private Date creation;
+
+	/**
+	 * Description of the grid that displays the list of documents
+	 */
+	private String docsGrid;
+
+	/**
+	 * Description of the grid that shows the results of a search
+	 */
+	private String hitsGrid;
 
 	public User() {
 	}
@@ -274,15 +291,20 @@ public class User extends PersistentObject implements Serializable {
 	}
 
 	/**
-	 * Removes the user from a all groups except it's user's own group
+	 * Removes the user from a all groups except it's user's own group. You can
+	 * restrict the deletion to a specified source
+	 * 
+	 * @param source the source
 	 */
-	public void removeAllGroups() {
+	public void removeGroupMemberships(String source) {
 		Iterator<Group> iter = getGroups().iterator();
 		while (iter.hasNext()) {
-			Group p = iter.next();
-			if (!getUserGroupName().equals(p.getName())) {
-				iter.remove();
-				getUserGroups().remove(new UserGroup(p.getId()));
+			Group grp = iter.next();
+			if (!getUserGroupName().equals(grp.getName())) {
+				if (source == null || (source != null && source.equals(grp.getSource()))) {
+					iter.remove();
+					getUserGroups().remove(new UserGroup(grp.getId()));
+				}
 			}
 		}
 	}
@@ -379,6 +401,8 @@ public class User extends PersistentObject implements Serializable {
 		language = "";
 		email = "";
 		telephone = "";
+		docsGrid = null;
+		hitsGrid = null;
 		groups = new HashSet<Group>();
 		groupIds = null;
 		passwordExpires = 0;
@@ -398,6 +422,8 @@ public class User extends PersistentObject implements Serializable {
 
 	/**
 	 * The name of the group associated to this user, that is '_user_'+id
+	 * 
+	 * @return name of the group that represents this user
 	 */
 	public String getUserGroupName() {
 		return "_user_" + getId();
@@ -405,6 +431,8 @@ public class User extends PersistentObject implements Serializable {
 
 	/**
 	 * Retrieves this user's group
+	 * 
+	 * @return the group
 	 */
 	public Group getUserGroup() {
 		if (getGroups() != null)
@@ -415,11 +443,11 @@ public class User extends PersistentObject implements Serializable {
 
 		// The special group was not found in the belonging groups, this may
 		// indicate a lost association between this user and his group
-		log.warn("User " + username + " has lost association with his group");
+		log.warn("User {} has lost association with his group", username);
 		GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		Group group = dao.findByName(getUserGroupName(), getTenantId());
 		if (group == null)
-			log.warn("User " + username + " doesn't have his user group " + getUserGroupName());
+			log.warn("User {} doesn't have his user group {}", username, getUserGroupName());
 		return group;
 	}
 
@@ -457,6 +485,8 @@ public class User extends PersistentObject implements Serializable {
 
 	/**
 	 * When the password was modified
+	 * 
+	 * @return when the password has been altered
 	 */
 	public Date getPasswordChanged() {
 		return passwordChanged;
@@ -468,6 +498,8 @@ public class User extends PersistentObject implements Serializable {
 
 	/**
 	 * If the password expires or not
+	 * 
+	 * @return <b>1</b> if the password expires, <b>0</b> otherwise
 	 */
 	public int getPasswordExpires() {
 		return passwordExpires;
@@ -483,6 +515,8 @@ public class User extends PersistentObject implements Serializable {
 	 * @see User#SOURCE_DEFAULT
 	 * @see User#SOURCE_LDAP
 	 * @see User#SOURCE_ACTIVE_DIRECTORY
+	 * 
+	 * @return the source
 	 */
 	public int getSource() {
 		return source;
@@ -619,5 +653,33 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setKey(String key) {
 		this.key = key;
+	}
+
+	public boolean isReadonly() {
+		return type == TYPE_READONLY;
+	}
+
+	public Date getCreation() {
+		return creation;
+	}
+
+	public void setCreation(Date creation) {
+		this.creation = creation;
+	}
+
+	public String getDocsGrid() {
+		return docsGrid;
+	}
+
+	public void setDocsGrid(String docsGrid) {
+		this.docsGrid = docsGrid;
+	}
+
+	public String getHitsGrid() {
+		return hitsGrid;
+	}
+
+	public void setHitsGrid(String hitsGrid) {
+		this.hitsGrid = hitsGrid;
 	}
 }

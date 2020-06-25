@@ -6,17 +6,9 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.Side;
-import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -25,7 +17,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This panel collects all tenant details
@@ -52,13 +43,9 @@ public class TenantDetailsPanel extends VLayout {
 
 	private TenantKeystorePanel keystorePanel;
 
-	private HLayout savePanel;
-
-	private TabSet tabSet = new TabSet();
+	private EditingTabSet tabSet;
 
 	private TenantsPanel tenantsPanel;
-
-	private Button saveButton;
 
 	public TenantDetailsPanel(TenantsPanel tenantsPanel) {
 		super();
@@ -68,30 +55,12 @@ public class TenantDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		savePanel = new HLayout();
-		savePanel.setHeight(20);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
-		saveButton = new Button(I18N.message("save"));
-		saveButton.setAutoFit(true);
-		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
+		tabSet = new EditingTabSet(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				onSave();
 			}
-		});
-		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("70%");
-		spacer.setOverflow(Overflow.HIDDEN);
-
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (tenant.getId() != 0) {
@@ -109,24 +78,9 @@ public class TenantDetailsPanel extends VLayout {
 				} else {
 					setTenant(new GUITenant());
 				}
-				savePanel.setVisible(false);
+				tabSet.hideSave();
 			}
 		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		savePanel.addMember(saveButton);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		addMember(savePanel);
-
-		tabSet = new TabSet();
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight100();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		propertiesTabPanel = new HLayout();
@@ -164,8 +118,7 @@ public class TenantDetailsPanel extends VLayout {
 	}
 
 	private void refresh() {
-		if (savePanel != null)
-			savePanel.setVisible(false);
+		tabSet.hideSave();
 
 		/*
 		 * Prepare the properties tab
@@ -236,7 +189,7 @@ public class TenantDetailsPanel extends VLayout {
 	}
 
 	public void onModified() {
-		savePanel.setVisible(true);
+		tabSet.displaySave();
 	}
 
 	private boolean validate() {
@@ -263,27 +216,23 @@ public class TenantDetailsPanel extends VLayout {
 	}
 
 	private boolean isBrandingEnabled() {
-		return (Feature.enabled(Feature.BRANDING_LOGO) || Feature.enabled(Feature.BRANDING_FULL) || Feature
-				.enabled(Feature.BRANDING_STANDARD)) && Menu.enabled(Menu.BRANDING);
+		return (Feature.enabled(Feature.BRANDING_LOGO) || Feature.enabled(Feature.BRANDING_FULL)
+				|| Feature.enabled(Feature.BRANDING_STANDARD)) && Menu.enabled(Menu.BRANDING);
 	}
 
 	public void onSave() {
 		if (validate()) {
-			saveButton.setDisabled(true);
-
 			final boolean newTenant = TenantDetailsPanel.this.tenant.getId() == 0L;
 
 			TenantService.Instance.get().save(tenant, new AsyncCallback<GUITenant>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					Log.serverError(caught);
-					saveButton.setDisabled(false);
 				}
 
 				@Override
 				public void onSuccess(GUITenant tenant) {
-					saveButton.setDisabled(false);
-					savePanel.setVisible(false);
+					tabSet.hideSave();
 					if (tenant != null) {
 						if (newTenant) {
 							SC.say(I18N.message("newtenantresume",

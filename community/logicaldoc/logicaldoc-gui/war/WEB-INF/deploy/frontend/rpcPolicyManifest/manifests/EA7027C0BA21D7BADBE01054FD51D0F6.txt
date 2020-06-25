@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.ZonalOCRService
+path: A399714D516AA219CCD9EF52226D750B.gwt.rpc

@@ -52,6 +52,16 @@
     <filter-name>springSecurityFilterChain</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
   </filter>
+  <!--
+  <filter>
+    <filter-name>IndexRequestFilter</filter-name>
+    <filter-class>com.logicaldoc.enterprise.cluster.IndexRequestFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>XssFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  -->
   <filter-mapping>
     <filter-name>CharsetFilter</filter-name>
     <url-pattern>/*</url-pattern>
@@ -112,6 +122,10 @@
     <servlet-class>com.logicaldoc.web.service.DocumentServiceImpl</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>DashletService</servlet-name>
+    <servlet-class>com.logicaldoc.web.service.DashletServiceImpl</servlet-class>
+  </servlet>  
+  <servlet>
     <servlet-name>GarbageData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.GarbageDataServlet</servlet-class>
   </servlet>
@@ -164,16 +178,24 @@
     <servlet-class>com.logicaldoc.web.data.SessionsDataServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>OnlineUsersData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.OnlineUsersDataServlet</servlet-class>
+  </servlet>  
+  <servlet>
     <servlet-name>FoldersData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.FoldersDataServlet</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>MenuesData</servlet-name>
-    <servlet-class>com.logicaldoc.web.data.MenuesDataServlet</servlet-class>
+    <servlet-name>MenusData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.MenusDataServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>DocumentsData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.DocumentsDataServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>IndexingQueueData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.IndexingQueueDataServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>LinksData</servlet-name>
@@ -199,6 +221,10 @@
     <servlet-name>EventsData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.EventsDataServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>TicketsData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.TicketsDataServlet</servlet-class>
+  </servlet>  
   <servlet>
     <servlet-name>VersionsData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.VersionsDataServlet</servlet-class>
@@ -230,6 +256,10 @@
   <servlet>
     <servlet-name>ConversionFormatsData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.ConversionFormatsDataServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>ExtensionAliasesData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.ExtensionAliasesDataServlet</servlet-class>
   </servlet>
   <servlet>    
     <servlet-name>FormatConvertersData</servlet-name>
@@ -278,10 +308,6 @@
   <servlet>
     <servlet-name>LanguagesData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.LanguagesDataServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>FeedMessageData</servlet-name>
-    <servlet-class>com.logicaldoc.web.data.FeedMessageDataServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>ContactsData</servlet-name>
@@ -376,18 +402,26 @@
     <servlet-class>de.novanic.eventservice.service.EventServiceImpl</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>MessengerRemoteService</servlet-name>
-    <servlet-class>com.logicaldoc.web.remote.MessengerRemoteServiceImpl</servlet-class>
-  </servlet>
-  <servlet>
     <servlet-name>StoragesData</servlet-name>
     <servlet-class>com.logicaldoc.web.data.StoragesDataServlet</servlet-class>
   </servlet>  
- 
+  <servlet>
+    <servlet-name>DashletContent</servlet-name>
+    <servlet-class>com.logicaldoc.core.dashlet.DashletContent</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>DashletsData</servlet-name>
+    <servlet-class>com.logicaldoc.web.data.DashletsDataServlet</servlet-class>
+  </servlet>
+  
   <servlet-mapping>
-    <servlet-name>MessengerRemoteService</servlet-name>
-    <url-pattern>/frontend/MessengerRemoteService</url-pattern>
-  </servlet-mapping>
+    <servlet-name>DashletsData</servlet-name>
+    <url-pattern>/data/dashlets.xml</url-pattern>
+  </servlet-mapping> 
+  <servlet-mapping>
+    <servlet-name>DashletContent</servlet-name>
+    <url-pattern>/dashletcontent</url-pattern>
+  </servlet-mapping> 
   <servlet-mapping>
     <servlet-name>EventService</servlet-name>
     <url-pattern>/frontend/gwteventservice</url-pattern>
@@ -399,7 +433,11 @@
   <servlet-mapping>
     <servlet-name>FormatConvertersData</servlet-name>
     <url-pattern>/data/formatconverters.xml</url-pattern>
-  </servlet-mapping>    
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ExtensionAliasesData</servlet-name>
+    <url-pattern>/data/extensionaliases.xml</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>UploadServlet</servlet-name>
     <url-pattern>*.gupld</url-pattern>
@@ -443,6 +481,10 @@
   <servlet-mapping>
     <servlet-name>DocumentService</servlet-name>
     <url-pattern>/frontend/document</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DashletService</servlet-name>
+    <url-pattern>/frontend/dashlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>GarbageData</servlet-name>
@@ -497,6 +539,10 @@
     <url-pattern>/data/sessions.xml</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>OnlineUsersData</servlet-name>
+    <url-pattern>/data/onlineusers.xml</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>SessionsData</servlet-name>
     <url-pattern>/sessions/sessions.xml</url-pattern>
   </servlet-mapping>
@@ -505,8 +551,8 @@
     <url-pattern>/data/folders.xml</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>MenuesData</servlet-name>
-    <url-pattern>/data/menues.xml</url-pattern>
+    <servlet-name>MenusData</servlet-name>
+    <url-pattern>/data/menus.xml</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>DocumentsData</servlet-name>
@@ -535,6 +581,10 @@
   <servlet-mapping>
     <servlet-name>EventsData</servlet-name>
     <url-pattern>/data/events.xml</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TicketsData</servlet-name>
+    <url-pattern>/data/tickets.xml</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>VersionsData</servlet-name>
@@ -581,10 +631,6 @@
     <url-pattern>/data/languages.xml</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>FeedMessageData</servlet-name>
-    <url-pattern>/data/feedmessage.xml</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
     <servlet-name>ContactsData</servlet-name>
     <url-pattern>/data/contacts.xml</url-pattern>
   </servlet-mapping>
@@ -627,7 +673,11 @@
   <servlet-mapping>
     <servlet-name>AspectsData</servlet-name>
     <url-pattern>/data/aspects.xml</url-pattern>
-  </servlet-mapping>  
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>IndexingQueueData</servlet-name>
+    <url-pattern>/data/indexingqueue.xml</url-pattern>
+  </servlet-mapping> 
   <servlet-mapping>
     <servlet-name>Thumbnail</servlet-name>
     <url-pattern>/thumbnail</url-pattern>

@@ -15,14 +15,16 @@ import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserHistoryDAO;
@@ -75,12 +77,13 @@ public class FormatConverterManager {
 	 * @param fileVersion The file version(optional)
 	 * @param sid (optional)
 	 * @return The content of the PDF as bytes
-	 * @throws IOException
+	 * 
+	 * @throws IOException If something went wrong
 	 */
 	public byte[] getPdfContent(Document document, String fileVersion, String sid) throws IOException {
 		String resource = storer.getResourceName(document.getId(), getSuitableFileVersion(document, fileVersion),
 				PDF_CONVERSION_SUFFIX);
-		if ("pdf".equals(FilenameUtils.getExtension(document.getFileName()).toLowerCase()))
+		if ("pdf".equals(AbstractFormatConverter.getExtension(document.getFileName())))
 			resource = storer.getResourceName(document, getSuitableFileVersion(document, fileVersion), null);
 		if (!storer.exists(document.getId(), resource))
 			convertToPdf(document, fileVersion, sid);
@@ -93,13 +96,15 @@ public class FormatConverterManager {
 	 * 
 	 * @param document The document to be processed
 	 * @param fileVersion The file version(optional)
+	 * @param out the output file
 	 * @param sid (optional)
-	 * @throws IOException
+	 * 
+	 * @throws IOException If something went wrong
 	 */
 	public void writePdfToFile(Document document, String fileVersion, File out, String sid) throws IOException {
 		String resource = storer.getResourceName(document.getId(), getSuitableFileVersion(document, fileVersion),
 				PDF_CONVERSION_SUFFIX);
-		if ("pdf".equals(FilenameUtils.getExtension(document.getFileName()).toLowerCase()))
+		if ("pdf".equals(AbstractFormatConverter.getExtension(document.getFileName())))
 			resource = storer.getResourceName(document.getId(), getSuitableFileVersion(document, fileVersion), null);
 		if (!storer.exists(document.getId(), resource))
 			convertToPdf(document, fileVersion, sid);
@@ -115,12 +120,12 @@ public class FormatConverterManager {
 	 * @param fileVersion The file version(optional)
 	 * @param sid (optional)
 	 * 
-	 * @throws IOException
+	 * @throws IOException If something went wrong
 	 */
 	public void convertToPdf(Document document, String fileVersion, String sid) throws IOException {
 		String fileName = DocUtil.getFileName(document, fileVersion);
 
-		if ("pdf".equals(FilenameUtils.getExtension(fileName).toLowerCase())) {
+		if ("pdf".equals(AbstractFormatConverter.getExtension(fileName))) {
 			log.debug("Document {} itself is a Pdf", document.getId());
 			return;
 		}
@@ -144,15 +149,15 @@ public class FormatConverterManager {
 		try {
 			src = writeToFile(document, fileVersion);
 			if (src == null || src.length() == 0)
-				throw new IOException(String.format("Unexisting source file,  document: %s - %s", document.getId(),
-						fileName));
+				throw new IOException(
+						String.format("Unexisting source file,  document: %s - %s", document.getId(), fileName));
 
 			converter.convert(sid, document, src, dest);
 
 			if (dest == null || dest.length() == 0)
-				throw new IOException(String.format(
-						"The converter %s was unable to convert as pdf the document: %s - %s", converter.getClass()
-								.getSimpleName(), document.getId(), fileName));
+				throw new IOException(
+						String.format("The converter %s was unable to convert as pdf the document: %s - %s",
+								converter.getClass().getSimpleName(), document.getId(), fileName));
 
 			storer.store(dest, document.getId(), resource);
 		} finally {
@@ -164,6 +169,11 @@ public class FormatConverterManager {
 
 	/**
 	 * Shortcut for convertToPdf(document, null, transaction)
+	 * 
+	 * @param document The document to be processed
+	 * @param sid identifier of the session
+	 * 
+	 * @throws IOException If something went wrong
 	 */
 	public void convertToPdf(Document document, String sid) throws IOException {
 		convertToPdf(document, null, sid);
@@ -175,12 +185,15 @@ public class FormatConverterManager {
 	 * 
 	 * @param document The document to be processed
 	 * @param fileVersion The file version(optional)
-	 * @param the target file, the extension of this filename is used to detect
-	 *        the output format
-	 * @param transaction
-	 * @throws Exception
+	 * @param format the extension used to define the output format
+	 * @param transaction details of the current session
+	 *
+	 * @return the document that represents the conversion
+	 * 
+	 * @throws Exception If something went wrong
 	 */
-	public Document convert(Document document, String fileVersion, String format, History transaction) throws Exception {
+	public Document convert(Document document, String fileVersion, String format, DocumentHistory transaction)
+			throws Exception {
 		String fileName = DocUtil.getFileName(document, fileVersion);
 		File out = null;
 		FormatConverter converter = null;
@@ -213,12 +226,14 @@ public class FormatConverterManager {
 	 * 
 	 * @param document The document to be processed
 	 * @param fileVersion The file version(optional)
-	 * @param the target file, the extension of this filename is used to detect
-	 *        the output format
-	 * @param transaction
-	 * @throws IOException
+	 * @param out the target file, the extension of this filename is used to
+	 *        detect the output format
+	 * @param transaction iformations about the session
+	 * 
+	 * @throws IOException if an error happens during the conversion
 	 */
-	public void convertToFile(Document document, String fileVersion, File out, History transaction) throws IOException {
+	public void convertToFile(Document document, String fileVersion, File out, DocumentHistory transaction)
+			throws IOException {
 		String fileName = DocUtil.getFileName(document, fileVersion);
 		FormatConverter converter = getConverter(fileName, out.getName());
 		if (converter == null)
@@ -231,13 +246,13 @@ public class FormatConverterManager {
 		try {
 			src = writeToFile(document, fileVersion);
 			if (src == null || src.length() == 0)
-				throw new IOException(String.format("Unexisting source file,  document: %s - %s", document.getId(),
-						fileName));
+				throw new IOException(
+						String.format("Unexisting source file,  document: %s - %s", document.getId(), fileName));
 
 			converter.convert(transaction != null ? transaction.getSessionId() : null, document, src, out);
 			if (out.length() <= 0)
-				throw new IOException(String.format("The converter %s was unable to convert document: %s", converter
-						.getClass().getSimpleName(), document.getId() + " - " + fileName));
+				throw new IOException(String.format("The converter %s was unable to convert document: %s",
+						converter.getClass().getSimpleName(), document.getId() + " - " + fileName));
 
 			if (transaction != null) {
 				transaction.setEvent(DocumentEvent.CONVERTED.toString());
@@ -254,16 +269,18 @@ public class FormatConverterManager {
 	/**
 	 * Converts a file into a different format
 	 * 
-	 * @param in Input file (the filename extension determines the source
-	 *        format)
-	 * @param out Output file (the filename extension determines the output
-	 *        format)
+	 * @param in input file (the filename extension determines the source
+	 *        format, in case you do not use inFilename)
+	 * @param inFilename file name of the input
+	 * @param out output file (if outFormat is null, the filename extension
+	 *        determines the output format)
+	 * @param outFormat extension of the output
 	 * @param sid session ID (optional)
 	 * 
-	 * @throws IOException
+	 * @throws IOException if an error happens during the conversion
 	 */
-	public void convertFile(File in, String inFileName, File out, String outFormat, String sid) throws IOException {
-		FormatConverter converter = getConverter(inFileName, outFormat);
+	public void convertFile(File in, String inFilename, File out, String outFormat, String sid) throws IOException {
+		FormatConverter converter = getConverter(inFilename, outFormat);
 		if (converter == null)
 			throw new IOException("Converter not found");
 
@@ -275,8 +292,8 @@ public class FormatConverterManager {
 		converter.convert(in, out);
 
 		if (out == null || !out.exists() || out.length() == 0)
-			throw new IOException(String.format("Converter %s has not been able to convert file %s", converter
-					.getClass().getSimpleName(), in.getPath()));
+			throw new IOException(String.format("Converter %s has not been able to convert file %s",
+					converter.getClass().getSimpleName(), in.getPath()));
 
 		// Register this event in the user's history
 		if (StringUtils.isNotEmpty(sid)) {
@@ -285,14 +302,18 @@ public class FormatConverterManager {
 				UserHistory history = new UserHistory();
 
 				history.setSession(session);
-				history.setEvent(UserHistory.EVENT_FILE_CONVERSION);
-				history.setFilename(FilenameUtils.getBaseName(inFileName) + "." + outFormat.toLowerCase());
-				history.setFilenameOld(inFileName);
+				history.setEvent(UserEvent.FILE_CONVERSION.toString());
+				history.setFilename(FilenameUtils.getBaseName(inFilename) + "." + outFormat.toLowerCase());
+				history.setFilenameOld(inFilename);
 				history.setComment(String.format("%s -> %s", history.getFilenameOld(), history.getFilename()));
 				history.setIp(session.getClient().getAddress());
 
 				UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-				dao.store(history);
+				try {
+					dao.store(history);
+				} catch (PersistenceException e) {
+					log.warn(e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -310,15 +331,17 @@ public class FormatConverterManager {
 
 	/**
 	 * Returns the available output formats for the given input format
+	 * 
+	 * @param srcFilename name of the file
+	 * 
+	 * @return identifiers of the possible output extensions
 	 */
-	public List<String> getEnabledOutputFormats(String inFileName) {
-		String inExt = inFileName;
-		if (inFileName.contains("."))
-			inExt = FilenameUtils.getExtension(inFileName);
+	public List<String> getEnabledOutputFormats(String srcFilename) {
+		String inExt = AbstractFormatConverter.getExtension(srcFilename);
 		List<String> formats = new ArrayList<String>();
 		for (String key : getConverters().keySet()) {
 			String inOut[] = key.split("-");
-			FormatConverter assignedConverter = getConverter(inFileName, inOut[1]);
+			FormatConverter assignedConverter = getConverter(srcFilename, inOut[1]);
 			// The actually assigned converter must be anabled
 			if (!formats.contains(inOut[1]) && assignedConverter.isEnabled() && !inExt.equalsIgnoreCase(inOut[1])
 					&& inExt.equalsIgnoreCase(inOut[0]))
@@ -329,6 +352,10 @@ public class FormatConverterManager {
 
 	/**
 	 * Returns all the possible output formats for the given input format
+	 * 
+	 * @param inFileName name of the file to convert
+	 * 
+	 * @return list of possible output formats
 	 */
 	public List<String> getAllOutputFormats(String inFileName) {
 		String inExt = inFileName;
@@ -346,6 +373,8 @@ public class FormatConverterManager {
 
 	/**
 	 * Returns all the possible input formats
+	 * 
+	 * @return the collection of all available input formats
 	 */
 	public List<String> getAvailableInputFormats() {
 		List<String> formats = new ArrayList<String>();
@@ -360,6 +389,11 @@ public class FormatConverterManager {
 
 	/**
 	 * Returns the list of possible converters for a given in and out format
+	 * 
+	 * @param inFileName input file name
+	 * @param outFileName convertion file name
+	 * 
+	 * @return the collection of all installed format converters
 	 */
 	public List<FormatConverter> getAvailableConverters(String inFileName, String outFileName) {
 		String key = composeKey(inFileName, outFileName);
@@ -368,6 +402,8 @@ public class FormatConverterManager {
 
 	/**
 	 * Returns the list of possible converters
+	 * 
+	 * @return the collection of all installed format converters
 	 */
 	public Collection<FormatConverter> getAllConverters() {
 		return availableConverters.values();
@@ -376,9 +412,14 @@ public class FormatConverterManager {
 	/**
 	 * Loads the proper converter for the passed file names. The right converter
 	 * used is defined in the configuration parameter converter.composeKey()
+	 * 
+	 * @param inFileName file name of the input content
+	 * @param outFileName file name of the conversion
+	 * 
+	 * @return The right format converter
 	 */
 	public FormatConverter getConverter(String inFileName, String outFileName) {
-		if (getExtension(inFileName).equals(getExtension(outFileName)))
+		if (AbstractFormatConverter.getExtension(inFileName).equals(AbstractFormatConverter.getExtension(outFileName)))
 			return new NoConversionConverter();
 
 		String inOutkey = composeKey(inFileName, outFileName);
@@ -407,29 +448,32 @@ public class FormatConverterManager {
 		return converter;
 	}
 
-	private String getExtension(String fileNameOrExtension) {
-		String ext = fileNameOrExtension;
-		if (fileNameOrExtension.contains("."))
-			ext = FilenameUtils.getExtension(fileNameOrExtension.toLowerCase());
-		return ext;
-	}
-
 	/**
-	 * Creates the key as <in_extension>-<out_extension>
+	 * Creates the key as &lt;in_extension&gt;-&lt;out_extension&gt;
+	 * 
+	 * @param inFileName file name of the input content
+	 * @param outFileName file name of the conversion
+	 * 
+	 * @return the key
 	 */
 	private String composeKey(String inFileName, String outFileName) {
-		String inExt = getExtension(inFileName).toLowerCase();
-		String outExt = getExtension(outFileName).toLowerCase();
+		String inExt = AbstractFormatConverter.getExtension(inFileName).toLowerCase();
+		String outExt = AbstractFormatConverter.getExtension(outFileName).toLowerCase();
 		return inExt + "-" + outExt;
 	}
 
 	/**
 	 * Write a document into a temporary file.
 	 * 
-	 * @throws IOException
+	 * @param document the document
+	 * @param fileVersion version of the file
+	 * 
+	 * @return the temporary file containing the document's contents
+	 * 
+	 * @throws IOException raised if the file cannot be written
 	 */
 	private File writeToFile(Document document, String fileVersion) throws IOException {
-		File target = File.createTempFile("scr", "." + FilenameUtils.getExtension(document.getFileName()));
+		File target = File.createTempFile("scr", "." + AbstractFormatConverter.getExtension(document.getFileName()));
 		String fver = getSuitableFileVersion(document, fileVersion);
 		String resource = storer.getResourceName(document, fver, null);
 		storer.writeToFile(document.getId(), resource, target);
@@ -439,6 +483,11 @@ public class FormatConverterManager {
 	/**
 	 * Returns the fileVersion in case this is not null or
 	 * document.getFileVersion() otherwise
+	 * 
+	 * @param document the document
+	 * @param fileVersion version of the file
+	 * 
+	 * @return the file version
 	 */
 	private String getSuitableFileVersion(Document document, String fileVersion) {
 		String fver = fileVersion;
@@ -463,10 +512,10 @@ public class FormatConverterManager {
 			try {
 				Class<?> clazz = Class.forName(className);
 				// Try to instantiate the builder
-				Object converter = clazz.newInstance();
+				Object converter = clazz.getDeclaredConstructor().newInstance();
 				if (!(converter instanceof FormatConverter))
-					throw new Exception("The specified converter " + className
-							+ " doesn't implement FormatConverter interface");
+					throw new Exception(
+							"The specified converter " + className + " doesn't implement FormatConverter interface");
 
 				FormatConverter cnvrt = (FormatConverter) converter;
 				for (String name : cnvrt.getParameterNames())

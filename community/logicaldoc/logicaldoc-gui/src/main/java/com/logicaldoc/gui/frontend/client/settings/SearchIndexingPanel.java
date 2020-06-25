@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.settings;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISearchEngine;
-import com.logicaldoc.gui.common.client.data.DocumentsDS;
+import com.logicaldoc.gui.common.client.data.IndexingQueueDS;
 import com.logicaldoc.gui.common.client.data.LanguagesDS;
 import com.logicaldoc.gui.common.client.data.ParsersDS;
 import com.logicaldoc.gui.common.client.data.TokenFiltersDS;
@@ -25,10 +26,12 @@ import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
+import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.SearchEngineService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
@@ -42,7 +45,8 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
-import com.smartgwt.client.widgets.form.fields.PickerIcon.Picker;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
@@ -96,24 +100,38 @@ public class SearchIndexingPanel extends AdminPanel {
 
 	private Tab indexingQueueTab;
 
-	public SearchIndexingPanel(GUISearchEngine searchEngine) {
+	public SearchIndexingPanel() {
 		super("searchandindexing");
-
-		this.searchEngine = searchEngine;
 	}
 
 	@Override
 	public void onDraw() {
-		fillSearchEngineTab(searchEngine);
+		if (searchEngine == null)
+			SearchEngineService.Instance.get().getInfo(new AsyncCallback<GUISearchEngine>() {
 
-		Tab parsersInfoTab = fillParsersTab();
+				@Override
+				public void onFailure(Throwable caught) {
+					Log.serverError(caught);
+				}
 
-		indexingQueueTab = fillIndexingQueueTab(100);
+				@Override
+				public void onSuccess(GUISearchEngine searchEngine) {
+					SearchIndexingPanel.this.searchEngine = searchEngine;
+					fillSearchEngineTab();
 
-		tabs.addTab(fillFiltersTab());
-		tabs.addTab(fillLanguagesTab());
-		tabs.addTab(parsersInfoTab);
-		tabs.addTab(indexingQueueTab);
+					Tab parsersInfoTab = fillParsersTab();
+
+					tabs.addTab(fillFiltersTab());
+					tabs.addTab(fillLanguagesTab());
+					tabs.addTab(parsersInfoTab);
+
+					if (Session.get().isDefaultTenant()) {
+						indexingQueueTab = fillIndexingQueueTab(100);
+						tabs.addTab(indexingQueueTab);
+					}
+				}
+
+			});
 	}
 
 	private Tab fillIndexingQueueTab(final int maxValue) {
@@ -309,8 +327,8 @@ public class SearchIndexingPanel extends AdminPanel {
 						final List<GUIParameter> params = new ArrayList<GUIParameter>();
 						ListGridRecord[] records = configsGrid.getRecords();
 						for (ListGridRecord rec : records) {
-							params.add(new GUIParameter(rec.getAttributeAsString("name"), rec
-									.getAttributeAsString("value")));
+							params.add(new GUIParameter(rec.getAttributeAsString("name"),
+									rec.getAttributeAsString("value")));
 						}
 
 						SearchEngineService.Instance.get().saveTokenFilterSettings(filter,
@@ -398,7 +416,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		return filtersTab;
 	}
 
-	private void fillSearchEngineTab(GUISearchEngine searchEngine) {
+	private void fillSearchEngineTab() {
 		searchEngineTabPanel = new VLayout();
 		searchEngineTabPanel.setWidth100();
 		searchEngineTabPanel.setHeight100();
@@ -410,7 +428,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		searchEngineForm.setColWidths(1, "*");
 		searchEngineForm.setValuesManager(vm);
 
-		PickerIcon computeStat = new PickerIcon(new Picker("[SKIN]/picker_refresh.png"), new FormItemClickHandler() {
+		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, new FormItemClickHandler() {
 			public void onFormItemClick(final FormItemIconClickEvent event) {
 				event.getItem().setValue(I18N.message("computing") + "...");
 				SearchEngineService.Instance.get().countEntries(new AsyncCallback<Long>() {
@@ -427,6 +445,7 @@ public class SearchIndexingPanel extends AdminPanel {
 				});
 			}
 		});
+
 		computeStat.setPrompt(I18N.message("calculatestats"));
 		computeStat.setWidth(16);
 
@@ -439,41 +458,83 @@ public class SearchIndexingPanel extends AdminPanel {
 		entries.setWidth("1%");
 
 		// Locked
-		StaticTextItem status = ItemFactory.newStaticTextItem(
-				"status",
-				"status",
-				this.searchEngine.isLocked() ? ("<span style='color:red'>" + I18N.message("locked") + "</span>") : I18N
-						.message("unlocked"));
+		StaticTextItem status = ItemFactory.newStaticTextItem("status", "status",
+				this.searchEngine.isLocked() ? ("<span style='color:red'>" + I18N.message("locked") + "</span>")
+						: I18N.message("unlocked"));
 		status.setRedrawOnChange(true);
 
 		// Include Patters
-		TextItem includePatters = ItemFactory.newTextItem("includePatters", "includepatters", null);
-		includePatters.setValue(this.searchEngine.getIncludePatters());
-		includePatters.setHint(I18N.message("separatedcomma"));
-		includePatters.setHintStyle("hint");
+		TextItem includePatterns = ItemFactory.newTextItem("includePatterns", "includepatterns", null);
+		includePatterns.setValue(this.searchEngine.getIncludePatters());
+		includePatterns.setHint(I18N.message("separatedcomma"));
+		includePatterns.setHintStyle("hint");
+		includePatterns.setWidth(300);
 
 		// Exclude Patters
-		TextItem excludePatters = ItemFactory.newTextItem("excludePatters", "excludepatters", null);
-		excludePatters.setValue(this.searchEngine.getExcludePatters());
-		excludePatters.setHint(I18N.message("separatedcomma"));
-		excludePatters.setHintStyle("hint");
+		TextItem excludePatterns = ItemFactory.newTextItem("excludePatterns", "excludepatterns", null);
+		excludePatterns.setValue(this.searchEngine.getExcludePatters());
+		excludePatterns.setHint(I18N.message("separatedcomma"));
+		excludePatterns.setHintStyle("hint");
+		excludePatterns.setWidth(300);
+
+		// Include Patters
+		TextItem includePatternsMetadata = ItemFactory.newTextItem("includePatternsMetadata", "includepatternsmetadata",
+				null);
+		includePatternsMetadata.setValue(this.searchEngine.getIncludePattersMetadata());
+		includePatternsMetadata.setHint(I18N.message("separatedcomma"));
+		includePatternsMetadata.setHintStyle("hint");
+		includePatternsMetadata.setWidth(300);
+
+		// Exclude Patters
+		TextItem excludePatternsMetadata = ItemFactory.newTextItem("excludePatternsMetadata", "excludepatternsmetadata",
+				null);
+		excludePatternsMetadata.setValue(this.searchEngine.getExcludePatternsMetadata());
+		excludePatternsMetadata.setHint(I18N.message("separatedcomma"));
+		excludePatternsMetadata.setHintStyle("hint");
+		excludePatternsMetadata.setWidth(300);
+
+		SelectItem sorting = ItemFactory.newSelectItem("sorting", "sorting");
+		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		opts.put("", I18N.message("none").toLowerCase());
+		opts.put("oldestfirst", I18N.message("oldestfirst"));
+		opts.put("mostrecentfirst", I18N.message("mostrecentfirst"));
+		sorting.setValueMap(opts);
+		sorting.setValue(this.searchEngine.getSorting());
 
 		// The optional batch
-		IntegerItem batch = ItemFactory.newIntegerItem("batch", "batch", this.searchEngine.getBatch());
+		SpinnerItem batch = ItemFactory.newSpinnerItem("batch", "batch", this.searchEngine.getBatch());
+		batch.setMin(1);
+		batch.setStep(50);
+		batch.setWidth(100);
+
+		// The number of threads
+		SpinnerItem threads = ItemFactory.newSpinnerItem("threads", "threads", this.searchEngine.getThreads());
+		threads.setRequired(true);
+		threads.setMin(1);
+		threads.setStep(1);
 
 		// The optional parse timeout
-		IntegerItem timeout = ItemFactory.newIntegerItem("timeout", "parsingtimeout",
+		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", "parsingtimeout",
 				this.searchEngine.getParsingTimeout());
 		timeout.setHint(I18N.message("seconds"));
+		timeout.setWidth(100);
+		timeout.setMin(0);
+		timeout.setStep(10);
 
 		// The optional max text that will be put in the index
-		IntegerItem maxText = ItemFactory.newIntegerItem("maxtext", "maxtext", this.searchEngine.getMaxText());
+		SpinnerItem maxText = ItemFactory.newSpinnerItem("maxtext", "maxtext", this.searchEngine.getMaxText());
 		maxText.setHint(I18N.message("maxtextinindex"));
+		maxText.setWidth(100);
+		maxText.setMin(0);
+		maxText.setStep(100);
 
 		// The optional max size elaborated when parsing text files
-		IntegerItem maxTextFileSize = ItemFactory.newIntegerItem("maxtextfilesize", "maxtextfilesize",
+		SpinnerItem maxTextFileSize = ItemFactory.newSpinnerItem("maxtextfilesize", "maxtextfilesize",
 				this.searchEngine.getMaxTextFileSize());
 		maxTextFileSize.setHint(I18N.message("maxtextfilesizehint"));
+		maxTextFileSize.setWidth(100);
+		maxTextFileSize.setMin(0);
+		maxTextFileSize.setStep(1048);
 
 		// Repository
 		TextItem repository = ItemFactory.newTextItem("repository", "repository", null);
@@ -490,33 +551,44 @@ public class SearchIndexingPanel extends AdminPanel {
 				final Map<String, Object> values = vm.getValues();
 
 				if (vm.validate()) {
-					SearchIndexingPanel.this.searchEngine.setIncludePatters((String) values.get("includePatters"));
-					SearchIndexingPanel.this.searchEngine.setExcludePatters((String) values.get("excludePatters"));
+					SearchIndexingPanel.this.searchEngine.setIncludePatterns((String) values.get("includePatterns"));
+					SearchIndexingPanel.this.searchEngine.setExcludePatterns((String) values.get("excludePatterns"));
+					SearchIndexingPanel.this.searchEngine
+							.setIncludePatternsMetadata((String) values.get("includePatternsMetadata"));
+					SearchIndexingPanel.this.searchEngine
+							.setExcludePatternsMetadata((String) values.get("excludePatternsMetadata"));
 					SearchIndexingPanel.this.searchEngine.setDir((String) values.get("repository"));
+					SearchIndexingPanel.this.searchEngine.setSorting((String) values.get("sorting"));
 
 					String btch = vm.getValueAsString("batch");
 					if (btch == null || "".equals(btch.trim()))
 						SearchIndexingPanel.this.searchEngine.setBatch(0);
 					else
-						SearchIndexingPanel.this.searchEngine.setBatch(new Integer(btch));
+						SearchIndexingPanel.this.searchEngine.setBatch(Integer.parseInt(btch));
+
+					String thrds = vm.getValueAsString("threads");
+					if (thrds == null || "".equals(thrds.trim()))
+						SearchIndexingPanel.this.searchEngine.setThreads(1);
+					else
+						SearchIndexingPanel.this.searchEngine.setThreads(Integer.parseInt(thrds));
 
 					String timeout = vm.getValueAsString("timeout");
 					if (timeout == null || "".equals(timeout.trim()))
 						SearchIndexingPanel.this.searchEngine.setParsingTimeout(0);
 					else
-						SearchIndexingPanel.this.searchEngine.setParsingTimeout(new Integer(timeout));
+						SearchIndexingPanel.this.searchEngine.setParsingTimeout(Integer.parseInt(timeout));
 
 					String maxtext = vm.getValueAsString("maxtext");
 					if (maxtext == null || "".equals(maxtext.trim()))
 						SearchIndexingPanel.this.searchEngine.setMaxText(0);
 					else
-						SearchIndexingPanel.this.searchEngine.setMaxText(new Integer(maxtext));
+						SearchIndexingPanel.this.searchEngine.setMaxText(Integer.parseInt(maxtext));
 
 					String maxTextFileSize = vm.getValueAsString("maxtextfilesize");
 					if (maxtext == null || "".equals(maxtext.trim()))
 						SearchIndexingPanel.this.searchEngine.setMaxTextFileSize(0);
 					else
-						SearchIndexingPanel.this.searchEngine.setMaxTextFileSize(new Integer(maxTextFileSize));
+						SearchIndexingPanel.this.searchEngine.setMaxTextFileSize(Integer.parseInt(maxTextFileSize));
 
 					SearchEngineService.Instance.get().save(SearchIndexingPanel.this.searchEngine,
 							new AsyncCallback<Void>() {
@@ -528,20 +600,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 								@Override
 								public void onSuccess(Void ret) {
-									Log.info(I18N.message("settingssaved"), null);
-									SearchEngineService.Instance.get().getInfo(new AsyncCallback<GUISearchEngine>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(GUISearchEngine searchEngine) {
-											AdminScreen.get().setContent(new SearchIndexingPanel(searchEngine));
-										}
-
-									});
+									AdminScreen.get().setContent(new SearchIndexingPanel());
 								}
 							});
 				}
@@ -562,19 +621,7 @@ public class SearchIndexingPanel extends AdminPanel {
 					@Override
 					public void onSuccess(Void ret) {
 						Log.info(I18N.message("indexunlocked"), null);
-						SearchEngineService.Instance.get().getInfo(new AsyncCallback<GUISearchEngine>() {
-
-							@Override
-							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
-							}
-
-							@Override
-							public void onSuccess(GUISearchEngine searchEngine) {
-								AdminScreen.get().setContent(new SearchIndexingPanel(searchEngine));
-							}
-
-						});
+						AdminScreen.get().setContent(new SearchIndexingPanel());
 					}
 				});
 			}
@@ -606,18 +653,7 @@ public class SearchIndexingPanel extends AdminPanel {
 									Log.info(I18N.message("docsreindex"), null);
 									rescheduleAll.setDisabled(false);
 									ContactingServer.get().hide();
-
-									SearchEngineService.Instance.get().getInfo(new AsyncCallback<GUISearchEngine>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(GUISearchEngine searchEngine) {
-											AdminScreen.get().setContent(new SearchIndexingPanel(searchEngine));
-										}
-									});
+									AdminScreen.get().setContent(new SearchIndexingPanel());
 								}
 							});
 						}
@@ -652,18 +688,7 @@ public class SearchIndexingPanel extends AdminPanel {
 									Log.info(I18N.message("docsreindex"), null);
 									dropIndex.setDisabled(false);
 									ContactingServer.get().hide();
-
-									SearchEngineService.Instance.get().getInfo(new AsyncCallback<GUISearchEngine>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(GUISearchEngine searchEngine) {
-											AdminScreen.get().setContent(new SearchIndexingPanel(searchEngine));
-										}
-									});
+									AdminScreen.get().setContent(new SearchIndexingPanel());
 								}
 							});
 						}
@@ -697,13 +722,16 @@ public class SearchIndexingPanel extends AdminPanel {
 		if (Session.get().isDefaultTenant()) {
 			buttons.setMembers(save, unlock, rescheduleAll, dropIndex, check);
 		} else {
+			buttons.setMembers(save, rescheduleAll);
 			repository.setVisible(false);
 			batch.setVisible(false);
+			threads.setVisible(false);
 			maxText.setVisible(false);
-			buttons.setMembers(save, rescheduleAll);
+			sorting.setVisible(false);
 		}
 
-		searchEngineForm.setItems(entries, status, repository, includePatters, excludePatters, batch, timeout, maxText,
+		searchEngineForm.setItems(entries, status, repository, includePatterns, excludePatterns,
+				includePatternsMetadata, excludePatternsMetadata, sorting, threads, batch, timeout, maxText,
 				maxTextFileSize);
 
 		buttons.setMembersMargin(5);
@@ -737,7 +765,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		// Prepare a panel containing a title and the documents number
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		ListGridField id = new ListGridField("id");
+		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
 		ListGridField size = new ListGridField("size", I18N.message("size"), 70);
@@ -789,15 +817,6 @@ public class SearchIndexingPanel extends AdminPanel {
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setCanFilter(false);
 
-		ListGridField locked = new ListGridField("locked", " ", 24);
-		locked.setType(ListGridFieldType.IMAGE);
-		locked.setCanSort(false);
-		locked.setAlign(Alignment.CENTER);
-		locked.setShowDefaultContextMenu(false);
-		locked.setImageURLPrefix(Util.imagePrefix());
-		locked.setImageURLSuffix(".png");
-		locked.setCanFilter(false);
-
 		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
 		filename.setCanFilter(true);
 
@@ -845,21 +864,34 @@ public class SearchIndexingPanel extends AdminPanel {
 		docsList.setSelectionType(SelectionStyle.MULTIPLE);
 		docsList.setShowFilterEditor(true);
 		docsList.setFilterOnKeypress(true);
-		docsList.setFields(locked, icon, filename, size, lastModified, version, publisher, published, creator, created,
+		docsList.setFields(id, icon, filename, size, lastModified, version, publisher, published, creator, created,
 				customId);
 
 		indexingQueueTabPanel = new VLayout();
 		indexingQueueTabPanel.setMembers(toolStrip, infoPanel, docsList);
 	}
 
-	private void refreshIndexingQueue(Integer maxValue) {
-		docsList.refresh(new DocumentsDS(null, null, maxValue, 1, 0, null, false));
+	private void refreshIndexingQueue(Integer max) {
+		docsList.refresh(new IndexingQueueDS(max));
 	}
 
 	private void showIndexQueueMenu() {
 		final ListGridRecord[] selection = docsList.getSelectedRecords();
 
 		Menu contextMenu = new Menu();
+
+		MenuItem openInFolder = new MenuItem();
+		openInFolder.setTitle(I18N.message("openinfolder"));
+		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				ListGridRecord record = docsList.getSelectedRecord();
+				if (record == null)
+					return;
+
+				DocumentsPanel.get().openInFolder(record.getAttributeAsLong("id"));
+			}
+		});
+
 		MenuItem markUnindexable = new MenuItem();
 		markUnindexable.setTitle(I18N.message("markunindexable"));
 		markUnindexable.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
@@ -887,7 +919,7 @@ public class SearchIndexingPanel extends AdminPanel {
 			}
 		});
 
-		contextMenu.setItems(markUnindexable);
+		contextMenu.setItems(markUnindexable, openInFolder);
 		contextMenu.showContextMenu();
 	}
 

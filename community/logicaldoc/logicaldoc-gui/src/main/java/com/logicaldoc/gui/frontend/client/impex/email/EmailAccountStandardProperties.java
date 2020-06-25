@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
-import com.logicaldoc.gui.frontend.client.folder.FolderSelector;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
@@ -37,7 +37,7 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		setMembers(formsContainer);
 
 		targetSelector = new FolderSelector("target", true);
-		targetSelector.setTitle(I18N.message("target"));
+		targetSelector.setTitle(I18N.message("targetfolder"));
 		targetSelector.setWidth(250);
 
 		if (account.getTarget() != null)

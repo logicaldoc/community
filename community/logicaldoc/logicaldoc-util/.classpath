@@ -6,15 +6,15 @@
   <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/4.3.14.RELEASE/spring-core-4.3.14.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/4.3.20.RELEASE/spring-core-4.3.20.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/4.3.14.RELEASE/spring-context-4.3.14.RELEASE.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/4.3.14.RELEASE/spring-aop-4.3.14.RELEASE.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/4.3.14.RELEASE/spring-beans-4.3.14.RELEASE.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-expression/4.3.14.RELEASE/spring-expression-4.3.14.RELEASE.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-orm/4.3.14.RELEASE/spring-orm-4.3.14.RELEASE.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-jdbc/4.3.14.RELEASE/spring-jdbc-4.3.14.RELEASE.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/4.3.14.RELEASE/spring-tx-4.3.14.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/4.3.20.RELEASE/spring-context-4.3.20.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/4.3.20.RELEASE/spring-aop-4.3.20.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/4.3.20.RELEASE/spring-beans-4.3.20.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-expression/4.3.20.RELEASE/spring-expression-4.3.20.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-orm/4.3.20.RELEASE/spring-orm-4.3.20.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-jdbc/4.3.20.RELEASE/spring-jdbc-4.3.20.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/4.3.20.RELEASE/spring-tx-4.3.20.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-core/5.2.12.Final/hibernate-core-5.2.12.Final.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging/3.3.0.Final/jboss-logging-3.3.0.Final.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/hibernate/javax/persistence/hibernate-jpa-2.1-api/1.0.0.Final/hibernate-jpa-2.1-api-1.0.0.Final.jar"/>
@@ -43,11 +43,12 @@
   <classpathentry kind="var" path="M2_REPO/net/sf/jpf/jpf/1.5.1/jpf-1.5.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/quartz-scheduler/quartz/2.2.1/quartz-2.2.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/c3p0/c3p0/0.9.1.1/c3p0-0.9.1.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/junit/junit/4.4/junit-4.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.6/junit-4.6.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.6/commons-codec-1.6.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcmail-jdk15on/1.51/bcmail-jdk15on-1.51.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcprov-jdk15on/1.51/bcprov-jdk15on-1.51.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcpkix-jdk15on/1.51/bcpkix-jdk15on-1.51.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcmail-jdk15on/1.61/bcmail-jdk15on-1.61.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcprov-jdk15on/1.61/bcprov-jdk15on-1.61.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcpkix-jdk15on/1.61/bcpkix-jdk15on-1.61.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/bouncycastle/bcprov-ext-jdk15on/1.61/bcprov-ext-jdk15on-1.61.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.5.2/httpclient-4.5.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.4.4/httpcore-4.4.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpmime/4.5.2/httpmime-4.5.2.jar"/>

@@ -2,6 +2,7 @@ package com.logicaldoc.gui.common.client.widgets;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.RepeatingCommand;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.log.EventPanel;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.smartgwt.client.types.Alignment;
@@ -56,11 +57,13 @@ public class ToastNotification extends Window {
 				ToastNotification.this.destroy();
 				return false;
 			}
-		}, 2000);
+		}, Session.get().getConfigAsInt("gui.popup.timeout") * 1000);
 	}
 
 	/**
 	 * Shows toast notification and also writes in the status bar.
+	 * 
+	 * @param message the text to be printed in the toast
 	 */
 	public static void showNotification(String message) {
 		new ToastNotification(message).show();

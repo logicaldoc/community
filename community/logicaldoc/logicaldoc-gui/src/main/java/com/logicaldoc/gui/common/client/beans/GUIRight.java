@@ -52,6 +52,8 @@ public class GUIRight implements Serializable {
 
 	private boolean email = false;
 
+	private boolean automation = false;
+
 	private String name;
 
 	private String label;
@@ -230,5 +232,13 @@ public class GUIRight implements Serializable {
 
 	public void setEmail(boolean email) {
 		this.email = email;
+	}
+
+	public boolean isAutomation() {
+		return automation;
+	}
+
+	public void setAutomation(boolean automation) {
+		this.automation = automation;
 	}
 }

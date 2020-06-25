@@ -2,8 +2,6 @@ package com.logicaldoc.core.searchengine;
 
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
+
+import junit.framework.Assert;
 
 public class StandardSearchEngineTest extends AbstractCoreTCase {
 

@@ -2,10 +2,12 @@ package com.logicaldoc.util.io;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.StandardCopyOption;
 
 public class IOUtil {
 	private static final int DEFAULT_BUFFER_SIZE = 10240; // ..bytes = 10KB.
@@ -34,6 +36,8 @@ public class IOUtil {
 	 * 
 	 * @param input Original input stream
 	 * @param limit Size of the new stream, expressed in bytes
+	 * 
+	 * @return the limited input stream
 	 */
 	public static InputStream getLimitedStream(InputStream input, long limit) {
 		return new LimitedInputStream(input, limit);
@@ -45,6 +49,10 @@ public class IOUtil {
 		while ((letter = input.read(buffer)) != -1) {
 			output.write(buffer, 0, letter);
 		}
+	}
+
+	public static void write(InputStream input, File output) throws IOException {
+		java.nio.file.Files.copy(input, output.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	}
 
 	public static String getStringFromInputStream(InputStream is) throws IOException {

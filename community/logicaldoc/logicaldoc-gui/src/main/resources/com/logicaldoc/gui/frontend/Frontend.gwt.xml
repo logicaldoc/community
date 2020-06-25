@@ -7,12 +7,15 @@
   <inherits name='com.google.gwt.widgetideas.GWTCanvas'/>
   <inherits name='com.google.gwt.widgetideas.WidgetIdeas' />   
   <inherits name='com.google.gwt.libideas.LibIdeas' /> 
-  
   <inherits name='com.google.gwt.user.User' />
   <inherits name='com.google.gwt.xml.XML' />
-  <inherits name='de.novanic.eventservice.GWTEventService' />
   
+  <inherits name="com.sksamuel.gwt.GwtWebsockets" />
   <inherits name="gdurelle.tagcloud.TagCloud"/>
+    
+  <!-- inherits name='edu.ycp.cs.dh.acegwt.AceGWT'/ -->
+  <inherits name='org.wisepersist.gwt.ace.AceEditor'/>
+  
   <stylesheet src="tags.css" />
   
   <entry-point class="com.logicaldoc.gui.frontend.client.Frontend" />

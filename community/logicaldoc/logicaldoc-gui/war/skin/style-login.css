@@ -93,13 +93,8 @@ input:focus {
 	border: 2px solid transparent;
 	font-size: 16px;
 	line-height: 30px;
-	text-decoration: none;
-	text-shadow: none;
-	border-radius: 3px;
-	box-shadow: none;
-	transition: 0.25s;
-	display: block;
 }
+
 
 .btnOver, .btnFocused, .btnFocusedOver {
 	background-color: #D8590A;
@@ -107,12 +102,6 @@ input:focus {
 	border: 2px solid transparent;
 	font-size: 16px;
 	line-height: 30px;
-	text-decoration: none;
-	text-shadow: none;
-	border-radius: 3px;
-	box-shadow: none;
-	transition: 0.25s;
-	display: block;
 }
 
 .btnDown, .btnFocusedDown {
@@ -120,13 +109,7 @@ input:focus {
 	color: black;
 	border: 2px solid transparent;
 	font-size: 16px;
-	line-height: 30px;
-	text-decoration: none;
-	text-shadow: none;
-	border-radius: 3px;
-	box-shadow: none;
-	transition: 0.25s;
-	display: block;
+    line-height: 30px;
 }
 
 .login-link {

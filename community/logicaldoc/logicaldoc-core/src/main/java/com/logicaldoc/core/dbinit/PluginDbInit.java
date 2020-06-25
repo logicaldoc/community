@@ -25,7 +25,7 @@ public class PluginDbInit extends DBInit {
 	protected static Logger log = LoggerFactory.getLogger(PluginDbInit.class);
 
 	/**
-	 * Intitialises the database using 'DbInit' extension point.
+	 * Intitializes the database using 'DbInit' extension point.
 	 */
 	public void init() {
 		init(null);

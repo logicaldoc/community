@@ -1,5 +1,6 @@
 package com.logicaldoc.core.generic;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -15,7 +17,6 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 4.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> implements GenericDAO {
 	public HibernateGenericDAO() {
 		super(Generic.class);
@@ -23,23 +24,22 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	}
 
 	@Override
-	public boolean delete(long genericId, int code) {
+	public boolean delete(long genericId, int code) throws PersistenceException {
 		assert (code != 0);
+
+		if (!checkStoringAspect())
+			return false;
+
 		boolean result = true;
-		try {
-			Generic generic = findById(genericId);
-			if (generic != null) {
-				generic.setType(generic.getType() + "." + generic.getId());
-				generic.setSubtype(generic.getSubtype() + "." + generic.getId());
-				generic.setDeleted(code);
-				saveOrUpdate(generic);
-				flush();
-			}
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
+		Generic generic = findById(genericId);
+		if (generic != null) {
+			generic.setType(generic.getType() + "." + generic.getId());
+			generic.setSubtype(generic.getSubtype() + "." + generic.getId());
+			generic.setDeleted(code);
+			saveOrUpdate(generic);
+			flush();
 		}
+
 		return result;
 	}
 
@@ -53,9 +53,12 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 			sb.append(" and _entity.qualifier=" + qualifier);
 		else
 			sb.append(" and _entity.qualifier is null");
-		Collection<Generic> coll = findByWhere(sb.toString(), null, null);
-		if (coll.size() > 0) {
-			generic = coll.iterator().next();
+		try {
+			Collection<Generic> coll = findByWhere(sb.toString(), null, null);
+			if (coll.size() > 0)
+				generic = coll.iterator().next();
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 		return generic;
 	}
@@ -71,7 +74,13 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 			query += " and _entity.qualifier = " + qualifier;
 		if (tenantId != null)
 			query += " and _entity.tenantId = " + tenantId;
-		return findByWhere(query, null, null);
+
+		try {
+			return findByWhere(query, null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<Generic>();
+		}
 	}
 
 	@Override
@@ -84,7 +93,7 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	}
 
 	@Override
-	public boolean store(Generic entity) {
+	public boolean store(Generic entity) throws PersistenceException {
 		boolean stored = super.store(entity);
 		flush();
 		return stored;

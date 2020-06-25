@@ -7,8 +7,6 @@ import java.util.List;
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.logicaldoc.core.document.Document;
@@ -24,6 +22,8 @@ import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.model.WSUtil;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>SoapDocumentService</code>
@@ -110,7 +110,7 @@ public class SoapDocumentServiceTest extends AbstractWebServiceTestCase {
 		Folder folder = doc.getFolder();
 		Assert.assertEquals(103, folder.getId());
 
-		Folder newFolder = folderDao.findById(100);
+		Folder newFolder = folderDao.findById(80);
 		docDao.initialize(doc);
 		doc.setIndexed(0);
 		docDao.store(doc);
@@ -150,8 +150,11 @@ public class SoapDocumentServiceTest extends AbstractWebServiceTestCase {
 		wsDoc.addAttribute(att);
 		docService.create("xxxx", wsDoc, new DataHandler(new FileDataSource(file)));
 
+		System.out.println(wsDoc.getFileName());
 		Document doc = docDao.findByFileNameAndParentFolderId(wsDoc.getFolderId(), wsDoc.getFileName(), null, 1L, null)
 				.get(0);
+		System.out.println(doc.getFileName());
+		
 		Assert.assertNotNull(doc);
 		docDao.initialize(doc);
 
@@ -166,13 +169,13 @@ public class SoapDocumentServiceTest extends AbstractWebServiceTestCase {
 	@Test
 	public void testUpload() throws Exception {
 		File file = new File("pom.xml");
-		long docId = docService.upload("xxxx", null, 4L, true, "document test.txt", "en", new DataHandler(
-				new FileDataSource(file)));
+		long docId = docService.upload("xxxx", null, 4L, true, "document test.txt", "en",
+				new DataHandler(new FileDataSource(file)));
 
 		Assert.assertTrue(docId > 0L);
 
-		long docId2 = docService.upload("xxxx", docId, null, true, "document test.txt", "en", new DataHandler(
-				new FileDataSource(file)));
+		long docId2 = docService.upload("xxxx", docId, null, true, "document test.txt", "en",
+				new DataHandler(new FileDataSource(file)));
 
 		Assert.assertEquals(docId, docId2);
 		Assert.assertEquals("2.0", docDao.findById(docId2).getVersion());
@@ -221,18 +224,6 @@ public class SoapDocumentServiceTest extends AbstractWebServiceTestCase {
 	}
 
 	@Test
-	public void testRenameFile() throws Exception {
-		Document doc = docDao.findById(1);
-		Assert.assertNotNull(doc);
-		Assert.assertEquals("pippo", doc.getFileName());
-		docDao.initialize(doc);
-		docService.renameFile("", 1, "pippo.doc");
-		docDao.initialize(doc);
-		Assert.assertEquals("pippo.doc", doc.getFileName());
-		Assert.assertEquals("doc", doc.getType());
-	}
-
-	@Test
 	public void testGetDocument() throws Exception {
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
@@ -277,8 +268,8 @@ public class SoapDocumentServiceTest extends AbstractWebServiceTestCase {
 		Assert.assertEquals("testVer02", versionsList.get(0).getVersion());
 		Assert.assertEquals("testVer01", versionsList.get(1).getVersion());
 
-		versions = docService.getVersions("", 2);
-		Assert.assertEquals(0, versions.length);
+		versions = docService.getVersions("", 2L);
+		Assert.assertEquals(2, versions.length);
 	}
 
 	@Test

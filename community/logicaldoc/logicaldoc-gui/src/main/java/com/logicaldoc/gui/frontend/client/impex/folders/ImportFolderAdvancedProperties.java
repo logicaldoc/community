@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -16,6 +17,7 @@ import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
@@ -70,6 +72,32 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		if (importFolder.getTemplateId() != null)
 			template.setValue(importFolder.getTemplateId().toString());
 
+		ChangedHandler changeTemplateHandler = new ChangedHandler() {
+			@Override
+			public void onChanged(ChangedEvent event) {
+				if (form.getValue("template") == null || "".equals(form.getValueAsString("template")))
+					importFolder.setTemplateId(null);
+				else
+					importFolder.setTemplateId(Long.parseLong(form.getValueAsString("template")));
+				importFolder.setOcrTemplateId(null);
+				importFolder.setBarcodeTemplateId(null);
+				refresh();
+			}
+		};
+		template.addChangedHandler(changeTemplateHandler);
+		
+		SelectItem ocrTemplate = ItemFactory.newOCRTemplateSelector(true, importFolder.getTemplateId(),
+				importFolder.getOcrTemplateId());
+		ocrTemplate.addChangedHandler(changedHandler);
+		ocrTemplate.setMultiple(false);
+		ocrTemplate.setDisabled(!Feature.enabled(Feature.ZONAL_OCR) || importFolder.getTemplateId() == null);
+
+		SelectItem barcodeTemplate = ItemFactory.newBarcodeTemplateSelector(true, importFolder.getTemplateId(),
+				importFolder.getBarcodeTemplateId());
+		barcodeTemplate.addChangedHandler(changedHandler);
+		barcodeTemplate.setMultiple(false);
+		barcodeTemplate.setDisabled(!Feature.enabled(Feature.BARCODES));
+
 		CheckboxItem delImport = new CheckboxItem();
 		delImport.setName("delImport");
 		delImport.setTitle(I18N.message("deleteafterimport"));
@@ -86,7 +114,6 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		importEmpty.setValue(importFolder.isImportEmpty());
 		importEmpty.addChangedHandler(changedHandler);
 
-		
 		CheckboxItem inheritRights = new CheckboxItem();
 		inheritRights.setName("inheritRights");
 		inheritRights.setTitle(I18N.message("inheritrights"));
@@ -94,7 +121,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		inheritRights.setWidth(50);
 		inheritRights.setValue(importFolder.isInheritRights());
 		inheritRights.addChangedHandler(changedHandler);
-		
+
 		TextItem tags = ItemFactory.newTextItem("tags", "tags", importFolder.getTags());
 		tags.addChangedHandler(changedHandler);
 
@@ -107,8 +134,7 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		startDate.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
-				if ("backspace".equals(event.getKeyName().toLowerCase())
-						|| "delete".equals(event.getKeyName().toLowerCase())) {
+				if ("delete".equals(event.getKeyName().toLowerCase())) {
 					startDate.clearValue();
 					startDate.setValue((Date) null);
 					changedHandler.onChanged(null);
@@ -126,7 +152,8 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 		updatePolicy.setValueMap(map);
 		updatePolicy.setValue(Integer.toString(importFolder.getUpdatePolicy()));
 
-		form.setItems(depth, size, startDate, template, tags, updatePolicy, importEmpty, inheritRights, delImport);
+		form.setItems(depth, size, startDate, template, ocrTemplate, barcodeTemplate, tags, updatePolicy, importEmpty,
+				inheritRights, delImport);
 
 		formsContainer.addMember(form);
 
@@ -146,11 +173,22 @@ public class ImportFolderAdvancedProperties extends ImportFolderDetailsTab {
 
 			importFolder.setDepth(Integer.parseInt(values.get("depth").toString()));
 			importFolder.setUpdatePolicy(Integer.parseInt(values.get("updatePolicy").toString()));
-			
+
 			if (values.get("template") == null || "".equals((String) values.get("template")))
 				importFolder.setTemplateId(null);
 			else
 				importFolder.setTemplateId(Long.parseLong((String) values.get("template")));
+			
+			if (values.get("ocrtemplate") == null || "".equals((String) values.get("ocrtemplate")))
+				importFolder.setOcrTemplateId(null);
+			else
+				importFolder.setOcrTemplateId(Long.parseLong((String) values.get("ocrtemplate")));
+			
+			if (values.get("barcodetemplate") == null || "".equals((String) values.get("barcodetemplate")))
+				importFolder.setBarcodeTemplateId(null);
+			else
+				importFolder.setBarcodeTemplateId(Long.parseLong((String) values.get("barcodetemplate")));
+			
 			importFolder.setDelImport((Boolean) values.get("delImport"));
 			importFolder.setInheritRights((Boolean) values.get("inheritRights"));
 			importFolder.setImportEmpty((Boolean) values.get("importEmpty"));

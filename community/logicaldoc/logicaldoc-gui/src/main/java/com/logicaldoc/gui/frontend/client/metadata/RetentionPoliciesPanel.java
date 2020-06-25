@@ -347,6 +347,8 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param policy the policy to update
 	 */
 	public void updateRecord(GUIRetentionPolicy policy) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, policy.getId()));

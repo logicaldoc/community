@@ -25,7 +25,12 @@ import com.logicaldoc.webservice.model.WSTagCloud;
 public interface TagService {
 
 	/**
-	 * Sets the tags of a document.
+	 * Sets the tags of a document
+	 * 
+	 * @param docId identifier of the document
+	 * @param tags array of tags
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@POST
 	@Path("/setDocumentTags")
@@ -33,68 +38,96 @@ public interface TagService {
 
 	/**
 	 * Adds tags to a document
+	 * 
+	 * @param docId identifier of the document
+	 * @param tags array of tags
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@POST
 	@Path("/addDocumentTags")
 	public void addDocumentTags(@FormParam("docId") long docId, @FormParam("tag") String[] tags) throws Exception;
 
 	/**
-	 * Retrieves all the tags of a document.
+	 * Retrieves all the tags of a document
+	 *
+	 * @param docId identifier of the document
 	 * 
 	 * @return The tags of the document
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/getDocumentTags")
 	public String[] getDocumentTags(@QueryParam("docId") long docId) throws Exception;
 
 	/**
-	 * Sets the tags of a folder.
+	 * Sets the tags of a folder
 	 * 
-	 * @param sid Session Identifier
+	 * @param folderId identifier of the folder
+	 * @param tags list of tags
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@POST
 	@Path("/setFolderTags")
 	public void setFolderTags(@FormParam("folderId") long folderId, @FormParam("tag") String[] tags) throws Exception;
 
 	/**
-	 * Adds tags to a folder.
+	 * Adds tags to a folder
+	 * 
+	 * @param folderId identifier of the folder
+	 * @param tags list of tags
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@POST
 	@Path("/addFolderTags")
 	public void addFolderTags(@FormParam("folderId") long folderId, @FormParam("tag") String[] tags) throws Exception;
 
 	/**
-	 * Retrieves all the tags of a folder.
+	 * Retrieves all the tags of a folder
+	 * 
+	 * @param folderId identifier of the folder
 	 * 
 	 * @return The tags of the folder
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/getFolderTags")
 	public String[] getFolderTags(@FormParam("folderId") long folderId) throws Exception;
 
 	/**
-	 * Retrieves all the tags in the repository.
+	 * Retrieves all the tags in the repository
 	 * 
 	 * @return The tags in the repository
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/getTags")
 	public String[] getTags() throws Exception;
 
 	/**
-	 * Retrieves all tag clouds in the repository.
+	 * Retrieves all tag clouds in the repository
 	 * 
 	 * @return The tags in the repository
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/getTagCloud")
 	public WSTagCloud[] getTagCloud() throws Exception;
 
 	/**
-	 * Finds authorized documents for the current user having a specified tag.
+	 * Finds authorized documents for the current user having a specified tag
 	 * 
 	 * @param tag Tag of the document
-	 * @return Collection of found documents.
+	 * 
+	 * @return Collection of found documents
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/findDocumentsByTag")
@@ -104,9 +137,23 @@ public interface TagService {
 	 * Finds authorized folders for the current user having a specified tag.
 	 * 
 	 * @param tag Tag of the folder
-	 * @return Collection of found folders.
+	 * 
+	 * @return Collection of found folders
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@GET
 	@Path("/findFoldersByTag")
 	public WSFolder[] findFoldersByTag(@QueryParam("tag") String tag) throws Exception;
+	
+	/**
+	 * Retrieves all the tags in the preset (if the input mode is preset).
+	 * 
+	 * @return The tags in the preset
+	 * 
+	 * @throws Exception error in the server application
+	 */
+	@GET
+	@Path("/getTagsPreset")
+	public String[] getTagsPreset() throws Exception;	
 }

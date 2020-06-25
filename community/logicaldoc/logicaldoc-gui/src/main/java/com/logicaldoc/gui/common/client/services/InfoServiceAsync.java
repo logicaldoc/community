@@ -6,8 +6,10 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 
 public interface InfoServiceAsync {
 
-	void getInfo(String locale, String tenant, AsyncCallback<GUIInfo> callback);
+	void getInfo(String locale, String tenant, boolean login, AsyncCallback<GUIInfo> callback);
 
 	void getSessionInfo(AsyncCallback<GUIParameter[]> callback);
+
+	void ping(AsyncCallback<Boolean> callback);
 
 }

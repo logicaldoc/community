@@ -36,14 +36,11 @@ public class FormCreate extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("createform"));
-		setWidth(270);
-		setHeight(155);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setPadding(5);
-		setMembersMargin(3);
+		setAutoSize(true);
 
 		DynamicForm form = new DynamicForm();
 		vm = new ValuesManager();

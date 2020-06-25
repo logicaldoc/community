@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-gui" version="8.0.0">
+<plugin id="logicaldoc-gui" version="8.4.2">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>

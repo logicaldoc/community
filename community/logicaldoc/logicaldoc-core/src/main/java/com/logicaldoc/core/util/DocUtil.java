@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.VersionDAO;
-import com.logicaldoc.core.document.thumbnail.PdfThumbnailBuilder;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.util.Context;
@@ -19,7 +18,7 @@ import com.logicaldoc.util.Context;
  * @since 7.6.4
  */
 public class DocUtil {
-	protected static Logger log = LoggerFactory.getLogger(PdfThumbnailBuilder.class);
+	protected static Logger log = LoggerFactory.getLogger(DocUtil.class);
 
 	public static String getFileName(Document document, String fileVersion) {
 		String fileName = document.getFileName();

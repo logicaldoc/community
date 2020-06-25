@@ -8,8 +8,9 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.History;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -20,8 +21,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 3.0
  */
 @SuppressWarnings("unchecked")
-public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> implements
-		TicketDAO {
+public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> implements TicketDAO {
 
 	private DocumentDAO documentDAO;
 
@@ -38,7 +38,10 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 	}
 
 	@Override
-	public boolean store(Ticket entity, History transaction) {
+	public boolean store(Ticket entity, DocumentHistory transaction) {
+		if (!checkStoringAspect())
+			return false;
+
 		if (entity.getExpired() == null) {
 			// Retrieve the time to live
 			int ttl = contextProperties.getInt("ticket.ttl");
@@ -50,13 +53,18 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		if (StringUtils.isEmpty(entity.getSuffix()))
 			entity.setSuffix(null);
 
-		boolean ret = super.store(entity);
+		boolean ret = false;
+		try {
+			ret = super.store(entity);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		if (transaction != null) {
 			transaction.setEvent(DocumentEvent.DTICKET_CREATED.toString());
 			transaction.setDocId(entity.getDocId());
 			transaction.setComment("Ticket " + entity.getTicketId());
-			
+
 			documentDAO.saveDocumentHistory(documentDAO.findById(entity.getDocId()), transaction);
 		}
 
@@ -67,6 +75,9 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 	 * @see com.logicaldoc.core.ticket.TicketDAO#deleteByTicketId(java.lang.String)
 	 */
 	public boolean deleteByTicketId(String ticketid) {
+		if (!checkStoringAspect())
+			return false;
+
 		boolean result = true;
 		try {
 			Ticket ticket = findByTicketId(ticketid);
@@ -100,11 +111,14 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 
 	@Override
 	public boolean deleteByDocId(long docId) {
+		if (!checkStoringAspect())
+			return false;
+
 		boolean result = true;
 
 		try {
-			Collection<Ticket> coll = (Collection<Ticket>) findByQuery(
-					"from Ticket _ticket where _ticket.docId = ?1", new Object[] { new Long(docId) }, null);
+			Collection<Ticket> coll = (Collection<Ticket>) findByQuery("from Ticket _ticket where _ticket.docId = ?1",
+					new Object[] { docId }, null);
 			for (Ticket downloadTicket : coll) {
 				downloadTicket.setDeleted(1);
 				saveOrUpdate(downloadTicket);
@@ -123,9 +137,12 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 
 	@Override
 	public void deleteExpired() {
+		if (!checkStoringAspect())
+			return;
+
 		try {
-			Collection<Ticket> coll = (Collection<Ticket>) findByQuery(
-					"from Ticket _ticket where _ticket.expired < ?1", new Object[] { new Date() }, null);
+			Collection<Ticket> coll = (Collection<Ticket>) findByQuery("from Ticket _ticket where _ticket.expired < ?1",
+					new Object[] { new Date() }, null);
 			for (Ticket downloadTicket : coll) {
 				downloadTicket.setDeleted(1);
 				saveOrUpdate(downloadTicket);

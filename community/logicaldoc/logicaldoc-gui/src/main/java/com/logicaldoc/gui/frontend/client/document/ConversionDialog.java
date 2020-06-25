@@ -67,29 +67,30 @@ public class ConversionDialog extends Window {
 			}
 		});
 
-		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, new AsyncCallback<GUIFolder>() {
+		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false, 
+				new AsyncCallback<GUIFolder>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
-			}
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+					}
 
-			@Override
-			public void onSuccess(GUIFolder folder) {
-				convert.setDisabled(!folder.isDownload() && !folder.isWrite());
+					@Override
+					public void onSuccess(GUIFolder folder) {
+						convert.setDisabled(!folder.isDownload() && !folder.isWrite());
 
-				LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-				if (folder.isDownload())
-					map.put("download", I18N.message("download"));
-				if (folder.isWrite())
-					map.put("save", I18N.message("save"));
-				action.setValueMap(map);
-				action.setValue("download");
+						LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+						if (folder.isDownload())
+							map.put("download", I18N.message("download"));
+						if (folder.isWrite())
+							map.put("save", I18N.message("save"));
+						action.setValueMap(map);
+						action.setValue("download");
 
-				form.setFields(format, action, convert);
-				addItem(form);
-			}
-		});
+						form.setFields(format, action, convert);
+						addItem(form);
+					}
+				});
 	}
 
 	public void onConvert() {

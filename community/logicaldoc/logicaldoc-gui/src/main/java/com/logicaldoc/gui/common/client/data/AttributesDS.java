@@ -9,7 +9,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * declared in the attribute sets
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since 7.6
+ * @since 7.6 n
  */
 public class AttributesDS extends DataSource {
 	

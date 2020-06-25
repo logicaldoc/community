@@ -36,9 +36,9 @@ public interface AuthService {
 
 	@DELETE
 	@Path("/logout")
-	public void logout();
+	public void logout(@QueryParam("sid") String sid);
 	
 	@GET
 	@Path("/getSid")
-	public String getSid();
+	public String getSid();	
 }

@@ -14,14 +14,23 @@ public class BaseURL {
 	}
 
 	/**
-	 * @return Server URL as : protocol://serverName:port/
+	 * Gets the server's URL
+	 * 
+	 * @param request the HTTP request
+	 * @param local if the URL must be local
+	 * 
+	 * @return Server URL as protocol://serverName:port/
 	 */
 	public static String getServerURL(ServletRequest request, boolean local) {
 		return VirtualHostHelper.getServerURL(request, local);
 	}
 
 	/**
-	 * @return WebApp name : ie : logicaldoc
+	 * Gets the name od the application
+	 * 
+	 * @param request the HTTP request
+	 * 
+	 * @return WebApp name, i.e.: logicaldoc
 	 */
 	public static String getWebAppName(HttpServletRequest request) {
 		String baseURL = request.getContextPath();
@@ -35,6 +44,10 @@ public class BaseURL {
 	}
 
 	/**
+	 * Gets the base URL
+	 * 
+	 * @param request the HTTP request
+	 * 
 	 * @return base URL as protocol://serverName:port/webappName/
 	 */
 	public static String getBaseURL(ServletRequest request) {

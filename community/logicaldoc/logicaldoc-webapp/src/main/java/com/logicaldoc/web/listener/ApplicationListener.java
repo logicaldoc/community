@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Log4jConfigurer;
 
+import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LoggingConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
@@ -47,8 +48,15 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */
 	public void contextDestroyed(ServletContextEvent sce) {
-		log.warn("Shutting down application");
+		onShutdown();
+	}
 
+	public static void onShutdown() {
+		log.warn("Shutting down the application");
+
+		/*
+		 * Try to shutdown the DB connection
+		 */
 		try {
 			ContextProperties config = new ContextProperties();
 			if (config.getProperty("jdbc.url").contains("jdbc:hsqldb")) {
@@ -60,11 +68,16 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 				dbInit.executeSql("shutdown compact");
 				log.warn("Embedded database stopped");
+			} else if (config.getProperty("jdbc.url").contains("jdbc:mysql")) {
+				com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.uncheckedShutdown();
 			}
-		} catch (IOException e) {
-			log.warn(e.getMessage(), e);
+		} catch (Throwable e) {
+			log.warn(e.getMessage());
 		}
 
+		/*
+		 * De-register the database drivers
+		 */
 		try {
 			Enumeration<Driver> drivers = DriverManager.getDrivers();
 			Driver d = null;
@@ -126,6 +139,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			lconf.setLogsRoot(config.getProperty("conf.logdir"));
 			lconf.write();
 
+			// Init the logs
 			Log4jConfigurer.initLogging(log4jPath);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -158,25 +172,42 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			e.printStackTrace();
 		}
 
-		// Clean the upload folder
-		File uploadDir = new File(context.getRealPath("upload"));
+		// Clean some temporary folders
+		File tempDirToDelete = new File(context.getRealPath("upload"));
 		try {
-			if (uploadDir.exists())
-				FileUtils.forceDelete(uploadDir);
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
 		} catch (IOException e) {
 			log.warn(e.getMessage());
-			e.printStackTrace();
 		}
 
-		needRestart = PluginRegistry.getInstance().isRestartRequired();
+		tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/upload");
+		try {
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+
+		tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/convertjpg");
+		try {
+			if (tempDirToDelete.exists())
+				FileUtils.forceDelete(tempDirToDelete);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+
+		// Initialize the Automation
+		Automation.initialize();
 
 		// Try to unpack new plugins
 		try {
 			unpackPlugins(context);
 		} catch (IOException e) {
 			log.warn(e.getMessage());
-			e.printStackTrace();
 		}
+
+		needRestart = PluginRegistry.getInstance().isRestartRequired();
 
 		if (needRestart) {
 			log.warn("The application has to be restarted");
@@ -195,10 +226,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		File[] archives = pluginsDir.listFiles(new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				if (name.contains("plugin"))
-					return true;
-				else
-					return false;
+				return name.toLowerCase().contains("plugin") && name.toLowerCase().endsWith(".zip");
 			}
 		});
 		File webappDir = new File(context.getRealPath("/"));
@@ -207,7 +235,21 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				System.out.println("Unpack plugin " + archive.getName());
 				ZipUtil zipUtil = new ZipUtil();
 				zipUtil.unzip(archive.getPath(), webappDir.getPath());
-				FileUtils.forceDelete(archive);
+				FileUtils.moveFile(archive, new File(archive.getParentFile(), archive.getName() + ".installed"));
+
+				String pluginName = archive.getName().replace("-plugin.zip", "");
+				pluginName = pluginName.substring(0, pluginName.lastIndexOf('-'));
+				System.out.println("Remove installation marker of plugin " + pluginName);
+				File pluginDir = new File(pluginsDir, pluginName);
+				File[] installationMarkers = pluginDir.listFiles(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return name.toLowerCase().startsWith("install-");
+					}
+				});
+				for (File file : installationMarkers)
+					FileUtils.deleteQuietly(file);
+
 				needRestart = true;
 			}
 	}
@@ -224,6 +266,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	public void sessionDestroyed(HttpSessionEvent event) {
 		HttpSession session = event.getSession();
 		String id = session.getId();
+
+		// Remove the upload folders
 		File uploadFolder = new File(session.getServletContext().getRealPath("upload"));
 		uploadFolder = new File(uploadFolder, id);
 		try {
@@ -231,6 +275,16 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				FileUtils.forceDelete(uploadFolder);
 		} catch (Throwable e) {
 			log.warn(e.getMessage());
+		}
+
+		String sid = (String) session.getAttribute("sid");
+		File uploadDir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + sid);
+		try {
+			if (uploadDir.exists())
+				FileUtils.forceDelete(uploadDir);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+			e.printStackTrace();
 		}
 	}
 }

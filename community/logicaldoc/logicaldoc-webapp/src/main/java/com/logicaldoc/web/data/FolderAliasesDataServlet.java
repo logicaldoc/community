@@ -28,14 +28,14 @@ public class FolderAliasesDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(FolderAliasesDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
 			Long folderId = null;
 			if (StringUtils.isNotEmpty(request.getParameter("folderId")))
-				folderId = new Long(request.getParameter("folderId"));
+				folderId = Long.parseLong(request.getParameter("folderId"));
 
 			response.setContentType("text/xml");
 			response.setCharacterEncoding("UTF-8");
@@ -51,14 +51,35 @@ public class FolderAliasesDataServlet extends HttpServlet {
 			Context context = Context.get();
 			DocumentDAO dao = (DocumentDAO) context.getBean(DocumentDAO.class);
 			FolderDAO folderDAO = (FolderDAO) context.getBean(FolderDAO.class);
-			Collection<Long> ids = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
+			Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
 
-			StringBuffer query = new StringBuffer("select id, name from Folder where deleted = 0 and foldRef = " + folderId);
+			StringBuffer query = new StringBuffer(
+					"select id, name from Folder where deleted = 0 and foldRef = " + folderId);
 
 			User user = ServiceUtil.getSessionUser(request);
 			if (!user.isMemberOf("admin")) {
-				query.append(" and id in ");
-				query.append(ids.toString().replace('[', ' ').replace(']', ' '));
+				if (dao.isOracle()) {
+					/*
+					 * In Oracle The limit of 1000 elements applies to sets of
+					 * single items: (x) IN ((1), (2), (3), ...). There is no
+					 * limit if the sets contain two or more items: (x, 0) IN
+					 * ((1,0), (2,0), (3,0), ...):
+					 */
+					query.append(" and (id,0) in ( ");
+					boolean firstItem = true;
+					for (Long fid : accessibleFolderIds) {
+						if (!firstItem)
+							query.append(",");
+						query.append("(");
+						query.append(fid);
+						query.append(",0)");
+						firstItem = false;
+					}
+					query.append(" )");
+				} else {
+					query.append(" and id in ");
+					query.append(accessibleFolderIds.toString().replace('[', '(').replace(']', ')'));
+				}
 			}
 
 			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, null);

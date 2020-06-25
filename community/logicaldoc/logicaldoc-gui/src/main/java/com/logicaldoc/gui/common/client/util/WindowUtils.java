@@ -2,6 +2,7 @@ package com.logicaldoc.gui.common.client.util;
 
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window.Navigator;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 
@@ -123,4 +124,17 @@ public class WindowUtils {
 	public static native String top()/*-{
 		return $wnd.screenY;
 	}-*/;
+
+	public static native String getUserAgent() /*-{
+		return navigator.userAgent.toLowerCase();
+	}-*/;
+
+	public static boolean isChrome() {
+		return getUserAgent().toLowerCase().contains("chrome");
+	}
+
+	public static boolean isWindows() {
+		String platform = Navigator.getPlatform();
+		return platform.trim().toLowerCase().contains("win");
+	}
 }

@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.frontend.client.webcontent;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -8,7 +7,6 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.logicaldoc.gui.frontend.client.services.DocumentServiceAsync;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ContentsType;
 import com.smartgwt.client.types.HeaderControls;
@@ -45,11 +43,11 @@ public class WebcontentEditor extends Window {
 
 		this.document = document;
 
-		setWidth(com.google.gwt.user.client.Window.getClientWidth());
-		setHeight(com.google.gwt.user.client.Window.getClientHeight());
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setWidth100();
+		setHeight100();
 		centerInPage();
 
 		addCloseClickHandler(new CloseClickHandler() {
@@ -99,19 +97,20 @@ public class WebcontentEditor extends Window {
 
 	private void unlockAndClose() {
 		if (document.getId() != 0)
-			DocumentService.Instance.get().unlock(new long[] { WebcontentEditor.this.document.getId() }, new AsyncCallback<Void>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
-					destroy();
-				}
+			DocumentService.Instance.get().unlock(new long[] { WebcontentEditor.this.document.getId() },
+					new AsyncCallback<Void>() {
+						@Override
+						public void onFailure(Throwable caught) {
+							Log.serverError(caught);
+							destroy();
+						}
 
-				@Override
-				public void onSuccess(Void result) {
-					DocumentsPanel.get().refresh();
-					destroy();
-				}
-			});
+						@Override
+						public void onSuccess(Void result) {
+							DocumentsPanel.get().refresh();
+							destroy();
+						}
+					});
 		else
 			destroy();
 	}

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,7 +28,6 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.login.client.services.LoginService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.crypt.CryptUtil;
 
 /**
  * Implementation of the <code>LoginService</code>
@@ -42,9 +42,9 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	private static Logger log = LoggerFactory.getLogger(InfoServiceImpl.class);
 
 	@Override
-	public int changePassword(long userId, String oldPassword, String newPassword, boolean notify) {
+	public int changePassword(long userId, String oldPassword, String newPassword) {
 		SecurityServiceImpl ser = new SecurityServiceImpl();
-		return ser.changePassword(userId, oldPassword, newPassword, notify);
+		return ser.changePassword(userId, userId, oldPassword, newPassword, false);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			// Get just a few informations needed by the login
 			GUIUser usr = new GUIUser();
 			usr.setId(user.getId());
-			usr.setTenantId(user.getTenantId());
+			usr.setTenant(SecurityServiceImpl.getTenant(user.getTenantId()));
 			usr.setPasswordExpires(user.getPasswordExpires() == 1);
 			usr.setPasswordExpired(user.getPasswordExpired() == 1);
 
@@ -81,13 +81,13 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		User user = userDao.findByUsername(username);
 
-		EMail email;
-		try {
-			if (user == null)
-				throw new ServerException("User " + username + " not found");
-			else if (!user.getEmail().trim().equals(emailAddress.trim()))
-				throw new ServerException("User with email " + emailAddress + " not found");
+		if (user == null)
+			throw new ServerException(String.format("User %s not found", username));
+		else if (!user.getEmail().trim().equals(emailAddress.trim()))
+			throw new ServerException(String.format("Email %s is wrong", emailAddress));
 
+		try {
+			EMail email;
 			email = new EMail();
 			email.setHtml(1);
 			email.setTenantId(user.getTenantId());
@@ -98,8 +98,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			email.setFolder("outbox");
 
 			// Prepare a new download ticket
-			String temp = new Date().toString() + user.getId();
-			String ticketid = CryptUtil.cryptString(temp);
+			String ticketid = (UUID.randomUUID().toString());
 			Ticket ticket = new Ticket();
 			ticket.setTicketId(ticketid);
 			ticket.setDocId(0L);
@@ -141,6 +140,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			sender.send(email, "psw.rec2", dictionary);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
+			throw new ServerException(e.getMessage());
 		}
 	}
 }

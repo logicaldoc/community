@@ -105,9 +105,9 @@ public class ParameterConditionRow extends HLayout {
 
 		LinkedHashMap<String, String> fieldsMap = new LinkedHashMap<String, String>();
 		fieldsMap.put("", " ");
-		for (DataSourceField sourceField : ds.getFields()) {
+		for (DataSourceField sourceField : ds.getFields())
 			fieldsMap.put(sourceField.getName(), I18N.message(sourceField.getTitle()));
-		}
+
 		attribute.setValueMap(fieldsMap);
 		attribute.setValue(fieldSelected);
 		attribute.setColSpan(1);
@@ -170,6 +170,27 @@ public class ParameterConditionRow extends HLayout {
 				value.setWidth(padSize);
 			}
 		});
+
+		operator.addChangedHandler(new ChangedHandler() {
+			@Override
+			public void onChanged(ChangedEvent event) {
+				onOperatorChanged(event != null ? event.getValue().toString() : null);
+			}
+		});
+
+		onOperatorChanged(operator.getValue() != null ? operator.getValue().toString() : null);
+	}
+
+	private void onOperatorChanged(String valueOperator) {
+		if (valueOperator == null || "null".equals(valueOperator) || "notnull".equals(valueOperator)) {
+			form.hideItem("value");
+			if (value != null)
+				value.setVisible(false);
+		} else {
+			form.showItem("value");
+			if (value != null)
+				value.setVisible(true);
+		}
 	}
 
 	private LinkedHashMap<String, String> operatorsFor(String criteriaField) {
@@ -184,25 +205,42 @@ public class ParameterConditionRow extends HLayout {
 			map.put("lessthan", I18N.message("lessthan"));
 			map.put("equals", I18N.message("equals"));
 			map.put("notequal", I18N.message("notequal"));
+			map.put("null", I18N.message("isnull"));
+			map.put("notnull", I18N.message("isnotnull"));
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
 				|| criteriaField.equals("date") || criteriaField.equals("creation")
 				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
 				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_DATE)) {
 			map.put("greaterthan", I18N.message("greaterthan"));
 			map.put("lessthan", I18N.message("lessthan"));
+			map.put("null", I18N.message("isnull"));
+			map.put("notnull", I18N.message("isnotnull"));
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN)) {
 			map.put("equals", I18N.message("equals"));
-		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
+			map.put("null", I18N.message("isnull"));
+			map.put("notnull", I18N.message("isnotnull"));
+		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)
+				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_USER)
+				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_FOLDER)) {
 			map.put("equals", I18N.message("equals"));
 			map.put("notequal", I18N.message("notequal"));
+			map.put("null", I18N.message("isnull"));
+			map.put("notnull", I18N.message("isnotnull"));
 		} else if (criteriaField.equals("tags") || criteriaField.equals("notes")) {
 			map.put("contains", I18N.message("contains"));
 			map.put("notcontains", I18N.message("notcontains"));
+			map.put("null", I18N.message("isnull"));
+			map.put("notnull", I18N.message("isnotnull"));
+		} else if (criteriaField.equals("template")) {
+			map.put("null", I18N.message("isnull"));
+			map.put("notnull", I18N.message("isnotnull"));
 		} else {
 			map.put("contains", I18N.message("contains"));
 			map.put("notcontains", I18N.message("notcontains"));
 			map.put("equals", I18N.message("equals"));
 			map.put("notequal", I18N.message("notequal"));
+			map.put("null", I18N.message("isnull"));
+			map.put("notnull", I18N.message("isnotnull"));
 		}
 
 		return map;
@@ -210,9 +248,11 @@ public class ParameterConditionRow extends HLayout {
 
 	private FormItem valueItemFor(String criteriaField) {
 		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("rating")
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_DOUBLE)) {
+				|| criteriaField.equals("template") || criteriaField.equals("published")
+				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)) {
 			return ItemFactory.newIntegerItem("value", "integer", null);
+		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_DOUBLE)) {
+			return ItemFactory.newFloatItem("value", "double", null);
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN)) {
 			FormItem item = ItemFactory.newBooleanSelector("value", "boolean");
 			item.setValue("yes");
@@ -220,6 +260,19 @@ public class ParameterConditionRow extends HLayout {
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
 			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replaceAll("_", "");
 			FormItem item = ItemFactory.newStringItemForAttribute(template.getAttribute(attributeName));
+			item.setName("value");
+			return item;
+		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_USER)) {
+			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replaceAll("_", "");
+			GUIAttribute att = template.getAttribute(attributeName);
+			FormItem item = ItemFactory.newUserSelectorForAttribute("value", att.getLabel(),
+					(att.getOptions() != null && att.getOptions().length > 0) ? att.getOptions()[0] : null, null);
+			item.setName("value");
+			return item;
+		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_FOLDER)) {
+			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replaceAll("_", "");
+			GUIAttribute att = template.getAttribute(attributeName);
+			FormItem item = ItemFactory.newFolderSelectorForAttribute("value", att.getLabel(), false, null);
 			item.setName("value");
 			return item;
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
@@ -234,15 +287,15 @@ public class ParameterConditionRow extends HLayout {
 		}
 	}
 
-	public SelectItem getCriteriaFieldsItem() {
+	public SelectItem getAttributeFieldItem() {
 		return attribute;
 	}
 
-	public SelectItem getOperatorsFieldsItem() {
+	public SelectItem getOperatorsFieldItem() {
 		return operator;
 	}
 
-	public FormItem getValueFieldsItem() {
+	public FormItem getValueFieldItem() {
 		return value;
 	}
 

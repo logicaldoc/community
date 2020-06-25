@@ -14,6 +14,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
@@ -60,6 +61,8 @@ public class LastChangesReport extends AdminPanel {
 
 	private InfoPanel infoPanel;
 
+	private FolderSelector folder;
+
 	public LastChangesReport() {
 		super("lastchanges");
 	}
@@ -88,6 +91,11 @@ public class LastChangesReport extends AdminPanel {
 		// Session ID
 		TextItem sessionId = ItemFactory.newTextItem("sid", "sid", null);
 		sessionId.setColSpan(4);
+		sessionId.setWidth(250);
+
+		folder = new FolderSelector(null, true);
+		folder.setColSpan(3);
+		folder.setWidth(200);
 
 		// Max results
 		TextItem displayMax = ItemFactory.newTextItem("displayMax", "displaymax", null);
@@ -147,9 +155,10 @@ public class LastChangesReport extends AdminPanel {
 		export.setEndRow(true);
 
 		if (Feature.visible(Feature.EXPORT_CSV))
-			form.setItems(user, sessionId, fromDate, tillDate, displayMax, searchButton, resetButton, print, export);
+			form.setItems(user, sessionId, fromDate, tillDate, folder, displayMax, searchButton, resetButton, print,
+					export);
 		else
-			form.setItems(user, sessionId, fromDate, tillDate, displayMax, searchButton, resetButton, print);
+			form.setItems(user, sessionId, fromDate, tillDate, folder, displayMax, searchButton, resetButton, print);
 
 		DynamicForm eventForm = new DynamicForm();
 		eventForm.setValuesManager(vm);
@@ -159,7 +168,7 @@ public class LastChangesReport extends AdminPanel {
 		eventForm.setColWidths(1, "*");
 
 		// Event
-		SelectItem event = ItemFactory.newEventsSelector("event", I18N.message("event"), true, true, true);
+		SelectItem event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, true, true);
 		event.setColSpan(2);
 		event.setEndRow(true);
 
@@ -223,12 +232,16 @@ public class LastChangesReport extends AdminPanel {
 		comment.setCanFilter(true);
 		comment.setHidden(true);
 
+		ListGridField reason = new ListGridField("reason", I18N.message("reason"), 200);
+		reason.setCanFilter(true);
+		reason.setHidden(true);
+
 		histories = new ListGrid();
 		histories.setEmptyMessage(I18N.message("notitemstoshow"));
 		histories.setWidth100();
 		histories.setHeight100();
 		histories.setFields(eventField, date, userField, name, folder, sid, docId, folderId, userId, ip, username,
-				comment);
+				comment, reason);
 		histories.setSelectionType(SelectionStyle.SINGLE);
 		histories.setShowRecordComponents(true);
 		histories.setShowRecordComponentsByCell(true);
@@ -258,7 +271,9 @@ public class LastChangesReport extends AdminPanel {
 	}
 
 	/**
-	 * Gets the option items for Messageshistory events types
+	 * Gets the option items to choose events types
+	 * 
+	 * @return an array of select items
 	 */
 	public SelectItem[] getEventTypes() {
 		List<SelectItem> items = new ArrayList<SelectItem>();
@@ -310,7 +325,7 @@ public class LastChangesReport extends AdminPanel {
 
 			ContactingServer.get().show();
 			SystemService.Instance.get().search(userValue, fromValue, tillValue, displayMaxValue, sid, eventValues,
-					new AsyncCallback<GUIHistory[]>() {
+					folder.getFolderId(), new AsyncCallback<GUIHistory[]>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -338,14 +353,15 @@ public class LastChangesReport extends AdminPanel {
 									record.setAttribute("ip", result[i].getIp());
 									record.setAttribute("username", result[i].getUserLogin());
 									record.setAttribute("comment", result[i].getComment());
+									record.setAttribute("reason", result[i].getReason());
 									records[i] = record;
 								}
 								histories.setData(records);
 							}
 							lastchanges.removeMember(infoPanel);
 							infoPanel = new InfoPanel("");
-							infoPanel.setMessage(I18N.message("showelements",
-									Integer.toString(histories.getTotalRows())));
+							infoPanel.setMessage(
+									I18N.message("showelements", Integer.toString(histories.getTotalRows())));
 							lastchanges.addMember(infoPanel, 1);
 						}
 					});

@@ -50,6 +50,7 @@ public class AspectsDataServlet extends HttpServlet {
 				writer.print("<default>" + RunLevel.DEFAULT.aspectEnabled(aspect) + "</default>");
 				writer.print("<bulkload>" + RunLevel.BULKLOAD.aspectEnabled(aspect) + "</bulkload>");
 				writer.print("<devel>" + RunLevel.DEVEL.aspectEnabled(aspect) + "</devel>");
+				writer.print("<devel>" + RunLevel.SLAVE.aspectEnabled(aspect) + "</devel>");
 				writer.print("<demo>" + RunLevel.DEMO.aspectEnabled(aspect) + "</demo>");
 				writer.print("</aspect>");
 			}

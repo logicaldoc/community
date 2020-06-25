@@ -14,5 +14,5 @@
    <!-- Compile for firefox only more fastly for developement and hosted mode -->
    <!-- set-property name="user.agent" value="gecko1_8" / -->
    <set-property name="user.agent" value="gecko1_8,safari" />
-   <entry-point class="com.logicaldoc.gui.common.client.Common" />
+   <!-- entry-point class="com.logicaldoc.gui.common.client.Common" / -->
 </module>

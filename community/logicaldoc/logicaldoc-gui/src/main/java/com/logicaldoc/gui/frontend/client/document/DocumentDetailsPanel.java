@@ -10,32 +10,24 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
+import com.logicaldoc.gui.frontend.client.document.note.NotesPanel;
+import com.logicaldoc.gui.frontend.client.document.signature.SignaturePanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.Side;
-import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Button;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
 import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 
@@ -78,9 +70,11 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected Layout subscriptionsTabPanel;
 
+	protected Layout ocrTabPanel;
+
 	protected StandardPropertiesPanel propertiesPanel;
 
-	protected ExtendedPropertiesPanel extendedPropertiesPanel;
+	protected DocumentExtendedPropertiesPanel extendedPropertiesPanel;
 
 	protected VersionsPanel versionsPanel;
 
@@ -102,11 +96,9 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected PublishingPanel retentionPoliciesPanel;
 
-	protected HLayout savePanel;
+	protected DocumentOCRPanel ocrPanel;
 
-	protected TabSet tabSet = new TabSet();
-
-	protected DynamicForm saveForm;
+	protected EditingTabSet tabSet;
 
 	protected Tab propertiesTab;
 
@@ -132,6 +124,8 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected Tab subscriptionsTab;
 
+	protected Tab ocrTab;
+
 	public DocumentDetailsPanel() {
 		super();
 
@@ -141,74 +135,11 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		setWidth100();
 		setMembersMargin(10);
 
-		savePanel = new HLayout();
-		saveForm = new DynamicForm();
-		Button saveButton = new Button(I18N.message("save"));
-		saveButton.setAutoFit(true);
-		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
-		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// We have to reload the document because the tags may be
-				// reverted to the original tags list.
-				// This 'if condition' is necessary to know if the close image
-				// has been selected into the Documents list panel or into the
-				// Search list panel.
-				DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIDocument doc) {
-						DocumentController.get().selected(doc);
-					}
-				});
-				savePanel.setVisible(false);
-			}
-		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("60%");
-		spacer.setOverflow(Overflow.HIDDEN);
-
-		TextItem versionComment = ItemFactory.newTextItem("versionComment", "versioncomment", null);
-		versionComment.setWidth(300);
-		saveForm.setItems(versionComment);
-		savePanel.addMember(saveButton);
-		savePanel.addMember(saveForm);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		savePanel.setHeight(20);
-		savePanel.setMembersMargin(10);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
-		addMember(savePanel);
-
 		prepareTabs();
 		prepareTabset();
-
 	}
 
-	public void selectDeafultTab() {
+	public void selectDefaultTab() {
 		if ("preview".equals(Session.get().getInfo().getConfig("gui.document.tab")))
 			tabSet.selectTab(previewTab);
 		else
@@ -277,6 +208,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		retentionPoliciesTabPanel.setHeight100();
 		retentionPoliciesTab.setPane(retentionPoliciesTabPanel);
 
+		ocrTab = new Tab(I18N.message("ocr"));
+		ocrTabPanel = new HLayout();
+		ocrTabPanel.setWidth100();
+		ocrTabPanel.setHeight100();
+		ocrTab.setPane(ocrTabPanel);
+
 		calendarTab = new Tab(I18N.message("calendar"));
 		calendarTabPanel = new HLayout();
 		calendarTabPanel.setWidth100();
@@ -292,11 +229,33 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	protected void prepareTabset() {
-		tabSet = new TabSet();
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight100();
+		tabSet = new EditingTabSet(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				onSave();
+			}
+		}, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				// We have to reload the document because the tags may be
+				// reverted to the original tags list.
+				// This 'if condition' is necessary to know if the close image
+				// has been selected into the Documents list panel or into the
+				// Search list panel.
+				DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIDocument doc) {
+						DocumentController.get().selected(doc);
+					}
+				});
+			}
+		});
 
 		tabSet.addTab(propertiesTab);
 		propertiesTab.addTabSelectedHandler(new TabSelectedHandler() {
@@ -314,13 +273,15 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			}
 		});
 
-		tabSet.addTab(versionsTab);
-		versionsTab.addTabSelectedHandler(new TabSelectedHandler() {
-			@Override
-			public void onTabSelected(TabSelectedEvent event) {
-				versionsPanel.onTabSelected();
-			}
-		});
+		if (Menu.enabled(Menu.VERSIONS)) {
+			tabSet.addTab(versionsTab);
+			versionsTab.addTabSelectedHandler(new TabSelectedHandler() {
+				@Override
+				public void onTabSelected(TabSelectedEvent event) {
+					versionsPanel.onTabSelected();
+				}
+			});
+		}
 
 		tabSet.addTab(previewTab);
 		previewTab.addTabSelectedHandler(new TabSelectedHandler() {
@@ -359,7 +320,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			});
 		}
 
-		if (Feature.visible(Feature.DIGITAL_SIGNATURE)) {
+		if (Feature.visible(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.SIGNATURE)) {
 			tabSet.addTab(signatureTab);
 			signatureTab.setDisabled(!Feature.enabled(Feature.DIGITAL_SIGNATURE));
 			signatureTab.addTabSelectedHandler(new TabSelectedHandler() {
@@ -382,7 +343,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			}
 		});
 
-		if (Feature.visible(Feature.CALENDAR)) {
+		if (Feature.visible(Feature.CALENDAR) && Menu.enabled(Menu.DOCUMENT_CALENDAR)) {
 			tabSet.addTab(calendarTab);
 			calendarTab.setDisabled(!Feature.enabled(Feature.CALENDAR));
 			calendarTab.addTabSelectedHandler(new TabSelectedHandler() {
@@ -414,12 +375,21 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			});
 		}
 
+		if (Menu.enabled(Menu.DOCUMENT_OCR)) {
+			tabSet.addTab(ocrTab);
+			ocrTab.addTabSelectedHandler(new TabSelectedHandler() {
+				@Override
+				public void onTabSelected(TabSelectedEvent event) {
+					ocrPanel.onTabSelected();
+				}
+			});
+		}
+
 		addMember(tabSet);
 	}
 
 	protected void refresh() {
-		if (savePanel != null)
-			savePanel.setVisible(false);
+		hideSave();
 
 		/*
 		 * Prepare the standard properties tab
@@ -433,7 +403,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		ChangedHandler changeHandler = new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
-				onModified();
+				displaySave();
 			}
 		};
 		propertiesPanel = new StandardPropertiesPanel(document, changeHandler);
@@ -447,7 +417,15 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (extendedPropertiesTabPanel.contains(extendedPropertiesPanel))
 				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
 		}
-		extendedPropertiesPanel = new ExtendedPropertiesPanel(document, changeHandler);
+		ChangedHandler templateChangedHandler = new ChangedHandler() {
+			@Override
+			public void onChanged(ChangedEvent event) {
+				document.setOcrTemplateId(null);
+				document.setBarcodeTemplateId(null);
+				ocrPanel.refresh(document.getTemplateId());
+			}
+		};
+		extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, changeHandler, templateChangedHandler);
 		extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
 
 		/*
@@ -460,6 +438,17 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		}
 		retentionPoliciesPanel = new PublishingPanel(document, changeHandler);
 		retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
+
+		/*
+		 * Prepare the OCR tab
+		 */
+		if (ocrPanel != null) {
+			ocrPanel.destroy();
+			if (ocrTabPanel.contains(ocrPanel))
+				ocrTabPanel.removeMember(ocrPanel);
+		}
+		ocrPanel = new DocumentOCRPanel(document, changeHandler, true);
+		ocrTabPanel.addMember(ocrPanel);
 
 		/*
 		 * Prepare the versions tab
@@ -591,27 +580,36 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		refresh();
 	}
 
-	public void onModified() {
-		savePanel.setVisible(true);
+	private void disableSave() {
+		tabSet.disableSave();
+	}
+
+	private void hideSave() {
+		tabSet.hideSave();
+	}
+
+	private void displaySave() {
+		tabSet.displaySave();
 	}
 
 	private boolean validate() {
 		boolean stdValid = propertiesPanel.validate();
 		boolean extValid = extendedPropertiesPanel.validate();
 		boolean publishingValid = retentionPoliciesPanel.validate();
+		boolean ocrValid = ocrPanel.validate();
 		if (!stdValid)
 			tabSet.selectTab(0);
 		else if (!extValid)
 			tabSet.selectTab(1);
 		else if (!publishingValid)
 			tabSet.selectTab(2);
-		return stdValid && extValid && publishingValid;
+		else if (!ocrValid)
+			tabSet.selectTab(ocrTab);
+		return stdValid && extValid && publishingValid && ocrValid;
 	}
 
 	public void onSave() {
 		if (validate()) {
-			document.setComment(saveForm.getValueAsString("versionComment"));
-
 			try {
 				// Check if the user has changed the extension and warn him
 				if (!originalExtension.equalsIgnoreCase(Util.getExtension(document.getFileName()))) {
@@ -633,17 +631,32 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	private void saveDocument() {
+		if (Session.get().getConfigAsBoolean("gui.onsave.askversioncomment")) {
+			LD.askforString(I18N.message("versioncomment"), I18N.message("versioncomment"), null, new ValueCallback() {
+
+				@Override
+				public void execute(String comment) {
+					document.setComment(comment);
+					save();
+				}
+			});
+		} else {
+			save();
+		}
+	}
+
+	private void save() {
+		disableSave();
 		DocumentService.Instance.get().save(document, new AsyncCallback<GUIDocument>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				saveForm.setValue("versionComment", "");
 				Log.serverError(caught);
+				displaySave();
 			}
 
 			@Override
 			public void onSuccess(GUIDocument result) {
-				savePanel.setVisible(false);
-				saveForm.setValue("versionComment", "");
+				hideSave();
 				DocumentController.get().modified(result);
 			}
 		});

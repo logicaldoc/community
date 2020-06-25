@@ -61,7 +61,8 @@ public class FormatConvertersDataServlet extends HttpServlet {
 
 			FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(
 					FormatConverterManager.class);
-
+			manager.getConverters();
+			
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 

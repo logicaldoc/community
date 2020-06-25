@@ -1,7 +1,5 @@
 package com.logicaldoc.core.security.authentication;
 
-import com.logicaldoc.core.security.authentication.AuthenticationException;
-
 /**
  * Raised when the remote client is in the black list
  * 

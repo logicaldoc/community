@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.RetentionPoliciesService
+path: 62212BB7BCE7FF233355D1C65A54A677.gwt.rpc

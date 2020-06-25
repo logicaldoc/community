@@ -31,7 +31,7 @@ public class MetadataDiff extends Window {
 	public MetadataDiff(final GUIVersion version1, final GUIVersion version2) {
 		super();
 
-		setTitle(I18N.message("compare") + " " + version1.getVersion() + " - " + version2.getVersion());
+		setTitle(I18N.message("compare") + " " + version1.getVersion() + " > " + version2.getVersion());
 		setWidth(450);
 		setHeight(350);
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.MAXIMIZE_BUTTON, HeaderControls.MINIMIZE_BUTTON,
@@ -42,43 +42,56 @@ public class MetadataDiff extends Window {
 
 		// Prepare the records, each one is related to a version's attribute
 		ArrayList<DiffRecord> records = new ArrayList<DiffRecord>();
-		records.add(new DiffRecord(I18N.message("versiondate"), I18N.formatDate(version1.getVersionDate()), I18N
-				.formatDate(version2.getVersionDate())));
-		records.add(new DiffRecord(I18N.message("fileversion"), version1.getFileVersion(), version2.getFileVersion()));
-		records.add(new DiffRecord(I18N.message("filename"), version1.getFileName(), version2.getFileName()));
-		records.add(new DiffRecord(I18N.message("username"), version1.getUsername(), version2.getUsername()));
-		records.add(new DiffRecord(I18N.message("comment"), version1.getComment(), version2.getComment()));
-		records.add(new DiffRecord(I18N.message("customid"), version1.getCustomId(), version2.getCustomId()));
-		records.add(new DiffRecord(I18N.message("language"), version1.getLanguage(), version2.getLanguage()));
-		records.add(new DiffRecord(I18N.message("createdon"), I18N.formatDate(version1.getCreation()), I18N
-				.formatDate(version2.getCreation())));
-		records.add(new DiffRecord(I18N.message("creator"), version1.getCreator(), version2.getCreator()));
-		records.add(new DiffRecord(I18N.message("publishedon"), I18N.formatDate(version1.getDate()), I18N
-				.formatDate(version2.getDate())));
-		records.add(new DiffRecord(I18N.message("publisher"), version1.getPublisher(), version2.getPublisher()));
-		records.add(new DiffRecord(I18N.message("size"), Util.formatSizeBytes((double) version1.getFileSize()), Util
-				.formatSizeBytes((double) version2.getFileSize())));
-		records.add(new DiffRecord(I18N.message("folder"),
+		records.add(new DiffRecord(I18N.message("versiondate"), I18N.message("versiondate"),
+				I18N.formatDate(version1.getVersionDate()), I18N.formatDate(version2.getVersionDate()), 0));
+		records.add(new DiffRecord(I18N.message("fileversion"), I18N.message("fileversion"), version1.getFileVersion(),
+				version2.getFileVersion(), 0));
+		records.add(new DiffRecord(I18N.message("filename"), I18N.message("filename"), version1.getFileName(),
+				version2.getFileName(), 0));
+		records.add(new DiffRecord(I18N.message("username"), I18N.message("username"), version1.getUsername(),
+				version2.getUsername(), 0));
+		records.add(new DiffRecord(I18N.message("comment"), I18N.message("comment"), version1.getComment(),
+				version2.getComment(), 0));
+		records.add(new DiffRecord(I18N.message("customid"), I18N.message("customid"), version1.getCustomId(),
+				version2.getCustomId(), 0));
+		records.add(new DiffRecord(I18N.message("language"), I18N.message("language"), version1.getLanguage(),
+				version2.getLanguage(), 0));
+		records.add(new DiffRecord(I18N.message("createdon"), I18N.message("createdon"),
+				I18N.formatDate(version1.getCreation()), I18N.formatDate(version2.getCreation()), 0));
+		records.add(new DiffRecord(I18N.message("creator"), I18N.message("creator"), version1.getCreator(),
+				version2.getCreator(), 0));
+		records.add(new DiffRecord(I18N.message("publishedon"), I18N.message("publishedon"),
+				I18N.formatDate(version1.getDate()), I18N.formatDate(version2.getDate()), 0));
+		records.add(new DiffRecord(I18N.message("publisher"), I18N.message("publisher"), version1.getPublisher(),
+				version2.getPublisher(), 0));
+		records.add(new DiffRecord(I18N.message("size"), I18N.message("size"),
+				Util.formatSizeBytes((double) version1.getFileSize()),
+				Util.formatSizeBytes((double) version2.getFileSize()), 0));
+		records.add(new DiffRecord(I18N.message("folder"), I18N.message("folder"),
 				version1.getFolder().getId() == Constants.DOCUMENTS_FOLDERID ? "/" : version1.getFolder().getName(),
-				version2.getFolder().getId() == Constants.DOCUMENTS_FOLDERID ? "/" : version2.getFolder().getName()));
+				version2.getFolder().getId() == Constants.DOCUMENTS_FOLDERID ? "/" : version2.getFolder().getName(),
+				0));
 
-		records.add(new DiffRecord(I18N.message("tags"), version1.getTagsString(), version2.getTagsString()));
+		records.add(new DiffRecord(I18N.message("tags"), I18N.message("tags"), version1.getTagsString(),
+				version2.getTagsString(), 0));
 
-		records.add(new DiffRecord(I18N.message("published"), version1.getPublished() == 1 ? I18N.message("yes") : I18N
-				.message("no"), version2.getPublished() == 1 ? I18N.message("yes") : I18N.message("no")));
+		records.add(new DiffRecord(I18N.message("published"), I18N.message("published"),
+				version1.getPublished() == 1 ? I18N.message("yes") : I18N.message("no"),
+				version2.getPublished() == 1 ? I18N.message("yes") : I18N.message("no"), 0));
 
-		records.add(new DiffRecord(I18N.message("startpublishing"), version1.getStartPublishing() != null ? I18N
-				.formatDate(version1.getStartPublishing()) : null, version2.getStartPublishing() != null ? I18N
-				.formatDate(version2.getStartPublishing()) : null));
+		records.add(new DiffRecord(I18N.message("startpublishing"), I18N.message("startpublishing"),
+				version1.getStartPublishing() != null ? I18N.formatDate(version1.getStartPublishing()) : null,
+				version2.getStartPublishing() != null ? I18N.formatDate(version2.getStartPublishing()) : null, 0));
 
-		records.add(new DiffRecord(I18N.message("stoppublishing"), version1.getStopPublishing() != null ? I18N
-				.formatDate(version1.getStopPublishing()) : null, version2.getStopPublishing() != null ? I18N
-				.formatDate(version2.getStopPublishing()) : null));
+		records.add(new DiffRecord(I18N.message("stoppublishing"), I18N.message("stoppublishing"),
+				version1.getStopPublishing() != null ? I18N.formatDate(version1.getStopPublishing()) : null,
+				version2.getStopPublishing() != null ? I18N.formatDate(version2.getStopPublishing()) : null, 0));
 
-		records.add(new DiffRecord(I18N.message("template"), version1.getTemplate(), version2.getTemplate()));
+		records.add(new DiffRecord(I18N.message("template"), I18N.message("template"), version1.getTemplate(),
+				version2.getTemplate(), 0));
 		printExtendedAttributes(records, version1, version2);
 
-		ListGridField name = new ListGridField("name", " ");
+		ListGridField label = new ListGridField("label", " ");
 		ListGridField val1 = new ListGridField("val1", version1.getVersion());
 		ListGridField val2 = new ListGridField("val2", version2.getVersion());
 
@@ -90,7 +103,7 @@ public class MetadataDiff extends Window {
 		listGrid.setCanReorderFields(false);
 		listGrid.setCanSort(false);
 		listGrid.setData(records.toArray(new ListGridRecord[0]));
-		listGrid.setFields(name, val1, val2);
+		listGrid.setFields(label, val1, val2);
 		addItem(listGrid);
 
 		IButton compareContent = new IButton(I18N.message("comparecontent"));
@@ -99,20 +112,21 @@ public class MetadataDiff extends Window {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				ContentDiff diff = new ContentDiff(version1.getDocId(), version1.getFileVersion(), version2
-						.getFileVersion());
+				ComparisonWindow diff = new ComparisonWindow(version1, version2);
 				diff.show();
 			}
 		});
-		if (Feature.visible(Feature.CONTENT_DIFF)) {
+		if (Feature.visible(Feature.COMPARISON)) {
 			addItem(compareContent);
-			compareContent.setDisabled(!Feature.enabled(Feature.CONTENT_DIFF));
+			compareContent.setDisabled(!Feature.enabled(Feature.COMPARISON));
 		}
 	}
 
 	private void printExtendedAttributes(ArrayList<DiffRecord> records, GUIVersion version1, GUIVersion version2) {
 		DateTimeFormat dateFormat = DateTimeFormat.getFormat(I18N.message("format_date"));
 		NumberFormat numberFormat = NumberFormat.getDecimalFormat();
+
+		List<DiffRecord> attributeRecords = new ArrayList<DiffRecord>();
 
 		List<String> names = new ArrayList<String>();
 
@@ -130,7 +144,11 @@ public class MetadataDiff extends Window {
 		for (String name : names) {
 			GUIAttribute att = version1.getAttribute(name);
 			String val1 = "";
-			if (att != null)
+			String label = null;
+			int position = -1;
+			if (att != null) {
+				label = att.getDisplayName();
+				position = att.getPosition();
 				if ((att.getType() == GUIAttribute.TYPE_STRING || att.getType() == GUIAttribute.TYPE_USER)
 						&& att.getStringValue() != null) {
 					val1 = att.getStringValue();
@@ -141,10 +159,16 @@ public class MetadataDiff extends Window {
 				} else if (att.getType() == GUIAttribute.TYPE_DATE && att.getValue() != null) {
 					val1 = dateFormat.format(att.getDateValue());
 				}
+			}
 
 			att = version2.getAttribute(name);
 			String val2 = "";
-			if (att != null)
+			if (att != null) {
+				if (label == null)
+					label = att.getDisplayName();
+				if (position == -1)
+					position = att.getPosition();
+
 				if ((att.getType() == GUIAttribute.TYPE_STRING || att.getType() == GUIAttribute.TYPE_USER)
 						&& att.getStringValue() != null) {
 					val2 = att.getStringValue();
@@ -155,28 +179,44 @@ public class MetadataDiff extends Window {
 				} else if (att.getType() == GUIAttribute.TYPE_DATE && att.getValue() != null) {
 					val2 = dateFormat.format(att.getDateValue());
 				}
+			}
 
-			DiffRecord record = new DiffRecord(name, val1, val2);
-			records.add(record);
+			DiffRecord record = new DiffRecord(name, label, val1, val2, position);
+			attributeRecords.add(record);
 		}
+
+		attributeRecords.sort(null);
+		records.addAll(attributeRecords);
 	}
 
-	public class DiffRecord extends ListGridRecord {
+	public class DiffRecord extends ListGridRecord implements Comparable<DiffRecord> {
+		private int position = 0;
 
-		public DiffRecord(String name, String val1, String val2) {
+		public DiffRecord(String name, String label, String val1, String val2, int position) {
 			super();
+			this.position = position;
 			setName(name);
+			setLabel(label);
 			setVal1(val1);
 			setVal2(val2);
 			if (isDifferent()) {
 				setName("<b class='diff'>" + getAttribute("name") + "</b>");
+				setLabel("<b class='diff'>" + getAttribute("label") + "</b>");
 				setVal1("<b class='diff'>" + getAttribute("val1") + "</b>");
 				setVal2("<b class='diff'>" + getAttribute("val2") + "</b>");
 			}
 		}
 
+		public String getName() {
+			return getAttributeAsString("name");
+		}
+
 		public void setName(String name) {
 			setAttribute("name", name != null ? name : "");
+		}
+
+		public void setLabel(String label) {
+			setAttribute("label", label != null ? label : "");
 		}
 
 		public void setVal1(String val1) {
@@ -187,8 +227,20 @@ public class MetadataDiff extends Window {
 			setAttribute("val2", val2 != null ? val2 : "");
 		}
 
+		public int getPosition() {
+			return position;
+		}
+
 		public boolean isDifferent() {
 			return !getAttributeAsString("val1").equals(getAttributeAsString("val2"));
+		}
+
+		@Override
+		public int compareTo(DiffRecord other) {
+			if (position == other.position)
+				return getName().compareTo(other.getName());
+			else
+				return Integer.valueOf(position).compareTo(Integer.valueOf(other.position));
 		}
 	}
 }

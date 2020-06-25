@@ -56,15 +56,20 @@ public class LDAuthenticationFailureHandler implements AuthenticationFailureHand
 
 		try {
 			Cookie failureCookie = new Cookie(COOKIE_LDOC_FAILURE, failureReason);
+			failureCookie.setMaxAge(10);
 			response.addCookie(failureCookie);
 		} catch (Throwable t) {
 
 		}
-		
-		String username = request.getParameter("j_username");
-		log.warn("Authentication of {} was unsuccesful", username);
 
-		log.info("Redirecting to {}", failureUrl.toString());
+		String username = request.getParameter("j_username");
+		log.warn("Authentication of {} was unsuccesful due to {}", username, failureReason);
+
+		String normalizedFailureUrl = failureUrl.toString().replace("//", "/");
+		if (normalizedFailureUrl.startsWith("/"))
+			normalizedFailureUrl = normalizedFailureUrl.substring(1);
+
+		log.info("Redirecting to {}", normalizedFailureUrl.toString());
 		response.sendRedirect(failureUrl.toString());
 	}
 }

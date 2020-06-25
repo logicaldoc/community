@@ -134,6 +134,10 @@ public class GroupsPanel extends AdminPanel {
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
 		name.setCanFilter(true);
 
+		ListGridField source = new ListGridField("source", I18N.message("source"), 100);
+		source.setCanFilter(true);
+		source.setHidden(true);
+		
 		ListGridField description = new ListGridField("description", I18N.message("description"), 200);
 		description.setCanFilter(true);
 
@@ -145,7 +149,7 @@ public class GroupsPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new GroupsDS());
-		list.setFields(id, name, description);
+		list.setFields(id, name, description, source);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -194,6 +198,8 @@ public class GroupsPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param group the group to update
 	 */
 	public void updateRecord(GUIGroup group) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, group.getId()));
@@ -254,7 +260,8 @@ public class GroupsPanel extends AdminPanel {
 		});
 
 		if (Constants.GROUP_ADMIN.equals(record.getAttributeAsString("name"))
-				|| Constants.GROUP_PUBLISHER.equals(record.getAttributeAsString("name"))) {
+				|| Constants.GROUP_PUBLISHER.equals(record.getAttributeAsString("name"))
+						|| Constants.GROUP_GUEST.equals(record.getAttributeAsString("name"))) {
 			delete.setEnabled(false);
 		}
 

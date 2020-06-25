@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -14,16 +17,12 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.conversion.FormatConverter;
-import com.logicaldoc.core.generic.Generic;
-import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.store.StorerManager;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
@@ -54,15 +53,15 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 
 			emailSettings.setSmtpServer(conf.getProperty(session.getTenantName() + ".smtp.host"));
 			emailSettings.setPort(Integer.parseInt(conf.getProperty(session.getTenantName() + ".smtp.port")));
-			emailSettings
-					.setUsername(!conf.getProperty(session.getTenantName() + ".smtp.username").trim().isEmpty() ? conf
-							.getProperty(session.getTenantName() + ".smtp.username") : "");
-			emailSettings.setPwd(!conf.getProperty(session.getTenantName() + ".smtp.password").trim().isEmpty() ? conf
-					.getProperty(session.getTenantName() + ".smtp.password") : "");
+			emailSettings.setUsername(!conf.getProperty(session.getTenantName() + ".smtp.username").trim().isEmpty()
+					? conf.getProperty(session.getTenantName() + ".smtp.username")
+					: "");
+			emailSettings.setPwd(!conf.getProperty(session.getTenantName() + ".smtp.password").trim().isEmpty()
+					? conf.getProperty(session.getTenantName() + ".smtp.password")
+					: "");
 			emailSettings.setConnSecurity(conf.getProperty(session.getTenantName() + ".smtp.connectionSecurity"));
-			emailSettings
-					.setSecureAuth("true".equals(conf.getProperty(session.getTenantName() + ".smtp.authEncripted")) ? true
-							: false);
+			emailSettings.setSecureAuth(
+					"true".equals(conf.getProperty(session.getTenantName() + ".smtp.authEncripted")) ? true : false);
 			emailSettings.setSenderEmail(conf.getProperty(session.getTenantName() + ".smtp.sender"));
 			emailSettings.setUserAsFrom(conf.getBoolean(session.getTenantName() + ".smtp.userasfrom", true));
 
@@ -88,8 +87,8 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 			conf.setProperty(session.getTenantName() + ".smtp.password",
 					!settings.getPwd().trim().isEmpty() ? settings.getPwd() : "");
 			conf.setProperty(session.getTenantName() + ".smtp.connectionSecurity", settings.getConnSecurity());
-			conf.setProperty(session.getTenantName() + ".smtp.authEncripted", settings.isSecureAuth() ? "true"
-					: "false");
+			conf.setProperty(session.getTenantName() + ".smtp.authEncripted",
+					settings.isSecureAuth() ? "true" : "false");
 			conf.setProperty(session.getTenantName() + ".smtp.sender", settings.getSenderEmail());
 			conf.setProperty(session.getTenantName() + ".smtp.userasfrom", "" + settings.isUserAsFrom());
 
@@ -101,10 +100,10 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 			sender.setUsername(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.username"));
 			sender.setPassword(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.password"));
 			sender.setSender(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.sender"));
-			sender.setAuthEncripted("true".equals(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.authEncripted")) ? true
-					: false);
-			sender.setConnectionSecurity(Integer.parseInt(conf.getProperty(Tenant.DEFAULT_NAME
-					+ ".smtp.connectionSecurity")));
+			sender.setAuthEncripted(
+					"true".equals(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.authEncripted")) ? true : false);
+			sender.setConnectionSecurity(
+					Integer.parseInt(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.connectionSecurity")));
 
 			log.info("Email settings data written successfully.");
 		} catch (Exception e) {
@@ -135,15 +134,17 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 					|| name.startsWith("task.") || name.startsWith("store") || name.startsWith("advancedocr.")
 					|| name.startsWith("command.") || name.contains(".gui.") || name.contains(".upload.")
 					|| name.equals("userno") || name.contains(".search.") || name.contains("password")
-					|| name.contains("tag.") || name.startsWith("jdbc.") || name.startsWith("cluster")
-					|| name.startsWith("ip.") || name.contains(".extcall.") || name.contains("anonymous")
-					|| name.startsWith("hibernate.") || name.contains(".session.") || name.contains("antivirus.")
-					|| name.startsWith("login.") || name.equals("upload.maxsize") || name.startsWith("news.")
-					|| name.equals("registry") || name.equals("searchengine") || name.equals("load")
-					|| name.startsWith("ssl.") || name.contains(".tagcloud.") || name.startsWith("throttle.")
-					|| name.contains("security.") || name.contains("parser.") || name.startsWith("quota.")
-					|| name.equals("initialized") || name.startsWith("converter.") || name.startsWith("firewall.")
-					|| name.contains(".2fa.") || name.startsWith("ftp."))
+					|| name.contains("tag.") || name.startsWith("cluster") || name.startsWith("ip.")
+					|| name.contains(".extcall.") || name.contains("anonymous") || name.startsWith("hibernate.")
+					|| name.contains(".session.") || name.contains("antivirus.") || name.startsWith("login.")
+					|| name.equals("upload.maxsize") || name.startsWith("news.") || name.equals("registry")
+					|| name.equals("searchengine") || name.equals("load") || name.startsWith("ssl.")
+					|| name.contains(".tagcloud.") || name.startsWith("throttle.") || name.contains("security.")
+					|| name.contains("parser.") || name.startsWith("quota.") || name.equals("initialized")
+					|| name.startsWith("converter.") || name.startsWith("firewall.") || name.contains(".2fa.")
+					|| name.startsWith("ftp.") || name.startsWith("cas.") || name.startsWith("cache.")
+					|| name.startsWith("jdbc.") || name.startsWith("comparator.") || name.contains(".via.")
+					|| name.contains(".downloadticket.") || name.startsWith("zonalocr."))
 				continue;
 
 			sortedSet.add(key.toString());
@@ -169,7 +170,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 		for (Object key : conf.keySet()) {
 			if (key.toString().equals("webservice.enabled") || key.toString().startsWith("webdav")
 					|| key.toString().startsWith("cmis") || key.toString().startsWith("command.")
-					|| key.toString().startsWith("openoffice") || key.toString().startsWith("ftp.")
+					|| key.toString().startsWith("ftp.")
 					|| key.toString().startsWith(session.getTenantName() + ".extcall.")) {
 				GUIParameter p = new GUIParameter(key.toString(), conf.getProperty(key.toString()));
 				params.add(p);
@@ -200,6 +201,13 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 		} catch (Throwable e) {
 			ServiceUtil.throwServerException(session, log, e);
 		}
+	}
+
+	@Override
+	public void saveStorageSettings(GUIParameter[] settings) throws ServerException {
+		saveSettings(settings);
+		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		storer.init();
 	}
 
 	@Override
@@ -236,50 +244,22 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 				params.add(new GUIParameter(name.toString(), conf.getProperty(name.toString())));
 		}
 		if (session.getTenantName().equals(Tenant.DEFAULT_NAME))
-			params.add(new GUIParameter("upload.maxsize", conf.getProperty("upload.maxsize")));
-		params.add(new GUIParameter(session.getTenantName() + ".upload.disallow", conf.getProperty(session
-				.getTenantName() + ".upload.disallow")));
-		params.add(new GUIParameter(session.getTenantName() + ".search.hits", conf.getProperty(session.getTenantName()
-				+ ".search.hits")));
-		params.add(new GUIParameter(session.getTenantName() + ".search.extattr", conf.getProperty(session
-				.getTenantName() + ".search.extattr")));
-		params.add(new GUIParameter(session.getTenantName() + ".session.timeout", conf.getProperty(session
-				.getTenantName() + ".session.timeout")));
-		params.add(new GUIParameter(session.getTenantName() + ".session.heartbeat", conf.getProperty(session
-				.getTenantName() + ".session.heartbeat")));
+			params.add(new GUIParameter(session.getTenantName() + ".upload.maxsize",
+					conf.getProperty(session.getTenantName() + ".upload.maxsize")));
+		params.add(new GUIParameter(session.getTenantName() + ".upload.disallow",
+				conf.getProperty(session.getTenantName() + ".upload.disallow")));
+		params.add(new GUIParameter(session.getTenantName() + ".search.hits",
+				conf.getProperty(session.getTenantName() + ".search.hits")));
+		params.add(new GUIParameter(session.getTenantName() + ".search.extattr",
+				conf.getProperty(session.getTenantName() + ".search.extattr")));
+		params.add(new GUIParameter(session.getTenantName() + ".session.timeout",
+				conf.getProperty(session.getTenantName() + ".session.timeout")));
+		params.add(new GUIParameter(session.getTenantName() + ".session.heartbeat",
+				conf.getProperty(session.getTenantName() + ".session.heartbeat")));
+		params.add(new GUIParameter(session.getTenantName() + ".downloadticket.behavior",
+				conf.getProperty(session.getTenantName() + ".downloadticket.behavior")));
 
 		return params.toArray(new GUIParameter[0]);
-	}
-
-	@Override
-	public void saveDashlets(GUIDashlet[] dashlets) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-
-		try {
-			/*
-			 * Delete the actual dashlets for this user
-			 */
-			Map<String, Generic> settings = uDao.findUserSettings(session.getUserId(), "dashlet");
-			for (Generic setting : settings.values()) {
-				gDao.delete(setting.getId());
-			}
-
-			/*
-			 * Now save the new dashlets
-			 */
-			for (GUIDashlet dashlet : dashlets) {
-				Generic generic = new Generic("usersetting", "dashlet-" + dashlet.getId(), session.getUserId());
-				generic.setInteger1((long) dashlet.getId());
-				generic.setInteger2((long) dashlet.getColumn());
-				generic.setInteger3((long) dashlet.getRow());
-				generic.setString1(Long.toString(dashlet.getIndex()));
-				gDao.store(generic);
-			}
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-		}
 	}
 
 	@Override
@@ -325,7 +305,8 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 	}
 
 	@Override
-	public void saveRegistration(String name, String email, String organization, String website) throws ServerException {
+	public void saveRegistration(String name, String email, String organization, String website)
+			throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
@@ -350,12 +331,42 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 		List<GUIParameter> parameters = new ArrayList<GUIParameter>();
 		try {
 			ServletUtil.checkMenu(getThreadLocalRequest(), 1750L);
-			FormatConverter conv = (FormatConverter) Class.forName(converter).newInstance();
+			FormatConverter conv = (FormatConverter) Class.forName(converter).getDeclaredConstructor().newInstance();
 			for (String name : conv.getParameterNames())
 				parameters.add(new GUIParameter(name, conv.getParameter(name)));
 			return parameters.toArray(new GUIParameter[0]);
 		} catch (Throwable e) {
 			return (GUIParameter[]) ServiceUtil.throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public void saveExtensionAliases(String extension, String aliases) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			ContextProperties config = Context.get().getProperties();
+			Map<String, String> aliasMap = config.getProperties("converter.alias.");
+
+			// Get all the keys that correspond to the same target
+			// extension
+			Set<String> keys = aliasMap.entrySet().stream().filter(entry -> Objects.equals(entry.getValue(), extension))
+					.map(Map.Entry::getKey).collect(Collectors.toSet());
+
+			// Delete all actual aliases
+			for (String key : keys)
+				config.remove("converter.alias."+key);
+			
+			// Now add the new ones
+			if (StringUtils.isNotEmpty(aliases)) {
+				String[] tokens = aliases.split(",");
+				for (String token : tokens)
+					config.setProperty("converter.alias." + token.toLowerCase().trim().replace(" ", "").replace(".", "").replace("=", ""), extension);
+			}
+
+			config.write();
+		} catch (Throwable e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 }

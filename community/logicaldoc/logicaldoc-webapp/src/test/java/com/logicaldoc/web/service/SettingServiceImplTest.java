@@ -1,15 +1,11 @@
 package com.logicaldoc.web.service;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
-import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.web.AbstractWebappTCase;
 
 public class SettingServiceImplTest extends AbstractWebappTCase {
@@ -63,15 +59,5 @@ public class SettingServiceImplTest extends AbstractWebappTCase {
 		settings[1] = wdSettings;
 
 		service.saveSettings(settings);
-	}
-
-	@Test
-	public void testSaveDashlets() throws ServerException {
-		GUIDashlet[] dashlets = new GUIDashlet[] { new GUIDashlet(100, 0, 1, 0), new GUIDashlet(101, 0, 2, 0) };
-		service.saveDashlets(dashlets);
-
-		SecurityServiceImpl secserver = new SecurityServiceImpl();
-		GUIUser user = secserver.getUser(1);
-		Assert.assertTrue(user.getDashlets().length == 2);
 	}
 }

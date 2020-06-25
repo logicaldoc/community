@@ -27,6 +27,8 @@ public class I18N {
 	 */
 	private static Map<String, Locale> iso3LocaleMap;
 
+	public static String[] bundles = new String[] { "i18n.messages" };
+
 	static {
 		String[] languages = Locale.getISOLanguages();
 		iso3LocaleMap = new HashMap<String, Locale>(languages.length);
@@ -38,7 +40,7 @@ public class I18N {
 
 	private I18N() {
 	}
-	
+
 	public static String message(String key) {
 		return message(key, Locale.getDefault());
 	}
@@ -50,10 +52,17 @@ public class I18N {
 	}
 
 	public static String message(String key, Locale locale) {
-		try {
-			ResourceBundle bundle = ResourceBundle.getBundle("i18n.messages", locale);
-			return bundle.getString(key);
-		} catch (Throwable t) {
+
+		for (String b : bundles) {
+			try {
+				ResourceBundle bundle = ResourceBundle.getBundle(b, locale);
+				if (!bundle.containsKey(key))
+					continue;
+				String val = bundle.getString(key);
+				if (val != null && !val.isEmpty())
+					return val;
+			} catch (Throwable t) {
+			}
 		}
 
 		return key;
@@ -70,18 +79,25 @@ public class I18N {
 
 	public static Map<String, String> getMessages(Locale locale) {
 		Map<String, String> map = new HashMap<String, String>();
-		try {
-			ResourceBundle bundle = ResourceBundle.getBundle("i18n.messages", locale);
-			Enumeration<String> keys = bundle.getKeys();
-			while (keys.hasMoreElements()) {
-				String key = keys.nextElement();
-				map.put(key, bundle.getString(key));
+
+		for (String b : bundles) {
+			try {
+				ResourceBundle bundle = ResourceBundle.getBundle(b, locale);
+				Enumeration<String> keys = bundle.getKeys();
+				while (keys.hasMoreElements()) {
+					String key = keys.nextElement();
+					if (!bundle.containsKey(key))
+						continue;
+					String val = bundle.getString(key);
+					if (val != null && !val.isEmpty())
+						map.put(key, bundle.getString(key));
+				}
+			} catch (Throwable t) {
 			}
-		} catch (Throwable t) {
 		}
 		return map;
 	}
-	
+
 	public static List<String> getLocales() {
 		List<String> locales = new ArrayList<String>();
 		Properties p = new Properties();
@@ -95,10 +111,10 @@ public class I18N {
 		}
 		return locales;
 	}
-	
+
 	/**
 	 * Get the locale corresponding to the ISO 639-2(3 digits)
-	 *  
+	 * 
 	 * @param iso3Code The 3 digit code
 	 * @return The localse
 	 */

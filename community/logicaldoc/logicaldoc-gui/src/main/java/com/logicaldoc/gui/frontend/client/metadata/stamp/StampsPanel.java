@@ -295,6 +295,8 @@ public class StampsPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param stamp the stamp object
 	 */
 	public void updateRecord(GUIStamp stamp) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, stamp.getId()));

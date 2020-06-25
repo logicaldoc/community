@@ -31,14 +31,11 @@ public class TextContentCreate extends Window {
 	public TextContentCreate() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("createtextcontent"));
-		setWidth(270);
-		setHeight(155);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setAutoSize(true);
 		centerInPage();
-		setPadding(5);
-		setMembersMargin(3);
 
 		DynamicForm form = new DynamicForm();
 		vm = new ValuesManager();

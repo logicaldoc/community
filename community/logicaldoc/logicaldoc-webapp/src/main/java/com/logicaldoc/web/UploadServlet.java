@@ -1,9 +1,5 @@
 package com.logicaldoc.web;
 
-import gwtupload.server.UploadAction;
-import gwtupload.server.exceptions.UploadActionException;
-import gwtupload.shared.UConsts;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,9 +25,14 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.web.util.ServiceUtil;
+
+import gwtupload.server.UploadAction;
+import gwtupload.server.exceptions.UploadActionException;
+import gwtupload.shared.UConsts;
 
 /**
  * This servlet is responsible for document uploads operations.
@@ -53,7 +54,14 @@ public class UploadServlet extends UploadAction {
 
 	/**
 	 * Override executeAction to save the received files in a custom place and
-	 * delete this items from session.
+	 * delete this items from session
+	 * 
+	 * @param request the HTTP request
+	 * @param sessionFiles list of file items
+	 * 
+	 * @return always null
+	 * 
+	 * @throws UploadActionException error on the server handling the upload
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -61,10 +69,14 @@ public class UploadServlet extends UploadAction {
 		try {
 			setUploadMax();
 
-			HttpSession session = SessionManager.get().getServletSession(SessionManager.get().getSessionId(request));
+			String sid = SessionManager.get().getSessionId(request);
+			HttpSession session = SessionManager.get().getServletSession(sid);
 
-			if (session == null)
+			if (session == null) {
+				// No SID already associated to the current session, so do it
 				session = request.getSession();
+				LDSecurityContextRepository.bindServletSession(sid, request);
+			}
 
 			/**
 			 * Maintain a list with received files and their content types
@@ -101,30 +113,33 @@ public class UploadServlet extends UploadAction {
 				tenant = sess.getTenantName();
 			} catch (Throwable t) {
 				// ok no session, but was the security checks passed?
-				if (request.getAttribute("__spring_security_session_mgmt_filter_applied")==null || !"true".equals(request.getAttribute("__spring_security_session_mgmt_filter_applied").toString()))
+				if (request.getAttribute("__spring_security_session_mgmt_filter_applied") == null || !"true"
+						.equals(request.getAttribute("__spring_security_session_mgmt_filter_applied").toString()))
 					throw t;
 			}
 
 			for (FileItem item : sessionFiles) {
+				String uploadedFileName = FilenameUtils.getName(item.getFieldName());
+				String targetFileName = FilenameUtils.getName(item.getName());
+
 				if (false == item.isFormField()) {
 					if (!isAllowedForUpload(item.getName(), tenant))
-						throw new UploadActionException("Invalid file name " + item.getName());
+						throw new UploadActionException("Invalid file name " + uploadedFileName);
 
 					OutputStream os = null;
 					try {
-						File file = new File(uploadFolder, item.getFieldName());
+						File file = new File(uploadFolder, uploadedFileName);
 
 						os = new FileOutputStream(file);
 						copyFromInputStreamToOutputStream(item.getInputStream(), os);
 
-						receivedFiles.put(item.getFieldName(), file);
-						receivedContentTypes.put(item.getFieldName(), item.getContentType());
+						receivedFiles.put(uploadedFileName, file);
+						receivedContentTypes.put(uploadedFileName, item.getContentType());
 						try {
-							receivedFileNames.put(item.getFieldName(),
-									URLDecoder.decode(FilenameUtils.getName(item.getName()), "UTF-8"));
+							receivedFileNames.put(uploadedFileName, URLDecoder.decode(targetFileName, "UTF-8"));
 						} catch (Throwable uee) {
 							log.debug(uee.getMessage());
-							receivedFileNames.put(item.getFieldName(), FilenameUtils.getName(item.getName()));
+							receivedFileNames.put(uploadedFileName, targetFileName);
 						}
 					} catch (Throwable e) {
 						log.warn(e.getMessage(), e);
@@ -155,15 +170,21 @@ public class UploadServlet extends UploadAction {
 	/**
 	 * The post method is used to receive the file and save it in the user
 	 * session. It returns a very XML page that the client receives in an
-	 * iframe.
+	 * iframe<br>
+	 * <br>
 	 * 
 	 * The content of this xml document has a tag error in the case of error in
-	 * the upload process or the string OK in the case of success.
+	 * the upload process or the string OK in the case of success
 	 * 
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * 
+	 * @throws IOException generic I/O error
+	 * @throws ServletException error in the servlet container
 	 */
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException,
-			ServletException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 		setUploadMax();
 		super.doPost(request, response);
 	}
@@ -184,6 +205,11 @@ public class UploadServlet extends UploadAction {
 
 	/**
 	 * Remove a file when the user sends a delete request
+	 * 
+	 * @param request the HTTP request
+	 * @param fieldName name of the field
+	 * 
+	 * @throws UploadActionException error on the server handling the upload
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -214,6 +240,11 @@ public class UploadServlet extends UploadAction {
 
 	/**
 	 * Get the content of an uploaded file
+	 * 
+	 * @param request the HTTP request
+	 * @param response the server's response
+	 * 
+	 * @throws IOException generic I/O error
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -271,9 +302,7 @@ public class UploadServlet extends UploadAction {
 
 	protected void setUploadMax() {
 		ContextProperties config = Context.get().getProperties();
-		long maxUploadMB = 100;
-		if (config.getProperty("upload.maxsize") != null)
-			maxUploadMB = Long.parseLong(config.getProperty("upload.maxsize"));
+		long maxUploadMB = config.getLong("default.upload.maxsize", 100);
 
 		if (maxUploadMB > 0)
 			super.maxFileSize = maxUploadMB * 1024 * 1024;
@@ -284,7 +313,12 @@ public class UploadServlet extends UploadAction {
 
 	/**
 	 * Checks if the passed filename can be uploaded or not on the basis of what
-	 * configured in 'upload.disallow'.
+	 * configured in 'upload.disallow'
+	 * 
+	 * @param filename name of the file
+	 * @param tenant name of the tenant
+	 * 
+	 * @return true id the filename is allowed
 	 */
 	public static boolean isAllowedForUpload(String filename, String tenant) {
 		ContextProperties config = Context.get().getProperties();

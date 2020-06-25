@@ -25,9 +25,9 @@ public class SystemInfo {
 
 	protected String product = "LogicalDOC";
 
-	protected String release = "7.8";
+	protected String release = "8.4.2";
 
-	protected String year = "2006-2018";
+	protected String year = "2006-2020";
 
 	protected String help = "https://help.logicaldoc.com";
 
@@ -226,7 +226,8 @@ public class SystemInfo {
 					@SuppressWarnings("rawtypes")
 					Class clazz = Class.forName(className);
 					// Try to instantiate the info
-					Object tmp = clazz.newInstance();
+					@SuppressWarnings("unchecked")
+					Object tmp = clazz.getDeclaredConstructor().newInstance();
 					if (!(tmp instanceof SystemInfo))
 						throw new Exception("The specified info " + className
 								+ " doesn't implement SystemInfo interface");

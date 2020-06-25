@@ -6,15 +6,15 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
-import com.logicaldoc.gui.common.client.beans.GUISearchEngine;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
-import com.logicaldoc.gui.frontend.client.services.SearchEngineService;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
-import com.logicaldoc.gui.frontend.client.settings.converters.FormatConvertersPanel;
+import com.logicaldoc.gui.frontend.client.settings.automation.AutomationSettingsPanel;
+import com.logicaldoc.gui.frontend.client.settings.comparators.ComparatorsPanel;
 import com.logicaldoc.gui.frontend.client.settings.gui.GUISettingsPanel;
 import com.logicaldoc.gui.frontend.client.settings.messages.OutgoingEmailPanel;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -31,6 +31,7 @@ public class SettingsMenu extends VLayout {
 	public SettingsMenu() {
 		setMargin(10);
 		setMembersMargin(5);
+		setOverflow(Overflow.AUTO);
 
 		Button searchAndIndexing = new Button(I18N.message("searchandindexing"));
 		searchAndIndexing.setWidth100();
@@ -55,10 +56,6 @@ public class SettingsMenu extends VLayout {
 		Button keystore = new Button(I18N.message("keystore"));
 		keystore.setWidth100();
 		keystore.setHeight(25);
-
-		Button converters = new Button(I18N.message("formatconverters"));
-		converters.setWidth100();
-		converters.setHeight(25);
 
 		Button ocr = new Button(I18N.message("ocr"));
 		ocr.setWidth100();
@@ -86,7 +83,15 @@ public class SettingsMenu extends VLayout {
 		Button via = new Button(I18N.message("via"));
 		via.setWidth100();
 		via.setHeight(25);
-		
+
+		Button automation = new Button(I18N.message("automation"));
+		automation.setWidth100();
+		automation.setHeight(25);
+
+		Button comparators = new Button(I18N.message("comparators"));
+		comparators.setWidth100();
+		comparators.setHeight(25);
+
 		Button parameters = new Button(I18N.message("parameters"));
 		parameters.setWidth100();
 		parameters.setHeight(25);
@@ -138,15 +143,20 @@ public class SettingsMenu extends VLayout {
 				AdminScreen.get().setContent(new VIASettingsPanel());
 			}
 		});
-		
-		if (Session.get().isDefaultTenant() && Feature.visible(Feature.FORMAT_CONVERSION)
-				&& Menu.enabled(Menu.FORMAT_CONVERTERS)) {
-			addMember(converters);
-			if (!Feature.enabled(Feature.FORMAT_CONVERSION)) {
-				converters.setDisabled(true);
-				converters.setTooltip(I18N.message("featuredisabled"));
+
+		comparators.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new ComparatorsPanel());
 			}
-		}
+		});
+
+		automation.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new AutomationSettingsPanel());
+			}
+		});
 
 		addMember(smtp);
 
@@ -163,43 +173,37 @@ public class SettingsMenu extends VLayout {
 				via.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
-		
+
+		if (Feature.visible(Feature.AUTOMATION) && Menu.enabled(Menu.AUTOMATION)) {
+			addMember(automation);
+			if (!Feature.enabled(Feature.AUTOMATION)) {
+				automation.setDisabled(true);
+				automation.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+
+		if (Feature.visible(Feature.COMPARISON) && Menu.enabled(Menu.COMPARATORS)) {
+			addMember(comparators);
+			if (!Feature.enabled(Feature.COMPARISON)) {
+				comparators.setDisabled(true);
+				comparators.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+
 		if (Session.get().isDefaultTenant() && Menu.enabled(Menu.PARAMETERS))
 			addMember(parameters);
 
 		searchAndIndexing.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				SearchEngineService.Instance.get().getInfo(new AsyncCallback<GUISearchEngine>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUISearchEngine searchEngine) {
-						AdminScreen.get().setContent(new SearchIndexingPanel(searchEngine));
-					}
-
-				});
+				AdminScreen.get().setContent(new SearchIndexingPanel());
 			}
 		});
 
 		guiSettings.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				SettingService.Instance.get().loadGUISettings(new AsyncCallback<GUIParameter[]>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIParameter[] settings) {
-						AdminScreen.get().setContent(new GUISettingsPanel(settings));
-					}
-				});
+				AdminScreen.get().setContent(new GUISettingsPanel());
 			}
 		});
 
@@ -252,13 +256,6 @@ public class SettingsMenu extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				AdminScreen.get().setContent(new RepositoriesPanel());
-			}
-		});
-
-		converters.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new FormatConvertersPanel());
 			}
 		});
 	}

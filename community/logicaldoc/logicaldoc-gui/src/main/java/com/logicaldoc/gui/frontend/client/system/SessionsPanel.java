@@ -30,7 +30,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * Displays a list list of user sessions, allowing the kill operation.
+ * Displays a list of user sessions, allowing the kill operation.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0

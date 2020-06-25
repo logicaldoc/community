@@ -1,13 +1,17 @@
 package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 
-import com.logicaldoc.gui.common.client.Constants;
+import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.widgets.HeaderControl;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.Portlet;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
@@ -20,11 +24,14 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @since 6.6
  */
 public class Dashlet extends Portlet {
-	private int id;
 
-	public Dashlet(int id) {
+	protected GUIDashlet guiDashlet;
+
+	protected HeaderControl refreshControl;
+
+	public Dashlet(GUIDashlet guiDashlet) {
 		super();
-		this.id = id;
+		this.guiDashlet = guiDashlet;
 
 		setMinHeight(150);
 		setMinWidth(100);
@@ -45,45 +52,46 @@ public class Dashlet extends Portlet {
 
 		setCloseConfirmationMessage(I18N.message("closedashletconfirm"));
 
-		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.MAXIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
+		refreshControl = new HeaderControl(HeaderControl.REFRESH, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				refresh();
+			}
+		});
+
+		setHeaderControls(HeaderControls.HEADER_LABEL, refreshControl, HeaderControls.MINIMIZE_BUTTON,
+				HeaderControls.MAXIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
+
+		if (guiDashlet.getTitle() != null && !guiDashlet.getTitle().isEmpty())
+			setTitle(AwesomeFactory.getIconHtml("cube", I18N.message(guiDashlet.getTitle())));
+		else
+			setTitle(AwesomeFactory.getIconHtml("cube", I18N.message(guiDashlet.getName())));
 	}
 
-	public static Dashlet getDashlet(int dashletId) {
+	public static Dashlet getDashlet(GUIDashlet guiDashlet) {
 		Dashlet dashlet = null;
-		switch (dashletId) {
-		case Constants.DASHLET_CHECKOUT:
-			dashlet = new StatusDashlet(Constants.DASHLET_CHECKOUT, Constants.EVENT_CHECKEDOUT);
-			break;
-		case Constants.DASHLET_CHECKIN:
-			dashlet = new HistoryDashlet(Constants.DASHLET_CHECKIN, Constants.EVENT_CHECKEDIN);
-			break;
-		case Constants.DASHLET_LOCKED:
-			dashlet = new StatusDashlet(Constants.DASHLET_LOCKED, Constants.EVENT_LOCKED);
-			break;
-		case Constants.DASHLET_DOWNLOADED:
-			dashlet = new HistoryDashlet(Constants.DASHLET_DOWNLOADED, Constants.EVENT_DOWNLOADED);
-			break;
-		case Constants.DASHLET_CHANGED:
-			dashlet = new HistoryDashlet(Constants.DASHLET_CHANGED, Constants.EVENT_CHANGED);
-			break;
-		case Constants.DASHLET_LAST_NOTES:
-			dashlet = new LastNotesDashlet();
-			break;
-		case Constants.DASHLET_TAGCLOUD:
-			dashlet = new TagCloudDashlet();
-			break;
+		if (GUIDashlet.TYPE_DOCEVENT.equals(guiDashlet.getType()))
+			dashlet = new DocumentHistoryDashlet(guiDashlet);
+		else if (GUIDashlet.TYPE_DOCUMENT.equals(guiDashlet.getType()))
+			dashlet = new DocumentDashlet(guiDashlet);
+		else if (GUIDashlet.TYPE_NOTE.equals(guiDashlet.getType()))
+			dashlet = new NotesDashlet(guiDashlet);
+		else if (GUIDashlet.TYPE_CONTENT.equals(guiDashlet.getType())) {
+			if (guiDashlet.getName().equals("tagcloud"))
+				dashlet = new TagCloudDashlet(guiDashlet);
+			else
+				dashlet = new ContentDashlet(guiDashlet);
 		}
-
 		return dashlet;
 	}
 
-	public int getId() {
-		return id;
+	protected String getDataSourceUrl() {
+		return "dashletcontent?locale=" + I18N.getLocale() + "&dashletId=" + guiDashlet.getId();
 	}
 
 	@Override
 	public String toString() {
-		return "Dashlet " + getId();
+		return "Dashlet " + guiDashlet.getName();
 	}
 
 	/**
@@ -121,5 +129,13 @@ public class Dashlet extends Portlet {
 		contextMenu.setItems(preview, download, openInFolder);
 
 		return contextMenu;
+	}
+
+	public GUIDashlet getGuiDashlet() {
+		return guiDashlet;
+	}
+
+	protected void refresh() {
+
 	}
 }

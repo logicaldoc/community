@@ -12,6 +12,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -30,7 +31,12 @@ import com.smartgwt.client.widgets.layout.VStack;
 public class LD {
 
 	/**
-	 * Show a dialog to confirm a operation.
+	 * Show a dialog to confirm a operation
+	 * 
+	 * @param title title of the dialog box
+	 * @param message text printed in the body of the dialog box 
+	 * @param width width dimension expressed in pixels
+	 * @param callback a call back invoked when the user confirm his choice
 	 */
 	public static void ask(String title, String message, Integer width, final BooleanCallback callback) {
 		final Window dialog = new Window();
@@ -112,7 +118,13 @@ public class LD {
 	}
 
 	/**
-	 * Show a dialog asking for a value to complete a operation.
+	 * Show a dialog asking for a value to complete a operation
+	 * 
+	 * @param title title of the dialog box
+	 * @param message text printed in the body of the dialog box
+	 * @param defaultValue default value
+	 * @param width width of the dialog box
+	 * @param callback call back used when the user confirms the input
 	 */
 	public static void askForValue(String title, String message, String defaultValue, Integer width,
 			ValueCallback callback) {
@@ -120,7 +132,8 @@ public class LD {
 		askForValue(title, message, defaultValue, textItem, width, callback);
 	}
 
-	public static void askForDocumentPassword(String title, String message, Integer width, final ValueCallback callback) {
+	public static void askForDocumentPassword(String title, String message, Integer width,
+			final ValueCallback callback) {
 		final Window dialog = new Window();
 		dialog.setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		dialog.setAutoCenter(true);
@@ -236,7 +249,14 @@ public class LD {
 
 	/**
 	 * Show a dialog asking for a value to complete an operation. The provided
-	 * form item will be used.
+	 * form item will be used
+	 * 
+	 * @param title title of the dialog box
+	 * @param message text printed in the body of the dialog box
+	 * @param defaultValue default value
+	 * @param item the item used to input the value
+	 * @param width width of the dialog box
+	 * @param callback call back used when the user confirms the input
 	 */
 	public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
 			final ValueCallback callback) {
@@ -298,7 +318,7 @@ public class LD {
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
 				if (form.validate() && callback != null) {
 					dialog.close();
-					callback.execute(form.getValue("value").toString());
+					callback.execute(form.getValue("value") != null ? form.getValue("value").toString() : null);
 					dialog.destroy();
 				}
 			}
@@ -309,11 +329,8 @@ public class LD {
 		cancel.setMinWidth(70);
 		cancel.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				if (callback != null) {
-					dialog.close();
-					callback.execute(null);
-					dialog.destroy();
-				}
+				dialog.close();
+				dialog.destroy();
 			}
 		});
 
@@ -348,5 +365,9 @@ public class LD {
 	public static void askforValue(String title, String message, String defaultValue, FormItem item,
 			final ValueCallback callback) {
 		askForValue(title, message, defaultValue, item, null, callback);
+	}
+
+	public static void askforString(String title, String message, String defaultValue, final ValueCallback callback) {
+		askForValue(title, message, defaultValue, new TextItem(), null, callback);
 	}
 }

@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.services;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 
@@ -21,8 +20,6 @@ public interface SettingServiceAsync {
 
 	void loadSettings(AsyncCallback<GUIParameter[]> callback);
 
-	void saveDashlets(GUIDashlet[] dashlets, AsyncCallback<Void> callback);
-
 	void testEmail(String email, AsyncCallback<Boolean> callback);
 
 	void saveRegistration(String name, String email, String company, String website, AsyncCallback<Void> callback);
@@ -30,4 +27,8 @@ public interface SettingServiceAsync {
 	void testStorage(int id, AsyncCallback<Boolean> callback);
 
 	void loadConverterParameters(String converter, AsyncCallback<GUIParameter[]> callback);
+
+	void saveStorageSettings(GUIParameter[] settings, AsyncCallback<Void> callback);
+
+	void saveExtensionAliases(String extension, String aliases, AsyncCallback<Void> callback);
 }

@@ -18,7 +18,7 @@ import com.logicaldoc.core.PersistentObject;
  * 
  * @version 6.9
  */
-public class Tenant extends PersistentObject implements Serializable {
+public class Tenant extends PersistentObject implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -51,6 +51,8 @@ public class Tenant extends PersistentObject implements Serializable {
 	private int type = DEFAULT_TYPE;
 
 	private Integer maxUsers;
+
+	private Integer maxGuests;
 
 	private Integer maxSessions;
 
@@ -196,6 +198,8 @@ public class Tenant extends PersistentObject implements Serializable {
 
 	/**
 	 * Check if the tenant is enabled and not expired
+	 * 
+	 * @return if it is available
 	 */
 	public boolean isAvailable() {
 		if (enabled == 0)
@@ -249,4 +253,40 @@ public class Tenant extends PersistentObject implements Serializable {
 			str += "," + recipient;
 		setQuotaAlertRecipients(str);
 	}
+
+	public Integer getMaxGuests() {
+		return maxGuests;
+	}
+
+	public void setMaxGuests(Integer maxGuests) {
+		this.maxGuests = maxGuests;
+	}
+
+	@Override
+	public Tenant clone() throws CloneNotSupportedException {
+		Tenant tenant = new Tenant();
+		tenant.setId(getId());
+		tenant.setCity(getCity());
+		tenant.setCountry(getCountry());
+		tenant.setDisplayName(getDisplayName());
+		tenant.setEmail(getEmail());
+		tenant.setEnabled(getEnabled());
+		tenant.setExpire(getExpire());
+		tenant.setMaxGuests(getMaxGuests());
+		tenant.setMaxRepoDocs(getMaxRepoDocs());
+		tenant.setMaxRepoSize(getMaxRepoSize());
+		tenant.setMaxSessions(getMaxSessions());
+		tenant.setMaxUsers(getMaxUsers());
+		tenant.setName(getName());
+		tenant.setPostalCode(getPostalCode());
+		tenant.setQuotaAlertRecipients(getQuotaAlertRecipients());
+		tenant.setQuotaThreshold(getQuotaThreshold());
+		tenant.setState(getState());
+		tenant.setStreet(getStreet());
+		tenant.setTelephone(getTelephone());
+		tenant.setTenantId(getTenantId());
+		tenant.setType(getType());
+		return tenant;
+	}
+
 }

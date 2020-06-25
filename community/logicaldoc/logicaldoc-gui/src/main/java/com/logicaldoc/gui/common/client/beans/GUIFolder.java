@@ -18,7 +18,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	public static final int TYPE_WORKSPACE = 1;
 
 	public static final int TYPE_DEFAULT = 0;
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private long id;
@@ -45,6 +45,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	private Date creation;
 
+	// Total number of documents direct children of the folder
 	private int documentCount;
 
 	private int subfolderCount;
@@ -81,12 +82,25 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 
 	private String tagsString;
 
+	private String grid;
+
+	/**
+	 * Identifier of the Zonal OCR template to use to process the documents
+	 * inside this folder
+	 */
+	private Long ocrTemplateId = null;
+
+	/**
+	 * Identifier of the barcode template to use to process this document
+	 */
+	private Long barcodeTemplateId = null;
+
 	public GUIFolder() {
 
 	}
 
 	public boolean isWorkspace() {
-		return type == 1;
+		return type == TYPE_WORKSPACE;
 	}
 
 	public boolean isDefaultWorkspace() {
@@ -457,5 +471,34 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 				tmp[i++] = tg;
 		}
 		quotaAlertRecipients = tmp;
+	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
+	public String getGrid() {
+		return grid;
+	}
+
+	public void setGrid(String grid) {
+		this.grid = grid;
+	}
+
+	public Long getOcrTemplateId() {
+		return ocrTemplateId;
+	}
+
+	public void setOcrTemplateId(Long ocrTemplateId) {
+		this.ocrTemplateId = ocrTemplateId;
+	}
+
+	public Long getBarcodeTemplateId() {
+		return barcodeTemplateId;
+	}
+
+	public void setBarcodeTemplateId(Long barcodeTemplateId) {
+		this.barcodeTemplateId = barcodeTemplateId;
 	}
 }

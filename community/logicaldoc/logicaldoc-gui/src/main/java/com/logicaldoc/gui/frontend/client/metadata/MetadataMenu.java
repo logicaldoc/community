@@ -3,20 +3,22 @@ package com.logicaldoc.gui.frontend.client.metadata;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
-import com.logicaldoc.gui.common.client.beans.GUICustomId;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
+import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
-import com.logicaldoc.gui.frontend.client.metadata.barcode.BarcodesSettingsPanel;
+import com.logicaldoc.gui.frontend.client.metadata.barcode.BarcodesPanel;
 import com.logicaldoc.gui.frontend.client.metadata.form.FormsPanel;
 import com.logicaldoc.gui.frontend.client.metadata.stamp.StampsPanel;
 import com.logicaldoc.gui.frontend.client.metadata.tag.TagsPanel;
 import com.logicaldoc.gui.frontend.client.metadata.template.TemplatesAndAttributesPanel;
-import com.logicaldoc.gui.frontend.client.services.CustomIdService;
+import com.logicaldoc.gui.frontend.client.metadata.zonalocr.ZonalOCRPanel;
+import com.logicaldoc.gui.frontend.client.services.SchemeService;
 import com.logicaldoc.gui.frontend.client.services.TagService;
 import com.logicaldoc.gui.frontend.client.workflow.WorkflowDesigner;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -33,6 +35,7 @@ public class MetadataMenu extends VLayout {
 	public MetadataMenu() {
 		setMargin(10);
 		setMembersMargin(5);
+		setOverflow(Overflow.AUTO);
 
 		Button tags = new Button(I18N.message("tags"));
 		tags.setWidth100();
@@ -94,7 +97,7 @@ public class MetadataMenu extends VLayout {
 		barcode.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new BarcodesSettingsPanel());
+				AdminScreen.get().setContent(new BarcodesPanel());
 			}
 		});
 
@@ -102,9 +105,8 @@ public class MetadataMenu extends VLayout {
 		customidAndAutonaming.setWidth100();
 		customidAndAutonaming.setHeight(25);
 
-		if (Menu.enabled(Menu.CUSTOM_ID)
-				&& (Feature.visible(Feature.CUSTOMID) || Feature.visible(Feature.AUTO_NAMING) || Feature
-						.visible(Feature.AUTO_FOLDING))) {
+		if (Menu.enabled(Menu.CUSTOM_ID) && (Feature.visible(Feature.CUSTOMID) || Feature.visible(Feature.AUTO_NAMING)
+				|| Feature.visible(Feature.AUTO_FOLDING))) {
 			addMember(customidAndAutonaming);
 			if (!Feature.enabled(Feature.CUSTOMID) && !Feature.enabled(Feature.AUTO_NAMING)
 					&& !Feature.enabled(Feature.AUTO_FOLDING)) {
@@ -116,7 +118,7 @@ public class MetadataMenu extends VLayout {
 		customidAndAutonaming.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				CustomIdService.Instance.get().load(new AsyncCallback<GUICustomId[]>() {
+				SchemeService.Instance.get().load(new AsyncCallback<GUIScheme[]>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -124,7 +126,7 @@ public class MetadataMenu extends VLayout {
 					}
 
 					@Override
-					public void onSuccess(final GUICustomId[] schemas) {
+					public void onSuccess(final GUIScheme[] schemas) {
 						AdminScreen.get().setContent(new CustomIdPanel(schemas));
 					}
 				});
@@ -218,6 +220,24 @@ public class MetadataMenu extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				AdminScreen.get().setContent(new FormsPanel());
+			}
+		});
+
+		Button zonalOcr = new Button(I18N.message("zonalocr"));
+		zonalOcr.setWidth100();
+		zonalOcr.setHeight(25);
+
+		if (Feature.visible(Feature.ZONAL_OCR) && Menu.enabled(Menu.ZONAL_OCR)) {
+			addMember(zonalOcr);
+			if (!Feature.enabled(Feature.ZONAL_OCR)) {
+				zonalOcr.setDisabled(true);
+				zonalOcr.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+		zonalOcr.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new ZonalOCRPanel(null, null));
 			}
 		});
 	}

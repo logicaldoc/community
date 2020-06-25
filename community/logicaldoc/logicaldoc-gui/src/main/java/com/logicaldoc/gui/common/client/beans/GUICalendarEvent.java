@@ -42,6 +42,16 @@ public class GUICalendarEvent implements Serializable {
 
 	private GUIUser[] participants = new GUIUser[0];
 
+	private GUIGroup[] participantsGroups = new GUIGroup[0];
+
+	public GUIGroup[] getParticipantsGroups() {
+		return participantsGroups;
+	}
+
+	public void setParticipantsGroups(GUIGroup[] participantsGroups) {
+		this.participantsGroups = participantsGroups;
+	}
+
 	private GUIDocument[] documents = new GUIDocument[0];
 
 	private int frequency = 0;
@@ -140,6 +150,14 @@ public class GUICalendarEvent implements Serializable {
 		return null;
 	}
 
+	public GUIGroup getParticipantGroup(long id) {
+		for (int i = 0; i < participantsGroups.length; i++) {
+			if (participantsGroups[i].getId() == id)
+				return participantsGroups[i];
+		}
+		return null;
+	}
+
 	public void addParticipant(GUIUser newPart) {
 		if (getParticipant(newPart.getId()) != null)
 			return;
@@ -151,6 +169,19 @@ public class GUICalendarEvent implements Serializable {
 		participants = newParts;
 	}
 
+	public void addParticipant(GUIGroup newPart) {
+		if (getParticipantGroup(newPart.getId()) != null)
+			return;
+
+		GUIGroup[] newParts = new GUIGroup[participantsGroups.length + 1];
+		for (int i = 0; i < participantsGroups.length; i++) {
+			newParts[i] = participantsGroups[i];
+		}
+
+		newParts[participantsGroups.length] = newPart;
+		participantsGroups = newParts;
+	}
+
 	public void removeParticipant(long id) {
 		GUIUser[] newParts = new GUIUser[participants.length - 1];
 		int j = 0;
@@ -160,6 +191,17 @@ public class GUICalendarEvent implements Serializable {
 			newParts[j++] = participants[i];
 		}
 		participants = newParts;
+	}
+
+	public void removeParticipantGroup(long id) {
+		GUIGroup[] newParts = new GUIGroup[participants.length - 1];
+		int j = 0;
+		for (int i = 0; i < participantsGroups.length; i++) {
+			if (id == participantsGroups[i].getId())
+				continue;
+			newParts[j++] = participantsGroups[i];
+		}
+		participantsGroups = newParts;
 	}
 
 	public GUIDocument getDocument(long id) {

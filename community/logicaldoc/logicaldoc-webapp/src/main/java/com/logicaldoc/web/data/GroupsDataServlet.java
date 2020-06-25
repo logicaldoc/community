@@ -50,7 +50,7 @@ public class GroupsDataServlet extends HttpServlet {
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
-			StringBuffer query = new StringBuffer("select A.id, A.name, A.description "
+			StringBuffer query = new StringBuffer("select A.id, A.name, A.description, A.source "
 					+ "from com.logicaldoc.core.security.Group A where A.deleted = 0 and A.type = "
 					+ Group.TYPE_DEFAULT + " and A.tenantId=" + session.getTenantId());
 
@@ -69,6 +69,7 @@ public class GroupsDataServlet extends HttpServlet {
 				writer.print("<description><![CDATA[" + (cols[2] == null ? "" : cols[2]) + "]]></description>");
 				writer.print("<label><![CDATA[" + I18N.message("group", locale) + ": " + (String) cols[1]
 						+ "]]></label>");
+				writer.print("<source><![CDATA[" + (cols[3] == null ? "" : cols[3]) + "]]></source>");
 				writer.print("</group>");
 			}
 

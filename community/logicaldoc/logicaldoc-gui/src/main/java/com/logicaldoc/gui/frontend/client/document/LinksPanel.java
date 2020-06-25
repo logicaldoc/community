@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
@@ -8,10 +9,12 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.LinksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
+import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
@@ -19,6 +22,7 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -148,6 +152,8 @@ public class LinksPanel extends DocumentDetailTab {
 													.getParent(treeGrid.getSelectedRecord());
 											treeGrid.selectRecord(parent);
 											treeGrid.getTree().reloadChildren(parent);
+											document.setLinks(document.getLinks() - ids.length);
+											DocumentController.get().modified(document);
 										}
 									});
 								}
@@ -172,12 +178,28 @@ public class LinksPanel extends DocumentDetailTab {
 					}
 				});
 
+				final MenuItem downloadPackage = new MenuItem();
+				downloadPackage.setTitle(I18N.message("downloadpackage"));
+				downloadPackage.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+					public void onClick(MenuItemClickEvent event) {
+						onDownloadPackage();
+					}
+				});
+
+				final MenuItem openInFolder = new MenuItem();
+				openInFolder.setTitle(I18N.message("openinfolder"));
+				openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+					public void onClick(MenuItemClickEvent event) {
+						onOpenInFolder(treeGrid.getSelectedRecord());
+					}
+				});
+
 				// Compute the folder ID of the referenced document
 				long folderId = selection[0].getAttributeAsLong("folderId1");
 				if (document.getFolder().getId() == folderId)
 					folderId = selection[0].getAttributeAsLong("folderId2");
 
-				FolderService.Instance.get().getFolder(folderId, false, new AsyncCallback<GUIFolder>() {
+				FolderService.Instance.get().getFolder(folderId, false, false, false, new AsyncCallback<GUIFolder>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -189,8 +211,11 @@ public class LinksPanel extends DocumentDetailTab {
 						if (fld == null)
 							return;
 						download.setEnabled(fld.isDownload());
+						downloadPackage.setEnabled(fld.isDownload());
 						delete.setEnabled(fld.isDelete());
-						contextMenu.setItems(preview, download, delete);
+						openInFolder.setEnabled(com.logicaldoc.gui.common.client.Menu
+								.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS));
+						contextMenu.setItems(preview, download, downloadPackage, openInFolder, delete);
 						contextMenu.showContextMenu();
 					}
 				});
@@ -207,8 +232,8 @@ public class LinksPanel extends DocumentDetailTab {
 					public void onCellDoubleClick(CellDoubleClickEvent event) {
 						final ListGridRecord record = event.getRecord();
 
-						FolderService.Instance.get().getFolder(record.getAttributeAsLong("folderId"), false,
-								new AsyncCallback<GUIFolder>() {
+						FolderService.Instance.get().getFolder(record.getAttributeAsLong("folderId"), false, false,
+								false, new AsyncCallback<GUIFolder>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
@@ -217,9 +242,8 @@ public class LinksPanel extends DocumentDetailTab {
 
 									@Override
 									public void onSuccess(GUIFolder fld) {
-										if (fld.isDownload()
-												&& "download".equals(Session.get().getInfo()
-														.getConfig("gui.doubleclick")))
+										if (fld.isDownload() && "download"
+												.equals(Session.get().getInfo().getConfig("gui.doubleclick")))
 											onDownload(record);
 										else
 											onPreview(record);
@@ -231,11 +255,49 @@ public class LinksPanel extends DocumentDetailTab {
 		});
 	}
 
+	protected void onOpenInFolder(ListGridRecord record) {
+		String documentId = record.getAttributeAsString("documentId");
+		long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
+		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Log.serverError(caught.getMessage(), caught);
+			}
+
+			@Override
+			public void onSuccess(GUIDocument document) {
+				DocumentsPanel.get().openInFolder(document.getFolder().getId(), document.getId());
+			}
+		});
+	}
+
 	protected void onDownload(ListGridRecord record) {
 		if (document.getFolder().isDownload()) {
 			String documentId = record.getAttributeAsString("documentId");
 			long docId = Long.parseLong(documentId.substring(documentId.lastIndexOf('-') + 1));
 			DocUtil.download(docId, null);
+		}
+	}
+
+	protected void onDownloadPackage() {
+		if (document.getFolder().isDownload()) {
+			String url = GWT.getHostPageBaseURL() + "zip-export?folderId=" + document.getFolder().getId();
+			url += "&docId=" + document.getId();
+
+			treeGrid.getRecords();
+
+			for (ListGridRecord record : treeGrid.getRecords()) {
+				if (record.getAttributeAsBoolean("password")) {
+					SC.warn(I18N.message("somedocsprotected"));
+					break;
+				}
+
+				String docId = record.getAttribute("documentId");
+				docId = docId.substring(docId.indexOf('-') + 1);
+				url += "&docId=" + docId;
+			}
+			WindowUtils.openUrl(url);
 		}
 	}
 

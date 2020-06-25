@@ -94,7 +94,7 @@ public class GUIGridsPanel extends VLayout {
 			public void onCellContextClick(CellContextClickEvent event) {
 				Menu contextMenu = new Menu();
 				MenuItem delete = new MenuItem();
-				delete.setTitle(I18N.message("delete"));
+				delete.setTitle(I18N.message("ddelete"));
 				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 					public void onClick(MenuItemClickEvent event) {
 						documentsGrid.removeSelectedData();

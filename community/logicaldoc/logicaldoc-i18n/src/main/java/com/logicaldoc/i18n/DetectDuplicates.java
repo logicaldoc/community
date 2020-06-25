@@ -16,10 +16,6 @@ import java.util.Map;
  */
 public class DetectDuplicates {
 
-	/**
-	 * @param args
-	 * @throws FileNotFoundException
-	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		File file = new File("src/main/resources/i18n/messages.properties");
 		Map<String, Integer> map = new HashMap<String, Integer>();

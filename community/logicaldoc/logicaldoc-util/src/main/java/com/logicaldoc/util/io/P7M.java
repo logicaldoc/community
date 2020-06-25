@@ -39,6 +39,21 @@ public class P7M {
 		read(is);
 	}
 
+	public P7M(byte[] content) throws Exception {
+		super();
+		read(content);
+	}
+
+	public void read(byte[] content) {
+		this.content = content;
+
+		try {
+			this.cms = new CMSSignedData(content);
+		} catch (Exception ex1) {
+			log.error("Error extracting file certificate");
+		}
+	}
+
 	/**
 	 * Reads a p7m file from a stream. Sets the signed data with the stream as
 	 * content.
@@ -56,7 +71,7 @@ public class P7M {
 			log.error("Error reading file");
 		}
 		byte[] tmp = baos.toByteArray();
-		
+
 		try {
 			// if the content is on Base64, we must decode it into DER format
 			content = Base64.decode(tmp);
@@ -68,17 +83,13 @@ public class P7M {
 			log.debug("The signed file is probably in DER format");
 		}
 
-		try {
-			this.cms = new CMSSignedData(content);
-		} catch (Exception ex1) {
-			log.error("Error extracting file certificate");
-		}
+		read(content);
 	}
 
 	/**
 	 * Reads a p7m file from a file.
 	 * 
-	 * @throws Exception
+	 * @throws Exception if the file cannot be read
 	 */
 	public void read() throws Exception {
 		read(new FileInputStream(file));
@@ -87,7 +98,9 @@ public class P7M {
 	/**
 	 * Extracts the original file content as stream
 	 * 
-	 * @throws Exception
+	 * @return the stream representing the enclosed file
+	 * 
+	 * @throws Exception in case the enclosed file cannot be extracted
 	 */
 	public InputStream extractOriginalFileStream() throws Exception {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -101,7 +114,7 @@ public class P7M {
 	 * @param outFile The file in which will contained the original file
 	 *        content.
 	 * 
-	 * @throws Exception
+	 * @throws Exception in case the embedded file cannot be extracted
 	 */
 	public void extractOriginalFile(File outFile) throws Exception {
 		OutputStream os = new FileOutputStream(outFile);
@@ -114,30 +127,6 @@ public class P7M {
 
 	public void setFile(File file) {
 		this.file = file;
-	}
-
-	/**
-	 * Retrieves the certificate subjects name.
-	 */
-
-	public String[] retrieveCertificateSubjects() {
-		return new String[0];
-		// List<String> names = new ArrayList<String>();
-		// Store certStore = cms.getCertificates();
-		// SignerInformationStore signers = cms.getSignerInfos();
-		// Collection c = signers.getSigners();
-		// Iterator it = c.iterator();
-		//
-		// while (it.hasNext()) {
-		// SignerInformation signer = (SignerInformation) it.next();
-		// Collection certCollection = certStore.getMatches(signer.getSID());
-		//
-		// Iterator certIt = certCollection.iterator();
-		// X509CertificateHolder cert = (X509CertificateHolder) certIt.next();
-		// names.add(Sign.toCNNames("" + cert.getSubject().toString()));
-		// }
-		//
-		// return names.toArray(new String[0]);
 	}
 
 	public CMSSignedData getCms() {

@@ -3,14 +3,14 @@ package com.logicaldoc.core.searchengine.folder;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.searchengine.Hit;
+
+import junit.framework.Assert;
 
 public class FolderSearchTest extends AbstractCoreTCase {
 
@@ -31,7 +31,7 @@ public class FolderSearchTest extends AbstractCoreTCase {
 		opt.setCriteria(criteria.toArray(new FolderCriterion[0]));
 		opt.setMaxHits(10);
 		opt.setUserId(1);
-		opt.setRetrieveAliases(1);
+		opt.setRetrieveAliases(true);
 		opt.setOrder(new String[] { "lastmodified desc", "name asc" });
 
 		FolderSearch search = new FolderSearch();
@@ -52,13 +52,13 @@ public class FolderSearchTest extends AbstractCoreTCase {
 		criterion = new FolderCriterion();
 		criterion.setComposition("and");
 		criterion.setExtendedAttribute(true);
-		criterion.setOperator(FolderCriterion.OPERATOR_EQUAL);
+		criterion.setOperator(FolderCriterion.OPERATOR_EQUALS);
 		criterion.setField("val1");
 		criterion.setValue("test_val_1");
 
 		criterion = new FolderCriterion();
 		criterion.setComposition("and");
-		criterion.setOperator(FolderCriterion.OPERATOR_EQUAL);
+		criterion.setOperator(FolderCriterion.OPERATOR_EQUALS);
 		criterion.setField("template");
 		criterion.setValue(1L);
 		criterion.setType(FolderCriterion.TYPE_TEMPLATE);
@@ -68,7 +68,7 @@ public class FolderSearchTest extends AbstractCoreTCase {
 		opt.setCriteria(criteria.toArray(new FolderCriterion[0]));
 		opt.setMaxHits(10);
 		opt.setUserId(1);
-		opt.setRetrieveAliases(1);
+		opt.setRetrieveAliases(true);
 		opt.setOrder(new String[] { "lastmodified desc", "name asc" });
 
 		search = new FolderSearch();

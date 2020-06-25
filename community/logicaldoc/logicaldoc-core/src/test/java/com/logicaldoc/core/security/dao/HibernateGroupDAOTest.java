@@ -2,15 +2,16 @@ package com.logicaldoc.core.security.dao;
 
 import java.util.Collection;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Group;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateGroupDAOTest</code>
@@ -38,15 +39,14 @@ public class HibernateGroupDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		Assert.assertNotNull(dao.findById(10));
 
 		Assert.assertTrue(dao.delete(10));
 		Assert.assertNull(dao.findById(10));
 
-		// Delete a BIG group with associated FolderGroups and UserGroups
-		Assert.assertTrue(dao.delete(1));
-		Assert.assertNull(dao.findById(1));
+		// Try to delete undeletable group
+		Assert.assertFalse(dao.delete(1));
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class HibernateGroupDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		Assert.assertNull(dao.findByName("LogicalObjects", 1));
 
 		Group group = new Group();
@@ -131,12 +131,12 @@ public class HibernateGroupDAOTest extends AbstractCoreTCase {
 		Assert.assertTrue(dao.insert(group, 0));
 		Assert.assertFalse(manager.getAllowedGroups(5).contains(group));
 
-		dao.inheritACLs(group.getId(), 2);
+		dao.inheritACLs(group, 2);
 		System.out.println(manager.getAllowedGroups(5));
 		Assert.assertTrue(manager.getAllowedGroups(5).contains(group));
 		Assert.assertFalse(manager.getAllowedGroups(9).contains(group));
 
-		dao.inheritACLs(group.getId(), 1);
+		dao.inheritACLs(group, 1);
 		System.out.println(manager.getAllowedGroups(9));
 		Assert.assertTrue(manager.getAllowedGroups(9).contains(group));
 	}

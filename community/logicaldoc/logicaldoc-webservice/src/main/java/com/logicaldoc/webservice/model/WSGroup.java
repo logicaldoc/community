@@ -23,7 +23,7 @@ public class WSGroup implements Serializable {
 
 	@WSDoc(documented = false)
 	private static final long serialVersionUID = 1L;
-	
+
 	@WSDoc(documented = false)
 	public static final long GROUPID_ADMIN = 1;
 
@@ -53,6 +53,9 @@ public class WSGroup implements Serializable {
 
 	@WSDoc(description = "the last modified date (format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd')", required = false)
 	private String lastModified;
+
+	@WSDoc(description = "where the group was created, 'local' indicates it was created in the local database", required = false)
+	private String source = "local";
 
 	public long getId() {
 		return id;
@@ -146,6 +149,7 @@ public class WSGroup implements Serializable {
 			wsGroup.setDescription(group.getDescription());
 			wsGroup.setType(group.getType());
 			wsGroup.setLastModified(WSUtil.convertDateToString(group.getLastModified()));
+			wsGroup.setSource(group.getSource());
 
 			if (group.getUsers() != null && group.getUsers().size() > 0) {
 				long[] userIds = new long[group.getUsers().size()];
@@ -170,6 +174,14 @@ public class WSGroup implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return new Long(id).hashCode();
+		return Long.valueOf(id).hashCode();
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

@@ -1,0 +1,17 @@
+# A customized type mapping for WordDelimiterFilter
+# the allowable types are: LOWER, UPPER, ALPHA, DIGIT, ALPHANUM, SUBWORD_DELIM
+# 
+# the default for any character without a mapping is always computed from 
+# Unicode character properties
+
+# Map the $, %, '.', and ',' characters to DIGIT 
+# This might be useful for financial data.
+$ => DIGIT
+% => DIGIT
+. => DIGIT
+\u002C => DIGIT
+
+# in some cases you might not want to split on ZWJ
+# this also tests the case where we need a bigger byte[]
+# see http://en.wikipedia.org/wiki/Zero-width_joiner
+\u200D => ALPHANUM

@@ -33,7 +33,7 @@ public class GoogleAuthenticatorSetup extends TwoFactorsAuthenticationSetup {
 		setMembersMargin(5);
 		setMargin(5);
 
-		account = user.getUserName() + "@" + WindowUtils.getRequestInfo().getHostName();
+		account = user.getUsername() + "@" + WindowUtils.getRequestInfo().getHostName();
 
 		TwoFactorsAuthenticationService.Instance.get().generateGoogleAuthorizationCredentials(account,
 				new AsyncCallback<String[]>() {

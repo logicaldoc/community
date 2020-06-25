@@ -16,7 +16,6 @@ import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Window;
@@ -53,7 +52,8 @@ public class UpdateDialog extends Window {
 
 	private String charset = "UTF-8";
 
-	public UpdateDialog(final long[] ids, final GUIDocument metadata, final String context, final boolean majorVersion) {
+	public UpdateDialog(final long[] ids, final GUIDocument metadata, final String context,
+			final boolean majorVersion) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
 		addCloseClickHandler(new CloseClickHandler() {
@@ -108,7 +108,8 @@ public class UpdateDialog extends Window {
 		else
 			saveForm.setItems(versionComment);
 
-		Button saveButton = new Button(CONTEXT_CHECKIN.equals(context) ? I18N.message("checkin") : I18N.message("save"));
+		Button saveButton = new Button(
+				CONTEXT_CHECKIN.equals(context) ? I18N.message("checkin") : I18N.message("save"));
 		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -140,7 +141,8 @@ public class UpdateDialog extends Window {
 							if (value) {
 								bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
 								ContactingServer.get().show();
-								DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(), "true".equals(saveForm.getValueAsString("ignoreemptyfields")),
+								DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
+										"true".equals(saveForm.getValueAsString("ignoreemptyfields")),
 										new AsyncCallback<Void>() {
 											@Override
 											public void onFailure(Throwable error) {
@@ -163,26 +165,14 @@ public class UpdateDialog extends Window {
 				else {
 					bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
 					ContactingServer.get().show();
-					DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing,
-							bulkPanel.getDocument(), new AsyncCallback<GUIDocument[]>() {
+					DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing, bulkPanel.getDocument(),
+							new AsyncCallback<GUIDocument[]>() {
 
 								@Override
-								public void onSuccess(GUIDocument[] arg0) {
+								public void onSuccess(GUIDocument[] doc) {
+									destroy();
 									DocumentsPanel.get().refresh();
 									ContactingServer.get().hide();
-									DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
-											destroy();
-										}
-
-										@Override
-										public void onSuccess(Void result) {
-											destroy();
-										}
-									});
 								}
 
 								@Override
@@ -194,19 +184,6 @@ public class UpdateDialog extends Window {
 									// because maybe
 									// some documents have been stored.
 									DocumentsPanel.get().refresh();
-									DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
-											destroy();
-										}
-
-										@Override
-										public void onSuccess(Void result) {
-											destroy();
-										}
-									});
 								}
 							});
 				}

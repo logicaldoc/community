@@ -18,6 +18,8 @@ public interface SetupService extends RemoteService {
 	/**
 	 * Performs simple security check to enforce that only the admin can go
 	 * through the setup
+	 * 
+	 * @throws ServerException an error happened in the server applications
 	 */
 	public void securityCheck() throws ServerException;
 
@@ -25,6 +27,8 @@ public interface SetupService extends RemoteService {
 	 * Performs a system setup.
 	 * 
 	 * @param data The intallation data
+	 * 
+	 * @throws ServerException an error happened in the server applications
 	 */
 	public void setup(SetupInfo data) throws ServerException;
 }

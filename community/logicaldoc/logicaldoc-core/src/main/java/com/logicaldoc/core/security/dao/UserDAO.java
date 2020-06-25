@@ -19,14 +19,28 @@ import com.logicaldoc.core.security.UserHistory;
 public interface UserDAO extends PersistentObjectDAO<User> {
 
 	/**
-	 * Counts the total number of users
+	 * Counts the total number of standard users
+	 * 
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return total number of guest users
 	 */
 	public int count(Long tenantId);
+
+	/**
+	 * Counts the total number of guest users
+	 *
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return total number of guest users
+	 */
+	public int countGuests(Long tenantId);
 
 	/**
 	 * This method finds an User by its username. The search is case sensitive.
 	 * 
 	 * @param username username of wanted User.
+	 * 
 	 * @return Wanted User or null if user doesn't exist.
 	 */
 	public User findByUsername(String username);
@@ -36,6 +50,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * insensitive.
 	 * 
 	 * @param username username of wanted User.
+	 * 
 	 * @return Wanted User or null if user doesn't exist.
 	 */
 	public User findByUsernameIgnoreCase(String username);
@@ -45,6 +60,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * findByUsernameIgnoreCase
 	 * 
 	 * @param username The username of the user
+	 * 
 	 * @return The found user
 	 */
 	public User getUser(String username);
@@ -53,6 +69,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * This method finds an User by username.
 	 * 
 	 * @param username The username of wanted User.
+	 * 
 	 * @return Collection of selected users.
 	 */
 	public List<User> findByLikeUsername(String username);
@@ -61,6 +78,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * This method finds an User by name.
 	 * 
 	 * @param name The name of wanted User.
+	 * 
 	 * @return Collection of selected users.
 	 */
 	public List<User> findByName(String name);
@@ -68,17 +86,19 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	/**
 	 * This method finds an User by username and name.
 	 * 
-	 * @param username The username of wanted user.
-	 * @param name The name of wanted user.
-	 * @return Collection of selected users.
+	 * @param username The username of wanted user
+	 * @param name The name of wanted user
+	 * 
+	 * @return Collection of selected users
 	 */
 	public List<User> findByUsernameAndName(String username, String name);
 
 	/**
-	 * Validates an username and a password.
+	 * Validates an username and a password
 	 * 
-	 * @param username Username of the User to be validated.
-	 * @param password Password of the User to be validated.
+	 * @param username Username of the User to be validated
+	 * @param password Password of the User to be validated
+	 * 
 	 * @return True if User is valid and authenticated.
 	 */
 	public boolean validateUser(String username, String password);
@@ -87,6 +107,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * Validates an username only (the password content is not inspectged.
 	 * 
 	 * @param username Username of the User to be validated.
+	 * 
 	 * @return True if User is valid.
 	 */
 	public boolean validateUser(String username);
@@ -95,6 +116,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * Is password expired.
 	 * 
 	 * @param username Username of the User to be validate.
+	 * 
 	 * @return True if the password is expired
 	 */
 	public boolean isPasswordExpired(String username);
@@ -104,6 +126,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * 
 	 * @param userId The id of the user to delete
 	 * @param transaction entry to log the event
+	 * 
 	 * @return True if successfully deleted from the database.
 	 */
 	public boolean delete(long userId, UserHistory transaction);
@@ -111,7 +134,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	/**
 	 * This method persists the user object and insert a new user history entry.
 	 * 
-	 * @param user
+	 * @param user the user to store
 	 * @param transaction entry to log the event
 	 * @return True if successfully stored in a database.
 	 */
@@ -119,7 +142,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 
 	/**
 	 * Retrieves the settings for a user. The settings are stored as Generics of
-	 * type usersetting.
+	 * type <b>usersetting</b>.
 	 * 
 	 * @param userId Identifier of the user
 	 * @param namePrefix Name prefix of the property (optional)
@@ -135,6 +158,10 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * <li>admin if the tenant is default</li>
 	 * <li>admin<b>Tenantname</b> in all other cases</li>
 	 * </ol>
+	 * 
+	 * @param tenantName name of the tenant
+	 * 
+	 * @return the user to administrate the tenant
 	 */
 	public User findAdminUser(String tenantName);
 
@@ -142,6 +169,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * Retrieves the users belonging to a given group.
 	 * 
 	 * @param groupId Identifier of the group
+	 * 
 	 * @return the set of groups
 	 */
 	public Set<User> findByGroup(long groupId);

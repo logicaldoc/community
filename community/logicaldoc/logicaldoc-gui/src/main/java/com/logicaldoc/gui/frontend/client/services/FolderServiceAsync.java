@@ -12,7 +12,8 @@ public interface FolderServiceAsync {
 
 	void delete(long[] folderIds, AsyncCallback<Void> callback);
 
-	void getFolder(long folderId, boolean computePath, AsyncCallback<GUIFolder> callback);
+	void getFolder(long folderId, boolean computePath, boolean computeDocs, boolean computeSubfolders,
+			AsyncCallback<GUIFolder> callback);
 
 	void move(long[] folderIds, long targetId, AsyncCallback<Void> callback);
 
@@ -44,4 +45,12 @@ public interface FolderServiceAsync {
 	void createAlias(long parentId, long foldRef, AsyncCallback<GUIFolder> callback);
 
 	void applyTags(long parentId, AsyncCallback<Void> callback);
+
+	void computeStats(long folerId, AsyncCallback<int[]> callback);
+
+	void setFolderPagination(long folderId, Integer startRecord, Integer pageSize, AsyncCallback<Void> callback);
+
+	void applyGridLayout(long folderId, AsyncCallback<Void> callback);
+
+	void applyOCR(long parentId, AsyncCallback<Void> callback);
 }

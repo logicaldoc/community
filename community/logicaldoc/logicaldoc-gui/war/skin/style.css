@@ -1,3 +1,9 @@
+.treeCellOver,
+.treeCellOverDark {
+  background: #b6e3ff;
+  color: black;
+}
+
 .gwt-HorizontalSplitPanel {
 	
 }
@@ -193,4 +199,8 @@
 	white-space: nowrap;
 	padding-left: 3px;
 	color: grey;
+}
+
+.savepanel {
+	background-color: #eeeeee;
 }

@@ -139,7 +139,6 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setShowFilterEditor(false);
-		list.setAutoDraw(true);
 		list.setFields(id, email, firstName, lastName, company, phone, mobile, address);
 
 		addItem(toolStrip);

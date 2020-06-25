@@ -3,6 +3,8 @@ package com.logicaldoc.gui.common.client.beans;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.logicaldoc.gui.common.client.Constants;
+
 /**
  * This class represents a Tenant, that is a branch of the organization or an
  * organizational unit or whatever other class of organization.
@@ -43,6 +45,8 @@ public class GUITenant implements Serializable {
 
 	private Integer maxUsers;
 
+	private Integer maxGuests;
+
 	private Integer maxSessions;
 
 	private Long maxRepoDocs;
@@ -57,6 +61,9 @@ public class GUITenant implements Serializable {
 	private Date expire;
 
 	private long users;
+
+	// The read-only users
+	private long guests;
 
 	private long documents;
 
@@ -219,6 +226,10 @@ public class GUITenant implements Serializable {
 		this.enabled = enabled;
 	}
 
+	public boolean isDefault() {
+		return id == Constants.TENANT_DEFAULTID;
+	}
+
 	public Date getExpire() {
 		return expire;
 	}
@@ -288,17 +299,17 @@ public class GUITenant implements Serializable {
 	}
 
 	public String getQuotaAlertRecipientsAsString() {
-		if(quotaAlertRecipients==null || quotaAlertRecipients.length==0)
+		if (quotaAlertRecipients == null || quotaAlertRecipients.length == 0)
 			return null;
-		String str="";
+		String str = "";
 		for (String rec : quotaAlertRecipients) {
-			if(!str.isEmpty())
-				str+=",";
-			str+=rec.trim();
+			if (!str.isEmpty())
+				str += ",";
+			str += rec.trim();
 		}
 		return str;
 	}
-	
+
 	public void setQuotaAlertRecipients(String[] quotaAlertRecipients) {
 		this.quotaAlertRecipients = quotaAlertRecipients;
 	}
@@ -336,5 +347,21 @@ public class GUITenant implements Serializable {
 				tmp[i++] = tg;
 		}
 		quotaAlertRecipients = tmp;
+	}
+
+	public Integer getMaxGuests() {
+		return maxGuests;
+	}
+
+	public void setMaxGuests(Integer maxGuests) {
+		this.maxGuests = maxGuests;
+	}
+
+	public long getGuests() {
+		return guests;
+	}
+
+	public void setGuests(long guests) {
+		this.guests = guests;
 	}
 }

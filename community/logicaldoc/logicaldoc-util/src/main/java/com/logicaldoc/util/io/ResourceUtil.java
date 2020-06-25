@@ -20,8 +20,8 @@ public class ResourceUtil {
 
 	public static String readAsString(String resourceName) throws IOException {
 		StringBuffer resourceData = new StringBuffer(1000);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				ResourceUtil.class.getResourceAsStream(resourceName)));
+		BufferedReader reader = new BufferedReader(
+				new InputStreamReader(ResourceUtil.class.getResourceAsStream(resourceName)));
 		char[] buf = new char[1024];
 		int numRead = 0;
 		while ((numRead = reader.read(buf)) != -1) {
@@ -36,7 +36,9 @@ public class ResourceUtil {
 	 * 
 	 * @param classpath The classpath specification
 	 * @param out The target file
-	 * @throws IOException
+	 * 
+	 * @throws IOException raised in case the resource does not exist or the
+	 *         output file cannot be written
 	 */
 	public static void copyResource(String classpath, File out) throws IOException {
 		InputStream is = new BufferedInputStream(ResourceUtil.class.getResource(classpath).openStream());
@@ -53,15 +55,15 @@ public class ResourceUtil {
 			os.close();
 		}
 	}
-	
+
 	public static boolean existsResource(String resourceName) {
 		InputStream is = null;
 		try {
 			try {
 				is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
 			} catch (Throwable e) {
-				is = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResource(resourceName)
-						.openStream());
+				is = new BufferedInputStream(
+						Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
 			}
 			return is != null;
 		} catch (Throwable e) {

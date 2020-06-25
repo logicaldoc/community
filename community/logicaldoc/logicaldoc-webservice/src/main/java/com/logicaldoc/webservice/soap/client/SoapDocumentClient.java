@@ -101,6 +101,18 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
+	public void checkinDocument(String sid, long docId, String comment, String filename, boolean release,
+			WSDocument docVO, DataHandler content) throws Exception {
+		client.checkinDocument(sid, docId, comment, filename, release, docVO, content);
+	}
+
+	public void checkinDocument(String sid, long docId, String comment, String filename, boolean release,
+			WSDocument docVO, File content) throws Exception {
+		client.checkinDocument(sid, docId, comment, filename, release, docVO,
+				new DataHandler(new FileDataSource(content)));
+	}
+
+	@Override
 	public DataHandler getContent(String sid, long docId) throws Exception {
 		return client.getContent(sid, docId);
 	}
@@ -114,8 +126,18 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	public DataHandler getResource(String sid, long docId, String fileVersion, String suffix) throws Exception {
 		return client.getResource(sid, docId, fileVersion, suffix);
 	}
+	
+	public void downloadContent(String sid, long docId, File out) throws Exception {
+		DataHandler data = client.getContent(sid, docId);
+		data.writeTo(new FileOutputStream(out));
+	}
+	
+	public void downloadVersionContent(String sid, long docId, String version, File out) throws Exception {
+		DataHandler data = client.getVersionContent(sid, docId, version);
+		data.writeTo(new FileOutputStream(out));
+	}
 
-	public void getResourceContent(String sid, long docId, String fileVersion, String suffix, File out)
+	public void downloadResourceContent(String sid, long docId, String fileVersion, String suffix, File out)
 			throws Exception {
 		DataHandler data = client.getResource(sid, docId, fileVersion, suffix);
 		data.writeTo(new FileOutputStream(out));
@@ -158,11 +180,6 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public void renameFile(String sid, long docId, String name) throws Exception {
-		client.renameFile(sid, docId, name);
-	}
-
-	@Override
 	public void reindex(String sid, long docId, String content) throws Exception {
 		client.reindex(sid, docId, content);
 	}
@@ -175,12 +192,6 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	@Override
 	public WSDocument[] getAliases(String sid, long docId) throws Exception {
 		return client.getAliases(sid, docId);
-	}
-
-	@Override
-	public long upload(String sid, Long docId, Long folderId, boolean release, String filename, String language,
-			DataHandler content) throws Exception {
-		return client.upload(sid, docId, folderId, release, filename, language, content);
 	}
 
 	@Override
@@ -207,7 +218,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	public void createThumbnail(String sid, long docId, String fileVersion) throws Exception {
 		client.createThumbnail(sid, docId, fileVersion);
 	}
-	
+
 	@Override
 	public void uploadResource(String sid, long docId, String fileVersion, String suffix, DataHandler content)
 			throws Exception {
@@ -225,9 +236,9 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public String createDownloadTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate)
-			throws Exception {
-		return client.createDownloadTicket(sid, docId, suffix, expireHours, expireDate);
+	public String createDownloadTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
+			Integer maxDownloads) throws Exception {
+		return client.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
 	}
 
 	@Override
@@ -273,5 +284,27 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	@Override
 	public String deleteVersion(String sid, long docId, String version) throws Exception {
 		return client.deleteVersion(sid, docId, version);
+	}
+
+	@Override
+	public void replaceFile(String sid, long docId, String fileVersion, String comment, DataHandler content)
+			throws Exception {
+		client.replaceFile(sid, docId, fileVersion, comment, content);
+	}
+
+	@Override
+	public void promoteVersion(String sid, long docId, String version) throws Exception {
+		client.promoteVersion(sid, docId, version);
+	}
+
+	@Override
+	public WSNote saveNote(String sid, long docId, WSNote note) throws Exception {
+		return client.saveNote(sid, docId, note);
+	}
+
+	@Override
+	public long upload(String sid, Long docId, Long folderId, boolean release, String filename, String language,
+			DataHandler content) throws Exception {
+		return client.upload(sid, docId, folderId, release, filename, language, content);
 	}
 }

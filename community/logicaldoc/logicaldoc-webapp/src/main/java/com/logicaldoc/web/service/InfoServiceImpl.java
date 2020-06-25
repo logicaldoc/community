@@ -9,7 +9,6 @@ import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +26,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.gui.common.client.InvalidSessionException;
+import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
@@ -54,7 +54,7 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public GUIInfo getInfo(String locale, String tenantName) {
+	public GUIInfo getInfo(String locale, String tenantName, boolean login) {
 		ContextProperties config = Context.get().getProperties();
 
 		GUIInfo info = null;
@@ -137,14 +137,26 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 			AttributeSetDAO aDAO = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 			try {
 				Map<String, Attribute> attributes = aDAO.findAttributes(tDAO.findByName(tenantName).getId(), null);
-				List<GUIValue> attributeLabels = new ArrayList<GUIValue>();
+				List<GUIAttribute> guiAttributes = new ArrayList<GUIAttribute>();
 				for (String name : attributes.keySet()) {
-					GUIValue val = new GUIValue(name,
-							StringUtils.isNotEmpty(attributes.get(name).getLabel()) ? attributes.get(name).getLabel()
-									: name);
-					attributeLabels.add(val);
+					Attribute att = attributes.get(name);
+					GUIAttribute guiAtt = new GUIAttribute();
+					guiAtt.setName(name);
+					guiAtt.setStringValue(att.getStringValue());
+					guiAtt.setBooleanValue(att.getBooleanValue());
+					guiAtt.setDoubleValue(att.getDoubleValue());
+					guiAtt.setEditor(att.getEditor());
+					guiAtt.setHidden(att.getHidden() == 1);
+					guiAtt.setIntValue(att.getIntValue());
+					guiAtt.setLabel(att.getLabel());
+					guiAtt.setMandatory(att.getMandatory() == 1);
+					guiAtt.setMultiple(att.getMultiple() == 1);
+					guiAtt.setPosition(att.getPosition());
+					guiAtt.setSetId(att.getSetId());
+					guiAtt.setType(att.getType());
+					guiAttributes.add(guiAtt);
 				}
-				info.setAttributeLabels(attributeLabels.toArray(new GUIValue[0]));
+				info.setAttributeDefinitions(guiAttributes.toArray(new GUIAttribute[0]));
 			} catch (Throwable t) {
 				log.error(t.getMessage(), t);
 			}
@@ -158,7 +170,11 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 
 	/**
 	 * Retrieves the informations but not localization issues like messages and
-	 * installed languages.
+	 * installed languages
+	 * 
+	 * @param tenantName name of the tenant
+	 * 
+	 * @return bean carrying informations about the User Interface
 	 */
 	public static GUIInfo getInfo(String tenantName) {
 		ContextProperties config = Context.get().getProperties();
@@ -296,15 +312,15 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 	@Override
 	public GUIParameter[] getSessionInfo() throws InvalidSessionException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		log.debug("Requested info for session " + session.getSid());
+		log.debug("Requested info for session {}", session.getSid());
 
 		try {
 			SystemMessageDAO messageDao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
 			List<GUIParameter> parameters = new ArrayList<GUIParameter>();
 
 			if (session != null) {
-				GUIParameter messages = new GUIParameter("messages", ""
-						+ messageDao.getCount(session.getUsername(), SystemMessage.TYPE_SYSTEM, 0));
+				GUIParameter messages = new GUIParameter("messages",
+						"" + messageDao.getUnreadCount(session.getUsername(), SystemMessage.TYPE_SYSTEM));
 				parameters.add(messages);
 			}
 			parameters.add(new GUIParameter("valid", "" + SessionManager.get().isOpen(session.getSid())));
@@ -314,5 +330,17 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 			log.error(t.getMessage(), t);
 			throw new RuntimeException(t.getMessage(), t);
 		}
+	}
+
+	@Override
+	public boolean ping() throws InvalidSessionException {
+		try {
+			Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+			if (session == null)
+				return false;
+		} catch (Throwable t) {
+			return false;
+		}
+		return true;
 	}
 }

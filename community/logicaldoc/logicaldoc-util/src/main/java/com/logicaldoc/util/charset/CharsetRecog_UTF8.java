@@ -2,8 +2,6 @@ package com.logicaldoc.util.charset;
 
 /**
  * Charset recognizer for UTF-8
- *
- * @internal
  */
 class CharsetRecog_UTF8 extends CharsetRecognizer {
 
@@ -11,9 +9,6 @@ class CharsetRecog_UTF8 extends CharsetRecognizer {
         return "UTF-8";
     }
 
-    /* (non-Javadoc)
-     * @see com.ibm.icu.text.CharsetRecognizer#match(com.ibm.icu.text.CharsetDetector)
-     */
     int match(CharsetDetector det) {
         boolean     hasBOM = false;
         int         numValid = 0;
@@ -89,5 +84,4 @@ class CharsetRecog_UTF8 extends CharsetRecognizer {
         }
         return confidence;
     }
-
 }

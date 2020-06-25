@@ -71,8 +71,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 		usersItem.setDisabled(!updateEnabled);
 
 		TextAreaItem message = ItemFactory.newTextAreaItem("message", "message", null);
-		message.setHeight(100);
-		
+		message.setWidth("*");
 		form.setItems(usersItem, message);
 	}
 

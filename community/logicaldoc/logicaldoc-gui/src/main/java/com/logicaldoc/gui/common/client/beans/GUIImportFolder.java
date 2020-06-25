@@ -15,6 +15,10 @@ public class GUIImportFolder implements Serializable {
 
 	public static String PROVIDER_SMB = "smb";
 
+	public static String PROVIDER_SMB2 = "smb2";
+
+	public static String PROVIDER_SMB3 = "smb3";
+
 	public static String PROVIDER_FILE = "file";
 
 	public static String PROVIDER_FTP = "ftp";
@@ -53,6 +57,10 @@ public class GUIImportFolder implements Serializable {
 
 	private Long templateId;
 
+	private Long ocrTemplateId;
+
+	private Long barcodeTemplateId;
+
 	private int depth = 5;
 
 	private boolean delImport = false;
@@ -68,6 +76,8 @@ public class GUIImportFolder implements Serializable {
 	private Integer port = null;
 
 	private String host;
+
+	private Long batch = 10000L;
 
 	public GUIImportFolder() {
 		super();
@@ -257,15 +267,25 @@ public class GUIImportFolder implements Serializable {
 		this.host = host;
 	}
 
+	public Long getBatch() {
+		return batch;
+	}
+
+	public void setBatch(Long batch) {
+		this.batch = batch;
+	}
+
 	/**
 	 * Composes the displayable importFolder's url.
+	 * 
+	 * @return the URL to display
 	 */
 	public String getDisplayUrl() {
 		String url = "";
 		if (PROVIDER_FILE.equals(getProvider())) {
-			if (getPath() == null || getPath().isEmpty())
+			if (getPath() != null && !getPath().isEmpty())
 				url += getPath();
-		} else if (PROVIDER_SMB.equals(getProvider())) {
+		} else if (getProvider().startsWith(PROVIDER_SMB)) {
 			String path = getPath().replaceAll("/", "\\\\");
 			if (!path.startsWith("\\"))
 				path = "\\" + path;
@@ -283,5 +303,21 @@ public class GUIImportFolder implements Serializable {
 			url += getPath();
 		}
 		return url;
+	}
+
+	public Long getOcrTemplateId() {
+		return ocrTemplateId;
+	}
+
+	public void setOcrTemplateId(Long ocrTemplateId) {
+		this.ocrTemplateId = ocrTemplateId;
+	}
+
+	public Long getBarcodeTemplateId() {
+		return barcodeTemplateId;
+	}
+
+	public void setBarcodeTemplateId(Long barcodeTemplateId) {
+		this.barcodeTemplateId = barcodeTemplateId;
 	}
 }

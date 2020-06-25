@@ -27,6 +27,7 @@ import org.java.plugin.registry.PluginDescriptor;
 import org.java.plugin.util.ExtendedProperties;
 
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Central point where plugins are loaded and handled. The class is abstract and
@@ -68,6 +69,8 @@ public abstract class PluginRegistry {
 
 	/**
 	 * Initializes all found plugins
+	 * 
+	 * @param pluginsDir the root folder where the plugins files are located
 	 */
 	public void init(String pluginsDir) {
 		ExtendedProperties properties = new ExtendedProperties();
@@ -184,8 +187,8 @@ public abstract class PluginRegistry {
 		try {
 			PluginRegistry registry = PluginRegistry.getInstance();
 			PluginDescriptor descriptor = registry.getManager().getRegistry().getPluginDescriptor(pluginId);
-			ExtensionPoint dbinitExtPoint = registry.getManager().getRegistry()
-					.getExtensionPoint(descriptor.getId(), extensionPoint);
+			ExtensionPoint dbinitExtPoint = registry.getManager().getRegistry().getExtensionPoint(descriptor.getId(),
+					extensionPoint);
 			exts = dbinitExtPoint.getConnectedExtensions();
 		} catch (Exception e) {
 
@@ -242,6 +245,8 @@ public abstract class PluginRegistry {
 	/**
 	 * Retrieve the plugin descriptor
 	 * 
+	 * @param pluginId identifier of the plugin
+	 * 
 	 * @return The plugin descriptor
 	 */
 	public PluginDescriptor getPlugin(String pluginId) {
@@ -259,13 +264,20 @@ public abstract class PluginRegistry {
 
 	/**
 	 * This method retrieves the folder of the given plugin. If not exists, it
-	 * creates the folder. The folder is: <conf.plugindir>/<pluginName>
+	 * creates the folder. The folder is: <b>conf.plugindir</b>/<b>pluginName</b>
 	 * 
 	 * @param pluginName The plugin name
+	 * 
+	 * @return the directory used as plugin's home
 	 */
 	public static File getPluginHome(String pluginName) {
 		File root = getPluginsDir();
 		File userDir = new File(root, pluginName);
+
+		if (!FileUtil.isInsideFolder(root, userDir))
+			throw new SecurityException(
+					String.format("Plugin %s non inside plugin home %s", pluginName, root.getPath()));
+
 		if (!userDir.exists()) {
 			try {
 				FileUtils.forceMkdir(userDir);
@@ -278,36 +290,44 @@ public abstract class PluginRegistry {
 
 	/**
 	 * This method retrieves the plugins root folder. If not exists, it creates
-	 * the folder. The folder is: <conf.plugindir>
+	 * the folder. The folder is: <b>conf.plugindir</b>
+	 * 
+	 * @return root of the plugins data folders 
 	 */
 	public static File getPluginsDir() {
-		File userpath = null;
+		File pluginsPath = null;
 		try {
 			ContextProperties conf = new ContextProperties();
-			userpath = new File(conf.getPropertyWithSubstitutions("conf.plugindir"));
+			pluginsPath = new File(conf.getPropertyWithSubstitutions("conf.plugindir"));
 		} catch (IOException e1) {
 		}
 
 		try {
-			FileUtils.forceMkdir(userpath);
+			FileUtils.forceMkdir(pluginsPath);
 		} catch (IOException e) {
 			return null;
 		}
-		return userpath;
+		return pluginsPath;
 	}
 
 	/**
 	 * This method retrieves a plugin folder resource (file or folder). If the
 	 * resource is a folder and not exists, it creates the folder. The folder
-	 * will be: <conf.plugindir>/<pluginName>/<path>
+	 * will be: <b>conf.plugindir</b>/<b>pluginName</b>/<b>path</b>
 	 * 
 	 * @param pluginName The plugin name
 	 * @param path The resource path
-	 * @return
+	 * 
+	 * @return the plugin's resource
 	 */
 	public static File getPluginResource(String pluginName, String path) {
 		File root = getPluginHome(pluginName);
 		File resource = new File(root.getPath() + "/" + path);
+
+		if (!FileUtil.isInsideFolder(root, resource))
+			throw new SecurityException(
+					String.format("Resource %s non inside plugin home %s", resource.getPath(), root.getPath()));
+
 		if (!resource.exists() && !path.contains("."))
 			try {
 				FileUtils.forceMkdir(resource);

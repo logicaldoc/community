@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.frontend.client.dashboard.dashlet.Dashlet;
 import com.logicaldoc.gui.frontend.client.dashboard.dashlet.DashletSelector;
-import com.logicaldoc.gui.frontend.client.services.SettingService;
+import com.logicaldoc.gui.frontend.client.services.DashletService;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -64,7 +64,6 @@ public class UserDashboard extends VLayout {
 
 		toolStrip.addFill();
 		
-
 		portal = new PortalLayout();
 		portal.setShowColumnMenus(false);
 		portal.setShowEdges(false);
@@ -78,7 +77,7 @@ public class UserDashboard extends VLayout {
 		int maxCol = 0;
 		int maxRow = 0;
 		int maxIndex = 0;
-
+		
 		for (GUIDashlet gd : Session.get().getUser().getDashlets()) {
 			if (maxCol < gd.getColumn())
 				maxCol = gd.getColumn();
@@ -90,7 +89,7 @@ public class UserDashboard extends VLayout {
 
 		Dashlet[][][] portlets = new Dashlet[maxCol + 1][maxRow + 1][maxIndex + 1];
 		for (GUIDashlet gd : Session.get().getUser().getDashlets())
-			portlets[gd.getColumn()][gd.getRow()][gd.getIndex()] = Dashlet.getDashlet(gd.getId());
+			portlets[gd.getColumn()][gd.getRow()][gd.getIndex()] = Dashlet.getDashlet(gd);
 
 		for (int col = 0; col <= maxCol; col++)
 			for (int row = 0; row <= maxRow; row++)
@@ -121,11 +120,15 @@ public class UserDashboard extends VLayout {
 			for (int row = 0; row < portlets[column].length; row++)
 				for (int i = 0; i < portlets[column][row].length; i++) {
 					Dashlet dashlet = (Dashlet) portlets[column][row][i];
-					dashlets[q++] = new GUIDashlet(dashlet.getId(), column, row, i);
+					GUIDashlet guiDashlet=dashlet.getGuiDashlet();
+					guiDashlet.setColumn(column);
+					guiDashlet.setRow(row);
+					guiDashlet.setIndex(i);
+					dashlets[q++] = guiDashlet;
 				}
 
 		Session.get().getUser().setDashlets(dashlets);
-		SettingService.Instance.get().saveDashlets(dashlets, new AsyncCallback<Void>() {
+		DashletService.Instance.get().saveUserDashlets(dashlets, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {

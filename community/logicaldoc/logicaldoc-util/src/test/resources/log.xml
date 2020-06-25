@@ -297,21 +297,6 @@
     <param name="MaxBackupIndex" value="5" />
     <layout class="com.logicaldoc.web.util.HTMLLayout" />
   </appender>
-  <appender name="ProductNews" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/productnews.log" />
-    <param name="MaxFileSize" value="5MB" />
-    <param name="MaxBackupIndex" value="5" />
-    <param name="Append" value="true" />
-    <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p  (%c:%4L) -- %m%n" />
-    </layout>
-  </appender>
-  <appender name="ProductNews_WEB" class="org.apache.log4j.RollingFileAppender">
-    <param name="File" value="D:/LogicalDOC-Devel/repository/logs/productnews.log.html" />
-    <param name="MaxFileSize" value="5MB" />
-    <param name="MaxBackupIndex" value="5" />
-    <layout class="com.logicaldoc.web.util.HTMLLayout" />
-  </appender>
   <category name="org.hibernate" additivity="true">
     <priority value="error" />
     <appender-ref ref="DB" />
@@ -342,11 +327,6 @@
     <priority value="info" />
     <appender-ref ref="IndexerTask" />
     <appender-ref ref="IndexerTask_WEB" />
-  </category>
-  <category name="com.logicaldoc.core.rss.ProductNews" additivity="false">
-    <priority value="info" />
-    <appender-ref ref="ProductNews" />
-    <appender-ref ref="ProductNews_WEB" />
   </category>
   <category name="com.logicaldoc.enterprise.cleaner.CleanerTask" additivity="false">
     <priority value="info" />

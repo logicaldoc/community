@@ -109,7 +109,7 @@ public class EmailAccountAdvancedProperties extends EmailAccountDetailsTab {
 		if (!form.hasErrors()) {
 			account.setIncludes((String) values.get("include"));
 			account.setExcludes((String) values.get("exclude"));
-			account.setDeleteFromMailbox(new Boolean(values.get("delete").toString()));
+			account.setDeleteFromMailbox(Boolean.parseBoolean(values.get("delete").toString()));
 			account.setMailFolder((String) values.get("mailfolder"));
 			account.setFormat(Integer.parseInt((String) values.get("format")));
 			account.setStartDate((Date) values.get("startdate"));

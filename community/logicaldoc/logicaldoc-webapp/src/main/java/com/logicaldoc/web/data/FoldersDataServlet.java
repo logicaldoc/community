@@ -35,13 +35,17 @@ import com.logicaldoc.web.util.ServiceUtil;
  */
 public class FoldersDataServlet extends HttpServlet {
 
+	public static String FOLDER_PAGE_SIZE = "ld-folder-page-size";
+
+	public static String FOLDER_START_RECORD = "ld-folder-start-record";
+
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(FoldersDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			response.setContentType("text/xml");
 			response.setCharacterEncoding("UTF-8");
@@ -51,14 +55,15 @@ public class FoldersDataServlet extends HttpServlet {
 			response.setHeader("Cache-Control", "no-store");
 			response.setDateHeader("Expires", 0);
 
-			if (request.getParameter("parent") != null
-					&& (request.getParameter("parent").startsWith("d-") || request.getParameter("parent")
-							.equals("null"))) {
+			if (request.getParameter("parent") != null && (request.getParameter("parent").startsWith("d-")
+					|| request.getParameter("parent").equals("null"))) {
 				// The user clicked on a file
 				PrintWriter writer = response.getWriter();
 				writer.write("<list></list>");
 				return;
 			}
+
+			boolean nopagination = "true".equals(request.getParameter("nopagination"));
 
 			Session session = ServiceUtil.validateSession(request);
 			long tenantId = session.getTenantId();
@@ -91,11 +96,35 @@ public class FoldersDataServlet extends HttpServlet {
 				parentFolderId = Long.parseLong(parent);
 
 			Folder parentFolder = folderDao.findFolder(parentFolderId);
+			if (parentFolder == null)
+				log.error("No folder found with ID={} parent {}" + parentFolderId, parent);
 
 			Context context = Context.get();
 			UserDAO udao = (UserDAO) context.getBean(UserDAO.class);
 			User user = udao.findById(session.getUserId());
 			udao.initialize(user);
+
+			/*
+			 * Check if we have to paginate and what should be the start and end
+			 * record numbers
+			 */
+			Long startRecord = null;
+			Long endRecord = null;
+
+			if (!nopagination && Context.get().getProperties()
+					.getBoolean(session.getTenantName() + ".gui.folder.pagination", false)) {
+				endRecord = Context.get().getProperties().getLong(session.getTenantName() + ".gui.folder.maxchildren",
+						2000L);
+				Integer[] pagination = new Integer[] {
+						(Integer) session.getDictionary().get(FOLDER_START_RECORD + ":" + parentFolderId),
+						(Integer) session.getDictionary().get(FOLDER_PAGE_SIZE + ":" + parentFolderId) };
+				if (pagination != null && pagination[0] != null && pagination[1] != null) {
+					log.debug("Found pagination for folder %s -> max: %s  page: %s", parentFolder, pagination[0],
+							pagination[1]);
+					startRecord = (long) pagination[0];
+					endRecord = startRecord + pagination[1] - 1;
+				}
+			}
 
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
@@ -105,29 +134,35 @@ public class FoldersDataServlet extends HttpServlet {
 			if (!user.isMemberOf("admin")) {
 				Collection<Long> accessibleIds = folderDao.findFolderIdByUserId(session.getUserId(),
 						parentFolder.getId(), false);
-				List<Long> folderIds = new ArrayList<Long>(accessibleIds);
-				query.append(" and ( ");
+				if (!accessibleIds.isEmpty()) {
+					List<Long> folderIds = new ArrayList<Long>(accessibleIds);
+					query.append(" and ( ");
 
-				/*
-				 * Oracle has a dramatic limitation: no more than 1000 elements
-				 * in a list, so we have to partition the list groups of at least
-				 * 1000 elements.
-				 */
-				int length = folderIds.size();
-				int chunkSize = 1000;
-				int fullChunks = (int) Math.ceil((double) length / (double) chunkSize);
-				for (int chunk = 0; chunk < fullChunks; chunk++) {
-					if (chunk > 0)
-						query.append(" or ");
+					/*
+					 * Oracle has a dramatic limitation: no more than 1000
+					 * elements in a list, so we have to partition the list
+					 * groups of at least 1000 elements.
+					 */
+					int length = folderIds.size();
+					int chunkSize = 1000;
+					int fullChunks = (int) Math.ceil((double) length / (double) chunkSize);
+					for (int chunk = 0; chunk < fullChunks; chunk++) {
+						if (chunk > 0)
+							query.append(" or ");
 
-					int chunkStart = chunk * chunkSize;
-					List<Long> sublist = folderIds.subList(chunkStart, chunkStart + chunkSize < length ? chunkStart
-							+ chunkSize : length);
-					String idsStr = sublist.toString().replace('[', '(').replace(']', ')');
-					query.append(" ld_id in " + idsStr);
+						int chunkStart = chunk * chunkSize;
+						List<Long> sublist = folderIds.subList(chunkStart,
+								chunkStart + chunkSize < length ? chunkStart + chunkSize : length);
+						String idsStr = sublist.toString().replace('[', '(').replace(']', ')');
+						query.append(" ld_id in " + idsStr);
+					}
+
+					query.append(" ) ");
+				} else {
+					// no folders are accessible so we do not have to return any
+					// record
+					query.append(" and 1 = 2");
 				}
-
-				query.append(" ) ");
 			}
 			query.append(" order by ld_position asc, ");
 			if ("name".equals(context.getProperties().getProperty(tenantName + ".gui.folder.sorting")))
@@ -137,8 +172,19 @@ public class FoldersDataServlet extends HttpServlet {
 
 			SqlRowSet rs = folderDao.queryForRowSet(query.toString(), new Long[] { parentFolder.getId(), tenantId },
 					null);
-			if (rs != null)
+
+			if (rs != null) {
+				long i = 0;
 				while (rs.next()) {
+					if (startRecord != null && i < startRecord) {
+						i++;
+						continue;
+					}
+					if (endRecord != null && i > endRecord) {
+						i++;
+						continue;
+					}
+
 					writer.print("<folder>");
 					writer.print("<id>" + parent + "-" + rs.getLong(1) + "</id>");
 					writer.print("<folderId>" + rs.getLong(1) + "</folderId>");
@@ -155,7 +201,10 @@ public class FoldersDataServlet extends HttpServlet {
 						writer.print("<color><![CDATA[" + rs.getString(6) + "]]></color>");
 					writer.print("<position>" + rs.getInt(7) + "</position>");
 					writer.print("</folder>");
+
+					i++;
 				}
+			}
 
 			if (request.getParameter("withdocs") != null) {
 				query = new StringBuffer(
@@ -180,8 +229,9 @@ public class FoldersDataServlet extends HttpServlet {
 						writer.print("<name><![CDATA[" + rs.getString(2) + "]]></name>");
 						writer.print("<type>file</type>");
 						writer.print("<customIcon>"
-								+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils.getExtension(rs
-										.getString(2)))) + "</customIcon>");
+								+ FilenameUtils.getBaseName(
+										IconSelector.selectIcon(FilenameUtils.getExtension(rs.getString(2))))
+								+ "</customIcon>");
 						writer.print("<size>" + rs.getInt(3) + "</size>");
 						writer.print("<status>" + rs.getInt(7) + "</status>");
 						writer.print("<publishedStatus>" + (published ? "yes" : "no") + "</publishedStatus>");

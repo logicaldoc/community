@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +31,13 @@ import com.logicaldoc.util.io.FileUtil;
  * @since 7.6.4
  */
 public abstract class AbstractStorer implements Storer {
-	protected static final int DEFAULT_BUFFER_SIZE = 10240;
+	protected static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	protected static Logger log = LoggerFactory.getLogger(AbstractStorer.class);
 
 	protected ContextProperties config;
+
+	protected StorerManager manager;
 
 	protected int id = 1;
 
@@ -49,6 +50,10 @@ public abstract class AbstractStorer implements Storer {
 		if (config == null)
 			config = Context.get().getProperties();
 		return config;
+	}
+
+	public void setManager(StorerManager manager) {
+		this.manager = manager;
 	}
 
 	public void setConfig(ContextProperties config) {
@@ -65,12 +70,12 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public int compareTo(Storer o) {
-		return new Integer(id).compareTo(o.getId());
+		return Integer.valueOf(id).compareTo(o.getId());
 	}
 
 	@Override
 	public int hashCode() {
-		return new Integer(id).hashCode();
+		return Integer.valueOf(id).hashCode();
 	}
 
 	@Override
@@ -79,19 +84,15 @@ public abstract class AbstractStorer implements Storer {
 	}
 
 	@Override
-	public long store(File file, long docId, String resource) {
+	public void store(File file, long docId, String resource) throws IOException {
 		if (!isEnabled()) {
 			log.warn("Storer not enabled");
-			return -1;
+			throw new IOException("Storer not enabled");
 		}
 
-		InputStream is = null;
-		try {
-			is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
-		} catch (FileNotFoundException e) {
-			return -1;
-		}
-		return store(is, docId, resource);
+		InputStream is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+
+		store(is, docId, resource);
 	}
 
 	/**
@@ -123,14 +124,12 @@ public abstract class AbstractStorer implements Storer {
 	}
 
 	@Override
-	public byte[] getBytes(long docId, String resource) {
+	public byte[] getBytes(long docId, String resource) throws IOException {
 		InputStream is = null;
 		try {
 			is = getStream(docId, resource);
 			byte[] bytes = IOUtils.toByteArray(is);
 			return bytes;
-		} catch (IOException e) {
-			log.error(e.getMessage());
 		} finally {
 			if (is != null)
 				try {
@@ -139,7 +138,6 @@ public abstract class AbstractStorer implements Storer {
 
 				}
 		}
-		return null;
 	}
 
 	@Override
@@ -175,7 +173,7 @@ public abstract class AbstractStorer implements Storer {
 			log.error(ioe.getMessage(), ioe);
 			throw ioe;
 		} catch (Throwable e) {
-			log.error("Error writing document " + docId + " into " + out.getPath());
+			log.error("Error writing document {} into {}", docId, out.getPath());
 			log.error(e.getMessage(), e);
 		} finally {
 			if (os != null) {
@@ -292,4 +290,13 @@ public abstract class AbstractStorer implements Storer {
 		return this.getClass().getSimpleName() + " #" + id;
 	}
 
+	@Override
+	public void init() {
+
+	}
+
+	@Override
+	public void destroy() {
+
+	}
 }

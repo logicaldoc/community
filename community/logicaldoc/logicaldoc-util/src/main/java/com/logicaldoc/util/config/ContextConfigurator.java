@@ -12,7 +12,6 @@ import org.jdom.Element;
  * Configurator class for spring's application context setup.
  * 
  * @author Marco Meschieri
- * @version $Id: ContextConfigurator.java,v 1.1 2007/06/29 06:28:25 marco Exp $
  * @since 3.0
  */
 public class ContextConfigurator {
@@ -101,10 +100,10 @@ public class ContextConfigurator {
 
 	/**
 	 * Retrieves the prop value of the specified property, that is one inside
-	 * the <props> tag:
+	 * the &lt;props&gt; tag:
 	 * <p>
 	 * 
-	 * <property><props><prop key="key_name">key_value</prop></props></property>
+	 * &lt;property&gt;&lt;props&gt;&lt;prop key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
 	 * 
 	 * @param id The bean id
 	 * @param propertyName The property name
@@ -121,10 +120,10 @@ public class ContextConfigurator {
 
 	/**
 	 * Retrieves the prop element of the specified property, that is one inside
-	 * the <props> tag:
+	 * the &lt;props&gt; tag:
 	 * <p>
 	 * 
-	 * <property><props><prop key="key_name">key_value</prop></props></property>
+	 * &lt;property&gt;&lt;props&gt;&lt;prop key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
 	 * 
 	 * @param id The bean id
 	 * @param propertyName The property name
@@ -143,16 +142,16 @@ public class ContextConfigurator {
 	}
 
 	/**
-	 * Sets the prop value of the specified property, that is one inside the
-	 * <props> tag:
+	 * Sets the prop value of the specified property, that is one inside
+	 * the &lt;props&gt; tag:
 	 * <p>
 	 * 
-	 * <property><props><prop key="key_name">key_value</prop></props></property>
+	 * &lt;property&gt;&lt;props&gt;&lt;prop key="key_name"&gt;key_value&lt;/prop&gt;&lt;/props&gt;&lt;/property&gt;
 	 * 
 	 * @param id The bean id
 	 * @param propertyName The property name
-	 * @param key The pop key
-	 * @return The prop element
+	 * @param key The property key
+	 * @param value The property value
 	 */
 	public void setPropValue(String id, String propertyName, String key, String value) {
 		Element prop = getPropElement(id, propertyName, key);

@@ -18,7 +18,6 @@ import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -83,30 +82,7 @@ public class AddTemplateAttributeDialog extends Window {
 		type.setCanEdit(false);
 		type.setCanSort(false);
 		type.setWidth(100);
-		type.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				if (value == null)
-					return "";
-				int intValue = new Integer(value.toString());
-				switch (intValue) {
-				case GUIAttribute.TYPE_STRING:
-					return I18N.message("string");
-				case GUIAttribute.TYPE_INT:
-					return I18N.message("integer");
-				case GUIAttribute.TYPE_DOUBLE:
-					return I18N.message("decimal");
-				case GUIAttribute.TYPE_DATE:
-					return I18N.message("date");
-				case GUIAttribute.TYPE_BOOLEAN:
-					return I18N.message("boolean");
-				case GUIAttribute.TYPE_USER:
-					return I18N.message("user");
-				}
-				return value.toString();
-			}
-		});
+		type.setCellFormatter(new AttributeTypeFormatter());
 
 		setAttributesList.setFields(name, label, type);
 
@@ -124,7 +100,7 @@ public class AddTemplateAttributeDialog extends Window {
 				if (event.getValue() == null)
 					fillSetAttributesList(null);
 				else
-					fillSetAttributesList(new Long(event.getValue().toString()));
+					fillSetAttributesList(Long.parseLong(event.getValue().toString()));
 			}
 		});
 
@@ -170,9 +146,8 @@ public class AddTemplateAttributeDialog extends Window {
 			public void onSuccess(GUIAttributeSet set) {
 				ListGridRecord[] records = setAttributesList.getRecords();
 				if (records != null)
-					for (ListGridRecord record : records) {
+					for (ListGridRecord record : records)
 						setAttributesList.removeData(record);
-					}
 
 				GUIAttribute[] attributes = set.getAttributes();
 
@@ -189,6 +164,8 @@ public class AddTemplateAttributeDialog extends Window {
 					record.setAttribute("type", att.getType());
 					record.setAttribute("editor", att.getEditor());
 					record.setAttribute("mandatory", att.isMandatory());
+					record.setAttribute("hidden", att.isHidden());
+					record.setAttribute("multiple", att.isMultiple());
 					setAttributesList.getRecordList().add(record);
 				}
 			}

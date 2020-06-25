@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.ibm.icu.util.Calendar;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.IPBlockedException;
 import com.logicaldoc.core.security.authentication.UsernameBlockedException;
@@ -34,19 +35,33 @@ public class LoginThrottle {
 
 	/**
 	 * Clears the failures for the given username and or password
+	 * 
+	 * @param username the username
+	 * @param ip the IP address from which the login intent comes from
 	 */
 	public static void clearFailures(String username, String ip) {
 		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
 			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
 			if (StringUtils.isNotEmpty(username))
-				sDao.delete(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
+				try {
+					sDao.delete(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
+				} catch (PersistenceException e) {
+					log.warn(e.getMessage(), e);
+				}
 			if (StringUtils.isNotEmpty(ip))
-				sDao.delete(LOGINFAIL_IP + ip, 0L, Tenant.SYSTEM_ID);
+				try {
+					sDao.delete(LOGINFAIL_IP + ip, 0L, Tenant.SYSTEM_ID);
+				} catch (PersistenceException e) {
+					log.warn(e.getMessage(), e);
+				}
 		}
 	}
 
 	/**
 	 * Saves the login failure in the database
+	 * 
+	 * @param username the username 
+	 * @param ip the IP address from which the login intent comes from
 	 */
 	public static void recordFailure(String username, String ip) {
 
@@ -69,11 +84,16 @@ public class LoginThrottle {
 			user.setName(username);
 		}
 		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		dao.createUserHistory(user, UserHistory.EVENT_USER_LOGIN_FAILED, ip, ip, null);
+		dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(), ip, ip, null);
 	}
 
 	/**
 	 * Performs anti brute force attack checks
+	 * 
+	 * @param username the username 
+	 * @param ip the IP address from which the login intent comes from
+	 * 
+	 * @throws AuthenticationException if the authentication fails
 	 */
 	public static void checkLoginThrottle(String username, String ip) throws AuthenticationException {
 		ContextProperties config = Context.get().getProperties();
@@ -100,11 +120,16 @@ public class LoginThrottle {
 					cal.add(Calendar.MINUTE, -wait);
 					Date oldestDate = cal.getTime();
 					if (oldestDate.before(seq.getLastModified())) {
-						log.warn("Possible brute force attack detected for username " + username);
+						log.warn("Possible brute force attack detected for username {}", username);
 						throw new UsernameBlockedException();
 					} else {
-						log.info("Login block for username " + username + " expired");
-						sDao.delete(seq.getId());
+						log.info("Login block for username {} expired", username);
+
+						try {
+							sDao.delete(seq.getId());
+						} catch (PersistenceException e) {
+							log.warn(e.getMessage(), e);
+						}
 					}
 				}
 			}
@@ -122,11 +147,16 @@ public class LoginThrottle {
 					cal.add(Calendar.MINUTE, -wait);
 					Date oldestDate = cal.getTime();
 					if (oldestDate.before(seq.getLastModified())) {
-						log.warn("Possible brute force attack detected for IP " + ip);
+						log.warn("Possible brute force attack detected for IP {}", ip);
 						throw new IPBlockedException();
 					} else {
-						log.info("Login block for IP " + ip + " expired");
-						sDao.delete(seq.getId());
+						log.info("Login block for IP {} expired", ip);
+
+						try {
+							sDao.delete(seq.getId());
+						} catch (PersistenceException e) {
+							log.warn(e.getMessage(), e);
+						}
 					}
 				}
 			}

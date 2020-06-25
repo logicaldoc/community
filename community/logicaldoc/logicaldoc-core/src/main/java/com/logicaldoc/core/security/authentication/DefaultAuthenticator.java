@@ -1,6 +1,5 @@
 package com.logicaldoc.core.security.authentication;
 
-import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.HibernateUserDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -12,7 +11,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
  * @author Sebastian Wenzky
  * @since 4.5
  */
-public class DefaultAuthenticator implements Authenticator {
+public class DefaultAuthenticator extends AbstractAuthenticator {
 
 	protected UserDAO userDAO;
 
@@ -21,28 +20,7 @@ public class DefaultAuthenticator implements Authenticator {
 	}
 
 	@Override
-	public boolean canAuthenticateUser(String username) {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-
-	@Override
-	public User authenticate(String username, String password, String key, Client client)
-			throws AuthenticationException {
-		return authenticate(username, password, key);
-	}
-
-	@Override
 	public User authenticate(String username, String password) throws AuthenticationException {
-		return this.authenticate(username, password, null);
-	}
-
-	@Override
-	public User authenticate(String username, String password, String key) throws AuthenticationException {
 		User user = null;
 
 		if (HibernateUserDAO.ignoreCaseLogin())

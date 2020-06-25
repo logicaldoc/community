@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.template;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,6 @@ import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.frontend.client.metadata.Options;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
@@ -105,13 +105,13 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributesList.setEmptyMessage(I18N.message("norecords"));
 		attributesList.setCanReorderRecords(false);
 		attributesList.setCanSort(false);
-		attributesList.setCanReorderRecords(true);
-		attributesList.setCanAcceptDroppedRecords(true);
+		attributesList.setCanReorderRecords(!attributeSet.isReadonly());
+		attributesList.setCanAcceptDroppedRecords(!attributeSet.isReadonly());
 		attributesList.setCanFreezeFields(false);
 		attributesList.setCanGroupBy(false);
 		attributesList.setLeaveScrollbarGap(false);
 		attributesList.setShowHeader(true);
-		attributesList.setCanEdit(true);
+		attributesList.setCanEdit(!attributeSet.isReadonly());
 		attributesList.setShowRowNumbers(true);
 		attributesList.setSelectionType(SelectionStyle.SINGLE);
 
@@ -148,8 +148,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			@Override
 			public void onDropComplete(DropCompleteEvent event) {
 				List<String> attributes = new ArrayList<String>();
-				ListGridRecord[] records = attributesList.getRecords();
-				for (ListGridRecord record : records) {
+				for (int i = 0; i < attributesList.getTotalRows(); i++) {
+					ListGridRecord record = attributesList.getRecord(i);
 					attributes.add(record.getAttributeAsString("name"));
 				}
 
@@ -176,7 +176,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 	protected void fillAttributesList() {
 		if (attributeSet != null && attributeSet.getAttributes() != null) {
-			for (GUIAttribute att : attributeSet.getAttributes()) {
+			for (GUIAttribute att : attributeSet.getAttributesOrderedByPosition()) {
 				ListGridRecord record = new ListGridRecord();
 				record.setAttribute("name", att.getName());
 				record.setAttribute("label", att.getLabel());
@@ -234,6 +234,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				clean();
 				form2.getField("label").setDisabled(false);
 				form2.getField("mandatory").setDisabled(false);
+				form2.getField("hidden").setDisabled(false);
+				form2.getField("multiple").setDisabled(false);
 				form2.getField("type").setDisabled(false);
 				form2.getField("editor").setDisabled(false);
 				form2.getField("group").setDisabled(true);
@@ -258,6 +260,24 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		mandatory.setWidth(50);
 		mandatory.setDefaultValue(false);
 		mandatory.setDisabled(attributeSet.isReadonly());
+
+		// Hidden
+		final CheckboxItem hidden = new CheckboxItem();
+		hidden.setName("hidden");
+		hidden.setTitle(I18N.message("hidden"));
+		hidden.setRedrawOnChange(true);
+		hidden.setWidth(50);
+		hidden.setDefaultValue(false);
+		hidden.setDisabled(attributeSet.isReadonly());
+
+		// Multiple
+		final CheckboxItem multiple = new CheckboxItem();
+		multiple.setName("multiple");
+		multiple.setTitle(I18N.message("multiplevalues"));
+		multiple.setRedrawOnChange(true);
+		multiple.setWidth(50);
+		multiple.setDefaultValue(false);
+		multiple.setDisabled(attributeSet.isReadonly());
 
 		// Editor
 		editor = new SelectItem("editor", I18N.message("inputmode"));
@@ -286,6 +306,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		types.put("" + GUIAttribute.TYPE_DATE, I18N.message("date"));
 		types.put("" + GUIAttribute.TYPE_BOOLEAN, I18N.message("boolean"));
 		types.put("" + GUIAttribute.TYPE_USER, I18N.message("user"));
+		types.put("" + GUIAttribute.TYPE_FOLDER, I18N.message("folder"));
 		type.setValueMap(types);
 		type.setWrapTitle(false);
 		type.setDefaultValue("" + GUIAttribute.TYPE_STRING);
@@ -313,8 +334,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				if (attributeSet.getId() == 0L) {
 					SC.say(I18N.message("saveattributesetfirst"));
 				} else {
-					Options options = new Options(attributeSet.getId(), attributeName.getValueAsString(), attributeSet
-							.isReadonly());
+					Options options = new Options(attributeSet.getId(), attributeName.getValueAsString(),
+							attributeSet.isReadonly());
 					options.show();
 				}
 			}
@@ -328,14 +349,26 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		addUpdate.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if(!form2.validate())
+				if (!form2.validate()) {
 					return;
+				} else {
+					String name = (String) attributeName.getValue();
+					if (GUIAttribute.isForbidden(name.trim())) {
+						final String message = I18N.message("attributenameforbidden",
+								Arrays.asList(GUIAttribute.FORBIDDEN_NAMES).toString().substring(1).replace("]", ""));
+						SC.warn(I18N.message("error"), message);
+						return;
+					}
+				}
+
 				if (attributeName.getValue() != null && !((String) attributeName.getValue()).trim().isEmpty()) {
 					if (updatingAttributeName.trim().isEmpty()) {
 						GUIAttribute att = new GUIAttribute();
 						att.setName((String) attributeName.getValue());
 						att.setLabel((String) label.getValue());
 						att.setMandatory((Boolean) mandatory.getValue());
+						att.setHidden((Boolean) hidden.getValue());
+						att.setMultiple((Boolean) multiple.getValue());
 						att.setType(Integer.parseInt((String) type.getValue()));
 						att.setEditor(Integer.parseInt((String) editor.getValue()));
 
@@ -353,6 +386,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 							att.setName(attributeName.getValueAsString());
 							att.setLabel((String) label.getValue());
 							att.setMandatory((Boolean) mandatory.getValue());
+							att.setHidden((Boolean) hidden.getValue());
+							att.setMultiple((Boolean) multiple.getValue());
 							att.setType(Integer.parseInt(type.getValueAsString()));
 							att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
 
@@ -364,7 +399,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 							updateAttribute(att, updatingAttributeName);
 
 							clean();
-							detailsPanel.getSavePanel().setVisible(true);
+							detailsPanel.enableSave();
 						}
 					}
 				}
@@ -372,9 +407,9 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		});
 
 		if (!attributeSet.isReadonly())
-			form2.setItems(attributeName, label, mandatory, type, editor, group, options, addUpdate);
+			form2.setItems(attributeName, label, mandatory, hidden, multiple, type, editor, group, options, addUpdate);
 		else
-			form2.setItems(attributeName, label, mandatory, type, editor, group, options);
+			form2.setItems(attributeName, label, mandatory, hidden, multiple, type, editor, group, options);
 
 		attributesLayout.setMembers(form2);
 		attributesLayout.setMembersMargin(10);
@@ -402,7 +437,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description",
 				attributeSet.getDescription());
 		description.setDisabled(attributeSet.isReadonly());
-		description.setWidth(name.getWidth());
+
 		if (!attributeSet.isReadonly())
 			description.addChangedHandler(changedHandler);
 
@@ -428,7 +463,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		record.setAttribute("label", att.getLabel());
 		attributesList.getDataAsRecordList().add(record);
 		attributeSet.appendAttribute(att);
-		detailsPanel.getSavePanel().setVisible(true);
+		detailsPanel.enableSave();
+		;
 		form2.clearValues();
 		attributesList.deselectRecord(record);
 	}
@@ -441,7 +477,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		record.setAttribute("label", att.getLabel());
 		attributesList.getDataAsRecordList().addAt(record, att.getPosition());
 
-		detailsPanel.getSavePanel().setVisible(true);
+		detailsPanel.enableSave();
+		;
 		form2.clearValues();
 		attributesList.deselectRecord(record);
 	}
@@ -450,7 +487,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		form2.clearValues();
 		form2.getField("attributeName").setDisabled(false);
 		updatingAttributeName = "";
-		detailsPanel.getSavePanel().setVisible(false);
+		detailsPanel.disableSave();
 		attributesList.deselectAllRecords();
 	}
 
@@ -477,7 +514,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 								attributeSet.removeAttribute(attrName);
 							attributesList.removeSelectedData();
 							clean();
-							detailsPanel.getSavePanel().setVisible(true);
+							detailsPanel.enableSave();
+							;
 						}
 					}
 				});
@@ -495,6 +533,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			form2.setValue("attributeName", extAttr.getName());
 			form2.setValue("label", extAttr.getLabel());
 			form2.setValue("mandatory", extAttr.isMandatory());
+			form2.setValue("hidden", extAttr.isHidden());
+			form2.setValue("multiple", extAttr.isMultiple());
 			form2.setValue("type", extAttr.getType());
 			form2.setValue("editor", extAttr.getEditor());
 			form2.setValue("group", extAttr.getStringValue());
@@ -516,6 +556,9 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		} else if (type.getValueAsString().equals("" + GUIAttribute.TYPE_USER)) {
 			editor.setVisible(false);
 			group.setVisible(true);
+			options.setVisible(false);
+		} else if (type.getValueAsString().equals("" + GUIAttribute.TYPE_FOLDER)) {
+			editor.setVisible(false);
 			options.setVisible(false);
 		} else {
 			editor.setVisible(false);

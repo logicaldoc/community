@@ -102,6 +102,14 @@ public class DownloadTicketDialog extends Window {
 		date.setColSpan(4);
 		date.setWrapTitle(false);
 
+		SpinnerItem maxDownloads = ItemFactory.newSpinnerItem("maxDownloads", I18N.message("maxdownloads"),
+				(Integer) null);
+		maxDownloads.setEndRow(true);
+		maxDownloads.setColSpan(4);
+		maxDownloads.setWrapTitle(false);
+		maxDownloads.setRequired(false);
+		maxDownloads.setMin(0);
+
 		SpinnerItem duedateTimeItem = ItemFactory.newSpinnerItem("duedateNumber", I18N.message("expiresin"), 24);
 		duedateTimeItem.setWrapTitle(false);
 		duedateTimeItem.setDefaultValue(24);
@@ -113,7 +121,7 @@ public class DownloadTicketDialog extends Window {
 		duedateTime.setValueMap(map);
 		duedateTime.setValue("hour");
 
-		form.setItems(type, duedateTimeItem, duedateTime, date);
+		form.setItems(type, duedateTimeItem, duedateTime, date, maxDownloads);
 	}
 
 	public void onSave() {
@@ -132,7 +140,12 @@ public class DownloadTicketDialog extends Window {
 		if (date == null && (expireHours == null || expireHours.intValue() < 1))
 			SC.warn(I18N.message("providexepinfo"));
 
-		DocumentService.Instance.get().createDownloadTicket(document.getId(), suffix, expireHours, date,
+		Integer maxDownloads = null;
+		String val = form.getValueAsString("maxDownloads");
+		if (val != null && !val.trim().isEmpty() && !"0".equals(val.trim()))
+			maxDownloads = Integer.parseInt(val.trim());
+
+		DocumentService.Instance.get().createDownloadTicket(document.getId(), suffix, expireHours, date, maxDownloads,
 				new AsyncCallback<String>() {
 
 					@Override
@@ -145,8 +158,8 @@ public class DownloadTicketDialog extends Window {
 					public void onSuccess(String url) {
 						destroy();
 
-						SC.confirm(I18N.message("event.dticket.created.short"), "<a href='" + url
-								+ "' target='_blank'>" + url + "</a>", null);
+						SC.confirm(I18N.message("event.dticket.created.short"),
+								"<a href='" + url + "' target='_blank'>" + url + "</a>", null);
 					}
 				});
 	}

@@ -6,9 +6,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * Get a variable's java type, or a collection's generic type<br/>
- * For Example, <br/>
- * "String a" => String.class, and "List<Integer> b" => Integer.class
+ * Get a variable's java type, or a collection's generic type<br>
+ * For Example, <br>
+ * "String a" =&gt; String.class, and "List&lt;Integer&gt; b" =&gt; Integer.class
  * 
  */
 public class GenericsUtils {

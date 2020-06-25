@@ -8,17 +8,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.FileHeader;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 /**
  * This class is for handling with zip-files.
@@ -37,15 +41,41 @@ public class ZipUtil {
 		this.fileNameCharset = charset;
 	}
 
+	public List<ZipEntry> listZipEntries(File zipsource) {
+		List<ZipEntry> files = new ArrayList<ZipEntry>();
+
+		try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(zipsource)) {
+			@SuppressWarnings("unchecked")
+			Enumeration<ZipEntry> e = (Enumeration<ZipEntry>) zipFile.entries();
+			while (e.hasMoreElements()) {
+				ZipEntry zipEntry = (ZipEntry) e.nextElement();
+				files.add(zipEntry);
+			}
+			files.sort(new Comparator<ZipEntry>() {
+
+				@Override
+				public int compare(ZipEntry o1, ZipEntry o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+		} catch (Throwable e) {
+			logError(e.getMessage());
+		}
+
+		return files;
+	}
+
 	public List<String> listEntries(File zipsource) {
 		List<String> files = new ArrayList<String>();
 		try {
 			ZipFile zipFile = new ZipFile(zipsource);
 			setCharset(zipFile);
+
 			@SuppressWarnings("unchecked")
 			List<FileHeader> fileHeaders = zipFile.getFileHeaders();
-			for (FileHeader fileHeader : fileHeaders)
+			for (FileHeader fileHeader : fileHeaders) {
 				files.add(fileHeader.getFileName());
+			}
 		} catch (Throwable e) {
 			logError(e.getMessage());
 		}
@@ -75,7 +105,7 @@ public class ZipUtil {
 	/**
 	 * Read the entry inside the file zip resource.
 	 * 
-	 * @param zipFile File to read inside it
+	 * @param zipsource File to read inside it
 	 * @param entry The entry to be read
 	 * @return The bytes of the entry
 	 */
@@ -113,7 +143,7 @@ public class ZipUtil {
 	/**
 	 * Read the entry inside the file zip resource.
 	 * 
-	 * @param zipFile File to read inside it
+	 * @param zip File to read inside it
 	 * @param entry The entry to be read
 	 * @return The stream of the entry
 	 */
@@ -139,6 +169,29 @@ public class ZipUtil {
 	private static void logError(String message) {
 		Logger logger = LoggerFactory.getLogger(ZipUtil.class);
 		logger.error(message);
+	}
+
+	public static void addEntry(File zip, String entry, InputStream content) {
+		try {
+			// read war.zip and write to
+			ZipFile zipFile = new ZipFile(zip);
+			ZipParameters parameters = new ZipParameters();
+			parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+			// this would be the name of the file for this entry in the zip file
+			parameters.setFileNameInZip(entry);
+
+			// we set this flag to true. If this flag is true, Zip4j identifies
+			// that
+			// the data will not be from a file but directly from a stream
+			parameters.setSourceExternalStream(true);
+
+			// Creates a new entry in the zip file and adds the content to the
+			// zip
+			// file
+			zipFile.addStream(content, parameters);
+		} catch (Exception e) {
+			logError(e.getMessage());
+		}
 	}
 
 	private void zipDir(File zipDir, ZipOutputStream zos, File startZipDir) {
@@ -219,6 +272,9 @@ public class ZipUtil {
 
 	/**
 	 * Zips a folder into a .zip archive
+	 * 
+	 * @param inFolder the folder to compress
+	 * @param outFile the zip file
 	 */
 	public void zipFolder(File inFolder, File outFile) {
 		try {

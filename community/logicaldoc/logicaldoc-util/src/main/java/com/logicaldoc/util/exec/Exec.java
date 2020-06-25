@@ -26,6 +26,11 @@ public class Exec {
 
 	protected static Logger log = LoggerFactory.getLogger(Exec.class);
 
+	/**
+	 * Checks if you are running on Windows
+	 * 
+	 * @return true if the execution platform is Windows
+	 */
 	public static boolean isWindows() {
 		boolean windows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
 		return windows;
@@ -34,8 +39,11 @@ public class Exec {
 	/**
 	 * Executes the command by using the process builder.
 	 * 
-	 * @commandLine The command line to process
-	 * @timeout The timeout in seconds
+	 * @param commandLine The command line to process
+	 * @param directory The folder where the command will be executed
+	 * @param timeout The timeout in seconds
+	 * 
+     * @throws IOException raised in case of errors during execution
 	 */
 	public static void exec2(List<String> commandLine, File directory, int timeout) throws IOException {
 		log.debug("Executing command: " + commandLine);
@@ -75,6 +83,12 @@ public class Exec {
 
 	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
+	 * 
+	 * @param commandLine the list of elements in the command line
+	 *
+	 * @return the command execution return value
+	 * 
+	 * @throws IOException raised in case of errors during execution
 	 */
 	public static int exec(List<String> commandLine) throws IOException {
 		return exec(commandLine, null, null, -1);
@@ -82,6 +96,15 @@ public class Exec {
 
 	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
+	 * 
+	 * @param commandLine the list of elements in the command line
+	 * @param env the environment variables
+	 * @param dir the current folder
+	 * @param timeout maximum execution time expressed in seconds
+	 * 
+	 * @throws IOException raised in case of errors during execution
+	 * 
+	 * @return the return code of the command
 	 */
 	public static int exec(final List<String> commandLine, String[] env, File dir, int timeout) throws IOException {
 		int exit = 0;
@@ -99,7 +122,7 @@ public class Exec {
 				String message = "Timeout command " + commandLine;
 				log.warn(message);
 			} catch (Exception e) {
-				log.warn("Command failed to execute - " + commandLine);
+				log.warn("Command failed to execute - {}", commandLine);
 				exit = 1;
 			} finally {
 				service.shutdown();
@@ -131,6 +154,17 @@ public class Exec {
 		return exit;
 	}
 
+	/**
+	 * Execute the command by using the Runtime.getRuntime().exec()
+	 * 
+	 * @param commandLine the command line string
+	 * @param env the execution environment
+	 * @param dir the current folder
+	 * 
+	 * @return The output of the command
+	 * 
+	 * @throws IOException If the execution caused an error
+	 */
 	public static String exec(String commandLine, String[] env, File dir) throws IOException {
 		Process process = Runtime.getRuntime().exec(commandLine, env, dir != null ? dir : null);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
@@ -196,6 +230,15 @@ public class Exec {
 
 	/**
 	 * Execute the command by using the Runtime.exec
+	 * 
+	 * @param commandLine the command line
+	 * @param env the environment variables
+	 * @param dir the current execution directory
+	 * @param timeout maximum execution time expressed in seconds
+	 * 
+	 * @return the command return value
+	 *  
+	 * @throws IOException raised if the command produced an error
 	 */
 	public static int exec(final String commandLine, String[] env, File dir, int timeout) throws IOException {
 		return exec(commandLine, env, dir, null, timeout);

@@ -20,10 +20,11 @@ import com.logicaldoc.webservice.model.WSSystemInfo;
 public interface SystemService {
 
 	/**
-	 * Retrieves the Installation informations.
+	 * Retrieves the Installation informations
 	 * 
-	 * @return The value object containing the installation informations.
-	 * @throws Exception
+	 * @return The value object containing the installation informations
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "info")
 	@WebMethod
@@ -31,11 +32,13 @@ public interface SystemService {
 	public WSSystemInfo getInfo() throws Exception;
 
 	/**
-	 * Retrieves the system statistics.
+	 * Retrieves the system statistics
 	 * 
 	 * @param sid Session identifier
-	 * @return The value object containing the statistics values.
-	 * @throws Exception
+	 * 
+	 * @return The value object containing the statistics values
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "parameter")
 	@WebMethod
@@ -46,9 +49,10 @@ public interface SystemService {
 	 * Retrieves the languages enabled in the server.
 	 * 
 	 * @return Array of active languages (en, it, es ....)
+	 * 
 	 * @param tenantOrSid Tenant name or session identifier (optional)
 	 * 
-	 * @throws Exception
+	 * @throws Exception error in the server application
 	 */
 	@WebResult(name = "language")
 	@WSDoc(description = "retrieves the languages enabled in the server")

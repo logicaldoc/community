@@ -34,9 +34,6 @@ public interface BookmarkService {
 	@Path("/bookmarkFolder")
 	public WSBookmark bookmarkFolder(@QueryParam("folderId") long folderId) throws Exception;
 
-	/**
-	 * Retrieves all the bookmarks of the current user.
-	 */
 	@GET
 	@Path("/getBookmarks")
 	public WSBookmark[] getBookmarks() throws Exception;

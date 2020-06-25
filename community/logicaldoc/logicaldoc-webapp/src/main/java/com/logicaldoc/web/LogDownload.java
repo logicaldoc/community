@@ -48,7 +48,7 @@ public class LogDownload extends HttpServlet {
 		try {
 			ServletUtil.checkMenu(request, Menu.LOGS);
 		} catch (Throwable t) {
-			return;
+			throw new ServletException(t.getMessage());
 		}
 
 		String appender = request.getParameter("appender");
@@ -193,7 +193,7 @@ public class LogDownload extends HttpServlet {
 							&& !file.getName().toLowerCase().endsWith(".out")
 							&& !file.getName().toLowerCase().endsWith(".txt")))
 						continue;
-					
+
 					// store just the logs of today
 					if (file.getName().toLowerCase().endsWith(".out")
 							|| file.getName().toLowerCase().endsWith(today + ".log")

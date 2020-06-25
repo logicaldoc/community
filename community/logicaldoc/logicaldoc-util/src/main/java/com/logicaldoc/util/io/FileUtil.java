@@ -6,21 +6,25 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.io.Writer;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -39,6 +43,8 @@ import org.apache.tools.ant.types.selectors.SelectorUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.util.SystemUtil;
+
 /**
  * This class manages I/O operations with files.
  * 
@@ -46,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * @version 4.0
  */
 public class FileUtil {
-	static final int BUFF_SIZE = 100000;
+	static final int BUFF_SIZE = 8192;
 
 	static final byte[] buffer = new byte[BUFF_SIZE];
 
@@ -220,6 +226,7 @@ public class FileUtil {
 	 * This method calculates the digest of a string using the algorithm SHA-1.
 	 * 
 	 * @param src The string for which will be computed the digest
+	 * 
 	 * @return digest
 	 */
 	public static String computeDigest(String src) {
@@ -259,7 +266,7 @@ public class FileUtil {
 	 * This method calculates the digest of a inputStram content using the
 	 * algorithm SHA-1.
 	 * 
-	 * @param file The file for which will be computed the digest
+	 * @param is The content of which will be computed the digest
 	 * @return digest
 	 */
 	public static byte[] computeSha1Hash(InputStream is) {
@@ -288,7 +295,8 @@ public class FileUtil {
 	 * 
 	 * @param resourceName Fully qualified resource name
 	 * @param out The output file
-	 * @throws IOException
+	 * 
+	 * @throws IOException if the copy caused an error
 	 */
 	public static void copyResource(String resourceName, File out) throws IOException {
 		InputStream is = null;
@@ -297,8 +305,8 @@ public class FileUtil {
 			try {
 				is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
 			} catch (Exception e) {
-				is = new BufferedInputStream(Thread.currentThread().getContextClassLoader().getResource(resourceName)
-						.openStream());
+				is = new BufferedInputStream(
+						Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
 			}
 			os = new BufferedOutputStream(new FileOutputStream(out));
 
@@ -319,6 +327,10 @@ public class FileUtil {
 	/**
 	 * Computes the folder size as the sum of all files directly and indirectly
 	 * contained.
+	 * 
+	 * @param folder the folder to calculate
+	 * 
+	 * @return the sum of the sizes of all contained files expressed in bytes
 	 */
 	public static long getFolderSize(File folder) {
 		long foldersize = 0;
@@ -341,7 +353,8 @@ public class FileUtil {
 	 * 
 	 * @param size Size to be rendered
 	 * @param language The language for the format symbols
-	 * @return
+	 * 
+	 * @return the size as human readable text
 	 */
 	public static String getDisplaySize(long size, String language) {
 		String displaySize = "";
@@ -368,7 +381,8 @@ public class FileUtil {
 	 * 
 	 * @param size Size to be rendered
 	 * @param language The language for the format symbols
-	 * @return
+	 * 
+	 * @return the size in KB as human readable text
 	 */
 	public static String getDisplaySizeKB(long size, String language) {
 		String displaySize = "";
@@ -386,7 +400,8 @@ public class FileUtil {
 	 * 
 	 * @param filename The filename to consider
 	 * @param includes list of includes expressions (eg. *.doc,*dummy*)
-	 * @param excludes list of excludeses expressions (eg. *.doc,*dummy*)
+	 * @param excludes list of excludes expressions (eg. *.doc,*dummy*)
+	 * 
 	 * @return true only if the passed filename matches the includes and not the
 	 *         excludes
 	 */
@@ -394,13 +409,13 @@ public class FileUtil {
 		// First of all check if the filename must be excluded
 		if (excludes != null && excludes.length > 0)
 			for (String s : excludes)
-				if (SelectorUtils.match(s, filename, false))
+				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, filename, false))
 					return false;
 
 		// Then check if the filename must can be included
 		if (includes != null && includes.length > 0)
 			for (String s : includes)
-				if (SelectorUtils.match(s, filename, false))
+				if (StringUtils.isNotEmpty(s) && SelectorUtils.match(s, filename, false))
 					return true;
 
 		if (includes == null || includes.length == 0)
@@ -416,7 +431,7 @@ public class FileUtil {
 	 * @param filename The filename to consider
 	 * @param includes comma-separated list of includes expressions (eg.
 	 *        *.doc,*dummy*)
-	 * @param excludes comma-separated list of excludeses expressions (eg.
+	 * @param excludes comma-separated list of excludes expressions (eg.
 	 *        *.doc,*dummy*)
 	 * @return true only if the passed filename matches the includes and not the
 	 *         excludes
@@ -502,6 +517,13 @@ public class FileUtil {
 
 	/**
 	 * Copies the input file into the output at the given offset
+	 * 
+	 * @param input the file to copy
+	 * @param output the target file to copy to
+	 * @param offset an offset to use in copying from the input expressed in
+	 *        number of bytes
+	 * 
+	 * @throws IOException raised in case of error
 	 */
 	public static void copy(File input, File output, long offset) throws IOException {
 		RandomAccessFile inputRa = new RandomAccessFile(input, "r");
@@ -547,7 +569,7 @@ public class FileUtil {
 	 * @param length Length of the byte range.
 	 * @throws IOException If something fails at I/O level.
 	 */
-	public static void copy(RandomAccessFile input, OutputStream output, long start, long length) throws IOException {
+	private static void copy(RandomAccessFile input, OutputStream output, long start, long length) throws IOException {
 		byte[] buffer = new byte[BUFF_SIZE];
 		int read;
 
@@ -573,52 +595,89 @@ public class FileUtil {
 	}
 
 	public static void replaceInFile(String sourcePath, String token, String newValue) throws Exception {
-		boolean windows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+		BufferedReader reader = null;
+		Writer writer = null;
+		String oldContent = "";
+
+		File tmp = new File(sourcePath + ".tmp");
+		File file = new File(sourcePath);
 
 		try {
-			File tmp = new File(sourcePath + ".tmp");
-			File file = new File(sourcePath);
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			String line = "", oldtext = "";
-			while ((line = reader.readLine()) != null) {
-				oldtext += line.replaceAll(token, newValue.replaceAll("\\\\", "\\\\\\\\"));
-				if (windows && !sourcePath.endsWith(".sh"))
-					oldtext += "\r";
-				oldtext += "\n";
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourcePath), "UTF-8"));
+
+			// Reading all the lines of input text file into oldContent
+			String line = reader.readLine();
+
+			while (line != null) {
+				oldContent = oldContent + line + System.lineSeparator();
+				line = reader.readLine();
 			}
-			reader.close();
 
-			// To replace a line in a file
-			String newtext = oldtext.replaceAll(token, newValue.replaceAll("\\\\", "\\\\\\\\"));
+			// Replacing oldString with newString in the oldContent
+			String newContent = oldContent.replaceAll(token, newValue);
 
-			FileWriter writer = new FileWriter(tmp);
-			writer.write(newtext);
-			writer.close();
+			// Rewriting the input text file with newContent
+			writer = new OutputStreamWriter(new FileOutputStream(tmp), "UTF-8");
 
-			file.delete();
-			tmp.renameTo(file);
+			writer.write(newContent);
 		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			log.error(ioe.getMessage(), ioe);
+		} finally {
+			try {
+				// Closing the resources
+				reader.close();
+				writer.close();
+			} catch (IOException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+
+		file.delete();
+		tmp.renameTo(file);
+	}
+
+	/**
+	 * Quickest way to copy a file in Java, makes use of NIO buffer.
+	 * 
+	 * @param source the source file to copy
+	 * @param target the target file
+	 * 
+	 * @throws IOException if the copy resulted in an error
+	 */
+	@SuppressWarnings("resource")
+	public static void copyFile(File source, File target) throws IOException {
+		FileChannel in = null;
+		FileChannel out = null;
+
+		try {
+			in = new FileInputStream(source).getChannel();
+			out = new FileOutputStream(target).getChannel();
+
+			ByteBuffer buffer = ByteBuffer.allocateDirect(BUFF_SIZE);
+			while (in.read(buffer) != -1) {
+				// For Java8 compatibility
+				((Buffer) buffer).flip();
+
+				while (buffer.hasRemaining()) {
+					out.write(buffer);
+				}
+				// For Java8 compatibility
+				((Buffer) buffer).clear();
+			}
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		} finally {
+			close(in);
+			close(out);
 		}
 	}
 
-	public static void copyFile(File sourceFile, File destFile) throws IOException {
-		if (!destFile.exists())
-			destFile.createNewFile();
-
-		FileChannel source = null;
-		FileChannel destination = null;
-
-		try {
-			source = new FileInputStream(sourceFile).getChannel();
-			destination = new FileOutputStream(destFile).getChannel();
-			destination.transferFrom(source, 0, source.size());
-		} finally {
-			if (source != null) {
-				source.close();
-			}
-			if (destination != null) {
-				destination.close();
+	private static void close(Closeable closable) {
+		if (closable != null) {
+			try {
+				closable.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -626,12 +685,150 @@ public class FileUtil {
 	public static void strongDelete(File file) {
 		if (file == null || !file.exists())
 			return;
-		FileUtils.deleteQuietly(file);
+
+		try {
+			if (file != null && file.exists())
+				FileUtils.forceDelete(file);
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+
+		if (file != null && file.exists())
+			try {
+				log.debug("Delete file {} using OS command", file.getAbsolutePath());
+				if (SystemUtil.isUnix() || SystemUtil.isMac() || SystemUtil.isSolaris())
+					java.lang.Runtime.getRuntime().exec("rm -rf \"" + file.getAbsolutePath() + "\"");
+				else
+					java.lang.Runtime.getRuntime().exec("cmd /C del /F /Q \"" + file.getAbsolutePath() + "\"");
+			} catch (IOException e) {
+				log.warn(e.getMessage(), e);
+			}
 	}
 
 	public static boolean isDirEmpty(final Path directory) throws IOException {
 		try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
 			return !dirStream.iterator().hasNext();
+		}
+	}
+
+	public static void merge(File f1, File f2, File merged) throws IOException {
+		copyFile(f1, merged);
+		Files.write(merged.toPath(), Files.readAllBytes(f2.toPath()), StandardOpenOption.APPEND);
+	}
+
+	public static void merge(List<File> files, File merged) throws IOException {
+		merged.createNewFile();
+		File tmp = new File(merged.getParent(), "tmp");
+		tmp.createNewFile();
+
+		try {
+			for (File chunk : files) {
+				FileUtil.merge(merged, chunk, tmp);
+				FileUtils.forceDelete(merged);
+				tmp.renameTo(merged);
+				tmp = new File(merged.getParent(), "tmp");
+				tmp.createNewFile();
+			}
+		} finally {
+			if (tmp != null && tmp.exists())
+				FileUtils.deleteQuietly(tmp);
+		}
+
+	}
+
+	public static List<File> split(File file, long chunkSize, File destDir) throws IOException {
+		RandomAccessFile raf = null;
+		List<File> chunks = new ArrayList<File>();
+		try {
+			raf = new RandomAccessFile(file, "r");
+			long numSplits = file.length() / chunkSize;
+			long sourceSize = raf.length();
+			long remainingBytes = sourceSize - (numSplits * chunkSize);
+
+			NumberFormat nf = new DecimalFormat("00000000000000");
+			int maxReadBufferSize = 8 * 1024; // 8KB
+			for (int destIx = 1; destIx <= numSplits; destIx++) {
+				File chunkFile = new File(destDir, nf.format(destIx));
+				BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(chunkFile));
+				try {
+					if (chunkSize > maxReadBufferSize) {
+						long numReads = chunkSize / maxReadBufferSize;
+						long numRemainingRead = chunkSize % maxReadBufferSize;
+						for (int i = 0; i < numReads; i++) {
+							readWrite(raf, bw, maxReadBufferSize);
+						}
+						if (numRemainingRead > 0) {
+							readWrite(raf, bw, numRemainingRead);
+						}
+					} else {
+						readWrite(raf, bw, chunkSize);
+					}
+					chunks.add(chunkFile);
+				} finally {
+					bw.close();
+				}
+			}
+
+			if (remainingBytes > 0) {
+				File chunkFile = new File(destDir, nf.format(numSplits + 1));
+				BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(chunkFile));
+				readWrite(raf, bw, remainingBytes);
+				bw.close();
+				chunks.add(chunkFile);
+			}
+		} finally {
+			if (raf != null)
+				try {
+					raf.close();
+				} catch (Throwable t) {
+				}
+		}
+		return chunks;
+	}
+
+	static private void readWrite(RandomAccessFile raf, BufferedOutputStream bw, long numBytes) throws IOException {
+		byte[] buf = new byte[(int) numBytes];
+		int val = raf.read(buf);
+		if (val != -1) {
+			bw.write(buf);
+		}
+	}
+
+	public static long countLines(File file) throws IOException {
+		InputStream is = new BufferedInputStream(new FileInputStream(file));
+		try {
+			byte[] c = new byte[1024];
+			long count = 0;
+			int readChars = 0;
+			boolean empty = true;
+			while ((readChars = is.read(c)) != -1) {
+				empty = false;
+				for (int i = 0; i < readChars; ++i) {
+					if (c[i] == '\n') {
+						++count;
+					}
+				}
+			}
+			return (count == 0 && !empty) ? 1 : count;
+		} finally {
+			is.close();
+		}
+	}
+
+	/**
+	 * Checks if <b>file</b> is in side <b>folder</b> at any level.
+	 *
+	 * @param folder the folder to inspect
+	 * @param file the file to check
+	 * 
+	 * @return true if <b>file</b> is in side <b>folder</b>
+	 */
+	public static boolean isInsideFolder(File folder, File file) {
+		try {
+			return file.getCanonicalPath().startsWith(folder.getCanonicalPath());
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+			return false;
 		}
 	}
 }

@@ -14,44 +14,33 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
  */
 public interface PersistentObjectDAO<T extends PersistentObject> {
 	/**
-	 * This method persists the entity object.
+	 * This method persists the entity object
 	 * 
-	 * @param entity entity to be stored.
-	 * @return True if successfully stored in a database.
+	 * @param entity entity to be stored
+	 * 
+	 * @return True if successfully stored in a database
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public boolean store(T entity);
+	public boolean store(T entity) throws PersistenceException;
 
 	/**
-	 * This method deletes an entity. Same as delete(id, 1)
+	 * This method finds an entity by ID
 	 * 
-	 * @param id ID of the entity which should be deleted.
-	 */
-	public boolean delete(long id);
-
-	/**
-	 * This method deletes an entity and you can give a deletion code
+	 * @param id ID of the entity
 	 * 
-	 * @param id ID of the entity which should be deleted.
-	 * @param code Deletion code.
-	 */
-	public boolean delete(long id, int code);
-
-	/**
-	 * This method finds an entity by ID.
-	 * 
-	 * @param doc ID of the entity.
-	 * @return Entity with given ID.
+	 * @return Entity with given ID
 	 */
 	public T findById(long id);
 
 	/**
-	 * This method finds an entity by ID.
+	 * This method finds an entity by ID
 	 * 
-	 * @param doc ID of the entity.
-	 * @param initialized True if the instance's lazy collections have to be
+	 * @param id ID of the entity
+	 * @param initialize True if the instance's lazy collections have to be
 	 *        initialized
 	 * 
-	 * @return Entity with given ID.
+	 * @return Entity with given ID
 	 */
 	public T findById(long id, boolean initialize);
 
@@ -74,7 +63,6 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	/**
 	 * Finds all entities ids
 	 * 
-	 * @param where The where clause expression
 	 * @return The list of all entities ids
 	 */
 	public List<Long> findAllIds();
@@ -95,9 +83,12 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param where The where clause expression
 	 * @param order The order clause expression
 	 * @param max Maximum results number (optional)
+	 * 
 	 * @return The list of marching entities
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<T> findByWhere(String where, String order, Integer max);
+	public List<T> findByWhere(String where, String order, Integer max) throws PersistenceException;
 
 	/**
 	 * Finds all entities by the given expression. Use _entity alias to
@@ -108,9 +99,26 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param values Parameters used in the where expression
 	 * @param order The order clause expression
 	 * @param max Maximum results number (optional)
+	 * 
 	 * @return The list of marching entities
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<T> findByWhere(String where, Object[] values, String order, Integer max);
+	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException;
+
+	/**
+	 * Finds all entities by the given object query.
+	 * 
+	 * @param query The query expression (for positional parameters, please use
+	 *        JPA-style: ?1, ?2 ...)
+	 * @param values Parameters used in the where expression
+	 * @param max Maximum results number (optional)
+	 * 
+	 * @return The list of marching entities
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public List<T> findByObjectQuery(String query, Object[] values, Integer max) throws PersistenceException;
 
 	/**
 	 * Find everything you want from the DB using the ORM query language
@@ -119,9 +127,12 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 *        JPA-style: ?1, ?2 ...)
 	 * @param values Array of paramaters
 	 * @param max Maximum results number (optional)
+	 * 
 	 * @return Query result
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<Object> findByQuery(String query, Object[] values, Integer max);
+	public List<Object> findByQuery(String query, Object[] values, Integer max) throws PersistenceException;
 
 	/**
 	 * Finds all entities ids by the given expression. Use _entity alias to
@@ -130,9 +141,12 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param where The where clause expression
 	 * @param order The order clause expression
 	 * @param max Maximum results number (optional)
+	 * 
 	 * @return The list of marching entities ids
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<Long> findIdsByWhere(String where, String order, Integer max);
+	public List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException;
 
 	/**
 	 * Finds all entities ids by the given expression. Use _entity alias to
@@ -143,9 +157,13 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param values Parameters used in the where expression
 	 * @param order The order clause expression
 	 * @param max Maximum results number (optional)
+	 * 
 	 * @return The list of marching entities ids
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public List<Long> findIdsByWhere(String where, Object[] values, String order, Integer max);
+	public List<Long> findIdsByWhere(String where, Object[] values, String order, Integer max)
+			throws PersistenceException;
 
 	/**
 	 * Initialises lazy loaded data such as collections
@@ -166,10 +184,13 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 *        argument value but also the SQL type and optionally the scale
 	 * @param maxRows the new max rows limit; null means there is no limit
 	 * @param rowMapper object that will map one object per row
+	 * 
 	 * @return the result List, containing mapped objects
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	@SuppressWarnings("rawtypes")
-	public List query(String sql, Object[] args, RowMapper rowMapper, Integer maxRows);
+	public List query(String sql, Object[] args, RowMapper rowMapper, Integer maxRows) throws PersistenceException;
 
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
@@ -181,9 +202,12 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 *        contain SqlParameterValue objects which indicate not only the
 	 *        argument value but also the SQL type and optionally the scale
 	 * @param maxRows the new max rows limit; null means there is no limit
+	 * 
 	 * @return the result row set
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public SqlRowSet queryForRowSet(String sql, Object[] args, Integer maxRows);
+	public SqlRowSet queryForRowSet(String sql, Object[] args, Integer maxRows) throws PersistenceException;
 
 	/**
 	 * Query given SQL to create a prepared statement from SQL and a list of
@@ -198,10 +222,14 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 *        PreparedStatement to guess the corresponding SQL type); may also
 	 *        contain SqlParameterValue objects which indicate not only the
 	 *        argument value but also the SQL type and optionally the scale
+	 * @param maxRows maximum number of returned records
+	 * 
 	 * @return a List of objects that match the specified element type
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	@SuppressWarnings("rawtypes")
-	public List queryForList(String sql, Object[] args, Class elementType, Integer maxRows);
+	public List queryForList(String sql, Object[] args, Class elementType, Integer maxRows) throws PersistenceException;
 
 	/**
 	 * Execute a query for a result list, given static SQL. Uses a JDBC
@@ -214,10 +242,13 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param sql SQL query to execute
 	 * @param elementType the required type of element in the result list (for
 	 *        example, Integer.class)
+	 * 
 	 * @return a List of objects that match the specified element type
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
 	@SuppressWarnings("rawtypes")
-	public List queryForList(String sql, Class elementType);
+	public List queryForList(String sql, Class elementType) throws PersistenceException;
 
 	/**
 	 * Execute a query that results in an int value, given static SQL. Uses a
@@ -228,9 +259,12 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * column query that results in an int value.
 	 * 
 	 * @param sql SQL query to execute
+	 * 
 	 * @return the int value, or 0 in case of SQL NULL
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public int queryForInt(String sql);
+	public int queryForInt(String sql) throws PersistenceException;
 
 	/**
 	 * Execute a query that results in an long value, given static SQL. Uses a
@@ -241,9 +275,12 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * column query that results in a long value.
 	 * 
 	 * @param sql SQL query to execute
+	 * 
 	 * @return the long value, or 0 in case of SQL NULL
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public long queryForLong(String sql);
+	public long queryForLong(String sql) throws PersistenceException;
 
 	/**
 	 * Execute a query that results in an string value, given static SQL. Uses a
@@ -254,9 +291,12 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * column query that results in a string value.
 	 * 
 	 * @param sql SQL query to execute
+	 * 
 	 * @return the string value
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public String queryForString(String sql);
+	public String queryForString(String sql) throws PersistenceException;
 
 	/**
 	 * Execute a query that results in a Object value, given static SQL. Uses a
@@ -267,58 +307,102 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @param sql SQL query to execute
 	 * @param type The type of the returned value
+	 * 
 	 * @return the object value
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public Object queryForObject(String sql, Class type);
+	public Object queryForObject(String sql, @SuppressWarnings("rawtypes") Class type) throws PersistenceException;
+
+	/**
+	 * This method deletes an entity. Same as delete(id, 1)
+	 * 
+	 * @param id ID of the entity which should be deleted.
+	 *
+	 * @return if the record has been successfully deleted
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public boolean delete(long id) throws PersistenceException;
+
+	/**
+	 * This method deletes an entity and you can give a deletion code
+	 * 
+	 * @param id ID of the entity which should be deleted
+	 * @param code Deletion code
+	 * 
+	 * @return if the record has been successfully deleted
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public boolean delete(long id, int code) throws PersistenceException;
 
 	/**
 	 * Deletes all entries form the database
 	 * 
 	 * @param entities The entities to be deleted
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public void deleteAll(Collection<T> entities);
+	public void deleteAll(Collection<T> entities) throws PersistenceException;
 
 	/**
 	 * Deletes all entries form the database giving a specific deletion code
 	 * 
 	 * @param entities The entities to be deleted
-	 * @param delete The deletion code
+	 * @param code The deletion code
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public void deleteAll(Collection<T> entities, int code);
+	public void deleteAll(Collection<T> entities, int code) throws PersistenceException;
 
 	/**
 	 * Executes a bulk update as specified by the given expression
 	 * 
-	 * @expression The update expression. (for positional parameters, please use
-	 *             JPA-style: ?1, ?2 ...)
-	 * @values Optional array of parameters values
+	 * @param expression The update expression. (for positional parameters,
+	 *        please use JPA-style: ?1, ?2 ...)
+	 * @param values Optional array of parameters values
 	 * 
 	 * @return the number of modified records
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public int bulkUpdate(String expression, Object[] values);
+	public int bulkUpdate(String expression, Object[] values) throws PersistenceException;
 
 	/**
 	 * Executes the given SQL update statement
+	 * 
+	 * @param statement the SQL statement to execute against the database
+	 * 
+	 * @return the value returned by the database after execution
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public int jdbcUpdate(String statement);
+	public int jdbcUpdate(String statement) throws PersistenceException;
 
 	/**
 	 * Issue a single SQL update operation (such as an insert, update or delete
-	 * statement) via a prepared statement, binding the given arguments.
+	 * statement) via a prepared statement, binding the given arguments
 	 * 
 	 * @param statement SQL containing bind parameters
 	 * @param args arguments to bind to the query (leaving it to the
 	 *        PreparedStatement to guess the corresponding SQL type); may also
 	 *        contain SqlParameterValue objects which indicate not only the
 	 *        argument value but also the SQL type and optionally the scale
+	 * 
 	 * @return the number of rows affected
-	 * @since 6.2.4
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public int jdbcUpdate(String statement, Object... args);
+	public int jdbcUpdate(String statement, Object... args) throws PersistenceException;
 
 	/**
-	 * Get the DBMS currently connected( possible values are: mysql, hsqldb,
-	 * oracle, mssql)
+	 * Get the DBMS name currently connected(possible values are: <b>mysql</b>,
+	 * <b>hsqldb</b>, <b>oracle</b>, <b>mssql</b>)
+	 * 
+	 * @return the database identifier
 	 */
 	public String getDbms();
+
+	public boolean isOracle();
 }

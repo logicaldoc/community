@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServiceUtil;
@@ -33,8 +36,8 @@ public class NotesDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(NotesDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			ServiceUtil.validateSession(request);
 
@@ -45,6 +48,10 @@ public class NotesDataServlet extends HttpServlet {
 			Long docId = null;
 			if (request.getParameter("docId") != null)
 				docId = Long.parseLong(request.getParameter("docId"));
+
+			String fileVersion = null;
+			if (request.getParameter("fileVersion") != null)
+				fileVersion = request.getParameter("fileVersion");
 
 			Long page = null;
 			if (request.getParameter("page") != null)
@@ -65,31 +72,52 @@ public class NotesDataServlet extends HttpServlet {
 			writer.write("<list>");
 
 			StringBuffer query = new StringBuffer(
-					"select A.ld_id,A.ld_message,A.ld_username,A.ld_date,A.ld_docid,B.ld_filename,A.ld_userid,A.ld_page,A.ld_snippet from ld_note A, ld_document B where A.ld_deleted=0 and B.ld_deleted=0 and A.ld_docid=B.ld_id ");
+					"select A.ld_id,A.ld_message,A.ld_username,A.ld_date,A.ld_docid,B.ld_filename,A.ld_userid,A.ld_page,A.ld_color,A.ld_fileversion from ld_note A, ld_document B where A.ld_deleted=0 and B.ld_deleted=0 and A.ld_docid=B.ld_id ");
 			if (userId != null)
 				query.append(" and A.ld_userid =" + userId);
 			if (docId != null)
 				query.append(" and A.ld_docid =" + docId);
 			if (page != null)
 				query.append(" and A.ld_page =" + page);
-			query.append(" order by A.ld_date desc, A.ld_page asc ");
+
+			if (docId != null && fileVersion == null) {
+				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				Document doc = ddao.findDocument(docId);
+				fileVersion = doc.getFileVersion();
+			}
 
 			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
-			SqlRowSet set = dao.queryForRowSet(query.toString(), null, 200);
+			SqlRowSet set = null;
+			if (docId != null && StringUtils.isNotEmpty(fileVersion)) {
+				query.append(" and A.ld_fileversion = ? order by A.ld_date desc, A.ld_page asc ");
+				set = dao.queryForRowSet(query.toString(), new Object[] { fileVersion }, 200);
+			} else {
+				query.append(" order by A.ld_date desc, A.ld_page asc ");
+				set = dao.queryForRowSet(query.toString(), null, 200);
+			}
 
 			while (set.next()) {
 				writer.print("<post>");
 				writer.print("<id>" + set.getLong(1) + "</id>");
 				writer.print("<title><![CDATA[" + StringUtils.abbreviate(set.getString(2), 100) + "]]></title>");
 				if (set.getString(9) != null)
-					writer.print("<snippet><![CDATA[" + set.getString(9) + "]]></snippet>");
+					writer.print("<color><![CDATA[" + set.getString(9) + "]]></color>");
 				writer.print("<page>" + set.getInt(8) + "</page>");
 				writer.print("<user><![CDATA[" + set.getString(3) + "]]></user>");
-				writer.print("<date>" + (set.getDate(4) != null ? df.format(set.getDate(4)) : "") + "</date>");
+
+				Date date = null;
+				if (set.getObject(4) != null && set.getObject(4).getClass().getName().equals("oracle.sql.TIMESTAMP")) {
+					oracle.sql.TIMESTAMP ts = (oracle.sql.TIMESTAMP) set.getObject(4);
+					date = new Date(ts.dateValue().getTime());
+				} else {
+					date = set.getDate(4);
+				}
+				writer.print("<date>" + (date != null ? df.format(date) : "") + "</date>");
 				writer.print("<message><![CDATA[" + set.getString(2) + "]]></message>");
 				writer.print("<docId>" + set.getLong(5) + "</docId>");
 				writer.print("<docFilename><![CDATA[" + set.getString(6) + "]]></docFilename>");
 				writer.print("<userId><![CDATA[" + set.getString(7) + "]]></userId>");
+				writer.print("<fileVersion><![CDATA[" + set.getString(10) + "]]></fileVersion>");
 				writer.print("</post>");
 			}
 

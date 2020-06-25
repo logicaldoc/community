@@ -9,12 +9,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.ibm.icu.text.SimpleDateFormat;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -100,6 +103,7 @@ public class FulltextSearch extends Search {
 			hit.setStamped(rs.getInt(33));
 			hit.setPassword(rs.getString(34));
 			hit.setWorkflowStatusDisplay(rs.getString(35));
+			hit.setLanguage(rs.getString(36));
 
 			return hit;
 		}
@@ -109,7 +113,7 @@ public class FulltextSearch extends Search {
 	}
 
 	@Override
-	public void internalSearch() throws Exception {
+	public void internalSearch() throws SearchException {
 		FulltextSearchOptions opt = (FulltextSearchOptions) options;
 		SearchEngine engine = (SearchEngine) Context.get().getBean(SearchEngine.class);
 
@@ -181,7 +185,7 @@ public class FulltextSearch extends Search {
 		boolean searchInSingleFolder = (opt.getFolderId() != null && !opt.isSearchInSubPath());
 		if (!searchInSingleFolder) {
 			log.debug("Folders search");
-			accessibleFolderIds = fdao.findFolderIdByUserId(opt.getUserId(), opt.getFolderId(), true);
+			accessibleFolderIds = fdao.findFolderIdByUserIdInPath(opt.getUserId(), opt.getFolderId());
 			log.debug("End of Folders search");
 		}
 		if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
@@ -227,7 +231,28 @@ public class FulltextSearch extends Search {
 
 		log.debug("DB search");
 
-		String hitsIdsStr = hitsMap.keySet().toString().replace('[', '(').replace(']', ')');
+		Set<Long> hitsIds = hitsMap.keySet();
+		StringBuffer hitsIdsCondition = new StringBuffer();
+		if (!hitsIds.isEmpty()) {
+			hitsIdsCondition.append(" and (");
+
+			if (fdao.isOracle()) {
+				/*
+				 * In Oracle The limit of 1000 elements applies to sets of
+				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
+				 * if the sets contain two or more items: (x, 0) IN ((1,0),
+				 * (2,0), (3,0), ...):
+				 */
+				hitsIdsCondition.append(" (A.ld_id,0) in ( ");
+				hitsIdsCondition
+						.append(hitsIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+				hitsIdsCondition.append(" )");
+			} else {
+				hitsIdsCondition.append(" A.ld_id in " + hitsIds.toString().replace('[', '(').replace(']', ')'));
+			}
+			
+			hitsIdsCondition.append(")");
+		}
 
 		StringBuffer richQuery = new StringBuffer();
 		// Find real documents
@@ -237,9 +262,9 @@ public class FulltextSearch extends Search {
 		richQuery.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");
 		richQuery.append(" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
 		richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
-		richQuery
-				.append(" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		richQuery.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp ");
+		richQuery.append(
+				" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
+		richQuery.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language ");
 		richQuery.append(" from ld_document A ");
 		richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 		richQuery.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
@@ -253,43 +278,47 @@ public class FulltextSearch extends Search {
 			richQuery.append(" and ( A.ld_stoppublishing is null or A.ld_stoppublishing > CURRENT_TIMESTAMP )");
 		}
 		richQuery.append("  and A.ld_docref is null ");
-		richQuery.append("  and A.ld_id in ");
-		richQuery.append(hitsIdsStr);
+		richQuery.append(hitsIdsCondition.toString());
 
-		// Append all aliases
-		richQuery
-				.append(" UNION select A.ld_id, REF.ld_customid, A.ld_docref, REF.ld_type, REF.ld_version, REF.ld_lastmodified, ");
-		richQuery
-				.append(" REF.ld_date, REF.ld_publisher, REF.ld_creation, REF.ld_creator, REF.ld_filesize, REF.ld_immutable, ");
-		richQuery
-				.append(" REF.ld_indexed, REF.ld_lockuserid, REF.ld_filename, REF.ld_status, REF.ld_signed, REF.ld_type, ");
-		richQuery
-				.append(" REF.ld_rating, REF.ld_fileversion, A.ld_comment, REF.ld_workflowstatus, REF.ld_startpublishing, ");
-		richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
-		richQuery
-				.append(" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		richQuery.append(" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp ");
-		richQuery.append(" from ld_document A  ");
-		richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
-		richQuery.append(" join ld_document REF on A.ld_docref=REF.ld_id ");
-		richQuery.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
-		richQuery.append(" where A.ld_deleted=0 and A.ld_nature=" + AbstractDocument.NATURE_DOC
-				+ " and A.ld_folderid=FOLD.ld_id ");
-		richQuery.append(" and A.ld_tenantid = " + tenantId);
-		// For normal users we have to exclude not published documents
-		if (searchUser != null && !searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
-			richQuery.append(" and REF.ld_published = 1 ");
-			richQuery.append(" and REF.ld_startpublishing <= CURRENT_TIMESTAMP ");
-			richQuery.append(" and ( REF.ld_stoppublishing is null or REF.ld_stoppublishing > CURRENT_TIMESTAMP )");
+		if (options.isRetrieveAliases()) {
+			// Append all aliases
+			richQuery.append(
+					" UNION select A.ld_id, REF.ld_customid, A.ld_docref, REF.ld_type, REF.ld_version, REF.ld_lastmodified, ");
+			richQuery.append(
+					" REF.ld_date, REF.ld_publisher, REF.ld_creation, REF.ld_creator, REF.ld_filesize, REF.ld_immutable, ");
+			richQuery.append(
+					" REF.ld_indexed, REF.ld_lockuserid, REF.ld_filename, REF.ld_status, REF.ld_signed, REF.ld_type, ");
+			richQuery.append(
+					" REF.ld_rating, REF.ld_fileversion, A.ld_comment, REF.ld_workflowstatus, REF.ld_startpublishing, ");
+			richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
+			richQuery.append(
+					" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
+			richQuery.append(" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp, REF.ld_language ");
+			richQuery.append(" from ld_document A  ");
+			richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
+			richQuery.append(" join ld_document REF on A.ld_docref=REF.ld_id ");
+			richQuery.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
+			richQuery.append(" where A.ld_deleted=0 and A.ld_nature=" + AbstractDocument.NATURE_DOC
+					+ " and A.ld_folderid=FOLD.ld_id ");
+			richQuery.append(" and A.ld_tenantid = " + tenantId);
+			// For normal users we have to exclude not published documents
+			if (searchUser != null && !searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
+				richQuery.append(" and REF.ld_published = 1 ");
+				richQuery.append(" and REF.ld_startpublishing <= CURRENT_TIMESTAMP ");
+				richQuery.append(" and ( REF.ld_stoppublishing is null or REF.ld_stoppublishing > CURRENT_TIMESTAMP )");
+			}
+			richQuery.append("  and A.ld_docref is not null and REF.ld_deleted=0 and A.ld_docref = REF.ld_id ");
+			richQuery.append(hitsIdsCondition.toString());
 		}
-		richQuery.append("  and A.ld_docref is not null and REF.ld_deleted=0 and A.ld_docref = REF.ld_id ");
-		richQuery.append("  and A.ld_id in ");
-		richQuery.append(hitsIdsStr);
 
-		log.debug("Execute query\n" + richQuery.toString());
+		log.debug("Execute query {}", richQuery.toString());
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		dao.query(richQuery.toString(), null, new HitMapper(hitsMap), null);
+		try {
+			dao.query(richQuery.toString(), null, new HitMapper(hitsMap), null);
+		} catch (PersistenceException e) {
+			throw new SearchException(e);
+		}
 
 		// Now sort the hits by score desc
 		List<Hit> sortedHitsList = new ArrayList<Hit>(hitsMap.values());
@@ -315,6 +344,6 @@ public class FulltextSearch extends Search {
 			if ((searchUser.isMemberOf("admin") && opt.getFolderId() == null)
 					|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId())))
 				hits.add(hit);
-		} 
+		}
 	}
 }

@@ -57,8 +57,8 @@ public class DocumentsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(DocumentsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Context context = Context.get();
 			Session session = ServiceUtil.validateSession(request);
@@ -98,6 +98,11 @@ public class DocumentsDataServlet extends HttpServlet {
 			if (StringUtils.isNotEmpty(request.getParameter("status")))
 				status = Integer.parseInt(request.getParameter("status"));
 
+			Long hiliteDocId = null;
+			if (StringUtils.isNotEmpty(request.getParameter("hiliteDocId")))
+				hiliteDocId = Long.parseLong(request.getParameter("hiliteDocId"));
+			Document hiliteDoc = null;
+
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
@@ -125,7 +130,7 @@ public class DocumentsDataServlet extends HttpServlet {
 			 * documentId-atttributeName, the value is the attribute value. This
 			 * fieldsMap is used to maximize the listing performances.
 			 */
-			final Map<String, String> extValues = new HashMap<String, String>();
+			final Map<String, Object> extValues = new HashMap<String, Object>();
 
 			if (status != null && status.intValue() != AbstractDocument.DOC_ARCHIVED) {
 				List<Document> docs = dao.findByLockUserAndStatus(session.getUserId(), status);
@@ -157,30 +162,30 @@ public class DocumentsDataServlet extends HttpServlet {
 				 */
 				Long folderId = null;
 				if (StringUtils.isNotEmpty(request.getParameter("folderId")))
-					folderId = new Long(request.getParameter("folderId"));
+					folderId = Long.parseLong(request.getParameter("folderId"));
+
 				if (folderId != null && session != null && !fDao.isReadEnabled(folderId, session.getUserId()))
-					throw new Exception("Folder " + folderId + " is not accessible by user " + session.getUsername());
+					throw new Exception(
+							String.format("Folder %s is not accessible by user %s", folderId, session.getUsername()));
 
 				String filename = null;
 				if (StringUtils.isNotEmpty(request.getParameter("filename")))
 					filename = request.getParameter("filename");
 
 				if (!attrs.isEmpty()) {
-					log.debug("Search for extended attributes " + extattrs);
+					log.debug("Search for extended attributes {}", extattrs);
 
 					StringBuffer query = new StringBuffer(
-							"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue ");
+							"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
 					query.append(" from ld_document_ext where ld_docid in (");
 					query.append("select D.ld_id from ld_document D where D.ld_deleted=0 ");
 					if (folderId != null)
 						query.append(" and D.ld_folderid=" + Long.toString(folderId));
 					query.append(") and ld_name in ");
-					query.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')")
-							.replaceAll(",", "','").replaceAll(" ", ""));
+					query.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')").replaceAll(",", "','")
+							.replaceAll(" ", ""));
 
 					final Locale l = LocaleUtil.toLocale(locale);
-					final SimpleDateFormat edf = new SimpleDateFormat(I18N.message("format_dateshort", l));
-
 					dao.query(query.toString(), null, new RowMapper<Long>() {
 						@Override
 						public Long mapRow(ResultSet rs, int row) throws SQLException {
@@ -191,13 +196,16 @@ public class DocumentsDataServlet extends HttpServlet {
 							String key = docId + "-" + name;
 
 							if (type == Attribute.TYPE_STRING) {
-								extValues.put(key, rs.getString(4));
+								if (StringUtils.isNotEmpty(rs.getString(8)))
+									extValues.put(key, rs.getString(8));
+								else
+									extValues.put(key, rs.getString(4));
 							} else if (type == Attribute.TYPE_INT) {
-								extValues.put(key, Long.toString(rs.getLong(5)));
+								extValues.put(key, rs.getLong(5));
 							} else if (type == Attribute.TYPE_DOUBLE) {
-								extValues.put(key, Double.toString(rs.getDouble(6)));
+								extValues.put(key, rs.getDouble(6));
 							} else if (type == Attribute.TYPE_DATE) {
-								extValues.put(key, rs.getDate(7) != null ? edf.format(rs.getDate(7)) : "");
+								extValues.put(key, rs.getDate(7));
 							} else if (type == Attribute.TYPE_USER) {
 								extValues.put(key, rs.getString(4));
 							} else if (type == Attribute.TYPE_BOOLEAN) {
@@ -219,16 +227,20 @@ public class DocumentsDataServlet extends HttpServlet {
 								+ " A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,"
 								+ " A.startPublishing, A.stopPublishing, A.published, A.extResId,"
 								+ " B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages, "
-								+ " A.workflowStatusDisplay " + " from Document as A left outer join A.template as B ");
+								+ " A.workflowStatusDisplay, A.language, A.links from Document as A left outer join A.template as B ");
 				query.append(" where A.deleted = 0 and not A.status=" + AbstractDocument.DOC_ARCHIVED);
 				if (folderId != null)
 					query.append(" and A.folder.id=" + folderId);
 				if (StringUtils.isNotEmpty(request.getParameter("indexed")))
 					query.append(" and A.indexed=" + request.getParameter("indexed"));
-				if (filename != null)
-					query.append(" and lower(A.fileName) like '%" + filename.toLowerCase() + "%' ");
 
-				List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, null);
+				Object[] values = null;
+				if (filename != null) {
+					query.append(" and lower(A.fileName) like ?1 ");
+					values = new Object[] { "%" + filename.toLowerCase() + "%" };
+				}
+
+				List<Object> records = (List<Object>) dao.findByQuery(query.toString(), values, null);
 				List<Document> documents = new ArrayList<Document>();
 
 				/*
@@ -298,10 +310,12 @@ public class DocumentsDataServlet extends HttpServlet {
 							doc.setPassword((String) cols[30]);
 							doc.setPages((Integer) cols[31]);
 							doc.setWorkflowStatusDisplay((String) cols[32]);
+							doc.setLanguage((String) cols[33]);
+							doc.setLinks((Integer) cols[34]);
 
 							if (!extValues.isEmpty())
 								for (String name : attrs) {
-									String val = extValues.get(doc.getId() + "-" + name);
+									Object val = extValues.get(doc.getId() + "-" + name);
 									if (val != null) {
 										doc.setValue(name, val);
 									}
@@ -321,6 +335,21 @@ public class DocumentsDataServlet extends HttpServlet {
 				int end = Math.min(begin + max - 1, documents.size() - 1);
 				for (int i = begin; i <= end; i++)
 					documentRecords.add(documents.get(i));
+
+				// Always add the hilight doc as first element of the collection
+				if (hiliteDocId != null) {
+					hiliteDoc = dao.findById(hiliteDocId);
+					if (folderId != null && hiliteDoc != null && hiliteDoc.getFolder() != null
+							&& hiliteDoc.getFolder().getId() == folderId) {
+						hiliteDoc = dao.findDocument(hiliteDocId);
+						dao.initialize(hiliteDoc);
+					} else
+						hiliteDoc = null;
+				}
+				if (hiliteDoc != null) {
+					if (!documentRecords.contains(hiliteDoc))
+						documentRecords.add(0, hiliteDoc);
+				}
 			}
 
 			/*
@@ -345,8 +374,8 @@ public class DocumentsDataServlet extends HttpServlet {
 						+ "</lastModified>");
 				writer.print("<published>" + (doc.getDate() != null ? df.format(doc.getDate()) : "") + "</published>");
 				writer.print("<publisher><![CDATA[" + doc.getPublisher() + "]]></publisher>");
-				writer.print("<created>" + (doc.getCreation() != null ? df.format(doc.getCreation()) : "")
-						+ "</created>");
+				writer.print(
+						"<created>" + (doc.getCreation() != null ? df.format(doc.getCreation()) : "") + "</created>");
 				writer.print("<creator><![CDATA[" + doc.getCreator() + "]]></creator>");
 				writer.print("<size>" + doc.getFileSize() + "</size>");
 
@@ -358,6 +387,8 @@ public class DocumentsDataServlet extends HttpServlet {
 				writer.print("<stamped>" + doc.getStamped() + "</stamped>");
 				writer.print("<bookmarked>" + (bookmarks.contains(doc.getId()) || bookmarks.contains(doc.getDocRef()))
 						+ "</bookmarked>");
+				writer.print("<language>" + doc.getLanguage() + "</language>");
+				writer.print("<links>" + doc.getLinks() + "</links>");
 
 				if (doc.getLockUserId() != null)
 					writer.print("<lockUserId>" + doc.getLockUserId() + "</lockUserId>");
@@ -368,14 +399,17 @@ public class DocumentsDataServlet extends HttpServlet {
 
 				writer.print("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
 				writer.print("<fileVersion><![CDATA[" + doc.getFileVersion() + "]]></fileVersion>");
-				writer.print("<comment><![CDATA[" + (doc.getComment() != null ? doc.getComment() : "")
-						+ "]]></comment>");
+				writer.print(
+						"<comment><![CDATA[" + (doc.getComment() != null ? doc.getComment() : "") + "]]></comment>");
 				writer.print("<workflowStatus><![CDATA["
 						+ (doc.getWorkflowStatus() != null ? doc.getWorkflowStatus() : "") + "]]></workflowStatus>");
 				writer.print("<workflowStatusDisplay><![CDATA["
 						+ (doc.getWorkflowStatusDisplay() != null ? doc.getWorkflowStatusDisplay() : "")
 						+ "]]></workflowStatusDisplay>");
-				writer.print("<startPublishing>" + df.format(doc.getStartPublishing()) + "</startPublishing>");
+				if (doc.getStartPublishing() != null)
+					writer.print("<startPublishing>" + df.format(doc.getStartPublishing()) + "</startPublishing>");
+				else
+					writer.print("<startPublishing></startPublishing>");
 				if (doc.getStopPublishing() != null)
 					writer.print("<stopPublishing>" + df.format(doc.getStopPublishing()) + "</stopPublishing>");
 				else
@@ -391,9 +425,25 @@ public class DocumentsDataServlet extends HttpServlet {
 				if (!extValues.isEmpty())
 					for (String name : attrs) {
 						Object val = doc.getValue(name);
-						if (val != null)
-							writer.print("<ext_" + name + "><![CDATA[" + val + "]]></ext_" + name + ">");
+						if (val != null) {
+							writer.print("<ext_" + name + ">");
+							if (val instanceof Date)
+								writer.print(df.format((Date) val));
+							else if (val instanceof Integer)
+								writer.print(Integer.toString((Integer) val));
+							else if (val instanceof Long)
+								writer.print(Long.toString((Long) val));
+							else if (val instanceof Double)
+								writer.print(Double.toString((Double) val));
+							else
+								writer.print("<![CDATA[" + val + "]]>");
+							writer.print("</ext_" + name + ">");
+						}
 					}
+
+				if (hiliteDoc != null && doc.getId() == hiliteDoc.getId())
+					writer.print("<order>1</order>");
+
 				writer.print("</document>");
 			}
 

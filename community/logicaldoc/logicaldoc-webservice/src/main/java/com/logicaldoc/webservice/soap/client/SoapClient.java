@@ -7,6 +7,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.common.gzip.GZIPInInterceptor;
 import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -26,6 +27,10 @@ public abstract class SoapClient<T> {
 
 	protected String endpoint;
 
+	public void setMaxChildElements(int maxChildElements) {
+		StaxUtils.setInnerElementCountThreshold(maxChildElements);
+	}
+	
 	/**
 	 * Constructor
 	 * 

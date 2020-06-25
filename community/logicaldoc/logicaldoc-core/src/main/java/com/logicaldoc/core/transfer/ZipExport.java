@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.History;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -63,6 +63,7 @@ public class ZipExport {
 	 * @param transaction Transaction with all informations about the export
 	 * @param pdfConversion True if the pdf conversion has to be used instead of
 	 *        the original files
+	 *        
 	 * @return The Stream of the zip archive
 	 */
 	public ByteArrayOutputStream process(FolderHistory transaction, boolean pdfConversion) {
@@ -102,11 +103,13 @@ public class ZipExport {
 	 * Exports a selection of documents
 	 * 
 	 * @param docIds Identifiers of the documents
-	 * @return The Stream of the zip archive
 	 * @param pdfConversion True if the pdf conversion has to be used instead of
 	 *        the original files
+	 * @param transaction session informations
+	 * 
+	 * @return The Stream of the zip archive
 	 */
-	public ByteArrayOutputStream process(long[] docIds, boolean pdfConversion, History transaction) {
+	public ByteArrayOutputStream process(Long[] docIds, boolean pdfConversion, DocumentHistory transaction) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		process(docIds, bos, pdfConversion, transaction);
 		return bos;
@@ -119,8 +122,9 @@ public class ZipExport {
 	 * @param out The stream that will receive the zip
 	 * @param pdfConversion True if the pdf conversion has to be used instead of
 	 *        the original files
+	 * @param transaction session informations       
 	 */
-	public void process(long[] docIds, OutputStream out, boolean pdfConversion, History transaction) {
+	public void process(Long[] docIds, OutputStream out, boolean pdfConversion, DocumentHistory transaction) {
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -152,7 +156,7 @@ public class ZipExport {
 
 				if (transaction != null) {
 					try {
-						History t = (History) transaction.clone();
+						DocumentHistory t = (DocumentHistory) transaction.clone();
 						transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
 						ddao.saveDocumentHistory(doc, t);
 					} catch (CloneNotSupportedException e) {
@@ -174,17 +178,22 @@ public class ZipExport {
 	 * If allLevel set true all children of a specified folder will be export.
 	 * Otherwise only the first level will be export.
 	 * 
-	 * @param b
+	 * @param level the compression level
 	 */
-	public void setAllLevel(boolean b) {
-		allLevel = b;
+	public void setAllLevel(boolean level) {
+		allLevel = level;
 	}
 
 	/**
 	 * Adds all children of the specified folder up to the given level
+	 * 
+	 * @param folder the folder to elaborate
+	 * @param depth the depth
+	 * @param pdfConversion if the PDF conversions have to be used instead
+	 * @param sid identifier of the session
 	 */
-	protected void appendChildren(Folder folder, int level, boolean pdfConversion, String sid) {
-		if (!allLevel && (level > 1)) {
+	protected void appendChildren(Folder folder, int depth, boolean pdfConversion, String sid) {
+		if (!allLevel && (depth > 1)) {
 			return;
 		} else {
 			addFolderDocuments(folder, pdfConversion, sid);
@@ -193,13 +202,17 @@ public class ZipExport {
 			Iterator<Folder> iter = children.iterator();
 
 			while (iter.hasNext()) {
-				appendChildren(iter.next(), level + 1, pdfConversion, sid);
+				appendChildren(iter.next(), depth + 1, pdfConversion, sid);
 			}
 		}
 	}
 
 	/**
 	 * Adds all folder's documents
+	 * 
+	 * @param folder the folder to elaborate
+	 * @param pdfConversion if the PDF conversions have to be used instead
+	 * @param sid identifier of the session
 	 */
 	protected void addFolderDocuments(Folder folder, boolean pdfConversion, String sid) {
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -222,6 +235,9 @@ public class ZipExport {
 	/**
 	 * To maximize the compatibility with Windows we have to remove special
 	 * chars and the total filename size must be <=250
+	 * 
+	 * @param src the source filename
+	 * @return the compatible name
 	 */
 	private String adjustFileNameForWindows(String src) {
 		String newName = src.replace("/", "").replace("\\", "");
@@ -236,14 +252,19 @@ public class ZipExport {
 
 	/**
 	 * Adds a single document into the archive in the specified path.
+	 * 
+	 * @param path path to store the document in
+	 * @param document the document
+	 * @param pdfConversion if the PDF conversion has to be used instead
+	 * @param sid identifier of the session
 	 */
 	private void addDocument(String path, Document document, boolean pdfConversion, String sid) {
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(document, null, null);
 
 		if (pdfConversion && !"pdf".equals(FilenameUtils.getExtension(document.getFileName().toLowerCase()))) {
-			FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(
-					FormatConverterManager.class);
+			FormatConverterManager manager = (FormatConverterManager) Context.get()
+					.getBean(FormatConverterManager.class);
 			try {
 				manager.convertToPdf(document, null);
 			} catch (IOException e) {

@@ -51,7 +51,6 @@ public class BrandingPanel extends AdminPanel {
 		});
 
 		IButton save = new IButton(I18N.message("save"));
-		save.setAutoDraw(true);
 		save.setMinWidth(80);
 		save.addClickHandler(new ClickHandler() {
 

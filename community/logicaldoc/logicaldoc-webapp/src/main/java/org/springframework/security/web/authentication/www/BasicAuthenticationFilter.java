@@ -66,14 +66,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * remoting protocol clients (such as Hessian and SOAP) as well as standard user
  * agents (such as Internet Explorer and Netscape).
  * <p>
- * If authentication is successful, the resulting {@link Authentication} object
+ * If authentication is successful, the resulting Authentication object
  * will be placed into the <code>SecurityContextHolder</code>.
  *
  * <p>
  * If authentication fails and <code>ignoreFailure</code> is <code>false</code>
  * (the default), an {@link AuthenticationEntryPoint} implementation is called
- * (unless the <tt>ignoreFailure</tt> property is set to <tt>true</tt>). Usually
- * this should be {@link BasicAuthenticationEntryPoint}, which will prompt the
+ * (unless the <b>ignoreFailure</b> property is set to <b>true</b>). Usually
+ * this should be BasicAuthenticationEntryPoint, which will prompt the
  * user to authenticate again via BASIC authentication.
  *
  * <p>

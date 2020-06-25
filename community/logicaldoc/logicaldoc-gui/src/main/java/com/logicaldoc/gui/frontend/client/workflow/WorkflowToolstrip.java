@@ -210,9 +210,8 @@ public class WorkflowToolstrip extends ToolStrip {
 								break;
 							}
 							for (GUITransition transition : state.getTransitions()) {
-								if (transition.getTargetState() == null
-										|| (transition.getTargetState() != null && transition.getTargetState()
-												.getType() == GUIWFState.TYPE_UNDEFINED)) {
+								if (transition.getTargetState() == null || (transition.getTargetState() != null
+										&& transition.getTargetState().getType() == GUIWFState.TYPE_UNDEFINED)) {
 									transitionErrorFound = true;
 									break;
 								}
@@ -315,18 +314,19 @@ public class WorkflowToolstrip extends ToolStrip {
 			@Override
 			public void onClick(ClickEvent event) {
 				// Ask for new name
-				LD.askForValue(I18N.message("clone"), I18N.message("newname"), "", new ValueCallback() {
-					@Override
-					public void execute(String value) {
-						if (value == null || "".equals(value.trim()))
-							return;
-						// Set the new name in the designer, then
-						// request a save
-						currentWorkflow.setId(null);
-						currentWorkflow.setName(value.trim());
-						onSave();
-					}
-				});
+				LD.askForValue(I18N.message("clone"), I18N.message("newname"), "",
+						ItemFactory.newSimpleTextItem("name", "newname", ""), null, new ValueCallback() {
+							@Override
+							public void execute(String value) {
+								if (value == null || "".equals(value.trim()))
+									return;
+								// Set the new name in the designer, then
+								// request a save
+								currentWorkflow.setId(null);
+								currentWorkflow.setName(value.trim());
+								onSave();
+							}
+						});
 			}
 		});
 		addButton(clone);
@@ -346,9 +346,8 @@ public class WorkflowToolstrip extends ToolStrip {
 		export.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				WindowUtils.openUrl(Util.contextPath()
-						+ "download?pluginId=logicaldoc-workflow&resourcePath=templates/" + currentWorkflow.getId()
-						+ ".ldpm");
+				WindowUtils.openUrl(Util.contextPath() + "download?pluginId=logicaldoc-workflow&resourcePath=templates/"
+						+ currentWorkflow.getId() + ".ldpm&fileName=" + currentWorkflow.getName() + ".ldpm");
 			}
 		});
 		addButton(export);
@@ -379,22 +378,22 @@ public class WorkflowToolstrip extends ToolStrip {
 	}
 
 	private void update() {
-		export.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
-				|| "0".equals(currentWorkflow.getId()));
-		_import.setDisabled(currentWorkflow == null || currentWorkflow.getName() == null
-				|| currentWorkflow.getName().isEmpty());
-		save.setDisabled(currentWorkflow == null || currentWorkflow.getName() == null
-				|| currentWorkflow.getName().isEmpty());
-		clone.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
-				|| "0".equals(currentWorkflow.getId()));
-		deploy.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
-				|| "0".equals(currentWorkflow.getId()));
-		undeploy.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
-				|| "0".equals(currentWorkflow.getId()));
-		delete.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
-				|| "0".equals(currentWorkflow.getId()));
-		settings.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
-				|| "0".equals(currentWorkflow.getId()));
+		export.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
+		_import.setDisabled(
+				currentWorkflow == null || currentWorkflow.getName() == null || currentWorkflow.getName().isEmpty());
+		save.setDisabled(
+				currentWorkflow == null || currentWorkflow.getName() == null || currentWorkflow.getName().isEmpty());
+		clone.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
+		deploy.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
+		undeploy.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
+		delete.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
+		settings.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
 		close.setDisabled(currentWorkflow == null);
 
 		workflowSelect.setOptionDataSource(new WorkflowsDS(false, false));

@@ -319,6 +319,8 @@ public class EmailAccountsPanel extends AdminPanel {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param account the email account to update
 	 */
 	public void updateRecord(GUIEmailAccount account) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, account.getId()));

@@ -1,7 +1,5 @@
 package com.logicaldoc.web.service;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +15,8 @@ import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.web.AbstractWebappTCase;
+
+import junit.framework.Assert;
 
 public class SecurityServiceImplTest extends AbstractWebappTCase {
 
@@ -37,7 +37,7 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testLogout() {
-		Assert.assertEquals("admin", session.getUser().getUserName());
+		Assert.assertEquals("admin", session.getUser().getUsername());
 		Assert.assertEquals(1, session.getUser().getId());
 		int sessions = SessionManager.get().countOpened();
 		service.logout();
@@ -47,9 +47,9 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testChangePassword() {
-		Assert.assertEquals(0, service.changePassword(1, "admin", "test", false));
-		Assert.assertEquals(0, service.changePassword(1, "test", "admin", false));
-		Assert.assertNotSame(0, service.changePassword(1, "xxxxx", "test", false));
+		Assert.assertEquals(0, service.changePassword(1L, 1L, "admin", "test", false));
+		Assert.assertEquals(0, service.changePassword(1L, 1L, "test", "admin", false));
+		Assert.assertNotSame(0, service.changePassword(1L, 1L, "xxxxx", "test", false));
 	}
 
 	@Test
@@ -75,10 +75,10 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 		service.deleteGroup(10);
 		Assert.assertNull(groupDAO.findById(10));
 
-		// Delete a BIG group with associated MenuGroups and UserGroups
+		// Delete a non-deleteable group
 		Assert.assertNotNull(groupDAO.findById(1));
 		service.deleteGroup(1);
-		Assert.assertNull(groupDAO.findById(1));
+		Assert.assertNotNull(groupDAO.findById(1));
 	}
 
 	@Test
@@ -118,12 +118,12 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 	public void testGetUser() throws ServerException {
 		GUIUser user = service.getUser(1);
 		Assert.assertNotNull(user);
-		Assert.assertEquals("admin", user.getUserName());
+		Assert.assertEquals("admin", user.getUsername());
 		Assert.assertEquals("admin@admin.net", user.getEmail());
 
 		user = service.getUser(3);
 		Assert.assertNotNull(user);
-		Assert.assertEquals("sebastian", user.getUserName());
+		Assert.assertEquals("sebastian", user.getUsername());
 		Assert.assertEquals("seb_stein@gmx.de", user.getEmail());
 		Assert.assertEquals("de", user.getLanguage());
 
@@ -147,14 +147,14 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 
 		user = service.saveUser(user, session.getInfo());
 		Assert.assertNotNull(user);
-		Assert.assertEquals("admin", user.getUserName());
+		Assert.assertEquals("admin", user.getUsername());
 		Assert.assertEquals("admin@admin.net", user.getEmail());
 
 		user = service.getUser(3);
 
 		user = service.saveUser(user, session.getInfo());
 		Assert.assertNotNull(user);
-		Assert.assertEquals("sebastian", user.getUserName());
+		Assert.assertEquals("sebastian", user.getUsername());
 		Assert.assertEquals("seb_stein@gmx.de", user.getEmail());
 		Assert.assertEquals("de", user.getLanguage());
 	}

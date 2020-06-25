@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
@@ -17,7 +18,6 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<AttributeSet> implements AttributeSetDAO {
 
 	private AttributeOptionDAO optionsDao;
@@ -31,30 +31,46 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 	@Override
 	public List<AttributeSet> findAll() {
-		return findByWhere(" 1=1", "order by _entity.name", null);
+		try {
+			return findByWhere(" 1=1", "order by _entity.name", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<AttributeSet>();
+		}
 	}
 
 	@Override
 	public List<AttributeSet> findAll(long tenantId) {
-		return findByWhere(" _entity.tenantId=" + tenantId, "order by _entity.name", null);
+		try {
+			return findByWhere(" _entity.tenantId=" + tenantId, "order by _entity.name", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<AttributeSet>();
+		}
 	}
 
 	@Override
 	public AttributeSet findByName(String name, long tenantId) {
 		AttributeSet template = null;
-		List<AttributeSet> coll = findByWhere("_entity.name = '" + SqlUtil.doubleQuotes(name)
-				+ "' and _entity.tenantId=" + tenantId, null, null);
-		if (coll.size() > 0)
-			template = coll.iterator().next();
-		if (template != null && template.getDeleted() == 1)
-			template = null;
+		try {
+			List<AttributeSet> coll = findByWhere(
+					"_entity.name = '" + SqlUtil.doubleQuotes(name) + "' and _entity.tenantId=" + tenantId, null, null);
+			if (coll.size() > 0)
+				template = coll.iterator().next();
+			if (template != null && template.getDeleted() == 1)
+				template = null;
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		return template;
 	}
 
 	@Override
 	public boolean delete(long id, int code) {
-		boolean result = true;
+		if (!checkStoringAspect())
+			return false;
 
+		boolean result = true;
 		try {
 			AttributeSet set = (AttributeSet) findById(id);
 			if (set == null)
@@ -79,8 +95,13 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 
 	@Override
 	public List<AttributeSet> findByType(int type, long tenantId) {
-		return findByWhere("_entity.type =" + type + " and _entity.tenantId=" + tenantId, "order by _entity.name asc",
-				null);
+		try {
+			return findByWhere("_entity.type =" + type + " and _entity.tenantId=" + tenantId,
+					"order by _entity.name asc", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<AttributeSet>();
+		}
 	}
 
 	public void setOptionsDao(AttributeOptionDAO optionsDao) {
@@ -88,7 +109,10 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	@Override
-	public boolean store(AttributeSet set) {
+	public boolean store(AttributeSet set) throws PersistenceException {
+		if (!checkStoringAspect())
+			return false;
+
 		// Enforce the set specifications in all the attributes
 		for (Attribute att : set.getAttributes().values()) {
 			att.setSetId(set.getId());
@@ -148,7 +172,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	/**
-	 * Returns a TreeMap so the key set is alphabetically ordered 
+	 * Returns a TreeMap so the key set is alphabetically ordered
 	 */
 	@Override
 	public Map<String, Attribute> findAttributes(long tenantId, Long setId) {
@@ -166,7 +190,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 				if (!attributes.containsKey(name))
 					attributes.put(name, localAttributes.get(name));
 		}
-		
+
 		return attributes;
 	}
 }

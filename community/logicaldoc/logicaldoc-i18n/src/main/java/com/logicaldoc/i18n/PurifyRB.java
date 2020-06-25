@@ -1,10 +1,8 @@
 package com.logicaldoc.i18n;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
@@ -18,10 +16,6 @@ import java.util.StringTokenizer;
 
 public class PurifyRB {
 
-	/**
-	 * @param args
-	 * @throws IOException
-	 */
 	public static void main(String[] args) throws IOException {
 
 		List<Locale> locales = new ArrayList<Locale>();
@@ -102,13 +96,13 @@ public class PurifyRB {
 		try {
 			// scrivo il prop destinazione su FileSystem
 			System.out.println(locale);
-			File dir=new File("target/po/i18n");
+			File dir = new File("target/po/i18n");
 			dir.mkdir();
 			dir.mkdirs();
-			
+
 			File file = new File("target/po/" + transalatedBundle + "_" + locale + ".properties");
 			FileOutputStream out = new FileOutputStream(file);
-			OutputStreamWriter ow=new OutputStreamWriter(out,"UTF-8");
+			OutputStreamWriter ow = new OutputStreamWriter(out, "UTF-8");
 			destprop.store(ow, "comments");
 			ow.flush();
 			out.flush();

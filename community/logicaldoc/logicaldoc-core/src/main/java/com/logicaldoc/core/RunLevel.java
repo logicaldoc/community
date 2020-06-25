@@ -20,7 +20,7 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 7.6.4
  */
 public enum RunLevel {
-	DEFAULT("default"), BULKLOAD("bulkload"), DEVEL("devel"), DEMO("demo"), UPDATED("updated");
+	DEFAULT("default"), BULKLOAD("bulkload"), DEVEL("devel"), DEMO("demo"), UPDATED("updated"), SLAVE("slave");
 
 	private String level;
 
@@ -51,7 +51,7 @@ public enum RunLevel {
 	}
 
 	public boolean aspectEnabled(String aspect) {
-		return getConfig().getBoolean(getAspectProperty(aspect));
+		return getConfig().getBoolean(getAspectProperty(aspect), false);
 	}
 
 	public void setAspect(String aspect, boolean enabled) {

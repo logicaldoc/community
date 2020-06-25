@@ -11,8 +11,9 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.History;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.Rating;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -33,7 +34,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 	}
 
 	@Override
-	public boolean store(Rating rating, History transaction) {
+	public boolean store(Rating rating, DocumentHistory transaction) throws PersistenceException {
 		boolean result = super.store(rating);
 		if (!result)
 			return false;
@@ -42,7 +43,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 			if (transaction != null) {
 				transaction.setEvent(DocumentEvent.RATING_NEW.toString());
 				transaction.setComment("rating: " + rating.getVote());
-				
+
 				DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				documentDao.saveDocumentHistory(documentDao.findById(rating.getDocId()), transaction);
 			}
@@ -77,7 +78,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 					if (rs.getInt(1) > 0) {
 						float div = (float) rs.getInt(2) / (float) rs.getInt(1);
 						double avg = Math.round(div * 100.0) / 100.0;
-						rating.setAverage(new Double(avg).floatValue());
+						rating.setAverage(Double.valueOf(avg).floatValue());
 					} else
 						rating.setAverage(0F);
 
@@ -98,7 +99,12 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 
 	@Override
 	public Rating findByDocIdAndUserId(long docId, long userId) {
-		List<Rating> results = findByWhere("_entity.docId =" + docId + " and _entity.userId =" + userId, null, null);
+		List<Rating> results = new ArrayList<Rating>();
+		try {
+			results = findByWhere("_entity.docId =" + docId + " and _entity.userId =" + userId, null, null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		if (results.isEmpty())
 			return null;
 		else
@@ -107,11 +113,19 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 
 	@Override
 	public List<Rating> findByDocId(long docId) {
-		return findByWhere("_entity.docId = " + docId, " order by _entity.lastModified desc", null);
+		try {
+			return findByWhere("_entity.docId = " + docId, " order by _entity.lastModified desc", null);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<Rating>();
+		}
 	}
 
 	@Override
-	public boolean delete(long id, int code) {
+	public boolean delete(long id, int code) throws PersistenceException {
+		if (!checkStoringAspect())
+			return false;
+
 		jdbcUpdate("delete from ld_rating where ld_id=" + id);
 		return true;
 	}

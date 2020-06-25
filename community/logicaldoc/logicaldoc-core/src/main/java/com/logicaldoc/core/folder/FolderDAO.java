@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.security.Permission;
 
@@ -20,6 +21,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * returned.
 	 * 
 	 * @param folderId The ID
+	 * 
 	 * @return A real folder that is referenced by the given ID
 	 */
 	public Folder findFolder(long folderId);
@@ -41,18 +43,27 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param name The folder name to search for
 	 * @param tenantId Specification of the owning tenant (optional). If not
 	 *        specified the tenant of parent is used instead
-	 * @param caseSensitive
+	 * @param caseSensitive true if the search must be case sensitive
+	 * 
 	 * @return List of folders with given name
 	 */
 	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive);
 
 	/**
 	 * Retrieves the root folder of the given tenant
+	 * 
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return the root folder
 	 */
 	public Folder findRoot(long tenantId);
 
 	/**
 	 * Retrieves the Default workspace of the given tenant
+	 * 
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return The default workspace
 	 */
 	public Folder findDefaultWorkspace(long tenantId);
 
@@ -60,6 +71,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * Finds authorized folders for a user
 	 * 
 	 * @param userId ID of the user
+	 * 
 	 * @return List of found folders
 	 */
 	public List<Folder> findByUserId(long userId);
@@ -70,6 +82,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param userId ID of the user
 	 * @param tag Tag of the folder
 	 * @param max Optional, defines the maximum records number
+	 * 
 	 * @return Collection of found folders
 	 */
 	public List<Folder> findByUserIdAndTag(long userId, String tag, Integer max);
@@ -83,7 +96,8 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param parentId The id of the parent folder to inspect (optional)
 	 * @param tree If true, the parentId will be interpreted as the root of a
 	 *        tree
-	 * @return List of selected folder ID's.
+	 * 
+	 * @return List of selected folder IDs.
 	 */
 	public Collection<Long> findFolderIdByUserIdAndPermission(long userId, Permission permission, Long parentId,
 			boolean tree);
@@ -96,23 +110,49 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param parentId The id of the parent folder to inspect (optional)
 	 * @param tree If true, the parentId will be interpreted as the root of a
 	 *        tree
-	 * @return List of selected folder ID's.
+	 * 
+	 * @return List of selected folder IDs.
 	 */
 	public Collection<Long> findFolderIdByUserId(long userId, Long parentId, boolean tree);
 
 	/**
-	 * Retrieve all the ids of the folder in a given tree
+	 * Retrieve all the ids of the folders in a given tree
+	 * 
+	 * @param rootId Root of the tree
+	 * @param includeDeleted True if the deleted records need to be loaded
+	 * 
+	 * @return List of selected folder IDs.
+	 */
+	public Collection<Long> findFolderIdInTree(long rootId, boolean includeDeleted);
+
+	/**
+	 * Retrieve all the ids of the folder in a given tree using the path
+	 * attribute
 	 * 
 	 * @param rootId Root of the folder
 	 * @param includeDeleted True if the deleted records need to be loaded
-	 * @return
+	 * 
+	 * @return List of selected folder IDs.
 	 */
-	public Collection<Long> findFolderIdInTree(long rootId, boolean includeDeleted);
+	public Collection<Long> findFolderIdInPath(long rootId, boolean includeDeleted);
+
+	/**
+	 * This method selects only the folder ID from the folders for which a user
+	 * is authorized.
+	 * 
+	 * @param userId ID of the user.
+	 * @param parentId The id of the parent folder to inspect (optional)
+	 * 
+	 * @return List of selected folder IDs.
+	 */
+	public Collection<Long> findFolderIdByUserIdInPath(long userId, Long parentId);
 
 	/**
 	 * Finds direct children of a folder.
 	 * 
 	 * @param parentId ID of the folder which children are wanted
+	 * @param userId identifier of the user
+	 * 
 	 * @return List of found folders sorted by text
 	 */
 	public List<Folder> findByUserId(long userId, long parentId);
@@ -120,16 +160,18 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	/**
 	 * Finds all children(direct and indirect) by parentId
 	 * 
-	 * @param parentId
-	 * @return
+	 * @param parentId identifier of the parent folder
+	 * 
+	 * @return List of found folders
 	 */
 	public List<Folder> findByParentId(long parentId);
 
 	/**
 	 * Finds all children sds(direct and indirect) by parentId
 	 * 
-	 * @param parentId
-	 * @return
+	 * @param parentId identifier of the parent folder
+	 * 
+	 * @return list of folder IDs
 	 */
 	public List<Long> findIdsByParentId(long parentId);
 
@@ -138,6 +180,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param parentId Folder ID of the folder which children are wanted
 	 * @param max Optional, maximum number of children
+	 * 
 	 * @return List of found folders
 	 */
 	public List<Folder> findChildren(long parentId, Integer max);
@@ -157,6 +200,8 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param folderId ID of the folder
 	 * @param userId ID of the user
+	 * 
+	 * @return if the write permission is granted
 	 */
 	public boolean isWriteEnabled(long folderId, long userId);
 
@@ -175,6 +220,8 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param permission the permission to check
 	 * @param folderId ID of the folder
 	 * @param userId ID of the user
+	 * 
+	 * @return if the permission is granted to the user
 	 */
 	public boolean isPermissionEnabled(Permission permission, long folderId, long userId);
 
@@ -183,6 +230,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param folderId ID of the folder
 	 * @param userId ID of the user
+	 * 
 	 * @return Collection of enabled permissions
 	 */
 	public Set<Permission> getEnabledPermissions(long folderId, long userId);
@@ -200,6 +248,11 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 
 	/**
 	 * Checks that the user has access to the folder and all its sub-items
+	 * 
+	 * @param folder the folder
+	 * @param userId identifier of the document
+	 * 
+	 * @return if the user has write permission
 	 */
 	public boolean hasWriteAccess(Folder folder, long userId);
 
@@ -207,6 +260,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * Finds all folders accessible by the passed group
 	 * 
 	 * @param groupId The group id
+	 * 
 	 * @return The List of folders
 	 */
 	public List<Folder> findByGroupId(long groupId);
@@ -217,6 +271,8 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * given folder.
 	 * 
 	 * @param id ID of the folder
+	 * 
+	 * @return the hierarchy of parent folders
 	 */
 	public List<Folder> findParents(long id);
 
@@ -224,6 +280,8 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * Returns the workspace that contains the given folder
 	 * 
 	 * @param folderId ID of the folder
+	 * 
+	 * @return the workspace containing the fiven folder
 	 */
 	public Folder findWorkspace(long folderId);
 
@@ -233,54 +291,82 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param folderId The folder identifier
 	 * @param parentId The parent folder to restore in
 	 * @param transaction Current session informations
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public void restore(long folderId, long parentId, FolderHistory transaction);
+	public void restore(long folderId, long parentId, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Finds that folder that lies under a specific parent (given by the id) an
 	 * with a given name(like operator is used)
 	 * 
-	 * @param text
-	 * @param parentId
-	 * @return
+	 * @param name name of the dolder
+	 * @param parentId identifier of the parent folder
+	 * 
+	 * @return list of folders
 	 */
-	public List<Folder> findByNameAndParentId(String text, long parentId);
+	public List<Folder> findByNameAndParentId(String name, long parentId);
 
 	/**
 	 * Same as store(Folder, boolean, FolderHistory)
+	 * 
+	 * @param folder the folder to store
+	 * @param transaction current session informations
+	 * 
+	 * @return true if the folder has been correctly stored
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public boolean store(Folder folder, FolderHistory transaction);
+	public boolean store(Folder folder, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Shortcut for deleteAll(folders, 1, transaction)
+	 * 
+	 * @param folders the folders
+	 * @param transaction current session informations
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public void deleteAll(List<Folder> folders, FolderHistory transaction);
+	public void deleteAll(Collection<Folder> folders, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * For each folder, save the folder delete history entry for each folder and
 	 * delete the folder
 	 * 
-	 * @param folder List of folder to be delete
+	 * @param folders List of folder to be delete
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event on each folder
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public void deleteAll(List<Folder> folders, int delCode, FolderHistory transaction);
+	public void deleteAll(Collection<Folder> folders, int delCode, FolderHistory transaction)
+			throws PersistenceException;
 
 	/**
 	 * Shortcut for delete(id, 1, transaction)
+	 * 
+	 * @param id the folder identifier
+	 * @param transaction the session informations
+	 * 
+	 * @return if the folde has been succesfully deleted
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public boolean delete(long id, FolderHistory transaction);
+	public boolean delete(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * This method deletes the folder object and insert a new folder history
-	 * entry.
+	 * entry
 	 * 
 	 * @param id The id of the folder to delete
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event
-	 * @return True if successfully deleted from the database.
+	 * 
+	 * @return True if successfully deleted from the database
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public boolean delete(long id, int delCode, FolderHistory transaction);
+	public boolean delete(long id, int delCode, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Creates a new folder in the parent Folder
@@ -289,26 +375,34 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param folderVO The folder's metadata
 	 * @param inheritSecurity If true the new folder will 'point' to the parent
 	 *        for the security policies.
-	 * @transaction optional transaction entry to log the event
+	 * @param transaction optional transaction entry to log the event
+	 * 
 	 * @return The newly created folder
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public Folder create(Folder parent, Folder folderVO, boolean inheritSecurity, FolderHistory transaction);
+	public Folder create(Folder parent, Folder folderVO, boolean inheritSecurity, FolderHistory transaction)
+			throws PersistenceException;
 
 	/**
 	 * Creates a new folder folder alias
 	 * 
 	 * @param parentId The parent folder
 	 * @param foldRef The referenced folder
-	 * @transaction optional transaction entry to log the event
+	 * @param transaction optional transaction entry to log the event
+	 * 
 	 * @return The newly created alias
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public Folder createAlias(long parentId, long foldRef, FolderHistory transaction);
+	public Folder createAlias(long parentId, long foldRef, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Finds all the aliases
 	 * 
 	 * @param foldRef The referenced folder
 	 * @param tenantId The tenant
+	 * 
 	 * @return Collection of aliases
 	 */
 	public List<Folder> findAliases(Long foldRef, long tenantId);
@@ -322,28 +416,44 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param path The folder path(for example /dog/cat/mouse)
 	 * @param inheritSecurity If true the new folders will 'point' to the parent
 	 *        for the security policies.
-	 * @transaction optional transaction entry to log the event
+	 * @param transaction optional transaction entry to log the event
 	 * 
 	 * @return The created folder
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public Folder createPath(Folder parent, String path, boolean inheritSecurity, FolderHistory transaction);
+	public Folder createPath(Folder parent, String path, boolean inheritSecurity, FolderHistory transaction)
+			throws PersistenceException;
+
+	/**
+	 * Dynamically computes the path for the specified folder. The path is a
+	 * sequence of IDS in the form: /4/55897/99870
+	 * 
+	 * @param folderId identifier of the folder
+	 * 
+	 * @return the folder's path
+	 */
+	public String computePath(long folderId);
 
 	/**
 	 * Dynamically computes the path extended for the specified folder. The path
 	 * extended is a human readable path in the form: /folder1/folder2/folder3
 	 * 
-	 * @param id
-	 * @return
+	 * @param folderId the folder's identifier
+	 * 
+	 * @return The path extended
 	 */
-	public String computePathExtended(long id);
+	public String computePathExtended(long folderId);
 
 	/**
 	 * Retrieval of a folder by the extended path
 	 * 
-	 * @param pathExtended
-	 * @return
+	 * @param pathExtended the path extended
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return The folder that matched the given path
 	 */
-	public Folder findByPath(String pathExtended, long tenantId);
+	public Folder findByPathExtended(String pathExtended, long tenantId);
 
 	/**
 	 * Move a folder into another folder
@@ -351,9 +461,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param source The folder to move
 	 * @param target The target folder
 	 * @param transaction entry to log the event (set the user)
-	 * @throws Exception
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public void move(Folder source, Folder target, FolderHistory transaction) throws Exception;
+	public void move(Folder source, Folder target, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Folder a folder into another folder
@@ -364,17 +475,17 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param inheritSecurity If true the new folder will 'point' to the parent
 	 *        for the security policies.
 	 * @param transaction entry to log the event (set the user)
-	 * @throws Exception
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
 	public void copy(Folder source, Folder target, boolean foldersOnly, boolean inheritSecurity,
-			FolderHistory transaction) throws Exception;
+			FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Delete a folder and all its sub-folders that a user can delete. After
 	 * recovering of all sub-folders inside the folder, will be canceled all
 	 * folders for which the user has the delete permission or there isn't an
-	 * immutable document inside it.
-	 * <p>
+	 * immutable document inside it.<br>
 	 * 
 	 * <b>Important:</b> Remember to delete orphaned documents.
 	 * 
@@ -383,30 +494,40 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param transaction entry to log the event (set the user)
 	 * @return List of folders that the user cannot delete(permissions, o
 	 *         immutable documents presents)
-	 * @throws Exception
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public List<Folder> deleteTree(Folder folder, int delCode, FolderHistory transaction) throws Exception;
+	public List<Folder> deleteTree(Folder folder, int delCode, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Delete a folder and all its sub-folders that a user can delete. After
 	 * recovering of all sub-folders inside the folder, will be canceled all
 	 * folders for which the user has the delete permission or there isn't an
-	 * immutable document inside it.
-	 * <p>
+	 * immutable document inside it. <br>
 	 * 
 	 * <b>Important:</b> All the contained documents will be deleted
 	 * 
 	 * @param folderId Folder to delete
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event (set the user)
+	 * 
 	 * @return List of folders that the user cannot delete(permissions, o
 	 *         immutable documents presents)
-	 * @throws Exception
+	 * 
+	 * @throws Exception in case of any error
 	 */
 	public List<Folder> deleteTree(long folderId, int delCode, FolderHistory transaction) throws Exception;
 
 	/**
 	 * Shortcut for deleteTree(folderId, 1, transaction)
+	 * 
+	 * @param folderId Folder to delete
+	 * @param transaction entry to log the event (set the user)
+	 * 
+	 * @return List of folders that the user cannot delete(permissions, o
+	 *         immutable documents presents)
+	 * 
+	 * @throws Exception in case of any error
 	 */
 	public List<Folder> deleteTree(long folderId, FolderHistory transaction) throws Exception;
 
@@ -426,6 +547,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param userId The user that performed the deletion
 	 * @param maxHits Optional defines the max number of returned hits
+	 * 
 	 * @return The folders list
 	 */
 	public List<Folder> findDeleted(long userId, Integer maxHits);
@@ -436,40 +558,96 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param folderId The folder to be checked
 	 * @param targetId The target folder
+	 * 
 	 * @return True if the folder with the given folderId is parent of the
 	 *         folder with the given targetId
 	 */
 	public boolean isInPath(long folderId, long targetId);
 
 	/**
-	 * Propagates the security policies of a node to the whole subree
+	 * Propagates the security policies of a node to the whole subtree
+	 * 
+	 * @param rootId identifier of the root folder
+	 * @param transaction session informations
+	 * 
+	 * @return if the rights have been correctly applied
 	 */
-	public boolean applyRithtToTree(long rootId, FolderHistory transaction);
+	public boolean applyRightToTree(long rootId, FolderHistory transaction);
+
+	/**
+	 * Propagates the grid layout of a node to the whole subtree
+	 * 
+	 * @param rootId identifier of the root folder
+	 * @param transaction session informations
+	 * 
+	 * @return if the grid layout has been correctly replicated
+	 */
+	public boolean applyGridToTree(long rootId, FolderHistory transaction);
 
 	/**
 	 * Changes the securityRef of the given folder, all the other folders that
 	 * inherits from this one will be changed accordingly.
+	 * 
+	 * @param folderId identifier of the folder
+	 * @param rightsFolderId id of the folder to inherit from
+	 * @param transaction session informations
+	 * 
+	 * @return is the update has been successful
 	 */
 	public boolean updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction);
 
 	/**
 	 * Propagates the template metadata to the whole subree
+	 * 
+	 * @param id identifier of the folder
+	 * @param transaction session informations
+	 * 
+	 * @return is the update has been successful
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public boolean applyMetadataToTree(long id, FolderHistory transaction);
+	public boolean applyMetadataToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Propagates the tags to the whole subree
+	 * 
+	 * @param id identifier of the folder
+	 * @param transaction session informations
+	 *
+	 * @return is the update has been successful
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public boolean applyTagsToTree(long id, FolderHistory transaction);
+	public boolean applyTagsToTree(long id, FolderHistory transaction) throws PersistenceException;
+
+	/**
+	 * Propagates the OCR settings to the whole subree
+	 * 
+	 * @param id identifier of the folder
+	 * @param transaction session informations
+	 *
+	 * @return is the update has been successful
+	 * 
+	 * @throws PersistenceException in case of database error
+	 */
+	public boolean applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Counts the number of folders
+	 * 
+	 * @param computeDeleted if the deleted folders have to be taken int account
+	 * 
+	 * @return the number of folders
 	 */
 	public int count(boolean computeDeleted);
 
 	/**
 	 * Retrieves all the workspaces in the system, that are the first-level
-	 * folders of type 1.
+	 * folders of type {@link Folder#TYPE_WORKSPACE}
+	 * 
+	 * @param tanantId identifier of the tenant
+	 * 
+	 * @return list of folders
 	 */
 	public List<Folder> findWorkspaces(long tanantId);
 
@@ -483,17 +661,39 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	/**
 	 * Utility method that logs into the DB the transaction that involved the
 	 * passed folder. The transaction must be provided with userId and userName.
+	 * 
+	 * @param folder the folder
+	 * @param transaction the session informations
 	 */
 	public void saveFolderHistory(Folder folder, FolderHistory transaction);
 
 	/**
 	 * Counts the number of documents inside a given folder's tree (direct and
 	 * indirect children)
+	 * 
+	 * @param rootId identifier of the root folder
+	 * 
+	 * @return the number of documents contained in the tree
 	 */
 	public long countDocsInTree(long rootId);
 
 	/**
-	 * Computes the size of a tree (all versions included)
+	 * Counts the number of documents inside a given folder's tree (direct and
+	 * indirect children)
+	 * 
+	 * @param rootId identifier of the root folder
+	 * 
+	 * @return sum of the sizes of the documents contained in the tree expressed
+	 *         in bytes
 	 */
 	public long computeTreeSize(long rootId);
+
+	/**
+	 * Retrieves the alphabetically ordered list of all the folder's tags
+	 * 
+	 * @param folderId identifier of the folder
+	 * 
+	 * @return list of tags
+	 */
+	public List<String> findTags(long folderId);
 }

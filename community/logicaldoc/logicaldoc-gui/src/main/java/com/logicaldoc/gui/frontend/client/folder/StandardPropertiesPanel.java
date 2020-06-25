@@ -19,15 +19,16 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
-import com.smartgwt.client.widgets.form.fields.ColorItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
+import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
@@ -35,6 +36,8 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.form.validator.DoesntContainValidator;
@@ -56,8 +59,6 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 
 	private ValuesManager vm = new ValuesManager();
 
-	private boolean updateEnabled = false;
-
 	private HLayout columns = new HLayout();
 
 	protected MultiComboBoxItem tagItem = null;
@@ -67,7 +68,6 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 		setWidth100();
 		setHeight100();
 
-		this.updateEnabled = changedHandler != null;
 		columns.setWidth100();
 		columns.setMembersMargin(10);
 		setMembers(columns);
@@ -93,18 +93,15 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 
 		TextItem name = ItemFactory.newTextItem("name", "name", folder.getName());
 		name.setWidth(200);
+		name.setRequired(true);
 		DoesntContainValidator validator = new DoesntContainValidator();
 		validator.setSubstring("/");
 		validator.setErrorMessage(I18N.message("invalidchar"));
 		name.setValidators(validator);
-		if (folder.hasPermission(Constants.PERMISSION_RENAME))
+		if (folder.hasPermission(Constants.PERMISSION_RENAME) && folder.isWrite())
 			name.addChangedHandler(changedHandler);
-		name.setRequired(true);
-
-		SpinnerItem position = ItemFactory.newSpinnerItem("position", "position", folder.getPosition());
-		if (folder.hasPermission(Constants.PERMISSION_RENAME))
-			position.addChangedHandler(changedHandler);
-		position.setRequired(true);
+		else
+			name.setDisabled(true);
 
 		SelectItem storage = ItemFactory.newStorageSelector("storage", folder.getStorage());
 		storage.setDisabled(!folder.isWrite());
@@ -126,22 +123,18 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 		description.setWidth(250);
 		if (folder.hasPermission(Constants.PERMISSION_RENAME))
 			description.addChangedHandler(changedHandler);
+		else
+			description.setDisabled(true);
 
-		StaticTextItem creation = ItemFactory.newStaticTextItem(
-				"creation",
-				"createdon",
-				Util.padLeft(
-						I18N.formatDate((Date) folder.getCreation()) + " " + I18N.message("by") + " "
-								+ folder.getCreator(), 40));
-		creation.setTooltip(I18N.formatDate((Date) folder.getCreation()) + " " + I18N.message("by") + " "
-				+ folder.getCreator());
+		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon", Util.padLeft(
+				I18N.formatDate((Date) folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator(),
+				40));
+		creation.setTooltip(
+				I18N.formatDate((Date) folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator());
 		creation.setWidth(DEFAULT_ITEM_WIDTH);
 
-		ColorItem color = ItemFactory.newColorItemPicker("color", "color", folder.getColor());
-		color.addChangedHandler(changedHandler);
-
 		LinkItem pathItem = ItemFactory.newLinkItem("path", folder.getPathExtended() != null ? folder.getPathExtended()
-				: "");
+				: FolderNavigator.get().getPath(folder.getId()));
 		pathItem.setTitle(I18N.message("path"));
 		pathItem.setValue(Util.displayURL(null, folder.getId()));
 		pathItem.setWidth(400);
@@ -151,19 +144,48 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 		barcode.setTitle(I18N.message("barcode"));
 		barcode.setValue(GWT.getHostPageBaseURL() + "barcode?code=" + folder.getId() + "&width=400&height=150");
 
-		StaticTextItem documents = ItemFactory.newStaticTextItem("documents", "documents",
-				"" + folder.getDocumentCount());
-		StaticTextItem subfolders = ItemFactory
-				.newStaticTextItem("folders", "folders", "" + folder.getSubfolderCount());
+		final StaticTextItem documents = ItemFactory.newStaticTextItem("documents", "documents",
+				folder.getDocumentCount() > 0 ? Integer.toString(folder.getDocumentCount()) : "-");
+		documents.setIconHSpace(2);
+		documents.setIconWidth(16);
+		documents.setIconHeight(16);
+		documents.setWidth("1%");
 
-		name.setDisabled(!updateEnabled);
-		description.setDisabled(!updateEnabled);
-		position.setDisabled(!updateEnabled);
-		color.setDisabled(!updateEnabled);
+		final StaticTextItem subfolders = ItemFactory.newStaticTextItem("folders", "folders",
+				folder.getSubfolderCount() > 0 ? Integer.toString(folder.getSubfolderCount()) : "-");
+		subfolders.setIconHSpace(2);
+		subfolders.setIconWidth(16);
+		subfolders.setIconHeight(16);
+		subfolders.setWidth("1%");
+
+		PickerIcon computeStats = new PickerIcon(PickerIconName.REFRESH, new FormItemClickHandler() {
+			public void onFormItemClick(final FormItemIconClickEvent event) {
+				event.getItem().setValue(I18N.message("computing") + "...");
+				FolderService.Instance.get().computeStats(folder.getId(), new AsyncCallback<int[]>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(int[] stats) {
+						folder.setDocumentCount(stats[0]);
+						documents.setValue(Util.formatLong(stats[0]));
+						folder.setSubfolderCount(stats[1]);
+						subfolders.setValue(Util.formatLong(stats[1]));
+					}
+				});
+			}
+		});
+		computeStats.setPrompt(I18N.message("calculatestats"));
+
+		documents.setIcons(computeStats);
+		subfolders.setIcons(computeStats);
 
 		List<FormItem> items = new ArrayList<FormItem>();
-		items.addAll(Arrays.asList(new FormItem[] { idItem, pathItem, name, description, color, position, storage,
-				maxVersions, creation, documents, subfolders, barcode }));
+		items.addAll(Arrays.asList(new FormItem[] { idItem, pathItem, name, description, storage, maxVersions, creation,
+				documents, subfolders, barcode }));
 		if (!Feature.enabled(Feature.BARCODES))
 			items.remove(barcode);
 		if (!Feature.enabled(Feature.MULTI_STORAGE))
@@ -199,11 +221,13 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 			final TagsDS ds = new TagsDS(null, true, null, folder.getId());
 
 			tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) folder.getTags());
-			tagItem.setDisabled(!updateEnabled);
-			tagItem.addChangedHandler(changedHandler);
+			tagItem.setDisabled(!folder.isWrite());
+			if (folder.isWrite())
+				tagItem.addChangedHandler(changedHandler);
 
 			final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
 			newTagItem.setRequired(false);
+			newTagItem.setDisabled(!folder.isWrite());
 			newTagItem.addKeyPressHandler(new KeyPressHandler() {
 				@Override
 				public void onKeyPress(KeyPressEvent event) {
@@ -213,6 +237,10 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 						newTagItem.clearValue();
 
 						if (!"".equals(input)) {
+							// replace the escapes \, with a string so the
+							// tokenizer will work propertly
+							input = input.replace("\\,", "__comma__");
+
 							String[] tokens = input.split("\\,");
 
 							int min = Integer.parseInt(Session.get().getConfig("tag.minsize"));
@@ -221,6 +249,9 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 							List<String> tags = new ArrayList<String>();
 							for (String token : tokens) {
 								String t = token.trim();
+
+								// Restore the commas inside the tag
+								t = t.replace("__comma__", ",");
 
 								if (t.length() < min || t.length() > max) {
 									containsInvalid = true;
@@ -254,7 +285,7 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 			});
 
 			items.add(tagItem);
-			if ("free".equals(mode) && updateEnabled)
+			if ("free".equals(mode) && !folder.isWrite())
 				items.add(newTagItem);
 		}
 
@@ -262,7 +293,7 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 		applyTags.setAutoFit(true);
 		applyTags.setEndRow(true);
 		applyTags.setColSpan(2);
-		applyTags.setDisabled(!updateEnabled);
+		applyTags.setDisabled(!folder.isWrite());
 		applyTags.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -293,14 +324,9 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 		vm.validate();
 
 		if (!vm.hasErrors()) {
-			folder.setPosition(Integer.parseInt(vm.getValueAsString("position")));
-			folder.setColor(vm.getValueAsString("color"));
 			folder.setTags(tagItem.getValues());
-
-			if (!folder.isDefaultWorkspace()) {
-				folder.setName(vm.getValueAsString("name").replaceAll("/", ""));
-				folder.setDescription(vm.getValueAsString("description"));
-			}
+			folder.setDescription(vm.getValueAsString("description"));
+			folder.setName(vm.getValueAsString("name").replaceAll("/", ""));
 
 			if (folder.isWorkspace()) {
 				try {

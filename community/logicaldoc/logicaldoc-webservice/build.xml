@@ -1,4 +1,5 @@
-<project name="logicaldoc-webservice" default="deploy" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+<project name="logicaldoc-webservice" default="deploy" basedir="."
+	xmlns:artifact="urn:maven-artifact-ant">
 	<property file="${user.home}/logicaldoc-dev.properties" />
 	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
 
@@ -9,39 +10,43 @@
 		<echo message="Deploying ${pom.artifactId}" />
 
 		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
-		  <arg line="-o -Dmaven.test.skip=true install"/>
+			<arg line="-o -Dmaven.test.skip=true install" />
 		</exec>
-		
+
 		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
 
 		<echo message="${pom.artifactId} is deployed" />
 	</target>
-	
-  <target name="mydep" description="Updates a deployed wwww">
+
+	<target name="deploy-classes" depends="init-all"
+		description="Copy classes into a deployed webapp">
+		<property environment="env" />
+		<property id="properties" file="build.properties" />
+
 		<copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
-      <!--
 			<fileset dir="target/classes">
-				<exclude name="**/*.xml" />
-				<exclude name="**/*.properties" />
-				<exclude name="**/*.dtd" />
+				<include name="com/logicaldoc/webservice/**" />
 			</fileset>
-      -->
+		</copy>
+	</target>
+
+	<target name="mydep" description="Updates a deployed wwww">
+		<copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
+			<!-- <fileset dir="target/classes"> <exclude name="**/*.xml" /> <exclude name="**/*.properties" /> 
+				<exclude name="**/*.dtd" /> </fileset> -->
 			<fileset dir="target/classes">
-        <!--
-        <include name="**/WSDocument.class" />
-        <include name="**/DocumentService.class" />
-        <include name="**/context-webservice.xml" />
-        -->
-        <include name="**/AuthService.class" />
-        <include name="**/Rest*.class" />
-        <include name="**/context-webservice.xml" />
-			</fileset>      
+				<!-- <include name="**/WSDocument.class" /> <include name="**/DocumentService.class" /> <include 
+					name="**/context-webservice.xml" /> -->
+				<include name="**/AuthService.class" />
+				<include name="**/Rest*.class" />
+				<include name="**/context-webservice.xml" />
+			</fileset>
 		</copy>
 		<echo message="xxx is deployed" />
 	</target>
-  
-  
-    <target name="mydep2" description="Updates a deployed wwww">
+
+
+	<target name="mydep2" description="Updates a deployed wwww">
 		<copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
 			<fileset dir="target/classes">
 				<!-- <exclude name="**/*.xml" /> -->
@@ -51,5 +56,5 @@
 		</copy>
 		<echo message="xxx is deployed" />
 	</target>
-		
+
 </project>

@@ -19,6 +19,8 @@ public class GUIStamp implements Serializable {
 
 	public static final int TYPE_BARCODE = 2;
 
+	public static final int TYPE_HTML = 3;
+
 	public static final int PAGE_OPT_ALL = 0;
 
 	public static final int PAGE_OPT_FIRST = 1;
@@ -47,21 +49,36 @@ public class GUIStamp implements Serializable {
 
 	private int size = 24;
 
+	private String font;
+
 	private String exprX;
 
 	private String exprY;
 
+	private String exprW;
+
+	private String exprH;
+
 	private String barcodeFormat = "CODE_128";
-
-	private int barcodeWidth = 150;
-
-	private int barcodeHeight = 100;
 
 	private int barcodeLabel;
 
 	private String color = "black";
 
+	private int imageWidth = 200;
+
+	private int imageHeight = 150;
+
 	private GUIUser[] users;
+
+	public GUIStamp() {
+		super();
+	}
+
+	public GUIStamp(long id) {
+		super();
+		this.id = id;
+	}
 
 	public long getId() {
 		return id;
@@ -167,6 +184,13 @@ public class GUIStamp implements Serializable {
 		this.size = size;
 	}
 
+	public double getAspectRatio() {
+		if (type == TYPE_TEXT || type == TYPE_HTML)
+			return 0;
+		else
+			return (double) imageWidth / (double) imageHeight;
+	}
+
 	public int getPageOption() {
 		return pageOption;
 	}
@@ -183,22 +207,6 @@ public class GUIStamp implements Serializable {
 		this.pageSelection = pageSelection;
 	}
 
-	public int getBarcodeWidth() {
-		return barcodeWidth;
-	}
-
-	public void setBarcodeWidth(int barcodeWidth) {
-		this.barcodeWidth = barcodeWidth;
-	}
-
-	public int getBarcodeHeight() {
-		return barcodeHeight;
-	}
-
-	public void setBarcodeHeight(int barcodeHeight) {
-		this.barcodeHeight = barcodeHeight;
-	}
-
 	public int getBarcodeLabel() {
 		return barcodeLabel;
 	}
@@ -213,5 +221,45 @@ public class GUIStamp implements Serializable {
 
 	public void setBarcodeFormat(String barcodeFormat) {
 		this.barcodeFormat = barcodeFormat;
+	}
+
+	public String getExprW() {
+		return exprW;
+	}
+
+	public String getExprH() {
+		return exprH;
+	}
+
+	public void setExprW(String exprW) {
+		this.exprW = exprW;
+	}
+
+	public void setExprH(String exprH) {
+		this.exprH = exprH;
+	}
+
+	public int getImageWidth() {
+		return imageWidth;
+	}
+
+	public int getImageHeight() {
+		return imageHeight;
+	}
+
+	public void setImageWidth(int imageWidth) {
+		this.imageWidth = imageWidth;
+	}
+
+	public void setImageHeight(int imageHeight) {
+		this.imageHeight = imageHeight;
+	}
+
+	public String getFont() {
+		return font;
+	}
+
+	public void setFont(String font) {
+		this.font = font;
 	}
 }

@@ -16,9 +16,9 @@ public class GUIInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String release = "7.8";
+	private String release = "8.4.2";
 
-	private String year = "2006-2018";
+	private String year = "2006-2020";
 
 	private String userNo;
 
@@ -47,8 +47,8 @@ public class GUIInfo implements Serializable {
 
 	private GUIValue[] config = new GUIValue[0];
 
-	// The labels of the extended attributes
-	private GUIValue[] attributeLabels = new GUIValue[0];
+	// The definitions of attributes
+	private GUIAttribute[] attributeDefinitions = new GUIAttribute[0];
 
 	private String[] features = new String[0];
 
@@ -260,21 +260,24 @@ public class GUIInfo implements Serializable {
 		this.defaultAttributeSet = defaultAttributeSet;
 	}
 
-	public GUIValue[] getAttributeLabels() {
-		return attributeLabels;
-	}
-
-	public void setAttributeLabels(GUIValue[] attributeLabels) {
-		this.attributeLabels = attributeLabels;
-	}
+	public GUIAttribute getAttributeDefinition(String name) {
+		String n = name;
+		if (n.startsWith("ext_"))
+			n = name.substring(4);
+		for (GUIAttribute val : attributeDefinitions) {
+			if (val.getName().equals(n))
+				return val;
+		}
+		return null;
+}
 
 	public String getAttributeLabel(String name) {
 		String n = name;
 		if (n.startsWith("ext_"))
 			n = name.substring(4);
-		for (GUIValue val : attributeLabels) {
-			if (val.getCode().equals(n))
-				return val.getValue();
+		for (GUIAttribute val : attributeDefinitions) {
+			if (val.getName().equals(n))
+				return val.getLabel()!=null && !val.getLabel().isEmpty() ? val.getLabel() : val.getName();
 		}
 		return I18N.message(n);
 	}
@@ -285,5 +288,13 @@ public class GUIInfo implements Serializable {
 
 	public void setBranding(GUIBranding branding) {
 		this.branding = branding;
+	}
+
+	public GUIAttribute[] getAttributeDefinitions() {
+		return attributeDefinitions;
+	}
+
+	public void setAttributeDefinitions(GUIAttribute[] attributeDefinitions) {
+		this.attributeDefinitions = attributeDefinitions;
 	}
 }

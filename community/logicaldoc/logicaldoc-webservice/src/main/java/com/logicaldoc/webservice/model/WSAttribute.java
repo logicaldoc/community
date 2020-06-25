@@ -41,7 +41,10 @@ public class WSAttribute implements Serializable {
 	@WSDoc(documented = false)
 	public static final int TYPE_BOOLEAN = 5;
 
-	@WSDoc(required = true, description="name of the attribute")
+	@WSDoc(documented = false)
+	public static final int TYPE_FOLDER = 6;
+
+	@WSDoc(required = true, description = "name of the attribute")
 	private String name;
 
 	@WSDoc(required = false)
@@ -53,14 +56,17 @@ public class WSAttribute implements Serializable {
 	@WSDoc(required = false)
 	private Double doubleValue;
 
-	@WSDoc(required = false)
+	@WSDoc(required = false, description = "the date value; format must be 'yyyy-MM-dd'")
 	private String dateValue;
 
-	@WSDoc(required = true, description = "<b>0</b> = String, <b>1</b> = int, <b>2</b> = double, <b>3</b> = date, <b>4</b> = user (intValue represents the user's id), <b>5</b> = boolean (intValue must be <b>0</b> or <b>1</b>)")
+	@WSDoc(required = true, description = "<b>0</b> = String, <b>1</b> = int, <b>2</b> = double, <b>3</b> = date, <b>4</b> = user (intValue represents the user's id), <b>5</b> = boolean (intValue must be <b>0</b> or <b>1</b>), <b>6</b> = folder (intValue represents the folders's id)")
 	private int type = TYPE_STRING;
 
 	@WSDoc(required = true)
 	private int mandatory = 0;
+
+	@WSDoc(required = true)
+	private int hidden = 0;
 
 	@WSDoc(required = false)
 	private int position = 0;
@@ -68,11 +74,20 @@ public class WSAttribute implements Serializable {
 	@WSDoc(required = false)
 	private String label;
 
-	@WSDoc(required = true, description="<b>0</b> = free, <b>1</b> = preset")
+	@WSDoc(required = true, description = "<b>0</b> = free, <b>1</b> = preset")
 	private int editor = 0;
 
-	@WSDoc(required = false, description="Id of the attribute set")
+	@WSDoc(required = false, description = "Id of the attribute set")
 	private Long setId;
+
+	@WSDoc(required = true, description = "<b>0</b> = single value, <b>1</b> = one or more values")
+	private int multiple = 0;
+
+	@WSDoc(required = false, description = "The reference attribute name, used for multi value attributes")
+	private String parent;
+
+	@WSDoc(required = false, description = "Read only. In case of multiple string values, contains the values separated by a comma")
+	private String stringValues;
 
 	public WSAttribute() {
 	}
@@ -173,6 +188,8 @@ public class WSAttribute implements Serializable {
 			return WSUtil.convertStringToDate(getDateValue());
 		case TYPE_USER:
 			return getIntValue();
+		case TYPE_FOLDER:
+			return getIntValue();
 		}
 		return null;
 	}
@@ -218,13 +235,19 @@ public class WSAttribute implements Serializable {
 			this.stringValue = ((WSUser) value).getFullName();
 			this.intValue = ((WSUser) value).getId();
 			this.type = TYPE_USER;
+		} else if (value instanceof WSFolder) {
+			this.stringValue = ((WSFolder) value).getName();
+			this.intValue = ((WSFolder) value).getId();
+			this.type = TYPE_FOLDER;
 		} else {
 			this.type = TYPE_DATE;
-			if (value != null) {
+			if (value != null && value instanceof XMLGregorianCalendar) {
 				XMLGregorianCalendar theXGCal = (XMLGregorianCalendar) value;
 				GregorianCalendar theGCal = theXGCal.toGregorianCalendar();
 				Date theDate = theGCal.getTime();
 				setDateValue(WSUtil.convertDateToString((Date) theDate));
+			} else if (value != null && value instanceof Date) {
+				setDateValue(WSUtil.convertDateToString((Date) value));
 			} else
 				setDateValue(null);
 		}
@@ -244,5 +267,37 @@ public class WSAttribute implements Serializable {
 
 	public void setSetId(Long setId) {
 		this.setId = setId;
+	}
+
+	public int getHidden() {
+		return hidden;
+	}
+
+	public void setHidden(int hidden) {
+		this.hidden = hidden;
+	}
+
+	public int getMultiple() {
+		return multiple;
+	}
+
+	public String getParent() {
+		return parent;
+	}
+
+	public void setMultiple(int multiple) {
+		this.multiple = multiple;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
+	}
+
+	public String getStringValues() {
+		return stringValues;
+	}
+
+	public void setStringValues(String stringValues) {
+		this.stringValues = stringValues;
 	}
 }

@@ -13,6 +13,7 @@ import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.client.api.ItemIterable;
+import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.QueryResult;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.client.api.SessionFactory;
@@ -37,9 +38,9 @@ public class SampleClient {
 	// private static final String CONNECTION_URL =
 	// "http://192.168.2.5:8080/service/cmis";
 
-	private static final String TEST_FOLDER_PATH = "/Default/index";
+	private static final String TEST_FOLDER_PATH = "/Default";
 
-	private static final String TEST_DOCUMENT_NAME_1 = "test5.txt";
+	private static final String TEST_DOCUMENT_NAME_1 = "migrazione_adam01.txt";
 
 	public static void main1(String[] args) throws IOException {
 
@@ -66,8 +67,8 @@ public class SampleClient {
 
 		// checkoutCheckin();
 
-		ItemIterable<QueryResult> result = session.query(
-				"SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE ldoc:tags = '12345'", true);
+		ItemIterable<QueryResult> result = session
+				.query("SELECT cmis:objectId,cmis:name,ldoc:tags FROM cmis:document WHERE ldoc:tags = '12345'", true);
 		for (QueryResult r : result) {
 			System.out.println("result: " + r.getPropertyById("ldoc:tags"));
 		}
@@ -75,16 +76,18 @@ public class SampleClient {
 
 	public static void main(String[] args) throws IOException {
 
-		Folder root = connect();
-		root.getName();
+//		Folder root = connect();
+//		root.getName();
 
 		// cleanup(root, TEST_FOLDER_NAME);
 		// Folder newFolder = (Folder)session.getObjectByPath("/Default");
 		// createDocument(newFolder, TEST_DOCUMENT_NAME_1);
 
-		CmisObject obj = session.getObjectByPath("/Default/Sync/prova2/test1/textAAA.pdf");
+		// CmisObject obj =
+		// session.getObjectByPath("/Default/Sync/prova2/test1/textAAA.pdf");
+		// System.out.println(obj.getId());
 
-		System.out.println(obj.getId());
+		checkoutCheckin();
 	}
 
 	private static void checkoutCheckin() throws IOException {
@@ -92,9 +95,9 @@ public class SampleClient {
 		// Folder root = connect("admin", "admin");
 		// Folder root = connect("manager", "12345678"); // user solely in group
 		// author
-		Folder root = connect("dotNET2WSClient", "12345678"); // user in groups
-																// author and
-																// admin
+		Folder root = connect("admin", "12345678"); // user in groups
+													// author and
+													// admin
 		root.getName();
 
 		CmisObject object = session.getObjectByPath(TEST_FOLDER_PATH);
@@ -104,47 +107,27 @@ public class SampleClient {
 		System.out.println(object.getId() + " " + object.getProperty(PropertyIds.NAME).getValues().get(0));
 
 		Document pwc = (Document) object;
-		// ObjectId oid = pwc.checkOut();
-		// System.out.println("oid: " +oid);
-		// System.out.println("oid.getId(): " +oid.getId());
+		ObjectId oid = pwc.checkOut();
 
 		// default values if the document has no content
-		String filename = "business plan 2014.docx";
+		String filename = "test.txt";
 		String mimetype = "text/plain; fileNameCharset=UTF-8";
 
-		// get the orginal content
-		ContentStream contentStream = pwc.getContentStream();
-		if (contentStream != null) {
-			filename = contentStream.getFileName();
-			mimetype = contentStream.getMimeType();
-			System.out.println("mimetype: " + mimetype);
-			// content = getContentAsString(contentStream);
-		}
-
-		// String updatedContents = content + "\nLine added in new version";
-		//
-		// byte[] buf = updatedContents.getBytes("UTF-8");
-		//
-		// ByteArrayInputStream input = new ByteArrayInputStream(buf);
-
-		File myFile = new File("C:/Users/alle/Desktop/business plan 2014.docx");
-
+		File myFile = new File("C:/tmp/test.txt");
 		FileInputStream fis = new FileInputStream(myFile);
 
 		byte[] buf = IOUtils.toByteArray(fis);
 		ByteArrayInputStream input = new ByteArrayInputStream(buf);
 
-		contentStream = session.getObjectFactory().createContentStream(filename, buf.length, mimetype, input);
+		ContentStream contentStream = session.getObjectFactory().createContentStream(filename, buf.length, mimetype,
+				input);
 
 		boolean major = false;
-		Map<String, ?> properties = null;
-
-		// Check in the pwc
+				// Check in the pwc
 		try {
-			if (true)
-				throw new RuntimeException("fghfgh");
-			// I can do the checkout only if I own the checkout or if I'm in
-			// admin group
+			Map<String, Object> properties = new HashMap<String, Object>();
+			properties.put("cmis:name","test-doc.txt");
+
 			pwc.checkIn(major, properties, contentStream, "minor version");
 			System.out.println("checkin completed!");
 		} catch (RuntimeException e) {

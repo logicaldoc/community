@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.util.Context;
 
 /**
- * This class represents groups. <br />
+ * This class represents groups. <br>
  * Groups have a type that qualifies the group usage as follows:
  * <ul>
  * <li>DEFAULT (0): Standard group of users</li>
@@ -36,6 +38,12 @@ public class Group extends PersistentObject implements Serializable {
 	private String descriprion = "";
 
 	private int type = TYPE_DEFAULT;
+
+	/**
+	 * Specifies the source: 'local' indicates the group was created in the local
+	 * database
+	 */
+	private String source = "local";
 
 	/**
 	 * Not persistent
@@ -90,5 +98,52 @@ public class Group extends PersistentObject implements Serializable {
 
 	public String toString() {
 		return getName();
+	}
+
+	public boolean isUserGroup() {
+		return type == TYPE_USER;
+	}
+
+	/**
+	 * If this is a user group, then it returns the user
+	 * 
+	 * @return the user
+	 */
+	public User getUser() {
+		if (!isUserGroup())
+			return null;
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		long userId = Long.parseLong(name.substring(name.lastIndexOf('_') + 1));
+		return userDao.findById(userId);
+	}
+
+	/**
+	 * Check if this group is the <b>guest</b> or is the user's group of a guest user
+	 * 
+	 * @return if this is the <b>guest</b> group or is the user's group of a guest user
+	 */
+	public boolean isGuest() {
+		if ("guest".equals(name))
+			return true;
+
+		if (isUserGroup()) {
+			User user = getUser();
+			if (user != null && user.isReadonly())
+				return true;
+		}
+
+		return false;
+	}
+
+	public boolean isAdmin() {
+		return "admin".equals(name);
+	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

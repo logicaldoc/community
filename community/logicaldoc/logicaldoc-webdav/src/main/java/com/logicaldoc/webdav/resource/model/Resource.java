@@ -8,9 +8,9 @@ import com.logicaldoc.webdav.session.DavSession;
 /**
  * Main-Class that contains all information about one particular resource within
  * logicalDOC. Important attributes are ID, Name, RequestedPerson <b>ID</b>
- * identifies a resource against logicalDOC.<br/>
+ * identifies a resource against logicalDOC.<br>
  * <b>Name</b> Is the Title of a given resource that appears on the client site
- * as "file name"<br/>
+ * as "file name"<br>
  * <b>RequestedPerson</b> shows the user that wants todo something with this
  * resource. Therefore the passed ID corresponds with the userid within
  * logicalDOC. Secure handlings will be managed through this.

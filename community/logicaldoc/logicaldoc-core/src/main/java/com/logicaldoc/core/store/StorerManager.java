@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
@@ -25,16 +26,20 @@ public class StorerManager {
 	// Key is the type, value is the associated builder
 	private Map<String, Storer> storers = new HashMap<String, Storer>();
 
-	private static StorerManager instance = new StorerManager();
+	private ContextProperties config;
 
 	public static StorerManager get() {
-		return instance;
+		return (StorerManager) Context.get().getBean(StorerManager.class);
 	}
 
 	private StorerManager() {
 	}
 
-	private void init() {
+	public void setConfig(ContextProperties config) {
+		this.config = config;
+	}
+
+	public synchronized void init() {
 		if (!storers.isEmpty())
 			return;
 
@@ -49,10 +54,10 @@ public class StorerManager {
 				@SuppressWarnings("rawtypes")
 				Class clazz = Class.forName(className);
 				// Try to instantiate the builder
-				Object storer = clazz.newInstance();
+				Object storer = clazz.getDeclaredConstructor().newInstance();
 				if (!(storer instanceof Storer))
-					throw new Exception(String.format("The specified storer %s doesn't implement the Storer interface",
-							className));
+					throw new Exception(
+							String.format("The specified storer %s doesn't implement the Storer interface", className));
 				storers.put(type, (Storer) storer);
 
 				Storer st = (Storer) storer;
@@ -67,28 +72,35 @@ public class StorerManager {
 	}
 
 	public Storer newStorer(int id) {
-		String type = Context.get().getProperties().getProperty("store." + id + ".type", "fs");
+		if (storers.isEmpty())
+			init();
+
+		String type = config.getProperty("store." + id + ".type", "fs");
 		Storer definition = getDefinitions().get(type);
+		if (definition == null) {
+			log.error("Unexisting definition for {}", type);
+			return null;
+		}
 
 		Storer storer = null;
 		try {
-			storer = definition.getClass().newInstance();
+			storer = definition.getClass().getDeclaredConstructor().newInstance();
 		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
+			log.error("Unable to instanciate class {} / {}", definition.getClass(), e.getMessage(), e);
 			return null;
 		}
 		storer.setId(id);
 
 		Set<String> params = definition.getParameters().keySet();
 		for (String param : params)
-			storer.getParameters().put(param,
-					Context.get().getProperties().getPropertyWithSubstitutions("store." + id + "." + param, ""));
+			storer.getParameters().put(param, config.getPropertyWithSubstitutions("store." + id + "." + param, ""));
 
 		return storer;
 	}
 
 	public Map<String, Storer> getDefinitions() {
-		init();
+		if (storers.isEmpty())
+			init();
 		return storers;
 	}
 }

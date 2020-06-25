@@ -1,12 +1,12 @@
 package com.logicaldoc.core.security;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+
+import junit.framework.Assert;
 
 /**
  * Test case for the <code>SessionManager</code>

@@ -11,7 +11,6 @@ import com.logicaldoc.util.Context;
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
- * 
  */
 public class Bookmark extends PersistentObject {
 	public static final int TYPE_DOCUMENT = 0;
@@ -86,6 +85,8 @@ public class Bookmark extends PersistentObject {
 
 	/**
 	 * The icon for the document associated to the subscription
+	 * 
+	 * @return name of the icon file
 	 */
 	public String getIcon() {
 		String icon = IconSelector.selectIcon("");
@@ -98,6 +99,8 @@ public class Bookmark extends PersistentObject {
 
 	/**
 	 * The path of the document associated to the bookmark.
+	 * 
+	 * @return full path to the document
 	 */
 	public String getPath() {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);

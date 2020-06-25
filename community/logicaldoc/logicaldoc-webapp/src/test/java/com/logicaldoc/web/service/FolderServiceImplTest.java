@@ -2,8 +2,6 @@ package com.logicaldoc.web.service;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,6 +11,8 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.web.AbstractWebappTCase;
+
+import junit.framework.Assert;
 
 public class FolderServiceImplTest extends AbstractWebappTCase {
 
@@ -30,14 +30,14 @@ public class FolderServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testSave() throws ServerException {
-		GUIFolder folder = service.getFolder(6, false);
+		GUIFolder folder = service.getFolder(6, false, false, false);
 
 		folder = service.save(folder);
 		Assert.assertNotNull(folder);
 		Assert.assertEquals("folder6", folder.getName());
 		Assert.assertEquals(5, folder.getParentId());
 
-		folder = service.getFolder(1200, false);
+		folder = service.getFolder(1200, false, false, false);
 
 		folder = service.save(folder);
 		Assert.assertNotNull(folder);
@@ -68,7 +68,7 @@ public class FolderServiceImplTest extends AbstractWebappTCase {
 		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.DELETE, 1202, 3));
 		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.RENAME, 1202, 3));
 
-		GUIFolder folder = service.getFolder(6, false);
+		GUIFolder folder = service.getFolder(6, false, false, false);
 
 		service.applyRights(folder, true);
 
@@ -80,19 +80,19 @@ public class FolderServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testGetFolder() throws ServerException {
-		GUIFolder folder = service.getFolder(6, false);
+		GUIFolder folder = service.getFolder(6, false, false, false);
 		Assert.assertNotNull(folder);
 		Assert.assertEquals("folder6", folder.getName());
 		Assert.assertEquals(5, folder.getParentId());
 
-		folder = service.getFolder(1202, true);
+		folder = service.getFolder(1202, true, false, false);
 		Assert.assertNotNull(folder);
 		Assert.assertEquals("xyz", folder.getName());
 		Assert.assertEquals(1201, folder.getParentId());
 		Assert.assertEquals("/test/ABC/xyz", folder.getPathExtended());
 
 		// Try with unexisting id
-		folder = service.getFolder(9999, false);
+		folder = service.getFolder(9999, false, false, false);
 		Assert.assertNull(folder);
 	}
 

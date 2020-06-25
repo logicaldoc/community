@@ -33,7 +33,7 @@ public class MenusDS extends DataSource {
 
 		setFields(name, id, position, parent);
 
-		setDataURL("data/menues.xml");
+		setDataURL("data/menus.xml");
 		setClientOnly(false);
 	}
 }

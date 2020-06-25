@@ -2,6 +2,7 @@ package com.logicaldoc.core.folder;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -9,8 +10,10 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.LazyInitializationException;
 
 import com.logicaldoc.core.document.Tag;
+import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
 
@@ -76,6 +79,8 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	private Long deleteUserId;
 
+	private String deleteUser;
+
 	private Long quotaDocs = null;
 
 	private Long quotaSize = null;
@@ -83,7 +88,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	private Integer quotaThreshold = null;
 
 	private String quotaAlertRecipients = null;
-	
+
 	private Long foldRef;
 
 	private Integer storage;
@@ -96,7 +101,33 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	private String tgs;
 
+	/**
+	 * Stores the absolute path of the folder composed by IDs like /5/4/12354
+	 */
 	private String path;
+
+	/**
+	 * Transient attribute that stores a human readable path like
+	 * /Default/invoices
+	 */
+	private String pathExtended;
+
+	/**
+	 * Description of the grid that displays the list of documents
+	 */
+	private String grid;
+
+	/**
+	 * Identifier of the Zonal OCR template to use to process the documents
+	 * inside this folder
+	 */
+	private Long ocrTemplateId = null;
+
+	/**
+	 * Identifier of the barcode template to use to process the documents inside
+	 * this folder
+	 */
+	private Long barcodeTemplateId = null;
 
 	public Folder() {
 	}
@@ -104,11 +135,11 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	public boolean isWorkspace() {
 		return type == TYPE_WORKSPACE;
 	}
-	
+
 	public boolean isAlias() {
 		return type == TYPE_ALIAS;
 	}
-	
+
 	public long getId() {
 		return id;
 	}
@@ -168,12 +199,16 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	}
 
 	/**
-	 * Adds a new element, substituting a precedin one with the same groupId.
+	 * Adds a new element, substituting an existing one with the same groupId.
+	 * 
+	 * @param fg the folder group
 	 */
 	public void addFolderGroup(FolderGroup fg) {
 		FolderGroup m = getFolderGroup(fg.getGroupId());
-		getFolderGroups().remove(m);
-		getFolderGroups().add(fg);
+		if (m != null)
+			getFolderGroups().remove(m);
+		if (fg.getRead() != 0)
+			getFolderGroups().add(fg);
 	}
 
 	public FolderGroup getFolderGroup(long groupId) {
@@ -186,9 +221,9 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	@Override
 	public int compareTo(Folder o) {
-		int comparation = Integer.compare(this.position, o.position);
-		if (comparation != 0)
-			return comparation;
+		int comparison = Integer.compare(this.position, o.position);
+		if (comparison != 0)
+			return comparison;
 		return this.name.compareTo(o.name);
 	}
 
@@ -387,6 +422,14 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		return words;
 	}
 
+	public String getGrid() {
+		return grid;
+	}
+
+	public void setGrid(String grid) {
+		this.grid = grid;
+	}
+
 	public String getTagsString() {
 		StringBuffer sb = new StringBuffer(",");
 		if (tags == null)
@@ -419,7 +462,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	public void setQuotaThreshold(Integer quotaThreshold) {
 		this.quotaThreshold = quotaThreshold;
 	}
-	
 
 	public String getQuotaAlertRecipients() {
 		return quotaAlertRecipients;
@@ -449,7 +491,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 			str += "," + recipient;
 		setQuotaAlertRecipients(str);
 	}
-	
+
 	public void setPath(String path) {
 		this.path = path;
 	}
@@ -457,8 +499,98 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	public String getPath() {
 		return path;
 	}
-	
+
 	public Folder(String name) {
 		this.name = name;
+	}
+
+	public String getDeleteUser() {
+		return deleteUser;
+	}
+
+	public void setDeleteUser(String deleteUser) {
+		this.deleteUser = deleteUser;
+	}
+
+	/**
+	 * Clones the folder
+	 * 
+	 * @return a cloned instance
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Folder cloned = new Folder();
+		cloned.setId(getId());
+
+		cloned.setParentId(getParentId());
+		cloned.setTenantId(getTenantId());
+		cloned.setFoldRef(getFoldRef());
+		cloned.setName(getName());
+		cloned.setDescription(getDescription());
+		cloned.setStorage(getStorage());
+		cloned.setMaxVersions(getMaxVersions());
+		cloned.setColor(getColor());
+		cloned.setHidden(getHidden());
+		cloned.setPosition(getPosition());
+		cloned.setCreator(getCreator());
+		cloned.setCreatorId(getCreatorId());
+		cloned.setType(getType());
+		cloned.setTemplate(getTemplate());
+		cloned.setPath(getPath());
+		cloned.setPathExtended(getPathExtended());
+		cloned.setOcrTemplateId(getOcrTemplateId());
+		cloned.setBarcodeTemplateId(getBarcodeTemplateId());
+
+		cloned.setAttributes(new HashMap<String, Attribute>());
+		try {
+			for (String name : getAttributes().keySet()) {
+				cloned.getAttributes().put(name, getAttributes().get(name));
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+
+		try {
+			cloned.setTags(new HashSet<Tag>());
+			for (Tag tag : getTags()) {
+				cloned.getTags().add(tag);
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+		try {
+			cloned.setFolderGroups(new HashSet<FolderGroup>());
+			for (FolderGroup fg : getFolderGroups()) {
+				cloned.getFolderGroups().add(fg.clone());
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+
+		return cloned;
+	}
+
+	public String getPathExtended() {
+		return pathExtended;
+	}
+
+	public void setPathExtended(String pathExtended) {
+		this.pathExtended = pathExtended;
+	}
+
+	public Long getOcrTemplateId() {
+		return ocrTemplateId;
+	}
+
+	public void setOcrTemplateId(Long ocrTemplateId) {
+		this.ocrTemplateId = ocrTemplateId;
+	}
+
+	public Long getBarcodeTemplateId() {
+		return barcodeTemplateId;
+	}
+
+	public void setBarcodeTemplateId(Long barcodeTemplateId) {
+		this.barcodeTemplateId = barcodeTemplateId;
 	}
 }

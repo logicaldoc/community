@@ -16,6 +16,7 @@ import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.setup.client.services.SetupService;
 import com.logicaldoc.gui.setup.client.services.SetupServiceAsync;
 import com.smartgwt.client.types.Alignment;
@@ -105,7 +106,7 @@ public class Setup implements EntryPoint {
 		Window.enableScrolling(false);
 		Window.setMargin("0px");
 
-		InfoService.Instance.get().getInfo(I18N.getLocale(), Constants.TENANT_DEFAULTNAME,
+		InfoService.Instance.get().getInfo(I18N.getLocale(), Constants.TENANT_DEFAULTNAME, true,
 				new AsyncCallback<GUIInfo>() {
 					@Override
 					public void onFailure(Throwable error) {
@@ -208,7 +209,7 @@ public class Setup implements EntryPoint {
 		if (dir != null && dir.endsWith("docs"))
 			dir = dir.substring(0, dir.length() - 4);
 		TextItem repositoryItem = ItemFactory.newTextItem(REPOSITORY_FOLDER, "repofolder",
-				info.getConfig("store.1.dir"));
+				dir);
 		repositoryItem.setWidth(400);
 		repositoryItem.setRequired(true);
 		repositoryItem.setWrapTitle(false);
@@ -225,8 +226,8 @@ public class Setup implements EntryPoint {
 	 */
 	private Tab setupDatabase(final ValuesManager vm, GUIInfo info) {
 		// Prepare the fieldsMap with all database engines
-		engines.put(MYSQL, new String[] { "MySQL", "com.mysql.jdbc.Driver",
-				"jdbc:mysql://<server>[,<failoverhost>][<:3306>]/<database>", "org.hibernate.dialect.MySQLDialect",
+		engines.put(MYSQL, new String[] { "MySQL", "com.mysql.cj.jdbc.Driver",
+				"jdbc:mysql://<server>[,<failoverhost>][<:3306>]/<database>?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC", "org.hibernate.dialect.MySQLDialect",
 				"SELECT 1" });
 		engines.put(POSTGRESQL, new String[] { "PostgreSQL", "org.postgresql.Driver",
 				"jdbc:postgresql:[<//server>[<:5432>/]]<database>", "org.hibernate.dialect.PostgreSQLDialect",
@@ -417,24 +418,26 @@ public class Setup implements EntryPoint {
 						data.setDbValidationQuery(engines.get(data.getDbEngine())[4]);
 					}
 
+					ContactingServer.get().show();
 					setupService.setup(data, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
+							ContactingServer.get().hide();
 							SC.warn(caught.getMessage());
 							submit.setDisabled(false);
 						}
 
 						@Override
 						public void onSuccess(Void arg) {
+							ContactingServer.get().hide();
 							SC.say(I18N.message("installationperformed"),
 									I18N.message("installationend", info.getBranding().getProduct()),
 									new BooleanCallback() {
 										@Override
 										public void execute(Boolean value) {
-											Util.redirect(Util.contextPath() + "frontend.jsp");
+											Util.redirect(Util.contextPath());
 										}
 									});
-							submit.setDisabled(false);
 						}
 					});
 					submit.setDisabled(true);

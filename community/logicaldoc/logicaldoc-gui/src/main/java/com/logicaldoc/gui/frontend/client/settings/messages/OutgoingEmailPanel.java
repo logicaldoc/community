@@ -121,7 +121,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 					if (values.get("port") instanceof Integer)
 						OutgoingEmailPanel.this.emailSettings.setPort((Integer) values.get("port"));
 					else
-						OutgoingEmailPanel.this.emailSettings.setPort(new Integer(values.get("port").toString()));
+						OutgoingEmailPanel.this.emailSettings.setPort(Integer.parseInt(values.get("port").toString()));
 
 					OutgoingEmailPanel.this.emailSettings.setUsername((String) values.get("username"));
 					OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get("password"));

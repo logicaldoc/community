@@ -23,39 +23,53 @@ public interface SearchService {
 	/**
 	 * Performs a search by the search options.
 	 * 
-	 * @param sid Session Identifier
+	 * @param sid identifier of the session
 	 * @param options Search options
+	 * 
 	 * @return The search result
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WebResult(name = "searchResult")
 	@WSDoc(description = "performs a search by the search options")
-	public WSSearchResult find(@WebParam(name = "sid") String sid, @WebParam(name = "options") WSSearchOptions options)
-			throws Exception;
+	public WSSearchResult find(
+			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
+			@WebParam(name = "options") WSSearchOptions options) throws Exception;
 
 	/**
 	 * Finds authorized documents for the current user the given filename (like
-	 * operator is used).
+	 * operator is used)
 	 * 
+	 * @param sid identifier of the session
 	 * @param filename Filename of the document
-	 * @return Collection of found documents.
+	 * 
+	 * @return Collection of found documents
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WebResult(name = "document")
 	@WSDoc(description = "finds authorized documents for the current user with the given filename (like '%' operator is used)")
-	public WSDocument[] findByFilename(@WebParam(name = "sid") String sid, @WebParam(name = "filename") String filename)
-			throws Exception;
+	public WSDocument[] findByFilename(
+			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
+			@WebParam(name = "filename") String filename) throws Exception;
 
 	/**
 	 * Finds authorized folders for the current user containing the given name
-	 * (like operator is used).
+	 * (like operator is used)
 	 * 
+	 * @param sid identifier of the session
 	 * @param name Name of the folder
-	 * @return Collection of found folders.
+	 * 
+	 * @return Collection of found folders
+	 * 
+	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WebResult(name = "folder")
 	@WSDoc(description = "finds authorized folders for the current user containing the given name (like '%' operator is used)")
-	public WSFolder[] findFolders(@WebParam(name = "sid") String sid, @WebParam(name = "name") String name)
-			throws Exception;
+	public WSFolder[] findFolders(
+			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
+			@WebParam(name = "name") String name) throws Exception;
 }

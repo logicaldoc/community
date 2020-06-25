@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
-import gdurelle.tagcloud.client.tags.WordTag;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITag;
 import com.logicaldoc.gui.frontend.client.services.TagService;
@@ -10,6 +8,8 @@ import com.smartgwt.client.widgets.events.VisibilityChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import gdurelle.tagcloud.client.tags.WordTag;
 
 /**
  * This represent a tag cloud using a 3-D ball.

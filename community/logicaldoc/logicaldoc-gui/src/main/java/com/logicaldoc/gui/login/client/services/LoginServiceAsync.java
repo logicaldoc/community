@@ -5,8 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 
 public interface LoginServiceAsync {
 
-	void changePassword(long userId, String oldPassword, String newPassword, boolean notify,
-			AsyncCallback<Integer> callback);
+	void changePassword(long userId, String oldPassword, String newPassword, AsyncCallback<Integer> callback);
 
 	void getUser(String username, AsyncCallback<GUIUser> callback);
 

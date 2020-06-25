@@ -6,7 +6,6 @@ import java.util.LinkedHashMap;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
-import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.smartgwt.client.types.DateDisplayFormat;
 
@@ -49,14 +48,18 @@ public class I18N {
 
 	public static String message(String key, String val1, String val2) {
 		String tmp = message(key);
-		try {
-			tmp = tmp.replaceAll("\\{0\\}", val1);
-		} catch (Throwable t) {
-		}
-		try {
-			tmp = tmp.replaceAll("\\{1\\}", val2);
-		} catch (Throwable t) {
-		}
+
+		if (val1 != null)
+			try {
+				tmp = tmp.replace("{0}", val1);
+			} catch (Throwable t) {
+			}
+
+		if (val2 != null)
+			try {
+				tmp = tmp.replace("{1}", val2);
+			} catch (Throwable t) {
+			}
 		return tmp;
 	}
 
@@ -64,7 +67,7 @@ public class I18N {
 		String tmp = message(key);
 		try {
 			for (int i = 0; i < vals.length; i++) {
-				tmp = tmp.replaceAll("\\{" + i + "\\}", vals[i]);
+				tmp = tmp.replace("{" + i + "}", vals[i]);
 			}
 		} catch (Throwable t) {
 		}
@@ -78,6 +81,8 @@ public class I18N {
 
 	/**
 	 * Computes the default suitable language for documents
+	 * 
+	 * @return the default locale
 	 */
 	public static String getDefaultLocaleForDoc() {
 		// Search for exact match
@@ -114,9 +119,8 @@ public class I18N {
 		if (addEmpty)
 			map.put("", " ");
 		if (languages != null)
-			for (GUIValue l : languages) {
+			for (GUIValue l : languages)
 				map.put(l.getCode(), l.getValue());
-			}
 		return map;
 	}
 
@@ -125,9 +129,8 @@ public class I18N {
 		if (addEmpty)
 			map.put("", " ");
 		if (guiLanguages != null)
-			for (GUIValue l : guiLanguages) {
+			for (GUIValue l : guiLanguages)
 				map.put(l.getCode(), l.getValue());
-			}
 		return map;
 	}
 
@@ -139,7 +142,7 @@ public class I18N {
 		I18N.languages = languages;
 	}
 
-	public static void initBundle(GUIValue[] messages) {
+	private static void initBundle(GUIValue[] messages) {
 		bundle.clear();
 		for (GUIValue val : messages) {
 			bundle.put(val.getCode(), val.getValue());
@@ -156,11 +159,6 @@ public class I18N {
 		 */
 		dateFormatShort = DateTimeFormat.getFormat(message("format_dateshort"));
 		dateFormat = DateTimeFormat.getFormat(message("format_date"));
-	}
-
-	public static void init(GUISession session) {
-		init(session.getInfo());
-		I18N.locale = session.getUser().getLanguage();
 	}
 
 	public static GUIValue[] getGuiLanguages() {

@@ -2,11 +2,10 @@ package com.logicaldoc.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.sf.ehcache.CacheManager;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -22,6 +21,8 @@ import org.springframework.core.io.Resource;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.event.SystemEvent;
 import com.logicaldoc.util.event.SystemEventStatus;
+
+import net.sf.ehcache.CacheManager;
 
 /**
  * Utility class collecting static methods related to spring's context.
@@ -49,6 +50,8 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 
 	/**
 	 * Gets the registry with all the configuration properties for this context
+	 * 
+	 * @return the instance of ContextProperties in the application context
 	 */
 	public ContextProperties getProperties() {
 		ContextProperties registry = (ContextProperties) getBean(ContextProperties.class);
@@ -63,6 +66,7 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 	 * Retrieves a bean registered in the Spring context.
 	 * 
 	 * @param id The bean identifier
+	 * 
 	 * @return The bean instance
 	 */
 	public Object getBean(String id) {
@@ -70,7 +74,20 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 	}
 
 	/**
+	 * Retrieves the collection of all the bean ids
+	 * 
+	 * @return the collection of ids of all the beans available in the application context
+	 */
+	public List<String> getBeanIds() {
+		return Arrays.asList(applicationContext.getBeanDefinitionNames());
+	}
+
+	/**
 	 * Retrieves the list of bean of the same type
+	 * 
+	 * @param clazz class to use as filter
+	 * 
+	 * @return the collection of bean instances
 	 */
 	public List<Object> getBeansOfType(@SuppressWarnings("rawtypes") Class clazz) {
 		List<Object> beans = new ArrayList<Object>();
@@ -86,6 +103,7 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 	 * found the simple class name is used as bean id.
 	 * 
 	 * @param clazz The bean identifier as class name
+	 * 
 	 * @return The bean instance
 	 */
 	public Object getBean(@SuppressWarnings("rawtypes") Class clazz) {
@@ -131,8 +149,9 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 	/**
 	 * Adds an Listener to a particular Event given from
 	 * 
-	 * @see {@link SystemEvent#getSystemStatus()}
-	 * @param evt
+	 * @see SystemEvent#getSystemStatus()
+	 * 
+	 * @param evt the listener
 	 */
 	public static void addListener(SystemEvent evt) {
 
@@ -152,7 +171,7 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 	/**
 	 * Removes a particular Listener from the list
 	 * 
-	 * @param evt
+	 * @param evt the system event
 	 */
 	public static void removeListener(SystemEvent evt) {
 		synchronized (systemEvents) {
@@ -177,7 +196,9 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 	/**
 	 * Returns a Spring-Resource
 	 * 
-	 * @return
+	 * @param resourceLocation name of the resource to retrieve
+	 * 
+	 * @return the resource instance
 	 */
 	public Resource getResource(String resourceLocation) {
 		return Context.applicationContext.getResource(resourceLocation);
@@ -186,6 +207,8 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 	/**
 	 * Processes a newly incoming event on appropriated events that registered
 	 * itself on it
+	 * 
+	 * @param event the event to process
 	 */
 	@Override
 	public synchronized void onApplicationEvent(ApplicationEvent event) {
@@ -208,5 +231,13 @@ public class Context implements ApplicationContextAware, ApplicationListener {
 		for (SystemEvent evt : evts) {
 			evt.processEvent();
 		}
+	}
+
+	/**
+	 * Closes this context
+	 */
+	public void close() {
+		if ((applicationContext instanceof org.springframework.context.ConfigurableApplicationContext))
+			((org.springframework.context.ConfigurableApplicationContext) applicationContext).close();
 	}
 }

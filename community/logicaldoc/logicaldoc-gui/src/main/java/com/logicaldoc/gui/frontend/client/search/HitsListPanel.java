@@ -1,11 +1,9 @@
 package com.logicaldoc.gui.frontend.client.search;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -16,25 +14,19 @@ import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
-import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
 import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
-import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
@@ -44,8 +36,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import com.smartgwt.client.widgets.toolbar.ToolStrip;
-import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This panel shows a list of search results in a tabular way.
@@ -56,8 +46,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class HitsListPanel extends VLayout implements SearchObserver, DocumentObserver, FolderObserver {
 
 	protected DocumentsGrid grid = null;
-
-	protected ToolStrip toolStrip;
 
 	private Cursor cursor;
 
@@ -72,14 +60,9 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		initialize();
 	}
 
-	private void initialize() {
+	void initialize() {
 		if (grid != null)
 			removeMember((Canvas) grid);
-
-		if (toolStrip != null)
-			toolStrip.clear();
-
-		GUISearchOptions options = Search.get().getOptions();
 
 		ListGridField id = new ListGridField("id", 60);
 		id.setHidden(true);
@@ -103,15 +86,14 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				final String type = doc.getType();
 				long id = doc.getFolder().getId();
 
-				if (type == null
-						|| (!type.contains("folder") && Session.get().getCurrentDocument() != null && Session.get()
-								.getCurrentDocument().getId() == id)) {
+				if (type == null || (!type.contains("folder") && Session.get().getCurrentDocument() != null
+						&& Session.get().getCurrentDocument().getId() == id)) {
 					showContextMenu(Session.get().getCurrentDocument().getFolder(), true);
 				} else {
 					/*
 					 * We need to retrieve the folder from the server
 					 */
-					FolderService.Instance.get().getFolder(id, false, new AsyncCallback<GUIFolder>() {
+					FolderService.Instance.get().getFolder(id, false, false, false, new AsyncCallback<GUIFolder>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
@@ -134,7 +116,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				if (Search.get().getOptions().getType() != GUISearchOptions.TYPE_FOLDERS) {
 					final GUIDocument doc = grid.getSelectedDocument();
 
-					FolderService.Instance.get().getFolder(doc.getFolder().getId(), false,
+					FolderService.Instance.get().getFolder(doc.getFolder().getId(), false, false, false,
 							new AsyncCallback<GUIFolder>() {
 
 								@Override
@@ -158,9 +140,6 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			}
 		});
 
-		// Prepare the toolbar with some buttons
-		prepareToolbar(options.getType());
-
 		if (cursor != null)
 			removeMember(cursor);
 		cursor = new Cursor();
@@ -175,192 +154,9 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			}
 		});
 
-		addMember(cursor);
-
-		addMember((Canvas) grid);
+		setMembers(cursor, (Canvas) grid);
 
 		onSearchArrived();
-	}
-
-	/**
-	 * Prepares the toolbar containing the search report and a set of buttons
-	 */
-	protected void prepareToolbar(int optionsType) {
-		if (toolStrip == null)
-			toolStrip = new ToolStrip();
-		else {
-			toolStrip.removeMembers(toolStrip.getMembers());
-		}
-
-		toolStrip.setVisible(true);
-
-		toolStrip.setHeight(20);
-		toolStrip.setWidth100();
-		toolStrip.addSpacer(2);
-
-		ToolStripButton showSnippets = AwesomeFactory.newToolStripButton("file", "showsnippets");
-		showSnippets.setDisabled(optionsType != GUISearchOptions.TYPE_FULLTEXT);
-		toolStrip.addButton(showSnippets);
-		showSnippets.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				expandVisibleRows();
-			}
-		});
-
-		ToolStripButton save = AwesomeFactory.newToolStripButton("save", "save");
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				SaveDialog dialog = new SaveDialog();
-				dialog.show();
-			}
-		});
-
-		if (Feature.visible(Feature.SAVED_SEARCHES)) {
-			toolStrip.addSeparator();
-			toolStrip.addButton(save);
-			if (!Feature.enabled(Feature.SAVED_SEARCHES)) {
-				save.setDisabled(true);
-				save.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		ToolStripButton print = AwesomeFactory.newToolStripButton("print", "print");
-		print.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { grid });
-			}
-		});
-		toolStrip.addSeparator();
-		toolStrip.addButton(print);
-
-		if (Feature.visible(Feature.EXPORT_CSV)) {
-			ToolStripButton export = AwesomeFactory.newToolStripButton("angle-double-down", "export");
-			toolStrip.addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					Util.exportCSV((ListGrid) grid, false);
-				}
-			});
-			if (!Feature.enabled(Feature.EXPORT_CSV)) {
-				export.setDisabled(true);
-				export.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		toolStrip.addSeparator();
-		ToolStripButton download = AwesomeFactory.newToolStripButton("download", "download");
-		toolStrip.addButton(download);
-		download.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (Search.get().getLastResult() == null || Search.get().getLastResult().length < 1)
-					return;
-
-				String url = GWT.getHostPageBaseURL() + "zip-export?1=1";
-				for (GUIDocument record : Search.get().getLastResult()) {
-					url += "&docId=" + record.getId();
-				}
-
-				WindowUtils.openUrl(url);
-			}
-		});
-
-		final ToolStripButton toggle = AwesomeFactory.newToolStripButton("toggle-on", "closeseleftpanel");
-		if (SearchMenu.get().getWidth() > 0) {
-			toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
-			toggle.setTooltip(I18N.message("closeseleftpanel"));
-		} else {
-			toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
-			toggle.setTooltip(I18N.message("openleftpanel"));
-		}
-		toggle.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				SearchPanel.get().toggleMenu();
-				if (SearchPanel.get().isMenuOpened()) {
-					toggle.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
-					toggle.setTooltip(I18N.message("closeseleftpanel"));
-				} else {
-					toggle.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
-					toggle.setTooltip(I18N.message("openleftpanel"));
-				}
-			}
-		});
-		toolStrip.addSeparator();
-		toolStrip.addButton(toggle);
-
-		final ToolStripButton list = AwesomeFactory.newToolStripButton("bars", "list");
-		list.setRadioGroup("mode");
-		list.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_LIST);
-				HitsListPanel.this.visualizationMode = DocumentsGrid.MODE_LIST;
-				initialize();
-			}
-		});
-
-		final ToolStripButton gallery = AwesomeFactory.newToolStripButton("images", "gallery");
-		gallery.setActionType(SelectionType.RADIO);
-		gallery.setRadioGroup("mode");
-		gallery.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (Session.get().getCurrentFolder() != null)
-					CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_GALLERY);
-				HitsListPanel.this.visualizationMode = DocumentsGrid.MODE_GALLERY;
-				initialize();
-			}
-		});
-
-		final ToolStripButton togglePreview = AwesomeFactory.newToolStripButton("toggle-on", "closepreview");
-		try {
-			// Retrieve the saved preview width
-			String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
-			if (Integer.parseInt(w) <= 0) {
-				togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
-				togglePreview.setTooltip(I18N.message("openpreview"));
-			}
-		} catch (Throwable t) {
-		}
-		togglePreview.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (SearchPanel.get().getPreviewPanel().isVisible()
-						&& SearchPanel.get().getPreviewPanel().getWidth() > 0) {
-					SearchPanel.get().getPreviewPanel().setWidth(0);
-					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
-					togglePreview.setTooltip(I18N.message("openpreview"));
-				} else {
-					SearchPanel.get().getPreviewPanel().setWidth(350);
-					SearchPanel.get().getPreviewPanel().setDocument(grid.getSelectedDocument());
-					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
-					togglePreview.setTooltip(I18N.message("closepreview"));
-				}
-			}
-		});
-
-		if (visualizationMode == DocumentsGrid.MODE_LIST)
-			list.setSelected(true);
-		else
-			gallery.setSelected(true);
-
-		toolStrip.addSeparator();
-		toolStrip.addButton(list);
-		toolStrip.addButton(gallery);
-		toolStrip.addSeparator();
-		toolStrip.addButton(togglePreview);
-
-		toolStrip.addFill();
-
-		addMember(toolStrip);
-	}
-
-	protected void expandVisibleRows() {
-		grid.expandVisibleRows();
 	}
 
 	@Override
@@ -371,10 +167,8 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		 */
 		NumberFormat format = NumberFormat.getFormat("#.###");
 
-		String stats = I18N.message(
-				"aboutresults",
-				new String[] { "" + Search.get().getEstimatedHits(),
-						format.format((double) Search.get().getTime() / (double) 1000) });
+		String stats = I18N.message("aboutresults", new String[] { "" + Search.get().getEstimatedHits(),
+				format.format((double) Search.get().getTime() / (double) 1000) });
 		stats += " (<b>" + format.format((double) Search.get().getTime() / (double) 1000) + "</b> "
 				+ I18N.message("seconds").toLowerCase() + ")";
 		cursor.setMessage(stats);
@@ -385,9 +179,11 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		GUIDocument[] result = Search.get().getLastResult();
 		if (result != null)
 			grid.setDocuments(result);
-
+		
 		if (Search.get().isHasMore())
 			Log.warn(I18N.message("possiblemorehits"), I18N.message("possiblemorehitsdetail"));
+
+		cursor.setMaxDisplayedRecords(options.getMaxHits());
 	}
 
 	@Override
@@ -545,5 +341,17 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	protected void onDestroy() {
 		destroy();
 		super.onDestroy();
+	}
+
+	public int getVisualizationMode() {
+		return visualizationMode;
+	}
+
+	public void setVisualizationMode(int visualizationMode) {
+		this.visualizationMode = visualizationMode;
+	}
+
+	public DocumentsGrid getGrid() {
+		return grid;
 	}
 }

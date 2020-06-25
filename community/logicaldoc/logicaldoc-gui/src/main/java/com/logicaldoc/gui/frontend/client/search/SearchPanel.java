@@ -34,7 +34,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  */
 public class SearchPanel extends HLayout implements SearchObserver, DocumentObserver {
 
-	private Layout content = new VLayout();
+	private Layout listing = new VLayout();
 
 	private Layout details = new VLayout();
 
@@ -53,6 +53,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	private SearchPanel() {
 		setWidth100();
 		setOverflow(Overflow.HIDDEN);
+		setShowEdges(false);
 
 		Search.get().addObserver(this);
 		DocumentController.get().addObserver(this);
@@ -69,29 +70,29 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 		if (drawn)
 			return;
 		drawn = true;
-	
+
 		// Prepare the collapsable menu
 		SearchMenu searchMenu = SearchMenu.get();
 		searchMenu.setWidth(350);
 		searchMenu.setShowResizeBar(true);
 
-		
 		// Initialize the listing panel as placeholder
 		listingPanel = new HitsListPanel();
-		content.setAlign(Alignment.CENTER);
-		content.setHeight("51%");
-		content.setShowResizeBar(true);
-		content.addMember(listingPanel);
-		
+		listing.setAlign(Alignment.CENTER);
+		listing.setHeight("51%");
+		listing.setShowResizeBar(true);
+		listing.addMember(listingPanel);
+
 		// Add a details panel under the listing one
 		detailPanel = new Label("&nbsp;" + I18N.message("selectahit"));
 		details.setAlign(Alignment.CENTER);
 		details.addMember(detailPanel);
 
-		body.addMember(content);
-		body.addMember(details);
-		body.setShowResizeBar(true);
-		body.setResizeBarTarget("next");
+		// The two rows: listing and details
+		VLayout listingAndDetails = new VLayout();
+		listingAndDetails.setMembers(listing, details);
+		listingAndDetails.setShowResizeBar(true);
+		listingAndDetails.setResizeBarTarget("next");
 
 		previewPanel = new SearchPreviewPanel();
 		previewPanel.addVisibilityChangedHandler(new VisibilityChangedHandler() {
@@ -102,10 +103,15 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 					previewPanel.setDocument(((DocumentDetailsPanel) detailPanel).getDocument());
 			}
 		});
-		
-		setMembers(searchMenu, body, previewPanel);
 
-		setShowEdges(false);
+		// The listing plus the preview
+		HLayout bodyPanel = new HLayout();
+		bodyPanel.setWidth100();
+		bodyPanel.setMembers(listingAndDetails, previewPanel);
+
+		body.setMembers(new SearchToolbar(listingPanel), bodyPanel);
+
+		setMembers(searchMenu, body);
 	}
 
 	public void onSelectedDocumentHit(long id) {
@@ -130,7 +136,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 			details.removeMember(detailPanel);
 		detailPanel.destroy();
 		if (id > 0) {
-			FolderService.Instance.get().getFolder(id, true, new AsyncCallback<GUIFolder>() {
+			FolderService.Instance.get().getFolder(id, true, false, false, new AsyncCallback<GUIFolder>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
@@ -214,7 +220,8 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	@Override
 	public void onDocumentModified(GUIDocument document) {
-		previewPanel.setDocument(document);
+		if (getGrid().getSelectedDocument() != null && getGrid().getSelectedDocument().getId() == document.getId())
+			previewPanel.setDocument(document);
 	}
 
 	public SearchPreviewPanel getPreviewPanel() {
@@ -276,5 +283,19 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	protected void onDestroy() {
 		destroy();
 		super.onDestroy();
+	}
+
+	public HitsListPanel getListingPanel() {
+		return listingPanel;
+	}
+
+	public String getDocsGridViewState() {
+		if (listingPanel != null) {
+			if (listingPanel.getGrid() instanceof SearchHitsGrid)
+				return ((SearchHitsGrid) listingPanel.getGrid()).getViewState();
+			else
+				return null;
+		} else
+			return null;
 	}
 }

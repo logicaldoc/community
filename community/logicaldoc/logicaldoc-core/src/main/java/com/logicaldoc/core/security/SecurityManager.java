@@ -41,6 +41,8 @@ public interface SecurityManager {
 	 * 
 	 * @param docId ID of the document
 	 * @param userId ID of the user
+	 * 
+	 * @return if the user has the write permission on the document
 	 */
 	public boolean isWriteEnabled(long docId, long userId);
 
@@ -57,6 +59,8 @@ public interface SecurityManager {
 	 * @param permission the permission to check
 	 * @param docId ID of the document
 	 * @param userId ID of the user
+	 * 
+	 * @return if the permission is granted to the user on the document
 	 */
 	public boolean isPermissionEnabled(Permission permission, long docId, long userId);
 
@@ -65,7 +69,8 @@ public interface SecurityManager {
 	 * 
 	 * @param docId ID of the document
 	 * @param userId ID of the user
-	 * @return Collection of enabled permissions
+	 * 
+	 * @return Collection of permissions granted to the user on the document
 	 */
 	public Set<Permission> getEnabledPermissions(long docId, long userId);
 }

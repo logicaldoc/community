@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
@@ -25,6 +27,8 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 
 public class WSUtil {
+	protected static Logger log = LoggerFactory.getLogger(WSUtil.class);
+
 	public static WSDocument toWSDocument(AbstractDocument document) {
 		WSDocument wsDoc = new WSDocument();
 
@@ -63,6 +67,8 @@ public class WSUtil {
 			wsDoc.setNature(document.getNature());
 			wsDoc.setFormId(document.getFormId());
 			wsDoc.setPasswordProtected(document.isPasswordProtected() ? 1 : 0);
+			wsDoc.setOcrTemplateId(document.getOcrTemplateId());
+			wsDoc.setOcrd(document.getOcrd());
 
 			String date = null;
 			if (document.getDate() != null)
@@ -94,12 +100,15 @@ public class WSUtil {
 						WSAttribute attribute = new WSAttribute();
 						attribute.setName(name);
 						attribute.setMandatory(attr.getMandatory());
+						attribute.setHidden(attr.getHidden());
+						attribute.setMultiple(attr.getMultiple());
+						attribute.setParent(attr.getParent());
 						attribute.setPosition(attr.getPosition());
-						attribute.setType(attr.getType());
 						attribute.setValue(attr.getValue());
 						attribute.setSetId(attr.getSetId());
+						attribute.setStringValues(attr.getStringValues());
 
-						if (attr.getType() == Attribute.TYPE_USER) {
+						if (attr.getType() == Attribute.TYPE_USER || attr.getType() == Attribute.TYPE_FOLDER) {
 							attribute.setIntValue(attr.getIntValue());
 							attribute.setStringValue(attr.getStringValue());
 						}
@@ -124,7 +133,7 @@ public class WSUtil {
 			}
 			wsDoc.setTags(tags);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 
 		return wsDoc;
@@ -136,7 +145,7 @@ public class WSUtil {
 		if (folder == null) {
 			throw new Exception("error - folder not found");
 		}
-		fdao.initialize(folder);
+		// fdao.initialize(folder);
 
 		Set<String> tagsSet = new TreeSet<String>();
 		if (wsDoc.getTags() != null) {
@@ -155,13 +164,16 @@ public class WSUtil {
 					for (int i = 0; i < wsDoc.getAttributes().length; i++) {
 						Attribute att = new Attribute();
 						att.setMandatory(wsDoc.getAttributes()[i].getMandatory());
+						att.setHidden(wsDoc.getAttributes()[i].getHidden());
+						att.setMultiple(wsDoc.getAttributes()[i].getMultiple());
+						att.setParent(wsDoc.getAttributes()[i].getParent());
 						att.setPosition(wsDoc.getAttributes()[i].getPosition());
 						att.setIntValue(wsDoc.getAttributes()[i].getIntValue());
 						att.setStringValue(wsDoc.getAttributes()[i].getStringValue());
 						att.setDoubleValue(wsDoc.getAttributes()[i].getDoubleValue());
 						att.setDateValue(convertStringToDate(wsDoc.getAttributes()[i].getDateValue()));
-						att.setType(wsDoc.getAttributes()[i].getType());
 						att.setSetId(wsDoc.getAttributes()[i].getSetId());
+						att.setType(wsDoc.getAttributes()[i].getType());
 
 						attrs.put(wsDoc.getAttributes()[i].getName(), att);
 					}
@@ -219,6 +231,7 @@ public class WSUtil {
 			doc.setStartPublishing(convertStringToDate(wsDoc.getStartPublishing()));
 		if (StringUtils.isNotEmpty(wsDoc.getStopPublishing()))
 			doc.setStopPublishing(convertStringToDate(wsDoc.getStopPublishing()));
+		doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
 
 		return doc;
 	}
@@ -274,20 +287,24 @@ public class WSUtil {
 					attribute.setName(name);
 					attribute.setLabel(attr.getLabel());
 					attribute.setMandatory(attr.getMandatory());
+					attribute.setHidden(attr.getHidden());
+					attribute.setMultiple(attr.getMultiple());
+					attribute.setParent(attr.getParent());
 					attribute.setPosition(attr.getPosition());
-					attribute.setType(attr.getType());
+					attribute.setStringValues(attr.getStringValues());
 					attribute.setStringValue(attr.getStringValue());
 					attribute.setIntValue(attr.getIntValue());
 					attribute.setDoubleValue(attr.getDoubleValue());
 					attribute.setDateValue(convertDateToString(attr.getDateValue()));
 					attribute.setEditor(attr.getEditor());
 					attribute.setSetId(attr.getSetId());
+					attribute.setType(attr.getType());
 					attributes[i++] = attribute;
 				}
 				wsAttributeSet.setAttributes(attributes);
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 
 		return wsAttributeSet;
@@ -309,20 +326,23 @@ public class WSUtil {
 					Attribute att = new Attribute();
 					att.setLabel(wsSet.getAttributes()[i].getLabel());
 					att.setMandatory(wsSet.getAttributes()[i].getMandatory());
+					att.setHidden(wsSet.getAttributes()[i].getHidden());
+					att.setMultiple(wsSet.getAttributes()[i].getMultiple());
+					att.setParent(wsSet.getAttributes()[i].getParent());
 					att.setPosition(wsSet.getAttributes()[i].getPosition());
-					att.setType(wsSet.getAttributes()[i].getType());
 					att.setStringValue(wsSet.getAttributes()[i].getStringValue());
 					att.setIntValue(wsSet.getAttributes()[i].getIntValue());
 					att.setDoubleValue(wsSet.getAttributes()[i].getDoubleValue());
 					att.setDateValue(convertStringToDate(wsSet.getAttributes()[i].getStringValue()));
 					att.setEditor(wsSet.getAttributes()[i].getEditor());
 					att.setSetId(wsSet.getAttributes()[i].getSetId());
+					att.setType(wsSet.getAttributes()[i].getType());
 					attributes.put(wsSet.getAttributes()[i].getName(), att);
 				}
 				set.setAttributes(attributes);
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 
 		return set;
@@ -343,7 +363,9 @@ public class WSUtil {
 				for (int i = 0; i < wsTemplate.getAttributes().length; i++) {
 					Attribute att = new Attribute();
 					att.setLabel(wsTemplate.getAttributes()[i].getLabel());
-					att.setMandatory(wsTemplate.getAttributes()[i].getMandatory());
+					att.setHidden(wsTemplate.getAttributes()[i].getHidden());
+					att.setMultiple(wsTemplate.getAttributes()[i].getMultiple());
+					att.setParent(wsTemplate.getAttributes()[i].getParent());
 					att.setPosition(wsTemplate.getAttributes()[i].getPosition());
 					att.setType(wsTemplate.getAttributes()[i].getType());
 					att.setStringValue(wsTemplate.getAttributes()[i].getStringValue());
@@ -357,13 +379,13 @@ public class WSUtil {
 				template.setAttributes(attributes);
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 
 		return template;
 	}
 
-	public static WSTemplate toWFTemplate(Template template) {
+	public static WSTemplate toWSTemplate(Template template) {
 		WSTemplate wsTemplate = new WSTemplate();
 
 		try {
@@ -373,6 +395,7 @@ public class WSUtil {
 			wsTemplate.setLastModified(convertDateToString(template.getLastModified()));
 
 			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			templateDao.initialize(template);
 			wsTemplate.setDocsCount(templateDao.countDocs(template.getId()));
 
 			// Populate extended attributes
@@ -386,20 +409,24 @@ public class WSUtil {
 					attribute.setName(name);
 					attribute.setLabel(attr.getLabel());
 					attribute.setMandatory(attr.getMandatory());
+					attribute.setHidden(attr.getHidden());
+					attribute.setMultiple(attr.getMultiple());
+					attribute.setParent(attr.getParent());
 					attribute.setPosition(attr.getPosition());
-					attribute.setType(attr.getType());
 					attribute.setStringValue(attr.getStringValue());
+					attribute.setStringValues(attr.getStringValues());
 					attribute.setIntValue(attr.getIntValue());
 					attribute.setDoubleValue(attr.getDoubleValue());
 					attribute.setDateValue(convertDateToString(attr.getDateValue()));
 					attribute.setEditor(attr.getEditor());
 					attribute.setSetId(attr.getSetId());
+					attribute.setType(attr.getType());
 					attributes[i++] = attribute;
 				}
 				wsTemplate.setAttributes(attributes);
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			log.error(e.getMessage(), e);
 		}
 
 		return wsTemplate;

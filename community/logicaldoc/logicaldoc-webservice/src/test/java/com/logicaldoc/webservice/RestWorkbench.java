@@ -57,13 +57,25 @@ public class RestWorkbench {
 		tagClient = new RestTagClient(BASE_PATH + "/services/rest/tag", username, password);
 		bookmarkClient = new RestBookmarkClient(BASE_PATH + "/services/rest/bookmark", username, password);
 
+		
+		String sid = authClient.loginPost(username, password);
+		System.err.println(sid);
+		
+		
+		authClient.logout(sid);
+		System.err.println("op finished");
+		
+		// createDocument();
+		
 		// tagStuff();
 
 		// bookmarkStuff();
 
 		// noteStuff();
 
-		ratingStuff();
+		// ratingStuff();
+
+//		folderStuff();
 
 		// Note: 04L is the id of the default workspace
 
@@ -321,6 +333,14 @@ public class RestWorkbench {
 		}
 	}
 
+	private static void folderStuff() throws Exception {
+		WSFolder folder = fldClient.getRootFolder();
+		System.out.println("Root: " + folder.getName());
+
+		folder = fldClient.findByPath("/Default/Alle");
+		System.out.println("Folder: " + folder.getName());
+	}
+
 	private static void checkin(long docId) throws Exception {
 		try {
 			docClient.checkout(docId);
@@ -411,7 +431,7 @@ public class RestWorkbench {
 	}
 
 	private static void createDocument() throws Exception {
-		File xxxx = new File("C:\\tmp\\InvoiceProcessing02-dashboard.png");
+		File xxxx = new File("C:\\tmp\\test-split.pdf");
 		WSDocument document = new WSDocument();
 		document.setFolderId(04L);
 		document.setFileName(xxxx.getName());
@@ -546,10 +566,6 @@ public class RestWorkbench {
 		String sid = authClient.login("admin", "admin");
 		System.out.println("sid: " + sid);
 		return sid;
-	}
-
-	private static void logoutDelete() throws Exception {
-		authClient.logout();
 	}
 
 }

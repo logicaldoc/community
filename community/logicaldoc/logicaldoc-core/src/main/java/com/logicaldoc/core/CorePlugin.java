@@ -1,13 +1,16 @@
 package com.logicaldoc.core;
 
+import java.io.File;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.dashlet.DashletContent;
 import com.logicaldoc.core.task.TaskManager;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 
 /**
@@ -33,6 +36,9 @@ public class CorePlugin extends LogicalDOCPlugin {
 		} catch (Throwable t) {
 			log.error("Unable to register some tasks", t);
 		}
+		
+		
+		
 	}
 
 	@Override
@@ -44,6 +50,13 @@ public class CorePlugin extends LogicalDOCPlugin {
 				pbean.setProperty("aspect." + aspect + "." + level.toString(), "true");
 		}
 		pbean.write();
+		
+		// Register the needed servlets
+		File dest = new File(getPluginPath());
+		dest = dest.getParentFile().getParentFile();
+		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
+		config.addServlet("DashletContent", DashletContent.class.getName());
+		config.addServletMapping("DashletContent", "/data/dashletcontent");
 
 		setRestartRequired();
 	}

@@ -61,25 +61,30 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		this.userId = userId;
 	}
 
-	/**
-	 * @see Version#getUsername()
-	 */
+	
 	public String getUsername() {
 		return username;
 	}
 
-	/**
-	 * @see Version#setUsername(java.lang.String)
-	 */
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
 	/**
-	 * @see Version#getNewVersionName(java.lang.String,
-	 *      VersionImpl.VERSION_TYPE)
+	 * Calculate the new version name in the format <b>X</b>.<b>Y</b>.
+	 * 
+	 * <ul>
+	 * <li>if the new version is a release, then X will be raised by 1 and Y will be 0 (e.g.: 12.3 will become 13.0)</li>
+	 * <li>if the new version is not a release, then Y will be raised by 1 (e.g.: 12.3 will become 12.4)</li>
+	 * </ul>
+	 * 
+	 * @param oldVersionName the old version in the format <b>X</b>.<b>Y</b>
+	 * @param major if the new version is a major release or not
+	 * 
+	 * @return the new version name in the format <b>X</b>.<b>Y</b>
 	 */
-	private String getNewVersionName(String oldVersionName, boolean release) {
+	private String getNewVersionName(String oldVersionName, boolean major) {
 		if (StringUtils.isEmpty(oldVersionName)) {
 			ContextProperties config;
 			try {
@@ -90,11 +95,25 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 			}
 		}
 
+		return calculateNewVersion(oldVersionName, major);
+	}
+
+	/**
+	 * Calculate the new version name in the format <b>X</b>.<b>Y</b>.
+	 * 
+	 * @see #getNewVersionName(String, boolean)
+	 * 
+	 * @param oldVersionName the old version in the format <b>X</b>.<b>Y</b>
+	 * @param major if the new version is a major release or not
+	 * 
+	 * @return the new version name in the format <b>X</b>.<b>Y</b>
+	 */
+	public static String calculateNewVersion(String oldVersionName, boolean major) {
 		String rel = oldVersionName.substring(0, oldVersionName.indexOf("."));
 		String version = oldVersionName.substring(oldVersionName.lastIndexOf(".") + 1);
 
 		int number;
-		if (release) {
+		if (major) {
 			number = Integer.parseInt(rel);
 			rel = String.valueOf(number + 1);
 			version = "0";
@@ -106,7 +125,6 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		return rel + "." + version;
 	}
 
-	/** For sorting a list of Version objects by the version number */
 	public int compareTo(Version other) {
 		try {
 			StringTokenizer st1 = new StringTokenizer(getVersion().trim(), ".", false);
@@ -169,9 +187,10 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
 	/**
 	 * Factory method that creates a Version and replicate all given document's
-	 * properties.<br />
-	 * The new version and fileVersion will be set in both Document and Version<br/>
-	 * <br/>
+	 * properties.<br>
+	 * The new version and fileVersion will be set in both Document and
+	 * Version<br>
+	 * <br>
 	 * <b>Important:</b> The created Version is not persistent
 	 * 
 	 * @param document The document to be versioned
@@ -180,7 +199,6 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	 * @param event The event that caused the new release
 	 * @param release True if this is a new release(eg: 2.0) rather than a
 	 *        subversion(eg: 1.1)
-	 * @param initial True if this is an initial release
 	 * @return The newly created version
 	 */
 	public static Version create(Document document, User user, String comment, String event, boolean release) {
@@ -188,9 +206,9 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		try {
 			BeanUtils.copyProperties(version, document);
 		} catch (Exception e) {
-			
+
 		}
-		
+
 		version.setVersion(document.getVersion());
 		version.setType(document.getType());
 		version.setTenantId(document.getTenantId());
@@ -201,7 +219,9 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		version.setEvent(event);
 		version.setUserId(user.getId());
 		version.setUsername(user.getFullName());
-
+		version.setOcrTemplateId(document.getOcrTemplateId());
+		version.setBarcodeTemplateId(document.getBarcodeTemplateId());
+		
 		if (document.getTemplate() != null) {
 			version.setTemplateId(document.getTemplate().getId());
 			version.setTemplateName(document.getTemplate().getName());
@@ -221,6 +241,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		version.setFolderName(document.getFolder().getName());
 		version.setTgs(document.getTagsString());
 		version.setDocId(document.getId());
+		version.setLinks(document.getLinks());
 
 		version.setPublished(document.getPublished());
 		version.setStartPublishing(document.getStartPublishing());
@@ -275,5 +296,19 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
 	public void setDocId(long docId) {
 		this.docId = docId;
+	}
+
+	/**
+	 * Clones the document but does not replicate the CustomID
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Version cloned = new Version();
+		cloned.copyAttributes((Version) this);
+		cloned.setId(getId());
+		if (getIndexed() != INDEX_INDEXED)
+			cloned.setIndexed(getIndexed());
+		cloned.setCustomId(null);
+		return cloned;
 	}
 }

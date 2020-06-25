@@ -15,9 +15,12 @@ public interface SignServiceAsync {
 
 	void imporKeystore(GUIKeystore keystore, AsyncCallback<Void> callback);
 
-	void generateNewCertificate(String password, AsyncCallback<Void> callback);
+	void generateNewCertificate(AsyncCallback<Void> callback);
 
 	void deleteCertificate(AsyncCallback<Void> callback);
 
-	void signDocuments(long[] docIds, String reason, String password, AsyncCallback<Void> callback);
+	void signDocuments(long[] docIds, String reason, int page, String signX, String signY, String signWidth,
+			AsyncCallback<Void> callback);
+
+	void isVisualSignatureEnabled(AsyncCallback<Boolean> callback);
 }

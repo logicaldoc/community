@@ -13,19 +13,16 @@ import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.remote.MessengerRemoteService;
-import com.logicaldoc.gui.common.client.remote.RemoteMessageListener;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.websockets.EventListener;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.TagsForm;
+import com.sksamuel.gwt.websockets.Websocket;
 import com.smartgwt.client.util.SC;
-
-import de.novanic.eventservice.client.event.RemoteEventService;
-import de.novanic.eventservice.client.event.RemoteEventServiceFactory;
 
 /**
  * The Frontend entry point
@@ -34,6 +31,8 @@ import de.novanic.eventservice.client.event.RemoteEventServiceFactory;
  * @since 6.0
  */
 public class Frontend implements EntryPoint {
+
+	private Websocket websocket = null;
 
 	private static Frontend instance;
 
@@ -78,7 +77,7 @@ public class Frontend implements EntryPoint {
 		declareGetCurrentFolderId(this);
 		declareCheckPermission(this);
 
-		InfoService.Instance.get().getInfo(locale, tenant, new AsyncCallback<GUIInfo>() {
+		InfoService.Instance.get().getInfo(locale, tenant, false, new AsyncCallback<GUIInfo>() {
 			@Override
 			public void onFailure(Throwable error) {
 				SC.warn(error.getMessage());
@@ -102,11 +101,11 @@ public class Frontend implements EntryPoint {
 						if (session == null || !session.isLoggedIn()) {
 							SC.warn(I18N.message("accessdenied"));
 						} else {
+							session.getInfo().setUserNo(info.getUserNo());
+							init(session.getInfo());
 							Session.get().init(session);
-							init(info);
-							I18N.init(session);
 							showMain();
-							connectServerPush();
+							connectWebsockets();
 							declareReloadTrigger(Frontend.this);
 						}
 					}
@@ -115,7 +114,7 @@ public class Frontend implements EntryPoint {
 		});
 	}
 
-	public void showMain() {
+	public static void showMain() {
 		// Remove the loading frame
 		RootPanel.getBodyElement().removeChild(RootPanel.get("loadingwrapper-frontend").getElement());
 		MainPanel.get().show();
@@ -145,32 +144,38 @@ public class Frontend implements EntryPoint {
 	}
 
 	private void init(final GUIInfo info) {
+		Feature.init(info);
 		I18N.init(info);
 
 		WindowUtils.setTitle(info, null);
-
-		Feature.init(info);
-		Session.get().setInfo(info);
-
 		WindowUtils.setFavicon(info);
 
+		Session.get().setInfo(info);
 		Util.setupDensity(info);
 	}
 
 	/**
 	 * Install the receiver to get messages from the server (Server Push)
 	 */
-	public static void connectServerPush() {
+	public void connectWebsockets() {
 		if (Session.get().isServerPushEnabled()) {
-			RemoteEventService remoteEventService = RemoteEventServiceFactory.getInstance().getRemoteEventService();
-			remoteEventService.removeListeners();
-			remoteEventService.addListener(MessengerRemoteService.MESSAGE_DOMAIN_GUI, new RemoteMessageListener());
+			websocket = new Websocket(Util.websocketUrl());
+			websocket.addListener(new EventListener());
+			websocket.open();
 		}
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		if (websocket != null)
+			websocket.close();
 	}
 
 	/**
 	 * Declares the javascript function used to check a permission in the
-	 * current folder.
+	 * current folder
+	 * 
+	 * @param frontend the Frontend module
 	 */
 	public static native void declareCheckPermission(Frontend frontend) /*-{
 		$wnd.checkPermission = function(permission) {
@@ -179,7 +184,9 @@ public class Frontend implements EntryPoint {
 	}-*/;
 
 	/**
-	 * Declares the javascript function used to retrieve the current folder ID.
+	 * Declares the javascript function used to retrieve the current folder ID
+	 * 
+	 * @param frontend the Frontend module
 	 */
 	public static native void declareGetCurrentFolderId(Frontend frontend) /*-{
 		$wnd.getCurrentFolderId = function() {
@@ -189,7 +196,9 @@ public class Frontend implements EntryPoint {
 
 	/**
 	 * Declares the javascript function used to trigger the reload of the
-	 * current folder.
+	 * current folder
+	 * 
+	 * @param frontend the Frontend module
 	 */
 	public static native void declareReloadTrigger(Frontend frontend) /*-{
 		$wnd.triggerReload = function() {
@@ -199,7 +208,9 @@ public class Frontend implements EntryPoint {
 
 	/**
 	 * Declares the javascript function used to trigger the search for a
-	 * specific tag.
+	 * specific tag
+	 * 
+	 * @param frontend the Frontend module
 	 */
 	public static native void declareSearchTag(Frontend frontend) /*-{
 		$wnd.searchTag = function(tag) {

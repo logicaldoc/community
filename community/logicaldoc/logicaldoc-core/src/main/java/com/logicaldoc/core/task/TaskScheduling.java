@@ -116,6 +116,8 @@ public class TaskScheduling {
 
 	/**
 	 * The maximum duration expressed in seconds
+	 * 
+	 * @return the maximpum duration in seconds
 	 */
 	public long getMaxLength() {
 		return maxLength;
@@ -168,6 +170,10 @@ public class TaskScheduling {
 
 	/**
 	 * Loads scheduling configurations from persistent storage
+	 * 
+	 * @throws IOException error reading the configuration file
+	 * 
+	 * @throws ParseException error parsing the scheduling expression
 	 */
 	public void load() throws IOException, ParseException {
 		ContextProperties config = Context.get().getProperties();
@@ -185,6 +191,9 @@ public class TaskScheduling {
 
 	/**
 	 * Saves scheduling configurations in the persistent storage
+	 * 
+	 * @throws IOException raised is an I/O problem occurs
+	 * @throws ParseException raised if the scheduling expression is invalid
 	 */
 	public void save() throws IOException, ParseException {
 		Scheduler scheduler = (Scheduler) Context.get().getBean("Scheduler");
@@ -209,9 +218,9 @@ public class TaskScheduling {
 			Date date = scheduler.rescheduleJob(key, trigger.getObject());
 
 			if (date != null)
-				log.info("Rescheduled the task " + taskName + "; next estimated fire time is " + date);
+				log.info("Rescheduled the task {}; next estimated fire time is {}", taskName, date);
 			else
-				log.warn("Unable to reschedule the task " + taskName);
+				log.warn("Unable to reschedule the task {}", taskName);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 		}
@@ -221,6 +230,8 @@ public class TaskScheduling {
 
 	/**
 	 * Checks if the time was expired(a maxLength must be defined)
+	 * 
+	 * @return if the task execution has expired
 	 */
 	boolean isExpired() {
 		if (previousFireTime == null || getMaxLength() <= 0)

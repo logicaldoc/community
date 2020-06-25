@@ -29,21 +29,24 @@ public class RestFolderClient extends AbstractRestClient {
 		super(endpoint, username, password, timeout);
 
 		JacksonJsonProvider provider = new JacksonJsonProvider();
-		
+
 		if ((username == null) || (password == null)) {
 			proxy = JAXRSClientFactory.create(endpoint, FolderService.class, Arrays.asList(provider));
 		} else {
-			//proxy = JAXRSClientFactory.create(endpoint, FolderService.class, Arrays.asList(provider));
-			//create(String baseAddress, Class<T> cls, List<?> providers, String username, String password, String configLocation)
-			proxy = JAXRSClientFactory.create(endpoint, FolderService.class, Arrays.asList(provider), username, password, null);
+			// proxy = JAXRSClientFactory.create(endpoint, FolderService.class,
+			// Arrays.asList(provider));
+			// create(String baseAddress, Class<T> cls, List<?> providers,
+			// String username, String password, String configLocation)
+			proxy = JAXRSClientFactory.create(endpoint, FolderService.class, Arrays.asList(provider), username,
+					password, null);
 		}
-		
+
 		if (timeout > 0) {
 			HTTPConduit conduit = WebClient.getConfig(proxy).getHttpConduit();
 			HTTPClientPolicy policy = new HTTPClientPolicy();
 			policy.setReceiveTimeout(timeout);
 			conduit.setClient(policy);
-		}		
+		}
 	}
 
 	public WSFolder[] listChildren(long folderId) throws Exception {
@@ -52,21 +55,29 @@ public class RestFolderClient extends AbstractRestClient {
 
 		return proxy.listChildren(folderId);
 	}
-	
+
 	public WSFolder create(WSFolder folder) throws Exception {
 
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
 
 		return proxy.create(folder);
-	}	
+	}
 
 	public WSFolder createPath(long rootFolder, String path) throws Exception {
-
 		WebClient.client(proxy).type(MediaType.APPLICATION_FORM_URLENCODED);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-
 		return proxy.createPath(rootFolder, path);
+	}
+
+	public WSFolder findByPath(String path) throws Exception {
+		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+		return proxy.findByPath(path);
+	}
+
+	public WSFolder getRootFolder() throws Exception {
+		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
+		return proxy.getRootFolder();
 	}
 
 	public WSFolder getFolder(long folderId) throws Exception {

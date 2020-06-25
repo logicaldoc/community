@@ -15,13 +15,13 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.PreviewPopup;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.SendToArchiveDialog;
-import com.logicaldoc.gui.frontend.client.folder.FolderSelector;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -152,12 +152,12 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 
 		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
 		version.setAlign(Alignment.CENTER);
-		version.setCanFilter(true);
+		version.setCanFilter(false);
 		version.setCanGroupBy(false);
 
 		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 55);
 		fileVersion.setAlign(Alignment.CENTER);
-		fileVersion.setCanFilter(true);
+		fileVersion.setCanFilter(false);
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
@@ -201,6 +201,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		list.setCanFreezeFields(false);
 		list.setAutoFetchData(true);
 		list.setFilterOnKeypress(true);
+		list.setShowFilterEditor(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 
 		list.setFields(icon, filename, version, fileVersion, size, created, lastModified, folder, id, customId, type);

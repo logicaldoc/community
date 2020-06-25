@@ -5,24 +5,17 @@ import java.nio.ByteBuffer;
 /**
  * This class recognizes single-byte encodings. Because the encoding scheme is so
  * simple, language statistics are used to do the matching.
- * 
- * @internal
  */
 abstract class CharsetRecog_sbcs extends CharsetRecognizer {
 
-    /* (non-Javadoc)
-     * @see com.ibm.icu.text.CharsetRecognizer#getName()
-     */
+
     abstract String getName();
 
-    /* (non-Javadoc)
-     * @see com.ibm.icu.text.CharsetRecognizer#match(com.ibm.icu.text.CharsetDetector)
-     */
+
     abstract int match(CharsetDetector det);
     
     static class NGramParser
     {
-//        private static final int N_GRAM_SIZE = 3;
         private static final int N_GRAM_MASK = 0xFFFFFF;
 
         private int byteIndex = 0;

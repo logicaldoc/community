@@ -10,9 +10,17 @@ import java.io.Serializable;
  */
 public class GUIDashlet implements Serializable {
 
+	public final static String TYPE_DOCEVENT = "docevent";
+
+	public final static String TYPE_DOCUMENT = "document";
+
+	public final static String TYPE_NOTE = "note";
+
+	public final static String TYPE_CONTENT = "content";
+	
 	private static final long serialVersionUID = 1L;
 
-	private int id;
+	private long id;
 
 	private int column;
 
@@ -20,22 +28,34 @@ public class GUIDashlet implements Serializable {
 
 	private int index;
 
+	private String query;
+
+	private String content;
+
+	private String name;
+
+	private String title;
+	
+	private String type;
+
+	private Integer max;
+	
 	public GUIDashlet() {
 	}
 
-	public GUIDashlet(int id, int column, int row, int index) {
+	public GUIDashlet(String name, int column, int row, int index) {
 		super();
-		this.id = id;
+		this.name = name;
 		this.column = column;
 		this.row = row;
 		this.index = index;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -61,5 +81,53 @@ public class GUIDashlet implements Serializable {
 
 	public void setIndex(int index) {
 		this.index = index;
+	}
+
+	public String getQuery() {
+		return query;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setQuery(String query) {
+		this.query = query;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Integer getMax() {
+		return max;
+	}
+
+	public void setMax(Integer max) {
+		this.max = max;
 	}
 }

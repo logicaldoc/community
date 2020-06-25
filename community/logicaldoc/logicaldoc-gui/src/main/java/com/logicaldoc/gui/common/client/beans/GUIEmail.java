@@ -43,7 +43,17 @@ public class GUIEmail implements Serializable {
 
 	private GUIDocument[] attachments;
 
+	private boolean signed = false;
+
 	public GUIEmail() {
+	}
+
+	public boolean isSigned() {
+		return signed;
+	}
+
+	public void setSigned(boolean signed) {
+		this.signed = signed;
 	}
 
 	public String getSubject() {

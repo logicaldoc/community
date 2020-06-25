@@ -18,11 +18,12 @@ public class FolderHistoryDS extends DataSource {
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 		DataSourceTextField event = new DataSourceTextField("event");
 		DataSourceTextField comment = new DataSourceTextField("comment");
+		DataSourceTextField reason = new DataSourceTextField("reason");
 		DataSourceTextField fileName = new DataSourceTextField("filename");
 		DataSourceTextField path = new DataSourceTextField("path");
 		DataSourceTextField sid = new DataSourceTextField("sid");
 
-		setFields(user, date, event, comment, fileName, path, sid);
+		setFields(user, date, event, comment, reason, fileName, path, sid);
 		setClientOnly(true);
 
 		setDataURL("data/folderhistory.xml?id=" + folderId + "&locale=" + I18N.getLocale());

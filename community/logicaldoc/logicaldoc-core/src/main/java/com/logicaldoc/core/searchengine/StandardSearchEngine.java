@@ -29,12 +29,12 @@ import org.apache.solr.core.CoreContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.parser.Parser;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.searchengine.analyzer.FilteredAnalyzer;
 import com.logicaldoc.util.StringUtil;
@@ -49,7 +49,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class StandardSearchEngine implements SearchEngine {
 
-	public static Version VERSION = Version.LUCENE_6_3_0;
+	public static Version VERSION = Version.LUCENE_7_7_2;
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 
@@ -118,11 +118,13 @@ public class StandardSearchEngine implements SearchEngine {
 			}
 		}
 
-		String utf8Content = StringUtil.removeNonUtf8Chars(content);
-		if (maxText > 0 && utf8Content.length() > maxText)
-			hit.addField(HitField.CONTENT.getName(), StringUtils.substring(utf8Content, 0, maxText));
-		else
-			hit.addField(HitField.CONTENT.getName(), utf8Content);
+		if (content != null) {
+			String utf8Content = StringUtil.removeNonUtf8Chars(content);
+			if (maxText > 0 && utf8Content.length() > maxText)
+				hit.addField(HitField.CONTENT.getName(), StringUtils.substring(utf8Content, 0, maxText));
+			else
+				hit.addField(HitField.CONTENT.getName(), utf8Content);
+		}
 
 		if (doc.getFolder() != null) {
 			hit.addField(HitField.FOLDER_ID.getName(), doc.getFolder().getId());
@@ -134,20 +136,26 @@ public class StandardSearchEngine implements SearchEngine {
 
 			for (String attribute : doc.getAttributeNames()) {
 				Attribute ext = doc.getAttribute(attribute);
+				if (StringUtils.isNotEmpty(ext.getParent()))
+					continue;
+
 				// Skip all non-string attributes
 				if ((ext.getType() == Attribute.TYPE_STRING || ext.getType() == Attribute.TYPE_USER)
-						&& StringUtils.isNotEmpty(ext.getStringValue())) {
+						&& (StringUtils.isNotEmpty(ext.getStringValue())
+								|| StringUtils.isNotEmpty(ext.getStringValues()))) {
 
 					// Prefix all extended attributes with 'ext_' in order to
 					// avoid collisions with standard fields
-					hit.addField("ext_" + attribute, ext.getStringValue());
+					hit.addField("ext_" + attribute,
+							StringUtils.isNotEmpty(ext.getStringValues()) ? ext.getStringValues()
+									: ext.getStringValue());
 				}
 			}
 		}
 
 		// Retrieve the notes
 		StringBuffer sb = new StringBuffer();
-		List<DocumentNote> notes = noteDao.findByDocId(doc.getId());
+		List<DocumentNote> notes = noteDao.findByDocId(doc.getId(), doc.getFileVersion());
 		for (DocumentNote note : notes) {
 			if (sb.length() > 0)
 				sb.append("\n\n");
@@ -181,8 +189,11 @@ public class StandardSearchEngine implements SearchEngine {
 		Locale locale = doc.getLocale();
 		if (locale == null)
 			locale = Locale.ENGLISH;
-		 
-		String contentString = ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId());
+
+		String contentString = null;
+
+		if (doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA)
+			ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId());
 
 		addHit(doc, contentString);
 	}
@@ -240,14 +251,8 @@ public class StandardSearchEngine implements SearchEngine {
 					statMsg = "ERROR: Can't check - tool out-of-date\n";
 				} else {
 					statMsg = "BAD: ";
-					if (status.cantOpenSegments) {
-						statMsg += "cantOpenSegments ";
-					}
 					if (status.missingSegments) {
 						statMsg += "missingSegments ";
-					}
-					if (status.missingSegmentVersion) {
-						statMsg += "missingSegVersion ";
 					}
 					if (status.numBadSegments > 0) {
 						statMsg += "numBadSegments=" + status.numBadSegments + " ";
@@ -302,9 +307,8 @@ public class StandardSearchEngine implements SearchEngine {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * com.logicaldoc.core.searchengine.SearchEngine#deleteHits(java.util.Collection
-	 * )
+	 * @see com.logicaldoc.core.searchengine.SearchEngine#deleteHits(java.util.
+	 * Collection )
 	 */
 	@Override
 	public synchronized void deleteHits(Collection<Long> ids) {
@@ -349,14 +353,13 @@ public class StandardSearchEngine implements SearchEngine {
 	public Hits search(String expression, String[] filters, String expressionLanguage, Integer rows) {
 		try {
 			// This configures the analyzer to use to to parse the expression of
-			// the
-			// content field
+			// the content field
 			FilteredAnalyzer.lang.set(expressionLanguage);
 			Hits hits = null;
 			SolrQuery query = prepareSearchQuery(expression, filters, expressionLanguage, rows);
 
 			try {
-				log.info("Execute search: " + expression);
+				log.info("Execute search: {}", expression);
 				QueryResponse rsp = server.query(query);
 				hits = new Hits(rsp);
 			} catch (Throwable e) {
@@ -371,7 +374,8 @@ public class StandardSearchEngine implements SearchEngine {
 	/**
 	 * Prepares the query for a search.
 	 */
-	protected SolrQuery prepareSearchQuery(String expression, String[] filters, String expressionLanguage, Integer rows) {
+	protected SolrQuery prepareSearchQuery(String expression, String[] filters, String expressionLanguage,
+			Integer rows) {
 		SolrQuery query = new SolrQuery();
 		query.setQuery(expression);
 		query.setSort(SortClause.desc("score"));
@@ -415,11 +419,11 @@ public class StandardSearchEngine implements SearchEngine {
 			if (isLocked())
 				directory.obtainLock(IndexWriter.WRITE_LOCK_NAME).close();
 		} catch (Throwable e) {
-			log.warn("unlock " + e.getMessage());
+			log.warn("unlock {}", e.getMessage());
 			try {
 				FileUtil.strongDelete(new File(getIndexDataFolder(), "write.lock"));
 			} catch (Throwable e1) {
-				log.warn("unlock " + e1.getMessage());
+				log.warn("unlock {}", e1.getMessage());
 			}
 		}
 	}
@@ -442,7 +446,7 @@ public class StandardSearchEngine implements SearchEngine {
 				result = true;
 			}
 		} catch (Throwable e) {
-			log.warn("isLocked " + e.getMessage(), e);
+			log.warn("isLocked {}", e.getMessage(), e);
 		}
 
 		return result;
@@ -536,6 +540,10 @@ public class StandardSearchEngine implements SearchEngine {
 			File protwords_txt = new File(conf, "protwords.txt");
 			if (!protwords_txt.exists()) {
 				FileUtil.copyResource("/index/logicaldoc/conf/protwords.txt", protwords_txt);
+			}
+			File alphatypes_txt = new File(conf, "alphatypes.txt");
+			if (!alphatypes_txt.exists()) {
+				FileUtil.copyResource("/index/logicaldoc/conf/alphatypes.txt", alphatypes_txt);
 			}
 
 			// Delete the lock file if it exists

@@ -1,9 +1,5 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -14,6 +10,10 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import gwtupload.client.IUploadStatus.Status;
+import gwtupload.client.IUploader;
+import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload a new workflow schema to the server.
@@ -35,13 +35,12 @@ public class WorkflowUploader extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		this.designer = designer;
 		setTitle(I18N.message("uploadworkflow"));
-		setWidth(420);
-		setHeight(140);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setAutoSize(true);
 		centerInPage();
-
+		
 		layout.setMembersMargin(2);
 		layout.setMargin(2);
 

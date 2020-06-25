@@ -3,14 +3,13 @@ package com.logicaldoc.core.ticket;
 import java.text.ParseException;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
-import com.logicaldoc.core.ticket.Ticket;
-import com.logicaldoc.core.ticket.TicketDAO;
+import com.logicaldoc.core.PersistenceException;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateTicketDAO</code>
@@ -90,7 +89,7 @@ public class HibernateTicketDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		Ticket ticket = new Ticket();
 		ticket.setDocId(1);
 		ticket.setUserId(3);

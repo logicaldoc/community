@@ -33,7 +33,9 @@ public class LoggingConfigurator {
 	}
 
 	/**
-	 * This method selects all file appenders.
+	 * This method selects all file appenders
+	 * 
+	 * @return collection of the appender names
 	 */
 	public Collection<String> getLoggingFiles() {
 		Collection<String> result = new ArrayList<String>();
@@ -59,6 +61,8 @@ public class LoggingConfigurator {
 
 	/**
 	 * This method selects all file appenders suitable for web visualization
+	 * 
+	 * @return collection of the appender names
 	 */
 	public Collection<String> getWebLoggingFiles() {
 		Collection<String> result = new ArrayList<String>();
@@ -72,7 +76,11 @@ public class LoggingConfigurator {
 	}
 
 	/**
-	 * same as getFile(appender, true)
+	 * Same as {@link #getFile(String, boolean)}
+	 * 
+	 * @param appender name of the appender
+	 * 
+	 * @return the path of the log file
 	 */
 	public String getFile(String appender) {
 		return getFile(appender, true);
@@ -84,6 +92,7 @@ public class LoggingConfigurator {
 	 * @param appender The appender name
 	 * @param replaceVariables If true all variables(${var}) in the file path
 	 *        will be substituted
+	 * 
 	 * @return The log file path
 	 */
 	public String getFile(String appender, boolean replaceVariables) {
@@ -111,6 +120,9 @@ public class LoggingConfigurator {
 
 	/**
 	 * This method sets a file of an appender.
+	 * 
+	 * @param appender name of the appender
+	 * @param file path of the log file
 	 */
 	public void setFile(String appender, String file) {
 		Element elem = xml.getChild("appender", "name", appender);

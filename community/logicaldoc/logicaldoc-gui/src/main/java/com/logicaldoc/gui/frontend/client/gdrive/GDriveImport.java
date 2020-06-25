@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
-import com.logicaldoc.gui.frontend.client.menu.SearchBox;
 import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;

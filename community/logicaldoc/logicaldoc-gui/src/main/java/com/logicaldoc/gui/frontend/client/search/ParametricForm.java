@@ -19,7 +19,8 @@ import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.folder.FolderSelector;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
+import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
@@ -115,6 +116,7 @@ public class ParametricForm extends VLayout {
 		CheckboxItem casesensitive = new CheckboxItem("casesensitive", I18N.message("casesensitive"));
 		casesensitive.setValue(true);
 		CheckboxItem aliases = new CheckboxItem("aliases", I18N.message("retrievealiases"));
+		aliases.setValue(true);
 
 		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders2"));
 		subfolders.setColSpan(2);
@@ -143,7 +145,7 @@ public class ParametricForm extends VLayout {
 				@Override
 				public void onChanged(ChangedEvent event) {
 					if (event.getValue() != null && !"".equals((String) event.getValue())) {
-						TemplateService.Instance.get().getTemplate(new Long((String) event.getValue()),
+						TemplateService.Instance.get().getTemplate(Long.parseLong((String) event.getValue()),
 								new AsyncCallback<GUITemplate>() {
 									@Override
 									public void onFailure(Throwable caught) {
@@ -223,12 +225,9 @@ public class ParametricForm extends VLayout {
 
 		GUISearchOptions options = new GUISearchOptions();
 
-		String hits = Session.get().getInfo().getConfig("search.hits");
-		if (hits != null)
-			options.setMaxHits(Integer.parseInt(hits));
-
-		options.setRetrieveAliases(new Boolean(vm.getValueAsString("aliases")).booleanValue() ? 1 : 0);
-		options.setCaseSensitive(new Boolean(vm.getValueAsString("casesensitive")).booleanValue() ? 1 : 0);
+		options.setMaxHits(Session.get().getConfigAsInt("search.hits"));
+		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
+		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString("casesensitive")) ? 1 : 0);
 
 		options.setType(GUISearchOptions.TYPE_PARAMETRIC);
 
@@ -240,7 +239,7 @@ public class ParametricForm extends VLayout {
 
 		if (values.containsKey("template") && values.get("template") != null
 				&& !((String) values.get("template")).isEmpty())
-			options.setTemplate(new Long((String) values.get("template")));
+			options.setTemplate(Long.parseLong((String) values.get("template")));
 
 		options.setTopOperator((String) values.get("match"));
 
@@ -249,60 +248,70 @@ public class ParametricForm extends VLayout {
 			options.setFolderName(folder.getFolderName());
 		}
 
-		options.setSearchInSubPath(new Boolean(vm.getValueAsString("subfolders")).booleanValue());
+		options.setSearchInSubPath(Boolean.parseBoolean(vm.getValueAsString("subfolders")));
 
 		List<GUICriterion> list = new ArrayList<GUICriterion>();
 		if (conditionsLayout.getMembers() != null)
 			for (Canvas canvas : conditionsLayout.getMembers()) {
 				ParameterConditionRow condition = (ParameterConditionRow) canvas;
-				String fieldName = condition.getCriteriaFieldsItem().getValueAsString();
+				String fieldName = condition.getAttributeFieldItem().getValueAsString();
 				if (fieldName == null || fieldName.isEmpty())
 					continue;
 
 				fieldName = fieldName.replaceAll(Constants.BLANK_PLACEHOLDER, " ");
 				if (fieldName.startsWith("_"))
 					fieldName = fieldName.substring(1);
-				String fieldOperator = condition.getOperatorsFieldsItem().getValueAsString();
-				Object fieldValue = condition.getValueFieldsItem().getValue();
-
-				// This lines are necessary to avoid error for GWT values type.
-				if (condition.getValueFieldsItem() instanceof IntegerItem)
-					fieldValue = Long.parseLong(fieldValue.toString());
-
-				if (fieldName.endsWith("type:" + GUIAttribute.TYPE_INT)
-						|| fieldName.endsWith("type:" + GUIAttribute.TYPE_DOUBLE))
-					fieldValue = Long.parseLong(fieldValue.toString());
-				else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN))
-					fieldValue = fieldValue.toString().equals("yes") ? 1L : 0L;
-				else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DATE))
-					fieldValue = (Date) fieldValue;
-				else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
-					fieldName = fieldName.replaceAll("type:" + GUIAttribute.TYPE_STRING_PRESET, "type:"
-							+ GUIAttribute.TYPE_STRING);
-				} else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_TEXTAREA)) {
-					fieldName = fieldName.replaceAll("type:" + GUIAttribute.TYPE_STRING_TEXTAREA, "type:"
-							+ GUIAttribute.TYPE_STRING);
-				}
+				String fieldOperator = condition.getOperatorsFieldItem().getValueAsString();
+				Object fieldValue = condition.getValueFieldItem() != null ? condition.getValueFieldItem().getValue()
+						: null;
 
 				GUICriterion criterion = new GUICriterion();
-				criterion.setField(fieldName);
 
-				if (fieldValue instanceof Date)
-					criterion.setDateValue((Date) fieldValue);
-				else if (fieldValue instanceof Integer)
-					criterion.setLongValue(new Long((Integer) fieldValue));
-				else if (fieldValue instanceof Long)
-					criterion.setLongValue((Long) fieldValue);
-				else if (fieldValue instanceof Float)
-					criterion.setDoubleValue(new Double((Float) fieldValue));
-				else if (fieldValue instanceof Double)
-					criterion.setDoubleValue((Double) fieldValue);
-				else if (fieldValue instanceof String)
-					criterion.setStringValue((String) fieldValue);
-				else if (fieldValue instanceof JavaScriptObject) {
-					Map m = JSOHelper.convertToMap((JavaScriptObject) fieldValue);
+				if (fieldValue != null) {
+					// This lines are necessary to avoid error for GWT values
+					// type.
+					if (condition.getValueFieldItem() instanceof IntegerItem)
+						fieldValue = Long.parseLong(fieldValue.toString());
+					if (condition.getValueFieldItem() instanceof UserSelector)
+						fieldValue = ((UserSelector) condition.getValueFieldItem()).getUser().getId();
+					if (condition.getValueFieldItem() instanceof FolderSelector)
+						fieldValue = ((FolderSelector) condition.getValueFieldItem()).getFolder().getId();
+
+					if (fieldName.endsWith("type:" + GUIAttribute.TYPE_INT)
+							|| fieldName.endsWith("type:" + GUIAttribute.TYPE_USER)
+							|| fieldName.endsWith("type:" + GUIAttribute.TYPE_FOLDER))
+						fieldValue = Long.parseLong(fieldValue.toString());
+					else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DOUBLE))
+						fieldValue = Double.parseDouble(fieldValue.toString());
+					else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN))
+						fieldValue = fieldValue.toString().equals("yes") ? 1L : 0L;
+					else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DATE))
+						fieldValue = (Date) fieldValue;
+					else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
+						fieldName = fieldName.replaceAll("type:" + GUIAttribute.TYPE_STRING_PRESET,
+								"type:" + GUIAttribute.TYPE_STRING);
+					} else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_TEXTAREA)) {
+						fieldName = fieldName.replaceAll("type:" + GUIAttribute.TYPE_STRING_TEXTAREA,
+								"type:" + GUIAttribute.TYPE_STRING);
+					}
+					if (fieldValue instanceof Date)
+						criterion.setDateValue((Date) fieldValue);
+					else if (fieldValue instanceof Integer)
+						criterion.setLongValue(Long.valueOf((Integer) fieldValue));
+					else if (fieldValue instanceof Long)
+						criterion.setLongValue((Long) fieldValue);
+					else if (fieldValue instanceof Float)
+						criterion.setDoubleValue(((Float) fieldValue).doubleValue());
+					else if (fieldValue instanceof Double)
+						criterion.setDoubleValue((Double) fieldValue);
+					else if (fieldValue instanceof String)
+						criterion.setStringValue((String) fieldValue);
+					else if (fieldValue instanceof JavaScriptObject) {
+						Map m = JSOHelper.convertToMap((JavaScriptObject) fieldValue);
+					}
 				}
 
+				criterion.setField(fieldName);
 				criterion.setOperator(fieldOperator.toLowerCase());
 
 				if (!fieldName.equals("tags")) {
@@ -311,7 +320,7 @@ public class ParametricForm extends VLayout {
 					// In case of tags, we will have to create a criterion per
 					// tag
 					if (fieldName.equals("tags")) {
-						String[] tgs = ((SelectItem) condition.getValueFieldsItem()).getValues();
+						String[] tgs = ((SelectItem) condition.getValueFieldItem()).getValues();
 						for (String tag : tgs) {
 							GUICriterion c = new GUICriterion();
 							c.setField(fieldName);
@@ -343,7 +352,7 @@ public class ParametricForm extends VLayout {
 
 		options.setCriteria(list.toArray(new GUICriterion[0]));
 
-		if (new Boolean(vm.getValueAsString(SEARCHINHITS)).booleanValue()) {
+		if (Boolean.parseBoolean(vm.getValueAsString(SEARCHINHITS))) {
 			GUIDocument[] records = Search.get().getLastResult();
 			Long[] ids = new Long[records.length];
 			int i = 0;

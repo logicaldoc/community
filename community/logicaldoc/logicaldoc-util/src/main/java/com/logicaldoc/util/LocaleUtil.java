@@ -16,8 +16,9 @@ public class LocaleUtil {
 	/**
 	 * Creates the locale from a string
 	 * 
-	 * @param str String in format <language>_<country>_<variant>
-	 * @return
+	 * @param str String in format <b>language</b>_<b>country</b>_<b>variant</b>
+	 * 
+	 * @return the locale that corresponds to <code>str</code>
 	 */
 	public static Locale toLocale(String str) {
 		if (StringUtils.isEmpty(str))

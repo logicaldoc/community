@@ -8,11 +8,13 @@ import java.util.Map;
  * <p>
  * Each methods has access to a dictionary map that can be used through the
  * execution pipeline in order to carry needed informations among all listeners.
+ * </p>
  * 
  * @author Matteo Caruso - LogicalDOC
  * @since 5.1
  */
 public interface UserListener {
+
 	/**
 	 * Called before a user is stored in the database
 	 * 
@@ -20,7 +22,7 @@ public interface UserListener {
 	 * @param transaction Transaction informations
 	 * @param dictionary Dictionary of the execution pipeline
 	 * 
-	 * @throws Exception
+	 * @throws Exception raises if some kind of error happens during execution
 	 */
 	public void beforeStore(User user, UserHistory transaction, Map<String, Object> dictionary) throws Exception;
 
@@ -31,7 +33,7 @@ public interface UserListener {
 	 * @param transaction Transaction informations
 	 * @param dictionary Dictionary of the execution pipeline
 	 * 
-	 * @throws Exception
+	 * @throws Exception raises if some kind of error happens during execution
 	 */
 	public void afterStore(User user, UserHistory transaction, Map<String, Object> dictionary) throws Exception;
 }

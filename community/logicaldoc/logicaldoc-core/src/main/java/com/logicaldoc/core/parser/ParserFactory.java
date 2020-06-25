@@ -23,8 +23,7 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
- * This is a factory, returning a parser instance for the given file. Created on
- * 4. November 2003, 21:54
+ * This is a factory, returning a parser instance for the given file.
  * 
  * @author Michael Scholz
  */
@@ -101,6 +100,9 @@ public class ParserFactory {
 		parsers.put("pps", new PPTParser());
 		parsers.put("pot", new PPTParser());
 
+		// Zip
+		parsers.put("zip", new ZipParser());
+
 		// Acquire the 'Parse' extensions of the core plugin and add defined
 		// parsers
 		PluginRegistry registry = PluginRegistry.getInstance();
@@ -113,8 +115,8 @@ public class ParserFactory {
 				// Try to instantiate the parser
 				Object parser = clazz.newInstance();
 				if (!(parser instanceof Parser))
-					throw new Exception(String.format("The specified parser %s doesn't implement Parser interface",
-							className));
+					throw new Exception(
+							String.format("The specified parser %s doesn't implement Parser interface", className));
 				parsers.put(ext, (Parser) parser);
 				log.info("Added new parser {} for extension {}", className, ext);
 			} catch (Throwable e) {
@@ -127,6 +129,14 @@ public class ParserFactory {
 
 	/**
 	 * Gets the proper parser and parse the given content
+	 * 
+	 * @param input the input contents as stream
+	 * @param filename name of the file
+	 * @param encoding encoding of the stream
+	 * @param locale the locale
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return the text extracted from the input
 	 */
 	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId) {
 		Parser parser = getParser(filename);
@@ -139,14 +149,18 @@ public class ParserFactory {
 	}
 
 	/**
-	 * Method containing the lookup logic.
+	 * Method containing the lookup logic
+	 * 
+	 * @param filename name of the file
+	 * 
+	 * @return the right parser for the given file name
 	 */
 	public static Parser getParser(String filename) {
 		if (parsers.isEmpty())
 			init();
 
 		String ext = filename.contains(".") ? FilenameUtils.getExtension(filename.trim()) : filename.trim();
-		if (StringUtils.isEmpty(ext))
+		if (!StringUtils.isEmpty(ext))
 			ext = ext.toLowerCase();
 
 		Parser parser = parsers.get(ext);
@@ -155,7 +169,7 @@ public class ParserFactory {
 
 			String alias = aliases.get(ext);
 			if (StringUtils.isNotEmpty(alias)) {
-				log.info("Found alias " + alias);
+				log.info("Found alias {}", alias);
 				parser = parsers.get(alias);
 			}
 		}

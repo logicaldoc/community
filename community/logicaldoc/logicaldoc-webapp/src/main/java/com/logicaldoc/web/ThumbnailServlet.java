@@ -127,7 +127,7 @@ public class ThumbnailServlet extends HttpServlet {
 		if (storer.size(doc.getId(), thumbResource) <= 0) {
 			try {
 				thumbManager.createTumbnail(doc, fileVersion, sid);
-				log.debug("Created thumbnail " + resource);
+				log.debug("Created thumbnail {}", resource);
 			} catch (Throwable t) {
 				log.error(t.getMessage(), t);
 			}
@@ -141,7 +141,7 @@ public class ThumbnailServlet extends HttpServlet {
 			if (storer.size(doc.getId(), tileResource) <= 0L) {
 				try {
 					thumbManager.createTile(doc, fileVersion, sid);
-					log.debug("Created tile " + resource);
+					log.debug("Created tile {}", resource);
 				} catch (Throwable t) {
 					log.error(t.getMessage(), t);
 				}

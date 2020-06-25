@@ -51,7 +51,7 @@ public class GUITask implements Serializable {
 		int i = 0;
 		for (GUIUser u : reportRecipients) {
 			// Skip if the user already exists
-			if (u.getUserName().equals(user.getUserName()))
+			if (u.getUsername().equals(user.getUsername()))
 				return;
 			tmp[i++] = u;
 		}

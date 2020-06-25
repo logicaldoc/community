@@ -14,22 +14,22 @@ import com.logicaldoc.webservice.rest.AuthService;
  * @since 6.9
  */
 public class RestAuthClient extends AbstractRestClient implements AuthService {
-	
+
 	protected static Logger log = LoggerFactory.getLogger(RestAuthClient.class);
-	
+
 	private AuthService proxy = null;
 
 	public RestAuthClient(String endpoint) {
 		super(endpoint, null, null);
 		proxy = JAXRSClientFactory.create(endpoint, AuthService.class);
 	}
-	
-	public String login(String username, String password) throws Exception {
-		return proxy.login(username, password);   
-	}	
 
-	public void logout() {
-		proxy.logout();
+	public String login(String username, String password) throws Exception {
+		return proxy.login(username, password);
+	}
+
+	public void logout(String sid) {
+		proxy.logout(sid);
 	}
 
 	@Override
@@ -41,10 +41,9 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 	public String loginPostJSON(String jsonstr) throws Exception {
 		return proxy.loginPostJSON(jsonstr);
 	}
-
+	
 	@Override
 	public String getSid() {
 		return proxy.getSid();
-	}
-
+	}	
 }

@@ -18,33 +18,34 @@ import com.logicaldoc.webdav.session.DavSession;
  * are also implemented through every method. Therefore the caller
  * (WebDAV-Implementation) has just pass the required path or
  * 
- * @link {@link Resource} Object to the appropriated method.
+ * @see Resource Object to the appropriated method.
  * 
  * @author Sebastian Wenzky
- * 
  */
-public interface ResourceService extends Serializable{
+public interface ResourceService extends Serializable {
 
 	/**
 	 * On passing a location as well as the current session you gettin back the
 	 * appropriated resource.
 	 * 
-	 * @param location The location retrieved through {@see
-	 *        DavResourceLocator#getResourcePath}
+	 * @param location The location retrieved through (@see DavResourceLocator#getResourcePath())
 	 * @param session The current session
-	 * @return
-	 * @throws DavException
+	 * 
+	 * @return the DAV resource
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public Resource getResource(String location, DavSession session) throws DavException;
 
 	/**
 	 * On passing a valid
 	 * 
-	 * @link {@link Resource} all resources (Folders as well as documents) will
-	 *       be returned - unsorted.
+	 * @see Resource all resources (Folders as well as documents) will be
+	 *      returned - unsorted.
 	 * 
 	 * @param parentResource The resource(mostly a folder) from which are all
 	 *        direct childs has to be fetched and turned back
+	 *        s
 	 * @return direct childs of the parent resource
 	 */
 	public List<Resource> getChildResources(Resource parentResource);
@@ -58,8 +59,10 @@ public interface ResourceService extends Serializable{
 	 * @param isCollection is the resource folder?
 	 * @param context for inputstream
 	 * @param session the current session
+	 * 
 	 * @return the newly created {@link Resource}
-	 * @throws DavException
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public Resource createResource(Resource parentResource, String name, boolean isCollection, ImportContext context,
 			DavSession session) throws DavException;
@@ -70,6 +73,7 @@ public interface ResourceService extends Serializable{
 	 * valid resource in logicalDOC.
 	 * 
 	 * @param resource The updateable resource
+	 * 
 	 * @return the updated resource
 	 */
 	public Resource updateResource(Resource resource);
@@ -82,7 +86,8 @@ public interface ResourceService extends Serializable{
 	 * @param resource The updateable resource
 	 * @param context the ImportContext
 	 * @param session the current session
-	 * @throws DavException
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public void updateResource(Resource resource, ImportContext context, DavSession session) throws DavException;
 
@@ -90,7 +95,8 @@ public interface ResourceService extends Serializable{
 	 * Check for existing resource(logically)
 	 * 
 	 * @param resource The Resource
-	 * @return True if foud else false
+	 * 
+	 * @return True if found else false
 	 */
 	public boolean resourceExists(Resource resource);
 
@@ -100,6 +106,7 @@ public interface ResourceService extends Serializable{
 	 * 
 	 * @param parentResource The parent resource
 	 * @param name name of the child must be
+	 * 
 	 * @return The resource that matches, else it will be returned null
 	 */
 	public Resource getChildByName(Resource parentResource, String name);
@@ -109,19 +116,21 @@ public interface ResourceService extends Serializable{
 	 * resource
 	 * 
 	 * @param resource the current resource
+	 * 
 	 * @return the parent resource
 	 */
 	public Resource getParentResource(Resource resource);
 
 	/**
-	 * Based on a location path (given by
+	 * Based on a location path
 	 * 
-	 * @see {@link DavResourceLocator#getResourcePath()} the system tries to get
-	 *      the parent resource
+	 * @see DavResourceLocator#getResourcePath() the system tries to get the
+	 *      parent resource
 	 * 
 	 * @param location the resource path
 	 * @param userId the user id
 	 * @param session the current session
+	 * 
 	 * @return the parent resource
 	 */
 	public Resource getParentResource(String location, long userId, DavSession session);
@@ -133,40 +142,46 @@ public interface ResourceService extends Serializable{
 	 * @param destination the destination of the move operation
 	 * @param session the current session
 	 * @return the moved resource
-	 * @throws DavException
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public Resource move(Resource target, Resource destination, DavSession session) throws DavException;
 
 	/**
+	 * Sets the stream for a resource
 	 * 
-	 * @param resource
-	 * @param is
+	 * @param resource the DAV resource
+	 * @param is the stream gor the resource
 	 */
 	public void streamIn(Resource resource, InputStream is);
 
 	/**
+	 * Gets the stream for a resource
 	 * 
-	 * @param resource
-	 * @return
+	 * @param resource the DAV resource
+	 * 
+	 * @return the stream of the resource
 	 */
 	public InputStream streamOut(Resource resource);
 
 	/**
 	 * Deletion of a resource within logicalDOC.
 	 * 
-	 * @param resource a vaild resource
+	 * @param resource a valid resource
 	 * @param session the current session
-	 * @throws DavException
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public void deleteResource(Resource resource, DavSession session) throws DavException;
 
 	/**
 	 * Copying of a resource within logicalDOC. Not supported those days.
 	 * 
-	 * @param destinResource
-	 * @param resource
+	 * @param destinResource target resource
+	 * @param resource the DAV resource
 	 * @param session the current session
-	 * @throws DavException
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public void copyResource(Resource destinResource, Resource resource, DavSession session) throws DavException;
 
@@ -176,7 +191,8 @@ public interface ResourceService extends Serializable{
 	 * 
 	 * @param resource The appropriated resource that has to be checked out
 	 * @param session the current session
-	 * @throws DavException
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
 	public void checkout(Resource resource, DavSession session) throws DavException;
 
@@ -185,12 +201,15 @@ public interface ResourceService extends Serializable{
 	 * returned matches to this resource.
 	 * 
 	 * @param resource The appropriated resource
+	 * 
 	 * @return All Versions
 	 */
 	public List<Resource> getHistory(Resource resource);
 
 	/**
-	 * @param resource
+	 * Cancels a checkout
+	 * 
+	 * @param resource the DAV resource
 	 * @param session the current session
 	 */
 	public void uncheckout(Resource resource, DavSession session);

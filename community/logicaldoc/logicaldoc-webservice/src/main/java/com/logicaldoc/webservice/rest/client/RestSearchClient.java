@@ -30,8 +30,8 @@ public class RestSearchClient extends AbstractRestClient {
 	 * Constructor
 	 * 
 	 * @param endpoint  Connection URL
-	 * @param username
-	 * @param password
+	 * @param username the username
+	 * @param password the password
 	 * @param timeout Timeout for the RESTful requests
 	 */
 	public RestSearchClient(String endpoint, String username, String password, int timeout) {
@@ -59,6 +59,5 @@ public class RestSearchClient extends AbstractRestClient {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);		
 
 		return proxy.find(owd);
-	}	
-
+	}
 }

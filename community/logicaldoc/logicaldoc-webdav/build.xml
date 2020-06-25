@@ -2,6 +2,18 @@
 	<property file="${user.home}/logicaldoc-dev.properties" />
 	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
 
+	
+    <target name="deploy-classes" depends="init-all" description="Copy classes into a deployed webapp">
+        <property environment="env" />
+        <property id="properties" file="build.properties" />
+
+        <copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
+            <fileset dir="target/classes">
+                <include name="com/logicaldoc/webdav/**" />
+            </fileset>
+        </copy>
+    </target>
+    	
 	<target name="deploy" depends="init-all" description="Updates a deployed webapp">
 		<property environment="env" />
 		<property id="properties" file="build.properties" />

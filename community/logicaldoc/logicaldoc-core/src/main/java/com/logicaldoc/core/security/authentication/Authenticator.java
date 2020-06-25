@@ -16,8 +16,9 @@ public interface Authenticator {
 	 * Authenticates the user using the given credentials, if successful, the
 	 * corresponding user is returned.
 	 * 
-	 * @param username
-	 * @param password
+	 * @param username the username
+	 * @param password the password
+	 * 
 	 * @return The user, or null if the authentication was unsuccessful
 	 */
 	public User authenticate(String username, String password) throws AuthenticationException;
@@ -26,9 +27,10 @@ public interface Authenticator {
 	 * Authenticates the user using the given credentials, if successful, the
 	 * corresponding user is returned.
 	 * 
-	 * @param username
-	 * @param password
+	 * @param username the username
+	 * @param password the password
 	 * @param key Optional third authentication parameter
+	 * 
 	 * @return The user, or null if the authentication was unsuccessful
 	 */
 	public User authenticate(String username, String password, String key) throws AuthenticationException;
@@ -37,11 +39,13 @@ public interface Authenticator {
 	 * Authenticates the user using the given credentials, if successful, the
 	 * corresponding user is returned.
 	 * 
-	 * @param username
-	 * @param password
+	 * @param username the username
+	 * @param password the password
 	 * @param key Optional third authentication parameter
+	 * 
 	 * @param client Client informations
-	 * @return @return The user, or null if the authentication was unsuccessful
+	 * 
+	 * @return The user, or null if the authentication was unsuccessful
 	 */
 	public User authenticate(String username, String password, String key, Client client) throws AuthenticationException;
 
@@ -49,6 +53,8 @@ public interface Authenticator {
 
 	/**
 	 * A provider can be in a disabled state
+	 * 
+	 * @return if this authenticator is enabled
 	 */
 	public boolean isEnabled();
 }

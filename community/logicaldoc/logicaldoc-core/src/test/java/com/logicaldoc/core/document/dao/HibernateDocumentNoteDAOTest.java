@@ -2,13 +2,14 @@ package com.logicaldoc.core.document.dao;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentNote;
+
+import junit.framework.Assert;
 
 /**
  * Test case for document note DAO
@@ -30,7 +31,7 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testFindByDocId() {
-		List<DocumentNote> notes = dao.findByDocId(1L);
+		List<DocumentNote> notes = dao.findByDocId(1L, null);
 		Assert.assertNotNull(notes);
 		Assert.assertEquals(2, notes.size());
 		DocumentNote note = notes.get(0);
@@ -38,9 +39,9 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDeleteContentAnnotations() {
-		Assert.assertNotNull(dao.findById(2L));
-		dao.deleteContentAnnotations(1L);
-		Assert.assertNull(dao.findById(2L));
+	public void testCopyAnnotations() throws PersistenceException {
+		Assert.assertTrue(dao.findByDocId(4L, "2.0").isEmpty());
+		dao.copyAnnotations(4L, "1.0", "2.0");
+		Assert.assertEquals(1, dao.findByDocId(4L, "2.0").size());
 	}
 }

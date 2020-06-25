@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.frontend.client.webcontent;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -9,7 +8,6 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.logicaldoc.gui.frontend.client.services.DocumentServiceAsync;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
@@ -35,15 +33,13 @@ public class WebcontentCreate extends Window {
 	public WebcontentCreate() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("createwebcontent"));
-		setWidth(270);
-		setHeight(155);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setAutoSize(true);
 		centerInPage();
-		setPadding(5);
-		setMembersMargin(3);
-
+		
+		
 		DynamicForm form = new DynamicForm();
 		vm = new ValuesManager();
 		form.setValuesManager(vm);
@@ -90,27 +86,28 @@ public class WebcontentCreate extends Window {
 		vo.setLanguage(I18N.getDefaultLocaleForDoc());
 		vo.setFolder(Session.get().getCurrentFolder());
 
-		DocumentService.Instance.get().createEmpty(vo, new AsyncCallback<GUIDocument>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
-				destroy();
-			}
+		DocumentService.Instance.get().createWithContent(vo, "<html><body></body></html>",
+				new AsyncCallback<GUIDocument>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+						destroy();
+					}
 
-			@Override
-			public void onSuccess(GUIDocument document) {
-				DocumentsPanel.get().refresh();
-				DocumentsPanel.get().selectDocument(document.getId(), true);
+					@Override
+					public void onSuccess(GUIDocument document) {
+						DocumentsPanel.get().refresh();
+						DocumentsPanel.get().selectDocument(document.getId(), true);
 
-				Session.get().getUser().setCheckedOutDocs(Session.get().getUser().getCheckedOutDocs() + 1);
-				Log.info(I18N.message("documentcheckedout"), null);
+						Session.get().getUser().setCheckedOutDocs(Session.get().getUser().getCheckedOutDocs() + 1);
+						Log.info(I18N.message("documentcheckedout"), null);
 
-				destroy();
+						destroy();
 
-				WebcontentEditor popup = new WebcontentEditor(document);
-				popup.show();
-			}
-		});
+						WebcontentEditor popup = new WebcontentEditor(document);
+						popup.show();
+					}
+				});
 
 		destroy();
 	}

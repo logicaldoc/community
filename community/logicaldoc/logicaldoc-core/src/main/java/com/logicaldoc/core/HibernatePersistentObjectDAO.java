@@ -5,13 +5,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,6 +20,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -35,6 +38,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected SessionFactory sessionFactory;
 
+	protected final static String STORING_ASPECT = "storing";
+
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
@@ -44,8 +49,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		this.entityClass = entityClass;
 	}
 
-	public boolean delete(long id, int code) {
+	public boolean delete(long id, int code) throws PersistenceException {
 		assert (code != 0);
+
+		if (!checkStoringAspect())
+			return false;
 
 		boolean result = true;
 		try {
@@ -55,30 +63,49 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			entity.setDeleted(code);
 			store(entity);
 		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
+			throw new PersistenceException(e);
 		}
 		return result;
 	}
 
-	public boolean delete(long id) {
+	public boolean delete(long id) throws PersistenceException {
 		return delete(id, PersistentObject.DELETED_CODE_DEFAULT);
 	}
 
 	public List<T> findAll() {
-		return findByWhere("", "", null);
+		try {
+			return findByWhere("", "", null);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<T>();
+		}
 	}
 
 	public List<T> findAll(long tenantId) {
-		return findByWhere(" _entity.tenantId=" + tenantId, "", null);
+		try {
+			return findByWhere(" _entity.tenantId=" + tenantId, "", null);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<T>();
+		}
 	}
 
 	public List<Long> findAllIds() {
-		return findIdsByWhere("", "", null);
+		try {
+			return findIdsByWhere("", "", null);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<Long>();
+		}
 	}
 
 	public List<Long> findAllIds(long tenantId) {
-		return findIdsByWhere(" _entity.tenantId=" + tenantId, "", null);
+		try {
+			return findIdsByWhere(" _entity.tenantId=" + tenantId, "", null);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			return new ArrayList<Long>();
+		}
 	}
 
 	@Override
@@ -96,88 +123,132 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			entity = (T) sessionFactory.getCurrentSession().get(entityClass, id);
 			if (entity != null && entity.getDeleted() == 1)
 				return null;
+			return entity;
 		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
+			return null;
 		}
-		return entity;
 	}
 
 	@Override
-	public List<T> findByWhere(String where, String order, Integer max) {
+	public List<T> findByWhere(String where, String order, Integer max) throws PersistenceException {
 		return findByWhere(where, null, order, max);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public List<T> findByWhere(String where, Object[] values, String order, Integer max) {
+	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException {
 		List<T> coll = new ArrayList<T>();
 		try {
+			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains("order by")
+					? "order by " + order
+					: order;
 			String query = "from " + entityClass.getCanonicalName() + " _entity where _entity.deleted=0 "
 					+ (StringUtils.isNotEmpty(where) ? " and (" + where + ") " : " ")
-					+ (StringUtils.isNotEmpty(order) ? order : " ");
-			log.debug("Execute query: " + query);
-			Query queryObject = prepareQuery(query, values, max);
-			coll = (List<T>) queryObject.list();
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
+			coll = findByObjectQuery(query, values, max);
+			return coll;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
 		}
-		return coll;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List findByQuery(String query, Object[] values, Integer max) {
-		List<Object> coll = new ArrayList<Object>();
-		try {
-			log.debug("Execute query: " + query);
-			Query queryObject = prepareQuery(query, values, max);
-			coll = (List<Object>) queryObject.list();
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-		}
-		return coll;
 	}
 
 	@Override
-	public List<Long> findIdsByWhere(String where, String order, Integer max) {
+	public List<T> findByObjectQuery(String query, Object[] values, Integer max) throws PersistenceException {
+		List<T> coll = new ArrayList<T>();
+		try {
+			log.debug("Execute query: {}", query);
+			Query<T> queryObject = prepareQueryForObject(query, values, max);
+			coll = (List<T>) queryObject.list();
+			return coll;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List findByQuery(String query, Object[] values, Integer max) throws PersistenceException {
+		List<Object> coll = new ArrayList<Object>();
+		try {
+			log.debug("Execute query: {}", query);
+			Query queryObject = prepareQuery(query, values, max);
+			coll = (List<Object>) queryObject.list();
+			return coll;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException {
 		return findIdsByWhere(where, new Object[0], order, max);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public List<Long> findIdsByWhere(String where, Object[] values, String order, Integer max) {
+	public List<Long> findIdsByWhere(String where, Object[] values, String order, Integer max)
+			throws PersistenceException {
 		List<Long> coll = new ArrayList<Long>();
 		try {
+			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains("order by")
+					? "order by " + order
+					: order;
 			String query = "select _entity.id from " + entityClass.getCanonicalName()
 					+ " _entity where _entity.deleted=0 "
 					+ (StringUtils.isNotEmpty(where) ? " and (" + where + ") " : " ")
-					+ (StringUtils.isNotEmpty(order) ? order : " ");
-			log.debug("Execute query: " + query);
-			Query queryObject = prepareQuery(query, values, max);
+					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
+			log.debug("Execute query: {}", query);
+			Query<Long> queryObject = prepareQueryForLong(query, values, max);
 			coll = (List<Long>) queryObject.list();
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+			return coll;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
 		}
-		return coll;
 	}
 
-	public boolean store(T entity) {
-		boolean result = true;
-		try {
-			// Save the entity
-			entity.setLastModified(new java.util.Date());
-			sessionFactory.getCurrentSession().saveOrUpdate(entity);
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
+	/**
+	 * Checks if the aspect for storing data is enabled
+	 */
+	protected boolean checkStoringAspect() {
+		if (!RunLevel.current().aspectEnabled(STORING_ASPECT)) {
+			log.error("Apect {} is disabled", STORING_ASPECT);
+			return false;
 		}
-		return result;
+		return true;
+	}
+
+	public boolean store(T entity) throws PersistenceException {
+		if (!checkStoringAspect())
+			return false;
+
+		try {
+			entity.setLastModified(new java.util.Date());
+
+			// Save the entity
+			saveOrUpdate(entity);
+			return true;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	protected void saveOrUpdate(Object entity) {
+		// Update the attributes
+		if (entity instanceof ExtensibleObject) {
+			try {
+				ExtensibleObject extensibleEntity = (ExtensibleObject) entity;
+				for (String name : extensibleEntity.getAttributes().keySet()) {
+					Attribute att = extensibleEntity.getAttribute(name);
+					if (att.getMultiple() == 1 && att.getType() == Attribute.TYPE_STRING) {
+						String vals = extensibleEntity.getValues(name).stream().map(n -> n.toString())
+								.collect(Collectors.joining(","));
+						att.setStringValues(vals);
+					} else
+						att.setStringValues(null);
+				}
+			} catch (Throwable t) {
+			}
+		}
+
 		sessionFactory.getCurrentSession().saveOrUpdate(entity);
 	}
 
@@ -213,7 +284,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	/**
-	 * Utility method useful for preparing an Hibernate query
+	 * Utility method useful for preparing an Hibernate query for updates
 	 * 
 	 * @param expression The expression for the query
 	 * @param values The parameters values to be used (optional, if the query is
@@ -222,15 +293,69 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * 
 	 * @return The Hibernate query
 	 */
-	protected Query prepareQuery(String expression, Object[] values, Integer max) {
+	@SuppressWarnings("rawtypes")
+	protected Query prepareQueryForUpdate(String expression, Object[] values, Integer max) {
 		Query queryObject = sessionFactory.getCurrentSession().createQuery(expression);
+		applyParamsAndLimit(values, max, queryObject);
+		return queryObject;
+	}
+
+	/**
+	 * Utility method useful for preparing an Hibernate query for objects of
+	 * this type
+	 * 
+	 * @param expression The expression for the query
+	 * @param values The parameters values to be used (optional, if the query is
+	 *        parametric)
+	 * @param max Optional maximum number of wanted results
+	 * 
+	 * @return The Hibernate query
+	 */
+	protected Query<T> prepareQueryForObject(String expression, Object[] values, Integer max) {
+		Query<T> queryObject = sessionFactory.getCurrentSession().createQuery(expression, entityClass);
+		applyParamsAndLimit(values, max, queryObject);
+		return queryObject;
+	}
+
+	/**
+	 * Utility method useful for preparing an Hibernate query for generic result
+	 * 
+	 * @param expression The expression for the query
+	 * @param values The parameters values to be used (optional, if the query is
+	 *        parametric)
+	 * @param max Optional maximum number of wanted results
+	 * 
+	 * @return The Hibernate query
+	 */
+	protected Query<Object[]> prepareQuery(String expression, Object[] values, Integer max) {
+		Query<Object[]> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Object[].class);
+		applyParamsAndLimit(values, max, queryObject);
+		return queryObject;
+	}
+
+	/**
+	 * Utility method useful for preparing an Hibernate query for longs
+	 * 
+	 * @param expression The expression for the query
+	 * @param values The parameters values to be used (optional, if the query is
+	 *        parametric)
+	 * @param max Optional maximum number of wanted results
+	 * 
+	 * @return The Hibernate query
+	 */
+	protected Query<Long> prepareQueryForLong(String expression, Object[] values, Integer max) {
+		Query<Long> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Long.class);
+		applyParamsAndLimit(values, max, queryObject);
+		return queryObject;
+	}
+
+	private void applyParamsAndLimit(Object[] values, Integer max, @SuppressWarnings("rawtypes") Query queryObject) {
 		if (values != null)
 			for (int i = 0; i < values.length; i++)
 				queryObject.setParameter(Integer.toString(i + 1), values[i]);
 
 		if (max != null && max > 0)
 			queryObject.setMaxResults(max);
-		return queryObject;
 	}
 
 	/**
@@ -296,7 +421,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public List query(String sql, Object[] args, RowMapper rowMapper, Integer maxRows) {
+	public List query(String sql, Object[] args, RowMapper rowMapper, Integer maxRows) throws PersistenceException {
 		List list = new ArrayList();
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
@@ -308,15 +433,17 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 				list = jdbcTemplate.query(insertTopClause(sql, maxRows), args, rowMapper);
 			else
 				list = jdbcTemplate.query(insertTopClause(sql, maxRows), rowMapper);
+			return list;
 		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
+			throw new PersistenceException(e);
 		}
-		return list;
+
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public List queryForList(String sql, Object[] args, Class elementType, Integer maxRows) {
+	public List queryForList(String sql, Object[] args, Class elementType, Integer maxRows)
+			throws PersistenceException {
 
 		List list = new ArrayList();
 		try {
@@ -328,14 +455,15 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 				list = jdbcTemplate.queryForList(insertTopClause(sql, maxRows), args, elementType);
 			else
 				list = jdbcTemplate.queryForList(insertTopClause(sql, maxRows), elementType);
+			return list;
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
+			throw new PersistenceException(e);
 		}
-		return list;
 	}
 
 	@Override
-	public SqlRowSet queryForRowSet(String sql, Object[] args, Integer maxRows) {
+	public SqlRowSet queryForRowSet(String sql, Object[] args, Integer maxRows) throws PersistenceException {
 		SqlRowSet rs = null;
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
@@ -346,98 +474,139 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 				rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows), args);
 			else
 				rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows));
+			return rs;
 		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
+			throw new PersistenceException(e);
 		}
-		return rs;
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public List queryForList(String sql, Class elementType) {
+	public List queryForList(String sql, Class elementType) throws PersistenceException {
 		return queryForList(sql, null, elementType, null);
 	}
 
 	@Override
-	public int queryForInt(String sql) {
+	public int queryForInt(String sql) throws PersistenceException {
 		long mytmplong = queryForLong(sql);
-		return new Long(mytmplong).intValue();
+		return Long.valueOf(mytmplong).intValue();
 	}
 
 	@Override
-	public long queryForLong(String sql) {
+	public long queryForLong(String sql) throws PersistenceException {
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			return jdbcTemplate.queryForObject(sql, Long.class);
-		} catch (Throwable empty) {
+			Long ret = jdbcTemplate.queryForObject(sql, Long.class);
+			if (ret != null)
+				return ret;
+			else
+				return 0L;
+		} catch (EmptyResultDataAccessException e) {
+			return 0L;			
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
 		}
-		return 0;
 	}
 
 	@Override
-	public String queryForString(String sql) {
+	public String queryForString(String sql) throws PersistenceException {
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			return jdbcTemplate.queryForObject(sql, String.class);
-		} catch (Throwable empty) {
+		} catch (EmptyResultDataAccessException e) {
+			return null;
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			throw new PersistenceException(e);
 		}
-		return null;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Object queryForObject(String sql, @SuppressWarnings("rawtypes") Class type) {
+	public Object queryForObject(String sql, @SuppressWarnings("rawtypes") Class type) throws PersistenceException {
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			return jdbcTemplate.queryForObject(sql, type);
-		} catch (EmptyResultDataAccessException empty) {
+		} catch (EmptyResultDataAccessException e) {
+			return null;						
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
 		}
-		return 0;
 	}
 
 	@Override
-	public int jdbcUpdate(String statement) {
-		DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		return jdbcTemplate.update(statement);
+	public int jdbcUpdate(String statement) throws PersistenceException {
+		if (!checkStoringAspect())
+			return 0;
+
+		try {
+			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
+			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+			return jdbcTemplate.update(statement);
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
-	public void deleteAll(Collection<T> entities, int code) {
+	public void deleteAll(Collection<T> entities, int code) throws PersistenceException {
+		if (!checkStoringAspect())
+			return;
+
 		if (entities == null || entities.isEmpty())
 			return;
-		StringBuffer ids = new StringBuffer();
-		for (T t : entities) {
-			if (ids.length() > 0)
-				ids.append(",");
-			ids.append(Long.toString(t.getId()));
-		}
 
-		Query queryObject = sessionFactory.getCurrentSession().createQuery(
-				"update " + entityClass.getCanonicalName() + " set deleted=" + code + " where id in(" + ids.toString()
-						+ ")");
-		queryObject.executeUpdate();
+		try {
+			StringBuffer ids = new StringBuffer();
+			for (T t : entities) {
+				if (ids.length() > 0)
+					ids.append(",");
+				ids.append(Long.toString(t.getId()));
+			}
+
+			Query<T> queryObject = prepareQueryForObject("update " + entityClass.getCanonicalName() + " set deleted="
+					+ code + " where id in(" + ids.toString() + ")", null, null);
+			queryObject.executeUpdate();
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
-	public void deleteAll(Collection<T> entities) {
+	public void deleteAll(Collection<T> entities) throws PersistenceException {
 		deleteAll(entities, PersistentObject.DELETED_CODE_DEFAULT);
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	public int bulkUpdate(String expression, Object[] values) {
-		Query queryObject = prepareQuery("update " + entityClass.getCanonicalName() + " " + expression, values, null);
-		return queryObject.executeUpdate();
+	public int bulkUpdate(String expression, Object[] values) throws PersistenceException {
+		if (!checkStoringAspect())
+			return 0;
+
+		try {
+			Query queryObject = prepareQueryForUpdate("update " + entityClass.getCanonicalName() + " " + expression,
+					values, null);
+			return queryObject.executeUpdate();
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	@Override
-	public int jdbcUpdate(String statement, Object... args) {
+	public int jdbcUpdate(String statement, Object... args) throws PersistenceException {
+		if (!checkStoringAspect())
+			return 0;
+
 		DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
-		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		return jdbcTemplate.update(statement, args);
+		try {
+			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+			return jdbcTemplate.update(statement, args);
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
 	}
 
 	protected Connection getConnection() throws SQLException {
@@ -451,6 +620,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return config.getProperty("jdbc.dbms").toLowerCase();
 	}
 
+	@Override
+	public boolean isOracle() {
+		return "oracle".equals(getDbms());
+	}
+
 	protected boolean isHsql() {
 		return "hsqldb".equals(getDbms());
 	}
@@ -461,10 +635,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected boolean isPostgreSQL() {
 		return "postgresql".equals(getDbms());
-	}
-
-	protected boolean isOracle() {
-		return "oracle".equals(getDbms());
 	}
 
 	protected boolean isSqlServer() {

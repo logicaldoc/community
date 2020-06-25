@@ -2,9 +2,10 @@ package com.logicaldoc.core.document.dao;
 
 import java.util.List;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentNote;
-import com.logicaldoc.core.document.History;
 
 /**
  * DAO for <code>DocumentNote</code> handling.
@@ -14,29 +15,39 @@ import com.logicaldoc.core.document.History;
  */
 public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 
-	public boolean store(DocumentNote note, History transaction);
+	public boolean store(DocumentNote note, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * This method finds the list of document note regarding a document with the
-	 * given ID.
+	 * given ID
 	 * 
 	 * @param docId ID of the document.
-	 * @return The list of document note.
+	 * @param fileVersion indicates a specific file version, optional
+	 * 
+	 * @return The list of document note
 	 */
-	public List<DocumentNote> findByDocId(long docId);
+	public List<DocumentNote> findByDocId(long docId, String fileVersion);
 
 	/**
-	 * Deletes all content annotations(notes on pages)
+	 * Copies all the notes not associated to a specific page from a given file
+	 * version to another
 	 * 
-	 * @param docId The identifier of the document
+	 * @param docId The document ID
+	 * @param oldFileVersion the old version
+	 * @param newFileVersion the version to copy to
+	 *
+	 * @return Number of copied notes
+	 * 
+	 * @throws PersistenceException If an error occurs in the database
 	 */
-	public void deleteContentAnnotations(long docId);
+	public int copyAnnotations(long docId, String oldFileVersion, String newFileVersion) throws PersistenceException;
 
 	/**
 	 * This method finds the list of document notes regarding posted by a
-	 * specific user.
+	 * specific user
 	 * 
 	 * @param userId ID of the user
+	 * 
 	 * @return The list of document notes ordered by descending date
 	 */
 	public List<DocumentNote> findByUserId(long userId);

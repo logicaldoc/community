@@ -2,6 +2,7 @@ package com.logicaldoc.gui.common.client.util;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
@@ -12,6 +13,7 @@ import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
@@ -20,6 +22,7 @@ import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -31,7 +34,7 @@ public class Util {
 	public static String[] OFFICE_EXTS = new String[] { ".doc", ".xls", ".xlsm", ".ppt", ".docx", ".docxm", ".xlsx",
 			".xlsm", ".pptx", ".rtf", ".odt", ".ods", ".odp" };
 
-	public static String[] IMAGE_EXTS = new String[] { ".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png" };
+	public static String[] IMAGE_EXTS = new String[] { ".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png", ".jfif" };
 
 	public static String[] VIDEO_EXTS = new String[] { ".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov", ".rm",
 			".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv" };
@@ -42,11 +45,15 @@ public class Util {
 
 	public static String[] EMAIL_EXTS = new String[] { ".eml", ".msg" };
 
+	public static String[] DICOM_EXTS = new String[] { ".dcm", ".dicom" };
+
 	/**
 	 * Generates HTML image code with style.
 	 * 
 	 * @param imageName the name of the icon image
 	 * @param alt the image alt
+	 * @param style CSS style specification
+	 * 
 	 * @return the resultant HTML
 	 */
 	public static String imageHTML(String imageName, String alt, String style) {
@@ -114,6 +121,12 @@ public class Util {
 		return url;
 	}
 
+	public static String webEditorUrl(int height) {
+		String url = contextPath() + "ckeditor/index.jsp?docId=nodoc&lang=" + I18N.getLocale() + "&height=" + height
+				+ "&sid=" + Session.get().getSid();
+		return url;
+	}
+
 	public static String webstartURL(String appName, Map<String, String> params) {
 		StringBuffer url = new StringBuffer(GWT.getHostPageBaseURL());
 		url.append("webstart/");
@@ -124,8 +137,6 @@ public class Util {
 		url.append(I18N.getLocale());
 		url.append("&docLanguage=");
 		url.append(I18N.getDefaultLocaleForDoc());
-		url.append("&baseUrl=");
-		url.append(URL.encode(GWT.getHostPageBaseURL()));
 		url.append("&sid=");
 		url.append(Session.get().getSid());
 		if (params != null)
@@ -140,6 +151,12 @@ public class Util {
 
 	/**
 	 * Generates HTML code for reproducing video files
+	 * 
+	 * @param mediaUrl URL of the media file to reproduce
+	 * @param width width specification
+	 * @param height height specification
+	 * 
+	 * @return the HTML content
 	 */
 	public static String videoHTML(String mediaUrl, String width, String height) {
 		String tmp = "<video controls ";
@@ -155,6 +172,10 @@ public class Util {
 
 	/**
 	 * Generates HTML code for reproducing audio files
+	 * 
+	 * @param mediaUrl URL of the media file to reproduce
+	 * 
+	 * @return the HTML content
 	 */
 	public static String audioHTML(String mediaUrl) {
 		String tmp = "<audio style='margin-top: 20px; vertical-align: middle; text-align: center' controls >";
@@ -200,6 +221,15 @@ public class Util {
 		return imagePrefix() + imageName;
 	}
 
+	public static String licenseUrl() {
+		return contextPath() + "license";
+	}
+
+	public static String websocketUrl() {
+		String url = contextPath() + "wk-event";
+		return "ws" + url.substring(url.indexOf(':'));
+	}
+
 	public static String strip(String src) {
 		if (src == null)
 			return null;
@@ -235,13 +265,14 @@ public class Util {
 		String base = GWT.getModuleBaseURL();
 		if (!base.endsWith("/"))
 			base = base + "/";
-		return GWT.getModuleBaseURL() + "sc/skins/" + currentSkin() + "/images/";
+		return base + "sc/skins/" + currentSkin() + "/images/";
 	}
 
 	/**
 	 * Generates HTML image code.
 	 * 
 	 * @param imageName the image name
+	 * 
 	 * @return the resultant HTML
 	 */
 	public static String imageHTML(String imageName) {
@@ -251,10 +282,19 @@ public class Util {
 	public static boolean isCommunity() {
 		return !Feature.enabled(Feature.ADDITIONAL_FORMATS);
 	}
-	
+
 	public static boolean isOfficeFile(String fileName) {
 		String tmp = fileName.toLowerCase();
 		for (String ext : OFFICE_EXTS) {
+			if (tmp.endsWith(ext))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean isDICOMFile(String fileName) {
+		String tmp = fileName.toLowerCase();
+		for (String ext : DICOM_EXTS) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -387,12 +427,14 @@ public class Util {
 	public static String formatSizeKB(Object value) {
 		if (value == null)
 			return null;
+		if (value instanceof Double)
+			return Util.formatSizeKB(((Double) value).doubleValue());
 		if (value instanceof Long)
 			return Util.formatSizeKB(((Long) value).doubleValue());
 		else if (value instanceof Integer)
 			return Util.formatSizeKB(((Integer) value).doubleValue());
 		if (value instanceof String)
-			return Util.formatSizeKB(new Long(value.toString()).longValue());
+			return Util.formatSizeKB(Long.parseLong(value.toString()));
 		else
 			return Util.formatSizeKB(0L);
 	}
@@ -401,6 +443,7 @@ public class Util {
 	 * Format file size in KB.
 	 * 
 	 * @param size The file size in bytes.
+	 * 
 	 * @return The formated file size.
 	 */
 	public static String formatSizeKB(double size) {
@@ -420,8 +463,10 @@ public class Util {
 	/**
 	 * Format file size in Windows 7 Style.
 	 * 
-	 * @param size The file size in bytes.
-	 * @return The formated file size.
+	 * @param value The file size in bytes(can be Float, Long, Integer or
+	 *        String)
+	 * 
+	 * @return The formated file size
 	 */
 	public static String formatSizeW7(Object value) {
 		if (value == null)
@@ -435,7 +480,7 @@ public class Util {
 		else if (value instanceof Float)
 			return Util.formatSizeW7(((Float) value).doubleValue());
 		if (value instanceof String)
-			return Util.formatSizeW7(new Long(value.toString()).longValue());
+			return Util.formatSizeW7(Long.parseLong(value.toString()));
 		else
 			return Util.formatSizeW7(0L);
 	}
@@ -444,6 +489,7 @@ public class Util {
 	 * Format file size in Windows 7 Style.
 	 * 
 	 * @param size The file size in bytes.
+	 * 
 	 * @return The formated file size.
 	 */
 	public static String formatSizeW7(double size) {
@@ -519,7 +565,9 @@ public class Util {
 	/**
 	 * Format file size in bytes
 	 * 
-	 * @param size The file size in bytes.
+	 * @param size The file size in bytes
+	 * 
+	 * @return the formatted size
 	 */
 	public static String formatSizeBytes(double size) {
 		String str;
@@ -557,7 +605,9 @@ public class Util {
 	}-*/;
 
 	/**
-	 * returns 'opera', 'safari', 'ie6', 'ie7', 'gecko', or 'unknown'.
+	 * Detects the user agent(browser's family)
+	 *
+	 * @return 'opera', 'safari', 'ie6', 'ie7', 'gecko', or 'unknown'
 	 */
 	public static native String getUserAgent() /*-{
 		try {
@@ -600,12 +650,42 @@ public class Util {
 			return s;
 	}
 
-	public static void openDropSpot() {
+	private static boolean isWebstartMode() {
+		return WindowUtils.isChrome()
+				|| (WindowUtils.isWindows() && "webstart".equals(Session.get().getConfig("gui.webstart.mode")));
+	}
+
+	public static void openScan() {
+		if (!WindowUtils.isWindows())
+			return;
+
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("folderId", "" + Session.get().getCurrentFolder().getId());
-		params.put("disallow", Session.get().getInfo().getConfig("upload.disallow"));
-		params.put("sizeMax", "" + (Long.parseLong(Session.get().getInfo().getConfig("upload.maxsize")) * 1024 * 1024));
-		WindowUtils.openUrl(Util.webstartURL("dropspot", params), "_self");
+		params.put("targetFolderId", "" + Session.get().getCurrentFolder().getId());
+		String url = Util.webstartURL("scan", params);
+
+		openWebstartApp(url);
+	}
+
+	public static void openBulkCheckout(List<Long> unlockedIds) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("targetFolderId", "" + Session.get().getCurrentFolder().getId());
+		params.put("docIds", unlockedIds.toString().replace('[', ' ').replace(']', ' ').trim());
+		String url = Util.webstartURL("bulkcheckout", params);
+
+		openWebstartApp(url);
+	}
+
+	private static void openWebstartApp(String url) {
+		if (isWebstartMode()) {
+			url = url.replace("=", "_x_");
+			url = url.replace("&", "_y_");
+			url = url.replace(",", "_z_");
+			WindowUtils.openUrl("ldwebstart:" + url);
+			ToastNotification.showNotification(I18N.message("webstarthintlauncher"));
+		} else {
+			WindowUtils.openUrl(url, "_self");
+			ToastNotification.showNotification(I18N.message("webstarthint", url));
+		}
 	}
 
 	/**
@@ -614,8 +694,6 @@ public class Util {
 	 * @param listGrid Grid containing the data
 	 * @param allFields True if all the fields(even if hidden) have to be
 	 *        extracted
-	 * 
-	 * @return The CSV document as trying
 	 */
 	public static void exportCSV(ListGrid listGrid, boolean allFields) {
 		StringBuilder stringBuilder = new StringBuilder(); // csv data in here
@@ -678,7 +756,10 @@ public class Util {
 					if (listGridField.getType().equals(ListGridFieldType.DATE)) {
 						stringBuilder.append(I18N.formatDateShort(record.getAttributeAsDate(listGridField.getName())));
 					} else {
-						stringBuilder.append(record.getAttribute(listGridField.getName()));
+						if (record.getAttribute(listGridField.getName()) != null)
+							stringBuilder.append(record.getAttribute(listGridField.getName()));
+						else
+							stringBuilder.append("");
 					}
 					stringBuilder.append("\";");
 				} catch (Throwable t) {
@@ -697,7 +778,8 @@ public class Util {
 		/*
 		 * Now post the CSV content to the server
 		 */
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST, Util.contextPath() + "/csv");
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
+				Util.contextPath().endsWith("/") ? Util.contextPath() + "csv" : Util.contextPath() + "/csv");
 		builder.setHeader("Content-type", "application/csv");
 
 		try {
@@ -710,7 +792,8 @@ public class Util {
 					/*
 					 * Now we can download the complete file
 					 */
-					WindowUtils.openUrl(GWT.getHostPageBaseURL() + "/csv");
+					WindowUtils.openUrl(GWT.getHostPageBaseURL().endsWith("/") ? GWT.getHostPageBaseURL() + "csv"
+							: GWT.getHostPageBaseURL() + "/csv");
 				}
 			});
 		} catch (RequestException e) {
@@ -720,7 +803,11 @@ public class Util {
 
 	/**
 	 * Checks if the passed filename can be uploaded or not on the basis of what
-	 * configured in 'upload.disallow'.
+	 * configured in 'upload.disallow'
+	 * 
+	 * @param filename the file name
+	 * 
+	 * @return if the extension is allowed
 	 */
 	public static boolean isAllowedForUpload(String filename) {
 		Session session = Session.get();
@@ -747,6 +834,8 @@ public class Util {
 
 	/**
 	 * Detect tenant specification from the request
+	 * 
+	 * @return the current tenant's name
 	 */
 	public static String detectTenant() {
 		RequestInfo request = WindowUtils.getRequestInfo();
@@ -769,6 +858,8 @@ public class Util {
 
 	/**
 	 * Detect locale specification from the request
+	 * 
+	 * @return the locale specification
 	 */
 	public static String detectLocale() {
 		String locale = Util.getLocaleInRequest();
@@ -785,6 +876,8 @@ public class Util {
 
 	/**
 	 * Detect KEY specification from the request
+	 * 
+	 * @return the secret KEY
 	 */
 	public static String detectKey() {
 		String key = null;
@@ -800,25 +893,9 @@ public class Util {
 	}
 
 	/**
-	 * Detect SID specification from the request and then from the cookie
-	 */
-	public static String detectSid() {
-		String sid = null;
-
-		try {
-			RequestInfo request = WindowUtils.getRequestInfo();
-			sid = request.getParameter(Constants.SID);
-		} catch (Throwable t) {
-		}
-
-		if (sid == null)
-			sid = CookiesManager.getSid();
-
-		return sid;
-	}
-
-	/**
 	 * Detect skin specification from the request
+	 * 
+	 * @return the current skin's name
 	 */
 	private static String detectSkin() {
 		String skin = null;
@@ -854,7 +931,9 @@ public class Util {
 
 	/**
 	 * Redirects to the configured page after a successful login (the url
-	 * specified in the j_successurl javascript variable.
+	 * specified in the j_successurl javascript variable
+	 * 
+	 * @param locale language specification
 	 */
 	public static void redirectToSuccessUrl(String locale) {
 		String url = Util.getJavascriptVariable("j_successurl");
@@ -865,13 +944,20 @@ public class Util {
 
 	/**
 	 * Redirects to the configured login page (the url specified in the
-	 * j_loginurl javascript variable.
+	 * j_loginurl javascript variable
+	 * 
+	 * @param tenant name of the tenant
 	 */
-	public static void redirectToLoginUrl() {
-		String url = Util.getJavascriptVariable("j_loginurl");
-		url += "?tenant=" + Session.get().getTenantName();
-		url += "&locale=" + I18N.getLocale();
+	public static void redirectToLoginUrl(String tenant) {
+		String url = getLoginUrl(tenant);
 		Util.redirect(url);
+	}
+
+	public static String getLoginUrl(String tenant) {
+		String url = Util.getJavascriptVariable("j_loginurl");
+		url += "?tenant=" + tenant;
+		url += "&locale=" + I18N.getLocale();
+		return url;
 	}
 
 	public static String getValue(String name, GUIParameter[] parameters) {
@@ -931,6 +1017,48 @@ public class Util {
 			for (GUIParameter param : parameters)
 				map.put(param.getName(), param.getValue());
 		return map;
+	}
+
+	public static void waitForUpAndRunning(String tenant, String locale) {
+		final String url = Util.getJavascriptVariable("j_loginurl") + "?tenant=" + tenant + "&locale=" + locale;
+
+		RequestBuilder checkRequest = new RequestBuilder(RequestBuilder.HEAD, url);
+		checkRequest.setCallback(new RequestCallback() {
+			@Override
+			public void onResponseReceived(Request request, Response response) {
+				if (response.getStatusCode() > 199 && response.getStatusCode() < 300) {
+					Timer timer = new Timer() {
+						public void run() {
+							CookiesManager.removeSid();
+							Util.redirect(url);
+						}
+					};
+					timer.schedule(5000);
+				} else {
+					Timer timer = new Timer() {
+						public void run() {
+							waitForUpAndRunning(tenant, locale);
+						}
+					};
+					timer.schedule(5000);
+				}
+			}
+
+			@Override
+			public void onError(Request request, Throwable exception) {
+				Timer timer = new Timer() {
+					public void run() {
+						waitForUpAndRunning(tenant, locale);
+					}
+				};
+				timer.schedule(5000);
+			}
+		});
+		try {
+			checkRequest.send();
+		} catch (RequestException e) {
+
+		}
 	}
 
 	public static native String getJavascriptVariable(String jsVar)/*-{

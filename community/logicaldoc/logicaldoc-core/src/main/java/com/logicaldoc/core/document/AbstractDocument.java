@@ -1,6 +1,7 @@
 package com.logicaldoc.core.document;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
@@ -8,9 +9,11 @@ import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.LazyInitializationException;
 
 import com.logicaldoc.core.TransactionalObject;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.util.IconSelector;
@@ -58,11 +61,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public static final int INDEX_SKIP = 2;
 
-	public static final int BARCODE_TO_PROCESS = 0;
-
-	public static final int BARCODE_PROCESSED = 1;
-
-	public static final int BARCODE_SKIP = 2;
+	public static final int INDEX_TO_INDEX_METADATA = 3;
 
 	public static final int NATURE_DOC = 0;
 
@@ -111,9 +110,14 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	private String fileName;
 
+	/**
+	 * The indexing status of the document, one of {@link #INDEX_TO_INDEX},
+	 * {@link #INDEX_TO_INDEX_METADATA}, {@link #INDEX_INDEXED} or
+	 * {@link #INDEX_SKIP}
+	 */
 	private int indexed = INDEX_TO_INDEX;
 
-	private int barcoded = BARCODE_TO_PROCESS;
+	private int barcoded = 0;
 
 	private int signed = 0;
 
@@ -143,10 +147,12 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	private Long deleteUserId;
 
+	private String deleteUser;
+
 	private Integer rating;
 
 	private String workflowStatus;
-	
+
 	private String workflowStatusDisplay;
 
 	private int published = 1;
@@ -157,11 +163,16 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	private String transactionId;
 
+	/**
+	 * Not persistent. Used sometimes to carry the name of the template
+	 */
 	private String templateName;
 
 	private int pages = -1;
 
-	/*
+	private int links = 0;
+
+	/**
 	 * Used for saving the external resource ID when editing online
 	 */
 	private String extResId;
@@ -174,13 +185,27 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	private String decodedPassword;
 
-	public Long getDeleteUserId() {
-		return deleteUserId;
-	}
+	/**
+	 * Not persistent flag used to indicate that the document was modified and
+	 * should be saved back
+	 */
+	private boolean modified = false;
 
-	public void setDeleteUserId(Long deleteUserId) {
-		this.deleteUserId = deleteUserId;
-	}
+	/**
+	 * Identifier of the Zonal OCR template to use to process this document
+	 */
+	private Long ocrTemplateId = null;
+
+	/**
+	 * Identifier of the barcode template to use to process this document
+	 */
+	private Long barcodeTemplateId = null;
+
+	/**
+	 * Indicates if the document has been processed by the zonal OCR: <b>0</b> =
+	 * to process, <b>1</b> = processed
+	 */
+	private int ocrd = 0;
 
 	public AbstractDocument() {
 		super();
@@ -192,6 +217,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 * @see Document#DOC_UNLOCKED
 	 * @see Document#DOC_CHECKED_OUT
 	 * @see Document#DOC_LOCKED
+	 * 
+	 * @return the document's status
 	 */
 	public int getStatus() {
 		return status;
@@ -203,6 +230,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The working version (the most recent version)
+	 * 
+	 * @return the version
 	 */
 	public String getVersion() {
 		return version;
@@ -211,8 +240,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	/**
 	 * Iterates over the versions searching for the specified id
 	 * 
-	 * @param id The version id
-	 * @return The found version
+	 * @param version The version id
 	 */
 	public void setVersion(String version) {
 		this.version = version;
@@ -221,6 +249,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	/**
 	 * The document's last publication date. This date is altered by checkin
 	 * operations.
+	 * 
+	 * @return the publication date
 	 */
 	public Date getDate() {
 		return date;
@@ -232,6 +262,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The user id of the user that published this document
+	 * 
+	 * @return identifier of the user that published the file
 	 */
 	public long getPublisherId() {
 		return publisherId;
@@ -241,8 +273,26 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		this.publisherId = publisherId;
 	}
 
+	public boolean isModified() {
+		return modified;
+	}
+
+	public void setModified(boolean modified) {
+		this.modified = modified;
+	}
+
+	public Long getDeleteUserId() {
+		return deleteUserId;
+	}
+
+	public void setDeleteUserId(Long deleteUserId) {
+		this.deleteUserId = deleteUserId;
+	}
+
 	/**
 	 * The username that published this document
+	 * 
+	 * @return the username that published the document
 	 */
 	public String getPublisher() {
 		return publisher;
@@ -253,7 +303,9 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	/**
-	 * The document type
+	 * The document type, that is the file extension
+	 * 
+	 * @return the right part of the file name
 	 */
 	public String getType() {
 		return type;
@@ -265,6 +317,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The id of the user that locked this document and that currently locks it
+	 * 
+	 * @return identifier of the user that owns the lock
 	 */
 	public Long getLockUserId() {
 		return lockUserId;
@@ -277,6 +331,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	/**
 	 * The document's language. This attribute is very important because of it
 	 * is used to select the right full-text index.
+	 * 
+	 * @return the language
 	 */
 	public String getLanguage() {
 		return language;
@@ -284,6 +340,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * @see Document#setLanguage(java.lang.String)
+	 * 
+	 * @param language the language
 	 */
 	public void setLanguage(String language) {
 		this.language = language;
@@ -291,6 +349,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The set of tags for this document.
+	 * 
+	 * @return the set of tags
 	 */
 	public Set<Tag> getTags() {
 		return tags;
@@ -340,6 +400,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 		while (iter.hasNext()) {
 			String words = iter.next().toString();
+			words.replace(",", "\\,");
 
 			if (!start) {
 				sb.append(",");
@@ -356,7 +417,9 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	/**
-	 * Computes the title that is the filenamem without the extension
+	 * Computes the title that is the file name without the extension
+	 * 
+	 * @return the left part of the file name
 	 */
 	public String getTitle() {
 		if (fileName != null && fileName.lastIndexOf('.') >= 0)
@@ -367,6 +430,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The original file name
+	 * 
+	 * @return the file name
 	 */
 	public String getFileName() {
 		return fileName;
@@ -378,6 +443,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The icon for this document, it may be kept from file name extension
+	 * 
+	 * @return name of the icon file
 	 */
 	public String getIcon() {
 		String icon = IconSelector.selectIcon("", docRef != null && docRef.longValue() != 0L);
@@ -399,6 +466,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The document's file size expressed in bytes
+	 * 
+	 * @return the file size in bytes
 	 */
 	public long getFileSize() {
 		return fileSize;
@@ -410,6 +479,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * Retrieve the folder owning this document
+	 * 
+	 * @return the parent folder
 	 */
 	public Folder getFolder() {
 		return folder;
@@ -417,7 +488,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public void setFolder(Folder folder) {
 		this.folder = folder;
-		this.setTenantId(folder.getTenantId());
+		if (folder != null)
+			this.setTenantId(folder.getTenantId());
 	}
 
 	public void addTag(String word) {
@@ -447,6 +519,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The document's creation date
+	 * 
+	 * @return the creation date
 	 */
 	public Date getCreation() {
 		return creation;
@@ -458,6 +532,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * Each document can be identified with a custom identifier
+	 * 
+	 * @return the unique custom identifier
 	 */
 	public String getCustomId() {
 		return customId;
@@ -469,6 +545,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * Defines if the document is immutable
+	 * 
+	 * @return <b>1</b> = immutable, <b>0</b> = regular
 	 */
 	public int getImmutable() {
 		return immutable;
@@ -480,6 +558,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The document's digest
+	 * 
+	 * @return the digest
 	 */
 	public String getDigest() {
 		return digest;
@@ -491,6 +571,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * Return 1 if the document was signed
+	 * 
+	 * @return <b>1</b> = signed, <b>0</b> = not signed
 	 */
 	public int getSigned() {
 		return signed;
@@ -504,6 +586,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 * The working file version. Sometimes the version of the document may
 	 * differ from the file versions. In fact if a new version differs from
 	 * metadata only, we it have to reference the old file.
+	 * 
+	 * @return the file version
 	 */
 	public String getFileVersion() {
 		return fileVersion;
@@ -540,8 +624,10 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	/**
 	 * The document export status
 	 * 
-	 * @see Document#EXPORT_UNLOCKED
-	 * @see Document#EXPORT_LOCKED
+	 * @see #EXPORT_UNLOCKED
+	 * @see #EXPORT_LOCKED
+	 * 
+	 * @return the export satus
 	 */
 	public int getExportStatus() {
 		return exportStatus;
@@ -553,6 +639,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The last exported version
+	 * 
+	 * @return the last exported version
 	 */
 	public String getExportVersion() {
 		return exportVersion;
@@ -564,6 +652,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The last archive name in which the document was exported
+	 * 
+	 * @return name of the export archive
 	 */
 	public String getExportName() {
 		return exportName;
@@ -575,6 +665,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * The last archive in which the document was exported
+	 * 
+	 * @return identifier of the export archive
 	 */
 	public Long getExportId() {
 		return exportId;
@@ -586,6 +678,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	/**
 	 * If the document is an alias, it is the id of the referenced document
+	 * 
+	 * @return identifier of the referenced document
 	 */
 	public Long getDocRef() {
 		return docRef;
@@ -638,7 +732,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public void setWorkflowStatusDisplay(String workflowStatusDisplay) {
 		this.workflowStatusDisplay = workflowStatusDisplay;
 	}
-	
+
 	public int getPublished() {
 		return published;
 	}
@@ -789,8 +883,20 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		return decodedPassword;
 	}
 
+	public String getDeleteUser() {
+		return deleteUser;
+	}
+
+	public void setDeleteUser(String deleteUser) {
+		this.deleteUser = deleteUser;
+	}
+
 	/**
 	 * Checks if the document is accessible with the given password
+	 * 
+	 * @param myPassword the password to check
+	 * 
+	 * @return true id the password is correct
 	 */
 	public boolean isGranted(String myPassword) {
 		if (StringUtils.isEmpty(getPassword()))
@@ -805,5 +911,91 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public boolean isPasswordProtected() {
 		return StringUtils.isNotEmpty(getPassword());
+	}
+
+	/**
+	 * Copies in the current instance the attributes of the passed values
+	 * object, but NOT the ID
+	 * 
+	 * @param docVO the document to get the attributes from
+	 */
+	public void copyAttributes(AbstractDocument docVO) {
+		setTenantId(docVO.getTenantId());
+		setCustomId(docVO.getCustomId());
+		setImmutable(docVO.getImmutable());
+		setVersion(docVO.getVersion());
+		setFileVersion(docVO.getFileVersion());
+		setDate(docVO.getDate());
+		setPublisher(docVO.getPublisher());
+		setPublisherId(docVO.getPublisherId());
+		setCreator(docVO.getCreator());
+		setCreatorId(docVO.getCreatorId());
+		setStatus(docVO.getStatus());
+		setType(docVO.getType());
+		setLockUserId(docVO.getLockUserId());
+		setLanguage(docVO.getLanguage());
+		setFileName(docVO.getFileName());
+		setFileSize(docVO.getFileSize());
+		setIndexed(docVO.getIndexed());
+		setBarcoded(docVO.getBarcoded());
+		setSigned(docVO.getSigned());
+		setStamped(docVO.getStamped());
+		setDigest(docVO.getDigest());
+		setDocRef(docVO.getDocRef());
+		setFolder(docVO.getFolder());
+		setTemplate(docVO.getTemplate());
+		setPages(docVO.getPages());
+		setWorkflowStatus(docVO.getWorkflowStatus());
+		setWorkflowStatusDisplay(docVO.getWorkflowStatusDisplay());
+
+		setAttributes(new HashMap<String, Attribute>());
+		try {
+			for (String name : docVO.getAttributes().keySet()) {
+				getAttributes().put(name, docVO.getAttributes().get(name));
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+
+		try {
+			setTags(new HashSet<Tag>());
+			for (Tag tag : docVO.getTags()) {
+				getTags().add(tag);
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+	}
+
+	public int getLinks() {
+		return links;
+	}
+
+	public void setLinks(int links) {
+		this.links = links;
+	}
+
+	public Long getOcrTemplateId() {
+		return ocrTemplateId;
+	}
+
+	public void setOcrTemplateId(Long ocrTemplateId) {
+		this.ocrTemplateId = ocrTemplateId;
+	}
+
+	public int getOcrd() {
+		return ocrd;
+	}
+
+	public void setOcrd(int ocrd) {
+		this.ocrd = ocrd;
+	}
+
+	public Long getBarcodeTemplateId() {
+		return barcodeTemplateId;
+	}
+
+	public void setBarcodeTemplateId(Long barcodeTemplateId) {
+		this.barcodeTemplateId = barcodeTemplateId;
 	}
 }

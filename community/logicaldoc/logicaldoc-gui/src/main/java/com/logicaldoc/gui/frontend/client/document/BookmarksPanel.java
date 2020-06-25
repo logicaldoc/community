@@ -95,7 +95,7 @@ public class BookmarksPanel extends VLayout {
 			public void onCellContextClick(CellContextClickEvent event) {
 				final ListGridRecord record = list.getSelectedRecord();
 				FolderService.Instance.get().getFolder(Long.parseLong(record.getAttributeAsString("folderId")), false,
-						new AsyncCallback<GUIFolder>() {
+						false, false, new AsyncCallback<GUIFolder>() {
 
 							@Override
 							public void onSuccess(GUIFolder folder) {

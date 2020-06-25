@@ -1,4 +1,4 @@
-<%@ page import="javax.servlet.*" %>
+ <%@ page import="javax.servlet.*" %>
 <%@ page import="javax.servlet.http.*" %>
 <%@ page import="java.util.regex.*" %>
 <%@ page import="com.logicaldoc.core.security.*" %>
@@ -17,10 +17,15 @@
   
   boolean print = security.isPrintEnabled(docId, userId);
   boolean download = security.isDownloadEnabled(docId, userId);
+  
+  
+  String path = "convertpdf";
+  if(request.getParameter("path")!=null)
+  	path = request.getParameter("path");
 %>
 
 <!DOCTYPE html>
-<html dir="ltr" mozdisallowselectionprint moznomarginboxes>
+<html dir="ltr" mozdisallowselectionprint>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -30,32 +35,33 @@
 
     <link rel="stylesheet" href="viewer.css">
 
-    <!-- This snippet is used in production (included from viewer.html) -->
-    <link rel="resource" type="application/l10n" href="locale/locale.properties">
-    <script src="./pdf.js"></script>
-
-    <script>
-        var fileVersion='<%=request.getParameter("fileVersion")!=null ? request.getParameter("fileVersion") : ""%>';
-        var version='<%=request.getParameter("version")!=null ? request.getParameter("version") : ""%>';
-        var pdfUrl='<%=request.getContextPath()%>/convertpdf?docId=<%=docId%>&control=preview';
-        
-        if(fileVersion!=''){
-               pdfUrl=pdfUrl+'&fileVersion='+fileVersion;
-        }
-        if(version!=''){
-               pdfUrl=pdfUrl+'&version='+version;
-        }
+    <link rel="resource" type="application/l10n" href="locale/locale.properties" />
     
-        var DEFAULT_URL = pdfUrl;    
-       
-        PDFJS.locale = '<%=request.getParameter("locale")!=null ? request.getParameter("locale").replace("_", "-") : ""%>';
-    </script>
+    <script src="pdf.js"></script>
+    
+    <script src="viewer.js"></script>
+    
+    <script>
+        var pdfUrl='<%=request.getContextPath()%>/<%=path%>?<%=request.getQueryString()%>';
+                
+        window.addEventListener('load', function() {
+          // PDFViewerApplication.appConfig.toolbar.viewBookmark;
+          // PDFViewerApplication.appConfig.secondaryToolbar;
+          // PDFViewerApplication.pdfViewer;
+          // PDFViewerApplication.preferences;
+          // PDFViewerApplication._initializeL10n
+          // PDFViewerApplication.preferences.set('pdfBugEnabled', true);
 
-    <script src="./viewer.js"></script>
+          PDFViewerApplication.open(pdfUrl);   
+        });
+    </script>
     
     <style>
-      body {cursor: pointer;}, #outerContainer {cursor: pointer;}, #mainContainer {cursor: pointer;}, #viewerContainer  {cursor: pointer;}
-    </style>    
+          body {cursor: pointer;}, #outerContainer {cursor: pointer;}, #mainContainer {cursor: pointer;}, #viewerContainer  {cursor: pointer;}
+    </style>   
+
+    <!-- Needed to support Edge -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
   </head>
 
   <body tabindex="1" class="loadingInProgress">
@@ -83,6 +89,7 @@
           <div id="attachmentsView" class="hidden">
           </div>
         </div>
+        <div id="sidebarResizer" class="hidden"></div>
       </div>  <!-- sidebarContainer -->
 
       <div id="mainContainer">
@@ -100,11 +107,15 @@
             </div>
           </div>
 
-          <div id="findbarOptionsContainer">
+          <div id="findbarOptionsOneContainer">
             <input type="checkbox" id="findHighlightAll" class="toolbarField" tabindex="94">
             <label for="findHighlightAll" class="toolbarLabel" data-l10n-id="find_highlight">Highlight all</label>
             <input type="checkbox" id="findMatchCase" class="toolbarField" tabindex="95">
             <label for="findMatchCase" class="toolbarLabel" data-l10n-id="find_match_case_label">Match case</label>
+          </div>
+          <div id="findbarOptionsTwoContainer">
+            <input type="checkbox" id="findEntireWord" class="toolbarField" tabindex="96">
+            <label for="findEntireWord" class="toolbarLabel" data-l10n-id="find_entire_word_label">Whole words</label>
             <span id="findResultsCount" class="toolbarLabel hidden"></span>
           </div>
 
@@ -164,7 +175,31 @@
 
             <div class="horizontalToolbarSeparator"></div>
 
-            <button id="documentProperties" class="secondaryToolbarButton documentProperties" title="Document Properties…" tabindex="62" data-l10n-id="document_properties">
+            <button id="scrollVertical" class="secondaryToolbarButton scrollModeButtons scrollVertical toggled" title="Use Vertical Scrolling" tabindex="62" data-l10n-id="scroll_vertical">
+              <span data-l10n-id="scroll_vertical_label">Vertical Scrolling</span>
+            </button>
+            <button id="scrollHorizontal" class="secondaryToolbarButton scrollModeButtons scrollHorizontal" title="Use Horizontal Scrolling" tabindex="63" data-l10n-id="scroll_horizontal">
+              <span data-l10n-id="scroll_horizontal_label">Horizontal Scrolling</span>
+            </button>
+            <button id="scrollWrapped" class="secondaryToolbarButton scrollModeButtons scrollWrapped" title="Use Wrapped Scrolling" tabindex="64" data-l10n-id="scroll_wrapped">
+              <span data-l10n-id="scroll_wrapped_label">Wrapped Scrolling</span>
+            </button>
+
+            <div class="horizontalToolbarSeparator scrollModeButtons"></div>
+
+            <button id="spreadNone" class="secondaryToolbarButton spreadModeButtons spreadNone toggled" title="Do not join page spreads" tabindex="65" data-l10n-id="spread_none">
+              <span data-l10n-id="spread_none_label">No Spreads</span>
+            </button>
+            <button id="spreadOdd" class="secondaryToolbarButton spreadModeButtons spreadOdd" title="Join page spreads starting with odd-numbered pages" tabindex="66" data-l10n-id="spread_odd">
+              <span data-l10n-id="spread_odd_label">Odd Spreads</span>
+            </button>
+            <button id="spreadEven" class="secondaryToolbarButton spreadModeButtons spreadEven" title="Join page spreads starting with even-numbered pages" tabindex="67" data-l10n-id="spread_even">
+              <span data-l10n-id="spread_even_label">Even Spreads</span>
+            </button>
+
+            <div class="horizontalToolbarSeparator spreadModeButtons"></div>
+
+            <button id="documentProperties" class="secondaryToolbarButton documentProperties" title="Document Properties…" tabindex="68" data-l10n-id="document_properties">
               <span data-l10n-id="document_properties_label">Document Properties…</span>
             </button>
           </div>
@@ -347,6 +382,13 @@
             <div class="row">
               <span data-l10n-id="document_properties_page_count">Page Count:</span> <p id="pageCountField">-</p>
             </div>
+            <div class="row">
+              <span data-l10n-id="document_properties_page_size">Page Size:</span> <p id="pageSizeField">-</p>
+            </div>
+            <div class="separator"></div>
+            <div class="row">
+              <span data-l10n-id="document_properties_linearized">Fast Web View:</span> <p id="linearizedField">-</p>
+            </div>
             <div class="buttonRow">
               <button id="documentPropertiesClose" class="overlayButton"><span data-l10n-id="document_properties_close">Close</span></button>
             </div>
@@ -377,12 +419,14 @@
 	document.getElementById("openFile").style.display = 'none';
 	document.getElementById("secondaryOpenFile").style.display = 'none';
 </script>
+
 <% if(!download) { %>
 <script>
 	document.getElementById("download").style.display = 'none';
 	document.getElementById("secondaryDownload").style.display = 'none';
 </script>
 <% } %>
+
 <% if(!print) { %>
 <script>
 	document.getElementById("print").style.display = 'none';

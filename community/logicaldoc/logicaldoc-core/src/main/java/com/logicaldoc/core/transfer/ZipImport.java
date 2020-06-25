@@ -15,13 +15,14 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
@@ -44,7 +45,7 @@ public class ZipImport {
 
 	protected User user;
 
-	protected static Logger logger = LoggerFactory.getLogger(ZipImport.class);
+	protected static Logger log = LoggerFactory.getLogger(ZipImport.class);
 
 	protected File zipFile;
 
@@ -95,7 +96,11 @@ public class ZipImport {
 		for (int i = 0; i < files.length; i++) {
 			if (StringUtils.isNotEmpty(files[i].getName())
 					|| StringUtils.isNotEmpty(FilenameUtils.getBaseName(files[i].getName())))
-				addEntry(files[i], parent);
+				try {
+					addEntry(files[i], parent);
+				} catch (PersistenceException e) {
+					log.error("Error adding entry " + files[i].getName(), e);
+				}
 		}
 
 		try {
@@ -107,7 +112,8 @@ public class ZipImport {
 			sendNotificationMessage();
 	}
 
-	public void process(String zipsource, Locale locale, Folder parent, long userId, Long templateId, String sessionId) {
+	public void process(String zipsource, Locale locale, Folder parent, long userId, Long templateId,
+			String sessionId) {
 		File srcfile = new File(zipsource);
 		process(srcfile, parent, userId, sessionId);
 	}
@@ -119,8 +125,9 @@ public class ZipImport {
 	 * 
 	 * @param file
 	 * @param parent
+	 * @throws PersistenceException
 	 */
-	protected void addEntry(File file, Folder parent) {
+	protected void addEntry(File file, Folder parent) throws PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		String folderName = file.getName();
 		FolderHistory transaction = new FolderHistory();
@@ -128,9 +135,9 @@ public class ZipImport {
 		transaction.setSessionId(sessionId);
 
 		Session session = SessionManager.get().get(sessionId);
-		if(transaction!=null)
+		if (transaction != null)
 			transaction.setSession(session);
-		
+
 		if (file.isDirectory()) {
 			// creates a logicaldoc folder
 			Folder folderVO = new Folder();
@@ -147,14 +154,13 @@ public class ZipImport {
 			// creates a document
 			DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			try {
-				History history = new History();
+				DocumentHistory history = new DocumentHistory();
 				history.setEvent(DocumentEvent.STORED.toString());
 				history.setComment("");
 				history.setUser(user);
 				history.setSessionId(sessionId);
-				if(session!=null)
+				if (session != null)
 					history.setSession(session);
-				
 
 				Document doc = (Document) docVo.clone();
 				doc.setId(0L);
@@ -162,15 +168,13 @@ public class ZipImport {
 
 				docManager.create(file, doc, history);
 			} catch (Exception e) {
-				logger.error("InMemoryZipImport addEntry failed", e);
+				log.error("InMemoryZipImport addEntry failed", e);
 			}
 		}
 	}
 
 	/**
-	 * Sends a system message to the user that imported the zip.
-	 * 
-	 * @param archive
+	 * Sends a system message to the user that imported the zip
 	 */
 	protected void sendNotificationMessage() {
 		SystemMessageDAO smdao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
@@ -194,7 +198,12 @@ public class ZipImport {
 		sysmess.setConfirmation(0);
 		sysmess.setPrio(0);
 		sysmess.setDateScope(1);
-		smdao.store(sysmess);
+
+		try {
+			smdao.store(sysmess);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	public boolean isNotifyUser() {

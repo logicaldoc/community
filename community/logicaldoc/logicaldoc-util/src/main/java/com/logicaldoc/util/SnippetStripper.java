@@ -19,8 +19,9 @@ public class SnippetStripper {
 	 * Strips all characters from the input string that may invalidate XML.
 	 * Particularly useful for search result summaries
 	 * 
-	 * @param snippet
-	 * @return
+	 * @param snippet the string to process
+	 * 
+	 * @return the sanitized string
 	 */
 	public static String strip(String snippet) {
 		String summary = snippet;

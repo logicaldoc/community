@@ -4,9 +4,12 @@
 <hibernate-mapping default-lazy="false">
 	<class name="com.logicaldoc.core.metadata.AttributeOption" table="ld_extoption" where="ld_deleted=0">
 		<cache usage="read-write" />
-        <id name="id" type="long" column="ld_id" unsaved-value="0">
-            <generator class="org.hibernate.id.MultipleHiLoPerTableGenerator" />
-        </id>
+		<id name="id" type="long" column="ld_id" unsaved-value="0">
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+			    <param name="segment_value">ld_extoption</param>
+			    <param name="optimizer">org.hibernate.id.enhanced.HiLoOptimizer</param>
+			</generator>
+		</id>
         <version name="recordVersion" column="ld_recordversion"  type="long" />   
         <property name="lastModified" type="timestamp" column="ld_lastmodified" />
         <property name="deleted" type="int" column="ld_deleted" not-null="true" />

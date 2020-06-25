@@ -87,7 +87,7 @@ public class GUIExternalCall implements Serializable {
 
 		for (String param : getParameters()) {
 			if ("user".equals(param.trim()))
-				url += "&user=" + Session.get().getUser().getUserName();
+				url += "&user=" + Session.get().getUser().getUsername();
 			else if ("filename".equals(param.trim())) {
 				url += "&filename=";
 				for (String title : titles) {

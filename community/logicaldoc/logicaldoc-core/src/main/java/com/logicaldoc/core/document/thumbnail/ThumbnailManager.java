@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.util.DocUtil;
 import com.logicaldoc.util.Context;
@@ -47,7 +49,8 @@ public class ThumbnailManager {
 	 * @param document The document to be treated
 	 * @param fileVersion The file version(optional)
 	 * @param sid The session identifier(optional)
-	 * @throws IOException
+	 * 
+	 * @throws IOException in case an error happens during image creation
 	 */
 	public void createTumbnail(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "thumbnail", SUFFIX_THUMB, sid);
@@ -59,7 +62,9 @@ public class ThumbnailManager {
 	 * 
 	 * @param document The document to be treated
 	 * @param fileVersion The file version(optional)
-	 * @throws IOException
+	 * @param sid The session identifier(optional)
+	 * 
+	 * @throws IOException in case an error happens during image creation
 	 */
 	public void createTile(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "tile", SUFFIX_TILE, sid);
@@ -67,9 +72,19 @@ public class ThumbnailManager {
 
 	protected void createImage(Document document, String fileVersion, String type, String suffix, String sid)
 			throws IOException {
+		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		Tenant tenant = tDao.findById(document.getTenantId());
+		long maxFileSize = Context.get().getProperties().getLong(tenant.getName() + ".gui.preview.maxfilesize", 0)
+				* 1024 * 1024;
+
+		if (maxFileSize > 0 && maxFileSize < document.getFileSize()) {
+			log.warn("Document {} is too big for the thumbnail", document.getId());
+			return;
+		}
+
 		ThumbnailBuilder builder = getBuilder(document);
 		if (builder == null) {
-			log.warn("No builder found for document " + document.getId());
+			log.warn("No builder found for document {}", document.getId());
 			return;
 		}
 
@@ -77,7 +92,7 @@ public class ThumbnailManager {
 
 		int size = 150;
 		try {
-			ContextProperties conf=Context.get().getProperties();
+			ContextProperties conf = Context.get().getProperties();
 			size = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".size"));
 		} catch (Throwable t) {
 			log.error(t.getMessage());
@@ -85,7 +100,7 @@ public class ThumbnailManager {
 
 		int quality = 100;
 		try {
-			ContextProperties conf=Context.get().getProperties();
+			ContextProperties conf = Context.get().getProperties();
 			int buf = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".quality"));
 			if (buf < 1)
 				buf = 1;
@@ -106,11 +121,10 @@ public class ThumbnailManager {
 			builder.buildThumbnail(sid, document, fileVersion, src, dest, size, quality);
 
 			// Put the resource
-			String resource = storer.getResourceName(document, getSuitableFileVersion(document, fileVersion),
-					suffix);
+			String resource = storer.getResourceName(document, getSuitableFileVersion(document, fileVersion), suffix);
 			storer.store(dest, document.getId(), resource);
 		} catch (Throwable e) {
-			log.warn("Error rendering image for document: " + document.getId() + " - " + document.getFileName(), e);
+			log.warn("Error rendering image for document: {} - {}", document.getId(), document.getFileName(), e);
 		} finally {
 			// Delete temporary resources
 			FileUtil.strongDelete(src);
@@ -123,7 +137,8 @@ public class ThumbnailManager {
 	 * 
 	 * @param document The document to be treated
 	 * @param sid The session identifier (optional)
-	 * @throws IOException
+	 * 
+	 * @throws IOException raised in case the thumbnail file cannot be created
 	 */
 	public void createTumbnail(Document document, String sid) throws IOException {
 		createTumbnail(document, null, sid);
@@ -131,12 +146,16 @@ public class ThumbnailManager {
 
 	/**
 	 * Loads the proper builder for the passed document
+	 * 
+	 * @param document the document
+	 * 
+	 * @return the right thumbnail builder for the given document
 	 */
 	private ThumbnailBuilder getBuilder(Document document) {
 		ThumbnailBuilder builder = getBuilders().get(document.getFileExtension().toLowerCase());
 
 		if (builder == null) {
-			log.warn("No registered thumbnail builder for extension " + document.getFileExtension().toLowerCase());
+			log.warn("No registered thumbnail builder for extension {}", document.getFileExtension().toLowerCase());
 			try {
 				String mime = MimeType.getByFilename(document.getFileName());
 				if ("text/plain".equals(mime)) {
@@ -155,7 +174,12 @@ public class ThumbnailManager {
 	/**
 	 * Write a document into a temporary file.
 	 * 
-	 * @throws IOException
+	 * @param document the document
+	 * @param fileVersion version of the file
+	 * 
+	 * @return the temporary file
+	 * 
+	 * @throws IOException raised if the temporary file cannot be written
 	 */
 	private File writeToTempFile(Document document, String fileVersion) throws IOException {
 		File target = File.createTempFile("scr",
@@ -169,6 +193,11 @@ public class ThumbnailManager {
 	/**
 	 * Returns the fileVersion in case this is not null or
 	 * document.getFileVersion() otherwise
+	 * 
+	 * @param document the document
+	 * @param fileVersion version of the file
+	 * 
+	 * @return the file version name
 	 */
 	private String getSuitableFileVersion(Document document, String fileVersion) {
 		String fver = fileVersion;
@@ -195,10 +224,10 @@ public class ThumbnailManager {
 				// Try to instantiate the builder
 				Object builder = clazz.newInstance();
 				if (!(builder instanceof ThumbnailBuilder))
-					throw new Exception("The specified builder " + className
-							+ " doesn't implement ThumbnailBuilder interface");
+					throw new Exception(
+							"The specified builder " + className + " doesn't implement ThumbnailBuilder interface");
 				builders.put(extension, (ThumbnailBuilder) builder);
-				log.info("Added new thumbnail builder " + className + " for extension " + extension);
+				log.info("Added new thumbnail builder {} for extension {}", className, extension);
 			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
 			}

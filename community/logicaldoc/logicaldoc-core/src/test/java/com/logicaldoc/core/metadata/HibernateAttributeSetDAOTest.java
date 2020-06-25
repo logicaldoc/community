@@ -3,13 +3,14 @@ package com.logicaldoc.core.metadata;
 import java.util.Collection;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Tenant;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateAttributeDAO</code>
@@ -31,7 +32,7 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		Assert.assertTrue(dao.delete(1));
 		AttributeSet set = dao.findById(1);
 		Assert.assertNull(set);
@@ -72,7 +73,7 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		AttributeSet set = new AttributeSet();
 		set.setName("test3");
 		set.setValue("a1", "v1");
@@ -87,7 +88,7 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTCase {
 	@Test
 	public void testFindAttributes() {
 		Map<String, Attribute> attributes = dao.findAttributes(1L, null);
-		Assert.assertEquals(8, attributes.size());
+		Assert.assertEquals(9, attributes.size());
 		Assert.assertTrue(attributes.containsKey("sourceAuthor"));
 	}
 }

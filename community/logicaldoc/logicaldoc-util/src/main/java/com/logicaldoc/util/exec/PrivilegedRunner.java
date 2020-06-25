@@ -25,8 +25,6 @@ public class PrivilegedRunner {
 
 	/**
 	 * Builds a default privileged runner.
-	 * 
-	 * @param platform the current platform
 	 */
 	public PrivilegedRunner() {
 	}

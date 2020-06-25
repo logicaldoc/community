@@ -73,6 +73,8 @@ public class UserHistoryDataServlet extends HttpServlet {
 				writer.print("<date>" + df.format(history.getDate()) + "</date>");
 				if (history.getComment() != null)
 					writer.print("<comment><![CDATA[" + history.getComment() + "]]></comment>");
+				if (history.getReason() != null)
+					writer.print("<reason><![CDATA[" + history.getReason() + "]]></reason>");
 				if (history.getSessionId() != null && showSid)
 					writer.print("<sid><![CDATA[" + history.getSessionId() + "]]></sid>");
 				writer.print("<userId>" + history.getUserId() + "</userId>");

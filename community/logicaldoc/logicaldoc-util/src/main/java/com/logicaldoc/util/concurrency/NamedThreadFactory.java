@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This thread faactory acts like <code>Executors.defaultThreadFactory()</code>
+ * This thread factory acts like <code>Executors.defaultThreadFactory()</code>
  * but gives a name prefix to the new thread.
  * 
  * @author Marco Meschieri - LogicalDOC

@@ -27,17 +27,15 @@ public class WebConfigurator extends XMLBean {
 	 * Check for existing element within a XML-document
 	 * 
 	 * @param elements List of Elements which have as child a
-	 * 
 	 *        <pre>
-	 * name
-	 * </pre>
-	 * 
+	 *        name
+	 *        </pre>
 	 *        tag
 	 * @param match_text The text for looking up whether exists
 	 * @param name The tag that should be right there for checking this value
-	 * @return
+	 * 
+	 * @return the element
 	 */
-	@SuppressWarnings("unchecked")
 	private Element elementLookUp(List elements, String match_text, String name) {
 		for (Iterator iterator = elements.iterator(); iterator.hasNext();) {
 			Element elem = (Element) iterator.next();
@@ -54,16 +52,16 @@ public class WebConfigurator extends XMLBean {
 	/**
 	 * Adding a contextparam to the web.xml
 	 * 
-	 * @param param_name the param
-	 * @param param_value the value
-	 * @param param_description
+	 * @param name the param
+	 * @param value the value
+	 * @param description description of the parameter
 	 * @param append * @param append if the param exist, should the new value
 	 *        appended? possible values are represented in
 	 *        {@link WebConfigurator.INIT_PARAM}
 	 */
-	public void addContextParam(String param_name, String param_value, String param_description, INIT_PARAM append) {
+	public void addContextParam(String name, String value, String description, INIT_PARAM append) {
 		List contextParams = getRootElement().getChildren("context-param", getRootElement().getNamespace());
-		Element contextParam = this.elementLookUp(contextParams, "param-name", param_name);
+		Element contextParam = this.elementLookUp(contextParams, "param-name", name);
 
 		if (contextParam != null && append.equals(INIT_PARAM.PARAM_STOP))
 			return;
@@ -80,9 +78,9 @@ public class WebConfigurator extends XMLBean {
 			// Prepare the new mapping
 			contextParam = new Element("context-param", getRootElement().getNamespace());
 			Element paramName = new Element("param-name", getRootElement().getNamespace());
-			paramName.setText(param_name);
+			paramName.setText(name);
 			Element paramValue = new Element("param-value", getRootElement().getNamespace());
-			paramValue.setText(param_value);
+			paramValue.setText(value);
 			contextParam.addContent("\n ");
 			contextParam.addContent(paramName);
 			contextParam.addContent("\n ");
@@ -100,23 +98,22 @@ public class WebConfigurator extends XMLBean {
 		if (contextParam != null && append.equals(INIT_PARAM.PARAM_APPEND)) {
 
 			Element paramValue = (Element) contextParam.getChildren().get(1);
-			paramValue.setText(paramValue.getText() + "," + param_value);
+			paramValue.setText(paramValue.getText() + "," + value);
 			writeXMLDoc();
 			return;
 		}
 
 		if (contextParam != null && append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
 			Element paramValue = (Element) contextParam.getChildren().get(1);
-			paramValue.setText(param_value);
+			paramValue.setText(value);
 			writeXMLDoc();
 			return;
 		}
 	}
-	
+
 	public void addFilterInitParam(String filterName, String param_name, String param_value) {
 		this.addFilterInitParam(filterName, param_name, param_value, null, INIT_PARAM.PARAM_STOP);
 	}
-	
 
 	/**
 	 * Adds a init parameter to the filter
@@ -129,30 +126,30 @@ public class WebConfigurator extends XMLBean {
 	 *        possible values are represented in
 	 *        {@link WebConfigurator.INIT_PARAM}
 	 */
-	public void addFilterInitParam(String filterName, String param_name, String param_value, String param_description,
+	public void addFilterInitParam(String filterName, String name, String value, String description,
 			INIT_PARAM append) {
 		List filters = getRootElement().getChildren("filter", getRootElement().getNamespace());
 		Element filter = this.elementLookUp(filters, "filter-name", filterName);
 
 		if (filter == null)
-			throw new IllegalStateException("The filter " + filterName
-					+ " has not been found. Have you already written the filter?");
+			throw new IllegalStateException(
+					"The filter " + filterName + " has not been found. Have you already written the filter?");
 
-		Element initParam = this.elementLookUp(filter.getChildren(), "param-name", param_name);
+		Element initParam = this.elementLookUp(filter.getChildren(), "param-name", name);
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_STOP))
 			return;
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_APPEND)) {
 			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
-			paramValue.setText(paramValue.getText() + "," + param_value);
+			paramValue.setText(paramValue.getText() + "," + value);
 			writeXMLDoc();
 			return;
 		}
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
 			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
-			paramValue.setText(param_value);
+			paramValue.setText(value);
 			writeXMLDoc();
 			return;
 		}
@@ -161,18 +158,18 @@ public class WebConfigurator extends XMLBean {
 
 		// the name
 		Element param = new Element("param-name", getRootElement().getNamespace());
-		param.setText(param_name);
+		param.setText(name);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		param = new Element("param-value", getRootElement().getNamespace());
-		param.setText(param_value);
+		param.setText(value);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
-		if (param_description != null && param_description.equals("") != true) {
+		if (description != null && description.equals("") != true) {
 			param = new Element("description", getRootElement().getNamespace());
-			param.setText(param_description);
+			param.setText(description);
 			// paramElement.addContent("\n ");
 			paramElement.getChildren().add(param);
 		}
@@ -191,30 +188,30 @@ public class WebConfigurator extends XMLBean {
 	 * @param append if the param exist, should the new value appended? possible
 	 *        values are represented in {@link WebConfigurator.INIT_PARAM}
 	 */
-	public void addInitParam(String servletName, String param_name, String param_value, String param_description,
+	public void addInitParam(String servletName, String name, String value, String description,
 			INIT_PARAM append) {
 		List servlets = getRootElement().getChildren("servlet", getRootElement().getNamespace());
 		Element servlet = this.elementLookUp(servlets, "servlet-name", servletName);
 
 		if (servlet == null)
-			throw new IllegalStateException("The servlet " + servletName
-					+ " has not been found. Have you already written the servlet?");
+			throw new IllegalStateException(
+					"The servlet " + servletName + " has not been found. Have you already written the servlet?");
 
-		Element initParam = this.elementLookUp(servlet.getChildren(), "param-name", param_name);
+		Element initParam = this.elementLookUp(servlet.getChildren(), "param-name", name);
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_STOP))
 			return;
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_APPEND)) {
 			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
-			paramValue.setText(paramValue.getText() + "," + param_value);
+			paramValue.setText(paramValue.getText() + "," + value);
 			writeXMLDoc();
 			return;
 		}
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
 			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
-			paramValue.setText(param_value);
+			paramValue.setText(value);
 			writeXMLDoc();
 			return;
 		}
@@ -223,18 +220,18 @@ public class WebConfigurator extends XMLBean {
 
 		// the name
 		Element param = new Element("param-name", getRootElement().getNamespace());
-		param.setText(param_name);
+		param.setText(name);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		param = new Element("param-value", getRootElement().getNamespace());
-		param.setText(param_value);
+		param.setText(value);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
-		if (param_description != null && param_description.equals("") != true) {
+		if (description != null && description.equals("") != true) {
 			param = new Element("description", getRootElement().getNamespace());
-			param.setText(param_description);
+			param.setText(description);
 			// paramElement.addContent("\n ");
 			paramElement.getChildren().add(param);
 		}
@@ -261,29 +258,29 @@ public class WebConfigurator extends XMLBean {
 	 * @param append if the param exist, should the new value appended? possible
 	 *        values are represented in {@link WebConfigurator.INIT_PARAM}
 	 */
-	public void addListenerInitParam(String listenerClazz, String param_name, String param_value, INIT_PARAM append) {
+	public void addListenerInitParam(String listenerClazz, String name, String value, INIT_PARAM append) {
 		List listeners = getRootElement().getChildren("listener", getRootElement().getNamespace());
 		Element listener = this.elementLookUp(listeners, "listener-class", listenerClazz);
 
 		if (listener == null)
-			throw new IllegalStateException("The listener " + listenerClazz
-					+ " has not been found. Have you already written the listener?");
+			throw new IllegalStateException(
+					"The listener " + listenerClazz + " has not been found. Have you already written the listener?");
 
-		Element initParam = this.elementLookUp(listener.getChildren(), "param-name", param_name);
+		Element initParam = this.elementLookUp(listener.getChildren(), "param-name", name);
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_STOP))
 			return;
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_APPEND)) {
 			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
-			paramValue.setText(paramValue.getText() + "," + param_value);
+			paramValue.setText(paramValue.getText() + "," + value);
 			writeXMLDoc();
 			return;
 		}
 
 		if (initParam != null && append.equals(INIT_PARAM.PARAM_OVERWRITE)) {
 			Element paramValue = ((Element) initParam.getParent()).getChild("param-value");
-			paramValue.setText(param_value);
+			paramValue.setText(value);
 			writeXMLDoc();
 			return;
 		}
@@ -292,12 +289,12 @@ public class WebConfigurator extends XMLBean {
 
 		// the name
 		Element param = new Element("param-name", getRootElement().getNamespace());
-		param.setText(param_name);
+		param.setText(name);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 
 		param = new Element("param-value", getRootElement().getNamespace());
-		param.setText(param_value);
+		param.setText(value);
 		// paramElement.addContent("\n ");
 		paramElement.getChildren().add(param);
 		listener.getChildren().add(paramElement);
@@ -306,13 +303,13 @@ public class WebConfigurator extends XMLBean {
 	/**
 	 * Adds a init parameter to the servlet
 	 * 
-	 * @param clazz The classname
+	 * @param servletName name of the servlet
 	 * @param name Name of the Parameter
 	 * @param value Value of the Parameter
 	 * @param description Description
 	 */
-	public void addInitParam(String servletName, String param_name, String param_value, String param_description) {
-		this.addInitParam(servletName, param_name, param_value, param_description, INIT_PARAM.PARAM_STOP);
+	public void addInitParam(String servletName, String name, String value, String description) {
+		this.addInitParam(servletName, name, value, description, INIT_PARAM.PARAM_STOP);
 	}
 
 	/**
@@ -332,10 +329,10 @@ public class WebConfigurator extends XMLBean {
 	 * 
 	 * @param name The servlet name
 	 * @param clazz The servlet class fully qualified name
-	 * @param load_on startup
+	 * @param loadOnStartup use 1 in case the servlet must be started during the startup
 	 */
 	@SuppressWarnings("unchecked")
-	public void addServlet(String name, String clazz, int load_on_startup) {
+	public void addServlet(String name, String clazz, int loadOnStartup) {
 		Element servlet = null;
 		Element servletClass = null;
 
@@ -580,7 +577,9 @@ public class WebConfigurator extends XMLBean {
 	}
 
 	/**
-	 * Sets the given policy in the <transport-guarantee> tags
+	 * Sets the given policy in the &lt;transport-guarantee&gt; tags
+	 *
+	 * @param policy the policy to set
 	 * 
 	 * @return true if the XML was touched
 	 */

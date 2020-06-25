@@ -9,23 +9,18 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.DragPanSampleImg;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.StampService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.Side;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.HTMLPane;
+import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ColorItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -38,7 +33,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This panel collects details about a stamp
@@ -51,9 +45,7 @@ public class StampDetailsPanel extends VLayout {
 
 	private Layout propertiesTabPanel;
 
-	private HLayout savePanel;
-
-	private TabSet tabSet = new TabSet();
+	private EditingTabSet tabSet;
 
 	private StampsPanel stampsPanel;
 
@@ -67,6 +59,8 @@ public class StampDetailsPanel extends VLayout {
 
 	private StampUsersPanel usersPanel;
 
+	private FormItem text;
+
 	public StampDetailsPanel(StampsPanel stampsPanel) {
 		super();
 
@@ -74,31 +68,33 @@ public class StampDetailsPanel extends VLayout {
 		setHeight100();
 		setWidth100();
 		setMembersMargin(10);
+	}
 
-		savePanel = new HLayout();
-		savePanel.setHeight(20);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
-		Button saveButton = new Button(I18N.message("save"));
-		saveButton.setAutoFit(true);
-		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
+	private void refresh() {
+		vm.clearErrors(false);
+		vm.clearValues();
+		vm.resetValues();
+
+		if (form1 != null)
+			form1.destroy();
+
+		if (form2 != null)
+			form2.destroy();
+
+		/*
+		 * Prepare the standard properties tab
+		 */
+		if (tabSet != null) {
+			tabSet.hideSave();
+			removeMember(tabSet);
+		}
+
+		tabSet = new EditingTabSet(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				onSave();
 			}
-		});
-		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("70%");
-		spacer.setOverflow(Overflow.HIDDEN);
-
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (stamp.getId() != 0) {
@@ -117,45 +113,9 @@ public class StampDetailsPanel extends VLayout {
 					GUIStamp newStamp = new GUIStamp();
 					setStamp(newStamp);
 				}
-				savePanel.setVisible(false);
+				tabSet.hideSave();
 			}
 		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		savePanel.addMember(saveButton);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		addMember(savePanel);
-	}
-
-	private void refresh() {
-		vm.clearErrors(false);
-		vm.clearValues();
-		vm.resetValues();
-
-		if (form1 != null)
-			form1.destroy();
-
-		if (form2 != null)
-			form2.destroy();
-
-		if (savePanel != null)
-			savePanel.setVisible(false);
-
-		/*
-		 * Prepare the standard properties tab
-		 */
-		if (tabSet != null)
-			removeMember(tabSet);
-
-		tabSet = new TabSet();
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight100();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		propertiesTabPanel = new HLayout();
@@ -192,6 +152,9 @@ public class StampDetailsPanel extends VLayout {
 		form2.setTitleOrientation(TitleOrientation.TOP);
 		form2.setValuesManager(vm);
 
+		if (stamp.getType() != GUIStamp.TYPE_IMAGE)
+			form2.setWidth100();
+
 		TextItem name = ItemFactory.newSimpleTextItem("name", "name", stamp.getName());
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
@@ -201,43 +164,56 @@ public class StampDetailsPanel extends VLayout {
 		exprx.addChangedHandler(changedHandler);
 		exprx.setWidth(300);
 
+		TextItem exprw = ItemFactory.newTextItem("exprw", "exprw", stamp.getExprW());
+		exprw.addChangedHandler(changedHandler);
+		exprw.setWidth(300);
+
 		TextItem expry = ItemFactory.newTextItem("expry", "expry", stamp.getExprY());
 		expry.addChangedHandler(changedHandler);
 		expry.setWidth(300);
 
+		TextItem exprh = ItemFactory.newTextItem("exprh", "exprh", stamp.getExprH());
+		exprh.addChangedHandler(changedHandler);
+		exprh.setWidth(300);
+
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", stamp.getDescription());
 		description.addChangedHandler(changedHandler);
+		description.setRowSpan(2);
 		description.setWidth(300);
 
-		final TextAreaItem text = ItemFactory.newTextAreaItem("text", "text", stamp.getText());
-		text.addChangedHandler(changedHandler);
-		text.setWidth(300);
-		text.setHeight(100);
+		text = ItemFactory.newTextAreaItemForAutomation("text", "text", stamp.getText(), changedHandler, false);
+		text.setWidth("*");
+		if (stamp.getType() == GUIStamp.TYPE_HTML) {
+			text = ItemFactory.newRichTextItemForAutomation("text", "text", stamp.getText(), changedHandler);
+			text.setHeight("*");
+		}
 
-		final ColorItem color = ItemFactory.newColorItemPicker("color", "color", stamp.getColor());
-		color.addChangedHandler(changedHandler);
+		final ColorItem color = ItemFactory.newColorItemPicker("color", "color", stamp.getColor(), true,
+				changedHandler);
 
 		final RadioGroupItem barcodeLabel = ItemFactory.newBooleanSelector("barcodeLabel", "label");
 		barcodeLabel.setValue(stamp.getBarcodeLabel() == 1 ? "yes" : "no");
 		barcodeLabel.addChangedHandler(changedHandler);
 
-		final SelectItem barcodeFormat = ItemFactory.newBarcodeTypeSelector("barcodeFormat", "format",
+		final SelectItem barcodeFormat = ItemFactory.newBarcodeGenerationFormatSelector("barcodeFormat", "format",
 				stamp.getBarcodeFormat());
 		barcodeFormat.addChangedHandler(changedHandler);
 
-		final IntegerItem barcodeWidth = ItemFactory.newIntegerItem("barcodeWidth", "width", stamp.getBarcodeWidth());
-		barcodeWidth.setHint("px");
-		barcodeWidth.addChangedHandler(changedHandler);
+		final IntegerItem imageWidth = ItemFactory.newIntegerItem("imageWidth", "width", stamp.getImageWidth());
+		imageWidth.setWidth(80);
+		imageWidth.setHint("px");
+		imageWidth.addChangedHandler(changedHandler);
 
-		final IntegerItem barcodeHeight = ItemFactory.newIntegerItem("barcodeHeight", "height",
-				stamp.getBarcodeHeight());
-		barcodeHeight.setHint("px");
-		barcodeHeight.addChangedHandler(changedHandler);
+		final IntegerItem imageHeight = ItemFactory.newIntegerItem("imageHeight", "height", stamp.getImageHeight());
+		imageHeight.setWidth(80);
+		imageHeight.setHint("px");
+		imageHeight.addChangedHandler(changedHandler);
 
 		final SelectItem type = ItemFactory.newSelectItem("type", "type");
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		map.put("" + GUIStamp.TYPE_IMAGE, I18N.message("image"));
 		map.put("" + GUIStamp.TYPE_TEXT, I18N.message("text"));
+		map.put("" + GUIStamp.TYPE_HTML, I18N.message("html"));
 		map.put("" + GUIStamp.TYPE_BARCODE, I18N.message("barcode"));
 		type.setValueMap(map);
 		type.setValue("" + stamp.getType());
@@ -279,9 +255,15 @@ public class StampDetailsPanel extends VLayout {
 		final SpinnerItem size = ItemFactory.newSpinnerItem("size", "size", stamp.getSize(), 1, 9999);
 		size.addChangedHandler(changedHandler);
 
-		form1.setItems(name, type, pageOption, pageSelection, exprx, rotation, expry, opacity, description);
+		TextItem font = ItemFactory.newTextItem("font", "font", stamp.getFont());
+		font.addChangedHandler(changedHandler);
+		font.setHint(I18N.message("fontpathhint"));
+		font.setWidth(300);
 
-		form2.setItems(text, color, size, barcodeFormat, barcodeWidth, barcodeHeight, barcodeLabel);
+		form1.setItems(name, type, pageOption, pageSelection, exprx, rotation, expry, opacity, exprw, description,
+				exprh);
+
+		form2.setItems(text, color, size, font, barcodeFormat, imageWidth, imageHeight, barcodeLabel);
 
 		// For the spinners we need to manually update the VM or the widget will
 		// not be refreshed
@@ -293,49 +275,70 @@ public class StampDetailsPanel extends VLayout {
 		ChangedHandler typeChangedhandler = new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
-				if (type.getValue().toString().equals("" + GUIStamp.TYPE_IMAGE)) {
-					text.hide();
-					color.hide();
-					size.hide();
-					barcodeFormat.hide();
-					barcodeWidth.hide();
-					barcodeHeight.hide();
-					barcodeLabel.hide();
-					if (stamp.getId() != 0L)
-						image.show();
-				} else {
-					text.show();
-					color.show();
-					image.hide();
-
-					if (type.getValue().toString().equals("" + GUIStamp.TYPE_BARCODE)) {
-						barcodeFormat.show();
-						barcodeWidth.show();
-						barcodeHeight.show();
-						barcodeLabel.show();
-						size.hide();
-						color.hide();
-					} else {
-						barcodeFormat.hide();
-						barcodeWidth.hide();
-						barcodeHeight.hide();
-						barcodeLabel.hide();
-						size.show();
-						color.show();
-					}
-				}
+				stamp.setType(Integer.parseInt(type.getValue().toString()));
+				refresh();
+				// Timer timer = new Timer() {
+				// public void run() {
+				// stampsPanel.showStampDetails(stamp);
+				// }
+				// };
+				// timer.schedule(100);
 			}
 		};
 		type.addChangedHandler(typeChangedhandler);
 		type.addChangedHandler(changedHandler);
-		typeChangedhandler.onChanged(null);
 
-		if (type.getValue().toString().equals("" + GUIStamp.TYPE_IMAGE))
+		if (type.getValue().toString().equals("" + GUIStamp.TYPE_IMAGE)) {
+			text.hide();
+			color.hide();
+			size.hide();
+			font.hide();
+			barcodeFormat.hide();
+			imageWidth.hide();
+			imageHeight.hide();
+			barcodeLabel.hide();
+			if (stamp.getId() != 0L)
+				image.show();
+			exprh.show();
 			refreshStampImage();
+		} else {
+			text.show();
+			color.show();
+			exprh.show();
+			image.hide();
+
+			if (type.getValue().toString().equals("" + GUIStamp.TYPE_BARCODE)) {
+				barcodeFormat.show();
+				imageWidth.show();
+				imageHeight.show();
+				barcodeLabel.show();
+				size.hide();
+				font.hide();
+				color.hide();
+			} else if (type.getValue().toString().equals("" + GUIStamp.TYPE_HTML)) {
+				barcodeFormat.hide();
+				barcodeLabel.hide();
+				imageWidth.hide();
+				imageHeight.hide();
+				size.hide();
+				color.hide();
+				font.hide();
+			} else {
+				barcodeFormat.hide();
+				barcodeLabel.hide();
+				imageWidth.hide();
+				imageHeight.hide();
+				exprh.hide();
+				size.show();
+				font.show();
+				color.show();
+			}
+		}
 	}
 
 	static String stampImageUrl(long stampId) {
-		return Util.contextPath() + "/stampimage/" + stampId + "?random=" + new Date().getTime();
+		return Util.contextPath() + (!Util.contextPath().endsWith("/") ? "/" : "") + "stampimage/" + stampId
+				+ "?random=" + new Date().getTime();
 	}
 
 	public GUIStamp getStamp() {
@@ -348,7 +351,7 @@ public class StampDetailsPanel extends VLayout {
 	}
 
 	public void onModified() {
-		savePanel.setVisible(true);
+		tabSet.displaySave();
 	}
 
 	public void onSave() {
@@ -357,15 +360,21 @@ public class StampDetailsPanel extends VLayout {
 			stamp.setType(Integer.parseInt(vm.getValueAsString("type")));
 			stamp.setExprX(vm.getValueAsString("exprx"));
 			stamp.setExprY(vm.getValueAsString("expry"));
+			stamp.setExprW(vm.getValueAsString("exprw"));
+			stamp.setExprH(vm.getValueAsString("exprh"));
 			stamp.setRotation(Integer.parseInt(vm.getValueAsString("rotation")));
 			stamp.setOpacity(Integer.parseInt(vm.getValueAsString("opacity")));
 			stamp.setSize(Integer.parseInt(vm.getValueAsString("size")));
+			stamp.setFont(vm.getValueAsString("font"));
 			stamp.setPageOption(Integer.parseInt(vm.getValueAsString("pageOption")));
 			stamp.setPageSelection(vm.getValueAsString("pageSelection"));
 
+			if (vm.getValueAsString("imageWidth") != null)
+				stamp.setImageWidth(Integer.parseInt(vm.getValueAsString("imageWidth")));
+			if (vm.getValueAsString("imageHeight") != null)
+				stamp.setImageHeight(Integer.parseInt(vm.getValueAsString("imageHeight")));
+
 			stamp.setBarcodeLabel("yes".equals(vm.getValueAsString("barcodeLabel")) ? 1 : 0);
-			stamp.setBarcodeWidth(Integer.parseInt(vm.getValueAsString("barcodeWidth")));
-			stamp.setBarcodeHeight(Integer.parseInt(vm.getValueAsString("barcodeHeight")));
 			stamp.setBarcodeFormat(vm.getValueAsString("barcodeFormat"));
 
 			stamp.setDescription(vm.getValueAsString("description"));
@@ -380,7 +389,7 @@ public class StampDetailsPanel extends VLayout {
 
 				@Override
 				public void onSuccess(GUIStamp newStamp) {
-					savePanel.setVisible(false);
+					tabSet.hideSave();
 					if (stamp.getId() == 0L)
 						stampsPanel.refresh();
 					else if (newStamp != null) {
@@ -406,9 +415,11 @@ public class StampDetailsPanel extends VLayout {
 		image.setMargin(1);
 		image.setMembersMargin(1);
 
-		DragPanSampleImg img = new DragPanSampleImg(stampImageUrl(stamp.getId()));
-		img.setHeight(getHeight() - 60);
+		String html = "<img border='0' alt='' title='' src='" + stampImageUrl(stamp.getId()) + "' height='"
+				+ (getHeight() - 60) + "px' style='float:body;' align='body' />";
+		HTMLFlow img = new HTMLFlow(html);
 		img.setWidth100();
+		img.setHeight(getHeight() - 60);
 
 		IButton uploadStamp = new IButton(I18N.message("uploadstamp"));
 		uploadStamp.addClickHandler(new ClickHandler() {

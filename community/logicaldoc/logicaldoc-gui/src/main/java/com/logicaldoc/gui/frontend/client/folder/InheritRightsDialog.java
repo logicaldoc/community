@@ -24,7 +24,7 @@ import com.smartgwt.client.widgets.tree.TreeGrid;
  */
 public class InheritRightsDialog extends Dialog {
 
-	public InheritRightsDialog(final SecurityPanel panel) {
+	public InheritRightsDialog(final FolderSecurityPanel panel) {
 		super();
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("inheritrights"));

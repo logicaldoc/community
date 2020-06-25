@@ -21,10 +21,10 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	 * <p>
 	 * <b>Attention:</b> The group(groupId) ACLs will be discarded.
 	 * 
-	 * @param groupId The group to be altered.
+	 * @param group The group to be altered.
 	 * @param parentGroupId The group whose ACLs will be inherited.
 	 */
-	public void inheritACLs(long groupId, long parentGroupId);
+	public void inheritACLs(Group group, long parentGroupId);
 
 	/**
 	 * Finds a group by name.
@@ -37,7 +37,11 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 	public Group findByName(String name, long tenantId);
 
 	/**
-	 * This method selects all groupnames.
+	 * This method selects all group names
+	 * 
+	 * @param tenantId identifier of the tenant
+	 * 
+	 * @return collection of all the group names
 	 */
 	public Collection<String> findAllGroupNames(long tenantId);
 
@@ -53,11 +57,15 @@ public interface GroupDAO extends PersistentObjectDAO<Group> {
 
 	/**
 	 * Counts the total number of groups
+	 * 
+	 * @return total number of groups
 	 */
 	public int count();
 
 	/**
-	 * Initialize the group collections.
+	 * Initialize the group collections
 	 */
 	public void initialize(Group group);
+	
+	public void fixGuestPermissions(Group group);
 }

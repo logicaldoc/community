@@ -1,6 +1,8 @@
 package com.logicaldoc.gui.frontend.client.system;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
@@ -8,13 +10,19 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.ApplicationRestarting;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.logicaldoc.gui.frontend.client.system.task.TasksPanel;
+import com.logicaldoc.gui.frontend.client.system.update.UpdateAndPatchPanel;
 import com.logicaldoc.gui.frontend.client.tenant.TenantsPanel;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -35,6 +43,7 @@ public class SystemMenu extends VLayout {
 	public SystemMenu() {
 		setMargin(10);
 		setMembersMargin(5);
+		setOverflow(Overflow.AUTO);
 
 		Button general = new Button(I18N.message("general"));
 		general.setWidth100();
@@ -81,44 +90,42 @@ public class SystemMenu extends VLayout {
 			}
 		}
 
-		final Button updates = new Button(I18N.message("updates"));
+		final Button updates = new Button(I18N.message("updatesandpatches"));
 		updates.setWidth100();
 		updates.setHeight(25);
 		updates.setVisible(false);
 		addMember(updates);
-		final Button confirmUpdate = new Button("<span style='color:red;'><b>" + I18N.message("confirmupdate")
-				+ "</b></span>");
+
+		final Button confirmUpdate = new Button(
+				"<span style='color:red;'><b>" + I18N.message("confirmupdate") + "</b></span>");
 		confirmUpdate.setWidth100();
 		confirmUpdate.setHeight(25);
 		confirmUpdate.setVisible(false);
 		addMember(confirmUpdate);
 
-		if (Feature.visible(Feature.UPDATES) && Menu.enabled(Menu.UPDATES) && Session.get().isDefaultTenant()) {
+		if ((Feature.enabled(Feature.UPDATES) || Feature.enabled(Feature.PATCHES))
+				&& Menu.enabled(Menu.UPDATES_AND_PATCHES) && Session.get().isDefaultTenant()) {
 			String runlevel = Session.get().getConfig("runlevel");
 			if ("updated".equals(runlevel)) {
 				confirmUpdate.setVisible(true);
-				if (!Feature.enabled(Feature.UPDATES)) {
-					confirmUpdate.setDisabled(true);
-					confirmUpdate.setTooltip(I18N.message("featuredisabled"));
-				}
 			} else {
 				updates.setVisible(true);
-				if (!Feature.enabled(Feature.UPDATES)) {
-					updates.setDisabled(true);
-					updates.setTooltip(I18N.message("featuredisabled"));
-				}
 			}
 		}
 
-		Button productNews = new Button(I18N.message("task.name.ProductNews"));
-		productNews.setWidth100();
-		productNews.setHeight(25);
-		if (Feature.visible(Feature.PRODUCT_NEWS)) {
-			addMember(productNews);
-			if (!Feature.enabled(Feature.PRODUCT_NEWS)) {
-				productNews.setDisabled(true);
-				productNews.setTooltip(I18N.message("featuredisabled"));
-			}
+		final Button license = new Button(I18N.message("license"));
+		license.setWidth100();
+		license.setHeight(25);
+		if (Session.get().isDefaultTenant() && "admin".equals(Session.get().getUser().getUsername())
+				&& !Session.get().isDemo() && Feature.enabled(Feature.LICENSE)) {
+			addMember(license);
+		}
+
+		final Button restart = new Button(I18N.message("restart"));
+		restart.setWidth100();
+		restart.setHeight(25);
+		if (Menu.enabled(Menu.RESTART) && Session.get().isDefaultTenant()) {
+			addMember(restart);
 		}
 
 		if (Session.get().isDemo()) {
@@ -126,6 +133,8 @@ public class SystemMenu extends VLayout {
 			tenants.setDisabled(true);
 			updates.setDisabled(true);
 			branding.setDisabled(true);
+			restart.setDisabled(true);
+			license.setDisabled(true);
 		}
 
 		if (!Session.get().isDefaultTenant()) {
@@ -133,6 +142,8 @@ public class SystemMenu extends VLayout {
 			tenants.setVisible(false);
 			updates.setVisible(false);
 			confirmUpdate.setVisible(false);
+			restart.setVisible(false);
+			license.setVisible(false);
 		}
 
 		addInformations();
@@ -151,17 +162,17 @@ public class SystemMenu extends VLayout {
 			}
 		});
 
-		productNews.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new ProductNewsPanel());
-			}
-		});
-
 		updates.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new UpdatePanel());
+				AdminScreen.get().setContent(new UpdateAndPatchPanel());
+			}
+		});
+
+		license.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				WindowUtils.openUrl(Util.licenseUrl(), "_blank");
 			}
 		});
 
@@ -182,6 +193,44 @@ public class SystemMenu extends VLayout {
 						updates.setVisible(true);
 
 						SC.say(I18N.message("confirmupdateresp") + "\n" + I18N.message("suggestedtorestart"));
+					}
+				});
+			}
+		});
+
+		restart.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				SC.ask(I18N.message("restartalert"), new BooleanCallback() {
+
+					@Override
+					public void execute(Boolean choice) {
+						if (choice) {
+							SystemService.Instance.get().restart(new AsyncCallback<Void>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									Log.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(Void arg) {
+									ApplicationRestarting.get().show();
+
+									restart.setDisabled(true);
+									final String tenant = Session.get().getUser().getTenant().getName();
+									Session.get().close();
+									CookiesManager.removeSid();
+
+									Timer timer = new Timer() {
+										public void run() {
+											Util.waitForUpAndRunning(tenant, I18N.getLocale());
+										}
+									};
+									timer.schedule(6000);
+								}
+							});
+						}
 					}
 				});
 			}
@@ -228,23 +277,23 @@ public class SystemMenu extends VLayout {
 		form1.setWidth(300);
 		form1.setColWidths(1, "*");
 
-		StaticTextItem productName = ItemFactory.newStaticTextItem("productName", "", "<b>"
-				+ Session.get().getInfo().getBranding().getProductName() + "</b>");
+		StaticTextItem productName = ItemFactory.newStaticTextItem("productName", "",
+				"<b>" + Session.get().getInfo().getBranding().getProductName() + "</b>");
 		productName.setShouldSaveValue(false);
 		productName.setShowTitle(false);
 		productName.setWrapTitle(false);
 		productName.setWrap(false);
 		productName.setEndRow(true);
 
-		StaticTextItem version = ItemFactory.newStaticTextItem("version", "", I18N.message("version") + " "
-				+ Session.get().getInfo().getRelease());
+		StaticTextItem version = ItemFactory.newStaticTextItem("version", "",
+				I18N.message("version") + " " + Session.get().getInfo().getRelease());
 		version.setShouldSaveValue(false);
 		version.setShowTitle(false);
 		version.setWrap(false);
 		version.setEndRow(true);
 
-		StaticTextItem vendor = ItemFactory.newStaticTextItem("vendor", "", "&copy; "
-				+ Session.get().getInfo().getBranding().getVendor());
+		StaticTextItem vendor = ItemFactory.newStaticTextItem("vendor", "",
+				"&copy; " + Session.get().getInfo().getBranding().getVendor());
 		vendor.setShouldSaveValue(false);
 		vendor.setShowTitle(false);
 		vendor.setEndRow(true);
@@ -287,8 +336,8 @@ public class SystemMenu extends VLayout {
 		usernoItem.setWrap(true);
 		usernoItem.setWrapTitle(false);
 
-		StaticTextItem hostName = ItemFactory.newStaticTextItem("hostname", "hostname", Session.get().getInfo()
-				.getHostName());
+		StaticTextItem hostName = ItemFactory.newStaticTextItem("hostname", "hostname",
+				Session.get().getInfo().getHostName());
 		hostName.setWidth(250);
 		hostName.setRequired(true);
 		hostName.setShouldSaveValue(false);

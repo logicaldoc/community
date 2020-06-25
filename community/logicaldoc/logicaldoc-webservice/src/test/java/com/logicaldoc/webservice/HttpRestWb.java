@@ -3,16 +3,20 @@ package com.logicaldoc.webservice;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -20,12 +24,16 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -40,7 +48,8 @@ import com.logicaldoc.webservice.model.WSSearchOptions;
 
 public class HttpRestWb {
 
-	public static String BASE_PATH = "http://localhost:8080/logicaldoc";
+	//public static String BASE_PATH = "http://localhost:8080/logicaldoc";
+	public static String BASE_PATH = "http://localhost:9080";
 
 	public static void main(String[] args) throws Exception {
 
@@ -51,8 +60,24 @@ public class HttpRestWb {
         
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setDefaultCredentialsProvider(credsProvider)
+                .setConnectionTimeToLive(1, TimeUnit.MINUTES)
                 .build();
+/*        
+		URL url = new URL(BASE_PATH);
+		
+		HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
         
+        AuthCache authCache = new BasicAuthCache();
+        authCache.put(targetHost, new BasicScheme());
+        
+		// Add AuthCache to the execution context
+		HttpClientContext context = HttpClientContext.create();
+		context.setCredentialsProvider(credsProvider);
+		context.setAuthCache(authCache);*/
+        
+        uploadDocument(httpclient);
+        
+        /*        
 		createFolderSimpleForm(httpclient);
 		createFolderSimpleJSON(httpclient);
 
@@ -61,9 +86,10 @@ public class HttpRestWb {
 		listChildren(httpclient, 04L);
 		
 		long start_time = System.nanoTime();
-		
+				
         WSSearchOptions wsso = buildSearchOptions("en", "document management system");
 		find(httpclient, wsso);
+		*/
 		
 		/*
         wsso = buildSearchOptions("en", "document management");
@@ -115,12 +141,32 @@ public class HttpRestWb {
 		// Total Exec. time (ms): 1062.980412
 		// Total Exec. time (ms): 1064.021243
 		
-		createPath(httpclient, 04L, "/sgsgsgs/Barisoni/rurururu");
+		//createPath(httpclient, 04L, "/sgsgsgs/Barisoni/rurururu");
 		
-		logout(httpclient);
+        String sid = getSid(httpclient);  
+		logout(httpclient, sid);
 	}
 	
-	private static void logout(CloseableHttpClient httpclient) throws ClientProtocolException, IOException {
+	private static String getSid(CloseableHttpClient httpclient) throws ClientProtocolException, IOException {
+		
+		HttpGet getg = new HttpGet(BASE_PATH + "/services/rest/auth/getSid");
+		String sid = null;
+
+		CloseableHttpResponse response = httpclient.execute(getg);
+		try {
+			HttpEntity rent = response.getEntity();
+			if (rent != null) {
+				String respoBody = EntityUtils.toString(rent, "UTF-8");
+				System.out.println("SID: " +respoBody);
+				sid = respoBody;
+			}
+		} finally {
+			response.close();
+		}	
+		return sid;
+	}
+
+	private static void logout(CloseableHttpClient httpclient, String sid) throws ClientProtocolException, IOException {
 
 		HttpDelete deletem = new HttpDelete(BASE_PATH + "/services/rest/auth/logout");	
 
@@ -425,5 +471,113 @@ public class HttpRestWb {
 
 		return null;
 	}
+	
+	
+	private static void uploadDocument02(CloseableHttpClient httpclient) throws IOException {
+
+		System.out.println("uploadDocument(CloseableHttpClient)");
+		
+        HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/upload");
+
+		//File file = new File("C:/tmp/InvoiceProcessing01-workflow.png");        
+        File file = new File("c:/users/shatz/Downloads/SimpleTestProject.zip");
+        //File file = new File("C:/tmp/testContent.txt");        
+                
+		System.out.println(file.getName());	
+		
+		long folderID = 124358812L;
+        
+		StringBody fnamePart = new StringBody(file.getName(), ContentType.TEXT_PLAIN);
+		StringBody folderPart = new StringBody(Long.toString(folderID), ContentType.TEXT_PLAIN);
+        FileBody binPart = new FileBody(file, ContentType.DEFAULT_BINARY);        
+
+        HttpEntity reqEntity = MultipartEntityBuilder.create()
+                .addPart("filename", fnamePart)
+                .addPart("filedata", binPart)
+                .addPart("folderId", folderPart)
+                .build();
+		
+		httppost.setEntity(reqEntity);
+
+		/*
+		int timeout = 5; // seconds
+		HttpParams httpParams = httpclient.getParams();
+		HttpConnectionParams.setConnectionTimeout(
+		  httpParams, timeout * 1000); // http.connection.timeout
+		HttpConnectionParams.setSoTimeout(
+		  httpParams, timeout * 1000); // http.socket.timeout
+		*/
+		
+		CloseableHttpResponse response = httpclient.execute(httppost);
+		
+		int code = response.getStatusLine().getStatusCode();
+		System.out.println("HTTPstatus code: "+ code);
+		
+		try {
+			HttpEntity rent = response.getEntity();
+			if (rent != null) {
+				String respoBody = EntityUtils.toString(rent, "UTF-8");
+				System.out.println(respoBody);
+			}
+		} finally {
+			response.close();
+		}
+	}
+	
+	
+	private static void uploadDocument(CloseableHttpClient httpclient) throws IOException {
+
+		System.out.println("uploadDocument(CloseableHttpClient)");
+		
+		URL url = new URL(BASE_PATH);
+		
+		HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
+		CredentialsProvider credsProvider = new BasicCredentialsProvider();
+		credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", "admin"));
+        
+        AuthCache authCache = new BasicAuthCache();
+        authCache.put(targetHost, new BasicScheme());
+        
+		// Add AuthCache to the execution context
+		HttpClientContext context = HttpClientContext.create();
+		context.setCredentialsProvider(credsProvider);
+		context.setAuthCache(authCache);
+		
+        HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/upload");
+       
+        File file = new File("c:/users/shatz/Downloads/logicaldocsecurity-171122130133.pdf");
+        //File file = new File("C:/tmp/InvoiceProcessing01-workflow.png");  
+                
+		System.out.println(file.getName());	
+		System.out.println(file.getAbsolutePath());	
+		
+		long folderID = 124358812L;
+		
+		MultipartEntityBuilder builder = MultipartEntityBuilder.create();         
+		builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+		builder.addTextBody("filename", file.getName(), ContentType.TEXT_PLAIN);
+		builder.addBinaryBody("filedata", file, ContentType.DEFAULT_BINARY, file.getName());
+		builder.addTextBody("folderId", Long.toString(folderID), ContentType.TEXT_PLAIN);		
+		
+		// 
+		HttpEntity entity = builder.build();
+		httppost.setEntity(entity);
+		
+		CloseableHttpResponse response = httpclient.execute(httppost, context);
+		
+		int code = response.getStatusLine().getStatusCode();
+		System.out.println("HTTPstatus code: "+ code);
+		
+		try {
+			HttpEntity rent = response.getEntity();
+			if (rent != null) {
+				String respoBody = EntityUtils.toString(rent, "UTF-8");
+				System.out.println(respoBody);
+			}
+		} finally {
+			response.close();
+		}
+	}	
+	
 
 }

@@ -91,9 +91,8 @@ public class DownloadServlet extends HttpServlet {
 		if (StringUtils.isNotEmpty(docId)) {
 			doc = docDao.findById(Long.parseLong(docId));
 
-			if (session.getUser() != null
-					&& !folderDao
-							.isPermissionEnabled(Permission.DOWNLOAD, doc.getFolder().getId(), session.getUserId()))
+			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
+					doc.getFolder().getId(), session.getUserId()))
 				throw new IOException("You don't have the DOWNLOAD permission");
 
 			/*
@@ -103,8 +102,8 @@ public class DownloadServlet extends HttpServlet {
 					&& (doc.getDocRefType() != null && doc.getDocRefType().contains("pdf"))) {
 
 				// Generate the PDF conversion
-				FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(
-						FormatConverterManager.class);
+				FormatConverterManager manager = (FormatConverterManager) Context.get()
+						.getBean(FormatConverterManager.class);
 				manager.convertToPdf(doc, fileVersion, session.getSid());
 
 				suffix = FormatConverterManager.PDF_CONVERSION_SUFFIX;
@@ -152,7 +151,8 @@ public class DownloadServlet extends HttpServlet {
 						version == null ? doc.getFileVersion() : version.getFileVersion(), null);
 				String unsafe = storer.getString(doc.getId(), unsafeResource);
 				String safe = HTMLSanitizer.sanitize(unsafe);
-				storer.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), doc.getId(), safeResource);
+				storer.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), doc.getId(),
+						safeResource);
 			}
 		}
 
@@ -170,9 +170,9 @@ public class DownloadServlet extends HttpServlet {
 		}
 
 		if (version != null)
-			log.debug("Download version id=" + versionId);
+			log.debug("Download version id={}", versionId);
 		else
-			log.debug("Download document id=" + docId);
+			log.debug("Download document id={}", docId);
 
 		if ("true".equals(downloadText)) {
 			ServletUtil.downloadDocumentText(request, response, doc.getId(), session.getUser());

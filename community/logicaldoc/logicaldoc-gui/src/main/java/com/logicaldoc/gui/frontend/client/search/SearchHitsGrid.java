@@ -3,17 +3,11 @@ package com.logicaldoc.gui.frontend.client.search;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.events.DrawEvent;
-import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.events.GroupStateChangedEvent;
-import com.smartgwt.client.widgets.grid.events.GroupStateChangedHandler;
-import com.smartgwt.client.widgets.grid.events.ViewStateChangedEvent;
-import com.smartgwt.client.widgets.grid.events.ViewStateChangedHandler;
 
 /**
  * Grid of documents displayed in the search workspace
@@ -29,7 +23,7 @@ public class SearchHitsGrid extends DocumentsListGrid {
 		super(null);
 		setShowRecordComponents(true);
 		setShowRecordComponentsByCell(true);
-		setSelectionType(SelectionStyle.SINGLE);
+		setSelectionType(Session.get().isAdmin() ? SelectionStyle.MULTIPLE : SelectionStyle.SINGLE);
 		setShowRowNumbers(true);
 
 		fieldsMap.get("type").setHidden(true);
@@ -91,54 +85,22 @@ public class SearchHitsGrid extends DocumentsListGrid {
 			fields.add(fieldsMap.get("stopPublishing"));
 		if (!fields.contains(fieldsMap.get("template")))
 			fields.add(fieldsMap.get("template"));
+		if (!fields.contains(fieldsMap.get("language")))
+			fields.add(fieldsMap.get("language"));
 
 		setFields(fields.toArray(new ListGridField[0]));
 
-		/*
-		 * Save the layout of the grid at every change
-		 */
-		addViewStateChangedHandler(new ViewStateChangedHandler() {
-			@Override
-			public void onViewStateChanged(ViewStateChangedEvent event) {
-				saveGridState();
-			}
-		});
-
-		/*
-		 * Save the grouping of the grid at every change
-		 */
-		addGroupStateChangedHandler(new GroupStateChangedHandler() {
-
-			@Override
-			public void onGroupStateChanged(GroupStateChangedEvent event) {
-				saveGridState();
-			}
-		});
-
-		/*
-		 * Restore any previously saved view state for this grid.
-		 */
-		addDrawHandler(new DrawHandler() {
-			@Override
-			public void onDraw(DrawEvent event) {
-				saveGridState();
-			}
-		});
-
-		loadGridState();
+		loadGridLayout(null);
 	}
 
-	private void saveGridState() {
-		CookiesManager.save(CookiesManager.COOKIE_HITSLIST, getViewState());
-		CookiesManager.save(CookiesManager.COOKIE_HITSLIST_GROUPING, getGroupState());
-	}
-
-	private void loadGridState() {
-		String previouslySavedState = CookiesManager.get(CookiesManager.COOKIE_HITSLIST);
-		if (previouslySavedState != null)
-			setViewState(previouslySavedState);
-		String previouslySavedGroupState = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_GROUPING);
-		if (previouslySavedGroupState != null)
-			setGroupState(previouslySavedGroupState);
+	
+	@Override
+	public void loadGridLayout(GUIFolder folder) {
+		String previouslySavedState = Session.get().getUser().getHitsGrid();
+		if (previouslySavedState != null && !previouslySavedState.isEmpty())
+			try {
+				setViewState(previouslySavedState);
+			} catch (Throwable t) {
+			}
 	}
 }

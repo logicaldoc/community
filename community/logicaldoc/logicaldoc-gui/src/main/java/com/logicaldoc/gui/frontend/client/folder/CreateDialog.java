@@ -35,8 +35,7 @@ public class CreateDialog extends Dialog {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(folder.getType() == 0 ? I18N.message("newfolder") : I18N.message("newworkspace"));
-		setWidth(400);
-		setHeight(150);
+		setAutoSize(true);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -53,6 +52,7 @@ public class CreateDialog extends Dialog {
 		CheckboxItem inheritSecurity = new CheckboxItem();
 		inheritSecurity.setName("inheritSecurity");
 		inheritSecurity.setTitle(I18N.message("inheritparentsec"));
+		inheritSecurity.setHidden(!inheritOptionEnabled);
 
 		TextItem name = ItemFactory.newTextItem("name", "name",
 				folder.getType() == 0 ? I18N.message("newfolder") : I18N.message("newworkspace"));
@@ -62,7 +62,7 @@ public class CreateDialog extends Dialog {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
 				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onCreate(folder, inheritOptionEnabled);
+					onCreate(folder);
 			}
 		});
 
@@ -72,16 +72,13 @@ public class CreateDialog extends Dialog {
 		create.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				onCreate(folder, inheritOptionEnabled);
+				onCreate(folder);
 			}
 		});
 
-		if (inheritOptionEnabled) {
-			form.setItems(name, inheritSecurity, create);
-			inheritSecurity.setValue(Session.get().getInfo().getConfig("gui.security.inheritoption.default"));
-		} else
-			form.setItems(name, create);
-
+		form.setItems(name, inheritSecurity, create);
+		inheritSecurity.setValue(Session.get().getConfigAsBoolean("gui.security.inheritoption.default"));
+		
 		VLayout content = new VLayout();
 		content.setTop(10);
 		content.setWidth100();
@@ -92,12 +89,11 @@ public class CreateDialog extends Dialog {
 		addItem(content);
 	}
 
-	private void onCreate(final GUIFolder folder, boolean inheritOptionEnabled) {
+	private void onCreate(final GUIFolder folder) {
 		if (form.validate()) {
 			folder.setName(form.getValueAsString("name").trim());
 			FolderService.Instance.get().create(folder,
-					folder.getType() == 0
-							&& (!inheritOptionEnabled || "true".equals(form.getValueAsString("inheritSecurity"))),
+					folder.getType() == 0 && "true".equals(form.getValueAsString("inheritSecurity")),
 					new AsyncCallback<GUIFolder>() {
 
 						@Override

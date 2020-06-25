@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -27,11 +28,15 @@ public class TagSearch extends Search {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void internalSearch() throws Exception {
+	public void internalSearch() throws SearchException {
 		prepareExpression();
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		hits.addAll((List<Hit>) dao.query(options.getExpression(), null, new HitMapper(), options.getMaxHits()));
+		try {
+			hits.addAll((List<Hit>) dao.query(options.getExpression(), null, new HitMapper(), options.getMaxHits()));
+		} catch (PersistenceException e) {
+			throw new SearchException(e);
+		}
 
 		moreHitsPresent = (hits.size() >= options.getMaxHits());
 		if (moreHitsPresent)
@@ -53,7 +58,7 @@ public class TagSearch extends Search {
 		query.append(" A.ld_rating, A.ld_fileversion, A.ld_comment, A.ld_workflowstatus, A.ld_startpublishing, ");
 		query.append(" A.ld_stoppublishing, A.ld_published, ");
 		query.append(" B.ld_name, A.ld_folderid, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		query.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp ");
+		query.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language ");
 		query.append(" from ld_document A ");
 		query.append(" join ld_folder B on A.ld_folderid=B.ld_id ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
@@ -61,13 +66,17 @@ public class TagSearch extends Search {
 		appendWhereClause(false, query);
 
 		// Append all shortcuts
-		query.append(" UNION select A.ld_id, REF.ld_customid, A.ld_docref, REF.ld_type, REF.ld_version, REF.ld_lastmodified, ");
-		query.append(" REF.ld_date, REF.ld_publisher, REF.ld_creation, REF.ld_creator, REF.ld_filesize, REF.ld_immutable, ");
-		query.append(" REF.ld_indexed, REF.ld_lockuserid, REF.ld_filename, REF.ld_status, REF.ld_signed, REF.ld_type, ");
-		query.append(" REF.ld_rating, REF.ld_fileversion, REF.ld_comment, REF.ld_workflowstatus, A.ld_startpublishing, ");
+		query.append(
+				" UNION select A.ld_id, REF.ld_customid, A.ld_docref, REF.ld_type, REF.ld_version, REF.ld_lastmodified, ");
+		query.append(
+				" REF.ld_date, REF.ld_publisher, REF.ld_creation, REF.ld_creator, REF.ld_filesize, REF.ld_immutable, ");
+		query.append(
+				" REF.ld_indexed, REF.ld_lockuserid, REF.ld_filename, REF.ld_status, REF.ld_signed, REF.ld_type, ");
+		query.append(
+				" REF.ld_rating, REF.ld_fileversion, REF.ld_comment, REF.ld_workflowstatus, A.ld_startpublishing, ");
 		query.append(" A.ld_stoppublishing, A.ld_published, ");
 		query.append(" B.ld_name, A.ld_folderid, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		query.append(" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp ");
+		query.append(" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp, REF.ld_language ");
 		query.append(" from ld_document A ");
 		query.append(" join ld_folder B on A.ld_folderid=B.ld_id ");
 		query.append(" join ld_document REF on A.ld_docref=REF.ld_id ");
@@ -75,7 +84,7 @@ public class TagSearch extends Search {
 
 		appendWhereClause(true, query);
 
-		log.info("executing tag search query=" + query.toString());
+		log.info("executing tag search query={}", query.toString());
 
 		options.setExpression(query.toString());
 	}
@@ -117,7 +126,8 @@ public class TagSearch extends Search {
 		 * them as filter
 		 */
 		if (aliases)
-			query.append(" and A.ld_docref is not null and REF.ld_deleted=0 and A.ld_docref = REF.ld_id and A.ld_docref in ");
+			query.append(
+					" and A.ld_docref is not null and REF.ld_deleted=0 and A.ld_docref = REF.ld_id and A.ld_docref in ");
 		else
 			query.append(" and A.ld_docref is null and A.ld_id in ");
 		DocumentDAO docDAO = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -181,6 +191,7 @@ public class TagSearch extends Search {
 			hit.setStamped(rs.getInt(32));
 			hit.setPassword(rs.getString(33));
 			hit.setWorkflowStatusDisplay(rs.getString(34));
+			hit.setLanguage(rs.getString(35));
 
 			return hit;
 		}

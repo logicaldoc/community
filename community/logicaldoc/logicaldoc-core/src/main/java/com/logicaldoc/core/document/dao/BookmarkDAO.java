@@ -14,38 +14,50 @@ import com.logicaldoc.core.document.Bookmark;
 public interface BookmarkDAO extends PersistentObjectDAO<Bookmark> {
 
 	/**
-	 * Finds all bookmarks for the given user id.
+	 * Finds all bookmarks for the given user id
 	 * 
-	 * @param userId ID of the user.
+	 * @param userId ID of the user
+	 * 
 	 * @return Collection of all bookmarks for the specified user ordered by
-	 *         position.
+	 *         position
 	 */
 	public List<Bookmark> findByUserId(long userId);
 
 	/**
-	 * Finds the identifiers of the docs bookmarked by the given user.
+	 * Finds the identifiers of the docs bookmarked by the given user
+	 * 
+	 * @param userId identifier of the user
+	 * 
+	 * @return list of document identifiers
 	 */
 	public List<Long> findBookmarkedDocs(long userId);
 
 	/**
-	 * Checks if the document is bookmarked
+	 * Checks if the document is bookmarked by a user
+	 * 
+	 * @param docId identifier of the document
+	 * @param userId identifier of the user
+	 * 
+	 * @return true id the document was bookmarked
 	 */
 	public boolean isDocBookmarkedByUser(long docId, long userId);
 
 	/**
-	 * Finds all bookmarks for the given user id and the given document id.
+	 * Finds all bookmarks for the given user id and the given document's identifier
 	 * 
-	 * @param userId ID of the user.
-	 * @param docId ID of the document.
+	 * @param userId ID of the user
+	 * @param docId ID of the document
+	 * 
 	 * @return The bookmark
 	 */
 	public Bookmark findByUserIdAndDocId(long userId, long docId);
 
 	/**
-	 * Finds the bookmark for the given user id and the given folder id.
+	 * Finds the bookmark for the given user id and the given folder id
 	 * 
-	 * @param userId ID of the user.
-	 * @param folderId ID of the folder.
+	 * @param userId ID of the user
+	 * @param folderId ID of the folder
+	 * 
 	 * @return The bookmark
 	 */
 	public Bookmark findByUserIdAndFolderId(long userId, long folderId);

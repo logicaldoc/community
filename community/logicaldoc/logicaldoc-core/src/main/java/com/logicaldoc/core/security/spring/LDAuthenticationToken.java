@@ -26,7 +26,7 @@ public class LDAuthenticationToken extends UsernamePasswordAuthenticationToken {
 	/**
 	 * Constructor for the anonymous login
 	 * 
-	 * @param username
+	 * @param username the username
 	 */
 	public LDAuthenticationToken(String username) {
 		this(username, "", null);

@@ -22,6 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.logicaldoc.webservice.rest.AuthService;
 import com.logicaldoc.webservice.soap.endpoint.SoapAuthService;
 
+import io.swagger.annotations.Api;
+
+@Path("/")
+@Api(value = "author")
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestAuthService extends SoapAuthService implements AuthService {
@@ -69,16 +73,15 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 
 	@DELETE
 	@Path("/logout")
-	public void logout() {
-		String sid = getCurrentSessionId();
+	public void logout(@QueryParam("sid") String sid) {
 		log.debug("logout({})", sid);
 		if (sid != null)
 			super.logout(sid);
 	}
-
+	
 	@GET
 	@Path("/getSid")
 	public String getSid() {
 		return getCurrentSessionId();
-	}
+	}	
 }

@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.session.DavSession;
 import com.logicaldoc.webdav.version.VersionHistoryResourceImpl;
+import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
 public class VersionControlledResourceImpl extends DeltaVResourceImpl implements VersionControlledResource,
 		Serializable {
@@ -48,12 +49,12 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	/**
 	 * Create a new {@link org.apache.jackrabbit.webdav.DavResource}.
 	 * 
-	 * @param locator
-	 * @param factory
-	 * @param session
-	 * @param config
-	 * @param item
-	 * @throws DavException
+	 * @param locator resource locator
+	 * @param factory factory
+	 * @param session the DAV session
+	 * @param config configurations
+	 * 
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
 	 */
 	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
 			ResourceConfig config) throws DavException {
@@ -64,12 +65,13 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	/**
 	 * Create a new {@link org.apache.jackrabbit.webdav.DavResource}.
 	 * 
-	 * @param locator
-	 * @param factory
-	 * @param session
-	 * @param config
-	 * @param isCollection
-	 * @throws DavException
+	 * @param locator resource locator
+	 * @param factory factory
+	 * @param session the DAV session
+	 * @param config configurations
+	 * @param isCollection is this a folder?
+	 * 
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
 	 */
 	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
 			ResourceConfig config, boolean isCollection) throws DavException {
@@ -80,9 +82,10 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	// --------------------------------------------------------< DavResource
 	// >---
 	/**
-	 * Return a comma separated string listing the supported method names.
+	 * Return a comma separated string listing the supported method names
 	 * 
-	 * @return the supported method names.
+	 * @return the supported method names
+	 * 
 	 * @see org.apache.jackrabbit.webdav.DavResource#getSupportedMethods()
 	 */
 	public String getSupportedMethods() {
@@ -118,7 +121,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	/**
 	 * Calls {@link javax.jcr.Node#checkin()} on the underlying repository node.
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#checkin()
 	 */
 	public String checkin() throws DavException {
@@ -127,9 +130,10 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 
 	/**
 	 * Calls {@link javax.jcr.Node#checkout()} on the underlying repository
-	 * node.
+	 * node
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * 
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#checkout()
 	 */
 	public void checkout() throws DavException {
@@ -137,7 +141,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	}
 
 	/**
-	 * @throws org.apache.jackrabbit.webdav.DavException
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * 
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#uncheckout()
 	 */
 	public void uncheckout() throws DavException {
@@ -148,9 +153,11 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * UPDATE feature is not (yet) supported. This method allows fails with
 	 * {@link DavServletResponse#SC_NOT_IMPLEMENTED}.
 	 * 
-	 * @param updateInfo
-	 * @return
-	 * @throws DavException
+	 * @param updateInfo update datails
+	 *  
+	 * @return the status
+	 * 
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
 	 * @see VersionControlledResource#update(UpdateInfo)
 	 */
 	public MultiStatus update(UpdateInfo updateInfo) throws DavException {
@@ -161,9 +168,11 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * MERGE feature is not (yet) supported. This method allows fails with
 	 * {@link DavServletResponse#SC_NOT_IMPLEMENTED}.
 	 * 
-	 * @param mergeInfo
-	 * @return
-	 * @throws DavException
+	 * @param mergeInfo details bout the merge
+	 * 
+	 * @return the status
+	 * 
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
 	 * @see VersionControlledResource#merge(MergeInfo)
 	 */
 	public MultiStatus merge(MergeInfo mergeInfo) throws DavException {
@@ -173,8 +182,9 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	/**
 	 * Modify the labels present with the versions of this resource.
 	 * 
-	 * @param labelInfo
-	 * @throws DavException
+	 * @param labelInfo details of the label
+	 * 
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
 	 * @see VersionControlledResource#label(LabelInfo)
 	 * @see javax.jcr.version.VersionHistory#addVersionLabel(String, String,
 	 *      boolean)
@@ -210,7 +220,6 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * repository node. If the node is not versionable an exception is thrown.
 	 * 
 	 * @return the {@link VersionHistoryResource} associated with this resource.
-	 * @throws org.apache.jackrabbit.webdav.DavException
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#getVersionHistory()
 	 * @see javax.jcr.Node#getVersionHistory()
 	 */
@@ -263,7 +272,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 				return;
 			
 			properties.add(new DefaultDavProperty(DavPropertyName.DISPLAYNAME, resource.getName(), false));
-
+			properties.add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, AbstractWebdavServlet.getContext().getMimeType(resource.getName()), false));
+			
 			if (resource.isFolder())
 				return;
 
@@ -274,7 +284,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 			String baseVHref = getLocatorFromResource(resource).getHref(false);
 
 			if (resource.isCheckedOut() || resource.isLocked()) {
-				log.debug(resource.getName() + " is checkedout");
+				log.debug("{} is checkedout", resource.getName());
 				properties.add(new HrefProperty(CHECKED_OUT, baseVHref, true));
 				properties.add(new HrefProperty(VersionResource.PREDECESSOR_SET, locator.getResourcePath(), false));
 
@@ -300,7 +310,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	/**
 	 * Build a new {@link DavResourceLocator} from the given repository node.
 	 * 
-	 * @param repositoryNode
+	 * @param resource the resource
 	 * @return a new locator for the specified node.
 	 * @see #getLocatorFromNodePath(String)
 	 */
@@ -317,8 +327,11 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	/**
 	 * Create a new <code>DavResource</code> from the given locator.
 	 * 
-	 * @param loc
+	 * @param loc resource locator
+	 * 
 	 * @return new <code>DavResource</code>
+	 * 
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
 	 */
 	@SuppressWarnings("deprecation")
 	protected DavResource createResourceFromLocator(DavResourceLocator loc) throws DavException {

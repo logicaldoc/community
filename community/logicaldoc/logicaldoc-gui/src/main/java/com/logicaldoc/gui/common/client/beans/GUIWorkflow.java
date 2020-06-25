@@ -18,12 +18,12 @@ public class GUIWorkflow implements Serializable {
 	private String name = "";
 
 	private String description = "";
-	
+
 	private String tag = "";
 
 	private String startStateId = null;
 
-	private String supervisor = "";
+	private GUIUser[] supervisors = null;
 
 	private GUIWFState[] states = new GUIWFState[0];
 
@@ -38,8 +38,8 @@ public class GUIWorkflow implements Serializable {
 	private String appendedDocIds;
 
 	private GUIWFState[] wflHistory;
-	
-	//The persistence template
+
+	// The persistence template
 	private Long templateId;
 
 	public GUIWFState getStateById(String id) {
@@ -86,14 +86,6 @@ public class GUIWorkflow implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getSupervisor() {
-		return supervisor;
-	}
-
-	public void setSupervisor(String supervisor) {
-		this.supervisor = supervisor;
 	}
 
 	public String getStartStateId() {
@@ -182,5 +174,13 @@ public class GUIWorkflow implements Serializable {
 
 	public void setTag(String tag) {
 		this.tag = tag;
+	}
+
+	public GUIUser[] getSupervisors() {
+		return supervisors;
+	}
+
+	public void setSupervisors(GUIUser[] supervisors) {
+		this.supervisors = supervisors;
 	}
 }

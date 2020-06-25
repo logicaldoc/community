@@ -4,16 +4,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.EmailAccountService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.Side;
-import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -22,7 +14,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This panel collects all account details
@@ -37,17 +28,19 @@ public class EmailAccountDetailsPanel extends VLayout {
 
 	private Layout advancedTabPanel;
 
+	private Layout automationTabPanel;
+
 	private Layout filtersTabPanel;
 
 	private EmailAccountStandardProperties standardPanel;
 
 	private EmailAccountAdvancedProperties advancedPanel;
 
+	private EmailAccountAutomationPanel automationPanel;
+
 	private EmailAccountFiltersPanel filtersPanel;
 
-	private HLayout savePanel;
-
-	private TabSet tabSet = new TabSet();
+	private EditingTabSet tabSet;
 
 	private EmailAccountsPanel accountsPanel;
 
@@ -59,30 +52,12 @@ public class EmailAccountDetailsPanel extends VLayout {
 		setWidth100();
 		setMembersMargin(10);
 
-		savePanel = new HLayout();
-		savePanel.setHeight(20);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
-		Button saveButton = new Button(I18N.message("save"));
-		saveButton.setAutoFit(true);
-		saveButton.setMargin(2);
-		saveButton.addClickHandler(new ClickHandler() {
+		tabSet = new EditingTabSet(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				onSave();
 			}
-		});
-		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("70%");
-		spacer.setOverflow(Overflow.HIDDEN);
-
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (account.getId() != 0) {
@@ -100,24 +75,9 @@ public class EmailAccountDetailsPanel extends VLayout {
 				} else {
 					setAccount(new GUIEmailAccount());
 				}
-				savePanel.setVisible(false);
+				tabSet.hideSave();
 			}
 		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		savePanel.addMember(saveButton);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		addMember(savePanel);
-
-		tabSet = new TabSet();
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight100();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		standardTabPanel = new HLayout();
@@ -140,12 +100,18 @@ public class EmailAccountDetailsPanel extends VLayout {
 		filtersTab.setPane(filtersTabPanel);
 		tabSet.addTab(filtersTab);
 
+		Tab automationTab = new Tab(I18N.message("automation"));
+		automationTabPanel = new HLayout();
+		automationTabPanel.setWidth100();
+		automationTabPanel.setHeight100();
+		automationTab.setPane(automationTabPanel);
+		tabSet.addTab(automationTab);
+
 		addMember(tabSet);
 	}
 
 	private void refresh() {
-		if (savePanel != null)
-			savePanel.setVisible(false);
+		tabSet.hideSave();
 
 		/*
 		 * Prepare the standard properties tab
@@ -186,6 +152,17 @@ public class EmailAccountDetailsPanel extends VLayout {
 		}
 		filtersPanel = new EmailAccountFiltersPanel(account, changeHandler);
 		filtersTabPanel.addMember(filtersPanel);
+
+		/*
+		 * Prepare the automation tab
+		 */
+		if (automationPanel != null) {
+			automationPanel.destroy();
+			if (automationTabPanel.contains(automationPanel))
+				automationTabPanel.removeMember(automationPanel);
+		}
+		automationPanel = new EmailAccountAutomationPanel(account, changeHandler);
+		automationTabPanel.addMember(automationPanel);
 	}
 
 	public GUIEmailAccount getAccount() {
@@ -198,13 +175,14 @@ public class EmailAccountDetailsPanel extends VLayout {
 	}
 
 	public void onModified() {
-		savePanel.setVisible(true);
+		tabSet.displaySave();
 	}
 
 	private boolean validate() {
 		boolean stdValid = standardPanel.validate();
 		boolean extValid = advancedPanel.validate();
 		boolean filtValid = filtersPanel.validate();
+		boolean automationValid = automationPanel.validate();
 
 		if (!stdValid)
 			tabSet.selectTab(0);
@@ -212,7 +190,9 @@ public class EmailAccountDetailsPanel extends VLayout {
 			tabSet.selectTab(1);
 		else if (!filtValid)
 			tabSet.selectTab(2);
-		return stdValid && extValid && filtValid;
+		else if (!automationValid)
+			tabSet.selectTab(3);
+		return stdValid && extValid && filtValid && automationValid;
 	}
 
 	public void onSave() {
@@ -225,7 +205,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 
 				@Override
 				public void onSuccess(GUIEmailAccount account) {
-					savePanel.setVisible(false);
+					tabSet.hideSave();
 					if (account != null) {
 						accountsPanel.updateRecord(account);
 						accountsPanel.showDetails(account);

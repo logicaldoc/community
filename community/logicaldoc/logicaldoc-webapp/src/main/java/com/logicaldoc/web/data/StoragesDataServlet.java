@@ -3,6 +3,7 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -63,7 +64,7 @@ public class StoragesDataServlet extends HttpServlet {
 			if (types) {
 				// Just list the different storers (types of storages)
 				Set<String> set = StorerManager.get().getDefinitions().keySet();
-				for (String type : set) {
+				for (String type : set.stream().sorted().collect(Collectors.toList())) {
 					if (!StorerManager.get().getDefinitions().get(type).isEnabled())
 						continue;
 

@@ -16,9 +16,12 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 public class DuplicatesDS extends DataSource {
 
 	/**
-	 * Constructor.
+	 * Constructor
+	 * 
+	 * @param folderId identifier of the folder
+	 * @param max maximum number of entries
 	 */
-	public DuplicatesDS(Long folderID, int max) {
+	public DuplicatesDS(Long folderId, int max) {
 		setTitleField("filename");
 		setRecordXPath("/list/duplicate");
 
@@ -35,14 +38,14 @@ public class DuplicatesDS extends DataSource {
 		DataSourceTextField filename = new DataSourceTextField("filename");
 		DataSourceTextField digest = new DataSourceTextField("digest");
 		DataSourceImageField immutable = new DataSourceImageField("immutable");
-		DataSourceTextField folderId = new DataSourceTextField("folderId");
+		DataSourceTextField foldId = new DataSourceTextField("folderId");
 		DataSourceTextField type = new DataSourceTextField("type");
 		DataSourceImageField locked = new DataSourceImageField("locked");
 		DataSourceTextField folderName = new DataSourceTextField("foldername");
 
-		setFields(id, size, publisher, version, lastModified, customId, icon, filename, digest, immutable, folderId,
+		setFields(id, size, publisher, version, lastModified, customId, icon, filename, digest, immutable, foldId,
 				folderName, type, locked);
 		setClientOnly(true);
-		setDataURL("data/duplicates.xml?max=" + max + (folderID != null ? "&folderId=" + folderID : ""));
+		setDataURL("data/duplicates.xml?max=" + max + (folderId != null ? "&folderId=" + folderId : ""));
 	}
 }

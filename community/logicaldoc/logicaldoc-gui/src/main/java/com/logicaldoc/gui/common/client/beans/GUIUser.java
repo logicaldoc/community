@@ -13,6 +13,10 @@ import com.logicaldoc.gui.common.client.Constants;
  */
 public class GUIUser implements Serializable {
 
+	public static final int TYPE_DEFAULT = 0;
+
+	public static final int TYPE_READONLY = 2;
+
 	public static final String ALL_TASKS = "tasks";
 
 	public static final String EVENTS = "events";
@@ -87,9 +91,9 @@ public class GUIUser implements Serializable {
 
 	private int upcomingEvents = 0;
 
-	private long tenantId = Constants.TENANT_DEFAULTID;
+	private GUITenant tenant = null;
 
-	private Long[] menues = new Long[0];
+	private Long[] menus = new Long[0];
 
 	private long quota = -1;
 
@@ -110,8 +114,27 @@ public class GUIUser implements Serializable {
 	private String certDN = null;
 
 	private String secondFactor = null;
-	
+
 	private String key = null;
+
+	private int type = 0;
+	
+	/**
+	 * Description of the grid that displays the list of documents, a JSON format
+	 */
+	private String docsGrid;
+
+	/**
+	 * Description of the grid that shows the results of a search, a JSON format
+	 */
+	private String hitsGrid;
+
+	public GUIUser() {
+		tenant = new GUITenant();
+		tenant.setId(Constants.TENANT_DEFAULTID);
+		tenant.setName(Constants.TENANT_DEFAULTNAME);
+		tenant.setDisplayName(Constants.TENANT_DEFAULTDISPLAYNAME);
+	}
 
 	public String getKey() {
 		return key;
@@ -129,11 +152,11 @@ public class GUIUser implements Serializable {
 		this.secondFactor = secondFactor;
 	}
 
-	public void setUserName(String userName) {
-		this.username = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public String getUserName() {
+	public String getUsername() {
 		return username;
 	}
 
@@ -168,7 +191,7 @@ public class GUIUser implements Serializable {
 		if (fullName == null && getName() != null)
 			fullName = getName();
 		if (fullName == null)
-			fullName = getUserName();
+			fullName = getUsername();
 		return fullName;
 	}
 
@@ -373,22 +396,20 @@ public class GUIUser implements Serializable {
 		}
 	}
 
-	public int getActiveTasks() {
+	public int getAssignedTasks() {
 		return tasks;
 	}
 
-	public void setActiveTasks(int tasks) {
-		if (this.tasks != tasks) {
-			this.tasks = tasks;
-		}
+	public void setAssignedTasks(int tasks) {
+		this.tasks = tasks;
 	}
 
-	public Long[] getMenues() {
-		return menues;
+	public Long[] getMenus() {
+		return menus;
 	}
 
-	public void setMenues(Long[] menues) {
-		this.menues = menues;
+	public void setMenus(Long[] menus) {
+		this.menus = menus;
 	}
 
 	public int getSubscriptions() {
@@ -480,14 +501,6 @@ public class GUIUser implements Serializable {
 		return (getFirstName() != null ? getFirstName() : "") + " " + (getName() != null ? getName() : "");
 	}
 
-	public long getTenantId() {
-		return tenantId;
-	}
-
-	public void setTenantId(long tenantId) {
-		this.tenantId = tenantId;
-	}
-
 	public String getEmailSignature() {
 		return emailSignature;
 	}
@@ -541,5 +554,41 @@ public class GUIUser implements Serializable {
 
 	public void setCertDN(String certDN) {
 		this.certDN = certDN;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public boolean isReadOnly() {
+		return type == TYPE_READONLY;
+	}
+
+	public GUITenant getTenant() {
+		return tenant;
+	}
+
+	public void setTenant(GUITenant tenant) {
+		this.tenant = tenant;
+	}
+
+	public String getDocsGrid() {
+		return docsGrid;
+	}
+
+	public void setDocsGrid(String docsGrid) {
+		this.docsGrid = docsGrid;
+	}
+
+	public String getHitsGrid() {
+		return hitsGrid;
+	}
+
+	public void setHitsGrid(String hitsGrid) {
+		this.hitsGrid = hitsGrid;
 	}
 }

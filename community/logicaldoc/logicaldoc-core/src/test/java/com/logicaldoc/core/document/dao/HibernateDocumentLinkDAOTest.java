@@ -2,14 +2,15 @@ package com.logicaldoc.core.document.dao;
 
 import java.util.Collection;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentLink;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateDocumentLinkDAO</code>
@@ -35,7 +36,7 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		DocumentLink link = new DocumentLink();
 		Document doc1 = docDao.findById(1);
 		Document doc2 = docDao.findById(2);
@@ -50,7 +51,7 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		DocumentLink link = dao.findById(1);
 		Assert.assertNotNull(link);
 		Assert.assertTrue(dao.delete(1));

@@ -5,15 +5,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
-import com.logicaldoc.core.communication.Recipient;
-import com.logicaldoc.core.communication.SystemMessage;
-import com.logicaldoc.core.communication.SystemMessageDAO;
+import com.logicaldoc.core.PersistenceException;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateSystemMessageDAO</code>
@@ -35,7 +33,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		Assert.assertTrue(dao.delete(1));
 		SystemMessage message = dao.findById(1);
 		Assert.assertNull(message);
@@ -75,10 +73,10 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testGetCount() {
-		Assert.assertEquals(1, dao.getCount("sebastian", SystemMessage.TYPE_SYSTEM, null));
-		Assert.assertEquals(2, dao.getCount("marco", 1, null));
-		Assert.assertEquals(0, dao.getCount("admin", SystemMessage.TYPE_SYSTEM, null));
+	public void testGetUnreadCount() {
+		Assert.assertEquals(1, dao.getUnreadCount("sebastian", SystemMessage.TYPE_SYSTEM));
+		Assert.assertEquals(2, dao.getUnreadCount("marco", 1));
+		Assert.assertEquals(0, dao.getUnreadCount("admin", SystemMessage.TYPE_SYSTEM));
 	}
 
 	@Test
@@ -106,7 +104,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		Set<Recipient> recipients = new HashSet<Recipient>();
 		Recipient recipient = new Recipient();
 		recipient.setName("pippo");
@@ -147,7 +145,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindMessagesToBeSent() {
+	public void testFindMessagesToBeSent() throws PersistenceException {
 		Collection<SystemMessage> coll = dao.findMessagesToBeSent(0, 5);
 		Assert.assertEquals(1, coll.size());
 		coll = dao.findMessagesToBeSent(1, 5);

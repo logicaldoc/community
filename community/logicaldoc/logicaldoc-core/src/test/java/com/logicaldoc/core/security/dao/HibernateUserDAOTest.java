@@ -6,16 +6,18 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.util.crypt.CryptUtil;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateUserDAO</code>
@@ -42,7 +44,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		// User with history, not deletable
 		User user = dao.findByUsername("author");
 		Assert.assertEquals(2, user.getGroups().size());
@@ -53,7 +55,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		// Try with a deletable user
 		User testUser = dao.findByUsername("test");
 		Assert.assertEquals(2, testUser.getGroups().size());
-		testUser.removeAllGroups();
+		testUser.removeGroupMemberships(null);
 		dao.store(testUser);
 		dao.initialize(testUser);
 		Assert.assertEquals(1, testUser.getGroups().size());
@@ -188,7 +190,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() {
+	public void testStore() throws PersistenceException {
 		User user = new User();
 		user.setUsername("xxx");
 		user.setDecodedPassword("xxxpwd");
@@ -196,7 +198,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		user.setFirstName("valca");
 		user.setEmail("valca@acme.com");
 		UserHistory transaction = new UserHistory();
-		transaction.setEvent(UserHistory.EVENT_USER_LOGIN);
+		transaction.setEvent(UserEvent.LOGIN.toString());
 		transaction.setUserId(user.getId());
 		transaction.setNotified(0);
 		Assert.assertTrue(dao.store(user, transaction));
@@ -215,7 +217,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		user = dao.findById(1);
 		user.setDecodedPassword("xxxpwd");
 		transaction = new UserHistory();
-		transaction.setEvent(UserHistory.EVENT_USER_PASSWORDCHANGED);
+		transaction.setEvent(UserEvent.PASSWORDCHANGED.toString());
 		transaction.setUserId(user.getId());
 		transaction.setNotified(0);
 		dao.store(user, transaction);
@@ -241,7 +243,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(5, dao.count(null));
 	}
 
-	public void isPasswordExpired() {
+	public void isPasswordExpired() throws PersistenceException {
 		Assert.assertFalse(dao.isPasswordExpired("admin"));
 		User user = dao.findByUsername("boss");
 		Date lastChange = null;

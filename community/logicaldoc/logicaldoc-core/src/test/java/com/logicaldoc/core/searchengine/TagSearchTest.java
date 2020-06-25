@@ -2,13 +2,13 @@ package com.logicaldoc.core.searchengine;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+
+import junit.framework.Assert;
 
 public class TagSearchTest extends AbstractCoreTCase {
 

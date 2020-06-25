@@ -41,4 +41,14 @@ public class UserController {
 			} catch (Throwable t) {
 			}
 	}
+
+	public void loggedIn(String username) {
+		for (UserObserver observer : observers)
+			observer.onUserLogin(username);
+	}
+
+	public void loggedOut(String username) {
+		for (UserObserver observer : observers)
+			observer.onUserLogout(username);
+	}
 }

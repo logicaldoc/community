@@ -1,7 +1,5 @@
 package com.logicaldoc.web.service;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +7,8 @@ import com.logicaldoc.core.communication.MessageTemplate;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.web.AbstractWebappTCase;
+
+import junit.framework.Assert;
 
 public class MessageServiceImplTest extends AbstractWebappTCase {
 

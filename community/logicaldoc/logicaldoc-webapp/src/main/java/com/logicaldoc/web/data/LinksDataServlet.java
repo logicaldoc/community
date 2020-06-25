@@ -33,7 +33,7 @@ public class LinksDataServlet extends HttpServlet {
 
 			Long docId = null;
 			if (StringUtils.isNotEmpty(request.getParameter("docId")))
-				docId = new Long(request.getParameter("docId"));
+				docId = Long.parseLong(request.getParameter("docId"));
 
 			String parent = request.getParameter("parent");
 			if (StringUtils.isEmpty(parent))

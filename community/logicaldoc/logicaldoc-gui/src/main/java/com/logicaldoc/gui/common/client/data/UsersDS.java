@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
@@ -20,6 +21,8 @@ public class UsersDS extends DataSource {
 
 		DataSourceTextField username = new DataSourceTextField("username");
 		DataSourceTextField label = new DataSourceTextField("label");
+		DataSourceBooleanField guest = new DataSourceBooleanField("guest");
+		guest.setHidden(true);
 		DataSourceImageField enabled = new DataSourceImageField("eenabled");
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField firstName = new DataSourceTextField("firstName");
@@ -29,7 +32,7 @@ public class UsersDS extends DataSource {
 		DataSourceTextField usergroup = new DataSourceTextField("usergroup");
 		DataSourceTextField groups = new DataSourceTextField("groups");
 
-		setFields(id, username, label, enabled, name, firstName, email, phone, cell,groups, usergroup);
+		setFields(id, username, label, enabled, name, firstName, email, phone, cell,groups, usergroup, guest);
 		setDataURL("data/users.xml?1=1" + (groupIdOrName != null ? "&groupId=" + groupIdOrName : "") + "&required="
 				+ required);
 		setClientOnly(true);

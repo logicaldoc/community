@@ -1,7 +1,5 @@
 package com.logicaldoc.web.service;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,6 +8,8 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.web.AbstractWebappTCase;
+
+import junit.framework.Assert;
 
 public class TemplateServiceImplTest extends AbstractWebappTCase {
 

@@ -71,6 +71,12 @@ public class GUIWFState implements Serializable {
 
 	private String color;
 
+	private String creationMessageTemplate;
+
+	private String assignmentMessageTemplate;
+
+	private String reminderMessageTemplate;
+
 	public GUIWFState() {
 	}
 
@@ -269,12 +275,36 @@ public class GUIWFState implements Serializable {
 	public void setDisplay(String display) {
 		this.display = display;
 	}
-	
+
 	public String getColor() {
 		return color;
 	}
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+
+	public String getCreationMessageTemplate() {
+		return creationMessageTemplate;
+	}
+
+	public String getAssignmentMessageTemplate() {
+		return assignmentMessageTemplate;
+	}
+
+	public String getReminderMessageTemplate() {
+		return reminderMessageTemplate;
+	}
+
+	public void setCreationMessageTemplate(String creationMessageTemplate) {
+		this.creationMessageTemplate = creationMessageTemplate;
+	}
+
+	public void setAssignmentMessageTemplate(String assignmentMessageTemplate) {
+		this.assignmentMessageTemplate = assignmentMessageTemplate;
+	}
+
+	public void setReminderMessageTemplate(String reminderMessageTemplate) {
+		this.reminderMessageTemplate = reminderMessageTemplate;
 	}
 }

@@ -10,8 +10,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,17 +17,22 @@ import org.junit.Test;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
-import com.logicaldoc.core.document.History;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.TagsProcessor;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.lock.LockManager;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.util.crypt.CryptUtil;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>HibernateDocumentDAO</code>
@@ -46,6 +49,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 
 	private LockManager lockManager;
 
+	private TemplateDAO templateDao;
+
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -55,12 +60,13 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		dao = (DocumentDAO) context.getBean("DocumentDAO");
 		folderDao = (FolderDAO) context.getBean("FolderDAO");
 		lockManager = (LockManager) context.getBean("LockManager");
+		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
 	}
 
 	@Test
-	public void testDelete() {
+	public void testDelete() throws PersistenceException {
 		// Create the document history event
-		History transaction = new History();
+		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId("123");
 		transaction.setEvent(DocumentEvent.DELETED.toString());
 		transaction.setComment("");
@@ -72,9 +78,9 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testArchive() {
+	public void testArchive() throws PersistenceException {
 		// Create the document history event
-		History transaction = new History();
+		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId("123");
 		transaction.setComment("");
 		transaction.setUser(new User());
@@ -86,9 +92,9 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindArchivedByFolder() {
+	public void testFindArchivedByFolder() throws PersistenceException {
 		// Create the document history event
-		History transaction = new History();
+		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId("123");
 		transaction.setComment("");
 		transaction.setUser(new User());
@@ -102,9 +108,9 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testUnArchive() {
+	public void testUnArchive() throws PersistenceException {
 		// Create the document history event
-		History transaction = new History();
+		DocumentHistory transaction = new DocumentHistory();
 		transaction.setSessionId("123");
 		transaction.setComment("");
 		transaction.setUser(new User());
@@ -121,7 +127,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindAll() {
+	public void testFindAll() throws PersistenceException {
 		Collection<Document> documents = dao.findAll();
 		Assert.assertNotNull(documents);
 		Assert.assertEquals(3, documents.size());
@@ -205,13 +211,12 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	public void testFindIndexed() {
 		List<Document> docs = dao.findByIndexed(1);
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(2, docs.size());
+		Assert.assertEquals(1, docs.size());
 		Assert.assertEquals(1, docs.get(0).getId());
 
 		docs = dao.findByIndexed(0);
 		Assert.assertNotNull(docs);
-		// The document with is 2 has a docRef not null
-		Assert.assertEquals(0, docs.size());
+		Assert.assertEquals(1, docs.size());
 	}
 
 	@Test
@@ -238,7 +243,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testDeleteOrphaned() {
+	public void testDeleteOrphaned() throws PersistenceException {
 		folderDao.delete(6);
 		Assert.assertNull(folderDao.findById(6));
 		dao.deleteOrphaned(1);
@@ -247,7 +252,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindPublishedIds() throws IOException {
+	public void testFindPublishedIds() throws IOException, PersistenceException {
 		GregorianCalendar cal = new GregorianCalendar();
 
 		Document doc = new Document();
@@ -307,7 +312,39 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testStore() throws IOException {
+	public void testMultipleValues() throws IOException, PersistenceException {
+		Folder folder = folderDao.findById(Folder.ROOTID);
+		Template template = templateDao.findById(-1L);
+
+		Document doc = new Document();
+		doc.setFolder(folder);
+		doc.setTemplate(template);
+		doc.setFileName("pippo.pdf");
+
+		doc.setValues("multi", new String[] { "value1", "value2", "value3" });
+		Assert.assertTrue(dao.store(doc));
+		
+		doc = dao.findById(doc.getId());
+		Assert.assertNotNull(doc);
+		dao.initialize(doc);
+		
+		Assert.assertEquals("value2", doc.getValue("multi-0001"));
+		Assert.assertEquals("value3", doc.getValue("multi-0002"));
+		Assert.assertEquals("multi", doc.getAttribute("multi-0002").getParent());
+		
+		Assert.assertEquals(3, doc.getValueAttributes("multi").size());
+		
+		doc.setValues("multi", new String[] { "A", "B" });
+		dao.store(doc);
+		
+		doc = dao.findById(doc.getId());
+		Assert.assertNotNull(doc);
+		dao.initialize(doc);
+		Assert.assertEquals("B", doc.getValue("multi-0001"));
+	}
+
+	@Test
+	public void testStore() throws IOException, PersistenceException {
 		Document doc = new Document();
 		Folder folder = folderDao.findById(Folder.ROOTID);
 
@@ -426,7 +463,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindByFileNameAndParentFolderId() {
+	public void testFindByFileNameAndParentFolderId() throws PersistenceException {
 		Collection<Document> documents = dao.findByFileNameAndParentFolderId(6L, "pluto", null, null, null);
 		Assert.assertNotNull(documents);
 		Assert.assertEquals(2, documents.size());
@@ -502,12 +539,12 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testCountByIndexed() {
-		Assert.assertEquals(1L, dao.countByIndexed(0));
-		Assert.assertEquals(2L, dao.countByIndexed(1));
+		Assert.assertEquals(2L, dao.countByIndexed(0));
+		Assert.assertEquals(1L, dao.countByIndexed(1));
 	}
 
 	@Test
-	public void testRestore() {
+	public void testRestore() throws PersistenceException {
 		Assert.assertNull(dao.findById(4));
 		dao.restore(4, 5, null);
 		Assert.assertNotNull(dao.findById(4));
@@ -515,11 +552,11 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testMakeImmutable() {
-		History transaction = new History();
-		transaction.setFolderId(103);
+	public void testMakeImmutable() throws PersistenceException {
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setFolderId(103L);
 		transaction.setDocId(2L);
-		transaction.setUserId(1);
+		transaction.setUserId(1L);
 		transaction.setNotified(0);
 		dao.makeImmutable(2, transaction);
 		Assert.assertEquals(1, dao.findById(2).getImmutable());
@@ -528,8 +565,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	@Test
 	public void testFindByLockUserAndStatus() {
 		Assert.assertEquals(3, dao.findByLockUserAndStatus(3L, null).size());
-		Assert.assertEquals(2, dao.findByLockUserAndStatus(3L, Document.DOC_CHECKED_OUT).size());
-		Assert.assertEquals(2, dao.findByLockUserAndStatus(null, Document.DOC_CHECKED_OUT).size());
+		Assert.assertEquals(1, dao.findByLockUserAndStatus(3L, Document.DOC_CHECKED_OUT).size());
+		Assert.assertEquals(1, dao.findByLockUserAndStatus(null, Document.DOC_CHECKED_OUT).size());
 		Assert.assertEquals(0, dao.findByLockUserAndStatus(1L, null).size());
 		Assert.assertEquals(0, dao.findByLockUserAndStatus(1L, Document.DOC_CHECKED_OUT).size());
 		Assert.assertEquals(0, dao.findByLockUserAndStatus(987541L, null).size());
@@ -552,8 +589,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Document doc = dao.findById(3L);
 		Assert.assertNull(doc.getPassword());
 
-		History history = new History();
-		history.setUserId(1);
+		DocumentHistory history = new DocumentHistory();
+		history.setUserId(1L);
 		history.setUsername("admin");
 		dao.setPassword(3L, "test", history);
 
@@ -608,9 +645,9 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(0, duplicates.size());
 
 	}
-	
+
 	@Test
-	public void testCleanExpiredTransactions() {
+	public void testCleanExpiredTransactions() throws PersistenceException {
 		Document doc = dao.findById(1);
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);

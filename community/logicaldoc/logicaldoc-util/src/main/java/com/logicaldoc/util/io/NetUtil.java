@@ -16,7 +16,8 @@ public class NetUtil {
 	 * Checks if a port is available
 	 * 
 	 * @param port The port to check
-	 * @return
+	 * 
+	 * @return true id the port is available
 	 */
 	public static boolean available(int port) {
 		ServerSocket socket = null;

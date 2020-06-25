@@ -23,10 +23,13 @@ import com.logicaldoc.webservice.doc.WSDoc;
 public class WSUser {
 	@WSDoc(documented = false)
 	public static int TYPE_DEFAULT = 0;
-
+	
 	@WSDoc(documented = false)
 	public static int TYPE_SYSTEM = 1;
 
+	@WSDoc(documented = false)
+	public static int TYPE_GUEST = 2;
+	
 	@WSDoc(documented = false)
 	public static int SOURCE_DEFAULT = 0;
 
@@ -90,7 +93,7 @@ public class WSUser {
 	@WSDoc(required = false)
 	private String telephone2 = "";
 
-	@WSDoc(description = "must be <b>0</b>")
+	@WSDoc(description = "must be <b>0: normal or 2: guest</b>")
 	private int type = TYPE_DEFAULT;
 
 	@WSDoc(description = "ids of the groups this user belongs to")
@@ -252,7 +255,7 @@ public class WSUser {
 	}
 
 	/**
-	 * The name of the group associated to this user, that is '_user_'+id
+	 * @return the name of the group associated to this user, that is '_user_'+id
 	 */
 	public String getUserGroupName() {
 		return "_user_" + getId();
@@ -283,7 +286,7 @@ public class WSUser {
 	}
 
 	/**
-	 * When the password was modified
+	 * @return when the password was modified
 	 */
 	public String getPasswordChanged() {
 		return passwordChanged;
@@ -294,7 +297,7 @@ public class WSUser {
 	}
 
 	/**
-	 * If the password expires or not
+	 * @return if the password expires or not
 	 */
 	public int getPasswordExpires() {
 		return passwordExpires;
@@ -310,6 +313,8 @@ public class WSUser {
 	 * @see User#SOURCE_DEFAULT
 	 * @see User#SOURCE_LDAP
 	 * @see User#SOURCE_ACTIVE_DIRECTORY
+	 * 
+	 * @return the source
 	 */
 	public int getSource() {
 		return source;

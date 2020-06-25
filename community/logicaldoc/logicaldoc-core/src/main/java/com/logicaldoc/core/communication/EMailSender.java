@@ -1,8 +1,10 @@
 package com.logicaldoc.core.communication;
 
 import java.net.URL;
+import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -14,14 +16,12 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MailDateFormat;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
-
-import net.sf.jmimemagic.Magic;
-import net.sf.jmimemagic.MagicMatch;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -31,6 +31,9 @@ import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+
+import net.sf.jmimemagic.Magic;
+import net.sf.jmimemagic.MagicMatch;
 
 /**
  * SMTP E-Mail sender service
@@ -129,6 +132,10 @@ public class EMailSender {
 
 	/**
 	 * Same as send(EMail, String, Map) but executes in another thread
+	 * 
+	 * @param email the email to send
+	 * @param templateName the template to use to render the body of the message using the automation engine
+	 * @param dictionary map of variable to pass to the automation
 	 */
 	public void sendAsync(EMail email, String templateName, Map<String, Object> dictionary) {
 		new Thread(() -> {
@@ -146,14 +153,15 @@ public class EMailSender {
 	 * @param email The email to send
 	 * @param templateName Name of the template to be applied
 	 * @param dictionary The dictionary to be used in the template
-	 * @throws Exception
+	 * 
+	 * @throws Exception raised if the message cannot be sent
 	 */
 	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws Exception {
 		MessageTemplateDAO templateDao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
 		MessageTemplate template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
 				email.getTenantId());
 		if (template == null) {
-			log.error("Template " + templateName + " was not found");
+			log.error("Template {} was not found", templateName);
 			return;
 		}
 
@@ -166,6 +174,8 @@ public class EMailSender {
 
 	/**
 	 * Same as send(EMail) but executes in another thread
+	 * 
+	 * @param email the email to send
 	 */
 	public void sendAsync(EMail email) {
 		new Thread(() -> {
@@ -181,9 +191,9 @@ public class EMailSender {
 	 * This method sends an email using the smtp-protocol. The email can be a
 	 * simple mail or a multipart mail containing up to 5 attachments.
 	 * 
-	 * @param account E-Mail account of the sender.
 	 * @param email E-Mail which should be sent.
-	 * @throws Exception
+	 * 
+	 * @throws Exception raised if the email cannot be sent
 	 */
 	public void send(EMail email) throws Exception {
 		Properties props = new Properties();
@@ -326,6 +336,13 @@ public class EMailSender {
 		}
 
 		Address[] adr = message.getAllRecipients();
+		// message.setSentDate(new Date());
+
+		MailDateFormat formatter = new MailDateFormat();
+		formatter.setTimeZone(TimeZone.getTimeZone("GMT")); // always use UTC
+															// for outgoing mail
+		message.setHeader("Date", formatter.format(new Date()));
+
 		trans.sendMessage(message, adr);
 		trans.close();
 	}

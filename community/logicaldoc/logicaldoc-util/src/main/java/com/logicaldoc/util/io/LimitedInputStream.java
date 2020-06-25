@@ -144,6 +144,13 @@ public class LimitedInputStream extends FilterInputStream {
 	 * will block until either the full amount has been skipped or until the end
 	 * of the stream is reached, whichever happens first. Returns the total
 	 * number of bytes skipped.
+	 * 
+	 * @param in the input stream to treat
+	 * @param n index of the byte to skip to
+	 * 
+	 * @throws IOException raised in case the stream did not allow the skip
+	 * 
+	 * @return the total number of skipped bytes
 	 */
 	static long skipUpTo(InputStream in, final long n) throws IOException {
 		long totalSkipped = 0;

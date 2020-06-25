@@ -26,7 +26,11 @@ public class SessionUtil {
 	/**
 	 * Throws a runtime exception id the given session is invalid
 	 * 
-	 * @throws InvalidSessionException
+	 * @param sid identifier of the session
+	 * 
+	 * @throws InvalidSessionException if the session does not exist or it is expired
+	 * 
+	 * @return the session
 	 */
 	public static Session validateSession(String sid) throws InvalidSessionException {
 		Session session = SessionManager.get().get(sid);

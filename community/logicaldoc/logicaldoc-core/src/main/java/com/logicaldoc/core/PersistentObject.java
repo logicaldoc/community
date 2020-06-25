@@ -31,6 +31,8 @@ public abstract class PersistentObject {
 
 	/**
 	 * Unique identifier in the data store
+	 * 
+	 * @return the unique identifier of this record
 	 */
 	public long getId() {
 		return id;
@@ -42,6 +44,8 @@ public abstract class PersistentObject {
 
 	/**
 	 * The last time this instance was modified
+	 * 
+	 * @return the last modified date
 	 */
 	public Date getLastModified() {
 		return lastModified;
@@ -53,6 +57,8 @@ public abstract class PersistentObject {
 
 	/**
 	 * This flag is used to mark an object as deleted
+	 * 
+	 * @return <b>1</b> if the record is deleted, <b>0</b> otherwise
 	 */
 	public int getDeleted() {
 		return deleted;
@@ -70,7 +76,7 @@ public abstract class PersistentObject {
 	}
 
 	public int hashCode() {
-		return new Long(getId()).hashCode();
+		return Long.valueOf(getId()).hashCode();
 	}
 
 	public String toString() {

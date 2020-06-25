@@ -5,6 +5,8 @@ import java.util.Date;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 
@@ -19,17 +21,27 @@ import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 public interface CalendarService extends RemoteService {
 
 	/**
-	 * Saves an event
+	 * Saves an event into the calendar
+	 * 
+	 * @param event the event to save
+	 * 
+	 * @throws ServerException an error happened in the server application 
 	 */
 	public void saveEvent(GUICalendarEvent event) throws ServerException;
 
 	/**
 	 * Gets an event
+	 * 
+	 * @param eventId identifier of the event
+	 * 
+	 * @return the calendar event
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public GUICalendarEvent getEvent(long eventId) throws ServerException;
 
 	/**
-	 * Searches for events.
+	 * Searches for events
 	 * 
 	 * @param startDate Start date (optional)
 	 * @param endDate End date (optional)
@@ -43,24 +55,31 @@ public interface CalendarService extends RemoteService {
 	 * @param maxRecords Maximum number of records (optional)
 	 * 
 	 * @return The list of events ordered by ascending date
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public GUICalendarEvent[] find(Date startDate, Date endDate, Date expireFrom, Date expireTo, Integer frequency,
 			String title, String type, String subtype, Integer status, Integer maxRecords) throws ServerException;
 
 	/**
 	 * Deletes an event. If the event is a master, in any case all the
-	 * occurrences will be deleted too.
+	 * occurrences will be deleted too
+	 * 
+	 * @param eventId identifier of the event
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public void deleteEvent(long eventId) throws ServerException;
 
 	/**
-	 * Counts the number of events that start from now until a given date.
+	 * Counts the number of events that start from now until a given date
 	 * 
 	 * @param username The user to be processed
 	 * @param end The and date
+	 * 
 	 * @return The number of found events
 	 * 
-	 * @throws ServerException
+	 * @throws ServerException an error happened in the server application
 	 */
 	public int countUserEvents(String username, Date end) throws ServerException;
 
@@ -70,6 +89,7 @@ public interface CalendarService extends RemoteService {
 		public static CalendarServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(CalendarService.class);
+				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
 			return instance;
 		}

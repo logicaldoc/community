@@ -8,14 +8,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +34,13 @@ public class ContextProperties extends OrderedProperties {
 	private static final long serialVersionUID = 1L;
 
 	/** this points to an ordinary file */
-	private String docPath;
+	private File file;
+
+	private File overrideFile;
 
 	protected static Logger log = LoggerFactory.getLogger(ContextProperties.class);
 
-	protected int maxBackups = 1;
+	protected int maxBackups = 10;
 
 	public ContextProperties(int maxBackups) throws IOException {
 		this();
@@ -54,54 +59,100 @@ public class ContextProperties extends OrderedProperties {
 		}
 	}
 
-	public ContextProperties(String docname) throws IOException {
-		docPath = docname;
+	public ContextProperties(String filePath) throws IOException {
+		this.file = new File(filePath);
 		try {
-			load(new FileInputStream(docPath));
-		} catch (IOException e) {
-			log.error("Unable to read from " + docPath, e);
+			load(new FileInputStream(this.file));
+		} catch (Throwable e) {
+			log.error("Unable to read from {}", filePath, e);
 			throw e;
+		}
+
+		overrideFile = detectOverrideFile();
+		if (overrideFile != null) {
+			try {
+				load(new FileInputStream(overrideFile));
+				log.info("Override settings defined in {}", overrideFile.getPath());
+			} catch (Throwable e) {
+				log.error("Unable to read from {}", overrideFile.getPath(), e);
+				throw e;
+			}
 		}
 	}
 
-	public ContextProperties(URL docname) throws IOException {
-		load(docname);
+	private File detectOverrideFile() {
+		if (file == null || !file.exists())
+			return null;
+		File override = new File(file.getParentFile(),
+				FilenameUtils.getBaseName(file.getName()) + "-override." + FilenameUtils.getExtension(file.getName()));
+		return override.exists() ? override : null;
+	}
+
+	public ContextProperties(URL fileUrl) throws IOException {
+		load(fileUrl);
 	}
 
 	/**
 	 * Loads the file from the given URL
 	 */
-	private void load(URL docname) throws IOException {
+	private void load(URL fileUrl) throws IOException {
 		try {
-			docPath = URLDecoder.decode(docname.getPath(), "UTF-8");
+			file = new File(URLDecoder.decode(fileUrl.getPath(), "UTF-8"));
 		} catch (IOException e) {
-			log.error("Unable to read from " + docPath, e);
+			log.error("Unable to read from {}", file, e);
 			throw e;
 		}
 		try {
-			load(new FileInputStream(docPath));
+			load(new FileInputStream(file));
 		} catch (IOException e) {
-			log.error("Unable to read from " + docPath, e);
+			log.error("Unable to read from {}", file, e);
 			throw e;
+		}
+
+		overrideFile = detectOverrideFile();
+		if (overrideFile != null) {
+			try {
+				load(new FileInputStream(overrideFile));
+				log.debug("Override settings defined in {}", overrideFile.getPath());
+			} catch (Throwable e) {
+				log.error("Unable to read from {}", overrideFile.getPath(), e);
+				throw e;
+			}
 		}
 	}
 
-	public ContextProperties(File doc) throws IOException {
+	public ContextProperties(File file) throws IOException {
 		try {
-			docPath = doc.getPath();
-			if (doc.exists())
-				load(new FileInputStream(docPath));
+			if (file.exists()) {
+				this.file = file;
+				load(new FileInputStream(file));
+			}
 		} catch (IOException e) {
-			log.error("Unable to read from " + docPath, e);
+			log.error("Unable to read from " + file.getPath(), e);
 			throw e;
+		}
+
+		overrideFile = detectOverrideFile();
+		if (overrideFile != null) {
+			try {
+				load(new FileInputStream(overrideFile));
+			} catch (Throwable e) {
+				log.error("Unable to read from {}", overrideFile.getPath(), e);
+				throw e;
+			}
 		}
 	}
 
 	/**
 	 * Creates new XMLBean from an input stream; XMLBean is read-only!!!
+	 *
+	 * @param is the stream that represents the XML to parse
+	 * 
+	 * @throws IOException raised when the stream cannot be read
 	 */
 	public ContextProperties(InputStream is) throws IOException {
-		docPath = null;
+		file = null;
+		overrideFile = null;
 		try {
 			load(is);
 		} catch (IOException e) {
@@ -115,20 +166,19 @@ public class ContextProperties extends OrderedProperties {
 	 * <b>NOTE:</b> only call this on an ContextProperties _NOT_ created from an
 	 * InputStream!
 	 * 
-	 * @throws IOException
+	 * @throws IOException raised when the file cannot be written
 	 */
 	public void write() throws IOException {
 		// it might be that we do not have an ordinary file,
 		// so we can't write to it
-		if (docPath == null)
-			throw new IOException("Path not given");
+		if (file == null)
+			throw new IOException("File not given");
+		backup(file);
 
-		backup();
-
-		FileOutputStream fos = new FileOutputStream(docPath);
+		FileOutputStream fos = new FileOutputStream(file);
 		try {
 			store(fos, "");
-			log.info("Saved file " + docPath);
+			log.info("Saved file {}", file);
 		} catch (IOException ex) {
 			if (log.isWarnEnabled()) {
 				log.warn(ex.getMessage());
@@ -145,54 +195,48 @@ public class ContextProperties extends OrderedProperties {
 	}
 
 	/**
-	 * makes a backup of the actual file. Up to <code>maxBackups</code> are
-	 * maintained
+	 * Makes a daily backup of the actual file. Up to <code>maxBackups</code>
+	 * are maintained.
+	 * 
+	 * @param src the source file to backup
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	protected void backup() throws IOException {
+	protected void backup(File src) throws IOException {
 		// Backup the file first
-		final File src = new File(docPath);
 		final File parent = src.getParentFile();
-		File backup = null;
 
-		// Check if there is a free slot between 1 and maxBackups
-		for (int i = 1; i <= maxBackups; i++) {
-			File test = new File(parent + "/" + src.getName() + "." + i);
-			if (!test.exists()) {
-				backup = test;
-				break;
+		/*
+		 * Save the daily backup
+		 */
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
+		String today = df.format(new Date());
+		File backup = new File(parent, src.getName() + "." + today);
+		if (!backup.exists()) {
+			FileUtils.copyFile(src, backup);
+			log.debug("Backup saved in {}", backup.getPath());
+		}
+
+		/*
+		 * Delete the oldest backups
+		 */
+		File[] oldBackups = parent.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.startsWith(src.getName() + ".") && name.substring(name.lastIndexOf('.') + 1).length() == 8;
 			}
-		}
+		});
 
-		// No free slots, we have to replace an existing one
-		if (backup == null) {
-			File[] oldBackups = parent.listFiles(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return name.startsWith(src.getName() + ".");
-				}
-			});
+		// Sort old backup by descending date
+		Arrays.sort(oldBackups, new Comparator<File>() {
+			public int compare(File f1, File f2) {
+				String date1 = f1.getName().substring(f1.getName().lastIndexOf('.') + 1);
+				String date2 = f2.getName().substring(f2.getName().lastIndexOf('.') + 1);
+				return date2.compareTo(date1);
+			}
+		});
 
-			// Sort old backup by date
-			Arrays.sort(oldBackups, new Comparator() {
-				public int compare(Object o1, Object o2) {
-
-					if (((File) o1).lastModified() < ((File) o2).lastModified()) {
-						return -1;
-					} else if (((File) o1).lastModified() > ((File) o2).lastModified()) {
-						return +1;
-					} else {
-						return 0;
-					}
-				}
-			});
-
-			// Take the oldest one, so we will reuse it
-			backup = oldBackups[0];
-		}
-
-		FileUtils.copyFile(src, backup);
-		log.debug("Backup saved in " + backup.getPath());
+		if (oldBackups.length > maxBackups)
+			for (int i = maxBackups - 1; i < oldBackups.length; i++)
+				oldBackups[i].delete();
 	}
 
 	public int getInt(String property) {
@@ -201,10 +245,10 @@ public class ContextProperties extends OrderedProperties {
 
 	public int getInt(String property, int defaultValue) {
 		String v = getProperty(property);
-		if (v == null || v.isEmpty())
+		if (v == null || v.trim().isEmpty())
 			return defaultValue;
 		else
-			return Integer.parseInt(getProperty(property));
+			return Integer.parseInt(v.trim());
 	}
 
 	public long getLong(String property) {
@@ -213,10 +257,10 @@ public class ContextProperties extends OrderedProperties {
 
 	public long getLong(String property, long defaultValue) {
 		String v = getProperty(property);
-		if (v == null || v.isEmpty())
+		if (v == null || v.trim().isEmpty())
 			return defaultValue;
 		else
-			return Long.parseLong(getProperty(property));
+			return Long.parseLong(v.trim());
 	}
 
 	public boolean getBoolean(String property) {
@@ -224,12 +268,16 @@ public class ContextProperties extends OrderedProperties {
 	}
 
 	public boolean getBoolean(String property, boolean defaultValue) {
-		String v = getProperty(property, "" + defaultValue);
+		String v = getProperty(property, "" + defaultValue).trim();
 		return "true".equals(v) || "yes".equals(v) || "1".equals(v);
 	}
 
 	/**
 	 * Gets the property value replacing all variable references
+	 * 
+	 * @param property name of the setting to process
+	 * 
+	 * @return the porperty's value with expanded variables
 	 */
 	public String getPropertyWithSubstitutions(String property) {
 		return StrSubstitutor.replaceSystemProperties(getProperty(property));
@@ -261,6 +309,10 @@ public class ContextProperties extends OrderedProperties {
 
 	/**
 	 * Gets all the properties whose name starts with the given prefix.
+	 * 
+	 * @param prefix property's prefix
+	 * 
+	 * @return the map property_name = property_value
 	 */
 	public Map<String, String> getProperties(String prefix) {
 		Map<String, String> props = new HashMap<String, String>();
@@ -274,6 +326,8 @@ public class ContextProperties extends OrderedProperties {
 
 	/**
 	 * Removes all the properties of a specific tenant
+	 * 
+	 * @param tenant name of the tenant
 	 */
 	public void removeTenantProperties(String tenant) {
 		if ("default".equals(tenant))
@@ -289,7 +343,9 @@ public class ContextProperties extends OrderedProperties {
 	}
 
 	/**
-	 * Replicates the settings of the default tenant to a new tenant.
+	 * Replicates the settings of the default tenant to a new tenant
+	 * 
+	 * @param tenant name of the tenant
 	 */
 	public void replicateTenantSettings(String tenant) {
 		Map<String, String> defaultProps = getTenantProperties("default");

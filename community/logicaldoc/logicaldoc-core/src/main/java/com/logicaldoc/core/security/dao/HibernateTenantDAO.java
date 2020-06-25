@@ -6,16 +6,16 @@ import java.util.List;
 import java.util.Set;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
+import com.logicaldoc.core.dashlet.DashletDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.sql.SqlUtil;
 
-@SuppressWarnings("unchecked")
 public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> implements TenantDAO {
 
 	@SuppressWarnings("unused")
@@ -42,6 +42,9 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	@SuppressWarnings("unused")
 	private MessageTemplateDAO messageTemplateDao;
 
+	@SuppressWarnings("unused")
+	private DashletDAO dashletDao;
+
 	protected HibernateTenantDAO() {
 		super(Tenant.class);
 	}
@@ -49,11 +52,15 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	@Override
 	public Tenant findByName(String name) {
 		Tenant tenant = null;
-		Collection<Tenant> coll = findByWhere("_entity.name = '" + SqlUtil.doubleQuotes(name) + "'", null, null);
-		if (coll.size() > 0) {
-			tenant = coll.iterator().next();
-			if (tenant.getDeleted() == 1)
-				tenant = null;
+		try {
+			Collection<Tenant> coll = findByWhere("_entity.name = ?1", new String[] { name }, null, null);
+			if (coll.size() > 0) {
+				tenant = coll.iterator().next();
+				if (tenant.getDeleted() == 1)
+					tenant = null;
+			}
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 
 		return tenant;
@@ -62,7 +69,13 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	@Override
 	public int count() {
 		String query = "select count(*) from ld_tenant where ld_deleted=0";
-		return queryForInt(query);
+
+		try {
+			return queryForInt(query);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return 0;
+		}
 	}
 
 	public void setFolderDao(FolderDAO folderDao) {
@@ -89,6 +102,10 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 		this.templateDao = templateDao;
 	}
 
+	public void setDashletDao(DashletDAO dashletDao) {
+		this.dashletDao = dashletDao;
+	}
+
 	@Override
 	public Set<String> findAllNames() {
 		Set<String> names = new HashSet<String>();
@@ -110,5 +127,14 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 
 	public void setAttributeSetDao(AttributeSetDAO attributeSetDao) {
 		this.attributeSetDao = attributeSetDao;
+	}
+
+	@Override
+	public String getTenantName(long tenantId) {
+		Tenant tenant = findById(tenantId);
+		if (tenant != null)
+			return tenant.getName();
+		else
+			return null;
 	}
 }

@@ -29,7 +29,6 @@ public class JarUtil {
 	 * @param target Path of the extracted files.
 	 * @return True if successfully extracted.
 	 */
-	@SuppressWarnings("unchecked")
 	public static boolean unjar(String jarsource, String target) {
 		boolean result = true;
 
@@ -89,27 +88,35 @@ public class JarUtil {
 	}
 
 	private static void saveEntry(JarFile jar, JarEntry jare, String target) throws Exception {
-
 		File file = new File(target, jare.getName());
 
 		if (jare.isDirectory()) {
 			file.mkdirs();
 		} else {
-			java.io.InputStream is = jar.getInputStream(jare);
-			BufferedInputStream bis = new BufferedInputStream(is);
-			File dir = new File(file.getParent());
-			dir.mkdirs();
+			java.io.InputStream is = null;
+			BufferedInputStream bis = null;
+			BufferedOutputStream bos = null;
+			FileOutputStream fos = null;
+			try {
+				is = jar.getInputStream(jare);
+				bis = new BufferedInputStream(is);
+				File dir = new File(file.getParent());
+				dir.mkdirs();
 
-			FileOutputStream fos = new FileOutputStream(file);
-			BufferedOutputStream bos = new BufferedOutputStream(fos);
+				fos = new FileOutputStream(file);
+				bos = new BufferedOutputStream(fos);
 
-			for (int letter = 0; (letter = bis.read()) != -1;) {
-				bos.write((byte) letter);
+				for (int letter = 0; (letter = bis.read()) != -1;) {
+					bos.write((byte) letter);
+				}
+			} finally {
+				if (bos != null)
+					bos.close();
+				if (fos != null)
+					fos.close();
+				if (bis != null)
+					bis.close();
 			}
-
-			bos.close();
-			fos.close();
-			bis.close();
 		}
 	}
 }

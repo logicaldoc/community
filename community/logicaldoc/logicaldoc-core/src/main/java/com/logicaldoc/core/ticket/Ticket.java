@@ -1,6 +1,7 @@
 package com.logicaldoc.core.ticket;
 
 import java.util.Date;
+import java.util.UUID;
 
 import com.logicaldoc.core.PersistentObject;
 
@@ -16,7 +17,7 @@ public class Ticket extends PersistentObject {
 
 	public static final int PSW_RECOVERY = 1;
 
-	private String ticketId = "";
+	private String ticketId = UUID.randomUUID().toString();
 
 	private long docId = 0;
 
@@ -29,6 +30,10 @@ public class Ticket extends PersistentObject {
 	private Date expired = null;
 
 	private int count = 0;
+
+	private Integer maxCount;
+
+	private int enabled = 1;
 
 	private String suffix;
 
@@ -104,7 +109,8 @@ public class Ticket extends PersistentObject {
 	}
 
 	public boolean isTicketExpired() {
-		return new Date().getTime() > expired.getTime();
+		return enabled == 0 || new Date().getTime() > expired.getTime()
+				|| (maxCount != null && maxCount > 0 && count >= maxCount);
 	}
 
 	public String getSuffix() {
@@ -121,5 +127,21 @@ public class Ticket extends PersistentObject {
 
 	public void setUrl(String url) {
 		this.url = url;
+	}
+
+	public Integer getMaxCount() {
+		return maxCount;
+	}
+
+	public void setMaxCount(Integer maxCount) {
+		this.maxCount = maxCount;
+	}
+
+	public int getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(int enabled) {
+		this.enabled = enabled;
 	}
 }

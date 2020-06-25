@@ -19,10 +19,10 @@ import com.dropbox.core.v2.files.Metadata;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
-import com.logicaldoc.core.document.History;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.HistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
@@ -119,7 +119,12 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			generic = new Generic("dropbox", "token", user.getId(), user.getTenantId());
 		generic.setString1(token);
 		generic.setString2(account);
-		dao.store(generic);
+
+		try {
+			dao.store(generic);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+		}
 	}
 
 	@Override
@@ -187,7 +192,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void uploadDocument(Long docId, String path, Dropbox dropbox, Session session) throws IOException {
 		Storer store = (Storer) Context.get().getBean(Storer.class);
-		HistoryDAO hdao = (HistoryDAO) Context.get().getBean(HistoryDAO.class);
+		DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		File temp = null;
@@ -199,7 +204,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			Document doc = ddao.findById(docId);
 
 			// Add an history entry to track the download of the document
-			History history = new History();
+			DocumentHistory history = new DocumentHistory();
 			history.setDocId(doc.getId());
 			history.setVersion(doc.getVersion());
 			history.setFilename(doc.getFileName());
@@ -210,7 +215,12 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
 			history.setEvent(DocumentEvent.DOWNLOADED.toString());
-			hdao.store(history);
+
+			try {
+				hdao.store(history);
+			} catch (Throwable t) {
+				log.error(t.getMessage(), t);
+			}
 		} finally {
 			FileUtils.deleteQuietly(temp);
 		}
@@ -245,7 +255,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			dbox.login(token);
 
 			Folder root = fdao.findById(targetFolder);
-			
+
 			Set<String> imported = new HashSet<String>();
 			for (String path : paths) {
 				if (imported.contains(path))
@@ -305,7 +315,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				 */
 				Document doc = docs.get(0);
 
-				History history = new History();
+				DocumentHistory history = new DocumentHistory();
 				history.setFolderId(root.getId());
 				history.setSession(session);
 
@@ -315,7 +325,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 				manager.checkout(doc.getId(), history);
 
-				history = new History();
+				history = new DocumentHistory();
 				history.setFolderId(root.getId());
 				history.setSession(session);
 				history.setPath(pathExtended);
@@ -332,7 +342,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 				docVO.setFolder(root);
 				docVO.setLanguage(session.getUser().getLanguage());
 
-				History history = new History();
+				DocumentHistory history = new DocumentHistory();
 				history.setFolderId(root.getId());
 				history.setComment("Imported from Dropbox");
 				history.setSession(session);

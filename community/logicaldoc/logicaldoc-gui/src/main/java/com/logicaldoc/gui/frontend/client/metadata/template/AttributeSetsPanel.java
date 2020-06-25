@@ -239,6 +239,8 @@ public class AttributeSetsPanel extends VLayout {
 
 	/**
 	 * Updates the selected record with new data
+	 * 
+	 * @param set the attribute set to update
 	 */
 	public void updateRecord(GUIAttributeSet set) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, set.getId()));

@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.DataSourceField;
@@ -14,6 +15,7 @@ import com.smartgwt.client.data.fields.DataSourceFloatField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
 import com.smartgwt.client.data.fields.DataSourceIntegerField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
+import com.smartgwt.client.types.FieldType;
 
 /**
  * Data Source to handle documents grid lists. It is based on Xml parsing
@@ -27,9 +29,9 @@ public class DocumentsDS extends DataSource {
 
 	private GUIFolder folder = null;
 
-	public DocumentsDS(GUIFolder folder, String fileFilter, Integer max, int page, Integer indexed, Integer barcoded,
-			boolean sort) {
-		this(folder != null ? folder.getId() : null, fileFilter, max, page, indexed, barcoded, sort);
+	public DocumentsDS(GUIFolder folder, String fileFilter, Integer max, int page, Integer indexed, boolean barcoded,
+			boolean ocrd, boolean sort) {
+		this(folder != null ? folder.getId() : null, fileFilter, max, page, indexed, barcoded, ocrd, sort);
 		this.folder = folder;
 	}
 
@@ -42,20 +44,24 @@ public class DocumentsDS extends DataSource {
 	 *        used)
 	 * @param indexed The indexed flag
 	 * @param barcoded The barcoded flag
+	 * @param ocrd The ocrd flag
 	 */
-	private DocumentsDS(Long folderId, String fileFilter, Integer max, int page, Integer indexed, Integer barcoded,
-			boolean sort) {
+	private DocumentsDS(Long folderId, String fileFilter, Integer max, int page, Integer indexed, boolean barcoded,
+			boolean ocrd, boolean sort) {
 		prepareFields();
 
-		if (barcoded == null) {
+		if (!barcoded && !ocrd) {
 			String sortSpec = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_SORT);
 			setDataURL("data/documents.xml?locale=" + Session.get().getUser().getLanguage() + "&folderId="
 					+ (folderId != null ? folderId : "") + "&filename=" + (fileFilter != null ? fileFilter : "")
 					+ "&max=" + (max != null ? max : DEFAULT_MAX) + "&indexed="
 					+ (indexed != null ? indexed.toString() : "") + "&page=" + page
-					+ (sortSpec != null && !sortSpec.isEmpty() ? "&sort=" + sortSpec : ""));
-		} else
+					+ (sortSpec != null && !sortSpec.isEmpty() ? "&sort=" + sortSpec : "")
+					+ (Session.get().getHiliteDocId() != null ? "&hiliteDocId=" + Session.get().getHiliteDocId() : ""));
+		} else if (barcoded)
 			setDataURL("data/tobarcode.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
+		else
+			setDataURL("data/toocr.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
 	}
 
 	public DocumentsDS(String docIds) {
@@ -66,6 +72,11 @@ public class DocumentsDS extends DataSource {
 	public DocumentsDS(int status, int max) {
 		prepareFields();
 		setDataURL("data/documents.xml?status=" + status + "&max=" + max);
+	}
+
+	public DocumentsDS(String url, String locale) {
+		prepareFields();
+		setDataURL(url);
 	}
 
 	private void prepareFields() {
@@ -116,6 +127,8 @@ public class DocumentsDS extends DataSource {
 		DataSourceDateTimeField startPublishing = new DataSourceDateTimeField("startPublishing");
 		DataSourceDateTimeField stopPublishing = new DataSourceDateTimeField("stopPublishing");
 		DataSourceTextField extResId = new DataSourceTextField("extResId");
+		DataSourceIntegerField order = new DataSourceIntegerField("order");
+		DataSourceTextField language = new DataSourceTextField("language");
 
 		List<DataSourceField> fields = new ArrayList<DataSourceField>();
 		fields.add(id);
@@ -151,13 +164,34 @@ public class DocumentsDS extends DataSource {
 		fields.add(stopPublishing);
 		fields.add(extResId);
 		fields.add(template);
+		fields.add(language);
+		fields.add(order);
 
-		String[] extNames = Session.get().getInfo().getConfig("search.extattr").split(",");
-		for (String name : extNames) {
-			DataSourceTextField ext = new DataSourceTextField("ext_" + name, name);
-			ext.setHidden(true);
-			ext.setCanFilter(true);
-			fields.add(ext);
+		String attrs = Session.get().getInfo().getConfig("search.extattr");
+		if (attrs != null && !attrs.isEmpty()) {
+			String[] extNames = attrs.split(",");
+			for (String name : extNames) {
+				DataSourceTextField ext = new DataSourceTextField("ext_" + name, name);
+				ext.setHidden(true);
+				ext.setCanFilter(true);
+
+				GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
+
+				if (attDef != null) {
+					if (attDef.getType() == GUIAttribute.TYPE_DATE) {
+						ext.setType(FieldType.DATE);
+						ext.setCanFilter(false);
+					} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
+						ext.setType(FieldType.INTEGER);
+						ext.setCanFilter(false);
+					} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
+						ext.setType(FieldType.FLOAT);
+						ext.setCanFilter(false);
+					}
+				}
+
+				fields.add(ext);
+			}
 		}
 
 		setFields(fields.toArray(new DataSourceField[0]));

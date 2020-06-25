@@ -20,7 +20,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.dao.HistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.dao.MenuDAO;
@@ -70,16 +70,16 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 			Set<Long> docIds = new HashSet<Long>();
 
 			List<Object> parameters = new ArrayList<Object>();
-			HistoryDAO dao = (HistoryDAO) Context.get().getBean(HistoryDAO.class);
+			DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			StringBuffer query = new StringBuffer(
-					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId from History A where 1=1 and A.deleted = 0 ");
+					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason from DocumentHistory A where 1=1 and A.deleted = 0 ");
 			if (request.getParameter("docId") != null) {
 				query.append(" and A.docId = ?" + (parameters.size() + 1));
-				parameters.add(new Long(request.getParameter("docId")));
+				parameters.add(Long.parseLong(request.getParameter("docId")));
 			}
 			if (request.getParameter("userId") != null) {
 				query.append(" and A.userId = ?" + (parameters.size() + 1));
-				parameters.add(new Long(request.getParameter("userId")));
+				parameters.add(Long.parseLong(request.getParameter("userId")));
 			}
 			if (request.getParameter("event") != null) {
 				query.append(" and A.event = ?" + (parameters.size() + 1));
@@ -126,6 +126,7 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 				if (showSid)
 					writer.print("<sid><![CDATA[" + (cols[10] == null ? "" : cols[10]) + "]]></sid>");
 				writer.print("<userid>" + cols[11] + "</userid>");
+				writer.print("<reason><![CDATA[" + (cols[12] == null ? "" : cols[12]) + "]]></reason>");
 				writer.print("</history>");
 			}
 			writer.write("</list>");

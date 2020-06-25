@@ -27,6 +27,7 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -53,7 +54,9 @@ public class ExternalAppsPanel extends AdminPanel {
 
 	private GUIParameter cmisMaxItems = null;
 
-	private GUIParameter wdSettings = null;
+	private GUIParameter wdEnabled = null;
+
+	private GUIParameter wdDepth = null;
 
 	private GUIParameter wdCache = null;
 
@@ -66,8 +69,6 @@ public class ExternalAppsPanel extends AdminPanel {
 	private CheckboxItem extCallParamTitle;
 
 	private GUIParameter openssl = null;
-
-	private GUIParameter pdftohtml = null;
 
 	private GUIParameter keytool = null;
 
@@ -96,7 +97,9 @@ public class ExternalAppsPanel extends AdminPanel {
 			else if (parameter.getName().equals("cmis.maxitems"))
 				cmisMaxItems = parameter;
 			else if (parameter.getName().equals("webdav.enabled"))
-				wdSettings = parameter;
+				wdEnabled = parameter;
+			else if (parameter.getName().equals("webdav.depth"))
+				wdDepth = parameter;
 			else if (parameter.getName().equals("webdav.usecache"))
 				wdCache = parameter;
 			else if (parameter.getName().equals("command.convert"))
@@ -105,8 +108,6 @@ public class ExternalAppsPanel extends AdminPanel {
 				ghost = parameter;
 			else if (parameter.getName().equals("command.openssl"))
 				openssl = parameter;
-			else if (parameter.getName().equals("command.pdftohtml"))
-				pdftohtml = parameter;
 			else if (parameter.getName().equals("command.keytool"))
 				keytool = parameter;
 			else if (parameter.getName().equals("ftp.enabled"))
@@ -134,8 +135,8 @@ public class ExternalAppsPanel extends AdminPanel {
 		webServiceForm.setPadding(5);
 
 		// Url
-		StaticTextItem url = ItemFactory.newStaticTextItem("wsUrl", I18N.message("url"), GWT.getHostPageBaseURL()
-				+ "services");
+		StaticTextItem url = ItemFactory.newStaticTextItem("wsUrl", I18N.message("url"),
+				GWT.getHostPageBaseURL() + "services");
 
 		// Web Service Enabled
 		RadioGroupItem wsEnabled = ItemFactory.newBooleanSelector("wsEnabled", "enabled");
@@ -160,8 +161,8 @@ public class ExternalAppsPanel extends AdminPanel {
 		cmisForm.setPadding(5);
 
 		// Url
-		StaticTextItem cmisUrl = ItemFactory.newStaticTextItem("cmisUrl", I18N.message("url"), GWT.getHostPageBaseURL()
-				+ "service/cmis");
+		StaticTextItem cmisUrl = ItemFactory.newStaticTextItem("cmisUrl", I18N.message("url"),
+				GWT.getHostPageBaseURL() + "service/cmis");
 
 		// CMIS Service Enabled
 		RadioGroupItem cmisEnabledItem = ItemFactory.newBooleanSelector("cmisEnabled", "enabled");
@@ -176,17 +177,19 @@ public class ExternalAppsPanel extends AdminPanel {
 		cmisChangelogItem.setValue(cmisChangelog.getValue().equals("true") ? "yes" : "no");
 
 		// CMIS Max Items
-		IntegerItem cmisMaxItemsItem = ItemFactory.newIntegerItem("cmisMaxItems", "maxitems",
+		SpinnerItem cmisMaxItemsItem = ItemFactory.newSpinnerItem("cmisMaxItems", "maxitems",
 				Integer.parseInt(cmisMaxItems.getValue()));
 		cmisMaxItemsItem.setRequired(true);
 		cmisMaxItemsItem.setWrapTitle(false);
+		cmisMaxItemsItem.setMin(0);
+		cmisMaxItemsItem.setMax(Integer.MAX_VALUE);
 
 		if (Session.get().isDefaultTenant())
 			cmisForm.setItems(cmisUrl, cmisEnabledItem, cmisChangelogItem, cmisMaxItemsItem);
 		else
 			cmisForm.setItems(cmisUrl);
 		cmis.setPane(cmisForm);
-
+		
 		Tab webDav = new Tab();
 		webDav.setTitle(I18N.message("webdav"));
 		DynamicForm webDavForm = new DynamicForm();
@@ -197,20 +200,26 @@ public class ExternalAppsPanel extends AdminPanel {
 		webDavForm.setPadding(5);
 
 		// Urls
-		StaticTextItem wdUrl = ItemFactory.newStaticTextItem("wdUrl", "WebDAV", GWT.getHostPageBaseURL()
-				+ "webdav/store");
+		StaticTextItem wdUrl = ItemFactory.newStaticTextItem("wdUrl", "WebDAV",
+				GWT.getHostPageBaseURL() + "webdav/store");
 
-		StaticTextItem wdbUrl = ItemFactory.newStaticTextItem("wdbUrl", "WebDAV basic", GWT.getHostPageBaseURL()
-				+ "webdavb");
+		StaticTextItem wdbUrl = ItemFactory.newStaticTextItem("wdbUrl", "WebDAV basic",
+				GWT.getHostPageBaseURL() + "webdavb");
 		wdbUrl.setVisible(Feature.enabled(Feature.WEBDAV_BASIC));
 		wdbUrl.setHint("&nbsp;&nbsp;&nbsp;(" + I18N.message("webdavbtooltip") + ")");
 
 		// Status
-		RadioGroupItem wdEnabled = ItemFactory.newBooleanSelector("wdEnabled", "enabled");
-		wdEnabled.setName("wdEnabled");
-		wdEnabled.setRequired(true);
-		wdEnabled.setValue(wdSettings.getValue().equals("true") ? "yes" : "no");
-
+		RadioGroupItem wdEnabledItem = ItemFactory.newBooleanSelector("wdEnabled", "enabled");
+		wdEnabledItem.setRequired(true);
+		wdEnabledItem.setValue(wdEnabled.getValue().equals("true") ? "yes" : "no");
+		
+		// Default depth
+		SpinnerItem wdDepthItem = ItemFactory.newSpinnerItem("wdDepth", "depth",
+				wdDepth.getValue() != null ? Long.parseLong(wdDepth.getValue()) : 1L);
+		wdDepthItem.setRequired(true);
+		wdDepthItem.setMin(0);
+		wdDepthItem.setMax(Integer.MAX_VALUE);
+		
 		// Webdav Cache
 		RadioGroupItem cache = ItemFactory.newBooleanSelector("wdCache", "usecache");
 		cache.setName("wdCache");
@@ -220,11 +229,11 @@ public class ExternalAppsPanel extends AdminPanel {
 		cache.setValue(wdCache.getValue().equals("true") ? "yes" : "no");
 
 		if (Session.get().isDefaultTenant())
-			webDavForm.setItems(wdUrl, wdbUrl, wdEnabled, cache);
+			webDavForm.setItems(wdUrl, wdbUrl, wdEnabledItem, wdDepthItem, cache);
 		else
 			webDavForm.setItems(wdUrl, wdbUrl);
 		webDav.setPane(webDavForm);
-
+		
 		// FTP Service status
 		RadioGroupItem ftpEnabledItem = ItemFactory.newBooleanSelector("ftpEnabled", "enabled");
 		ftpEnabledItem.setRequired(true);
@@ -323,14 +332,12 @@ public class ExternalAppsPanel extends AdminPanel {
 		convertCommand.setWidth(400);
 		TextItem ghostCommand = ItemFactory.newTextItem("ghostCommand", "Ghostscript", ghost.getValue());
 		ghostCommand.setWidth(400);
-		TextItem pdftohtmlCommand = ItemFactory.newTextItem("pdftohtmlCommand", "Pdftohtml", pdftohtml.getValue());
-		pdftohtmlCommand.setWidth(400);
 		TextItem opensslCommand = ItemFactory.newTextItem("opensslCommand", "OpenSSL", openssl.getValue());
 		opensslCommand.setWidth(400);
 		TextItem keytoolCommand = ItemFactory.newTextItem("keytoolCommand", "Keytool", keytool.getValue());
 		keytoolCommand.setWidth(400);
 
-		extAppForm.setItems(convertCommand, ghostCommand, pdftohtmlCommand, opensslCommand, keytoolCommand);
+		extAppForm.setItems(convertCommand, ghostCommand, opensslCommand, keytoolCommand);
 
 		if (Session.get().isDefaultTenant()) {
 			body.setMembers(extAppForm);
@@ -379,45 +386,45 @@ public class ExternalAppsPanel extends AdminPanel {
 
 				if (vm.validate()) {
 					if (Session.get().isDefaultTenant()) {
-						ExternalAppsPanel.this.wsSettings.setValue(values.get("wsEnabled").equals("yes") ? "true"
-								: "false");
+						ExternalAppsPanel.this.wsSettings
+								.setValue(values.get("wsEnabled").equals("yes") ? "true" : "false");
 
-						ExternalAppsPanel.this.cmisEnabled.setValue(values.get("cmisEnabled").equals("yes") ? "true"
-								: "false");
+						ExternalAppsPanel.this.cmisEnabled
+								.setValue(values.get("cmisEnabled").equals("yes") ? "true" : "false");
 
 						ExternalAppsPanel.this.cmisChangelog
 								.setValue(values.get("cmisChangelog").equals("yes") ? "true" : "false");
 
 						ExternalAppsPanel.this.cmisMaxItems.setValue(values.get("cmisMaxItems").toString());
 
-						ExternalAppsPanel.this.wdSettings.setValue(values.get("wdEnabled").equals("yes") ? "true"
-								: "false");
+						ExternalAppsPanel.this.wdEnabled
+								.setValue(values.get("wdEnabled").equals("yes") ? "true" : "false");
 
+						ExternalAppsPanel.this.wdDepth.setValue(values.get("wdDepth").toString());
 						ExternalAppsPanel.this.wdCache.setValue(values.get("wdCache").equals("yes") ? "true" : "false");
 						ExternalAppsPanel.this.convert.setValue(values.get("convertCommand").toString());
 						ExternalAppsPanel.this.ghost.setValue(values.get("ghostCommand").toString());
 						ExternalAppsPanel.this.openssl.setValue(values.get("opensslCommand").toString());
-						ExternalAppsPanel.this.pdftohtml.setValue(values.get("pdftohtmlCommand").toString());
 						ExternalAppsPanel.this.keytool.setValue(values.get("keytoolCommand").toString());
 
-						ExternalAppsPanel.this.ftpEnabled.setValue(values.get("ftpEnabled").equals("yes") ? "true"
-								: "false");
+						ExternalAppsPanel.this.ftpEnabled
+								.setValue(values.get("ftpEnabled").equals("yes") ? "true" : "false");
 						ExternalAppsPanel.this.ftpPort.setValue(values.get("ftpPort").toString());
-						ExternalAppsPanel.this.ftpSsl.setValue(values.get("ftpSsl").equals("yes") ? "true"
-								: "false");
+						ExternalAppsPanel.this.ftpSsl.setValue(values.get("ftpSsl").equals("yes") ? "true" : "false");
 						ExternalAppsPanel.this.ftpKeystoreFile.setValue(values.get("ftpKeystoreFile").toString());
 						ExternalAppsPanel.this.ftpKeystoreAlias.setValue(values.get("ftpKeystoreAlias").toString());
-						ExternalAppsPanel.this.ftpKeystorePassword.setValue(values.get("ftpKeystorePassword").toString());
+						ExternalAppsPanel.this.ftpKeystorePassword
+								.setValue(values.get("ftpKeystorePassword").toString());
 					}
 
 					List<GUIParameter> params = new ArrayList<GUIParameter>();
 					params.add(ExternalAppsPanel.this.wsSettings);
-					params.add(ExternalAppsPanel.this.wdSettings);
+					params.add(ExternalAppsPanel.this.wdEnabled);
+					params.add(ExternalAppsPanel.this.wdDepth);
 					params.add(ExternalAppsPanel.this.wdCache);
 					params.add(ExternalAppsPanel.this.convert);
 					params.add(ExternalAppsPanel.this.ghost);
 					params.add(ExternalAppsPanel.this.openssl);
-					params.add(ExternalAppsPanel.this.pdftohtml);
 					params.add(ExternalAppsPanel.this.keytool);
 					params.add(ExternalAppsPanel.this.cmisEnabled);
 					params.add(ExternalAppsPanel.this.cmisChangelog);
@@ -433,20 +440,20 @@ public class ExternalAppsPanel extends AdminPanel {
 					try {
 						GUIExternalCall extCall = new GUIExternalCall();
 						extCall.setName(values.get("extCallName") == null ? "" : values.get("extCallName").toString());
-						extCall.setBaseUrl(values.get("extCallBaseUrl") == null ? "" : values.get("extCallBaseUrl")
-								.toString());
-						extCall.setSuffix(values.get("extCallSuffix") == null ? "" : values.get("extCallSuffix")
-								.toString());
-						extCall.setTargetWindow(values.get("extCallWindow") == null ? "" : values.get("extCallWindow")
-								.toString());
+						extCall.setBaseUrl(
+								values.get("extCallBaseUrl") == null ? "" : values.get("extCallBaseUrl").toString());
+						extCall.setSuffix(
+								values.get("extCallSuffix") == null ? "" : values.get("extCallSuffix").toString());
+						extCall.setTargetWindow(
+								values.get("extCallWindow") == null ? "" : values.get("extCallWindow").toString());
 						if ("yes".equals(values.get("extCallEnabled")))
 							Session.get().getSession().setExternalCall(extCall);
 						else
 							Session.get().getSession().setExternalCall(null);
 
 						String tenant = Session.get().getTenantName();
-						params.add(new GUIParameter(tenant + ".extcall.enabled", "yes".equals(values
-								.get("extCallEnabled")) ? "true" : "false"));
+						params.add(new GUIParameter(tenant + ".extcall.enabled",
+								"yes".equals(values.get("extCallEnabled")) ? "true" : "false"));
 						params.add(new GUIParameter(tenant + ".extcall.name", extCall.getName()));
 						params.add(new GUIParameter(tenant + ".extcall.baseurl", extCall.getBaseUrl()));
 						params.add(new GUIParameter(tenant + ".extcall.suffix", extCall.getSuffix()));

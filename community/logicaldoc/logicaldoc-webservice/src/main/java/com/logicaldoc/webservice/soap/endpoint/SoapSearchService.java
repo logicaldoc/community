@@ -63,8 +63,8 @@ public class SoapSearchService extends AbstractService implements SearchService 
 		searchResult.setTime(lastSearch.getExecTime());
 		searchResult.setMoreHits(lastSearch.isMoreHitsPresent() ? 1 : 0);
 
-		log.info("User: " + user.getUsername() + " Query: " + options.getExpression());
-		log.info("Results number: " + docs.size());
+		log.info("User: {}  Query: {}", user.getUsername(), options.getExpression());
+		log.info("Results number: {}", docs.size());
 
 		return searchResult;
 	}
@@ -75,6 +75,7 @@ public class SoapSearchService extends AbstractService implements SearchService 
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, user.getTenantId(), null);
+		
 		WSDocument[] wsDocs = new WSDocument[docs.size()];
 		for (int i = 0; i < docs.size(); i++) {
 			try {

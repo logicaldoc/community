@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.security.Group;
-import com.logicaldoc.core.security.SecurityManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -147,8 +147,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				throw new Exception("Unable to store the user");
 
 			if (user.getGroupIds() != null && user.getGroupIds().length > 0) {
-				SecurityManager manager = (SecurityManager) Context.get().getBean(SecurityManager.class);
-				usr.removeAllGroups();
+				usr.removeGroupMemberships(null);
 				for (long groupId : user.getGroupIds())
 					usr.addGroup(gDao.findById(groupId));
 				dao.store(usr);
@@ -171,8 +170,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			if (group.getId() != 0) {
 				grp = dao.findById(group.getId());
 				if (grp.getType() != Group.TYPE_DEFAULT) {
-					throw new Exception("You cannot edit group with id " + grp.getId()
-							+ " because it is a system group");
+					throw new Exception(String.format("You cannot edit group with id %s because it is a system group",
+							grp.getId()));
 				}
 				grp.setName(group.getName());
 				grp.setDescription(group.getDescription());
@@ -200,7 +199,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			if (dao.store(grp)) {
 				if (group.getInheritGroupId() != null && group.getInheritGroupId().longValue() > 0)
-					dao.inheritACLs(group.getId(), group.getInheritGroupId().longValue());
+					dao.inheritACLs(grp, group.getInheritGroupId().longValue());
 				return grp.getId();
 			} else
 				throw new Exception("Unable to store the group");
@@ -229,7 +228,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			throw new Exception("Unable to delete the user with id " + userId);
 		}
 	}
-
+	
 	@Override
 	public void deleteGroup(String sid, long groupId) throws Exception {
 		checkAdministrator(sid);
@@ -271,7 +270,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			// Add a user history entry
 			history = new UserHistory();
 			history.setUser(user);
-			history.setEvent(UserHistory.EVENT_USER_PASSWORDCHANGED);
+			history.setEvent(UserEvent.PASSWORDCHANGED.toString());
 			history.setComment("");
 			user.setRepass("");
 

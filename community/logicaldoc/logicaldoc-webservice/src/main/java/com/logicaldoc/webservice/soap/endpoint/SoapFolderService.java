@@ -1,7 +1,6 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -16,6 +15,7 @@ import com.logicaldoc.core.folder.FolderGroup;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -41,10 +41,9 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		try {
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			log.debug("folder.getParentId(): {}", folder.getParentId());
 			Folder parentFolder = folderDao.findById(folder.getParentId());
 			if (parentFolder == null)
-				throw new Exception("A parent folder with id " + folder.getParentId() + " was not found.");
+				throw new Exception(String.format("A parent folder with id %s was not found.", folder.getParentId()));
 			checkPermission(Permission.ADD, user, folder.getParentId());
 
 			// Add a folder history entry
@@ -62,7 +61,11 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			folderVO.setHidden(folder.getHidden());
 			folderVO.setFoldRef(folder.getFoldRef());
 			folderVO.setStorage(folder.getStorage());
-
+			folderVO.setSecurityRef(folder.getSecurityRef());
+			folderVO.setFoldRef(folder.getFoldRef());
+			folderVO.setOcrTemplateId(folder.getOcrTemplateId());
+			folderVO.setBarcodeTemplateId(folder.getBarcodeTemplateId());
+			
 			Set<String> tagsSet = new TreeSet<String>();
 			if (folder.getTags() != null) {
 				for (int i = 0; i < folder.getTags().length; i++) {
@@ -76,7 +79,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			Folder f = folderDao.create(parentFolder, folderVO, true, transaction);
 
 			if (f == null) {
-				log.error("Folder " + folderVO.getName() + " not created");
+				log.error("Folder {} not created", folderVO.getName());
 				throw new Exception("error");
 			}
 
@@ -97,7 +100,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			Folder parentFolder = folderDao.findFolder(parentId);
 			if (parentFolder == null)
-				throw new Exception("A parent folder with id " + parentId + " was not found.");
+				throw new Exception(String.format("A parent folder with id %s was not found.", parentId));
 			checkPermission(Permission.ADD, user, parentFolder.getId());
 
 			// Add a folder history entry
@@ -108,7 +111,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			Folder f = folderDao.createAlias(parentFolder.getId(), foldRef, transaction);
 
 			WSFolder createdFolder = WSFolder.fromFolder(f);
-			log.info("Created folder " + createdFolder.getName());
+			log.info("Created folder {}", createdFolder.getName());
 			return createdFolder;
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
@@ -164,7 +167,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		User user = validateSession(sid);
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		Folder folder = folderDao.findByPath(path, user.getTenantId());
+		Folder folder = folderDao.findByPathExtended(path, user.getTenantId());
 		if (folder == null)
 			return null;
 
@@ -300,13 +303,13 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		Folder folder = folderDao.findById(folderId);
 		if (folder == null)
-			throw new Exception("cannot find folder " + folderId);
+			throw new Exception(String.format("cannot find folder %s", folderId));
 
 		folderDao.initialize(folder);
 
 		List<Folder> folders = folderDao.findByNameAndParentId(name, folder.getParentId());
 		if (folders.size() > 0 && folders.get(0).getId() != folder.getId()) {
-			throw new Exception("duplicate folder name " + name);
+			throw new Exception(String.format("duplicate folder name %s", name));
 		} else {
 			// Add a folder history entry
 			FolderHistory transaction = new FolderHistory();
@@ -325,7 +328,11 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public WSFolder getRootFolder(String sid) throws Exception {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		return getFolder(sid, folderDao.findRoot(user.getTenantId()).getId());
+		
+		Folder folder = folderDao.findRoot(user.getTenantId());
+		folderDao.initialize(folder);
+
+		return WSFolder.fromFolder(folder);
 	}
 
 	@Override
@@ -336,7 +343,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public boolean isWriteable(String sid, long folderId) throws Exception {
+	public boolean isWritable(String sid, long folderId) throws Exception {
 		User user = validateSession(sid);
 		try {
 			checkWriteEnable(user, folderId);
@@ -403,45 +410,33 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		// Check if the session user has the Security Permission of this folder
 		if (!folderDao.isPermissionEnabled(Permission.SECURITY, folderId, sessionUser.getId()))
-			throw new Exception("Security Rights not granted to the user on folder id " + folderId);
+			throw new Exception(String.format("Security Rights not granted to the user on folder id %s", folderId));
 		try {
 			Folder folder = folderDao.findById(folderId);
 			folderDao.initialize(folder);
-			addFolderGroup(folder, groupId, permissions);
+			folder.setSecurityRef(null);
+
+			FolderGroup fg = new FolderGroup();
+			fg.setGroupId(groupId);
+			fg.setPermissions(permissions);
+			folder.addFolderGroup(fg);
+
+			FolderHistory history = new FolderHistory();
+			history.setEvent(FolderEvent.PERMISSION.toString());
+			history.setSession(SessionManager.get().get(sid));
+			folderDao.store(folder, history);
 
 			if (recursive) {
 				folderDao.initialize(folder);
 				FolderHistory transaction = new FolderHistory();
 				transaction.setUser(sessionUser);
 				transaction.setSessionId(sid);
-				folderDao.applyRithtToTree(folder.getId(), transaction);
+				folderDao.applyRightToTree(folder.getId(), transaction);
 			}
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			log.error("Some errors occurred", e);
 			throw new Exception("error", e);
 		}
-	}
-
-	private FolderGroup addFolderGroup(Folder folder, long groupId, int permissions) {
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
-		Set<FolderGroup> groups = new HashSet<FolderGroup>();
-		for (FolderGroup folderGroup : folder.getFolderGroups()) {
-			if (folderGroup.getGroupId() != groupId)
-				groups.add(folderGroup);
-		}
-		folder.setSecurityRef(null);
-		folder.getFolderGroups().clear();
-		folderDao.store(folder);
-
-		FolderGroup mg = new FolderGroup();
-		mg.setGroupId(groupId);
-		mg.setPermissions(permissions);
-		if (mg.getRead() != 0)
-			groups.add(mg);
-		folder.setFolderGroups(groups);
-		folderDao.store(folder);
-		return mg;
 	}
 
 	@Override
@@ -463,8 +458,9 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			for (FolderGroup mg : folder.getFolderGroups()) {
 				Group group = groupDao.findById(mg.getGroupId());
 				if (group.getName().startsWith("_user_") && users) {
-					rightsList.add(new WSRight(Long.parseLong(group.getName().substring(
-							group.getName().lastIndexOf('_') + 1)), mg.getPermissions()));
+					rightsList.add(
+							new WSRight(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)),
+									mg.getPermissions()));
 				} else if (!group.getName().startsWith("_user_") && !users)
 					rightsList.add(new WSRight(group.getId(), mg.getPermissions()));
 			}
@@ -498,11 +494,11 @@ public class SoapFolderService extends AbstractService implements FolderService 
 
 		Folder fld = folderDao.findById(folderId);
 		if (fld == null)
-			throw new Exception("cannot find folder " + folderId);
+			throw new Exception(String.format("cannot find folder %s", folderId));
 
 		List<Folder> folders = folderDao.findByNameAndParentId(name, fld.getParentId());
 		if (folders.size() > 0 && folders.get(0).getId() != fld.getId()) {
-			throw new Exception("duplicate folder name " + name);
+			throw new Exception(String.format("duplicate folder name %s", name));
 		} else {
 			folderDao.initialize(fld);
 
@@ -510,6 +506,10 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			fld.setDescription(folder.getDescription());
 			fld.setTemplateLocked(folder.getTemplateLocked());
 			fld.setPosition(folder.getPosition());
+			fld.setSecurityRef(folder.getSecurityRef());
+			fld.setFoldRef(folder.getFoldRef());
+			fld.setOcrTemplateId(folder.getOcrTemplateId());
+			fld.setBarcodeTemplateId(folder.getBarcodeTemplateId());
 
 			Set<String> tagsSet = new TreeSet<String>();
 			if (folder.getTags() != null) {
@@ -561,7 +561,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			 * Check if the path contains the workspace specification
 			 */
 			for (WSFolder w : listWorkspaces(sid)) {
-				if (path.startsWith(w.getName())) {
+				if (path.startsWith(w.getName() + "/")) {
 					workspace = folderDao.findById(w.getId());
 					folderDao.initialize(workspace);
 					break;

@@ -10,19 +10,10 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.gui.frontend.client.workflow.WorkflowTriggersPanel;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.Side;
-import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -31,7 +22,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
  * This panel collects all the folder details
@@ -40,6 +30,7 @@ import com.smartgwt.client.widgets.tab.TabSet;
  * @since 6.0
  */
 public class FolderDetailsPanel extends VLayout implements FolderObserver {
+
 	private GUIFolder folder;
 
 	private Layout propertiesTabPanel;
@@ -58,11 +49,17 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private Layout aliasesTabPanel;
 
+	private Layout automationTabPanel;
+
+	private Layout interfaceTabPanel;
+
+	private Layout ocrTabPanel;
+
 	private StandardPropertiesPanel propertiesPanel;
 
-	private ExtendedPropertiesPanel extendedPropertiesPanel;
+	private FolderExtendedPropertiesPanel extendedPropertiesPanel;
 
-	private SecurityPanel securityPanel;
+	private FolderSecurityPanel securityPanel;
 
 	private HistoryPanel historyPanel;
 
@@ -74,9 +71,13 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private FolderQuotaPanel quotaPanel;
 
-	private HLayout savePanel;
+	private FolderAutomationPanel automationPanel;
 
-	private TabSet tabSet = new TabSet();
+	private FolderInterfacePanel interfacePanel;
+
+	private FolderOCRPanel ocrPanel;
+
+	private EditingTabSet tabSet;
 
 	private Tab workflowTab = null;
 
@@ -84,73 +85,46 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private Tab quotaTab = null;
 
+	private Tab automationTab = null;
+
+	private Tab interfaceTab = null;
+
+	private Tab ocrTab = null;
+
 	public FolderDetailsPanel(GUIFolder folder) {
 		super();
-
-		FolderController.get().addObserver(this);
 
 		this.folder = folder;
 		setHeight100();
 		setWidth100();
 		setMembersMargin(10);
 
-		savePanel = new HLayout();
-		savePanel.setHeight(20);
-		savePanel.setVisible(false);
-		savePanel.setStyleName("warn");
-		savePanel.setWidth100();
-		Button saveButton = new Button(I18N.message("save"));
-		saveButton.setAutoFit(true);
-		saveButton.setMargin(2);
-		saveButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+		tabSet = new EditingTabSet(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				onSave();
 			}
-		});
-		saveButton.setLayoutAlign(VerticalAlignment.CENTER);
-
-		HTMLPane spacer = new HTMLPane();
-		spacer.setContents("<div>&nbsp;</div>");
-		spacer.setWidth("70%");
-		spacer.setOverflow(Overflow.HIDDEN);
-
-		Img closeImage = ItemFactory.newImgIcon("delete.png");
-		closeImage.setHeight("16px");
-		closeImage.addClickHandler(new ClickHandler() {
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				FolderService.Instance.get().getFolder(getFolder().getId(), false, new AsyncCallback<GUIFolder>() {
+				FolderService.Instance.get().getFolder(getFolder().getId(), false, false, false,
+						new AsyncCallback<GUIFolder>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
+							@Override
+							public void onFailure(Throwable caught) {
+								Log.serverError(caught);
+							}
 
-					@Override
-					public void onSuccess(GUIFolder folder) {
-						folder.setPathExtended(FolderNavigator.get().getPath(folder.getId()));
-						setFolder(folder);
-						savePanel.setVisible(false);
-					}
-				});
+							@Override
+							public void onSuccess(GUIFolder folder) {
+								folder.setPathExtended(folder.getPathExtended() != null ? folder.getPathExtended()
+										: FolderNavigator.get().getPath(folder.getId()));
+								setFolder(folder);
+								tabSet.hideSave();
+							}
+						});
 			}
 		});
-		closeImage.setCursor(Cursor.HAND);
-		closeImage.setTooltip(I18N.message("close"));
-		closeImage.setLayoutAlign(Alignment.RIGHT);
-		closeImage.setLayoutAlign(VerticalAlignment.CENTER);
-
-		savePanel.addMember(saveButton);
-		savePanel.addMember(spacer);
-		savePanel.addMember(closeImage);
-		addMember(savePanel);
-
-		tabSet = new TabSet();
-		tabSet.setTabBarPosition(Side.TOP);
-		tabSet.setTabBarAlign(Side.LEFT);
-		tabSet.setWidth100();
-		tabSet.setHeight100();
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		propertiesTabPanel = new HLayout();
@@ -231,14 +205,52 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		if (Menu.enabled(Menu.ALIASES) && folder.getFoldRef() == null)
 			tabSet.addTab(aliasesTab);
 
+		automationTab = new Tab(I18N.message("automation"));
+		if (folder.hasPermission(Constants.PERMISSION_AUTOMATION))
+			if (Feature.visible(Feature.AUTOMATION)) {
+				if (Feature.enabled(Feature.AUTOMATION)) {
+					automationTabPanel = new HLayout();
+					automationTabPanel.setWidth100();
+					automationTabPanel.setHeight100();
+				} else {
+					automationTabPanel = new FeatureDisabled();
+				}
+				automationTab.setPane(automationTabPanel);
+				tabSet.addTab(automationTab);
+			}
+
+		if (Menu.enabled(Menu.FOLDER_INTERFACE)) {
+			interfaceTab = new Tab(I18N.message("userinterface"));
+			interfaceTabPanel = new HLayout();
+			interfaceTabPanel.setWidth100();
+			interfaceTabPanel.setHeight100();
+			interfaceTab.setPane(interfaceTabPanel);
+			tabSet.addTab(interfaceTab);
+		}
+
+		if (Menu.enabled(Menu.DOCUMENT_OCR)) {
+			ocrTab = new Tab(I18N.message("ocr"));
+			ocrTabPanel = new HLayout();
+			ocrTabPanel.setWidth100();
+			ocrTabPanel.setHeight100();
+			ocrTab.setPane(ocrTabPanel);
+			tabSet.addTab(ocrTab);
+		}
+
 		addMember(tabSet);
 		refresh();
 	}
 
 	private void refresh() {
 		try {
-			if (savePanel != null)
-				savePanel.setVisible(false);
+			disableSave();
+
+			ChangedHandler changeHandler = new ChangedHandler() {
+				@Override
+				public void onChanged(ChangedEvent event) {
+					onModified();
+				}
+			};
 
 			/*
 			 * Prepare the standard properties tab
@@ -247,13 +259,6 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				propertiesPanel.destroy();
 				propertiesTabPanel.removeMember(propertiesPanel);
 			}
-
-			ChangedHandler changeHandler = new ChangedHandler() {
-				@Override
-				public void onChanged(ChangedEvent event) {
-					onModified();
-				}
-			};
 			propertiesPanel = new StandardPropertiesPanel(folder, changeHandler);
 			propertiesTabPanel.addMember(propertiesPanel);
 
@@ -264,10 +269,18 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				extendedPropertiesPanel.destroy();
 				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
 			}
-			extendedPropertiesPanel = new ExtendedPropertiesPanel(folder, changeHandler);
-			if (Feature.enabled(Feature.TEMPLATE)) {
+
+			ChangedHandler templateChangedHandler = new ChangedHandler() {
+				@Override
+				public void onChanged(ChangedEvent event) {
+					folder.setOcrTemplateId(null);
+					folder.setBarcodeTemplateId(null);
+					ocrPanel.refresh(folder.getTemplateId());
+				}
+			};
+			extendedPropertiesPanel = new FolderExtendedPropertiesPanel(folder, changeHandler, templateChangedHandler);
+			if (Feature.enabled(Feature.TEMPLATE))
 				extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
-			}
 
 			/*
 			 * Prepare the security properties tab
@@ -276,7 +289,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				securityPanel.destroy();
 				securityTabPanel.removeMember(securityPanel);
 			}
-			securityPanel = new SecurityPanel(folder);
+			securityPanel = new FolderSecurityPanel(folder);
 			securityTabPanel.addMember(securityPanel);
 
 			/*
@@ -338,8 +351,45 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				quotaPanel = new FolderQuotaPanel(folder, changeHandler);
 				quotaTabPanel.addMember(quotaPanel);
 			}
+
+			if (Feature.enabled(Feature.AUTOMATION) && folder.hasPermission(Constants.PERMISSION_AUTOMATION)) {
+				/*
+				 * Prepare the subscriptions tab
+				 */
+				if (automationPanel != null) {
+					automationPanel.destroy();
+					automationTabPanel.removeMember(automationPanel);
+				}
+
+				automationPanel = new FolderAutomationPanel(folder);
+				automationTabPanel.addMember(automationPanel);
+			}
+
+			if (Menu.enabled(Menu.FOLDER_INTERFACE)) {
+				/*
+				 * Prepare the User Interface tab
+				 */
+				if (interfacePanel != null) {
+					interfacePanel.destroy();
+					interfaceTabPanel.removeMember(interfacePanel);
+				}
+				interfacePanel = new FolderInterfacePanel(folder, changeHandler);
+				interfaceTabPanel.addMember(interfacePanel);
+			}
+
+			if (Menu.enabled(Menu.DOCUMENT_OCR)) {
+				/*
+				 * Prepare the OCR tab
+				 */
+				if (ocrPanel != null) {
+					ocrPanel.destroy();
+					ocrTabPanel.removeMember(ocrPanel);
+				}
+				ocrPanel = new FolderOCRPanel(folder, changeHandler);
+				ocrTabPanel.addMember(ocrPanel);
+			}
 		} catch (Throwable r) {
-			SC.warn(r.getMessage());
+			Log.error(r.getMessage(), null, r);
 		}
 	}
 
@@ -353,7 +403,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	public void onModified() {
-		savePanel.setVisible(true);
+		enableSave();
 	}
 
 	private boolean validate() {
@@ -373,6 +423,18 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				tabSet.selectTab(quotaTab);
 		}
 
+		if (valid && interfacePanel != null) {
+			valid = interfacePanel.validate();
+			if (!valid)
+				tabSet.selectTab(interfaceTab);
+		}
+
+		if (valid && Feature.enabled(Feature.OCR)) {
+			valid = ocrPanel.validate();
+			if (!valid)
+				tabSet.selectTab(ocrTab);
+		}
+
 		return valid;
 	}
 
@@ -387,14 +449,13 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 				@Override
 				public void onSuccess(GUIFolder folder) {
-					savePanel.setVisible(false);
-
+					disableSave();
 					FolderController.get().modified(folder);
-
 					GUIFolder current = Session.get().getCurrentFolder();
 					current.setTemplate(folder.getTemplate());
 					current.setTemplateId(folder.getTemplateId());
 					current.setAttributes(folder.getAttributes());
+					current.setOcrTemplateId(folder.getOcrTemplateId());
 				}
 			});
 		}
@@ -447,5 +508,18 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	protected void onDestroy() {
 		destroy();
 		super.onDestroy();
+	}
+
+	@Override
+	protected void onDraw() {
+		FolderController.get().addObserver(this);
+	}
+
+	private void disableSave() {
+		tabSet.hideSave();
+	}
+
+	private void enableSave() {
+		tabSet.displaySave();
 	}
 }

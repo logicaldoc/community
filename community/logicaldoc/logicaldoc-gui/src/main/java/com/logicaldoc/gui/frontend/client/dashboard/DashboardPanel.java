@@ -1,9 +1,11 @@
 package com.logicaldoc.gui.frontend.client.dashboard;
 
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.calendar.UserCalendarPanel;
+import com.logicaldoc.gui.frontend.client.dashboard.chat.ChatPanel;
 import com.logicaldoc.gui.frontend.client.workflow.WorkflowDashboard;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -21,6 +23,8 @@ public class DashboardPanel extends VLayout {
 	public static final String WORKFLOW_ID = "workflow";
 
 	public static final String MESSAGES_ID = "messages";
+
+	public static final String CHAT_ID = "chat";
 
 	public static final String TAGS_ID = "tags";
 
@@ -41,6 +45,8 @@ public class DashboardPanel extends VLayout {
 	private Tab userTab = null;
 
 	private Tab tagsTab = null;
+
+	private Tab chatTab = null;
 
 	private String defaultOpenTab = USER_ID;
 
@@ -66,6 +72,10 @@ public class DashboardPanel extends VLayout {
 		messagesTab.setID(MESSAGES_ID);
 		messagesTab.setPane(new MessagesPanel());
 
+		chatTab = new Tab(I18N.message("chat"));
+		chatTab.setID(CHAT_ID);
+		chatTab.setPane(new ChatPanel());
+
 		workflowTab = new Tab(I18N.message("workflow"));
 		workflowTab.setID(WORKFLOW_ID);
 		workflowTab.setPane(new WorkflowDashboard());
@@ -82,13 +92,19 @@ public class DashboardPanel extends VLayout {
 				tagsTab.setPane(new TagsDashboard());
 		}
 
-		if (Feature.visible(Feature.MESSAGES)) {
+		if (Feature.visible(Feature.MESSAGES) && Menu.enabled(Menu.MESSAGES)) {
 			tabSet.addTab(messagesTab);
 			if (!Feature.enabled(Feature.MESSAGES))
 				messagesTab.setPane(new FeatureDisabled());
 		}
 
-		if (Feature.visible(Feature.CALENDAR)) {
+		if (Feature.visible(Feature.CHAT) && Menu.enabled(Menu.CHAT)) {
+			tabSet.addTab(chatTab);
+			if (!Feature.enabled(Feature.CHAT))
+				chatTab.setPane(new FeatureDisabled());
+		}
+
+		if (Feature.visible(Feature.CALENDAR) && Menu.enabled(Menu.DASHBOARD_CALENDAR)) {
 			tabSet.addTab(calendarTab);
 			if (!Feature.enabled(Feature.CALENDAR))
 				workflowTab.setPane(new FeatureDisabled());

@@ -1,2 +1,3 @@
-mvn deploy:deploy-file -Dfile=jtds-1.2.5.jar -DgroupId=net.sourceforge.jtds -DartifactId=jtds -Dversion=1.2.5 -Dpackaging=jar -DrepositoryId=logicaldoc-community -Durl=sftp://web.sourceforge.net/home/groups/l/lo/logicaldoc/htdocs/maven
-;sftp://eva01/home/maven/repository3/
+rem mvn deploy:deploy-file -Dfile=morena-7.1.31.jar -DgroupId=morena -DartifactId=morena -Dversion=7.1.31 -Dpackaging=jar -DrepositoryId=logicaldoc-enterprise -Durl=sftp://repo.logicaldoc.com/srv/maven/repository1
+rem mvn deploy:deploy-file -Dfile=morena_windows-7.1.31.jar -DgroupId=morena -DartifactId=morena_windows -Dversion=7.1.31 -Dpackaging=jar -DrepositoryId=logicaldoc-enterprise -Durl=sftp://repo.logicaldoc.com/srv/maven/repository1
+mvn deploy:deploy-file -Dfile=morena_license-ldoc201805.jar -DgroupId=morena -DartifactId=morena_license -Dversion=ldoc201805 -Dpackaging=jar -DrepositoryId=logicaldoc-enterprise -Durl=sftp://repo.logicaldoc.com/srv/maven/repository1

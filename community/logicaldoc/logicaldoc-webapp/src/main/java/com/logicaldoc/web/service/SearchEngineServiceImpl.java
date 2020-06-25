@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,21 +45,19 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 			searchEngine.setLocked(indexer.isLocked());
 
 			ContextProperties conf = Context.get().getProperties();
-			searchEngine.setExcludePatters(conf.getProperty(session.getTenantName() + ".index.excludes"));
-			searchEngine.setIncludePatters(conf.getProperty(session.getTenantName() + ".index.includes"));
+			searchEngine.setExcludePatterns(conf.getProperty(session.getTenantName() + ".index.excludes"));
+			searchEngine.setIncludePatterns(conf.getProperty(session.getTenantName() + ".index.includes"));
+			searchEngine
+					.setExcludePatternsMetadata(conf.getProperty(session.getTenantName() + ".index.excludes.metadata"));
+			searchEngine
+					.setIncludePatternsMetadata(conf.getProperty(session.getTenantName() + ".index.includes.metadata"));
 			searchEngine.setParsingTimeout(conf.getInt(session.getTenantName() + ".parser.timeout", 0));
 			searchEngine.setMaxTextFileSize(conf.getInt(session.getTenantName() + ".parser.txt.maxsize", 0));
 			searchEngine.setDir(conf.getProperty("index.dir"));
-
-			if (StringUtils.isNotEmpty(conf.getProperty("index.batch")))
-				searchEngine.setBatch(new Integer(conf.getProperty("index.batch")));
-			else
-				searchEngine.setBatch(0);
-
-			if (StringUtils.isNotEmpty(conf.getProperty("index.maxtext")))
-				searchEngine.setMaxText(new Integer(conf.getProperty("index.maxtext")));
-			else
-				searchEngine.setMaxText(0);
+			searchEngine.setSorting(conf.getProperty("index.sorting"));
+			searchEngine.setThreads(conf.getInt("index.threads", 2));
+			searchEngine.setBatch(conf.getInt("index.batch", 0));
+			searchEngine.setMaxText(conf.getInt("index.maxtext", 0));
 
 			// Populate the list of supported languages
 			searchEngine.setLanguages("");
@@ -144,15 +141,22 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 					searchEngine.getExcludePatters() != null ? searchEngine.getExcludePatters() : "");
 			conf.setProperty(session.getTenantName() + ".index.includes",
 					searchEngine.getIncludePatters() != null ? searchEngine.getIncludePatters() : "");
+			conf.setProperty(session.getTenantName() + ".index.excludes.metadata",
+					searchEngine.getExcludePatters() != null ? searchEngine.getExcludePatternsMetadata() : "");
+			conf.setProperty(session.getTenantName() + ".index.includes.metadata",
+					searchEngine.getIncludePatters() != null ? searchEngine.getIncludePattersMetadata() : "");
 			conf.setProperty(session.getTenantName() + ".parser.timeout",
 					searchEngine.getParsingTimeout() != null ? Integer.toString(searchEngine.getParsingTimeout()) : "");
 			conf.setProperty(session.getTenantName() + ".parser.txt.maxsize",
-					searchEngine.getMaxTextFileSize() != null ? Integer.toString(searchEngine.getMaxTextFileSize()) : "");
-			
+					searchEngine.getMaxTextFileSize() != null ? Integer.toString(searchEngine.getMaxTextFileSize())
+							: "");
+
 			if (session.getTenantId() == Tenant.DEFAULT_ID) {
 				conf.setProperty("index.batch", Integer.toString(searchEngine.getBatch()));
 				conf.setProperty("index.maxtext", Integer.toString(searchEngine.getMaxText()));
 				conf.setProperty("index.dir", searchEngine.getDir());
+				conf.setProperty("index.sorting", searchEngine.getSorting());
+				conf.setProperty("index.threads", "" + searchEngine.getThreads());
 			}
 
 			conf.write();

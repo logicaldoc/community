@@ -9,10 +9,10 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
-import com.logicaldoc.gui.frontend.client.folder.FolderSelector;
 import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -134,23 +134,14 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		icon.setCanFilter(false);
 		icon.setCanGroupBy(false);
 
-		ListGridField immutable = new ListGridField("immutable", " ", 24);
-		immutable.setType(ListGridFieldType.IMAGE);
-		immutable.setCanSort(false);
-		immutable.setAlign(Alignment.CENTER);
-		immutable.setShowDefaultContextMenu(false);
-		immutable.setImageURLPrefix(Util.imagePrefix());
-		immutable.setImageURLSuffix(".png");
-		immutable.setCanFilter(false);
-
 		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
 		version.setAlign(Alignment.CENTER);
-		version.setCanFilter(true);
+		version.setCanFilter(false);
 		version.setCanGroupBy(false);
 
 		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 55);
 		fileVersion.setAlign(Alignment.CENTER);
-		fileVersion.setCanFilter(true);
+		fileVersion.setCanFilter(false);
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
@@ -169,35 +160,26 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
 		filename.setCanFilter(true);
 
+		ListGridField deleteUser = new ListGridField("deleteUser", I18N.message("deletedby"), 200);
+		deleteUser.setCanFilter(true);
+
 		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
 		type.setType(ListGridFieldType.TEXT);
 		type.setAlign(Alignment.CENTER);
 		type.setHidden(true);
 		type.setCanGroupBy(false);
 
-		list = new RefreshableListGrid() {
-			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (getFieldName(colNum).equals("filename")) {
-					if ("stop".equals(record.getAttribute("immutable"))) {
-						return "color: #888888; font-style: italic;";
-					} else {
-						return super.getCellCSSText(record, rowNum, colNum);
-					}
-				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
-				}
-			}
-		};
+		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(false);
 		list.setAutoFetchData(true);
 		list.setFilterOnKeypress(true);
+		list.setShowFilterEditor(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 
-		list.setFields(immutable, icon, filename, version, fileVersion, size, lastModified, customId, type);
+		list.setFields(icon, filename, version, fileVersion, size, lastModified, customId, deleteUser, type);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -215,7 +197,7 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		});
 
 		body.setMembers(toolStrip, infoPanel, list);
-		
+
 		refresh();
 	}
 

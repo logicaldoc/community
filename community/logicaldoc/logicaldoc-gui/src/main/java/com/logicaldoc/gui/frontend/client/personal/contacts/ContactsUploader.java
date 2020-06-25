@@ -1,9 +1,5 @@
 package com.logicaldoc.gui.frontend.client.personal.contacts;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
@@ -14,6 +10,10 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+
+import gwtupload.client.IUploadStatus.Status;
+import gwtupload.client.IUploader;
+import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload a new contacts file to the server.

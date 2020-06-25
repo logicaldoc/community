@@ -3,6 +3,8 @@ package com.logicaldoc.gui.frontend.client.services;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 
 /**
@@ -17,11 +19,19 @@ public interface ClusterService extends RemoteService {
 
 	/**
 	 * Shares a list of configuration parameters
+	 * 
+	 * @param parameters the parameters to make global
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public void makeGlobal(String[] parameters) throws ServerException;
 
 	/**
 	 * Unshares a list of configuration parameters
+	 * 
+	 * @param parameters the parameters to make local
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public void makeLocal(String[] parameters) throws ServerException;
 
@@ -31,6 +41,7 @@ public interface ClusterService extends RemoteService {
 		public static ClusterServiceAsync get() {
 			if (instance == null) {
 				instance = GWT.create(ClusterService.class);
+				((ServiceDefTarget) instance).setRpcRequestBuilder(new LDRpcRequestBuilder());
 			}
 			return instance;
 		}

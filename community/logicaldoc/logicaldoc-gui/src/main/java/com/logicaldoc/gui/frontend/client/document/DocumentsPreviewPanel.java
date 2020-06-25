@@ -53,7 +53,7 @@ public class DocumentsPreviewPanel extends VLayout {
 				child.destroy();
 			}
 
-			child = new com.logicaldoc.gui.common.client.widgets.PreviewPanel(document);
+			child = new com.logicaldoc.gui.common.client.widgets.preview.PreviewPanel(document);
 			addMember(child);
 		} else
 			reset();

@@ -6,6 +6,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -48,9 +49,6 @@ public class SecurityManagerImpl implements SecurityManager {
 		this.userDAO = userDAO;
 	}
 
-	/**
-	 * @see com.logicaldoc.core.security.SecurityManager#getAllowedGroups(com.logicaldoc.core.security.Menu)
-	 */
 	@Override
 	public Set<Group> getAllowedGroups(long menuId) {
 		Menu menu = menuDAO.findById(menuId);
@@ -70,8 +68,13 @@ public class SecurityManagerImpl implements SecurityManager {
 
 	@Override
 	public boolean isMemberOf(long userId, long groupId) {
-		return userDAO.queryForInt("select count(*) from ld_usergroup where ld_userid=" + userId + " and ld_groupid="
-				+ groupId) > 0;
+		try {
+			return userDAO.queryForInt(
+					"select count(*) from ld_usergroup where ld_userid=" + userId + " and ld_groupid=" + groupId) > 0;
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return false;
+		}
 	}
 
 	@Override

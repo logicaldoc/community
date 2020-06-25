@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.CharacterCodingException;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -31,7 +32,8 @@ public class StringUtil {
 	 * @param src The source string
 	 * @param separator The separator character
 	 * @param tokenSize Size or each token
-	 * @return
+	 * 
+	 * @return the string with separators
 	 */
 	public static String split(String src, char separator, int tokenSize) {
 		StringBuffer sb = new StringBuffer();
@@ -49,7 +51,8 @@ public class StringUtil {
 	 * 
 	 * @param src The source string
 	 * @param tokenSize size of each token
-	 * @return
+	 * 
+	 * @return array of splitted tokens
 	 */
 	public static String[] split(String src, int tokenSize) {
 		ArrayList<String> buf = new ArrayList<String>();
@@ -64,6 +67,13 @@ public class StringUtil {
 
 	/**
 	 * Writes to UFT-8 encoding.
+	 * 
+	 * @param reader the reader over a string
+	 * 
+	 * @return a string with the contents readed from the <code>reader</code>
+	 * 
+	 * @throws IOException raised in case the <code>reader</code> failed to read
+	 *        or if the string cannot be written
 	 */
 	public static String writeToString(Reader reader) throws IOException {
 		return writeToString(reader, "UTF-8");
@@ -75,7 +85,9 @@ public class StringUtil {
 	 * @param reader Attention, this will be closed at the end of invocation
 	 * @param targetEncoding The output string encoding
 	 * @return The encoded string
-	 * @throws IOException
+	 * 
+	 * @throws IOException raised in case the <code>reader</code> is unable to
+	 *         get the contents
 	 */
 	public static String writeToString(Reader reader, String targetEncoding) throws IOException {
 		String enc = "UTF-8";
@@ -129,21 +141,63 @@ public class StringUtil {
 	}
 
 	public static String arrayToString(Object[] a, String separator) {
-		String result = "";
+		StringBuffer result = new StringBuffer("");
 		if (a.length > 0) {
-			result = a[0].toString(); // start with the first element
+			result.append(a[0].toString()); // start with the first element
 			for (int i = 1; i < a.length; i++) {
-				result = result + separator + a[i];
+				result.append(separator);
+				result.append(a[i]);
 			}
 		}
-		return result;
+		return result.toString();
 	}
-	
+
 	public static String collectionToString(Collection<?> collection, String separator) {
 		return String.join(separator, collection.stream().map(o -> o.toString()).collect(Collectors.toList()));
 	}
 
 	public static String removeNonUtf8Chars(String src) throws CharacterCodingException {
 		return src.replace('\uFFFF', ' ').replace('\uD835', ' ');
+	}
+
+	/**
+	 * Check if a given string matches the <code>includes</code> and not the
+	 * <code>excludes</code>
+	 * 
+	 * @param str The string to consider
+	 * @param includes list of includes regular expressions
+	 * @param excludes list of excludes regular expressions
+	 * 
+	 * @return true only if the passed string matches the includes and not the
+	 *         excludes
+	 */
+	public static boolean matches(String str, String[] includes, String[] excludes) {
+		// First of all check if the string must be excluded
+		if (excludes != null && excludes.length > 0)
+			for (String s : excludes)
+				if (StringUtils.isNotEmpty(s) && str.matches(s))
+					return false;
+
+		// Then check if the string must can be included
+		if (includes != null && includes.length > 0)
+			for (String s : includes)
+				if (StringUtils.isNotEmpty(s) && str.matches(s))
+					return true;
+
+		if (includes == null || includes.length == 0)
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * Converts the non latin chars in the nearest ASCII char
+	 * 
+	 * @param src the source string to process
+	 * 
+	 * @return the unaccented string
+	 */
+	public static String unaccent(String src) {
+		return Normalizer.normalize(src, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 	}
 }

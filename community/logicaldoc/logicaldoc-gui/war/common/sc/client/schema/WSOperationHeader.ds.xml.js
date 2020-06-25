@@ -1,0 +1,22 @@
+isc.DataSource.create({
+    allowAdvancedCriteria:true,
+    addGlobalId:false,
+    ID:"WSOperationHeader",
+    fields:[
+        {
+            name:"encoding",
+            validators:[
+            ]
+        },
+        {
+            name:"message",
+            validators:[
+            ]
+        },
+        {
+            name:"part",
+            validators:[
+            ]
+        }
+    ]
+})
