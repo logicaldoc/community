@@ -34,7 +34,7 @@ import com.logicaldoc.web.util.ServletUtil;
  */
 public class ThumbnailServlet extends HttpServlet {
 
-	/** Format can be tile.jpg, thumb.jpg or convert.pdf */
+	/** Format can be tile.jpg, thumb.png or convert.pdf */
 	protected static final String SUFFIX = "suffix";
 
 	public static final String DOC_ID = "docId";
@@ -76,7 +76,7 @@ public class ThumbnailServlet extends HttpServlet {
 			// 1) check if the document exists
 			long docId = Long.parseLong(id);
 			if (StringUtils.isEmpty(suffix))
-				suffix = "thumb.jpg";
+				suffix = ThumbnailManager.SUFFIX_THUMB;
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document doc = docDao.findById(docId);
 			if (doc.getDocRef() != null) {
@@ -123,7 +123,7 @@ public class ThumbnailServlet extends HttpServlet {
 		ThumbnailManager thumbManager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);
 
 		// In any case try to produce the thumbnail
-		String thumbResource = storer.getResourceName(doc, fileVersion, "thumb.jpg");
+		String thumbResource = storer.getResourceName(doc, fileVersion, ThumbnailManager.SUFFIX_THUMB);
 		if (storer.size(doc.getId(), thumbResource) <= 0) {
 			try {
 				thumbManager.createTumbnail(doc, fileVersion, sid);
@@ -133,11 +133,11 @@ public class ThumbnailServlet extends HttpServlet {
 			}
 		}
 
-		if (resource.endsWith("thumb.jpg"))
+		if (resource.endsWith(ThumbnailManager.SUFFIX_THUMB))
 			return;
 
-		if (resource.endsWith("tile.jpg")) {
-			String tileResource = storer.getResourceName(doc, fileVersion, "tile.jpg");
+		if (resource.endsWith(ThumbnailManager.SUFFIX_TILE)) {
+			String tileResource = storer.getResourceName(doc, fileVersion, ThumbnailManager.SUFFIX_TILE);
 			if (storer.size(doc.getId(), tileResource) <= 0L) {
 				try {
 					thumbManager.createTile(doc, fileVersion, sid);
@@ -148,7 +148,7 @@ public class ThumbnailServlet extends HttpServlet {
 			}
 		}
 
-		if (resource.endsWith("tile.jpg"))
+		if (resource.endsWith(ThumbnailManager.SUFFIX_TILE))
 			return;
 	}
 }

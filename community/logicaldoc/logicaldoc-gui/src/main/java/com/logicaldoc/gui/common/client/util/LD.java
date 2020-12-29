@@ -12,7 +12,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.RichTextItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -34,7 +34,7 @@ public class LD {
 	 * Show a dialog to confirm a operation
 	 * 
 	 * @param title title of the dialog box
-	 * @param message text printed in the body of the dialog box 
+	 * @param message text printed in the body of the dialog box
 	 * @param width width dimension expressed in pixels
 	 * @param callback a call back invoked when the user confirm his choice
 	 */
@@ -271,7 +271,7 @@ public class LD {
 		dialog.setCanDragResize(false);
 		dialog.setCanDrag(true);
 		dialog.centerInPage();
-		dialog.setTitle(title);
+		dialog.setTitle(I18N.message(title));
 		if (width != null)
 			dialog.setWidth(width);
 		else
@@ -294,7 +294,11 @@ public class LD {
 		item.setName("value");
 		item.setTitle(I18N.message(message));
 		item.setWrapTitle(false);
-		if (!(item instanceof TextAreaItem))
+		if (!(item instanceof TextAreaItem) && !(item instanceof RichTextItem))
+			/*
+			 * In case of simple input item, when the user presses the Enter key,
+			 * we consider he wants to confirm the input
+			 */
 			item.addKeyPressHandler(new KeyPressHandler() {
 				@Override
 				public void onKeyPress(KeyPressEvent event) {
@@ -369,5 +373,11 @@ public class LD {
 
 	public static void askforString(String title, String message, String defaultValue, final ValueCallback callback) {
 		askForValue(title, message, defaultValue, new TextItem(), null, callback);
+	}
+	
+	public static void askforStringMandatory(String title, String message, String defaultValue, final ValueCallback callback) {
+		TextItem item = new TextItem();
+		item.setRequired(true);
+		askForValue(title, message, defaultValue, item, null, callback);
 	}
 }

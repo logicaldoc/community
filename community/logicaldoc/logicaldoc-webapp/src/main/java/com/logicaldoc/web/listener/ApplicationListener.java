@@ -28,6 +28,7 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LoggingConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.dbinit.DBInit;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
@@ -44,11 +45,18 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 	public static boolean needRestart = false;
 
+	public static boolean pidCreated = false;
+
 	/**
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */
 	public void contextDestroyed(ServletContextEvent sce) {
-		onShutdown();
+		try {
+			onShutdown();
+		} finally {
+			if (pidCreated)
+				FileUtil.strongDelete(getPidFile());
+		}
 	}
 
 	public static void onShutdown() {
@@ -103,9 +111,9 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 						&& !Thread.currentThread().equals(t) && !t.isInterrupted())
 					try {
 						t.interrupt();
-						log.warn("Killed thread " + t.getName());
+						log.warn("Killed thread {}", t.getName());
 					} catch (Throwable e) {
-						log.warn("Error killing " + t.getName());
+						log.warn("Error killing {}", t.getName());
 					}
 			}
 		}
@@ -117,101 +125,105 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
 	public void contextInitialized(ServletContextEvent sce) {
-		ServletContext context = sce.getServletContext();
-
-		// Initialize logging
-		String log4jPath = null;
 		try {
-			URL configFile = null;
+			ServletContext context = sce.getServletContext();
+
+			// Initialize logging
+			String log4jPath = null;
 			try {
-				configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
-			} catch (Throwable t) {
+				URL configFile = null;
+				try {
+					configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
+				} catch (Throwable t) {
+				}
+
+				if (configFile == null)
+					configFile = LoggingConfigurator.class.getClassLoader().getResource("log.xml");
+
+				log4jPath = URLDecoder.decode(configFile.getPath(), "UTF-8");
+
+				// Setup the correct logs folder
+				ContextProperties config = new ContextProperties();
+				LoggingConfigurator lconf = new LoggingConfigurator();
+				lconf.setLogsRoot(config.getProperty("conf.logdir"));
+				lconf.write();
+
+				// Init the logs
+				Log4jConfigurer.initLogging(log4jPath);
+			} catch (Throwable e) {
+				e.printStackTrace();
 			}
 
-			if (configFile == null)
-				configFile = LoggingConfigurator.class.getClassLoader().getResource("log.xml");
-
-			log4jPath = URLDecoder.decode(configFile.getPath(), "UTF-8");
-
-			// Setup the correct logs folder
-			ContextProperties config = new ContextProperties();
-			LoggingConfigurator lconf = new LoggingConfigurator();
-			lconf.setLogsRoot(config.getProperty("conf.logdir"));
-			lconf.write();
-
-			// Init the logs
-			Log4jConfigurer.initLogging(log4jPath);
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-
-		// Update the web descriptor with the correct transport guarantee
-		try {
-			ContextProperties conf = new ContextProperties();
-			String policy = "true".equals(conf.getProperty("ssl.required")) ? "CONFIDENTIAL" : "NONE";
-			WebConfigurator configurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
-			if (configurator.setTransportGuarantee(policy)) {
-				PluginRegistry.getInstance().setRestartRequired();
+			// Update the web descriptor with the correct transport guarantee
+			try {
+				ContextProperties conf = new ContextProperties();
+				String policy = "true".equals(conf.getProperty("ssl.required")) ? "CONFIDENTIAL" : "NONE";
+				WebConfigurator configurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
+				if (configurator.setTransportGuarantee(policy)) {
+					PluginRegistry.getInstance().setRestartRequired();
+				}
+			} catch (Throwable e) {
+				e.printStackTrace();
 			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
 
-		// Prepare the plugins dir
-		String pluginsDir = context.getRealPath("/WEB-INF/lib");
+			// Prepare the plugins dir
+			String pluginsDir = context.getRealPath("/WEB-INF/lib");
 
-		// Initialize plugins
-		PluginRegistry.getInstance().init(pluginsDir);
+			// Initialize plugins
+			PluginRegistry.getInstance().init(pluginsDir);
 
-		// Reinitialize logging because some plugins may have added new
-		// categories
-		try {
-			Log4jConfigurer.shutdownLogging();
-			Log4jConfigurer.initLogging(log4jPath);
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
+			// Reinitialize logging because some plugins may have added new
+			// categories
+			try {
+				Log4jConfigurer.shutdownLogging();
+				Log4jConfigurer.initLogging(log4jPath);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
 
-		// Clean some temporary folders
-		File tempDirToDelete = new File(context.getRealPath("upload"));
-		try {
-			if (tempDirToDelete.exists())
-				FileUtils.forceDelete(tempDirToDelete);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+			// Clean some temporary folders
+			File tempDirToDelete = new File(context.getRealPath("upload"));
+			try {
+				if (tempDirToDelete.exists())
+					FileUtils.forceDelete(tempDirToDelete);
+			} catch (IOException e) {
+				log.warn(e.getMessage());
+			}
 
-		tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/upload");
-		try {
-			if (tempDirToDelete.exists())
-				FileUtils.forceDelete(tempDirToDelete);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+			tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/upload");
+			try {
+				if (tempDirToDelete.exists())
+					FileUtils.forceDelete(tempDirToDelete);
+			} catch (IOException e) {
+				log.warn(e.getMessage());
+			}
 
-		tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/convertjpg");
-		try {
-			if (tempDirToDelete.exists())
-				FileUtils.forceDelete(tempDirToDelete);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+			tempDirToDelete = new File(System.getProperty("java.io.tmpdir") + "/convertjpg");
+			try {
+				if (tempDirToDelete.exists())
+					FileUtils.forceDelete(tempDirToDelete);
+			} catch (IOException e) {
+				log.warn(e.getMessage());
+			}
 
-		// Initialize the Automation
-		Automation.initialize();
+			// Initialize the Automation
+			Automation.initialize();
 
-		// Try to unpack new plugins
-		try {
-			unpackPlugins(context);
-		} catch (IOException e) {
-			log.warn(e.getMessage());
-		}
+			// Try to unpack new plugins
+			try {
+				unpackPlugins(context);
+			} catch (IOException e) {
+				log.warn(e.getMessage());
+			}
 
-		needRestart = PluginRegistry.getInstance().isRestartRequired();
+			needRestart = PluginRegistry.getInstance().isRestartRequired();
 
-		if (needRestart) {
-			log.warn("The application has to be restarted");
-			System.out.println("The application has to be restarted");
+			if (needRestart) {
+				log.warn("The application has to be restarted");
+				System.out.println("The application has to be restarted");
+			}
+		} finally {
+			writePidFile();
 		}
 	}
 
@@ -285,6 +297,30 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		} catch (IOException e) {
 			log.warn(e.getMessage());
 			e.printStackTrace();
+		}
+	}
+
+	private void writePidFile() {
+		File pidFile = getPidFile();
+		if (pidFile.exists())
+			return;
+		long pid = ProcessHandle.current().pid();
+		try {
+			FileUtils.touch(pidFile);
+			FileUtil.writeFile("" + pid, pidFile.getPath());
+			pidCreated = true;
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	private File getPidFile() {
+		try {
+			ContextProperties config = new ContextProperties();
+			return new File(config.getProperty("LDOCHOME") + "/bin/pid");
+		} catch (Throwable t) {
+			return new File("pid");
 		}
 	}
 }

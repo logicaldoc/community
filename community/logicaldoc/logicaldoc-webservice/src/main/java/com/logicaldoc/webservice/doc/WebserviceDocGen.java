@@ -23,7 +23,10 @@ public class WebserviceDocGen {
 		List<Class<?>> services = new ArrayList<Class<?>>();
 		for (int i = 2; i < args.length; i++) {
 			try {
-				services.add(WebserviceDocGen.class.forName(args[i]));
+				String name = args[i];
+				if (!name.startsWith("com.logicaldoc."))
+					name = "com.logicaldoc." + args[i];
+				services.add(WebserviceDocGen.class.forName(name));
 			} catch (Throwable t) {
 				t.printStackTrace();
 			}
@@ -40,8 +43,8 @@ public class WebserviceDocGen {
 	public void indexPage(String release, File outputDir, List<Class<?>> services) throws IOException {
 		outputDir.mkdirs();
 
-		FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine.createEngine(
-				new SimpleJavaNameDisplayStrategy(), "/wsdocindex.ftl");
+		FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine
+				.createEngine(new SimpleJavaNameDisplayStrategy(), "/wsdocindex.ftl");
 
 		WebServiceStubSet serviceStubSet = new WebServiceStubSet();
 		serviceStubSet.setRelease(release);
@@ -69,8 +72,8 @@ public class WebserviceDocGen {
 
 		outputDir.mkdirs();
 
-		FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine.createEngine(
-				new SimpleJavaNameDisplayStrategy(), "/wsdoc.ftl");
+		FreemarkerWebServiceDisplayEngine displayEngine = ClasspathFreemarkerWebServiceDisplayEngine
+				.createEngine(new SimpleJavaNameDisplayStrategy(), "/wsdoc.ftl");
 
 		String html = displayEngine.displayWebService(serviceStubSet);
 		String fileName = webServiceClass.getSimpleName();

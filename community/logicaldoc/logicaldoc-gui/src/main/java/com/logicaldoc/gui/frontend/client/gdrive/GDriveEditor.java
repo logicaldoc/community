@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -105,7 +106,10 @@ public class GDriveEditor extends Window {
 	private void reloadBody() {
 		String url = "https://docs.google.com/document/d/" + document.getExtResId() + "/edit?hl="
 				+ Session.get().getUser().getLanguage();
-
+		if (Util.isSpreadsheetFile(document.getFileName()))
+			url = "https://docs.google.com/spreadsheets/d/" + document.getExtResId() + "/edit?hl="
+					+ Session.get().getUser().getLanguage();
+		
 		String iframe = "<iframe src='" + url + "' style='border: 0px solid white; width:" + (getWidth() - 18)
 				+ "px; height:" + (getHeight() - 68) + "px' scrolling='no'></iframe>";
 		html.setContents(iframe);

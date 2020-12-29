@@ -27,20 +27,25 @@ public class DocumentsPreviewPanel extends VLayout {
 
 	protected Label selectLabel;
 
-	protected String widthCookieName = CookiesManager.COOKIE_DOCSLIST_PREV_W;
+	protected String widthCookieName;
 
 	public DocumentsPreviewPanel() {
+		this(CookiesManager.COOKIE_DOCSLIST_PREV_W);
+	}
+
+	public DocumentsPreviewPanel(String widthCookieName) {
+		this.widthCookieName = widthCookieName;
 		setAlign(Alignment.CENTER);
 		selectLabel = new Label("&nbsp;" + selectLabelString);
 		selectLabel.setOverflow(Overflow.HIDDEN);
-		
+
 		setInitialSize();
 		reset();
-		
+
 		addResizedHandler(new ResizedHandler() {
 			@Override
 			public void onResized(ResizedEvent event) {
-				if ("true".equals(Session.get().getConfig("gui.preview.openpanel")))
+				if (getWidth() > 1)
 					Offline.put(widthCookieName, getWidthAsString());
 			}
 		});

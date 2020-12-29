@@ -21,8 +21,8 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.EventPanel;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -31,13 +31,16 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
 public class Util {
-	public static String[] OFFICE_EXTS = new String[] { ".doc", ".xls", ".xlsm", ".ppt", ".docx", ".docxm", ".xlsx",
-			".xlsm", ".pptx", ".rtf", ".odt", ".ods", ".odp" };
+	public static String[] OFFICE_EXTS = new String[] { ".doc", ".xls", ".xlsm", ".ppt", ".docx", ".docxm", ".dotm",
+			".xlsx", ".xlsm", ".pptx", ".rtf", ".odt", ".ods", ".odp" };
 
-	public static String[] IMAGE_EXTS = new String[] { ".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png", ".jfif" };
+	public static String[] SPREADSHEET_EXTS = new String[] { ".xls", ".xlsm", ".xlsx", ".xlsm", ".ods" };
+
+	public static String[] IMAGE_EXTS = new String[] { ".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png",
+			".jfif", ".webp" };
 
 	public static String[] VIDEO_EXTS = new String[] { ".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov", ".rm",
-			".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv" };
+			".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v" };
 
 	public static String[] AUDIO_EXTS = new String[] { ".mp3", ".m4p", ".m4a", ".wav" };
 
@@ -203,7 +206,7 @@ public class Util {
 	}
 
 	public static String tileUrl(long docId, String fileVersion) {
-		return thumbnailUrl(docId, fileVersion) + "&suffix=tile.jpg";
+		return thumbnailUrl(docId, fileVersion) + "&suffix=tile.png";
 	}
 
 	public static String tileImageHTML(long docId, String fileVersion, Integer width, Integer height) {
@@ -286,6 +289,15 @@ public class Util {
 	public static boolean isOfficeFile(String fileName) {
 		String tmp = fileName.toLowerCase();
 		for (String ext : OFFICE_EXTS) {
+			if (tmp.endsWith(ext))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean isSpreadsheetFile(String fileName) {
+		String tmp = fileName.toLowerCase();
+		for (String ext : SPREADSHEET_EXTS) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -681,10 +693,10 @@ public class Util {
 			url = url.replace("&", "_y_");
 			url = url.replace(",", "_z_");
 			WindowUtils.openUrl("ldwebstart:" + url);
-			ToastNotification.showNotification(I18N.message("webstarthintlauncher"));
+			EventPanel.get().info(I18N.message("webstarthintlauncher"), null);
 		} else {
 			WindowUtils.openUrl(url, "_self");
-			ToastNotification.showNotification(I18N.message("webstarthint", url));
+			EventPanel.get().info(I18N.message("webstarthint"), null);
 		}
 	}
 
@@ -754,12 +766,11 @@ public class Util {
 
 					stringBuilder.append("\"");
 					if (listGridField.getType().equals(ListGridFieldType.DATE)) {
-						stringBuilder.append(I18N.formatDateShort(record.getAttributeAsDate(listGridField.getName())));
+						Date val = record.getAttributeAsDate(listGridField.getName());
+						stringBuilder.append(val == null ? "" : I18N.formatDateShort(val));
 					} else {
-						if (record.getAttribute(listGridField.getName()) != null)
-							stringBuilder.append(record.getAttribute(listGridField.getName()));
-						else
-							stringBuilder.append("");
+						Object val = record.getAttribute(listGridField.getName());
+						stringBuilder.append(val == null || "null".equals(val.toString()) ? "" : val.toString());
 					}
 					stringBuilder.append("\";");
 				} catch (Throwable t) {
@@ -1059,6 +1070,26 @@ public class Util {
 		} catch (RequestException e) {
 
 		}
+	}
+
+	/**
+	 * Formats a set of tags into an HTML grid
+	 * 
+	 * @param tags the tags to format
+	 * 
+	 * @return the HTML content
+	 */
+	public static String getTagsHTML(String[] tags) {
+		StringBuffer buf = new StringBuffer(
+				"<div style='display: grid; grid-gap: 2px; padding: 1px; grid-auto-flow: row dense; grid-template-columns: auto auto auto; grid-template-rows: auto auto;'>");
+		if (tags != null)
+			for (String tag : tags) {
+				buf.append("<span class='button' style='white-space: nowrap;'>");
+				buf.append(tag);
+				buf.append("</span>");
+			}
+		buf.append("</div>");
+		return buf.toString();
 	}
 
 	public static native String getJavascriptVariable(String jsVar)/*-{

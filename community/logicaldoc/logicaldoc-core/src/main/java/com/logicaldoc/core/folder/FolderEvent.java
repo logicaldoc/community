@@ -24,7 +24,8 @@ public enum FolderEvent {
 	RESTORED("event.folder.restored"),
 	EXPORTED("event.folder.exported"),
 	SUBSCRIBED("event.folder.subscribed"),
-	QUOTA_OVERTHRESHOLD("event.folder.quota.overthreshold");
+	QUOTA_OVERTHRESHOLD("event.folder.quota.overthreshold"),
+	ALIAS_CREATED("event.folder.alias.created");
 	
     private String event;
 

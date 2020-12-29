@@ -200,7 +200,7 @@ public class PDFParserTest extends AbstractCoreTCase {
 
 		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-		String content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+		pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 
 		inputFile = "src/test/resources/fillablePDF1.pdf";
 		file = new File(inputFile);
@@ -208,9 +208,6 @@ public class PDFParserTest extends AbstractCoreTCase {
 
 		parser = ParserFactory.getParser(filename);
 		pdfp = (PDFParser) parser;
-		content = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
-		
-		System.out.println(content);
-
+		pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 	}
 }

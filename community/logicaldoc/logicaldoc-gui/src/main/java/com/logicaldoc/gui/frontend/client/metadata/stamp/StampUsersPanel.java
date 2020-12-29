@@ -58,7 +58,7 @@ public class StampUsersPanel extends VLayout {
 
 		// Prepare the list for adding a new user
 		final DynamicForm userForm = new DynamicForm();
-		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true);
+		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		user.setMultiple(true);
 		user.addChangedHandler(new ChangedHandler() {
 

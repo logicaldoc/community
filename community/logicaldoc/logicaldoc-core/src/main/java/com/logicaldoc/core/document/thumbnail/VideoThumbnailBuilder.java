@@ -38,7 +38,6 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 				writeVideoFrame(src, frameImage);
 
 			ImageThumbnailBuilder imageTBuilder = new ImageThumbnailBuilder();
-			FileUtils.copyFile(frameImage, new File("C:\\tmp\\frame.png"));
 			imageTBuilder.buildThumbnail(sid, document, fileVersion, frameImage, dest, size, quality);
 		} catch (Throwable e) {
 			throw new IOException("Error in extracting video frame", e);

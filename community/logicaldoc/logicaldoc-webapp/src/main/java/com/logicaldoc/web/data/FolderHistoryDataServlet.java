@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.hsqldb.lib.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,10 @@ public class FolderHistoryDataServlet extends HttpServlet {
 			response.setHeader("Cache-Control", "no-store");
 			response.setDateHeader("Expires", 0);
 
+			int max = Context.get().getProperties().getInt(session.getTenantName() + ".gui.maxhistories", 100);
+			if (StringUtils.isNotEmpty(request.getParameter("max")))
+				max = Integer.parseInt(request.getParameter("max"));
+			
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
@@ -60,13 +65,12 @@ public class FolderHistoryDataServlet extends HttpServlet {
 					"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason from FolderHistory A where A.deleted = 0 ");
 			if (request.getParameter("id") != null)
 				query.append(" and A.folderId=" + request.getParameter("id"));
-
 			query.append(" order by A.date desc ");
 
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 			df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, null);
+			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, max);
 
 			/*
 			 * Iterate over records composing the response XML document

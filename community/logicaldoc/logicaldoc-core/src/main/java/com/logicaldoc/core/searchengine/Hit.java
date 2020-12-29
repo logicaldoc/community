@@ -59,7 +59,7 @@ public class Hit extends Document implements Comparable<Hit> {
 					return 0;
 				}
 			} else
-				return -1 * (new Integer(this.score).compareTo(new Integer(other.score)));
+				return -1 * (Integer.valueOf(this.score).compareTo(Integer.valueOf(other.score)));
 		} catch (Throwable t) {
 			return 0;
 		}

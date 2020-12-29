@@ -184,7 +184,7 @@ public class CalendarEventDialog extends Window {
 		DynamicForm form = new DynamicForm();
 		form.setTitleOrientation(TitleOrientation.LEFT);
 		form.setNumCols(4);
-		final SelectItem newUser = ItemFactory.newUserSelector("user", "adduser", null, true);
+		final SelectItem newUser = ItemFactory.newUserSelector("user", "adduser", null, true, true);
 		newUser.addChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {

@@ -11,6 +11,7 @@ public interface ShareFileServiceAsync {
 
 	void loadSettings(AsyncCallback<String[]> callback);
 
-	void saveSettings(String hostname, String username, String password, AsyncCallback<Void> callback);
+	void authorize(String clientId, String clientSecret, AsyncCallback<String> callback);
 
+	void isAuthorized(AsyncCallback<Boolean> callback);
 }

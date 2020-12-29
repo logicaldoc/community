@@ -51,7 +51,7 @@ public class ReportUploader extends Window {
 			setTitle(I18N.message("newreport"));
 		setWidth(460);
 
-		setHeight(report != null ? 120 : 185);
+		setAutoSize(true);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);

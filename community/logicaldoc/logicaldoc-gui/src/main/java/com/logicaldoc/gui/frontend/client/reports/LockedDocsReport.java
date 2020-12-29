@@ -66,7 +66,7 @@ public class LockedDocsReport extends AdminPanel {
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 
-		userSelector = ItemFactory.newUserSelector("user", "user", null, false);
+		userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(100);
 		userSelector.addChangedHandler(new ChangedHandler() {

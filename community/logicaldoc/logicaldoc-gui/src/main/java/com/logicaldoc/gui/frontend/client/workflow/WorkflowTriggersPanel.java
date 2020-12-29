@@ -1,28 +1,23 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.WorkflowTriggersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.SubmitItem;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -30,7 +25,6 @@ import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.layout.VStack;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -46,10 +40,6 @@ public class WorkflowTriggersPanel extends VLayout {
 	private ListGrid list;
 
 	private GUIFolder folder;
-
-	private SelectItem workflows = null;
-
-	private SelectItem templates = null;
 
 	public WorkflowTriggersPanel(final GUIFolder folder) {
 		this.folder = folder;
@@ -93,95 +83,9 @@ public class WorkflowTriggersPanel extends VLayout {
 		addTrigger.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				final Window window = new Window();
-				window.setTitle(I18N.message("workflowtriggertext"));
-				window.setCanDragResize(true);
-				window.setIsModal(true);
-				window.setShowModalMask(true);
-				window.centerInPage();
-				window.setAutoSize(true);
-
-				VStack layout = new VStack(5);
-
-				// Workflows list
-				DynamicForm workflowForm = new DynamicForm();
-				workflowForm.setAlign(Alignment.LEFT);
-				workflowForm.setTitleOrientation(TitleOrientation.LEFT);
-				workflowForm.setNumCols(2);
-				workflowForm.setColWidths(110, "*");
-
-				workflows = ItemFactory.newWorkflowSelector();
-				workflows.setColSpan(2);
-				workflows.setEndRow(true);
-				workflows.setRequired(true);
-				workflowForm.setItems(workflows);
-
-				// Templates list
-				DynamicForm templateForm = new DynamicForm();
-				templateForm.setAlign(Alignment.LEFT);
-				templateForm.setTitleOrientation(TitleOrientation.LEFT);
-				templateForm.setNumCols(2);
-				templateForm.setColWidths(110, "*");
-
-				templates = ItemFactory.newTemplateSelector(true, null);
-				templates.setWrapTitle(false);
-				templates.setColSpan(2);
-				templates.setEndRow(true);
-				templates.setWidth(200);
-				templates.setMultipleAppearance(MultipleAppearance.GRID);
-				templateForm.setItems(templates);
-
-				final RadioGroupItem checkin = ItemFactory.newBooleanSelector("checkin",
-						I18N.message("triggerateverycheckin"));
-				checkin.setValue("no");
-				checkin.setWrapTitle(false);
-
-				DynamicForm form = new DynamicForm();
-				form.setTitleOrientation(TitleOrientation.LEFT);
-
-				SubmitItem saveButton = new SubmitItem("save", I18N.message("save"));
-				saveButton.setAlign(Alignment.LEFT);
-				saveButton.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-					@Override
-					public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-						String workflowSelectedId = "";
-						if (workflows.getValue() != null) {
-							workflowSelectedId = workflows.getValue().toString();
-
-							String templateSelectedId = "";
-							if (templates.getValue() != null) {
-								templateSelectedId = templates.getValueAsString();
-							}
-
-							WorkflowService.Instance.get().saveTrigger(Long.toString(getFolder().getId()),
-									workflowSelectedId, templateSelectedId,
-									"yes".equals(checkin.getValueAsString()) ? 1 : 0, new AsyncCallback<Void>() {
-										@Override
-										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
-										}
-
-										@Override
-										public void onSuccess(Void result) {
-											removeMember(list);
-											refresh();
-											window.destroy();
-										}
-									});
-						} else {
-							SC.warn(I18N.message("workflowselection"));
-						}
-					}
-				});
-
-				form.setFields(checkin, saveButton);
-
-				layout.addMember(workflowForm);
-				layout.addMember(templateForm);
-				layout.addMember(form);
-
-				window.addItem(layout);
-				window.show();
+				list.deselectAllRecords();
+				TriggerDialog dialog = new TriggerDialog(WorkflowTriggersPanel.this);
+				dialog.show();
 			}
 		});
 
@@ -189,17 +93,47 @@ public class WorkflowTriggersPanel extends VLayout {
 		addMember(buttons);
 	}
 
-	private void refresh() {
+	void refresh() {
+		if(list!=null)
+			removeMember(list);
+		
 		ListGridField workflow = new ListGridField("workflow", I18N.message("workflow"), 200);
 		workflow.setCanFilter(true);
 
 		ListGridField template = new ListGridField("template", I18N.message("template"), 200);
 		template.setCanFilter(true);
 
-		ListGridField checkin = new ListGridField("triggerAtCheckin", I18N.message("triggeratcheckin"));
-		checkin.setCanFilter(false);
-		checkin.setAlign(Alignment.LEFT);
-		checkin.setWidth("*");
+		ListGridField events = new ListGridField("events", I18N.message("triggeron"));
+		events.setCanFilter(false);
+		events.setAlign(Alignment.LEFT);
+		events.setWidth("*");
+		events.setCanEdit(false);
+		events.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				try {
+					if (value != null && !value.toString().isEmpty()) {
+						// Translate the set of events
+						String[] key = null;
+
+						if (!value.toString().contains(","))
+							key = new String[] { value.toString().trim() };
+						else
+							key = value.toString().split(",");
+						List<String> labels = new ArrayList<String>();
+						for (String string : key) {
+							labels.add(I18N.message(string + ".short"));
+						}
+						String str = labels.toString().substring(1);
+						return str.substring(0, str.length() - 1);
+					} else
+						return "";
+				} catch (Throwable e) {
+					return "";
+				}
+			}
+		});
 
 		list = new ListGrid() {
 			@Override
@@ -217,7 +151,7 @@ public class WorkflowTriggersPanel extends VLayout {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(false);
 		list.setDataSource(new WorkflowTriggersDS("" + folder.getId()));
-		list.setFields(workflow, template, checkin);
+		list.setFields(workflow, template, events);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -261,11 +195,24 @@ public class WorkflowTriggersPanel extends VLayout {
 			}
 		});
 
-		contextMenu.setItems(deleteTrigger);
+		MenuItem edit = new MenuItem();
+		edit.setTitle(I18N.message("edit"));
+		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				TriggerDialog dialog = new TriggerDialog(WorkflowTriggersPanel.this);
+				dialog.show();
+			}
+		});
+
+		contextMenu.setItems(edit, deleteTrigger);
 		contextMenu.showContextMenu();
 	}
 
 	public GUIFolder getFolder() {
 		return folder;
+	}
+
+	public ListGridRecord getSelectedRecord() {
+		return list.getSelectedRecord();
 	}
 }

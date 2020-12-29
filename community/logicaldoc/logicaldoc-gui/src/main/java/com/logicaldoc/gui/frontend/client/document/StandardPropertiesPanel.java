@@ -15,15 +15,18 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewTile;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -32,6 +35,8 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -140,12 +145,31 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		if (comment != null && !"".equals(comment))
 			version.setTooltip(comment);
 
-		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(document.getPathExtended(), 40));
+		String path = document.getPathExtended();
+
+		FormItemIcon copyPath = new FormItemIcon();
+		copyPath.setPrompt(I18N.message("copypath"));
+		copyPath.setSrc("[SKIN]/page_white_paste.png");
+		copyPath.setWidth(16);
+		copyPath.setHeight(16);
+		copyPath.addFormItemClickHandler(new FormItemClickHandler() {
+			public void onFormItemClick(final FormItemIconClickEvent event) {
+				LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
+					@Override
+					public void execute(final String value) {
+					}
+				});
+				event.cancel();
+			}
+		});
+
+		LinkItem folder = ItemFactory.newLinkItem("folder", Util.padLeft(path, 40));
 		folder.setTitle(I18N.message("folder"));
 		folder.setValue(Util.displayURL(null, document.getFolder().getId()));
 		folder.setTooltip(document.getPathExtended());
 		folder.setWrap(false);
 		folder.setWidth(DEFAULT_ITEM_WIDTH);
+		folder.setIcons(copyPath);
 
 		String downloadUrl = Util.downloadURL(document.getDocRef() != null ? document.getDocRef() : document.getId());
 		String displayUrl = Util.displayURL(document.getDocRef() != null ? document.getDocRef() : document.getId(),
@@ -190,6 +214,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		StaticTextItem rating = ItemFactory.newStaticTextItem("rating", "rating",
 				document.getRating() > 0 ? DocUtil.getRatingIcon(document.getRating())
 						: I18N.message("ratethisdocument"));
+		rating.setEndRow(true);
 		if (updateEnabled)
 			rating.addClickHandler(new ClickHandler() {
 
@@ -215,6 +240,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		rating.setDisabled(!updateEnabled);
 
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, false);
+		language.setEndRow(true);
 		language.addChangedHandler(changedHandler);
 		language.setDisabled(!updateEnabled);
 		language.setValue(document.getLanguage());
@@ -225,10 +251,12 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 			final TagsDS ds = new TagsDS(null, true, document.getId(), null);
 
 			tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) document.getTags());
+			tagItem.setEndRow(true);
 			tagItem.setDisabled(!updateEnabled);
 			tagItem.addChangedHandler(changedHandler);
 
 			final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
+			newTagItem.setEndRow(true);
 			newTagItem.setRequired(false);
 			newTagItem.addKeyPressHandler(new KeyPressHandler() {
 				@Override
@@ -286,7 +314,35 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 				}
 			});
 
+			final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
+					Util.getTagsHTML(document.getTags()));
+			tagsString.setEndRow(true);
+
+			FormItemIcon editTags = new FormItemIcon();
+			editTags.setPrompt(I18N.message("edittags"));
+			editTags.setSrc("[SKIN]/actions/edit.png");
+			editTags.setWidth(16);
+			editTags.setHeight(16);
+			editTags.addFormItemClickHandler(new FormItemClickHandler() {
+				public void onFormItemClick(final FormItemIconClickEvent event) {
+					tagsString.setVisible(false);
+					tagItem.setVisible(true);
+					tagItem.setEndRow(true);
+					if (items.contains(newTagItem)) {
+						newTagItem.setVisible(true);
+						newTagItem.setEndRow(true);
+					}
+					form2.redraw();
+				}
+			});
+
+			if (updateEnabled)
+				tagsString.setIcons(editTags);
+
+			items.add(tagsString);
 			items.add(tagItem);
+			tagItem.setVisible(false);
+			newTagItem.setVisible(false);
 			if ("free".equals(mode) && updateEnabled)
 				items.add(newTagItem);
 		}

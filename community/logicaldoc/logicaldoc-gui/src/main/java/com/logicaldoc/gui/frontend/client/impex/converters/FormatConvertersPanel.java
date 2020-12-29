@@ -336,9 +336,16 @@ public class FormatConvertersPanel extends AdminPanel {
 		final Set<String> settingNames = new TreeSet<String>();
 
 		for (Record rec : associationsGrid.getRecordList().toArray()) {
-			String id = rec.getAttributeAsString("id").trim();
-			String converter = rec.getAttributeAsString("converter").trim();
-			settings.add(new GUIParameter(SETTING_PREFIX + id, converter));
+			try {
+				String id = rec.getAttributeAsString("id").trim();
+				String converter = rec.getAttributeAsString("converter").trim();
+				settings.add(new GUIParameter(SETTING_PREFIX + id, converter));
+			} catch (Throwable t) {
+				/*
+				 * the extensions table is lazy loaded so we may have null
+				 * pointers here, in this case just skip
+				 */
+			}
 		}
 
 		for (Record rec : settingsGrid.getRecordList().toArray()) {

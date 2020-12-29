@@ -53,8 +53,7 @@ public class ExportContextImpl extends AbstractExportContext {
 			try {
 				// clean up the stream retrieved by the preceeding handler, that
 				// did not behave properly and failed to export although
-				// initially
-				// willing to handle the export.
+				// initially willing to handle the export.
 				if (outStream != null) {
 					outStream.close();
 				}

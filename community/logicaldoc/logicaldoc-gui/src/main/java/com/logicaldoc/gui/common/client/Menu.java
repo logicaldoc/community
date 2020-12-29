@@ -73,6 +73,8 @@ public class Menu {
 
 	public static final long FOLDER_INTERFACE = 11;
 	
+	public static final long DROP_SPOT = 12;
+	
 	public static final long CUSTOM_ID = 17;
 
 	public static final long METADATA = 25;
@@ -125,6 +127,8 @@ public class Menu {
 
 	public static final long ZOHO = -2120;
 
+	public static final long DOCUSIGN = -2125;
+	
 	public static final long SYSTEM = 80;
 
 	public static final long GENERAL = 70;

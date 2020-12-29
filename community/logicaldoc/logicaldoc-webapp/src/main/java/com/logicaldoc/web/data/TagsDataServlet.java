@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -67,6 +68,10 @@ public class TagsDataServlet extends HttpServlet {
 			if (request.getParameter("folderId") != null)
 				folderId = Long.parseLong(request.getParameter("folderId"));
 
+			long max = 1000L;
+			if (request.getParameter("max") != null)
+				max = Long.parseLong(request.getParameter("max"));
+
 			HashMap<String, Long> tgs = new HashMap<String, Long>();
 
 			if (("preset".equals(firstLetter) || "preset".equals(mode)) && "true".equals(editing)) {
@@ -83,6 +88,13 @@ public class TagsDataServlet extends HttpServlet {
 				tgs = (HashMap<String, Long>) docDao.findTags(null, session.getTenantId());
 			}
 
+			List<String> words = new ArrayList<String>(tgs.keySet());
+			Collections.sort(words);
+
+			// Limit the collection
+			if (words.size() > max)
+				words = words.stream().limit(max).collect(Collectors.toList());
+
 			if (docId != null) {
 				List<String> tags = docDao.findTags(docId);
 
@@ -90,9 +102,12 @@ public class TagsDataServlet extends HttpServlet {
 				 * In case a document was specified we have to enrich the list
 				 * with the document's tags
 				 */
-				for (String tag : tags)
+				for (String tag : tags) {
 					if (!tgs.containsKey(tag))
 						tgs.put(tag, 1L);
+					if (!words.contains(tag))
+						words.add(tag);
+				}
 			}
 
 			if (folderId != null) {
@@ -102,17 +117,17 @@ public class TagsDataServlet extends HttpServlet {
 				 * In case a folder was specified we have to enrich the list
 				 * with the folder's tags
 				 */
-				for (String tag : tags)
+				for (String tag : tags) {
 					if (!tgs.containsKey(tag))
 						tgs.put(tag, 1L);
+					if (!words.contains(tag))
+						words.add(tag);
+				}
 			}
 
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 			int i = 0;
-
-			List<String> words = new ArrayList<String>(tgs.keySet());
-			Collections.sort(words);
 
 			for (String tag : words) {
 				writer.print("<tag>");

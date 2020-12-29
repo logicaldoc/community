@@ -21,7 +21,7 @@
    </bean>
     
    <!-- System Load Monitor -->
-   <bean id="SystemLoadMonitor" abstract="false" autowire="default" class="${load}" lazy-init="default" init-method="start">
+   <bean id="SystemLoadMonitor" abstract="false" autowire="default" class="${load}" lazy-init="default" init-method="start" destroy-method="stop">
       <property name="config" ref="ContextProperties" />
    </bean>
    

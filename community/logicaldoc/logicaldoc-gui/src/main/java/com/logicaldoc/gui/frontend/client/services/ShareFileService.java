@@ -32,17 +32,6 @@ public interface ShareFileService extends RemoteService {
 	public int importDocuments(long targetFolder, String[] itemIds) throws ServerException;
 
 	/**
-	 * Save the settings used by the FileShare module
-	 * 
-	 * @param hostname name of the host
-	 * @param username username
-	 * @param password password
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public void saveSettings(String hostname, String username, String password) throws ServerException;
-
-	/**
 	 * Retrieve the settings saved for connecting to FileShare
 	 * 
 	 * @return the settings
@@ -50,6 +39,28 @@ public interface ShareFileService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public String[] loadSettings() throws ServerException;
+
+	/**
+	 * Saves the settings into the database and returns the authorization URL
+	 * the user must be redirected to.
+	 * 
+	 * @param clientId the client identifier
+	 * @param clientSecret the client secret
+	 * 
+	 * @return the authorization URL
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public String authorize(String clientId, String clientSecret) throws ServerException;
+
+	/**
+	 * Checks if the current user is authorized to interact with ShreFile
+	 * 
+	 * @return if you are authorized
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public boolean isAuthorized() throws ServerException;
 
 	public static class Instance {
 		private static ShareFileServiceAsync instance;

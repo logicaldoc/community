@@ -79,7 +79,7 @@ public class UsersPanel extends AdminPanel {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				list.refresh(new UsersDS(null, true));
+				list.refresh(new UsersDS(null, true, false));
 				details = SELECT_USER;
 				detailsContainer.removeMembers(detailsContainer.getMembers());
 				detailsContainer.setMembers(details);
@@ -144,10 +144,6 @@ public class UsersPanel extends AdminPanel {
 		username.setCanFilter(true);
 		username.setCellFormatter(new UserCellFormatter());
 
-		ListGridField guest = new ListGridField("guest", I18N.message("guest"), 50);
-		guest.setCanFilter(true);
-		guest.setHidden(true);
-
 		ListGridField name = new ListGridField("name", I18N.message("lastname"), 100);
 		name.setCanFilter(true);
 		name.setCellFormatter(new UserCellFormatter());
@@ -168,15 +164,23 @@ public class UsersPanel extends AdminPanel {
 		email.setCanFilter(true);
 		email.setCellFormatter(new UserCellFormatter());
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
-		enabled.setType(ListGridFieldType.IMAGE);
-		enabled.setCanSort(false);
-		enabled.setAlign(Alignment.CENTER);
-		enabled.setShowDefaultContextMenu(false);
-		enabled.setImageURLPrefix(Util.imagePrefix());
-		enabled.setImageURLSuffix(".gif");
-		enabled.setCanFilter(false);
+		ListGridField eenabled = new ListGridField("eenabled", " ", 24);
+		eenabled.setType(ListGridFieldType.IMAGE);
+		eenabled.setCanSort(false);
+		eenabled.setAlign(Alignment.CENTER);
+		eenabled.setShowDefaultContextMenu(false);
+		eenabled.setImageURLPrefix(Util.imagePrefix());
+		eenabled.setImageURLSuffix(".gif");
+		eenabled.setCanFilter(false);
 
+		ListGridField enabled = new ListGridField("_enabled", I18N.message("enabled"), 55);
+		enabled.setCanFilter(true);
+		enabled.setHidden(true);
+		
+		ListGridField guest = new ListGridField("guest", I18N.message("guest"), 55);
+		guest.setCanFilter(true);
+		guest.setHidden(true);
+		
 		ListGridField groups = new ListGridField("groups", I18N.message("groups"), 200);
 		groups.setCanFilter(true);
 		groups.setCellFormatter(new UserCellFormatter());
@@ -188,8 +192,8 @@ public class UsersPanel extends AdminPanel {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
-		list.setDataSource(new UsersDS(null, true));
-		list.setFields(id, enabled, username, firstName, name, email, phone, cell, groups, guest);
+		list.setDataSource(new UsersDS(null, true, false));
+		list.setFields(id, eenabled, username, firstName, name, email, phone, cell, groups, enabled, guest);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -385,6 +389,6 @@ public class UsersPanel extends AdminPanel {
 	}
 	
 	void refresh() {
-		list.refresh(new UsersDS(null, true));
+		list.refresh(new UsersDS(null, true, false));
 	}
 }

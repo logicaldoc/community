@@ -4,11 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIResult;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 
@@ -32,6 +34,8 @@ public class Search {
 	private boolean hasMore = false;
 
 	private long estimatedHits;
+
+	private Integer maxHits;
 
 	private Search() {
 	}
@@ -119,5 +123,19 @@ public class Search {
 
 	public void setEstimatedResults(long estimatedResults) {
 		this.estimatedHits = estimatedResults;
+	}
+
+	public int getMaxHits() {
+		if (maxHits == null) {
+			Integer pageSize = GridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
+			if (pageSize == null)
+				pageSize = Session.get().getConfigAsInt("search.hits");
+			maxHits = pageSize;
+		}
+		return maxHits;
+	}
+
+	public void setMaxHits(int maxHits) {
+		this.maxHits = maxHits;
 	}
 }

@@ -49,7 +49,7 @@ public class ImageWithCanvases extends Canvas {
 					img.setWidth(width);
 					img.setHeight((int) ((double) width / getImageAspectRatio()));
 				}
-				
+
 				for (Canvas canvas : ImageWithCanvases.this.canvases) {
 					canvas.setOverflow(Overflow.HIDDEN);
 					canvas.setSmoothFade(true);
@@ -105,7 +105,7 @@ public class ImageWithCanvases extends Canvas {
 			removeChild(canvas);
 		canvases.clear();
 	}
-	
+
 	public int getImageWidth() {
 		return imageWidth;
 	}
@@ -117,11 +117,13 @@ public class ImageWithCanvases extends Canvas {
 	public double getImageAspectRatio() {
 		return (double) imageWidth / (double) imageHeight;
 	}
-
+	
 	@Override
-	public void setWidth(Integer width) {
+	public Canvas setWidth(Integer width) {
+		Canvas canvas = super.setWidth(width);
 		int newHeight = (int) ((double) width / getImageAspectRatio());
 		resize(newHeight);
+		return canvas;
 	}
 
 	public void resize(int zoom) {
@@ -132,7 +134,7 @@ public class ImageWithCanvases extends Canvas {
 	private void resize2(int newHeight) {
 		if (newHeight <= 0)
 			return;
-		
+
 		int newWidth = (int) ((double) newHeight * getImageAspectRatio());
 
 		for (Canvas canvas : canvases) {

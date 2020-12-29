@@ -16,7 +16,7 @@
 		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
 		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
 		<property name="author" type="string" column="ld_author" length="255" />
-		<property name="messageText" type="string" column="ld_messagetext" length="2000" />
+		<property name="messageText" type="text" column="ld_messagetext" />
 		<property name="subject" type="string" column="ld_subject" length="255" />
 		<property name="sentDate" type="timestamp" column="ld_sentdate" not-null="true" />
 		<property name="dateScope" type="int" column="ld_datescope" />

@@ -67,15 +67,31 @@ public class GUIWFState implements Serializable {
 
 	private String onAssignment;
 
+	private String onCompletion;
+
 	private String display;
 
 	private String color;
 
 	private String creationMessageTemplate;
 
+	private String completionMessageTemplate;
+
 	private String assignmentMessageTemplate;
 
 	private String reminderMessageTemplate;
+
+	/**
+	 * If true it means that the user must enter a note when the he completes
+	 * the task
+	 */
+	private boolean requiresNote = false;
+
+	/**
+	 * If the requiredNote=1 this indicates an optional minimum size of the note
+	 * text
+	 */
+	private Integer minNoteSize;
 
 	public GUIWFState() {
 	}
@@ -268,6 +284,14 @@ public class GUIWFState implements Serializable {
 		this.onAssignment = onAssignment;
 	}
 
+	public String getOnCompletion() {
+		return onCompletion;
+	}
+
+	public void setOnCompletion(String onCompletion) {
+		this.onCompletion = onCompletion;
+	}
+
 	public String getDisplay() {
 		return display;
 	}
@@ -306,5 +330,29 @@ public class GUIWFState implements Serializable {
 
 	public void setReminderMessageTemplate(String reminderMessageTemplate) {
 		this.reminderMessageTemplate = reminderMessageTemplate;
+	}
+
+	public String getCompletionMessageTemplate() {
+		return completionMessageTemplate;
+	}
+
+	public void setCompletionMessageTemplate(String completionMessageTemplate) {
+		this.completionMessageTemplate = completionMessageTemplate;
+	}
+
+	public boolean isRequiresNote() {
+		return requiresNote;
+	}
+
+	public void setRequiresNote(boolean requiresNote) {
+		this.requiresNote = requiresNote;
+	}
+
+	public Integer getMinNoteSize() {
+		return minNoteSize;
+	}
+
+	public void setMinNoteSize(Integer minNoteSize) {
+		this.minNoteSize = minNoteSize;
 	}
 }

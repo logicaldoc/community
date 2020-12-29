@@ -18,5 +18,9 @@ public class SystemInfoTest extends AbstractCoreTCase {
 		SystemInfo info = SystemInfo.get();
 		Assert.assertEquals("LogicalDOC", info.getProduct());
 		Assert.assertEquals("LogicalDOC Community", info.getProductName());
+		
+		Assert.assertEquals(7, info.getMajor());
+		Assert.assertEquals(7, info.getMinor());
+		Assert.assertEquals(4, info.getMicro());
 	}
 }

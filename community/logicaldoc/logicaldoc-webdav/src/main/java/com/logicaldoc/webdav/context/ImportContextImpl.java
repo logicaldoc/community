@@ -27,9 +27,9 @@ public class ImportContextImpl implements ImportContext {
 
 	private final Resource resource;
 
-	private final String systemId;
+	private String systemId;
 
-	private final File inputFile;
+	private File inputFile;
 
 	private InputContext inputCtx;
 
@@ -129,4 +129,12 @@ public class ImportContextImpl implements ImportContext {
 	public Resource getResource() {
 		return this.resource;
 	}
+
+	public void setSystemId(String newResourceName) {
+		this.systemId = newResourceName;
+	}
+	
+	public void setInputFile(File inputFile) {
+		this.inputFile = inputFile;
+	}	
 }

@@ -175,12 +175,12 @@ values (1204,CURRENT_TIMESTAMP,1,'deleted',1201,0,0,3,1,1,7,0);
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
 values (1210,CURRENT_TIMESTAMP,0,'ölard',4,0,0,1,1,8,0);
 
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (6,2,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (6,3,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (6,-3,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (6,2,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (6,3,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (6,-3,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0);
 
 insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1200, 1, 'ftag1');
 insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1200, 1, 'ftag2');
@@ -380,8 +380,8 @@ values		(4,'2011-02-18 00:00:00',1,2,2,4,1,1);
 insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message, ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
 values(1, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 1',1,1,0,80,0.5,0.5,0.15,0.10,'1.0');
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
-values(2, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 2',1,1,1,80,0.5,0.5,0.15,0.10,'1.0');
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion,ld_type)
+values(2, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 2',1,1,1,80,0.5,0.5,0.15,0.10,'1.0','x');
 
 insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
 values(3, '2011-04-18 00:00:00',0,4,'John',3,'2011-04-18 00:00:00','message for note 3',1,1,0,80,0.5,0.5,0.15,0.10,'1.0');

@@ -154,7 +154,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		while (iter.hasNext()) {
 			FolderGroup fg = iter.next();
 			Group group = gDao.findById(fg.getGroupId());
-			if (group.isGuest()) {
+			if (group != null && group.isGuest()) {
 				fg.setAdd(0);
 				fg.setArchive(0);
 				fg.setAutomation(0);
@@ -895,7 +895,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			}
 
 			StringBuffer query = new StringBuffer(
-					"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL, A.ld_automation LDAUTOMATION");
+					"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL, A.ld_automation LDAUTOMATION, A.ld_storage LDSTORAGE");
 			query.append(" from ld_foldergroup A");
 			query.append(" where ");
 			query.append(" A.ld_folderid=" + id);
@@ -962,6 +962,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 						permissions.add(Permission.EMAIL);
 					if (rs.getInt("LDAUTOMATION") == 1)
 						permissions.add(Permission.AUTOMATION);
+					if (rs.getInt("LDSTORAGE") == 1)
+						permissions.add(Permission.STORAGE);
 				}
 			}
 		} catch (Exception e) {
@@ -1171,15 +1173,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void deleteAll(Collection<Folder> folders, int code, FolderHistory transaction) throws PersistenceException {
 		for (Folder folder : folders) {
-			try {
-				FolderHistory deleteHistory = (FolderHistory) transaction.clone();
-				deleteHistory.setEvent(FolderEvent.DELETED.toString());
-				deleteHistory.setFolderId(folder.getId());
-				deleteHistory.setPath(computePathExtended(folder.getId()));
-				delete(folder.getId(), code, deleteHistory);
-			} catch (CloneNotSupportedException e) {
-				log.error(e.getMessage(), e);
-			}
+			FolderHistory deleteHistory = (FolderHistory) transaction.clone();
+			deleteHistory.setEvent(FolderEvent.DELETED.toString());
+			deleteHistory.setFolderId(folder.getId());
+			deleteHistory.setPath(computePathExtended(folder.getId()));
+			delete(folder.getId(), code, deleteHistory);
 		}
 
 	}
@@ -1311,10 +1309,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		// Prepare the transaction
-		if (transaction != null) {
+		if (transaction != null)
 			transaction.setTenantId(targetFolder.getTenantId());
-			transaction.setEvent(FolderEvent.CREATED.toString());
-		}
 
 		Folder folderVO = new Folder();
 		folderVO.setName(targetFolder.getName());
@@ -1328,7 +1324,19 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		folderVO.setFoldRef(targetFolder.getId());
 
 		// Finally create
-		return create(parentFolder, folderVO, false, transaction);
+		Folder aliasFolder = create(parentFolder, folderVO, false, transaction);
+
+		/*
+		 * Create the alias event in the original folder
+		 */
+		if (aliasFolder != null && transaction != null) {
+			FolderHistory aliasHistory = (FolderHistory) transaction.clone();
+			aliasHistory.setFolder(targetFolder);
+			aliasHistory.setEvent(FolderEvent.ALIAS_CREATED.toString());
+			saveFolderHistory(targetFolder, aliasHistory);
+		}
+
+		return aliasFolder;
 	}
 
 	@Override
@@ -1443,15 +1451,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			List<Folder> childs = findByName(folder, name, folder.getTenantId(), true);
 			Folder dir = null;
 			if (childs.isEmpty()) {
-				try {
-					Folder folderVO = new Folder();
-					folderVO.setName(name);
-					folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
-					dir = create(folder, folderVO, inheritSecurity,
-							transaction != null ? (FolderHistory) transaction.clone() : null);
-					flush();
-				} catch (CloneNotSupportedException e) {
-				}
+				Folder folderVO = new Folder();
+				folderVO.setName(name);
+				folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
+				dir = create(folder, folderVO, inheritSecurity,
+						transaction != null ? (FolderHistory) transaction.clone() : null);
+				flush();
 			} else {
 				dir = childs.iterator().next();
 				initialize(dir);
@@ -1504,8 +1509,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public void copy(Folder source, Folder target, boolean foldersOnly, boolean inheritSecurity,
+	public Folder copy(Folder source, Folder target, boolean foldersOnly, boolean inheritSecurity,
 			FolderHistory transaction) throws PersistenceException {
+
 		assert (source != null);
 		assert (target != null);
 		assert (transaction != null);
@@ -1518,10 +1524,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		// Create the same folder in the target
 		Folder newFolder = null;
-		try {
-			newFolder = createPath(target, source.getName(), inheritSecurity, (FolderHistory) transaction.clone());
-		} catch (CloneNotSupportedException e1) {
-		}
+		newFolder = createPath(target, source.getName(), inheritSecurity, (FolderHistory) transaction.clone());
 		newFolder.setFoldRef(source.getFoldRef());
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1574,8 +1577,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		List<Folder> children = findChildren(source.getId(), transaction.getUser().getId());
-		for (Folder child : children)
+		for (Folder child : children) {
 			copy(child, newFolder, foldersOnly, inheritSecurity, transaction);
+		}
+
+		return newFolder;
 	}
 
 	@Override
@@ -1923,11 +1929,22 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public long countDocsInTree(long rootId) {
 		Collection<Long> folderIds = findFolderIdInTree(rootId, false);
 
-		String query = "select count(*) from ld_document where ld_deleted = 0 ";
-		query += " and ld_folderid in " + folderIds.toString().replace('[', '(').replace(']', ')');
+		StringBuffer query = new StringBuffer("select count(*) from ld_document where ld_deleted = 0 ");
+		if (isOracle()) {
+			/*
+			 * In Oracle The limit of 1000 elements applies to sets of single
+			 * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
+			 * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
+			 */
+			query.append(" and (ld_folderid,0) in ( ");
+			query.append(folderIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+			query.append(" ) ");
+		} else {
+			query.append(" and ld_folderid in " + folderIds.toString().replace('[', '(').replace(']', ')'));
+		}
 
 		try {
-			return queryForLong(query);
+			return queryForLong(query.toString());
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return 0;
@@ -2128,6 +2145,42 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
+	public boolean applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException {
+		boolean result = true;
+
+		Folder parent = findById(id);
+		if (parent == null)
+			return result;
+
+		try {
+			transaction.setEvent(FolderEvent.CHANGED.toString());
+			transaction.setTenantId(parent.getTenantId());
+			transaction.setNotifyEvent(false);
+
+			// Iterate over all children setting the template and field values
+			List<Folder> children = findChildren(id, null);
+			for (Folder folder : children) {
+				initialize(folder);
+				folder.setStorage(parent.getStorage());
+
+				FolderHistory tr = (FolderHistory) transaction.clone();
+				tr.setFolderId(folder.getId());
+
+				store(folder, tr);
+				flush();
+
+				if (!applyGridToTree(folder.getId(), transaction))
+					return false;
+			}
+		} catch (Throwable e) {
+			if (log.isErrorEnabled())
+				log.error(e.getMessage(), e);
+			result = false;
+		}
+		return result;
+	}
+
+	@Override
 	public boolean applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
 		boolean result = true;
 
@@ -2146,7 +2199,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				initialize(folder);
 				folder.setOcrTemplateId(parent.getOcrTemplateId());
 				folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
-				
+
 				FolderHistory tr = (FolderHistory) transaction.clone();
 				tr.setFolderId(folder.getId());
 
@@ -2194,12 +2247,24 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				 * Search for all accessible folders
 				 */
 				Collection<Long> precoll = findFolderIdByUserId(userId, null, true);
-				String precollString = precoll.toString().replace('[', '(').replace(']', ')');
 
 				query.append("select distinct(C.ld_id) from ld_folder C, ld_foldertag D "
 						+ " where C.ld_id=D.ld_folderid AND C.ld_deleted=0 ");
-				query.append(" AND C.ld_folderid in ");
-				query.append(precollString);
+
+				if (isOracle()) {
+					/*
+					 * In Oracle The limit of 1000 elements applies to sets of
+					 * single items: (x) IN ((1), (2), (3), ...). There is no
+					 * limit if the sets contain two or more items: (x, 0) IN
+					 * ((1,0), (2,0), (3,0), ...):
+					 */
+					query.append(" and (C.ld_folderid,0) in ( ");
+					query.append(precoll.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+					query.append(" ) ");
+				} else {
+					query.append(" and C.ld_folderid in " + precoll.toString().replace('[', '(').replace(']', ')'));
+				}
+
 				query.append(" AND D.ld_tag='" + SqlUtil.doubleQuotes(tag.toLowerCase()) + "' ");
 
 				List<Long> docIds = (List<Long>) queryForList(query.toString(), Long.class);

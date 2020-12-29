@@ -206,7 +206,7 @@ public class MessageDialog extends Window {
 			}
 		});
 
-		final SelectItem userSelector = ItemFactory.newUserSelector("users", "users", null, true);
+		final SelectItem userSelector = ItemFactory.newUserSelector("users", "users", null, true, true);
 		userSelector.setWidth(150);
 		userSelector.setMultiple(true);
 		userSelector.addChangedHandler(new ChangedHandler() {

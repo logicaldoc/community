@@ -2,10 +2,10 @@ package com.logicaldoc.core.document;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
 
 import com.logicaldoc.core.folder.Folder;
-import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
 
 /**
@@ -313,8 +313,6 @@ public interface DocumentManager {
 	 */
 	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws Exception;
 
-	public void setStorer(Storer storer);
-
 	/**
 	 * Creates a new download ticket.
 	 * 
@@ -346,4 +344,33 @@ public interface DocumentManager {
 	 * @return True if the file gets unprotected
 	 */
 	public boolean unprotect(String sid, long docId, String password);
+
+	/**
+	 * Moves all the files of the documents in the given tree from it's original
+	 * location to the storage defined in the owning folder
+	 * 
+	 * @param rootFolderId identifier of the root of the tree to process
+	 * @param transaction informations about the transaction, optional
+	 * 
+	 * @return number of moved files
+	 * 
+	 * @throws Exception In case of error during the process
+	 */
+	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws Exception;
+	
+	
+	/**
+	 * Merges a set of documents into a single PDF file
+	 * 0
+	 * @param documents the list of documents to merge(the order counts)
+	 * @param targetFolderId identifier of the target folder
+	 * @param fileName name of the output file(must ends with .pdf)
+	 * @param transaction informations about the transaction, optional
+	 * 
+	 * @return the generated merged document
+	 * 
+	 * @throws Exception generic error happened
+	 */
+	public Document merge(Collection<Document> documents, long targetFolderId, String fileName, DocumentHistory transaction)
+			throws Exception;
 }

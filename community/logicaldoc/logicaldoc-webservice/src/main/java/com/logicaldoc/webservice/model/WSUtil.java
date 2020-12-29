@@ -69,6 +69,8 @@ public class WSUtil {
 			wsDoc.setPasswordProtected(document.isPasswordProtected() ? 1 : 0);
 			wsDoc.setOcrTemplateId(document.getOcrTemplateId());
 			wsDoc.setOcrd(document.getOcrd());
+			wsDoc.setBarcodeTemplateId(document.getBarcodeTemplateId());
+			wsDoc.setBarcoded(document.getBarcoded());
 
 			String date = null;
 			if (document.getDate() != null)
@@ -232,6 +234,7 @@ public class WSUtil {
 		if (StringUtils.isNotEmpty(wsDoc.getStopPublishing()))
 			doc.setStopPublishing(convertStringToDate(wsDoc.getStopPublishing()));
 		doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
+		doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
 
 		return doc;
 	}

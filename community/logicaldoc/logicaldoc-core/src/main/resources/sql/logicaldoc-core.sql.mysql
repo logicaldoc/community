@@ -1,5 +1,4 @@
 -- timestamp -> datetime
--- mediumtext -> text
 
 create table ld_bookmark (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, 
@@ -28,7 +27,8 @@ create table ld_document_ext (ld_docid bigint not null, ld_mandatory int not nul
 create table ld_generic (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null, 
                          ld_deleted int not null, ld_tenantid bigint not null, ld_type varchar(255) not null, 
                          ld_subtype varchar(255) not null, ld_qualifier bigint null, ld_string1 varchar(4000), 
-                         ld_string2 varchar(4000), ld_string3 varchar(4000), ld_string4 varchar(4000), 
+                         ld_string2 varchar(4000), ld_string3 varchar(4000), ld_string4 varchar(4000),
+                         ld_string5 varchar(1000), ld_string6 varchar(1000), ld_string7 varchar(1000), ld_string8 varchar(1000),
                          ld_integer1 bigint null, ld_integer2 bigint null, ld_integer3 bigint null, 
                          ld_double1 double, ld_double2 double, 
                          ld_date1 datetime null, ld_date2 datetime null, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -61,7 +61,7 @@ create table ld_menugroup (ld_menuid bigint not null, ld_groupid bigint not null
 create table ld_recipient (ld_messageid bigint not null, ld_name varchar(255) not null, ld_address varchar(255) not null, ld_mode varchar(255) not null, ld_type int not null, ld_read int not null) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_systemmessage (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                                ld_deleted int not null, ld_tenantid bigint not null, 
-                               ld_author varchar(255), ld_messagetext varchar(4000), ld_subject varchar(255), 
+                               ld_author varchar(255), ld_messagetext mediumtext, ld_subject varchar(1000), 
                                ld_sentdate datetime not null, ld_datescope int, ld_prio int, ld_confirmation int, 
                                ld_lastnotified datetime, ld_status int not null, ld_trials int,
                                ld_type int not null, ld_html int not null, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -98,7 +98,7 @@ create table ld_user (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_source int not null, ld_quota bigint not null, ld_welcomescreen int null, ld_ipwhitelist varchar(1000), 
                       ld_ipblacklist varchar(1000), ld_passwordexpired int not null, ld_defworkspace bigint,
                       ld_email2 varchar(255), ld_emailsignature2 varchar(1000),
-                      ld_certexpire datetime, ld_certdn varchar(1000), ld_certpass varchar(255), 
+                      ld_certexpire datetime, ld_certdn varchar(1000), 
                       ld_secondfactor varchar(255), ld_key varchar(255), 
                       ld_docsgrid varchar(4000), ld_hitsgrid varchar(4000), ld_creation datetime, primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_user_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
@@ -154,7 +154,7 @@ create table ld_foldergroup (ld_folderid bigint not null, ld_groupid bigint not 
                              ld_rename int not null, ld_import int not null, ld_export int not null, ld_sign int not null, 
                              ld_archive int not null, ld_workflow int not null, ld_download int not null, ld_calendar int not null,
                              ld_subscription int not null, ld_print int not null, ld_password int not null, ld_move int not null,
-                             ld_email int not null, ld_automation int not null, constraint PK_LD_FOLDERGROUP primary key (ld_folderid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+                             ld_email int not null, ld_automation int not null, ld_storage int not null, constraint PK_LD_FOLDERGROUP primary key (ld_folderid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_rating (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint not null, 
                         ld_userid bigint not null, ld_vote int not null, ld_username varchar(255), primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
@@ -163,7 +163,8 @@ create table ld_note (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_username varchar(255), ld_userid bigint, ld_date datetime, ld_filename varchar(255), 
                       ld_message varchar(4000), ld_page int not null, ld_fileversion varchar(10),
                       ld_opacity int not null, ld_color varchar(255), ld_left double not null,
- 					  ld_top double not null, ld_width double not null, ld_height double not null,                    
+ 					  ld_top double not null, ld_width double not null, ld_height double not null,
+ 					  ld_type varchar(255), ld_recipient varchar(255), ld_recipientemail varchar(255),                     
                       primary key (ld_id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_messagetemplate (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                                  ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, ld_language varchar(10) not null,
@@ -394,7 +395,7 @@ values     (-7,CURRENT_TIMESTAMP,0,'downloadtickets',90,'menu.png',1,1,1,1);
 
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (3,CURRENT_TIMESTAMP,0,'clienandextapps',7,'menu.png',1,1,1,1);
+values     (3,CURRENT_TIMESTAMP,0,'protocols',7,'menu.png',1,1,1,1);
 
 insert into ld_menu 
            (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
@@ -446,6 +447,10 @@ values     (10,CURRENT_TIMESTAMP,0,'index',1500,'menu.png',1,1,1,1);
 insert into ld_menu
            (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
 values     (11,CURRENT_TIMESTAMP,0,'userinterface',1500,'menu.png',1,1,1,1);
+
+insert into ld_menu
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
+values     (12,CURRENT_TIMESTAMP,0,'dropspot',1500,'menu.png',1,1,1,1);
 
 insert into ld_group
            (ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_description,ld_type,ld_recordversion)
@@ -559,28 +564,29 @@ insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1607,-10000,0)
 
 insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 10,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 11,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 12,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (5,CURRENT_TIMESTAMP,0,'/',5,1,CURRENT_TIMESTAMP,0,1,1,1,0,'/');
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (5,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (5,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (5,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (5,-10000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (5,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (5,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (5,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (5,-10000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0);
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation, ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (4,CURRENT_TIMESTAMP,0,'Default',5,1,CURRENT_TIMESTAMP,0,1,1,1,0,'/4');
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (4,2,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (4,3,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (4,4,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0);
-insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation)
-values (4,-10000,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (4,2,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (4,3,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,1,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (4,4,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0);
+insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
+values (4,-10000,1,1,0,0,1,1,0,0,0,0,0,1,1,0,1,0,1,1,0,0);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(1, CURRENT_TIMESTAMP,0,'task.report','system','en', '$product - $task',
@@ -621,6 +627,8 @@ $I18N.get(''date''): <b>$DateTool.format($CURRENT_DATE, true)</b><br/>
   <br/>$doc.fileName | <a href="$DocTool.downloadUrl($doc)">$I18N.get(''download'')</a> | <a href="$DocTool.displayUrl($doc)">$I18N.get(''display'')</a>
 #end',1,1);
 
+insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
+values(5, CURRENT_TIMESTAMP,0,'empty','user','en', null,null,1,1);
 
 insert into ld_dashlet	(ld_id, ld_lastmodified, ld_deleted, ld_recordversion, ld_tenantid, ld_name, ld_title, ld_query, ld_content, ld_type, ld_max)
 values(1,CURRENT_TIMESTAMP,0,1,1,'checkout','event.checkedoutdocs','from Document where lockUserId=$user.id and status=1 order by date desc',null,'document', 10);

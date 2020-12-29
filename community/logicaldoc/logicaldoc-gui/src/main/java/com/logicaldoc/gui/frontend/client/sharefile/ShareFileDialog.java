@@ -44,7 +44,6 @@ public class ShareFileDialog extends Dialog {
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setPadding(3);
 
 		VLayout content = new VLayout();
 		content.setTop(10);

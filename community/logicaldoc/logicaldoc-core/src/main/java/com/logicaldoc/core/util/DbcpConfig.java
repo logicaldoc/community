@@ -31,6 +31,8 @@ public class DbcpConfig {
 	private String username;
 
 	private volatile String validationQuery;
+	
+	private String connectionInitSqls;
 
 	public String getDriverClassName() {
 		return driverClassName;
@@ -126,5 +128,13 @@ public class DbcpConfig {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public String getConnectionInitSqls() {
+		return connectionInitSqls;
+	}
+
+	public void setConnectionInitSqls(String connectionInitSqls) {
+		this.connectionInitSqls = connectionInitSqls;
 	}
 }

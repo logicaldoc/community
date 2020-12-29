@@ -63,7 +63,7 @@ public class ZipExport {
 	 * @param transaction Transaction with all informations about the export
 	 * @param pdfConversion True if the pdf conversion has to be used instead of
 	 *        the original files
-	 *        
+	 * 
 	 * @return The Stream of the zip archive
 	 */
 	public ByteArrayOutputStream process(FolderHistory transaction, boolean pdfConversion) {
@@ -122,7 +122,7 @@ public class ZipExport {
 	 * @param out The stream that will receive the zip
 	 * @param pdfConversion True if the pdf conversion has to be used instead of
 	 *        the original files
-	 * @param transaction session informations       
+	 * @param transaction session informations
 	 */
 	public void process(Long[] docIds, OutputStream out, boolean pdfConversion, DocumentHistory transaction) {
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -155,12 +155,9 @@ public class ZipExport {
 				addDocument("", doc, convertToPdf, transaction.getSessionId());
 
 				if (transaction != null) {
-					try {
-						DocumentHistory t = (DocumentHistory) transaction.clone();
-						transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
-						ddao.saveDocumentHistory(doc, t);
-					} catch (CloneNotSupportedException e) {
-					}
+					DocumentHistory t = (DocumentHistory) transaction.clone();
+					transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
+					ddao.saveDocumentHistory(doc, t);
 				}
 			}
 		} finally {

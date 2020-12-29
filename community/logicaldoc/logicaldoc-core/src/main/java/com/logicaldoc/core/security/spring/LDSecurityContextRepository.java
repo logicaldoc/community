@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
@@ -44,7 +45,11 @@ public class LDSecurityContextRepository implements SecurityContextRepository {
 
 		Session session = SessionManager.get().get(sid);
 
-		LDAuthenticationToken token = new LDAuthenticationToken(session.getUsername(), "", null);
+		String username = session.getClient() != null && StringUtils.isNotEmpty(session.getClient().getUsername())
+				? session.getClient().getUsername()
+				: session.getUsername();
+
+		LDAuthenticationToken token = new LDAuthenticationToken(username, "", null);
 		token.setSid(sid);
 
 		SecurityContextImpl context = new SecurityContextImpl();

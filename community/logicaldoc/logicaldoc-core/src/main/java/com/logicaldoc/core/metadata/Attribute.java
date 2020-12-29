@@ -33,7 +33,7 @@ public class Attribute implements Comparable<Attribute> {
 
 	public static final int EDITOR_LISTBOX = 1;
 
-	/*
+	/**
 	 * Not persistent
 	 */
 	private String name;
@@ -42,6 +42,11 @@ public class Attribute implements Comparable<Attribute> {
 
 	private String stringValue;
 
+	/**
+	 * String representation of the multiple string values
+	 */
+	private String stringValues;
+	
 	private Long intValue;
 
 	private Double doubleValue;
@@ -69,11 +74,6 @@ public class Attribute implements Comparable<Attribute> {
 	 * Name of a parent attribute
 	 */
 	private String parent;
-
-	/**
-	 * String representation of the multiple string values
-	 */
-	private String stringValues;
 
 	public String getStringValue() {
 		return stringValue;
@@ -182,7 +182,7 @@ public class Attribute implements Comparable<Attribute> {
 		} else if (value instanceof User) {
 			this.type = TYPE_USER;
 			this.intValue = ((User) value).getId();
-			this.stringValue = ((User) value).getFullName();
+			this.stringValue = ((User) value).getUsername();
 		} else if (value instanceof Folder) {
 			this.type = TYPE_FOLDER;
 			this.intValue = ((Folder) value).getId();

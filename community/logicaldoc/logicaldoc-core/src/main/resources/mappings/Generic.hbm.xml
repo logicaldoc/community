@@ -21,6 +21,10 @@
 		<property name="string2" type="string" column="ld_string2" />
 		<property name="string3" type="string" column="ld_string3" />
 		<property name="string4" type="string" column="ld_string4" />
+		<property name="string5" type="string" column="ld_string5" />
+		<property name="string6" type="string" column="ld_string6" />
+		<property name="string7" type="string" column="ld_string7" />
+		<property name="string8" type="string" column="ld_string8" />
 		<property name="integer1" type="long" column="ld_integer1" />
 		<property name="integer2" type="long" column="ld_integer2" />
 		<property name="integer3" type="long" column="ld_integer3" />

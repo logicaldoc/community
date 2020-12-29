@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client.data;
 
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
@@ -14,11 +15,18 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 6.0
  */
 public class DocumentHistoryDS extends DataSource {
-	private static final int MAX = 100;
+
+	private static Integer getDefaultMaxHistories() {
+		try {
+			return Session.get().getConfigAsInt("gui.maxhistories");
+		} catch (Throwable t) {
+			return 100;
+		}
+	}
 
 	public DocumentHistoryDS(long docId, Integer max) {
 		init("data/documenthistory.xml?docId=" + docId + "&locale=" + I18N.getLocale() + "&max="
-				+ (max != null ? max : MAX));
+				+ (max != null ? max : getDefaultMaxHistories()));
 	}
 
 	public DocumentHistoryDS(Long userId, Long docId, String event, Integer max) {
@@ -29,13 +37,13 @@ public class DocumentHistoryDS extends DataSource {
 			url += "&event=" + event;
 		if (docId != null)
 			url += "&docId=" + docId;
-		init(url + "&max=" + (max != null ? max : MAX));
+		init(url + "&max=" + (max != null ? max : getDefaultMaxHistories()));
 	}
 
 	public DocumentHistoryDS(String url) {
 		init(url);
 	}
-	
+
 	private void init(String url) {
 		setRecordXPath("/list/history");
 		DataSourceTextField user = new DataSourceTextField("user");
@@ -53,7 +61,8 @@ public class DocumentHistoryDS extends DataSource {
 		DataSourceTextField path = new DataSourceTextField("path");
 		DataSourceTextField sid = new DataSourceTextField("sid");
 
-		setFields(user, filename, date, event, comment, reason, version, icon, _new, documentId, folderId, userId, path, sid);
+		setFields(user, filename, date, event, comment, reason, version, icon, _new, documentId, folderId, userId, path,
+				sid);
 		setClientOnly(true);
 
 		setDataURL(url);

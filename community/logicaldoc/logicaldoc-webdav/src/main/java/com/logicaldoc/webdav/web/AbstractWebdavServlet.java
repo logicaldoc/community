@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.HttpHeaders;
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
@@ -33,6 +36,7 @@ import org.apache.jackrabbit.webdav.io.OutputContextImpl;
 import org.apache.jackrabbit.webdav.property.DavPropertyName;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameIterator;
 import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
+import org.apache.jackrabbit.webdav.property.PropEntry;
 import org.apache.jackrabbit.webdav.search.SearchConstants;
 import org.apache.jackrabbit.webdav.search.SearchResource;
 import org.apache.jackrabbit.webdav.security.AclResource;
@@ -51,7 +55,10 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.resource.DavResourceFactory;
+import com.logicaldoc.webdav.resource.DavResourceImpl;
+import com.logicaldoc.webdav.resource.RangeResourceImpl;
 import com.logicaldoc.webdav.session.DavSession;
 import com.logicaldoc.webdav.session.DavSessionImpl;
 
@@ -65,6 +72,12 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	protected static Logger log = LoggerFactory.getLogger(AbstractWebdavServlet.class);
 
 	private static final long serialVersionUID = -8726695805361483901L;
+
+	private static final String RANGE_BYTE_PREFIX = "bytes=";
+
+	private static final char RANGE_SET_SEP = ',';
+
+	private static final char RANGE_SEP = '-';
 
 	/**
 	 * Checks if the precondition for this request and resource is valid.
@@ -280,7 +293,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * 
 	 * @throws IOException generic I/O error
 	 */
-	protected void doHead(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException {
+	protected void doHead(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
 		log.debug("head");
 		spoolResource(request, response, resource, false);
 	}
@@ -294,13 +308,28 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * 
 	 * @throws IOException generic I/O error
 	 */
-	protected void doGet(WebdavRequest request, WebdavResponse response, DavResource resource) throws IOException {
+	protected void doGet(WebdavRequest request, WebdavResponse response, DavResource resource)
+			throws IOException, DavException {
+
 		log.debug("get");
 
 		try {
 			spoolResource(request, response, resource, true);
+		} catch (DavException dave) {
+			log.debug(dave.getMessage(), dave);
+			response.setStatus(dave.getErrorCode());
+
+//			if (dave.getErrorCode() == DavServletResponse.SC_FORBIDDEN) {
+//				response.setStatus(dave.getErrorCode());
+//				
+//				Writer writer = new OutputStreamWriter(response.getOutputStream(),"UTF-8");
+//			    writer.write(dave.getMessage());
+//			    writer.close();
+//			}
+
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+			response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -311,9 +340,10 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * @param sendContent
 	 * 
 	 * @throws IOException generic I/O error
+	 * @throws DavException
 	 */
 	private void spoolResource(WebdavRequest request, WebdavResponse response, DavResource resource,
-			boolean sendContent) throws IOException {
+			boolean sendContent) throws IOException, DavException {
 
 		if (!resource.exists()) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -335,9 +365,82 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			}
 		}
 
+		OutputStream outX = (sendContent) ? response.getOutputStream() : null;
+		OutputContext oc = getOutputContext(response, outX);
+
+		if (!resource.isCollection()) {
+
+			if (resource instanceof DavResourceImpl) {
+				log.debug("resource instanceof DavResourceImpl");
+				DavResourceImpl dri = (DavResourceImpl) resource;
+
+				// Enforce download permission
+				ExportContext exportCtx = dri.getExportContext(oc);
+				if (!exportCtx.getResource().isDownloadEnabled()) {
+					throw new DavException(DavServletResponse.SC_FORBIDDEN,
+							"Download permission not granted to this user");
+				}
+
+				// Deals with ranges
+				String rangeHeader = request.getHeader(HttpHeaders.RANGE);
+				if (rangeHeader != null) {
+
+					Pair<String, String> parsedRange = null;
+					try {
+						parsedRange = parseRangeRequestHeader(rangeHeader);
+						log.debug("parsedRange {}", parsedRange);
+					} catch (DavException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					resource = new RangeResourceImpl(dri.getLocator(), dri.getFactoryXXXX(), dri.getSessionXXX(),
+							dri.getConfigXXX(), dri.getResourceXXX(), parsedRange);
+
+					log.debug("converted resource to RangeResourceImpl {}", resource);
+
+					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+					response.setHeader(HttpHeaders.PRAGMA, "no-cache");
+				}
+			}
+
+		}
+
 		// spool resource properties and ev. resource content.
-		OutputStream out = (sendContent) ? response.getOutputStream() : null;
-		resource.spool(getOutputContext(response, out));
+		// OutputStream out = (sendContent) ? response.getOutputStream() : null;
+		// resource.spool(getOutputContext(response, out));
+
+		resource.spool(oc);
+	}
+
+	/**
+	 * Processes the given range header field, if it is supported. Only headers
+	 * containing a single byte range are supported.<br/>
+	 * <code>
+	 * bytes=100-200<br/>
+	 * bytes=-500<br/>
+	 * bytes=1000-
+	 * </code>
+	 * 
+	 * @return Tuple of lower and upper range.
+	 * @throws DavException HTTP statuscode 400 for malformed requests. 416 if
+	 *         requested range is not supported.
+	 */
+	private Pair<String, String> parseRangeRequestHeader(String rangeHeader) throws DavException {
+		assert rangeHeader != null;
+		if (!rangeHeader.startsWith(RANGE_BYTE_PREFIX)) {
+			throw new DavException(DavServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+		}
+		final String byteRangeSet = StringUtils.removeStartIgnoreCase(rangeHeader, RANGE_BYTE_PREFIX);
+		final String[] byteRanges = StringUtils.split(byteRangeSet, RANGE_SET_SEP);
+		if (byteRanges.length != 1) {
+			throw new DavException(DavServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+		}
+		final String byteRange = byteRanges[0];
+		final String[] bytePos = StringUtils.splitPreserveAllTokens(byteRange, RANGE_SEP);
+		if (bytePos.length != 2 || bytePos[0].isEmpty() && bytePos[1].isEmpty()) {
+			throw new DavException(DavServletResponse.SC_BAD_REQUEST, "malformed range header: " + rangeHeader);
+		}
+		return new ImmutablePair<>(bytePos[0], bytePos[1]);
 	}
 
 	/**
@@ -353,10 +456,10 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws IOException, DavException {
 
 		log.debug("doPropFind");
-		if (log.isDebugEnabled())
-			log.debug("[READ] FINDING {} {}",
-					(resource.isCollection() ? "DOCUMENTS WITHIN THE FOLDER" : "JUST THE DOCUMENT"),
-					resource.getDisplayName());
+
+		log.debug("[READ] FINDING {} {}",
+				(resource.isCollection() ? "DOCUMENTS WITHIN THE FOLDER" : "JUST THE DOCUMENT"),
+				resource.getDisplayName());
 
 		if (!resource.exists()) {
 			log.warn("Resource not found: {}", resource.getResourcePath());
@@ -403,12 +506,11 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * 
 	 * @throws IOException generic I/O error
 	 */
-	@SuppressWarnings("rawtypes")
 	protected void doPropPatch(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws IOException, DavException {
 		log.debug("doPropPatch");
 
-		List changeList = request.getPropPatchChangeList();
+		List<? extends PropEntry> changeList = request.getPropPatchChangeList();
 		if (changeList.isEmpty()) {
 			response.sendError(DavServletResponse.SC_BAD_REQUEST);
 			return;
@@ -448,12 +550,14 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 */
 	protected void doPut(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws IOException, DavException {
+
 		log.debug("************doPut*****************");
-		if (log.isDebugEnabled())
-			log.debug("[ADD] Document {}", resource.getDisplayName());
+
+		log.debug("[ADD] Document {}", resource.getDisplayName());
 
 		try {
 			DavResource parentResource = resource.getCollection();
+
 			if (parentResource == null || !parentResource.exists()) {
 				// parent does not exist
 				response.sendError(DavServletResponse.SC_CONFLICT);
@@ -468,13 +572,30 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				status = DavServletResponse.SC_CREATED;
 			}
 
+			boolean isChunkedUpload = false;
+			if (request.getHeader("LD-Chunked") != null) {
+				isChunkedUpload = true;
+			}
+
 			parentResource.addMember(resource, getInputContext(request, request.getInputStream()));
 
-			getResourceFactory().putInCache((com.logicaldoc.webdav.session.DavSession) parentResource.getSession(),
-					parentResource);
+			if (!isChunkedUpload) {
+				WebdavRequest webdavRequest = new WebdavRequestImpl(request, getLocatorFactory());
+				webdavRequest.setDavSession(request.getDavSession());
+				DavSession session = (com.logicaldoc.webdav.session.DavSession) webdavRequest.getDavSession();
+			}
 
 			response.setStatus(status);
+		} catch (DavException dave) {
+
+			log.debug("A DavException occurred!", dave);
+
+			// return the status code
+			response.setStatus(dave.getErrorCode());
+
 		} catch (Exception e) {
+			log.error("An Exception occurred!", e);
+			response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -492,8 +613,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws IOException, DavException {
 
 		log.debug("doMkCol");
-		if (log.isDebugEnabled())
-			log.debug("[ADD] Directory {}", resource.getDisplayName());
+		log.debug("[ADD] Directory {}", resource.getDisplayName());
+
 		try {
 			DavResource parentResource = resource.getCollection();
 			if (parentResource == null || !parentResource.exists() || !parentResource.isCollection()) {
@@ -512,8 +633,12 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				parentResource.addMember(resource, getInputContext(request, null));
 			}
 			response.setStatus(DavServletResponse.SC_CREATED);
+		} catch (DavException dave) {
+			log.debug("Error during folder creation", dave);
+			response.setStatus(dave.getErrorCode());
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error during folder creation", e);
+			response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -532,19 +657,21 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		log.debug("doDelete");
 		try {
-			if (log.isDebugEnabled())
-				log.debug("[DELETE] {} {}", (resource.isCollection() ? " FOLDER" : " DOCUMENT"),
-						resource.getDisplayName());
+			log.debug("[DELETE] {} {}", (resource.isCollection() ? " FOLDER" : " DOCUMENT"), resource.getDisplayName());
 
 			DavResource parent = resource.getCollection();
 			if (parent != null) {
 				parent.removeMember(resource);
 				response.setStatus(DavServletResponse.SC_NO_CONTENT);
 			} else {
-				response.sendError(DavServletResponse.SC_FORBIDDEN, "Cannot remove the root resource.");
+				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot remove the root resource.");
 			}
+		} catch (DavException dave) {
+			log.debug(dave.getMessage(), dave);
+			response.setStatus(dave.getErrorCode());
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+			response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -619,11 +746,13 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			}
 
 			resource.move(destResource);
-
-			getResourceFactory().putInCache(session, destResource);
-
 			response.setStatus(status);
+		} catch (DavException dave) {
+			log.debug("Exception during move", dave);
+			response.setStatus(dave.getErrorCode());
 		} catch (Exception e) {
+			log.error("Error during move", e);
+			response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 

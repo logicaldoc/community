@@ -22,16 +22,23 @@ public class SystemMessage extends Message {
 
 	private int dateScope = 10;
 
+	/**
+	 * A priority: <b>0</b> = low, <b>1</b> = medium, <b>2</b> = high
+	 */
 	private int prio = 0;
 
 	private int confirmation = 0; // 0 - false; 1 - true
 
-	// The date this message was last notified
+	/**
+	 * The date this message was last notified
+	 */
 	private Date lastNotified = null;
 
 	private int status = STATUS_NEW;
 
-	// The number of notification trials
+	/**
+	 * The number of notification trials
+	 */
 	private int trials = 0;
 
 	public SystemMessage() {

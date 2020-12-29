@@ -6,11 +6,13 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Arrays;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +48,12 @@ public class ConnectionPool implements DataSource, Closeable {
 				} catch (Throwable e) {
 					log.error(e.getMessage(), e);
 				}
+				
+				if(StringUtils.isNotEmpty(dbcpConfig.getConnectionInitSqls())) {
+					String[] sqls=dbcpConfig.getConnectionInitSqls().split(";");
+					ds.setConnectionInitSqls(Arrays.asList(sqls));
+				}
+				
 				wrappedDataSource = ds;
 			} else {
 				wrappedDataSource = new HikariDataSource(hikariConfig);

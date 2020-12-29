@@ -17,9 +17,11 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.UserController;
-import com.logicaldoc.gui.common.client.widgets.PopupMessage;
 import com.logicaldoc.gui.frontend.client.dashboard.chat.ChatController;
 import com.sksamuel.gwt.websockets.WebsocketListener;
+import com.smartgwt.client.types.EdgeName;
+import com.smartgwt.client.widgets.notify.Notify;
+import com.smartgwt.client.widgets.notify.NotifySettings;
 
 /**
  * Listens to events coming from websockets
@@ -126,13 +128,14 @@ public class EventListener implements WebsocketListener {
 				if (event.getUserId() != null && event.getUserId() == Session.get().getUser().getId()) {
 					Session.get().getUser().setUnreadMessages(Session.get().getUser().getUnreadMessages() + 1);
 					UserController.get().changed(Session.get().getUser());
-					String oneRow = event.getComment().replace('\n', ' ').replaceAll("<", "&lt;").replaceAll(">",
-							"&gt;");
-					Log.info(event.getAuthor() + ": "
-							+ (oneRow.length() <= 80 ? oneRow : oneRow.substring(0, 80) + "..."));
-					PopupMessage popup = new PopupMessage(I18N.message("newmessagefrom", event.getAuthor()),
-							event.getComment());
-					popup.show();
+
+					NotifySettings settings = new NotifySettings();
+					settings.setDuration(Session.get().getConfigAsInt("gui.popup.timeout") * 1000);
+					settings.setMessagePriority(Notify.MESSAGE);
+					settings.setPosition(EdgeName.T);
+
+					Notify.addMessage("<b>"+I18N.message("newmessagefrom", event.getAuthor()) + "</b>:<br/><br/>" + event.getComment(),
+							null, null, settings);
 				}
 			} else if ("event.user.login".equals(event.getEvent())) {
 				UserController.get().loggedIn(event.getUsername());

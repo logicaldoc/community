@@ -74,6 +74,8 @@ public class ResourceImpl implements Resource {
 
 	DavSession session;
 
+	private String eTag;
+
 	public Long getContentLength() {
 		return contentLength;
 	}
@@ -111,7 +113,8 @@ public class ResourceImpl implements Resource {
 	}
 
 	public boolean isLocked() {
-		log.debug("isLocked(" + getName() + "): " + (this.isLocked || this.isCheckedOut));
+		//log.debug("isLocked(" + getName() + "): " + (this.isLocked || this.isCheckedOut));
+		log.debug("isLocked({}): {}", getName(), (this.isLocked || this.isCheckedOut));
 		return this.isLocked || this.isCheckedOut;
 	}
 
@@ -153,7 +156,8 @@ public class ResourceImpl implements Resource {
 
 	@Override
 	public boolean isCheckedOut() {
-		log.debug("isCheckedOut(" + getName() + "): " + this.isCheckedOut);
+		//log.debug("isCheckedOut(" + getName() + "): " + this.isCheckedOut);
+		log.debug("isCheckedOut({}): {}", getName(), this.isCheckedOut);
 		return this.isCheckedOut;
 	}
 
@@ -342,4 +346,13 @@ public class ResourceImpl implements Resource {
 	public void setLockUser(String lockUser) {
 		this.lockUser = lockUser;
 	}
+
+	@Override
+	public void setETag(String eTag) {
+		this.eTag = eTag;
+	}
+	
+	public String getETag() {
+		return this.eTag;
+	}	
 }

@@ -20,8 +20,8 @@
 	</target>
 	
   <target name="mydep" description="Updates a deployed wwww">
-		<copy todir="C:/LogicalDOC/tomcat/webapps/ROOT/WEB-INF/classes" verbose="true">
-      <!--
+		<copy todir="C:/LogicalDOC842mdb/tomcat/webapps/ROOT/WEB-INF/classes" verbose="true">
+      <!-- 
 			<fileset dir="target/classes">
 				<exclude name="**/*.xml" />
 				<exclude name="**/*.properties" />
@@ -45,7 +45,7 @@
   
   
     <target name="mydep2" description="Updates a deployed wwww">
-		<copy todir="C:/LogicalDOC/tomcat/webapps/ROOT/WEB-INF/classes" verbose="true">
+		<copy todir="C:/LogicalDOC842mdb/tomcat/webapps/ROOT/WEB-INF/classes" verbose="true">
 			<fileset dir="target/classes">
         <!--
 				<exclude name="**/*.xml" />

@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailTab;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
@@ -17,9 +18,13 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -149,8 +154,34 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 				}
 			});
 
+			final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
+					Util.getTagsHTML(document.getTags()));
+			tagsString.setEndRow(true);
+			
+			FormItemIcon editTags = new FormItemIcon();
+			editTags.setPrompt(I18N.message("edittags"));
+			editTags.setSrc("[SKIN]/actions/edit.png");
+			editTags.setWidth(16);
+			editTags.setHeight(16);
+			editTags.addFormItemClickHandler(new FormItemClickHandler() {
+				public void onFormItemClick(final FormItemIconClickEvent event) {
+					tagsString.setVisible(false);
+					tagItem.setVisible(true);
+					tagItem.setEndRow(true);
+					if (items.contains(newTagItem)) {
+						newTagItem.setVisible(true);
+						newTagItem.setEndRow(true);
+					}
+					form.redraw();
+				}
+			});
+			tagsString.setIcons(editTags);
+			
 			if (updateEnabled) {
+				items.add(tagsString);
 				items.add(tagItem);
+				tagItem.setVisible(false);
+				newTagItem.setVisible(false);
 				if ("free".equals(mode) && updateEnabled)
 					items.add(newTagItem);
 			}

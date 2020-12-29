@@ -24,11 +24,11 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class UserSelector extends SelectItem {
 
-	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull) {
-		this(name, title, groupIdOrName, allowNull, null);
+	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled) {
+		this(name, title, groupIdOrName, allowNull, skipDisabled, null);
 	}
 
-	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull,
+	public UserSelector(String name, String title, String groupIdOrName, boolean allowNull, boolean skipDisabled,
 			List<FormItemIcon> additionalIcons) {
 		setName(name);
 		setTitle(I18N.message(title));
@@ -40,7 +40,7 @@ public class UserSelector extends SelectItem {
 		setPickListWidth(300);
 		setPickListFields(username, label);
 		setPickListProperties(new UserPickListProperties());
-		setOptionDataSource(new UsersDS(groupIdOrName, allowNull));
+		setOptionDataSource(new UsersDS(groupIdOrName, allowNull, skipDisabled));
 		setHintStyle("hint");
 
 		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {

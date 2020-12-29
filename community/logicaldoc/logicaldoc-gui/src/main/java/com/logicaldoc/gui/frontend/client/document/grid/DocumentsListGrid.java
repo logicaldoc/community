@@ -119,9 +119,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		addDataArrivedHandler(new DataArrivedHandler() {
 			@Override
 			public void onDataArrived(DataArrivedEvent event) {
-				if (cursor != null) {
+				if (cursor != null)
 					cursor.setMessage(I18N.message("showndocuments", Integer.toString(getCount())));
-				}
 
 				if (Session.get().getHiliteDocId() != null) {
 					// Add the sorting by order first
@@ -287,6 +286,12 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		comment.setCanFilter(true);
 		comment.setCanSort(true);
 		fieldsMap.put(comment.getName(), comment);
+
+		ListGridField tags = new ListGridField("tags", I18N.message("tags"), 200);
+		tags.setHidden(true);
+		tags.setCanFilter(true);
+		tags.setCanSort(true);
+		fieldsMap.put(tags.getName(), tags);
 
 		ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 150);
 		wfStatus.setHidden(true);
@@ -936,15 +941,32 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	@Override
 	public void loadGridLayout(GUIFolder folder) {
+		this.folder = folder;
 		String previouslySavedState = folder != null ? folder.getGrid() : null;
 		if (previouslySavedState == null || previouslySavedState.isEmpty())
 			previouslySavedState = Session.get().getUser().getDocsGrid();
-		if (previouslySavedState != null && !previouslySavedState.isEmpty())
+
+		String gridState = GridUtil.getGridLayoutFromSpec(previouslySavedState);
+		Integer pageSize = GridUtil.getPageSizeFromSpec(previouslySavedState);
+		if (pageSize == null)
+			pageSize = Session.get().getConfigAsInt("gui.document.pagesize");
+
+		if (gridState != null && !gridState.isEmpty())
 			try {
-				setViewState(previouslySavedState);
+				setViewState(gridState);
 			} catch (Throwable t) {
 			}
-		if (folder != null && getGridCursor() != null)
-			getGridCursor().setTotalRecords(folder.getDocumentCount());
+		if (getGridCursor() != null) {
+			getGridCursor().setPageSize(pageSize);
+			if (folder != null)
+				getGridCursor().setTotalRecords(folder.getDocumentCount());
+		}
+	}
+
+	public String getGridLayout() {
+		if (getGridCursor() != null)
+			return "|" + getGridCursor().getPageSize() + "|" + getViewState();
+		else
+			return getViewState();
 	}
 }

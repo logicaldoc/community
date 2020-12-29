@@ -139,6 +139,12 @@ public class AttributesDataServlet extends HttpServlet {
 			writer.print("</attribute>");
 
 			writer.print("<attribute>");
+			writer.print("<name>tags</name>");
+			writer.print("<label><![CDATA[" + I18N.message("tags", locale) + "]]></label>");
+			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+			writer.print("</attribute>");
+			
+			writer.print("<attribute>");
 			writer.print("<name>workflowStatus</name>");
 			writer.print("<label><![CDATA[" + I18N.message("workflowstatus", locale) + "]]></label>");
 			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");

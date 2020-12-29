@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -71,7 +72,6 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 			try {
 				int rowsUpdated = jdbcUpdate("UPDATE ld_user_history SET ld_deleted = 1, ld_lastmodified = ?"
 						+ " WHERE ld_deleted = 0 AND ld_date < ?", today, ldDate);
-
 				log.info("cleanOldHistories rows updated: {}", rowsUpdated);
 			} catch (Exception e) {
 				if (log.isErrorEnabled())
@@ -85,6 +85,8 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 	public boolean store(UserHistory history) throws PersistenceException {
 		// Write only if the history is enabled
 		if (RunLevel.current().aspectEnabled(DocumentHistory.ASPECT)) {
+			if (history.getComment() != null && history.getComment().length() > 4000)
+				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 			boolean ret = super.store(history);
 			if (ret)
 				EventCollector.get().newEvent(history);

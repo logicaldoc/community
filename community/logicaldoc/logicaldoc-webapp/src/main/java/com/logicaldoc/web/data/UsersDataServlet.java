@@ -43,6 +43,7 @@ public class UsersDataServlet extends HttpServlet {
 
 			String groupIdOrName = request.getParameter("groupId");
 			boolean required = "true".equals(request.getParameter("required"));
+			boolean skipdisabled = "true".equals(request.getParameter("skipdisabled"));
 
 			response.setContentType("text/xml");
 			response.setCharacterEncoding("UTF-8");
@@ -85,6 +86,9 @@ public class UsersDataServlet extends HttpServlet {
 				if (user.getType() == User.TYPE_SYSTEM)
 					continue;
 
+				if (skipdisabled && user.getEnabled() != 1)
+					continue;
+
 				userDao.initialize(user);
 
 				writer.print("<user>");
@@ -94,6 +98,7 @@ public class UsersDataServlet extends HttpServlet {
 					writer.print("<eenabled>0</eenabled>");
 				else if (user.getEnabled() == 0)
 					writer.print("<eenabled>2</eenabled>");
+				writer.print("<_enabled>" + (user.getEnabled() == 1 ? "true" : "false") + "</_enabled>");
 				writer.print("<guest>" + user.isReadonly() + "</guest>");
 				writer.print("<name><![CDATA[" + (user.getName() == null ? "" : user.getName()) + "]]></name>");
 				writer.print("<firstName><![CDATA[" + (user.getFirstName() == null ? "" : user.getFirstName())

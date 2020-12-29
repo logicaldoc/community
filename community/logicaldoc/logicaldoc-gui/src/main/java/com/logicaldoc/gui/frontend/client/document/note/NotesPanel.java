@@ -121,7 +121,7 @@ public class NotesPanel extends DocumentDetailTab {
 		annotations.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(
+				AbstractAnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(
 						document, null, NotesPanel.this, true);
 				dialog.show();
 			}

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -83,10 +82,9 @@ public class DocumentsDataServlet extends HttpServlet {
 
 			FolderDAO fDao = (FolderDAO) context.getBean(FolderDAO.class);
 			DocumentDAO dao = (DocumentDAO) context.getBean(DocumentDAO.class);
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			df.setTimeZone(TimeZone.getTimeZone("UTC"));
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-			int max = 100;
+			int max = Context.get().getProperties().getInt(session.getTenantName() + ".gui.maxhistories", 100);
 			if (StringUtils.isNotEmpty(request.getParameter("max")))
 				max = Integer.parseInt(request.getParameter("max"));
 
@@ -138,10 +136,8 @@ public class DocumentsDataServlet extends HttpServlet {
 				int end = Math.min(begin + max - 1, docs.size() - 1);
 				for (int i = begin; i <= end; i++) {
 					Document doc = docs.get(i);
-
 					if (!fDao.isReadEnabled(doc.getFolder().getId(), session.getUserId()))
 						continue;
-
 					documentRecords.add(doc);
 				}
 			} else if (StringUtils.isNotEmpty(request.getParameter("docIds"))) {
@@ -150,10 +146,8 @@ public class DocumentsDataServlet extends HttpServlet {
 					Document doc = dao.findById(Long.parseLong(id));
 					if (doc == null || doc.getDeleted() == 1)
 						continue;
-
 					if (!fDao.isReadEnabled(doc.getFolder().getId(), session.getUserId()))
 						continue;
-
 					documentRecords.add(doc);
 				}
 			} else {
@@ -186,6 +180,7 @@ public class DocumentsDataServlet extends HttpServlet {
 							.replaceAll(" ", ""));
 
 					final Locale l = LocaleUtil.toLocale(locale);
+
 					dao.query(query.toString(), null, new RowMapper<Long>() {
 						@Override
 						public Long mapRow(ResultSet rs, int row) throws SQLException {
@@ -205,7 +200,7 @@ public class DocumentsDataServlet extends HttpServlet {
 							} else if (type == Attribute.TYPE_DOUBLE) {
 								extValues.put(key, rs.getDouble(6));
 							} else if (type == Attribute.TYPE_DATE) {
-								extValues.put(key, rs.getDate(7));
+								extValues.put(key, rs.getTimestamp(7));
 							} else if (type == Attribute.TYPE_USER) {
 								extValues.put(key, rs.getString(4));
 							} else if (type == Attribute.TYPE_BOOLEAN) {
@@ -227,7 +222,7 @@ public class DocumentsDataServlet extends HttpServlet {
 								+ " A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,"
 								+ " A.startPublishing, A.stopPublishing, A.published, A.extResId,"
 								+ " B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages, "
-								+ " A.workflowStatusDisplay, A.language, A.links from Document as A left outer join A.template as B ");
+								+ " A.workflowStatusDisplay, A.language, A.links, A.tgs from Document as A left outer join A.template as B ");
 				query.append(" where A.deleted = 0 and not A.status=" + AbstractDocument.DOC_ARCHIVED);
 				if (folderId != null)
 					query.append(" and A.folder.id=" + folderId);
@@ -278,6 +273,13 @@ public class DocumentsDataServlet extends HttpServlet {
 							doc.setDocRefType(aliasDocRefType);
 							doc.setFileName(aliasFileName);
 							doc.setType(aliasType);
+
+							for (String name : attrs) {
+								String key = aliasId + "-" + name;
+								if (!extValues.containsKey(key) && doc.getValue(name) != null)
+									extValues.put(key, doc.getValue(name));
+							}
+
 						} else
 							continue;
 					} else {
@@ -312,6 +314,7 @@ public class DocumentsDataServlet extends HttpServlet {
 							doc.setWorkflowStatusDisplay((String) cols[32]);
 							doc.setLanguage((String) cols[33]);
 							doc.setLinks((Integer) cols[34]);
+							doc.setTgs((String) cols[35]);
 
 							if (!extValues.isEmpty())
 								for (String name : attrs) {
@@ -325,11 +328,29 @@ public class DocumentsDataServlet extends HttpServlet {
 
 					if (doc.isPublishing() || user.isMemberOf("admin") || user.isMemberOf("publisher"))
 						documents.add(doc);
-				}
-
+				}			
+				
 				// If a sorting is specified sort the collection of documents
-				if (StringUtils.isNotEmpty(sort))
-					Collections.sort(documents, DocumentComparator.getComparator(sort));
+				if (StringUtils.isNotEmpty(sort)) {
+					// make the sorting to be case insensitive (add lower
+					// function)
+					StringBuffer ciSort = new StringBuffer();
+					StringTokenizer st = new StringTokenizer(sort, ",", false);
+					while (st.hasMoreElements()) {
+						String token = (String) st.nextElement();
+						String field = token.split(" ")[0].trim();
+						String direction = token.split(" ")[1].trim();
+
+						if (ciSort.length() > 0)
+							ciSort.append(",");
+						ciSort.append("lower(");
+						ciSort.append(field);
+						ciSort.append(") ");
+						ciSort.append(direction);
+					}
+
+					Collections.sort(documents, DocumentComparator.getComparator(ciSort.toString()));
+				}
 
 				int begin = (page - 1) * max;
 				int end = Math.min(begin + max - 1, documents.size() - 1);
@@ -421,6 +442,10 @@ public class DocumentsDataServlet extends HttpServlet {
 
 				if (doc.getTemplateName() != null)
 					writer.print("<template><![CDATA[" + doc.getTemplateName() + "]]></template>");
+
+				if (StringUtils.isNotEmpty(doc.getTgs()))
+					writer.print(
+							"<tags><![CDATA[" + doc.getTgs().substring(1, doc.getTgs().length() - 1) + "]]></tags>");
 
 				if (!extValues.isEmpty())
 					for (String name : attrs) {

@@ -237,8 +237,12 @@ public class IndexerTask extends Task {
 		if (StringUtils.isNotEmpty(sorting))
 			if ("oldestfirst".equals(sorting))
 				sorting = "_entity.date asc";
-			else
+			else if ("mostrecentfirst".equals(sorting))
 				sorting = "_entity.date desc";
+			else if ("smallestfirst".equals(sorting))
+				sorting = "_entity.fileSize asc";
+			else
+				sorting = "_entity.fileSize desc";
 
 		// This hidden setting overrides the default sorting policy(some really
 		// demanding users may need this optimization).

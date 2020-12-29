@@ -80,7 +80,7 @@ public class OcrQueuePanel extends VLayout {
 			public void onClick(ClickEvent event) {
 				if (max.validate()) {
 					maxRecords = (Integer) max.getValue();
-					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, false, true, false));
+					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, false, true, null));
 				}
 			}
 		});
@@ -108,7 +108,7 @@ public class OcrQueuePanel extends VLayout {
 											Log.info(I18N.message("docsrescheduledprocessing"), null);
 											maxRecords = (Integer) max.getValue();
 											list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, false, true,
-													false));
+													null));
 										}
 									});
 							}
@@ -241,7 +241,7 @@ public class OcrQueuePanel extends VLayout {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new DocumentsDS(null, null, maxRecords, 1, null, false, true, false));
+		list.setDataSource(new DocumentsDS(null, null, maxRecords, 1, null, false, true, null));
 		list.setFields(locked, immutable, icon, filename, size, lastModified, version, publisher, published, creator,
 				created, customId);
 

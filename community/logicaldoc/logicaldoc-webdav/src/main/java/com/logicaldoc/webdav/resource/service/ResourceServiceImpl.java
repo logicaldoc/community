@@ -77,12 +77,16 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	private Resource marshallFolder(Folder folder, long userId, DavSession session) {
+
 		Resource resource = new ResourceImpl();
-		resource.setID(new Long(folder.getId()).toString());
-		resource.setContentLength(new Long(0));
+		resource.setID(String.valueOf(folder.getId()));
+		resource.setContentLength(0L);
 		resource.setName(folder.getName());
 		resource.setPath(folderDAO.computePathExtended(folder.getId()));
 		resource.setLastModified(folder.getLastModified());
+
+		resource.setETag(String.format("f-%d_%d", folder.getId(), folder.getRecordVersion()));
+
 		resource.setSession(session);
 		resource.isFolder(true);
 		if (folder.getType() == Folder.TYPE_WORKSPACE)
@@ -96,10 +100,9 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	private Resource marshallDocument(Document document, DavSession session) {
+
 		Resource resource = new ResourceImpl();
-		resource.setID(new Long(document.getId()).toString());
-		// We cannot use the title because it can contain
-		// resource.setName(document.getTitle() + "." + document.getType());
+		resource.setID(String.valueOf(document.getId()));
 		resource.setName(document.getFileName());
 		resource.setContentLength(document.getFileSize());
 		resource.setCreationDate(document.getCreation());
@@ -110,7 +113,11 @@ public class ResourceServiceImpl implements ResourceService {
 		resource.setVersionLabel(document.getVersion());
 		resource.setAuthor(document.getPublisher());
 		resource.setDocRef(document.getDocRef());
-		resource.setFolderID(new Long(document.getFolder().getId()).toString());
+		resource.setFolderID(String.valueOf(document.getFolder().getId()));
+
+		// this is for getetag property
+		resource.setETag(String.format("d-%d_%s", document.getId(), document.getVersion()));
+
 		resource.setSession(session);
 		resource.setLocked(
 				document.getStatus() == Document.DOC_LOCKED || document.getStatus() == Document.DOC_CHECKED_OUT);
@@ -124,22 +131,29 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public List<Resource> getChildResources(Resource parentResource) {
+		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		List<Resource> resourceList = new LinkedList<Resource>();
 		final Long folderID = Long.parseLong(parentResource.getID());
 		boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
 
-		User user = userDAO.findById(parentResource.getRequestedPerson());
-		userDAO.initialize(user);
+		if (hasAccess == false) {
+			// Check if the folder is a root and in that case we mark it as
+			// readable.
+			Folder folder = folderDAO.findFolder(folderID);
+			if (folder != null && folder.equals(folderDAO.findRoot(folder.getTenantId())))
+				hasAccess = true;
+		}
 
 		if (hasAccess == false)
 			return resourceList;
 
+		User user = userDAO.findById(parentResource.getRequestedPerson());
+		userDAO.initialize(user);
+
 		// Find children visible by the current user
-		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Collection<Folder> folders = folderDAO.findChildren(folderID, parentResource.getRequestedPerson());
 		if (folders != null) {
-			for (Iterator<Folder> iterator = folders.iterator(); iterator.hasNext();) {
-				Folder currentFolder = iterator.next();
+			for (Folder currentFolder : folders) {
 				if (currentFolder.getHidden() == 0)
 					resourceList.add(marshallFolder(currentFolder, parentResource.getRequestedPerson(),
 							parentResource.getSession()));
@@ -205,6 +219,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 		if (docs.isEmpty())
 			return null;
+
 		Document document = docs.iterator().next();
 		boolean hasAccess = folderDAO.isReadEnabled(document.getFolder().getId(), userId);
 
@@ -377,14 +392,18 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public Resource getChildByName(Resource parentResource, String name) {
+		
 		Folder parentFolder = folderDAO.findById(Long.parseLong(parentResource.getID()));
-		Collection<Document> docs = documentDAO.findByFileNameAndParentFolderId(parentFolder.getId(), name, null,
-				parentFolder.getTenantId(), null);
+		Collection<Document> docs = documentDAO.findByFileNameAndParentFolderId(parentFolder.getId(), name, null, parentFolder.getTenantId(), null);
 		User user = userDAO.findById(parentResource.getRequestedPerson());
 		userDAO.initialize(user);
+		
 		if (!docs.isEmpty()) {
-			Document document = docs.iterator().next();
-			return marshallDocument(document, parentResource.getSession());
+			for (Document document : docs) {
+				if (name.equals(document.getFileName())) {
+					return marshallDocument(document, parentResource.getSession());
+				} 
+			}		
 		}
 		return null;
 	}
@@ -660,6 +679,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Override
 	public InputStream streamOut(Resource resource) {
+
 		if (!resource.isDownloadEnabled())
 			throw new DavResourceIOException("The user doesn't have the download permission");
 

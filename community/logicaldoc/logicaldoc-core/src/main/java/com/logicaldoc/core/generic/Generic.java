@@ -30,6 +30,14 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 	private String string3;
 
 	private String string4;
+	
+	private String string5;
+
+	private String string6;
+
+	private String string7;
+
+	private String string8;
 
 	private Long integer1;
 
@@ -192,5 +200,37 @@ public class Generic extends ExtensibleObject implements Comparable<Generic> {
 
 	public void setString4(String string4) {
 		this.string4 = string4;
+	}
+
+	public String getString5() {
+		return string5;
+	}
+
+	public void setString5(String string5) {
+		this.string5 = string5;
+	}
+
+	public String getString6() {
+		return string6;
+	}
+
+	public void setString6(String string6) {
+		this.string6 = string6;
+	}
+
+	public String getString7() {
+		return string7;
+	}
+
+	public void setString7(String string7) {
+		this.string7 = string7;
+	}
+
+	public String getString8() {
+		return string8;
+	}
+
+	public void setString8(String string8) {
+		this.string8 = string8;
 	}
 }

@@ -275,10 +275,7 @@ public class TagsForm extends VLayout {
 		GUISearchOptions options = new GUISearchOptions();
 		options.setType(GUISearchOptions.TYPE_TAGS);
 		options.setExpression(word);
-
-		String hits = Session.get().getConfig("search.hits");
-		if (hits != null)
-			options.setMaxHits(Integer.parseInt(hits));
+		options.setMaxHits(Search.get().getMaxHits());
 
 		if (searchInHits) {
 			GUIDocument[] records = Search.get().getLastResult();

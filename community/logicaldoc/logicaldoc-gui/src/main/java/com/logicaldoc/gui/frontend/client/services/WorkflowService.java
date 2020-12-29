@@ -18,24 +18,27 @@ public interface WorkflowService extends RemoteService {
 	 * Loads a given workflow from the database
 	 * 
 	 * @param workflowName name of the workflow
+	 * @param version version of the workflow
 	 * 
 	 * @return the workflow retrieved by the server application
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIWorkflow get(String workflowName) throws ServerException;
+	public GUIWorkflow get(String workflowName, Integer version) throws ServerException;
 
 	/**
 	 * Loads a given workflow to display a completion diagram
 	 * 
 	 * @param workflowName name of the workflow
+	 * @param version version of the workflow template(optional)
 	 * @param processInstanceId identifier of the workflow instance
 	 * 
 	 * @return the completion diagram retrieved by the server application
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIWorkflow getCompletionDiagram(String workflowName, String processInstanceId) throws ServerException;
+	public GUIWorkflow getCompletionDiagram(String workflowName, Integer version, String processInstanceId)
+			throws ServerException;
 
 	/**
 	 * Deletes a given workflow
@@ -80,9 +83,11 @@ public interface WorkflowService extends RemoteService {
 	 * 
 	 * @param workflow the workflow to deploy
 	 * 
+	 * @return the next version of the workflow
+	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void deploy(GUIWorkflow workflow) throws ServerException;
+	public GUIWorkflow deploy(GUIWorkflow workflow) throws ServerException;
 
 	/**
 	 * Undeploys a given workflow
@@ -127,12 +132,11 @@ public interface WorkflowService extends RemoteService {
 	 * @param folderId identifier of the folder
 	 * @param workflowId identifier of the workflow
 	 * @param templateId identifier of the template(optional)
-	 * @param startAtCheckin <b>1</b> if the trigger must be invoked even at
-	 *        checkin time
+	 * @param events the comma separated list of events(null for all the events)
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
-	public void saveTrigger(String folderId, String workflowId, String templateId, int startAtCheckin)
+	public void saveTrigger(String folderId, String workflowId, String templateId, String events)
 			throws ServerException;
 
 	/**
@@ -140,9 +144,10 @@ public interface WorkflowService extends RemoteService {
 	 * the given doc ids
 	 * 
 	 * @param workflowName name of the workflow
-	 * @param workflowDescription description of the workflow 
+	 * @param workflowDescription description of the workflow
 	 * @param tag a tak to mark this new execution
-	 * @param docIds identifiers of the documents appended to the new workflow instance
+	 * @param docIds identifiers of the documents appended to the new workflow
+	 *        instance
 	 * 
 	 * @throws ServerException an error happened in the server applications
 	 */
@@ -153,7 +158,7 @@ public interface WorkflowService extends RemoteService {
 	 * Retrieves all the info of the workflow of the given task
 	 * 
 	 * @param taskId identifier of the task
-	 *  
+	 * 
 	 * @return the workflow retrieved by the server application
 	 * 
 	 * @throws ServerException an error happened in the server applications

@@ -37,6 +37,15 @@ public class HibernateDocumentNoteDAOTest extends AbstractCoreTCase {
 		DocumentNote note = notes.get(0);
 		Assert.assertEquals("message for note 1", note.getMessage());
 	}
+	
+	@Test
+	public void testFindByDocIdAndType() {
+		List<DocumentNote> notes = dao.findByDocIdAndType(1L, null, "x");
+		Assert.assertNotNull(notes);
+		Assert.assertEquals(1, notes.size());
+		DocumentNote note = notes.get(0);
+		Assert.assertEquals("message for note 2", note.getMessage());
+	}
 
 	@Test
 	public void testCopyAnnotations() throws PersistenceException {

@@ -11,15 +11,21 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.security.User;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
@@ -218,7 +224,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			@ApiImplicitParam(name = "filedata", value = "File data", required = true, dataType = "file", paramType = "form") })
 	@ApiResponses(value = { @ApiResponse(code = 401, message = "Authentication failed"),
 			@ApiResponse(code = 500, message = "Generic error, see the response message") })
-	public Response replaceFile(List<Attachment> attachments) throws Exception {
+	public Response replaceFile(@ApiParam(hidden = true) List<Attachment> attachments) throws Exception {
 		String sid = validateSession();
 		try {
 			Long docId = null;
@@ -300,8 +306,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Path("/deleteVersion")
 	@ApiOperation(value = "Delete the version of a document", notes = "Deletes the version of a document using the document ID and version."
 			+ " You can not delete the latest version of a document. Returns the latest version of the document")
-	public String deleteVersion(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId, @QueryParam("version") String version)
-			throws Exception {
+	public String deleteVersion(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
+			@QueryParam("version") String version) throws Exception {
 		String sid = validateSession();
 		return super.deleteVersion(sid, docId, version);
 	}
@@ -323,8 +329,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Path("/addNote")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	@ApiOperation(value = "Adds a new note for the given document")
-	public WSNote addNote(
-			@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
+	public WSNote addNote(@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
 			@FormParam("note") @ApiParam(value = "Text of the note to add", required = true) String note)
 			throws Exception {
 		String sid = validateSession();
@@ -395,10 +400,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@PUT
 	@Path("/createThumbnail")
 	@ApiOperation(value = "Creates the thumbail of the given document; if the thumbnail was already created, nothing will happen")
-	public void createThumbnail(@QueryParam("docId") long docId, @QueryParam("fileVersion") String fileVersion)
-			throws Exception {
+	public void createThumbnail(@QueryParam("docId") long docId, @QueryParam("fileVersion") String fileVersion,
+			@QueryParam("type") String type) throws Exception {
 		String sid = validateSession();
-		super.createThumbnail(sid, docId, fileVersion);
+		super.createThumbnail(sid, docId, fileVersion, type);
 	}
 
 	@Override
@@ -425,8 +430,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@PUT
 	@Path("/rename")
 	@ApiOperation(value = "Renames the title of an existing document with the given identifier")
-	public void rename(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId, 
-			@QueryParam("name") @ApiParam(value = "The new document filename", required = true) String name) throws Exception {
+	public void rename(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
+			@QueryParam("name") @ApiParam(value = "The new document filename", required = true) String name)
+			throws Exception {
 		String sid = validateSession();
 		super.rename(sid, docId, name);
 	}
@@ -434,8 +440,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@GET
 	@Path("/getVersions")
-	@ApiOperation(value="Gets the versions", notes = "Gets the version history of an existing document with the given identifier")
-	public WSDocument[] getVersions(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId) throws Exception {
+	@ApiOperation(value = "Gets the versions", notes = "Gets the version history of an existing document with the given identifier")
+	public WSDocument[] getVersions(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId)
+			throws Exception {
 		String sid = validateSession();
 		return super.getVersions(sid, docId);
 	}
@@ -443,12 +450,13 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@POST
 	@Path("/createAlias")
-	@ApiOperation(value="Creates a new document alias", notes = "Creates a new document alias for the given document inside a specified folder")	
+	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
+	@ApiOperation(value = "Creates a new document alias", notes = "Creates a new document alias for the given document inside a specified folder")
 	public WSDocument createAlias(
-			@FormParam("docId") @ApiParam(value = "Source document ID", required = true) long docId, 
-			@FormParam("folderId") @ApiParam(value = "Target folder ID", required = true) long folderId, 
-			@FormParam("type") @ApiParam(value = "Type of the alias (use 'pdf' to create an alias to the PDF conversion)", required = true) String type) 
-					throws Exception {
+			@FormParam("docId") @ApiParam(value = "Source document ID", required = true) long docId,
+			@FormParam("folderId") @ApiParam(value = "Target folder ID", required = true) long folderId,
+			@FormParam("type") @ApiParam(value = "Type of the alias (use 'pdf' to create an alias to the PDF conversion)", required = true) String type)
+			throws Exception {
 		String sid = validateSession();
 		return super.createAlias(sid, docId, folderId, type);
 	}
@@ -457,14 +465,14 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@POST
 	@Path("/createDownloadTicket")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation(value="Creates a new download ticket", notes = "Creates a new download ticket to the original document or it's PDF conversion")	
+	@ApiOperation(value = "Creates a new download ticket", notes = "Creates a new download ticket to the original document or it's PDF conversion")
 	public String createDownloadTicket(
-			@FormParam("docId") @ApiParam(value = "Source document ID", required = true) long docId, 
-			@FormParam("suffix") @ApiParam(value = "can be null or 'conversion.pdf'") String suffix, 
-			@FormParam("expireHours") @ApiParam(value = "expiration time expressed in hours") Integer expireHours, 
-			@FormParam("expireDate") @ApiParam(value = "exact expiration date expressed in the format yyyy-MM-dd") String expireDate, 
-			@FormParam("maxDownloads") @ApiParam(value = "maximum number of downloads allowed", required = true) Integer maxDownloads) 
-					throws Exception {
+			@FormParam("docId") @ApiParam(value = "Source document ID", required = true) long docId,
+			@FormParam("suffix") @ApiParam(value = "can be null or 'conversion.pdf'") String suffix,
+			@FormParam("expireHours") @ApiParam(value = "expiration time expressed in hours") Integer expireHours,
+			@FormParam("expireDate") @ApiParam(value = "exact expiration date expressed in the format yyyy-MM-dd") String expireDate,
+			@FormParam("maxDownloads") @ApiParam(value = "maximum number of downloads allowed", required = true) Integer maxDownloads)
+			throws Exception {
 		String sid = validateSession();
 		return super.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
 	}
@@ -472,8 +480,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@DELETE
 	@Path("/deleteLink")
-	@ApiOperation(value="Removes an existing link")
-	public void deleteLink(@ApiParam(value = "ID of the link", required = true) @QueryParam("id") long id) throws Exception {
+	@ApiOperation(value = "Removes an existing link")
+	public void deleteLink(@ApiParam(value = "ID of the link", required = true) @QueryParam("id") long id)
+			throws Exception {
 		String sid = validateSession();
 		super.deleteLink(sid, id);
 	}
@@ -481,17 +490,20 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@GET
 	@Path("/getAliases")
-	@ApiOperation(value="Gets the aliases", notes = "Gets the aliases of the given document; returns an array of WSDocument that are aliases")
-	public WSDocument[] getAliases(@ApiParam(value = "The document ID", required = true) @QueryParam("docId") long docId) throws Exception {
+	@ApiOperation(value = "Gets the aliases", notes = "Gets the aliases of the given document; returns an array of WSDocument that are aliases")
+	public WSDocument[] getAliases(
+			@ApiParam(value = "The document ID", required = true) @QueryParam("docId") long docId) throws Exception {
 		String sid = validateSession();
 		return super.getAliases(sid, docId);
 	}
-	
+
 	@Override
 	@GET
 	@Path("/getDocumentByCustomId")
-	@ApiOperation(value="Gets document metadata by custom ID", notes = "Gets document metadata of an existing document with the given custom identifier")
-	public WSDocument getDocumentByCustomId(@ApiParam(value = "The custom ID", required = true) @QueryParam("customId") String customId) throws Exception {
+	@ApiOperation(value = "Gets document metadata by custom ID", notes = "Gets document metadata of an existing document with the given custom identifier")
+	public WSDocument getDocumentByCustomId(
+			@ApiParam(value = "The custom ID", required = true) @QueryParam("customId") String customId)
+			throws Exception {
 		String sid = validateSession();
 		return super.getDocumentByCustomId(sid, customId);
 	}
@@ -499,8 +511,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@GET
 	@Path("/getDocuments")
-	@ApiOperation(value="Gets the metadata of a collection of document", notes = "Gets document metadata of a collection of existing documents with the given identifiers; returns an array of WSDocument")	
-	public WSDocument[] getDocuments(@QueryParam("docIds") @ApiParam(value = "Array of document IDs", required = true) Long[] docIds) throws Exception {
+	@ApiOperation(value = "Gets the metadata of a collection of document", notes = "Gets document metadata of a collection of existing documents with the given identifiers; returns an array of WSDocument")
+	public WSDocument[] getDocuments(
+			@QueryParam("docIds") @ApiParam(value = "Array of document IDs", required = true) Long[] docIds)
+			throws Exception {
 		String sid = validateSession();
 		return super.getDocuments(sid, docIds);
 	}
@@ -508,8 +522,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@GET
 	@Path("/getExtractedText")
-	@ApiOperation(value="Gets the extracted text of a document", notes = "Gets the document's text stored in the full-text index")	
-	public String getExtractedText(@QueryParam("docId") @ApiParam(value = "The document ID", required = true) long docId) throws Exception {
+	@Produces({ MediaType.TEXT_PLAIN })
+	@ApiOperation(value = "Gets the extracted text of a document", notes = "Gets the document's text stored in the full-text index")
+	public String getExtractedText(
+			@QueryParam("docId") @ApiParam(value = "The document ID", required = true) long docId) throws Exception {
 		String sid = validateSession();
 		return super.getExtractedText(sid, docId);
 	}
@@ -517,8 +533,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@GET
 	@Path("/getRecentDocuments")
-	@ApiOperation(value="Gets the last modified documents", notes = "Lists of last modified documents of the current session")
-	public WSDocument[] getRecentDocuments(@QueryParam("maxHits") @ApiParam(value = "Maximum number of returned records", required = true) Integer maxHits) throws Exception {
+	@ApiOperation(value = "Gets the last modified documents", notes = "Lists of last modified documents of the current session")
+	public WSDocument[] getRecentDocuments(
+			@QueryParam("maxHits") @ApiParam(value = "Maximum number of returned records", required = true) Integer maxHits)
+			throws Exception {
 		String sid = validateSession();
 		return super.getRecentDocuments(sid, maxHits);
 	}
@@ -526,8 +544,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@GET
 	@Path("/getLinks")
-	@ApiOperation(value="Gets the links of a document", notes = "Gets all the links of a specific document; returns an array of links")
-	public WSLink[] getLinks(@QueryParam("docId") @ApiParam(value = "The document ID", required = true) long docId) throws Exception {
+	@ApiOperation(value = "Gets the links of a document", notes = "Gets all the links of a specific document; returns an array of links")
+	public WSLink[] getLinks(@QueryParam("docId") @ApiParam(value = "The document ID", required = true) long docId)
+			throws Exception {
 		String sid = validateSession();
 		return super.getLinks(sid, docId);
 	}
@@ -535,21 +554,22 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@GET
 	@Path("/getResource")
-	@ApiOperation(value="Gets the content of a resource", notes = "Gets the content of a resource associated to the given document; returns the raw content of the file")	
+	@ApiOperation(value = "Gets the content of a resource", notes = "Gets the content of a resource associated to the given document; returns the raw content of the file")
 	public DataHandler getResource(
-			@QueryParam("docId") @ApiParam(value = "The document ID", required = true) long docId, 
-			@QueryParam("fileVersion") @ApiParam(value = "The file version to retrieve") String fileVersion, 
-			@QueryParam("suffix") @ApiParam(value = "suffix specification(it cannot be empty, use 'conversion.pdf' to get the PDF conversion)") String suffix) 
-					throws Exception {
+			@QueryParam("docId") @ApiParam(value = "The document ID", required = true) long docId,
+			@QueryParam("fileVersion") @ApiParam(value = "The file version to retrieve") String fileVersion,
+			@QueryParam("suffix") @ApiParam(value = "suffix specification(it cannot be empty, use 'conversion.pdf' to get the PDF conversion)") String suffix)
+			throws Exception {
 		String sid = validateSession();
-		return super.getResource(sid, docId,fileVersion,suffix);
+		return super.getResource(sid, docId, fileVersion, suffix);
 	}
 
 	@Override
 	@GET
 	@Path("/isReadable")
-	@ApiOperation(value="Tests if a document is readable", notes = "Tests if a document is readable; returns True if the identifier denotes a document, otherwise false")	
-	public boolean isReadable(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId) throws Exception {
+	@ApiOperation(value = "Tests if a document is readable", notes = "Tests if a document is readable; returns True if the identifier denotes a document, otherwise false")
+	public boolean isReadable(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId)
+			throws Exception {
 		String sid = validateSession();
 		return super.isReadable(sid, docId);
 	}
@@ -557,12 +577,12 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@POST
 	@Path("/link")
-	@ApiOperation(value="Creates a link between two documents", notes = "Creates a new link between two documents; returns the created link object")	
-	public WSLink link(
-			@FormParam("doc1") @ApiParam(value = "ID of document 1", required = true) long doc1, 
-			@FormParam("doc2") @ApiParam(value = "ID of document 2", required = true) long doc2, 
-			@FormParam("type") @ApiParam(value = "type of the link (use 'pdf' to point to the pdf conversion)") String type) 
-					throws Exception {
+	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
+	@ApiOperation(value = "Creates a link between two documents", notes = "Creates a new link between two documents; returns the created link object")
+	public WSLink link(@FormParam("doc1") @ApiParam(value = "ID of document 1", required = true) long doc1,
+			@FormParam("doc2") @ApiParam(value = "ID of document 2", required = true) long doc2,
+			@FormParam("type") @ApiParam(value = "type of the link (use 'pdf' to point to the pdf conversion)") String type)
+			throws Exception {
 		String sid = validateSession();
 		return super.link(sid, doc1, doc2, type);
 	}
@@ -570,8 +590,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@PUT
 	@Path("/lock")
-	@ApiOperation(value="Locks a document", notes = "Locks an existing document with the given identifier")	
-	public void lock(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId) throws Exception {
+	@ApiOperation(value = "Locks a document", notes = "Locks an existing document with the given identifier")
+	public void lock(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId)
+			throws Exception {
 		String sid = validateSession();
 		super.lock(sid, docId);
 	}
@@ -580,12 +601,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@POST
 	@Path("/reindex")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation(value="Re-indexes a document", notes = "re-indexes(or indexes from scratch) a document")
-	public void reindex(
-			@FormParam("doc1") @ApiParam(value = "Document ID", required = true) long docId, 
-			@FormParam("content") @ApiParam(value = "Document ID") String content) 
-					throws Exception 
-	{
+	@ApiOperation(value = "Re-indexes a document", notes = "re-indexes(or indexes from scratch) a document")
+	public void reindex(@FormParam("doc1") @ApiParam(value = "Document ID", required = true) long docId,
+			@FormParam("content") @ApiParam(value = "Document ID") String content) throws Exception {
 		String sid = validateSession();
 		super.reindex(sid, docId, content);
 	}
@@ -594,14 +612,13 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@POST
 	@Path("/uploadResource")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@ApiOperation( value = "Uploads a new resource of the document", notes = "Uploads a new resource attached to the given document. If the resource already exists it is overwritten")
+	@ApiOperation(value = "Uploads a new resource of the document", notes = "Uploads a new resource attached to the given document. If the resource already exists it is overwritten")
 	@ApiImplicitParams({
 			@ApiImplicitParam(name = "docId", value = "the document id", required = true, dataType = "integer", paramType = "form"),
 			@ApiImplicitParam(name = "fileVersion", value = "the specific file version", required = false, dataType = "string", paramType = "form"),
 			@ApiImplicitParam(name = "suffix", value = "suffix specification(it cannot be empty, use 'conversion.pdf' to put the PDF conversion)", required = true, dataType = "string", paramType = "form"),
-			@ApiImplicitParam(name = "content", value = "raw content of the file", required = true, dataType = "file", paramType = "form"),
-			})
-	public void uploadResource(List<Attachment> attachments) throws Exception {
+			@ApiImplicitParam(name = "content", value = "raw content of the file", required = true, dataType = "file", paramType = "form"), })
+	public void uploadResource(@ApiParam(hidden = true) List<Attachment> attachments) throws Exception {
 
 		String sid = validateSession();
 
@@ -632,10 +649,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@PUT
 	@Path("/restore")
-	@ApiOperation( value = "Restores a deleted document")
-	public void restore(
-			@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId, 
-			@QueryParam("folderId") @ApiParam(value = "Folder ID (target)", required = true) long folderId) throws Exception {
+	@ApiOperation(value = "Restores a deleted document")
+	public void restore(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
+			@QueryParam("folderId") @ApiParam(value = "Folder ID (target)", required = true) long folderId)
+			throws Exception {
 		String sid = validateSession();
 		super.restore(sid, docId, folderId);
 	}
@@ -643,10 +660,11 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@POST
 	@Path("/saveNote")
-	@ApiOperation( value = "Adds a new note", notes="Adds/modifies a note for the given document")
-	public WSNote saveNote(
-			@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId, 
-			@FormParam("note") @ApiParam(value = "the WSNote representation as json string", required = true) WSNote note) throws Exception {
+	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
+	@ApiOperation(value = "Adds a new note", notes = "Adds/modifies a note for the given document")
+	public WSNote saveNote(@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
+			@FormParam("note") @ApiParam(value = "the WSNote representation as json string", required = true) WSNote note)
+			throws Exception {
 		String sid = validateSession();
 		return super.saveNote(sid, docId, note);
 	}
@@ -655,13 +673,11 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@POST
 	@Path("/sendEmail")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation( value = "Sends documents by email", notes = "Sends a set of documents as mail attachments")	
-	public void sendEmail(
-			@FormParam("docIds") @ApiParam(value = "Document IDs", required = true) Long[] docIds, 
-			@FormParam("recipients") @ApiParam(value = "Set of recipients(comma separated)", required = true) String recipients, 
-			@FormParam("subject") @ApiParam(value = "The email subject") String subject, 
-			@FormParam("message") @ApiParam(value = "The email message body") String message) 
-					throws Exception {
+	@ApiOperation(value = "Sends documents by email", notes = "Sends a set of documents as mail attachments")
+	public void sendEmail(@FormParam("docIds") @ApiParam(value = "Document IDs", required = true) Long[] docIds,
+			@FormParam("recipients") @ApiParam(value = "Set of recipients(comma separated)", required = true) String recipients,
+			@FormParam("subject") @ApiParam(value = "The email subject") String subject,
+			@FormParam("message") @ApiParam(value = "The email message body") String message) throws Exception {
 		String sid = validateSession();
 		super.sendEmail(sid, docIds, recipients, subject, message);
 	}
@@ -670,11 +686,9 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@POST
 	@Path("/setPassword")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation( value = "Password protect a document", notes = "Protects with a password the given document")		
-	public void setPassword(
-			@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId, 
-			@FormParam("password") @ApiParam(value = "A password", required = true) String password) 
-					throws Exception {
+	@ApiOperation(value = "Password protect a document", notes = "Protects with a password the given document")
+	public void setPassword(@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
+			@FormParam("password") @ApiParam(value = "A password", required = true) String password) throws Exception {
 		String sid = validateSession();
 		super.setPassword(sid, docId, password);
 	}
@@ -682,8 +696,8 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Override
 	@PUT
 	@Path("/unlock")
-	@ApiOperation( value = "Unlocks the document", notes = "Unlocks an existing document with the given identifier")			
-	public void unlock(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId) 
+	@ApiOperation(value = "Unlocks the document", notes = "Unlocks an existing document with the given identifier")
+	public void unlock(@QueryParam("docId") @ApiParam(value = "Document ID", required = true) long docId)
 			throws Exception {
 		String sid = validateSession();
 		super.unlock(sid, docId);
@@ -693,11 +707,10 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@POST
 	@Path("/unsetPassword")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation( value = "Removes password protection", notes = "Removes the password protection from the document")				
-	public void unsetPassword(
-			@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId, 
-			@FormParam("currentPassword") @ApiParam(value = "A password", required = true) String currentPassword) 
-					throws Exception {
+	@ApiOperation(value = "Removes password protection", notes = "Removes the password protection from the document")
+	public void unsetPassword(@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
+			@FormParam("currentPassword") @ApiParam(value = "A password", required = true) String currentPassword)
+			throws Exception {
 		String sid = validateSession();
 		super.unsetPassword(sid, docId, currentPassword);
 	}
@@ -706,12 +719,39 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@POST
 	@Path("/unprotect")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation( value = "Temporarily removes password protection", notes = "Unprotect a document that is password protected. If the given password is right, the document remains unprotected for the duration of the session")			
-	public boolean unprotect(
-			@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId, 
-			@FormParam("password") @ApiParam(value = "A password", required = true) String password) 
-					throws Exception {
+	@ApiOperation(value = "Temporarily removes password protection", notes = "Unprotect a document that is password protected. If the given password is right, the document remains unprotected for the duration of the session")
+	public boolean unprotect(@FormParam("docId") @ApiParam(value = "Document ID", required = true) long docId,
+			@FormParam("password") @ApiParam(value = "A password", required = true) String password) throws Exception {
 		String sid = validateSession();
 		return super.unprotect(sid, docId, password);
+	}
+
+	// @Produces(MediaType.APPLICATION_OCTET_STREAM)
+	// "application/octet-stream";
+	// @Produces("image/jpeg")
+
+	@Override
+	@GET
+	@Path("/thumbnail/{type}/{docpath:.*}")
+	@Produces("image/png")
+	public DataHandler getThumbnail(@PathParam("type") String type, @PathParam("docpath") String docPath,
+			@PathParam("docpath") List<PathSegment> docPathList) throws Exception {
+		String sid = validateSession();
+
+		String myPath = "/" + docPath;
+
+		User user = validateSession(sid);
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Document doc = docDao.findByPath(myPath, user.getTenantId());
+
+		if (!type.toLowerCase().endsWith(".png"))
+			type = type += ".png";
+
+		try {
+			return super.getResource(sid, doc.getId(), doc.getFileVersion(), type);
+		} catch (Exception e) {
+			super.createThumbnail(sid, doc.getId(), doc.getFileVersion(), type);
+			return super.getResource(sid, doc.getId(), doc.getFileVersion(), type);
+		}
 	}
 }

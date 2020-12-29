@@ -1,6 +1,7 @@
- <%@ page import="javax.servlet.*" %>
+<%@ page import="javax.servlet.*" %>
 <%@ page import="javax.servlet.http.*" %>
 <%@ page import="java.util.regex.*" %>
+<%@ page import="java.util.*" %>
 <%@ page import="com.logicaldoc.core.security.*" %>
 <%@ page import="com.logicaldoc.util.*" %>
 <%@ page import="com.logicaldoc.web.util.*" %>
@@ -18,6 +19,23 @@
   boolean print = security.isPrintEnabled(docId, userId);
   boolean download = security.isDownloadEnabled(docId, userId);
   
+  
+  /*
+   * Prepares an hash so the servlet could check that this request comes from a real preview panel.
+   * Also store a session attribute containing the docId as additional information used by the servlet
+   * to prevent a user without download permission to download the file being previewed.
+   */ 
+  com.logicaldoc.core.document.dao.DocumentDAO docDao = (com.logicaldoc.core.document.dao.DocumentDAO)Context.get().getBean(com.logicaldoc.core.document.dao.DocumentDAO.class);
+  com.logicaldoc.core.document.Document doc = docDao.findById(docId);
+  Integer previewCheck=null;
+  if(doc!=null) {
+	 if(doc.getDigest()!=null)
+    	previewCheck=(doc.getDigest() + doc.getFileName()).hashCode();
+	 else
+	    previewCheck=doc.getFileName().hashCode();
+	 
+	 session.setAttribute("preview-"+docId, new Date());   
+  }
   
   String path = "convertpdf";
   if(request.getParameter("path")!=null)
@@ -42,7 +60,7 @@
     <script src="viewer.js"></script>
     
     <script>
-        var pdfUrl='<%=request.getContextPath()%>/<%=path%>?<%=request.getQueryString()%>';
+        var pdfUrl='<%=request.getContextPath()%>/<%=path%>?<%=request.getQueryString()%><%=previewCheck!=null ? "&previewcheck="+previewCheck : "" %>';
                 
         window.addEventListener('load', function() {
           // PDFViewerApplication.appConfig.toolbar.viewBookmark;

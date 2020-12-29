@@ -53,6 +53,7 @@
 		<property name="maxIdle" value="${jdbc.dbcp.maxIdle}" />
 		<property name="testOnBorrow" value="${jdbc.dbcp.testOnBorrow}" />
 		<property name="testWhileIdle" value="${jdbc.dbcp.testWhileIdle}" />
+		<property name="connectionInitSqls" value="${jdbc.dbcp.connectionInitSqls}" />
 		<property name="timeBetweenEvictionRunsMillis"
 			value="${jdbc.dbcp.timeBetweenEvictionRuns}" />
 		<property name="numTestsPerEvictionRun" value="${jdbc.dbcp.testsPerEvictionRun}" />
@@ -69,6 +70,7 @@
 		<property name="maxLifetime" value="${jdbc.hikari.maxLifetime}" />
 		<property name="minimumIdle" value="${jdbc.hikari.minimumIdle}" />
 		<property name="maximumPoolSize" value="${jdbc.hikari.maximumPoolSize}" />
+		<property name="connectionInitSql" value="${jdbc.hikari.connectionInitSql}" />
 	</bean>
 
 	<!-- Data Source -->

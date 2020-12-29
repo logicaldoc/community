@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUITransition;
+import com.logicaldoc.gui.common.client.beans.GUIWFState;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
@@ -18,6 +19,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
@@ -34,6 +36,7 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
@@ -48,11 +51,13 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.RichTextItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -221,6 +226,10 @@ public class TaskDetailsDialog extends Window {
 				workflow.getName());
 		workflowName.setShouldSaveValue(false);
 
+		StaticTextItem version = ItemFactory.newStaticTextItem("version", I18N.message("version"),
+				"" + workflow.getVersion());
+		version.setShouldSaveValue(false);
+
 		StaticTextItem workflowTag = ItemFactory.newStaticTextItem("tag", I18N.message("tag"),
 				workflow.getTag() != null ? workflow.getTag() : "");
 
@@ -235,8 +244,8 @@ public class TaskDetailsDialog extends Window {
 		if (workflow.getEndDate() != null)
 			endDate.setValue(I18N.formatDate((Date) workflow.getEndDate()));
 
-		workflowForm.setItems(workflowTitle, workflowInstanceId, workflowName, workflowTag, workflowDescription,
-				startDate, endDate);
+		workflowForm.setItems(workflowTitle, workflowInstanceId, workflowName, version, workflowTag,
+				workflowDescription, startDate, endDate);
 		sxLayout.addMember(workflowForm);
 
 		// Task section
@@ -306,7 +315,7 @@ public class TaskDetailsDialog extends Window {
 				reassignUserForm.setTitleOrientation(TitleOrientation.TOP);
 				reassignUserForm.setNumCols(1);
 				reassignUserForm.setValuesManager(vm);
-				user = ItemFactory.newUserSelector("user", I18N.message("user"), null, true);
+				user = ItemFactory.newUserSelector("user", I18N.message("user"), null, true, true);
 				user.setShowTitle(true);
 				user.setDisplayField("username");
 
@@ -421,7 +430,7 @@ public class TaskDetailsDialog extends Window {
 
 			@Override
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				WorkflowService.Instance.get().getCompletionDiagram(wfl.getName(), wfl.getId(),
+				WorkflowService.Instance.get().getCompletionDiagram(wfl.getName(), wfl.getVersion(), wfl.getId(),
 						new AsyncCallback<GUIWorkflow>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -456,7 +465,7 @@ public class TaskDetailsDialog extends Window {
 				transitionsForm.setWidth(150);
 				transitionsForm.setIsGroup(true);
 				transitionsForm.setGroupTitle(I18N.message("actions"));
-
+				
 				List<FormItem> items = new ArrayList<FormItem>();
 				// Add Transitions buttons
 				if (workflow.getSelectedTask().getTransitions() != null)
@@ -464,26 +473,24 @@ public class TaskDetailsDialog extends Window {
 						final String transitionName = transition.getText();
 						if (transitionName == null || transitionName.trim().isEmpty())
 							continue;
+						
 						ButtonItem transitionButton = new ButtonItem(transition.getText());
 						transitionButton.setAutoFit(true);
 						transitionButton.addClickHandler(new ClickHandler() {
 
 							@Override
 							public void onClick(ClickEvent event) {
-								WorkflowService.Instance.get().endTask(getWorkflow().getSelectedTask().getId(),
-										transitionName, new AsyncCallback<Void>() {
-											@Override
-											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
-											}
-
-											@Override
-											public void onSuccess(Void result) {
-												TaskDetailsDialog.this.workflowDashboard.refresh();
-												destroy();
-											}
-										});
+								if (workflow.getSelectedTask().isRequiresNote()) {
+									/*
+									 * This task requires a note at completion,
+									 * so we collect the input from the user
+									 */
+									collectNoteAndEndTask(getWorkflow().getSelectedTask(), transitionName);
+								} else {
+									onEndTask(getWorkflow().getSelectedTask(), transitionName);
+								}
 							}
+
 						});
 						items.add(transitionButton);
 					}
@@ -971,8 +978,8 @@ public class TaskDetailsDialog extends Window {
 						else
 							contextMenu.setItems(preview, download, checkout, checkin, unlock, open, remove);
 
-						FolderService.Instance.get().getFolder(selectedDocument.getFolder().getId(), false, false, false,
-								new AsyncCallback<GUIFolder>() {
+						FolderService.Instance.get().getFolder(selectedDocument.getFolder().getId(), false, false,
+								false, new AsyncCallback<GUIFolder>() {
 									@Override
 									public void onFailure(Throwable caught) {
 										Log.serverError(caught);
@@ -1001,5 +1008,82 @@ public class TaskDetailsDialog extends Window {
 					}
 				});
 
+	}
+
+	/**
+	 * Gets the required note to the user before terminating the task taking the given transition
+	 * 
+	 * @param task the task to end
+	 * @param transition name of the transition to take
+	 */
+	private void collectNoteAndEndTask(GUIWFState task, String transition) {
+		RichTextItem noteInput = ItemFactory.newRichTextItemForNote("note", "note", null);
+		Integer minlength = task.getMinNoteSize();
+		int maxlength = Session.get().getConfigAsInt("default.gui.note.maxlength");
+		noteInput.setValidators(new CustomValidator() {
+
+				@Override
+				protected boolean condition(Object value) {
+					if (value == null || value.toString().length() < 1) {
+						setErrorMessage(I18N.message("fieldrequired"));
+						return false;
+					}
+
+					setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
+					if (value != null && value.toString().length() > maxlength)
+						return false;
+					
+					
+					if(minlength!=null && minlength>1) {
+						setErrorMessage(I18N.message("notetoosmall", Integer.toString(minlength)));
+						if (value != null && value.toString().length() < minlength)
+							return false;
+					}
+					
+					return true;
+				}
+			});
+		
+		LD.askForValue("providenotetocomplete", "note", null, noteInput, 500, new ValueCallback() {
+
+			@Override
+			public void execute(String value) {
+				if(noteInput.validate())
+				WorkflowService.Instance.get().addNote(workflow.getSelectedTask().getId(),
+						value, new AsyncCallback<Long>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								Log.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Long noteId) {
+								destroy();
+								onEndTask(getWorkflow().getSelectedTask(), transition);						
+							}
+						});
+			}
+		});
+	}
+	
+	/**
+	 * Ends the task taking the specified transition
+	 * 
+	 * @param task the task to end
+	 * @param transition name of the transition to take
+	 */
+	private void onEndTask(GUIWFState task, String transition) {
+		WorkflowService.Instance.get().endTask(task.getId(), transition, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Log.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				TaskDetailsDialog.this.workflowDashboard.refresh();
+				destroy();
+			}
+		});
 	}
 }

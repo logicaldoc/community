@@ -151,6 +151,7 @@
             access="isAuthenticated()" />
         <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
     </security:http>
+    
     <security:http pattern="/download/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
         access-decision-manager-ref="LDAccessDecisionManager"
@@ -165,6 +166,22 @@
             access="isAuthenticated()" />
         <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
     </security:http>    
+    
+    <security:http pattern="/download-ticket/**" use-expressions="true"
+        create-session="never" disable-url-rewriting="true" auto-config="false"
+        access-decision-manager-ref="LDAccessDecisionManager"
+        authentication-manager-ref="AuthenticationManager"
+        security-context-repository-ref="LDSecurityContextRepository">
+        
+        <security:headers disabled="true" />
+        <security:csrf disabled="true" />
+        
+        <!-- We do not want any protection -->
+        <security:intercept-url pattern="/nosecurity"
+            access="isAuthenticated()" />
+        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
+    </security:http>    
+    
     <security:http pattern="/display/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
         access-decision-manager-ref="LDAccessDecisionManager"

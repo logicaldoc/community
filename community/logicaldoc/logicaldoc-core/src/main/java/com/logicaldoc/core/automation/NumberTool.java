@@ -12,6 +12,8 @@ import com.logicaldoc.util.LocaleUtil;
 @AutomationDictionary
 public class NumberTool extends org.apache.velocity.tools.generic.NumberTool {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Formats a number using the specified format
 	 * 

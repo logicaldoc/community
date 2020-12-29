@@ -147,6 +147,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (document.getStatus() == Document.DOC_CHECKED_OUT
 				&& (user.getId() == document.getLockUserId() || user.isMemberOf("admin"))) {
 			try {
+				ddao.initialize(document);
+
 				// Create the document history event
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSessionId(sid);
@@ -317,21 +319,27 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public void createThumbnail(String sid, long docId, String fileVersion) throws Exception {
+	public void createThumbnail(String sid, long docId, String fileVersion, String type) throws Exception {
+
 		validateSession(sid);
+
 		try {
 			ThumbnailManager manager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document doc = docDao.findDocument(docId);
 
-			String resource = storer.getResourceName(doc, fileVersion, "thumbnail");
-			if (!storer.exists(docId, resource))
-				manager.createTumbnail(doc, fileVersion, sid);
-
-			resource = storer.getResourceName(doc, fileVersion, "tile");
-			if (!storer.exists(docId, resource))
-				manager.createTile(doc, fileVersion, sid);
+			if (!type.toLowerCase().endsWith(".png"))
+				type = type += ".png";
+			String resource = storer.getResourceName(doc, fileVersion, type);
+			if (!storer.exists(docId, resource)) {
+				if (type.equals(ThumbnailManager.SUFFIX_THUMB))
+					manager.createTumbnail(doc, fileVersion, sid);
+				else if (type.equals(ThumbnailManager.SUFFIX_TILE))
+					manager.createTile(doc, fileVersion, sid);
+				else if (type.equals(ThumbnailManager.SUFFIX_MOBILE))
+					manager.createMobile(doc, fileVersion, sid);
+			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			throw e;

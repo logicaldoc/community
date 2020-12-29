@@ -42,6 +42,21 @@ public class GUIDocumentNote implements Serializable {
 
 	private double height = 0.10;
 
+	/**
+	 * A type of note, for normal notes in a document it is null
+	 */
+	private String type;
+	
+	/**
+	 * A reference to a recipient, it could be a username or the full name of a person, normally this field is not used
+	 */
+	private String recipient;
+	
+	/**
+	 * An email associated to the note, normally this field is not used
+	 */
+	private String recipientEmail;
+	
 	public long getId() {
 		return id;
 	}
@@ -160,5 +175,29 @@ public class GUIDocumentNote implements Serializable {
 
 	public void setFileVersion(String fileVersion) {
 		this.fileVersion = fileVersion;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getRecipient() {
+		return recipient;
+	}
+
+	public void setRecipient(String recipient) {
+		this.recipient = recipient;
+	}
+
+	public String getRecipientEmail() {
+		return recipientEmail;
+	}
+
+	public void setRecipientEmail(String recipientEmail) {
+		this.recipientEmail = recipientEmail;
 	}
 }

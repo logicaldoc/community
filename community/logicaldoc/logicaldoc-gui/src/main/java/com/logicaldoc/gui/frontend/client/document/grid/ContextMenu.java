@@ -600,7 +600,8 @@ public class ContextMenu extends Menu {
 									record.setIndexed(Constants.INDEX_TO_INDEX_METADATA);
 									if (Session.get().getCurrentDocument() != null
 											&& Session.get().getCurrentDocument().getId() == record.getId()) {
-										Session.get().getCurrentDocument().setIndexed(Constants.INDEX_TO_INDEX_METADATA);
+										Session.get().getCurrentDocument()
+												.setIndexed(Constants.INDEX_TO_INDEX_METADATA);
 										DocumentController.get().modified(Session.get().getCurrentDocument());
 									} else {
 										DocumentController.get().modified(record);
@@ -736,10 +737,35 @@ public class ContextMenu extends Menu {
 		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				PreviewPopup iv = null;
+
 				if (grid.getSelectedCount() == 1) {
-					iv = new PreviewPopup(grid.getSelectedDocument());
+					GUIDocument doc = grid.getSelectedDocument();
+					if (doc.getDocRef() != null) {
+						/*
+						 * in case of alias the data servlet inverts the docId
+						 * and the docRef so in order to have the preview to do
+						 * the right security checks we have to restore the
+						 * correct ids
+						 */
+						long aliasId = doc.getDocRef();
+						doc.setDocRef(doc.getId());
+						doc.setId(aliasId);
+					}
+					iv = new PreviewPopup(doc);
 				} else {
-					iv = new PreviewPopup(grid.getSelectedDocuments(), 0);
+					GUIDocument[] docs = grid.getSelectedDocuments();
+					for (GUIDocument doc : docs) {
+						/*
+						 * in case of alias the data servlet inverts the docId
+						 * and the docRef so in order to have the preview to do
+						 * the right security checks we have to restore the
+						 * correct ids
+						 */
+						long aliasId = doc.getDocRef();
+						doc.setDocRef(doc.getId());
+						doc.setId(aliasId);
+					}
+					iv = new PreviewPopup(docs, 0);
 				}
 				iv.show();
 			}
@@ -846,6 +872,36 @@ public class ContextMenu extends Menu {
 			}
 		});
 
+		MenuItem merge = new MenuItem(I18N.message("merge"));
+		merge.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				LD.askforStringMandatory(I18N.message("merge"), I18N.message("filename"), null, new ValueCallback() {
+
+					@Override
+					public void execute(String value) {
+						ContactingServer.get().show();
+						DocumentService.Instance.get().merge(selectionIds, folder.getId(), value,
+								new AsyncCallback<GUIDocument>() {
+
+									@Override
+									public void onFailure(Throwable caught) {
+										Log.serverError(caught);
+										ContactingServer.get().hide();
+									}
+
+									@Override
+									public void onSuccess(GUIDocument mergedDoc) {
+										ContactingServer.get().hide();
+										DocumentController.get().stored(mergedDoc);
+									}
+								});
+					}
+				});
+			}
+		});
+
 		setItems(download, preview, cut, copy, delete, bookmark, sendMail, links, office, checkout, checkin, lock,
 				unlock);
 		if (!Feature.visible(Feature.OFFICE))
@@ -876,6 +932,9 @@ public class ContextMenu extends Menu {
 			moreMenu.addItem(stamp);
 		if (Feature.visible(Feature.SPLIT))
 			moreMenu.addItem(split);
+
+		moreMenu.addItem(merge);
+
 		if (Feature.visible(Feature.IMPEX))
 			moreMenu.addItem(sendToExpArchive);
 		if (Feature.visible(Feature.WORKFLOW))
@@ -890,6 +949,7 @@ public class ContextMenu extends Menu {
 		 */
 		{
 			boolean someSelection = selection != null && selection.length > 0;
+			boolean moreSelected = selection != null && selection.length > 1;
 			boolean justOneSelected = someSelection && selection.length == 1;
 			boolean immutablesInSelection = someSelection && checkImmutablesInSelection(selection);
 
@@ -952,6 +1012,7 @@ public class ContextMenu extends Menu {
 			replaceAlias.setEnabled(justOneSelected && folder.isWrite() && selection[0].getDocRef() != null);
 			split.setEnabled(
 					justOneSelected && selection[0].getFileName().toLowerCase().endsWith(".pdf") && folder.isWrite());
+			merge.setEnabled(moreSelected && folder.isWrite());
 
 			if ((selection != null && selection.length == 2) && Feature.enabled(Feature.COMPARISON)) {
 				String fileName1 = selection[0].getFileName().toLowerCase();

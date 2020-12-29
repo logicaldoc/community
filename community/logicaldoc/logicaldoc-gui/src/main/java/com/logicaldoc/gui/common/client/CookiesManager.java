@@ -12,17 +12,9 @@ import com.smartgwt.client.util.Offline;
  */
 public class CookiesManager {
 
-	public static final String COOKIE_HITSLIST_GROUPING = "ldoc-hitslist-grouping";
-
 	public static final String COOKIE_HITSLIST_MODE = "ldoc-hitslist-mode";
 
 	public static final String COOKIE_HITSLIST_PREV_W = "ldoc-hitslist-prev-w";
-
-	public static final String COOKIE_DOCSLIST_GROUPING = "ldoc-docslist-grouping";
-
-	public static final String COOKIE_DOCSLIST_SORT = "ldoc-docslist-sort";
-
-	public static final String COOKIE_DOCSLIST_MAX = "ldoc-docslist-max";
 
 	public static final String COOKIE_DOCSLIST_MODE = "ldoc-docslist-mode";
 
@@ -83,12 +75,6 @@ public class CookiesManager {
 
 		try {
 			Offline.remove(COOKIE_HITSLIST_PREV_W);
-		} catch (Throwable t) {
-
-		}
-
-		try {
-			Offline.remove(COOKIE_DOCSLIST_MAX);
 		} catch (Throwable t) {
 
 		}

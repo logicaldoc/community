@@ -22,7 +22,12 @@ import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.TagsForm;
 import com.sksamuel.gwt.websockets.Websocket;
+import com.smartgwt.client.types.EdgeName;
+import com.smartgwt.client.types.MultiMessageMode;
+import com.smartgwt.client.types.NotifyTransition;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.notify.Notify;
+import com.smartgwt.client.widgets.notify.NotifySettings;
 
 /**
  * The Frontend entry point
@@ -41,6 +46,24 @@ public class Frontend implements EntryPoint {
 	 */
 	public static Frontend get() {
 		return instance;
+	}
+
+	/**
+	 * Configure some interface defaults
+	 */
+	static {
+		NotifySettings settings = new NotifySettings();
+		settings.setMultiMessageMode(MultiMessageMode.REPLACE);
+		settings.setAutoFitMaxWidth(400);
+		settings.setSlideSpeed(300);
+		settings.setDuration(3000);
+		settings.setMultiMessageMode(MultiMessageMode.STACK);
+		settings.setCanDismiss(true);
+		settings.setPosition(EdgeName.T);
+		settings.setAppearMethod(NotifyTransition.FADE);
+		settings.setDisappearMethod(NotifyTransition.FADE);
+
+		Notify.configureDefaultSettings(settings);
 	}
 
 	@Override

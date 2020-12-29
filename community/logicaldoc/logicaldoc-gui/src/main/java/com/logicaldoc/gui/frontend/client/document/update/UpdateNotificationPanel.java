@@ -66,7 +66,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 		form.setWidth100();
 		form.setValuesManager(vm);
 
-		usersItem = ItemFactory.newMultipleUsersSelector("users", "users", null);
+		usersItem = ItemFactory.newMultipleUsersSelector("users", "users", false, null);
 		usersItem.setWidth(350);
 		usersItem.setDisabled(!updateEnabled);
 

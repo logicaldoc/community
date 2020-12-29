@@ -50,6 +50,8 @@ public class FolderGroup {
 	private int email = 1;
 
 	private int automation = 0;
+	
+	private int storage = 0;
 
 	private long groupId;
 
@@ -82,6 +84,7 @@ public class FolderGroup {
 		mg.setMove(move);
 		mg.setEmail(email);
 		mg.setAutomation(automation);
+		mg.setStorage(storage);
 		return mg;
 	}
 
@@ -109,6 +112,7 @@ public class FolderGroup {
 		 * the same mask order.
 		 */
 		StringBuffer sb = new StringBuffer();
+		sb.append(getStorage() == 1 ? "1" : "0");
 		sb.append(getAutomation() == 1 ? "1" : "0");
 		sb.append(getEmail() == 1 ? "1" : "0");
 		sb.append(getMove() == 1 ? "1" : "0");
@@ -160,6 +164,7 @@ public class FolderGroup {
 		setMove(Permission.MOVE.match(permissions) ? 1 : 0);
 		setEmail(Permission.EMAIL.match(permissions) ? 1 : 0);
 		setAutomation(Permission.AUTOMATION.match(permissions) ? 1 : 0);
+		setStorage(Permission.STORAGE.match(permissions) ? 1 : 0);
 	}
 
 	public int getRead() {
@@ -328,5 +333,13 @@ public class FolderGroup {
 
 	public void setAutomation(int automation) {
 		this.automation = automation;
+	}
+
+	public int getStorage() {
+		return storage;
+	}
+
+	public void setStorage(int storage) {
+		this.storage = storage;
 	}
 }

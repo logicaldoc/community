@@ -80,7 +80,7 @@ public class BarcodeQueuePanel extends VLayout {
 			public void onClick(ClickEvent event) {
 				if (max.validate()) {
 					maxRecords = (Integer) max.getValue();
-					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false, false));
+					list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
 				}
 			}
 		});
@@ -108,7 +108,7 @@ public class BarcodeQueuePanel extends VLayout {
 											Log.info(I18N.message("docsrescheduledprocessing"), null);
 											maxRecords = (Integer) max.getValue();
 											list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false,
-													false));
+													null));
 										}
 									});
 							}
@@ -241,7 +241,7 @@ public class BarcodeQueuePanel extends VLayout {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);
-		list.setDataSource(new DocumentsDS(null, null, maxRecords, 1, null, true, false, false));
+		list.setDataSource(new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
 		list.setFields(locked, immutable, icon, filename, size, lastModified, version, publisher, published, creator,
 				created, customId);
 

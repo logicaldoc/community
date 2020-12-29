@@ -292,8 +292,8 @@ public class RestDocumentClient extends AbstractRestClient {
 		proxy.createPdf(docId, fileVersion);
 	}
 
-	public void createThumbnail(long docId, String fileVersion) throws Exception {
+	public void createThumbnail(long docId, String fileVersion, String type) throws Exception {
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-		proxy.createThumbnail(docId, fileVersion);
+		proxy.createThumbnail(docId, fileVersion, type);
 	}
 }

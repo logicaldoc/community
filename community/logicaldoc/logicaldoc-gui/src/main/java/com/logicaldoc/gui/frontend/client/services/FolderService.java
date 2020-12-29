@@ -106,6 +106,14 @@ public interface FolderService extends RemoteService {
 	 */
 	public void applyTags(long parentId) throws ServerException;
 
+	/**
+	 * Applies the storage setting to a sub-tree
+	 * 
+	 * @param parentId The parent folder containing the tags
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void applyStorage(long parentId) throws ServerException;
 	
 	/**
 	 * Applies all OCR settings to a sub-tree

@@ -195,7 +195,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		if (Session.get().isDefaultTenant()) {
 			items.addAll(Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold,
-					ocrrendres, batch, batchTimeout, barcoderendres, barcodeformats, engine));
+					ocrrendres, barcoderendres, barcodeformats, batch, batchTimeout, engine));
 		} else
 			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold, barcodeformats));
 		form.setItems(items.toArray(new FormItem[0]));

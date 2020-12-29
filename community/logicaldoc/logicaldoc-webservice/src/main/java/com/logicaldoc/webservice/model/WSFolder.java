@@ -89,6 +89,9 @@ public class WSFolder implements Serializable {
 	@WSDoc(required = false, description = "identifier of the barcode template to use to process the documents inside this folder")
 	private Long barcodeTemplateId = null;
 
+	@WSDoc(required = false, description = "maximum number of versions maintaned in the workspace")
+	private Integer maxVersions;
+	
 	public void addAttribute(WSAttribute att) {
 		List<WSAttribute> buf = (List<WSAttribute>) Arrays.asList(getAttributes());
 		buf.add(att);
@@ -141,6 +144,7 @@ public class WSFolder implements Serializable {
 		wsFolder.setTemplateLocked(folder.getTemplateLocked());
 		wsFolder.setHidden(folder.getHidden());
 		wsFolder.setStorage(folder.getStorage());
+		wsFolder.setMaxVersions(folder.getMaxVersions());
 		wsFolder.setSecurityRef(folder.getSecurityRef());
 		wsFolder.setOcrTemplateId(folder.getOcrTemplateId());
 		wsFolder.setBarcodeTemplateId(folder.getBarcodeTemplateId());
@@ -363,5 +367,13 @@ public class WSFolder implements Serializable {
 
 	public void setBarcodeTemplateId(Long barcodeTemplateId) {
 		this.barcodeTemplateId = barcodeTemplateId;
+	}
+
+	public Integer getMaxVersions() {
+		return maxVersions;
+	}
+
+	public void setMaxVersions(Integer maxVersions) {
+		this.maxVersions = maxVersions;
 	}
 }

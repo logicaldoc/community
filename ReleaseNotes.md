@@ -1,7 +1,7 @@
-The LogicalDOC development team is pleased to announce the availability of LogicalDOC CE 8.4.2
+The LogicalDOC development team is proud to announce the availability of LogicalDOC CE 8.5.2
 
-You can get this distribution in Tomcat-bundle archive from SourceForge: 
-https://sourceforge.net/projects/logicaldoc/files/distribution/LogicalDOC%20CE%208.4/logicaldoc-8.4.2-tomcat-bundle.zip/download
+You can get this distribution in various formats from the LD's website:
+https://www.logicaldoc.com/download-logicaldoc-community 
 
 LogicalDOC Community Edition is free (libre) software (FLOSS) and allows organizations and individuals to centralize the management, storage, retrieval and distribution of documents.
 
@@ -20,28 +20,39 @@ Native apps for Android and iOS are published and available for free download on
    
 For a complete list of features, take a look at https://www.logicaldoc.com/features
 
-
-Some changes since v8.3.4:
-+ New REST web-services: DocumentMetadata, System and many new methods for document and folders management
-+ Support for .jfif image files ([#1009](https://bugs.logicaldoc.com/ticket/1009)) 
-+ Control labels of the preview are garbled, tangled ([#1013](https://bugs.logicaldoc.com/ticket/1013))
-+ Versions tab empty when filename contains the ampersign ([#1019](https://bugs.logicaldoc.com/ticket/1019))
-+ Checkout and Lock does not work properly on alias (link) documents ([#1020](https://bugs.logicaldoc.com/ticket/1020))
-+ Extended attributes of type Folder ([#1001](https://bugs.logicaldoc.com/ticket/1001))
-+ Save documents grid layout on a per folder basis ([#1008](https://bugs.logicaldoc.com/ticket/1008))
-+ configurable delimiters for the worddelimiter search filter ([#997](https://bugs.logicaldoc.com/ticket/997))
-+ The administrator can force the interface settings of a user and replicate the same to a selection of users ([#1004](https://bugs.logicaldoc.com/ticket/1004))
-+ Maximum number of download criteria for Download Tickets (Web-service) ([#992](https://bugs.logicaldoc.com/ticket/992))
-+ Reports of current download tickets ([#993](https://bugs.logicaldoc.com/ticket/993))
-+ The calculation of documents tagged by word does not work ([#996](https://bugs.logicaldoc.com/ticket/996)) 
-	
-
-The LogicalDOC documentation is available at the following address
-https://docs.logicaldoc.com
-
-Please note that this documentation is related to LogicalDOC Enterprise, and that some features may not be available in the Community version
-
-At any time you can start a discussion to request clarifications or propose changes on the Community Forum https://forums.logicaldoc.com/    
+There are many updates in this version 8.5.2, both in terms of performance and system stability, but the most relevant updates are those that have been made on the WebDAV interface. 
+In particular, HTTP responses have been improved in the face of violation of permissions and a great job has been done to support the new App: **LogicalDOC Mobile**, available for free on Google Play https://play.google.com/store/apps/details?id=com.logicaldoc.mobile
 
 
-The LogicalDOC development Team
+###Changes since version 8.4.2:###
+
++ **Support for the new Android app LogicalDOC Mobile**
++ Enforced permission management in WebDAV with correct HTTP return codes
++ 1045	Unable to delete some files
++ 1046	Recording of folder alias creations
++ 1051	WebDAV cache removed because of superseeded by other optimizations
++ 1032	Display tags column in the documents grid
++ 1035	Customizable number of displayed history records
++ 1038	Nice popups to notify alerts
++ 1039	Issues when number of folders in a subfolder is more than 1000
++ 1042	Reduced time to shutdown of the Windows service
++ 1026	Updated the indexing engine
++ 1027	Copy the path of a folder
+
+
+See also the file CHANGELOG.txt for more details
+
+The web-service API documentation is available in the LogicalDOC Documentation website https://docs.logicaldoc.com/en/web-services-api
+
+The LogicalDOC documentation is available at the following address https://docs.logicaldoc.com
+
+Please note that the above documentation is related to LogicalDOC Enterprise, and that some features may not be available in the Community version
+
+At any time you can start a discussion in the Community forums http://forums.logicaldoc.com
+
+An official Docker project for LogicalDOC Community is available at https://hub.docker.com/r/logicaldoc/logicaldoc-ce/ other Docker projects with different configurations and settings are available from https://hub.docker.com/u/logicaldoc/  
+
+If you like this free software, why don't you leave a positive review on SourceForge?
+https://sourceforge.net/projects/logicaldoc/reviews/new
+
+The LogicalDOC's Development Team

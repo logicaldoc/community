@@ -20,7 +20,9 @@ import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
 import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
+import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
@@ -47,13 +49,20 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 	protected DocumentsGrid grid = null;
 
-	private Cursor cursor;
+	private Cursor searchCursor;
 
 	private int visualizationMode = DocumentsGrid.MODE_LIST;
 
 	public HitsListPanel() {
-		if (CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE) != null)
-			visualizationMode = Integer.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE).toString());
+		try {
+			if (CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE) != null) {				
+				visualizationMode = Integer
+						.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE).toString());
+			}
+		} catch (Throwable t) {
+
+		}
+		
 		Search.get().addObserver(this);
 		DocumentController.get().addObserver(this);
 		FolderController.get().addObserver(this);
@@ -140,21 +149,26 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			}
 		});
 
-		if (cursor != null)
-			removeMember(cursor);
-		cursor = new Cursor();
-		cursor.setMaxDisplayedRecords(Search.get().getOptions().getMaxHits());
-		cursor.registerMaxChangedHandler(new ChangedHandler() {
+		if (searchCursor != null)
+			removeMember(searchCursor);
+
+		searchCursor = new Cursor();
+		Integer pageSize = GridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
+		if (pageSize == null)
+			pageSize = Session.get().getConfigAsInt("search.hits");
+		searchCursor.setPageSize(pageSize);
+		searchCursor.registerPageSizeChangedHandler(new ChangedHandler() {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
 				GUISearchOptions opt = Search.get().getOptions();
-				opt.setMaxHits(cursor.getMaxDisplayedRecords());
+				opt.setMaxHits(searchCursor.getPageSize());
+				Search.get().setMaxHits(searchCursor.getPageSize());
 				Search.get().search();
 			}
 		});
 
-		setMembers(cursor, (Canvas) grid);
+		setMembers(searchCursor, (Canvas) grid);
 
 		onSearchArrived();
 	}
@@ -171,7 +185,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				format.format((double) Search.get().getTime() / (double) 1000) });
 		stats += " (<b>" + format.format((double) Search.get().getTime() / (double) 1000) + "</b> "
 				+ I18N.message("seconds").toLowerCase() + ")";
-		cursor.setMessage(stats);
+		searchCursor.setMessage(stats);
 
 		GUISearchOptions options = Search.get().getOptions();
 		if (options.getType() == GUISearchOptions.TYPE_FULLTEXT)
@@ -179,11 +193,11 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		GUIDocument[] result = Search.get().getLastResult();
 		if (result != null)
 			grid.setDocuments(result);
-		
+
 		if (Search.get().isHasMore())
 			Log.warn(I18N.message("possiblemorehits"), I18N.message("possiblemorehitsdetail"));
 
-		cursor.setMaxDisplayedRecords(options.getMaxHits());
+		searchCursor.setPageSize(options.getMaxHits());
 	}
 
 	@Override
@@ -203,12 +217,11 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				SearchPanel.get().onSelectedDocumentHit(hit.getId());
 	}
 
-	protected void showContextMenu(GUIFolder folder, final boolean document) {
+	private void showContextMenu(GUIFolder folder, final boolean document) {
 		Menu contextMenu = new Menu();
 
 		if (document) {
-			contextMenu = new ContextMenu(Session.get().getCurrentFolder(), grid);
-
+			contextMenu = new ContextMenu(folder, grid);
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
 				MenuItem openInFolder = new MenuItem();
 				openInFolder.setTitle(I18N.message("openinfolder"));
@@ -220,7 +233,6 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				});
 				contextMenu.addItem(openInFolder);
 			}
-
 		} else {
 			if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUMENTS)) {
 				MenuItem openInFolder = new MenuItem();
@@ -353,5 +365,20 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 	public DocumentsGrid getGrid() {
 		return grid;
+	}
+
+	public String getGridLayout() {
+		if (!(grid instanceof DocumentsListGrid))
+			return null;
+
+		DocumentsListGrid grd = (DocumentsListGrid) grid;
+		if (searchCursor != null)
+			return "|" + searchCursor.getPageSize() + "|" + grd.getGridLayout();
+		else
+			return grd.getGridLayout();
+	}
+
+	public Cursor getSearchCursor() {
+		return searchCursor;
 	}
 }

@@ -52,7 +52,7 @@ public class Log {
 				Util.redirect(base
 						+ (base.endsWith("/") ? GWT.getModuleName() + ".jsp" : "/" + GWT.getModuleName() + ".jsp"));
 			} else if (caught instanceof ServerException) {
-				SC.warn(caught.getMessage());
+				Log.error(caught.getMessage(), null, caught);
 			}
 		} catch (Throwable t) {
 		}

@@ -27,6 +27,9 @@
 		<property name="left" type="double" column="ld_left" not-null="true" />
 		<property name="top" type="double" column="ld_top" not-null="true" />
 		<property name="width" type="double" column="ld_width" not-null="true" />
-		<property name="height" type="double" column="ld_height" not-null="true" />		
+		<property name="height" type="double" column="ld_height" not-null="true" />
+		<property name="type" type="string" column="ld_type" length="255" />		
+		<property name="recipient" type="string" column="ld_recipient" length="255" />
+		<property name="recipientEmail" type="string" column="ld_recipientemail" length="255" />
 	</class>
 </hibernate-mapping>

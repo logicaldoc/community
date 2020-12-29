@@ -56,7 +56,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		setSelectionType(SelectionStyle.MULTIPLE);
 		setShowAllRecords(false);
 		setCanReorderTiles(false);
-		setCanDrag(folder.isMove());
+		setCanDrag(folder != null && folder.isMove());
 		setWidth100();
 
 		DetailViewerField thumbnail = new DetailViewerField("thumbnail");
@@ -64,20 +64,20 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 			@Override
 			public String format(Object value, Record record, DetailViewerField field) {
-				int tileSize = 200;
-				if (Session.get().getConfig("gui.tile.size") != null)
-					tileSize = Integer.parseInt(Session.get().getConfig("gui.tile.size"));
+				int thumbnailSize = 200;
+				if (Session.get().getConfig("gui.thumbnail.size") != null)
+					thumbnailSize = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
 
 				try {
 					if ("folder".equals(record.getAttribute("type")))
-						return Util.imageHTML("folder_tile.png", null, tileSize, null);
+						return Util.imageHTML("folder_tile.png", null, thumbnailSize, null);
 					else {
 						long docId = Long.parseLong(record.getAttribute("id"));
 						if (!record.getAttributeAsBoolean("password") || DocumentProtectionManager.isUnprotected(docId))
-							return Util.tileImageHTML(docId, null, null, tileSize);
+							return Util.thumbnailImgageHTML(docId, null, null, thumbnailSize);
 						else
 							return Util.imageHTML("blank.png", null,
-									"width:" + tileSize + "px height:" + tileSize + "px");
+									"width:" + thumbnailSize + "px height:" + thumbnailSize + "px");
 					}
 				} catch (Throwable e) {
 					return "";
@@ -459,7 +459,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	public Cursor getGridCursor() {
 		return cursor;
 	}
-	
+
 	@Override
 	public void loadGridLayout(GUIFolder folder) {
 		// Function not supported byt the tiles visualization

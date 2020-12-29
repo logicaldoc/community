@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.workflow;
 
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.frontend.client.workflow.designer.DrawingPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Window;
 

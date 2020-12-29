@@ -394,14 +394,15 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 	}
 
 	public String getTagsString() {
-		if (tagsString != null || !tagsString.isEmpty())
+		if (tagsString != null && !tagsString.isEmpty())
 			return tagsString;
 		else {
-			StringBuffer buf = new StringBuffer();
-			for (String tag : getTags()) {
-				buf.append(tag);
-				buf.append(" ");
-			}
+			StringBuffer buf = new StringBuffer("");
+			if (getTags() != null)
+				for (String tag : getTags()) {
+					buf.append(tag);
+					buf.append(" ");
+				}
 			return buf.toString();
 		}
 	}

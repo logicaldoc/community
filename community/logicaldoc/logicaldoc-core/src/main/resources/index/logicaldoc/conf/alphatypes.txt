@@ -10,6 +10,10 @@ $ => DIGIT
 % => DIGIT
 . => DIGIT
 \u002C => DIGIT
+# _ => SUBWORD_DELIM 
+# / => DIGIT
+# - => DIGIT
+
 
 # in some cases you might not want to split on ZWJ
 # this also tests the case where we need a bigger byte[]

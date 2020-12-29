@@ -17,7 +17,7 @@ import com.logicaldoc.gui.frontend.client.metadata.template.TemplatesAndAttribut
 import com.logicaldoc.gui.frontend.client.metadata.zonalocr.ZonalOCRPanel;
 import com.logicaldoc.gui.frontend.client.services.SchemeService;
 import com.logicaldoc.gui.frontend.client.services.TagService;
-import com.logicaldoc.gui.frontend.client.workflow.WorkflowDesigner;
+import com.logicaldoc.gui.frontend.client.workflow.designer.WorkflowDesigner;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;

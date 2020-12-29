@@ -50,14 +50,14 @@
             <property name="title" value="LogicalDOC REST API"/>
             <property name="version" value="8.4.2"/>
             <property name="contact" value="devel@logicaldoc.com"/>
-            <property name="description" value="This is the interactive documentation of the REST APIs exposed by LogicalDOC. You can find more information about LogicalDOC at http://logicaldoc.com or on Twitter @logicaldoc.&lt;br/&gt;   
+            <property name="description" value="This is the interactive documentation of the REST APIs exposed by LogicalDOC. You can find more information about LogicalDOC at https://www.logicaldoc.com or on Twitter @logicaldoc.&lt;br/&gt;   
             Note: The access path to the API is protected with basic authentication, to be able to run the samples you must log in using the credentials of a Logicaldoc user, or passing to the request the session ID (SID) as a cookie (cookie name: `ldoc-sid`).&lt;br/&gt;&lt;br/&gt;
             Here is an example to list the children folders: &lt;br/&gt;
             curl -u admin:admin -H ''Accept: application/json'' http://localhost:8080/services/rest/folder/listChildren?folderId=4
             &lt;br/&gt;&lt;br/&gt;
             More examples are available at the following address: http://wiki.logicaldoc.com/wiki/Bindings_And_Samples
             &lt;br/&gt;&lt;br/&gt;
-            **Find out more about LogicalDOC** http://logicaldoc.com"/>                        
+            **Find out more about LogicalDOC** https://www.logicaldoc.com"/>                        
     </bean>
 
     <jaxrs:server id="restDocumentSWG" address="/rest/documentSWG">
@@ -134,7 +134,46 @@
         <jaxrs:features>
             <ref bean="swagger2Feature" />
         </jaxrs:features>                
-    </jaxrs:server>                
+    </jaxrs:server>
+    
+    <jaxrs:server id="restSystemSWG" address="/rest/systemSWG">
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservicedoc.RestSystemSwagger" />
+        </jaxrs:serviceBeans>        
+        <jaxrs:providers>
+            <ref bean="jsonProvider" />
+            <ref bean="originFilter" />
+        </jaxrs:providers>
+        <jaxrs:features>
+            <ref bean="swagger2Feature" />
+        </jaxrs:features>                
+    </jaxrs:server>
+    
+    <jaxrs:server id="restDocumentMetadataSWG" address="/rest/documentMetadataSWG">
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservicedoc.RestDocumentMetadataSwagger" />
+        </jaxrs:serviceBeans>        
+        <jaxrs:providers>
+            <ref bean="jsonProvider" />
+            <ref bean="originFilter" />
+        </jaxrs:providers>
+        <jaxrs:features>
+            <ref bean="swagger2Feature" />
+        </jaxrs:features>                
+    </jaxrs:server>
+    
+    <jaxrs:server id="restAuthSWG" address="/rest/authSWG">
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservicedoc.RestAuthSwagger" />
+        </jaxrs:serviceBeans>        
+        <jaxrs:providers>
+            <ref bean="jsonProvider" />
+            <ref bean="originFilter" />
+        </jaxrs:providers>
+        <jaxrs:features>
+            <ref bean="swagger2Feature" />
+        </jaxrs:features>                
+    </jaxrs:server>                             
 
    
 </beans>

@@ -2,7 +2,6 @@ package com.logicaldoc.gui.common.client.data;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -25,9 +24,8 @@ public class WorkflowTriggersDS extends DataSource {
 		templateId.setHidden(true);
 		DataSourceTextField workflow = new DataSourceTextField("workflow", I18N.message("workflow"));
 		DataSourceTextField template = new DataSourceTextField("template", I18N.message("template"));
-		DataSourceBooleanField checkin = new DataSourceBooleanField("triggerAtCheckin",
-				I18N.message("triggeratcheckin"));
-		setFields(id, workflowId, templateId, workflow, template, checkin);
+		DataSourceTextField events = new DataSourceTextField("events", I18N.message("triggeron"));
+		setFields(id, workflowId, templateId, workflow, template, events);
 		setDataURL("data/workflowtriggers.xml?folderId=" + folderId);
 		setClientOnly(false);
 	}

@@ -1,7 +1,6 @@
 package com.logicaldoc.core.automation;
 
 import java.io.File;
-import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,16 +8,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.communication.EMail;
-import com.logicaldoc.core.communication.EMailAttachment;
-import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
@@ -35,7 +29,6 @@ import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.TenantDAO;
-import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.Context;
@@ -123,7 +116,6 @@ public class DocTool {
 		return displayUrl(doc.getTenantId(), doc.getId());
 	}
 
-	
 	/**
 	 * Builds the display url of a document(display permalink)
 	 * 
@@ -139,7 +131,8 @@ public class DocTool {
 	 * Creates a new download ticket for a document
 	 * 
 	 * @param docId identifier of the document
-	 * @param pdfConversion if the pdf conversion should be downloaded instead of the original file
+	 * @param pdfConversion if the pdf conversion should be downloaded instead
+	 *        of the original file
 	 * @param expireHours number of hours after which the ticket expires
 	 * @param expireDate a specific expiration date
 	 * @param maxDownloads number of downloads over which the ticket expires
@@ -157,7 +150,7 @@ public class DocTool {
 		if (!urlPrefix.endsWith("/"))
 			urlPrefix += "/";
 
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -199,11 +192,11 @@ public class DocTool {
 	 * @param username the user in whose name the method is run
 	 */
 	public void store(Document doc, String username) {
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		DocumentHistory transaction = new DocumentHistory();
-		transaction.setDocId(doc.getId());
+		transaction.setDocument(doc);
 		transaction.setDate(new Date());
 		transaction.setUser(user);
 
@@ -212,6 +205,16 @@ public class DocTool {
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 		}
+	}
+
+	/**
+	 * Initializes lazy loaded collections
+	 * 
+	 * @param doc the document to initialize
+	 */
+	public void initialize(Document doc) {
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		docDao.initialize(doc);
 	}
 
 	/**
@@ -224,14 +227,13 @@ public class DocTool {
 	 * @throws Exception a generic error happened
 	 */
 	public void move(Document doc, String targetPath, String username) throws Exception {
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
 		Folder folder = createPath(doc, targetPath, username);
 
 		DocumentHistory transaction = new DocumentHistory();
-		transaction.setDocId(doc.getId());
-		transaction.setTenantId(doc.getTenantId());
+		transaction.setDocument(doc);
 		transaction.setDate(new Date());
 		transaction.setUser(user);
 
@@ -245,10 +247,12 @@ public class DocTool {
 	 * @param targetPath the full path of the target folder
 	 * @param username the user in whose name the method is run
 	 * 
+	 * @return the new document created
+	 * 
 	 * @throws Exception a generic error happened
 	 */
-	public void copy(Document doc, String targetPath, String username) throws Exception {
-		User user = getUser(username);
+	public Document copy(Document doc, String targetPath, String username) throws Exception {
+		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
@@ -258,19 +262,62 @@ public class DocTool {
 		transaction.setDocId(doc.getId());
 		transaction.setUser(user);
 
-		manager.copyToFolder(doc, folder, transaction);
+		return manager.copyToFolder(doc, folder, transaction);
+	}
+
+	/**
+	 * Creates an alias to a document
+	 * 
+	 * @param originalDoc the original document to be referenced
+	 * @param targetPath the full path of the target folder
+	 * @param type the alias type(<b>null</b> for the original file or
+	 *        <b>pdf</b> for it's pdf conversion)
+	 * @param username the user in whose name the method is run
+	 * 
+	 * @return The new alias created
+	 * 
+	 * @throws Exception a generic error happened
+	 */
+	public Document createAlias(Document originalDoc, String targetPath, String type, String username)
+			throws Exception {
+		Folder targetFolder = createPath(originalDoc, targetPath, username);
+		return createAlias(originalDoc, targetFolder, type, username);
+	}
+
+	/**
+	 * Creates an alias to a document
+	 * 
+	 * @param originalDoc the original document to be referenced
+	 * @param targetFolder the folder that will contain the alias
+	 * @param type the alias type(<b>null</b> for the original file or
+	 *        <b>pdf</b> for it's pdf conversion)
+	 * @param username the user in whose name the method is run
+	 * 
+	 * @return The new alias created
+	 * 
+	 * @throws Exception a generic error happened
+	 */
+	public Document createAlias(Document originalDoc, Folder targetFolder, String type, String username)
+			throws Exception {
+		User user = new SecurityTool().getUser(username);
+
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setUser(user);
+
+		return manager.createAlias(originalDoc, targetFolder, type, transaction);
 	}
 
 	/**
 	 * Locks a document
 	 * 
 	 * @param docId identifier of the document
-	 * @param username the  user that locks the document
+	 * @param username the user that locks the document
 	 * 
 	 * @throws Exception a generic error happened
 	 */
 	public void lock(long docId, String username) throws Exception {
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
@@ -285,12 +332,12 @@ public class DocTool {
 	 * Unlocks a document
 	 * 
 	 * @param docId identifier of the document
-	 * @param username the  user that locks the document
+	 * @param username the user that locks the document
 	 * 
 	 * @throws Exception a generic error happened
 	 */
 	public void unlock(long docId, String username) throws Exception {
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
@@ -310,7 +357,7 @@ public class DocTool {
 	 * @throws Exception a generic error happened
 	 */
 	public void delete(long docId, String username) throws Exception {
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setDocId(docId);
@@ -335,7 +382,7 @@ public class DocTool {
 	 */
 	public Document copyResource(Document doc, String fileVersion, String suffix, String newFileName, String username)
 			throws Exception {
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
@@ -380,7 +427,23 @@ public class DocTool {
 	}
 
 	/**
-	 * Convert a document in another format and saves the result in another file in the same folder
+	 * Converts a document in PDF format and saves it as ancillary resource of
+	 * the document with suffix
+	 * {@link FormatConverterManager#PDF_CONVERSION_SUFFIX}. If the conversion
+	 * already exists, nothing will be done.
+	 * 
+	 * @param doc the document to convert
+	 * 
+	 * @throws Exception generic error happened
+	 */
+	public void convertPDF(Document doc) throws Exception {
+		FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(FormatConverterManager.class);
+		manager.convertToPdf(doc, null);
+	}
+
+	/**
+	 * Convert a document in another format and saves the result in another file
+	 * in the same folder
 	 * 
 	 * @param doc the document to convert
 	 * @param format it is the output format(e.g. <b>pdf</b>, <b>txt</b>, ...)
@@ -391,7 +454,7 @@ public class DocTool {
 	 * @throws Exception generic error happened
 	 */
 	public Document convert(Document doc, String format, String username) throws Exception {
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
@@ -402,18 +465,27 @@ public class DocTool {
 	}
 
 	/**
-	 * Retrieves a user object
+	 * Merges a set of documents into a single PDF file
 	 * 
-	 * @param username the username
+	 * @param documents the list of documents to merge(the order counts)
+	 * @param targetFolderId identifier of the target folder
+	 * @param fileName name of the output file(must ends with .pdf)
+	 * @param username the user in whose name the method is run
 	 * 
-	 * @return the user object
+	 * @return the generated merged document
+	 * 
+	 * @throws Exception generic error happened
 	 */
-	@Deprecated
-	public User getUser(String username) {
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		User user = StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
-				: userDao.findByUsername("_system");
-		return user;
+	public Document merge(Collection<Document> documents, long targetFolderId, String fileName, String username)
+			throws Exception {
+		User user = new SecurityTool().getUser(username);
+
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setUser(user);
+
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		Document merged = manager.merge(documents, targetFolderId, fileName, transaction);
+		return merged;
 	}
 
 	/**
@@ -489,14 +561,16 @@ public class DocTool {
 	/**
 	 * Creates a path, all existing nodes in the specified path will be reused
 	 * 
-	 * @param doc document used to take the root folder in case the <code>targetPath</code> represents a relative path
-	 * @param targetPath absolute or relative(in relation to the document's parent folder) path to be created
+	 * @param doc document used to take the root folder in case the
+	 *        <code>targetPath</code> represents a relative path
+	 * @param targetPath absolute or relative(in relation to the document's
+	 *        parent folder) path to be created
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @return the folder leaf of the path
 	 */
 	public Folder createPath(Document doc, String targetPath, String username) {
-		SecurityTool secTool=new SecurityTool();
+		SecurityTool secTool = new SecurityTool();
 		User user = secTool.getUser(username);
 
 		FolderHistory transaction = new FolderHistory();
@@ -556,10 +630,11 @@ public class DocTool {
 	 * 
 	 * @param doc the document
 	 * @param text text of the note
-	 * @param username username of the user in name of which this action is taken
+	 * @param username username of the user in name of which this action is
+	 *        taken
 	 */
 	public void addNote(Document doc, String text, String username) {
-		User user = getUser(username);
+		User user = new SecurityTool().getUser(username);
 
 		DocumentNote note = new DocumentNote();
 		note.setTenantId(doc.getTenantId());
@@ -603,7 +678,8 @@ public class DocTool {
 	}
 
 	/**
-	 * Calculates what will be the next version specification. @see {@link Version#getNewVersionName(String, boolean)} 
+	 * Calculates what will be the next version specification. @see
+	 * {@link Version#getNewVersionName(String, boolean)}
 	 * 
 	 * @param currentVersion the current version(e.g. 1.1, 2.15, ...)
 	 * @param major if the new release must be a major release
@@ -613,82 +689,4 @@ public class DocTool {
 	public String calculateNextVersion(String currentVersion, boolean major) {
 		return Version.calculateNewVersion(currentVersion, major);
 	}
-	
-	/**
-	 * Extracts attachments of email files (.eml, .msg) in the current folder
-	 * 
-	 * @param doc the document
-	 * @param filterFileName a filter on the extensions of the attachment to be extracted (comma separated)
-	 * @param username the user that will be impersonated to write the attachments
-	 * @return a list with the new documents created
-	 */
-	public List<Document> extractAttachments(Document doc, String filterFileName, String username) {
-		
-		List<Document> createdDocs = new ArrayList<Document>();
-		
-		User user = getUser(username);
-		InputStream is = null;
-		try {
-			long docId = doc.getId();
-			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			String resource = storer.getResourceName(docId, doc.getFileVersion(), null);
-			is = storer.getStream(docId, resource);
-
-			EMail email = null;
-
-			if (doc.getFileName().toLowerCase().endsWith(".eml"))
-				email = MailUtil.messageToMail(is, true);
-			else
-				email = MailUtil.msgToMail(is, true);
-
-			
-			if (email.getAttachments().size() > 0) {
-				for (EMailAttachment att : email.getAttachments().values()) {
-					
-					// Apply the filter
-					if (isAllowed(att.getFileName(), filterFileName)) {
-						
-						File tmpFile = null;
-						try {
-							tmpFile = File.createTempFile("att-", null);
-							FileUtils.writeByteArrayToFile(tmpFile, att.getData());
-
-							Document docVO = new Document();
-							docVO.setFileName(att.getFileName());
-							docVO.setTenantId(doc.getTenantId());
-							docVO.setFolder(doc.getFolder());
-							docVO.setLanguage(doc.getLanguage());
-							
-							DocumentHistory transaction = new DocumentHistory();
-							transaction.setUser(user);
-
-							DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-							Document attDoc = manager.create(tmpFile, docVO, transaction);
-							createdDocs.add(attDoc);
-						} finally {
-							if (tmpFile != null)
-								FileUtil.strongDelete(tmpFile);
-						}
-					}
-				}
-			}
-
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-		} finally {
-			IOUtils.closeQuietly(is);
-		}
-		return createdDocs;
-	}
-	
-	/**
-	 * Check if the specified filename is allowed or not.
-	 * 
-	 * @param filename The file name to check
-	 * @return True if <code>filename</code> is included in
-	 *         <code>includes</code>
-	 */
-	private boolean isAllowed(String filename, String includes) {
-		return FileUtil.matches(filename, includes, "");
-	}		
 }

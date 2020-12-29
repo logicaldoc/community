@@ -189,4 +189,9 @@ public class FSStorer extends AbstractStorer {
 	public List<String> getParameterNames() {
 		return new ArrayList<String>();
 	}
+
+	@Override
+	public int moveResourcesToStore(long docId, int targetStorageId) throws IOException {
+		throw new UnsupportedOperationException();
+	}
 }

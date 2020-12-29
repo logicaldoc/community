@@ -72,14 +72,22 @@ public class GroupUsersPanel extends VLayout {
 		ListGridField email = new ListGridField("email", I18N.message("email"), 200);
 		email.setCanFilter(true);
 
-		ListGridField enabled = new ListGridField("eenabled", " ", 24);
-		enabled.setType(ListGridFieldType.IMAGE);
-		enabled.setCanSort(false);
-		enabled.setAlign(Alignment.CENTER);
-		enabled.setShowDefaultContextMenu(false);
-		enabled.setImageURLPrefix(Util.imagePrefix());
-		enabled.setImageURLSuffix(".gif");
-		enabled.setCanFilter(false);
+		ListGridField eenabled = new ListGridField("eenabled", " ", 24);
+		eenabled.setType(ListGridFieldType.IMAGE);
+		eenabled.setCanSort(false);
+		eenabled.setAlign(Alignment.CENTER);
+		eenabled.setShowDefaultContextMenu(false);
+		eenabled.setImageURLPrefix(Util.imagePrefix());
+		eenabled.setImageURLSuffix(".gif");
+		eenabled.setCanFilter(false);
+
+		ListGridField enabled = new ListGridField("_enabled", I18N.message("enabled"), 55);
+		enabled.setCanFilter(true);
+		enabled.setHidden(true);
+
+		ListGridField guest = new ListGridField("guest", I18N.message("guest"), 55);
+		guest.setCanFilter(true);
+		guest.setHidden(true);
 
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -91,7 +99,7 @@ public class GroupUsersPanel extends VLayout {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(UsersDS.get(groupId));
-		list.setFields(id, enabled, username, firstName, name, email, cell, phone);
+		list.setFields(id, eenabled, username, firstName, name, email, cell, phone, enabled, guest);
 
 		HLayout buttons = new HLayout();
 		buttons.setHeight(25);
@@ -99,7 +107,7 @@ public class GroupUsersPanel extends VLayout {
 
 		// Prepare the list for adding a new user
 		final DynamicForm userForm = new DynamicForm();
-		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, false);
+		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, false, false);
 		user.addChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {

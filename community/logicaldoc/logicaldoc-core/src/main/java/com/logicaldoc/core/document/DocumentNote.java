@@ -18,8 +18,14 @@ public class DocumentNote extends PersistentObject implements Cloneable {
 
 	private String fileName;
 
+	/**
+	 * Unique identifier of the user that created this note 
+	 */
 	private long userId;
 
+	/**
+	 * Unique username of the user that created this note 
+	 */
 	private String username;
 
 	private Date date = new Date();
@@ -39,6 +45,21 @@ public class DocumentNote extends PersistentObject implements Cloneable {
 	private double width = 0.15;
 
 	private double height = 0.10;
+	
+	/**
+	 * A type of note, for normal notes it is null
+	 */
+	private String type;
+	
+	/**
+	 * A reference to a recipient, it could be a username or the full name of a person, normally this field is not used
+	 */
+	private String recipient;
+	
+	/**
+	 * An email associated to the note, normally this field is not used
+	 */
+	private String recipientEmail;
 
 	public DocumentNote() {
 	}
@@ -155,6 +176,30 @@ public class DocumentNote extends PersistentObject implements Cloneable {
 		this.fileVersion = fileVersion;
 	}
 
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getRecipient() {
+		return recipient;
+	}
+
+	public void setRecipient(String recipient) {
+		this.recipient = recipient;
+	}
+
+	public String getRecipientEmail() {
+		return recipientEmail;
+	}
+
+	public void setRecipientEmail(String recipientEmail) {
+		this.recipientEmail = recipientEmail;
+	}
+	
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		DocumentNote note=new DocumentNote();
@@ -173,6 +218,9 @@ public class DocumentNote extends PersistentObject implements Cloneable {
 		note.setHeight(getHeight());
 		note.setFileVersion(getFileVersion());
 		note.setFileName(getFileName());
+		note.setType(getType());
+		note.setRecipient(getRecipient());
+		note.setRecipientEmail(getRecipientEmail());
 		return note;
 	}
 }

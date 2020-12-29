@@ -3,6 +3,7 @@ package com.logicaldoc.webdav.io.handler;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 
 import com.logicaldoc.webdav.context.ExportContext;
@@ -28,9 +29,9 @@ public interface IOHandler extends Serializable {
 
 	public boolean canImport(ImportContext context, DavResource resource);
 
-	public boolean importContent(ImportContext context, boolean isCollection) throws IOException;
+	public boolean importContent(ImportContext context, boolean isCollection) throws IOException, DavException;
 
-	public boolean importContent(ImportContext context, DavResource resource) throws IOException;
+	public boolean importContent(ImportContext context, DavResource resource) throws IOException, DavException;
 
 	public boolean canExport(ExportContext context, boolean isCollection);
 
@@ -39,4 +40,6 @@ public interface IOHandler extends Serializable {
 	public boolean exportContent(ExportContext context, boolean isCollection) throws IOException;
 
 	public boolean exportContent(ExportContext context, DavResource resource) throws IOException;
+
+	public boolean exportContent(ExportContext context, DavResource resource, Long left, Long rangeLength) throws IOException;
 }

@@ -1,8 +1,6 @@
 package com.logicaldoc.core.security;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import com.logicaldoc.core.PersistentObject;
@@ -61,10 +59,6 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	public static final long CHAT = 1527;
 
 	public static final long INTERFACE_DENSITY = 1535;
-
-	public static final List<Long> admittedGuestMenuIds = Arrays
-			.asList(new Long[] { ROOT, DOCUMENTS, FRONTEND, DOCUMENTS, VERSIONS, ALIASES, SEARCH, DASHBOARD, MESSAGES,
-					MAINMENU, SUBSCRIPTIONS, PERSONAL, CHAT, INTERFACE_DENSITY });
 
 	private long id = 0;
 

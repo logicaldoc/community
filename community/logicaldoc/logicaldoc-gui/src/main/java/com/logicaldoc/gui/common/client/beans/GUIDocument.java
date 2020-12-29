@@ -201,8 +201,22 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		tags = tmp;
 	}
 
+	public String getTgs() {
+		if(getTags()==null || getTags().length<1)
+			return "";
+		else {
+			StringBuffer buf = new StringBuffer();
+			for (String tag : getTags()) {
+				if(buf.length()>0)
+					buf.append(",");
+				buf.append(tag);
+			}
+			return buf.toString();
+		}
+	}
+	
 	public String getTagsString() {
-		if (tagsString != null || !tagsString.isEmpty())
+		if (tagsString != null && !tagsString.isEmpty())
 			return tagsString;
 		else {
 			StringBuffer buf = new StringBuffer();

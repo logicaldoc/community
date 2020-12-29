@@ -498,6 +498,8 @@ public class SearchIndexingPanel extends AdminPanel {
 		opts.put("", I18N.message("none").toLowerCase());
 		opts.put("oldestfirst", I18N.message("oldestfirst"));
 		opts.put("mostrecentfirst", I18N.message("mostrecentfirst"));
+		opts.put("smallestfirst", I18N.message("smallestfirst"));
+		opts.put("biggestfirst", I18N.message("biggestfirst"));
 		sorting.setValueMap(opts);
 		sorting.setValue(this.searchEngine.getSorting());
 

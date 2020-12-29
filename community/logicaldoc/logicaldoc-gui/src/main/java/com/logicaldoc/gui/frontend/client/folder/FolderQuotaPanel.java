@@ -83,7 +83,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
 		if (update)
 			quotaThreshold.addChangedHandler(changedHandler);
 
-		recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false),
+		recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false, false),
 				folder.getQuotaAlertRecipients());
 		recipients.setValueField("username");
 		recipients.setDisplayField("username");

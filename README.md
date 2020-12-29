@@ -6,11 +6,11 @@ LogicalDOC integrates all essential documents management, collaboration and an a
 LogicalDOC builds a highly valuable repository of corporate information assets to facilitate [knowledge management](https://www.logicaldoc.com/solutions/knowledge-management) and improve business decision making, boosting workgroups and enterprise productivity through shared practices, greater, better customer relations, faster sales cycles, improved product time-to-market, and better-informed decision making.
 
 With LogicalDOC Community Edition you can:
- * Collect information from any digital source.
- * Collaborate with colleagues on documents and projects.
- * Empower organizations to capitalize on accumulated knowledge by locating documents, experts, and information sources.
- * Embedded workflow engine to take control of your business case.
- * Automate task.
+ * Collect information from any digital source
+ * Collaborate with colleagues on documents and projects
+ * Empower organizations to capitalize on accumulated knowledge by locating documents, experts, and information sources
+ * Embedded workflow engine to take control of your business case
+ * Automate task
  
 ## Installing binaries
 You can install LogicalDOC binaries from [SourceForge](https://sourceforge.net/projects/logicaldoc/):
@@ -40,7 +40,7 @@ $ cd ../../community/logicaldoc
 $ mvn clean package
 ```
 
-See also the file Build_this_Sources.md
+See also the file README.txt
 
 ## Documentation
  * [LogicalDOC Knowledge Center](https://docs.logicaldoc.com)
@@ -54,18 +54,19 @@ See also the file Build_this_Sources.md
  * [Developers Manual](https://www.logicaldoc.com/documents/logicaldoc-devmanual.pdf)
  * [Web Services API](https://docs.logicaldoc.com/en/web-services-api)
 
+
+## Docker Setup
+An official Docker project for LogicalDOC Community is available at https://hub.docker.com/r/logicaldoc/logicaldoc-ce/ other Docker projects with different configurations and settings are available from https://hub.docker.com/u/logicaldoc/
+
+## Mobile Apps for iOS and Android
+There are some free Apps available for devices with Apple iOS and Android operating systems.
+At the moment we are talking about 2 Android apps and 1 for Apple tablets and smartphones. For more information and to connect to the respective online stores, follow this address https://www.logicaldoc.com/product/logicaldoc-mobile
+
 ## Reporting issues
 LogicalDOC Community Edition is supported by developers and technical enthusiasts via [the forum](http://forums.logicaldoc.com) of the user community. If you want to raise an issue, please follow the below recommendations:
  * Before you post a question, please search the question to see if someone has already reported it / asked for it.
  * If the question does not already exist, create a new post. 
  * Please provide as much detailed information as possible with the issue report. We need to know the version of LogicalDOC, Operating System, browser and whatever you think might help us to understand the problem or question.
-
-## Docker images
-An official Docker project for LogicalDOC Community is available at https://hub.docker.com/r/logicaldoc/logicaldoc-ce/ other Docker projects with different configurations and settings are available from https://hub.docker.com/u/logicaldoc/
-
-## Supported databases
-LogicalDOC Community supports the following database engines: MySQL, MariaDB, Oracle, MS SQL, PostgreSQL (experimental).
-In addition, it can work with an embedded Java database: HSQLDB can be used directly, although that is not recommended for production. 
 
 ## License
 [LogicalDOC Community Edition](https://www.logicaldoc.com/download-logicaldoc-community) is made available to the Open Source community under the [GNU Lesser General Public License v3.0](https://www.gnu.org/licenses/lgpl-3.0.en.html).

@@ -8,6 +8,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -17,12 +21,44 @@ import javax.mail.MessagingException;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentComparator;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.io.ZipUtil;
 
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		Document doc1 = new Document();
+		doc1.setId(1L);
+		doc1.setFileName("doc001.pdf");
+		doc1.setDate(df.parse("2020-05-20"));
+
+		Document doc2 = new Document();
+		doc2.setId(2L);
+		doc2.setFileName("doc002.pdf");
+		doc2.setDate(df.parse("2020-05-15"));
+
+		Document doc3 = new Document();
+		doc3.setId(3L);
+		doc3.setFileName("doc003.pdf");
+		doc3.setDate(df.parse("2020-05-16"));
+		
+		Document doc4 = new Document();
+		doc4.setId(4L);
+		doc4.setFileName("doc004.pdf");
+		doc4.setDate(df.parse("2020-05-21"));
+		
+		List<Document> docs = new ArrayList<Document>();
+		docs.add(doc1);
+		docs.add(doc2);
+		docs.add(doc3);
+		docs.add(doc4);
+
+		Collections.sort(docs, DocumentComparator.getComparator("filename desc, date asc"));
+		for (Document doc : docs) {
+			System.out.println(doc.getFileName()+" > "+df.format(doc.getDate()));
+		}
 		//
 		// File xslt = new File("target/xslt");
 		// FileUtils.copyURLToFile(
@@ -36,20 +72,29 @@ public class CoreWorkBench {
 //			System.out.println(entry);
 //		}
 
-		
-		emailStuff();
+//		String inputFile = "src/test/resources/aliceDynamic.epub";
+//		Reader reader = new Reader();
+//		reader.setIsIncludingTextContent(true);
+//		reader.setFullContent(inputFile);
+//		
+//		BookSection bookSection = reader.readSection(1);
+//		
+//		System.out.println(bookSection.getSectionContent());
+//		FileUtil.writeFile(bookSection.getSectionContent(), "c:/tmp/ebook.html");
+
+//		emailStuff();
 	}
 
 	static void emailStuff() throws MessagingException, IOException {
 		EMail email = MailUtil.messageToMail(CoreWorkBench.class.getResourceAsStream("/GENNAIO2020.eml"), true);
 		Map<Integer, EMailAttachment> attachments = email.getAttachments();
 		for (Integer index : attachments.keySet()) {
-			EMailAttachment attachment=attachments.get(index);
-			if(attachment.parseContent().toLowerCase().contains("compensi erogati nel mese")) {
+			EMailAttachment attachment = attachments.get(index);
+			if (attachment.parseContent().toLowerCase().contains("compensi erogati nel mese")) {
 				System.out.println(attachment.getFileName());
 				System.out.println(attachment.parseContent());
 			}
-			
+
 		}
 	}
 

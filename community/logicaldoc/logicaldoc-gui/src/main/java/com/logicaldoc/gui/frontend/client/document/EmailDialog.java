@@ -109,7 +109,7 @@ public class EmailDialog extends Window {
 		subject.setRequired(true);
 		subject.setWidth(350);
 
-		message=ItemFactory.newRichTextItemForAutomation("message", "message", null, null);
+		message = ItemFactory.newRichTextItemForEmail("message", "message", null, null);
 		message.setWidth("*");
 		message.setHeight(200);
 		message.setColSpan(2);
@@ -139,7 +139,7 @@ public class EmailDialog extends Window {
 								@Override
 								public void onSuccess(GUIMessageTemplate t) {
 									Log.info(t.getSubject());
-									
+
 									subject.setValue(t.getSubject());
 									message.setValue(t.getBody());
 									updateSignature();

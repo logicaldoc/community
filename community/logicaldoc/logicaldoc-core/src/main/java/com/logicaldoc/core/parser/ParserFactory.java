@@ -88,9 +88,15 @@ public class ParserFactory {
 		parsers.put("abw", new AbiWordParser());
 		parsers.put("zabw", new ZABWParser()); // Compressed AbiWord document
 
+		parsers.put("java", new TXTParser());
+		parsers.put("json", new TXTParser());
+		parsers.put("c", new TXTParser());
+		parsers.put("cpp", new TXTParser());
+		parsers.put("log", new TXTParser());
 		parsers.put("txt", new TXTParser());
 		parsers.put("csv", new TXTParser());
 		parsers.put("dbf", new TXTParser());
+		
 		parsers.put("xml", new XMLParser());
 		parsers.put("xls", new XLSParser());
 		parsers.put("xlt", new XLSParser());
@@ -102,6 +108,9 @@ public class ParserFactory {
 
 		// Zip
 		parsers.put("zip", new ZipParser());
+
+		// Epub
+		parsers.put("epub", new EpubParser());
 
 		// Acquire the 'Parse' extensions of the core plugin and add defined
 		// parsers

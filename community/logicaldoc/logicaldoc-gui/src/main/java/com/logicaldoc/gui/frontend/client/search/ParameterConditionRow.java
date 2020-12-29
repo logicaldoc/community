@@ -199,48 +199,51 @@ public class ParameterConditionRow extends HLayout {
 			return map;
 
 		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("rating")
-				|| criteriaField.equals("published") || criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)
+				|| criteriaField.equals("published") || criteriaField.equals("indexed")
+				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)
 				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_DOUBLE)) {
-			map.put("greaterthan", I18N.message("greaterthan"));
-			map.put("lessthan", I18N.message("lessthan"));
-			map.put("equals", I18N.message("equals"));
-			map.put("notequal", I18N.message("notequal"));
-			map.put("null", I18N.message("isnull"));
-			map.put("notnull", I18N.message("isnotnull"));
+			map.put("greaterthan", I18N.message("greaterthan").toLowerCase());
+			map.put("lessthan", I18N.message("lessthan").toLowerCase());
+			map.put("equals", I18N.message("equals").toLowerCase());
+			map.put("notequal", I18N.message("notequal").toLowerCase());
+			map.put("null", I18N.message("isnull").toLowerCase());
+			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		} else if (criteriaField.equals("sourceDate") || criteriaField.equals("lastModified")
 				|| criteriaField.equals("date") || criteriaField.equals("creation")
 				|| criteriaField.equals("startPublishing") || criteriaField.equals("stopPublishing")
 				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_DATE)) {
-			map.put("greaterthan", I18N.message("greaterthan"));
-			map.put("lessthan", I18N.message("lessthan"));
-			map.put("null", I18N.message("isnull"));
-			map.put("notnull", I18N.message("isnotnull"));
+			map.put("greaterthan", I18N.message("greaterthan").toLowerCase());
+			map.put("lessthan", I18N.message("lessthan").toLowerCase());
+			map.put("null", I18N.message("isnull").toLowerCase());
+			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN)) {
-			map.put("equals", I18N.message("equals"));
-			map.put("null", I18N.message("isnull"));
-			map.put("notnull", I18N.message("isnotnull"));
+			map.put("equals", I18N.message("equals")).toLowerCase();
+			map.put("null", I18N.message("isnull").toLowerCase());
+			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)
 				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_USER)
 				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_FOLDER)) {
-			map.put("equals", I18N.message("equals"));
-			map.put("notequal", I18N.message("notequal"));
-			map.put("null", I18N.message("isnull"));
-			map.put("notnull", I18N.message("isnotnull"));
+			map.put("equals", I18N.message("equals").toLowerCase());
+			map.put("notequal", I18N.message("notequal").toLowerCase());
+			map.put("null", I18N.message("isnull").toLowerCase());
+			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		} else if (criteriaField.equals("tags") || criteriaField.equals("notes")) {
-			map.put("contains", I18N.message("contains"));
-			map.put("notcontains", I18N.message("notcontains"));
-			map.put("null", I18N.message("isnull"));
-			map.put("notnull", I18N.message("isnotnull"));
+			map.put("contains", I18N.message("contains").toLowerCase());
+			map.put("notcontains", I18N.message("notcontains").toLowerCase());
+			map.put("null", I18N.message("isnull").toLowerCase());
+			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		} else if (criteriaField.equals("template")) {
-			map.put("null", I18N.message("isnull"));
-			map.put("notnull", I18N.message("isnotnull"));
+			map.put("null", I18N.message("isnull").toLowerCase());
+			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		} else {
-			map.put("contains", I18N.message("contains"));
-			map.put("notcontains", I18N.message("notcontains"));
-			map.put("equals", I18N.message("equals"));
-			map.put("notequal", I18N.message("notequal"));
-			map.put("null", I18N.message("isnull"));
-			map.put("notnull", I18N.message("isnotnull"));
+			map.put("contains", I18N.message("contains").toLowerCase());
+			map.put("notcontains", I18N.message("notcontains").toLowerCase());
+			map.put("equals", I18N.message("equals").toLowerCase());
+			map.put("notequal", I18N.message("notequal").toLowerCase());
+			map.put("beginswith", I18N.message("beginswith").toLowerCase());
+			map.put("endswith", I18N.message("endswith").toLowerCase());
+			map.put("null", I18N.message("isnull").toLowerCase());
+			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		}
 
 		return map;
@@ -249,7 +252,7 @@ public class ParameterConditionRow extends HLayout {
 	private FormItem valueItemFor(String criteriaField) {
 		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("rating")
 				|| criteriaField.equals("template") || criteriaField.equals("published")
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)) {
+				|| criteriaField.equals("indexed") || criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)) {
 			return ItemFactory.newIntegerItem("value", "integer", null);
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_DOUBLE)) {
 			return ItemFactory.newFloatItem("value", "double", null);

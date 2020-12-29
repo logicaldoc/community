@@ -229,7 +229,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 
 	@PUT
 	@Path("/rename")
-	@ApiOperation(value = "Renames a folder", notes = "Changes the name of a given folder")
+	@ApiOperation(nickname = "renameFolder", value = "Renames a folder", notes = "Changes the name of a given folder")
 	public void rename(@QueryParam("folderId") long folderId, @QueryParam("name") String name) throws Exception {
 		String sid = validateSession();
 		super.rename(sid, folderId, name);
@@ -237,7 +237,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 
 	@PUT
 	@Path("/move")
-	@ApiOperation(value = "Moves a folder", notes = "Updates a folder by changing its parent. The folder is moved to the new parent folder.")
+	@ApiOperation(nickname = "moveFolder", value = "Moves a folder", notes = "Updates a folder by changing its parent. The folder is moved to the new parent folder.")
 	public void move(@QueryParam("folderId") long folderId, @QueryParam("parentId") long parentId) throws Exception {
 		String sid = validateSession();
 		super.move(sid, folderId, parentId);
@@ -246,7 +246,8 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Override
 	@POST
 	@Path("/createAlias")
-	@ApiOperation(value = "Creates a new folder alias", notes = "Creates a new alias/simlink of the source folder into the target folder; returns the newly created alias")	
+	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
+	@ApiOperation(nickname = "createAliasFolder", value = "Creates a new folder alias", notes = "Creates a new alias/simlink of the source folder into the target folder; returns the newly created alias")	
 	public WSFolder createAlias(
 			@ApiParam(value = "Folder ID in which the alias will be created (target)") @FormParam("parentId") long parentId, 
 			@ApiParam(value = "Folder ID of the referenced folder (source)") @FormParam("foldRef") long foldRef) throws Exception {
@@ -275,7 +276,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Override
 	@GET
 	@Path("/isReadable")
-	@ApiOperation(value = "Tests if a folder is readable")
+	@ApiOperation(nickname = "isReadableFolder", value = "Tests if a folder is readable")
 	public boolean isReadable(@QueryParam("folderId") long folderId) throws Exception {
 		String sid = validateSession();
 		return super.isReadable(sid, folderId);
@@ -304,6 +305,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 	@Override
 	@POST
 	@Path("/copy")
+	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	@ApiOperation(value = "Copies a folder", notes = "Copies an existing folder (source) into the given target; it can copy all the documents contained while defining the inheritance of security policies")
 	public void copy(
 			@ApiParam(value = "Folder identifier (source)", required = true) @FormParam("folderId") long folderId, 

@@ -198,6 +198,21 @@ public interface Storer extends Comparable<Storer> {
 	 * @throws IOException cannot open the resource to get the bytes
 	 */
 	public byte[] getBytes(long docId, String resource, long start, long length) throws IOException;
+	
+	/**
+	 * Moves all the resources of a document from it's original location to a
+	 * different storage
+	 * 
+	 * @param docId identifier of the document to process
+	 * @param targetStorageId identifier of the storage that will receive the
+	 *        files
+	 * 
+	 * @return number of moved resources
+	 * 
+	 * @throws IOException In case of error during the process
+	 */
+	public int moveResourcesToStore(long docId, int targetStorageId) throws IOException;
+	
 
 	/**
 	 * Obtains the document's content as string for the specified resource

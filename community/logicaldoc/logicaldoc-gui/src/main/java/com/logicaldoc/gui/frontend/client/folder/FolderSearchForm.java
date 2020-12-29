@@ -10,7 +10,6 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
@@ -21,6 +20,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.frontend.client.search.ParameterConditionRow;
+import com.logicaldoc.gui.frontend.client.search.Search;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
@@ -227,11 +227,7 @@ public abstract class FolderSearchForm extends VLayout {
 		Map<String, Object> values = vm.getValues();
 
 		GUISearchOptions options = new GUISearchOptions();
-
-		String hits = Session.get().getInfo().getConfig("search.hits");
-		if (hits != null)
-			options.setMaxHits(Integer.parseInt(hits));
-
+		options.setMaxHits(Search.get().getMaxHits());
 		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
 		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString("casesensitive")) ? 1 : 0);
 

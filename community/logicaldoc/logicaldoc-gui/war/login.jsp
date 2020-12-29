@@ -28,4 +28,7 @@
 
 
 <%@ include file="body.jsp" %>
+
+<link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style-login.css" TYPE="text/css" />
+
 <%@ include file="footer.jsp" %>

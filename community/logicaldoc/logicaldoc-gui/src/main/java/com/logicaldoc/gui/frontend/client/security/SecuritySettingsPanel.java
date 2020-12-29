@@ -201,7 +201,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 			}
 		});
 
-		anonymousUser = ItemFactory.newUserSelector("anonymousUser", "user", null, false);
+		anonymousUser = ItemFactory.newUserSelector("anonymousUser", "user", null, false, false);
 		anonymousUser.setHint(I18N.message("anonymoususerhint"));
 		anonymousUser.setHintStyle("hint");
 		anonymousUser.addChangedHandler(new ChangedHandler() {

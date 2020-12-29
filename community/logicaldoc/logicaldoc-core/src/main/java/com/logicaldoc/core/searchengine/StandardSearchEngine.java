@@ -49,7 +49,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class StandardSearchEngine implements SearchEngine {
 
-	public static Version VERSION = Version.LUCENE_7_7_2;
+	public static Version VERSION = Version.LUCENE_8_5_1;
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 
@@ -300,7 +300,7 @@ public class StandardSearchEngine implements SearchEngine {
 			server.deleteById(Long.toString(id));
 			server.commit();
 		} catch (Throwable e) {
-			log.debug("Unable to delete hit " + id, e);
+			log.debug("Unable to delete hit {}", id, e);
 		}
 	}
 

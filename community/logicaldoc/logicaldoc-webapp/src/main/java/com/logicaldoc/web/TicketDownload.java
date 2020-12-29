@@ -101,9 +101,10 @@ public class TicketDownload extends HttpServlet {
 
 			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			String tenantName = tenantDao.getTenantName(ticket.getTenantId());
-
+			
 			request.setAttribute("open", Boolean.toString("display".equals(
 					Context.get().getProperties().getProperty(tenantName + ".downloadticket.behavior", "download"))));
+			
 			downloadDocument(request, response, doc, null, suffix, ticketId);
 			ticket.setCount(ticket.getCount() + 1);
 			ticketDao.store(ticket);

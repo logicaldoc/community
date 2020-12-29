@@ -14,6 +14,8 @@ public class Client {
 	 */
 	private String id;
 
+	private String username;
+	
 	private String address;
 
 	private String host;
@@ -21,7 +23,7 @@ public class Client {
 	public Client() {
 	}
 
-	public Client(String address, String host) {
+	Client(String address, String host) {
 		this(null, address, host);
 	}
 
@@ -74,5 +76,13 @@ public class Client {
 			return String.format("%s - %s", host, address);
 		else
 			return String.format("%s - %s - %s", id, host, address);
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }

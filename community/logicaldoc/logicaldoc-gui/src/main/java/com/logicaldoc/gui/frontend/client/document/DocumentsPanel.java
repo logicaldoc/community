@@ -15,6 +15,7 @@ import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
+import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.NavigatorDocumentsGrid;
 import com.logicaldoc.gui.frontend.client.folder.FolderDetailsPanel;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
@@ -22,7 +23,6 @@ import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.Offline;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.VisibilityChangedEvent;
@@ -78,12 +78,10 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 			instance = new DocumentsPanel();
 			DocumentController.get().addObserver(instance);
 
-			// Setup the default elements number
-			String mx = "100";
-			if (CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_MAX) != null
-					&& !Offline.get(CookiesManager.COOKIE_DOCSLIST_MAX).equals(""))
-				mx = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_MAX);
-			instance.setMax(Integer.parseInt(mx));
+			try {
+				instance.max = (Session.get().getConfigAsInt("gui.document.pagesize"));
+			} catch (Throwable t) {
+			}
 
 			int mode = DocumentsGrid.MODE_LIST;
 			if (CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_MODE) != null
@@ -230,14 +228,34 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 			this.max = max;
 		if (visualizationMode != null)
 			this.visualizationMode = visualizationMode;
-
 		updateListingPanel(folder);
 
-		/*
-		 * Launch the refresh of the details panel in another thread because the
-		 * synchronous invocation makes the observers notification's thread to
-		 * stop.
-		 */
+		scheduleFolderDetailsRefresh();
+	}
+
+	public void changePageSize(Integer pageSize) {
+		this.max = pageSize;
+
+		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
+				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
+			((DocumentsListPanel) listingPanel).updateData(folder, max);
+		} else {
+			listing.removeMember(listingPanel);
+			listingPanel.destroy();
+			listingPanel = new DocumentsListPanel(folder, max, visualizationMode);
+			listing.addMember(listingPanel);
+			listing.redraw();
+		}
+		previewPanel.reset();
+
+		scheduleFolderDetailsRefresh();
+	}
+
+	/*
+	 * Launches the refresh of the details panel in another thread because the
+	 * synchronous invocation makes the observers notification's thread to stop.
+	 */
+	private void scheduleFolderDetailsRefresh() {
 		Timer timer = new Timer() {
 			public void run() {
 				showFolderDetails();
@@ -249,7 +267,10 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	private void updateListingPanel(GUIFolder folder) {
 		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
-			((DocumentsListPanel) listingPanel).updateData(folder, max);
+			Integer pageSize = GridUtil.getPageSizeFromSpec(folder.getGrid());
+			if (pageSize == null)
+				pageSize = max;
+			((DocumentsListPanel) listingPanel).updateData(folder, pageSize);
 		} else {
 			listing.removeMember(listingPanel);
 			listingPanel.destroy();
@@ -299,14 +320,6 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	public DocumentsGrid getDocumentsGrid() {
 		return ((DocumentsListPanel) listingPanel).getGrid();
-	}
-
-	public Integer getMax() {
-		return max;
-	}
-
-	public void setMax(Integer max) {
-		this.max = max;
 	}
 
 	public int getMode() {
@@ -452,7 +465,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		if (listingPanel != null && listingPanel instanceof DocumentsListPanel) {
 			DocumentsListPanel docsListingPanel = (DocumentsListPanel) listingPanel;
 			if (docsListingPanel.getGrid() instanceof NavigatorDocumentsGrid)
-				return ((NavigatorDocumentsGrid) docsListingPanel.getGrid()).getViewState();
+				return ((NavigatorDocumentsGrid) docsListingPanel.getGrid()).getGridLayout();
 			else
 				return null;
 		} else

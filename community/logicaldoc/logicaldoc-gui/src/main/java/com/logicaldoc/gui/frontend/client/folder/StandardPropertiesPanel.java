@@ -15,17 +15,22 @@ import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
@@ -103,19 +108,81 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 		else
 			name.setDisabled(true);
 
+		FormItemIcon applyStorageToSubfolders = new FormItemIcon();
+		applyStorageToSubfolders.setPrompt(I18N.message("applytosubfolders"));
+		applyStorageToSubfolders.setSrc("[SKIN]/page_save.png");
+		applyStorageToSubfolders.setWidth(16);
+		applyStorageToSubfolders.setHeight(16);
+		applyStorageToSubfolders.addFormItemClickHandler(new FormItemClickHandler() {
+			public void onFormItemClick(final FormItemIconClickEvent event) {
+				ContactingServer.get().show();
+				FolderService.Instance.get().applyStorage(folder.getId(), new AsyncCallback<Void>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						ContactingServer.get().hide();
+						Log.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Void v) {
+						ContactingServer.get().hide();
+					}
+				});
+				event.cancel();
+			}
+		});
+
+		FormItemIcon enforceStorage = new FormItemIcon();
+		enforceStorage.setPrompt(I18N.message("enforcefilesintofolderstorage"));
+		enforceStorage.setSrc("[SKIN]/data_into.png");
+		enforceStorage.setWidth(16);
+		enforceStorage.setHeight(16);
+		enforceStorage.addFormItemClickHandler(new FormItemClickHandler() {
+			public void onFormItemClick(final FormItemIconClickEvent event) {
+				LD.ask(I18N.message("enforcementofstorage"),
+						I18N.message("enforcefilesintofolderstorage") + ".\n" + I18N.message("doyouwanttoproceed"),
+						new BooleanCallback() {
+
+							@Override
+							public void execute(Boolean yes) {
+								if (yes) {
+									DocumentService.Instance.get().enforceFilesIntoFolderStorage(folder.getId(),
+											new AsyncCallback<Void>() {
+
+												@Override
+												public void onFailure(Throwable caught) {
+													Log.serverError(caught);
+												}
+
+												@Override
+												public void onSuccess(Void v) {
+													Log.info(I18N.message("processstartedwillbenotified"));
+												}
+											});
+								}
+							}
+						});
+
+				event.cancel();
+			}
+		});
+
 		SelectItem storage = ItemFactory.newStorageSelector("storage", folder.getStorage());
-		storage.setDisabled(!folder.isWrite());
-		boolean storageVisible = folder.isWorkspace() && folder.getFoldRef() == null;
+		storage.setDisabled(!folder.hasPermission(Constants.PERMISSION_STORAGE));
+		boolean storageVisible = folder.getFoldRef() == null && Feature.enabled(Feature.MULTI_STORAGE);
 		storage.setVisible(storageVisible);
-		if (folder.isWrite() && storageVisible)
+		if (folder.hasPermission(Constants.PERMISSION_STORAGE) && storageVisible) {
 			storage.addChangedHandler(changedHandler);
+			storage.setIcons(applyStorageToSubfolders, enforceStorage);
+		}
 
 		SpinnerItem maxVersions = ItemFactory.newSpinnerItem("maxVersions", I18N.message("maxversions"),
 				folder.getMaxVersions());
 		maxVersions.setWrapTitle(false);
 		maxVersions.setDisabled(!folder.isWrite());
 		boolean maxVersionsVisible = folder.isWorkspace() && folder.getFoldRef() == null;
-		maxVersions.setVisible(storageVisible);
+		maxVersions.setVisible(maxVersionsVisible);
 		if (folder.isWrite() && maxVersionsVisible)
 			maxVersions.addChangedHandler(changedHandler);
 
@@ -133,11 +200,31 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 				I18N.formatDate((Date) folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator());
 		creation.setWidth(DEFAULT_ITEM_WIDTH);
 
-		LinkItem pathItem = ItemFactory.newLinkItem("path", folder.getPathExtended() != null ? folder.getPathExtended()
-				: FolderNavigator.get().getPath(folder.getId()));
+		String path = folder.getPathExtended() != null ? folder.getPathExtended()
+				: FolderNavigator.get().getPath(folder.getId());
+
+		FormItemIcon copyPath = new FormItemIcon();
+		copyPath.setPrompt(I18N.message("copypath"));
+		copyPath.setSrc("[SKIN]/page_white_paste.png");
+		copyPath.setWidth(16);
+		copyPath.setHeight(16);
+		copyPath.addFormItemClickHandler(new FormItemClickHandler() {
+			public void onFormItemClick(final FormItemIconClickEvent event) {
+				LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
+					@Override
+					public void execute(final String value) {
+					}
+				});
+				event.cancel();
+			}
+		});
+
+		LinkItem pathItem = ItemFactory.newLinkItem("path", Util.padLeft(path, 150));
+		pathItem.setTooltip(path);
 		pathItem.setTitle(I18N.message("path"));
 		pathItem.setValue(Util.displayURL(null, folder.getId()));
 		pathItem.setWidth(400);
+		pathItem.setIcons(copyPath);
 
 		LinkItem barcode = ItemFactory.newLinkItem("barcode", I18N.message("generatebarcode"));
 		barcode.setTarget("_blank");
@@ -221,12 +308,14 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 			final TagsDS ds = new TagsDS(null, true, null, folder.getId());
 
 			tagItem = ItemFactory.newTagsComboBoxItem("tag", "tag", ds, (Object[]) folder.getTags());
+			tagItem.setEndRow(true);
 			tagItem.setDisabled(!folder.isWrite());
 			if (folder.isWrite())
 				tagItem.addChangedHandler(changedHandler);
 
 			final TextItem newTagItem = ItemFactory.newTextItem("newtag", "newtag", null);
 			newTagItem.setRequired(false);
+			newTagItem.setEndRow(true);
 			newTagItem.setDisabled(!folder.isWrite());
 			newTagItem.addKeyPressHandler(new KeyPressHandler() {
 				@Override
@@ -284,8 +373,35 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 				}
 			});
 
+			final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
+					Util.getTagsHTML(folder.getTags()));
+			tagsString.setEndRow(true);
+			FormItemIcon editTags = new FormItemIcon();
+			editTags.setPrompt(I18N.message("edittags"));
+			editTags.setSrc("[SKIN]/actions/edit.png");
+			editTags.setWidth(16);
+			editTags.setHeight(16);
+			editTags.addFormItemClickHandler(new FormItemClickHandler() {
+				public void onFormItemClick(final FormItemIconClickEvent event) {
+					tagsString.setVisible(false);
+					tagItem.setVisible(true);
+					tagItem.setEndRow(true);
+					if (items.contains(newTagItem)) {
+						newTagItem.setVisible(true);
+						newTagItem.setEndRow(true);
+					}
+					form2.redraw();
+				}
+			});
+
+			if (folder.isWrite())
+				tagsString.setIcons(editTags);
+
+			items.add(tagsString);
 			items.add(tagItem);
-			if ("free".equals(mode) && !folder.isWrite())
+			tagItem.setVisible(false);
+			newTagItem.setVisible(false);
+			if ("free".equals(mode) && folder.isWrite())
 				items.add(newTagItem);
 		}
 
@@ -322,18 +438,20 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 
 	boolean validate() {
 		vm.validate();
-
 		if (!vm.hasErrors()) {
 			folder.setTags(tagItem.getValues());
 			folder.setDescription(vm.getValueAsString("description"));
-			folder.setName(vm.getValueAsString("name").replaceAll("/", ""));
+			if (vm.getValueAsString("name") != null)
+				folder.setName(vm.getValueAsString("name").replaceAll("/", ""));
 
-			if (folder.isWorkspace()) {
+			if (folder.hasPermission(Constants.PERMISSION_STORAGE))
 				try {
 					folder.setStorage(Integer.parseInt(vm.getValueAsString("storage")));
 				} catch (Throwable t) {
 					folder.setStorage(null);
 				}
+
+			if (folder.isWorkspace())
 				try {
 					folder.setMaxVersions(Integer.parseInt(vm.getValueAsString("maxVersions")));
 					if (folder.getMaxVersions() != null && folder.getMaxVersions() < 1)
@@ -341,7 +459,6 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 				} catch (Throwable t) {
 					folder.setMaxVersions(null);
 				}
-			}
 		}
 		return !vm.hasErrors();
 	}

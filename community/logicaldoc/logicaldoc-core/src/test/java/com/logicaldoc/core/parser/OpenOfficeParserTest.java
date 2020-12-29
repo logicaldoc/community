@@ -63,8 +63,6 @@ public class OpenOfficeParserTest extends AbstractCoreTCase {
 
 			String content = p.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 
-			System.out.println(content);
-
 			assertNotNull(content);
 			assertTrue(StringUtils.isNotEmpty(content));
 

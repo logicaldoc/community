@@ -12,7 +12,7 @@ import com.logicaldoc.core.History;
 public class DocumentHistory extends History {
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public DocumentHistory clone() {
 		DocumentHistory history = new DocumentHistory();
 		history.setTenantId(getTenantId());
 		history.setDate(getDate());

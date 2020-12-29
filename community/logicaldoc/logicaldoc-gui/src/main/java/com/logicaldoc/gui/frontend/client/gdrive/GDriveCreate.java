@@ -35,14 +35,11 @@ public class GDriveCreate extends Window {
 	public GDriveCreate() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("createdoc"));
-		setWidth(300);
-		setHeight(120);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setAutoSize(true);
 		centerInPage();
-		setPadding(5);
-		setMembersMargin(3);
 
 		DynamicForm form = new DynamicForm();
 		vm = new ValuesManager();
@@ -57,17 +54,12 @@ public class GDriveCreate extends Window {
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		map.put("doc", "doc");
 		map.put("docx", "docx");
-		map.put("odt", "odt");
 		map.put("txt", "txt");
-		map.put("xls", "xls");
 		map.put("xlsx", "xlsx");
-		map.put("ods", "ods");
-		map.put("ppt", "ppt");
 		map.put("pptx", "pptx");
-		map.put("odp", "odp");
 		type.setValueMap(map);
-		type.setValue("doc");
-		type.setWidth(50);
+		type.setValue("docx");
+		type.setWidth(80);
 		type.setEndRow(true);
 		type.setRequired(true);
 
@@ -91,7 +83,14 @@ public class GDriveCreate extends Window {
 			return;
 		hide();
 		ContactingServer.get().show();
-		GDriveService.Instance.get().create(vm.getValueAsString("fileName"), new AsyncCallback<String>() {
+
+		final String type = vm.getValueAsString("type");
+		String filename = vm.getValueAsString("fileName");
+		if (!filename.toLowerCase().endsWith("." + type))
+			filename = filename + "." + type;
+		final String fn = filename;
+		
+		GDriveService.Instance.get().create(filename, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				ContactingServer.get().hide();
@@ -103,8 +102,8 @@ public class GDriveCreate extends Window {
 			public void onSuccess(String resId) {
 				ContactingServer.get().hide();
 				GUIDocument document = new GUIDocument();
-				document.setFileName(vm.getValueAsString("fileName"));
-				document.setType(vm.getValueAsString("type"));
+				document.setFileName(fn);
+				document.setType(type);
 				document.setExtResId(resId);
 				GDriveEditor editor = new GDriveEditor(document);
 				editor.show();

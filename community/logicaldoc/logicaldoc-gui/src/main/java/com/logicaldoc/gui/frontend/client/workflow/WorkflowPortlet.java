@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.data.Record;
@@ -20,6 +21,10 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.HeaderControl;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -77,7 +82,23 @@ public class WorkflowPortlet extends Portlet {
 			setTitle(AwesomeFactory.getIconHtml("cogs", I18N.message("workflowsinvolvedin")));
 		}
 
-		setHeaderControls(HeaderControls.HEADER_LABEL);
+		HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Util.exportCSV(list, true);
+			}
+		});
+		exportControl.setTooltip(I18N.message("export"));
+		
+		HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Canvas.printComponents(new Object[] { list });
+			}
+		});
+		printControl.setTooltip(I18N.message("print"));
+
+		setHeaderControls(HeaderControls.HEADER_LABEL, exportControl, printControl);
 	}
 
 	@Override
@@ -88,6 +109,10 @@ public class WorkflowPortlet extends Portlet {
 		ListGridField processId = new ListGridField("processId", I18N.message("processid"), 80);
 		processId.setHidden(true);
 		ListGridField name = new ListGridField("name", I18N.message("task"), 100);
+
+		ListGridField templateVersion = new ListGridField("templateVersion", I18N.message("version"), 70);
+		templateVersion.setHidden(true);
+
 		ListGridField pooledAssignees = new ListGridField("pooledassignees", I18N.message("pooledassignees"), 150);
 		ListGridField documents = new ListGridField("documents", I18N.message("documents"), 300);
 		ListGridField documentIds = new ListGridField("documentIds", I18N.message("documentids"), 200);
@@ -127,11 +152,11 @@ public class WorkflowPortlet extends Portlet {
 		list.sort("startdate", SortDirection.ASCENDING);
 		if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ADMIN
 				|| type == WorkflowDashboard.TASKS_SUPERVISOR || type == WorkflowDashboard.TASKS_INVOLVED)
-			list.setFields(workflow, tag, startdate, duedate, enddate, name, id, processId, documents, lastnote,
-					documentIds, pooledAssignees);
+			list.setFields(workflow, templateVersion, tag, startdate, duedate, enddate, name, id, processId, documents,
+					lastnote, documentIds, pooledAssignees);
 		else
-			list.setFields(workflow, tag, startdate, duedate, enddate, id, processId, name, documents, lastnote,
-					documentIds);
+			list.setFields(workflow, templateVersion, tag, startdate, duedate, enddate, id, processId, name, documents,
+					lastnote, documentIds);
 
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
@@ -203,8 +228,8 @@ public class WorkflowPortlet extends Portlet {
 	public void refresh() {
 		list.refresh(new WorkflowTasksDS(type, null));
 	}
-	
-		private void showContextMenu() {
+
+	private void showContextMenu() {
 		Menu contextMenu = new Menu();
 
 		final ListGridRecord selection = list.getSelectedRecord();

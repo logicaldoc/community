@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.4.2</version>
+		<version>8.5.2</version>
 	</parent>
 	<artifactId>logicaldoc-core</artifactId>
 	<name>logicaldoc-core</name>
@@ -100,6 +100,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
 			<scope>provided</scope>
@@ -143,6 +148,12 @@
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>jdom</groupId>
@@ -282,10 +293,11 @@
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox-tools</artifactId>
-		</dependency>		
-		<!-- Extracting text in languages whose text goes from right to left (such as Arabic and Hebrew) in 
-			PDF files can result in text that is backwards. PDFBox can normalize and reverse the text if the ICU4J 
-			jar file has been placed on the classpath (it is an optional dependency). http://pdfbox.apache.org/userguide/text_extraction.html -->
+		</dependency>
+		<!-- Extracting text in languages whose text goes from right to left (such 
+			as Arabic and Hebrew) in PDF files can result in text that is backwards. 
+			PDFBox can normalize and reverse the text if the ICU4J jar file has been 
+			placed on the classpath (it is an optional dependency). http://pdfbox.apache.org/userguide/text_extraction.html -->
 		<dependency>
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
@@ -327,11 +339,21 @@
 			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-core</artifactId>
 			<version>3.2.6</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>jmimemagic</groupId>
 			<artifactId>jmimemagic</artifactId>
 			<version>0.1.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xmlParserAPIs</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>javax.media</groupId>
@@ -460,6 +482,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.github.mertakdut</groupId>
+			<artifactId>EpubParser</artifactId>
+			<version>1.0.95</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -496,9 +523,11 @@
 						<configuration>
 							<tasks>
 								<delete dir="target/plugin" quiet="true" />
-								<unzip src="target/${project.artifactId}-${project.version}-plugin.zip"
+								<unzip
+									src="target/${project.artifactId}-${project.version}-plugin.zip"
 									dest="target/plugin" />
-								<delete dir="target/${project.artifactId}-${project.version}-plugin.zip" />
+								<delete
+									dir="target/${project.artifactId}-${project.version}-plugin.zip" />
 								<delete dir="target/plugin/WEB-INF/lib">
 									<include name="**" />
 									<exclude name="*lucene*" />
@@ -515,6 +544,9 @@
 									<exclude name="*icu4j*" />
 									<exclude name="*rrd4j*" />
 									<exclude name="*solr*" />
+									<exclude name="*jetty*" />
+									<exclude name="*http2*" />
+									<exclude name="*metrics*" />
 									<exclude name="velocity*" />
 									<exclude name="xmlbeans*" />
 									<exclude name="noggit*" />
@@ -529,6 +561,7 @@
 									<exclude name="opencv*" />
 									<exclude name="ffmpeg*" />
 									<exclude name="metrics-core*" />
+									<exclude name="Epub*" />
 								</delete>
 								<delete dir="target/plugin/WEB-INF/lib">
 									<include name="opencv-*-android-*" />
@@ -542,12 +575,15 @@
 									<include name="ffmpeg-*ppc*" />
 									<include name="ffmpeg-*x86.jar" />
 								</delete>
-								
-								<copy file="target/${project.artifactId}-${project.version}.${project.packaging}"
+
+								<copy
+									file="target/${project.artifactId}-${project.version}.${project.packaging}"
 									tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
-								<zip destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
+								<zip
+									destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
 									basedir="target/plugin" />
-								<move file="target/${project.artifactId}-${project.version}-plugin2.zip"
+								<move
+									file="target/${project.artifactId}-${project.version}-plugin2.zip"
 									tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
 							</tasks>
 						</configuration>
@@ -571,8 +607,8 @@
 					<reportSet>
 						<reports>
 							<report>dependencies</report>
-							<!-- <report>project-team</report> <report>mailing-list</report> <report>cim</report> <report>issue-tracking</report> 
-								<report>license</report> <report>scm</report> -->
+							<!-- <report>project-team</report> <report>mailing-list</report> <report>cim</report> 
+								<report>issue-tracking</report> <report>license</report> <report>scm</report> -->
 						</reports>
 					</reportSet>
 				</reportSets>

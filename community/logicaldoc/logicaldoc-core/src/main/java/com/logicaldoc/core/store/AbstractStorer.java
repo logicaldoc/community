@@ -236,7 +236,7 @@ public abstract class AbstractStorer implements Storer {
 
 		/*
 		 * Document's related resources are stored with a suffix, e.g.
-		 * "doc/2.1-thumb.jpg"
+		 * "doc/2.1-thumb.png"
 		 */
 		if (StringUtils.isNotEmpty(suffix))
 			filename += "-" + suffix;

@@ -79,6 +79,8 @@ public final class Constants {
 
 	public static final String PERMISSION_AUTOMATION = "automation";
 	
+	public static final String PERMISSION_STORAGE = "storage";
+	
 	public static final int DOC_UNLOCKED = 0;
 
 	public static final int DOC_CHECKED_OUT = 1;
@@ -115,10 +117,19 @@ public final class Constants {
 
 	public final static String EVENT_CHECKEDIN = "event.checkedin";
 
+	/**
+	 * The document must be indexed, both metadata and content
+	 */
 	public final static int INDEX_TO_INDEX = 0;
 
+	/**
+	 * The document must be indexed, just the metadata
+	 */
 	public final static int INDEX_TO_INDEX_METADATA = 3;
 	
+	/**
+	 * The document has already been indexed
+	 */
 	public final static int INDEX_INDEXED = 1;
 
 	// The document is un-indexable

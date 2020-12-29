@@ -77,7 +77,6 @@ public interface AutomationService extends RemoteService {
 	/**
 	 * Executes a routine or a given script
 	 * 
-	 * @param routineId identifier of the routine to execute
 	 * @param routine The automation routine to execute, if the
 	 *        <code>routine.id=0</code> then the <code>routine.script</code> is
 	 *        executed, otherwise the referenced routine is picked from the

@@ -23,13 +23,13 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class AnnotationCanvas extends Label {
 
-	private GUIDocumentNote note;
+	protected GUIDocumentNote note;
 
-	private AnnotationsWindow annotationsWindow;
+	protected AbstractAnnotationsWindow annotationsWindow;
 	
 	private boolean writeEnabled=true;
 
-	public AnnotationCanvas(GUIDocumentNote note, final AnnotationsWindow annotationsWindow, boolean writeAllowed) {
+	public AnnotationCanvas(GUIDocumentNote note, final AbstractAnnotationsWindow annotationsWindow, boolean writeAllowed) {
 		this.note = note;
 		this.annotationsWindow = annotationsWindow;
 		writeEnabled = writeAllowed && (Session.get().getUser().isMemberOf("admin")
@@ -77,7 +77,7 @@ public class AnnotationCanvas extends Label {
 		setHeight(pageImage.computeHeightPixels(note.getHeight()));
 	}
 
-	private void onEdit() {
+	protected void onEdit() {
 		AnnotationEditor editor = new AnnotationEditor(note, writeEnabled) {
 			@Override
 			void onSave() {
@@ -90,7 +90,7 @@ public class AnnotationCanvas extends Label {
 		editor.show();
 	}
 
-	void captureNotePosition() {
+	public void captureNotePosition() {
 		ImageWithCanvases pageImage = annotationsWindow.getPageImage();
 		note.setLeft(pageImage.getLeft(getLeft()));
 		note.setTop(pageImage.getTop(getTop()));

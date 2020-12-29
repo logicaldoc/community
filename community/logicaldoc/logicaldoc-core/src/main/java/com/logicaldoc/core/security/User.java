@@ -291,7 +291,7 @@ public class User extends PersistentObject implements Serializable {
 	}
 
 	/**
-	 * Removes the user from a all groups except it's user's own group. You can
+	 * Removes the user from All groups except it's user's own group. You can
 	 * restrict the deletion to a specified source
 	 * 
 	 * @param source the source

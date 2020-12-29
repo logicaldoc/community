@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Group;
-import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.sql.SqlUtil;
@@ -158,9 +157,9 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 				log.debug("Replicate all ACLs from group {}", parentGroupId);
 				jdbcUpdate(sql);
 
-				sql = "insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation) "
+				sql = "insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage) "
 						+ "select B.ld_folderid," + groupId
-						+ ", B.ld_write, B.ld_add, B.ld_security, B.ld_immutable, B.ld_delete, B.ld_rename, B.ld_import, B.ld_export, B.ld_sign, B.ld_archive, B.ld_workflow, B.ld_download, B.ld_calendar, B.ld_subscription, B.ld_print, B.ld_password, B.ld_move, B.ld_email, B.ld_automation from ld_foldergroup B "
+						+ ", B.ld_write, B.ld_add, B.ld_security, B.ld_immutable, B.ld_delete, B.ld_rename, B.ld_import, B.ld_export, B.ld_sign, B.ld_archive, B.ld_workflow, B.ld_download, B.ld_calendar, B.ld_subscription, B.ld_print, B.ld_password, B.ld_move, B.ld_email, B.ld_automation, B.ld_storage from ld_foldergroup B "
 						+ "where B.ld_groupid= " + parentGroupId;
 				jdbcUpdate(sql);
 			} else {
@@ -171,8 +170,8 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 						+ ",1 from ld_menu B where B.ld_deleted=0";
 				jdbcUpdate(sql);
 
-				sql = "insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation) "
-						+ "select B.ld_id," + groupId + ",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 from ld_folder B "
+				sql = "insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage) "
+						+ "select B.ld_id," + groupId + ",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 from ld_folder B "
 						+ "where B.ld_deleted=0";
 				jdbcUpdate(sql);
 			}
@@ -222,7 +221,7 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	}
 
 	/**
-	 * If the user is guest, we remove not admitted permissions and menus
+	 * If the user is guest, we remove not admitted permissions
 	 */
 	@Override
 	public void fixGuestPermissions(Group group) {
@@ -240,13 +239,9 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 			if (guest) {
 				// Remove not admitted permissions in folders
 				String sql = "update ld_foldergroup set ld_write=0, ld_add=0, ld_security=0, ld_immutable=0, ld_delete=0, ld_rename=0, ld_import=0, ld_export=0,"
-						+ " ld_sign=0, ld_archive=0, ld_workflow=0, ld_calendar=0, ld_password=0, ld_move=0, ld_automation=0 "
+						+ " ld_sign=0, ld_archive=0, ld_workflow=0, ld_calendar=0, ld_password=0, ld_move=0, ld_automation=0 , ld_storage=0 "
 						+ " where ld_groupid=" + group.getId();
 				jdbcUpdate(sql);
-
-				// Remove not admitted menus
-				sql = "delete from ld_menugroup where ld_groupid=" + group.getId() + " and ld_menuid not in "
-						+ Menu.admittedGuestMenuIds.toString().substring(1).replace(']', ')');
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);

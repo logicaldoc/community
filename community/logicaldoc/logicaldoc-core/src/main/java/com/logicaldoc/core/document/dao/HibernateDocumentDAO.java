@@ -115,6 +115,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		try {
 			Document doc = (Document) findById(docId);
 			doc.setStatus(AbstractDocument.DOC_ARCHIVED);
+			if (doc.getIndexed() != AbstractDocument.INDEX_SKIP)
+				doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
 			doc.setLockUserId(transaction.getUserId());
 			transaction.setEvent(DocumentEvent.ARCHIVED.toString());
 			store(doc, transaction);
@@ -755,7 +757,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findByFolder(long folderId, Integer max) {
 		try {
-			return findByWhere("_entity.folder.id = ?1 ", new Object[] { new Long(folderId) }, null, max);
+			return findByWhere("_entity.folder.id = ?1 ", new Object[] { Long.valueOf(folderId) }, null, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Document>();
@@ -1000,14 +1002,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void deleteAll(Collection<Document> documents, int delCode, DocumentHistory transaction) {
 		for (Document document : documents) {
-			try {
-				DocumentHistory deleteHistory = (DocumentHistory) transaction.clone();
-				deleteHistory.setEvent(DocumentEvent.DELETED.toString());
-				delete(document.getId(), delCode, deleteHistory);
-			} catch (CloneNotSupportedException e) {
-				if (log.isErrorEnabled())
-					log.error(e.getMessage(), e);
-			}
+			DocumentHistory deleteHistory = (DocumentHistory) transaction.clone();
+			deleteHistory.setEvent(DocumentEvent.DELETED.toString());
+			delete(document.getId(), delCode, deleteHistory);
 		}
 
 	}

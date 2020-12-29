@@ -8,12 +8,14 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -342,7 +344,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		addSeparator();
 		addButton(add);
 
-		if (Feature.visible(Feature.DROP_SPOT)) {
+		if (Feature.visible(Feature.DROP_SPOT) && Menu.enabled(Menu.DROP_SPOT)) {
 			addButton(dropSpot);
 			if (!Feature.enabled(Feature.DROP_SPOT)) {
 				dropSpot.setDisabled(true);
@@ -556,12 +558,17 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (DocumentsPanel.get().getPreviewPanel().isVisible()
-						&& DocumentsPanel.get().getPreviewPanel().getWidth() > 0) {
+						&& DocumentsPanel.get().getPreviewPanel().getWidth() > 1) {
 					DocumentsPanel.get().getPreviewPanel().setWidth(0);
 					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 					togglePreview.setTooltip(I18N.message("openpreview"));
 				} else {
-					DocumentsPanel.get().getPreviewPanel().setWidth(350);
+					try {
+						String w = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_PREV_W);
+						DocumentsPanel.get().getPreviewPanel().setWidth(Integer.parseInt(w));
+					} catch (Throwable t) {
+						DocumentsPanel.get().getPreviewPanel().setWidth(350);
+					}
 					DocumentsPanel.get().getPreviewPanel().setDocument(document);
 					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
 					togglePreview.setTooltip(I18N.message("closepreview"));
@@ -717,7 +724,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 			@Override
 			public void onFailure(Throwable e) {
-
+				Log.info(I18N.message("settingssaved"));
 			}
 		});
 	}

@@ -29,12 +29,16 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 4.5
  */
 public class ThumbnailManager {
+	
 	public static final String SUFFIX_PREVIEW = "conversion.pdf";
 
-	public static final String SUFFIX_TILE = "tile.jpg";
+	public static final String SUFFIX_TILE = "tile.png";
 
-	public static final String SUFFIX_THUMB = "thumb.jpg";
+	public static final String SUFFIX_THUMB = "thumb.png";
+	
+	public static final String SUFFIX_MOBILE = "mobile.png";	
 
+	
 	protected static Logger log = LoggerFactory.getLogger(ThumbnailManager.class);
 
 	private Storer storer;
@@ -58,7 +62,7 @@ public class ThumbnailManager {
 
 	/**
 	 * Creates the tile for the specified document and file version. The
-	 * thumbnail is an image rendering of the first page only.
+	 * tile is an image rendering of the first page only.
 	 * 
 	 * @param document The document to be treated
 	 * @param fileVersion The file version(optional)
@@ -69,6 +73,20 @@ public class ThumbnailManager {
 	public void createTile(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "tile", SUFFIX_TILE, sid);
 	}
+	
+	/**
+	 * Creates the mobile image for the specified document and file version. The
+	 * mobile is an image rendering of the first page only.
+	 * 
+	 * @param document The document to be treated
+	 * @param fileVersion The file version(optional)
+	 * @param sid The session identifier(optional)
+	 * 
+	 * @throws IOException in case an error happens during image creation
+	 */
+	public void createMobile(Document document, String fileVersion, String sid) throws IOException {
+		createImage(document, fileVersion, "mobile", SUFFIX_MOBILE, sid);
+	}	
 
 	protected void createImage(Document document, String fileVersion, String type, String suffix, String sid)
 			throws IOException {
@@ -145,21 +163,23 @@ public class ThumbnailManager {
 	}
 
 	/**
-	 * Loads the proper builder for the passed document
+	 * Loads the proper builder for the passed file name
 	 * 
-	 * @param document the document
+	 * @param filename the filename to be rendered
 	 * 
-	 * @return the right thumbnail builder for the given document
+	 * @return the right thumbnail builder for the given file name
 	 */
-	private ThumbnailBuilder getBuilder(Document document) {
-		ThumbnailBuilder builder = getBuilders().get(document.getFileExtension().toLowerCase());
+	public ThumbnailBuilder getBuilder(String filename) {
+		String ext = filename.contains(".") ? FilenameUtils.getExtension(filename.toLowerCase())
+				: filename.toLowerCase();
+		ThumbnailBuilder builder = getBuilders().get(ext);
 
 		if (builder == null) {
-			log.warn("No registered thumbnail builder for extension {}", document.getFileExtension().toLowerCase());
+			log.warn("No registered thumbnail builder for extension {}", ext);
 			try {
-				String mime = MimeType.getByFilename(document.getFileName());
+				String mime = MimeType.getByFilename(filename);
 				if ("text/plain".equals(mime)) {
-					log.warn("Try to convert as plain text");
+					log.warn("Try to use a txt builder");
 					builder = getBuilders().get("txt");
 				} else
 					builder = getBuilders().get("*");
@@ -169,6 +189,17 @@ public class ThumbnailManager {
 		}
 
 		return builder;
+	}
+
+	/**
+	 * Loads the proper builder for the passed document
+	 * 
+	 * @param document the document
+	 * 
+	 * @return the right thumbnail builder for the given document
+	 */
+	private ThumbnailBuilder getBuilder(Document document) {
+		return getBuilder(document.getFileExtension().toLowerCase());
 	}
 
 	/**
@@ -222,7 +253,8 @@ public class ThumbnailManager {
 				@SuppressWarnings("rawtypes")
 				Class clazz = Class.forName(className);
 				// Try to instantiate the builder
-				Object builder = clazz.newInstance();
+				@SuppressWarnings("unchecked")
+				Object builder = clazz.getDeclaredConstructor().newInstance();
 				if (!(builder instanceof ThumbnailBuilder))
 					throw new Exception(
 							"The specified builder " + className + " doesn't implement ThumbnailBuilder interface");

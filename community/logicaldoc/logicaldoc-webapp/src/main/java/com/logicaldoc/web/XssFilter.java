@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
  * Anti XSS vulnerability, that is the presence of &lt;script&gt; element inside
  * the request URL.
  * 
- * @see https://www.owasp.org/index.php/XSS
- * @see https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html
+ * <br>See <a href="https://www.owasp.org/index.php/XSS">https://www.owasp.org/index.php/XSS</a>
+ * <br>See <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html">https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html</a>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2

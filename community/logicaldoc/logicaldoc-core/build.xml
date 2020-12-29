@@ -57,6 +57,17 @@
             </fileset>
         </copy>
     </target>
-    
+	
+	
+    <target name="deploy-thumbnail" depends="init-all" description="Copy classes into a deployed webapp">
+        <property environment="env" />
+        <property id="properties" file="build.properties" />
+
+        <copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
+            <fileset dir="target/classes">
+                <include name="**/document/thumbnail/*" />
+            </fileset>
+        </copy>
+    </target>	
         
 </project>

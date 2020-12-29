@@ -12,6 +12,8 @@ import java.util.StringTokenizer;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.logicaldoc.core.folder.Folder;
 
 /**
@@ -43,11 +45,11 @@ public class EMail extends Message {
 
 	private Recipient from;
 
-	private Recipient replyTo;
-
 	private Set<Recipient> recipientsCC = new HashSet<Recipient>();
 
 	private Set<Recipient> recipientsBCC = new HashSet<Recipient>();
+
+	private Set<Recipient> replyTo = new HashSet<Recipient>();
 
 	/**
 	 * This images are added as part of the body, each image will be identified
@@ -184,6 +186,10 @@ public class EMail extends Message {
 		parseRecipients(str, recipientsBCC);
 	}
 
+	public void parseReplyTo(String str) {
+		parseRecipients(str, replyTo);
+	}
+
 	private void parseRecipients(String str, Collection<Recipient> recipients) {
 		StringTokenizer st = new StringTokenizer(str.trim().toLowerCase(), ", ;", false);
 		recipients.clear();
@@ -213,6 +219,14 @@ public class EMail extends Message {
 		this.recipientsBCC = recipientsBCC;
 	}
 
+	public Set<Recipient> getReplyTo() {
+		return replyTo;
+	}
+
+	public void setReplyTo(Set<Recipient> replyTo) {
+		this.replyTo = replyTo;
+	}
+
 	public boolean isHtml() {
 		return html == 1;
 	}
@@ -227,14 +241,6 @@ public class EMail extends Message {
 
 	public void setAttachmentsCount(int attachmentCount) {
 		this.attachmentsCount = attachmentCount;
-	}
-
-	public Recipient getReplyTo() {
-		return replyTo;
-	}
-
-	public void setReplyTo(Recipient replyTo) {
-		this.replyTo = replyTo;
 	}
 
 	public Recipient getFrom() {
@@ -271,5 +277,38 @@ public class EMail extends Message {
 
 	public void setTargetFolder(Folder targetFolder) {
 		this.targetFolder = targetFolder;
+	}
+
+	/**
+	 * Retrieves the set of all the recipients of the message, does not matter
+	 * if they are direct recipient or CC or BCC
+	 * 
+	 * @return the email addresses that will receive the message
+	 */
+	public Set<String> getAllRecipientsEmails() {
+		Set<String> emails = new HashSet<String>();
+
+		if (recipients != null && !recipients.isEmpty()) {
+			for (Recipient recipient : recipients)
+				if (StringUtils.isNotEmpty(recipient.getAddress())
+						&& !emails.contains(recipient.getAddress().toLowerCase()))
+					emails.add(recipient.getAddress().toLowerCase());
+		}
+
+		if (recipientsCC != null && !recipientsCC.isEmpty()) {
+			for (Recipient recipient : recipientsCC)
+				if (StringUtils.isNotEmpty(recipient.getAddress())
+						&& !emails.contains(recipient.getAddress().toLowerCase()))
+					emails.add(recipient.getAddress().toLowerCase());
+		}
+
+		if (recipientsBCC != null && !recipientsBCC.isEmpty()) {
+			for (Recipient recipient : recipientsBCC)
+				if (StringUtils.isNotEmpty(recipient.getAddress())
+						&& !emails.contains(recipient.getAddress().toLowerCase()))
+					emails.add(recipient.getAddress().toLowerCase());
+		}
+		
+		return emails;
 	}
 }

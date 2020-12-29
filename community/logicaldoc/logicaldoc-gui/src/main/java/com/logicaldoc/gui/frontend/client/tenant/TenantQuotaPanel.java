@@ -72,7 +72,7 @@ public class TenantQuotaPanel extends HLayout {
 		SpinnerItem usersQuota = ItemFactory.newSpinnerItem("usersquota", "usersquota", tenant.getMaxUsers());
 		usersQuota.setDisabled(readonly);
 		usersQuota.setRequired(false);
-		usersQuota.setMin(0);
+		usersQuota.setMin((double)tenant.getUsers());
 		usersQuota.setStep(1);
 		usersQuota.setWidth(80);
 		if (!readonly)
@@ -82,7 +82,7 @@ public class TenantQuotaPanel extends HLayout {
 				tenant.getMaxGuests());
 		guestsQuota.setDisabled(readonly);
 		guestsQuota.setRequired(false);
-		guestsQuota.setMin(0);
+		guestsQuota.setMin((double)tenant.getGuests());
 		guestsQuota.setStep(1);
 		guestsQuota.setWidth(80);
 		if (!readonly)
@@ -127,7 +127,7 @@ public class TenantQuotaPanel extends HLayout {
 		if (!readonly)
 			quotaThreshold.addChangedHandler(changedHandler);
 
-		recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false),
+		recipients = ItemFactory.newMultiComboBoxItem("recipients", "alertrecipients", new UsersDS(null, false, false),
 				tenant.getQuotaAlertRecipients());
 		recipients.setDisabled(readonly);
 		recipients.setValueField("username");

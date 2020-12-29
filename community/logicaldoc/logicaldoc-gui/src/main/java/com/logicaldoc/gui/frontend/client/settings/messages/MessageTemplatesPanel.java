@@ -207,7 +207,7 @@ public class MessageTemplatesPanel extends VLayout {
 	}
 
 	private void onEdit() {
-		MessageTemplateEditor editor = new MessageTemplateEditor(rollOverRecord);
+		MessageTemplateEditor editor = new MessageTemplateEditor(list, rollOverRecord);
 		editor.show();
 	}
 

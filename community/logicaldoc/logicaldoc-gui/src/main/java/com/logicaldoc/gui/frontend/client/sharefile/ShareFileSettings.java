@@ -4,15 +4,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.ShareFileService;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.util.SC;
+import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.SubmitItem;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
@@ -23,72 +21,83 @@ import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
  * @author Marco Meschieri - LogicalDOC since 7.2.1
  */
 public class ShareFileSettings extends Window {
-	private SubmitItem save;
+	private DynamicForm form = new DynamicForm();
 
-	private ValuesManager vm;
-
-	public ShareFileSettings(String[] settings) {
+	public ShareFileSettings() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("sharefile"));
-		setWidth(400);
-		setHeight(150);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
 		setPadding(2);
-		setMembersMargin(2);
+		setAutoSize(true);
 
-		DynamicForm form = new DynamicForm();
-		vm = new ValuesManager();
-		form.setValuesManager(vm);
+		ShareFileService.Instance.get().loadSettings(new AsyncCallback<String[]>() {
 
-		TextItem username = ItemFactory.newEmailItem("username", "username", false);
-		username.setValue(settings[0]);
-		username.setRequired(true);
-		username.setWidth(220);
+			@Override
+			public void onFailure(Throwable caught) {
+				Log.serverError(caught);
+			}
 
-		TextItem password = ItemFactory.newPasswordItem("password", "password", null);
-		password.setRequired(true);
-		password.setWidth(150);
+			@Override
+			public void onSuccess(String[] settings) {
+				initGUI(settings);
+			}
 
-		TextItem host = ItemFactory.newTextItem("host", "host", null);
-		host.setValue(settings[2]);
-		host.setRequired(true);
-		host.setWidth(220);
+		});
+	}
 
-		save = new SubmitItem();
-		save.setTitle(I18N.message("save"));
-		save.setAlign(Alignment.RIGHT);
-		save.addClickHandler(new ClickHandler() {
+	private void initGUI(String[] settings) {
+		TextItem clientId = ItemFactory.newTextItem("clientId", "clientid", settings[0]);
+		clientId.setRequired(true);
+		clientId.setWidth(300);
+
+		TextItem clientSecret = ItemFactory.newTextItem("clientSecret", "clientsecret", settings[1]);
+		clientSecret.setRequired(true);
+		clientSecret.setWidth(300);
+
+		TextItem authBaseUrl = ItemFactory.newTextItem("authBaseUrl", "authbaseurl", settings[2]);
+		authBaseUrl.setRequired(true);
+		authBaseUrl.setDisabled(true);
+		authBaseUrl.setWidth(300);
+
+		TextItem callbackUrl = ItemFactory.newTextItem("callbackUrl", "callbackurl", settings[3]);
+		callbackUrl.setRequired(false);
+		callbackUrl.setDisabled(true);
+		callbackUrl.setWidth(300);
+
+		ButtonItem authorize = new ButtonItem("authorize", I18N.message("authorize"));
+		authorize.setAutoFit(true);
+
+		authorize.addClickHandler(new ClickHandler() {
+
 			@Override
 			public void onClick(ClickEvent event) {
-				onSave();
+				onAuthorize();
 			}
 		});
 
-		form.setItems(host, username, password, save);
+		form.setTitleOrientation(TitleOrientation.TOP);
+		form.setFields(clientId, clientSecret, authBaseUrl, callbackUrl, authorize);
 
 		addItem(form);
 	}
 
-	public void onSave() {
-		if (!vm.validate())
+	public void onAuthorize() {
+		if (!form.validate())
 			return;
 
-		ContactingServer.get().show();
-		ShareFileService.Instance.get().saveSettings(vm.getValueAsString("host"), vm.getValueAsString("username"),
-				vm.getValueAsString("password"), new AsyncCallback<Void>() {
+		ShareFileService.Instance.get().authorize(form.getValueAsString("clientId"),
+				form.getValueAsString("clientSecret"), new AsyncCallback<String>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
-						SC.warn(I18N.message("connectionfailed"));
+						Log.serverError(caught);
 					}
 
 					@Override
-					public void onSuccess(Void result) {
-						ContactingServer.get().hide();
-						Log.info(I18N.message("connectionestablished"), null);
+					public void onSuccess(String authorizationUrl) {
+						WindowUtils.openUrl(authorizationUrl, "_blank", null);
 						destroy();
 					}
 				});

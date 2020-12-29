@@ -7,6 +7,8 @@ import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.SortSpecifier;
+import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
@@ -132,11 +134,16 @@ public class GridUtil {
 		} else {
 			record.setAttribute("summary", record.getAttribute("summary"));
 			record.setAttribute("id", doc.getId());
-			record.setAttribute("docref", doc.getDocRef());
+			if (record.getAttribute("docref") == null || record.getAttribute("docref").isEmpty())
+				record.setAttribute("docref", doc.getDocRef());
 			record.setAttribute("docrefType", doc.getDocRefType());
 			record.setAttribute("filename", doc.getFileName());
 			record.setAttribute("size", doc.getFileSize());
 			record.setAttribute("icon", doc.getIcon());
+			if (record.getAttribute("docref") != null && !record.getAttribute("docref").isEmpty()
+					&& doc.getIcon() != null && !doc.getIcon().endsWith("-sc"))
+				record.setAttribute("icon", doc.getIcon() + "-sc");
+
 			record.setAttribute("lastModified", doc.getLastModified());
 			record.setAttribute("published", doc.getDate());
 			record.setAttribute("publisher", doc.getPublisher());
@@ -170,14 +177,123 @@ public class GridUtil {
 			record.setAttribute("extResId", doc.getExtResId());
 			record.setAttribute("language", doc.getLanguage());
 			record.setAttribute("links", doc.getLinks());
+			record.setAttribute("tags", doc.getTgs());
 
-			String[] extNames = Session.get().getInfo().getConfig("search.extattr").split(",");
-			for (String name : extNames) {
-				GUIAttribute att = doc.getAttribute(name);
-				Object value = (att != null && att.getStringValues() != null) ? att.getStringValues()
-						: doc.getValue(name);
-				record.setAttribute("ext_" + name, value);
+			String[] extNames = Session.get().getInfo().getConfig("search.extattr") != null
+					? Session.get().getInfo().getConfig("search.extattr").split(",")
+					: null;
+			if (extNames != null)
+				for (String name : extNames) {
+					GUIAttribute att = doc.getAttribute(name);
+					if (att == null)
+						continue;
+					Object value = (att != null && att.getStringValues() != null) ? att.getStringValues()
+							: doc.getValue(name);
+					if (att.getType() == GUIAttribute.TYPE_USER && att.getStringValues() == null)
+						value = att.getUsername();
+					record.setAttribute("ext_" + name, value);
+				}
+		}
+	}
+
+	/**
+	 * Takes the sort specification of a grid. It is a string of comma separated
+	 * values each one defining the sorting of a specific attribute of the
+	 * document, eg: fileName asc, date desc
+	 * 
+	 * @param grid the grid to inspect
+	 * 
+	 * @return the full sort specification
+	 */
+	public static String getSortSpec(ListGrid grid) {
+		return getSortSpec(grid.getSort());
+	}
+
+	public static String getSortSpec(SortSpecifier[] sortSpecifiers) {
+		String sortSpec = "";
+		if (sortSpecifiers != null) {
+			for (SortSpecifier sortSpecifier : sortSpecifiers) {
+				String attribute = getDocAttribute(sortSpecifier.getAttributeAsString("property"));
+				if (attribute == null)
+					continue;
+				if (!sortSpec.isEmpty())
+					sortSpec += ",";
+				sortSpec += attribute + " "
+						+ (sortSpecifier.getAttributeAsString("direction").equalsIgnoreCase("ascending") ? "asc"
+								: "desc");
 			}
 		}
+		return sortSpec;
+	}
+
+	/**
+	 * Translates the name of a property in the grid into a document's attribute
+	 * 
+	 * @param property name of the property
+	 * 
+	 * @return name of the attribute
+	 */
+	private static String getDocAttribute(String property) {
+		String attribute;
+		if (property.equalsIgnoreCase("filename"))
+			attribute = "fileName";
+		else if (property.equalsIgnoreCase("size"))
+			attribute = "fileSize";
+		else if (property.equalsIgnoreCase("docref"))
+			attribute = "docRef";
+		else if (property.equalsIgnoreCase("docreftype"))
+			attribute = "docRefType";
+		else if (property.equalsIgnoreCase("published"))
+			attribute = "date";
+		else if (property.equalsIgnoreCase("created"))
+			attribute = "creation";
+		else if (property.equalsIgnoreCase("order"))
+			attribute = null;
+		else
+			attribute = property;
+		return attribute;
+	}
+
+	/**
+	 * Gets the page size from the layout specification, the format is:
+	 * |<b>pageSize</b>|<b>gridLayout</b>
+	 * 
+	 * @param spec layout specification
+	 * 
+	 * @return the page size
+	 */
+	public static Integer getPageSizeFromSpec(String spec) {
+		if (spec != null && spec.startsWith("|")) {
+			try {
+				String txt = spec.substring(1);
+				return Integer.parseInt(txt.substring(0, txt.indexOf('|')));
+			} catch (Throwable t) {
+				return null;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the grid layout specification, the format is:
+	 * |<b>pageSize</b>|<b>gridLayout</b> or simply <b>gridLayout</b>
+	 * 
+	 * @param spec layout specification
+	 * 
+	 * @return grid definition
+	 */
+	public static String getGridLayoutFromSpec(String spec) {
+		if (spec == null)
+			return null;
+
+		if (spec.startsWith("|")) {
+			try {
+				String txt = spec.substring(1);
+				return txt.substring(txt.indexOf('|') + 1);
+			} catch (Throwable t) {
+				return null;
+			}
+		} else
+			return spec;
 	}
 }

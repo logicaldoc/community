@@ -9,10 +9,12 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.Log;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.widgets.Canvas;
@@ -87,7 +89,7 @@ public class SearchToolbar extends ToolStrip {
 				export.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
-		
+
 		ToolStripButton saveLayout = AwesomeFactory.newToolStripButton("save", "savelayoutinuserprofile");
 		saveLayout.addClickHandler(new ClickHandler() {
 			@Override
@@ -178,12 +180,17 @@ public class SearchToolbar extends ToolStrip {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (SearchPanel.get().getPreviewPanel().isVisible()
-						&& SearchPanel.get().getPreviewPanel().getWidth() > 0) {
+						&& SearchPanel.get().getPreviewPanel().getWidth() > 1) {
 					SearchPanel.get().getPreviewPanel().setWidth(0);
 					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-off"));
 					togglePreview.setTooltip(I18N.message("openpreview"));
 				} else {
-					SearchPanel.get().getPreviewPanel().setWidth(350);
+					try {
+						String w = CookiesManager.get(CookiesManager.COOKIE_HITSLIST_PREV_W);
+						SearchPanel.get().getPreviewPanel().setWidth(Integer.parseInt(w));
+					} catch (Throwable t) {
+						SearchPanel.get().getPreviewPanel().setWidth(350);
+					}
 					SearchPanel.get().getPreviewPanel().setDocument(hitsPanel.getGrid().getSelectedDocument());
 					togglePreview.setTitle(AwesomeFactory.getIconHtml("toggle-on"));
 					togglePreview.setTooltip(I18N.message("closepreview"));
@@ -206,17 +213,17 @@ public class SearchToolbar extends ToolStrip {
 	}
 
 	private void saveGridState() {
-		Session.get().getUser().setHitsGrid(SearchPanel.get().getDocsGridViewState());
+		Session.get().getUser().setHitsGrid(SearchPanel.get().getDocsGridLayout());
 		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<GUIUser>() {
-
-			@Override
-			public void onSuccess(GUIUser usr) {
-
-			}
 
 			@Override
 			public void onFailure(Throwable e) {
 
+			}
+
+			@Override
+			public void onSuccess(GUIUser usr) {
+				Log.info(I18N.message("settingssaved"));
 			}
 		});
 	}

@@ -63,18 +63,18 @@ public class DigestProcessor extends Task {
 			if (max != null && max.intValue() < 1)
 				max = null;
 
-			log.info("Found a total of " + size + " documents to be processed");
+			log.info("Found a total of {} documents to be processed", size);
 
 			List<Long> ids = documentDao
 					.findIdsByWhere("_entity.docRef is null and _entity.digest is null and deleted = 0", null, max);
 			for (Long id : ids) {
 				try {
-					log.debug("Processing document " + id);
+					log.debug("Processing document {}", id);
 
 					Document doc = documentDao.findById(id);
 					documentDao.updateDigest(doc);
 
-					log.debug("Processed document " + id);
+					log.debug("Processed document {}", id);
 					processed++;
 				} catch (Throwable e) {
 					log.error(e.getMessage(), e);
@@ -87,8 +87,8 @@ public class DigestProcessor extends Task {
 			}
 		} finally {
 			log.info("Digest processing finished");
-			log.info("Processed documents: " + processed);
-			log.info("Errors: " + errors);
+			log.info("Processed documents: {}", processed);
+			log.info("Errors: {}", errors);
 		}
 	}
 

@@ -48,17 +48,23 @@ public class MailPreviewPanel extends VLayout {
 		form.setTitleAlign(Alignment.LEFT);
 		form.setAlign(Alignment.LEFT);
 
-		StaticTextItem from = ItemFactory.newStaticTextItem("from", "from", mail.getFrom() != null ? mail.getFrom()
-				.displayLink() : "");
+		StaticTextItem from = ItemFactory.newStaticTextItem("from", "from",
+				mail.getFrom() != null ? mail.getFrom().displayLink() : "");
 		from.setEndRow(true);
 
 		StaticTextItem subject = ItemFactory.newStaticTextItem("subject", "subject", mail.getSubject());
 		subject.setEndRow(true);
 
-		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", "replyto", mail.getReplyTo() != null ? mail
-				.getReplyTo().displayLink() : null);
+		String replyToString = "";
+		if (mail.getReplyTo() != null && mail.getReplyTo().length > 0)
+			for (GUIContact contact : mail.getReplyTo()) {
+				if (!replyToString.isEmpty())
+					replyToString += ", ";
+				replyToString += contact.displayLink();
+			}
+		StaticTextItem replyto = ItemFactory.newStaticTextItem("replyto", "replyto", replyToString);
 		replyto.setEndRow(true);
-		replyto.setVisible(mail.getReplyTo() != null && !mail.getReplyTo().getEmail().equals(mail.getFrom().getEmail()));
+		replyto.setVisible(!replyToString.isEmpty() && !replyToString.equals(mail.getFrom().getEmail()));
 
 		StaticTextItem sent = ItemFactory.newStaticTextItem("sentdate", "sentdate",
 				mail.getSent() != null ? I18N.formatDate(mail.getSent()) : null);
@@ -81,7 +87,7 @@ public class MailPreviewPanel extends VLayout {
 
 		String ccString = "";
 		if (mail.getCcs() != null && mail.getCcs().length > 0)
-			for (GUIContact contact : mail.getTos()) {
+			for (GUIContact contact : mail.getCcs()) {
 				if (!ccString.isEmpty())
 					ccString += ", ";
 				ccString += contact.displayLink();
@@ -92,14 +98,14 @@ public class MailPreviewPanel extends VLayout {
 
 		String bccString = "";
 		if (mail.getBccs() != null && mail.getBccs().length > 0)
-			for (GUIContact contact : mail.getTos()) {
-				if (!ccString.isEmpty())
-					ccString += ", ";
-				ccString += contact.displayLink();
+			for (GUIContact contact : mail.getBccs()) {
+				if (!bccString.isEmpty())
+					bccString += ", ";
+				bccString += contact.displayLink();
 			}
 		StaticTextItem bcc = ItemFactory.newStaticTextItem("bcc", "bcc", bccString);
 		bcc.setEndRow(true);
-		bcc.setVisible(!ccString.isEmpty());
+		bcc.setVisible(!bccString.isEmpty());
 
 		form.setItems(from, subject, replyto, to, cc, bcc, sent, received);
 
@@ -110,9 +116,10 @@ public class MailPreviewPanel extends VLayout {
 		GUIDocument[] docs = mail.getAttachments();
 		if (docs != null)
 			for (final GUIDocument doc : docs) {
-				IButton button = new IButton(doc.getFileName() + " (" + Util.formatSizeCompact(doc.getFileSize()) + ")");
+				IButton button = new IButton(
+						doc.getFileName() + " (" + Util.formatSizeCompact(doc.getFileSize()) + ")");
 				button.setAutoFit(true);
-				button.setIcon("[SKIN]/"+doc.getIcon());
+				button.setIcon("[SKIN]/" + doc.getIcon());
 				if (doc.getFolder().isDownload())
 					button.addClickHandler(new ClickHandler() {
 
@@ -136,7 +143,8 @@ public class MailPreviewPanel extends VLayout {
 			header.setMembers(form);
 
 		Canvas body = null;
-		if (mail.getMessage().toLowerCase().startsWith("<html") || mail.getMessage().toLowerCase().startsWith("<body")) {
+		if (mail.getMessage().toLowerCase().startsWith("<html")
+				|| mail.getMessage().toLowerCase().startsWith("<body")) {
 			HTMLPane htmlBody = new HTMLPane();
 			htmlBody.setShowEdges(true);
 			htmlBody.setWidth100();
@@ -156,8 +164,7 @@ public class MailPreviewPanel extends VLayout {
 							+ (document.getFileVersion() != null ? "&fileVersion=" + document.getFileVersion() : "")
 							+ "&locale=" + I18N.getLocale();
 					html.setIFrameURL(url);
-					contents = "<iframe src='"
-							+ url
+					contents = "<iframe src='" + url
 							+ "' style='border:0px solid white; width:100%; height:100%; overflow:hidden;'  scrolling='no' seamless='seamless'></iframe>";
 				} catch (Throwable t) {
 				}
@@ -209,8 +216,8 @@ public class MailPreviewPanel extends VLayout {
 		download.setTitle(I18N.message("download"));
 		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				WindowUtils.openUrl(Util.downloadAttachmentURL(doc.getId(), doc.getFileVersion(),
-						attachment.getFileName()));
+				WindowUtils.openUrl(
+						Util.downloadAttachmentURL(doc.getId(), doc.getFileVersion(), attachment.getFileName()));
 			}
 		});
 		download.setEnabled(doc.getFolder().isDownload());

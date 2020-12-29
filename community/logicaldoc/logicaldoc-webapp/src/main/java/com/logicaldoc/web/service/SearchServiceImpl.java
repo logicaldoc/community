@@ -79,6 +79,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 			Search search = Search.get(searchOptions);
 
 			try {
+				log.info("Searching max {} hits", searchOptions.getMaxHits());
 				search.search();
 			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
@@ -135,6 +136,8 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 					ext.setType(e.getType());
 					ext.setParent(e.getParent());
 					ext.setStringValues(e.getStringValues());
+					if(e.getType()==Attribute.TYPE_USER)
+						ext.setUsername(ext.getStringValue());
 					extList.add(ext);
 				}
 				h.setAttributes(extList.toArray(new GUIAttribute[0]));

@@ -41,7 +41,7 @@ public class ReplicateUserSettings extends Window {
 		form.setValuesManager(vm);
 		form.setWidth(350);
 
-		SelectItem masterUser = ItemFactory.newUserSelector("user", "masteruser", null, true);
+		SelectItem masterUser = ItemFactory.newUserSelector("user", "masteruser", null, true, false);
 		masterUser.setHint(I18N.message("masteruserhint"));
 
 		final CheckboxItem userInterface = ItemFactory.newCheckbox("userinterface", "userinterface");

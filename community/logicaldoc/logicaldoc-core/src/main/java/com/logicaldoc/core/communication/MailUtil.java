@@ -10,7 +10,9 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -129,12 +131,12 @@ public class MailUtil {
 	}
 
 	private static void copyMetadata(EMail email, com.auxilii.msgparser.Message msg) {
-    
+		
 		email.setSubject(msg.getSubject() == null || msg.getSubject().isEmpty() ? NO_SUBJECT : msg.getSubject());
-        
-		// NOte: with com.auxilii.msgparser.Message you can't get sentDate and receivedDate, they are the same
+
+		// Note: with com.auxilii.msgparser.Message you can't get sentDate and receivedDate, they are the same
 		email.setSentDate(msg.getDate());
-		email.setReceivedDate(email.getSentDate());        
+		email.setReceivedDate(email.getSentDate());
 
 		Recipient rec = new Recipient();
 		rec.setAddress(msg.getFromEmail());
@@ -318,15 +320,6 @@ public class MailUtil {
 			email.setHtml(0);
 		email.setMessageText(body.substring(1));
 
-		if (msg.getReplyTo() != null && msg.getReplyTo().length > 0) {
-			Recipient rec = new Recipient();
-			rec.setName(getAddressName(msg.getReplyTo()[0]));
-			rec.setAddress(getAddressEmail(msg.getReplyTo()[0]));
-			rec.setType(Recipient.TYPE_EMAIL);
-			rec.setMode(Recipient.MODE_EMAIL_TO);
-			email.setReplyTo(rec);
-		}
-
 		if (msg.getFrom() != null && msg.getFrom().length > 0) {
 			Recipient rec = new Recipient();
 			rec.setName(getAddressName(msg.getFrom()[0]));
@@ -381,6 +374,21 @@ public class MailUtil {
 				}
 		} catch (Throwable t) {
 			log.warn("Unable to extract BCC addresses - {}", t.getMessage());
+		}
+
+		try {
+			Address[] addresses = msg.getReplyTo();
+			if (addresses != null)
+				for (Address address : addresses) {
+					Recipient rec = new Recipient();
+					rec.setName(getAddressName(address));
+					rec.setAddress(getAddressEmail(address));
+					rec.setType(Recipient.TYPE_EMAIL);
+					rec.setMode(Recipient.MODE_EMAIL_REPLYTO);
+					email.getReplyTo().add(rec);
+				}
+		} catch (Throwable t) {
+			log.warn("Unable to extract ReplyTo addresses - {}", t.getMessage());
 		}
 
 		if (msg.isMimeType("multipart/*") && (msg.getContent() instanceof Multipart)) {

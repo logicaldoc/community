@@ -171,9 +171,9 @@ public class SoapDocumentServiceTest extends AbstractWebServiceTestCase {
 		File file = new File("pom.xml");
 		long docId = docService.upload("xxxx", null, 4L, true, "document test.txt", "en",
 				new DataHandler(new FileDataSource(file)));
-
 		Assert.assertTrue(docId > 0L);
 
+		System.out.println("----------------------");
 		long docId2 = docService.upload("xxxx", docId, null, true, "document test.txt", "en",
 				new DataHandler(new FileDataSource(file)));
 

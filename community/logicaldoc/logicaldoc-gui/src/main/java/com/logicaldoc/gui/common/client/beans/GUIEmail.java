@@ -33,7 +33,7 @@ public class GUIEmail implements Serializable {
 
 	private GUIContact from;
 
-	private GUIContact replyTo;
+	private GUIContact[] replyTo;
 
 	private GUIContact[] tos;
 
@@ -112,14 +112,6 @@ public class GUIEmail implements Serializable {
 		this.pdfConversion = pdfConversion;
 	}
 
-	public GUIContact getReplyTo() {
-		return replyTo;
-	}
-
-	public void setReplyTo(GUIContact replyTo) {
-		this.replyTo = replyTo;
-	}
-
 	public GUIContact[] getTos() {
 		return tos;
 	}
@@ -174,5 +166,13 @@ public class GUIEmail implements Serializable {
 
 	public void setAttachments(GUIDocument[] attachments) {
 		this.attachments = attachments;
+	}
+
+	public GUIContact[] getReplyTo() {
+		return replyTo;
+	}
+
+	public void setReplyTo(GUIContact[] replyTo) {
+		this.replyTo = replyTo;
 	}
 }

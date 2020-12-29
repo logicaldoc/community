@@ -15,8 +15,14 @@ public class UserCellFormatter implements CellFormatter {
 		if (value == null)
 			return null;
 		if (record.getAttributeAsBoolean("guest") != null && record.getAttributeAsBoolean("guest"))
-			return "<span style='color: #888888;'>" + value + "</span>";
+			if("0".equals(record.getAttribute("eenabled")))
+			   return "<span style='color: #888888;'>" + value + "</span>";
+			else
+			   return "<span style='color: #cc8888;'>" + value + "</span>";
 		else
-			return value.toString();
+			if("0".equals(record.getAttribute("eenabled")))
+			   return value.toString();
+			else
+			   return "<span style='color: red;'>" + value + "</span>";
 	}
 }

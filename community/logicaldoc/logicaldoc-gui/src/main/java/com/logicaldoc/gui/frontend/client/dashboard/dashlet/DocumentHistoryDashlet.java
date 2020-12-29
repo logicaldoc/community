@@ -22,6 +22,7 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -162,9 +163,25 @@ public class DocumentHistoryDashlet extends Dashlet {
 				});
 			}
 		});
-		
-		setHeaderControls(HeaderControls.HEADER_LABEL, markAsRead, refreshControl, HeaderControls.MINIMIZE_BUTTON,
-				HeaderControls.MAXIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
+
+		HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Util.exportCSV(list, true);
+			}
+		});
+		exportControl.setTooltip(I18N.message("export"));
+
+		HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Canvas.printComponents(new Object[] { list });
+			}
+		});
+		printControl.setTooltip(I18N.message("print"));
+
+		setHeaderControls(HeaderControls.HEADER_LABEL, markAsRead, refreshControl, exportControl, printControl,
+				HeaderControls.MINIMIZE_BUTTON, HeaderControls.MAXIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
 
 		// Count the total of events and the total of unchecked events
 		list.addDataArrivedHandler(new DataArrivedHandler() {

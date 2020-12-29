@@ -41,21 +41,34 @@ public class GhostUtil {
 	 */
 	public static List<File> print(File srcPdf, File dst, Integer page, Integer dpi) {
 		ContextProperties config = Context.get().getProperties();
-		String ghostCommand = config.getProperty("command.gs");
+		String ghostCommand = config.getProperty("converter.GhostscriptConverter.path");
 
 		List<File> pages = new ArrayList<File>();
 		String[] cmd = null;
 		if (page != null) {
-			cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", "-dBATCH",
-					"-dNOPAUSE", "-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi,
-					"-sOutputFile=" + dst.getPath(), srcPdf.getPath() };
+			if ("png".equals(
+					org.apache.velocity.shaded.commons.io.FilenameUtils.getExtension(dst.getName().toLowerCase())))
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", "-dBATCH", "-dNOPAUSE",
+						"-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi, "-sOutputFile=" + dst.getPath(),
+						srcPdf.getPath() };
+			else
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", "-dBATCH",
+						"-dNOPAUSE", "-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi,
+						"-sOutputFile=" + dst.getPath(), srcPdf.getPath() };
 			pages.add(dst);
 		} else {
-			cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", "-dBATCH",
-					"-dNOPAUSE", "-r" + dpi,
-					"-sOutputFile=" + dst.getParent() + "/" + FilenameUtils.getBaseName(dst.getName()) + "-%04d."
-							+ FilenameUtils.getExtension(dst.getName()),
-					srcPdf.getPath() };
+			if ("png".equals(
+					org.apache.velocity.shaded.commons.io.FilenameUtils.getExtension(dst.getName().toLowerCase())))
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", "-dBATCH", "-dNOPAUSE", "-r" + dpi,
+						"-sOutputFile=" + dst.getParent() + "/" + FilenameUtils.getBaseName(dst.getName()) + "-%04d."
+								+ FilenameUtils.getExtension(dst.getName()),
+						srcPdf.getPath() };
+			else
+				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", "-dBATCH",
+						"-dNOPAUSE", "-r" + dpi,
+						"-sOutputFile=" + dst.getParent() + "/" + FilenameUtils.getBaseName(dst.getName()) + "-%04d."
+								+ FilenameUtils.getExtension(dst.getName()),
+						srcPdf.getPath() };
 		}
 
 		log.debug("Executing: {}", ghostCommand);
@@ -74,7 +87,7 @@ public class GhostUtil {
 			worker = new Worker(process);
 			worker.start();
 
-			worker.join(config.getInt("ghostscript.timeout", 30) * 1000);
+			worker.join(config.getInt("converter.GhostscriptConverter.timeout", 30) * 1000);
 			if (worker.getExit() == null)
 				throw new TimeoutException();
 

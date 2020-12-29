@@ -8,6 +8,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
+import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
@@ -20,12 +21,15 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class MessageTemplateEditor extends Window {
 
+	private ListGrid grid;
+
 	private ListGridRecord record;
 
 	private DynamicForm form = new DynamicForm();
 
-	public MessageTemplateEditor(ListGridRecord record) {
+	public MessageTemplateEditor(ListGrid grid, ListGridRecord record) {
 		this.record = record;
+		this.grid = grid;
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("messagetemplate") + " - " + record.getAttributeAsString("name"));
@@ -90,5 +94,6 @@ public class MessageTemplateEditor extends Window {
 	private void onSave() {
 		record.setAttribute("subject", form.getValueAsString("subject"));
 		record.setAttribute("body", form.getValueAsString("body"));
+		grid.refreshRow(grid.getRowNum(record));
 	}
 }

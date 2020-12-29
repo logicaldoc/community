@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.workflow;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
@@ -40,10 +41,7 @@ public class WorkflowNoteEditor extends Window {
 		centerInPage();
 		setAutoSize(true);
 
-		message = new RichTextItem("message");
-		message.setTitle(I18N.message("message"));
-		message.setShowTitle(false);
-		message.setRequired(true);
+		message = ItemFactory.newRichTextItemForNote("message", "message", null);
 		message.setWidth(680);
 		message.setHeight(230);
 

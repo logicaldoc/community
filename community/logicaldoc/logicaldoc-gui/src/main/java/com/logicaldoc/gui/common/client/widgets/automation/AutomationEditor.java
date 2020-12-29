@@ -7,6 +7,7 @@ import org.wisepersist.gwt.ace.client.AceEditorTheme;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VStack;
@@ -79,9 +80,9 @@ public class AutomationEditor extends VStack {
 	}
 
 	@Override
-	public void setDisabled(boolean disabled) {
+	public Canvas setDisabled(boolean disabled) {
 		editor.setVisible(!disabled);
-		super.setDisabled(disabled);
+		return super.setDisabled(disabled);
 	}
 
 	@Override

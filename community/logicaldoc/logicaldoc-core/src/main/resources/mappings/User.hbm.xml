@@ -52,11 +52,11 @@
         <property name="docsGrid" type="string" column="ld_docsgrid" not-null="false" />
         <property name="hitsGrid" type="string" column="ld_hitsgrid" not-null="false" />
 		
-		<set name="userGroups" table="ld_usergroup" cascade="all" lazy="false">
+		<!-- set name="userGroups" table="ld_usergroup" cascade="all" lazy="false">
 			<key column="ld_userid" />
 			<composite-element class="com.logicaldoc.core.security.UserGroup">
 				<property name="groupId" type="long" column="ld_groupid" not-null="true" />
 			</composite-element>
-		</set>
+		</set-->
 	</class>
 </hibernate-mapping>

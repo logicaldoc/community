@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.security.User;
 
@@ -88,7 +89,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTCase {
 		user.setUsername("admin");
 		user.setName("xx");
 		user.setFirstName("xx");
-		version = Version.create(doc, user, "", Version.EVENT_STORED, true);
+		version = Version.create(doc, user, "", DocumentEvent.STORED.toString(), true);
 		dao.store(version);
 	}
 }

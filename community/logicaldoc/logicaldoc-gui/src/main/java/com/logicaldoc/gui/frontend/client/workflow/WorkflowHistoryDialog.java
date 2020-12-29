@@ -87,7 +87,7 @@ public class WorkflowHistoryDialog extends Window {
 				if (selectedRecord == null)
 					return;
 
-				WorkflowService.Instance.get().get(selectedRecord.getAttributeAsString("name"),
+				WorkflowService.Instance.get().get(selectedRecord.getAttributeAsString("name"), null,
 						new AsyncCallback<GUIWorkflow>() {
 							@Override
 							public void onFailure(Throwable caught) {
@@ -159,6 +159,8 @@ public class WorkflowHistoryDialog extends Window {
 		endDate.setType(ListGridFieldType.DATE);
 		endDate.setCellFormatter(new DateCellFormatter(false));
 		endDate.setCanFilter(false);
+		ListGridField version = new ListGridField("templateVersion", I18N.message("version"), 70);
+		version.setHidden(true);
 		ListGridField tag = new ListGridField("tag", I18N.message("tag"), 150);
 		ListGridField documents = new ListGridField("documents", I18N.message("documents"), 250);
 		ListGridField documentIds = new ListGridField("documentIds", I18N.message("documentids"), 300);
@@ -175,7 +177,7 @@ public class WorkflowHistoryDialog extends Window {
 		instancesGrid.setWidth100();
 		instancesGrid.setBorder("1px solid #E1E1E1");
 		instancesGrid.sort("startdate", SortDirection.DESCENDING);
-		instancesGrid.setFields(id, tag, startDate, endDate, documents, initiator, documentIds);
+		instancesGrid.setFields(id, version, tag, startDate, endDate, documents, initiator, documentIds);
 
 		instancesGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
@@ -199,8 +201,8 @@ public class WorkflowHistoryDialog extends Window {
 
 	private void refreshInstancesGrid() {
 		if (selectedWorkflow != null) {
-			instancesGrid.refresh(new WorkflowHistoriesDS(null, Long.parseLong(selectedWorkflow.getId()), null,
-					tagFilter));
+			instancesGrid
+					.refresh(new WorkflowHistoriesDS(null, Long.parseLong(selectedWorkflow.getId()), null, tagFilter));
 
 			historiesPanel.setWfTemplateId(Long.parseLong(selectedWorkflow.getId()));
 			historiesPanel.setWfInstanceId(null);
@@ -262,7 +264,8 @@ public class WorkflowHistoryDialog extends Window {
 		completionDiagram.setTitle(I18N.message("completiondiagram"));
 		completionDiagram.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(), selection.getAttributeAsString("id"),
+				WorkflowService.Instance.get().getCompletionDiagram(selectedWorkflow.getName(),
+						selectedWorkflow.getVersion(), selection.getAttributeAsString("id"),
 						new AsyncCallback<GUIWorkflow>() {
 							@Override
 							public void onFailure(Throwable caught) {

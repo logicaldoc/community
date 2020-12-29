@@ -112,21 +112,14 @@ input:focus {
     line-height: 30px;
 }
 
-.login-link {
+.login-link, a.login-link {
 	font-size: 12px;
 	color: white;
 	display: block;
 	margin-bottom: 3px;
 }
 
-.login-switchview {
-	font-size: 11px;
-	color: white;
-	display: block;
-	text-align: right;
-}
-
-.login-lost {
+.login-lost, a.login-lost {
 	font-size: 11px;
 	color: #777;
 	display: block;
@@ -134,7 +127,7 @@ input:focus {
 	text-align: right;
 }
 
-.login-copyright {
+.login-copyright, a.login-copyright {
 	font-size: 11px;
 	color: #777;
 	display: block;
@@ -142,31 +135,43 @@ input:focus {
 	margin-top: 10px;
 }
 
-.login-copyright-link {
+.login-copyright-link, a.login-copyright-link {
 	font-size: 11px;
 	color: #777;
 	display: block;
 	text-align: left;
 }
 
-.login-link:link, .login-lost:link, .login-copyright-link:link,
-	.login-switchview:link {
+
+.login-switchview, a.login-switchview {
+	font-size: 11px;
+	color: white;
+	display: block;
+	text-align: right;
+}
+
+.login-link:link, .login-lost:link, a.login-copyright-link:link,
+	a.login-switchview:link {
 	text-decoration: none;
+    outline: 0;
 }
 
-.login-link:visited, .login-lost:visited, .login-copyright-link:visited,
-	.login-switchview:visited {
+a.login-link:visited, a.login-lost:visited, a.login-copyright-link:visited,
+	a.login-switchview:visited {
 	text-decoration: none;
+    outline: 0;
 }
 
-.login-link:hover, .login-lost:hover, .login-copyright-link:hover,
-	.login-switchview:hover {
+a.login-link:hover, a.login-lost:hover, a.login-copyright-link:hover,
+	a.ogin-switchview:hover {
 	text-decoration: underline;
+    outline: 0;
 }
 
-.login-link:active, .login-lost:active, .login-copyright-link:active,
-	.login-switchview:active {
+a.login-link:active, a.login-lost:active, a.login-copyright-link:active,
+	a.login-switchview:active {
 	text-decoration: underline;
+    outline: 0;
 }
 
 .login-product-info {

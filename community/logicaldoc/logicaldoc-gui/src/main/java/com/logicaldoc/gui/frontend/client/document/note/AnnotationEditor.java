@@ -36,9 +36,9 @@ public class AnnotationEditor extends Window {
 	public AnnotationEditor(GUIDocumentNote note, boolean writeAllowed) {
 		super();
 		this.note = note;
-		boolean writeEnabled = writeAllowed && (Session.get().getUser().isMemberOf("admin")
-				|| note.getUserId() == Session.get().getUser().getId());
-		
+		boolean writeEnabled = writeAllowed
+				&& (Session.get().getUser().isMemberOf("admin") || note.getUserId() == Session.get().getUser().getId());
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("annotationleftby", note.getUsername(), I18N.formatDate(note.getDate())));
 		setCanDragResize(true);
@@ -82,17 +82,12 @@ public class AnnotationEditor extends Window {
 		toolStrip.addButton(close);
 		toolStrip.addFill();
 
-		message = new RichTextItem("message");
-		message.setTitle(I18N.message("message"));
-		message.setShowTitle(false);
-		message.setRequired(true);
+		message = ItemFactory.newRichTextItemForNote("message", "message", note.getMessage());
 		message.setWidth("*");
 		message.setHeight(200);
-		message.setValue(note.getMessage());
-
 		noteForm.setItems(message);
-		
-		if(writeEnabled)
+
+		if (writeEnabled)
 			addItem(toolStrip);
 		addItem(noteForm);
 	}

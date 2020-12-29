@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.4.2</version>
+		<version>8.5.2</version>
 	</parent>
 	<artifactId>logicaldoc-webapp</artifactId>
 	<name>logicaldoc-webapp</name>
@@ -102,6 +102,10 @@
 			<artifactId>commons-lang</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>		
+		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
 		</dependency>
@@ -148,7 +152,6 @@
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>jdom</groupId>

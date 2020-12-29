@@ -19,6 +19,8 @@ import com.logicaldoc.i18n.I18N;
 @AutomationDictionary
 public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 
+	private static final long serialVersionUID = 1L;
+
 	private String dateFormatLong;
 
 	private String dateFormatShort;

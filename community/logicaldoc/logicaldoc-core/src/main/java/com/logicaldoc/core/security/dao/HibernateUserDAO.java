@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -163,13 +162,16 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 			log.debug("Invoke listeners before store");
 			for (UserListener listener : userListenerManager.getListeners())
-				listener.beforeStore(user, transaction, dictionary);
+				try {
+					listener.beforeStore(user, transaction, dictionary);
+				} catch (Throwable t) {
+					log.warn(t.getMessage(), t);
+				}
 
 			if (newUser)
 				user.setCreation(new Date());
 
 			saveOrUpdate(user);
-			initialize(user);
 
 			GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			String userGroupName = user.getUserGroupName();
@@ -181,15 +183,31 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				grp.setTenantId(user.getTenantId());
 				groupDAO.store(grp);
 			}
-			if (!user.getGroups().contains(grp)) {
-				user.getGroups().add(grp);
-				user.getUserGroups().add(new UserGroup(grp.getId()));
-				saveOrUpdate(user);
+			if (!user.isMemberOf(grp.getName()))
+				user.addGroup(grp);
+
+			/*
+			 * Update the user-group assignments
+			 */
+			{
+				jdbcUpdate("delete from ld_usergroup where ld_userid = ?", user.getId());
+				for (UserGroup ug : user.getUserGroups()) {
+					int exists = queryForInt("select count(*) from ld_group where ld_id=" + ug.getGroupId());
+					if (exists > 0) {
+						jdbcUpdate("insert into ld_usergroup(ld_userid, ld_groupid) values (" + user.getId() + ", "
+								+ ug.getGroupId() + ")");
+					} else
+						log.warn("It seems that the usergroup {} does not exist anymore", ug.getGroupId());
+				}
 			}
 
 			log.debug("Invoke listeners after store");
 			for (UserListener listener : userListenerManager.getListeners())
-				listener.afterStore(user, transaction, dictionary);
+				try {
+					listener.afterStore(user, transaction, dictionary);
+				} catch (Throwable t) {
+					log.warn(t.getMessage(), t);
+				}
 
 			if (newUser) {
 				// Save default dashlets
@@ -406,6 +424,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				groupDAO.delete(userGroup.getId());
 			}
 
+			jdbcUpdate("delete from ld_usergroup where ld_userid=" + userId);
+
 			saveUserHistory(user, transaction);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -452,21 +472,28 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		refresh(user);
 
-		for (UserGroup ug : user.getUserGroups()) {
-			ug.getGroupId();
+		List<Long> groupIds = new ArrayList<Long>();
+		try {
+			groupIds = queryForList("select distinct ld_groupid from ld_usergroup where ld_userid=" + user.getId(),
+					Long.class);
+			for (Long groupId : groupIds)
+				user.getUserGroups().add(new UserGroup(groupId));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 
 		user.getGroups().clear();
-		if (!user.getUserGroups().isEmpty()) {
-			List<Long> groupIds = user.getUserGroups().stream().map(u -> u.getGroupId()).collect(Collectors.toList());
+		user.getUserGroups().clear();
+		if (!groupIds.isEmpty()) {
 			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-
 			try {
 				List<Group> groups = gDao.findByWhere(
 						"_entity.id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")", null,
 						null);
-				for (Group group : groups)
+				for (Group group : groups) {
 					user.getGroups().add(group);
+					user.getUserGroups().add(new UserGroup(group.getId()));
+				}
 			} catch (PersistenceException e) {
 				log.warn(e.getMessage(), e);
 			}

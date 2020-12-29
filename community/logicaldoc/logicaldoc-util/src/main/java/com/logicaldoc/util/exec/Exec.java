@@ -46,7 +46,7 @@ public class Exec {
      * @throws IOException raised in case of errors during execution
 	 */
 	public static void exec2(List<String> commandLine, File directory, int timeout) throws IOException {
-		log.debug("Executing command: " + commandLine);
+		log.debug("Executing command: {}", commandLine);
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.redirectErrorStream(true);
 		pb.command(commandLine);
@@ -119,8 +119,7 @@ public class Exec {
 				exit = future.get(timeout, TimeUnit.SECONDS);
 			} catch (TimeoutException e) {
 				process.destroy();
-				String message = "Timeout command " + commandLine;
-				log.warn(message);
+				log.warn("Timeout command {}", commandLine);
 			} catch (Exception e) {
 				log.warn("Command failed to execute - {}", commandLine);
 				exit = 1;

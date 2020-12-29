@@ -59,6 +59,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		dao.store(testUser);
 		dao.initialize(testUser);
 		Assert.assertEquals(1, testUser.getGroups().size());
+		
 		String name = testUser.getUserGroupName();
 		Assert.assertTrue(dao.delete(testUser.getId()));
 		user = dao.findByUsername("test");

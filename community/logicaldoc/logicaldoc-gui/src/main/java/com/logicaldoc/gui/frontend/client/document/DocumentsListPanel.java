@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.document;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -13,7 +12,9 @@ import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
 import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
+import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.NavigatorDocumentsGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.widgets.Canvas;
@@ -51,26 +52,27 @@ public class DocumentsListPanel extends VLayout {
 	public DocumentsListPanel(GUIFolder folder, Integer max, int visualizationMode) {
 		this.visualizationMode = visualizationMode;
 
-		DocumentsDS dataSource = new DocumentsDS(folder, null, max, 1, null, false, false, true);
 		if (visualizationMode == DocumentsGrid.MODE_LIST)
-			grid = new NavigatorDocumentsGrid(dataSource, folder);
-		else if (visualizationMode == DocumentsGrid.MODE_GALLERY)
+			grid = new NavigatorDocumentsGrid(folder, max);
+		else if (visualizationMode == DocumentsGrid.MODE_GALLERY) {
+			DocumentsDS dataSource = new DocumentsDS(folder, null, max, 1, null, false, false, null);
 			grid = new DocumentsTileGrid(folder, dataSource);
+		}
 
 		// Prepare a panel containing a title and the documents list
-		cursor = new Cursor(CookiesManager.COOKIE_DOCSLIST_MAX, true, false);
+		cursor = new Cursor(true, false);
 		cursor.setTotalRecords(folder.getDocumentCount());
 
-		cursor.registerMaxChangedHandler(new ChangedHandler() {
+		cursor.registerPageSizeChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
-				DocumentsPanel.get().refresh(cursor.getMaxDisplayedRecords(), null);
+				DocumentsPanel.get().changePageSize(cursor.getPageSize());
 			}
 		});
 		cursor.registerPageChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
-				DocumentsPanel.get().refresh(cursor.getMaxDisplayedRecords(), null);
+				DocumentsPanel.get().changePageSize(cursor.getPageSize());
 			}
 		});
 
@@ -93,6 +95,17 @@ public class DocumentsListPanel extends VLayout {
 
 					}
 				else {
+					if (doc.getDocRef() != null) {
+						/*
+						 * in case of alias the data servlet inverts the docId
+						 * and the docRef so in order to have the preview to do
+						 * the right security checks we have to restore the
+						 * correct ids
+						 */
+						long aliasId = doc.getDocRef();
+						doc.setDocRef(doc.getId());
+						doc.setId(aliasId);
+					}
 					PreviewPopup iv = new PreviewPopup(doc);
 					iv.show();
 				}
@@ -133,11 +146,19 @@ public class DocumentsListPanel extends VLayout {
 		});
 	}
 
+	/**
+	 * Refreshes the grid getting the documents from the given folder
+	 * 
+	 * @param folder the folder being opened
+	 * @param max maximum number of elements
+	 */
 	public void updateData(GUIFolder folder, Integer max) {
+		if (grid.getFolder() == null || (grid.getFolder() != null && grid.getFolder().getId() != folder.getId()))
+			grid.loadGridLayout(folder);
 		DocumentsDS dataSource = new DocumentsDS(folder, null, max, grid.getGridCursor().getCurrentPage(), null, false,
-				false, true);
+				false, (grid instanceof DocumentsListGrid ? GridUtil.getSortSpec((DocumentsListGrid) grid) : null));
 		grid.fetchNewData(dataSource);
-		grid.loadGridLayout(folder);
+
 	}
 
 	@Override

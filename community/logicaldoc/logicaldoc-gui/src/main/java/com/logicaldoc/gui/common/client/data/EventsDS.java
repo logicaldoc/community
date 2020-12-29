@@ -23,6 +23,6 @@ public class EventsDS extends DataSource {
 		setFields(code, type, label);
 		setClientOnly(true);
 
-		setDataURL("data/events.xml?locale=" + I18N.getLocale() + "&folder=" + folder + "&workflow=" + "&user=" + user);
+		setDataURL("data/events.xml?locale=" + I18N.getLocale() + "&folder=" + folder + "&workflow=" + workflow + "&user=" + user);
 	}
 }

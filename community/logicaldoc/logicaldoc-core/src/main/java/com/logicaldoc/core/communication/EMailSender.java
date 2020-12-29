@@ -76,15 +76,19 @@ public class EMailSender {
 	}
 
 	private void loadSettings(String tenant) {
-		ContextProperties config = Context.get().getProperties();
+		try {
+			ContextProperties config = Context.get().getProperties();
 
-		host = config.getProperty(tenant + ".smtp.host");
-		port = config.getInt(tenant + ".smtp.port");
-		username = config.getProperty(tenant + ".smtp.username");
-		password = config.getProperty(tenant + ".smtp.password");
-		sender = config.getProperty(tenant + ".smtp.sender");
-		authEncripted = "true".equals(config.getProperty(tenant + ".smtp.authEncripted"));
-		connectionSecurity = config.getInt(tenant + ".smtp.connectionSecurity");
+			host = config.getProperty(tenant + ".smtp.host");
+			port = config.getInt(tenant + ".smtp.port");
+			username = config.getProperty(tenant + ".smtp.username");
+			password = config.getProperty(tenant + ".smtp.password");
+			sender = config.getProperty(tenant + ".smtp.sender");
+			authEncripted = "true".equals(config.getProperty(tenant + ".smtp.authEncripted"));
+			connectionSecurity = config.getInt(tenant + ".smtp.connectionSecurity");
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+		}
 	}
 
 	public EMailSender() {
@@ -134,7 +138,8 @@ public class EMailSender {
 	 * Same as send(EMail, String, Map) but executes in another thread
 	 * 
 	 * @param email the email to send
-	 * @param templateName the template to use to render the body of the message using the automation engine
+	 * @param templateName the template to use to render the body of the message
+	 *        using the automation engine
 	 * @param dictionary map of variable to pass to the automation
 	 */
 	public void sendAsync(EMail email, String templateName, Map<String, Object> dictionary) {
@@ -345,6 +350,8 @@ public class EMailSender {
 
 		trans.sendMessage(message, adr);
 		trans.close();
+		
+		log.info("Sent email with subject '{}' to rececipients {}", email.getSubject(), email.getAllRecipientsEmails());
 	}
 
 	public boolean isAuthEncripted() {

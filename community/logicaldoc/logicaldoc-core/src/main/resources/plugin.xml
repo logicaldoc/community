@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-core" version="8.4.2" class="com.logicaldoc.core.CorePlugin">
+<plugin id="logicaldoc-core" version="8.5.2" class="com.logicaldoc.core.CorePlugin">
   <extension-point id="DbInit">
     <parameter-def id="name" />
     <parameter-def id="sqlFile" />
@@ -195,7 +195,11 @@
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="jfifThumb">
     <parameter id="extension" value="jfif" />
     <parameter id="class" value="com.logicaldoc.core.document.thumbnail.ImageThumbnailBuilder" />
-  </extension>  
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="webpThumb">
+    <parameter id="extension" value="webp" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.ImageThumbnailBuilder" />
+  </extension>    
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="gifThumb">
     <parameter id="extension" value="gif" />
     <parameter id="class" value="com.logicaldoc.core.document.thumbnail.ImageThumbnailBuilder" />
@@ -247,7 +251,15 @@
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="movThumb">
     <parameter id="extension" value="mov" />
     <parameter id="class" value="com.logicaldoc.core.document.thumbnail.VideoThumbnailBuilder" />
-  </extension> 
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="m4vThumb">
+    <parameter id="extension" value="m4v" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.VideoThumbnailBuilder" />
+  </extension>   
+  <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="epubThumb">
+    <parameter id="extension" value="epub" />
+    <parameter id="class" value="com.logicaldoc.core.document.thumbnail.EpubThumbnailBuilder" />
+  </extension>    
 
   <extension plugin-id="logicaldoc-core" point-id="Search" id="fulltextSearch">
     <parameter id="type" value="0" />
@@ -332,7 +344,7 @@
   </extension>
   
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="imageConv">
-		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd"/>
+		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd,webp"/>
 		<parameter id="out" value="pdf"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.ImageConverter"/>
   </extension>
@@ -355,5 +367,10 @@
 		<parameter id="in" value="*"/>
 		<parameter id="out" value="pdf"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.NotAvailableConverter"/>
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="ghostscriptConverter">
+		<parameter id="in" value="pdf"/>
+		<parameter id="out" value="jpg,png,tif"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.GhostscriptConverter"/>
   </extension>  
 </plugin>

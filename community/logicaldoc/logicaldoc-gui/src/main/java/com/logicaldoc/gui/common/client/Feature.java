@@ -125,7 +125,7 @@ public class Feature {
 
 	public static final int TEMPLATE = 56;
 
-	public static final int CLIENT_TOOLS = 57;
+	public static final int PROTOCOLS = 57;
 
 	public static final int WEBSERVICE = 58;
 
@@ -145,7 +145,7 @@ public class Feature {
 
 	public static final int DUPLICATES_DISCOVERY = 66;
 
-	public static final int COMPRESSED_REPO = 67;
+	public static final int REPO_ENCRYPTION = 67;
 
 	public static final int ADVANCED_OCR = 68;
 
@@ -190,6 +190,8 @@ public class Feature {
 	public static final int AUTO_NAMING = 88;
 
 	public static final int AUTO_FOLDING = 89;
+	
+	public static final int DOCUSIGN = 90;
 
 	public static final int HOT_FOLDER = 91;
 

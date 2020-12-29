@@ -1,9 +1,9 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.Collection;
 import java.util.Date;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.Constants;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
@@ -375,7 +375,8 @@ public interface DocumentService extends RemoteService {
 	 * Restores a given document
 	 * 
 	 * @param docIds identifiers of the documents
-	 * @param folderId identifier of the folder in which to restore the documents
+	 * @param folderId identifier of the folder in which to restore the
+	 *        documents
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
@@ -394,7 +395,7 @@ public interface DocumentService extends RemoteService {
 	 * Adds new bookmarks
 	 * 
 	 * @param targetIds identfiers of the documents or folders to bookmark
-	 * @param type the type of bookmark (<b>0</b> = document,  <b>1</b> = folder)
+	 * @param type the type of bookmark (<b>0</b> = document, <b>1</b> = folder)
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
@@ -441,7 +442,10 @@ public interface DocumentService extends RemoteService {
 	 * Marks a set of documents as indexable
 	 * 
 	 * @param docIds identifiers of the documents
-	 * @param policy indexing policy: {@link Constants.INDEX_TO_INDEX} or {@link Constants.INDEX_TO_INDEX_METADATA}
+	 * @param policy indexing policy:
+	 *        {@link com.logicaldoc.gui.common.client.Constants#INDEX_TO_INDEX}
+	 *        or
+	 *        {@link com.logicaldoc.gui.common.client.Constants#INDEX_TO_INDEX_METADATA}
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
@@ -504,22 +508,24 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @param docId identifier of the document
 	 * @param fileVersion file version specification
+	 * @param types optional filter for the note type
 	 * 
 	 * @return the notes on the given version
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocumentNote[] getNotes(long docId, String fileVersion) throws ServerException;
+	public GUIDocumentNote[] getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException;
 
 	/**
 	 * Saves a set of notes
 	 * 
 	 * @param docId identifier of the document
 	 * @param notes the notes to save
+	 * @param types optional filter for the note type
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveNotes(long docId, GUIDocumentNote[] notes) throws ServerException;
+	public void saveNotes(long docId, GUIDocumentNote[] notes, Collection<String> types) throws ServerException;
 
 	/**
 	 * Deletes a selection of document notes
@@ -544,7 +550,7 @@ public interface DocumentService extends RemoteService {
 	/**
 	 * Creates a new empty document
 	 * 
-	 * @param vo the value object to use as template 
+	 * @param vo the value object to use as template
 	 * @param content the text body of the new document
 	 * 
 	 * @return the created document
@@ -624,11 +630,37 @@ public interface DocumentService extends RemoteService {
 	 * @param folderId optional ID of the folder to process
 	 * @param retainNewest true if the newest has to be retained, otherwise it
 	 *        will be the oldest.
-	 *        
-	 * @throws ServerException an error happened in the server application       
+	 * 
+	 * @throws ServerException an error happened in the server application
 	 */
 	public void deDuplicate(Long folderId, boolean retainNewest) throws ServerException;
 
+	/**
+	 * Enforces that all the files in the given tree are stored in the storage
+	 * configured in the owning folder. The process is asynchronous, at the end
+	 * an internal message to the user will be sent to alert him about its end.
+	 * 
+	 * @param folderId identifier of the tree root
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void enforceFilesIntoFolderStorage(long folderId) throws ServerException;
+
+	/**
+	 * Merges a set of documents into a single PDF
+	 * 
+	 * @param docIds identifiers of the documents to merge
+	 * 
+	 * @param targetFolderId identifier of the folder that will receive the
+	 *        merged PDF
+	 * @param fileName file name of the merged file
+	 * 
+	 * @return the newly created merged document
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIDocument merge(long[] docIds, long targetFolderId, String fileName) throws ServerException;
+	
 	public static class Instance {
 		private static DocumentServiceAsync instance;
 

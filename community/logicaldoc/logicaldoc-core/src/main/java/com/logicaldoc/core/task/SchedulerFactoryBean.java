@@ -1,6 +1,9 @@
 package com.logicaldoc.core.task;
 
+import java.util.Date;
+
 import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.SchedulingException;
@@ -50,5 +53,10 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
 			super.afterPropertiesSet();
 		else
 			log.warn("Aspect disabled");
+	}
+
+	@Override
+	public void destroy() throws SchedulerException {
+		super.destroy();
 	}
 }

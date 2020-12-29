@@ -5,8 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Models a permission, that is the ability to do something
- * <br>
+ * Models a permission, that is the ability to do something <br>
  * 
  * <ul>
  * <li>READ: ability to read the folder and its documents</li>
@@ -28,6 +27,7 @@ import java.util.Set;
  * <li>MOVE: ability to move documents</li>
  * <li>EMAIL: ability to send emails</li>
  * <li>AUTOMATION: ability to handle the automation</li>
+ * <li>STORAGE: ability to handle the storage</li>
  * </ul>
  * 
  * @author Marco Meschieri - LogicalDOC
@@ -37,7 +37,8 @@ public enum Permission {
 	READ("read"), DOWNLOAD("download"), WRITE("write"), ADD("add"), SECURITY("security"), IMMUTABLE(
 			"immutable"), DELETE("delete"), RENAME("rename"), IMPORT("import"), EXPORT("export"), SIGN("sign"), ARCHIVE(
 					"archive"), WORKFLOW("workflow"), CALENDAR("calendar"), SUBSCRIPTION("subscription"), PRINT(
-							"print"), PASSWORD("password"), MOVE("move"), EMAIL("email"), AUTOMATION("automation");
+							"print"), PASSWORD("password"), MOVE(
+									"move"), EMAIL("email"), AUTOMATION("automation"), STORAGE("storage");
 
 	private final String name;
 
@@ -46,45 +47,47 @@ public enum Permission {
 	private Permission(String name) {
 		this.name = name;
 		if ("read".equals(name))
-			mask = Integer.parseInt("00000000000000000001", 2);
+			mask = Integer.parseInt("000000000000000000001", 2);
 		if ("write".equals(name))
-			mask = Integer.parseInt("00000000000000000010", 2);
+			mask = Integer.parseInt("000000000000000000010", 2);
 		if ("add".equals(name))
-			mask = Integer.parseInt("00000000000000000100", 2);
+			mask = Integer.parseInt("000000000000000000100", 2);
 		if ("security".equals(name))
-			mask = Integer.parseInt("00000000000000001000", 2);
+			mask = Integer.parseInt("000000000000000001000", 2);
 		if ("immutable".equals(name))
-			mask = Integer.parseInt("00000000000000010000", 2);
+			mask = Integer.parseInt("000000000000000010000", 2);
 		if ("delete".equals(name))
-			mask = Integer.parseInt("00000000000000100000", 2);
+			mask = Integer.parseInt("000000000000000100000", 2);
 		if ("rename".equals(name))
-			mask = Integer.parseInt("00000000000001000000", 2);
+			mask = Integer.parseInt("000000000000001000000", 2);
 		if ("import".equals(name))
-			mask = Integer.parseInt("00000000000010000000", 2);
+			mask = Integer.parseInt("000000000000010000000", 2);
 		if ("export".equals(name))
-			mask = Integer.parseInt("00000000000100000000", 2);
+			mask = Integer.parseInt("000000000000100000000", 2);
 		if ("sign".equals(name))
-			mask = Integer.parseInt("00000000001000000000", 2);
+			mask = Integer.parseInt("000000000001000000000", 2);
 		if ("archive".equals(name))
-			mask = Integer.parseInt("00000000010000000000", 2);
+			mask = Integer.parseInt("000000000010000000000", 2);
 		if ("workflow".equals(name))
-			mask = Integer.parseInt("00000000100000000000", 2);
+			mask = Integer.parseInt("000000000100000000000", 2);
 		if ("download".equals(name))
-			mask = Integer.parseInt("00000001000000000000", 2);
+			mask = Integer.parseInt("000000001000000000000", 2);
 		if ("calendar".equals(name))
-			mask = Integer.parseInt("00000010000000000000", 2);
+			mask = Integer.parseInt("000000010000000000000", 2);
 		if ("subscription".equals(name))
-			mask = Integer.parseInt("00000100000000000000", 2);
+			mask = Integer.parseInt("000000100000000000000", 2);
 		if ("print".equals(name))
-			mask = Integer.parseInt("00001000000000000000", 2);
+			mask = Integer.parseInt("000001000000000000000", 2);
 		if ("password".equals(name))
-			mask = Integer.parseInt("00010000000000000000", 2);
+			mask = Integer.parseInt("000010000000000000000", 2);
 		if ("move".equals(name))
-			mask = Integer.parseInt("00100000000000000000", 2);
+			mask = Integer.parseInt("000100000000000000000", 2);
 		if ("email".equals(name))
-			mask = Integer.parseInt("01000000000000000000", 2);
+			mask = Integer.parseInt("001000000000000000000", 2);
 		if ("automation".equals(name))
-			mask = Integer.parseInt("10000000000000000000", 2);
+			mask = Integer.parseInt("010000000000000000000", 2);
+		if ("storage".equals(name))
+			mask = Integer.parseInt("100000000000000000000", 2);
 	}
 
 	public String getName() {

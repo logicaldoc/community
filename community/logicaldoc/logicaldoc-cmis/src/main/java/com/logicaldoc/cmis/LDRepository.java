@@ -105,7 +105,7 @@ import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfoHandler;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -526,7 +526,7 @@ public class LDRepository {
 	public String createDocument(CallContext context, Properties properties, String folderId,
 			ContentStream contentStream, VersioningState versioningState) {
 
-		debug("createDocument " + folderId);
+		log.debug("createDocument {}", folderId);
 
 		validatePermission(folderId, context, Permission.WRITE);
 

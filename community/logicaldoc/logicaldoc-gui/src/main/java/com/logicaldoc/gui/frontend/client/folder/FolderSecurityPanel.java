@@ -131,7 +131,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 					});
 		}
 
-		ListGridField entityId = new ListGridField("entityId", "entityId", 50);
+		ListGridField entityId = new ListGridField("entityId", "entityId");
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 		entityId.setAutoFitWidth(true);
@@ -139,112 +139,120 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		ListGridField entity = new ListGridField("entity", I18N.message("entity"), 180);
 		entity.setCanEdit(false);
 		entity.setAutoFitWidth(true);
+		entity.setRotateTitle(false);
 
-		ListGridField read = new ListGridField("read", I18N.message("read"), 60);
+		ListGridField read = new ListGridField("read", I18N.message("read"));
 		read.setType(ListGridFieldType.BOOLEAN);
 		read.setCanEdit(true);
 		read.setAutoFitWidth(true);
 
-		ListGridField print = new ListGridField("print", I18N.message("print"), 60);
+		ListGridField print = new ListGridField("print", I18N.message("print"));
 		print.setType(ListGridFieldType.BOOLEAN);
 		print.setCanEdit(true);
 		print.setAutoFitWidth(true);
 
-		ListGridField download = new ListGridField("download", I18N.message("download"), 60);
+		ListGridField download = new ListGridField("download", I18N.message("download"));
 		download.setType(ListGridFieldType.BOOLEAN);
 		download.setCanEdit(true);
 		download.setAutoFitWidth(true);
 
-		ListGridField write = new ListGridField("write", I18N.message("write"), 60);
+		ListGridField write = new ListGridField("write", I18N.message("write"));
 		write.setType(ListGridFieldType.BOOLEAN);
 		write.setCanEdit(true);
 		write.setAutoFitWidth(true);
 
-		ListGridField add = new ListGridField("add", I18N.message("addfolder"), 60);
+		ListGridField add = new ListGridField("add", I18N.message("addfolder"));
 		add.setType(ListGridFieldType.BOOLEAN);
 		add.setCanEdit(true);
 		add.setAutoFitWidth(true);
 
-		ListGridField security = new ListGridField("security", I18N.message("security"), 60);
+		ListGridField security = new ListGridField("security", I18N.message("security"));
 		security.setType(ListGridFieldType.BOOLEAN);
 		security.setCanEdit(true);
 		security.setAutoFitWidth(true);
 
-		ListGridField immutable = new ListGridField("immutable", I18N.message("immutable"), 60);
+		ListGridField immutable = new ListGridField("immutable", I18N.message("immutable"));
 		immutable.setType(ListGridFieldType.BOOLEAN);
 		immutable.setCanEdit(true);
 		immutable.setAutoFitWidth(true);
 
-		ListGridField delete = new ListGridField("delete", I18N.message("ddelete"), 60);
+		ListGridField delete = new ListGridField("delete", I18N.message("ddelete"));
 		delete.setType(ListGridFieldType.BOOLEAN);
 		delete.setCanEdit(true);
 		delete.setAutoFitWidth(true);
 
-		ListGridField rename = new ListGridField("rename", I18N.message("rename"), 60);
+		ListGridField rename = new ListGridField("rename", I18N.message("rename"));
 		rename.setType(ListGridFieldType.BOOLEAN);
 		rename.setCanEdit(true);
 		rename.setAutoFitWidth(true);
 
-		ListGridField _import = new ListGridField("import", I18N.message("iimport"), 60);
+		ListGridField _import = new ListGridField("import", I18N.message("iimport"));
 		_import.setType(ListGridFieldType.BOOLEAN);
 		_import.setCanEdit(true);
 		_import.setAutoFitWidth(true);
 
-		ListGridField export = new ListGridField("export", I18N.message("eexport"), 60);
+		ListGridField export = new ListGridField("export", I18N.message("eexport"));
 		export.setType(ListGridFieldType.BOOLEAN);
 		export.setCanEdit(true);
 		export.setAutoFitWidth(true);
 
-		ListGridField sign = new ListGridField("sign", I18N.message("sign"), 60);
+		ListGridField sign = new ListGridField("sign", I18N.message("sign"));
 		sign.setType(ListGridFieldType.BOOLEAN);
 		sign.setCanEdit(true);
 		sign.setAutoFitWidth(true);
 
-		ListGridField archive = new ListGridField("archive", I18N.message("archive"), 60);
+		ListGridField archive = new ListGridField("archive", I18N.message("archive"));
 		archive.setType(ListGridFieldType.BOOLEAN);
 		archive.setCanEdit(true);
 		archive.setAutoFitWidth(true);
 
-		ListGridField workflow = new ListGridField("workflow", I18N.message("workflow"), 60);
+		ListGridField workflow = new ListGridField("workflow", I18N.message("workflow"));
 		workflow.setType(ListGridFieldType.BOOLEAN);
 		workflow.setCanEdit(true);
 		workflow.setAutoFitWidth(true);
 
-		ListGridField calendar = new ListGridField("calendar", I18N.message("calendar"), 60);
+		ListGridField calendar = new ListGridField("calendar", I18N.message("calendar"));
 		calendar.setType(ListGridFieldType.BOOLEAN);
 		calendar.setCanEdit(true);
 		calendar.setAutoFitWidth(true);
 
-		ListGridField subscription = new ListGridField("subscription", I18N.message("subscription"), 60);
+		ListGridField subscription = new ListGridField("subscription", I18N.message("subscription"));
 		subscription.setType(ListGridFieldType.BOOLEAN);
 		subscription.setCanEdit(true);
 		subscription.setAutoFitWidth(true);
 
-		ListGridField password = new ListGridField("password", I18N.message("password"), 60);
+		ListGridField password = new ListGridField("password", I18N.message("password"));
 		password.setType(ListGridFieldType.BOOLEAN);
 		password.setCanEdit(true);
 		password.setAutoFitWidth(true);
 
-		ListGridField move = new ListGridField("move", I18N.message("move"), 60);
+		ListGridField move = new ListGridField("move", I18N.message("move"));
 		move.setType(ListGridFieldType.BOOLEAN);
 		move.setCanEdit(true);
 		move.setAutoFitWidth(true);
 
-		ListGridField email = new ListGridField("email", I18N.message("email"), 60);
+		ListGridField email = new ListGridField("email", I18N.message("email"));
 		email.setType(ListGridFieldType.BOOLEAN);
 		email.setCanEdit(true);
 		email.setAutoFitWidth(true);
 
-		ListGridField automation = new ListGridField("automation", I18N.message("automation"), 60);
+		ListGridField automation = new ListGridField("automation", I18N.message("automation"));
 		automation.setType(ListGridFieldType.BOOLEAN);
 		automation.setCanEdit(true);
 		automation.setAutoFitWidth(true);
+
+		ListGridField storage = new ListGridField("storage", I18N.message("storage"));
+		storage.setType(ListGridFieldType.BOOLEAN);
+		storage.setCanEdit(true);
+		storage.setAutoFitWidth(true);
 
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setAutoFetchData(true);
+		list.setRotateHeaderTitles(true);
+		list.setHeaderHeight(100);
 		dataSource = new RightsDS(folder.getId(), true);
 		list.setDataSource(dataSource);
 
@@ -277,6 +285,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			fields.add(subscription);
 		if (Feature.enabled(Feature.AUTOMATION))
 			fields.add(automation);
+		if (Feature.enabled(Feature.MULTI_STORAGE))
+			fields.add(storage);
 
 		list.setFields(fields.toArray(new ListGridField[0]));
 
@@ -368,7 +378,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		});
 
 		final DynamicForm userForm = new DynamicForm();
-		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true);
+		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
 		user.addChangedHandler(new ChangedHandler() {
@@ -460,6 +470,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			right.setMove("true".equals(record.getAttributeAsString("move")));
 			right.setEmail("true".equals(record.getAttributeAsString("email")));
 			right.setAutomation("true".equals(record.getAttributeAsString("automation")));
+			right.setStorage("true".equals(record.getAttributeAsString("storage")));
 
 			tmp.add(right);
 		}

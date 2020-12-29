@@ -50,17 +50,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		try {
 			if (menu.getSecurityRef() != null)
 				menu.getMenuGroups().clear();
-
-			// Remove the forbidden menu groups for the guests
-			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-			Iterator<MenuGroup> iter = menu.getMenuGroups().iterator();
-			while (iter.hasNext()) {
-				MenuGroup mg = iter.next();
-				Group group = gDao.findById(mg.getGroupId());
-				if (group.isGuest() && !Menu.admittedGuestMenuIds.contains(menu.getId()))
-					iter.remove();
-			}
-
 			saveOrUpdate(menu);
 		} catch (Throwable e) {
 			throw new PersistenceException(e);

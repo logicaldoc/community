@@ -21,7 +21,7 @@ public class GUIZone implements Serializable {
 	private String name;
 
 	/**
-	 * Type of the zone, taken from {@link GUIAttribute.type}
+	 * Type of the zone, taken from {@link GUIAttribute#getType()}
 	 */
 	private int type;
 

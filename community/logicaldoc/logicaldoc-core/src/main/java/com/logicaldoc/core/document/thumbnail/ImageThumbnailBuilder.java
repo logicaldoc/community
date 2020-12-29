@@ -24,13 +24,18 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 	protected static Logger log = LoggerFactory.getLogger(ImageThumbnailBuilder.class);
 
 	@Override
-	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest, int size, int quality)
-			throws IOException {
+	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,
+			int size, int quality) throws IOException {
 		try {
+			String outExt = FilenameUtils.getExtension(dest.getName().toLowerCase());
 			ContextProperties conf = Context.get().getProperties();
-			String commandLine = conf.getProperty(CONVERT) + " -compress JPEG -quality " + Integer.toString(quality)
-					+ " -resize x" + Integer.toString(size) + " " + src.getPath() + " " + dest.getPath();
-			Exec.exec(commandLine, null, null, 10);
+			StringBuffer commandLine = new StringBuffer(conf.getProperty("converter.ImageConverter.path"));
+			if ("png".equals(outExt))
+				commandLine.append(" -alpha on ");
+			commandLine.append(" -compress JPEG -quality " + quality);
+			commandLine.append(" -resize x" + Integer.toString(size) + " " + src.getPath() + " " + dest.getPath());
+			
+			Exec.exec(commandLine.toString(), null, null, conf.getInt("converter.ImageConverter.timeout", 10));
 
 			if (!dest.exists() || dest.length() == 0) {
 				/*
@@ -38,7 +43,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 				 * name-0.jpg, name-1.jpg ...
 				 */
 				final String basename = FilenameUtils.getBaseName(dest.getName());
-				String testname = basename + "-0.jpg";
+				String testname = basename + "-0." + outExt;
 				File test = new File(dest.getParentFile(), testname);
 				if (test.exists()) {
 					// In this case rename the first page with the wanted
@@ -49,7 +54,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 					String[] pages = dest.getParentFile().list(new FilenameFilter() {
 						@Override
 						public boolean accept(File dir, String name) {
-							return name.startsWith(basename + "-") && name.endsWith(".jpg");
+							return name.startsWith(basename + "-") && name.endsWith("." + outExt);
 						}
 					});
 					for (String page : pages) {

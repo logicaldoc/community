@@ -188,7 +188,7 @@ public class FileUtil {
 					buf.append(strUnsignedValue);
 				}
 				digest = buf.toString();
-				log.debug("Computed Digest: " + digest);
+				log.debug("Computed Digest: {}", digest);
 
 				return digest;
 			}

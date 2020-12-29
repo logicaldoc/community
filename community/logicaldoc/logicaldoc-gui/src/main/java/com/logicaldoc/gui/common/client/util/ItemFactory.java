@@ -97,6 +97,7 @@ import com.smartgwt.client.widgets.form.fields.events.EditorExitEvent;
 import com.smartgwt.client.widgets.form.fields.events.EditorExitHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
+import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import com.smartgwt.client.widgets.form.validator.IntegerRangeValidator;
 import com.smartgwt.client.widgets.form.validator.IsFloatValidator;
 import com.smartgwt.client.widgets.form.validator.IsIntegerValidator;
@@ -313,7 +314,7 @@ public class ItemFactory {
 		return date;
 	}
 
-	public static MultiComboBoxItem newMultipleUsersSelector(String name, String title, long[] selection) {
+	public static MultiComboBoxItem newMultipleUsersSelector(String name, String title, boolean skipDisabled, long[] selection) {
 		String[] ids = null;
 
 		if (selection != null) {
@@ -322,7 +323,7 @@ public class ItemFactory {
 				ids[i] = Long.toString(selection[i]);
 		}
 
-		MultiComboBoxItem item = ItemFactory.newMultiComboBoxItem(name, title, new UsersDS(null, false), ids);
+		MultiComboBoxItem item = ItemFactory.newMultiComboBoxItem(name, title, new UsersDS(null, false, skipDisabled), ids);
 		item.setValueField("id");
 		item.setDisplayField("username");
 
@@ -343,7 +344,7 @@ public class ItemFactory {
 	public static SelectItem newUserSelectorForAttribute(String name, String title, String groupIdOrName,
 			List<FormItemIcon> additionalIcons) {
 		final SelectItem item = new UserSelector("_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER), title,
-				groupIdOrName, false, additionalIcons);
+				groupIdOrName, false, true, additionalIcons);
 		return item;
 	}
 
@@ -729,7 +730,7 @@ public class ItemFactory {
 		return group;
 	}
 
-	public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required) {
+	public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required, boolean skipDisabled) {
 		SelectItem user = new SelectItem(filterItemName(name));
 		user.setTitle(I18N.message(title));
 		user.setWrapTitle(false);
@@ -741,7 +742,7 @@ public class ItemFactory {
 		user.setDisplayField("username");
 		user.setPickListWidth(300);
 		user.setPickListFields(id, username, label);
-		user.setOptionDataSource(new UsersDS(groupIdOrName, required));
+		user.setOptionDataSource(new UsersDS(groupIdOrName, required, skipDisabled));
 		user.setPickListProperties(new UserPickListProperties());
 		return user;
 	}
@@ -1035,6 +1036,16 @@ public class ItemFactory {
 		select.setValueField("extension");
 		select.setDisplayField("extension");
 		return select;
+	}
+
+	public static ComboBoxItem newComboBoxItem(String name, String title) {
+		ComboBoxItem item = new ComboBoxItem();
+		item.setName(filterItemName(name));
+		item.setTitle(I18N.message(title));
+		item.setMultiple(true);
+		item.setValueMap("");
+		item.setWrapTitle(false);
+		return item;
 	}
 
 	public static SelectItem newYesNoSelectItem(String name, String title) {
@@ -1978,6 +1989,27 @@ public class ItemFactory {
 		return selector;
 	}
 
+	public static SelectItem newDocuSignTabType(String value) {
+		SelectItem selector = new SelectItem("type", I18N.message("type"));
+		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		opts.put("esig-signhere", I18N.message("annotation.type.esig-signhere"));
+		opts.put("esig-text", I18N.message("annotation.type.esig-text"));
+		opts.put("esig-date", I18N.message("annotation.type.esig-date"));
+		opts.put("esig-company", I18N.message("annotation.type.esig-company"));
+		opts.put("esig-datesigned", I18N.message("annotation.type.esig-datesigned"));
+		opts.put("esig-title", I18N.message("annotation.type.esig-title"));
+		opts.put("esig-fullname", I18N.message("annotation.type.esig-fullname"));
+		opts.put("esig-email", I18N.message("annotation.type.esig-email"));
+		opts.put("esig-emailaddress", I18N.message("annotation.type.esig-emailaddress"));
+		opts.put("esig-envelopeid", I18N.message("annotation.type.esig-envelopeid"));
+
+		selector.setValueMap(opts);
+		selector.setWrapTitle(false);
+		selector.setValue(value);
+		selector.setDefaultValue(value);
+		return selector;
+	}
+
 	public static SelectItem newRetentionAction(int value) {
 		SelectItem selector = new SelectItem("action", I18N.message("action"));
 		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
@@ -2037,6 +2069,92 @@ public class ItemFactory {
 		select.setValue("0");
 		select.setWidth(200);
 		return select;
+	}
+
+	/**
+	 * Creates a new RichTextItem suitable for notes.
+	 * 
+	 * @param name The item name (mandatory)
+	 * @param title The item title (mandatory)
+	 * @param value The item value (optional)
+	 * 
+	 * @return the text item
+	 */
+	public static RichTextItem newRichTextItemForNote(String name, String title, String value) {
+		RichTextItem item = new RichTextItem();
+		item.setName(filterItemName(name));
+		item.setTitle(I18N.message(title));
+		if (value != null)
+			item.setValue(value);
+		else
+			item.setValue("");
+		item.setWrapTitle(false);
+		item.setRequiredMessage(I18N.message("fieldrequired"));
+		item.setShowTitle(false);
+		item.setRequired(true);
+		item.setWidth("*");
+		item.setHeight("*");
+
+		int maxlength = Session.get().getConfigAsInt("default.gui.note.maxlength");
+		if (maxlength > 0)
+			item.setValidators(new CustomValidator() {
+
+				@Override
+				protected boolean condition(Object value) {
+					if (getFormItem().getRequired() && (value == null || value.toString().length() < 1)) {
+						setErrorMessage(I18N.message("fieldrequired"));
+						return false;
+					}
+
+					setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
+					if (value != null && value.toString().length() > maxlength) {
+						return false;
+					}
+					return true;
+				}
+			});
+		return item;
+	}
+
+	/**
+	 * Creates a new RichTextItem suitable for emails.
+	 * 
+	 * @param name The item name (mandatory)
+	 * @param title The item title (mandatory)
+	 * @param value The item value (optional)
+	 * @param chagnedHandler A handler thas is notified about changes (optional)
+	 * 
+	 * @return the text item
+	 */
+	public static RichTextItem newRichTextItemForEmail(String name, String title, String value,
+			ChangedHandler chagnedHandler) {
+		RichTextItem item = newRichTextItemForAutomation(name, title, value, chagnedHandler);
+		item.setName(filterItemName(name));
+		item.setTitle(I18N.message(title));
+		if (value != null)
+			item.setValue(value);
+		else
+			item.setValue("");
+
+		int maxlength = Session.get().getConfigAsInt("default.gui.email.maxlength");
+		if (maxlength > 0)
+			item.setValidators(new CustomValidator() {
+
+				@Override
+				protected boolean condition(Object value) {
+					if (getFormItem().getRequired() && (value == null || value.toString().length() < 1)) {
+						setErrorMessage(I18N.message("fieldrequired"));
+						return false;
+					}
+
+					setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
+					if (value != null && value.toString().length() > maxlength) {
+						return false;
+					}
+					return true;
+				}
+			});
+		return item;
 	}
 
 	/**

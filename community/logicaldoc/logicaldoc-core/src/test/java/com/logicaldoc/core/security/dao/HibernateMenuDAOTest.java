@@ -186,7 +186,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 	public void testFindMenuIdByUserId() {
 		Collection<Long> ids = dao.findMenuIdByUserId(4);
 		Assert.assertNotNull(ids);
-		Assert.assertEquals(18, ids.size());
+		Assert.assertEquals(19, ids.size());
 		Assert.assertTrue(ids.contains(104L));
 		Assert.assertTrue(ids.contains(1200L));
 

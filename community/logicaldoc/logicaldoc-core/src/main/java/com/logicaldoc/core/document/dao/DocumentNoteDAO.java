@@ -1,5 +1,6 @@
 package com.logicaldoc.core.document.dao;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.logicaldoc.core.PersistenceException;
@@ -18,7 +19,7 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	public boolean store(DocumentNote note, DocumentHistory transaction) throws PersistenceException;
 
 	/**
-	 * This method finds the list of document note regarding a document with the
+	 * This method finds the list of document notes regarding a document with the
 	 * given ID
 	 * 
 	 * @param docId ID of the document.
@@ -28,6 +29,30 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	 */
 	public List<DocumentNote> findByDocId(long docId, String fileVersion);
 
+	/**
+	 * This method finds the list of document notes regarding a document with the
+	 * given ID and optionally filter on the type
+	 * 
+	 * @param docId ID of the document
+	 * @param fileVersion indicates a specific file version, optional
+	 * @param type note type, optional
+	 * 
+	 * @return The list of document note
+	 */
+	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type);
+	
+	/**
+	 * This method finds the list of document notes regarding a document with the
+	 * given ID and optionally filter on a collection of types
+	 * 
+	 * @param docId ID of the document
+	 * @param fileVersion indicates a specific file version, optional
+	 * @param types collection of admitted note types, optional
+	 * 
+	 * @return The list of document note
+	 */
+	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types);
+	
 	/**
 	 * Copies all the notes not associated to a specific page from a given file
 	 * version to another

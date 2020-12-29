@@ -40,5 +40,6 @@ public interface AuthService {
 	
 	@GET
 	@Path("/getSid")
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
 	public String getSid();	
 }

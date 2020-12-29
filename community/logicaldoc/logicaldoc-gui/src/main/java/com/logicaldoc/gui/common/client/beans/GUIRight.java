@@ -53,6 +53,8 @@ public class GUIRight implements Serializable {
 	private boolean email = false;
 
 	private boolean automation = false;
+	
+	private boolean storage = false;
 
 	private String name;
 
@@ -240,5 +242,13 @@ public class GUIRight implements Serializable {
 
 	public void setAutomation(boolean automation) {
 		this.automation = automation;
+	}
+
+	public boolean isStorage() {
+		return storage;
+	}
+
+	public void setStorage(boolean storage) {
+		this.storage = storage;
 	}
 }

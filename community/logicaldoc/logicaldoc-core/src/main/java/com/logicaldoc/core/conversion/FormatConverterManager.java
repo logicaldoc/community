@@ -212,7 +212,10 @@ public class FormatConverterManager {
 				docVO.setFileName(FilenameUtils.getBaseName(fileName) + "." + format);
 				docVO.setFolder(document.getFolder());
 				docVO.setLanguage(document.getLanguage());
-				return documentManager.create(out, docVO, transaction);
+				
+				DocumentHistory createHistory=(DocumentHistory)transaction.clone();
+				createHistory.setComment(null);
+				return documentManager.create(out, docVO, createHistory);
 			} else
 				throw new IOException("The conversion was not done");
 		} finally {
@@ -228,7 +231,7 @@ public class FormatConverterManager {
 	 * @param fileVersion The file version(optional)
 	 * @param out the target file, the extension of this filename is used to
 	 *        detect the output format
-	 * @param transaction iformations about the session
+	 * @param transaction informations about the session
 	 * 
 	 * @throws IOException if an error happens during the conversion
 	 */

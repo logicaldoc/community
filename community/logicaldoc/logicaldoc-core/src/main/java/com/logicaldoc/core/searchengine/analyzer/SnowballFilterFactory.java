@@ -1,7 +1,7 @@
 package com.logicaldoc.core.searchengine.analyzer;
 
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
@@ -22,7 +22,7 @@ public class SnowballFilterFactory extends TokenFilterFactory {
 
 	private Language language;
 
-	public SnowballFilterFactory(HashMap<String, String> config) {
+	public SnowballFilterFactory(Map<String, String> config) {
 		super(config);
 
 		String lang = config.get("lang");
@@ -36,11 +36,10 @@ public class SnowballFilterFactory extends TokenFilterFactory {
 	public TokenStream create(TokenStream ts) {
 		// Try to add a snowball filter
 		SnowballProgram stemmer = language.getStemmer();
-
+		
 		if (stemmer != null)
 			return new SnowballFilter(ts, stemmer);
 		else
 			return ts;
 	}
-
 }

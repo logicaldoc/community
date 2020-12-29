@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.4.2</version>
+		<version>8.5.2</version>
 	</parent>
 	<artifactId>logicaldoc-webservice</artifactId>
 	<name>logicaldoc-webservice</name>
@@ -16,6 +16,20 @@
 			<artifactId>logicaldoc-core</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>jmimemagic</groupId>
+					<artifactId>jmimemagic</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>net.sourceforge.nekohtml</groupId>
+					<artifactId>nekohtml</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.poi</groupId>
+					<artifactId>poi</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
@@ -23,6 +37,37 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>1.5.8</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jpf</groupId>
+			<artifactId>jpf-boot</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jpf</groupId>
+			<artifactId>jpf</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>provided</scope>
+		</dependency>		
+				
 		<!-- CXF dependencies -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -43,27 +88,11 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
-			<version>3.1.6</version>
 		</dependency>
 		<dependency>
 			<groupId>jdom</groupId>
 			<artifactId>jdom</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.jpf</groupId>
-			<artifactId>jpf-boot</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.jpf</groupId>
-			<artifactId>jpf</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.mail</groupId>
@@ -104,7 +133,7 @@
 			<artifactId>spring-context-support</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
+        <dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 			<scope>provided</scope>
@@ -118,6 +147,12 @@
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+			</exclusions>			
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -125,20 +160,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.ant</groupId>
 			<artifactId>ant</artifactId>
 			<scope>test</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
@@ -168,14 +193,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>jmimemagic</groupId>
-			<artifactId>jmimemagic</artifactId>
-			<version>0.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>io.swagger</groupId>
-			<artifactId>swagger-annotations</artifactId>
-			<version>1.5.8</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -216,11 +235,6 @@
 			<artifactId>javax.jws</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.2.1</version>
-		</dependency>
-		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<scope>provided</scope>
@@ -228,11 +242,6 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.activation</groupId>
-			<artifactId>activation</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -271,18 +280,23 @@
 						<configuration>
 							<tasks>
 								<delete dir="target/plugin" quiet="true" />
-								<unzip src="target/${project.artifactId}-${project.version}-plugin.zip"
+								<unzip
+									src="target/${project.artifactId}-${project.version}-plugin.zip"
 									dest="target/plugin" />
-								<delete dir="target/${project.artifactId}-${project.version}-plugin.zip" />
+								<delete
+									dir="target/${project.artifactId}-${project.version}-plugin.zip" />
 								<delete>
 									<fileset dir="target/plugin/WEB-INF/lib"
 										includes="*logicaldoc*,*spring*,*commons*,*velocity*,*geronimo*,*aopalliance*,*saaj*,ant*,hibernate*,ehcache*,jetty*,joda*" />
 								</delete>
-								<copy file="target/${project.artifactId}-${project.version}.${project.packaging}"
+								<copy
+									file="target/${project.artifactId}-${project.version}.${project.packaging}"
 									tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
-								<zip destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
+								<zip
+									destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
 									basedir="target/plugin" />
-								<move file="target/${project.artifactId}-${project.version}-plugin2.zip"
+								<move
+									file="target/${project.artifactId}-${project.version}-plugin2.zip"
 									tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
 							</tasks>
 						</configuration>

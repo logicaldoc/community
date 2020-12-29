@@ -61,6 +61,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			folderVO.setHidden(folder.getHidden());
 			folderVO.setFoldRef(folder.getFoldRef());
 			folderVO.setStorage(folder.getStorage());
+			folderVO.setMaxVersions(folder.getMaxVersions());			
 			folderVO.setSecurityRef(folder.getSecurityRef());
 			folderVO.setFoldRef(folder.getFoldRef());
 			folderVO.setOcrTemplateId(folder.getOcrTemplateId());
@@ -510,6 +511,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			fld.setFoldRef(folder.getFoldRef());
 			fld.setOcrTemplateId(folder.getOcrTemplateId());
 			fld.setBarcodeTemplateId(folder.getBarcodeTemplateId());
+			fld.setStorage(folder.getStorage());
+			fld.setMaxVersions(folder.getMaxVersions());
 
 			Set<String> tagsSet = new TreeSet<String>();
 			if (folder.getTags() != null) {

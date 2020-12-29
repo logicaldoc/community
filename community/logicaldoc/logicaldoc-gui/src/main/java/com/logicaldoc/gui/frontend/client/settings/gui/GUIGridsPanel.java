@@ -16,6 +16,7 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -45,6 +46,10 @@ public class GUIGridsPanel extends VLayout {
 
 	private ListGrid searchGrid;
 
+	private SpinnerItem searchHits;
+	
+	private SpinnerItem pageSize;
+	
 	public GUIGridsPanel() {
 		setMembersMargin(3);	
 	}	
@@ -110,6 +115,7 @@ public class GUIGridsPanel extends VLayout {
 		controls.setWidth100();
 		controls.setHeight(24);
 		final SelectItem selector = ItemFactory.newAttributesSelector();
+		selector.setWidth(100);
 		selector.addChangedHandler(new ChangedHandler() {
 
 			@Override
@@ -151,13 +157,20 @@ public class GUIGridsPanel extends VLayout {
 		}
 
 		SectionStack stack = new SectionStack();
-		stack.setWidth(300);
+		stack.setWidth(350);
 		stack.setHeight100();
 
 		SectionStackSection section = new SectionStackSection(I18N.message("columnsindocuments"));
 		section.setCanCollapse(false);
 		section.setExpanded(true);
 
+		pageSize = ItemFactory.newSpinnerItem("pagesize", I18N.message("pagesize"), Session.get().getConfigAsInt("gui.document.pagesize"));
+		pageSize.setRequired(true);
+		pageSize.setWrapTitle(false);
+		pageSize.setMin(5);
+		pageSize.setStep(10);
+		controls.addFormItem(pageSize);
+		
 		section.setItems(documentsGrid);
 		stack.setSections(section);
 
@@ -199,6 +212,7 @@ public class GUIGridsPanel extends VLayout {
 		controls.setWidth100();
 		controls.setHeight(24);
 		final SelectItem selector = ItemFactory.newAttributesSelector();
+		selector.setWidth(100);
 		selector.addChangedHandler(new ChangedHandler() {
 
 			@Override
@@ -218,6 +232,13 @@ public class GUIGridsPanel extends VLayout {
 
 		});
 		controls.addFormItem(selector);
+		
+		searchHits = ItemFactory.newSpinnerItem("searchhits", I18N.message("searchhits"), Session.get().getConfigAsInt("search.hits"));
+		searchHits.setRequired(true);
+		searchHits.setWrapTitle(false);
+		searchHits.setMin(5);
+		searchHits.setStep(5);
+		controls.addFormItem(searchHits);
 
 		searchGrid.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
 
@@ -235,7 +256,7 @@ public class GUIGridsPanel extends VLayout {
 		}
 
 		SectionStack stack = new SectionStack();
-		stack.setWidth(300);
+		stack.setWidth(350);
 		stack.setHeight(500);
 
 		SectionStackSection section = new SectionStackSection(I18N.message("columnsinsearch"));
@@ -274,7 +295,7 @@ public class GUIGridsPanel extends VLayout {
 		GUIParameter param = new GUIParameter(Session.get().getTenantName() + ".gui.document.columns", value.toString());
 		parameters.add(param);
 		Session.get().setConfig(param.getName(), param.getValue());
-
+		
 		/*
 		 * Prepare the list of columns for the search screen
 		 */
@@ -311,6 +332,14 @@ public class GUIGridsPanel extends VLayout {
 		parameters.add(param);
 		Session.get().setConfig(param.getName(), param.getValue());
 
+		param = new GUIParameter(Session.get().getTenantName() + ".search.hits", searchHits.getValueAsString());
+		parameters.add(param);
+		Session.get().setConfig(param.getName(), param.getValue());
+		
+		param = new GUIParameter(Session.get().getTenantName() + ".gui.document.pagesize", pageSize.getValueAsString());
+		parameters.add(param);
+		Session.get().setConfig(param.getName(), param.getValue());
+		
 		// Save all
 		SettingService.Instance.get().saveSettings(parameters.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
 

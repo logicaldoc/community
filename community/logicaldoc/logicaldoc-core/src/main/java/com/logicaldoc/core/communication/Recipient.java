@@ -13,6 +13,8 @@ public class Recipient {
 	public final static String MODE_EMAIL_CC = "CC";
 
 	public final static String MODE_EMAIL_BCC = "BCC";
+	
+	public final static String MODE_EMAIL_REPLYTO = "REPLYTO";
 
 	// The login
 	private String name = "";

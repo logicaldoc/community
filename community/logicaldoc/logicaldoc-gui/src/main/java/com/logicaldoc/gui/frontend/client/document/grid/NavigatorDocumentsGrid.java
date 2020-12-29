@@ -10,6 +10,8 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.events.SortChangedHandler;
+import com.smartgwt.client.widgets.grid.events.SortEvent;
 
 /**
  * Grid of documents displayed in the Navigator
@@ -19,10 +21,17 @@ import com.smartgwt.client.widgets.grid.ListGridField;
  */
 public class NavigatorDocumentsGrid extends DocumentsListGrid {
 
-	public NavigatorDocumentsGrid(DocumentsDS ds, GUIFolder folder) {
+	private long lastChangedSortFolder = 0L;
+
+	public NavigatorDocumentsGrid(GUIFolder folder, Integer max) {
 		super(folder);
-		setDataSource(ds);
 		setSelectionType(SelectionStyle.MULTIPLE);
+		this.lastChangedSortFolder = folder.getId();
+
+		loadGridLayout(folder);
+
+		DocumentsDS dataSource = new DocumentsDS(folder, null, max, 1, null, false, false, GridUtil.getSortSpec(this));
+		setDataSource(dataSource);
 
 		final List<ListGridField> fields = new ArrayList<ListGridField>();
 
@@ -125,6 +134,26 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 			}
 		});
 
-		loadGridLayout(folder);
+		addSortChangedHandler(new SortChangedHandler() {
+
+			@Override
+			public void onSortChanged(SortEvent event) {
+				/*
+				 * Check if the folder has been changes since the last sorting
+				 * and check if we have more than one page
+				 */
+				if (lastChangedSortFolder == getFolder().getId() && getGridCursor().getTotalPages() > 1) {
+					// if we have more pages, it is required to retrieve again
+					// the recodrs from the server using the right sorting
+					DocumentsDS dataSource = new DocumentsDS(getFolder(), null, getGridCursor().getPageSize(),
+							getGridCursor().getCurrentPage(), null, false, false,
+							GridUtil.getSortSpec(event.getSortSpecifiers()));
+					refresh(dataSource);
+				} else {
+					// save the current folder's ID
+					lastChangedSortFolder = getFolder().getId();
+				}
+			}
+		});
 	}
 }

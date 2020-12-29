@@ -218,6 +218,12 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		Document newDoc = documentManager.create(new FileInputStream("pom.xml"), doc, transaction);
 
+		Assert.assertEquals("1.0",newDoc.getVersion());
+		Assert.assertEquals("1.0",newDoc.getFileVersion());
+		
+		Version ver=verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
+		Assert.assertNotNull(ver);
+		
 		newDoc = docDao.findById(newDoc.getId());
 		Assert.assertEquals(newDoc.getFileName(), doc.getFileName());
 	}

@@ -45,7 +45,8 @@ public enum DocumentEvent {
 	VERSION_DELETED("event.version.deleted"),
 	VERSION_REPLACED("event.version.replaced"),
 	COMPARED("event.compared"),
-	COPYED("event.copyed");
+	COPYED("event.copyed"),
+	ESIGNED("event.esigned");
 	
     private String event;
 

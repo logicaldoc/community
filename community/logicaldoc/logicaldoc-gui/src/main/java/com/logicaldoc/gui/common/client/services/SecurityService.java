@@ -73,6 +73,7 @@ public interface SecurityService extends RemoteService {
 	 * Replicates the settings of a given user to a selection of other users
 	 * 
 	 * @param masterUserId identifier of the user with the settings you want to replicate
+	 * @param userIds identifiers of the users to replicate the settings to
 	 * @param gui if the user interface settings must be replicated
 	 * @param groups if the groups must be replicated(the read-only users will not be affected by this flag)
 	 * 

@@ -12,7 +12,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 6.0
  */
 public class UsersDS extends DataSource {
-	public UsersDS(String groupIdOrName, boolean required) {
+	public UsersDS(String groupIdOrName, boolean required, boolean skipDisabled) {
 		setTitleField("label");
 		setRecordXPath("/list/user");
 
@@ -23,7 +23,8 @@ public class UsersDS extends DataSource {
 		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceBooleanField guest = new DataSourceBooleanField("guest");
 		guest.setHidden(true);
-		DataSourceImageField enabled = new DataSourceImageField("eenabled");
+		DataSourceImageField eenabled = new DataSourceImageField("eenabled");
+		DataSourceBooleanField enabled = new DataSourceBooleanField("_enabled");
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField firstName = new DataSourceTextField("firstName");
 		DataSourceTextField email = new DataSourceTextField("email");
@@ -32,13 +33,13 @@ public class UsersDS extends DataSource {
 		DataSourceTextField usergroup = new DataSourceTextField("usergroup");
 		DataSourceTextField groups = new DataSourceTextField("groups");
 
-		setFields(id, username, label, enabled, name, firstName, email, phone, cell,groups, usergroup, guest);
+		setFields(id, username, label, eenabled, enabled, name, firstName, email, phone, cell, groups, usergroup, guest);
 		setDataURL("data/users.xml?1=1" + (groupIdOrName != null ? "&groupId=" + groupIdOrName : "") + "&required="
-				+ required);
+				+ required + "&skipdisabled=" + skipDisabled);
 		setClientOnly(true);
 	}
 
 	public static UsersDS get(long groupId) {
-		return new UsersDS(Long.toString(groupId), true);
+		return new UsersDS(Long.toString(groupId), true, false);
 	}
 }

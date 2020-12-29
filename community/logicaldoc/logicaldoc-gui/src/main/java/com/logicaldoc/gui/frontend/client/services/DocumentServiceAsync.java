@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.services;
 
+import java.util.Collection;
 import java.util.Date;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -127,13 +128,17 @@ public interface DocumentServiceAsync {
 
 	void promoteVersion(long docId, String version, AsyncCallback<GUIDocument> callback);
 
-	void getNotes(long docId, String fileVersion, AsyncCallback<GUIDocumentNote[]> callback);
+	void getNotes(long docId, String fileVersion, Collection<String> types, AsyncCallback<GUIDocumentNote[]> callback);
 
-	void saveNotes(long docId, GUIDocumentNote[] notes, AsyncCallback<Void> callback);
+	void saveNotes(long docId, GUIDocumentNote[] notes, Collection<String> types, AsyncCallback<Void> callback);
 
 	void deleteTicket(long ticketId, AsyncCallback<Void> callback);
 
 	void enableTicket(long ticketId, AsyncCallback<Void> callback);
 
 	void disableTicket(long ticketId, AsyncCallback<Void> callback);
+
+	void enforceFilesIntoFolderStorage(long folderId, AsyncCallback<Void> callback);
+
+	void merge(long[] docIds, long targetFolderId, String fileName, AsyncCallback<GUIDocument> callback);
 }

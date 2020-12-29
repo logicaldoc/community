@@ -25,7 +25,7 @@ public class SystemInfo {
 
 	protected String product = "LogicalDOC";
 
-	protected String release = "8.4.2";
+	protected String release = "8.5.2";
 
 	protected String year = "2006-2020";
 
@@ -229,8 +229,8 @@ public class SystemInfo {
 					@SuppressWarnings("unchecked")
 					Object tmp = clazz.getDeclaredConstructor().newInstance();
 					if (!(tmp instanceof SystemInfo))
-						throw new Exception("The specified info " + className
-								+ " doesn't implement SystemInfo interface");
+						throw new Exception(
+								"The specified info " + className + " doesn't implement SystemInfo interface");
 
 					info = (SystemInfo) tmp;
 					info.setTenantId(tenantId);
@@ -319,5 +319,29 @@ public class SystemInfo {
 
 	public void setTenantId(long tenantId) {
 		this.tenantId = tenantId;
+	}
+
+	public int getMajor() {
+		String[] parts = getRelease().split("\\.");
+		if (parts.length > 0)
+			return Integer.parseInt(parts[0]);
+		else
+			return 0;
+	}
+	
+	public int getMinor() {
+		String[] parts = getRelease().split("\\.");
+		if (parts.length > 1)
+			return Integer.parseInt(parts[1]);
+		else
+			return 0;
+	}
+	
+	public int getMicro() {
+		String[] parts = getRelease().split("\\.");
+		if (parts.length > 2)
+			return Integer.parseInt(parts[2]);
+		else
+			return 0;
 	}
 }

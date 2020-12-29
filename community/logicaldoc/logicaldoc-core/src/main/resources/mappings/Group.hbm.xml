@@ -18,7 +18,5 @@
 		<property name="description" type="string" column="ld_description" length="255" />
 		<property name="source" type="string" column="ld_source" length="255" />
 		<property name="type" type="int" column="ld_type" not-null="true" />
-		<!-- set name="users" table="ld_usergroup" lazy="true"> <key column="ld_groupid" /> <many-to-many column="ld_userid" 
-			class="com.logicaldoc.core.security.User" where="ld_deleted=0"/> </set -->
 	</class>
 </hibernate-mapping>

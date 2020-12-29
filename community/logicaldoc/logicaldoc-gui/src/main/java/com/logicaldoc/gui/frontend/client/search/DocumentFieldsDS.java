@@ -96,12 +96,15 @@ public class DocumentFieldsDS extends DataSource {
 		DataSourceIntegerField publishedStatus = new DataSourceIntegerField("published", I18N.message("published"));
 		publishedStatus.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL);
 
+		DataSourceIntegerField indexed = new DataSourceIntegerField("indexed", I18N.message("indexed"));
+		indexed.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL);
+		
 		DataSourceTextField tmplt = new DataSourceTextField("template", I18N.message("template"));
 		tmplt.setValidOperators(OperatorId.IS_NULL);
 
 		setFields(id, filename, fileSize, publisher, version, lastModified, published, created, creator, customId,
 				extension, rating, tags, comment, notes, wfStatus, publishedStatus, startPublishing, stopPublishing,
-				tmplt);
+				indexed, tmplt);
 
 		/*
 		 * Define extended attributes

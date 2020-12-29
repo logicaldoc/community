@@ -151,7 +151,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		firstName.setWidth(80);
 
 		ListGridField lastName = new ListGridField("lastName", I18N.message("lastname"));
-		firstName.setCanFilter(true);
+		lastName.setCanFilter(true);
 		lastName.setWidth(80);
 
 		ListGridField company = new ListGridField("company", I18N.message("company"));

@@ -121,18 +121,18 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param rootId Root of the tree
 	 * @param includeDeleted True if the deleted records need to be loaded
 	 * 
-	 * @return List of selected folder IDs.
+	 * @return List of selected folder IDs, rootId is included as well
 	 */
 	public Collection<Long> findFolderIdInTree(long rootId, boolean includeDeleted);
 
 	/**
-	 * Retrieve all the ids of the folder in a given tree using the path
+	 * Retrieve all the ids of the folders in a given tree using the path
 	 * attribute
 	 * 
 	 * @param rootId Root of the folder
 	 * @param includeDeleted True if the deleted records need to be loaded
 	 * 
-	 * @return List of selected folder IDs.
+	 * @return List of selected folder IDs, rootId is included as well
 	 */
 	public Collection<Long> findFolderIdInPath(long rootId, boolean includeDeleted);
 
@@ -167,7 +167,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	public List<Folder> findByParentId(long parentId);
 
 	/**
-	 * Finds all children sds(direct and indirect) by parentId
+	 * Finds all children(direct and indirect) by parentId
 	 * 
 	 * @param parentId identifier of the parent folder
 	 * 
@@ -456,7 +456,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	public Folder findByPathExtended(String pathExtended, long tenantId);
 
 	/**
-	 * Move a folder into another folder
+	 * Moves a folder into another folder
 	 * 
 	 * @param source The folder to move
 	 * @param target The target folder
@@ -467,22 +467,23 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	public void move(Folder source, Folder target, FolderHistory transaction) throws PersistenceException;
 
 	/**
-	 * Folder a folder into another folder
+	 * Copies a folder into another folder
 	 * 
-	 * @param source The folder to move
+	 * @param source The folder to copy
 	 * @param target The target folder
-	 * @param foldersOnly True if only the folders tree has to be copied
+	 * @param foldersOnly True if only the folders tree has to be copied; if false, the documents will also be copied
 	 * @param inheritSecurity If true the new folder will 'point' to the parent
 	 *        for the security policies.
 	 * @param transaction entry to log the event (set the user)
+	 * @return The new folder created
 	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public void copy(Folder source, Folder target, boolean foldersOnly, boolean inheritSecurity,
+	public Folder copy(Folder source, Folder target, boolean foldersOnly, boolean inheritSecurity,
 			FolderHistory transaction) throws PersistenceException;
 
 	/**
-	 * Delete a folder and all its sub-folders that a user can delete. After
+	 * Deletes a folder and all its sub-folders that a user can delete. After
 	 * recovering of all sub-folders inside the folder, will be canceled all
 	 * folders for which the user has the delete permission or there isn't an
 	 * immutable document inside it.<br>
@@ -620,6 +621,18 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 */
 	public boolean applyTagsToTree(long id, FolderHistory transaction) throws PersistenceException;
 
+	/**
+	 * Propagates the storage setting to the whole subree
+	 * 
+	 * @param id identifier of the folder
+	 * @param transaction session informations
+	 *
+	 * @return is the update has been successful
+	 * 
+	 * @throws PersistenceException in case of database error
+	 */
+	public boolean applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException;
+	
 	/**
 	 * Propagates the OCR settings to the whole subree
 	 * 

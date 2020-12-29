@@ -42,6 +42,12 @@ public class GUIWorkflow implements Serializable {
 	// The persistence template
 	private Long templateId;
 
+	private int version = 1;
+
+	private Date date = new Date();
+
+	private boolean latestVersion = true;
+
 	public GUIWFState getStateById(String id) {
 		if (states != null && states.length > 0) {
 			for (GUIWFState state : states) {
@@ -182,5 +188,29 @@ public class GUIWorkflow implements Serializable {
 
 	public void setSupervisors(GUIUser[] supervisors) {
 		this.supervisors = supervisors;
+	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public boolean isLatestVersion() {
+		return latestVersion;
+	}
+
+	public void setLatestVersion(boolean latestVersion) {
+		this.latestVersion = latestVersion;
 	}
 }

@@ -61,7 +61,6 @@ public class RestWorkbench {
 		String sid = authClient.loginPost(username, password);
 		System.err.println(sid);
 		
-		
 		authClient.logout(sid);
 		System.err.println("op finished");
 		

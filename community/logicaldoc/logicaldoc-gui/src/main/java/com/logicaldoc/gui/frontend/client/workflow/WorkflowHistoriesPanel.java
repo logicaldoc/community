@@ -79,9 +79,8 @@ public class WorkflowHistoriesPanel extends VLayout {
 		historyId.setHidden(true);
 
 		ListGridField historyEvent = new ListGridField("event", I18N.message("event"), 200);
-		ListGridField historyName = new ListGridField("name", I18N.message("task"), 200);
-		historyName.setHidden(true);
-
+		ListGridField historyName = new ListGridField("name", I18N.message("task"), 150);
+		
 		ListGridField historyDate = new ListGridField("date", I18N.message("date"), 120);
 		historyDate.setAlign(Alignment.CENTER);
 		historyDate.setType(ListGridFieldType.DATE);
@@ -98,6 +97,8 @@ public class WorkflowHistoriesPanel extends VLayout {
 		historySid.setHidden(true);
 		ListGridField transition = new ListGridField("transition", I18N.message("transition"), 120);
 		transition.setHidden(true);
+		ListGridField templateVersion = new ListGridField("templateVersion", I18N.message("version"), 70);
+		templateVersion.setHidden(true);
 
 		historiesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		historiesGrid.setCanFreezeFields(true);
@@ -111,10 +112,10 @@ public class WorkflowHistoriesPanel extends VLayout {
 		if (wfInstanceId != null && wfTemplateId != null)
 			historiesGrid.setDataSource(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null));
 		if (Menu.enabled(Menu.SESSIONS))
-			historiesGrid.setFields(historyId, historyEvent, historyName, historyDate, historyUser, historyComment,
+			historiesGrid.setFields(historyId, templateVersion, historyEvent, historyName, historyDate, historyUser, historyComment,
 					historyFilename, transition, documentId, historySid);
 		else
-			historiesGrid.setFields(historyId, historyEvent, historyName, historyDate, historyUser, historyComment,
+			historiesGrid.setFields(historyId, templateVersion, historyEvent, historyName, historyDate, historyUser, historyComment,
 					historyFilename, transition, documentId);
 		historiesGrid.addCellContextClickHandler(new CellContextClickHandler() {
 

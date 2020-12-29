@@ -21,9 +21,10 @@ public class WorkflowTasksDS extends DataSource {
 		DataSourceDateField duedate = new DataSourceDateField("duedate");
 		DataSourceDateField enddate = new DataSourceDateField("enddate");
 		DataSourceTextField lastnote = new DataSourceTextField("lastnote");
+		DataSourceTextField templateVersion = new DataSourceTextField("templateVersion");
 
 		setFields(id, processId, name, startdate, duedate, enddate, workflow, documents, lastnote, documentIds,
-				pooledassignees);
+				pooledassignees, templateVersion);
 		setDataURL("data/workflowtasks.xml?1=1" + (type != null ? "&type=" + type : "")
 				+ (taskId != null ? "&taskId=" + taskId : ""));
 		setClientOnly(true);

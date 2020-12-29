@@ -63,6 +63,7 @@
 				<property name="move" type="int" column="ld_move" not-null="true" />
 				<property name="email" type="int" column="ld_email" not-null="true" />
 				<property name="automation" type="int" column="ld_automation" not-null="true" />
+				<property name="storage" type="int" column="ld_storage" not-null="true" />
 			</composite-element>
 		</set>
 		<property name="tgs" type="string" column="ld_tgs" length="1000" />

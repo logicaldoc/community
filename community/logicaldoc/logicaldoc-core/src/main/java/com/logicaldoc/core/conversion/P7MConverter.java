@@ -22,8 +22,6 @@ public class P7MConverter extends AbstractFormatConverter {
 
 	protected static Logger log = LoggerFactory.getLogger(P7MConverter.class);
 
-	protected static String CONVERT = "command.convert";
-
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
 		File tmp = null;
@@ -38,13 +36,13 @@ public class P7MConverter extends AbstractFormatConverter {
 			p7m.read();
 			p7m.extractOriginalFile(tmp);
 
-			FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(
-					FormatConverterManager.class);
+			FormatConverterManager manager = (FormatConverterManager) Context.get()
+					.getBean(FormatConverterManager.class);
 			FormatConverter converter = manager.getConverter(enclosedExtension, targetExtension);
 
 			if (converter == null)
-				throw new IOException(String.format("Unable to find a converter from %s to %s", enclosedExtension,
-						targetExtension));
+				throw new IOException(
+						String.format("Unable to find a converter from %s to %s", enclosedExtension, targetExtension));
 			converter.convert(sid, document, tmp, dest);
 		} catch (Throwable e) {
 			throw new IOException(e.getMessage(), e);

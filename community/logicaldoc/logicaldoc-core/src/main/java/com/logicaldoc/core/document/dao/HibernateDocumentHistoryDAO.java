@@ -136,6 +136,8 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	public boolean store(DocumentHistory history) throws PersistenceException {
 		// Write only if the history is enabled
 		if (RunLevel.current().aspectEnabled(DocumentHistory.ASPECT)) {
+			if (history.getComment() != null && history.getComment().length() > 4000)
+				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 			boolean ret = super.store(history);
 			if (ret)
 				EventCollector.get().newEvent(history);

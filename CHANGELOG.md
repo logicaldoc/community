@@ -1,4 +1,32 @@
 # Change Log
+            __                _            ______  ____  ______
+           / /   ____  ____ _(_)________ _/ / __ \/ __ \/ ____/
+          / /   / __ \/ __ `/ / ___/ __ `/ / / / / / / / /     
+         / /___/ /_/ / /_/ / / /__/ /_/ / / /_/ / /_/ / /___   
+        /_____/\____/\__, /_/\___/\__,_/_/_____/\____/\____/   
+                     /____/                 
+
+                      https://www.logicaldoc.com                    
+
+                    LogicalDOC Community Edition
+
+
+LogicalDOC-CE 8.5.2 (2020-12-05; logicaldoc-8.5.2)
+================================================================================
++ Support for the new Android app LogicalDOC Mobile
++ Enforced permission management in WebDAV with correct HTTP return codes
++ Unable to delete some files  ([#1045](https://bugs.logicaldoc.com/ticket/1045)) 
++ Recording of folder alias creations  ([#1046](https://bugs.logicaldoc.com/ticket/1046)) 
++ WebDAV cache removed because of superseeded by other optimizations  ([#1051](https://bugs.logicaldoc.com/ticket/1051)) 
++ Programmatically merge more PDF files  ([#1028](https://bugs.logicaldoc.com/ticket/1028)) 
++ Display tags column in the documents grid  ([#1032](https://bugs.logicaldoc.com/ticket/1032)) 
++ Customizable number of displayed history records  ([#1035](https://bugs.logicaldoc.com/ticket/1035)) 
++ Nice popups to notify alerts ([#1038](https://bugs.logicaldoc.com/ticket/1038)) 
++ Issues when number of folders in a subfolder is more than 1000 ([#1039](https://bugs.logicaldoc.com/ticket/1039)) 
++ Reduced time to shutdown of the Windows service ([#1042](https://bugs.logicaldoc.com/ticket/1042)) 
++ Updated the indexing engine ([#1026](https://bugs.logicaldoc.com/ticket/1026)) 
++ Copy the path of a folder ([#1027](https://bugs.logicaldoc.com/ticket/1027))
+
 
 LogicalDOC-CE 8.4.2 (2020-06-23; logicaldoc-8.4.2)
 ================================================================================

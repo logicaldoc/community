@@ -1,10 +1,9 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
-import com.logicaldoc.gui.common.client.CookiesManager;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.util.Offline;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -21,59 +20,51 @@ public class Cursor extends ToolStrip {
 
 	private Label label = null;
 
-	private String maxCookieName = CookiesManager.COOKIE_DOCSLIST_MAX;
-
-	private SpinnerItem maxItem;
+	private SpinnerItem pageSizeItem;
 
 	private SpinnerItem pageItem;
 
+	private int totalRecords = 0;
+
 	public Cursor() {
-		this(null, false, false);
+		this(false, false);
 	}
 
 	/**
 	 * ID of the message to be used to compose the email
-	 * 
-	 * @param maxDisplayedRecordsCookieName name of the cookies to save the max number of displayed records
+	 *
 	 * @param enabledPagination if the pagination must be enabled
-	 * @param compactView if the compact vidualization must be used
+	 * @param compactView if the compact visualization must be used
 	 */
-	public Cursor(String maxDisplayedRecordsCookieName, boolean enabledPagination, boolean compactView) {
+	public Cursor(boolean enabledPagination, boolean compactView) {
 		setHeight(20);
-		this.maxCookieName = maxDisplayedRecordsCookieName;
 
 		label = new Label(" ");
 		label.setWrap(false);
 		label.setMargin(2);
 		setAlign(Alignment.RIGHT);
 
-		String mx = "100";
-		if (maxDisplayedRecordsCookieName != null) {
-			if (Offline.get(maxDisplayedRecordsCookieName) != null
-					&& !Offline.get(maxDisplayedRecordsCookieName).equals(""))
-				mx = (String) Offline.get(maxDisplayedRecordsCookieName);
-		}
-
-		maxItem = ItemFactory.newSpinnerItem("max", "display", Integer.parseInt(mx), 2, (Integer) null);
-		maxItem.setValue(Integer.parseInt(mx));
-		maxItem.setWidth(70);
-		maxItem.setStep(20);
-		maxItem.setSaveOnEnter(true);
-		maxItem.setImplicitSave(true);
-		maxItem.addChangedHandler(new ChangedHandler() {
+		String mx = Session.get().getConfig("gui.document.pagesize");
+		pageSizeItem = ItemFactory.newSpinnerItem("max", "display", Integer.parseInt(mx), 2, (Integer) null);
+		pageSizeItem.setValue(Integer.parseInt(mx));
+		pageSizeItem.setWidth(70);
+		pageSizeItem.setStep(20);
+		pageSizeItem.setSaveOnEnter(true);
+		pageSizeItem.setImplicitSave(true);
+		pageSizeItem.addChangedHandler(new ChangedHandler() {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
-				onMaxChange();
+				onPageSizeChange();
 			}
 		});
 		if (compactView) {
-			maxItem.setShowTitle(false);
+			pageSizeItem.setShowTitle(false);
 		} else {
-			maxItem.setHint(I18N.message("elements"));
+			pageSizeItem.setHint(I18N.message("elements"));
 		}
 
-		addFormItem(maxItem);
+		addFormItem(pageSizeItem);
 		if (enabledPagination) {
 			pageItem = ItemFactory.newSpinnerItem("page", "page", 1, 1, 1);
 			pageItem.setHint("");
@@ -92,9 +83,10 @@ public class Cursor extends ToolStrip {
 	}
 
 	public void setTotalRecords(int totalRecords) {
+		this.totalRecords = totalRecords;
 		if (pageItem == null)
 			return;
-		int max = getMaxDisplayedRecords();
+		int max = getPageSize();
 		int pages = (int) Math.ceil((double) totalRecords / (double) max);
 		if (pages == 0)
 			pages = 1;
@@ -105,12 +97,12 @@ public class Cursor extends ToolStrip {
 		pageItem.setHint("/" + pages);
 	}
 
-	public int getMaxDisplayedRecords() {
-		return Integer.parseInt(maxItem.getValue().toString());
+	public int getPageSize() {
+		return Integer.parseInt(pageSizeItem.getValue().toString());
 	}
 
-	public void setMaxDisplayedRecords(int maxRecords) {
-		maxItem.setValue(maxRecords);
+	public void setPageSize(int maxRecords) {
+		pageSizeItem.setValue(maxRecords);
 	}
 
 	public int getCurrentPage() {
@@ -119,21 +111,27 @@ public class Cursor extends ToolStrip {
 		return Integer.parseInt(pageItem.getValue().toString());
 	}
 
+	public int getTotalPages() {
+		if (pageItem == null)
+			return 1;
+		return Integer.parseInt(pageItem.getMax().toString());
+	}
+
 	public void setCurrentPage(int page) {
 		if (pageItem == null)
 			return;
 		pageItem.setValue(page);
 	}
 
-	private void onMaxChange() {
-		if (maxItem.validate() && maxCookieName != null) {
-			CookiesManager.save(maxCookieName, maxItem.getValueAsString());
+	private void onPageSizeChange() {
+		if (pageSizeItem.validate()) {
 			setCurrentPage(1);
+			setTotalRecords(totalRecords);
 		}
 	}
 
-	public void registerMaxChangedHandler(ChangedHandler handler) {
-		maxItem.addChangedHandler(handler);
+	public void registerPageSizeChangedHandler(ChangedHandler handler) {
+		pageSizeItem.addChangedHandler(handler);
 	}
 
 	public void registerPageChangedHandler(ChangedHandler handler) {
@@ -142,11 +140,11 @@ public class Cursor extends ToolStrip {
 	}
 
 	public void showTitle(boolean showTitle) {
-		maxItem.setShowTitle(showTitle);
-		maxItem.setShowHint(showTitle);
+		pageSizeItem.setShowTitle(showTitle);
+		pageSizeItem.setShowHint(showTitle);
 	}
 
 	public void showStackedIcons(boolean stackedIcons) {
-		maxItem.setWriteStackedIcons(stackedIcons);
+		pageSizeItem.setWriteStackedIcons(stackedIcons);
 	}
 }

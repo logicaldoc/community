@@ -53,4 +53,6 @@ public interface FolderServiceAsync {
 	void applyGridLayout(long folderId, AsyncCallback<Void> callback);
 
 	void applyOCR(long parentId, AsyncCallback<Void> callback);
+
+	void applyStorage(long parentId, AsyncCallback<Void> callback);
 }

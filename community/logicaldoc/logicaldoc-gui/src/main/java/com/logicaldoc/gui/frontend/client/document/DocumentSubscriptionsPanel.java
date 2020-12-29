@@ -162,7 +162,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 		});
 
 		final DynamicForm userForm = new DynamicForm();
-		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true);
+		final SelectItem user = ItemFactory.newUserSelector("user", "adduser", null, true, false);
 		userForm.setItems(user);
 
 		user.addChangedHandler(new ChangedHandler() {

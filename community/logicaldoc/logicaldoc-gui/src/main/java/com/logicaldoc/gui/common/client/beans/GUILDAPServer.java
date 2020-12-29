@@ -62,6 +62,8 @@ public class GUILDAPServer implements Serializable {
 
 	private int position = 1;
 
+	private int timeout = 10;
+	
 	private String validation;
 	
 	public int getPosition() {
@@ -278,5 +280,13 @@ public class GUILDAPServer implements Serializable {
 
 	public void setValidation(String validation) {
 		this.validation = validation;
+	}
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
 	}
 }

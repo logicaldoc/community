@@ -16,8 +16,13 @@ import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.HeaderControl;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
@@ -134,6 +139,25 @@ public class DocumentDashlet extends Dashlet {
 		addItem(list);
 
 		getDataSource();
+		
+		HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Util.exportCSV(list, true);
+			}
+		});
+		exportControl.setTooltip(I18N.message("export"));
+		
+		HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				Canvas.printComponents(new Object[] { list });
+			}
+		});
+		printControl.setTooltip(I18N.message("print"));
+		
+		setHeaderControls(HeaderControls.HEADER_LABEL, refreshControl, exportControl, printControl,
+				HeaderControls.MINIMIZE_BUTTON, HeaderControls.MAXIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
 	}
 
 	private DocumentsDS getDataSource() {

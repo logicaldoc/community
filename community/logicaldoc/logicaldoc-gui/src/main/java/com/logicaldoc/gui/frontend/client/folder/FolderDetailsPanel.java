@@ -429,7 +429,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				tabSet.selectTab(interfaceTab);
 		}
 
-		if (valid && Feature.enabled(Feature.OCR)) {
+		if (valid && ocrPanel != null && Feature.enabled(Feature.OCR)) {
 			valid = ocrPanel.validate();
 			if (!valid)
 				tabSet.selectTab(ocrTab);

@@ -8,8 +8,8 @@ import com.smartgwt.client.widgets.Window;
 public class ImageLightbox extends Window {
 	public ImageLightbox(long docId, String title) {
 		int size = 800;
-		if (Session.get().getConfig("gui.thumbnail.size") != null)
-			size = Integer.parseInt(Session.get().getConfig("gui.thumbnail.size"));
+		if (Session.get().getConfig("gui.tile.size") != null)
+			size = Integer.parseInt(Session.get().getConfig("gui.tile.size"));
 		int windowHeight = size + 10;
 		if (windowHeight > com.google.gwt.user.client.Window.getClientHeight())
 			windowHeight = com.google.gwt.user.client.Window.getClientHeight();
@@ -23,7 +23,7 @@ public class ImageLightbox extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		HTMLPanel html = new HTMLPanel(Util.thumbnailImgageHTML(docId, null, null, size));
+		HTMLPanel html = new HTMLPanel(Util.tileImageHTML(docId, null, null, size));
 		addItem(html);
 	}
 }

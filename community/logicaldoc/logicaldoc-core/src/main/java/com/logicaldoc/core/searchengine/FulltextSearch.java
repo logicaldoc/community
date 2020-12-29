@@ -250,7 +250,7 @@ public class FulltextSearch extends Search {
 			} else {
 				hitsIdsCondition.append(" A.ld_id in " + hitsIds.toString().replace('[', '(').replace(']', ')'));
 			}
-			
+
 			hitsIdsCondition.append(")");
 		}
 
@@ -268,8 +268,8 @@ public class FulltextSearch extends Search {
 		richQuery.append(" from ld_document A ");
 		richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 		richQuery.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
-		richQuery.append(" where A.ld_deleted=0 and A.ld_nature=" + AbstractDocument.NATURE_DOC
-				+ " and A.ld_folderid=FOLD.ld_id  ");
+		richQuery.append(" where A.ld_deleted=0 and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED
+				+ " and A.ld_nature=" + AbstractDocument.NATURE_DOC + " and A.ld_folderid=FOLD.ld_id  ");
 		richQuery.append(" and A.ld_tenantid = " + tenantId);
 		// For normal users we have to exclude not published documents
 		if (searchUser != null && !searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
@@ -298,8 +298,8 @@ public class FulltextSearch extends Search {
 			richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 			richQuery.append(" join ld_document REF on A.ld_docref=REF.ld_id ");
 			richQuery.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
-			richQuery.append(" where A.ld_deleted=0 and A.ld_nature=" + AbstractDocument.NATURE_DOC
-					+ " and A.ld_folderid=FOLD.ld_id ");
+			richQuery.append(" where A.ld_deleted=0 and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED
+					+ " and A.ld_nature=" + AbstractDocument.NATURE_DOC + " and A.ld_folderid=FOLD.ld_id ");
 			richQuery.append(" and A.ld_tenantid = " + tenantId);
 			// For normal users we have to exclude not published documents
 			if (searchUser != null && !searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
@@ -307,7 +307,8 @@ public class FulltextSearch extends Search {
 				richQuery.append(" and REF.ld_startpublishing <= CURRENT_TIMESTAMP ");
 				richQuery.append(" and ( REF.ld_stoppublishing is null or REF.ld_stoppublishing > CURRENT_TIMESTAMP )");
 			}
-			richQuery.append("  and A.ld_docref is not null and REF.ld_deleted=0 and A.ld_docref = REF.ld_id ");
+			richQuery.append("  and A.ld_docref is not null and REF.ld_deleted=0 and not A.ld_status="
+					+ AbstractDocument.DOC_ARCHIVED + " and A.ld_docref = REF.ld_id ");
 			richQuery.append(hitsIdsCondition.toString());
 		}
 

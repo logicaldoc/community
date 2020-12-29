@@ -28,12 +28,15 @@ import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
+import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
+import com.logicaldoc.gui.frontend.client.docusign.DocuSignSettings;
+import com.logicaldoc.gui.frontend.client.docusign.EnvelopeDetails;
+import com.logicaldoc.gui.frontend.client.docusign.Envelopes;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxAuthorizationWizard;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
 import com.logicaldoc.gui.frontend.client.gdrive.GDriveCreate;
@@ -47,6 +50,7 @@ import com.logicaldoc.gui.frontend.client.personal.Profile;
 import com.logicaldoc.gui.frontend.client.personal.contacts.Contacts;
 import com.logicaldoc.gui.frontend.client.search.Search;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationDialog;
+import com.logicaldoc.gui.frontend.client.services.DocuSignService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
 import com.logicaldoc.gui.frontend.client.services.GDriveService;
@@ -193,7 +197,10 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	private void onSearch() {
 		GUISearchOptions options = new GUISearchOptions();
 
-		options.setMaxHits(Session.get().getConfigAsInt("search.hits"));
+		Integer pageSize = GridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
+		if (pageSize == null)
+			pageSize = Session.get().getConfigAsInt("search.hits");
+		options.setMaxHits(pageSize);
 
 		String field = searchType.getValueAsString();
 		String value = searchBox.getValueAsString().trim();
@@ -219,6 +226,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				}
 			} else
 				criterion.setStringValue(value);
+			options.setCaseSensitive(0);
 			options.setCriteria(new GUICriterion[] { criterion });
 		}
 
@@ -293,14 +301,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void onLogout() {
-		LD.ask(I18N.message("question"), I18N.message("confirmexit"), 300, new BooleanCallback() {
-			@Override
-			public void execute(Boolean value) {
-				if (value) {
-					Session.get().logout();
-				}
-			}
-		});
+		Session.get().logout();
 	}
 
 	private MenuItem getWebContentMenuItem(GUIFolder folder, final GUIDocument document) {
@@ -529,34 +530,48 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		importFrom.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				ShareFileDialog dialog = new ShareFileDialog(false);
-				dialog.show();
-			}
-		});
+				ShareFileService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
 
-		final MenuItem account = new MenuItem(I18N.message("sharefileaccount"));
-		account.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				ShareFileService.Instance.get().loadSettings(new AsyncCallback<String[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						Log.serverError(caught);
+						ContactingServer.get().hide();
 					}
 
 					@Override
-					public void onSuccess(String[] settings) {
-						ShareFileSettings dialog = new ShareFileSettings(settings);
-						dialog.show();
+					public void onSuccess(Boolean authorized) {
+						ContactingServer.get().hide();
+						if (authorized) {
+							ShareFileDialog dialog = new ShareFileDialog(false);
+							dialog.show();
+						} else {
+							SC.say(I18N.message("youneedtoauthorizesharefile",
+									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
+
+										@Override
+										public void execute(Boolean value) {
+											new ShareFileSettings().show();
+										}
+									});
+						}
 					}
 				});
+
+			}
+		});
+
+		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
+		authorize.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				new ShareFileSettings().show();
 			}
 		});
 
 		Menu menu = new Menu();
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
-		menu.setItems(exportTo, importFrom, account);
+		menu.setItems(exportTo, importFrom, authorize);
 
 		exportTo.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.SHAREFILE));
 		importFrom.setEnabled(folder != null && folder.isWrite() && Feature.enabled(Feature.SHAREFILE)
@@ -566,6 +581,97 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		sharefileItem.setSubmenu(menu);
 
 		return sharefileItem;
+	}
+
+	private MenuItem getDocuSignMenuItem(GUIFolder folder, final GUIDocument document) {
+		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
+		authorize.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				new DocuSignSettings().show();
+			}
+		});
+
+		final MenuItem sendEnvelope = new MenuItem(I18N.message("sendenvelope"));
+		sendEnvelope.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				ContactingServer.get().show();
+				DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+						ContactingServer.get().hide();
+					}
+
+					@Override
+					public void onSuccess(Boolean authorized) {
+						ContactingServer.get().hide();
+						if (authorized) {
+							new EnvelopeDetails().show();
+						} else {
+							SC.say(I18N.message("youneedtoauthorizedocusign",
+									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
+
+										@Override
+										public void execute(Boolean value) {
+											new DocuSignSettings().show();
+										}
+									});
+						}
+					}
+				});
+			}
+		});
+		sendEnvelope.setEnabled(document != null);
+
+		final MenuItem envelopes = new MenuItem(I18N.message("envelopes"));
+		envelopes.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				ContactingServer.get().show();
+				DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+						ContactingServer.get().hide();
+					}
+
+					@Override
+					public void onSuccess(Boolean authorized) {
+						ContactingServer.get().hide();
+						if (authorized) {
+							new Envelopes().show();
+						} else {
+							SC.say(I18N.message("youneedtoauthorizedocusign",
+									Session.get().getInfo().getBranding().getProduct()), new BooleanCallback() {
+
+										@Override
+										public void execute(Boolean value) {
+											new DocuSignSettings().show();
+										}
+									});
+						}
+					}
+				});
+			}
+		});
+
+		sendEnvelope.setEnabled(Feature.enabled(Feature.DOCUSIGN));
+		envelopes.setEnabled(Feature.enabled(Feature.DOCUSIGN));
+		authorize.setEnabled(Feature.enabled(Feature.DOCUSIGN));
+
+		Menu menu = new Menu();
+		menu.setShowShadow(true);
+		menu.setShadowDepth(3);
+		menu.setItems(sendEnvelope, envelopes, authorize);
+
+		MenuItem docuSignItem = new MenuItem(I18N.message("docusign"));
+		docuSignItem.setSubmenu(menu);
+
+		return docuSignItem;
 	}
 
 	private MenuItem getGDriveMenuItem(GUIFolder folder, final GUIDocument document) {
@@ -877,6 +983,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			if (Feature.enabled(Feature.ZOHO)
 					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.ZOHO))
 				menu.addItem(getZohoMenuItem(folder, document));
+			if (Feature.enabled(Feature.DOCUSIGN)
+					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.DOCUSIGN))
+				menu.addItem(getDocuSignMenuItem(folder, document));
 			if (Feature.enabled(Feature.OFFICE)
 					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.OFFICE))
 				menu.addItem(getOfficeMenuItem(folder, document));

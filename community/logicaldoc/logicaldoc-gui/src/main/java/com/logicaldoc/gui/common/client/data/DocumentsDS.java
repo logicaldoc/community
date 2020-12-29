@@ -3,7 +3,6 @@ package com.logicaldoc.gui.common.client.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -30,8 +29,8 @@ public class DocumentsDS extends DataSource {
 	private GUIFolder folder = null;
 
 	public DocumentsDS(GUIFolder folder, String fileFilter, Integer max, int page, Integer indexed, boolean barcoded,
-			boolean ocrd, boolean sort) {
-		this(folder != null ? folder.getId() : null, fileFilter, max, page, indexed, barcoded, ocrd, sort);
+			boolean ocrd, String sortSpec) {
+		this(folder != null ? folder.getId() : null, fileFilter, max, page, indexed, barcoded, ocrd, sortSpec);
 		this.folder = folder;
 	}
 
@@ -45,13 +44,13 @@ public class DocumentsDS extends DataSource {
 	 * @param indexed The indexed flag
 	 * @param barcoded The barcoded flag
 	 * @param ocrd The ocrd flag
+	 * @param sortSpec the sort specification (optional)
 	 */
 	private DocumentsDS(Long folderId, String fileFilter, Integer max, int page, Integer indexed, boolean barcoded,
-			boolean ocrd, boolean sort) {
+			boolean ocrd, String sortSpec) {
 		prepareFields();
 
 		if (!barcoded && !ocrd) {
-			String sortSpec = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_SORT);
 			setDataURL("data/documents.xml?locale=" + Session.get().getUser().getLanguage() + "&folderId="
 					+ (folderId != null ? folderId : "") + "&filename=" + (fileFilter != null ? fileFilter : "")
 					+ "&max=" + (max != null ? max : DEFAULT_MAX) + "&indexed="
@@ -129,6 +128,7 @@ public class DocumentsDS extends DataSource {
 		DataSourceTextField extResId = new DataSourceTextField("extResId");
 		DataSourceIntegerField order = new DataSourceIntegerField("order");
 		DataSourceTextField language = new DataSourceTextField("language");
+		DataSourceTextField tags = new DataSourceTextField("tags");
 
 		List<DataSourceField> fields = new ArrayList<DataSourceField>();
 		fields.add(id);
@@ -165,6 +165,7 @@ public class DocumentsDS extends DataSource {
 		fields.add(extResId);
 		fields.add(template);
 		fields.add(language);
+		fields.add(tags);
 		fields.add(order);
 
 		String attrs = Session.get().getInfo().getConfig("search.extattr");

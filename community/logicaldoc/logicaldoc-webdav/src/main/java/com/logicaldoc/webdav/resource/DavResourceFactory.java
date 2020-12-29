@@ -23,5 +23,4 @@ public interface DavResourceFactory {
 
 	public DavResource createResource(DavResourceLocator locator, DavSession session) throws DavException;
 
-	public void putInCache(DavSession session, DavResource resource);
 }

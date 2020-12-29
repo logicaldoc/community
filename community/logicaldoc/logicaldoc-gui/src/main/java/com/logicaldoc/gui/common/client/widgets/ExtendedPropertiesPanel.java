@@ -96,7 +96,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 	public ExtendedPropertiesPanel(GUIExtensibleObject object, ChangedHandler changedHandler, boolean updateEnabled,
 			boolean checkMandatory, boolean allowTemplateSelection) {
-		this(object, changedHandler, null, updateEnabled, allowTemplateSelection, allowTemplateSelection);
+		this(object, changedHandler, null, updateEnabled, checkMandatory, allowTemplateSelection);
 	}
 
 	private void adaptForms() {
@@ -355,7 +355,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		}
 
 		if (item != null) {
-			if (att.isMultiple() && att.getType() != GUIAttribute.TYPE_USER
+			if ((att.isMultiple() || att.getParent() != null) && att.getType() != GUIAttribute.TYPE_USER
 					&& att.getType() != GUIAttribute.TYPE_FOLDER)
 				item.setIcons(multiValIcons.toArray(new FormItemIcon[0]));
 			item.setRequired(checkMandatory ? att.isMandatory() : false);
@@ -491,9 +491,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 										// attribute value
 										GUIUser dummy = new GUIUser();
 										dummy.setId(Long.parseLong(val.toString()));
+										dummy.setUsername(sel.getAttributeAsString("username"));
 										dummy.setFirstName(sel.getAttributeAsString("firstName"));
 										dummy.setName(sel.getAttributeAsString("name"));
 										object.setValue(nm, dummy);
+
+										GUIAttribute at = object.getAttribute(nm);
+										at.setStringValue(dummy.getUsername());
+										at.setUsername(dummy.getUsername());
 									} else {
 										GUIAttribute at = object.getAttribute(nm);
 										at.setIntValue(null);

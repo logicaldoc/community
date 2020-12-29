@@ -3,10 +3,6 @@ package com.logicaldoc.webdav.resource;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -18,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
 import com.logicaldoc.webdav.session.DavSession;
@@ -46,8 +41,8 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	}
 
 	public DavResourceFactoryImpl(LockManager lockMgr, ResourceConfig resourceConfig) {
-		this.resourceConfig = (resourceConfig != null) ? resourceConfig : (ResourceConfig) Context.get()
-				.getBean("ResourceConfig");
+		this.resourceConfig = (resourceConfig != null) ? resourceConfig
+				: (ResourceConfig) Context.get().getBean("ResourceConfig");
 		this.resourceService = (ResourceService) Context.get().getBean("ResourceService");
 	}
 
@@ -78,10 +73,10 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 			} else {
 				repositoryResource.setVersionLabel(version);
 				repositoryResource.setRequestedPerson(Long.parseLong(session.getObject("id").toString()));
-				resource = new VersionControlledResourceImpl(locator, this, session, resourceConfig, repositoryResource);
+				resource = new VersionControlledResourceImpl(locator, this, session, resourceConfig,
+						repositoryResource);
 			}
 
-			putInCache(session, resource);
 			return resource;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -91,62 +86,14 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 
 	public DavResource createResource(DavResourceLocator locator, DavSession session) throws DavException {
 		try {
-			DavResource resource = getFromCache(session, locator.getResourcePath());
-			if (resource != null)
-				return resource;
-
 			Resource res = resourceService.getResource(locator.getResourcePath(), session);
-			resource = createResource(locator, session, res);
+			DavResource resource = createResource(locator, session, res);
 
-			putInCache(session, resource);
 			return resource;
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
 		}
-	}
-
-	/**
-	 * Puts an entry in the cache
-	 * 
-	 * @param session The curent DAV session
-	 * @param resource The entry to be cached
-	 */
-	public void putInCache(DavSession session, DavResource resource) {
-		try {
-			ContextProperties config = Context.get().getProperties();
-			if ("true".equals(config.getProperty("webdav.usecache"))) {
-				// Initialize the collection of children
-				Cache cache = ((CacheManager) Context.get().getBean("DavCacheManager"))
-						.getCache("dav-resources");
-				Element element = new Element(session.getObject("id") + ";" + resource.getResourcePath(), resource);
-				cache.put(element);
-			}
-		} catch (Throwable t) {
-
-		}
-	}
-
-	/**
-	 * Retrieves an entry from cache
-	 * 
-	 * @param key The entry ID as <b>userid</b>;<b>path</b>
-	 * @return The cached entry
-	 */
-	private DavResource getFromCache(DavSession session, String path) {
-		ContextProperties config = Context.get().getProperties();
-		if ("true".equals(config.getProperty("webdav.usecache"))) {
-			String key = session.getObject("id") + ";" + path;
-			Cache cache = ((CacheManager) Context.get().getBean("DavCacheManager")).getCache("dav-resources");
-			Element element = cache.get(key);
-			DavResource resource = null;
-			if (element != null) {
-				resource = (DavResource) element.getValue();
-				return resource;
-			} else
-				return null;
-		} else
-			return null;
 	}
 
 	private DavResource createNullResource(DavResourceLocator locator, DavSession session, boolean isCollection)
@@ -157,12 +104,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 
 	public DavResource createResource(DavResourceLocator locator, DavSession session, Resource resource)
 			throws DavException {
-		DavResource res = getFromCache(session, locator.getResourcePath());
-		if (res != null)
-			return res;
-
-		res = new VersionControlledResourceImpl(locator, this, session, resourceConfig, resource);
-		putInCache(session, res);
+		DavResource res = new VersionControlledResourceImpl(locator, this, session, resourceConfig, resource);
 		return res;
 	}
 }

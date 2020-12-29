@@ -9,7 +9,8 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 
 /**
- * Utility methods to handle some security related operations from within the Automation
+ * Utility methods to handle some security related operations from within the
+ * Automation
  * 
  * @author Meschieri - LogicalDOC
  * 
@@ -32,5 +33,17 @@ public class SecurityTool {
 		User user = StringUtils.isNotEmpty(username) ? userDao.findByUsername(username)
 				: userDao.findByUsername("_system");
 		return user;
+	}
+
+	/**
+	 * Retrieves a user object
+	 * 
+	 * @param userId the user ID
+	 * 
+	 * @return the user object
+	 */
+	public User getUser(long userId) {
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		return userDao.findById(userId);
 	}
 }

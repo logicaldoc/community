@@ -120,4 +120,8 @@ public interface Resource {
 	public String getLockUser();
 
 	public void setLockUser(String lockUser);
+
+	public void setETag(String string);
+	
+	public String getETag();
 }

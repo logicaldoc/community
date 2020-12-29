@@ -3,10 +3,13 @@ package com.logicaldoc.core.document;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -16,15 +19,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.MailUtil;
+import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
@@ -99,6 +104,18 @@ public class DocumentManagerImpl implements DocumentManager {
 		this.indexer = indexer;
 	}
 
+	public void setVersionDAO(VersionDAO versionDAO) {
+		this.versionDAO = versionDAO;
+	}
+
+	public void setStorer(Storer storer) {
+		this.storer = storer;
+	}
+
+	public void setConfig(ContextProperties config) {
+		this.config = config;
+	}
+
 	@Override
 	public void replaceFile(long docId, String fileVersion, InputStream content, DocumentHistory transaction)
 			throws Exception {
@@ -149,18 +166,16 @@ public class DocumentManagerImpl implements DocumentManager {
 				}
 			}
 
-			// Update the document
-			if (document.getFileSize() == fileSize) {
-				documentDAO.initialize(document);
-				document.setFileSize(fileSize);
-				if (document.getIndexed() != Document.INDEX_SKIP)
-					document.setIndexed(Document.INDEX_TO_INDEX);
-				document.setOcrd(0);
-				document.setBarcoded(0);
-				document.setSigned(0);
-				document.setStamped(0);
-				documentDAO.store(document, transaction);
-			}
+			// Update the document's record
+			documentDAO.initialize(document);
+			document.setFileSize(fileSize);
+			if (document.getIndexed() != Document.INDEX_SKIP)
+				document.setIndexed(Document.INDEX_TO_INDEX);
+			document.setOcrd(0);
+			document.setBarcoded(0);
+			document.setSigned(0);
+			document.setStamped(0);
+			documentDAO.store(document, transaction);
 
 			log.debug("Replaced fileVersion {} of document {}", fileVersion, docId);
 		}
@@ -187,12 +202,12 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			document.setComment(transaction.getComment());
 
-			Document oldDocument = null; 
+			Document oldDocument = null;
 			if (document.getImmutable() == 0) {
 				documentDAO.initialize(document);
 
 				oldDocument = (Document) document.clone();
-				
+
 				// Check CustomId uniqueness
 				if (docVO != null && docVO.getCustomId() != null) {
 					Document test = documentDAO.findByCustomId(docVO.getCustomId(), document.getTenantId());
@@ -263,7 +278,8 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				// Create new version (a new version number is created)
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
-						Version.EVENT_CHECKIN, release);
+						DocumentEvent.CHECKEDIN.toString(), release);
+
 				document.setStatus(Document.DOC_UNLOCKED);
 				if (documentDAO.store(document, transaction) == false)
 					throw new Exception(String.format("Errors saving document %s", document.getId()));
@@ -271,7 +287,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				// store the document in the repository (on the file system)
 				try {
 					storeFile(document, file);
-				} catch (Exception t) {
+				} catch (Throwable t) {
 					log.error("Cannot save the new version {} into the storage", document, t);
 
 					document.copyAttributes(oldDocument);
@@ -360,6 +376,9 @@ public class DocumentManagerImpl implements DocumentManager {
 			document.setLockUser(transaction.getUser().getFullName());
 			document.setStatus(status);
 			document.setFolder(document.getFolder());
+
+			if (transaction.getEvent() == null)
+				transaction.setEvent(DocumentEvent.LOCKED.toString());
 
 			// Modify document history entry
 			boolean stored = documentDAO.store(document, transaction);
@@ -594,7 +613,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 					// create a new version
 					Version version = Version.create(doc, transaction.getUser(), transaction.getComment(),
-							Version.EVENT_CHANGED, false);
+							DocumentEvent.CHANGED.toString(), false);
 
 					boolean stored = false;
 
@@ -643,6 +662,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				documentDAO.initialize(doc);
 				transaction.setPathOld(folderDAO.computePathExtended(doc.getFolder().getId()));
 				transaction.setFilenameOld(doc.getFileName());
+				transaction.setEvent(DocumentEvent.MOVED.toString());
 
 				doc.setFolder(folder);
 
@@ -661,7 +681,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					transaction.setEvent(DocumentEvent.MOVED.toString());
 
 				Version version = Version.create(doc, transaction.getUser(), transaction.getComment(),
-						Version.EVENT_MOVED, false);
+						DocumentEvent.MOVED.toString(), false);
 				version.setId(0);
 
 				boolean stored = documentDAO.store(doc, transaction);
@@ -774,7 +794,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 					// Store the initial version (default 1.0)
 					Version vers = Version.create(docVO, userDAO.findById(transaction.getUserId()),
-							transaction.getComment(), Version.EVENT_STORED, true);
+							transaction.getComment(), DocumentEvent.STORED.toString(), true);
 					versionDAO.store(vers);
 					log.debug("Stored version {}", vers.getVersion());
 					return docVO;
@@ -937,7 +957,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
 
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
-						Version.EVENT_RENAMED, false);
+						DocumentEvent.RENAMED.toString(), false);
 				versionDAO.store(version);
 
 				transaction.setEvent(DocumentEvent.RENAMED.toString());
@@ -1039,18 +1059,6 @@ public class DocumentManagerImpl implements DocumentManager {
 			log.error(e.getMessage(), e);
 			throw e;
 		}
-	}
-
-	public void setVersionDAO(VersionDAO versionDAO) {
-		this.versionDAO = versionDAO;
-	}
-
-	public void setStorer(Storer storer) {
-		this.storer = storer;
-	}
-
-	public void setConfig(ContextProperties config) {
-		this.config = config;
 	}
 
 	@Override
@@ -1353,6 +1361,191 @@ public class DocumentManagerImpl implements DocumentManager {
 			} finally {
 				FileUtils.deleteQuietly(tmp);
 			}
+		}
+	}
+
+	@Override
+	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws Exception {
+		Folder rootFolder = folderDAO.findFolder(rootFolderId);
+		if (rootFolder == null)
+			throw new Exception("Unexisting folder ID  " + rootFolderId);
+
+		if (transaction != null)
+			transaction.setEvent(DocumentEvent.CHANGED.toString());
+
+		int totalMovedFiles = 0;
+
+		// Traverse the tree
+		Collection<Long> folderIds = folderDAO.findFolderIdInTree(rootFolderId, false);
+		for (Long folderId : folderIds) {
+			Folder folder = folderDAO.findById(folderId);
+			if (folder == null || folder.getFoldRef() != null)
+				continue;
+
+			// Retrieve the storage specification from the current folder
+			int targetStorage = config.getInt("store.write", 1);
+			if (folder.getStorage() != null)
+				targetStorage = folder.getStorage().intValue();
+			else {
+				// Check if one of the parent folders references the storer
+				List<Folder> parents = folderDAO.findParents(folderId);
+				Collections.reverse(parents);
+
+				for (Folder parentFolder : parents)
+					if (parentFolder.getStorage() != null) {
+						targetStorage = parentFolder.getStorage().intValue();
+						break;
+					}
+			}
+
+			log.info("Move the files of all the documents inside the folder {} into the target storage {}", rootFolder,
+					targetStorage);
+
+			List<Document> documents = documentDAO.findByFolder(folderId, null);
+			for (Document document : documents) {
+				int movedFiles = storer.moveResourcesToStore(document.getId(), targetStorage);
+				if (movedFiles > 0) {
+					totalMovedFiles += movedFiles;
+					try {
+						DocumentHistory storedTransaction = transaction.clone();
+						storedTransaction
+								.setComment(String.format("%d files moved to storage %d", movedFiles, targetStorage));
+						documentDAO.saveDocumentHistory(document, transaction);
+					} catch (Throwable t) {
+						log.warn("Cannot record history for document {}", document, t);
+					}
+				}
+			}
+		}
+
+		return totalMovedFiles;
+	}
+
+	@Override
+	public Document merge(Collection<Document> documents, long targetFolderId, String fileName,
+			DocumentHistory transaction) throws Exception {
+		List<Long> docIds = documents.stream().map(d -> d.getId()).collect(Collectors.toList());
+		File tempDir = null;
+		File bigPdf = null;
+		try {
+			tempDir = preparePdfs(transaction != null ? transaction.getUser() : null, docIds);
+
+			// Now collect and sort each PDF
+			File[] pdfs = tempDir.listFiles();
+
+			Arrays.sort(pdfs, new Comparator<File>() {
+				@Override
+				public int compare(File o1, File o2) {
+					return o1.getName().compareTo(o2.getName());
+				}
+			});
+
+			// Merge all the PDFs
+			bigPdf = mergePdf(pdfs);
+
+			// Add an history entry to track the export of the document
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			for (Long id : docIds) {
+				DocumentHistory trans = transaction.clone();
+				trans.setEvent(DocumentEvent.EXPORTPDF.toString());
+				docDao.saveDocumentHistory(docDao.findById(id), trans);
+			}
+
+			Document docVO = new Document();
+			docVO.setFileName(fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf");
+			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			docVO.setFolder(folderDao.findById(targetFolderId));
+
+			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+			return manager.create(bigPdf, docVO, transaction);
+		} finally {
+			try {
+				FileUtil.strongDelete(bigPdf);
+			} catch (Throwable r) {
+			}
+			try {
+				FileUtil.strongDelete(tempDir);
+			} catch (Throwable r) {
+			}
+		}
+	}
+
+	/**
+	 * Convert a selection of documents into PDF and stores them in a temporary
+	 * folder
+	 * 
+	 * @param user The current user
+	 * @param docIds List of documents to be converted
+	 * 
+	 * @return The temporary folder
+	 * 
+	 * @throws IOException
+	 */
+	private File preparePdfs(User user, List<Long> docIds) throws IOException {
+		File temp = File.createTempFile("merge", "");
+		temp.delete();
+		temp.mkdir();
+
+		DecimalFormat nf = new DecimalFormat("00000000");
+		int i = 0;
+		for (long docId : docIds) {
+			try {
+				i++;
+				DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				Document document = docDao.findDocument(docId);
+
+				if (document != null && user != null && !user.isMemberOf("admin") && !user.isMemberOf("publisher")
+						&& !document.isPublishing())
+					continue;
+
+				FormatConverterManager manager = (FormatConverterManager) Context.get()
+						.getBean(FormatConverterManager.class);
+				manager.convertToPdf(document, null);
+
+				File pdf = new File(temp, nf.format(i) + ".pdf");
+
+				manager.writePdfToFile(document, null, pdf, null);
+			} catch (Throwable t) {
+				log.error(t.getMessage(), t);
+			}
+		}
+		return temp;
+	}
+
+	/**
+	 * Merges different PDFs into a single PDF-
+	 * 
+	 * @param pdfs ordered array of pdf files to be merged
+	 * @return The merged Pdf file
+	 * 
+	 * @throws IOException
+	 * @throws COSVisitorException
+	 */
+	private static File mergePdf(File[] pdfs) throws IOException {
+
+		File temp = null;
+		try {
+			temp = File.createTempFile("merge", "");
+			temp.delete();
+			temp.mkdir();
+
+			File dst = null;
+			dst = File.createTempFile("merge", ".pdf");
+
+			PDFMergerUtility merger = new PDFMergerUtility();
+			for (File file : pdfs) {
+				merger.addSource(file);
+			}
+
+			merger.setDestinationFileName(dst.getAbsolutePath());
+			MemoryUsageSetting memoryUsage = MemoryUsageSetting.setupTempFileOnly();
+			memoryUsage.setTempDir(temp);
+			merger.mergeDocuments(memoryUsage);
+
+			return dst;
+		} finally {
+			if (temp != null && temp.exists())
+				FileUtil.strongDelete(temp);
 		}
 	}
 }

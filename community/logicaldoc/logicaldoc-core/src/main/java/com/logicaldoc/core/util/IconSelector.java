@@ -37,9 +37,9 @@ public class IconSelector {
 			icon = "generic.png";
 		else if (ext.equals("pdf"))
 			icon = "pdf.png";
-		else if (ext.equals("txt") || ext.equals("properties") || ext.equals("log") || ext.equals("csv"))
+		else if (ext.equals("txt") || ext.equals("properties") || ext.equals("log") || ext.equals("csv") || ext.equals("json"))
 			icon = "text.png";
-		else if (ext.equals("doc") || ext.equals("docm") || ext.equals("docx") || ext.equals("docxm")
+		else if (ext.equals("doc") || ext.equals("docm") || ext.equals("docx") || ext.equals("docxm") || ext.equals("dotm")
 				|| ext.equals("odt") || ext.equals("rtf") || ext.equals("ott") || ext.equals("sxw") || ext.equals("wpd")
 				|| ext.equals("kwd") || ext.equals("dot"))
 			icon = "word.png";
@@ -64,9 +64,7 @@ public class IconSelector {
 			icon = "p7m.png";
 		else if (ext.equals("dwg") || ext.equals("dxf") || ext.equals("dwt"))
 			icon = "dwg.png";
-		else if (ext.equals("avi") || ext.equals("mpg") || ext.equals("mp4") || ext.equals("mov") || ext.equals("divx")
-				|| ext.equals("wmv") || ext.equals("flv") || ext.equals("mkv") || ext.equals("mpeg")
-				|| ext.equals("m2v") || ext.equals("m2ts"))
+		else if (isVideo(ext))
 			icon = "film.png";
 		else if (ext.equals("mp3") || ext.equals("m4p") || ext.equals("m4a") || ext.equals("wav") || ext.equals("wma")
 				|| ext.equals("cda") || ext.equals("wave"))
@@ -77,6 +75,8 @@ public class IconSelector {
 			icon = "dcm.png";
 		else if (ext.equals("java"))
 			icon = "java.png";
+		else if (ext.equals("epub") || ext.equals("azw") || ext.equals("azw3") || ext.equals("mobi"))
+			icon = "book.png";
 		else
 			icon = "generic.png";
 
@@ -87,6 +87,20 @@ public class IconSelector {
 	}
 
 	/**
+	 * Determines if the given extension represents a video
+	 * 
+	 * @param ext the file extension
+	 * 
+	 * @return if ext is a video
+	 */	
+	private static boolean isVideo(String ext) {
+
+		return (ext.equals("avi") || ext.equals("mpg") || ext.equals("mp4") || ext.equals("mov") 
+				|| ext.equals("wmv") || ext.equals("mkv") || ext.equals("mpeg") || ext.equals("m4v") 
+				|| ext.equals("divx") || ext.equals("flv") || ext.equals("m2v") || ext.equals("m2ts"));
+	}
+
+	/**
 	 * Determines if the given extension represents a picture
 	 * 
 	 * @param ext the file extension
@@ -94,11 +108,12 @@ public class IconSelector {
 	 * @return if ext is an image
 	 */
 	public static boolean isPicture(String ext) {
+		
 		if (ext != null)
 			ext = ext.toLowerCase();
 
 		return (ext.equals("jpg") || ext.equals("jpeg") || ext.equals("gif") || ext.equals("png") || ext.equals("bmp")
 				|| ext.equals("tif") || ext.equals("tiff") || ext.equals("psd") || ext.equals("svg")
-				|| ext.equals("jfif"));
+				|| ext.equals("jfif") || ext.equals("webp"));
 	}
 }

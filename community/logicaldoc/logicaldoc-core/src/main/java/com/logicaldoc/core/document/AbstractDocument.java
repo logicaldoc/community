@@ -120,7 +120,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private int barcoded = 0;
 
 	private int signed = 0;
-
+	
 	private int stamped = 0;
 
 	private Set<Tag> tags = new HashSet<Tag>();

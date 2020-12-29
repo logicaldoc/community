@@ -1,6 +1,8 @@
 package com.logicaldoc.core.document.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -63,12 +65,29 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 
 	@Override
 	public List<DocumentNote> findByDocId(long docId, String fileVersion) {
+		return findByDocIdAndType(docId, fileVersion, null);
+	}
+
+	@Override
+	public List<DocumentNote> findByDocIdAndType(long docId, String fileVersion, String type) {
+		return findByDocIdAndTypes(docId, fileVersion, StringUtils.isEmpty(type) ? null : Arrays.asList(type));
+	}
+
+	@Override
+	public List<DocumentNote> findByDocIdAndTypes(long docId, String fileVersion, Collection<String> types) {
 		try {
 			if (StringUtils.isEmpty(fileVersion))
-				return findByWhere("_entity.docId = " + docId, null, null);
-			else
+				if (types == null || types.isEmpty())
+					return findByWhere("_entity.docId = " + docId, null, null);
+				else
+					return findByWhere("_entity.docId = ?1 and _entity.type in (?2)", new Object[] { docId, types },
+							null, null);
+			else if (types == null || types.isEmpty())
 				return findByWhere("_entity.docId = ?1 and _entity.fileVersion = ?2",
 						new Object[] { docId, fileVersion }, null, null);
+			else
+				return findByWhere("_entity.docId = ?1 and _entity.fileVersion = ?2 and _entity.type in (?3)",
+						new Object[] { docId, fileVersion, types }, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentNote>();
@@ -106,7 +125,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	@Override
 	public int copyAnnotations(long docId, String oldFileVersion, String newFileVersion) throws PersistenceException {
 		List<DocumentNote> oldNotes = findByDocId(docId, oldFileVersion);
-		int count=0;
+		int count = 0;
 		for (DocumentNote oldNote : oldNotes) {
 			if (oldNote.getPage() > 0)
 				continue;

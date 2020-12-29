@@ -20,16 +20,6 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class Version extends AbstractDocument implements Comparable<Version> {
 
-	public final static String EVENT_STORED = "event.stored";
-
-	public final static String EVENT_CHANGED = "event.changed";
-
-	public final static String EVENT_CHECKIN = "event.checkedin";
-
-	public static final String EVENT_RENAMED = "event.renamed";
-
-	public final static String EVENT_MOVED = "event.moved";
-
 	private String username;
 
 	private Date versionDate = new Date();
@@ -248,14 +238,14 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		version.setStopPublishing(document.getStopPublishing());
 
 		String newVersionName = document.getVersion();
-		if (!event.equals(Version.EVENT_STORED)) {
+		if (!event.equals(DocumentEvent.STORED.toString())) {
 			newVersionName = version.getNewVersionName(document.getVersion(), release);
 			version.setVersion(newVersionName);
 			document.setVersion(newVersionName);
 		}
 
 		// If the file changed, than the file version must be changed also
-		if (Version.EVENT_CHECKIN.equals(event) || Version.EVENT_STORED.equals(event)
+		if (DocumentEvent.CHECKEDIN.toString().equals(event) || DocumentEvent.STORED.toString().equals(event)
 				|| StringUtils.isEmpty(document.getFileVersion())) {
 			version.setFileVersion(newVersionName);
 			document.setFileVersion(newVersionName);

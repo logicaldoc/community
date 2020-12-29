@@ -6,6 +6,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -15,9 +16,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
-import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeSingleton;
-import org.apache.velocity.runtime.log.Log4JLogChute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -68,21 +67,6 @@ public class Automation {
 	public static synchronized void initialize() {
 		try {
 			if (!RuntimeSingleton.isInitialized()) {
-				RuntimeSingleton.setProperty(RuntimeConstants.SET_NULL_ALLOWED, true);
-
-				try {
-					RuntimeSingleton.setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
-							Log4JLogChute.class.getName());
-				} catch (Throwable t) {
-					log.warn(t.getMessage());
-				}
-
-				try {
-					RuntimeSingleton.setProperty(Log4JLogChute.RUNTIME_LOG_LOG4J_LOGGER, Automation.class.getName());
-				} catch (Throwable t) {
-					log.warn(t.getMessage());
-				}
-
 				RuntimeSingleton.init();
 
 				log.info("Automation has been initialized");
@@ -129,10 +113,10 @@ public class Automation {
 	 * @return The complete dictionary to use
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {
+	private Map<String, Object> prepareDictionary(Map<String, Object> clientDictionary) {	
 		if (clientDictionary == null)
 			clientDictionary = new ConcurrentHashMap<String, Object>();
-		ConcurrentHashMap<String, Object> dictionary = new ConcurrentHashMap<String, Object>();
+		HashMap<String, Object> dictionary = new HashMap<String, Object>();
 
 		/*
 		 * Scan the classpath to add all the @AutomationDictionary classes
@@ -154,7 +138,7 @@ public class Automation {
 			String key = beanClass.getSimpleName();
 			AutomationDictionary annotation = (AutomationDictionary) beanClass
 					.getAnnotation(AutomationDictionary.class);
-			if (StringUtils.isNotEmpty(annotation.key()))
+			if (annotation != null && StringUtils.isNotEmpty(annotation.key()))
 				key = annotation.key();
 
 			try {
@@ -235,7 +219,9 @@ public class Automation {
 	private VelocityContext prepareContext(Map<String, Object> extendedDictionary) {
 		initialize();
 
-		VelocityContext context = new VelocityContext(extendedDictionary);
+		VelocityContext context = new VelocityContext();
+		if (extendedDictionary != null)
+			context = new VelocityContext(extendedDictionary);
 
 		return context;
 	}

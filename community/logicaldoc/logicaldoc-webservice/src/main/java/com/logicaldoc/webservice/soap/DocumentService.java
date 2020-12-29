@@ -668,6 +668,7 @@ public interface DocumentService {
 	 * @param sid Session identifier
 	 * @param docId The document id
 	 * @param fileVersion The specific file version(it can be empty)
+	 * @param type The thumbnail type(eg: thumbnail, tile, mobile)
 	 * 
 	 * @throws Exception error in the server application
 	 */
@@ -676,7 +677,8 @@ public interface DocumentService {
 	public void createThumbnail(
 			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
 			@WSDoc(description = "the document id") @WebParam(name = "docId") long docId,
-			@WSDoc(description = "the specific file version", required = false) @WebParam(name = "fileVersion") String fileVersion)
+			@WSDoc(description = "the specific file version", required = false) @WebParam(name = "fileVersion") String fileVersion,
+			@WSDoc(description = "the thumbnail type(eg: thumbnail, tile, mobile)", required = false) @WebParam(name = "type") String type)
 			throws Exception;
 
 	/**

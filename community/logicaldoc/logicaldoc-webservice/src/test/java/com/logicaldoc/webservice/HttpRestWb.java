@@ -49,14 +49,18 @@ import com.logicaldoc.webservice.model.WSSearchOptions;
 public class HttpRestWb {
 
 	//public static String BASE_PATH = "http://localhost:8080/logicaldoc";
-	public static String BASE_PATH = "http://localhost:9080";
+	public static String BASE_PATH = "http://localhost:1000";
+	
+	public static String USERNAME = "admin";
+	
+	public static String PASSWORD = "12345678";
 
 	public static void main(String[] args) throws Exception {
 
 		//String sid = loginJSON();
 
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", "admin"));
+        credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USERNAME, PASSWORD));
         
         CloseableHttpClient httpclient = HttpClients.custom()
                 .setDefaultCredentialsProvider(credsProvider)
@@ -143,16 +147,30 @@ public class HttpRestWb {
 		
 		//createPath(httpclient, 04L, "/sgsgsgs/Barisoni/rurururu");
 		
-        String sid = getSid(httpclient);  
+        String sid = getSid(httpclient);
+        
 		logout(httpclient, sid);
 	}
 	
 	private static String getSid(CloseableHttpClient httpclient) throws ClientProtocolException, IOException {
+        URL url = new URL(BASE_PATH);
+		
+		HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
+		CredentialsProvider credsProvider = new BasicCredentialsProvider();
+		credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USERNAME, PASSWORD));
+        
+        AuthCache authCache = new BasicAuthCache();
+        authCache.put(targetHost, new BasicScheme());
+        
+		// Add AuthCache to the execution context
+		HttpClientContext context = HttpClientContext.create();
+		context.setCredentialsProvider(credsProvider);
+		context.setAuthCache(authCache);
 		
 		HttpGet getg = new HttpGet(BASE_PATH + "/services/rest/auth/getSid");
 		String sid = null;
 
-		CloseableHttpResponse response = httpclient.execute(getg);
+		CloseableHttpResponse response = httpclient.execute(getg, context);
 		try {
 			HttpEntity rent = response.getEntity();
 			if (rent != null) {
@@ -168,8 +186,8 @@ public class HttpRestWb {
 
 	private static void logout(CloseableHttpClient httpclient, String sid) throws ClientProtocolException, IOException {
 
-		HttpDelete deletem = new HttpDelete(BASE_PATH + "/services/rest/auth/logout");	
-
+		HttpDelete deletem = new HttpDelete(BASE_PATH + "/services/rest/auth/logout?sid="+sid);
+		
 		CloseableHttpResponse response = httpclient.execute(deletem);
 		try {
 			HttpEntity rent = response.getEntity();
@@ -533,7 +551,7 @@ public class HttpRestWb {
 		
 		HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-		credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", "admin"));
+		credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USERNAME, PASSWORD));
         
         AuthCache authCache = new BasicAuthCache();
         authCache.put(targetHost, new BasicScheme());
@@ -545,13 +563,13 @@ public class HttpRestWb {
 		
         HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/upload");
        
-        File file = new File("c:/users/shatz/Downloads/logicaldocsecurity-171122130133.pdf");
-        //File file = new File("C:/tmp/InvoiceProcessing01-workflow.png");  
+        // File file = new File("c:/users/shatz/Downloads/logicaldocsecurity-171122130133.pdf");
+        File file = new File("C:/tmp/alphatypes.txt");  
                 
 		System.out.println(file.getName());	
 		System.out.println(file.getAbsolutePath());	
 		
-		long folderID = 124358812L;
+		long folderID = 103645184L;
 		
 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();         
 		builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);

@@ -12,7 +12,6 @@ import com.logicaldoc.gui.frontend.client.document.DocumentsPreviewPanel;
 public class SearchPreviewPanel extends DocumentsPreviewPanel {
 
 	public SearchPreviewPanel() {
-		super();
-		super.widthCookieName = CookiesManager.COOKIE_HITSLIST_PREV_W;
+		super(CookiesManager.COOKIE_HITSLIST_PREV_W);
 	}
 }

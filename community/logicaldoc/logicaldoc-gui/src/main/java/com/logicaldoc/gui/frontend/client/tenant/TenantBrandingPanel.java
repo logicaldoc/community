@@ -341,7 +341,7 @@ public class TenantBrandingPanel extends HLayout {
 		final ListGridRecord record = grid.getSelectedRecord();
 		final String name = record.getAttributeAsString("name");
 
-		if (!Feature.enabled(Feature.BRANDING_LOGO) && !"logo_oem".equals(name) && !"logo_head_oem".equals(name))
+		if ((!Feature.enabled(Feature.BRANDING_LOGO) && !Feature.enabled(Feature.BRANDING_FULL)) && !"logo_oem".equals(name) && !"logo_head_oem".equals(name))
 			return;
 
 		Menu contextMenu = new Menu();

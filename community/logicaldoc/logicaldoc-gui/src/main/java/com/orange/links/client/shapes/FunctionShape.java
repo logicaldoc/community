@@ -3,7 +3,7 @@ package com.orange.links.client.shapes;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.user.client.ui.Widget;
 import com.logicaldoc.gui.common.client.beans.GUIWFState;
-import com.logicaldoc.gui.frontend.client.workflow.StateWidget;
+import com.logicaldoc.gui.frontend.client.workflow.designer.StateWidget;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.connection.Connection;

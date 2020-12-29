@@ -21,6 +21,8 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.events.DoubleClickEvent;
+import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -118,6 +120,14 @@ public class FormsPanel extends AdminPanel {
 			}
 		});
 
+		list.addDoubleClickHandler(new DoubleClickHandler() {
+
+			@Override
+			public void onDoubleClick(DoubleClickEvent event) {
+				onEdit();
+			}
+		});
+
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
@@ -198,8 +208,7 @@ public class FormsPanel extends AdminPanel {
 		edit.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				FormEditor popup = new FormEditor(getSelectedForm());
-				popup.show();
+				onEdit();
 			}
 		});
 
@@ -259,5 +268,10 @@ public class FormsPanel extends AdminPanel {
 		detailsContainer.removeMembers(detailsContainer.getMembers());
 		details = SELECT_FORM;
 		detailsContainer.setMembers(details);
+	}
+
+	private void onEdit() {
+		FormEditor popup = new FormEditor(getSelectedForm());
+		popup.show();
 	}
 }

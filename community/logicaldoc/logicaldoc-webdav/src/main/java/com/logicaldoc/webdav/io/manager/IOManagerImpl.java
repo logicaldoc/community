@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.context.ImportContext;
 import com.logicaldoc.webdav.io.handler.IOHandler;
+import com.logicaldoc.webdav.resource.RangeResourceImpl;
 
 /**
  * For more informations, please visit
@@ -42,7 +44,7 @@ public class IOManagerImpl implements IOManager {
 		return (IOHandler[]) ioHandlers.toArray(new IOHandler[ioHandlers.size()]);
 	}
 
-	public boolean importContent(ImportContext context, boolean isCollection) throws IOException {
+	public boolean importContent(ImportContext context, boolean isCollection) throws IOException, DavException {
 		boolean success = false;
 		if (context != null) {
 
@@ -50,9 +52,7 @@ public class IOManagerImpl implements IOManager {
 			for (int i = 0; i < ioHandlers.length && !success; i++) {
 				IOHandler ioh = ioHandlers[i];
 				if (ioh.canImport(context, isCollection)) {
-
 					success = ioh.importContent(context, isCollection);
-
 				}
 			}
 			context.informCompleted(success);
@@ -60,7 +60,7 @@ public class IOManagerImpl implements IOManager {
 		return success;
 	}
 
-	public boolean importContent(ImportContext context, DavResource resource) throws IOException {
+	public boolean importContent(ImportContext context, DavResource resource) throws IOException, DavException {
 		boolean success = false;
 		if (context != null && resource != null) {
 
@@ -77,16 +77,15 @@ public class IOManagerImpl implements IOManager {
 	}
 
 	public boolean exportContent(ExportContext context, boolean isCollection) throws IOException {
+		
 		boolean success = false;
+		
 		if (context != null) {
-
 			IOHandler[] ioHandlers = getIOHandlers();
 			for (int i = 0; i < ioHandlers.length && !success; i++) {
 				IOHandler ioh = ioHandlers[i];
 				if (ioh.canExport(context, isCollection)) {
-
 					success = ioh.exportContent(context, isCollection);
-
 				}
 			}
 			context.informCompleted(success);
@@ -95,16 +94,15 @@ public class IOManagerImpl implements IOManager {
 	}
 
 	public boolean exportContent(ExportContext context, DavResource resource) throws IOException {
+		
 		boolean success = false;
+		
 		if (context != null && resource != null) {
-
 			IOHandler[] ioHandlers = getIOHandlers();
 			for (int i = 0; i < ioHandlers.length && !success; i++) {
 				IOHandler ioh = ioHandlers[i];
 				if (ioh.canExport(context, resource)) {
-
 					success = ioh.exportContent(context, resource);
-
 				}
 			}
 			context.informCompleted(success);
@@ -118,5 +116,23 @@ public class IOManagerImpl implements IOManager {
 			myIOHandler.setIOManager(this);
 			this.ioHandlers.add(myIOHandler);
 		}
+	}
+
+	@Override
+	public boolean exportContent(ExportContext context, DavResource resource, Long left, Long rangeLength) throws IOException {
+		
+		boolean success = false;
+		
+		if (context != null && resource != null) {
+			IOHandler[] ioHandlers = getIOHandlers();
+			for (int i = 0; i < ioHandlers.length && !success; i++) {
+				IOHandler ioh = ioHandlers[i];
+				if (ioh.canExport(context, resource)) {
+					success = ioh.exportContent(context, resource, left, rangeLength);
+				}
+			}
+			context.informCompleted(success);
+		}
+		return success;
 	}
 }

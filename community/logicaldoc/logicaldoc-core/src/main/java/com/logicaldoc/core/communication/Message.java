@@ -48,7 +48,7 @@ public abstract class Message extends PersistentObject {
 	protected int html = 0;
 
 	/**
-	 * A flag that can be used to specify if the message has to be notified to
+	 * A flag that can be used to specify if the message has to be notified
 	 */
 	protected boolean notify = true;
 

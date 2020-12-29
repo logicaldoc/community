@@ -116,7 +116,7 @@
 	vertical-align: center;
 }
 
-.logo_head {
+.logo_head, .logo_headOver, .logo_headDown {
 	margin-left: 5px;
 	margin-top: 5px;
 	border: 0px solid;
@@ -124,7 +124,7 @@
 	width: 205px;
 }
 
-.logo_head_oem {
+.logo_head_oem, .logo_head_oemOver, .logo_head_oemDown {
 	margin-right: 5px;
 	margin-top: 5px;
 	border: 0px solid;
@@ -203,4 +203,11 @@
 
 .savepanel {
 	background-color: #eeeeee;
+}
+
+.notifyMessage a,
+.notifyMessage a:link, 
+.notifyMessage a:hover, 
+.notifyMessage a:visited {
+    color: rgb(10, 200, 200);
 }

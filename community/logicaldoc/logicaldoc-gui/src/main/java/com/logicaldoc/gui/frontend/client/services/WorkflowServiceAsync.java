@@ -7,9 +7,9 @@ public interface WorkflowServiceAsync {
 
 	void delete(String name, AsyncCallback<Void> callback);
 
-	void get(String workflowName, AsyncCallback<GUIWorkflow> callback);
+	void get(String workflowName, Integer version, AsyncCallback<GUIWorkflow> callback);
 
-	void deploy(GUIWorkflow workflow, AsyncCallback<Void> callback);
+	void deploy(GUIWorkflow workflow, AsyncCallback<GUIWorkflow> callback);
 
 	void list(AsyncCallback<GUIWorkflow[]> callback);
 
@@ -17,7 +17,7 @@ public interface WorkflowServiceAsync {
 
 	void deleteTrigger(long id, AsyncCallback<Void> callback);
 
-	void saveTrigger(String folderId, String workflowId, String templateId, int startAtCheckin,
+	void saveTrigger(String folderId, String workflowId, String templateId, String events,
 			AsyncCallback<Void> callback);
 
 	void startWorkflow(String workflowName, String workflowDescription, String tag, long[] docIds,
@@ -51,6 +51,7 @@ public interface WorkflowServiceAsync {
 
 	void removeDocument(String instanceId, long docId, AsyncCallback<Void> callback);
 
-	void getCompletionDiagram(String workflowName, String processInstanceId, AsyncCallback<GUIWorkflow> callback);
+	void getCompletionDiagram(String workflowName, Integer version, String processInstanceId,
+			AsyncCallback<GUIWorkflow> callback);
 
 }

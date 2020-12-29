@@ -2,6 +2,7 @@ package com.logicaldoc.web.stat;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.IOException;
 
@@ -80,26 +81,53 @@ public class StatChartServlet extends HttpServlet {
 				}
 			}
 
-			JFreeChart chrt = ChartFactory.createPieChart(I18N.message(chart, user.getLocale()), dataset, true, false,
-					false);
-			chrt.setBorderVisible(false);
-			chrt.getTitle().setPaint(new Color(110, 110, 110));
-			chrt.getLegend().setBorder(0, 0, 0, 0);
+			Font font = null;
+			try {
+				GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+				if (ge != null) {
+					String[] fontNames = ge.getAvailableFontFamilyNames();
 
+					for (String name : fontNames)
+						if ("arial".equalsIgnoreCase(name))
+							font = new Font("Arial", Font.PLAIN, 12);
+						else if ("helvetica".equalsIgnoreCase(name))
+							font = new Font("Helvetica", Font.PLAIN, 12);
+						else if ("Times New Roman".equalsIgnoreCase(name))
+							font = new Font("Times New Roman", Font.PLAIN, 12);
+
+					if (font == null && fontNames != null && fontNames.length > 0)
+						font = new Font(fontNames[0], Font.PLAIN, 12);
+				}
+			} catch (Throwable t) {
+				log.warn(t.getMessage());
+			}
+
+			JFreeChart chrt = ChartFactory.createPieChart(font != null ? I18N.message(chart, user.getLocale()) : null,
+					dataset, font!=null ? true : false, false, false);
+			chrt.setBorderVisible(false);
 			PiePlot plot = (PiePlot) chrt.getPlot();
-			plot.setLabelFont(new Font("Arial", Font.PLAIN, 12));
+			plot.setLabelGenerator(null);
+
+			if (font == null) {
+				log.warn("cannot find any usable font");
+				chrt.setTitle((String)null);
+			} else {
+				chrt.getTitle().setPaint(new Color(110, 110, 110));
+				chrt.getLegend().setBorder(0, 0, 0, 0);
+				plot.setLabelFont(font);
+				plot.setLabelGap(0.02);
+			}
+
 			plot.setNoDataMessage("No data available");
 			plot.setCircular(true);
 			plot.setBackgroundPaint(Color.WHITE);
-			plot.setLabelGap(0.02);
 			plot.setOutlinePaint(null);
-			plot.setLabelGenerator(null);
 			plot.setIgnoreNullValues(false);
 			plot.setDrawingSupplier(new ChartDrawingSupplier());
 
 			if (plot instanceof PiePlot) {
 				PiePlot piePlot = (PiePlot) plot;
-				piePlot.setInteriorGap(new Double(0.05));
+				piePlot.setInteriorGap(0.05);
 			}
 
 			ChartUtilities.saveChartAsPNG(chartFile, chrt, 250, 250);

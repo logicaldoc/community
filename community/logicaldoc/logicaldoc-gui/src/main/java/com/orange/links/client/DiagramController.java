@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.logicaldoc.gui.common.client.beans.GUITransition;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.frontend.client.workflow.StateWidget;
+import com.logicaldoc.gui.frontend.client.workflow.designer.StateWidget;
 import com.orange.links.client.canvas.BackgroundCanvas;
 import com.orange.links.client.canvas.DiagramCanvas;
 import com.orange.links.client.canvas.MultiBrowserDiagramCanvas;

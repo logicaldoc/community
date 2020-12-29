@@ -50,7 +50,7 @@ public class EmailAccountAutomationPanel extends EmailAccountDetailsTab {
 				account.getAutomation(), changedHandler, false);
 		automation.setShowTitle(false);
 		automation.setStartRow(false);
-		automation.setRequired(true);
+		automation.setRequired(false);
 		automation.setWidth("*");
 		automation.setHeight("*");
 		automation.addChangedHandler(changedHandler);

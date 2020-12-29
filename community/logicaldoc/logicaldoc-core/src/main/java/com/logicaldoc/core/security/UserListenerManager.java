@@ -59,8 +59,8 @@ public class UserListenerManager {
 					throw new Exception(
 							"The specified listener " + className + " doesn't implement UserListener interface");
 				listeners.add((UserListener) listener);
-				log.info("Added new user listener " + className + " position "
-						+ ext.getParameter("position").valueAsString());
+				log.info("Added new user listener {} position {}", className,
+						ext.getParameter("position").valueAsString());
 			} catch (Throwable e) {
 				log.error(e.getMessage());
 			}

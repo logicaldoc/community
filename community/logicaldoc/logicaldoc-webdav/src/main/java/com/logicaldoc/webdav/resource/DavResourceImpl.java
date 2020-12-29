@@ -1,11 +1,23 @@
 package com.logicaldoc.webdav.resource;
 
+import static org.apache.commons.io.comparator.ExtensionFileComparator.EXTENSION_COMPARATOR;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.util.Text;
 import org.apache.jackrabbit.webdav.DavException;
@@ -29,6 +41,7 @@ import org.apache.jackrabbit.webdav.property.DavPropertyNameSet;
 import org.apache.jackrabbit.webdav.property.DavPropertySet;
 import org.apache.jackrabbit.webdav.property.DefaultDavProperty;
 import org.apache.jackrabbit.webdav.property.ResourceType;
+import org.apache.jackrabbit.webdav.xml.Namespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +54,7 @@ import com.logicaldoc.webdav.io.manager.IOManager;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
 import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
 /**
  * For more informations, please visit
@@ -79,6 +93,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
 			ResourceConfig config, Resource resource) {
+
 		this.locator = locator;
 		this.resource = resource;
 		this.factory = factory;
@@ -236,6 +251,11 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * @throws IOException if the export fails
 	 */
 	public void spool(OutputContext outputContext) throws IOException {
+
+		outputContext.setModificationTime(this.resource.getLastModified().getTime());
+		outputContext.setETag(this.resource.getETag());
+		outputContext.setContentType(AbstractWebdavServlet.getContext().getMimeType(this.resource.getName()));
+
 		if (exists() && outputContext != null) {
 			ExportContext exportCtx = getExportContext(outputContext);
 			if (!config.getIOManager().exportContent(exportCtx, this)) {
@@ -248,9 +268,36 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * @see DavResource#getProperty(org.apache.jackrabbit.webdav.property.DavPropertyName)
 	 */
 	public DavProperty getProperty(DavPropertyName name) {
+
 		initProperties();
 
-		log.debug("getProperty(..) " + name);
+		/*
+		 * log.debug("getProperty() {}", name); log.debug("isCollection() {}",
+		 * isCollection()); log.debug("resource.isFolder() {}",
+		 * resource.isFolder());
+		 */
+
+		Namespace namespace = Namespace.getNamespace("http://logicaldoc.com/ns");
+
+		if (exists()) {
+			if (name.getNamespace().equals(namespace) && name.getName().equals("id")) {
+				if (!isCollection() && !resource.isFolder()) {
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "d-" + resource.getID(),
+							namespace);
+					properties.add(idProp);
+				} else {
+					DefaultDavProperty<String> idProp = new DefaultDavProperty<String>("id", "f-" + resource.getID(),
+							namespace);
+					properties.add(idProp);
+				}
+			}
+
+			if (name.getName().equals("getetag")) {
+				DefaultDavProperty<String> defaultDavProperty = new DefaultDavProperty<String>(DavPropertyName.GETETAG,
+						resource.getETag());
+				properties.add(defaultDavProperty);
+			}
+		}
 
 		return properties.get(name);
 	}
@@ -280,7 +327,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 		// set (or reset) fundamental properties
 		if (getDisplayName() != null) {
-			properties.add(new DefaultDavProperty(DavPropertyName.DISPLAYNAME, getDisplayName()));
+			properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, getDisplayName()));
 		}
 		if (isCollection()) {
 			properties.add(new ResourceType(ResourceType.COLLECTION));
@@ -429,6 +476,10 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 *      org.apache.jackrabbit.webdav.io.InputContext)
 	 */
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
+
+		boolean isChunking = false;
+		boolean isChunkingComplete = false;
+
 		if (!exists()) {
 			throw new DavException(DavServletResponse.SC_CONFLICT);
 		}
@@ -441,12 +492,169 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 			ImportContext ctx = getImportContext(inputContext, memberName);
 
+//			log.debug("member.getDisplayName() {}", member.getDisplayName());
+//			log.debug("member.isCollection() {}", member.isCollection());
+//			
+//			log.debug("ctx.getResource().getName() {}", ctx.getResource().getName());
+//			log.debug("ctx.getSystemId() {}", ctx.getSystemId());			
+
+			// Check Write permission on the target folder
+			if (!member.isCollection() && !ctx.getResource().isWriteEnabled()) {
+//				log.debug("Target folder is not write enabled");
+				throw new DavException(DavServletResponse.SC_FORBIDDEN,
+						"Write Access not allowed on the selected folder");
+			}
+
+			// Check Write permission on the target folder
+			if (member.isCollection() && !ctx.getResource().isAddChildEnabled()) {
+//				log.debug("Target folder is not add-child enabled");
+				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Add Child not allowed on the selected folder");
+			}
+
+			/*
+			 * LD-Chunked: LD-Chunked LD-Chunk-Size: 1024000 LD-Total-Length:
+			 * 5977199 X-LD-Mtime: 1599828016 Authorization: Basic
+			 * YWRtaW46YWRtaW4= User-Agent: Mozilla/5.0 (Android)
+			 * LogicalDOC-mobile/2.7.0 Host: 192.168.2.7:8083 Content-Length:
+			 * 1024000 Content-Type: video/mp4
+			 */
+
+			// log.debug("LD-Chunk-Size {}", ctx.getProperty("LD-Chunk-Size"));
+			log.debug("LD-Total-Length {}", ctx.getProperty("LD-Total-Length"));
+
+			log.debug("memberName {}", memberName);
+//			log.debug("ContentLength {}", ctx.getContentLength());
+//			log.debug("MimeType {}", ctx.getMimeType());
+
+			if (memberName.contains("chunking")) {
+
+				isChunking = true;
+
+				// String fileName =
+				// com.google.common.io.Files.getNameWithoutExtension(memberName);
+				String filext = com.google.common.io.Files.getFileExtension(memberName);
+				log.debug("filext {}", filext);
+
+				// get chunk part and total chunks
+				String ssss[] = filext.split("-");
+				// String XXXfilext = ssss[0];
+				String chunkString = ssss[1];
+				int chunkID = Integer.parseInt(ssss[2]);
+				int chunkTotal = Integer.parseInt(ssss[3]);
+				int chunkPart = Integer.parseInt(ssss[4]);
+
+				// log.debug("chunkString {}", chunkString);
+				log.debug("chunkID {}", chunkID);
+				log.debug("chunkPart {}-{}", chunkPart, chunkTotal);
+
+				// Creates directory webdav-chunking in temp dir
+				File webdavChunking = new File(FileUtils.getTempDirectory(), "webdav-chunking");
+				FileUtils.forceMkdir(webdavChunking);
+				Path webdavChunkingPath = webdavChunking.toPath();
+
+				if (chunkPart < chunkTotal) {
+					// Save the file on a temp location
+
+					// create a temporary file
+					String customFilePrefix = null;
+					String customFileSuffix = "." + filext;
+
+					Path tempFile = Files.createTempFile(webdavChunkingPath, customFilePrefix, customFileSuffix);
+					log.debug("tempFile {}", tempFile);
+
+					// Write the content on the file
+					OutputStream myStream = new FileOutputStream(tempFile.toFile());
+					IOUtils.copy(ctx.getInputStream(), myStream);
+					IOUtils.closeQuietly(myStream);
+				}
+
+				// Last part of the chunking received
+				// Join the parts in a unique filename
+				if (chunkPart == (chunkTotal - 1)) {
+
+					isChunkingComplete = true;
+
+					// get all the files in a folder and join them
+
+					log.debug("Join the parts in a unique filename");
+
+					// This filter will only include files ending with .py
+					FilenameFilter filter = new FilenameFilter() {
+						@Override
+						public boolean accept(File f, String name) {
+							return name.contains(chunkString + "-" + chunkID);
+						}
+					};
+
+					// We apply the filter
+					File[] chunkfiles = webdavChunking.listFiles(filter);
+
+					if (chunkfiles != null) {
+
+						// Check that the number of files is correct
+						log.debug("chunkfiles.length {}, chunkTotal {}", chunkfiles.length, chunkTotal);
+
+						if (chunkfiles.length < chunkTotal) {
+							// @TODO evaulate if it's appropriate to throw an
+							// exception
+							return;
+						}
+
+						// Sort files by extension in ascending order.
+						Arrays.sort(chunkfiles, EXTENSION_COMPARATOR);
+
+						// Checking If The File Exists At The Specified Location
+						// Or Not
+						Path filePathObj = Files.createTempFile(webdavChunkingPath, null, "merged-" + chunkID);
+						try {
+							for (File file : chunkfiles) {
+								// Appending The New Data To The Existing File
+								Files.write(filePathObj, Files.readAllBytes(file.toPath()), StandardOpenOption.APPEND);
+
+							}
+							log.debug("! Data Successfully Appended !");
+
+							// Check that the file size of the merged chunks
+							// equals to LD-Total-Length
+
+							// Remove all the chunk parts
+							for (File toDelete : chunkfiles) {
+								FileUtils.deleteQuietly(toDelete);
+							}
+
+							String newResourceName = memberName.substring(0, memberName.indexOf("-chunking"));
+							log.debug("newResourceName {}", newResourceName);
+
+							// Update the ImportContext: systemId and
+							// inputStream
+							if (ctx instanceof ImportContextImpl) {
+								ImportContextImpl ici = (ImportContextImpl) ctx;
+								ici.setSystemId(newResourceName);
+								ici.setInputFile(filePathObj.toFile());
+							}
+
+						} catch (IOException ioExceptionObj) {
+							log.error("Problem Occured While Writing To The File= " + ioExceptionObj.getMessage());
+						}
+					}
+
+				} // end if (chunkPart == (chunkTotal-1)) {
+
+			} // end if (memberName.contains("chunking")) {
+
+			if (isChunking && !isChunkingComplete)
+				return;
+
 			if (!config.getIOManager().importContent(ctx, member)) {
 				// any changes should have been reverted in the importer
 				throw new DavException(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 			}
+
+		} catch (DavException dave) {
+			throw dave;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
+			throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -454,6 +662,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * @see DavResource#removeMember(DavResource)
 	 */
 	public void removeMember(DavResource member) throws DavException {
+
 		if (!exists() || !member.exists()) {
 			throw new DavException(DavServletResponse.SC_NOT_FOUND);
 		}
@@ -461,34 +670,36 @@ public class DavResourceImpl implements DavResource, Serializable {
 			throw new DavException(DavServletResponse.SC_LOCKED);
 		}
 
-		try {
-			Resource resource = resourceService.getResource(member.getLocator().getResourcePath(), session);
-			// set the requesting person
-			resource.setRequestedPerson(this.resource.getRequestedPerson());
+		Resource resource = resourceService.getResource(member.getLocator().getResourcePath(), session);
+		// set the requesting person
+		resource.setRequestedPerson(this.resource.getRequestedPerson());
 
-			resourceService.deleteResource(resource, session);
-		} catch (DavException de) {
-			throw de;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		if (!resource.isDeleteEnabled()) {
+			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Delete not allowed.");
 		}
+
+		resourceService.deleteResource(resource, session);
 	}
 
 	/**
 	 * @see DavResource#move(DavResource)
 	 */
 	public void move(DavResource destination) throws DavException {
+
 		if (!exists()) {
 			throw new DavException(DavServletResponse.SC_NOT_FOUND);
 		}
 		if (isLocked(this)) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
 		}
+
 		try {
 			Resource res = resourceService.getResource(destination.getLocator().getResourcePath(), session);
+
 			if (res != null) {
 				res.setName(this.resource.getName());
 				Resource parentResource = resourceService.getParentResource(res);
+
 				resourceService.move(this.resource, parentResource, session);
 			} else {
 				String name = destination.getLocator().getResourcePath();
@@ -496,8 +707,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 				Resource parentResource = resourceService.getParentResource(destination.getLocator().getResourcePath(),
 						this.resource.getRequestedPerson(), session);
-				this.resource.setName(name);
 
+				this.resource.setName(name);
 				resourceService.move(this.resource, parentResource, session);
 			}
 		} catch (DavException de) {
@@ -653,6 +864,10 @@ public class DavResourceImpl implements DavResource, Serializable {
 		throw new UnsupportedOperationException();
 	}
 
+	public DavResourceFactory getFactoryXXXX() {
+		return this.factory;
+	}
+
 	/**
 	 * @see org.apache.jackrabbit.webdav.DavResource#getSession()
 	 * 
@@ -663,12 +878,39 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	/**
+	 * @see org.apache.jackrabbit.webdav.DavResource#getSession()
+	 * 
+	 * @return the session
+	 */
+	public DavSession getSessionXXX() {
+		return this.session;
+	}
+
+	/**
 	 * Returns the current resource that holds this object
 	 * 
 	 * @return the resource
 	 */
 	protected Resource getResource() {
 		return this.resource;
+	}
+
+	/**
+	 * Returns the current resource that holds this object
+	 * 
+	 * @return the resource
+	 */
+	public Resource getResourceXXX() {
+		return this.resource;
+	}
+
+	/**
+	 * Returns the current resource that holds this object
+	 * 
+	 * @return the resource
+	 */
+	public ResourceConfig getConfigXXX() {
+		return this.config;
 	}
 
 	/**
@@ -689,15 +931,23 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * 
 	 * @see org.apache.jackrabbit.webdav.simple.DavResourceImpl#getImportContext(InputContext,
 	 *      String)
+	 * 
+	 * @throws IOException a generic exception
 	 */
 	protected ImportContext getImportContext(InputContext inputCtx, String systemId) throws IOException {
 		return new ImportContextImpl(resource, systemId, inputCtx);
 	}
 
 	/**
+	 * @param outputCtx output context
+	 * 
+	 * @return the export context
+	 * 
 	 * @see org.apache.jackrabbit.webdav.simple.DavResourceImpl#getExportContext(OutputContext)
+	 * 
+	 * @throws IOException a generic exception
 	 */
-	protected ExportContext getExportContext(OutputContext outputCtx) throws IOException {
+	public ExportContext getExportContext(OutputContext outputCtx) throws IOException {
 		return new ExportContextImpl(this.resource, outputCtx);
 	}
 

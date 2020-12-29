@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -85,7 +86,7 @@ public class FolderSearch extends Search {
 
 		// Find all real folders
 		query.append(
-				"select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid ");
+				"select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid, A.ld_tgs ");
 		query.append(" from ld_folder A ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
 
@@ -94,7 +95,7 @@ public class FolderSearch extends Search {
 		if (options.isRetrieveAliases()) {
 			// Append all aliases
 			query.append(
-					") UNION (select A.ld_id, A.ld_parentid, A.ld_name, REF.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid ");
+					") UNION (select A.ld_id, A.ld_parentid, A.ld_name, REF.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid, A.ld_tgs ");
 			query.append(" from ld_folder A ");
 			query.append(" join ld_folder REF on A.ld_foldref=REF.ld_id ");
 			query.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
@@ -258,6 +259,10 @@ public class FolderSearch extends Search {
 						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
 							query.append(
 									" (" + columnName + " is null or not (" + columnName + " like '%" + val + "%'))");
+						else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
+							query.append(columnName + " like '" + val + "%'");
+						else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
+							query.append(columnName + " like '%" + val + "'");
 						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
 							query.append(columnName + " is null ");
 						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
@@ -273,8 +278,14 @@ public class FolderSearch extends Search {
 						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
 							query.append(" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val
 									+ "%')");
+						else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
+							query.append("lower(" + columnName + ") like '" + val + "%'");
+						else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
+							query.append("lower(" + columnName + ") like  '%" + val + "'");
 						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
 							query.append(columnName + " is null ");
+						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
+							query.append(columnName + " is not null ");
 						break;
 					}
 					break;
@@ -442,6 +453,7 @@ public class FolderSearch extends Search {
 			folder.setType(rs.getInt(7));
 			hit.setFolder(folder);
 			hit.setFileName(rs.getString(3));
+
 			if (rs.getLong(8) != 0) {
 				hit.setDocRef(rs.getLong(8));
 				folder.setFoldRef(rs.getLong(8));
@@ -462,6 +474,17 @@ public class FolderSearch extends Search {
 				t.setId(rs.getLong(10));
 				t.setName(rs.getString(9));
 				hit.setTemplate(t);
+			}
+
+			hit.setTgs(rs.getString(11));
+
+			if (hit.getTgs() != null) {
+				StringTokenizer st = new StringTokenizer(hit.getTgs(), ",", false);
+				while (st.hasMoreElements()) {
+					Object tag = (Object) st.nextElement();
+					if (tag != null && !tag.toString().isEmpty())
+						hit.addTag(tag.toString());
+				}
 			}
 
 			return hit;

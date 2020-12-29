@@ -1,5 +1,7 @@
 package com.logicaldoc.core.communication;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.util.Set;
 
@@ -24,14 +26,19 @@ public class MailUtilTest extends AbstractCoreTCase {
 	public void testMsgToMail() throws Exception {
 		{
 			EMail mail = MailUtil.msgToMail(new File("src/test/resources/test.msg"), true);
+			
 			Assert.assertNotNull(mail);
 			Assert.assertEquals("Re: Fwd: Offer for Customizations on LogicalDOC", mail.getSubject());
 			Assert.assertTrue(mail.getMessageText().contains("Stefan"));
 			Assert.assertEquals(1, mail.getAttachmentsCount());
 			Assert.assertEquals("erich.widmer@olig.ch", mail.getFrom().getAddress());
+			
+			Assert.assertNotNull(mail.getSentDate());
+			Assert.assertNotNull(mail.getReceivedDate());
+			assertEquals(mail.getSentDate(), mail.getReceivedDate());
 		}
 	}
-
+	
 	@Test
 	public void testSignedMsg() throws Exception {
 		EMail mail = MailUtil.msgToMail(new File("src/test/resources/signed.msg"), true);
@@ -83,7 +90,10 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertEquals(1, to.size());
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getName());
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getAddress());
-			Assert.assertEquals("vendor_info@kajima.co.uk", mail.getReplyTo().toString());
+			
+			//Assert.assertEquals("vendor_info@kajima.co.uk", mail.getReplyTo().toString());
+			System.out.println(mail.getReplyTo().toString());
+			Assert.assertTrue(mail.getReplyTo().toString().contains("vendor_info@kajima.co.uk"));
 		}
 
 		{
@@ -95,7 +105,11 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertEquals(1, to.size());
 			Assert.assertEquals("'Marco Meschieri'", to.iterator().next().getName());
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getAddress());
-			Assert.assertEquals("xcumplido@ingenium-ax.com.mx", mail.getReplyTo().toString());
+			
+			//Assert.assertEquals("xcumplido@ingenium-ax.com.mx", mail.getReplyTo().toString());
+			System.out.println(mail.getReplyTo().toString());
+			Assert.assertTrue(mail.getReplyTo().toString().contains("xcumplido@ingenium-ax.com.mx"));
+			
 			Assert.assertTrue(mail.getRecipientsCC().isEmpty());
 			Assert.assertEquals("Xavier Cumplido Morales", mail.getAuthor());
 			Assert.assertEquals("xcumplido@ingenium-ax.com.mx", mail.getAuthorAddress());
@@ -103,4 +117,5 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertTrue(mail.getMessageText().contains("Saludos"));
 		}
 	}
+
 }

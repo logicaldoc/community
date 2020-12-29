@@ -66,7 +66,7 @@ public abstract class Search {
 
 			String className = ext.getParameter("class").valueAsString();
 			try {
-				search = (Search) Class.forName(className).newInstance();
+				search = (Search) Class.forName(className).getDeclaredConstructor().newInstance();
 				search.setOptions(opt);
 			} catch (Throwable e) {
 				log.error(e.getMessage());
@@ -96,7 +96,7 @@ public abstract class Search {
 
 			String className = ext.getParameter("options").valueAsString();
 			try {
-				options = (SearchOptions) Class.forName(className).newInstance();
+				options = (SearchOptions) Class.forName(className).getDeclaredConstructor().newInstance();
 				options.setType(type);
 			} catch (Throwable e) {
 				log.error(e.getMessage());
@@ -186,8 +186,9 @@ public abstract class Search {
 					public Long mapRow(ResultSet rs, int row) throws SQLException {
 						Long docId = rs.getLong(1);
 						String name = rs.getString(2);
-
+						
 						Attribute ext = new Attribute();
+						ext.setName(name);
 						ext.setStringValue(rs.getString(4));
 						ext.setIntValue(rs.getLong(5));
 						ext.setDoubleValue(rs.getDouble(6));
@@ -207,9 +208,8 @@ public abstract class Search {
 					Attribute att = extAtt.get(h.getId() + "-" + name);
 					if (att == null)
 						att = extAtt.get(h.getDocRef() + "-" + name);
-					if (att != null) {
+					if (att != null)
 						h.getAttributes().put(name, att);
-					}
 				}
 			}
 

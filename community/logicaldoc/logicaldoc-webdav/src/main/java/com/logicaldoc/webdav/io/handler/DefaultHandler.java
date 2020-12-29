@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.server.io.PropertyExportContext;
@@ -94,7 +95,7 @@ public class DefaultHandler implements IOHandler {
 		return canImport(context, resource.isCollection());
 	}
 
-	public boolean importContent(ImportContext context, boolean isCollection) throws IOException {
+	public boolean importContent(ImportContext context, boolean isCollection) throws IOException, DavException {
 		if (!canImport(context, isCollection)) {
 			log.warn(getName() + ": Cannot import " + context.getSystemId());
 			throw new IOException(getName() + ": Cannot import " + context.getSystemId());
@@ -104,6 +105,8 @@ public class DefaultHandler implements IOHandler {
 		try {
 			success = setContentData(context, isCollection);
 			log.debug("success = " + success);
+		} catch (DavException e) {
+			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
 			log.warn(e.getMessage(), e);
@@ -112,7 +115,7 @@ public class DefaultHandler implements IOHandler {
 		return success;
 	}
 
-	public boolean importContent(ImportContext context, DavResource resource) throws IOException {
+	public boolean importContent(ImportContext context, DavResource resource) throws IOException, DavException {
 		if (!canImport(context, resource)) {
 			throw new IOException(getName() + ": Cannot import " + context.getSystemId());
 		}
@@ -177,7 +180,7 @@ public class DefaultHandler implements IOHandler {
 
 		Resource resource = context.getResource();
 		String name = context.getSystemId();
-
+		
 		Resource res = resourceService.getChildByName(resource, name);
 
 		if (res == null) {
@@ -221,6 +224,48 @@ public class DefaultHandler implements IOHandler {
 
 	public boolean canImport(PropertyImportContext context, boolean isCollection) {
 		return true;
+	}
+
+	@Override
+	public boolean exportContent(ExportContext context, DavResource resource, Long left, Long rangeLength)
+			throws IOException {
+		
+		if (!canExport(context, resource)) {
+			throw new IOException(getName() + ": Cannot export ");
+		}
+		
+		return exportContent(context, resource.isCollection(), left, rangeLength);
+	}
+
+	private boolean exportContent(ExportContext context, boolean isCollection, Long left, Long rangeLength) throws IOException {
+		
+		if (!canExport(context, isCollection)) {
+			throw new IOException(getName() + ": Cannot export ");
+		}
+		
+		try {
+			if (context.hasStream())
+				exportData(context, isCollection, context.getResource(), left, rangeLength);
+
+			return true;
+		} catch (WebDavStorageException e) {
+			// should never occur, since the proper structure of the content
+			// node must be asserted in the 'canExport' call.
+			throw new IOException(e.getMessage());
+		}
+	}
+	
+	protected void exportData(ExportContext context, boolean isCollection, Resource resource, Long left, Long rangeLength) 
+			throws IOException, WebDavStorageException {
+		try {
+			InputStream is = resourceService.streamOut(resource);
+			if (is != null) {
+				//IOUtil.spool(is, context.getOutputStream());
+				IOUtils.copyLarge(is, context.getOutputStream(), left, rangeLength);
+			}
+		} catch (FileNotFoundException e) {
+			throw new IOException("Can't find file " + resource.getName() + "(" + resource.getID() + ")");
+		}
 	}
 
 }

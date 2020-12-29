@@ -20,9 +20,9 @@ public class UpdateAndPatchPanel extends AdminPanel {
 	public void onDraw() {
 		tab.setPane(new UpdatePanel());
 
-		Tab plugins = new Tab();
-		plugins.setTitle(I18N.message("patches"));
-		plugins.setPane(new PatchPanel());
-		tabs.addTab(plugins);
+		Tab patches = new Tab();
+		patches.setTitle(I18N.message("patches"));
+		patches.setPane(new PatchPanel());
+		tabs.addTab(patches);
 	}
 }

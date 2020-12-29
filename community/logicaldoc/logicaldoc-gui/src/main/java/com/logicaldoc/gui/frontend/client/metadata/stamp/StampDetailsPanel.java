@@ -252,7 +252,7 @@ public class StampDetailsPanel extends VLayout {
 		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", "opacity", stamp.getOpacity(), 1, 100);
 		opacity.addChangedHandler(changedHandler);
 
-		final SpinnerItem size = ItemFactory.newSpinnerItem("size", "size", stamp.getSize(), 1, 9999);
+		final SpinnerItem size = ItemFactory.newSpinnerItem("size", "size", stamp.getSize(), 1, 1000);
 		size.addChangedHandler(changedHandler);
 
 		TextItem font = ItemFactory.newTextItem("font", "font", stamp.getFont());
@@ -265,10 +265,13 @@ public class StampDetailsPanel extends VLayout {
 
 		form2.setItems(text, color, size, font, barcodeFormat, imageWidth, imageHeight, barcodeLabel);
 
-		// For the spinners we need to manually update the VM or the widget will
-		// not be refreshed
+		/*
+		 * For the spinners we need to manually update the VM or the widget will
+		 * NOT be refreshed (unbelievable but that is)
+		 */
 		vm.setValue("rotation", stamp.getRotation());
 		vm.setValue("opacity", stamp.getOpacity());
+		vm.setValue("size", stamp.getSize());
 
 		propertiesTabPanel.setMembers(form1, form2, image);
 

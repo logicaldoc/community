@@ -82,6 +82,7 @@ public class SecurityManagerImpl implements SecurityManager {
 		User user = userDAO.findById(userId, true);
 		if (user == null)
 			return false;
+		userDAO.initialize(user);
 		for (Group group : user.getGroups())
 			if (group.getName().equals(groupName))
 				return true;

@@ -110,7 +110,7 @@ public class DBInit {
 	 * @throws SQLException
 	 */
 	private void execute(String sqlFile) throws IOException, SQLException {
-		log.debug("Execute " + sqlFile);
+		log.debug("Execute {}", sqlFile);
 		System.out.println("Execute " + sqlFile);
 		File file = new File(sqlFile);
 		if (!file.exists() || !file.canRead()) {

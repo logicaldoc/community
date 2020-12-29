@@ -27,6 +27,10 @@ public class FolderCriterion implements Serializable {
 
 	public final static String OPERATOR_NOTCONTAINS = "notcontains";
 
+	public final static String OPERATOR_BEGINSWITH = "beginswith";
+	
+	public final static String OPERATOR_ENDSWITH = "endswith";
+	
 	public final static String OPERATOR_GREATER = "greaterthan";
 
 	public final static String OPERATOR_LESSER = "lessthan";

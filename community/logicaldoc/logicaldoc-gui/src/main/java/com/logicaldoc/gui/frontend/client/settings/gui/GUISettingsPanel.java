@@ -143,20 +143,13 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem showLostPassword = ItemFactory.newBooleanSelector("showlostpassword",
 				I18N.message("showlostpasswordlink"));
 		showLostPassword.setWrapTitle(false);
-		
+
 		RadioGroupItem galleryEnabled = ItemFactory.newBooleanSelector("galleryenabled",
 				I18N.message("galleryenabled"));
 		galleryEnabled.setWrapTitle(false);
 
 		RadioGroupItem saveInputs = ItemFactory.newBooleanSelector("saveinputs", I18N.message("saveinputs"));
 		galleryEnabled.setWrapTitle(false);
-
-		SpinnerItem thumbSize = ItemFactory.newSpinnerItem("thumbsize", I18N.message("thumbsize"), (Integer) null);
-		thumbSize.setHint("pixels");
-		thumbSize.setRequired(true);
-		thumbSize.setWrapTitle(false);
-		thumbSize.setMin(10);
-		thumbSize.setStep(10);
 
 		SpinnerItem attrTextAreaW = ItemFactory.newSpinnerItem("textareaw", I18N.message("attrtextareaw"),
 				(Integer) null);
@@ -181,6 +174,31 @@ public class GUISettingsPanel extends AdminPanel {
 		attrTextBoxW.setStep(50);
 		attrTextBoxW.setMin(50);
 
+		SpinnerItem noteMaxSize = ItemFactory.newSpinnerItem("notemaxsize", I18N.message("notemaxsize"),
+				(Integer) null);
+		noteMaxSize.setHint(I18N.message("chars").toLowerCase());
+		noteMaxSize.setRequired(true);
+		noteMaxSize.setWrapTitle(false);
+		noteMaxSize.setStep(100);
+		noteMaxSize.setMin(0);
+		noteMaxSize.setWidth(70);
+
+		SpinnerItem emailMaxSize = ItemFactory.newSpinnerItem("emailmaxsize", I18N.message("emailmaxsize"),
+				(Integer) null);
+		emailMaxSize.setHint(I18N.message("chars").toLowerCase());
+		emailMaxSize.setRequired(true);
+		emailMaxSize.setWrapTitle(false);
+		emailMaxSize.setStep(100);
+		emailMaxSize.setMin(0);
+		emailMaxSize.setWidth(70);
+
+		SpinnerItem thumbSize = ItemFactory.newSpinnerItem("thumbsize", I18N.message("thumbsize"), (Integer) null);
+		thumbSize.setHint("pixels");
+		thumbSize.setRequired(true);
+		thumbSize.setWrapTitle(false);
+		thumbSize.setMin(10);
+		thumbSize.setStep(10);
+
 		SpinnerItem thumbQuality = ItemFactory.newSpinnerItem("thumbquality", I18N.message("thumbquality"),
 				(Integer) null);
 		thumbQuality.setHint("%");
@@ -189,6 +207,21 @@ public class GUISettingsPanel extends AdminPanel {
 		thumbQuality.setMin(1);
 		thumbQuality.setStep(10);
 		thumbQuality.setMax(100);
+
+		SpinnerItem mobileSize = ItemFactory.newSpinnerItem("mobilesize", I18N.message("mobilesize"), (Integer) null);
+		mobileSize.setHint("pixels");
+		mobileSize.setRequired(true);
+		mobileSize.setWrapTitle(false);
+		mobileSize.setMin(10);
+		mobileSize.setStep(10);
+
+		SpinnerItem mobileQuality = ItemFactory.newSpinnerItem("mobilequality", I18N.message("mobilequality"),
+				(Integer) null);
+		mobileQuality.setHint("%");
+		mobileQuality.setRequired(true);
+		mobileQuality.setWrapTitle(false);
+		mobileQuality.setMin(1);
+		mobileQuality.setStep(10);
 
 		SpinnerItem tileSize = ItemFactory.newSpinnerItem("tilesize", I18N.message("tilesize"), (Integer) null);
 		tileSize.setHint("pixels");
@@ -233,12 +266,6 @@ public class GUISettingsPanel extends AdminPanel {
 		textExtensions.setRequired(false);
 		textExtensions.setWrapTitle(false);
 
-		SpinnerItem searchHits = ItemFactory.newSpinnerItem("searchhits", I18N.message("searchhits"), (Integer) null);
-		searchHits.setRequired(true);
-		searchHits.setWrapTitle(false);
-		searchHits.setMin(5);
-		searchHits.setStep(5);
-
 		RadioGroupItem ondoubleclick = ItemFactory.newBooleanSelector("ondoubleclick", "ondoubleclick");
 		ondoubleclick.setValueMap("download", "preview");
 
@@ -261,6 +288,11 @@ public class GUISettingsPanel extends AdminPanel {
 		SpinnerItem foldMaxChildren = ItemFactory.newSpinnerItem("foldmaxchildren", I18N.message("foldmaxchildren"),
 				(Integer) null);
 		foldMaxChildren.setWrapTitle(false);
+
+		SpinnerItem maxHistories = ItemFactory.newSpinnerItem("maxhistories", I18N.message("maxhistories"),
+				(Integer) null);
+		maxHistories.setStep(10);
+		maxHistories.setWrapTitle(false);
 
 		RadioGroupItem foldPagination = ItemFactory.newBooleanSelector("foldpagination",
 				I18N.message("foldpagination"));
@@ -306,13 +338,14 @@ public class GUISettingsPanel extends AdminPanel {
 		sessionHeartbeat.setMin(0);
 		sessionHeartbeat.setStep(10);
 
-		SpinnerItem popupTimeout = ItemFactory.newSpinnerItem("popuptimeout", I18N.message("popuptimeout"), (Integer) null);
+		SpinnerItem popupTimeout = ItemFactory.newSpinnerItem("popuptimeout", I18N.message("popuptimeout"),
+				(Integer) null);
 		popupTimeout.setHint(I18N.message("seconds"));
 		popupTimeout.setRequired(true);
 		popupTimeout.setWrapTitle(false);
 		popupTimeout.setMin(1);
 		popupTimeout.setStep(1);
-		
+
 		RadioGroupItem askVersionCommentOnSave = ItemFactory.newBooleanSelector("askversioncommentonsave",
 				I18N.message("askversioncommentonsave"));
 		askVersionCommentOnSave.setWrapTitle(false);
@@ -346,12 +379,20 @@ public class GUISettingsPanel extends AdminPanel {
 				thumbSize.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.thumbnail.quality"))
 				thumbQuality.setValue(Integer.parseInt(p.getValue().trim()));
+			if (p.getName().endsWith("gui.mobile.size"))
+				mobileSize.setValue(Integer.parseInt(p.getValue().trim()));
+			if (p.getName().endsWith("gui.mobile.quality"))
+				mobileQuality.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.textarea.w"))
 				attrTextAreaW.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.textarea.h"))
 				attrTextAreaH.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.textbox.w"))
 				attrTextBoxW.setValue(Integer.parseInt(p.getValue().trim()));
+			if (p.getName().endsWith("gui.note.maxlength"))
+				noteMaxSize.setValue(Integer.parseInt(p.getValue().trim()));
+			if (p.getName().endsWith("gui.email.maxlength"))
+				emailMaxSize.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.tile.size"))
 				tileSize.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.tile.quality"))
@@ -364,6 +405,8 @@ public class GUISettingsPanel extends AdminPanel {
 				foldSorting.setValue(p.getValue());
 			if (p.getName().endsWith("gui.folder.maxchildren"))
 				foldMaxChildren.setValue(Integer.parseInt(p.getValue().trim()));
+			if (p.getName().endsWith("gui.maxhistories"))
+				maxHistories.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.folder.autoclose"))
 				autocloseFolderNodes.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.folder.pagination"))
@@ -378,8 +421,6 @@ public class GUISettingsPanel extends AdminPanel {
 				uploadMax.setValue(Long.parseLong(p.getValue().trim()));
 			if (p.getName().endsWith("upload.disallow") && p.getValue() != null)
 				disallow.setValue(p.getValue().trim());
-			if (p.getName().endsWith("search.hits"))
-				searchHits.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.webcontent.folders"))
 				webcontentFolders.setValue(p.getValue());
 			if (p.getName().endsWith("gui.rpc.timeout"))
@@ -408,6 +449,7 @@ public class GUISettingsPanel extends AdminPanel {
 				previewMaxFileSize.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.saveinputs"))
 				saveInputs.setValue(p.getValue().equals("true") ? "yes" : "no");
+
 		}
 
 		ButtonItem save = new ButtonItem();
@@ -445,10 +487,18 @@ public class GUISettingsPanel extends AdminPanel {
 							values.get("thumbsize").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.thumbnail.quality",
 							values.get("thumbquality").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.mobile.size",
+							values.get("mobilesize").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.mobile.quality",
+							values.get("mobilequality").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.tile.size",
 							values.get("tilesize").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.tile.quality",
 							values.get("tilequality").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.note.maxlength",
+							values.get("notemaxsize").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.email.maxlength",
+							values.get("emailmaxsize").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.doubleclick",
 							values.get("ondoubleclick").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.document.tab",
@@ -461,6 +511,8 @@ public class GUISettingsPanel extends AdminPanel {
 							"yes".equals(values.get("foldpagination")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.maxchildren",
 							values.get("foldmaxchildren").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.maxhistories",
+							values.get("maxhistories").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.autoclose",
 							"yes".equals(values.get("autoclosefoldernodes")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.serverpush",
@@ -485,8 +537,6 @@ public class GUISettingsPanel extends AdminPanel {
 							values.get("uploadmax").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".upload.disallow",
 							values.get("disallow").toString()));
-					params.add(new GUIParameter(Session.get().getTenantName() + ".search.hits",
-							values.get("searchhits").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.webcontent.folders",
 							values.get("webcontentfolders").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".session.timeout",
@@ -527,12 +577,13 @@ public class GUISettingsPanel extends AdminPanel {
 			}
 		});
 
-		parametersForm.setItems(welcome, density, previewSize, previewTimeout, previewMaxFileSize, thumbSize,
-				thumbQuality, tileSize, tileQuality, uploadMax, disallow, textExtensions, attrTextBoxW, attrTextAreaW,
-				attrTextAreaH, ondoubleclick, docTab, foldSorting, inheritSecurityOption, inheritSecurityOptionDefault,
-				foldOpentree, foldPagination, foldMaxChildren, openPreviewPanel, autocloseFolderNodes, webstartMode,
-				galleryEnabled, searchHits, webcontentFolders, downloadTicketBehavior, saveLogin, sessionTimeout,
-				rpcTimeout, sessionHeartbeat, popupTimeout,askVersionCommentOnSave, reactToRemoteEvents, showLicenseAlertsInLogin,
+		parametersForm.setItems(welcome, density, previewSize, previewTimeout, previewMaxFileSize, uploadMax, thumbSize,
+				thumbQuality, tileSize, tileQuality, mobileSize, mobileQuality, disallow, textExtensions,
+				attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize, emailMaxSize, ondoubleclick, docTab,
+				foldSorting, inheritSecurityOption, inheritSecurityOptionDefault, foldOpentree, foldPagination,
+				foldMaxChildren, openPreviewPanel, maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled,
+				webcontentFolders, downloadTicketBehavior, saveLogin, sessionTimeout, rpcTimeout, sessionHeartbeat,
+				popupTimeout, askVersionCommentOnSave, reactToRemoteEvents, showLicenseAlertsInLogin,
 				showQuotaAlertsInLogin, showUpdateAlertsInLogin, showPatchAlertsInLogin, showLanguageInLogin,
 				saveInputs, showLostPassword, save);
 	}

@@ -10,7 +10,6 @@ import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -225,7 +224,7 @@ public class ParametricForm extends VLayout {
 
 		GUISearchOptions options = new GUISearchOptions();
 
-		options.setMaxHits(Session.get().getConfigAsInt("search.hits"));
+		options.setMaxHits(Search.get().getMaxHits());
 		options.setRetrieveAliases(Boolean.parseBoolean(vm.getValueAsString("aliases")) ? 1 : 0);
 		options.setCaseSensitive(Boolean.parseBoolean(vm.getValueAsString("casesensitive")) ? 1 : 0);
 

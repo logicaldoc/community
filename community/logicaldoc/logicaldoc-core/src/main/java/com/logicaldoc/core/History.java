@@ -191,7 +191,8 @@ public abstract class History extends PersistentObject {
 	}
 
 	/**
-	 * This setter sets the sessionId, userId, username and other informations that can be captured by the given session
+	 * This setter sets the sessionId, userId, username and other informations
+	 * that can be captured by the given session
 	 * 
 	 * @param session the session to read informations from
 	 */
@@ -207,7 +208,8 @@ public abstract class History extends PersistentObject {
 	}
 
 	/**
-	 * This setter sets the userId and username and other informations that can be captured by the given user
+	 * This setter sets the userId and username and other informations that can
+	 * be captured by the given user
 	 * 
 	 * @param user the user to read informations from
 	 */
@@ -283,10 +285,12 @@ public abstract class History extends PersistentObject {
 
 	public void setDocument(Document document) {
 		this.document = document;
-		this.setDocId(document.getId());
-		this.setFilename(document.getFileName());
-		this.setFolderId(document.getFolder().getId());
-		this.setVersion(document.getVersion());
+		if (document != null) {
+			this.setDocId(document.getId());
+			this.setFilename(document.getFileName());
+			this.setFolderId(document.getFolder().getId());
+			this.setVersion(document.getVersion());
+		}
 	}
 
 	public Folder getFolder() {

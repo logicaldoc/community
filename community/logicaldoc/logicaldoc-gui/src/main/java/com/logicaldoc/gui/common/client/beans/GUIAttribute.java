@@ -46,6 +46,11 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	private String stringValue;
 
+	/**
+	 * In case of attribute of type User, this field stores the username
+	 */
+	private String username;
+	
 	private Long intValue;
 
 	private Double doubleValue;
@@ -178,7 +183,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 			setDateValue((Date) value);
 		} else if (value instanceof GUIUser) {
 			setIntValue(((GUIUser) value).getId());
-			setStringValue(((GUIUser) value).getFullName());
+			setStringValue(((GUIUser) value).getUsername());
+			setUsername(((GUIUser) value).getUsername());
 			this.type = TYPE_USER;
 		} else if (value instanceof GUIFolder) {
 			setIntValue(((GUIFolder) value).getId());
@@ -333,6 +339,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		newAttr.setOptions(options);
 		newAttr.setStringValues(stringValues);
 		newAttr.setType(type);
+		newAttr.setUsername(username);
 
 		return newAttr;
 	}
@@ -348,5 +355,13 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	public void setStringValues(String stringValues) {
 		this.stringValues = stringValues;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }

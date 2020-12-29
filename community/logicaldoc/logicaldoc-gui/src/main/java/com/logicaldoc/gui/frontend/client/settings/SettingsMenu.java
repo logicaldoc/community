@@ -76,9 +76,9 @@ public class SettingsMenu extends VLayout {
 			smtp.setTooltip(I18N.message("featuredisabled"));
 		}
 
-		Button clientTools = new Button(I18N.message("clienandextapps"));
-		clientTools.setWidth100();
-		clientTools.setHeight(25);
+		Button protocols = new Button(I18N.message("protocols"));
+		protocols.setWidth100();
+		protocols.setHeight(25);
 
 		Button via = new Button(I18N.message("via"));
 		via.setWidth100();
@@ -96,30 +96,18 @@ public class SettingsMenu extends VLayout {
 		parameters.setWidth100();
 		parameters.setHeight(25);
 
-		if (Feature.visible(Feature.CLIENT_TOOLS) && Menu.enabled(Menu.CLIENTS)) {
-			addMember(clientTools);
-			if (!Feature.enabled(Feature.CLIENT_TOOLS)) {
-				clientTools.setDisabled(true);
-				clientTools.setTooltip(I18N.message("featuredisabled"));
+		if (Feature.visible(Feature.PROTOCOLS) && Menu.enabled(Menu.CLIENTS)) {
+			addMember(protocols);
+			if (!Feature.enabled(Feature.PROTOCOLS)) {
+				protocols.setDisabled(true);
+				protocols.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
 
-		clientTools.addClickHandler(new ClickHandler() {
+		protocols.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				SettingService.Instance.get().loadClientSettings(new AsyncCallback<GUIParameter[]>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIParameter[] settings) {
-						AdminScreen.get().setContent(new ExternalAppsPanel(settings));
-					}
-
-				});
+				AdminScreen.get().setContent(new ProtocolsPanel());
 			}
 		});
 

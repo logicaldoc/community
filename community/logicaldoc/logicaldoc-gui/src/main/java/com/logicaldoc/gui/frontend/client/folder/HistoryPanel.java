@@ -1,21 +1,26 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
 import com.logicaldoc.gui.common.client.Menu;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.FolderHistoryDS;
 import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This panel shows the history of a folder
@@ -44,38 +49,49 @@ public class HistoryPanel extends FolderDetailTab {
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"));
 		ListGridField ip = new ListGridField("ip", I18N.message("ip"));
 
-		final ListGrid list = new ListGrid();
+		final RefreshableListGrid list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
-		list.setDataSource(new FolderHistoryDS(folder.getId()));
+		list.setDataSource(new FolderHistoryDS(folder.getId(), null));
 		if (Menu.enabled(Menu.SESSIONS))
 			list.setFields(user, event, date, comment, fileName, path, sid, ip);
 		else
 			list.setFields(user, event, date, comment, fileName, path);
 
-		VLayout container = new VLayout();
-		container.setMembersMargin(3);
-		container.addMember(list);
-
-		HLayout buttons = new HLayout();
-		buttons.setMembersMargin(4);
+		ToolStrip buttons = new ToolStrip();
 		buttons.setWidth100();
-		buttons.setHeight(20);
 
-		Button exportButton = new Button(I18N.message("export"));
-		exportButton.setAutoFit(true);
-		buttons.addMember(exportButton);
-		exportButton.addClickHandler(new ClickHandler() {
+		SpinnerItem maxItem = ItemFactory.newSpinnerItem("max", "display",
+				Session.get().getConfigAsInt("gui.maxhistories"), 1, (Integer) null);
+		maxItem.setWidth(70);
+		maxItem.setStep(20);
+		maxItem.setSaveOnEnter(true);
+		maxItem.setImplicitSave(true);
+		maxItem.setHint(I18N.message("elements"));
+		buttons.addFormItem(maxItem);
+		maxItem.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				list.refresh(new FolderHistoryDS(folder.getId(), Integer.parseInt(maxItem.getValueAsString())));
+			}
+		});
+
+		buttons.addSeparator();
+
+		ToolStripButton export = new ToolStripButton(I18N.message("export"));
+		buttons.addButton(export);
+		export.addClickHandler(new ClickHandler() {
+
 			@Override
 			public void onClick(ClickEvent event) {
 				Util.exportCSV(list, true);
 			}
 		});
 
-		Button print = new Button(I18N.message("print"));
-		print.setAutoFit(true);
-		buttons.addMember(print);
+		ToolStripButton print = new ToolStripButton(I18N.message("print"));
+		buttons.addButton(print);
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -83,6 +99,9 @@ public class HistoryPanel extends FolderDetailTab {
 			}
 		});
 
+		VLayout container = new VLayout();
+		container.setMembersMargin(3);
+		container.addMember(list);
 		container.addMember(buttons);
 		addMember(container);
 	}

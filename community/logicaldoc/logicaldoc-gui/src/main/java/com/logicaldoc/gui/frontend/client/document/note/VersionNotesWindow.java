@@ -96,7 +96,7 @@ public class VersionNotesWindow extends Window {
 		annotations.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AnnotationsWindow annotationWnd = new AnnotationsWindow(doc,
+				AbstractAnnotationsWindow annotationWnd = new AnnotationsWindow(doc,
 						fileVer != null ? fileVer : doc.getFileVersion(), null, false);
 				annotationWnd.show();
 			}

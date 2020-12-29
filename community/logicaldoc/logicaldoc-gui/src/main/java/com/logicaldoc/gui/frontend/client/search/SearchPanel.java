@@ -289,10 +289,10 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 		return listingPanel;
 	}
 
-	public String getDocsGridViewState() {
+	public String getDocsGridLayout() {
 		if (listingPanel != null) {
 			if (listingPanel.getGrid() instanceof SearchHitsGrid)
-				return ((SearchHitsGrid) listingPanel.getGrid()).getViewState();
+				return listingPanel.getGridLayout();
 			else
 				return null;
 		} else

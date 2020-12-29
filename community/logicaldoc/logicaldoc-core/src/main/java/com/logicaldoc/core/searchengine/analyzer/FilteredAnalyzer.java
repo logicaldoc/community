@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.miscellaneous.WordDelimiterGraphFilterFactory;
 import org.apache.lucene.analysis.util.FilesystemResourceLoader;
 import org.apache.lucene.analysis.util.ResourceLoader;
@@ -33,6 +32,9 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
  * This analyzer is a wrapper to be used to handle an ordered list of filters.
+ * Please see also
+ * https://lucene.apache.org/solr/guide/8_5/understanding-analyzers-tokenizers-and-filters.html
+ * 
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.1
@@ -68,11 +70,9 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 	@Override
 	protected TokenStreamComponents wrapComponents(String fieldName, TokenStreamComponents components) {
 		TokenStream ts = components.getTokenStream();
-		Tokenizer tokenizer = components.getTokenizer();
 
 		Map<String, String> filters = getTokenFilters();
 		List<String> order = getTokenFilterNames(true);
-
 		ContextProperties config = Context.get().getProperties();
 
 		/*
@@ -80,7 +80,6 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 		 * TokenStream over ts
 		 */
 		for (String filter : order) {
-
 			// Prepare the configuration of the filter
 			Map<String, String> configs = new HashMap<String, String>();
 			configs.put("luceneMatchVersion", StandardSearchEngine.VERSION.toString());
@@ -96,9 +95,9 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 
 			String filterClass = filters.get(filter);
 
-			if (filterClass.equalsIgnoreCase(WordDelimiterGraphFilterFactory.class.getName())) {
+			if (!filterClass.equalsIgnoreCase(SnowballFilterFactory.class.getName())) {
 				/**
-				 * Remove unsupported settings that will cause exception during
+				 * Remove unrecognized settings that will cause exception during
 				 * construction
 				 */
 				configs.remove("lang");
@@ -116,6 +115,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 			try {
 				@SuppressWarnings({ "rawtypes", "unchecked" })
 				Constructor constructor = aClass.getConstructor(new Class[] { java.util.Map.class });
+
 				TokenFilterFactory factory = (TokenFilterFactory) constructor.newInstance(configs);
 
 				if (factory instanceof WordDelimiterGraphFilterFactory) {
@@ -133,13 +133,13 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 
 				log.debug("Appended token stream filter {}", filterClass);
 			} catch (NoSuchMethodException nse) {
-				log.debug("constructor (Map<String, String>) not found for {}", filterClass);
+				log.warn("constructor (Map<String, String>) not found for {}", filterClass);
 			} catch (Throwable e) {
 				log.warn("constructor (Map<String, String>) of {} raised an error: {}", filterClass, e.getMessage(), e);
 			}
 		}
 
-		return new TokenStreamComponents(tokenizer, ts);
+		return new TokenStreamComponents(components.getSource(), ts);
 	}
 
 	private static Map<String, String> getTokenFilters() {

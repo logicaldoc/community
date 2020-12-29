@@ -320,7 +320,8 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Gets the Session with the identifier returned by {@link #getSessionId(HttpServletRequest)}
+	 * Gets the Session with the identifier returned by
+	 * {@link #getSessionId(HttpServletRequest)}
 	 * 
 	 * @param request the HTTP request
 	 * 
@@ -446,7 +447,14 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	public Client buildClient(HttpServletRequest req) {
 		Client client = new Client(req.getRemoteAddr(), req.getRemoteHost());
 
+		/**
+		 * We extract the username used by the user from the basic credentials.
+		 * This may differ from the real username in case the login.ignorecase
+		 * flag is activates
+		 */
 		String[] credentials = getBasicCredentials(req);
+		if (credentials != null && credentials[0] != null)
+			client.setUsername(credentials[0]);
 		if (credentials != null)
 			client.setId(String.format("%s-%s-%s", credentials[0],
 					credentials[1] == null ? "0" : credentials[1].hashCode(), req.getRemoteAddr()));

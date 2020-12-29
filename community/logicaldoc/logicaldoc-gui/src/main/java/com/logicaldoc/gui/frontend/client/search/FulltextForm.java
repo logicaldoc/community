@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
@@ -133,6 +132,9 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		folder.setColSpan(3);
 		folder.setWidth(200);
 
+		if (Search.get().getOptions().getFolder() != null)
+			folder.setFolder(Search.get().getOptions().getFolder(), Search.get().getOptions().getFolderName());
+
 		SelectItem sizeOperator = ItemFactory.newSizeOperator("sizeOperator", "size");
 		IntegerItem size = ItemFactory.newIntegerItem("size", " ", null);
 		size.setWidth(50);
@@ -171,10 +173,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 		GUISearchOptions options = new GUISearchOptions();
 
-		String hits = Session.get().getConfig("search.hits");
-		if (hits != null)
-			options.setMaxHits(Integer.parseInt(hits));
-
+		options.setMaxHits(Search.get().getMaxHits());
 		options.setType(GUISearchOptions.TYPE_FULLTEXT);
 		options.setExpression(vm.getValueAsString("expression"));
 		if (NO_LANGUAGE.equals(vm.getValueAsString("language")) || vm.getValue("language") == null) {

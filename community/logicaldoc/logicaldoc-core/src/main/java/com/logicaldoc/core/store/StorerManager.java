@@ -71,6 +71,13 @@ public class StorerManager {
 		}
 	}
 
+	/**
+	 * Instantiate a new storer and fully configures it.
+	 * 
+	 * @param id identifier of the storer to create
+	 * 
+	 * @return the created instance
+	 */
 	public Storer newStorer(int id) {
 		if (storers.isEmpty())
 			init();

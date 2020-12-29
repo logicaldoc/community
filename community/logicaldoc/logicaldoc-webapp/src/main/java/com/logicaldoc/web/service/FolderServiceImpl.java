@@ -315,6 +315,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					right.setMove(fg.getMove() == 1 ? true : false);
 					right.setEmail(fg.getEmail() == 1 ? true : false);
 					right.setAutomation(fg.getAutomation() == 1 ? true : false);
+					right.setStorage(fg.getStorage() == 1 ? true : false);
 
 					rights[i] = right;
 					i++;
@@ -521,7 +522,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	@Override
 	public GUIFolder save(GUIFolder folder) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		
+
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
 			Folder f = folderDao.findById(folder.getId());
@@ -545,9 +546,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				f.setDescription(folder.getDescription());
 				f.setPosition(folder.getPosition());
 				f.setType(folder.getType());
+				f.setStorage(folder.getStorage());
 
 				if (f.isWorkspace()) {
-					f.setStorage(folder.getStorage());
 					f.setMaxVersions(folder.getMaxVersions());
 				}
 
@@ -761,6 +762,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					fg.setAutomation(1);
 				else
 					fg.setAutomation(0);
+
+				if (isAdmin || right.isStorage())
+					fg.setStorage(1);
+				else
+					fg.setStorage(0);
 			}
 
 			folder.getFolderGroups().clear();
@@ -1208,6 +1214,21 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
 			fdao.applyOCRToTree(parentId, transaction);
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public void applyStorage(long parentId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			ServiceUtil.checkPermission(Permission.STORAGE, session.getUser(), parentId);
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderHistory transaction = new FolderHistory();
+			transaction.setSession(session);
+			fdao.applyStorageToTree(parentId, transaction);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}

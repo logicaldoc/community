@@ -96,7 +96,7 @@ public class StoragesPanel extends VLayout {
 		save.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				onSave();
+				onSave(true);
 			}
 		});
 		save.setDisabled(Session.get().isDemo() && Session.get().getUser().getId() == 1);
@@ -222,7 +222,7 @@ public class StoragesPanel extends VLayout {
 						public void onChanged(ChangedEvent event) {
 							list.getSelectedRecord().setAttribute("type", event.getValue().toString());
 							list.collapseRecord(list.getSelectedRecord());
-							onSave();
+							onSave(false);
 						}
 					});
 					return item;
@@ -299,45 +299,64 @@ public class StoragesPanel extends VLayout {
 		contextMenu.showContextMenu();
 	}
 
-	private void onSave() {
+	private void onSave(boolean alertInclusion) {
 		final List<GUIParameter> settings = new ArrayList<GUIParameter>();
 		ListGridRecord[] records = list.getRecords();
 		for (ListGridRecord rec : records) {
-			String id = rec.getAttributeAsString("id").trim();
-			settings.add(new GUIParameter("store." + id + ".dir", rec.getAttributeAsString("path").trim()));
-			settings.add(new GUIParameter("store." + id + ".type", rec.getAttributeAsString("type").trim()));
-			if ("database_edit".equals(rec.getAttributeAsString("write"))) {
-				settings.add(new GUIParameter("store.write", id));
-			}
-
-			String[] attrs = rec.getAttributes();
-			if (attrs != null && attrs.length > 0) {
-				for (String attr : attrs) {
-					if (!StoragesPanel.isParameterAttribute(attr))
-						continue;
-					settings.add(new GUIParameter("store." + id + "." + attr, rec.getAttributeAsString(attr).trim()));
+			try {
+				String id = rec.getAttributeAsString("id").trim();
+				settings.add(new GUIParameter("store." + id + ".dir", rec.getAttributeAsString("path").trim()));
+				settings.add(new GUIParameter("store." + id + ".type", rec.getAttributeAsString("type").trim()));
+				if ("database_edit".equals(rec.getAttributeAsString("write"))) {
+					settings.add(new GUIParameter("store.write", id));
 				}
+
+				String[] attrs = rec.getAttributes();
+				if (attrs != null && attrs.length > 0) {
+					try {
+						for (String attr : attrs) {
+							if (!StoragesPanel.isParameterAttribute(attr))
+								continue;
+							settings.add(new GUIParameter("store." + id + "." + attr,
+									rec.getAttributeAsString(attr).trim()));
+						}
+					} catch (Throwable t) {
+						/*
+						 * the extensions table is lazy loaded so we may have
+						 * null pointers here, in this case just skip
+						 */
+					}
+				}
+			} catch (Throwable t) {
+				/*
+				 * the extensions table is lazy loaded so we may have null
+				 * pointers here, in this case just skip
+				 */
 			}
 		}
 
-		SettingService.Instance.get().saveStorageSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
+		SettingService.Instance.get().saveStorageSettings(settings.toArray(new GUIParameter[0]),
+				new AsyncCallback<Void>() {
 
-			@Override
-			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
-			}
+					@Override
+					public void onFailure(Throwable caught) {
+						Log.serverError(caught);
+					}
 
-			@Override
-			public void onSuccess(Void arg) {
-				Log.info(I18N.message("settingssaved"), null);
+					@Override
+					public void onSuccess(Void arg) {
+						Log.info(I18N.message("settingssaved"), null);
 
-				// Replicate the settings in the current session
-				for (GUIParameter setting : settings)
-					Session.get().setConfig(setting.getName(), setting.getValue());
-				
-				refresh();
-			}
-		});
+						// Replicate the settings in the current session
+						for (GUIParameter setting : settings)
+							Session.get().setConfig(setting.getName(), setting.getValue());
+
+						refresh();
+
+						if(alertInclusion)
+							SC.warn(I18N.message("importantnotice"), I18N.message("makesurenotnestedstorage"));
+					}
+				});
 	}
 
 	private void onAddStorage() {
@@ -348,7 +367,8 @@ public class StoragesPanel extends VLayout {
 				newStore.setAttribute("id", Integer.toString(i));
 				newStore.setAttribute("name", "Storage " + i);
 				newStore.setAttribute("type", "fs");
-				newStore.setAttribute("encrypt", "false");
+				newStore.setAttribute("encryption", "false");
+				newStore.setAttribute("compression", "5");
 				newStore.setAttribute("write", "blank");
 
 				list.getDataSource().addData(newStore);

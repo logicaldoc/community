@@ -59,7 +59,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 
-		userSelector = ItemFactory.newUserSelector("user", "deletedby", null, false);
+		userSelector = ItemFactory.newUserSelector("user", "deletedby", null, false, false);
 		userSelector.setWrapTitle(false);
 		userSelector.setWidth(100);
 		userSelector.addChangedHandler(new ChangedHandler() {

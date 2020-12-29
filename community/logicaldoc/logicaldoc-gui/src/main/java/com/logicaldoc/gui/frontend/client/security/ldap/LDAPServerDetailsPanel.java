@@ -161,6 +161,13 @@ public class LDAPServerDetailsPanel extends VLayout {
 		pageSize.setRequired(true);
 		pageSize.setMin(0);
 		pageSize.setStep(50);
+		
+		// Timepout
+		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", "timeout", this.server.getTimeout());
+		timeout.setRequired(true);
+		timeout.setMin(1);
+		timeout.setStep(5);
+		timeout.setHint(I18N.message("seconds").toLowerCase());
 
 		// Synch TTL
 		SpinnerItem syncTtl = ItemFactory.newSpinnerItem("syncttl", "synchronizeifolderthan", this.server.getSyncTtl());
@@ -189,7 +196,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		validation.setWrapTitle(false);
 		validation.setColSpan(2);
 		
-		ldapForm.setItems(enabled, url, username, password, implementation, anon, syncTtl, pageSize, language, userType,
+		ldapForm.setItems(enabled, url, username, password, implementation, anon, syncTtl, pageSize, timeout, language, userType,
 				keepMembership, userIdentifierAttr, grpIdentifierAttr, userClass, groupClass, usersBaseNode,
 				groupsBaseNode, userInclude, groupInclude, userExclude, groupExclude, logonAttr, realm, validation);
 
@@ -327,6 +334,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 					LDAPServerDetailsPanel.this.server.setLanguage((String) values.get("language"));
 					LDAPServerDetailsPanel.this.server.setUserType(Integer.parseInt(values.get("usertype").toString()));
 					LDAPServerDetailsPanel.this.server.setValidation((String) values.get("validation"));
+					LDAPServerDetailsPanel.this.server.setTimeout(Integer.parseInt(values.get("timeout").toString()));
 					
 					LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server,
 							new AsyncCallback<GUILDAPServer>() {

@@ -117,7 +117,7 @@ public class RightsDataServlet extends HttpServlet {
 		StringBuffer query = new StringBuffer(
 				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write, A.ld_add, A.ld_security, A.ld_immutable, A.ld_delete, A.ld_rename, A.ld_import, A.ld_export, A.ld_sign, A.ld_archive, A.ld_workflow, A.ld_download, ");
 		query.append(
-				" A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation from ld_foldergroup as A, ld_group B where A.ld_folderid = ");
+				" A.ld_calendar, A.ld_subscription, A.ld_print, A.ld_password, A.ld_move, A.ld_email, A.ld_automation, A.ld_storage from ld_foldergroup as A, ld_group B where A.ld_folderid = ");
 		query.append("" + ref.getId());
 		query.append(" and B.ld_tenantid = " + ref.getTenantId());
 		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id order by B.ld_type asc, B.ld_name asc");
@@ -164,6 +164,7 @@ public class RightsDataServlet extends HttpServlet {
 			writer.print("<move>" + (set.getInt(20) == 1 ? true : false) + "</move>");
 			writer.print("<email>" + (set.getInt(21) == 1 ? true : false) + "</email>");
 			writer.print("<automation>" + (set.getInt(22) == 1 ? true : false) + "</automation>");
+			writer.print("<storage>" + (set.getInt(23) == 1 ? true : false) + "</storage>");
 			writer.print("<type>" + groupType + "</type>");
 			writer.print("</right>");
 

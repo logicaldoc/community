@@ -100,13 +100,17 @@ public class SystemLoadMonitor {
 			return averageCpuLoad[0] > cpumax;
 	}
 
-	public void start() {
+	public void stop() {
 		try {
 			if (tracker != null)
-				tracker.interrupt();
+				tracker.end();
 		} catch (Throwable t) {
 
 		}
+	}
+
+	public void start() {
+		stop();
 		tracker.setPriority(Thread.MIN_PRIORITY);
 		tracker.start();
 	}
@@ -116,13 +120,20 @@ public class SystemLoadMonitor {
 	 * minutes
 	 */
 	class LoadTracker extends Thread {
+
+		private boolean running = true;
+
 		public LoadTracker() {
+		}
+
+		public void end() {
+			running = false;
 		}
 
 		@Override
 		public void run() {
-			while (true) {
-				for (int i = 0; i < samples.length; i++) {
+			while (running) {
+				for (int i = 0; i < samples.length && running; i++) {
 					// Get an actual sample and store it
 					int[] sample = getCpuLoad();
 					samples[i] = sample;
