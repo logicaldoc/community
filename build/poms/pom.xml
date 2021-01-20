@@ -96,7 +96,7 @@
         <slf4j.version>1.7.7</slf4j.version>
         <ant.version>1.8.2</ant.version>
         <httpclient.version>4.5.2</httpclient.version>
-        <jackson.version>2.6.5</jackson.version>
+        <jackson.version>2.12.1</jackson.version>
         <poi.version>3.16</poi.version>
         <jaxb.version>2.2.11</jaxb.version>
     </properties>
