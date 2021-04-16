@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIStamp;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
@@ -101,7 +101,7 @@ public class StampDetailsPanel extends VLayout {
 					StampService.Instance.get().getStamp(stamp.getId(), new AsyncCallback<GUIStamp>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -158,6 +158,7 @@ public class StampDetailsPanel extends VLayout {
 		TextItem name = ItemFactory.newSimpleTextItem("name", "name", stamp.getName());
 		name.addChangedHandler(changedHandler);
 		name.setRequired(true);
+		name.setWidth(300);
 		name.setDisabled(stamp.getId() != 0L);
 
 		TextItem exprx = ItemFactory.newTextItem("exprx", "exprx", stamp.getExprX());
@@ -280,12 +281,6 @@ public class StampDetailsPanel extends VLayout {
 			public void onChanged(ChangedEvent event) {
 				stamp.setType(Integer.parseInt(type.getValue().toString()));
 				refresh();
-				// Timer timer = new Timer() {
-				// public void run() {
-				// stampsPanel.showStampDetails(stamp);
-				// }
-				// };
-				// timer.schedule(100);
 			}
 		};
 		type.addChangedHandler(typeChangedhandler);
@@ -387,7 +382,7 @@ public class StampDetailsPanel extends VLayout {
 			StampService.Instance.get().save(stamp, new AsyncCallback<GUIStamp>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override

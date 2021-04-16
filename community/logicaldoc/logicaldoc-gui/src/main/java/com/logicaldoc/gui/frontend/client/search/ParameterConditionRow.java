@@ -11,6 +11,7 @@ import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.DataSourceField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ResizedEvent;
 import com.smartgwt.client.widgets.events.ResizedHandler;
@@ -121,10 +122,15 @@ public class ParameterConditionRow extends HLayout {
 
 		LinkedHashMap<String, String> operatorsMap = null;
 
-		if (fieldSelected != null && !fieldSelected.trim().isEmpty())
-			operatorsMap = operatorsFor(fieldSelected);
-		else
-			operatorsMap = operatorsFor(null);
+		try {
+			if (fieldSelected != null && !fieldSelected.trim().isEmpty())
+				operatorsMap = operatorsFor(fieldSelected);
+			else
+				operatorsMap = operatorsFor(null);
+		} catch (Throwable t) {
+			SC.warn(t.getMessage());
+		}
+
 		operator.setValueMap(operatorsMap);
 		if (!operatorsMap.isEmpty())
 			operator.setValue(operatorsMap.keySet().iterator().next());
@@ -217,7 +223,7 @@ public class ParameterConditionRow extends HLayout {
 			map.put("null", I18N.message("isnull").toLowerCase());
 			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_BOOLEAN)) {
-			map.put("equals", I18N.message("equals")).toLowerCase();
+			map.put("equals", I18N.message("equals").toLowerCase());
 			map.put("null", I18N.message("isnull").toLowerCase());
 			map.put("notnull", I18N.message("isnotnull").toLowerCase());
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)

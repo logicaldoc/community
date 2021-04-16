@@ -38,7 +38,11 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String creator;
 
+	private Long creatorId;
+
 	private String publisher;
+
+	private Long publisherId;
 
 	private String language;
 
@@ -121,11 +125,11 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private Long barcodeTemplateId = null;
 
 	/**
-	 * Indicates if the document has been processed by the barcodes processor: <b>0</b> =
-	 * to process, <b>1</b> = processed
+	 * Indicates if the document has been processed by the barcodes processor:
+	 * <b>0</b> = to process, <b>1</b> = processed
 	 */
 	private int barcoded = 0;
-	
+
 	public long getId() {
 		return id;
 	}
@@ -202,19 +206,19 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	}
 
 	public String getTgs() {
-		if(getTags()==null || getTags().length<1)
+		if (getTags() == null || getTags().length < 1)
 			return "";
 		else {
 			StringBuffer buf = new StringBuffer();
 			for (String tag : getTags()) {
-				if(buf.length()>0)
+				if (buf.length() > 0)
 					buf.append(",");
 				buf.append(tag);
 			}
 			return buf.toString();
 		}
 	}
-	
+
 	public String getTagsString() {
 		if (tagsString != null && !tagsString.isEmpty())
 			return tagsString;
@@ -584,5 +588,21 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setBarcodeTemplateId(Long barcodeTemplateId) {
 		this.barcodeTemplateId = barcodeTemplateId;
+	}
+
+	public Long getCreatorId() {
+		return creatorId;
+	}
+
+	public void setCreatorId(Long creatorId) {
+		this.creatorId = creatorId;
+	}
+
+	public Long getPublisherId() {
+		return publisherId;
+	}
+
+	public void setPublisherId(Long publisherId) {
+		this.publisherId = publisherId;
 	}
 }

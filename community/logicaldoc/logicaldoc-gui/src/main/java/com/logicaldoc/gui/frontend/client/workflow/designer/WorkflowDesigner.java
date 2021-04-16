@@ -36,9 +36,9 @@ public class WorkflowDesigner extends AdminPanel {
 
 	private GUIWorkflow workflow = null;
 
-	private DrawingPanel drawingPanel = null;
+	private WorkflowDrawingPanel drawingPanel = null;
 
-	private WorkflowToolstrip workflowToolstrip;
+	private WorkflowToolStrip workflowToolstrip;
 
 	public WorkflowDesigner(GUIWorkflow workflow) {
 		super("workflow");
@@ -49,12 +49,12 @@ public class WorkflowDesigner extends AdminPanel {
 		drawingPanelLayout.setHeight100();
 
 		PrimitivesToolstrip primitives = new PrimitivesToolstrip(this);
-		workflowToolstrip = new WorkflowToolstrip(this, primitives);
+		workflowToolstrip = new WorkflowToolStrip(this, primitives);
 
 		drawingPanelLayout.addMember(workflowToolstrip);
 		drawingPanelLayout.addMember(primitives);
 
-		drawingPanel = new DrawingPanel(this);
+		drawingPanel = new WorkflowDrawingPanel(this);
 		drawingPanelLayout.addMember(drawingPanel);
 
 		body.setMembers(drawingPanelLayout);
@@ -116,7 +116,7 @@ public class WorkflowDesigner extends AdminPanel {
 		}
 	}
 
-	public DrawingPanel getDrawingPanel() {
+	public WorkflowDrawingPanel getDrawingPanel() {
 		return drawingPanel;
 	}
 

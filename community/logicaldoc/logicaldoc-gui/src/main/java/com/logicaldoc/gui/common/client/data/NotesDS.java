@@ -2,6 +2,7 @@ package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
+import com.smartgwt.client.data.fields.DataSourceImageField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -38,11 +39,13 @@ public class NotesDS extends DataSource {
 		DataSourceTextField message = new DataSourceTextField("message");
 		DataSourceTextField page = new DataSourceTextField("page");
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
-		DataSourceTextField docFilename = new DataSourceTextField("docFilename");
+		DataSourceTextField docFilename = new DataSourceTextField("filename");
 		DataSourceTextField color = new DataSourceTextField("color");
 		DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
+		DataSourceImageField icon = new DataSourceImageField("icon");
+		icon.setHidden(true);
 
-		setFields(id, page, userId, user, message, date, docId, docFilename, fileVersion, color);
+		setFields(id, page, userId, user, message, date, docId, icon, docFilename, fileVersion, color);
 		setClientOnly(true);
 	}
 }

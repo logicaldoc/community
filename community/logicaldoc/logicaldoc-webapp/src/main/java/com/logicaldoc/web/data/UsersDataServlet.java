@@ -117,6 +117,7 @@ public class UsersDataServlet extends HttpServlet {
 				groups = Arrays.stream(user.getGroupNames()).filter(g -> !g.startsWith("_user_"))
 						.toArray(String[]::new);
 				writer.print("<groups><![CDATA[" + StringUtil.arrayToString(groups, ", ") + "]]></groups>");
+				writer.print("<avatar>" + user.getId() + "</avatar>");
 				writer.print("</user>");
 			}
 

@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.impex.syndication;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISyndication;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.SyndicationService;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -53,7 +53,7 @@ public class SyndicationDetailsPanel extends VLayout {
 							new AsyncCallback<GUISyndication>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -127,7 +127,7 @@ public class SyndicationDetailsPanel extends VLayout {
 			SyndicationService.Instance.get().save(syndication, new AsyncCallback<GUISyndication>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override

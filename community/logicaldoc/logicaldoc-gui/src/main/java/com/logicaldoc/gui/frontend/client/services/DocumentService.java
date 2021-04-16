@@ -255,11 +255,11 @@ public interface DocumentService extends RemoteService {
 	/**
 	 * Checks out the document
 	 * 
-	 * @param docId identifier of the document
+	 * @param docIds identifiers of the documents
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void checkout(long docId) throws ServerException;
+	public void checkout(long[] docIds) throws ServerException;
 
 	/**
 	 * Adds new documents previously uploaded

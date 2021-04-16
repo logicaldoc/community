@@ -12,7 +12,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -64,7 +64,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 
 	protected MultiComboBoxItem tagItem = null;
 
-	private Layout tile = new HLayout();
+	private Layout thumbnail = new HLayout();
 
 	public StandardPropertiesPanel(final GUIDocument document, ChangedHandler changedHandler) {
 		super(document, changedHandler);
@@ -87,14 +87,14 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		if (form1 != null)
 			form1.destroy();
 
-		if (tile != null)
-			tile.destroy();
+		if (thumbnail != null)
+			thumbnail.destroy();
 
 		if (columns.contains(form1))
 			columns.removeMember(form1);
 
-		if (columns.contains(tile))
-			columns.removeChild(tile);
+		if (columns.contains(thumbnail))
+			columns.removeChild(thumbnail);
 
 		form1 = new DynamicForm();
 		form1.setNumCols(2);
@@ -111,17 +111,18 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		if (document.getDocRef() != null)
 			id.setTooltip(I18N.message("thisisalias") + ": " + document.getDocRef());
 
-		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon", Util.padLeft(
-				I18N.formatDate((Date) document.getCreation()) + " " + I18N.message("by") + " " + document.getCreator(),
-				40));
+		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon",
+				Util.textWithAvatar(document.getCreatorId(), Util.padLeft(I18N.formatDate((Date) document.getCreation())
+						+ " " + I18N.message("by") + " " + document.getCreator(), 40)));
 		creation.setTooltip(I18N.formatDate((Date) document.getCreation()) + " " + I18N.message("by") + " "
 				+ document.getCreator());
 
-		StaticTextItem published = ItemFactory.newStaticTextItem("date", "publishedon", Util.padLeft(
-				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher(),
-				40));
+		StaticTextItem published = ItemFactory.newStaticTextItem("date", "publishedon",
+				Util.textWithAvatar(document.getPublisherId(), Util.padLeft(I18N.formatDate((Date) document.getDate())
+						+ " " + I18N.message("by") + " " + document.getPublisher(), 40)));
 		published.setTooltip(
 				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
+
 		StaticTextItem size = ItemFactory.newStaticTextItem("size", "size",
 				Util.formatSizeW7(document.getFileSize().doubleValue()) + " ("
 						+ Util.formatSizeBytes(document.getFileSize()) + ")");
@@ -195,8 +196,8 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		 * Prepare the tile
 		 */
 		if (document.getId() != 0L) {
-			tile = new PreviewTile(document.getId(), document.getFileName());
-			columns.addMember(tile);
+			thumbnail = new PreviewTile(document.getId(), document.getFileName());
+			columns.addMember(thumbnail);
 		}
 	}
 
@@ -223,7 +224,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 					DocumentService.Instance.get().getRating(document.getId(), new AsyncCallback<GUIRating>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override

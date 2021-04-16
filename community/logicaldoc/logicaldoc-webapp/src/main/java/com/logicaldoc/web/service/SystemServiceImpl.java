@@ -39,6 +39,7 @@ import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.task.TaskManager;
 import com.logicaldoc.core.task.TaskScheduling;
 import com.logicaldoc.core.task.TaskTrigger;
+import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIHistory;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
@@ -533,7 +534,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 			// Search in the document/folder history
 			StringBuffer query = new StringBuffer(
-					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason from ld_history A where A.ld_tenantid = "
+					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation from ld_history A where A.ld_tenantid = "
 							+ session.getTenantId());
 			if (userName != null && StringUtils.isNotEmpty(userName))
 				query.append(" and lower(A.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
@@ -564,7 +565,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 			// Search in the folder history
 			query.append(
-					" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment, B.ld_reason from ld_folder_history B where B.ld_tenantid = "
+					" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment, B.ld_reason, B.ld_device, B.ld_geolocation from ld_folder_history B where B.ld_tenantid = "
 							+ session.getTenantId());
 			if (userName != null && StringUtils.isNotEmpty(userName))
 				query.append(" and lower(B.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
@@ -596,7 +597,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			// Search in the user history
 			if (rootFolderId == null) {
 				query.append(
-						" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment, C.ld_reason from ld_user_history C where C.ld_tenantid = "
+						" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment, C.ld_reason, C.ld_device, C.ld_geolocation from ld_user_history C where C.ld_tenantid = "
 								+ session.getTenantId());
 				if (userName != null && StringUtils.isNotEmpty(userName))
 					query.append(
@@ -628,7 +629,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 				// Search in the workflow history
 				query.append(
-						" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment, D.ld_reason from ld_workflowhistory D where D.ld_tenantid = "
+						" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment, D.ld_reason, D.ld_device, D.ld_geolocation from ld_workflowhistory D where D.ld_tenantid = "
 								+ session.getTenantId());
 				if (userName != null && StringUtils.isNotEmpty(userName))
 					query.append(
@@ -683,6 +684,13 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 					history.setUserLogin(rs.getString(11));
 					history.setComment(rs.getString(12));
 					history.setReason(rs.getString(13));
+					history.setDevice(rs.getString(14));
+					history.setGeolocation(rs.getString(15));
+
+					if (history.getFileName() != null && history.getDocId() != 0L)
+						history.setIcon(IconSelector.selectIcon(history.getFileName()));
+					else if (history.getFileName() != null && history.getDocId() == 0L && history.getFolderId() != 0L)
+						history.setIcon("folder");
 
 					return history;
 				}

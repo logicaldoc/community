@@ -163,7 +163,7 @@ public class TenantPropertiesPanel extends HLayout {
 			tenant.setPostalCode((String) values.get("postalcode"));
 			tenant.setTelephone((String) values.get("phone"));
 			tenant.setEmail((String) values.get("email"));
-			tenant.setEnabled(new Boolean(values.get("eenabled").toString()));
+			tenant.setEnabled(Boolean.valueOf(values.get("eenabled").toString()));
 			tenant.setExpire((Date) values.get("expire"));
 		}
 

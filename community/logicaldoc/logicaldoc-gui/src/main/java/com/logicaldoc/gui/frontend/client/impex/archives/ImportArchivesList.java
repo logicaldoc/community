@@ -3,14 +3,14 @@ package com.logicaldoc.gui.frontend.client.impex.archives;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.ArchivesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -85,11 +85,7 @@ public class ImportArchivesList extends VLayout {
 		status.setImageURLSuffix(".png");
 		status.setCanFilter(false);
 
-		ListGridField created = new ListGridField("created", I18N.message("createdon"), 110);
-		created.setAlign(Alignment.CENTER);
-		created.setType(ListGridFieldType.DATE);
-		created.setCellFormatter(new DateCellFormatter(false));
-		created.setCanFilter(false);
+		ListGridField created = new DateListGridField("created", "createdon");
 
 		ListGridField creator = new ListGridField("creator", I18N.message("creator"), 110);
 
@@ -183,7 +179,7 @@ public class ImportArchivesList extends VLayout {
 							ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -216,7 +212,7 @@ public class ImportArchivesList extends VLayout {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

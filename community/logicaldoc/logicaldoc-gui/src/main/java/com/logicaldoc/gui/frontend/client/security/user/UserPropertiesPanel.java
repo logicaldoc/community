@@ -4,15 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.GroupsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.Avatar;
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
@@ -41,6 +44,8 @@ public class UserPropertiesPanel extends HLayout {
 
 	private GUIUser user;
 
+	private UsersPanel usersPanel;
+
 	private ChangedHandler changedHandler;
 
 	private Canvas idLabel;
@@ -49,7 +54,8 @@ public class UserPropertiesPanel extends HLayout {
 
 	private MultiComboBoxItem groupsItem;
 
-	public UserPropertiesPanel(GUIUser user, ChangedHandler changedHandler) {
+	public UserPropertiesPanel(GUIUser user, ChangedHandler changedHandler, UsersPanel usersPanel) {
+		this.usersPanel = usersPanel;
 		if (user == null) {
 			setMembers(UsersPanel.SELECT_USER);
 		} else {
@@ -70,6 +76,8 @@ public class UserPropertiesPanel extends HLayout {
 	}
 
 	public void prepareGUI() {
+		setAlign(Alignment.LEFT);
+
 		boolean readonly = (changedHandler == null);
 		vm.clearValues();
 		vm.clearErrors(false);
@@ -217,12 +225,27 @@ public class UserPropertiesPanel extends HLayout {
 		addMember(layout);
 
 		prepareGroupsForm(readonly);
+
+		if (user.getId() != 0L) {
+			Avatar avatar = new Avatar(user.getId(), new AsyncCallback<Void>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void result) {
+					if (usersPanel != null)
+						usersPanel.updateRecord(user);
+				}
+			});
+			addMember(avatar);
+
+		}
 	}
 
 	private void prepareGroupsForm(boolean readOnly) {
-		DynamicForm form2 = new DynamicForm();
-		form2.setValuesManager(vm);
-
 		List<String> groupIds = new ArrayList<String>();
 		GUIGroup[] groups = user.getGroups();
 		if (groups != null && groups.length > 0) {
@@ -239,7 +262,10 @@ public class UserPropertiesPanel extends HLayout {
 		groupsItem.setDisplayField("name");
 		groupsItem.addChangedHandler(changedHandler);
 
+		DynamicForm form2 = new DynamicForm();
+		form2.setValuesManager(vm);
 		form2.setItems(groupsItem);
+		form2.setWidth(1);
 		addMember(form2, 2);
 	}
 
@@ -274,7 +300,7 @@ public class UserPropertiesPanel extends HLayout {
 		String[] ids = groupsItem.getValues();
 		if (ids == null || ids.length == 0) {
 			SC.warn(I18N.message("usermustbelongtogroup"));
-			Log.warn(I18N.message("usermustbelongtogroup"), I18N.message("usermustbelongtogroup"));
+			GuiLog.warn(I18N.message("usermustbelongtogroup"), I18N.message("usermustbelongtogroup"));
 			return false;
 		}
 

@@ -30,7 +30,10 @@
         <property name="sessionId" type="string" column="ld_sessionid" length="255" />
         <property name="isNew" type="int" column="ld_new" />
         <property name="filename" type="string" column="ld_filename" length="255"/>
+        <property name="fileSize" type="long" column="ld_filesize"/>
         <property name="filenameOld" type="string" column="ld_filenameold" length="255"/>
         <property name="ip" type="string" column="ld_ip" length="255" />
+        <property name="geolocation" type="string" column="ld_geolocation" length="255" />
+        <property name="device" type="string" column="ld_device" length="255" />
 	</class>
 </hibernate-mapping>

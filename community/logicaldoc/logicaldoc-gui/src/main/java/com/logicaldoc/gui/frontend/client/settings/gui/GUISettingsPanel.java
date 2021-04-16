@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -46,7 +46,7 @@ public class GUISettingsPanel extends AdminPanel {
 		SettingService.Instance.get().loadGUISettings(new AsyncCallback<GUIParameter[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -80,6 +80,17 @@ public class GUISettingsPanel extends AdminPanel {
 		dashlets.setPane(new DashletsPanel());
 		tabs.addTab(dashlets);
 
+		Tab customActions = new Tab();
+		customActions.setTitle(I18N.message("customactions"));
+		customActions.setPane(new CustomActionsPanel());
+		
+		if (Feature.visible(Feature.CUSTOM_ACTIONS)) {
+			tabs.addTab(customActions);
+			if (!Feature.enabled(Feature.CUSTOM_ACTIONS)) {
+				customActions.setPane(new FeatureDisabled());
+			}
+		}
+		
 		if (Feature.visible(Feature.GUI_LANGUAGES)) {
 			tabs.addTab(languages);
 			if (!Feature.enabled(Feature.GUI_LANGUAGES)) {
@@ -112,6 +123,10 @@ public class GUISettingsPanel extends AdminPanel {
 		previewSize.setMin(1);
 		previewSize.setStep(10);
 
+		RadioGroupItem banner = ItemFactory.newBooleanSelector("banner",
+				I18N.message("banner"));
+		banner.setWrapTitle(false);
+		
 		RadioGroupItem openPreviewPanel = ItemFactory.newBooleanSelector("openpreviewpanel",
 				I18N.message("openpreviewpanel"));
 		openPreviewPanel.setWrapTitle(false);
@@ -349,8 +364,17 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem askVersionCommentOnSave = ItemFactory.newBooleanSelector("askversioncommentonsave",
 				I18N.message("askversioncommentonsave"));
 		askVersionCommentOnSave.setWrapTitle(false);
+		
+		SpinnerItem avatarSize = ItemFactory.newSpinnerItem("avatarsize", I18N.message("avatarsize"), (Integer) null);
+		avatarSize.setHint("pixels");
+		avatarSize.setRequired(true);
+		avatarSize.setWrapTitle(false);
+		avatarSize.setStep(16);
+		avatarSize.setMin(16);
 
 		for (GUIParameter p : settings) {
+			if (p.getName().endsWith("gui.banner"))
+				banner.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.welcome"))
 				welcome.setValue(p.getValue());
 			if (p.getName().endsWith("gui.savelogin"))
@@ -449,6 +473,8 @@ public class GUISettingsPanel extends AdminPanel {
 				previewMaxFileSize.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.saveinputs"))
 				saveInputs.setValue(p.getValue().equals("true") ? "yes" : "no");
+			if (p.getName().endsWith("gui.avatar.size"))
+				avatarSize.setValue(Long.parseLong(p.getValue().trim()));
 
 		}
 
@@ -461,6 +487,8 @@ public class GUISettingsPanel extends AdminPanel {
 
 				if (vm.validate()) {
 					List<GUIParameter> params = new ArrayList<GUIParameter>();
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.banner",
+							"yes".equals(values.get("banner")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.welcome",
 							(String) values.get("welcome")));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.density",
@@ -555,6 +583,8 @@ public class GUISettingsPanel extends AdminPanel {
 							values.get("webstartmode").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.saveinputs",
 							"yes".equals(values.get("saveinputs")) ? "true" : "false"));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.avatar.size",
+							values.get("avatarsize").toString()));
 
 					// Update the current session parameters.
 					for (GUIParameter p : params)
@@ -565,20 +595,20 @@ public class GUISettingsPanel extends AdminPanel {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									Log.info(I18N.message("settingssaved"), null);
+									GuiLog.info(I18N.message("settingssaved"), null);
 								}
 							});
 				}
 			}
 		});
 
-		parametersForm.setItems(welcome, density, previewSize, previewTimeout, previewMaxFileSize, uploadMax, thumbSize,
-				thumbQuality, tileSize, tileQuality, mobileSize, mobileQuality, disallow, textExtensions,
+		parametersForm.setItems(welcome, density, banner, previewSize, previewTimeout, previewMaxFileSize, uploadMax, thumbSize,
+				thumbQuality, tileSize, tileQuality, mobileSize, mobileQuality, avatarSize, disallow, textExtensions,
 				attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize, emailMaxSize, ondoubleclick, docTab,
 				foldSorting, inheritSecurityOption, inheritSecurityOptionDefault, foldOpentree, foldPagination,
 				foldMaxChildren, openPreviewPanel, maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled,

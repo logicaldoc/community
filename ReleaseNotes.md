@@ -1,4 +1,4 @@
-The LogicalDOC development team is proud to announce the availability of LogicalDOC CE 8.5.2
+The LogicalDOC development team is proud to announce the availability of LogicalDOC CE 8.6.1
 
 You can get this distribution in various formats from the LD's website:
 https://www.logicaldoc.com/download-logicaldoc-community 
@@ -24,20 +24,20 @@ There are many updates in this version 8.5.2, both in terms of performance and s
 In particular, HTTP responses have been improved in the face of violation of permissions and a great job has been done to support the new App: **LogicalDOC Mobile**, available for free on Google Play https://play.google.com/store/apps/details?id=com.logicaldoc.mobile
 
 
-###Changes since version 8.4.2:###
+###Changes since version 8.5.2:###
 
-+ **Support for the new Android app LogicalDOC Mobile**
-+ Enforced permission management in WebDAV with correct HTTP return codes
-+ 1045	Unable to delete some files
-+ 1046	Recording of folder alias creations
-+ 1051	WebDAV cache removed because of superseeded by other optimizations
-+ 1032	Display tags column in the documents grid
-+ 1035	Customizable number of displayed history records
-+ 1038	Nice popups to notify alerts
-+ 1039	Issues when number of folders in a subfolder is more than 1000
-+ 1042	Reduced time to shutdown of the Windows service
-+ 1026	Updated the indexing engine
-+ 1027	Copy the path of a folder
++ Support for the new Android app LogicalDOC Mobile - https://play.google.com/store/apps/details?id=com.logicaldoc.mobile
++ Geolocation of requests
++ Customizable thumbnail generation
++ Option to save correctly sent emails as LogicalDOC's documents
++ Redesign of main menu: search on the left, removed Personal menu, added Account menu
++ Error in CustomID generation on version promotion
++ GUI Setting to Show / Hide the application banner
++ Display total pages number in the folders navigator cursor
++ Improved  the quality of grids prints
++ Enforce password history
++ Improve the Search Folder form
++ "Oracle database does not support ""as"" for aliasing table names in from cluase"
 
 
 See also the file CHANGELOG.txt for more details
@@ -47,8 +47,6 @@ The web-service API documentation is available in the LogicalDOC Documentation w
 The LogicalDOC documentation is available at the following address https://docs.logicaldoc.com
 
 Please note that the above documentation is related to LogicalDOC Enterprise, and that some features may not be available in the Community version
-
-At any time you can start a discussion in the Community forums http://forums.logicaldoc.com
 
 An official Docker project for LogicalDOC Community is available at https://hub.docker.com/r/logicaldoc/logicaldoc-ce/ other Docker projects with different configurations and settings are available from https://hub.docker.com/u/logicaldoc/  
 

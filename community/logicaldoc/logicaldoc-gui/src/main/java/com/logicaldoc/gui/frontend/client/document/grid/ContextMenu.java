@@ -1,20 +1,19 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
-import com.logicaldoc.gui.common.client.beans.GUIExternalCall;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.beans.GUIMenu;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
+import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -35,14 +34,13 @@ import com.logicaldoc.gui.frontend.client.document.signature.SignatureDialog;
 import com.logicaldoc.gui.frontend.client.document.split.SplitDialog;
 import com.logicaldoc.gui.frontend.client.document.stamp.StampDialog;
 import com.logicaldoc.gui.frontend.client.folder.AutomationDialog;
+import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.AutoComplete;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
@@ -64,20 +62,7 @@ public class ContextMenu extends Menu {
 		download.setTitle(I18N.message("download"));
 		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				if (selection.length == 1) {
-					long id = selection[0].getId();
-					DocUtil.download(id, null);
-				} else {
-					String url = GWT.getHostPageBaseURL() + "zip-export?folderId=" + folder.getId();
-					for (GUIDocument record : selection) {
-						if (record.isPasswordProtected()) {
-							SC.warn(I18N.message("somedocsprotected"));
-							break;
-						}
-						url += "&docId=" + record.getId();
-					}
-					WindowUtils.openUrl(url);
-				}
+				onDownload(folder, selection);
 			}
 		});
 
@@ -137,7 +122,7 @@ public class ContextMenu extends Menu {
 							DocumentService.Instance.get().delete(ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -185,7 +170,7 @@ public class ContextMenu extends Menu {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -211,7 +196,7 @@ public class ContextMenu extends Menu {
 								new AsyncCallback<GUIDocument>() {
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -245,7 +230,7 @@ public class ContextMenu extends Menu {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -285,14 +270,14 @@ public class ContextMenu extends Menu {
 											new AsyncCallback<Void>() {
 												@Override
 												public void onFailure(Throwable caught) {
-													Log.serverError(caught);
+													GuiLog.serverError(caught);
 												}
 
 												@Override
 												public void onSuccess(Void result) {
 													selection[0].setPasswordProtected(true);
 													grid.updateDocument(selection[0]);
-													Log.info("passwordapplied", null);
+													GuiLog.info("passwordapplied", null);
 												}
 											});
 							}
@@ -309,7 +294,7 @@ public class ContextMenu extends Menu {
 					DocumentService.Instance.get().unsetPassword(selection[0].getId(), "", new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -334,7 +319,7 @@ public class ContextMenu extends Menu {
 												new AsyncCallback<Void>() {
 													@Override
 													public void onFailure(Throwable caught) {
-														Log.serverError(caught);
+														GuiLog.serverError(caught);
 													}
 
 													@Override
@@ -364,7 +349,7 @@ public class ContextMenu extends Menu {
 							DocumentService.Instance.get().lock(selectionIds, value, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -390,7 +375,7 @@ public class ContextMenu extends Menu {
 				DocumentService.Instance.get().unlock(selectionIds, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -408,19 +393,20 @@ public class ContextMenu extends Menu {
 		checkout.setTitle(I18N.message("checkout"));
 		checkout.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				final GUIDocument document = grid.getSelectedDocument();
-				DocumentService.Instance.get().checkout(document.getId(), new AsyncCallback<Void>() {
+				DocumentService.Instance.get().checkout(selectionIds, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void result) {
-						DocUtil.markCheckedOut(document);
-						WindowUtils.openUrl(Util.downloadURL(document.getId()));
-						grid.selectDocument(document.getId());
-						Log.info(I18N.message("documentcheckedout"), null);
+						GuiLog.info(I18N.message("documentcheckedout"), null);
+						GUIDocument[] docs = grid.getSelectedDocuments();
+						for (GUIDocument doc : docs)
+							DocUtil.markCheckedOut(doc);
+						grid.selectDocument(selectionIds[0]);
+						onDownload(folder, selection);
 					}
 				});
 			}
@@ -435,17 +421,29 @@ public class ContextMenu extends Menu {
 					return;
 				long id = selection.getId();
 				final String filename = selection.getFileName();
-				DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+				
+				// Just to clean the upload folder
+				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
 					}
 
 					@Override
-					public void onSuccess(GUIDocument document) {
-						DocumentCheckin checkin = new DocumentCheckin(document, filename);
-						checkin.show();
+					public void onSuccess(Void result) {
+						DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIDocument document) {
+								DocumentCheckin checkin = new DocumentCheckin(document, filename);
+								checkin.show();
+							}
+						});
 					}
 				});
 			}
@@ -472,13 +470,13 @@ public class ContextMenu extends Menu {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
 										public void onSuccess(Void result) {
 											grid.removeSelectedDocuments();
-											Log.info(I18N.message("documentswerearchived", "" + selectionIds.length),
+											GuiLog.info(I18N.message("documentswerearchived", "" + selectionIds.length),
 													null);
 										}
 									});
@@ -497,7 +495,7 @@ public class ContextMenu extends Menu {
 				DocumentService.Instance.get().addBookmarks(selectionIds, 0, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -529,7 +527,7 @@ public class ContextMenu extends Menu {
 				DocumentService.Instance.get().markUnindexable(selectionIds, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -560,7 +558,7 @@ public class ContextMenu extends Menu {
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -591,7 +589,7 @@ public class ContextMenu extends Menu {
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -628,7 +626,7 @@ public class ContextMenu extends Menu {
 					@Override
 					public void onFailure(Throwable caught) {
 						ContactingServer.get().hide();
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -699,17 +697,10 @@ public class ContextMenu extends Menu {
 		startWorkflow.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				ListGrid list = (ListGrid) DocumentsPanel.get().getDocumentsGrid();
-				ListGridRecord[] selection = list.getSelectedRecords();
-				if (selection == null || selection.length == 0)
+				if (selectionIds.length < 1)
 					return;
 
-				final long[] ids = new long[selection.length];
-				for (int j = 0; j < selection.length; j++) {
-					ids[j] = Long.parseLong(selection[j].getAttribute("id"));
-				}
-
-				WorkflowDialog workflowDialog = new WorkflowDialog(ids);
+				WorkflowDialog workflowDialog = new WorkflowDialog(selectionIds);
 				workflowDialog.show();
 			}
 		});
@@ -718,14 +709,12 @@ public class ContextMenu extends Menu {
 		automation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				ListGrid list = (ListGrid) DocumentsPanel.get().getDocumentsGrid();
-				ListGridRecord[] selection = list.getSelectedRecords();
-				if (selection == null || selection.length == 0)
+				if (selectionIds.length < 1)
 					return;
 
-				final Long[] ids = new Long[selection.length];
-				for (int j = 0; j < selection.length; j++)
-					ids[j] = selection[j].getAttributeAsLong("id");
+				Long[] ids = new Long[selectionIds.length];
+				for (int i = 0; i < selectionIds.length; i++)
+					ids[i] = Long.valueOf(selectionIds[i]);
 
 				AutomationDialog dialog = new AutomationDialog(folder.getId(), ids);
 				dialog.show();
@@ -828,7 +817,7 @@ public class ContextMenu extends Menu {
 									new AsyncCallback<GUIDocument>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -842,25 +831,10 @@ public class ContextMenu extends Menu {
 			}
 		});
 
-		MenuItem externalCall = new MenuItem();
-		final GUIExternalCall extCall = Session.get().getSession().getExternalCall();
-		if (extCall != null) {
-			externalCall.setTitle(extCall.getName());
-			externalCall.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-				public void onClick(MenuItemClickEvent event) {
-					List<Long> ids = new ArrayList<Long>();
-					List<String> filenames = new ArrayList<String>();
-					for (GUIDocument record : selection) {
-						ids.add(record.getId());
-						filenames.add(record.getFileName());
-					}
-
-					WindowUtils.openUrl(
-							extCall.getUrl(true, ids.toArray(new Long[0]), filenames.toArray(new String[0])),
-							extCall.getTargetWindow() != null ? extCall.getTargetWindow() : "_blank", null);
-				}
-			});
-		}
+		Long[] ids = new Long[selectionIds.length];
+		for (int i = 0; i < selectionIds.length; i++)
+			ids[i] = Long.valueOf(selectionIds[i]);
+		MenuItem customActionsItem = prepareCustomActionsMenu(folder.getId(), ids);
 
 		MenuItem split = new MenuItem(I18N.message("split"));
 		split.addClickHandler(new ClickHandler() {
@@ -877,7 +851,7 @@ public class ContextMenu extends Menu {
 
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				LD.askforStringMandatory(I18N.message("merge"), I18N.message("filename"), null, new ValueCallback() {
+				LD.askForStringMandatory(I18N.message("merge"), I18N.message("filename"), null, new ValueCallback() {
 
 					@Override
 					public void execute(String value) {
@@ -887,7 +861,7 @@ public class ContextMenu extends Menu {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 										ContactingServer.get().hide();
 									}
 
@@ -908,8 +882,11 @@ public class ContextMenu extends Menu {
 			removeItem(office);
 		if (Feature.visible(Feature.ARCHIVING))
 			addItem(archive);
-		if (Feature.enabled(Feature.EXTERNAL_CALL) && extCall != null)
-			addItem(externalCall);
+		if (Feature.enabled(Feature.CUSTOM_ACTIONS)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS)
+				&& Session.get().getUser().getCustomActions() != null
+				&& Session.get().getUser().getCustomActions().length > 0)
+			addItem(customActionsItem);
 
 		MenuItem more = new MenuItem(I18N.message("more"));
 		addItem(more);
@@ -954,7 +931,6 @@ public class ContextMenu extends Menu {
 			boolean immutablesInSelection = someSelection && checkImmutablesInSelection(selection);
 
 			preview.setEnabled(someSelection);
-			externalCall.setEnabled(someSelection);
 			cut.setEnabled(someSelection && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isMove());
 			unlock.setEnabled(
@@ -989,7 +965,7 @@ public class ContextMenu extends Menu {
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection)
 					&& folder.hasPermission(Constants.PERMISSION_PASSWORD) && selection[0].isPasswordProtected());
 			sendMail.setEnabled(someSelection && folder.hasPermission(Constants.PERMISSION_EMAIL));
-			checkout.setEnabled(justOneSelected && !immutablesInSelection && folder.isDownload() && folder.isWrite()
+			checkout.setEnabled(someSelection && !immutablesInSelection && folder.isDownload() && folder.isWrite()
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
 			lock.setEnabled(someSelection && !immutablesInSelection && folder.isWrite()
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection));
@@ -1024,6 +1000,83 @@ public class ContextMenu extends Menu {
 		}
 	}
 
+	private MenuItem prepareCustomActionsMenu(final long folderId, final Long[] selectedDocIds) {
+		Menu customActionsMenu = new Menu();
+		if (Session.get().getUser().getCustomActions() != null
+				&& Session.get().getUser().getCustomActions().length > 0) {
+			for (GUIMenu menuAction : Session.get().getUser().getCustomActions()) {
+				MenuItem actionItem = new MenuItem(I18N.message(menuAction.getName()));
+				customActionsMenu.addItem(actionItem);
+
+				actionItem.addClickHandler(new ClickHandler() {
+
+					@Override
+					public void onClick(MenuItemClickEvent event) {
+						if (selectedDocIds == null || selectedDocIds.length < 1)
+							return;
+
+						/**
+						 * Check on the server if the action has been modified
+						 */
+						SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIMenu action) {
+								Session.get().getUser().updateCustomAction(action);
+								
+								if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
+										&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
+									/*
+									 * An automation cript is specified directly, so launch it's execution
+									 */
+									GUIAutomationRoutine routine = new GUIAutomationRoutine();
+									routine.setAutomation(action.getAutomation());
+									executeRoutine(folderId, selectedDocIds, routine);
+								} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
+									AutomationService.Instance.get().getRoutine(action.getRoutineId(),
+											new AsyncCallback<GUIAutomationRoutine>() {
+
+												@Override
+												public void onFailure(Throwable caught) {
+													GuiLog.serverError(caught);
+												}
+
+												@Override
+												public void onSuccess(GUIAutomationRoutine routine) {
+													if (routine.getTemplateId() != null
+															&& routine.getTemplateId().longValue() != 0L) {
+														/*
+														 * A routine with parameters is referenced, so open the input popup
+														 */
+														FillRoutineParams dialog = new FillRoutineParams(action.getName(),
+																routine, folderId, selectedDocIds);
+														dialog.show();
+													} else {
+														/*
+														 * A routine without parameters is referenced, so launch directly
+														 */
+														executeRoutine(folderId, selectedDocIds, routine);
+													}
+												}
+											});
+								}								
+							}
+						});
+					}
+				});
+			}
+		}
+
+		MenuItem customActionsItem = new MenuItem(I18N.message("customactions"));
+		customActionsItem.setSubmenu(customActionsMenu);
+		return customActionsItem;
+	}
+
 	private boolean checkStatusInSelection(int status, GUIDocument[] selection) {
 		for (GUIDocument doc : selection) {
 			if (doc.getStatus() != status) {
@@ -1049,5 +1102,36 @@ public class ContextMenu extends Menu {
 			if (doc.getImmutable() != 0)
 				return true;
 		return false;
+	}
+
+	private void onDownload(final GUIFolder folder, final GUIDocument[] selection) {
+		if (selection.length == 1) {
+			long id = selection[0].getId();
+			DocUtil.download(id, null);
+		} else {
+			String url = GWT.getHostPageBaseURL() + "zip-export?folderId=" + folder.getId();
+			for (GUIDocument record : selection) {
+				if (record.isPasswordProtected()) {
+					SC.warn(I18N.message("somedocsprotected"));
+					break;
+				}
+				url += "&docId=" + record.getId();
+			}
+			WindowUtils.openUrl(url);
+		}
+	}
+
+	private void executeRoutine(long folderId, Long[] docIds, GUIAutomationRoutine routine) {
+		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void arg0) {
+			}
+		});
 	}
 }

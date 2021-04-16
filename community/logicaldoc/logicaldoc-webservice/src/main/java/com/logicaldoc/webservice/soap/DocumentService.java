@@ -483,13 +483,34 @@ public interface DocumentService {
 	 * @throws Exception error in the server application
 	 */
 	@WebMethod
-	@WebResult(name = "document")
+	@WebResult(name = "version")
 	@WSDoc(description = "gets the versions' history of a document; returns an array of versions")
 	public WSDocument[] getVersions(
 			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
 			@WSDoc(description = "the document id") @WebParam(name = "docId") long docId)
 			throws Exception;
 
+	
+	/**
+	 * Gets a specific version
+	 * 
+	 * @param sid identifier of the session
+	 * @param docId The document id
+	 * @param version The version number
+	 * 
+	 * @return The version
+	 * 
+	 * @throws Exception error in the server application
+	 */
+	@WebMethod
+	@WebResult(name = "version")
+	@WSDoc(description = "gets a version of a document; returns the version")
+	public WSDocument getVersion(
+			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
+			@WSDoc(description = "the document id") @WebParam(name = "docId") long docId,
+			@WSDoc(description = "the version number") @WebParam(name = "version") String version)
+			throws Exception;
+	
 	/**
 	 * Gets a document in a specific folder
 	 * 
@@ -668,7 +689,7 @@ public interface DocumentService {
 	 * @param sid Session identifier
 	 * @param docId The document id
 	 * @param fileVersion The specific file version(it can be empty)
-	 * @param type The thumbnail type(eg: thumbnail, tile, mobile)
+	 * @param type The thumbnail type(eg: thumb, tile, mobile, thumb<b>XXX</b> where <b>XXX</b> is a resolution in pixels)
 	 * 
 	 * @throws Exception error in the server application
 	 */
@@ -678,7 +699,7 @@ public interface DocumentService {
 			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
 			@WSDoc(description = "the document id") @WebParam(name = "docId") long docId,
 			@WSDoc(description = "the specific file version", required = false) @WebParam(name = "fileVersion") String fileVersion,
-			@WSDoc(description = "the thumbnail type(eg: thumbnail, tile, mobile)", required = false) @WebParam(name = "type") String type)
+			@WSDoc(description = "the thumbnail type(eg: thumbnail, tile, mobile, thumbXXX)", required = false) @WebParam(name = "type") String type)
 			throws Exception;
 
 	/**

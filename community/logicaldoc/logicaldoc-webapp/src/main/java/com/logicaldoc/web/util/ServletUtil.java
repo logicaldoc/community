@@ -417,10 +417,7 @@ public class ServletUtil {
 		if (saveHistory) {
 			// Add an history entry to track the download of the document
 			DocumentHistory history = new DocumentHistory();
-			history.setDocId(doc.getId());
-			history.setVersion(doc.getVersion());
-			history.setFilename(doc.getFileName());
-			history.setFolderId(doc.getFolder().getId());
+			history.setDocument(doc);
 			history.setUser(user);
 			if (session != null) {
 				history.setSession(session);

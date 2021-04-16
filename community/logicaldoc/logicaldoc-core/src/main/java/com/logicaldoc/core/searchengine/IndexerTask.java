@@ -17,15 +17,16 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.task.Task;
+import com.logicaldoc.core.threading.NamedThreadFactory;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.CollectionUtil;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.concurrency.NamedThreadFactory;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.time.TimeDiff;
@@ -328,6 +329,12 @@ public class IndexerTask extends Task {
 		@Override
 		public Long call() throws Exception {
 			try {
+				/*
+				 * Prepare the master transaction object
+				 */
+				DocumentHistory transaction = new DocumentHistory();
+				transaction.setUser(userDao.findByUsername("_system"));
+
 				for (Long id : docIds) {
 					try {
 						log.debug("Thread {}: Indexing document {}", number, id);
@@ -348,7 +355,7 @@ public class IndexerTask extends Task {
 									doc.getFileName());
 						} else {
 							Date beforeIndexing = new Date();
-							parsingTime += documentManager.reindex(id, null);
+							parsingTime += documentManager.reindex(id, null, transaction.clone());
 							long indexingDiff = TimeDiff.getTimeDifference(beforeIndexing, new Date(),
 									TimeField.MILLISECOND);
 							indexingTime += indexingDiff;

@@ -14,14 +14,16 @@ import com.logicaldoc.gui.common.client.beans.GUIWFState;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentCheckin;
@@ -32,7 +34,6 @@ import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
@@ -74,7 +75,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 
 /**
- * This popup window is used to visualize the details of a selected task in a
+ * This popup window is used to display the details of a selected task in a
  * specific workflow instance.
  * 
  * @author Matteo Caruso - LogicalDOC
@@ -334,7 +335,7 @@ public class TaskDetailsDialog extends Window {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -370,7 +371,7 @@ public class TaskDetailsDialog extends Window {
 						Long.toString(Session.get().getUser().getId()), new AsyncCallback<GUIWorkflow>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -399,7 +400,7 @@ public class TaskDetailsDialog extends Window {
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -409,7 +410,7 @@ public class TaskDetailsDialog extends Window {
 
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -434,12 +435,12 @@ public class TaskDetailsDialog extends Window {
 						new AsyncCallback<GUIWorkflow>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(GUIWorkflow workflow) {
-								WorkflowCompletionWindow diagramWindow = new WorkflowCompletionWindow(workflow);
+								WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
 								diagramWindow.show();
 							}
 						});
@@ -465,7 +466,7 @@ public class TaskDetailsDialog extends Window {
 				transitionsForm.setWidth(150);
 				transitionsForm.setIsGroup(true);
 				transitionsForm.setGroupTitle(I18N.message("actions"));
-				
+
 				List<FormItem> items = new ArrayList<FormItem>();
 				// Add Transitions buttons
 				if (workflow.getSelectedTask().getTransitions() != null)
@@ -473,7 +474,7 @@ public class TaskDetailsDialog extends Window {
 						final String transitionName = transition.getText();
 						if (transitionName == null || transitionName.trim().isEmpty())
 							continue;
-						
+
 						ButtonItem transitionButton = new ButtonItem(transition.getText());
 						transitionButton.setAutoFit(true);
 						transitionButton.addClickHandler(new ClickHandler() {
@@ -572,12 +573,8 @@ public class TaskDetailsDialog extends Window {
 		taskId.setHidden(true);
 
 		ListGridField task = new ListGridField("name", I18N.message("task"), 150);
-		ListGridField user = new ListGridField("user", I18N.message("user"), 150);
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.LEFT);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
+		ListGridField user = new AvatarListGridField("user", "userId", "user", 160);
+		ListGridField date = new DateListGridField("date", "date");
 
 		notesGrid = new ListGrid() {
 			@Override
@@ -600,7 +597,7 @@ public class TaskDetailsDialog extends Window {
 		notesGrid.setSelectionType(SelectionStyle.SINGLE);
 		notesGrid.setFields(id, task, date, user);
 		notesGrid.setDataSource(new WorkflowHistoriesDS(Long.parseLong(workflow.getId()), workflow.getTemplateId(),
-				"event.workflow.task.note", null));
+				"event.workflow.task.note", null, null));
 		notesPanel.addMember(notesGrid);
 
 		Button addNote = new Button(I18N.message("addnote"));
@@ -639,7 +636,7 @@ public class TaskDetailsDialog extends Window {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -656,7 +653,7 @@ public class TaskDetailsDialog extends Window {
 					public void onClick(MenuItemClickEvent event) {
 						HTMLPane printContainer = new HTMLPane();
 						printContainer.setContents(notesGrid.getSelectedRecord().getAttribute("comment"));
-						Canvas.showPrintPreview(printContainer);
+						Canvas.printComponents(new Canvas[] { printContainer });
 					}
 				});
 
@@ -679,29 +676,13 @@ public class TaskDetailsDialog extends Window {
 	}
 
 	private void prepareAppendedDocsPanel() {
-		ListGridField docFilename = new ListGridField("filename", I18N.message("filename"));
+		FileNameListGridField docFilename = new FileNameListGridField();
 		docFilename.setWidth("*");
 		docFilename.setShowDefaultContextMenu(false);
-		docFilename.setHidden(false);
 
-		ListGridField docLastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 150);
-		docLastModified.setAlign(Alignment.CENTER);
-		docLastModified.setType(ListGridFieldType.DATE);
-		docLastModified.setCellFormatter(new DateCellFormatter(false));
-		docLastModified.setCanFilter(false);
+		ListGridField docLastModified = new DateListGridField("lastModified", "lastmodified");
 		docLastModified.setShowDefaultContextMenu(false);
 		docLastModified.setHidden(false);
-
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-		icon.setShowDefaultContextMenu(false);
-		icon.setHidden(false);
 
 		ListGridField statusIcons = new ListGridField("statusIcons", " ");
 		statusIcons.setWidth(90);
@@ -720,8 +701,11 @@ public class TaskDetailsDialog extends Window {
 		appendedDocs.setShowCellContextMenus(false);
 		appendedDocs.setSelectionType(SelectionStyle.SINGLE);
 		appendedDocs.setBorder("1px solid #E1E1E1");
-		appendedDocs.setDataSource(new DocumentsDS(workflow.getAppendedDocIds()));
-		appendedDocs.setFields(statusIcons, icon, docFilename, docLastModified);
+		appendedDocs.setDataSource(
+				new DocumentsDS(workflow.getAppendedDocIds() != null && !workflow.getAppendedDocIds().isEmpty()
+						? workflow.getAppendedDocIds()
+						: "empty"));
+		appendedDocs.setFields(statusIcons, docFilename, docLastModified);
 
 		appendedDocs.registerCellContextClickHandler(new CellContextClickHandler() {
 
@@ -740,7 +724,7 @@ public class TaskDetailsDialog extends Window {
 						new AsyncCallback<GUIFolder>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -780,7 +764,7 @@ public class TaskDetailsDialog extends Window {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -790,7 +774,7 @@ public class TaskDetailsDialog extends Window {
 
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -835,7 +819,7 @@ public class TaskDetailsDialog extends Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -852,7 +836,7 @@ public class TaskDetailsDialog extends Window {
 
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -896,7 +880,7 @@ public class TaskDetailsDialog extends Window {
 
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -911,19 +895,18 @@ public class TaskDetailsDialog extends Window {
 						checkout.setTitle(I18N.message("checkout"));
 						checkout.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 							public void onClick(MenuItemClickEvent event) {
-								DocumentService.Instance.get().checkout(selectedDocument.getId(),
+								DocumentService.Instance.get().checkout(new long[] { selectedDocument.getId() },
 										new AsyncCallback<Void>() {
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
 											public void onSuccess(Void result) {
-												GUIDocument[] docs = appendedDocs.getSelectedDocuments();
-												for (GUIDocument doc : docs)
-													DocUtil.markCheckedOut(doc);
-												Log.info(I18N.message("documentcheckedout"), null);
+												GUIDocument doc = appendedDocs.getSelectedDocument();
+												DocUtil.markCheckedOut(doc);
+												GuiLog.info(I18N.message("documentcheckedout"), null);
 
 												WindowUtils.openUrl(Util.downloadURL(selectedDocument.getId()));
 											}
@@ -939,7 +922,7 @@ public class TaskDetailsDialog extends Window {
 										new AsyncCallback<Void>() {
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -960,7 +943,7 @@ public class TaskDetailsDialog extends Window {
 
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -982,7 +965,7 @@ public class TaskDetailsDialog extends Window {
 								false, new AsyncCallback<GUIFolder>() {
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -1011,61 +994,64 @@ public class TaskDetailsDialog extends Window {
 	}
 
 	/**
-	 * Gets the required note to the user before terminating the task taking the given transition
+	 * Gets the required note to the user before terminating the task taking the
+	 * given transition
 	 * 
 	 * @param task the task to end
 	 * @param transition name of the transition to take
 	 */
 	private void collectNoteAndEndTask(GUIWFState task, String transition) {
 		RichTextItem noteInput = ItemFactory.newRichTextItemForNote("note", "note", null);
+		noteInput.setWidth("*");
+		noteInput.setHeight(200);
+
 		Integer minlength = task.getMinNoteSize();
 		int maxlength = Session.get().getConfigAsInt("default.gui.note.maxlength");
 		noteInput.setValidators(new CustomValidator() {
 
-				@Override
-				protected boolean condition(Object value) {
-					if (value == null || value.toString().length() < 1) {
-						setErrorMessage(I18N.message("fieldrequired"));
-						return false;
-					}
-
-					setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
-					if (value != null && value.toString().length() > maxlength)
-						return false;
-					
-					
-					if(minlength!=null && minlength>1) {
-						setErrorMessage(I18N.message("notetoosmall", Integer.toString(minlength)));
-						if (value != null && value.toString().length() < minlength)
-							return false;
-					}
-					
-					return true;
+			@Override
+			protected boolean condition(Object value) {
+				if (value == null || value.toString().length() < 1) {
+					setErrorMessage(I18N.message("fieldrequired"));
+					return false;
 				}
-			});
-		
+
+				setErrorMessage(I18N.message("contentexceedsmax", Integer.toString(maxlength)));
+				if (value != null && value.toString().length() > maxlength)
+					return false;
+
+				if (minlength != null && minlength > 1) {
+					setErrorMessage(I18N.message("notetoosmall", Integer.toString(minlength)));
+					if (value != null && value.toString().length() < minlength)
+						return false;
+				}
+
+				return true;
+			}
+		});
+
 		LD.askForValue("providenotetocomplete", "note", null, noteInput, 500, new ValueCallback() {
 
 			@Override
 			public void execute(String value) {
-				if(noteInput.validate())
-				WorkflowService.Instance.get().addNote(workflow.getSelectedTask().getId(),
-						value, new AsyncCallback<Long>() {
-							@Override
-							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
-							}
+				if (noteInput.validate())
+					WorkflowService.Instance.get().addNote(workflow.getSelectedTask().getId(), value,
+							new AsyncCallback<Long>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-							@Override
-							public void onSuccess(Long noteId) {
-								destroy();
-								onEndTask(getWorkflow().getSelectedTask(), transition);						
-							}
-						});
+								@Override
+								public void onSuccess(Long noteId) {
+									destroy();
+									onEndTask(getWorkflow().getSelectedTask(), transition);
+								}
+							});
 			}
 		});
 	}
-	
+
 	/**
 	 * Ends the task taking the specified transition
 	 * 
@@ -1076,7 +1062,7 @@ public class TaskDetailsDialog extends Window {
 		WorkflowService.Instance.get().endTask(task.getId(), transition, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

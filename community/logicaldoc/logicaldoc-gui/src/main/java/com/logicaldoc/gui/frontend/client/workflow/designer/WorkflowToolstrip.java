@@ -6,9 +6,10 @@ import com.logicaldoc.gui.common.client.beans.GUIWFState;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.PrintUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
@@ -23,7 +24,6 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -35,7 +35,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class WorkflowToolstrip extends ToolStrip {
+public class WorkflowToolStrip extends ToolStrip {
 
 	private GUIWorkflow currentWorkflow = null;
 
@@ -55,7 +55,11 @@ public class WorkflowToolstrip extends ToolStrip {
 
 	private ToolStripButton delete = null;
 
+	private ToolStripButton print = null;
+
 	private ToolStripButton close = null;
+
+	private ToolStripButton load = null;
 
 	private ToolStripButton settings = null;
 
@@ -65,7 +69,7 @@ public class WorkflowToolstrip extends ToolStrip {
 
 	private PrimitivesToolstrip primitives;
 
-	public WorkflowToolstrip(final WorkflowDesigner designer, PrimitivesToolstrip primitives) {
+	public WorkflowToolStrip(final WorkflowDesigner designer, PrimitivesToolstrip primitives) {
 		super();
 
 		this.designer = designer;
@@ -90,17 +94,16 @@ public class WorkflowToolstrip extends ToolStrip {
 							new AsyncCallback<GUIWorkflow>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(GUIWorkflow result) {
 									if (result != null) {
 										currentWorkflow = result;
-										WorkflowToolstrip.this.designer.redraw(currentWorkflow);
+										WorkflowToolStrip.this.designer.redraw(currentWorkflow);
 										updateVersionSelect();
 										update();
-
 									}
 								}
 							});
@@ -128,14 +131,14 @@ public class WorkflowToolstrip extends ToolStrip {
 						new AsyncCallback<GUIWorkflow>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(GUIWorkflow result) {
 								if (result != null) {
 									currentWorkflow = result;
-									WorkflowToolstrip.this.designer.redraw(currentWorkflow);
+									WorkflowToolStrip.this.designer.redraw(currentWorkflow);
 									update();
 								}
 							}
@@ -147,7 +150,7 @@ public class WorkflowToolstrip extends ToolStrip {
 
 		addSeparator();
 
-		ToolStripButton load = new ToolStripButton(I18N.message("load"));
+		load = new ToolStripButton(I18N.message("load"));
 		load.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -168,7 +171,7 @@ public class WorkflowToolstrip extends ToolStrip {
 
 				FormItem workflowName = ItemFactory.newSimpleTextItem("workflowName", "workflowname", null);
 				workflowName.setRequired(true);
-				LD.askforValue(I18N.message("newwftemplate"), I18N.message("workflowname"), null, workflowName,
+				LD.askForValue(I18N.message("newwftemplate"), I18N.message("workflowname"), null, workflowName,
 						new ValueCallback() {
 
 							@Override
@@ -207,8 +210,8 @@ public class WorkflowToolstrip extends ToolStrip {
 		deploy.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				WorkflowToolstrip.this.designer.saveModel();
-				currentWorkflow = WorkflowToolstrip.this.designer.getWorkflow();
+				WorkflowToolStrip.this.designer.saveModel();
+				currentWorkflow = WorkflowToolStrip.this.designer.getWorkflow();
 
 				boolean taskFound = false;
 				if (currentWorkflow.getStates() != null && currentWorkflow.getStates().length > 0)
@@ -259,13 +262,13 @@ public class WorkflowToolstrip extends ToolStrip {
 						@Override
 						public void onFailure(Throwable caught) {
 							ContactingServer.get().hide();
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(GUIWorkflow result) {
 							ContactingServer.get().hide();
-							Log.info(I18N.message("workflowdeployed", currentWorkflow.getName()));
+							GuiLog.info(I18N.message("workflowdeployed", currentWorkflow.getName()));
 							currentWorkflow = result;
 							reload(currentWorkflow.getName());
 						}
@@ -279,8 +282,8 @@ public class WorkflowToolstrip extends ToolStrip {
 		undeploy.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				WorkflowToolstrip.this.designer.saveModel();
-				currentWorkflow = WorkflowToolstrip.this.designer.getWorkflow();
+				WorkflowToolStrip.this.designer.saveModel();
+				currentWorkflow = WorkflowToolStrip.this.designer.getWorkflow();
 				if (currentWorkflow == null || currentWorkflow.getName() == null)
 					return;
 
@@ -293,12 +296,12 @@ public class WorkflowToolstrip extends ToolStrip {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
 										public void onSuccess(Void result) {
-											Log.info(I18N.message("workflowundeployed", currentWorkflow.getName()));
+											GuiLog.info(I18N.message("workflowundeployed", currentWorkflow.getName()));
 											update();
 											reload(currentWorkflow.getName());
 										}
@@ -320,7 +323,7 @@ public class WorkflowToolstrip extends ToolStrip {
 							WorkflowService.Instance.get().delete(currentWorkflow.getName(), new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -365,7 +368,7 @@ public class WorkflowToolstrip extends ToolStrip {
 		_import.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				WorkflowUploader uploader = new WorkflowUploader(WorkflowToolstrip.this.designer);
+				WorkflowUploader uploader = new WorkflowUploader(WorkflowToolStrip.this.designer);
 				uploader.show();
 				update();
 			}
@@ -381,6 +384,17 @@ public class WorkflowToolstrip extends ToolStrip {
 			}
 		});
 		addButton(export);
+
+		print = new ToolStripButton(I18N.message("print"));
+		print.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				PrintUtil.printScreenShot(designer.getDrawingPanel().getID(),
+						I18N.message("workflow") + " - " + designer.getWorkflow().getName()+" v"+designer.getWorkflow().getVersion());
+			}
+		});
+		addButton(print);
+
 		addSeparator();
 
 		close = new ToolStripButton(I18N.message("close"));
@@ -422,9 +436,14 @@ public class WorkflowToolstrip extends ToolStrip {
 				|| "0".equals(currentWorkflow.getId()) || !currentWorkflow.isLatestVersion());
 		delete.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
 				|| "0".equals(currentWorkflow.getId()) || !currentWorkflow.isLatestVersion());
-		settings.setDisabled(
+		settings.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
+				|| "0".equals(currentWorkflow.getId()) || !currentWorkflow.isLatestVersion());
+		print.setDisabled(
 				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
-		close.setDisabled(currentWorkflow == null);
+		load.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
+		close.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
 
 		workflowSelect.setOptionDataSource(new WorkflowsDS(false, false));
 
@@ -451,7 +470,7 @@ public class WorkflowToolstrip extends ToolStrip {
 			@Override
 			public void onFailure(Throwable caught) {
 				ContactingServer.get().hide();
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -481,14 +500,14 @@ public class WorkflowToolstrip extends ToolStrip {
 		WorkflowService.Instance.get().get(workflowName, null, new AsyncCallback<GUIWorkflow>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(GUIWorkflow result) {
 				if (result != null) {
 					currentWorkflow = result;
-					WorkflowToolstrip.this.designer.redraw(result);
+					WorkflowToolStrip.this.designer.redraw(result);
 					updateVersionSelect();
 					update();
 				}

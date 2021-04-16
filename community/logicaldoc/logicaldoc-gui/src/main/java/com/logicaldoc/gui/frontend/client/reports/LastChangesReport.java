@@ -8,22 +8,22 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIHistory;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -133,7 +133,7 @@ public class LastChangesReport extends AdminPanel {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { histories });
+				GridUtil.print(histories);
 			}
 		});
 		print.setAutoFit(true);
@@ -144,7 +144,7 @@ public class LastChangesReport extends AdminPanel {
 		export.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(histories, false);
+				GridUtil.exportCSV(histories, false);
 			}
 		});
 		if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -188,17 +188,13 @@ public class LastChangesReport extends AdminPanel {
 		ListGridField eventField = new ListGridField("event", I18N.message("event"), 200);
 		eventField.setCanFilter(true);
 
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setAlign(Alignment.CENTER);
-		date.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date");
 
-		ListGridField userField = new ListGridField("user", I18N.message("user"), 100);
+		ListGridField userField = new AvatarListGridField("user", "userId", "user", 110);
 		userField.setCanFilter(true);
 		userField.setAlign(Alignment.CENTER);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"), 100);
+		FileNameListGridField name = new FileNameListGridField("name", "icon", I18N.message("name"), 150);
 		name.setCanFilter(true);
 
 		ListGridField folder = new ListGridField("folder", I18N.message("folder"), 100);
@@ -224,6 +220,11 @@ public class LastChangesReport extends AdminPanel {
 		ip.setCanFilter(true);
 		ip.setHidden(true);
 
+		ListGridField device = new ListGridField("device", I18N.message("device"), 200);
+		device.setHidden(true);
+		ListGridField geolocation = new ListGridField("geolocation", I18N.message("geolocation"), 200);
+		geolocation.setHidden(true);
+
 		ListGridField username = new ListGridField("username", I18N.message("username"), 100);
 		username.setCanFilter(true);
 		username.setHidden(true);
@@ -240,8 +241,8 @@ public class LastChangesReport extends AdminPanel {
 		histories.setEmptyMessage(I18N.message("notitemstoshow"));
 		histories.setWidth100();
 		histories.setHeight100();
-		histories.setFields(eventField, date, userField, name, folder, sid, docId, folderId, userId, ip, username,
-				comment, reason);
+		histories.setFields(eventField, date, userField, name, folder, sid, docId, folderId, userId, username, ip,
+				device, geolocation, comment, reason);
 		histories.setSelectionType(SelectionStyle.SINGLE);
 		histories.setShowRecordComponents(true);
 		histories.setShowRecordComponentsByCell(true);
@@ -330,7 +331,7 @@ public class LastChangesReport extends AdminPanel {
 						@Override
 						public void onFailure(Throwable caught) {
 							ContactingServer.get().hide();
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -351,9 +352,12 @@ public class LastChangesReport extends AdminPanel {
 									record.setAttribute("folderId", result[i].getFolderId());
 									record.setAttribute("userId", result[i].getUserId());
 									record.setAttribute("ip", result[i].getIp());
+									record.setAttribute("device", result[i].getDevice());
+									record.setAttribute("geolocation", result[i].getGeolocation());
 									record.setAttribute("username", result[i].getUserLogin());
 									record.setAttribute("comment", result[i].getComment());
 									record.setAttribute("reason", result[i].getReason());
+									record.setAttribute("icon", result[i].getIcon());
 									records[i] = record;
 								}
 								histories.setData(records);

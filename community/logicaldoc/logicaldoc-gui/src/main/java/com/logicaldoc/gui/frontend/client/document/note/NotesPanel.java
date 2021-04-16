@@ -5,20 +5,18 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.NotesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailTab;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ExpansionMode;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.HTMLPane;
+import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -26,8 +24,6 @@ import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -44,7 +40,7 @@ public class NotesPanel extends DocumentDetailTab {
 
 	private ListGrid notesGrid;
 
-	private Button addNote;
+	private IButton addNote;
 
 	private HLayout buttons;
 
@@ -75,39 +71,28 @@ public class NotesPanel extends DocumentDetailTab {
 		ListGridField userId = new ListGridField("userId", "userid", 50);
 		userId.setHidden(true);
 
-		ListGridField user = new ListGridField("user", I18N.message("author"), 200);
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.LEFT);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
-		ListGridField page = new ListGridField("page", I18N.message("page"), 80);
-		page.setWidth("*");
+		AvatarListGridField user = new AvatarListGridField("user", "userId", "author", 150);
+		ListGridField date = new DateListGridField("date", "date");
 
-		notesGrid = new ListGrid() {
-			@Override
-			protected Canvas getExpansionComponent(final ListGridRecord record) {
-				return new HTMLFlow("<div class='details'>"
-						+ (record.getAttributeAsString("message") != null ? record.getAttributeAsString("message") : "")
-						+ "</div>");
-			}
-		};
+		ListGridField page = new ListGridField("page", I18N.message("page"), 50);
+		page.setAutoFitWidth(true);
+		page.setAlign(Alignment.CENTER);
+
+		ListGridField content = new ListGridField("message", I18N.message("content"), 70);
+		content.setWidth("*");
+
+		notesGrid = new ListGrid();
 		notesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		notesGrid.setCanFreezeFields(true);
 		notesGrid.setAutoFetchData(true);
 		notesGrid.setDataSource(new NotesDS(null, document.getId(), document.getFileVersion(), null));
-		notesGrid.setFields(id, userId, user, date, page);
-		notesGrid.setWidth100();
-		notesGrid.setCanExpandRecords(true);
-		notesGrid.setExpansionMode(ExpansionMode.DETAIL_FIELD);
-		notesGrid.setDetailField("message");
-
+		notesGrid.setFields(id, userId, user, date, page, content);
 		container.setHeight100();
 		container.setWidth100();
 		container.addMember(notesGrid);
 
-		addNote = new Button(I18N.message("addnote"));
-		addNote.setAutoFit(true);
+		addNote = new IButton(I18N.message("addnote"));
+		addNote.setAutoFit(false);
 		addNote.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -116,12 +101,12 @@ public class NotesPanel extends DocumentDetailTab {
 			}
 		});
 
-		Button annotations = new Button(I18N.message("annotations"));
-		annotations.setAutoFit(true);
+		IButton annotations = new IButton(I18N.message("annotations"));
+		annotations.setAutoFit(false);
 		annotations.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AbstractAnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(
+				AnnotationsWindow dialog = new com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow(
 						document, null, NotesPanel.this, true);
 				dialog.show();
 			}
@@ -193,16 +178,6 @@ public class NotesPanel extends DocumentDetailTab {
 				event.cancel();
 			}
 		});
-
-		// Expand all notes after arrived
-		notesGrid.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				for (ListGridRecord rec : notesGrid.getRecords()) {
-					notesGrid.expandRecord(rec);
-				}
-			}
-		});
 	}
 
 	private void onDelete() {
@@ -220,7 +195,7 @@ public class NotesPanel extends DocumentDetailTab {
 					DocumentService.Instance.get().deleteNotes(ids, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override

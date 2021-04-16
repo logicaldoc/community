@@ -74,7 +74,7 @@ public class GarbageDataServlet extends HttpServlet {
 			for (Folder fld : folderDAO.findDeleted(session.getUserId(), 100)) {
 				writer.print("<entry>");
 				writer.print("<id>" + fld.getId() + "</id>");
-				writer.print("<icon>folder_closed</icon>");
+				writer.print("<icon>folder</icon>");
 				writer.print("<filename><![CDATA[" + fld.getName() + "]]></filename>");
 				writer.print("<lastModified>" + df.format(fld.getLastModified()) + "</lastModified>");
 				writer.print("<folderId>" + fld.getParentId() + "</folderId>");

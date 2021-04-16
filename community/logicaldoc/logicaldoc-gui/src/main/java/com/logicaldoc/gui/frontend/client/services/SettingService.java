@@ -20,20 +20,20 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 public interface SettingService extends RemoteService {
 
 	/**
-	 * Loads web services, webDav and other client-related settings
+	 * Loads web services, webDav and other protocol settings
 	 * 
-	 * @return the client settings
+	 * @return the protocol settings
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIParameter[] loadClientSettings() throws ServerException;
+	public GUIParameter[] loadProtocolSettings() throws ServerException;
 
 	/**
 	 * Loads the complete settings set
 	 * 
 	 * @return all the settings
 	 * 
-* @throws ServerException an error happened in the server application
+	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIParameter[] loadSettings() throws ServerException;
 
@@ -110,6 +110,17 @@ public interface SettingService extends RemoteService {
 	public void saveStorageSettings(GUIParameter[] settings) throws ServerException;
 
 	/**
+	 * Tries to delete a storage and fails in case at least one folder is using it and also if the storage is marked as the default write one
+	 * 
+	 * @param storageId identifier of the storage to remove
+	 * 
+	 * @return list of paths using the storage
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public String[] removeStorage(int storageId) throws ServerException;
+
+	/**
 	 * Saves email settings (SMTP connection)
 	 * 
 	 * @param settings the SMTP settings
@@ -147,7 +158,7 @@ public interface SettingService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void saveExtensionAliases(String extension, String aliases) throws ServerException;
-	
+
 	public static class Instance {
 		private static SettingServiceAsync instance;
 

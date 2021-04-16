@@ -39,8 +39,6 @@ public class User extends PersistentObject implements Serializable {
 
 	public static int SOURCE_LDAP = 1;
 
-	public static int SOURCE_ACTIVE_DIRECTORY = 2;
-
 	public static final long USERID_ADMIN = 1;
 
 	private static final long serialVersionUID = 8093874904302301982L;
@@ -155,6 +153,11 @@ public class User extends PersistentObject implements Serializable {
 	 * Description of the grid that shows the results of a search
 	 */
 	private String hitsGrid;
+	
+	/**
+	 * Base64 representation of the avatar image
+	 */
+	private String avatar;
 
 	public User() {
 	}
@@ -406,6 +409,7 @@ public class User extends PersistentObject implements Serializable {
 		groups = new HashSet<Group>();
 		groupIds = null;
 		passwordExpires = 0;
+		avatar = null;
 	}
 
 	public String toString() {
@@ -514,7 +518,6 @@ public class User extends PersistentObject implements Serializable {
 	 * 
 	 * @see User#SOURCE_DEFAULT
 	 * @see User#SOURCE_LDAP
-	 * @see User#SOURCE_ACTIVE_DIRECTORY
 	 * 
 	 * @return the source
 	 */
@@ -681,5 +684,13 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setHitsGrid(String hitsGrid) {
 		this.hitsGrid = hitsGrid;
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
 	}
 }

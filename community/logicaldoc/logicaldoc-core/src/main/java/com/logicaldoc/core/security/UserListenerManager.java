@@ -52,7 +52,7 @@ public class UserListenerManager {
 		for (Extension ext : sortedExts) {
 			String className = ext.getParameter("class").valueAsString();
 			try {
-				Class clazz = Class.forName(className);
+				Class<?> clazz = Class.forName(className);
 				// Try to instantiate the listener
 				Object listener = clazz.getDeclaredConstructor().newInstance();
 				if (!(listener instanceof UserListener))

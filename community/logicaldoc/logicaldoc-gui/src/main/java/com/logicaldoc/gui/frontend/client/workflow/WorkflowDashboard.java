@@ -1,8 +1,14 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
+import java.util.ArrayList;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.PortalLayout;
@@ -91,7 +97,7 @@ public class WorkflowDashboard extends VLayout {
 		portalLayout.addPortlet(assignedTasks, 0, 0);
 		canOwnTasks = new WorkflowPortlet(this, TASKS_I_CAN_OWN);
 		portalLayout.addPortlet(canOwnTasks, 0, 1);
-		
+
 		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 			adminTasks = new WorkflowPortlet(this, TASKS_ADMIN);
 			portalLayout.addPortlet(adminTasks, 1, 0);
@@ -99,12 +105,45 @@ public class WorkflowDashboard extends VLayout {
 			supervisorTasks = new WorkflowPortlet(this, TASKS_SUPERVISOR);
 			portalLayout.addPortlet(supervisorTasks, 1, 1);
 		}
-		
+
 		involvedTasks = new WorkflowPortlet(this, TASKS_INVOLVED);
 		portalLayout.addPortlet(involvedTasks, 1, 1);
 
 		addMember(toolStrip);
 		addMember(portalLayout);
+	}
+
+	/**
+	 * Kills the given workflows
+	 * 
+	 * @param instanceIds Id of the instances to kill
+	 */
+	public void killWorkflows(ArrayList<String> instanceIds) {
+		ContactingServer.get().show();
+		WorkflowService.Instance.get().deleteInstances(instanceIds.toArray(new String[0]), new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+				ContactingServer.get().hide();
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				for (String id : instanceIds) {
+					if (assignedTasks != null)
+						assignedTasks.onDeletedWorkflow(id);
+					if (canOwnTasks != null)
+						canOwnTasks.onDeletedWorkflow(id);
+					if (adminTasks != null)
+						adminTasks.onDeletedWorkflow(id);
+					if (supervisorTasks != null)
+						supervisorTasks.onDeletedWorkflow(id);
+					if (involvedTasks != null)
+						involvedTasks.onDeletedWorkflow(id);
+				}
+				ContactingServer.get().hide();
+			}
+		});
 	}
 
 	public void refresh() {

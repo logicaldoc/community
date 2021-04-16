@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.smartgwt.client.types.HeaderControls;
@@ -124,12 +124,12 @@ public class SubscriptionDialog extends Window {
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(Void ret) {
-								Log.info(I18N.message("settingssaved"), null);
+								GuiLog.info(I18N.message("settingssaved"), null);
 								for (ListGridRecord record : selectedRecords) {
 									record.setAttribute("events", eventsStr);
 									if (option != null && !option.isEmpty())
@@ -236,12 +236,12 @@ public class SubscriptionDialog extends Window {
 							new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									Log.info(I18N.message("foldersubscribed"), null);
+									GuiLog.info(I18N.message("foldersubscribed"), null);
 									Session.get().getUser()
 											.setSubscriptions(Session.get().getUser().getSubscriptions() + 1);
 								}
@@ -251,12 +251,12 @@ public class SubscriptionDialog extends Window {
 							new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									Log.info(I18N.message("documentsubscribed"), null);
+									GuiLog.info(I18N.message("documentsubscribed"), null);
 									Session.get().getUser()
 											.setSubscriptions(Session.get().getUser().getSubscriptions() + 1);
 								}

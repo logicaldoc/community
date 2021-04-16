@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.sharefile;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.services.ShareFileService;
@@ -37,7 +37,7 @@ public class ShareFileSettings extends Window {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -92,7 +92,7 @@ public class ShareFileSettings extends Window {
 				form.getValueAsString("clientSecret"), new AsyncCallback<String>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

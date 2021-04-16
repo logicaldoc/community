@@ -21,25 +21,25 @@ import javax.ws.rs.core.MediaType;
 public interface AuthService {
 
 	@GET
-	@Path("/login")
+    @Path("/login")
 	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) throws Exception;
 
 	@POST
-	@Path("/login")
+    @Path("/login")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public String loginPost(@FormParam("username") String username, @FormParam("password") String password) throws Exception;
 
 	@POST
-	@Path("/login")
+    @Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public String loginPostJSON(String jsonstr) throws Exception;
 
 	@DELETE
-	@Path("/logout")
+    @Path("/logout")
 	public void logout(@QueryParam("sid") String sid);
 	
 	@GET
-	@Path("/getSid")
+    @Path("/getSid")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
 	public String getSid();	
 }

@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUIKeystore;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
@@ -69,7 +69,7 @@ public class TenantKeystorePanel extends VLayout {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -110,16 +110,17 @@ public class TenantKeystorePanel extends VLayout {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(2);
 
-		TextItem localCAalias = ItemFactory.newSimpleTextItem("localCAalias", "localcaalias",
+		TextItem localCAalias = ItemFactory.newSimpleTextItemPreventAutocomplete("localCAalias", "localcaalias",
 				keystore != null ? keystore.getOrganizationAlias() : null);
 		localCAalias.setRequired(true);
 		localCAalias.setSelectOnFocus(true);
 		localCAalias.setWrapTitle(false);
 
-		TextItem password = ItemFactory.newPasswordItem("password", "keystorepasswd", null);
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "keystorepasswd", null);
 		password.setRequired(true);
 		password.setWrapTitle(false);
-		PasswordItem passwordAgain = ItemFactory.newPasswordItem("passwordagain", "keystorepasswdagain", null);
+		PasswordItem passwordAgain = ItemFactory.newPasswordItemPreventAutocomplete("passwordagain",
+				"keystorepasswdagain", null);
 		passwordAgain.setRequired(true);
 		passwordAgain.setWrapTitle(false);
 		MatchesFieldValidator validator = new MatchesFieldValidator();
@@ -127,12 +128,11 @@ public class TenantKeystorePanel extends VLayout {
 		validator.setErrorMessage(I18N.message("passwordnotmatch"));
 		password.setValidators(validator);
 
-		StaticTextItem details = ItemFactory.newStaticTextItem(
-				"details",
-				"details",
-				(keystore != null && keystore.getOrganizationDN() != null) ? (keystore.getOrganizationDN() + " "
-						+ I18N.message("validtill") + ": " + I18N.formatDate(keystore.getOrganizationExpire())) : I18N
-						.message("error").toLowerCase());
+		StaticTextItem details = ItemFactory.newStaticTextItem("details", "details",
+				(keystore != null && keystore.getOrganizationDN() != null)
+						? (keystore.getOrganizationDN() + " " + I18N.message("validtill") + ": "
+								+ I18N.formatDate(keystore.getOrganizationExpire()))
+						: I18N.message("error").toLowerCase());
 		details.setWrap(false);
 		details.setColSpan(2);
 
@@ -188,7 +188,8 @@ public class TenantKeystorePanel extends VLayout {
 		TextItem width = ItemFactory.newTextItem("width", "width", keystore.getSignWidth());
 		width.setWidth(300);
 
-		final ColorItem color = ItemFactory.newColorItemPicker("color", "color", keystore.getSignFontColor(), true, null);
+		final ColorItem color = ItemFactory.newColorItemPicker("color", "color", keystore.getSignFontColor(), true,
+				null);
 
 		final RadioGroupItem visual = ItemFactory.newBooleanSelector("visual", "visual");
 		visual.setValue(keystore.isSignVisual() ? "yes" : "no");
@@ -214,7 +215,7 @@ public class TenantKeystorePanel extends VLayout {
 						@Override
 						public void onFailure(Throwable caught) {
 							ContactingServer.get().hide();
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -238,7 +239,7 @@ public class TenantKeystorePanel extends VLayout {
 						@Override
 						public void onFailure(Throwable caught) {
 							ContactingServer.get().hide();
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -274,7 +275,7 @@ public class TenantKeystorePanel extends VLayout {
 							SignService.Instance.get().deleteKeystore(tenantId, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -309,13 +310,24 @@ public class TenantKeystorePanel extends VLayout {
 			}
 		});
 
+		/*
+		 * Two invisible fields to 'mask' the real credentials to the browser
+		 * and prevent it to auto-fill the username and password we really use.
+		 */
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", "xyz");
+		fakeUsername.setCellStyle("nodisplay");
+		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake", "xyz");
+		fakePassword.setCellStyle("nodisplay");
+
 		if (ksAlreadyGenerated) {
 			password.setRequired(false);
 			passwordAgain.setRequired(false);
 			if (tenantId == Constants.TENANT_DEFAULTID)
-				form.setItems(details, validity, localCAalias, password, passwordAgain, keytoolCommand, opensslCommand);
+				form.setItems(fakeUsername, fakePassword, details, validity, localCAalias, password, passwordAgain,
+						keytoolCommand, opensslCommand);
 			else
-				form.setItems(details, validity, localCAalias, password, passwordAgain);
+				form.setItems(fakeUsername, fakePassword, details, validity, fakeUsername, fakePassword, localCAalias,
+						password, passwordAgain);
 			layout.addMember(form);
 			layout.addMember(signatureForm);
 
@@ -326,11 +338,11 @@ public class TenantKeystorePanel extends VLayout {
 			layout.addMember(label);
 
 			if (tenantId == Constants.TENANT_DEFAULTID)
-				form.setItems(validity, localCAalias, password, passwordAgain, organization, organizationalUnit,
-						countryCode, keytoolCommand, opensslCommand);
+				form.setItems(fakeUsername, fakePassword, validity, fakeUsername, fakePassword, localCAalias, password,
+						passwordAgain, organization, organizationalUnit, countryCode, keytoolCommand, opensslCommand);
 			else
-				form.setItems(validity, localCAalias, password, passwordAgain, organization, organizationalUnit,
-						countryCode);
+				form.setItems(fakeUsername, fakePassword, validity, fakeUsername, fakePassword, localCAalias, password,
+						passwordAgain, organization, organizationalUnit, countryCode);
 
 			layout.addMember(form);
 			layout.addMember(signatureForm);
@@ -361,11 +373,11 @@ public class TenantKeystorePanel extends VLayout {
 			keystore.setKeytoolPath((String) values.get("keytoolCommand"));
 			keystore.setOpenSSLPath((String) values.get("opensslCommand"));
 			try {
-				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU="
-						+ values.get("organizationalUnit") + ",C=" + values.get("countryCode").toString().toUpperCase());
+				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU=" + values.get("organizationalUnit")
+						+ ",C=" + values.get("countryCode").toString().toUpperCase());
 			} catch (Throwable t) {
 
-			}				
+			}
 
 		}
 		return !vm.hasErrors();

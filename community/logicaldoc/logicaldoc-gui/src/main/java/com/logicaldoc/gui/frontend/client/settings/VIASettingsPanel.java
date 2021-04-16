@@ -6,7 +6,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.beans.GUIVIASettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -22,6 +22,7 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
+import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -64,7 +65,7 @@ public class VIASettingsPanel extends AdminPanel {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -138,10 +139,10 @@ public class VIASettingsPanel extends AdminPanel {
 		mailaddress.setValue(account.getMailAddress());
 		mailaddress.setRequired(false);
 
-		TextItem username = ItemFactory.newTextItem("username", "username", account.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", account.getUsername());
 		username.setWidth(180);
 
-		TextItem password = ItemFactory.newPasswordItem("password", "password", account.getPassword());
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", account.getPassword());
 		password.setWidth(180);
 
 		TextItem server = ItemFactory.newTextItem("server", "server", account.getHost());
@@ -170,12 +171,12 @@ public class VIASettingsPanel extends AdminPanel {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
 										public void onSuccess(Void result) {
-											Log.info(I18N.message("cachedeleted"), null);
+											GuiLog.info(I18N.message("cachedeleted"), null);
 										}
 									});
 						}
@@ -192,18 +193,18 @@ public class VIASettingsPanel extends AdminPanel {
 					VIAService.Instance.get().save(settings, new AsyncCallback<GUIVIASettings>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(GUIVIASettings settings) {
-							Log.info(I18N.message("settingssaved"), null);
+							GuiLog.info(I18N.message("settingssaved"), null);
 							VIASettingsPanel.this.settings = settings;
 							EmailAccountService.Instance.get().test(settings.getEmailAccount().getId(),
 									new AsyncCallback<Boolean>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -220,7 +221,18 @@ public class VIASettingsPanel extends AdminPanel {
 			}
 		});
 
-		emailForm.setItems(mailaddress, server, username, password, protocol, port, ssl, folder, resetCache, testEmail);
+		/*
+		 * Two invisible fields to 'mask' the real credentials to the browser
+		 * and prevent it to auto-fill the username and password we really use.
+		 */
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", account.getUsername());
+		fakeUsername.setCellStyle("nodisplay");
+		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
+				account.getPassword());
+		fakePassword.setCellStyle("nodisplay");
+
+		emailForm.setItems(mailaddress, server, fakeUsername, fakePassword, username, password, protocol, port, ssl,
+				folder, resetCache, testEmail);
 
 		HLayout buttons = new HLayout();
 		buttons.setMembersMargin(5);
@@ -249,12 +261,12 @@ public class VIASettingsPanel extends AdminPanel {
 			VIAService.Instance.get().save(settings, new AsyncCallback<GUIVIASettings>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
 				public void onSuccess(GUIVIASettings settings) {
-					Log.info(I18N.message("settingssaved"), null);
+					GuiLog.info(I18N.message("settingssaved"), null);
 					VIASettingsPanel.this.settings = settings;
 					init();
 				}

@@ -12,12 +12,12 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.websockets.EventListener;
+import com.logicaldoc.gui.common.client.websockets.WebsocketListener;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.TagsForm;
@@ -76,7 +76,7 @@ public class Frontend implements EntryPoint {
 			public void onUncaughtException(Throwable caught) {
 				// Log unhandled errors only when in devel mode
 				if (Session.get().isDevel())
-					Log.error(caught.getMessage(), null, caught);
+					GuiLog.error(caught.getMessage(), null, caught);
 			}
 
 		});
@@ -183,7 +183,7 @@ public class Frontend implements EntryPoint {
 	public void connectWebsockets() {
 		if (Session.get().isServerPushEnabled()) {
 			websocket = new Websocket(Util.websocketUrl());
-			websocket.addListener(new EventListener());
+			websocket.addListener(new WebsocketListener());
 			websocket.open();
 		}
 	}

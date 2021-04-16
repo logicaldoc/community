@@ -4,11 +4,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.Avatar;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.ValueCallback;
@@ -26,6 +27,7 @@ import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -86,6 +88,9 @@ public class Profile extends Window {
 
 		detailsForm.setFields(firstName, lastName, language, address, postalCode, city, country, state, phone, cell,
 				quotaCount, quota);
+
+		HLayout detailsPanel = new HLayout();
+		detailsPanel.setMembers(detailsForm, new Avatar(user.getId()));
 
 		final DynamicForm emailForm = new DynamicForm();
 		emailForm.setHeight100();
@@ -206,7 +211,7 @@ public class Profile extends Window {
 		tabs.setHeight100();
 		tabs.setWidth100();
 		Tab detailsTab = new Tab(I18N.message("details"));
-		detailsTab.setPane(detailsForm);
+		detailsTab.setPane(detailsPanel);
 		Tab guiTab = new Tab(I18N.message("userinterface"));
 		guiTab.setPane(guiForm);
 		Tab emailTab = new Tab(I18N.message("email"));
@@ -277,7 +282,7 @@ public class Profile extends Window {
 			SecurityService.Instance.get().saveProfile(u, new AsyncCallback<GUIUser>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -306,7 +311,7 @@ public class Profile extends Window {
 
 					Profile.this.destroy();
 
-					Log.info(I18N.message("settingssaved"), null);
+					GuiLog.info(I18N.message("settingssaved"), null);
 				}
 			});
 		}

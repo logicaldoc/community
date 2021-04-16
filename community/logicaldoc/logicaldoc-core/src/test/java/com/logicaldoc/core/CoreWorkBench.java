@@ -1,5 +1,6 @@
 package com.logicaldoc.core;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,57 +9,71 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.mail.MessagingException;
 
+import org.apache.http.Consts;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
-import com.logicaldoc.core.document.Document;
-import com.logicaldoc.core.document.DocumentComparator;
+import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
+import com.talanlabs.avatargenerator.Avatar;
+import com.talanlabs.avatargenerator.IdenticonAvatar;
 
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		Document doc1 = new Document();
-		doc1.setId(1L);
-		doc1.setFileName("doc001.pdf");
-		doc1.setDate(df.parse("2020-05-20"));
-
-		Document doc2 = new Document();
-		doc2.setId(2L);
-		doc2.setFileName("doc002.pdf");
-		doc2.setDate(df.parse("2020-05-15"));
-
-		Document doc3 = new Document();
-		doc3.setId(3L);
-		doc3.setFileName("doc003.pdf");
-		doc3.setDate(df.parse("2020-05-16"));
+		Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(128, 128).build();
+		BufferedImage image = avatar.create(-1050);
+		System.out.println(image);
 		
-		Document doc4 = new Document();
-		doc4.setId(4L);
-		doc4.setFileName("doc004.pdf");
-		doc4.setDate(df.parse("2020-05-21"));
-		
-		List<Document> docs = new ArrayList<Document>();
-		docs.add(doc1);
-		docs.add(doc2);
-		docs.add(doc3);
-		docs.add(doc4);
+//		statsStuff();
 
-		Collections.sort(docs, DocumentComparator.getComparator("filename desc, date asc"));
-		for (Document doc : docs) {
-			System.out.println(doc.getFileName()+" > "+df.format(doc.getDate()));
-		}
+//		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+//		Document doc1 = new Document();
+//		doc1.setId(1L);
+//		doc1.setFileName("doc001.pdf");
+//		doc1.setDate(df.parse("2020-05-20"));
+//
+//		Document doc2 = new Document();
+//		doc2.setId(2L);
+//		doc2.setFileName("doc002.pdf");
+//		doc2.setDate(df.parse("2020-05-15"));
+//
+//		Document doc3 = new Document();
+//		doc3.setId(3L);
+//		doc3.setFileName("doc003.pdf");
+//		doc3.setDate(df.parse("2020-05-16"));
+//		
+//		Document doc4 = new Document();
+//		doc4.setId(4L);
+//		doc4.setFileName("doc004.pdf");
+//		doc4.setDate(df.parse("2020-05-21"));
+//		
+//		List<Document> docs = new ArrayList<Document>();
+//		docs.add(doc1);
+//		docs.add(doc2);
+//		docs.add(doc3);
+//		docs.add(doc4);
+//
+//		Collections.sort(docs, DocumentComparator.getComparator("filename desc, date asc"));
+//		for (Document doc : docs) {
+//			System.out.println(doc.getFileName()+" > "+df.format(doc.getDate()));
+//		}
 		//
 		// File xslt = new File("target/xslt");
 		// FileUtils.copyURLToFile(
@@ -83,6 +98,76 @@ public class CoreWorkBench {
 //		FileUtil.writeFile(bookSection.getSectionContent(), "c:/tmp/ebook.html");
 
 //		emailStuff();
+	}
+
+	static void statsStuff() throws ClientProtocolException, IOException {
+		List<NameValuePair> postParams = new ArrayList<NameValuePair>();
+
+		// Add all statistics as parameters
+		postParams.add(new BasicNameValuePair("id", "pippo"));
+		postParams.add(new BasicNameValuePair("userno", "pluto"));
+//		postParams.add(new BasicNameValuePair("sid", "paperino"));
+
+		postParams.add(new BasicNameValuePair("product_release", "8.6"));
+		postParams.add(new BasicNameValuePair("email", ""));
+		postParams.add(new BasicNameValuePair("product", "LogicalDOC"));
+		postParams.add(new BasicNameValuePair("product_name", "LogicalDOC Enterprise"));
+
+//		postParams.add(new BasicNameValuePair("java_version", javaversion != null ? javaversion : ""));
+//		postParams.add(new BasicNameValuePair("java_vendor", javavendor != null ? javavendor : ""));
+//		postParams.add(new BasicNameValuePair("java_arch", javaarch != null ? javaarch : ""));
+//		postParams.add(new BasicNameValuePair("dbms", "mysql"));
+
+//		postParams.add(new BasicNameValuePair("os_name", osname != null ? osname : ""));
+//		postParams.add(new BasicNameValuePair("os_version", osversion != null ? osversion : ""));
+//		postParams.add(new BasicNameValuePair("file_encoding", fileencoding != null ? fileencoding : ""));
+
+		postParams.add(new BasicNameValuePair("user_language", "en"));
+		postParams.add(new BasicNameValuePair("user_country", "us"));
+
+		// Sizing
+		postParams.add(new BasicNameValuePair("users", "20"));
+		postParams.add(new BasicNameValuePair("guests", "50"));
+		postParams.add(new BasicNameValuePair("groups", "50"));
+		postParams.add(new BasicNameValuePair("docs", "50"));
+		postParams.add(new BasicNameValuePair("archived_docs", "50"));
+		postParams.add(new BasicNameValuePair("folders", "50"));
+		postParams.add(new BasicNameValuePair("tags", "50"));
+		postParams.add(new BasicNameValuePair("versions", "50"));
+		postParams.add(new BasicNameValuePair("histories", "50"));
+		postParams.add(new BasicNameValuePair("user_histories", "50"));
+		postParams.add(new BasicNameValuePair("votes", "50"));
+
+		SimpleDateFormat isoDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
+		/*
+		 * Quotas
+		 */
+		postParams.add(new BasicNameValuePair("docdir", "50"));
+		postParams.add(new BasicNameValuePair("indexdir", "50"));
+		postParams.add(new BasicNameValuePair("quota", "50"));
+
+//		/*
+//		 * Registration
+//		 */
+//		postParams.add(new BasicNameValuePair("reg_name", regName != null ? regName : ""));
+//		postParams.add(new BasicNameValuePair("reg_email", regEmail != null ? regEmail : ""));
+//		postParams.add(new BasicNameValuePair("reg_organization", regOrganization != null ? regOrganization : ""));
+//		postParams.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
+
+		HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, Consts.UTF_8);
+		post.setEntity(entity);
+
+		CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
+
+		// Execute request
+		try (CloseableHttpResponse response = httpclient.execute(post)) {
+			int responseStatusCode = response.getStatusLine().getStatusCode();
+			// log status code
+			if (responseStatusCode != 200)
+				throw new IOException(HttpUtil.getBodyString(response));
+		}
 	}
 
 	static void emailStuff() throws MessagingException, IOException {

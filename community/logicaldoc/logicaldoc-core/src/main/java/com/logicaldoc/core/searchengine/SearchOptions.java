@@ -1,13 +1,14 @@
 package com.logicaldoc.core.searchengine;
 
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -106,25 +107,24 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
 	public static SearchOptions read(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
 		SearchOptions searchOptions = null;
-		// Deserialize from a file
-		ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-		try {
+
+		// Deserialize from a file (binay format)
+		try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
 			// Deserialize the object
 			searchOptions = (SearchOptions) in.readObject();
-		} finally {
-			in.close();
+		} catch (Throwable t) {
+			// Now try to deserialize using then XML format
+			try (XMLDecoder decoder = new XMLDecoder(new FileInputStream(file))) {
+				searchOptions = (SearchOptions) decoder.readObject();
+			}
 		}
 		return searchOptions;
 	}
 
 	public void write(File file) throws FileNotFoundException, IOException {
-		// Serialize to a file
-		ObjectOutput out = new ObjectOutputStream(new FileOutputStream(file));
-		try {
-			out.writeObject(this);
-		} finally {
-			out.flush();
-			out.close();
+		try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(file)))) {
+			encoder.writeObject(this);
+		} catch (FileNotFoundException fileNotFound) {
 		}
 	}
 

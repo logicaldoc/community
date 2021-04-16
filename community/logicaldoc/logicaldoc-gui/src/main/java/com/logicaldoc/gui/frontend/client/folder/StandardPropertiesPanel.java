@@ -13,7 +13,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -121,7 +121,7 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 					@Override
 					public void onFailure(Throwable caught) {
 						ContactingServer.get().hide();
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -152,12 +152,12 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 
 												@Override
 												public void onFailure(Throwable caught) {
-													Log.serverError(caught);
+													GuiLog.serverError(caught);
 												}
 
 												@Override
 												public void onSuccess(Void v) {
-													Log.info(I18N.message("processstartedwillbenotified"));
+													GuiLog.info(I18N.message("processstartedwillbenotified"));
 												}
 											});
 								}
@@ -193,9 +193,9 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 		else
 			description.setDisabled(true);
 
-		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon", Util.padLeft(
-				I18N.formatDate((Date) folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator(),
-				40));
+		StaticTextItem creation = ItemFactory.newStaticTextItem("creation", "createdon",
+				Util.textWithAvatar(folder.getCreatorId(), Util.padLeft(I18N.formatDate((Date) folder.getCreation())
+						+ " " + I18N.message("by") + " " + folder.getCreator(), 40)));
 		creation.setTooltip(
 				I18N.formatDate((Date) folder.getCreation()) + " " + I18N.message("by") + " " + folder.getCreator());
 		creation.setWidth(DEFAULT_ITEM_WIDTH);
@@ -252,7 +252,7 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -420,7 +420,7 @@ public class StandardPropertiesPanel extends FolderDetailTab {
 					@Override
 					public void onFailure(Throwable caught) {
 						ContactingServer.get().hide();
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

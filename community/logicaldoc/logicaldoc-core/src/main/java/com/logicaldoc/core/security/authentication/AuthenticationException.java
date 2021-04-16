@@ -6,7 +6,7 @@ package com.logicaldoc.core.security.authentication;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
  */
-public class AuthenticationException extends RuntimeException{
+public class AuthenticationException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 

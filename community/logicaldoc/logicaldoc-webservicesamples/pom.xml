@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.5.2</version>
+		<version>8.6.1</version>
 	</parent>
 	<artifactId>logicaldoc-webservicesamples</artifactId>
 	<name>logicaldoc-webservicesamples</name>
@@ -18,7 +18,7 @@
 			<artifactId>logicaldoc-webservice</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-		</dependency>
+		</dependency>    
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-core</artifactId>
@@ -30,7 +30,7 @@
 			<artifactId>logicaldoc-util</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-		</dependency>
+		</dependency>                      
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -53,21 +53,19 @@
 		<dependency>
 			<groupId>javax.activation</groupId>
 			<artifactId>activation</artifactId>
-		</dependency>
+		</dependency>		
 	</dependencies>
 	<repositories>
 		<repository>
 			<id>central</id>
-			<url>http://central.maven.org/maven2/</url>
+            <name>Central Repository</name>
+			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
 		<repository>
-			<id>central1</id>
-			<url>http://repo1.maven.org/maven2/</url>
-		</repository>
-		<repository>
-			<id>central2</id>
-			<url>http://repo2.maven.org/maven2/</url>
-		</repository>
+            <id>eclipse-releases</id>
+			<name>Eclipse Releases</name>
+			<url>https://repo.eclipse.org/content/groups/releases/</url>
+		</repository>        
 		<repository>
 			<id>logicaldoc</id>
 			<name>LogicalDOC Repository</name>
@@ -112,6 +110,7 @@
 			<id>java.net</id>
 			<url>https://maven.java.net/content/repositories/releases</url>
 		</repository>
+                
 	</repositories>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>

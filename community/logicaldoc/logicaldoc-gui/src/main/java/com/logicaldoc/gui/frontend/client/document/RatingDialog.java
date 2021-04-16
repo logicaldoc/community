@@ -7,13 +7,14 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.data.RatingsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
@@ -100,9 +101,7 @@ public class RatingDialog extends Window {
 				});
 
 				ListGridField user = new ListGridField("user", I18N.message("user"), 140);
-				ListGridField date = new ListGridField("date", I18N.message("date"));
-				date.setAlign(Alignment.CENTER);
-				date.setCellFormatter(new DateCellFormatter(true));
+				ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_SHORT);
 
 				ListGrid votesGrid = new ListGrid();
 				votesGrid.setWidth100();
@@ -158,13 +157,13 @@ public class RatingDialog extends Window {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 							destroy();
 						}
 
 						@Override
 						public void onSuccess(Integer rating) {
-							Log.info(I18N.message("votesaved"), null);
+							GuiLog.info(I18N.message("votesaved"), null);
 							afterSaveOrDelete(rating);
 						}
 					});
@@ -180,7 +179,7 @@ public class RatingDialog extends Window {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -212,7 +211,7 @@ public class RatingDialog extends Window {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -242,7 +241,7 @@ public class RatingDialog extends Window {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

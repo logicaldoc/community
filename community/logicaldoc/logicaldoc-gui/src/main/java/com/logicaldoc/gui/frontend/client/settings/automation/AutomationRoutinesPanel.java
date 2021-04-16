@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.data.AutomationRoutinesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -142,7 +142,7 @@ public class AutomationRoutinesPanel extends VLayout {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -191,7 +191,7 @@ public class AutomationRoutinesPanel extends VLayout {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override

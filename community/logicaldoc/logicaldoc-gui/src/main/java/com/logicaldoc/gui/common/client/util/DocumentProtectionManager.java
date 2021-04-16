@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
@@ -38,7 +38,7 @@ public class DocumentProtectionManager {
 		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -62,7 +62,7 @@ public class DocumentProtectionManager {
 
 														@Override
 														public void onFailure(Throwable caught) {
-															Log.serverError(caught);
+															GuiLog.serverError(caught);
 														}
 
 														@Override
@@ -78,7 +78,7 @@ public class DocumentProtectionManager {
 
 														@Override
 														public void onFailure(Throwable caught) {
-															Log.serverError(caught);
+															GuiLog.serverError(caught);
 														}
 
 														@Override

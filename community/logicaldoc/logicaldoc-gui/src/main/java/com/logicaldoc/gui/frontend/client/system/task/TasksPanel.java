@@ -9,10 +9,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.data.TasksDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.Alignment;
@@ -71,7 +71,7 @@ public class TasksPanel extends AdminPanel {
 						I18N.getLocale(), new AsyncCallback<GUITask>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -81,7 +81,7 @@ public class TasksPanel extends AdminPanel {
 										new AsyncCallback<Boolean>() {
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -113,7 +113,7 @@ public class TasksPanel extends AdminPanel {
 						new AsyncCallback<Boolean>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -138,7 +138,7 @@ public class TasksPanel extends AdminPanel {
 						new AsyncCallback<Boolean>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -164,7 +164,7 @@ public class TasksPanel extends AdminPanel {
 						new AsyncCallback<Boolean>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -232,7 +232,8 @@ public class TasksPanel extends AdminPanel {
 		label.setCellFormatter(new CellFormatter() {
 			@Override
 			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return I18N.messageWithDefault("task.name." + record.getAttributeAsString("name"), record.getAttributeAsString("name"));
+				return I18N.messageWithDefault("task.name." + record.getAttributeAsString("name"),
+						record.getAttributeAsString("name"));
 			}
 		});
 
@@ -247,17 +248,9 @@ public class TasksPanel extends AdminPanel {
 			}
 		});
 
-		ListGridField lastStart = new ListGridField("lastStart", I18N.message("laststart"), 110);
-		lastStart.setType(ListGridFieldType.DATE);
-		lastStart.setCellFormatter(new DateCellFormatter(false));
-		lastStart.setCanFilter(false);
-		lastStart.setAlign(Alignment.CENTER);
+		ListGridField lastStart = new DateListGridField("lastStart", "laststart");
 
-		ListGridField nextStart = new ListGridField("nextStart", I18N.message("nextstart"), 110);
-		nextStart.setType(ListGridFieldType.DATE);
-		nextStart.setCellFormatter(new DateCellFormatter(false));
-		nextStart.setCanFilter(false);
-		nextStart.setAlign(Alignment.CENTER);
+		ListGridField nextStart = new DateListGridField("nextStart", "nextstart");
 
 		ListGridField scheduling = new ListGridField("scheduling", I18N.message("scheduling"), 130);
 		scheduling.setCanFilter(false);
@@ -314,7 +307,7 @@ public class TasksPanel extends AdminPanel {
 							new AsyncCallback<GUITask>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -342,7 +335,7 @@ public class TasksPanel extends AdminPanel {
 							new AsyncCallback<GUITask>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -375,7 +368,7 @@ public class TasksPanel extends AdminPanel {
 				SystemService.Instance.get().loadTasks(I18N.getLocale(), new AsyncCallback<GUITask[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

@@ -5,16 +5,16 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
 import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
-import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.NavigatorDocumentsGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.widgets.Canvas;
@@ -49,14 +49,13 @@ public class DocumentsListPanel extends VLayout {
 		return visualizationMode;
 	}
 
-	public DocumentsListPanel(GUIFolder folder, Integer max, int visualizationMode) {
+	public DocumentsListPanel(GUIFolder folder, int visualizationMode) {
 		this.visualizationMode = visualizationMode;
 
 		if (visualizationMode == DocumentsGrid.MODE_LIST)
-			grid = new NavigatorDocumentsGrid(folder, max);
+			grid = new NavigatorDocumentsGrid(folder);
 		else if (visualizationMode == DocumentsGrid.MODE_GALLERY) {
-			DocumentsDS dataSource = new DocumentsDS(folder, null, max, 1, null, false, false, null);
-			grid = new DocumentsTileGrid(folder, dataSource);
+			grid = new DocumentsTileGrid(folder);
 		}
 
 		// Prepare a panel containing a title and the documents list
@@ -124,7 +123,7 @@ public class DocumentsListPanel extends VLayout {
 						new AsyncCallback<GUIDocument>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -150,13 +149,13 @@ public class DocumentsListPanel extends VLayout {
 	 * Refreshes the grid getting the documents from the given folder
 	 * 
 	 * @param folder the folder being opened
-	 * @param max maximum number of elements
 	 */
-	public void updateData(GUIFolder folder, Integer max) {
+	public void updateData(GUIFolder folder) {
 		if (grid.getFolder() == null || (grid.getFolder() != null && grid.getFolder().getId() != folder.getId()))
 			grid.loadGridLayout(folder);
-		DocumentsDS dataSource = new DocumentsDS(folder, null, max, grid.getGridCursor().getCurrentPage(), null, false,
-				false, (grid instanceof DocumentsListGrid ? GridUtil.getSortSpec((DocumentsListGrid) grid) : null));
+		DocumentsDS dataSource = new DocumentsDS(folder, null, grid.getGridCursor().getPageSize(), grid.getGridCursor().getCurrentPage(), null, false,
+				false,
+				(grid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) grid) : null));
 		grid.fetchNewData(dataSource);
 
 	}

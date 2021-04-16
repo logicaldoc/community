@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -252,21 +253,33 @@ public class WSUtil {
 		}
 		return null;
 	}
+	
+	public static String convertDateToStringWithMillis(Date date) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
+		try {
+			return df.format(date);
+		} catch (Exception e) {
+			df = new SimpleDateFormat("yyyy-MM-dd");
+			try {
+				return df.format(date);
+			} catch (Exception e1) {
+			}
+		}
+		return null;
+	}
+
 
 	public static Date convertStringToDate(String date) {
 		if (StringUtils.isEmpty(date))
 			return null;
 
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 		try {
-			return df.parse(date);
+			return DateUtils.parseDate(date, "yyyy-MM-dd HH:mm:ss.SSS Z", "yyyy-MM-dd HH:mm:ss.SS Z",
+					"yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd");
 		} catch (ParseException e) {
-			df = new SimpleDateFormat("yyyy-MM-dd");
-			try {
-				return df.parse(date);
-			} catch (ParseException e1) {
-			}
+			log.error("Unparseable date {}", date);
 		}
+
 		return null;
 	}
 

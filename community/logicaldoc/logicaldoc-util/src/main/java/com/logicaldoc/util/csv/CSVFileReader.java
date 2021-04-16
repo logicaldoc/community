@@ -1,6 +1,7 @@
 package com.logicaldoc.util.csv;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -29,7 +30,7 @@ import java.util.Vector;
  *         variable textQualifier and Vector with explicit String type)
  * @version %I%, %G%
  */
-public class CSVFileReader extends CSVFile {
+public class CSVFileReader extends CSVFile implements Closeable {
 	/**
 	 * The buffered reader linked to the CSV file to be read.
 	 */
@@ -127,6 +128,7 @@ public class CSVFileReader extends CSVFile {
 	 * 
 	 * @throws IOException If an error occurs while closing the file
 	 */
+	@Override
 	public void close() throws IOException {
 		in.close();
 	}

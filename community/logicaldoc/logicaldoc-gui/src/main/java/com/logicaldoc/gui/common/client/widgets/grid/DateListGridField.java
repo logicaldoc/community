@@ -1,0 +1,73 @@
+package com.logicaldoc.gui.common.client.widgets.grid;
+
+import java.util.Date;
+
+import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.widgets.grid.CellFormatter;
+import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
+
+/**
+ * A filed to display dates in cells that contains a user reference
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 8.6.1
+ */
+public class DateListGridField extends ListGridField {
+
+	public DateListGridField(String name, String title, int format) {
+		super(name, I18N.message(title));
+		setAlign(Alignment.CENTER);
+		setType(ListGridFieldType.DATE);
+		setCellFormatter(new DateCellFormatter(format));
+		setCanFilter(false);
+		setCanSort(true);
+		if (format == DateCellFormatter.FORMAT_LONG)
+			setWidth(125);
+		else if (format == DateCellFormatter.FORMAT_SHORT)
+			setWidth(80);
+		else
+			setWidth(110);
+	}
+
+	public DateListGridField(String name, String title) {
+		this(name, I18N.message(title), DateCellFormatter.FORMAT_DEFAULT);
+	}
+
+	/**
+	 * Utility formatter for those cells that contains dates
+	 * 
+	 * @author Marco Meschieri - LogicalDOC
+	 * @since 6.0
+	 */
+	public class DateCellFormatter implements CellFormatter {
+
+		public final static int FORMAT_DEFAULT = 0;
+
+		public final static int FORMAT_SHORT = 1;
+
+		public final static int FORMAT_LONG = 2;
+
+		private int format = FORMAT_DEFAULT;
+
+		@Override
+		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			if (format == FORMAT_SHORT)
+				return I18N.formatDateShort((Date) value);
+			else if (format == FORMAT_LONG)
+				return I18N.formatDateLong((Date) value);
+			else
+				return I18N.formatDate((Date) value);
+		}
+
+		public DateCellFormatter(int format) {
+			this.format = format;
+		}
+
+		public DateCellFormatter() {
+			this.format = FORMAT_DEFAULT;
+		}
+	}
+}

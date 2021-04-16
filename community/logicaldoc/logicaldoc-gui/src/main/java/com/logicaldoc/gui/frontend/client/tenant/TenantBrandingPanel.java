@@ -266,6 +266,8 @@ public class TenantBrandingPanel extends HLayout {
 						html = tenant.getBranding().getLogoSrc();
 					else if (name.equals("logo_head"))
 						html = tenant.getBranding().getLogoHeadSrc();
+					else if (name.equals("logo_menu"))
+						html = tenant.getBranding().getLogoMenuSrc();
 					else if (name.equals("logo_oem"))
 						html = tenant.getBranding().getLogoOemSrc();
 					else if (name.equals("logo_head_oem"))
@@ -305,6 +307,10 @@ public class TenantBrandingPanel extends HLayout {
 		rec = new ListGridRecord();
 		rec.setAttribute("name", "logo_head");
 		rec.setAttribute("image", tenant.getBranding().getLogoHeadSrc());
+		records.add(rec);
+		rec = new ListGridRecord();
+		rec.setAttribute("name", "logo_menu");
+		rec.setAttribute("image", tenant.getBranding().getLogoMenuSrc());
 		records.add(rec);
 		rec = new ListGridRecord();
 		rec.setAttribute("name", "banner");
@@ -358,6 +364,9 @@ public class TenantBrandingPanel extends HLayout {
 				} else if ("logo_head".equals(name)) {
 					tenant.getBranding().setLogoHeadSrc(model.getLogoHeadSrc());
 					image = model.getLogoHead();
+				} else if ("logo_menu".equals(name)) {
+					tenant.getBranding().setLogoMenuSrc(model.getLogoMenuSrc());
+					image = model.getLogoMenu();					
 				} else if ("logo_oem".equals(name)) {
 					tenant.getBranding().setLogoOemSrc(model.getLogoOemSrc());
 					image = model.getLogoOem();
@@ -399,6 +408,8 @@ public class TenantBrandingPanel extends HLayout {
 			tenant.getBranding().setLogoSrc(content);
 		else if (imageName.equals("logo_head"))
 			tenant.getBranding().setLogoHeadSrc(content);
+		else if (imageName.equals("logo_menu"))
+			tenant.getBranding().setLogoMenuSrc(content);
 		else if (imageName.equals("logo_oem"))
 			tenant.getBranding().setLogoOemSrc(content);
 		else if (imageName.equals("logo_head_oem"))

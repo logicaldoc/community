@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.impex.folders;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIImportFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.ImportFolderService;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -57,7 +57,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 							new AsyncCallback<GUIImportFolder>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -152,7 +152,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 			ImportFolderService.Instance.get().save(importFolder, new AsyncCallback<GUIImportFolder>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override

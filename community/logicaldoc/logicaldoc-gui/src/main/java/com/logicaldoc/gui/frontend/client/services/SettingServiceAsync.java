@@ -6,7 +6,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 
 public interface SettingServiceAsync {
 
-	void loadClientSettings(AsyncCallback<GUIParameter[]> callback);
+	void loadProtocolSettings(AsyncCallback<GUIParameter[]> callback);
 
 	void saveSettings(GUIParameter[] settings, AsyncCallback<Void> callback);
 
@@ -31,4 +31,6 @@ public interface SettingServiceAsync {
 	void saveStorageSettings(GUIParameter[] settings, AsyncCallback<Void> callback);
 
 	void saveExtensionAliases(String extension, String aliases, AsyncCallback<Void> callback);
+
+	void removeStorage(int storageId, AsyncCallback<String[]> callback);
 }

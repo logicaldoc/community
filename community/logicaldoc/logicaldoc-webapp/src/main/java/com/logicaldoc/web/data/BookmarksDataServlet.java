@@ -87,7 +87,7 @@ public class BookmarksDataServlet extends HttpServlet {
 				writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[1]))
 						+ "</icon>");
 				else
-					writer.print("<icon>folder_closed</icon>");	
+					writer.print("<icon>folder</icon>");	
 				writer.print("<name><![CDATA[" + (cols[2] == null ? "" : cols[2]) + "]]></name>");
 				writer.print("<description><![CDATA[" + (cols[3] == null ? "" : cols[3]) + "]]></description>");
 				writer.print("<position>" + (cols[4] == null ? "" : cols[4]) + "</position>");

@@ -96,7 +96,7 @@ public interface TagService {
 	 */
 	@GET
 	@Path("/getFolderTags")
-	public String[] getFolderTags(@FormParam("folderId") long folderId) throws Exception;
+	public String[] getFolderTags(@QueryParam("folderId") long folderId) throws Exception;
 
 	/**
 	 * Retrieves all the tags in the repository

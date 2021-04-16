@@ -42,10 +42,8 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 		super(locator, factory, session, config, resource);
 	}
 
-	@SuppressWarnings("rawtypes")
 	public DavResourceIterator getMembers() {
-		ArrayList list = new ArrayList();
-		return new DavResourceIteratorImpl(list);
+		return new DavResourceIteratorImpl(new ArrayList<DavResource>());
 	}
 
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
@@ -56,7 +54,7 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 		throw new UnsupportedOperationException();
 	}
 
-	public void setProperty(DavProperty property) throws DavException {
+	public void setProperty(DavProperty<?> property) throws DavException {
 		throw new DavException(DavServletResponse.SC_FORBIDDEN);
 	}
 

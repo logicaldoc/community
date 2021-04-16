@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -79,7 +79,7 @@ public class PreviewPanel extends VLayout {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -160,7 +160,7 @@ public class PreviewPanel extends VLayout {
 		DocumentService.Instance.get().extractEmail(docId, document.getFileVersion(), new AsyncCallback<GUIEmail>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -192,7 +192,7 @@ public class PreviewPanel extends VLayout {
 				contents = Util.videoHTML(url, getWidth() != null ? "" + (getWidth() - 2) : "",
 						getHeight() != null ? "" + (getHeight() - 1) : "");
 		} catch (Throwable t) {
-			Log.info(t.getMessage(), null);
+			GuiLog.info(t.getMessage(), null);
 		}
 
 		media.setContents(contents);
@@ -243,7 +243,7 @@ public class PreviewPanel extends VLayout {
 		String contents = "";
 
 		long maxFileSize = Session.get().getConfigAsLong("gui.preview.maxfilesize") * 1024 * 1024;
-		if (maxFileSize > 0 && maxFileSize < document.getFileSize()) {
+		if (maxFileSize > 0 && document.getFileSize() != null && maxFileSize < document.getFileSize()) {
 			contents = "<div><br><center><b>" + I18N.message("doctoobigtoberendered") + "</b></center></br></div>";
 		} else {
 			try {

@@ -71,13 +71,52 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			if (user != null)
 				break;
 		}
+		
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		if (user != null) {
+			userDao.initialize(user);
+		} else if (!errors.isEmpty()) {
+			// In case of multiple errors, we consider the first one that is
+			// not a UserNotFound exception because it is normal that some
+			// authenticator does not find this user because not in it's domain
+			if (errors.size() > 1)
+				for (AuthenticationException err : errors)
+					if (!(err instanceof AccountNotFoundException))
+						throw err;
+			throw errors.get(0);
+		}
+		
+		return user;
+	}
+	
+	@Override
+	public User pickUser(String username) {
+		if (authenticators == null || authenticators.isEmpty())
+			init();
+		
+		User user = null;
+		for (Authenticator cmp : authenticators) {
+			if (!cmp.isEnabled())
+				continue;
 
+			// Validates an user for valid login credentials if a specific
+			// component handles this user explicitly (e.g. admin is
+			// DefaultAuthentication)
+			if (cmp.canAuthenticateUser(username)) {
+				try {
+					user = cmp.pickUser(username);
+				} catch (Throwable t) {
+					log.warn("Cannot pick user {} using authenticator {}", username, cmp.getClass().getName(), t);
+				}
+			}
+
+			if (user != null)
+				break;
+		}
+		
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		if (user != null)
 			userDao.initialize(user);
-		else if (!errors.isEmpty())
-			throw errors.get(0);
-
 		return user;
 	}
 
@@ -153,9 +192,10 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		if (sortedExts.isEmpty())
 			authenticators.add((Authenticator) context.getBean(DefaultAuthenticator.class));
 
-		for (Authenticator auth : authenticators)
-			log.info("Added authenticator {}", auth.getClass().getSimpleName());
-		log.info("Authentication chain initialized");
+		for (Authenticator auth : authenticators) {	
+			log.warn("Added authenticator {}", auth.getClass().getSimpleName());
+		}
+		log.warn("Authentication chain initialized");
 	}
 
 	@Override

@@ -4,21 +4,21 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.GridUtil;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -80,23 +80,23 @@ public class WorkflowHistoriesPanel extends VLayout {
 
 		ListGridField historyEvent = new ListGridField("event", I18N.message("event"), 200);
 		ListGridField historyName = new ListGridField("name", I18N.message("task"), 150);
-		
-		ListGridField historyDate = new ListGridField("date", I18N.message("date"), 120);
-		historyDate.setAlign(Alignment.CENTER);
-		historyDate.setType(ListGridFieldType.DATE);
-		historyDate.setCellFormatter(new DateCellFormatter(false));
-		historyDate.setCanFilter(false);
-		ListGridField historyUser = new ListGridField("user", I18N.message("user"), 120);
+
+		ListGridField historyDate = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
+
+		ListGridField historyUser = new AvatarListGridField("user", "userId", "user", 130);
 		ListGridField historyComment = new ListGridField("comment", I18N.message("comment"));
 		historyComment.setWidth("*");
 		historyComment.setHidden(!showComment);
-		ListGridField historyFilename = new ListGridField("filename", I18N.message("document"), 180);
+		FileNameListGridField historyFilename = new FileNameListGridField();
 		ListGridField documentId = new ListGridField("documentId", I18N.message("docid"), 80);
 		documentId.setHidden(true);
 		ListGridField historySid = new ListGridField("sessionid", I18N.message("sid"), 240);
 		historySid.setHidden(true);
 		ListGridField transition = new ListGridField("transition", I18N.message("transition"), 120);
 		transition.setHidden(true);
+
+		ListGridField templateId = new ListGridField("templateId", I18N.message("templateid"), 70);
+		templateId.setHidden(true);
 		ListGridField templateVersion = new ListGridField("templateVersion", I18N.message("version"), 70);
 		templateVersion.setHidden(true);
 
@@ -110,13 +110,13 @@ public class WorkflowHistoriesPanel extends VLayout {
 		historiesGrid.sort("date", SortDirection.ASCENDING);
 		historiesGrid.setBorder("1px solid #E1E1E1");
 		if (wfInstanceId != null && wfTemplateId != null)
-			historiesGrid.setDataSource(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null));
+			historiesGrid.setDataSource(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null, null));
 		if (Menu.enabled(Menu.SESSIONS))
-			historiesGrid.setFields(historyId, templateVersion, historyEvent, historyName, historyDate, historyUser, historyComment,
-					historyFilename, transition, documentId, historySid);
+			historiesGrid.setFields(historyId, templateVersion, templateId, historyEvent, historyName, historyDate,
+					historyUser, historyComment, historyFilename, transition, documentId, historySid);
 		else
-			historiesGrid.setFields(historyId, templateVersion, historyEvent, historyName, historyDate, historyUser, historyComment,
-					historyFilename, transition, documentId);
+			historiesGrid.setFields(historyId, templateVersion, templateId, historyEvent, historyName, historyDate,
+					historyUser, historyComment, historyFilename, transition, documentId);
 		historiesGrid.addCellContextClickHandler(new CellContextClickHandler() {
 
 			@Override
@@ -137,7 +137,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 		exportButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(historiesGrid, true);
+				GridUtil.exportCSV(historiesGrid, true);
 			}
 		});
 
@@ -147,7 +147,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { historiesGrid });
+				GridUtil.print(historiesGrid);
 			}
 		});
 
@@ -161,7 +161,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 		}
 
 		if (wfInstanceId != null && wfTemplateId != null) {
-			historiesGrid.refresh(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null));
+			historiesGrid.refresh(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null, null));
 			historiesGrid.fetchData();
 		}
 	}
@@ -177,7 +177,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

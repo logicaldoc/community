@@ -339,6 +339,14 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 					manager.createTile(doc, fileVersion, sid);
 				else if (type.equals(ThumbnailManager.SUFFIX_MOBILE))
 					manager.createMobile(doc, fileVersion, sid);
+				else if (type.startsWith(ThumbnailManager.THUMB) && !type.equals(ThumbnailManager.SUFFIX_THUMB)) {
+					/*
+					 * In this case the resource is like thumb450.png so we
+					 * extract the size from the name
+					 */
+					String sizeStr = resource.substring(resource.indexOf('-') + 6, resource.lastIndexOf('.'));
+					manager.createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
+				}
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -629,31 +637,6 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
-	public WSDocument[] getVersions(String sid, long docId) throws Exception {
-		User user = validateSession(sid);
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Document doc = docDao.findById(docId);
-		if (doc == null)
-			throw new Exception("unexisting document " + docId);
-
-		checkReadEnable(user, doc.getFolder().getId());
-
-		doc = docDao.findDocument(docId);
-		checkPublished(user, doc);
-
-		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
-		List<Version> versions = versDao.findByDocId(doc.getId());
-		WSDocument[] wsVersions = new WSDocument[versions.size()];
-		for (int i = 0; i < versions.size(); i++) {
-			versDao.initialize(versions.get(i));
-			wsVersions[i] = WSUtil.toWSDocument(versions.get(i));
-			wsVersions[i].setComment(versions.get(i).getComment());
-		}
-
-		return wsVersions;
-	}
-
-	@Override
 	public WSDocument[] getRecentDocuments(String sid, Integer max) throws Exception {
 		User user = validateSession(sid);
 
@@ -735,9 +718,9 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				}
 
 				// Create the document history event
-				DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 				DocumentHistory history = new DocumentHistory();
 				history.setSessionId(sid);
+				history.setDocument(doc);
 				history.setDocId(doc.getId());
 				history.setEvent(DocumentEvent.SENT.toString());
 				history.setUser(user);
@@ -745,7 +728,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				history.setFilename(doc.getFileName());
 				history.setVersion(doc.getVersion());
 				history.setPath(folderDao.computePathExtended(doc.getFolder().getId()));
-				dao.store(history);
+				docDao.saveDocumentHistory(doc, history);
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -836,9 +819,13 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 	@Override
 	public void reindex(String sid, long docId, String content) throws Exception {
-		validateSession(sid);
+		User user = validateSession(sid);
 		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-		documentManager.reindex(docId, content);
+
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setSessionId(sid);
+		transaction.setUser(user);
+		documentManager.reindex(docId, content, transaction);
 	}
 
 	@Override
@@ -1251,5 +1238,54 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			log.error(e.getMessage(), e);
 			throw new Exception(e);
 		}
+	}
+
+	@Override
+	public WSDocument getVersion(String sid, long docId, String version) throws Exception {
+		User user = validateSession(sid);
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Document doc = docDao.findById(docId);
+		if (doc == null)
+			throw new Exception("unexisting document " + docId);
+
+		checkReadEnable(user, doc.getFolder().getId());
+
+		doc = docDao.findDocument(docId);
+		checkPublished(user, doc);
+
+		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
+		Version ver = versDao.findByVersion(docId, version);
+		if (ver != null) {
+			versDao.initialize(ver);
+			WSDocument wsVersion = WSUtil.toWSDocument(ver);
+			wsVersion.setComment(ver.getComment());
+			return wsVersion;
+		}
+		return null;
+	}
+
+	@Override
+	public WSDocument[] getVersions(String sid, long docId) throws Exception {
+		User user = validateSession(sid);
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Document doc = docDao.findById(docId);
+		if (doc == null)
+			throw new Exception("unexisting document " + docId);
+
+		checkReadEnable(user, doc.getFolder().getId());
+
+		doc = docDao.findDocument(docId);
+		checkPublished(user, doc);
+
+		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
+		List<Version> versions = versDao.findByDocId(doc.getId());
+		WSDocument[] wsVersions = new WSDocument[versions.size()];
+		for (int i = 0; i < versions.size(); i++) {
+			versDao.initialize(versions.get(i));
+			wsVersions[i] = WSUtil.toWSDocument(versions.get(i));
+			wsVersions[i].setComment(versions.get(i).getComment());
+		}
+
+		return wsVersions;
 	}
 }

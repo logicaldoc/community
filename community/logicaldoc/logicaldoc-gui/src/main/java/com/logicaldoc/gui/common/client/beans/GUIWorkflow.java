@@ -51,7 +51,7 @@ public class GUIWorkflow implements Serializable {
 	public GUIWFState getStateById(String id) {
 		if (states != null && states.length > 0) {
 			for (GUIWFState state : states) {
-				if (state.getId().equals(id)) {
+				if (state.getId().trim().equals(id.trim())) {
 					return state;
 				}
 			}
@@ -62,7 +62,7 @@ public class GUIWorkflow implements Serializable {
 	public GUIWFState getStateByName(String name) {
 		if (states != null && states.length > 0) {
 			for (GUIWFState state : states) {
-				if (state.getName().equals(name)) {
+				if (state.getName().trim().equals(name.trim())) {
 					return state;
 				}
 			}

@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
@@ -22,7 +22,7 @@ import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
-import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
@@ -79,7 +79,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		if (visualizationMode == DocumentsGrid.MODE_LIST)
 			grid = new SearchHitsGrid();
 		else if (visualizationMode == DocumentsGrid.MODE_GALLERY)
-			grid = new DocumentsTileGrid(null, null);
+			grid = new DocumentsTileGrid(null);
 
 		grid.registerSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
@@ -106,7 +106,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -130,7 +130,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -153,7 +153,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			removeMember(searchCursor);
 
 		searchCursor = new Cursor();
-		Integer pageSize = GridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
+		Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
 		if (pageSize == null)
 			pageSize = Session.get().getConfigAsInt("search.hits");
 		searchCursor.setPageSize(pageSize);
@@ -195,7 +195,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 			grid.setDocuments(result);
 
 		if (Search.get().isHasMore())
-			Log.warn(I18N.message("possiblemorehits"), I18N.message("possiblemorehitsdetail"));
+			GuiLog.warn(I18N.message("possiblemorehits"), I18N.message("possiblemorehitsdetail"));
 
 		searchCursor.setPageSize(options.getMaxHits());
 	}

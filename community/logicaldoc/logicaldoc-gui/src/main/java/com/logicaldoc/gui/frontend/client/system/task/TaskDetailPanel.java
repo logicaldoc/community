@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITask;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
@@ -68,7 +68,7 @@ public class TaskDetailPanel extends VLayout {
 						new AsyncCallback<GUITask>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -175,7 +175,7 @@ public class TaskDetailPanel extends VLayout {
 			SystemService.Instance.get().saveTask(task, I18N.getLocale(), new AsyncCallback<GUITask>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -184,7 +184,7 @@ public class TaskDetailPanel extends VLayout {
 						tasksPanel.updateSelectedRecord(task);
 						tabSet.hideSave();
 					} else {
-						Log.error(I18N.message("genericerror"), null, null);
+						GuiLog.error(I18N.message("genericerror"), null, null);
 					}
 				}
 			});

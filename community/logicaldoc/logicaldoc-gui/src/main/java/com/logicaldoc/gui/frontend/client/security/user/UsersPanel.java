@@ -11,13 +11,15 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationDialog;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -105,7 +107,7 @@ public class UsersPanel extends AdminPanel {
 		export.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 		if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -120,7 +122,7 @@ public class UsersPanel extends AdminPanel {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addFill();
@@ -176,14 +178,16 @@ public class UsersPanel extends AdminPanel {
 		ListGridField enabled = new ListGridField("_enabled", I18N.message("enabled"), 55);
 		enabled.setCanFilter(true);
 		enabled.setHidden(true);
-		
+
 		ListGridField guest = new ListGridField("guest", I18N.message("guest"), 55);
 		guest.setCanFilter(true);
 		guest.setHidden(true);
-		
+
 		ListGridField groups = new ListGridField("groups", I18N.message("groups"), 200);
 		groups.setCanFilter(true);
 		groups.setCellFormatter(new UserCellFormatter());
+
+		AvatarListGridField avatar = new AvatarListGridField(true);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -193,7 +197,7 @@ public class UsersPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
-		list.setFields(id, eenabled, username, firstName, name, email, phone, cell, groups, enabled, guest);
+		list.setFields(id, eenabled, avatar, username, firstName, name, email, phone, cell, groups, enabled, guest);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -220,7 +224,7 @@ public class UsersPanel extends AdminPanel {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -256,6 +260,7 @@ public class UsersPanel extends AdminPanel {
 			list.selectRecord(record);
 		}
 
+		record.setAttribute("avatar", user.getId());
 		record.setAttribute("username", user.getUsername());
 		record.setAttribute("name", user.getName());
 		record.setAttribute("firstName", user.getFirstName());
@@ -309,7 +314,7 @@ public class UsersPanel extends AdminPanel {
 							SecurityService.Instance.get().deleteUser(id, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -346,7 +351,7 @@ public class UsersPanel extends AdminPanel {
 				dialog.show();
 			}
 		});
-		
+
 		MenuItem twoTactorsAuth = new MenuItem();
 		twoTactorsAuth.setTitle(I18N.message("twofactorsauth"));
 		twoTactorsAuth.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
@@ -356,7 +361,7 @@ public class UsersPanel extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -384,10 +389,10 @@ public class UsersPanel extends AdminPanel {
 				password.setEnabled(false);
 			}
 		}
-		
+
 		contextMenu.showContextMenu();
 	}
-	
+
 	void refresh() {
 		list.refresh(new UsersDS(null, true, false));
 	}

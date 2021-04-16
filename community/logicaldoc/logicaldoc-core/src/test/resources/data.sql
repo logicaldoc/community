@@ -70,55 +70,55 @@ insert into ld_usergroup
 values (-5,5);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (99,'2008-10-22 00:00:00',0,'menu.admin',2,'administration.gif',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (99,'2008-10-22 00:00:00',0,'menu.admin',2,'administration.gif',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (2000,'2008-10-22 00:00:00',0,'menu.adminxxx',2,'administration.gif',3,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (2000,'2008-10-22 00:00:00',0,'menu.adminxxx',2,'administration.gif',3,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (101,'2008-10-22 00:00:00',0,'text',2000,'administration.gif',3,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (101,'2008-10-22 00:00:00',0,'text',2000,'administration.gif',3,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (102,'2008-10-22 00:00:00',0,'menu.admin',101,'administration.gif',3,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (102,'2008-10-22 00:00:00',0,'menu.admin',101,'administration.gif',3,1,1,1,1);
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (103,'2008-10-22 00:00:00',0,'menu.admin',101,'administration.gif',3,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (103,'2008-10-22 00:00:00',0,'menu.admin',101,'administration.gif',3,1,1,1,1);
 insert into ld_menu
-           (ld_id,ld_securityref,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (104,103,'2008-10-22 00:00:00',0,'menu.admin',101,'administration.gif',3,1,1,1);
+           (ld_id,ld_securityref,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (104,103,'2008-10-22 00:00:00',0,'menu.admin',101,'administration.gif',3,1,1,1,1);
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1041,'2008-10-22 00:00:00',0,'menu.admin',104,'administration.gif',3,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1041,'2008-10-22 00:00:00',0,'menu.admin',104,'administration.gif',3,1,1,1,1);
 
 
 
 insert into ld_menu
-           (ld_id,ld_securityref,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1000,103,'2008-10-22 00:00:00',1,'menu.admin.1000',2,'administration.gif',5,1,1,1);
+           (ld_id,ld_securityref,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1000,103,'2008-10-22 00:00:00',1,'menu.admin.1000',2,'administration.gif',5,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1100,'2008-10-22 00:00:00',1,'menu.admin.1100',1000,'administration.gif',5,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1100,'2008-10-22 00:00:00',1,'menu.admin.1100',1000,'administration.gif',5,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_securityref,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1200,103,'2009-10-19 00:00:00',0,'test',2,'administration.gif',3,1,1,1);
+           (ld_id,ld_securityref,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1200,103,'2009-10-19 00:00:00',0,'test',2,'administration.gif',3,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1201,'2009-10-19 00:00:00',0,'ABC',1200,'administration.gif',3,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1201,'2009-10-19 00:00:00',0,'ABC',1200,'administration.gif',3,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1202,'2009-10-19 00:00:00',0,'xyz',1201,'administration.gif',3,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1202,'2009-10-19 00:00:00',0,'xyz',1201,'administration.gif',3,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1203,'2009-10-19 00:00:00',0,'qqqq',1201,'administration.gif',3,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1203,'2009-10-19 00:00:00',0,'qqqq',1201,'administration.gif',3,1,1,1,1);
 
 
 insert into ld_menugroup (ld_menuid, ld_groupid, ld_write) values (2000,3,1);
@@ -173,7 +173,7 @@ values (1202, 0, 0, 0, 'test_val_1', 'val1',0,0,0);
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_deleteuserid,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
 values (1204,CURRENT_TIMESTAMP,1,'deleted',1201,0,0,3,1,1,7,0);
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
-values (1210,CURRENT_TIMESTAMP,0,'ölard',4,0,0,1,1,8,0);
+values (1210,CURRENT_TIMESTAMP,0,'Elard',4,0,0,1,1,8,0);
 
 insert into ld_foldergroup(ld_folderid, ld_groupid, ld_write , ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
 values (6,2,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0);
@@ -377,17 +377,17 @@ insert into ld_rating
 		(ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_userid, ld_vote,ld_tenantid,ld_recordversion)
 values		(4,'2011-02-18 00:00:00',1,2,2,4,1,1);
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message, ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
-values(1, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 1',1,1,0,80,0.5,0.5,0.15,0.10,'1.0');
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message, ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion,ld_linewidth,ld_lineopacity,ld_rotation)
+values(1, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 1',1,1,0,80,0.5,0.5,0.15,0.10,'1.0',1,80,0);
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion,ld_type)
-values(2, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 2',1,1,1,80,0.5,0.5,0.15,0.10,'1.0','x');
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion,ld_type,ld_linewidth,ld_lineopacity,ld_rotation)
+values(2, '2011-04-18 00:00:00',0,1,'Admin',1,'2011-04-18 00:00:00','message for note 2',1,1,1,80,0.5,0.5,0.15,0.10,'1.0','x',1,80,0);
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
-values(3, '2011-04-18 00:00:00',0,4,'John',3,'2011-04-18 00:00:00','message for note 3',1,1,0,80,0.5,0.5,0.15,0.10,'1.0');
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion,ld_linewidth,ld_lineopacity,ld_rotation)
+values(3, '2011-04-18 00:00:00',0,4,'John',3,'2011-04-18 00:00:00','message for note 3',1,1,0,80,0.5,0.5,0.15,0.10,'1.0',1,80,0);
 
-insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion)
-values(4, '2011-04-18 00:00:00',1,1,'Admin',1,'2011-04-18 00:00:00','message for note 4',1,1,0,80,0.5,0.5,0.15,0.10,'1.0');
+insert into ld_note (ld_id, ld_lastmodified, ld_deleted, ld_docid, ld_username, ld_userid, ld_date, ld_message,ld_tenantid,ld_recordversion,ld_page,ld_opacity,ld_top,ld_left,ld_width,ld_height,ld_fileversion,ld_linewidth,ld_lineopacity,ld_rotation)
+values(4, '2011-04-18 00:00:00',1,1,'Admin',1,'2011-04-18 00:00:00','message for note 4',1,1,0,80,0.5,0.5,0.15,0.10,'1.0',1,80,0);
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_deleted, ld_name, ld_language, ld_body, ld_subject,ld_tenantid,ld_recordversion)
 values(100, '2012-04-18 00:00:00',0,'test1','en', 'body $username $xxx','subject $xxx',1,1);
@@ -434,3 +434,17 @@ values(4, '2014-08-07 00:00:00',1,0,1,2,'att1','value4','value4 label',1);
 insert into ld_session
 (ld_id, ld_lastmodified, ld_recordversion, ld_deleted, ld_tenantid, ld_tenantname, ld_sid, ld_username, ld_key, ld_node, ld_creation, ld_status, ld_clientid, ld_clientaddr, ld_clienthost)
 values (1, '2017-05-24 00:00:00',1,0,1,'default','sid1','admin','key1','saert536yy','2017-05-24 00:00:00',0,'client1','addr1','host1');
+
+
+insert into ld_password_history	(ld_id, ld_lastmodified, ld_recordversion, ld_deleted, ld_tenantid, ld_password, ld_date, ld_userid)
+values(1, '2021-02-20 00:00:00',1,0,1,'psw1','2021-02-20 00:00:00', 1);
+
+insert into ld_password_history	(ld_id, ld_lastmodified, ld_recordversion, ld_deleted, ld_tenantid, ld_password, ld_date, ld_userid)
+values(2, '2021-02-19 00:00:00',1,0,1,'psw2','2021-02-19 00:00:00', 1);
+
+insert into ld_password_history	(ld_id, ld_lastmodified, ld_recordversion, ld_deleted, ld_tenantid, ld_password, ld_date, ld_userid)
+values(3, '2021-02-18 00:00:00',1,0,1,'psw3','2021-02-18 00:00:00', 1);
+
+
+INSERT INTO ld_uniquetag (ld_tag,ld_tenantid,ld_count) VALUES ('approved',1,2);
+INSERT INTO ld_uniquetag (ld_tag,ld_tenantid,ld_count) VALUES ('rejected',1,4);

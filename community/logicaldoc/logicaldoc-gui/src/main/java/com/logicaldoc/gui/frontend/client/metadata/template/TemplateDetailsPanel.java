@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.metadata.template;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.Overflow;
@@ -74,7 +74,7 @@ public class TemplateDetailsPanel extends VLayout {
 					TemplateService.Instance.get().getTemplate(template.getId(), new AsyncCallback<GUITemplate>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -158,7 +158,7 @@ public class TemplateDetailsPanel extends VLayout {
 			TemplateService.Instance.get().save(template, new AsyncCallback<GUITemplate>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override

@@ -10,7 +10,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import com.logicaldoc.webservice.doc.WSDoc;
-import com.logicaldoc.webservice.model.WSAttribute;
 
 /**
  * A WS Attribute Set

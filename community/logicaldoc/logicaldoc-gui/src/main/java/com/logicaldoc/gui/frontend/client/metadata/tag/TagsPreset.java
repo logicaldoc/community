@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
@@ -56,7 +56,7 @@ public class TagsPreset extends VLayout {
 
 							@Override
 							public void onFailure(Throwable t) {
-								Log.serverError(t);
+								GuiLog.serverError(t);
 							}
 
 							@Override
@@ -64,7 +64,7 @@ public class TagsPreset extends VLayout {
 								Session.get()
 										.getInfo()
 										.setConfig(Session.get().getTenantName() + ".tag.mode", mode.getValueAsString());
-								Log.info(I18N.message("settingssaved"), null);
+								GuiLog.info(I18N.message("settingssaved"), null);
 							}
 						});
 			}
@@ -84,12 +84,12 @@ public class TagsPreset extends VLayout {
 							TagService.Instance.get().addTag(value, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void arg0) {
-									Log.info(I18N.message("settingssaved"), null);
+									GuiLog.info(I18N.message("settingssaved"), null);
 									reloadTags();
 								}
 							});
@@ -148,7 +148,7 @@ public class TagsPreset extends VLayout {
 
 					@Override
 					public void onFailure(Throwable arg0) {
-						Log.serverError(arg0);
+						GuiLog.serverError(arg0);
 					}
 				});
 			}

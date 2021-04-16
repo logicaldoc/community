@@ -35,7 +35,10 @@ public class MessageTemplate extends PersistentObject {
 
 	private String getFormattedContent(Map<String, Object> dictionary, String text) {
 		Automation script = new Automation(getName(), LocaleUtil.toLocale(language), getTenantId());
-		return script.evaluate(text, dictionary);
+		String content = script.evaluate(text, dictionary);
+		if (content != null)
+			content = content.trim();
+		return content;
 	}
 
 	public String getFormattedBody(Map<String, Object> dictionary) {

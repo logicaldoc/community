@@ -103,6 +103,14 @@
   color: red;
 }
 
+.updatetemporarilyunavailable {
+  font-family: Arial, Bitstream Vera Sans, sans-serif; 
+  font-size: 14pt;
+  font-weight: bold;
+  white-space: nowrap;
+  color: orange;
+}
+
 .row {
   border-top: 1px solid #cccccc;
   margin-top: 4px;
@@ -210,4 +218,126 @@
 .notifyMessage a:hover, 
 .notifyMessage a:visited {
     color: rgb(10, 200, 200);
+}
+
+.avatarIcon {
+	vertical-align:middle;
+	margin-top:0px;
+	margin-bottom:0px;
+	margin-left:2px;
+	margin-right:2px;
+	display:block;
+    -webkit-touch-callout:none
+}
+
+.filenameIcon {
+	vertical-align:middle;
+	margin-top:0px;
+	margin-bottom:0px;
+	margin-left:2px;
+	margin-right:2px;
+	display:block;
+    -webkit-touch-callout:none
+}
+
+.box {
+   display: flex;
+   align-items:center;
+}
+
+.nodisplay {
+   display: none;
+}
+
+/*
+ * Print panel
+ */
+.printPanel {
+	width: 100%;
+	padding: 10px;
+	margin: 10px auto;
+	
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+	
+	-webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+	-moz-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+	box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+	
+	overflow: hidden;
+}
+
+.printPanel ul {
+	list-style: none;
+	margin: 0 auto;
+	overflow: hidden;
+    padding: 0px;
+}
+
+.printPanel ul li {
+	float: left;
+	margin: 0 5px;
+}
+
+.printPanel ul a {
+	display: inline-block;
+	text-decoration: none;
+	line-height: 18px;
+	padding: 4px 8px;
+	font-size: 12px;
+	color: #fff;
+	font-weight: bold;
+	outline: none;
+	
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	background: -ms-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	background: -o-linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	background: linear-gradient(top, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.1));
+	
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+	
+	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+	-moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.printPanel ul a:hover {
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+	background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+	background: -ms-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+	background: -o-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+	background: linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+}
+
+.printPanel ul a:active {
+	-webkit-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+	box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.1);
+	
+	background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background: -moz-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background: -ms-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background: -o-linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+	background: linear-gradient(top, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2));
+}
+
+.printPanel.default {
+	background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background: -moz-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background: -ms-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background: -o-linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background: linear-gradient(top, rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0.1));
+	background-color: #44A8D9;
+	
+	border: 1px solid #256CB4;
+}
+.printPanel.default ul a {
+	background-color: #44A8D9;
+	border: 1px solid #2589b4;
 }

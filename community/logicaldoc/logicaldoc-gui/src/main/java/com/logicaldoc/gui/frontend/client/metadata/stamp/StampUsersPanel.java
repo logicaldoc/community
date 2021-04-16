@@ -3,12 +3,13 @@ package com.logicaldoc.gui.frontend.client.metadata.stamp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.StampUsersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -76,7 +77,7 @@ public class StampUsersPanel extends VLayout {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 						user.clearValue();
 					}
 
@@ -92,6 +93,8 @@ public class StampUsersPanel extends VLayout {
 		userForm.setItems(user);
 		buttons.addMember(userForm);
 
+		AvatarListGridField avatar = new AvatarListGridField();
+		
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
@@ -132,7 +135,7 @@ public class StampUsersPanel extends VLayout {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new StampUsersDS(stampId));
-		list.setFields(id, enabled, username, firstName, name, email, cell, phone);
+		list.setFields(id, enabled, avatar, username, firstName, name, email, cell, phone);
 
 		list.addDataArrivedHandler(new DataArrivedHandler() {
 			@Override
@@ -174,7 +177,7 @@ public class StampUsersPanel extends VLayout {
 							StampService.Instance.get().removeUsers(ids, stampId, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

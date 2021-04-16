@@ -25,15 +25,19 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 
 	private String dateFormatShort;
 
-	public DateTool(String dateFormatLong, String dateFormatShort) {
+	private String dateFormat;
+
+	public DateTool(String dateFormat, String dateFormatLong, String dateFormatShort) {
 		super();
-		this.dateFormatLong = dateFormatLong != null ? dateFormatLong : I18N.message("format_date");
+		this.dateFormat = dateFormat != null ? dateFormat : I18N.message("format_date");
+		this.dateFormatLong = dateFormatLong != null ? dateFormatLong : I18N.message("format_datelong");
 		this.dateFormatShort = dateFormatShort != null ? dateFormatShort : I18N.message("format_dateshort");
 	}
 
 	public DateTool() {
 		super();
-		this.dateFormatLong = I18N.message("format_date");
+		this.dateFormat = I18N.message("format_date");
+		this.dateFormatLong = I18N.message("format_datelong");
 		this.dateFormatShort = I18N.message("format_dateshort");
 	}
 
@@ -47,12 +51,49 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	 */
 	public String format(Date date, boolean time) {
 		if (time) {
-			SimpleDateFormat df = new SimpleDateFormat(dateFormatLong);
+			SimpleDateFormat df = new SimpleDateFormat(dateFormat);
 			return df.format(date);
 		} else {
 			SimpleDateFormat df = new SimpleDateFormat(dateFormatShort);
 			return df.format(date);
 		}
+	}
+
+	/**
+	 * Formats a date using the normal format that also includes the time
+	 * 
+	 * @param date the date to format
+	 * 
+	 * @return the formatted string
+	 */
+	public String formatDate(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat(dateFormat);
+		return df.format(date);
+	}
+
+	/**
+	 * Formats a date using the short format that just includes the date
+	 * 
+	 * @param date the date to format
+	 * 
+	 * @return the formatted string
+	 */
+	public String formatDateShort(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat(dateFormatShort);
+		return df.format(date);
+	}
+
+	/**
+	 * Formats a date using the long format that includes the time and
+	 * milliseconds
+	 * 
+	 * @param date the date to format
+	 * 
+	 * @return the formatted string
+	 */
+	public String formatDateLong(Date date) {
+		SimpleDateFormat df = new SimpleDateFormat(dateFormatLong);
+		return df.format(date);
 	}
 
 	/**
@@ -121,7 +162,8 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	}
 
 	/**
-	 * Retrieves the default date format with time specification
+	 * Retrieves the default date format with time specification adn
+	 * milliseconds
 	 * 
 	 * @return the default date long format
 	 */
@@ -248,7 +290,8 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	}
 
 	/**
-	 * Calculates how many minutes are contained in a given amount of milliseconds
+	 * Calculates how many minutes are contained in a given amount of
+	 * milliseconds
 	 * 
 	 * @param ms the milliseconds
 	 * 
@@ -259,7 +302,8 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	}
 
 	/**
-	 * Calculates how many months are contained in a given amount of milliseconds
+	 * Calculates how many months are contained in a given amount of
+	 * milliseconds
 	 * 
 	 * @param ms the milliseconds
 	 * 
@@ -270,7 +314,8 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	}
 
 	/**
-	 * Calculates how many seconds are contained in a given amount of milliseconds
+	 * Calculates how many seconds are contained in a given amount of
+	 * milliseconds
 	 * 
 	 * @param ms the milliseconds
 	 * 
@@ -300,5 +345,13 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	 */
 	public long toYears(long ms) {
 		return ComparisonDateTool.toYears(ms);
+	}
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
 	}
 }

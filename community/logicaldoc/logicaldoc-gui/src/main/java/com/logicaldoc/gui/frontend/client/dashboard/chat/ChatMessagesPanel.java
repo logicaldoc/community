@@ -6,13 +6,11 @@ import java.util.List;
 
 import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.data.ChatMessagesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.VisibilityChangedEvent;
@@ -49,11 +47,7 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 		ListGridField username = new ListGridField("username", I18N.message("user"), 80);
 		username.setShowTitle(false);
 
-		ListGridField date = new ListGridField("date", I18N.getAttributeLabel("date"), 120);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date");
 		date.setHidden(true);
 		date.setShowTitle(false);
 

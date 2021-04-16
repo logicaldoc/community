@@ -3,25 +3,25 @@ package com.logicaldoc.gui.frontend.client.reports;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DeletedFoldersDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -61,7 +61,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 
 		userSelector = ItemFactory.newUserSelector("user", "deletedby", null, false, false);
 		userSelector.setWrapTitle(false);
-		userSelector.setWidth(100);
+		userSelector.setWidth(150);
 		userSelector.addChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
@@ -71,6 +71,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		toolStrip.addFormItem(userSelector);
 
 		folderSelector = new FolderSelector("folder", true);
+		folderSelector.setTitle(I18N.message("parent"));
 		folderSelector.setWrapTitle(false);
 		folderSelector.setWidth(250);
 		folderSelector.addFolderChangeListener(this);
@@ -82,7 +83,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		print.setAutoFit(true);
 		print.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addSeparator();
@@ -98,7 +99,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 			export.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					Util.exportCSV(list, false);
+					GridUtil.exportCSV(list, false);
 				}
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -118,27 +119,22 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 200);
 		name.setCanFilter(true);
+		name.setCellFormatter(new CellFormatter() {
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-		icon.setCanGroupBy(false);
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				boolean alias = "folder_alias".equals(record.getAttributeAsString("type"));
+				String icon = DocUtil.getFolderIcon(false, alias ? GUIFolder.TYPE_ALIAS : GUIFolder.TYPE_DEFAULT, "");
+				return icon + "&nbsp;" + record.getAttributeAsString("name");
+			}
+		});
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setCanGroupBy(false);
 
-		ListGridField deleteUser = new ListGridField("deleteUser", I18N.message("deletedby"), 200);
+		ListGridField deleteUser = new AvatarListGridField("deleteUser", "deleteUserId", "deletedby", 200);
 		deleteUser.setCanFilter(true);
-		
+
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowRecordComponents(true);
@@ -149,7 +145,7 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		list.setShowFilterEditor(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 
-		list.setFields(id, icon, name, lastModified, deleteUser);
+		list.setFields(id, name, lastModified, deleteUser);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override

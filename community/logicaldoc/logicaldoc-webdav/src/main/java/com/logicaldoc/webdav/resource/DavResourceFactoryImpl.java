@@ -3,6 +3,7 @@ package com.logicaldoc.webdav.resource;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -41,8 +42,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	}
 
 	public DavResourceFactoryImpl(LockManager lockMgr, ResourceConfig resourceConfig) {
-		this.resourceConfig = (resourceConfig != null) ? resourceConfig
-				: (ResourceConfig) Context.get().getBean("ResourceConfig");
+		this.resourceConfig = (resourceConfig != null) ? resourceConfig: (ResourceConfig) Context.get().getBean("ResourceConfig");
 		this.resourceService = (ResourceService) Context.get().getBean("ResourceService");
 	}
 
@@ -50,8 +50,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 		return createResource(locator, request, (DavSession) request.getDavSession());
 	}
 
-	public DavResource createResource(DavResourceLocator locator, DavServletRequest request, DavSession session)
-			throws DavException {
+	public DavResource createResource(DavResourceLocator locator, DavServletRequest request, DavSession session) throws DavException {
 
 		try {
 			String resourcePath = locator.getResourcePath();
@@ -73,8 +72,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 			} else {
 				repositoryResource.setVersionLabel(version);
 				repositoryResource.setRequestedPerson(Long.parseLong(session.getObject("id").toString()));
-				resource = new VersionControlledResourceImpl(locator, this, session, resourceConfig,
-						repositoryResource);
+				resource = new VersionControlledResourceImpl(locator, this, session, resourceConfig, repositoryResource);
 			}
 
 			return resource;
@@ -96,15 +94,26 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 		}
 	}
 
-	private DavResource createNullResource(DavResourceLocator locator, DavSession session, boolean isCollection)
-			throws DavException {
-
+	private DavResource createNullResource(DavResourceLocator locator, DavSession session, boolean isCollection) throws DavException {
 		return new VersionControlledResourceImpl(locator, this, session, resourceConfig, isCollection);
 	}
 
-	public DavResource createResource(DavResourceLocator locator, DavSession session, Resource resource)
-			throws DavException {
-		DavResource res = new VersionControlledResourceImpl(locator, this, session, resourceConfig, resource);
-		return res;
+	public DavResource createResource(DavResourceLocator locator, DavSession session, Resource resource) throws DavException {
+		return new VersionControlledResourceImpl(locator, this, session, resourceConfig, resource);
+	}
+
+	@Override
+	public DavResource createRangeResource(DavResourceLocator locator, DavSession session, Pair<String, String> parsedRange) throws DavException {
+		
+		Resource res = resourceService.getResource(locator.getResourcePath(), session);
+		//DavResource resource = createResource(locator, session, res);
+		
+		
+		/*
+public RangeResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session, ResourceConfig config, Resource resource, Pair<String, String> requestRange) {
+		 */		
+		
+		RangeResourceImpl rangeRes = new RangeResourceImpl(locator, this, session, resourceConfig, res, parsedRange);
+		return rangeRes;
 	}
 }

@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.update;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailTab;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
@@ -28,7 +29,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 
 	protected boolean tagsInitialized = false;
 
-	private MultiComboBoxItem usersItem;
+	private UserSelectorCombo usersItem;
 
 	public UpdateNotificationPanel(GUIDocument document) {
 		super(document, null);
@@ -65,9 +66,9 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 		form = new DynamicForm();
 		form.setWidth100();
 		form.setValuesManager(vm);
+		
+		usersItem = new UserSelectorCombo("users", "users", null, true, true);
 
-		usersItem = ItemFactory.newMultipleUsersSelector("users", "users", false, null);
-		usersItem.setWidth(350);
 		usersItem.setDisabled(!updateEnabled);
 
 		TextAreaItem message = ItemFactory.newTextAreaItem("message", "message", null);
@@ -79,10 +80,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 		vm.validate();
 
 		if (!vm.hasErrors()) {
-			long[] users = new long[usersItem.getValues().length];
-			for (int i = 0; i < users.length; i++)
-				users[i] = Long.parseLong(usersItem.getValues()[i]);
-			document.setNotifyUsers(users);
+			document.setNotifyUsers(usersItem.getUserIds());
 			document.setNotifyMessage(vm.getValueAsString("message"));
 		}
 

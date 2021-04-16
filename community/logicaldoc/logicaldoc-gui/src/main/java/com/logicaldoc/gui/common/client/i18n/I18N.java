@@ -24,6 +24,8 @@ public class I18N {
 
 	private static HashMap<String, String> bundle = new HashMap<String, String>();
 
+	private static DateTimeFormat dateFormatLong = null;
+	
 	private static DateTimeFormat dateFormatShort = null;
 
 	private static DateTimeFormat dateFormat = null;
@@ -159,6 +161,7 @@ public class I18N {
 		 */
 		dateFormatShort = DateTimeFormat.getFormat(message("format_dateshort"));
 		dateFormat = DateTimeFormat.getFormat(message("format_date"));
+		dateFormatLong = DateTimeFormat.getFormat(message("format_datelong"));
 	}
 
 	public static GUIValue[] getGuiLanguages() {
@@ -181,6 +184,12 @@ public class I18N {
 		return dateFormat.format(new Date(date.getTime()));
 	}
 
+	public static String formatDateLong(Date date) {
+		if (date == null)
+			return null;
+		return dateFormatLong.format(new Date(date.getTime()));
+	}
+	
 	public static DateTimeFormat getDateFormatShort() {
 		return dateFormatShort;
 	}

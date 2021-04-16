@@ -11,7 +11,7 @@
 				<exclude name="**/*.dtd" />
 			</fileset>
 		</copy>
-		<echo message="xxx is deployed" />
+		<echo message="xxx has been deployed" />
 	</target>
 
 	<target name="deploy" depends="init-all" description="Updates a deployed webapp">
@@ -26,6 +26,6 @@
 		
 		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
 
-		<echo message="${pom.artifactId} is deployed" />
+		<echo message="${pom.artifactId} has been deployed" />
 	</target>
 </project>

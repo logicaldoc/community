@@ -14,28 +14,35 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class TopPanel extends HLayout {
 	public TopPanel() {
-		setBackgroundImage(Session.get().getInfo().getBranding().getBannerSrc());
-		setBackgroundRepeat(BackgroundRepeat.REPEAT_X);
-		setBackgroundPosition("top left");
 		setWidth100();
-		setHeight(45);
+		if (Session.get().getConfigAsBoolean("gui.banner")) {
+			setBackgroundImage(Session.get().getInfo().getBranding().getBannerSrc());
+			setBackgroundRepeat(BackgroundRepeat.REPEAT_X);
+			setBackgroundPosition("top left");
 
-		// Prepare the logo image to be shown inside the banner
-		Img logoImage = ItemFactory.newBrandImg("logo_head.png", Session.get().getInfo());
-		logoImage.setStyleName("logo_head");
-		logoImage.setWidth(205);
-		logoImage.setHeight(40);
-		addMember(logoImage);
-	
-		Img separator = ItemFactory.newImg("blank.png");
-		separator.setWidth100();
-		addMember(separator);
-		
-		// Prepare the OEM logo image to be shown inside the banner
-		Img logoOemImage = ItemFactory.newBrandImg("logo_head_oem.png", Session.get().getInfo());
-		logoOemImage.setStyleName("logo_head_oem");
-		logoOemImage.setWidth(205);
-		logoOemImage.setHeight(40);
-		addMember(logoOemImage);
+			setHeight(45);
+
+			// Prepare the logo image to be shown inside the banner
+			Img logoImage = ItemFactory.newBrandImg("logo_head.png", Session.get().getInfo());
+			logoImage.setStyleName("logo_head");
+			logoImage.setWidth(205);
+			logoImage.setHeight(40);
+			logoImage.setTooltip(Session.get().getInfo().getBranding().getProductName());
+			addMember(logoImage);
+
+			Img separator = ItemFactory.newImg("blank.png");
+			separator.setWidth100();
+			addMember(separator);
+
+			// Prepare the OEM logo image to be shown inside the banner
+			Img logoOemImage = ItemFactory.newBrandImg("logo_head_oem.png", Session.get().getInfo());
+			logoOemImage.setStyleName("logo_head_oem");
+			logoOemImage.setWidth(205);
+			logoOemImage.setHeight(40);
+			logoOemImage.setTooltip(Session.get().getInfo().getBranding().getProductName());
+			addMember(logoOemImage);
+		} else {
+			setHeight(0);
+		}
 	}
 }

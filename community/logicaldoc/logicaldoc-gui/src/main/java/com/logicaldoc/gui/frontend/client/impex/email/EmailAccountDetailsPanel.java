@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.impex.email;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIEmailAccount;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.EmailAccountService;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -64,7 +64,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 					EmailAccountService.Instance.get().get(account.getId(), new AsyncCallback<GUIEmailAccount>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -200,7 +200,7 @@ public class EmailAccountDetailsPanel extends VLayout {
 			EmailAccountService.Instance.get().save(account, new AsyncCallback<GUIEmailAccount>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override

@@ -47,7 +47,6 @@ import com.logicaldoc.gui.common.client.validators.EmailValidator;
 import com.logicaldoc.gui.common.client.validators.EmailsValidator;
 import com.logicaldoc.gui.common.client.validators.SimpleTextValidator;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
-import com.logicaldoc.gui.common.client.widgets.UserPickListProperties;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.common.client.widgets.automation.AutomationItemEditor;
 import com.logicaldoc.gui.common.client.widgets.automation.HtmlItemEditor;
@@ -58,6 +57,7 @@ import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.MultiComboBoxLayoutStyle;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.DateChooser;
 import com.smartgwt.client.widgets.DateRangeDialog;
 import com.smartgwt.client.widgets.HeaderControl.HeaderIcon;
@@ -84,6 +84,7 @@ import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.RichTextItem;
 import com.smartgwt.client.widgets.form.fields.RowSpacerItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SliderItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -129,6 +130,7 @@ public class ItemFactory {
 		dateRangeItem.setPickerIconPrompt(I18N.message("showdatechooser"));
 		dateRangeItem.setHintStyle("hint");
 		dateRangeItem.setRequiredMessage(I18N.message("fieldrequired"));
+		dateRangeItem.setBrowserSpellCheck(false);
 		DateRangeItem.setDefaultProperties(dateRangeItem);
 
 		MiniDateRangeItem miniDateRangeItem = new MiniDateRangeItem();
@@ -142,6 +144,7 @@ public class ItemFactory {
 		miniDateRangeItem.setFromDateOnlyPrefix(I18N.message("ssince"));
 		miniDateRangeItem.setPickerIconPrompt(I18N.message("showdatechooser"));
 		miniDateRangeItem.setRequiredMessage(I18N.message("fieldrequired"));
+		miniDateRangeItem.setBrowserSpellCheck(false);
 		MiniDateRangeItem.setDefaultProperties(miniDateRangeItem);
 
 		DateItem dateItem = new DateItem();
@@ -155,6 +158,7 @@ public class ItemFactory {
 		dateItem.setRequiredMessage(I18N.message("fieldrequired"));
 		dateItem.setEndDate(new Date(2208985200000L));
 		dateItem.setStartDate(new Date(631148400000L));
+		dateItem.setBrowserSpellCheck(false);
 		DateItem.setDefaultProperties(dateItem);
 
 		DateChooser dateChooser = new DateChooser();
@@ -166,33 +170,39 @@ public class ItemFactory {
 		selectItem.setWidth(150);
 		selectItem.setHintStyle("hint");
 		selectItem.setRequiredMessage(I18N.message("fieldrequired"));
+		selectItem.setBrowserSpellCheck(false);
 		SelectItem.setDefaultProperties(selectItem);
 
 		TextItem textItem = new TextItem();
 		textItem.setHintStyle("hint");
 		textItem.setWidth(150);
 		textItem.setRequiredMessage(I18N.message("fieldrequired"));
+		textItem.setBrowserSpellCheck(false);
 		TextItem.setDefaultProperties(textItem);
 
 		RadioGroupItem radioGroupItem = new RadioGroupItem();
 		radioGroupItem.setHintStyle("hint");
 		radioGroupItem.setRequiredMessage(I18N.message("fieldrequired"));
+		radioGroupItem.setBrowserSpellCheck(false);
 		RadioGroupItem.setDefaultProperties(radioGroupItem);
 
 		CheckboxItem checkboxItem = new CheckboxItem();
 		checkboxItem.setHintStyle("hint");
 		checkboxItem.setRequiredMessage(I18N.message("fieldrequired"));
+		checkboxItem.setBrowserSpellCheck(false);
 		CheckboxItem.setDefaultProperties(checkboxItem);
 
 		MultiComboBoxItem multiComboBoxItem = new MultiComboBoxItem();
 		multiComboBoxItem.setHintStyle("hint");
 		multiComboBoxItem.setRequiredMessage(I18N.message("fieldrequired"));
+		multiComboBoxItem.setBrowserSpellCheck(false);
 		MultiComboBoxItem.setDefaultProperties(multiComboBoxItem);
 
 		SpinnerItem spinnerItem = new SpinnerItem();
 		spinnerItem.setHintStyle("hint");
 		spinnerItem.setWidth(60);
 		spinnerItem.setRequiredMessage(I18N.message("fieldrequired"));
+		spinnerItem.setBrowserSpellCheck(false);
 		SpinnerItem.setDefaultProperties(spinnerItem);
 
 		PasswordItem passwordItem = new PasswordItem();
@@ -204,42 +214,54 @@ public class ItemFactory {
 		staticTextItem.setWidth(150);
 		staticTextItem.setHintStyle("hint");
 		staticTextItem.setRequiredMessage(I18N.message("fieldrequired"));
+		staticTextItem.setBrowserSpellCheck(false);
 		StaticTextItem.setDefaultProperties(staticTextItem);
 
 		IntegerItem integerItem = new IntegerItem();
 		integerItem.setRequiredMessage(I18N.message("fieldrequired"));
 		integerItem.setHintStyle("hint");
+		integerItem.setBrowserSpellCheck(false);
 		IntegerItem.setDefaultProperties(integerItem);
 
 		ColorPickerItem colorPickerItem = new ColorPickerItem();
 		colorPickerItem.setWidth(180);
 		colorPickerItem.setRequiredMessage(I18N.message("fieldrequired"));
 		colorPickerItem.setHintStyle("hint");
+		colorPickerItem.setBrowserSpellCheck(false);
 		ColorPickerItem.setDefaultProperties(colorPickerItem);
 
 		LinkItem linkItem = new LinkItem();
 		linkItem.setRequiredMessage(I18N.message("fieldrequired"));
 		linkItem.setHintStyle("hint");
+		linkItem.setBrowserSpellCheck(false);
 		LinkItem.setDefaultProperties(linkItem);
 
 		TextAreaItem textAreaItem = new TextAreaItem();
 		textAreaItem.setRequiredMessage(I18N.message("fieldrequired"));
 		textAreaItem.setHintStyle("hint");
+		textAreaItem.setBrowserSpellCheck(false);
 		TextAreaItem.setDefaultProperties(textAreaItem);
 
 		TimeItem timeItem = new TimeItem();
 		timeItem.setHintStyle("hint");
 		timeItem.setWidth(60);
+		timeItem.setBrowserSpellCheck(false);
 		TimeItem.setDefaultProperties(timeItem);
 
 		FloatItem floatItem = new FloatItem();
 		floatItem.setHintStyle("hint");
+		floatItem.setBrowserSpellCheck(false);
 		FloatItem.setDefaultProperties(floatItem);
 
 		ColorPickerItem colorItemPicker = new ColorPickerItem();
 		colorItemPicker.setHintStyle("hint");
 		colorItemPicker.setWidth(115);
+		colorItemPicker.setBrowserSpellCheck(false);
 		ColorPickerItem.setDefaultProperties(colorItemPicker);
+		
+		RichTextItem richTextItem = new RichTextItem();
+		richTextItem.setBrowserSpellCheck(false);
+		RichTextItem.setDefaultProperties(richTextItem);
 	}
 
 	public static ColorPickerItem newColorItemPicker(String name, String title, String value, boolean clearOption,
@@ -314,7 +336,8 @@ public class ItemFactory {
 		return date;
 	}
 
-	public static MultiComboBoxItem newMultipleUsersSelector(String name, String title, boolean skipDisabled, long[] selection) {
+	public static MultiComboBoxItem newMultipleUsersSelector(String name, String title, boolean skipDisabled,
+			long[] selection) {
 		String[] ids = null;
 
 		if (selection != null) {
@@ -323,7 +346,8 @@ public class ItemFactory {
 				ids[i] = Long.toString(selection[i]);
 		}
 
-		MultiComboBoxItem item = ItemFactory.newMultiComboBoxItem(name, title, new UsersDS(null, false, skipDisabled), ids);
+		MultiComboBoxItem item = ItemFactory.newMultiComboBoxItem(name, title, new UsersDS(null, false, skipDisabled),
+				ids);
 		item.setValueField("id");
 		item.setDisplayField("username");
 
@@ -522,7 +546,7 @@ public class ItemFactory {
 		item.setWrapTitle(false);
 		item.setDisplayField("name");
 		item.setValueField("id");
-		item.setWidth(100);
+		item.setWidth(150);
 
 		ListGridField nameField = new ListGridField("name", I18N.message("name"));
 		nameField.setWidth("*");
@@ -545,6 +569,22 @@ public class ItemFactory {
 		item.setValueField("id");
 		item.setOptionDataSource(new StoragesTypesDS());
 		return item;
+	}
+
+	public static SelectItem newAnnotationShapeSelector(String value) {
+		SelectItem selector = new SelectItem();
+		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		opts.put("square", I18N.message("square"));
+		opts.put("circle", I18N.message("circle"));
+		opts.put("line", I18N.message("line"));
+		opts.put("arrow", I18N.message("arrow"));
+		opts.put("thickarrow", I18N.message("thickarrow"));
+		selector.setValueMap(opts);
+		selector.setName("shape");
+		selector.setTitle(I18N.message("shape"));
+		selector.setValue(value);
+		selector.setWidth(100);
+		return selector;
 	}
 
 	public static SelectItem newComparatorSelector() {
@@ -730,21 +770,10 @@ public class ItemFactory {
 		return group;
 	}
 
-	public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required, boolean skipDisabled) {
-		SelectItem user = new SelectItem(filterItemName(name));
-		user.setTitle(I18N.message(title));
-		user.setWrapTitle(false);
-		ListGridField id = new ListGridField("id", I18N.message("id"));
-		id.setHidden(true);
-		ListGridField username = new ListGridField("username", I18N.message("username"));
-		ListGridField label = new ListGridField("label", I18N.message("name"));
-		user.setValueField("id");
-		user.setDisplayField("username");
-		user.setPickListWidth(300);
-		user.setPickListFields(id, username, label);
-		user.setOptionDataSource(new UsersDS(groupIdOrName, required, skipDisabled));
-		user.setPickListProperties(new UserPickListProperties());
-		return user;
+	public static SelectItem newUserSelector(String name, String title, String groupIdOrName, boolean required,
+			boolean skipDisabled) {
+		final SelectItem item = new UserSelector(name, title, groupIdOrName, !required, skipDisabled, null);
+		return item;
 	}
 
 	public static SelectItem newTenantSelector() {
@@ -1105,6 +1134,8 @@ public class ItemFactory {
 			img = new Img(info.getBranding().getBannerSrc());
 		else if (name.equals("favicon.png"))
 			img = new Img(info.getBranding().getFaviconSrc());
+		else if (name.equals("logo_menu.png"))
+			img = new Img(info.getBranding().getLogoMenuSrc());
 		return img;
 	}
 
@@ -1138,6 +1169,12 @@ public class ItemFactory {
 			item.setValue("");
 		item.setWrapTitle(false);
 		item.setRequiredMessage(I18N.message("fieldrequired"));
+		return item;
+	}
+
+	public static TextItem newTextItemPreventAutocomplete(String name, String title, String value) {
+		TextItem item = newTextItem(name, title, value);
+		item.setAutoCompleteKeywords("nope");
 		return item;
 	}
 
@@ -1262,6 +1299,12 @@ public class ItemFactory {
 		return password;
 	}
 
+	public static PasswordItem newPasswordItemPreventAutocomplete(String name, String title, String value) {
+		PasswordItem password = newPasswordItem(name, title, value);
+		password.setAutoCompleteKeywords("new-password");
+		return password;
+	}
+
 	/**
 	 * Creates a new TextItem that validates a simple text
 	 * 
@@ -1274,6 +1317,12 @@ public class ItemFactory {
 	public static TextItem newSimpleTextItem(String name, String title, String value) {
 		TextItem item = newTextItem(filterItemName(name), I18N.message(title), value);
 		item.setValidators(new SimpleTextValidator());
+		return item;
+	}
+
+	public static TextItem newSimpleTextItemPreventAutocomplete(String name, String title, String value) {
+		TextItem item = newSimpleTextItem(name, title, value);
+		item.setAutoCompleteKeywords("nope");
 		return item;
 	}
 
@@ -1447,6 +1496,28 @@ public class ItemFactory {
 		return spinner;
 	}
 
+	/**
+	 * Creates a new SliderItem
+	 * 
+	 * @param name name of the item
+	 * @param title title of the item(optional)
+	 * @param value default value(optional)
+	 * @param min minimum value
+	 * @param max maximum value
+	 * 
+	 * @return the new item
+	 */
+	public static SliderItem newSliderItem(String name, String title, Double value, double minValue, double maxValue) {
+		SliderItem item = new SliderItem(name, I18N.message(title));
+		item.setMinValue(minValue);
+		item.setMaxValue(maxValue);
+		item.setValue(value);
+		item.setWidth(100);
+		item.setVertical(false);
+		item.setRoundValues(true);
+		return item;
+	}
+
 	public static LinkItem newLinkItem(String name, String title) {
 		LinkItem linkItem = new LinkItem(filterItemName(name));
 		if (!title.trim().isEmpty()) {
@@ -1503,6 +1574,14 @@ public class ItemFactory {
 			}
 		});
 
+		if (withHtmlEditor)
+			item.setIcons(editAutomation, prepareEditHtmlIcon(item, handler));
+		else
+			item.setIcons(editAutomation);
+		item.setIconVAlign(VerticalAlignment.CENTER);
+	}
+
+	private static FormItemIcon prepareEditHtmlIcon(FormItem item, ChangedHandler handler) {
 		FormItemIcon editHtml = new FormItemIcon();
 		editHtml.setName("edithtml");
 		editHtml.setWidth(16);
@@ -1517,12 +1596,7 @@ public class ItemFactory {
 				editor.show();
 			}
 		});
-
-		if (withHtmlEditor)
-			item.setIcons(editAutomation, editHtml);
-		else
-			item.setIcons(editAutomation);
-		item.setIconVAlign(VerticalAlignment.CENTER);
+		return editHtml;
 	}
 
 	public static SelectItem newDueTimeSelector(String name, String title) {
@@ -2072,6 +2146,59 @@ public class ItemFactory {
 	}
 
 	/**
+	 * Creates a new TextAreaItem suitable for notes.
+	 * 
+	 * @param name The item name (mandatory)
+	 * @param title The item title (mandatory)
+	 * @param value The item value (optional)
+	 * @param handler The changed handler (optional)
+	 * @param withSimplifiedHtmlEditor If the icon that opens the simplified
+	 *        HTML editor must be shown
+	 * 
+	 * @return the text item
+	 */
+	public static TextAreaItem newTextAreaItemForNote(String name, String title, String value, ChangedHandler handler,
+			boolean withSimplifiedHtmlEditor) {
+		TextAreaItem item = newTextAreaItem(name, title, value);
+		if (withSimplifiedHtmlEditor) {
+			FormItemIcon editHtml = new FormItemIcon();
+			editHtml.setName("edithtml");
+			editHtml.setWidth(16);
+			editHtml.setHeight(16);
+			editHtml.setSrc("[SKIN]/html.png");
+			editHtml.setPrompt(I18N.message("openhtmleditor"));
+			editHtml.addFormItemClickHandler(new FormItemClickHandler() {
+
+				@Override
+				public void onFormItemClick(FormItemIconClickEvent event) {
+					RichTextItem htmlItem = newRichTextItemForNote("html", "html", item.getValueAsString());
+					htmlItem.setBrowserSpellCheck(true);
+					htmlItem.setShowTitle(false);
+					if (handler != null)
+						htmlItem.addChangedHandler(handler);
+					LD.askForValue("edithtml", null, item.getValueAsString(), htmlItem, new ValueCallback() {
+
+						@Override
+						public void execute(String value) {
+							item.setValue(value);
+							if (handler != null)
+								handler.onChanged(null);
+						}
+					});
+				}
+			});
+
+			item.setIcons(editHtml);
+			item.setIconVAlign(VerticalAlignment.CENTER);
+		}
+
+		if (handler != null)
+			item.addChangedHandler(handler);
+		addNoteValidator(item);
+		return item;
+	}
+
+	/**
 	 * Creates a new RichTextItem suitable for notes.
 	 * 
 	 * @param name The item name (mandatory)
@@ -2095,6 +2222,11 @@ public class ItemFactory {
 		item.setWidth("*");
 		item.setHeight("*");
 
+		addNoteValidator(item);
+		return item;
+	}
+
+	private static void addNoteValidator(FormItem item) {
 		int maxlength = Session.get().getConfigAsInt("default.gui.note.maxlength");
 		if (maxlength > 0)
 			item.setValidators(new CustomValidator() {
@@ -2113,7 +2245,6 @@ public class ItemFactory {
 					return true;
 				}
 			});
-		return item;
 	}
 
 	/**

@@ -29,7 +29,7 @@ public interface SystemService {
 	 * @throws Exception error in the server application
 	 */
 	@GET
-	@Path("/getInfo")	
+    @Path("/getInfo")	
 	public WSSystemInfo getInfo() throws Exception;
 
 	/**
@@ -40,7 +40,7 @@ public interface SystemService {
 	 * @throws Exception error in the server application
 	 */
 	@GET
-	@Path("/getStatistics")		
+    @Path("/getStatistics")		
 	public WSParameter[] getStatistics() throws Exception;
 
 	/**
@@ -51,7 +51,7 @@ public interface SystemService {
 	 * @throws Exception error in the server application
 	 */
 	@GET
-	@Path("/getLanguages")		
+	@Path("/getLanguages")	
 	public String[] getLanguages() throws Exception;	
 	
 }

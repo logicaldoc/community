@@ -6,6 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -16,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -26,6 +29,10 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 7.5
  */
 public class LDAccessDecisionManager extends UnanimousBased {
+
+	private static Logger log = LoggerFactory.getLogger(LDAuthenticationSuccessHandler.class);
+
+	static final String REQUESTED_URL = "RequestedUrl";
 
 	public LDAccessDecisionManager(List<AccessDecisionVoter<? extends Object>> decisionVoters) {
 		super(decisionVoters);
@@ -51,7 +58,26 @@ public class LDAccessDecisionManager extends UnanimousBased {
 			}
 		}
 
-		super.decide(authentication, object, properties);
+		try {
+			super.decide(authentication, object, properties);
+		} catch (AccessDeniedException ade) {
+			saveOriginalUrl();
+			throw ade;
+		} catch (InsufficientAuthenticationException iae) {
+			saveOriginalUrl();
+			throw iae;
+		}
+	}
+
+	/**
+	 * Saves the originally required URL that needs authentication
+	 */
+	private void saveOriginalUrl() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
+		String url = ServletUtil.getFullURL(request);
+		request.getSession(true).setAttribute(REQUESTED_URL, url);
+		log.debug("Resource {} requires authentication", url);
 	}
 
 	@Override

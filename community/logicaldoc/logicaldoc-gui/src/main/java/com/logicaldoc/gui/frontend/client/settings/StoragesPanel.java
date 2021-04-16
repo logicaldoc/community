@@ -9,8 +9,9 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.StoragesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
@@ -18,6 +19,7 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -222,7 +224,7 @@ public class StoragesPanel extends VLayout {
 						public void onChanged(ChangedEvent event) {
 							list.getSelectedRecord().setAttribute("type", event.getValue().toString());
 							list.collapseRecord(list.getSelectedRecord());
-							onSave(false);
+//							onSave(false);
 						}
 					});
 					return item;
@@ -251,6 +253,9 @@ public class StoragesPanel extends VLayout {
 	 * Prepares the context menu
 	 */
 	private void showContextMenu() {
+		ListGridRecord selection = list.getSelectedRecord();
+		int selectedId = selection.getAttributeAsInt("id");
+
 		MenuItem makeWrite = new MenuItem();
 		makeWrite.setTitle(I18N.message("makedefwritestore"));
 		makeWrite.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
@@ -260,7 +265,7 @@ public class StoragesPanel extends VLayout {
 					rec.setAttribute("write", "blank");
 					list.refreshRow(list.getRowNum(rec));
 				}
-				list.getSelectedRecord().setAttribute("write", "database_edit");
+				selection.setAttribute("write", "database_edit");
 				list.refreshRow(list.getRowNum(list.getSelectedRecord()));
 			}
 		});
@@ -269,33 +274,69 @@ public class StoragesPanel extends VLayout {
 		test.setTitle(I18N.message("testconnection"));
 		test.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord selection = list.getSelectedRecord();
-				SettingService.Instance.get().testStorage(selection.getAttributeAsInt("id"),
-						new AsyncCallback<Boolean>() {
+				SettingService.Instance.get().testStorage(selectedId, new AsyncCallback<Boolean>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
-							}
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-							@Override
-							public void onSuccess(Boolean result) {
-								if (result.booleanValue())
-									SC.say(I18N.message("connectionestablished"));
-								else
-									SC.warn(I18N.message("connectionfailed"));
-							}
-						});
+					@Override
+					public void onSuccess(Boolean result) {
+						if (result.booleanValue())
+							SC.say(I18N.message("connectionestablished"));
+						else
+							SC.warn(I18N.message("connectionfailed"));
+					}
+				});
 			}
 		});
 
-		if (Session.get().isDemo()) {
-			makeWrite.setEnabled(false);
-			test.setEnabled(false);
-		}
+		MenuItem delete = new MenuItem();
+		delete.setTitle(I18N.message("ddelete"));
+		delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
+					@Override
+					public void execute(Boolean value) {
+						if (value) {
+							SettingService.Instance.get().removeStorage(selectedId, new AsyncCallback<String[]>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(String[] paths) {
+									if (paths != null && paths.length > 0) {
+										StringBuffer report = new StringBuffer("<ul>");
+										for (String path : paths) {
+											report.append("<li>");
+											report.append(path);
+											report.append("</li>");
+										}
+										report.append("</ul>");
+										
+										SC.warn(I18N.message("foldersusingstorage", "" + selectedId)
+												+ Util.padLeft(report.toString(), 1000));
+									} else {
+										refresh();
+									}
+								}
+							});
+						}
+					}
+				});
+			}
+		});
+
+		makeWrite.setEnabled(!Session.get().isDemo());
+		test.setEnabled(!Session.get().isDemo());
+		delete.setEnabled(!Session.get().isDemo() && !"database_edit".equals(selection.getAttributeAsString("write")));
 
 		Menu contextMenu = new Menu();
-		contextMenu.setItems(makeWrite, test);
+		contextMenu.setItems(makeWrite, test, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -340,12 +381,12 @@ public class StoragesPanel extends VLayout {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void arg) {
-						Log.info(I18N.message("settingssaved"), null);
+						GuiLog.info(I18N.message("settingssaved"), null);
 
 						// Replicate the settings in the current session
 						for (GUIParameter setting : settings)
@@ -353,7 +394,7 @@ public class StoragesPanel extends VLayout {
 
 						refresh();
 
-						if(alertInclusion)
+						if (alertInclusion)
 							SC.warn(I18N.message("importantnotice"), I18N.message("makesurenotnestedstorage"));
 					}
 				});

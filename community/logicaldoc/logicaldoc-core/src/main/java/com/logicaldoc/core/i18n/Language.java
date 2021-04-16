@@ -110,12 +110,11 @@ public class Language implements Comparable<Language> {
 		this.analyzerClass = analyzerClass;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Analyzer getAnalyzer() {
 		if (analyzer == null && !StringUtils.isEmpty(analyzerClass)) {
 			// Try to instantiate the specified analyzer (Using default
 			// constructor)
-			Class aClass = null;
+			Class<?> aClass = null;
 			try {
 				aClass = Class.forName(analyzerClass);
 			} catch (Throwable t) {
@@ -125,7 +124,7 @@ public class Language implements Comparable<Language> {
 			// Try to use constructor (Set<?> stopwords)
 			if (stopWords != null && (!stopWords.isEmpty())) {
 				try {
-					Constructor constructor = aClass.getConstructor(new Class[] { java.util.Set.class });
+					Constructor<?> constructor = aClass.getConstructor(new Class[] { java.util.Set.class });
 					if (constructor != null)
 						analyzer = (Analyzer) constructor.newInstance(stopWords);
 				} catch (Throwable e) {
@@ -182,9 +181,9 @@ public class Language implements Comparable<Language> {
 			String stemmerClass = "org.tartarus.snowball.ext." + getLocale().getDisplayName(Locale.ENGLISH) + "Stemmer";
 
 			try {
-				Class clazz = Class.forName(stemmerClass);
+				Class<?> clazz = Class.forName(stemmerClass);
 				if (clazz != null) {
-					Constructor constructor = clazz.getConstructor();
+					Constructor<?> constructor = clazz.getConstructor();
 					if (constructor != null)
 						stemmer = (SnowballProgram) constructor.newInstance();
 				}

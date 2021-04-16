@@ -31,5 +31,10 @@
 		<property name="type" type="string" column="ld_type" length="255" />		
 		<property name="recipient" type="string" column="ld_recipient" length="255" />
 		<property name="recipientEmail" type="string" column="ld_recipientemail" length="255" />
+		<property name="shape" type="string" column="ld_shape" />
+		<property name="lineWidth" type="int" column="ld_linewidth" not-null="true" />
+		<property name="lineOpacity" type="int" column="ld_lineopacity" not-null="true" />
+		<property name="lineColor" type="string" column="ld_linecolor" length="255" />
+		<property name="rotation" type="double" column="ld_rotation" not-null="true" />
 	</class>
 </hibernate-mapping>

@@ -36,6 +36,8 @@ public class CookiesManager {
 
 	public static final String COOKIE_FAILURE = "ldoc-failure";
 
+	public static final String COOKIE_DEVICE = "ldoc-device";
+
 	public static final String COOKIE_JSESSIONID = "JSESSIONID";
 
 	/**
@@ -106,6 +108,28 @@ public class CookiesManager {
 		} catch (Throwable t) {
 
 		}
+
+		try {
+			Offline.remove(COOKIE_DEVICE);
+			Cookies.removeCookie(COOKIE_DEVICE);
+		} catch (Throwable t) {
+
+		}
+
+		try {
+			removeLogin();
+		} catch (Throwable t) {
+
+		}
+	}
+
+	/**
+	 * Retrieves the device ID saved in the browser
+	 * 
+	 * @return the saved device ID
+	 */
+	public static String getSavedDevice() {
+		return get(COOKIE_DEVICE);
 	}
 
 	/**
@@ -139,7 +163,12 @@ public class CookiesManager {
 	 * @param info the User Interface informations
 	 */
 	public static void saveRelease(GUIInfo info) {
-		Cookies.setCookie(COOKIE_VERSION, info.getRelease(), null, null, null, true);
+		Cookies.setCookie(COOKIE_VERSION, info.getRelease(), null, null, null, false);
+	}
+
+	public static void saveDevice(String deviceId) {
+		Cookies.setCookie(COOKIE_DEVICE, deviceId, null, null, null, false);
+		Offline.put(COOKIE_DEVICE, deviceId);
 	}
 
 	public static boolean isSaveLogin() {

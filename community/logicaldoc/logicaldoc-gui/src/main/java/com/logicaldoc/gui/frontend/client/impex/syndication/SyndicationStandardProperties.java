@@ -13,6 +13,7 @@ import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DateItem;
+import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -85,10 +86,10 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		remoteUrl.setWidth(250);
 		remoteUrl.setRequired(true);
 
-		TextItem username = ItemFactory.newTextItem("username", "username", syndication.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", syndication.getUsername());
 		username.addChangedHandler(changedHandler);
 
-		TextItem password = ItemFactory.newPasswordItem("password", "password", syndication.getPassword());
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", syndication.getPassword());
 		password.addChangedHandler(changedHandler);
 
 		TextItem include = ItemFactory.newTextItem("include", "include", syndication.getIncludes());
@@ -137,8 +138,19 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		replicateCustomId.setValue(syndication.getReplicateCustomId() == 1 ? "yes" : "no");
 		replicateCustomId.addChangedHandler(changedHandler);
 
-		form.setItems(name, sourceSelector, remoteUrl, targetPath, username, password, include, exclude, maxPacketSize,
-				batch, startDate, replicateCustomId);
+		/*
+		 * Two invisible fields to 'mask' the real credentials to the browser
+		 * and prevent it to auto-fill the username and password we really use.
+		 */
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
+				syndication.getUsername());
+		fakeUsername.setCellStyle("nodisplay");
+		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
+				syndication.getPassword());
+		fakePassword.setCellStyle("nodisplay");
+
+		form.setItems(name, sourceSelector, remoteUrl, targetPath, fakeUsername, fakePassword, username, password,
+				include, exclude, maxPacketSize, batch, startDate, replicateCustomId);
 
 		formsContainer.addMember(form);
 

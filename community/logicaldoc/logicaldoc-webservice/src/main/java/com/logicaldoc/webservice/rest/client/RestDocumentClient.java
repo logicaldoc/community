@@ -3,14 +3,10 @@ package com.logicaldoc.webservice.rest.client;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -21,8 +17,6 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSNote;
@@ -63,47 +57,22 @@ public class RestDocumentClient extends AbstractRestClient {
 
 		WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-
-		ObjectWriter ow = new ObjectMapper().writer();
-		String jsonStr = ow.writeValueAsString(document);
-
-		Attachment docAttachment = new AttachmentBuilder().id("document").object(jsonStr).mediaType("application/json")
-				.contentDisposition(new ContentDisposition("form-data; name=\"document\"")).build();
-		Attachment fileAttachment = new Attachment("content", new FileInputStream(packageFile),
-				new ContentDisposition("form-data; name=\"content\"; filename=\"" + packageFile.getName() + "\""));
-
-		List<Attachment> atts = new LinkedList<Attachment>();
-		atts.add(docAttachment);
-		atts.add(fileAttachment);
-
-		Response res = proxy.create(atts);
-		WSDocument cdoc = res.readEntity(WSDocument.class);
-
-		return cdoc;
+		
+		Attachment fileAttachment = new Attachment("content", new FileInputStream(packageFile), new ContentDisposition("form-data; name=\"content\"; filename=\"" + packageFile.getName() + "\""));		
+		
+		return proxy.create(document, fileAttachment);
 	}
 
 	public WSDocument create(WSDocument document, DataHandler dataHandler) throws Exception {
 
 		WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
 		WebClient.client(proxy).accept(MediaType.APPLICATION_JSON);
-
-		ObjectWriter ow = new ObjectMapper().writer();
-		String jsonStr = ow.writeValueAsString(document);
-
-		Attachment docAttachment = new AttachmentBuilder().id("document").object(jsonStr).mediaType("application/json")
-				.contentDisposition(new ContentDisposition("form-data; name=\"document\"")).build();
+		
 		Attachment fileAttachment = new AttachmentBuilder().id("content").dataHandler(dataHandler)
 				.mediaType("application/octet-stream")
 				.contentDisposition(new ContentDisposition("form-data; name=\"content\"")).build();
-
-		List<Attachment> atts = new LinkedList<Attachment>();
-		atts.add(docAttachment);
-		atts.add(fileAttachment);
-
-		Response res = proxy.create(atts);
-		WSDocument cdoc = res.readEntity(WSDocument.class);
-
-		return cdoc;
+		
+		return proxy.create(document, fileAttachment);		
 	}
 
 	public WSDocument[] list(long folderId) throws Exception {
@@ -156,57 +125,15 @@ public class RestDocumentClient extends AbstractRestClient {
 		proxy.update(document);
 	}
 
-	public String checkin(long docId, String comment, Boolean release, File packageFile) throws Exception {
-
-		/*
-		 * if ("docId".equals(params.get("name"))) { docId =
-		 * Long.parseLong(att.getObject(String.class)); } else if
-		 * ("comment".equals(params.get("name"))) { comment =
-		 * att.getObject(String.class); } else if
-		 * ("release".equals(params.get("name"))) { release =
-		 * Boolean.parseBoolean(att.getObject(String.class)); } else if
-		 * ("filename".equals(params.get("name"))) { filename =
-		 * att.getObject(String.class); } else if
-		 * ("filedata".equals(params.get("name"))) { datah =
-		 * att.getDataHandler(); }
-		 */
-
+	public void checkin(long docId, String comment, Boolean release, File packageFile) throws Exception {
+		
+		Attachment fileAttachment = new Attachment("filedata", new FileInputStream(packageFile),
+		new ContentDisposition("form-data; name=\"filedata\"; filename=\"" + packageFile.getName() + "\""));
+		
 		WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
 		WebClient.client(proxy).accept(MediaType.TEXT_PLAIN);
-
-		Attachment docAttachment = new AttachmentBuilder().id("docId").object(docId).mediaType("text/plain")
-				.contentDisposition(new ContentDisposition("form-data; name=\"docId\"")).build();
-
-		Attachment commentAttachment = new AttachmentBuilder().id("comment").object(comment).mediaType("text/plain")
-				.contentDisposition(new ContentDisposition("form-data; name=\"comment\"")).build();
-
-		Attachment releaseAttachment = new AttachmentBuilder().id("release").object(release.toString())
-				.mediaType("text/plain").contentDisposition(new ContentDisposition("form-data; name=\"release\""))
-				.build();
-
-		Attachment filenameAttachment = new AttachmentBuilder().id("filename").object(packageFile.getName())
-				.mediaType("text/plain").contentDisposition(new ContentDisposition("form-data; name=\"filename\""))
-				.build();
-
-		Attachment fileAttachment = new Attachment("filedata", new FileInputStream(packageFile),
-				new ContentDisposition("form-data; name=\"filedata\"; filename=\"" + packageFile.getName() + "\""));
-
-		List<Attachment> atts = new LinkedList<Attachment>();
-		atts.add(docAttachment);
-
-		if (StringUtils.isNotEmpty(comment)) {
-			atts.add(commentAttachment);
-		}
-		if (release != null) {
-			atts.add(releaseAttachment);
-		}
-		if (packageFile != null) {
-			atts.add(filenameAttachment);
-		}
-		atts.add(fileAttachment);
-
-		Response res = proxy.checkin(atts);
-		return res.readEntity(String.class);
+		
+		proxy.checkin(Integer.valueOf(Long.toString(docId)), comment, release.toString(), packageFile.getName(), fileAttachment);
 	}
 
 	public WSNote addNote(long docId, String note) throws Exception {

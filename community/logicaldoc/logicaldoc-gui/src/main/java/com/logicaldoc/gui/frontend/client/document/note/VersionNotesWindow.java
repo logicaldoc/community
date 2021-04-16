@@ -2,20 +2,16 @@ package com.logicaldoc.gui.frontend.client.document.note;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.NotesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
-import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -50,32 +46,23 @@ public class VersionNotesWindow extends Window {
 		ListGridField userId = new ListGridField("userId", "userid", 50);
 		userId.setHidden(true);
 
-		ListGridField user = new ListGridField("user", I18N.message("author"), 200);
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.LEFT);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
-		ListGridField page = new ListGridField("page", I18N.message("page"), 80);
-		page.setWidth("*");
+		AvatarListGridField user = new AvatarListGridField("user", "userId", "author", 150);
+		DateListGridField date = new DateListGridField("date", "date");
+		ListGridField page = new ListGridField("page", I18N.message("page"), 50);
+		page.setAutoFitWidth(true);
+		page.setAlign(Alignment.CENTER);
 
-		ListGrid notesGrid = new ListGrid() {
-			@Override
-			protected Canvas getExpansionComponent(final ListGridRecord record) {
-				return new HTMLFlow("<div class='details'>"
-						+ (record.getAttributeAsString("message") != null ? record.getAttributeAsString("message") : "")
-						+ "</div>");
-			}
-		};
+		ListGridField content = new ListGridField("message", I18N.message("content"), 70);
+		content.setWidth("*");
+
+		ListGrid notesGrid = new ListGrid();
+
 		notesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		notesGrid.setCanFreezeFields(true);
 		notesGrid.setAutoFetchData(true);
 		notesGrid.setDataSource(new NotesDS(null, doc.getId(), fileVersion, null));
-		notesGrid.setFields(id, userId, user, date, page);
+		notesGrid.setFields(id, userId, user, date, page, content);
 		notesGrid.setWidth100();
-		notesGrid.setCanExpandRecords(true);
-		notesGrid.setExpansionMode(ExpansionMode.DETAIL_FIELD);
-		notesGrid.setDetailField("message");
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -96,7 +83,7 @@ public class VersionNotesWindow extends Window {
 		annotations.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AbstractAnnotationsWindow annotationWnd = new AnnotationsWindow(doc,
+				AnnotationsWindow annotationWnd = new AnnotationsWindow(doc,
 						fileVer != null ? fileVer : doc.getFileVersion(), null, false);
 				annotationWnd.show();
 			}

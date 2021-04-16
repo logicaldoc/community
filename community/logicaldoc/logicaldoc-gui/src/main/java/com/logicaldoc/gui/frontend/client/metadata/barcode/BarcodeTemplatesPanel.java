@@ -1,37 +1,35 @@
 package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
-import java.util.ArrayList;
+import java.util.Date;
 
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.widgetideas.graphics.client.ImageLoader.CallBack;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeSpec;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.PrintUtil;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.ImageWithCanvases;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.DragDataAction;
-import com.smartgwt.client.types.SelectionStyle;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import com.smartgwt.client.widgets.menu.Menu;
-import com.smartgwt.client.widgets.menu.MenuItem;
-import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -43,7 +41,9 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class BarcodeTemplatesPanel extends VLayout {
 
-	private ListGrid patternsGrid;
+	private PositionalBarcodesGrid positionalGrid;
+
+	private ImageWithCanvases zonalCanvas;
 
 	private SelectItem templateSelector;
 
@@ -63,10 +63,18 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 	private ToolStripButton delete;
 
+	private ToolStripButton print;
+
 	private ToolStripButton close;
+
+	private ToolStripButton zoomIn;
+
+	private ToolStripButton zoomOut;
 
 	private ToolStrip toolStrip;
 
+	private HLayout editorPanel;
+	
 	public BarcodeTemplatesPanel(GUITemplate selectedDocumentTemplate) {
 		setWidth100();
 		setHeight100();
@@ -83,54 +91,35 @@ public class BarcodeTemplatesPanel extends VLayout {
 		refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null, null);
 	}
 
-	private void showContextMenu() {
-		Menu contextMenu = new Menu();
-
-		MenuItem clean = new MenuItem();
-		clean.setTitle(I18N.message("ddelete"));
-		clean.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-			public void onClick(MenuItemClickEvent event) {
-				LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							patternsGrid.removeData(patternsGrid.getSelectedRecord());
-						}
-					}
-				});
-			}
-		});
-
-		contextMenu.setItems(clean);
-		contextMenu.showContextMenu();
-	}
-
 	/**
-	 * Sends the patterns in the grid to the server to save them.
+	 * Sends the patterns to the server to save them.
 	 */
 	private void onSave() {
-		Record[] records = patternsGrid.getRecords();
-		GUIBarcodeSpec[] patterns = new GUIBarcodeSpec[records.length];
-		int i = 0;
-		for (Record record : records) {
-			GUIBarcodeSpec patt = new GUIBarcodeSpec();
-			patt.setPatterns(record.getAttributeAsString("pattern"));
-			patt.setInclude(record.getAttributeAsString("include"));
-			patt.setExclude(record.getAttributeAsString("exclude"));
-			patt.setFormats(record.getAttributeAsString("formats"));
-			patterns[i++] = patt;
+		if (!selectedBarcodeTemplate.isZonal()) {
+			Record[] records = positionalGrid.getRecords();
+			GUIBarcodeSpec[] patterns = new GUIBarcodeSpec[records.length];
+			int i = 0;
+			for (Record record : records) {
+				GUIBarcodeSpec patt = new GUIBarcodeSpec();
+				patt.setPatterns(record.getAttributeAsString("pattern"));
+				patt.setInclude(record.getAttributeAsString("include"));
+				patt.setExclude(record.getAttributeAsString("exclude"));
+				patt.setFormats(record.getAttributeAsString("formats"));
+				patterns[i++] = patt;
+				patt.setIndex(i);
+			}
+			selectedBarcodeTemplate.setBarcodeSpecs(patterns);
 		}
-		selectedBarcodeTemplate.setBarcodeSpecs(patterns);
 
 		BarcodeService.Instance.get().save(selectedBarcodeTemplate, new AsyncCallback<GUIBarcodeTemplate>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(GUIBarcodeTemplate template) {
-				Log.info(I18N.message("settingssaved"), null);
+				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
 	}
@@ -138,10 +127,8 @@ public class BarcodeTemplatesPanel extends VLayout {
 	private void refresh(Long documentTemplateId, Long barcodeTemplateId) {
 		if (toolStrip != null)
 			removeMember(toolStrip);
-		if (patternsGrid != null) {
-			removeMember(patternsGrid);
-			patternsGrid.destroy();
-		}
+		if (editorPanel != null)
+			removeMember(editorPanel);
 
 		templateSelector = ItemFactory.newTemplateSelector(true, documentTemplateId);
 		templateSelector.setWrapTitle(false);
@@ -182,7 +169,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -205,14 +192,25 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 		append = new ToolStripButton();
 		append.setAutoFit(true);
-		append.setTitle(I18N.message("appendpattern"));
+		append.setTitle(selectedBarcodeTemplate != null && selectedBarcodeTemplate.isZonal() ? I18N.message("addzone")
+				: I18N.message("appendpattern"));
 		append.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				event.cancel();
-				ListGridRecord record = new ListGridRecord();
-				record.setAttribute("pattern", "");
-				patternsGrid.getRecordList().add(record);
+
+				if (selectedBarcodeTemplate != null && selectedBarcodeTemplate.isZonal()) {
+					GUIBarcodeSpec zone = new GUIBarcodeSpec();
+					zone.setTemplateId(selectedBarcodeTemplate.getId());
+					zone.setPatterns("<customId>");
+					selectedBarcodeTemplate.appendBarcodeSpec(zone);
+					Canvas zoneCanvas = new ZoneCanvas(zone, BarcodeTemplatesPanel.this);
+					zonalCanvas.addCanvas(zoneCanvas);
+				} else {
+					ListGridRecord record = new ListGridRecord();
+					record.setAttribute("pattern", "");
+					positionalGrid.getRecordList().add(record);
+				}
 			}
 		});
 
@@ -255,7 +253,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -279,6 +277,45 @@ public class BarcodeTemplatesPanel extends VLayout {
 			}
 		});
 
+		print = new ToolStripButton(I18N.message("print"));
+		print.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (selectedBarcodeTemplate.isZonal())
+					PrintUtil.printScreenShot(zonalCanvas.getID(),
+							I18N.message("zonalocr") + " - " + selectedBarcodeTemplate.getName());
+				else
+					GridUtil.print(positionalGrid);
+
+			}
+		});
+
+		zoomIn = new ToolStripButton();
+		zoomIn.setTitle(I18N.message("zoomin"));
+		zoomIn.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (zonalCanvas != null) {
+					zonalCanvas.clearCanvases();
+					zonalCanvas.resize(+100);
+					showZones();
+				}
+			}
+		});
+
+		zoomOut = new ToolStripButton();
+		zoomOut.setTitle(I18N.message("zoomout"));
+		zoomOut.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (zonalCanvas != null) {
+					zonalCanvas.clearCanvases();
+					zonalCanvas.resize(-100);
+					showZones();
+				}
+			}
+		});
+
 		toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
@@ -291,100 +328,53 @@ public class BarcodeTemplatesPanel extends VLayout {
 		toolStrip.addButton(append);
 		toolStrip.addButton(delete);
 		toolStrip.addSeparator();
+		toolStrip.addButton(zoomIn);
+		toolStrip.addButton(zoomOut);
+		toolStrip.addButton(print);
+		toolStrip.addSeparator();
 		toolStrip.addButton(close);
 		toolStrip.addFill();
+		
+		editorPanel=new HLayout();
+		editorPanel.setWidth100();
+		editorPanel.setHeight100();
+		editorPanel.setOverflow(Overflow.AUTO);
+		setMembers(toolStrip, editorPanel);
 
-		ListGridField pattern = new ListGridField("pattern", I18N.message("patternscomma"));
-		pattern.setWidth(300);
-		pattern.setRequired(true);
-		pattern.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return Util.strip(record.getAttributeAsString("pattern"));
-			}
-		});
+		if (selectedBarcodeTemplate != null && selectedBarcodeTemplate.isZonal()) {
+			String url = Util.contextPath() + "barcodetemplateimage/" + selectedBarcodeTemplate.getId() + "?random="
+					+ new Date().getTime();
+			zonalCanvas = new ImageWithCanvases(url, getWidth().intValue() - 50, null, new CallBack() {
 
-		ListGridField include = new ListGridField("include", I18N.message("include"));
-		include.setWidth(200);
-		include.setRequired(false);
-		include.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return Util.strip(record.getAttributeAsString("include"));
-			}
-		});
-
-		ListGridField exclude = new ListGridField("exclude", I18N.message("exclude"));
-		exclude.setWidth(200);
-		exclude.setRequired(false);
-		exclude.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return Util.strip(record.getAttributeAsString("exclude"));
-			}
-		});
-
-		ListGridField formats = new ListGridField("formats", I18N.message("formats"));
-		formats.setWidth(200);
-		formats.setRequired(false);
-		formats.setCanEdit(true);
-		formats.setEditorProperties(ItemFactory.newBarcodeFormatsComboBoxItem("formats", "formats", (String) null));
-
-		patternsGrid = new ListGrid();
-		patternsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		patternsGrid.setShowAllRecords(true);
-		patternsGrid.setCanEdit(true);
-		patternsGrid.setWidth100();
-		patternsGrid.setHeight100();
-		patternsGrid.setFields(pattern, include, exclude, formats);
-		patternsGrid.setSelectionType(SelectionStyle.SINGLE);
-		patternsGrid.setModalEditing(true);
-		patternsGrid.setShowRowNumbers(true);
-		patternsGrid.setCanReorderRecords(true);
-		patternsGrid.setCanDragRecordsOut(true);
-		patternsGrid.setCanAcceptDroppedRecords(true);
-		patternsGrid.setDragDataAction(DragDataAction.MOVE);
-		patternsGrid.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
-		});
-
-		addMember(toolStrip);
-		addMember(patternsGrid);
-
+				@Override
+				public void onImagesLoaded(ImageElement[] imageElements) {
+					showZones();
+				}
+			});
+			editorPanel.addMember(zonalCanvas);
+		} else {
+			positionalGrid = new PositionalBarcodesGrid(selectedBarcodeTemplate);
+			editorPanel.addMember(positionalGrid);
+		}
+		
+		
 		settings.setDisabled(selectedBarcodeTemplate == null);
 		save.setDisabled(selectedBarcodeTemplate == null);
 		append.setDisabled(selectedBarcodeTemplate == null);
 		delete.setDisabled(selectedBarcodeTemplate == null || selectedBarcodeTemplate.getId() == 0L);
 		close.setDisabled(selectedBarcodeTemplate == null);
-
-		updateGrid();
+		print.setDisabled(selectedBarcodeTemplate == null);
+		zoomIn.setDisabled(selectedBarcodeTemplate == null || zonalCanvas == null);
+		zoomOut.setDisabled(selectedBarcodeTemplate == null || zonalCanvas == null);
 	}
 
-	private void updateGrid() {
-		if (selectedBarcodeTemplate != null) {
-			ArrayList<ListGridRecord> records = new ArrayList<ListGridRecord>();
-			if (selectedBarcodeTemplate.getBarcodeSpecs() != null)
-				for (GUIBarcodeSpec pat : selectedBarcodeTemplate.getBarcodeSpecs()) {
-					ListGridRecord record = new ListGridRecord();
-					record.setAttribute("pattern", pat.getPatterns());
-					record.setAttribute("include", pat.getInclude());
-					record.setAttribute("exclude", pat.getExclude());
-
-					String frmts = pat.getFormats();
-					if (frmts == null || frmts.trim().isEmpty())
-						record.setAttribute("formats", (String) null);
-					else if (!frmts.trim().contains(","))
-						record.setAttribute("formats", frmts.trim());
-					else
-						record.setAttribute("formats", pat.getFormats().replaceAll(" ", "").split(","));
-					records.add(record);
-				}
-			patternsGrid.setRecords(records.toArray(new ListGridRecord[0]));
-		}
+	void showZones() {
+		if (selectedBarcodeTemplate.getBarcodeSpecs() != null)
+			for (GUIBarcodeSpec zone : selectedBarcodeTemplate.getBarcodeSpecs()) {
+				zone.setTemplateId(selectedBarcodeTemplate.getId());
+				Canvas zoneCanvas = new ZoneCanvas(zone, BarcodeTemplatesPanel.this);
+				zonalCanvas.addCanvas(zoneCanvas);
+			}
 	}
 
 	public GUIBarcodeTemplate getSelectedBarcodeTemplate() {
@@ -395,5 +385,9 @@ public class BarcodeTemplatesPanel extends VLayout {
 		this.selectedBarcodeTemplate = selectedBarcodeTemplate;
 		refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null,
 				selectedBarcodeTemplate.getId());
+	}
+
+	public ImageWithCanvases getZonalCanvas() {
+		return zonalCanvas;
 	}
 }

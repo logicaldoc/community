@@ -111,7 +111,7 @@ public class TaskSchedulingPanel extends VLayout {
 		initialDelay.setWidth(80);
 		initialDelay.setVisible(simplePolicy);
 		initialDelay.setStep(10);
-		initialDelay.setMin(0);
+		initialDelay.setMin(1);
 		initialDelay.addChangedHandler(changedHandler);
 		initialDelay.setHint(I18N.message("seconds").toLowerCase());
 		initialDelay.setHintStyle("hint");
@@ -122,7 +122,7 @@ public class TaskSchedulingPanel extends VLayout {
 		repeatInterval.setWidth(80);
 		repeatInterval.setVisible(simplePolicy);
 		repeatInterval.setStep(60);
-		repeatInterval.setMin(0);
+		repeatInterval.setMin(1);
 		repeatInterval.setVisible(simplePolicy);
 		repeatInterval.addChangedHandler(changedHandler);
 		repeatInterval.setHint(I18N.message("seconds").toLowerCase());

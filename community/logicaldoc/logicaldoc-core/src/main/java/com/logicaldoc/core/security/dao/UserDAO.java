@@ -136,6 +136,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * 
 	 * @param user the user to store
 	 * @param transaction entry to log the event
+	 * 
 	 * @return True if successfully stored in a database.
 	 */
 	public boolean store(final User user, final UserHistory transaction);

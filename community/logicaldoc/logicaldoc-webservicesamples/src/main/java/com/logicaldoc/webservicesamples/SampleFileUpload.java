@@ -108,9 +108,9 @@ public class SampleFileUpload {
 
     public static void main(String args[]){
         SampleFileUpload fileUpload = new SampleFileUpload () ;
-        File file = new File ("Hydrangeas.jpg") ;
+        File file = new File ("C:/tmp/aR5TUWLR_400x400.jpg") ;
 
-        String response = fileUpload.executeMultiPartRequest("<Request URL>", file, file.getName(), "File Upload test Hydrangeas.jpg description") ;
+        String response = fileUpload.executeMultiPartRequest("<Request URL>", file, file.getName(), "File Upload test aR5TUWLR_400x400.jpg description") ;
         System.out.println("Response : "+response);
     }  
 

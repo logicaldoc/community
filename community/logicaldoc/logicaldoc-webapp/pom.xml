@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.5.2</version>
+		<version>8.6.1</version>
 	</parent>
 	<artifactId>logicaldoc-webapp</artifactId>
 	<name>logicaldoc-webapp</name>
@@ -104,7 +104,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
@@ -481,6 +481,18 @@
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/war/</outputDirectory>
 								</artifactItem>
+								<artifactItem>
+									<groupId>com.logicaldoc</groupId>
+									<artifactId>logicaldoc-android</artifactId>
+									<version>${project.version}</version>
+									<type>zip</type>
+									<classifier>plugin</classifier>
+									<overWrite>true</overWrite>
+                                    <!--
+									<outputDirectory>${project.build.directory}/${project.build.finalName}/</outputDirectory>
+                                    -->
+                                    <outputDirectory>${project.build.directory}/war/</outputDirectory>
+								</artifactItem>
 							</artifactItems>
 						</configuration>
 					</execution>
@@ -498,8 +510,11 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<unzip src="target/${project.artifactId}-${project.version}.war" dest="target/war" />
-								<delete dir="target/war/WEB-INF/classes/com/logicaldoc/gui" />
+								<unzip
+									src="target/${project.artifactId}-${project.version}.war"
+									dest="target/war" />
+								<delete
+									dir="target/war/WEB-INF/classes/com/logicaldoc/gui" />
 								<delete dir="target/war/work" />
 								<delete dir="target/war/META-INF" />
 								<delete>
@@ -507,7 +522,8 @@
 										includes="gwt-user*,smartgwt-skin*,logicaldoc-webapp*,gwtevent*,guava-14*,guava-16*" />
 								</delete>
 								<copy file="src/main/resources/context.properties"
-									tofile="target/war/WEB-INF/classes/context.properties" overwrite="true" />
+									tofile="target/war/WEB-INF/classes/context.properties"
+									overwrite="true" />
 								<unzip dest="target/war">
 									<fileset dir="target/war">
 										<include name="*-plugin.zip" />
@@ -518,7 +534,9 @@
 										<include name="*-plugin.zip" />
 									</fileset>
 								</delete>
-								<zip destfile="target/${project.artifactId}-${project.version}.war" basedir="target/war" />
+								<zip
+									destfile="target/${project.artifactId}-${project.version}.war"
+									basedir="target/war" />
 							</tasks>
 						</configuration>
 					</execution>

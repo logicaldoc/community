@@ -1,32 +1,39 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
+import java.util.ArrayList;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowTasksDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
+import com.logicaldoc.gui.common.client.util.GridUtil;
+import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
+import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragAppearance;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -59,6 +66,8 @@ public class WorkflowPortlet extends Portlet {
 	// We save the state of the grid to correctly handle the refreshes
 	private String gridState = null;
 
+	private SpinnerItem max = null;
+
 	public WorkflowPortlet(WorkflowDashboard dashboard, int type) {
 		this.workflowDashboard = dashboard;
 		this.type = type;
@@ -85,20 +94,35 @@ public class WorkflowPortlet extends Portlet {
 		HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 		exportControl.setTooltip(I18N.message("export"));
-		
+
 		HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		printControl.setTooltip(I18N.message("print"));
 
-		setHeaderControls(HeaderControls.HEADER_LABEL, exportControl, printControl);
+		DynamicForm maxSelector = new DynamicForm();
+		maxSelector.setNumCols(1);
+		maxSelector.setLayoutAlign(Alignment.CENTER);
+
+		max = ItemFactory.newSpinnerItem("max", "max", 100);
+		max.setMin(0);
+		max.setStep(10);
+		max.setShowHint(false);
+		max.addChangedHandler(new ChangedHandler() {
+			public void onChanged(ChangedEvent event) {
+				refresh();
+			}
+		});
+		maxSelector.setItems(max);
+
+		setHeaderControls(HeaderControls.HEADER_LABEL, maxSelector, exportControl, printControl);
 	}
 
 	@Override
@@ -120,23 +144,11 @@ public class WorkflowPortlet extends Portlet {
 		ListGridField tag = new ListGridField("tag", I18N.message("tag"), 120);
 		ListGridField lastnote = new ListGridField("lastnote", I18N.message("lastnote"), 120);
 
-		ListGridField startdate = new ListGridField("startdate", I18N.message("startdate"), 120);
-		startdate.setAlign(Alignment.CENTER);
-		startdate.setType(ListGridFieldType.DATE);
-		startdate.setCellFormatter(new DateCellFormatter(false));
-		startdate.setCanFilter(false);
+		ListGridField startdate = new DateListGridField("startdate", "startdate");
 
-		ListGridField duedate = new ListGridField("duedate", I18N.message("duedate"), 120);
-		duedate.setAlign(Alignment.CENTER);
-		duedate.setType(ListGridFieldType.DATE);
-		duedate.setCellFormatter(new DateCellFormatter(false));
-		duedate.setCanFilter(false);
+		ListGridField duedate = new DateListGridField("duedate", "duedate");
 
-		ListGridField enddate = new ListGridField("enddate", I18N.message("enddate"), 120);
-		enddate.setAlign(Alignment.CENTER);
-		enddate.setType(ListGridFieldType.DATE);
-		enddate.setCellFormatter(new DateCellFormatter(false));
-		enddate.setCanFilter(false);
+		ListGridField enddate = new DateListGridField("enddate", "enddate");
 		enddate.setHidden(true);
 
 		list = new RefreshableListGrid();
@@ -145,10 +157,10 @@ public class WorkflowPortlet extends Portlet {
 		list.setAutoFetchData(true);
 		list.setShowHeader(true);
 		list.setCanSelectAll(false);
-		list.setSelectionType(SelectionStyle.SINGLE);
+		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setHeight100();
 		list.setBorder("0px");
-		list.setDataSource(new WorkflowTasksDS(type, null));
+		list.setDataSource(new WorkflowTasksDS(type, null, max.getValueAsInteger()));
 		list.sort("startdate", SortDirection.ASCENDING);
 		if (type == WorkflowDashboard.TASKS_I_CAN_OWN || type == WorkflowDashboard.TASKS_ADMIN
 				|| type == WorkflowDashboard.TASKS_SUPERVISOR || type == WorkflowDashboard.TASKS_INVOLVED)
@@ -167,7 +179,7 @@ public class WorkflowPortlet extends Portlet {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -226,7 +238,13 @@ public class WorkflowPortlet extends Portlet {
 	}
 
 	public void refresh() {
-		list.refresh(new WorkflowTasksDS(type, null));
+		list.refresh(new WorkflowTasksDS(type, null, max.getValueAsInteger()));
+	}
+
+	public void onDeletedWorkflow(String processId) {
+		Record[] records = list.findAll(new AdvancedCriteria("processId", OperatorId.EQUALS, processId));
+		for (Record record : records)
+			list.removeData(record);
 	}
 
 	private void showContextMenu() {
@@ -248,21 +266,11 @@ public class WorkflowPortlet extends Portlet {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
-							// Extract the process instance ID
-							String processId = selection.getAttributeAsString("processId");
-							WorkflowService.Instance.get().deleteInstance(processId, new AsyncCallback<Void>() {
-								@Override
-								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(Void result) {
-									list.deselectAllRecords();
-									list.removeSelectedData();
-									workflowDashboard.refresh();
-								}
-							});
+							ArrayList<String> ids = new ArrayList<String>();
+							ListGridRecord[] selectedRecords = list.getSelectedRecords();
+							for (ListGridRecord record : selectedRecords)
+								ids.add(record.getAttributeAsString("processId"));
+							workflowDashboard.killWorkflows(ids);
 						}
 					}
 				});

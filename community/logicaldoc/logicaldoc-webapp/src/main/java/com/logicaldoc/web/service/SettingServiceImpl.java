@@ -14,9 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.conversion.FormatConverter;
+import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
@@ -64,6 +67,10 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 					"true".equals(conf.getProperty(session.getTenantName() + ".smtp.authEncripted")) ? true : false);
 			emailSettings.setSenderEmail(conf.getProperty(session.getTenantName() + ".smtp.sender"));
 			emailSettings.setUserAsFrom(conf.getBoolean(session.getTenantName() + ".smtp.userasfrom", true));
+			emailSettings.setFoldering(conf.getInt(session.getTenantName() + ".smtp.save.foldering", 3));
+
+			emailSettings.setTargetFolder(FolderServiceImpl.getFolder(session,
+					conf.getLong(session.getTenantName() + ".smtp.save.folderId", 0)));
 
 			log.info("Email settings data loaded successfully.");
 		} catch (Exception e) {
@@ -91,6 +98,10 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 					settings.isSecureAuth() ? "true" : "false");
 			conf.setProperty(session.getTenantName() + ".smtp.sender", settings.getSenderEmail());
 			conf.setProperty(session.getTenantName() + ".smtp.userasfrom", "" + settings.isUserAsFrom());
+			conf.setProperty(session.getTenantName() + ".smtp.save.foldering",
+					Integer.toString(settings.getFoldering()));
+			conf.setProperty(session.getTenantName() + ".smtp.save.folderId",
+					settings.getTargetFolder() != null ? Long.toString(settings.getTargetFolder().getId()) : "");
 
 			conf.write();
 
@@ -104,6 +115,10 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 					"true".equals(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.authEncripted")) ? true : false);
 			sender.setConnectionSecurity(
 					Integer.parseInt(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.connectionSecurity")));
+			sender.setFoldering(conf.getInt(Tenant.DEFAULT_NAME + ".smtp.save.foldering", EMailSender.FOLDERING_MONTH));
+			sender.setFolderId(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.save.folderId") != null
+					? conf.getLong(Tenant.DEFAULT_NAME + ".smtp.save.folderId", 0L)
+					: null);
 
 			log.info("Email settings data written successfully.");
 		} catch (Exception e) {
@@ -162,7 +177,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 	}
 
 	@Override
-	public GUIParameter[] loadClientSettings() throws ServerException {
+	public GUIParameter[] loadProtocolSettings() throws ServerException {
 		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 
 		ContextProperties conf = Context.get().getProperties();
@@ -208,6 +223,35 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 		saveSettings(settings);
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		storer.init();
+	}
+
+	@Override
+	public String[] removeStorage(int storageId) throws ServerException {
+		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
+
+		try {
+			ContextProperties config = Context.get().getProperties();
+			if (storageId == config.getInt("store.write"))
+				throw new Exception(
+						"You cannot delete the storage " + storageId + " because it is the current default");
+
+			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			List<Folder> folders = (List<Folder>) dao.findByWhere("_entity.storage=" + storageId, null, null);
+			if (!folders.isEmpty()) {
+				List<String> paths = folders.stream().map(f -> dao.computePathExtended(f.getId()))
+						.collect(Collectors.toList());
+				paths.sort(null);
+				return paths.toArray(new String[0]);
+			} else {
+				Map<String, String> settings = config.getProperties("store." + storageId + ".");
+				for (String setting : settings.keySet())
+					config.remove("store." + storageId + "." + setting);
+				config.write();
+				return null;
+			}
+		} catch (Throwable e) {
+			return (String[]) ServiceUtil.throwServerException(session, log, e);
+		}
 	}
 
 	@Override
@@ -278,8 +322,8 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 			mail.parseRecipients(email);
 			mail.setFolder("outbox");
 			mail.setSentDate(new Date());
-			mail.setSubject("test");
-			mail.setMessageText("test");
+			mail.setSubject("Hello from " + SystemInfo.get().getProduct());
+			mail.setMessageText("This is a test email from " + SystemInfo.get().getProduct());
 
 			log.info("Sending test email to {}", email);
 			sender.send(mail);
@@ -355,13 +399,16 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 
 			// Delete all actual aliases
 			for (String key : keys)
-				config.remove("converter.alias."+key);
-			
+				config.remove("converter.alias." + key);
+
 			// Now add the new ones
 			if (StringUtils.isNotEmpty(aliases)) {
 				String[] tokens = aliases.split(",");
 				for (String token : tokens)
-					config.setProperty("converter.alias." + token.toLowerCase().trim().replace(" ", "").replace(".", "").replace("=", ""), extension);
+					config.setProperty(
+							"converter.alias."
+									+ token.toLowerCase().trim().replace(" ", "").replace(".", "").replace("=", ""),
+							extension);
 			}
 
 			config.write();

@@ -1,8 +1,10 @@
 package com.logicaldoc.web.service;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -32,6 +35,8 @@ import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.generic.Generic;
+import com.logicaldoc.core.security.Device;
+import com.logicaldoc.core.security.Geolocation;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.LoginThrottle;
 import com.logicaldoc.core.security.Menu;
@@ -42,6 +47,8 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
+import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
+import com.logicaldoc.core.security.dao.DeviceDAO;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
@@ -51,7 +58,6 @@ import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
-import com.logicaldoc.gui.common.client.beans.GUIExternalCall;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIMenu;
@@ -61,13 +67,18 @@ import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.services.SecurityService;
+import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.sql.SqlUtil;
+import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.util.ServiceUtil;
 
 /**
@@ -171,7 +182,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			session.setLoggedIn(true);
 
 			MenuDAO mdao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-			List<Long> menus = mdao.findMenuIdByUserId(sess.getUserId());
+			List<Long> menus = mdao.findMenuIdByUserId(sess.getUserId(), true);
 			guiUser.setMenus((Long[]) menus.toArray(new Long[0]));
 
 			loadDashlets(guiUser);
@@ -198,20 +209,6 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			sess.getDictionary().put(ServiceUtil.USER, user);
 
 			guiUser.setPasswordMinLenght(Integer.parseInt(config.getProperty(sess.getTenantName() + ".password.size")));
-
-			/*
-			 * Prepare the external command
-			 */
-			String tenantName = sess.getTenantName();
-			if (info.isEnabled("Feature_31") && "true".equals(config.getProperty(tenantName + ".extcall.enabled"))) {
-				GUIExternalCall externalCall = new GUIExternalCall();
-				externalCall.setName(config.getProperty(tenantName + ".extcall.name"));
-				externalCall.setBaseUrl(config.getProperty(tenantName + ".extcall.baseurl"));
-				externalCall.setSuffix(config.getProperty(tenantName + ".extcall.suffix"));
-				externalCall.setTargetWindow(config.getProperty(tenantName + ".extcall.window"));
-				externalCall.setParametersStr(config.getProperty(tenantName + ".extcall.params"));
-				session.setExternalCall(externalCall);
-			}
 
 			return session;
 		} catch (Throwable t) {
@@ -249,7 +246,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	}
 
 	@Override
-	public int changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
+	public GUIValue changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
 			boolean notify) {
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -305,12 +302,15 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					notifyAccount(user, newPassword);
 				} catch (Throwable e) {
 					log.warn(e.getMessage(), e);
-					return 2;
+					return new GUIValue("2", null);
 				}
-			return 0;
+			return new GUIValue("0", null);
+		} catch (PasswordAlreadyUsedException e) {
+			log.error(e.getMessage(), e);
+			return new GUIValue("3", e.getFormattedDate());
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			return 1;
+			return new GUIValue("1", null);
 		}
 	}
 
@@ -451,6 +451,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 						Integer.parseInt(config.getProperty(guiUser.getTenant().getName() + ".password.size")));
 
 				loadDashlets(guiUser);
+
+				guiUser.setCustomActions(getMenus(Menu.CUSTOM_ACTIONS, guiUser.getLanguage(), true));
 
 				return guiUser;
 			}
@@ -609,12 +611,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 				// Generate an initial password(that must be changed)
 				ContextProperties pbean = Context.get().getProperties();
-				int minsize = 8;
-				try {
-					minsize = pbean.getInt(session.getTenantName() + ".password.size");
-				} catch (Throwable t) {
-
-				}
+				int minsize = pbean.getInt(session.getTenantName() + ".password.size", 8);
 				decodedPassword = PasswordGenerator.generate(minsize);
 				usr.setDecodedPassword(decodedPassword);
 				usr.setPasswordExpired(1);
@@ -802,9 +799,9 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 			ContextProperties pbean = Context.get().getProperties();
 
-			securitySettings.setPwdExpiration(Integer.parseInt(pbean.getProperty("password.ttl")));
-			securitySettings
-					.setPwdSize(Integer.parseInt(pbean.getProperty(session.getTenantName() + ".password.size")));
+			securitySettings.setPwdExpiration(pbean.getInt(session.getTenantName() + ".password.ttl", 90));
+			securitySettings.setPwdSize(pbean.getInt(session.getTenantName() + ".password.size", 8));
+			securitySettings.setPwdEnforceHistory(pbean.getInt(session.getTenantName() + ".password.enforcehistory", 0));
 			if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ".gui.savelogin")))
 				securitySettings
 						.setSaveLogin("true".equals(pbean.getProperty(session.getTenantName() + ".gui.savelogin")));
@@ -822,6 +819,13 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			}
 			if (StringUtils.isNotEmpty(pbean.getProperty("ssl.required")))
 				securitySettings.setForceSsl("true".equals(pbean.getProperty("ssl.required")));
+
+			securitySettings.setAlertNewDevice(pbean.getBoolean(session.getTenantName() + ".alertnewdevice", true));
+
+			securitySettings.setGeolocationEnabled(pbean.getBoolean("security.geolocation.enabled", true));
+			securitySettings.setGeolocationCache(pbean.getBoolean("security.geolocation.cache", false));
+			securitySettings.setGeolocationKey(pbean.getProperty("security.geolocation.apikey"));
+			securitySettings.setGeolocationDbVer(Geolocation.get().getDatabaseVersion());
 
 			log.debug("Security settings data loaded successfully.");
 		} catch (Exception e) {
@@ -841,10 +845,13 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			ContextProperties conf = Context.get().getProperties();
 
 			if (session.getTenantId() == Tenant.DEFAULT_ID) {
-				conf.setProperty("password.ttl", Integer.toString(settings.getPwdExpiration()));
 				conf.setProperty("login.ignorecase", Boolean.toString(settings.isIgnoreLoginCase()));
 				conf.setProperty("ssl.required", Boolean.toString(settings.isForceSsl()));
 				conf.setProperty("security.acceptsid", Boolean.toString(settings.isAllowSidInRequest()));
+				conf.setProperty("security.geolocation.enabled", Boolean.toString(settings.isGeolocationEnabled()));
+				conf.setProperty("security.geolocation.cache", Boolean.toString(settings.isGeolocationCache()));
+				conf.setProperty("security.geolocation.apikey",
+						settings.getGeolocationKey() != null ? settings.getGeolocationKey() : "");
 
 				// Update the web.xml
 				try {
@@ -855,10 +862,17 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				} catch (Throwable t) {
 					log.error(t.getMessage());
 				}
+
+				// Invalidate then Geolocation
+				Geolocation.get().finalize();
 			}
 
+			conf.setProperty(session.getTenantName() + ".password.ttl", Integer.toString(settings.getPwdExpiration()));
+			conf.setProperty(session.getTenantName() + ".password.enforcehistory", Integer.toString(settings.getPwdEnforceHistory()));
 			conf.setProperty(session.getTenantName() + ".password.size", Integer.toString(settings.getPwdSize()));
 			conf.setProperty(session.getTenantName() + ".gui.savelogin", Boolean.toString(settings.isSaveLogin()));
+			conf.setProperty(session.getTenantName() + ".alertnewdevice",
+					Boolean.toString(settings.isAlertNewDevice()));
 			conf.setProperty(session.getTenantName() + ".anonymous.enabled",
 					Boolean.toString(settings.isEnableAnonymousLogin()));
 			conf.setProperty(session.getTenantName() + ".anonymous.key", settings.getAnonymousKey().trim());
@@ -935,7 +949,101 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	}
 
 	@Override
-	public GUIMenu getMenu(long menuId) throws ServerException {
+	public void deleteMenu(long menuId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+			Menu menu = dao.findById(menuId);
+			if (menu == null)
+				throw new Exception("Unexisting menu identified by " + menuId);
+			if (menu.getType() == Menu.TYPE_DEFAULT)
+				throw new Exception("Cannot delete legacy menu " + menuId);
+			dao.delete(menuId);
+		} catch (Throwable e) {
+			ServiceUtil.throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public void saveMenus(GUIMenu[] menus, String locale) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			if (menus == null || menus.length < 1)
+				return;
+			for (GUIMenu guiMenu : menus)
+				saveMenu(guiMenu, locale);
+		} catch (Throwable e) {
+			ServiceUtil.throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public GUIMenu saveMenu(GUIMenu guiMenu, String locale) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+			Menu menu = new Menu();
+			if (guiMenu.getId() != 0L) {
+				menu = dao.findById(guiMenu.getId());
+				dao.initialize(menu);
+			} else {
+				menu.setTenantId(session.getTenantId());
+			}
+
+			menu.setName(guiMenu.getName().replace("/", ""));
+			menu.setAutomation(guiMenu.getAutomation());
+			menu.setEnabled(guiMenu.isEnabled() ? 1 : 0);
+			menu.setDescription(guiMenu.getDescription());
+			menu.setPosition(guiMenu.getPosition());
+			menu.setParentId(guiMenu.getParentId());
+			menu.setRoutineId(guiMenu.getRoutineId());
+			menu.setSecurityRef(guiMenu.getSecurityRef());
+			menu.setType(guiMenu.getType());
+
+			menu.getMenuGroups().clear();
+			if (guiMenu.getRights() != null && guiMenu.getRights().length > 0) {
+				for (GUIRight right : guiMenu.getRights())
+					menu.getMenuGroups().add(new MenuGroup(right.getEntityId()));
+			}
+
+			dao.store(menu);
+			return getMenu(menu.getId(), locale);
+		} catch (Throwable e) {
+			return (GUIMenu) ServiceUtil.throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public GUIMenu[] getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+
+			List<Menu> menus = dao.findByUserId(session.getUserId(), parentId, enabledOnly);
+			List<GUIMenu> guiMenus = menus.stream().filter(m -> m.getTenantId() == session.getTenantId())
+					.map(m -> toGUIMenu(m, locale)).collect(Collectors.toList());
+			guiMenus.sort(new Comparator<GUIMenu>() {
+
+				@Override
+				public int compare(GUIMenu m1, GUIMenu m2) {
+					if (m1.getPosition() == m2.getPosition())
+						return m1.getName().compareToIgnoreCase(m2.getName());
+					return m1.getPosition() < m2.getPosition() ? -1 : 1;
+				}
+			});
+
+			return guiMenus.toArray(new GUIMenu[0]);
+		} catch (Throwable e) {
+			return (GUIMenu[]) ServiceUtil.throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public GUIMenu getMenu(long menuId, String locale) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
@@ -945,8 +1053,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			if (menu == null)
 				return null;
 
-			GUIMenu f = new GUIMenu();
-			f.setId(menuId);
+			GUIMenu f = toGUIMenu(menu, locale);
 
 			int i = 0;
 			GUIRight[] rights = new GUIRight[menu.getMenuGroups().size()];
@@ -966,6 +1073,58 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		} catch (Throwable e) {
 			return (GUIMenu) ServiceUtil.throwServerException(session, log, e);
 		}
+	}
+
+	private GUIMenu toGUIMenu(Menu menu, String locale) {
+		GUIMenu f = new GUIMenu();
+		f.setId(menu.getId());
+		f.setName(menu.getName());
+		f.setEnabled(menu.getEnabled() == 1);
+		f.setAutomation(menu.getAutomation());
+		f.setRoutineId(menu.getRoutineId());
+		f.setPosition(menu.getPosition());
+		f.setDescription(menu.getDescription());
+		f.setSecurityRef(menu.getSecurityRef());
+		f.setParentId(menu.getParentId());
+		f.setType(menu.getType());
+
+		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
+		dao.initialize(menu);
+
+		List<GUIRight> rights = new ArrayList<GUIRight>();
+
+		if (menu.getMenuGroups() != null && !menu.getMenuGroups().isEmpty()) {
+			GroupDAO gdao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
+			for (MenuGroup mg : menu.getMenuGroups()) {
+				GUIRight right = new GUIRight();
+				right.setEntityId(mg.getGroupId());
+				right.setDelete(mg.getDelete() == 1);
+				right.setSecurity(mg.getManageSecurity() == 1);
+				right.setRename(mg.getRename() == 1);
+				right.setWrite(mg.getWrite() == 1);
+
+				Group group = gdao.findById(mg.getGroupId());
+				if (group == null)
+					continue;
+
+				if (group.getType() == Group.TYPE_DEFAULT) {
+					right.setLabel(group.getName());
+					right.setName(I18N.message("group", LocaleUtil.toLocale(locale)) + ": " + group.getName());
+				} else {
+					User user = udao.findByGroup(group.getId()).iterator().next();
+					right.setLabel(user.getUsername());
+					right.setName(I18N.message("user", LocaleUtil.toLocale(locale)) + ": " + user.getFullName() + " ("
+							+ user.getUsername() + ")");
+				}
+
+				rights.add(right);
+			}
+		}
+
+		f.setRights(rights.toArray(new GUIRight[0]));
+
+		return f;
 	}
 
 	@Override
@@ -1107,5 +1266,107 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
+	}
+
+	@Override
+	public String trustDevice() throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		try {
+			if (session.getClient() != null && session.getClient().getDevice() != null) {
+				Device device = session.getClient().getDevice();
+				DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+				device = dDao.trustDevice(session.getUser(), session.getClient().getDevice());
+				return device.getDeviceId();
+			} else
+				return null;
+		} catch (Throwable t) {
+			return (String) ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public Boolean isTrustedDevice(String deviceId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		try {
+			// If the second factor is not enabled on the user, the device is
+			// always trusted
+			if (StringUtils.isEmpty(session.getUser().getSecondFactor()))
+				return true;
+
+			DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+			Device device = dDao.findByDeviceId(deviceId);
+			return device != null && device.getUserId() == session.getUserId() && device.getTrusted() == 1;
+		} catch (Throwable t) {
+			return (Boolean) ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public void deleteTrustedDevices(String[] deviceIds) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		try {
+			if (deviceIds == null || deviceIds.length < 1)
+				return;
+
+			DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+			for (String deviceId : deviceIds) {
+				Device device = dDao.findByDeviceId(deviceId);
+				if (device != null)
+					dDao.delete(device.getId());
+			}
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public String syncGeolocationDB(String key) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		try {
+			Context.get().getProperties().setProperty("security.geolocation.apikey", key != null ? key : "");
+			Context.get().getProperties().write();
+
+			Geolocation.get().syncDB(key);
+			return Geolocation.get().getDatabaseVersion();
+		} catch (Throwable t) {
+			return (String) ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public void saveAvatar(long userId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
+
+		File file = null;
+		try {
+			for (String fileId : uploadedFilesMap.keySet())
+				if (fileId.startsWith("LDOC_AVATAR")) {
+					file = uploadedFilesMap.get(fileId);
+					break;
+				}
+
+			if (file != null) {
+				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+				User user = userDao.findById(userId);
+				if (user != null)
+					UserUtil.saveAvatar(user, file);
+			}
+		} catch (Throwable e) {
+			log.error("Unable to store the avatar", e);
+		} finally {
+			FileUtil.strongDelete(file);
+		}
+	}
+
+	@Override
+	public void resetAvatar(long userId) throws ServerException {
+		ServiceUtil.validateSession(getThreadLocalRequest());
+
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDao.findById(userId);
+		if (user != null)
+			UserUtil.generateDefaultAvatar(user);
 	}
 }

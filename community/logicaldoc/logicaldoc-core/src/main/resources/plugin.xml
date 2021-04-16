@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-core" version="8.5.2" class="com.logicaldoc.core.CorePlugin">
+<plugin id="logicaldoc-core" version="8.6.1" class="com.logicaldoc.core.CorePlugin">
   <extension-point id="DbInit">
     <parameter-def id="name" />
     <parameter-def id="sqlFile" />
@@ -68,7 +68,7 @@
 
   <extension plugin-id="logicaldoc-core" point-id="Authentication" id="DefaultAuthentication">
     <parameter id="authenticatorId" value="DefaultAuthenticator" />
-    <parameter id="position" value="1" />
+    <parameter id="position" value="100" />
   </extension>
 
   <extension plugin-id="logicaldoc-core" point-id="Language" id="standardLanguage">
@@ -303,6 +303,9 @@
   <extension plugin-id="logicaldoc-core" point-id="Feature" id="fwd57">
 	    <parameter id="name" value="Feature_57" />
   </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Feature" id="fwd97">
+	    <parameter id="name" value="Feature_97" />
+  </extension>  
   
   <extension plugin-id="logicaldoc-core" point-id="Task" id="taskStatsCollector">
 	<parameter id="name" value="StatsCollector" />

@@ -1,34 +1,60 @@
-<project name="logicaldoc-gui" default="deploy" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+<project name="logicaldoc-gui" default="deploy" basedir="."
+	xmlns:artifact="urn:maven-artifact-ant">
 	<property file="${user.home}/logicaldoc-dev.properties" />
 	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
- 
-	<target name="deploy" depends="init-all" description="Updates a deployed webapp">
+
+	<target name="deploy" depends="init-all"
+		description="Updates a deployed webapp">
 		<property environment="env" />
 		<property id="properties" file="build.properties" />
 
 		<echo message="Deploying ${pom.artifactId}" />
 
-		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
-		  <arg line="-o -Dmaven.test.skip=true install"/>
+		<exec executable="mvn.cmd" resolveexecutable="true"
+			searchpath="true">
+			<arg line="-o -Dmaven.test.skip=true install" />
 		</exec>
-		
-		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
 
-		<copy todir="${logicaldoc.webroot}/fontawesome" overwrite="true" failonerror="false">  
-    		<fileset dir="../../../enterprise/logicaldoc/logicaldoc-enterprise-gui/war/fontawesome" includes="**"/>  
-		</copy> 
-		
-		<echo message="${pom.artifactId} is deployed" />
+		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip"
+			dest="${logicaldoc.webroot}" />
+
+		<copy todir="${logicaldoc.webroot}/fontawesome" overwrite="true"
+			failonerror="false">
+			<fileset
+				dir="../../../enterprise/logicaldoc/logicaldoc-enterprise-gui/war/fontawesome"
+				includes="**" />
+		</copy>
+
+		<echo message="${pom.artifactId} has been deployed" />
 	</target>
-	
+
 	<target name="deploy-resources">
-	    <copy todir="${logicaldoc.webroot}">
-	    	<fileset dir="war">
-	    	    <exclude name="fontawesome/"/>
-	    		<exclude name="common/"/>
-	    		<exclude name="WEB-INF/**"/>
-                <exclude name="*.jsp"/>
-	    	</fileset>
-	    </copy>
+		<copy todir="${logicaldoc.webroot}">
+			<fileset dir="war">
+				<exclude name="fontawesome/" />
+				<exclude name="common/" />
+				<exclude name="WEB-INF/**" />
+				<exclude name="*.jsp" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile-deploy-frontend">
+		<replace dir=".">
+    		<include name="**/Common.gwt.xml" />
+    		<replacetoken>"gecko1_8,safari"</replacetoken>
+    		<replacevalue>"gecko1_8"</replacevalue>
+		</replace>
+		<exec executable="mvn.cmd" resolveexecutable="true"
+			searchpath="true">
+			<arg
+				line="-o -Dgwt.compiler.force=true -Dgwt.module=com.logicaldoc.gui.frontend.Frontend gwt:compile" />
+		</exec>
+		<antcall target="deploy-resources" />
+		<replace dir=".">
+    		<include name="**/Common.gwt.xml" />
+    		<replacetoken>"gecko1_8"</replacetoken>
+    		<replacevalue>"gecko1_8,safari"</replacevalue>
+		</replace>
 	</target>
 </project>

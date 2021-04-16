@@ -112,7 +112,6 @@ public class DeletedFoldersDataServlet extends HttpServlet {
 			for (Folder fld : records) {
 				writer.print("<folder>");
 				writer.print("<id>" + fld.getId() + "</id>");
-				writer.print("<icon>" + (fld.getType() == Folder.TYPE_ALIAS ? "folder_alias" : "folder") + "</icon>");
 				writer.print("<name><![CDATA[" + fld.getName() + "]]></name>");
 				writer.print("<lastModified>" + df.format(fld.getLastModified()) + "</lastModified>");
 				writer.print("<deleteUserId>" + fld.getDeleteUserId() + "</deleteUserId>");

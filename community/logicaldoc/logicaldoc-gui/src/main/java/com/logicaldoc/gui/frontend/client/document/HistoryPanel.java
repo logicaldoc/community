@@ -4,16 +4,16 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.DocumentHistoryDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
@@ -43,19 +43,20 @@ public class HistoryPanel extends DocumentDetailTab {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		ListGridField user = new ListGridField("user", I18N.message("user"), 100);
+		ListGridField user = new AvatarListGridField("user", "userId", "user", 110);
 		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
 		ListGridField version = new ListGridField("version", I18N.message("version"), 70);
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
+
 		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
-		ListGridField fileName = new ListGridField("filename", I18N.message("filename"));
+		FileNameListGridField fileName = new FileNameListGridField();
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"));
 		ListGridField ip = new ListGridField("ip", I18N.message("ip"));
+		ListGridField device = new ListGridField("device", I18N.message("device"), 200);
+		device.setHidden(true);
+		ListGridField geolocation = new ListGridField("geolocation", I18N.message("geolocation"), 200);
+		geolocation.setHidden(true);
 
 		final RefreshableListGrid list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -63,7 +64,7 @@ public class HistoryPanel extends DocumentDetailTab {
 		list.setAutoFetchData(true);
 		list.setDataSource(new DocumentHistoryDS(document.getId(), null));
 		if (Menu.enabled(Menu.SESSIONS))
-			list.setFields(user, event, date, comment, version, fileName, path, sid, ip);
+			list.setFields(user, event, date, comment, version, fileName, path, sid, ip, device, geolocation);
 		else
 			list.setFields(user, event, date, comment, version, fileName, path);
 
@@ -100,14 +101,14 @@ public class HistoryPanel extends DocumentDetailTab {
 		});
 
 		buttons.addSeparator();
-		
+
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
 		buttons.addButton(export);
 		export.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 
@@ -116,10 +117,10 @@ public class HistoryPanel extends DocumentDetailTab {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
-		
+
 		VLayout container = new VLayout();
 		container.setMembersMargin(3);
 		container.addMember(list);

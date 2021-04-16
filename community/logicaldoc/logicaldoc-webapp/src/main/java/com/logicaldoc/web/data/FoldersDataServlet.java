@@ -113,8 +113,16 @@ public class FoldersDataServlet extends HttpServlet {
 
 			if (!nopagination && Context.get().getProperties()
 					.getBoolean(session.getTenantName() + ".gui.folder.pagination", false)) {
-				endRecord = Context.get().getProperties().getLong(session.getTenantName() + ".gui.folder.maxchildren",
-						2000L);
+				// Check if the folder itself specifies a max number of records
+				// per page
+				if (StringUtils.isNotEmpty(parentFolder.getGrid()))
+					endRecord = getFolderPageSizeFromSpec(parentFolder.getGrid());
+
+				// Go with the default page size
+				if (endRecord == null)
+					endRecord = Context.get().getProperties()
+							.getLong(session.getTenantName() + ".gui.folder.maxchildren", 2000L);
+
 				Integer[] pagination = new Integer[] {
 						(Integer) session.getDictionary().get(FOLDER_START_RECORD + ":" + parentFolderId),
 						(Integer) session.getDictionary().get(FOLDER_PAGE_SIZE + ":" + parentFolderId) };
@@ -250,5 +258,19 @@ public class FoldersDataServlet extends HttpServlet {
 			else
 				throw new ServletException(e.getMessage(), e);
 		}
+	}
+
+	private static Long getFolderPageSizeFromSpec(String spec) {
+		if (spec != null && spec.startsWith("|")) {
+			try {
+				String txt = spec.substring(1, spec.indexOf('('));
+				String[] tokens = txt.split("\\|");
+				if (tokens.length == 2)
+					return Long.parseLong(tokens[0]);
+			} catch (Throwable t) {
+				return null;
+			}
+		}
+		return null;
 	}
 }

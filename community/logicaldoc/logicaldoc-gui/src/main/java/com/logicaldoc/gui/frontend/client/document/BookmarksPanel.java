@@ -5,16 +5,14 @@ import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.BookmarksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridEditEvent;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -58,23 +56,13 @@ public class BookmarksPanel extends VLayout {
 		LengthRangeValidator validator = new LengthRangeValidator();
 		validator.setMin(1);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"));
-		name.setValidators(validator);
+		FileNameListGridField name = new FileNameListGridField("name", "icon", I18N.message("name"), 200);
 		name.setWidth("*");
+		name.setValidators(validator);
 
 		ListGridField description = new ListGridField("description", I18N.message("description"));
 		description.setValidators(validator);
 		description.setHidden(true);
-
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanEdit(false);
-		icon.setCanFilter(false);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -83,7 +71,7 @@ public class BookmarksPanel extends VLayout {
 		list.setWidth100();
 		list.setHeight100();
 		list.setAutoFetchData(true);
-		list.setFields(icon, name, description);
+		list.setFields(name, description);
 		list.setDataSource(new BookmarksDS());
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);
@@ -104,7 +92,7 @@ public class BookmarksPanel extends VLayout {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 						});
 				event.cancel();
@@ -171,7 +159,7 @@ public class BookmarksPanel extends VLayout {
 							DocumentService.Instance.get().deleteBookmarks(ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

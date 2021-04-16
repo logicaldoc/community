@@ -3,16 +3,14 @@ package com.logicaldoc.gui.frontend.client.system;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.SessionsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.ValueCallback;
@@ -45,7 +43,7 @@ public class SessionsPanel extends VLayout {
 	private RefreshableListGrid list;
 
 	private StaticTextItem activeSessions;
-	
+
 	public SessionsPanel() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -58,9 +56,9 @@ public class SessionsPanel extends VLayout {
 				list.refresh(new SessionsDS());
 			}
 		});
-		
-		activeSessions=ItemFactory.newStaticTextItem("activesessions", "activesessions", "");
-		
+
+		activeSessions = ItemFactory.newStaticTextItem("activesessions", "activesessions", "");
+
 		toolStrip.addButton(refresh);
 		toolStrip.addSeparator();
 		toolStrip.addFormItem(activeSessions);
@@ -84,17 +82,9 @@ public class SessionsPanel extends VLayout {
 		ListGridField tenant = new ListGridField("tenant", I18N.message("tenant"), 80);
 		tenant.setCanFilter(true);
 
-		ListGridField created = new ListGridField("created", I18N.message("createdon"), 110);
-		created.setAlign(Alignment.CENTER);
-		created.setType(ListGridFieldType.DATE);
-		created.setCellFormatter(new DateCellFormatter(false));
-		created.setCanFilter(false);
+		ListGridField created = new DateListGridField("created", "createdon");
 
-		ListGridField renew = new ListGridField("renew", I18N.message("lastrenew"), 110);
-		renew.setAlign(Alignment.CENTER);
-		renew.setType(ListGridFieldType.DATE);
-		renew.setCellFormatter(new DateCellFormatter(false));
-		renew.setCanFilter(false);
+		ListGridField renew = new DateListGridField("renew", "lastrenew");
 
 		ListGridField statusLabel = new ListGridField("statusLabel", I18N.message("status"), 80);
 		statusLabel.setCanFilter(false);
@@ -149,14 +139,14 @@ public class SessionsPanel extends VLayout {
 				event.cancel();
 			}
 		});
-		
+
 		list.addDataArrivedHandler(new DataArrivedHandler() {
-			
+
 			@Override
 			public void onDataArrived(DataArrivedEvent event) {
 				// Search the records with status=0 that are the active sessions
 				Record[] records = list.getRecordList().findAll("status", "0");
-				if(records==null || records.length<1)
+				if (records == null || records.length < 1)
 					activeSessions.setValue("0");
 				else
 					activeSessions.setValue(Integer.toString(records.length));
@@ -182,7 +172,7 @@ public class SessionsPanel extends VLayout {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -198,9 +188,8 @@ public class SessionsPanel extends VLayout {
 			}
 		});
 
-		if (!"0".equals(list.getSelectedRecord().getAttributeAsString("status"))
-				|| (Session.get().getSid() != null && Session.get().getSid()
-						.equals(list.getSelectedRecord().getAttributeAsString("sid"))))
+		if (!"0".equals(list.getSelectedRecord().getAttributeAsString("status")) || (Session.get().getSid() != null
+				&& Session.get().getSid().equals(list.getSelectedRecord().getAttributeAsString("sid"))))
 			killSession.setEnabled(false);
 
 		if (!list.getSelectedRecord().getAttributeAsString("node").equals(Session.get().getInfo().getInstallationId()))

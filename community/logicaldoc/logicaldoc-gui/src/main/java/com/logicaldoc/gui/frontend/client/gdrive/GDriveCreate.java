@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.GDriveService;
@@ -94,7 +94,7 @@ public class GDriveCreate extends Window {
 			@Override
 			public void onFailure(Throwable caught) {
 				ContactingServer.get().hide();
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 				destroy();
 			}
 

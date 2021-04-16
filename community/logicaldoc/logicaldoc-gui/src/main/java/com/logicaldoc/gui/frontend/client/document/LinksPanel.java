@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.LinksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -106,7 +106,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -143,7 +143,7 @@ public class LinksPanel extends DocumentDetailTab {
 									DocumentService.Instance.get().deleteLinks(ids, new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -203,7 +203,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -237,7 +237,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -262,7 +262,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught.getMessage(), caught);
+				GuiLog.serverError(caught.getMessage(), caught);
 			}
 
 			@Override
@@ -308,7 +308,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught.getMessage(), caught);
+				GuiLog.serverError(caught.getMessage(), caught);
 			}
 
 			@Override

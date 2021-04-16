@@ -6,7 +6,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailsPanel;
@@ -119,7 +119,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 			DocumentService.Instance.get().getById(id, new AsyncCallback<GUIDocument>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -132,21 +132,23 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	}
 
 	public void onSelectedFolderHit(long id) {
-		if (details.contains(detailPanel))
-			details.removeMember(detailPanel);
-		detailPanel.destroy();
 		if (id > 0) {
 			FolderService.Instance.get().getFolder(id, true, false, false, new AsyncCallback<GUIFolder>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
 				public void onSuccess(GUIFolder fld) {
-					detailPanel = new FolderDetailsPanel(fld);
-					details.addMember(detailPanel);
+					if (detailPanel instanceof FolderDetailsPanel) {
+						((FolderDetailsPanel) detailPanel).setFolder(fld);
+					} else {
+						details.removeMember(detailPanel);
+						detailPanel = new FolderDetailsPanel(fld);
+						details.addMember(detailPanel);
+					}
 				}
 			});
 		} else {

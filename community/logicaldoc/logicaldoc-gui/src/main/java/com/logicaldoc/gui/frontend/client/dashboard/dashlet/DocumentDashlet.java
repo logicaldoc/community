@@ -6,20 +6,18 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.GridUtil;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -49,20 +47,9 @@ public class DocumentDashlet extends Dashlet {
 
 	private void init() {
 		ListGridField version = new ListGridField("version", I18N.message("version"), 70);
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("date"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
-		ListGridField fileName = new ListGridField("filename", I18N.message("filename"));
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "date");
+
+		FileNameListGridField fileName = new FileNameListGridField();
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -74,7 +61,7 @@ public class DocumentDashlet extends Dashlet {
 		list.setHeight100();
 		list.setBorder("0px");
 		list.setDataSource(getDataSource());
-		list.setFields(icon, fileName, version, lastModified);
+		list.setFields(fileName, version, lastModified);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -87,7 +74,7 @@ public class DocumentDashlet extends Dashlet {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -139,23 +126,23 @@ public class DocumentDashlet extends Dashlet {
 		addItem(list);
 
 		getDataSource();
-		
+
 		HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 		exportControl.setTooltip(I18N.message("export"));
-		
+
 		HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		printControl.setTooltip(I18N.message("print"));
-		
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, refreshControl, exportControl, printControl,
 				HeaderControls.MINIMIZE_BUTTON, HeaderControls.MAXIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);
 	}
@@ -182,7 +169,7 @@ public class DocumentDashlet extends Dashlet {
 					DocumentService.Instance.get().unlock(new long[] { document.getId() }, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override

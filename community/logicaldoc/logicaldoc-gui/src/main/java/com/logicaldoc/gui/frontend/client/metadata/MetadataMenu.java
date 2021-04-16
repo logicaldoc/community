@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.metadata.barcode.BarcodesPanel;
 import com.logicaldoc.gui.frontend.client.metadata.form.FormsPanel;
@@ -54,7 +54,7 @@ public class MetadataMenu extends VLayout {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -83,24 +83,6 @@ public class MetadataMenu extends VLayout {
 			}
 		});
 
-		Button barcode = new Button(I18N.message("barcodes"));
-		barcode.setWidth100();
-		barcode.setHeight(25);
-
-		if (Feature.visible(Feature.BARCODES) && Menu.enabled(Menu.BARCODES)) {
-			addMember(barcode);
-			if (!Feature.enabled(Feature.BARCODES)) {
-				barcode.setDisabled(true);
-				barcode.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-		barcode.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AdminScreen.get().setContent(new BarcodesPanel());
-			}
-		});
-
 		Button customidAndAutonaming = new Button(I18N.message("customidandnaming"));
 		customidAndAutonaming.setWidth100();
 		customidAndAutonaming.setHeight(25);
@@ -122,7 +104,7 @@ public class MetadataMenu extends VLayout {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -220,6 +202,24 @@ public class MetadataMenu extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				AdminScreen.get().setContent(new FormsPanel());
+			}
+		});
+
+		Button barcode = new Button(I18N.message("barcodes"));
+		barcode.setWidth100();
+		barcode.setHeight(25);
+
+		if (Feature.visible(Feature.BARCODES) && Menu.enabled(Menu.BARCODES)) {
+			addMember(barcode);
+			if (!Feature.enabled(Feature.BARCODES)) {
+				barcode.setDisabled(true);
+				barcode.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+		barcode.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new BarcodesPanel());
 			}
 		});
 

@@ -45,7 +45,7 @@ public class CommentService extends AbstractService {
 		User user = validateSession(sid);
 
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Long docId = new Long(docid);
+		Long docId = Long.parseLong(docid);
 		Document document = ddao.findById(docId);
 
 		checkReadEnable(user, document.getFolder().getId());

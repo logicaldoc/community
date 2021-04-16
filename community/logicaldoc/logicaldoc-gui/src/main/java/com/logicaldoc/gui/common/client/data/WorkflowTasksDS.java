@@ -5,7 +5,7 @@ import com.smartgwt.client.data.fields.DataSourceDateField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 public class WorkflowTasksDS extends DataSource {
-	public WorkflowTasksDS(Integer type, String taskId) {
+	public WorkflowTasksDS(Integer type, String taskId, Integer max) {
 		setTitleField("name");
 		setRecordXPath("/list/workflowtask");
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -26,7 +26,7 @@ public class WorkflowTasksDS extends DataSource {
 		setFields(id, processId, name, startdate, duedate, enddate, workflow, documents, lastnote, documentIds,
 				pooledassignees, templateVersion);
 		setDataURL("data/workflowtasks.xml?1=1" + (type != null ? "&type=" + type : "")
-				+ (taskId != null ? "&taskId=" + taskId : ""));
+				+ (taskId != null ? "&taskId=" + taskId : "") + (max != null ? ("&max=" + max) : ""));
 		setClientOnly(true);
 	}
 }

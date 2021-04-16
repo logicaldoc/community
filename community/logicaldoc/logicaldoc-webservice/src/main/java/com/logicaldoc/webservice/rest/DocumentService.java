@@ -15,24 +15,37 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public interface DocumentService {
-
-	@POST
-	@Path("/create")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	// The "document" comes in the POST request body (encoded as JSON).
-	Response create(List<Attachment> atts) throws Exception;
+    
+    @POST
+    @Path("/create")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Creates a new document")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = WSDocument.class))),
+        @ApiResponse(responseCode = "401", description = "Authentication failed"),
+        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+    public WSDocument create(
+    		@Multipart(value = "document", required = true, type = "application/json") WSDocument document,  
+    		@Multipart(value = "content" , required = true, type = "application/octet-stream") Attachment contentDetail) throws Exception;    
 
 	@GET
 	@Path("/getDocument")
@@ -43,24 +56,89 @@ public interface DocumentService {
 	@Path("/checkout")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	void checkout(@FormParam("docId") long docId) throws Exception;
-
+	
+	/*
 	@POST
 	@Path("/checkin")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	Response checkin(List<Attachment> attachments) throws Exception;
+	Response checkin(List<Attachment> attachments) throws Exception; */
+	
+	/**
+     * Check-in an existing document
+     *
+     * Performs a check-in (commit) operation of new content over an existing document. The document must be in checked-out status
+     *
+     */
+    @POST
+    @Path("/checkin")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Operation(summary = "Check-in an existing document", description = "Performs a check-in (commit) operation of new content over an existing document. The document must be in checked-out status")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "204", description = "Successful operation"),	
+        @ApiResponse(responseCode = "401", description = "Authentication failed"),
+        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+    public void checkin(@Multipart(value = "docId", required = true) Integer docId, @Multipart(value = "comment", required = false)  String comment, @Multipart(value = "release", required = false)  String release, @Multipart(value = "filename", required = true)  String filename,  @Multipart(value = "filedata" , required = true) Attachment filedataDetail)  throws Exception;        
 
+    /*
 	@POST
 	@Path("/replaceFile")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	Response replaceFile(List<Attachment> attachments) throws Exception;
-
+	*/
+    
+    /**
+     * Replace the file of a version
+     *
+     * Replaces the file associated to a given version.
+     *
+     */
+    @POST
+    @Path("/replaceFile")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Operation(summary = "Replace the file of a version", description = "Replaces the file associated to a given version.")
+    @ApiResponses(value = { 
+        	@ApiResponse(responseCode = "204", description = "successful operation"),
+        	@ApiResponse(responseCode = "400", description = "bad request"),       		
+        @ApiResponse(responseCode = "401", description = "Authentication failed"),
+        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+    public void replaceFile(@Multipart(value = "docId", required = false)  Integer docId, @Multipart(value = "fileVersion", required = false)  String fileVersion, @Multipart(value = "comment", required = false)  String comment,  @Multipart(value = "filedata" , required = false) Attachment filedataDetail)  throws Exception;    
+	
+/*	
 	@POST
 	@Path("/upload")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
 	Response upload(List<Attachment> attachments) throws Exception;
+*/
+	
+    /**
+     * Uploads a document
+     *
+     * Creates or updates an existing document, if used in update mode docId must be provided, when used in create mode folderId is required. Returns the ID of the created/updated document. &lt;br/&gt;Example: curl -u admin:admin -H &#x27;&#x27;Accept: application/json&#x27;&#x27; -X POST -F folderId&#x3D;4 -F filename&#x3D;newDoc.txt -F filedata&#x3D;@newDoc.txt http://localhost:8080/services/rest/document/upload
+     *
+     */
+    @POST
+    @Path("/upload")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Operation(summary = "Uploads a document", description = "Creates or updates an existing document, if used in update mode docId must be provided, when used in create mode folderId is required. Returns the ID of the created/updated document. &lt;br/&gt;Example: curl -u admin:admin -H ''Accept: application/json'' -X POST -F folderId=4 -F filename=newDoc.txt -F filedata=@newDoc.txt http://localhost:8080/services/rest/document/upload")
+//	@ApiImplicitParams({
+//	@ApiImplicitParam(name = "docId", value = "The ID of an existing document to update", required = false, dataType = "integer", paramType = "form"),
+//	@ApiImplicitParam(name = "folderId", value = "Folder ID where to place the document", required = false, dataType = "string", paramType = "form"),
+//	@ApiImplicitParam(name = "release", value = "Indicates whether to create or not a new major release of an updated document", required = false, dataType = "string", paramType = "form", allowableValues = "true, false"),
+//	@ApiImplicitParam(name = "filename", value = "File name", required = true, dataType = "string", paramType = "form"),
+//	@ApiImplicitParam(name = "language", value = "Language of the document (ISO 639-2)", required = false, dataType = "string", paramType = "form", defaultValue = "en"),
+//	@ApiImplicitParam(name = "filedata", value = "File data", required = true, dataType = "file", paramType = "form") })    
+    @ApiResponses(value = { 
+   		@ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Long.class, description = "The ID of the document created or updated"))),	
+        @ApiResponse(responseCode = "401", description = "Authentication failed"),
+        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+    public Long upload(
+    		@Multipart(value = "docId", required = false) Integer docId, @Multipart(value = "folderId", required = false) String folderId, 
+    		@Multipart(value = "release", required = false)  String release, @Multipart(value = "filename", required = true)  String filename, 
+    		@Multipart(value = "language", required = false)  String language,  @Multipart(value = "filedata" , required = true) Attachment filedataDetail) throws Exception;
+	
 
 	@DELETE
 	@Path("/delete")
@@ -464,9 +542,24 @@ public interface DocumentService {
 	 * @param attachments the attachments to upload
 	 * 
 	 * @throws Exception error in the server application
-	 */
+
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public void uploadResource(List<Attachment> attachments) throws Exception;
+		 */
+	
+    /**
+     * Uploads a new resource of the document
+     *
+     * Uploads a new resource attached to the given document. If the resource already exists it is overwritten
+     *
+     */
+    @POST
+    @Path("/uploadResource")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Operation(summary = "Uploads a new resource of the document")
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "204", description = "successful operation") })
+    public void uploadResource(@Multipart(value = "docId", required = false)  Integer docId, @Multipart(value = "fileVersion", required = false)  String fileVersion, @Multipart(value = "suffix", required = false)  String suffix,  @Multipart(value = "content" , required = false) Attachment contentDetail)  throws Exception;	
 
 	/**
 	 * Restores a deleted document

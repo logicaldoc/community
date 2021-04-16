@@ -72,7 +72,7 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 			List<Object> parameters = new ArrayList<Object>();
 			DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			StringBuffer query = new StringBuffer(
-					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason from DocumentHistory A where 1=1 and A.deleted = 0 ");
+					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation from DocumentHistory A where 1=1 and A.deleted = 0 ");
 			if (request.getParameter("docId") != null) {
 				query.append(" and A.docId = ?" + (parameters.size() + 1));
 				parameters.add(Long.parseLong(request.getParameter("docId")));
@@ -87,7 +87,7 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 			}
 			query.append(" order by A.date desc ");
 
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 			df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), parameters.toArray(new Object[0]),
@@ -125,8 +125,11 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 				writer.print("<path><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></path>");
 				if (showSid)
 					writer.print("<sid><![CDATA[" + (cols[10] == null ? "" : cols[10]) + "]]></sid>");
-				writer.print("<userid>" + cols[11] + "</userid>");
+				writer.print("<userId>" + cols[11] + "</userId>");
 				writer.print("<reason><![CDATA[" + (cols[12] == null ? "" : cols[12]) + "]]></reason>");
+				writer.print("<ip><![CDATA[" + (cols[13] == null ? "" : cols[13]) + "]]></ip>");
+				writer.print("<device><![CDATA[" + (cols[14] == null ? "" : cols[14]) + "]]></device>");
+				writer.print("<geolocation><![CDATA[" + (cols[15] == null ? "" : cols[15]) + "]]></geolocation>");
 				writer.print("</history>");
 			}
 			writer.write("</list>");

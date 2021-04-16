@@ -14,6 +14,9 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
 import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.security.Client;
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserHistory;
 
@@ -24,34 +27,53 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 		super.log = LoggerFactory.getLogger(HibernateUserHistoryDAO.class);
 	}
 
-	/**
-	 * @see com.logicaldoc.core.security.dao.UserHistoryDAO#findByUserId(long)
-	 */
+	@Override
 	public List<UserHistory> findByUserId(long userId) {
+		return findByUserIdAndEvent(userId, null);
+	}
+
+	public List<UserHistory> findByUserIdAndEvent(long userId, String event) {
 		try {
-			return findByWhere("_entity.userId =" + userId, "order by _entity.date asc", null);
+			if (StringUtils.isEmpty(event))
+				return findByWhere("_entity.userId =" + userId, "order by _entity.date desc", null);
+			else
+				return findByWhere("_entity.userId = ?1 and _entity.event = ?2", new Object[] { userId, event },
+						"order by _entity.date desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<UserHistory>();
 		}
 	}
 
-	/**
-	 * @see com.logicaldoc.core.security.dao.UserHistoryDAO#createUserHistory(User,
-	 *      String, String, String, String)
-	 */
 	@Override
-	public void createUserHistory(User user, String eventType, String comment, String ip, String sessionId) {
+	public UserHistory createUserHistory(User user, String eventType, String comment, String sessionId, Client client) {
 		UserHistory history = new UserHistory();
-		history.setUser(user);
-		history.setEvent(eventType);
 		history.setComment(comment);
-		history.setIp(comment);
-		history.setSessionId(sessionId);
+		history.setEvent(eventType);
+
+		Session session = SessionManager.get().get(sessionId);
+		if (session != null)
+			history.setSession(session);
+		else
+			history.setSessionId(sessionId);
+
+		if (user != null)
+			history.setUser(user);
+
+		if (client != null) {
+			history.setIp(client.getAddress());
+			if (client.getDevice() != null)
+				history.setDevice(client.getDevice().toString());
+			if (client.getGeolocation() != null)
+				history.setGeolocation(client.getGeolocation().toString());
+		}
+
 		try {
 			store(history);
+			return history;
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
+			return null;
 		}
 	}
 

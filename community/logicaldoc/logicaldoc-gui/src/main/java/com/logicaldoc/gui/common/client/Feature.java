@@ -73,7 +73,7 @@ public class Feature {
 
 	public static final int MOBILE_APPS = 30;
 
-	public static final int EXTERNAL_CALL = 31;
+	public static final int CUSTOM_ACTIONS = 31;
 
 	public static final int BULK_CHECKOUT = 32;
 
@@ -204,6 +204,10 @@ public class Feature {
 	public static final int CHAT = 95;
 	
 	public static final int SYNDICATION = 96;
+	
+	public static final int GEOLOCATION = 97;
+	
+	public static final int ZONAL_BARCODE = 98;
 
 	private static Set<String> features = new HashSet<String>();
 

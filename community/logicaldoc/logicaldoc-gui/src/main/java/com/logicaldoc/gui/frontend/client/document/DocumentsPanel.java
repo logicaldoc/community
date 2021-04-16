@@ -7,15 +7,14 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
-import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.NavigatorDocumentsGrid;
 import com.logicaldoc.gui.frontend.client.folder.FolderDetailsPanel;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
@@ -57,8 +56,6 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	protected DocumentsPreviewPanel previewPanel;
 
-	protected Integer max;
-
 	protected int visualizationMode = DocumentsGrid.MODE_LIST;
 
 	protected boolean initialized = false;
@@ -77,11 +74,6 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		if (instance == null) {
 			instance = new DocumentsPanel();
 			DocumentController.get().addObserver(instance);
-
-			try {
-				instance.max = (Session.get().getConfigAsInt("gui.document.pagesize"));
-			} catch (Throwable t) {
-			}
 
 			int mode = DocumentsGrid.MODE_LIST;
 			if (CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_MODE) != null
@@ -165,7 +157,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 				 * Sometimes we can have spurious errors using Firefox.
 				 */
 				if (Session.get().isDevel())
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -195,7 +187,7 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 				 * Sometimes we can have spurious errors using Firefox.
 				 */
 				if (Session.get().isDevel())
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -220,12 +212,10 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void refresh() {
-		refresh(null, null);
+		refresh(null);
 	}
 
-	public void refresh(Integer max, Integer visualizationMode) {
-		if (max != null && max > 0)
-			this.max = max;
+	public void refresh(Integer visualizationMode) {
 		if (visualizationMode != null)
 			this.visualizationMode = visualizationMode;
 		updateListingPanel(folder);
@@ -234,15 +224,13 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void changePageSize(Integer pageSize) {
-		this.max = pageSize;
-
 		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
-			((DocumentsListPanel) listingPanel).updateData(folder, max);
+			((DocumentsListPanel) listingPanel).updateData(folder);
 		} else {
 			listing.removeMember(listingPanel);
 			listingPanel.destroy();
-			listingPanel = new DocumentsListPanel(folder, max, visualizationMode);
+			listingPanel = new DocumentsListPanel(folder, visualizationMode);
 			listing.addMember(listingPanel);
 			listing.redraw();
 		}
@@ -267,14 +255,11 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	private void updateListingPanel(GUIFolder folder) {
 		if (listingPanel != null && listingPanel instanceof DocumentsListPanel
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
-			Integer pageSize = GridUtil.getPageSizeFromSpec(folder.getGrid());
-			if (pageSize == null)
-				pageSize = max;
-			((DocumentsListPanel) listingPanel).updateData(folder, pageSize);
+			((DocumentsListPanel) listingPanel).updateData(folder);
 		} else {
 			listing.removeMember(listingPanel);
 			listingPanel.destroy();
-			listingPanel = new DocumentsListPanel(folder, max, visualizationMode);
+			listingPanel = new DocumentsListPanel(folder, visualizationMode);
 			listing.addMember(listingPanel);
 			listing.redraw();
 		}
@@ -301,14 +286,14 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	public void printPreview() {
 		if (listingPanel instanceof DocumentsListPanel) {
-			Canvas.printComponents(new Object[] { ((DocumentsListPanel) listingPanel).getGrid() });
+			GridUtil.print((DocumentsListGrid) ((DocumentsListPanel) listingPanel).getGrid());
 		}
 	}
 
 	public void export() {
 		if (listingPanel instanceof DocumentsListPanel)
 			if (((DocumentsListPanel) listingPanel).getGrid() instanceof DocumentsListGrid)
-				Util.exportCSV((DocumentsListGrid) ((DocumentsListPanel) listingPanel).getGrid(), false);
+				GridUtil.exportCSV((DocumentsListGrid) ((DocumentsListPanel) listingPanel).getGrid(), false);
 	}
 
 	public GUIDocument getSelectedDocument() {

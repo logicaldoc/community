@@ -14,9 +14,31 @@ public class GUIMenu implements Serializable {
 
 	private long id;
 
+	private long parentId;
+
 	private String name;
 
+	private String description;
+
+	private boolean enabled = true;
+
+	/**
+	 * The declared routine to execute
+	 */
+	private Long routineId;
+
+	/**
+	 * Automation script to execute(in absence of routine specification)
+	 */
+	private String automation;
+
+	private int position = 0;
+
 	private GUIRight[] rights = new GUIRight[] {};
+
+	private Long securityRef;
+
+	private int type = 0;
 
 	public long getId() {
 		return id;
@@ -40,5 +62,69 @@ public class GUIMenu implements Serializable {
 
 	public void setRights(GUIRight[] rights) {
 		this.rights = rights;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public Long getRoutineId() {
+		return routineId;
+	}
+
+	public void setRoutineId(Long routineId) {
+		this.routineId = routineId;
+	}
+
+	public String getAutomation() {
+		return automation;
+	}
+
+	public void setAutomation(String automation) {
+		this.automation = automation;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public long getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(long parentId) {
+		this.parentId = parentId;
+	}
+
+	public Long getSecurityRef() {
+		return securityRef;
+	}
+
+	public void setSecurityRef(Long securityRef) {
+		this.securityRef = securityRef;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 }

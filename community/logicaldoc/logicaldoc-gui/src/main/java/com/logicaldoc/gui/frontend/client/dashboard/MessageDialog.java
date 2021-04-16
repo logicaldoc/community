@@ -5,9 +5,10 @@ import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.EventPanel;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridEditEvent;
@@ -82,11 +83,13 @@ public class MessageDialog extends Window {
 
 		TextItem subject = ItemFactory.newTextItem("subject", "subject", "");
 		subject.setRequired(true);
+		subject.setBrowserSpellCheck(true);
 		subject.setWidth("*");
 		subject.setColSpan(formColumns);
 
 		final TextAreaItem message = ItemFactory.newTextAreaItem("message", "message", null);
 		message.setHeight(160);
+		message.setBrowserSpellCheck(true);
 		message.setWidth("*");
 		message.setColSpan(formColumns);
 
@@ -132,7 +135,7 @@ public class MessageDialog extends Window {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 							destroy();
 						}
 
@@ -169,6 +172,8 @@ public class MessageDialog extends Window {
 		section.setCanCollapse(false);
 		section.setExpanded(true);
 
+		AvatarListGridField avatar = new AvatarListGridField();
+		
 		ListGridField name = new ListGridField("label", I18N.message("name"));
 		name.setCanFilter(true);
 
@@ -185,7 +190,7 @@ public class MessageDialog extends Window {
 		recipientsGrid.setSelectionType(SelectionStyle.MULTIPLE);
 		recipientsGrid.setWidth100();
 		recipientsGrid.setEditEvent(ListGridEditEvent.CLICK);
-		recipientsGrid.setFields(id, name);
+		recipientsGrid.setFields(id, avatar, name);
 
 		recipientsGrid.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -229,7 +234,7 @@ public class MessageDialog extends Window {
 				SecurityService.Instance.get().searchUsers(null, groupId, new AsyncCallback<GUIUser[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -241,6 +246,7 @@ public class MessageDialog extends Window {
 						for (int i = 0; i < users.length; i++) {
 							records[i] = new ListGridRecord();
 							records[i].setAttribute("id", users[i].getId());
+							records[i].setAttribute("avatar", users[i].getId());
 							records[i].setAttribute("label", users[i].getFullName());
 						}
 
@@ -271,6 +277,7 @@ public class MessageDialog extends Window {
 		for (int i = 0; i < newSelection.length; i++) {
 			ListGridRecord newRec = new ListGridRecord();
 			newRec.setAttribute("id", newSelection[i].getAttributeAsString("id"));
+			newRec.setAttribute("avatar", newSelection[i].getAttributeAsString("avatar"));
 			newRec.setAttribute("label", newSelection[i].getAttributeAsString("label"));
 
 			// Iterate over the current recipients avoiding duplicates

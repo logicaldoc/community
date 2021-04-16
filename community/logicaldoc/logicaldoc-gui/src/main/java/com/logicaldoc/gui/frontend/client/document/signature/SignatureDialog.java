@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.signature;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.SignService;
@@ -94,7 +94,7 @@ public class SignatureDialog extends Window {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -121,12 +121,12 @@ public class SignatureDialog extends Window {
 						@Override
 						public void onFailure(Throwable caught) {
 							ContactingServer.get().hide();
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void arg) {
-							Log.info(I18N.message("event.signed"), null);
+							GuiLog.info(I18N.message("event.signed"), null);
 							ContactingServer.get().hide();
 						}
 					});

@@ -17,6 +17,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -83,7 +84,8 @@ public class OpenOfficeParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			Document document, String fileVersion, StringBuffer content) {
 		try {
 			try {
 				Thread.sleep(4000);

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.github.mertakdut.BookSection;
 import com.github.mertakdut.Reader;
 import com.github.mertakdut.exception.OutOfPagesException;
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -25,7 +26,7 @@ public class EpubParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			StringBuffer content) {
+			Document document, String fileVersion, StringBuffer content) {
 		File tmpFile = null;
 		try {
 			tmpFile = File.createTempFile("epubparser", ".epub");

@@ -6,16 +6,18 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.TicketsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -25,7 +27,6 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
@@ -89,7 +90,7 @@ public class DownloadTicketsReport extends AdminPanel {
 		print.setAutoFit(true);
 		print.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addButton(print);
@@ -104,7 +105,7 @@ public class DownloadTicketsReport extends AdminPanel {
 			export.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					Util.exportCSV(list, false);
+					GridUtil.exportCSV(list, false);
 				}
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -131,36 +132,19 @@ public class DownloadTicketsReport extends AdminPanel {
 		enabled.setImageURLSuffix(".gif");
 		enabled.setCanFilter(false);
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-		icon.setCanGroupBy(false);
-
 		ListGridField ticketId = new ListGridField("ticketId", I18N.message("ticket"), 210);
 		ticketId.setAlign(Alignment.CENTER);
 		ticketId.setCanFilter(true);
 		ticketId.setCanGroupBy(false);
 
-		ListGridField creation = new ListGridField("creation", I18N.message("createdon"), 110);
-		creation.setAlign(Alignment.CENTER);
-		creation.setType(ListGridFieldType.DATE);
-		creation.setCellFormatter(new DateCellFormatter(false));
-		creation.setCanFilter(false);
+		ListGridField creation = new DateListGridField("creation", "createdon");
 		creation.setCanGroupBy(false);
 
-		ListGridField expired = new ListGridField("expired", I18N.message("expireson"), 110);
-		expired.setAlign(Alignment.CENTER);
-		expired.setType(ListGridFieldType.DATE);
-		expired.setCellFormatter(new DateCellFormatter(false));
-		expired.setCanFilter(false);
+		ListGridField expired = new DateListGridField("expired", "expireson");
 		expired.setCanGroupBy(false);
 
-		ListGridField fileName = new ListGridField("fileName", I18N.message("filename"), 200);
+		FileNameListGridField fileName = new FileNameListGridField();
+		fileName.setWidth(200);
 		fileName.setCanFilter(true);
 
 		ListGridField count = new ListGridField("count", I18N.message("downloads"), 80);
@@ -190,7 +174,7 @@ public class DownloadTicketsReport extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
-		list.setFields(enabled, id, ticketId, count, maxCount, creation, expired, icon, fileName);
+		list.setFields(enabled, id, ticketId, count, maxCount, creation, expired, fileName);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -237,7 +221,7 @@ public class DownloadTicketsReport extends AdminPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -291,7 +275,7 @@ public class DownloadTicketsReport extends AdminPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -313,7 +297,7 @@ public class DownloadTicketsReport extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -338,7 +322,7 @@ public class DownloadTicketsReport extends AdminPanel {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override

@@ -10,12 +10,13 @@ import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -24,7 +25,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
@@ -143,15 +143,18 @@ public class CalendarEventDialog extends Window {
 		ListGridField username = new ListGridField("username", I18N.message("username"));
 		username.setWidth(110);
 
+		AvatarListGridField avatar = new AvatarListGridField();
+
 		final ListGrid list = new ListGrid();
 		list.setHeight100();
 		list.setWidth100();
-		list.setFields(id, username, name);
+		list.setFields(id, avatar, username, name);
 
 		ListGridRecord[] records = new ListGridRecord[calendarEvent.getParticipants().length];
 		for (int i = 0; i < calendarEvent.getParticipants().length; i++) {
 			records[i] = new ListGridRecord();
 			records[i].setAttribute("id", calendarEvent.getParticipants()[i].getId());
+			records[i].setAttribute("avatar", calendarEvent.getParticipants()[i].getId());
 			records[i].setAttribute("name", calendarEvent.getParticipants()[i].getFullName());
 			records[i].setAttribute("username", calendarEvent.getParticipants()[i].getUsername());
 		}
@@ -212,7 +215,7 @@ public class CalendarEventDialog extends Window {
 				String id = "g-" + selectedRecord.getAttribute("id");
 				String label = I18N.message("group") + ": " + selectedRecord.getAttribute("name");
 				String username = selectedRecord.getAttribute("name");
-				
+
 				addParticipant(list, id, username, label);
 				newGroup.clearValue();
 			}
@@ -235,23 +238,11 @@ public class CalendarEventDialog extends Window {
 	}
 
 	private Tab prepareDocuments() {
-		ListGridField fileName = new ListGridField("filename", I18N.message("filename"));
+		FileNameListGridField fileName = new FileNameListGridField();
 		fileName.setWidth("90%");
 		fileName.setCanEdit(!readOnly);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 150);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 
 		final ListGrid list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -262,7 +253,7 @@ public class CalendarEventDialog extends Window {
 		list.setShowHeader(true);
 		list.setCanSelectAll(false);
 		list.setSelectionType(SelectionStyle.SINGLE);
-		list.setFields(icon, fileName, lastModified);
+		list.setFields(fileName, lastModified);
 		refreshDocumentsGrid(list);
 
 		MenuItem preview = new MenuItem();
@@ -278,7 +269,7 @@ public class CalendarEventDialog extends Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught.getMessage(), caught);
+						GuiLog.serverError(caught.getMessage(), caught);
 					}
 
 					@Override
@@ -600,7 +591,7 @@ public class CalendarEventDialog extends Window {
 			CalendarService.Instance.get().saveEvent(calendarEvent, new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -635,7 +626,7 @@ public class CalendarEventDialog extends Window {
 										CalendarService.Instance.get().deleteEvent(id, new AsyncCallback<Void>() {
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -649,7 +640,7 @@ public class CalendarEventDialog extends Window {
 						CalendarService.Instance.get().deleteEvent(calendarEvent.getId(), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -679,7 +670,7 @@ public class CalendarEventDialog extends Window {
 		record.setAttribute("name", name);
 		record.setAttribute("username", username);
 		list.addData(record);
-		
+
 		if (id.startsWith("g-")) {
 			GUIGroup group = new GUIGroup();
 			group.setId(Long.parseLong(id.substring(2)));
@@ -687,6 +678,7 @@ public class CalendarEventDialog extends Window {
 			group.setDescription(name);
 			CalendarEventDialog.this.calendarEvent.addParticipant(group);
 		} else {
+			record.setAttribute("avatar", id);
 			GUIUser user = new GUIUser();
 			user.setId(Long.parseLong(id));
 			user.setUsername(username);

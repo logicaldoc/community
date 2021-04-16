@@ -4,27 +4,29 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
 import com.logicaldoc.gui.common.client.data.WorkflowsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -54,6 +56,8 @@ public class WorkflowHistoryDialog extends Window {
 	private String tagFilter = null;
 
 	private WorkflowHistoriesPanel historiesPanel = null;
+	
+	private SpinnerItem max;
 
 	public WorkflowHistoryDialog() {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -76,6 +80,17 @@ public class WorkflowHistoryDialog extends Window {
 			workflow.setValue(selectedWorkflow.getName());
 
 		final TextItem tagItem = ItemFactory.newTextItem("tag", "tag", null);
+		
+		max = ItemFactory.newSpinnerItem("max", "display", 50);
+		max.setMin(0);
+		max.setStep(10);
+		max.setHint(I18N.message("elements"));
+		max.addChangedHandler(new ChangedHandler() {
+			public void onChanged(ChangedEvent event) {
+				if(selectedWorkflow!=null)
+					refreshInstancesGrid();
+			}
+		});
 
 		ToolStripButton search = new ToolStripButton();
 		search.setAutoFit(true);
@@ -91,7 +106,7 @@ public class WorkflowHistoryDialog extends Window {
 						new AsyncCallback<GUIWorkflow>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -110,7 +125,7 @@ public class WorkflowHistoryDialog extends Window {
 		export.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(instancesGrid, true);
+				GridUtil.exportCSV(instancesGrid, true);
 			}
 		});
 
@@ -120,11 +135,13 @@ public class WorkflowHistoryDialog extends Window {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { instancesGrid });
+				GridUtil.print(instancesGrid);
 			}
 		});
 
 		ToolStrip toolStrip = new ToolStrip();
+		toolStrip.addFormItem(max);
+		toolStrip.addSeparator();
 		toolStrip.addFormItem(workflow);
 		toolStrip.addFormItem(tagItem);
 		toolStrip.addButton(search);
@@ -149,23 +166,19 @@ public class WorkflowHistoryDialog extends Window {
 		addItem(body);
 
 		ListGridField id = new ListGridField("id", I18N.message("instance"), 70);
-		ListGridField startDate = new ListGridField("startdate", I18N.message("startdate"), 120);
-		startDate.setAlign(Alignment.CENTER);
-		startDate.setType(ListGridFieldType.DATE);
-		startDate.setCellFormatter(new DateCellFormatter(false));
-		startDate.setCanFilter(false);
-		ListGridField endDate = new ListGridField("enddate", I18N.message("enddate"), 120);
-		endDate.setAlign(Alignment.CENTER);
-		endDate.setType(ListGridFieldType.DATE);
-		endDate.setCellFormatter(new DateCellFormatter(false));
-		endDate.setCanFilter(false);
+		ListGridField startDate = new DateListGridField("startdate", "startdate", DateCellFormatter.FORMAT_LONG);
+		
+		ListGridField endDate = new DateListGridField("enddate", "enddate", DateCellFormatter.FORMAT_LONG);
+		
 		ListGridField version = new ListGridField("templateVersion", I18N.message("version"), 70);
 		version.setHidden(true);
+		ListGridField templateId = new ListGridField("templateId", I18N.message("templateid"), 70);
+		templateId.setHidden(true);
 		ListGridField tag = new ListGridField("tag", I18N.message("tag"), 150);
 		ListGridField documents = new ListGridField("documents", I18N.message("documents"), 250);
 		ListGridField documentIds = new ListGridField("documentIds", I18N.message("documentids"), 300);
 		documentIds.setHidden(true);
-		ListGridField initiator = new ListGridField("initiator", I18N.message("initiator"), 100);
+		ListGridField initiator = new AvatarListGridField("initiator", "initiatorId", "initiator", 100);
 
 		instancesGrid = new RefreshableListGrid();
 		instancesGrid.setCanFreezeFields(true);
@@ -177,7 +190,7 @@ public class WorkflowHistoryDialog extends Window {
 		instancesGrid.setWidth100();
 		instancesGrid.setBorder("1px solid #E1E1E1");
 		instancesGrid.sort("startdate", SortDirection.DESCENDING);
-		instancesGrid.setFields(id, version, tag, startDate, endDate, documents, initiator, documentIds);
+		instancesGrid.setFields(id, version, templateId, tag, startDate, endDate, documents, initiator, documentIds);
 
 		instancesGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
@@ -202,7 +215,7 @@ public class WorkflowHistoryDialog extends Window {
 	private void refreshInstancesGrid() {
 		if (selectedWorkflow != null) {
 			instancesGrid
-					.refresh(new WorkflowHistoriesDS(null, Long.parseLong(selectedWorkflow.getId()), null, tagFilter));
+					.refresh(new WorkflowHistoriesDS(null, Long.parseLong(selectedWorkflow.getId()), null, tagFilter, max.getValueAsInteger()));
 
 			historiesPanel.setWfTemplateId(Long.parseLong(selectedWorkflow.getId()));
 			historiesPanel.setWfInstanceId(null);
@@ -213,6 +226,7 @@ public class WorkflowHistoryDialog extends Window {
 	private void onInstanceSelected() {
 		Record record = instancesGrid.getSelectedRecord();
 		historiesPanel.setWfInstanceId(record.getAttributeAsLong("id"));
+		historiesPanel.setWfTemplateId(record.getAttributeAsLong("templateId"));
 		historiesPanel.refresh();
 	}
 
@@ -243,7 +257,7 @@ public class WorkflowHistoryDialog extends Window {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -269,12 +283,12 @@ public class WorkflowHistoryDialog extends Window {
 						new AsyncCallback<GUIWorkflow>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(GUIWorkflow workflow) {
-								WorkflowCompletionWindow diagramWindow = new WorkflowCompletionWindow(workflow);
+								WorkflowPreview diagramWindow = new WorkflowPreview(workflow);
 								diagramWindow.show();
 							}
 						});

@@ -6,11 +6,12 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SpacerItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -41,9 +42,10 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		return instance;
 	}
 
-	public FolderCursor() {
+	private FolderCursor() {
 		setNumCols(3);
 		setHeight(1);
+		setAlign(Alignment.RIGHT);
 
 		maxItem = ItemFactory.newSpinnerItem("max", "display", Session.get().getConfigAsInt("gui.folder.maxchildren"),
 				2, (Integer) null);
@@ -66,6 +68,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		pageItem.setImplicitSave(true);
 		pageItem.setShowTitle(false);
 		pageItem.setWidth(45);
+		pageItem.setMinHintWidth(1);
 		pageItem.addChangedHandler(new ChangedHandler() {
 
 			@Override
@@ -73,16 +76,23 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 				onPageChange();
 			}
 		});
+		pageItem.setHint("/" + currentPagination.getTotalPages());
 
-		SpacerItem spacer = new SpacerItem();
-		spacer.setWidth(6);
-		spacer.setTitle("|");
+		SpacerItem spacer2 = new SpacerItem("spc2");
+		spacer2.setWidth(6);
+		spacer2.setTitle("|");
 
-		setItems(maxItem, spacer, pageItem);
+		setItems(maxItem, spacer2, pageItem);
 
 		FolderController.get().addObserver(this);
 	}
 
+	public void setPageSizeAndTotalRecords(int pageSize, int totalRecords) {
+		currentPagination.setTotalElements(totalRecords);
+		currentPagination.setPageSize(pageSize);
+		update();
+	}
+	
 	public void setTotalRecords(int totalRecords) {
 		currentPagination.setTotalElements(totalRecords);
 		update();
@@ -141,6 +151,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		maxItem.setValue(currentPagination.getPageSize());
 		pageItem.setValue(currentPagination.getPage());
 		pageItem.setMax(currentPagination.getTotalPages());
+		pageItem.setHint("/" + currentPagination.getTotalPages());
 	}
 
 	public boolean hasMorePages() {
@@ -170,7 +181,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -184,7 +195,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override

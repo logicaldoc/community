@@ -15,6 +15,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -70,7 +71,8 @@ public class AbiWordParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			Document document, String fileVersion, StringBuffer content) {
 		try {
 			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 			saxParserFactory.setValidating(false);

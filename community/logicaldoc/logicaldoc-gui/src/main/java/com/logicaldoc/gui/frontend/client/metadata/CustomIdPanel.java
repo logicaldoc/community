@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIScheme;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -19,7 +19,6 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -86,21 +85,17 @@ public class CustomIdPanel extends AdminPanel {
 		ListGridField scheme = new ListGridField("scheme", I18N.message("scheme"));
 		scheme.setWidth(200);
 		scheme.setRequired(true);
-		scheme.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return Util.strip(record.getAttributeAsString("scheme"));
-			}
-		});
+		scheme.setEscapeHTML(true);
 
-		final ListGridField evaluateAtCheckin = new ListGridField("evaluateAtCheckin", I18N.message("evaluateatcheckin"));
+		final ListGridField evaluateAtCheckin = new ListGridField("evaluateAtCheckin",
+				I18N.message("evaluateatcheckin"));
 		evaluateAtCheckin.setWidth(150);
 		evaluateAtCheckin.setType(ListGridFieldType.BOOLEAN);
 
 		final ListGridField evaluateAtUpdate = new ListGridField("evaluateAtUpdate", I18N.message("evaluateatupdate"));
 		evaluateAtUpdate.setWidth(150);
 		evaluateAtUpdate.setType(ListGridFieldType.BOOLEAN);
-		
+
 		final ListGrid customIds = new ListGrid();
 		customIds.setEmptyMessage(I18N.message("notitemstoshow"));
 		customIds.setShowAllRecords(true);
@@ -118,7 +113,7 @@ public class CustomIdPanel extends AdminPanel {
 					continue;
 				ListGridRecord record = new ListGridRecord();
 				record.setAttribute("templateId", Long.toString(cid.getTemplateId()));
-				record.setAttribute("templateName", Util.strip(cid.getTemplateName()));
+				record.setAttribute("templateName", cid.getTemplateName());
 				if (cid.getScheme() != null)
 					record.setAttribute("scheme", cid.getScheme());
 				record.setAttribute("evaluateAtCheckin", cid.isEvaluateAtCheckin());
@@ -153,7 +148,7 @@ public class CustomIdPanel extends AdminPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -226,7 +221,7 @@ public class CustomIdPanel extends AdminPanel {
 						(Integer) record.getAttributeAsInt("value"), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -255,7 +250,7 @@ public class CustomIdPanel extends AdminPanel {
 		SchemeService.Instance.get().loadSequences(new AsyncCallback<GUISequence[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -264,7 +259,7 @@ public class CustomIdPanel extends AdminPanel {
 				if (data != null)
 					for (GUISequence cid : data) {
 						ListGridRecord record = new ListGridRecord();
-						record.setAttribute("template", Util.strip(cid.getTemplate()));
+						record.setAttribute("template", cid.getTemplate());
 						record.setAttribute("frequency", I18N.message(cid.getFrequency()));
 						record.setAttribute("year", cid.getYear());
 						record.setAttribute("month", cid.getMonth());
@@ -296,7 +291,7 @@ public class CustomIdPanel extends AdminPanel {
 
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -334,7 +329,7 @@ public class CustomIdPanel extends AdminPanel {
 							SchemeService.Instance.get().deleteSequence(id, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

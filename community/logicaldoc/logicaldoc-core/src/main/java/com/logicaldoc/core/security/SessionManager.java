@@ -63,7 +63,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	}
 
 	/**
-	 * Creates a new session by authenticated the given user and stores it in
+	 * Creates a new session by authenticating the given user and stores it in
 	 * the pool of opened sessions
 	 * 
 	 * @param username the username
@@ -445,7 +445,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @return The client
 	 */
 	public Client buildClient(HttpServletRequest req) {
-		Client client = new Client(req.getRemoteAddr(), req.getRemoteHost());
+		Client client = new Client(req);
 
 		/**
 		 * We extract the username used by the user from the basic credentials.

@@ -98,7 +98,7 @@ public class DocumentFieldsDS extends DataSource {
 
 		DataSourceIntegerField indexed = new DataSourceIntegerField("indexed", I18N.message("indexed"));
 		indexed.setValidOperators(OperatorId.EQUALS, OperatorId.NOT_EQUAL);
-		
+
 		DataSourceTextField tmplt = new DataSourceTextField("template", I18N.message("template"));
 		tmplt.setValidOperators(OperatorId.IS_NULL);
 
@@ -133,7 +133,7 @@ public class DocumentFieldsDS extends DataSource {
 					name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_INT;
 				} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
 					field = new DataSourceIntegerField();
-					field.setValidOperators(OperatorId.EQUALS);
+					field.setValidOperators(OperatorId.EQUALS, OperatorId.IS_NULL, OperatorId.NOT_NULL);
 					name = name + Constants.BLANK_PLACEHOLDER + "type:" + GUIAttribute.TYPE_BOOLEAN;
 				} else if (att.getType() == GUIAttribute.TYPE_USER || att.getType() == GUIAttribute.TYPE_FOLDER) {
 					field = new DataSourceIntegerField();

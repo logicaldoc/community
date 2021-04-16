@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.HeaderControls;
@@ -74,12 +74,12 @@ public class WorkflowDialog extends Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void result) {
-						Log.info(I18N.message("event.workflow.start"), null);
+						GuiLog.info(I18N.message("event.workflow.start"), null);
 						destroy();
 					}
 				});

@@ -9,6 +9,7 @@ import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -29,7 +30,8 @@ public class DOCParser extends RTFParser {
 	protected static Logger log = LoggerFactory.getLogger(DOCParser.class);
 
 	@Override
-	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant) {
+	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			Document document, String fileVersion) {
 		try (BufferedInputStream bis = new BufferedInputStream(input)) {
 			bis.mark(Integer.MAX_VALUE);
 

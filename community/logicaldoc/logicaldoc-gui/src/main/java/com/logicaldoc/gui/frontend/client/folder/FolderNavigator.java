@@ -12,14 +12,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIAutomationRoutine;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
-import com.logicaldoc.gui.common.client.beans.GUIExternalCall;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.beans.GUIMenu;
 import com.logicaldoc.gui.common.client.data.FoldersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
+import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -30,9 +32,12 @@ import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.SendToArchiveDialog;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
+import com.logicaldoc.gui.frontend.client.document.grid.FillRoutineParams;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.Search;
+import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
@@ -62,6 +67,7 @@ import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
 import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
+import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tree.TreeGrid;
 import com.smartgwt.client.widgets.tree.TreeNode;
@@ -164,8 +170,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 													new AsyncCallback<Void>() {
 														@Override
 														public void onFailure(Throwable caught) {
-															Log.serverError(caught);
-															Log.warn(I18N.message("operationnotallowed"), null);
+															GuiLog.serverError(caught);
+															GuiLog.warn(I18N.message("operationnotallowed"), null);
 														}
 
 														@Override
@@ -211,15 +217,15 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 													new AsyncCallback<Void>() {
 														@Override
 														public void onFailure(Throwable caught) {
-															Log.serverError(caught);
-															Log.warn(I18N.message("operationnotallowed"), null);
+															GuiLog.serverError(caught);
+															GuiLog.warn(I18N.message("operationnotallowed"), null);
 														}
 
 														@Override
 														public void onSuccess(Void result) {
 															DocumentsPanel.get()
 																	.onFolderSelected(Session.get().getCurrentFolder());
-															Log.debug("Drag&Drop operation completed.");
+															GuiLog.debug("Drag&Drop operation completed.");
 														}
 													});
 										}
@@ -270,7 +276,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -431,7 +437,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -439,8 +445,21 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 						if (result != null) {
 							result.setPathExtended(getPath(folderId));
 							Session.get().setCurrentFolder(result);
-							if (Session.get().isFolderPagination())
-								FolderCursor.get().setTotalRecords(result.getSubfolderCount());
+							if (Session.get().isFolderPagination()) {
+								if (result.getGrid() != null && !result.getGrid().isEmpty())
+									FolderCursor.get().setPageSizeAndTotalRecords(
+											DocumentGridUtil.getFolderPageSizeFromSpec(result.getGrid()),
+											result.getSubfolderCount());
+								else if (Session.get().getUser().getDocsGrid() != null
+										&& !Session.get().getUser().getDocsGrid().isEmpty())
+									FolderCursor.get()
+											.setPageSizeAndTotalRecords(
+													DocumentGridUtil.getFolderPageSizeFromSpec(
+															Session.get().getUser().getDocsGrid()),
+													result.getSubfolderCount());
+								else
+									FolderCursor.get().setTotalRecords(result.getSubfolderCount());
+							}
 						}
 					}
 				});
@@ -655,18 +674,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			}
 		});
 
-		MenuItem externalCall = null;
-		final GUIExternalCall extCall = Session.get().getSession().getExternalCall();
-		if (Feature.enabled(Feature.EXTERNAL_CALL) && extCall != null) {
-			externalCall = new MenuItem();
-			externalCall.setTitle(extCall.getName());
-			externalCall.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
-				public void onClick(MenuItemClickEvent event) {
-					WindowUtils.openUrl(extCall.getUrl(false, new Long[] { id }, new String[] { name }),
-							extCall.getTargetWindow() != null ? extCall.getTargetWindow() : "_blank", null);
-				}
-			});
-		}
+		MenuItem customActionsItem = prepareCustomActionsMenu(folder.getId());
 
 		if (!folder.hasPermission(Constants.PERMISSION_ADD)) {
 			create.setEnabled(false);
@@ -755,8 +763,11 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			}
 		}
 
-		if (externalCall != null)
-			contextMenu.addItem(externalCall);
+		if (Feature.enabled(Feature.CUSTOM_ACTIONS)
+				&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.CUSTOM_ACTIONS)
+				&& Session.get().getUser().getCustomActions() != null
+				&& Session.get().getUser().getCustomActions().length > 0)
+			contextMenu.addItem(customActionsItem);
 
 		return contextMenu;
 	}
@@ -769,7 +780,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			@Override
 			public void onFailure(Throwable caught) {
 				ContactingServer.get().hide();
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -793,7 +804,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 												SC.say("timeout");
 											}
 
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -835,7 +846,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -897,7 +908,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -945,7 +956,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -984,7 +995,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -1034,7 +1045,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -1166,7 +1177,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -1201,7 +1212,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -1221,7 +1232,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 			docIds[i++] = doc.getId();
 
 		if (Feature.enabled(Feature.PDF))
-			LD.askforValue(I18N.message("pasteasalias"), "type", "", ItemFactory.newAliasTypeSelector(),
+			LD.askForValue(I18N.message("pasteasalias"), "type", "", ItemFactory.newAliasTypeSelector(),
 					new ValueCallback() {
 
 						@Override
@@ -1238,14 +1249,14 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void result) {
 				DocumentsPanel.get().onFolderSelected(Session.get().getCurrentFolder());
 				Clipboard.getInstance().clear();
-				Log.debug("Paste as Alias operation completed.");
+				GuiLog.debug("Paste as Alias operation completed.");
 			}
 		});
 	}
@@ -1289,8 +1300,8 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
-				Log.warn(I18N.message("operationnotallowed"), null);
+				GuiLog.serverError(caught);
+				GuiLog.warn(I18N.message("operationnotallowed"), null);
 			}
 
 			@Override
@@ -1320,7 +1331,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 					@Override
 					public void onFailure(Throwable caught) {
 						ContactingServer.get().hide();
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -1345,7 +1356,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -1469,12 +1480,12 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 					DocumentService.Instance.get().archiveFolder(folderId, value, new AsyncCallback<Long>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Long result) {
-							Log.info(I18N.message("documentswerearchived", "" + result), null);
+							GuiLog.info(I18N.message("documentswerearchived", "" + result), null);
 							reload();
 						}
 					});
@@ -1537,5 +1548,108 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	protected void onDestroy() {
 		destroy();
 		super.onDestroy();
+	}
+
+	private MenuItem prepareCustomActionsMenu(final long folderId) {
+		Menu customActionsMenu = new Menu();
+		if (Session.get().getUser().getCustomActions() != null
+				&& Session.get().getUser().getCustomActions().length > 0) {
+			for (GUIMenu menuAction : Session.get().getUser().getCustomActions()) {
+				MenuItem actionItem = new MenuItem(I18N.message(menuAction.getName()));
+				customActionsMenu.addItem(actionItem);
+
+				actionItem.addClickHandler(new ClickHandler() {
+
+					@Override
+					public void onClick(MenuItemClickEvent event) {
+						/**
+						 * Check on the server if the action has been modified
+						 */
+						SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(),
+								new AsyncCallback<GUIMenu>() {
+
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
+
+									@Override
+									public void onSuccess(GUIMenu action) {
+										Session.get().getUser().updateCustomAction(action);
+
+										if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
+												&& action.getAutomation() != null
+												&& !action.getAutomation().trim().isEmpty()) {
+											/*
+											 * An automation cript is specified
+											 * directly, so launch it's
+											 * execution
+											 */
+											GUIAutomationRoutine routine = new GUIAutomationRoutine();
+											routine.setAutomation(action.getAutomation());
+											executeRoutine(folderId, null, routine);
+										} else if (action.getRoutineId() != null
+												&& action.getRoutineId().longValue() != 0L) {
+											AutomationService.Instance.get().getRoutine(action.getRoutineId(),
+													new AsyncCallback<GUIAutomationRoutine>() {
+
+														@Override
+														public void onFailure(Throwable caught) {
+															GuiLog.serverError(caught);
+														}
+
+														@Override
+														public void onSuccess(GUIAutomationRoutine routine) {
+															if (routine.getTemplateId() != null
+																	&& routine.getTemplateId().longValue() != 0L) {
+																/*
+																 * A routine
+																 * with
+																 * parameters is
+																 * referenced,
+																 * so open the
+																 * input popup
+																 */
+																FillRoutineParams dialog = new FillRoutineParams(
+																		action.getName(), routine, folderId, null);
+																dialog.show();
+															} else {
+																/*
+																 * A routine
+																 * without
+																 * parameters is
+																 * referenced,
+																 * so launch
+																 * directly
+																 */
+																executeRoutine(folderId, null, routine);
+															}
+														}
+													});
+										}
+									}
+								});
+					}
+				});
+			}
+		}
+
+		MenuItem customActionsItem = new MenuItem(I18N.message("customactions"));
+		customActionsItem.setSubmenu(customActionsMenu);
+		return customActionsItem;
+	}
+
+	private void executeRoutine(long folderId, Long[] docIds, GUIAutomationRoutine routine) {
+		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void arg0) {
+			}
+		});
 	}
 }

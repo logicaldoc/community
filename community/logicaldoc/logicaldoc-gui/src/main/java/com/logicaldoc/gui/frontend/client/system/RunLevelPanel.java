@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.AspectsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -22,8 +22,6 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.Layout;
-import com.smartgwt.client.widgets.layout.SectionStack;
-import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
@@ -89,27 +87,27 @@ public class RunLevelPanel extends VLayout {
 		settings.add(new GUIParameter("runlevel", currentRunlevel.getValueAsString()));
 		settings.add(new GUIParameter("runlevel.back", currentRunlevel.getValueAsString()));
 		for (ListGridRecord rec : aspects.getRecords()) {
-			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".default", rec
-					.getAttributeAsString("default")));
-			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".bulkload", rec
-					.getAttributeAsString("bulkload")));
-			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".slave", rec
-					.getAttributeAsString("slave")));
-			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".devel", rec
-					.getAttributeAsString("devel")));
-			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".demo", rec
-					.getAttributeAsString("demo")));
+			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".default",
+					rec.getAttributeAsString("default")));
+			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".bulkload",
+					rec.getAttributeAsString("bulkload")));
+			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".slave",
+					rec.getAttributeAsString("slave")));
+			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".devel",
+					rec.getAttributeAsString("devel")));
+			settings.add(new GUIParameter("aspect." + rec.getAttributeAsString("id") + ".demo",
+					rec.getAttributeAsString("demo")));
 		}
 
 		SettingService.Instance.get().saveSettings(settings.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void arg) {
-				Log.info(I18N.message("settingssaved"));
+				GuiLog.info(I18N.message("settingssaved"));
 				for (GUIParameter param : settings)
 					Session.get().setConfig(param.getName(), param.getValue());
 				SC.say(I18N.message("settingssaved") + "\n" + I18N.message("suggestedtorestart"));
@@ -117,7 +115,7 @@ public class RunLevelPanel extends VLayout {
 		});
 	}
 
-	private SectionStack prepareAspectsTable() {
+	private ListGrid prepareAspectsTable() {
 		ListGridField id = new ListGridField("id", I18N.message("aspect"), 300);
 		id.setCanEdit(false);
 		id.setCanSort(false);
@@ -135,7 +133,7 @@ public class RunLevelPanel extends VLayout {
 		_default.setCanEdit(true);
 		_default.setAutoFitWidth(true);
 		_default.setCanSort(false);
-		
+
 		ListGridField bulkload = new ListGridField("bulkload", I18N.message("bulkload"), 60);
 		bulkload.setType(ListGridFieldType.BOOLEAN);
 		bulkload.setCanEdit(true);
@@ -147,7 +145,7 @@ public class RunLevelPanel extends VLayout {
 		slave.setCanEdit(true);
 		slave.setAutoFitWidth(true);
 		slave.setCanSort(false);
-		
+
 		ListGridField devel = new ListGridField("devel", I18N.message("devel"), 60);
 		devel.setType(ListGridFieldType.BOOLEAN);
 		devel.setCanEdit(true);
@@ -167,19 +165,9 @@ public class RunLevelPanel extends VLayout {
 		aspects.setDataSource(new AspectsDS());
 		aspects.setFields(id, _default, bulkload, slave, devel, demo);
 		aspects.setHeaderHeight(44);
-		aspects.setHeaderSpans(new HeaderSpan(I18N.message("runlevels"), new String[] { "default", "bulkload", "slave", "devel",
-				"demo" }));
+		aspects.setHeaderSpans(new HeaderSpan(I18N.message("runlevels"),
+				new String[] { "default", "bulkload", "slave", "devel", "demo" }));
 
-		SectionStack stack = new SectionStack();
-		stack.setWidth100();
-		stack.setHeight100();
-
-		SectionStackSection section = new SectionStackSection(I18N.message("aspects"));
-		section.setCanCollapse(false);
-		section.setExpanded(true);
-
-		section.setItems(aspects);
-		stack.setSections(section);
-		return stack;
+		return aspects;
 	}
 }

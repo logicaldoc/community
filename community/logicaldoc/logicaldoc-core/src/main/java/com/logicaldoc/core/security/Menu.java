@@ -52,13 +52,19 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 
 	public static final long SUBSCRIPTIONS = -1120;
 
-	public static final long PERSONAL = 40;
+	public static final long ACCOUNT = 40;
 
 	public static final long CONTACTS = 1530;
 
 	public static final long CHAT = 1527;
 
 	public static final long INTERFACE_DENSITY = 1535;
+
+	public static final long CUSTOM_ACTIONS = 1300;
+	
+	public static final int TYPE_DEFAULT = 1;
+
+	public static final int TYPE_CUSTOM_ACTION = 2;
 
 	private long id = 0;
 
@@ -70,11 +76,23 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 
 	private String icon = "";
 
-	private int type = 1;
+	private int type = TYPE_DEFAULT;
 
 	private String description = "";
 
 	private int position = 1;
+
+	private int enabled = 1;
+	
+	/**
+	 * The declared routine to execute
+	 */
+	private Long routineId;
+
+	/**
+	 * Automation script to execute(in absence of routine specification)
+	 */
+	private String automation;
 
 	protected Set<MenuGroup> menuGroups = new HashSet<MenuGroup>();
 
@@ -211,5 +229,29 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(int enabled) {
+		this.enabled = enabled;
+	}
+
+	public Long getRoutineId() {
+		return routineId;
+	}
+
+	public void setRoutineId(Long routineId) {
+		this.routineId = routineId;
+	}
+
+	public String getAutomation() {
+		return automation;
+	}
+
+	public void setAutomation(String automation) {
+		this.automation = automation;
 	}
 }

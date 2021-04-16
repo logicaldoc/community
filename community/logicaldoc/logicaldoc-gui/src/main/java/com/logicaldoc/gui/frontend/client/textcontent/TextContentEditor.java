@@ -3,8 +3,9 @@ package com.logicaldoc.gui.frontend.client.textcontent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
@@ -68,7 +69,7 @@ public class TextContentEditor extends Window {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -126,7 +127,7 @@ public class TextContentEditor extends Window {
 			DocumentService.Instance.get().unlock(new long[] { TextContentEditor.this.document.getId() }, new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 					destroy();
 				}
 
@@ -141,6 +142,7 @@ public class TextContentEditor extends Window {
 	}
 
 	private void onSave() {
+		ContactingServer.get().show();
 		if (document.getId() != 0L) {
 			// We are editing an existing file
 			DocumentService.Instance.get().checkinContent(document.getId(), form.getValueAsString("content"),
@@ -148,11 +150,13 @@ public class TextContentEditor extends Window {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							ContactingServer.get().hide();
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(GUIDocument doc) {
+							ContactingServer.get().hide();
 							TextContentEditor.this.document = doc;
 							DocumentsPanel.get().refresh();
 							destroy();
@@ -164,11 +168,13 @@ public class TextContentEditor extends Window {
 					new AsyncCallback<GUIDocument>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							ContactingServer.get().hide();
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(GUIDocument doc) {
+							ContactingServer.get().hide();
 							TextContentEditor.this.document = doc;
 							DocumentsPanel.get().refresh();
 							destroy();

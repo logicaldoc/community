@@ -54,4 +54,6 @@ public interface WorkflowServiceAsync {
 	void getCompletionDiagram(String workflowName, Integer version, String processInstanceId,
 			AsyncCallback<GUIWorkflow> callback);
 
+	void deleteInstances(String[] ids, AsyncCallback<Void> callback);
+
 }

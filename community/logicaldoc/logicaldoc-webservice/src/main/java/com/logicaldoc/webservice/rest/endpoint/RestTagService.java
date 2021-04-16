@@ -1,9 +1,5 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -22,8 +18,12 @@ import com.logicaldoc.webservice.model.WSTagCloud;
 import com.logicaldoc.webservice.rest.TagService;
 import com.logicaldoc.webservice.soap.endpoint.SoapTagService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Path("/")
-@Api(value = "tag")
+@Tag(name = "tag")
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestTagService extends SoapTagService implements TagService {
@@ -33,8 +33,8 @@ public class RestTagService extends SoapTagService implements TagService {
 	@POST
 	@Path("/setDocumentTags")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation(value = "Set the tags of a document")
-	public void setDocumentTags(@ApiParam(value = "Document ID", required = true) @FormParam("docId") long docId,
+	@Operation(summary = "Set the tags of a document")
+	public void setDocumentTags(@Parameter(description = "Document ID", required = true) @FormParam("docId") long docId,
 			@FormParam("tag") String[] tags) throws Exception {
 		String sid = validateSession();
 		super.setDocumentTags(sid, docId, tags);
@@ -44,8 +44,8 @@ public class RestTagService extends SoapTagService implements TagService {
 	@POST
 	@Path("/addDocumentTags")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation(value = "Appends new tags to a document")
-	public void addDocumentTags(@ApiParam(value = "Document ID", required = true) @FormParam("docId") long docId,
+	@Operation(summary = "Appends new tags to a document")
+	public void addDocumentTags(@Parameter(description = "Document ID", required = true) @FormParam("docId") long docId,
 			@FormParam("tag") String[] tags) throws Exception {
 		String sid = validateSession();
 		super.addDocumentTags(sid, docId, tags);
@@ -54,8 +54,8 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Override
 	@GET
 	@Path("/getDocumentTags")
-	@ApiOperation(value = "Gets all the tags of a document")
-	public String[] getDocumentTags(@ApiParam(value = "Document ID", required = true) @QueryParam("docId") long docId)
+	@Operation(summary = "Gets all the tags of a document")
+	public String[] getDocumentTags(@Parameter(description = "Document ID", required = true) @QueryParam("docId") long docId)
 			throws Exception {
 		String sid = validateSession();
 		return super.getDocumentTags(sid, docId);
@@ -65,8 +65,9 @@ public class RestTagService extends SoapTagService implements TagService {
 	@POST
 	@Path("/setFolderTags")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation(value = "Sets the tags of a folder")
-	public void setFolderTags(@ApiParam(value = "Folder ID", required = true) @FormParam("folderId") long folderId,
+	@Operation(summary = "Sets the tags of a folder")
+	public void setFolderTags(
+			@Parameter(description = "Folder ID", required = true) @FormParam("folderId") long folderId,
 			@FormParam("tag") String[] tags) throws Exception {
 		String sid = validateSession();
 		super.setFolderTags(sid, folderId, tags);
@@ -76,8 +77,9 @@ public class RestTagService extends SoapTagService implements TagService {
 	@POST
 	@Path("/addFolderTags")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	@ApiOperation(value = "Appends new tags to a folder")
-	public void addFolderTags(@ApiParam(value = "Folder ID", required = true) @FormParam("folderId") long folderId,
+	@Operation(summary = "Appends new tags to a folder")
+	public void addFolderTags(
+			@Parameter(description = "Folder ID", required = true) @FormParam("folderId") long folderId,
 			@FormParam("tag") String[] tags) throws Exception {
 		String sid = validateSession();
 		super.addFolderTags(sid, folderId, tags);
@@ -86,8 +88,8 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Override
 	@GET
 	@Path("/getFolderTags")
-	@ApiOperation(value = "Gets all the tags of a folder")
-	public String[] getFolderTags(@ApiParam(value = "Folder ID", required = true) @QueryParam("folderId") long folderId) throws Exception {
+	@Operation(summary = "Gets all the tags of a folder")
+	public String[] getFolderTags(@Parameter(description = "Folder ID", required = true) @QueryParam("folderId") long folderId) throws Exception {
 		String sid = validateSession();
 		return super.getFolderTags(sid, folderId);
 	}
@@ -95,7 +97,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Override
 	@GET
 	@Path("/getTags")
-	@ApiOperation(value = "Gets all the tags used in the sysem")
+	@Operation(summary = "Gets all the tags used in the sysem")
 	public String[] getTags() throws Exception {
 		String sid = validateSession();
 		return super.getTags(sid);
@@ -104,7 +106,7 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Override
 	@GET
 	@Path("/getTagCloud")
-	@ApiOperation(value = "Retrieves all tag clouds in the repository")
+	@Operation(summary = "Retrieves all tag clouds in the repository")
 	public WSTagCloud[] getTagCloud() throws Exception {
 		String sid = validateSession();
 		return super.getTagCloud(sid);
@@ -113,8 +115,8 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Override
 	@GET
 	@Path("/findDocumentsByTag")
-	@ApiOperation(value = "Finds authorized documents for the current user having a specified tag.")
-	public WSDocument[] findDocumentsByTag(@ApiParam(value = "The tag", required = true) @QueryParam("tag") String tag) throws Exception {
+	@Operation(summary = "Finds authorized documents for the current user having a specified tag")
+	public WSDocument[] findDocumentsByTag(@Parameter(description = "The tag", required = true) @QueryParam("tag") String tag) throws Exception {
 		String sid = validateSession();
 		WSDocument[] docs = super.findDocumentsByTag(sid, tag);
 		return docs;
@@ -123,8 +125,8 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Override
 	@GET
 	@Path("/findFoldersByTag")
-	@ApiOperation(value = "Finds authorized folders for the current user having a specified tag.")
-	public WSFolder[] findFoldersByTag(@ApiParam(value = "The tag", required = true) @QueryParam("tag") String tag) throws Exception {
+	@Operation(summary = "Finds authorized folders for the current user having a specified tag")
+	public WSFolder[] findFoldersByTag(@Parameter(description = "The tag", required = true) @QueryParam("tag") String tag) throws Exception {
 		String sid = validateSession();
 		return super.findFoldersByTag(sid, tag);
 	}
@@ -132,7 +134,9 @@ public class RestTagService extends SoapTagService implements TagService {
 	@Override
 	@GET
 	@Path("/getTagsPreset")
-	@ApiOperation(value = "Retrieves all the tags in the preset", notes = "Retrieves all the tags specified in the preset, empty if input mode is free")	
+	@Operation(
+			summary = "Retrieves all the tags in the preset", 
+			description = "Retrieves all the tags specified in the preset, empty if input mode is free")
 	public String[] getTagsPreset() throws Exception {
 		String sid = validateSession();
 		return super.getTagsPreset(sid);

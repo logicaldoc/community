@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -170,7 +170,7 @@ public class LDAPBrowser extends VLayout {
 				public void onFailure(Throwable caught) {
 					searchButton.setDisabled(false);
 					ContactingServer.get().hide();
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -214,7 +214,7 @@ public class LDAPBrowser extends VLayout {
 				LDAPService.Instance.get().importUsers(usernames, server.getId(), new AsyncCallback<GUIValue[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 						ContactingServer.get().hide();
 					}
 
@@ -224,9 +224,9 @@ public class LDAPBrowser extends VLayout {
 						String message = I18N.message("importreport",
 								new String[] { report[0].getValue(), report[1].getValue(), report[2].getValue() });
 						if ("0".equals(report[2].getValue()))
-							Log.info(I18N.message("importcompleted"), message);
+							GuiLog.info(I18N.message("importcompleted"), message);
 						else
-							Log.error(I18N.message("importerrors"), message, null);
+							GuiLog.error(I18N.message("importerrors"), message, null);
 						SC.warn(message);
 					}
 				});

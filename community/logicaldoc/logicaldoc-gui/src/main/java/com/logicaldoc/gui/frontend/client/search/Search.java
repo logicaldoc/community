@@ -8,9 +8,9 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIResult;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
-import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 
@@ -75,7 +75,7 @@ public class Search {
 			@Override
 			public void onFailure(Throwable caught) {
 				ContactingServer.get().hide();
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -127,7 +127,7 @@ public class Search {
 
 	public int getMaxHits() {
 		if (maxHits == null) {
-			Integer pageSize = GridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
+			Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
 			if (pageSize == null)
 				pageSize = Session.get().getConfigAsInt("search.hits");
 			maxHits = pageSize;

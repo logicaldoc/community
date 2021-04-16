@@ -1,31 +1,46 @@
-The LogicalDOC development team is happy to announce the immediate availability of LogicalDOC CE 7.6
+The LogicalDOC development team is proud to announce the availability of LogicalDOC CE 8.6.1
 
-You can get this distribution in tomcat-bundle archive from SourceForge: 
-http://sourceforge.net/projects/logicaldoc/files/distribution/LogicalDOC%20CE%207.6/logicaldoc-7.6-tomcat-bundle.zip/download
+You can get this distribution in Tomcat-bundle archive from SourceForge: 
+https://sourceforge.net/projects/logicaldoc/files/distribution/LogicalDOC%20CE%208.6/logicaldoc-8.6.1-tomcat-bundle.zip/download
 
-LogicalDOC is a Web-based Document Management System (DMS) based on open 
-source technology (GWT +Spring +Hibernate). Thanks to its intuitive interface, 
-LogicalDOC transforms complex operations into easy tasks. It allows the 
-storage, organization, versioning and use of all kind of files and documents 
-within an user friendly interface.
+LogicalDOC Community Edition is free (libre) software (FLOSS) and allows organizations and individuals to centralize the management, storage, retrieval and distribution of documents.
 
-Changes:
-Folder alias - new feature - Core
-REST implementation of web services - new feature - Web Services
-Reusable custom attribute sets - new feature - Core
-Removed support for Java7 - deprecation - Core
-Hiding Extended Properties that aren't used - improvement - User Interface
-Optimization of tags handling for huge repositories - enhancement - Core
-Preview of older document versions displays latest version only - defect - User Interface
-Removed all Java Applets - deprecation - User Interface
-SOAP webservices refactoring - improvement - Web Services
-Removed support for Internet Explorer 10 - deprecation - User Interface
-Add Documents Issue '&' and '%' symbols fail - bug - User Interface 
+LogicalDoc Community Edition offers a lot for your document management needs with a multilingual, 
+desktop interface and user-friendly features such as multilingual full-text indexing, full version control, task manager, 
+importing from zip files, and document searching to keep control of your documents.
+
+LogicalDOC is localized in many languages: Russian, English, Chinese, Korean, Japanese, Italian and many others and one of its most interesting features is its ability to index the content of documents using different algorithms depending on the language of the document.
+This allows later to perform "smart" full-text searches.
+
+LogicalDOC Community provides a set of SOAP and REST API interfaces that allow the system to be integrated with other applications
+The web-service API documentation is available in the LogicalDOC Documentation website https://docs.logicaldoc.com/en/web-services-api
+
+In addition, a WebDAV and a CMIS interface are available.
+Native apps for Android and iOS are published and available for free download on Google Play and iTunes.
+   
+For a complete list of features, take a look at https://www.logicaldoc.com/features
 
 
-You can use our dedicated Bug tracker http://bugs.logicaldoc.com to report errors or feature requests.
+Some changes since version 8.5.2:
+Support for the new Android app LogicalDOC Mobile - https://play.google.com/store/apps/details?id=com.logicaldoc.mobile
+1066	Geolocation of requests
+1055	Customizable thumbnail generation
+1059	Option to save correctly sent emails as LogicalDOC's documents
+1067	Redesign of main menu: search on the left, removed Personal menu, added Account menu
+1077	Error in CustomID generation on version promotion
+1071	GUI Setting to Show / Hide the application banner
+1072	Display total pages number in the folders navigator cursor
+1075	Improved  the quality of grids prints
+1078	Enforce password history
+1081	Improve the Search Folder form
+1084	"Oracle database does not support ""as"" for aliasing table names in from cluase" 
 
-Please contribute to the internationalization of LogicalDOC by using the translation platform described in the Wiki
-http://wiki.logicaldoc.com/wiki/Translate_LogicalDOC
+	
 
-The LogicalDOC development Team 
+The LogicalDOC documentation is available at the following address
+https://docs.logicaldoc.com
+
+Please note that this documentation is related to LogicalDOC Enterprise, and that some features may not be available in the Community version
+
+
+The LogicalDOC development Team

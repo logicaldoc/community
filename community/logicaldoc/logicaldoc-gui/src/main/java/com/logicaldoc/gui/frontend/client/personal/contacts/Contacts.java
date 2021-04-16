@@ -5,9 +5,9 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.data.ContactsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
@@ -98,7 +98,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -118,7 +118,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		export.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 		if (Feature.visible(Feature.EXPORT_CSV)) {
@@ -237,7 +237,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 							ContactService.Instance.get().delete(ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -270,7 +270,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 				new AsyncCallback<GUIContact>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

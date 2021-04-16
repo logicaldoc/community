@@ -48,11 +48,12 @@ public class DocumentsMenu extends SectionStack {
 
 		setShowResizeBar(true);
 
-		browser = new SectionStackSection(I18N.message("browser"));
+		browser = new SectionStackSection(I18N.message("browser") + "   ");
 		browser.setName("browser");
 		browser.setCanCollapse(true);
-		if (Session.get().isFolderPagination())
+		if (Session.get().isFolderPagination()) {
 			browser.setControls(FolderCursor.get());
+		}
 
 		browser.setItems(FolderNavigatorPanel.get());
 		if (showBrowser)

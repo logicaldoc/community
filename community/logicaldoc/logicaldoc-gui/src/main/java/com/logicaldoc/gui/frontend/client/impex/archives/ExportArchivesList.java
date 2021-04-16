@@ -4,15 +4,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.ArchivesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -97,11 +97,7 @@ public class ExportArchivesList extends VLayout {
 		status.setImageURLSuffix(".png");
 		status.setCanFilter(false);
 
-		ListGridField created = new ListGridField("created", I18N.message("createdon"), 110);
-		created.setAlign(Alignment.CENTER);
-		created.setType(ListGridFieldType.DATE);
-		created.setCellFormatter(new DateCellFormatter(false));
-		created.setCanFilter(false);
+		ListGridField created = new DateListGridField("created", "createdon");
 
 		ListGridField creator = new ListGridField("creator", I18N.message("creator"), 110);
 		creator.setCanFilter(true);
@@ -137,8 +133,8 @@ public class ExportArchivesList extends VLayout {
 			list.setDataSource(new ArchivesDS(GUIArchive.MODE_EXPORT, this.archivesType, GUIArchive.STATUS_FINALIZED,
 					Session.get().getUser().getId()));
 		else
-			list.setDataSource(new ArchivesDS(GUIArchive.MODE_EXPORT, this.archivesType, null, Session.get().getUser()
-					.getId()));
+			list.setDataSource(
+					new ArchivesDS(GUIArchive.MODE_EXPORT, this.archivesType, null, Session.get().getUser().getId()));
 
 		if (!showHistory)
 			listing.addMember(infoPanel);
@@ -183,8 +179,8 @@ public class ExportArchivesList extends VLayout {
 			public void onSelectionChanged(SelectionEvent event) {
 				ListGridRecord record = list.getSelectedRecord();
 				try {
-					showDetails(Long.parseLong(record.getAttribute("id")), !Integer.toString(GUIArchive.STATUS_OPENED)
-							.equals(record.getAttribute("status")));
+					showDetails(Long.parseLong(record.getAttribute("id")),
+							!Integer.toString(GUIArchive.STATUS_OPENED).equals(record.getAttribute("status")));
 				} catch (Throwable t) {
 				}
 			}
@@ -223,7 +219,7 @@ public class ExportArchivesList extends VLayout {
 							ImpexService.Instance.get().delete(id, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -292,7 +288,7 @@ public class ExportArchivesList extends VLayout {
 				GUIArchive.STATUS_CLOSED, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -331,7 +327,7 @@ public class ExportArchivesList extends VLayout {
 				GUIArchive.STATUS_OPENED, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -352,8 +348,8 @@ public class ExportArchivesList extends VLayout {
 
 	public void refresh() {
 		if (archivesType == GUIArchive.TYPE_STORAGE && showHistory)
-			list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, archivesType, GUIArchive.STATUS_FINALIZED, Session
-					.get().getUser().getId()));
+			list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, archivesType, GUIArchive.STATUS_FINALIZED,
+					Session.get().getUser().getId()));
 		else
 			list.refresh(new ArchivesDS(GUIArchive.MODE_EXPORT, archivesType, null, Session.get().getUser().getId()));
 		detailsContainer.removeMembers(detailsContainer.getMembers());

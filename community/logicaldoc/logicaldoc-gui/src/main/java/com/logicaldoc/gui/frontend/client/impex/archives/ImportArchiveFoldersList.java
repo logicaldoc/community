@@ -2,15 +2,14 @@ package com.logicaldoc.gui.frontend.client.impex.archives;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.ImpexFoldersDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -58,11 +57,7 @@ public class ImportArchiveFoldersList extends VLayout {
 
 		ListGridField name = new ListGridField("name", I18N.message("folder"), 250);
 
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date");
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -132,7 +127,7 @@ public class ImportArchiveFoldersList extends VLayout {
 							ImpexService.Instance.get().deleteFolder(name, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -158,7 +153,7 @@ public class ImportArchiveFoldersList extends VLayout {
 							ImpexService.Instance.get().startImport(name, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.warn(I18N.message("archiveimportingerror"), null);
+									GuiLog.warn(I18N.message("archiveimportingerror"), null);
 								}
 
 								@Override

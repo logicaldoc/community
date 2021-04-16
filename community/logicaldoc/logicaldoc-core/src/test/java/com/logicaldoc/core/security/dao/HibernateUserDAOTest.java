@@ -15,6 +15,8 @@ import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
+import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 
 import junit.framework.Assert;
@@ -59,7 +61,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		dao.store(testUser);
 		dao.initialize(testUser);
 		Assert.assertEquals(1, testUser.getGroups().size());
-		
+
 		String name = testUser.getUserGroupName();
 		Assert.assertTrue(dao.delete(testUser.getId()));
 		user = dao.findByUsername("test");
@@ -229,6 +231,26 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		user = dao.findById(1);
 		dao.initialize(user);
 		Assert.assertEquals(3, user.getGroups().size());
+	}
+
+	@Test
+	public void testStorePasswordChanged() throws PersistenceException {
+		User user = dao.findById(1L);
+		user.setPassword("psw1");
+
+		try {
+			dao.store(user);
+			Assert.fail();
+		} catch (PasswordAlreadyUsedException e) {
+
+		}
+
+		user = dao.findById(1L);
+		user.setPassword("notexistingpasswd");
+		dao.store(user);
+
+		PasswordHistoryDAO pDao = (PasswordHistoryDAO) Context.get().getBean(PasswordHistoryDAO.class);
+		Assert.assertEquals(4, pDao.findByUserId(user.getId(), null).size());
 	}
 
 	@Test

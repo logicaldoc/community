@@ -6,7 +6,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUILDAPServer;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
@@ -67,13 +67,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 		ldapForm.setTitleOrientation(TitleOrientation.TOP);
 		ldapForm.setColWidths(100, 100);
 
-		// Implementation
-		RadioGroupItem implementation = ItemFactory.newBooleanSelector("implementation", "implementation");
-		implementation.setName("implementation");
-		implementation.setValueMap("basic", "md5");
-		implementation.setRequired(true);
-		implementation.setValue(this.server.getImplementation());
-
 		// Enabled
 		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "enabled");
 		enabled.setValue(this.server.isEnabled() ? "yes" : "no");
@@ -92,14 +85,13 @@ public class LDAPServerDetailsPanel extends VLayout {
 		url.setWidth(300);
 
 		// Username
-		TextItem username = ItemFactory.newTextItem("username", "user", this.server.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "user", this.server.getUsername());
 		username.setCellStyle("warn");
 		username.setWidth(300);
 
 		// Password
-		PasswordItem password = new PasswordItem("password", I18N.message("password"));
-		password.setName("password");
-		password.setValue(this.server.getPassword());
+		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", I18N.message("password"),
+				this.server.getPassword());
 		password.setCellStyle("warn");
 		password.setWidth(300);
 
@@ -161,7 +153,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 		pageSize.setRequired(true);
 		pageSize.setMin(0);
 		pageSize.setStep(50);
-		
+
 		// Timepout
 		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", "timeout", this.server.getTimeout());
 		timeout.setRequired(true);
@@ -188,17 +180,28 @@ public class LDAPServerDetailsPanel extends VLayout {
 		keepMembership.setRequired(true);
 		keepMembership.setEndRow(true);
 
-		
-		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation",
-				"validation", this.server.getValidation(), null, false);
+		TextAreaItem validation = ItemFactory.newTextAreaItemForAutomation("validation", "validation",
+				this.server.getValidation(), null, false);
 		validation.setHeight(150);
 		validation.setWidth(400);
 		validation.setWrapTitle(false);
 		validation.setColSpan(2);
-		
-		ldapForm.setItems(enabled, url, username, password, implementation, anon, syncTtl, pageSize, timeout, language, userType,
-				keepMembership, userIdentifierAttr, grpIdentifierAttr, userClass, groupClass, usersBaseNode,
-				groupsBaseNode, userInclude, groupInclude, userExclude, groupExclude, logonAttr, realm, validation);
+
+		/*
+		 * Two invisible fields to 'mask' the real credentials to the browser
+		 * and prevent it to auto-fill the username and password we really use.
+		 */
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
+				this.server.getUsername());
+		fakeUsername.setCellStyle("nodisplay");
+		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
+				this.server.getPassword());
+		fakePassword.setCellStyle("nodisplay");
+
+		ldapForm.setItems(enabled, url, fakeUsername, fakePassword, username, password, anon, syncTtl, pageSize,
+				timeout, language, userType, keepMembership, userIdentifierAttr, grpIdentifierAttr, userClass,
+				groupClass, usersBaseNode, groupsBaseNode, userInclude, groupInclude, userExclude, groupExclude,
+				logonAttr, realm, validation);
 
 		ldapTab.setPane(ldapForm);
 
@@ -224,7 +227,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
 				if (vm.validate()) {
-					LDAPServerDetailsPanel.this.server.setImplementation((String) values.get("implementation"));
 					LDAPServerDetailsPanel.this.server.setEnabled(values.get("eenabled").equals("yes") ? true : false);
 					LDAPServerDetailsPanel.this.server.setAnonymous(values.get("anon").equals("yes") ? true : false);
 					LDAPServerDetailsPanel.this.server
@@ -257,7 +259,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -309,7 +311,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 
 				if (vm.validate()) {
-					LDAPServerDetailsPanel.this.server.setImplementation((String) values.get("implementation"));
 					LDAPServerDetailsPanel.this.server.setEnabled(values.get("eenabled").equals("yes") ? true : false);
 					LDAPServerDetailsPanel.this.server.setAnonymous(values.get("anon").equals("yes") ? true : false);
 					LDAPServerDetailsPanel.this.server
@@ -335,13 +336,13 @@ public class LDAPServerDetailsPanel extends VLayout {
 					LDAPServerDetailsPanel.this.server.setUserType(Integer.parseInt(values.get("usertype").toString()));
 					LDAPServerDetailsPanel.this.server.setValidation((String) values.get("validation"));
 					LDAPServerDetailsPanel.this.server.setTimeout(Integer.parseInt(values.get("timeout").toString()));
-					
+
 					LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server,
 							new AsyncCallback<GUILDAPServer>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -351,7 +352,7 @@ public class LDAPServerDetailsPanel extends VLayout {
 										browser.setServer(LDAPServerDetailsPanel.this.server);
 									listing.updateRecord(LDAPServerDetailsPanel.this.server);
 									test.setDisabled(false);
-									Log.info(I18N.message("settingssaved"), null);
+									GuiLog.info(I18N.message("settingssaved"), null);
 								}
 							});
 				}

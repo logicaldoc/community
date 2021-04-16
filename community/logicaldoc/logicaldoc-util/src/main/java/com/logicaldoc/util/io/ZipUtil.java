@@ -1,5 +1,6 @@
 package com.logicaldoc.util.io;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
@@ -14,6 +17,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -300,5 +306,55 @@ public class ZipUtil {
 
 	public void setFileNameCharset(String fileNameCharset) {
 		this.fileNameCharset = fileNameCharset;
+	}
+
+	/**
+	 * Gunzips and Untars a given .tar.gz file
+	 * 
+	 * @param tarGzFile the .tar.gz file
+	 * @param targetDir the target folder to unpack to
+	 */
+	public void unGZipUnTar(File tarGzFile, File targetDir) {
+		File tarFile = null;
+		try {
+			/*
+			 * Ungzip file to extract TAR file.
+			 */
+			tarFile = File.createTempFile("ungizp", ".tar");
+			try (GzipCompressorInputStream archive = new GzipCompressorInputStream(
+					new BufferedInputStream(new FileInputStream(tarGzFile)))) {
+				OutputStream out = Files.newOutputStream(tarFile.toPath());
+				IOUtils.copy(archive, out);
+			}
+
+			/*
+			 * Untar extracted TAR file
+			 */
+			try (FileInputStream tarIs = new FileInputStream(tarFile);
+					BufferedInputStream tarBIS = new BufferedInputStream(tarIs);
+					TarArchiveInputStream archive = new TarArchiveInputStream(tarBIS)) {
+
+				TarArchiveEntry entry;
+				while ((entry = archive.getNextTarEntry()) != null) {
+					File file = new File(targetDir + "/" + entry.getName());
+					if (!entry.isFile()) {
+						file.mkdirs();
+						file.mkdir();
+					} else {
+						try (FileOutputStream fos = new FileOutputStream(file)) {
+							IOUtils.copy(archive, fos);
+							fos.flush();
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			logError(e.getMessage());
+		} finally {
+			if (tarFile != null && tarFile.exists())
+				FileUtil.strongDelete(tarFile);
+		}
+
 	}
 }

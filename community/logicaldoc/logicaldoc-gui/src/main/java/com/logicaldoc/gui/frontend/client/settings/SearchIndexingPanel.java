@@ -14,16 +14,16 @@ import com.logicaldoc.gui.common.client.data.IndexingQueueDS;
 import com.logicaldoc.gui.common.client.data.LanguagesDS;
 import com.logicaldoc.gui.common.client.data.ParsersDS;
 import com.logicaldoc.gui.common.client.data.TokenFiltersDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -111,7 +111,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -184,12 +184,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		aliases.setCanEdit(true);
 		aliases.setCanFilter(false);
 		aliases.setCanSort(false);
-		aliases.setCellFormatter(new CellFormatter() {
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return Util.strip(record.getAttributeAsString("aliases"));
-			}
-		});
+		aliases.setEscapeHTML(true);
 
 		parsersList = new ListGrid();
 		parsersList.setCanEdit(true);
@@ -212,7 +207,7 @@ public class SearchIndexingPanel extends AdminPanel {
 						(String) event.getNewValues().get("aliases"), new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -336,7 +331,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -395,7 +390,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -435,7 +430,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -597,7 +592,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -617,12 +612,12 @@ public class SearchIndexingPanel extends AdminPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void ret) {
-						Log.info(I18N.message("indexunlocked"), null);
+						GuiLog.info(I18N.message("indexunlocked"), null);
 						AdminScreen.get().setContent(new SearchIndexingPanel());
 					}
 				});
@@ -647,12 +642,12 @@ public class SearchIndexingPanel extends AdminPanel {
 								public void onFailure(Throwable caught) {
 									ContactingServer.get().hide();
 									rescheduleAll.setDisabled(false);
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									Log.info(I18N.message("docsreindex"), null);
+									GuiLog.info(I18N.message("docsreindex"), null);
 									rescheduleAll.setDisabled(false);
 									ContactingServer.get().hide();
 									AdminScreen.get().setContent(new SearchIndexingPanel());
@@ -682,12 +677,12 @@ public class SearchIndexingPanel extends AdminPanel {
 								public void onFailure(Throwable caught) {
 									ContactingServer.get().hide();
 									dropIndex.setDisabled(false);
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									Log.info(I18N.message("docsreindex"), null);
+									GuiLog.info(I18N.message("docsreindex"), null);
 									dropIndex.setDisabled(false);
 									ContactingServer.get().hide();
 									AdminScreen.get().setContent(new SearchIndexingPanel());
@@ -707,7 +702,7 @@ public class SearchIndexingPanel extends AdminPanel {
 				SearchEngineService.Instance.get().check(new AsyncCallback<String>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 						ContactingServer.get().hide();
 					}
 
@@ -789,31 +784,19 @@ public class SearchIndexingPanel extends AdminPanel {
 		version.setAlign(Alignment.CENTER);
 		version.setCanFilter(true);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 
 		ListGridField publisher = new ListGridField("publisher", I18N.message("publisher"), 90);
 		publisher.setAlign(Alignment.CENTER);
 		publisher.setCanFilter(true);
 
-		ListGridField published = new ListGridField("published", I18N.message("publishedon"), 110);
-		published.setAlign(Alignment.CENTER);
-		published.setType(ListGridFieldType.DATE);
-		published.setCellFormatter(new DateCellFormatter(false));
-		published.setCanFilter(false);
+		ListGridField published = new DateListGridField("published", "publishedon");
 
 		ListGridField creator = new ListGridField("creator", I18N.message("creator"), 90);
 		creator.setAlign(Alignment.CENTER);
 		creator.setCanFilter(true);
 
-		ListGridField created = new ListGridField("created", I18N.message("createdon"), 110);
-		created.setAlign(Alignment.CENTER);
-		created.setType(ListGridFieldType.DATE);
-		created.setCellFormatter(new DateCellFormatter(false));
-		created.setCanFilter(false);
+		ListGridField created = new DateListGridField("created", "createdon");
 
 		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
@@ -908,7 +891,7 @@ public class SearchIndexingPanel extends AdminPanel {
 				DocumentService.Instance.get().markUnindexable(ids, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -938,14 +921,14 @@ public class SearchIndexingPanel extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(Void result) {
 								record.setAttribute("eenabled", "0");
 								langsList.refreshRow(langsList.getRecordIndex(record));
-								Log.info(I18N.message("settingsaffectnewsessions"), null);
+								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
 						});
 			}
@@ -960,14 +943,14 @@ public class SearchIndexingPanel extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(Void result) {
 								record.setAttribute("eenabled", "2");
 								langsList.refreshRow(langsList.getRecordIndex(record));
-								Log.info(I18N.message("settingsaffectnewsessions"), null);
+								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
 						});
 			}
@@ -993,7 +976,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -1014,7 +997,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override

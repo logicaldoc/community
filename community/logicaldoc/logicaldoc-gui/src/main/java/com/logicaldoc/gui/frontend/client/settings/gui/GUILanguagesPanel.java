@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.data.LanguagesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.Alignment;
@@ -87,14 +87,14 @@ public class GUILanguagesPanel extends VLayout {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(Void result) {
 								record.setAttribute("eenabled", "0");
 								list.refreshRow(list.getRecordIndex(record));
-								Log.info(I18N.message("settingsaffectnewsessions"), null);
+								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
 						});
 			}
@@ -109,14 +109,14 @@ public class GUILanguagesPanel extends VLayout {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(Void result) {
 								record.setAttribute("eenabled", "2");
 								list.refreshRow(list.getRecordIndex(record));
-								Log.info(I18N.message("settingsaffectnewsessions"), null);
+								GuiLog.info(I18N.message("settingsaffectnewsessions"), null);
 							}
 						});
 			}

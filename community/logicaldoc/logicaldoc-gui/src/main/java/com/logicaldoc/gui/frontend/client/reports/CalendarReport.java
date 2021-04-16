@@ -7,12 +7,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.smartgwt.client.types.Alignment;
@@ -20,7 +20,6 @@ import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
@@ -139,17 +138,9 @@ public class CalendarReport extends AdminPanel {
 		subtypeCol.setWidth(100);
 		subtypeCol.setCanFilter(true);
 
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setAlign(Alignment.CENTER);
-		date.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date");
 
-		ListGridField endDate = new ListGridField("endDate", I18N.message("enddate"), 110);
-		endDate.setType(ListGridFieldType.DATE);
-		endDate.setCellFormatter(new DateCellFormatter(false));
-		endDate.setAlign(Alignment.CENTER);
-		endDate.setCanFilter(false);
+		ListGridField endDate = new DateListGridField("endDate", "enddate");
 
 		ListGridField frequency = new ListGridField("frequency", I18N.message("frequency"), 90);
 		frequency.setType(ListGridFieldType.INTEGER);
@@ -237,7 +228,7 @@ public class CalendarReport extends AdminPanel {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addButton(print);
@@ -252,7 +243,7 @@ public class CalendarReport extends AdminPanel {
 			export.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
-					Util.exportCSV(list, true);
+					GridUtil.exportCSV(list, true);
 				}
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -324,7 +315,7 @@ public class CalendarReport extends AdminPanel {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override

@@ -36,8 +36,8 @@ public class UserHistoryDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(UserHistoryDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -45,6 +45,7 @@ public class UserHistoryDataServlet extends HttpServlet {
 			boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
 
 			long userId = Long.parseLong(request.getParameter("id"));
+			String event = request.getParameter("event");
 			String locale = request.getParameter("locale");
 
 			response.setContentType("text/xml");
@@ -59,15 +60,15 @@ public class UserHistoryDataServlet extends HttpServlet {
 			writer.write("<list>");
 
 			UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 			df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 			/*
 			 * Iterate over the collection of user histories
 			 */
-
-			for (UserHistory history : dao.findByUserId(userId)) {
+			for (UserHistory history : dao.findByUserIdAndEvent(userId, event)) {
 				writer.print("<history>");
+				writer.print("<id>" + history.getId() + "</id>");
 				writer.print("<user><![CDATA[" + history.getUsername() + "]]></user>");
 				writer.print("<event><![CDATA[" + I18N.message(history.getEvent(), locale) + "]]></event>");
 				writer.print("<date>" + df.format(history.getDate()) + "</date>");
@@ -80,6 +81,10 @@ public class UserHistoryDataServlet extends HttpServlet {
 				writer.print("<userId>" + history.getUserId() + "</userId>");
 				if (history.getIp() != null)
 					writer.print("<ip><![CDATA[" + history.getIp() + "]]></ip>");
+				if (history.getDevice() != null)
+					writer.print("<device><![CDATA[" + history.getDevice() + "]]></device>");
+				if (history.getGeolocation() != null)
+					writer.print("<geolocation><![CDATA[" + history.getGeolocation() + "]]></geolocation>");
 				writer.print("</history>");
 			}
 			writer.write("</list>");

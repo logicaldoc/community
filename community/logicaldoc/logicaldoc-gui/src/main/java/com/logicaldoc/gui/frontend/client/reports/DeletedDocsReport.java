@@ -3,21 +3,22 @@ package com.logicaldoc.gui.frontend.client.reports;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DeletedDocsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -62,7 +63,7 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 
 		userSelector = ItemFactory.newUserSelector("user", "deletedby", null, false, false);
 		userSelector.setWrapTitle(false);
-		userSelector.setWidth(100);
+		userSelector.setWidth(150);
 		userSelector.addChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
@@ -83,7 +84,7 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		print.setAutoFit(true);
 		print.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addSeparator();
@@ -99,7 +100,7 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 			export.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					Util.exportCSV(list, false);
+					GridUtil.exportCSV(list, false);
 				}
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -124,16 +125,6 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		size.setCanFilter(false);
 		size.setCanGroupBy(false);
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-		icon.setCanGroupBy(false);
-
 		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
 		version.setAlign(Alignment.CENTER);
 		version.setCanFilter(false);
@@ -145,11 +136,7 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setCanGroupBy(false);
 
 		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
@@ -157,7 +144,8 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		customId.setHidden(true);
 		customId.setCanGroupBy(false);
 
-		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
+		FileNameListGridField filename = new FileNameListGridField();
+		filename.setWidth(200);
 		filename.setCanFilter(true);
 
 		ListGridField deleteUser = new ListGridField("deleteUser", I18N.message("deletedby"), 200);
@@ -169,6 +157,8 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		type.setHidden(true);
 		type.setCanGroupBy(false);
 
+		AvatarListGridField avatar = new AvatarListGridField();
+
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowRecordComponents(true);
@@ -179,7 +169,7 @@ public class DeletedDocsReport extends AdminPanel implements FolderChangeListene
 		list.setShowFilterEditor(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 
-		list.setFields(icon, filename, version, fileVersion, size, lastModified, customId, deleteUser, type);
+		list.setFields(filename, version, fileVersion, size, lastModified, customId, avatar, deleteUser, type);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override

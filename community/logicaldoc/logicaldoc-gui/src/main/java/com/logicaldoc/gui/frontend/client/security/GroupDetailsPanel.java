@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.security;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -55,7 +55,7 @@ public class GroupDetailsPanel extends VLayout {
 					SecurityService.Instance.get().getGroup(group.getId(), new AsyncCallback<GUIGroup>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -148,7 +148,7 @@ public class GroupDetailsPanel extends VLayout {
 			SecurityService.Instance.get().saveGroup(group, new AsyncCallback<GUIGroup>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override

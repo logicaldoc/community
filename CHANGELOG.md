@@ -11,6 +11,22 @@
                     LogicalDOC Community Edition
 
 
+                    LogicalDOC-CE 8.6.1 (2021-04-15; logicaldoc-8.6.1)
+================================================================================
++ Support for the new Android app LogicalDOC Mobile - https://play.google.com/store/apps/details?id=com.logicaldoc.mobile
++ Geolocation of requests ([#1066](https://bugs.logicaldoc.com/ticket/1066))
++ Customizable thumbnail generation ([#1055](https://bugs.logicaldoc.com/ticket/1055))
++ Option to save correctly sent emails as LogicalDOC's documents ([#1059](https://bugs.logicaldoc.com/ticket/1059))
++ Redesign of main menu: search on the left, removed Personal menu, added Account menu ([#1067](https://bugs.logicaldoc.com/ticket/1067))
++ Error in CustomID generation on version promotion ([#1077](https://bugs.logicaldoc.com/ticket/1077))
++ GUI Setting to Show / Hide the application banner ([#1071](https://bugs.logicaldoc.com/ticket/1071))
++ Display total pages number in the folders navigator cursor ([#1072](https://bugs.logicaldoc.com/ticket/1072))
++ Improved  the quality of grids prints ([#1075](https://bugs.logicaldoc.com/ticket/1075))
++ Enforce password history ([#1078](https://bugs.logicaldoc.com/ticket/1078))
++ Improve the Search Folder form ([#1081](https://bugs.logicaldoc.com/ticket/1081))
++ "Oracle database does not support ""as"" for aliasing table names in from cluase" ([#1084](https://bugs.logicaldoc.com/ticket/1084))
+
+
 LogicalDOC-CE 8.5.2 (2020-12-05; logicaldoc-8.5.2)
 ================================================================================
 + Support for the new Android app LogicalDOC Mobile

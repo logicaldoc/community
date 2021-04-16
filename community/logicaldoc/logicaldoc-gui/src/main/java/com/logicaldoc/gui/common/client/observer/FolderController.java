@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 
 /**
  * Implements the Observer pattern to distribute events on the folders
@@ -43,7 +43,7 @@ public class FolderController {
 				try {
 					observer.onFolderSelected(folder);
 				} catch (Throwable t) {
-					Log.error(t.getMessage(), null, t);
+					GuiLog.error(t.getMessage(), null, t);
 				}
 		}
 	}

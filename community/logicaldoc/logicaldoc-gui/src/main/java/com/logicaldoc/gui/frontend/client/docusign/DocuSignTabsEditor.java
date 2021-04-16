@@ -2,15 +2,15 @@ package com.logicaldoc.gui.frontend.client.docusign;
 
 import java.util.Arrays;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.note.AbstractAnnotationsWindow;
-import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.widgets.drawing.DrawItem;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
@@ -37,8 +37,28 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 	}
 
 	@Override
-	protected Canvas getAnnotationCanvas(GUIDocumentNote note) {
-		return new ESignatureTabCanvas(note, DocuSignTabsEditor.this);
+	protected DrawItem prepareAnnotationItem(GUIDocumentNote note) {
+		DrawItem drawItem = newAnnotationItem(note);
+		if (Session.get().getUser().isMemberOf("admin") || note.getUserId() == Session.get().getUser().getId()) {
+			DocuSignTabContextMenu contextMenu = new DocuSignTabContextMenu(drawItem, note);
+			contextMenu.addDeleteClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+
+				@Override
+				public void onClick(com.smartgwt.client.widgets.menu.events.MenuItemClickEvent event) {
+					LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
+						@Override
+						public void execute(Boolean value) {
+							if (value) {
+								notes.remove(note);
+								drawItem.erase();
+							}
+						}
+					});
+				}
+			});
+			drawItem.setContextMenu(contextMenu);
+		}
+		return drawItem;
 	}
 
 	@Override
@@ -48,27 +68,27 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 		add.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				LD.askforValue("addtab", "addtab", "esig-signhere", ItemFactory.newDocuSignTabType("esig-signhere"),
-						new ValueCallback() {
+				DocuSignNewTabDialog dialog = new DocuSignNewTabDialog(new AsyncCallback<GUIDocumentNote>() {
 
-							@Override
-							public void execute(String value) {
-								captureNotesPosition();
+					@Override
+					public void onSuccess(GUIDocumentNote newNote) {
+						newNote.setUsername(Session.get().getUser().getFullName());
+						newNote.setMessage(I18N.message("annotation.type." + newNote.getType()));
+						newNote.setDocId(document.getId());
+						newNote.setFileVersion(fileVersion);
+						newNote.setPage((Integer) pageCursor.getValue());
+						newNote.setShowKnobs(true);
+						notes.add(newNote);
 
-								GUIDocumentNote note = new GUIDocumentNote();
-								note.setDocId(document.getId());
-								note.setUserId(Session.get().getUser().getId());
-								note.setUsername(Session.get().getUser().getFullName());
-								note.setMessage(I18N.message("annotation.type." + value));
-								note.setPage((Integer) pageCursor.getValue());
-								note.setType(value);
-								notes.add(note);
+						showCurrentPage();
+					}
 
-								ESignatureTabCanvas tabCanvas = new ESignatureTabCanvas(note, DocuSignTabsEditor.this);
-								pageImage.addCanvas(tabCanvas);
-								tabCanvas.onEdit();
-							}
-						});
+					@Override
+					public void onFailure(Throwable arg0) {
+
+					}
+				});
+				dialog.show();
 			}
 		});
 

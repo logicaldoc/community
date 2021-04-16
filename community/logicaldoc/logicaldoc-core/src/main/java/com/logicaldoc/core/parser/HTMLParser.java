@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -41,13 +42,14 @@ public class HTMLParser extends AbstractParser {
 	 */
 	protected static Logger log = LoggerFactory.getLogger(HTMLParser.class);
 
-	public String parse(File file, String filename, String encoding, Locale locale, String tenant) {
+	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
+			String fileVersion) {
 		FileInputStream fis = null;
 		try {
 			fis = new FileInputStream(file);
 			String enc = getCharEncoding(fis);
 			fis = new FileInputStream(file);
-			return parse(fis, filename, enc, locale, tenant);
+			return parse(fis, filename, enc, locale, tenant, document, fileVersion);
 		} catch (Throwable ex) {
 			log.warn("Failed to extract HTML text content", ex);
 		}
@@ -79,7 +81,7 @@ public class HTMLParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			StringBuffer content) {
+			Document document, String fileVersion, StringBuffer content) {
 		try {
 			TransformerFactory factory = TransformerFactory.newInstance();
 			Transformer transformer = factory.newTransformer();

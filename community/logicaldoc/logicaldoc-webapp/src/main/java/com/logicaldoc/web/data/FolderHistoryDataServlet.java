@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hsqldb.lib.StringUtil;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.dao.MenuDAO;
+import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServiceUtil;
@@ -33,8 +35,8 @@ public class FolderHistoryDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(FolderHistoryDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -56,18 +58,18 @@ public class FolderHistoryDataServlet extends HttpServlet {
 			int max = Context.get().getProperties().getInt(session.getTenantName() + ".gui.maxhistories", 100);
 			if (StringUtils.isNotEmpty(request.getParameter("max")))
 				max = Integer.parseInt(request.getParameter("max"));
-			
+
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
 			DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			StringBuffer query = new StringBuffer(
-					"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason from FolderHistory A where A.deleted = 0 ");
+					"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId from FolderHistory A where A.deleted = 0 ");
 			if (request.getParameter("id") != null)
 				query.append(" and A.folderId=" + request.getParameter("id"));
 			query.append(" order by A.date desc ");
 
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 			df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, max);
@@ -85,10 +87,19 @@ public class FolderHistoryDataServlet extends HttpServlet {
 				writer.print("<date>" + df.format((Date) cols[2]) + "</date>");
 				writer.print("<comment><![CDATA[" + (cols[3] == null ? "" : cols[3]) + "]]></comment>");
 				writer.print("<filename><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></filename>");
+				if (cols[4] != null && !FilenameUtils.getExtension(cols[4].toString()).isEmpty())
+					writer.print("<icon>" + FilenameUtils.getBaseName(
+							IconSelector.selectIcon(FilenameUtils.getExtension((String) cols[4]))) + "</icon>");
+				else
+					writer.print("<icon>folder</icon>");
 				writer.print("<path><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></path>");
 				if (showSid)
 					writer.print("<sid><![CDATA[" + (cols[6] == null ? "" : cols[6]) + "]]></sid>");
-				writer.print("<reason><![CDATA[" + (cols[7] == null ? "" : cols[7]) + "]]></reason>");
+				writer.print("<reason><![CDATA[" + (cols[8] == null ? "" : cols[8]) + "]]></reason>");
+				writer.print("<ip><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></ip>");
+				writer.print("<device><![CDATA[" + (cols[10] == null ? "" : cols[10]) + "]]></device>");
+				writer.print("<geolocation><![CDATA[" + (cols[11] == null ? "" : cols[11]) + "]]></geolocation>");
+				writer.print("<userId>" + cols[12] + "</userId>");
 				writer.print("</history>");
 			}
 			writer.write("</list>");

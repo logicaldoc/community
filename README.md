@@ -9,8 +9,9 @@ With LogicalDOC Community Edition you can:
  * Collect information from any digital source
  * Collaborate with colleagues on documents and projects
  * Empower organizations to capitalize on accumulated knowledge by locating documents, experts, and information sources
- * Embedded workflow engine to take control of your business case
- * Automate task
+ * Store any kind of document into your reporitory
+ * Organize documents on multiple levels
+ * Integrate your ERP with document management
  
 ## Installing binaries
 You can install LogicalDOC binaries from [SourceForge](https://sourceforge.net/projects/logicaldoc/):

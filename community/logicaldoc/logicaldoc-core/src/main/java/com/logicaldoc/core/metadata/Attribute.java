@@ -46,7 +46,7 @@ public class Attribute implements Comparable<Attribute> {
 	 * String representation of the multiple string values
 	 */
 	private String stringValues;
-	
+
 	private Long intValue;
 
 	private Double doubleValue;
@@ -164,6 +164,13 @@ public class Attribute implements Comparable<Attribute> {
 	 * @param value The attribute value.
 	 */
 	public void setValue(Object value) {
+		if (value == null) {
+			setStringValue(null);
+			setIntValue(null);
+			setDoubleValue(null);
+			setDateValue(null);
+		}
+
 		if (value instanceof String) {
 			this.type = TYPE_STRING;
 			setStringValue((String) value);
@@ -191,7 +198,8 @@ public class Attribute implements Comparable<Attribute> {
 			this.type = TYPE_BOOLEAN;
 			this.intValue = ((Boolean) value).booleanValue() ? 1L : 0L;
 		} else {
-			throw new IllegalArgumentException("No a String, Long, Double, Date, Boolean, User, Folder value");
+			if (value != null)
+				throw new IllegalArgumentException("No a String, Long, Double, Date, Boolean, User, Folder value");
 		}
 	}
 

@@ -102,7 +102,7 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 		} finally {
 			if (session == null) {
 				// Register a new login failure
-				LoginThrottle.recordFailure(username, client.getAddress());
+				LoginThrottle.recordFailure(username, client);
 			}
 		}
 	}

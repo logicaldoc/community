@@ -8,11 +8,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.OnlineUsersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.observer.UserObserver;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.frontend.client.services.ChatService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -52,10 +53,12 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		username.setCanFilter(true);
 		username.setWidth("100%");
 
+		AvatarListGridField avatar = new AvatarListGridField();
+
 		onlineUsers = new RefreshableListGrid(new OnlineUsersDS());
 		onlineUsers.setEmptyMessage(I18N.message("nousers"));
 		onlineUsers.setAutoFetchData(true);
-		onlineUsers.setFields(username);
+		onlineUsers.setFields(avatar, username);
 		onlineUsers.setSortField("username");
 
 		onlineUsers.addVisibilityChangedHandler(new VisibilityChangedHandler() {
@@ -196,12 +199,12 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(Void arg) {
-								Log.info(I18N.message("invitationsent"));
+								GuiLog.info(I18N.message("invitationsent"));
 							}
 						});
 					}

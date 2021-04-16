@@ -8,16 +8,15 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
@@ -72,7 +71,7 @@ public class BruteForcePanel extends AdminPanel {
 				new AsyncCallback<GUIParameter[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -138,7 +137,7 @@ public class BruteForcePanel extends AdminPanel {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -168,12 +167,7 @@ public class BruteForcePanel extends AdminPanel {
 		attempts.setWidth(80);
 		attempts.setAlign(Alignment.CENTER);
 
-		ListGridField lastAttempt = new ListGridField("lastmodified", I18N.message("lastattempt"));
-		lastAttempt.setWidth(120);
-		lastAttempt.setAlign(Alignment.CENTER);
-		lastAttempt.setType(ListGridFieldType.DATETIME);
-		lastAttempt.setCellFormatter(new DateCellFormatter(false));
-		lastAttempt.setCanFilter(false);
+		ListGridField lastAttempt = new DateListGridField("lastmodified", "lastattempt");
 
 		blockedEntities = new ListGrid();
 		blockedEntities.setShowAllRecords(true);
@@ -226,7 +220,7 @@ public class BruteForcePanel extends AdminPanel {
 							SecurityService.Instance.get().removeBlockedEntities(ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -251,8 +245,8 @@ public class BruteForcePanel extends AdminPanel {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> values = (Map<String, Object>) vm.getValues();
 		GUIParameter[] params = new GUIParameter[5];
-		params[0] = new GUIParameter("throttle.enabled", "yes".equals(values.get("eenabled").toString()) ? "true"
-				: "false");
+		params[0] = new GUIParameter("throttle.enabled",
+				"yes".equals(values.get("eenabled").toString()) ? "true" : "false");
 		params[1] = new GUIParameter("throttle.username.max", values.get("usernamemax").toString());
 		params[2] = new GUIParameter("throttle.username.wait", values.get("usernamewait").toString());
 		params[3] = new GUIParameter("throttle.ip.max", values.get("ipmax").toString());
@@ -262,12 +256,12 @@ public class BruteForcePanel extends AdminPanel {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void arg) {
-				Log.info(I18N.message("settingssaved"), null);
+				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
 	}

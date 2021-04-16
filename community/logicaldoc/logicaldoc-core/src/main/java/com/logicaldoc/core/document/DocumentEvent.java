@@ -14,6 +14,7 @@ public enum DocumentEvent {
 	IMMUTABLE("event.immutable"),
 	RENAMED("event.renamed"),
 	DOWNLOADED("event.downloaded"),
+	INDEXED("event.indexed"),
 	MOVED("event.moved"),
 	LOCKED("event.locked"),
 	UNLOCKED("event.unlocked"),
@@ -68,4 +69,12 @@ public enum DocumentEvent {
 	    }
  	    return null;
     }
+	
+	public static String[] valuesAsString() {
+		DocumentEvent[] tmp = DocumentEvent.values();
+		String[] vals = new String[tmp.length];
+		for (int i = 0; i < tmp.length; i++)
+			vals[i] = tmp[i].toString();
+		return vals;
+	}
 }

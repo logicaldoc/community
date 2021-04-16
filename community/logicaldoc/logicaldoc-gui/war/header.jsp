@@ -125,8 +125,7 @@ body {
 }
 </style>
 
-<script src="./fontawesome/svg-with-js/js/fontawesome-all.js"></script>
-<link rel="stylesheet" href="./fontawesome/web-fonts-with-css/css/fontawesome-all.css" />
+<link href="./fontawesome/css/all.css" rel="stylesheet">
 
 <link REL="STYLESHEET" HREF="<%=MODULE%>/sc/skins/<%=SKIN%>/style.css" TYPE="text/css" />
 <link id="favicon" rel="shortcut icon" type="image/png" href='' />
@@ -138,7 +137,47 @@ body {
   var module = "<%=MODULE%>";
 </script>
 
+<script src="./js/html2canvas.min.js"></script>
+<script type="text/javascript">
+  function screenshot(id, title, printLabel, closeLabel) {
+    html2canvas(document.querySelector("[eventproxy='"+id+"']")).then(canvas => {
+        const dataUrl = canvas.toDataURL();       
+       
+        let windowContent = '<!DOCTYPE html> ';
+        windowContent += '<html> ';
+        windowContent += '<head><title>' + title + '</title> ';
+        windowContent += '\u003Cstyle> ';
+        windowContent += '.cell, .cellDarkAltCol, .cellDark{white-space: nowrap;} ';
+        windowContent += '.printHeader{white-space: nowrap; font-weight: bold; border:0px solid white;} ';
+        windowContent += '\u003C/style> ';
+        
+        windowContent += "<link REL='STYLESHEET' HREF='<%=MODULE%>/sc/skins/<%=SKIN%>/style.css' TYPE='text/css' /> ";
 
+        windowContent += "\u003Cscript type='text/javascript'> ";
+        windowContent += "  function printPage(){document.getElementById('printPanel').style.display='none'; window.print(); window.close();} ";
+        windowContent += "\u003C/script> ";
+        
+        windowContent += '</head> ';
+        
+        windowContent += '<body> ';
+        
+        windowContent += "<div id='printPanel' class='printPanel default'><ul><li><a href='javascript:printPage();' id='printButton'> ";
+        windowContent += printLabel + "</a></li><li><a href='javascript:window.close();' id='printClose'> ";
+        windowContent += closeLabel + "</a></li></ul></div> ";
+        
+        windowContent += "<img src='" + dataUrl + "'> ";
+        
+        windowContent += '</body>';
+        windowContent += '</html>';
+
+        const printWin = window.open('', title, 'directories=0,titlebar=0,toolbar=0,location=0,status=0,menubar=0,scrollbars=no,resizable=no,width=' + screen.availWidth + ',height=' + screen.availHeight);
+        printWin.document.open();
+        printWin.document.write(windowContent);
+    });
+  }
+</script>
+
+<script src="./fontawesome/js/all.min.js"></script>
 <script src="./frontend/ace/ace.js"></script>
 <script src="./frontend/ace/ext-language_tools.js"></script>
 <script src="./frontend/ace/snippets/velocity.js" type="text/javascript" charset="utf-8"></script>

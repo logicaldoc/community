@@ -147,10 +147,12 @@ public interface DocumentManager {
 	 * @param docId The document to be indexed
 	 * @param content The content to use as document's body (can be null to
 	 *        parse the file)
+	 * @param transaction entry to log the event (set the user)
+	 * 
 	 * @return the number of milliseconds required to parse the document
 	 * @throws Exception if an error occurs, this exception is thrown
 	 */
-	public long reindex(long docId, String content) throws Exception;
+	public long reindex(long docId, String content, DocumentHistory transaction) throws Exception;
 
 	/**
 	 * Rename an existing document filename.

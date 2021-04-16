@@ -1,6 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This user interface bean to model a barcode template
@@ -33,7 +36,13 @@ public class GUIBarcodeTemplate implements Serializable {
 
 	private Integer batch = 200;
 
-	private Integer imageThreshold = 900;
+	private Integer threshold = 100;
+	
+	private Integer rendRes = 100;
+
+	private boolean zonal = false;
+
+	private String sample;
 
 	public long getId() {
 		return id;
@@ -83,11 +92,56 @@ public class GUIBarcodeTemplate implements Serializable {
 		this.batch = batch;
 	}
 
-	public Integer getImageThreshold() {
-		return imageThreshold;
+	public Integer getThreshold() {
+		return threshold;
 	}
 
-	public void setImageThreshold(Integer imageThreshold) {
-		this.imageThreshold = imageThreshold;
+	public void setThreshold(Integer threshold) {
+		this.threshold = threshold;
+	}
+
+	public boolean isZonal() {
+		return zonal;
+	}
+
+	public void setZonal(boolean zonal) {
+		this.zonal = zonal;
+	}
+
+	public String getSample() {
+		return sample;
+	}
+
+	public void setSample(String sample) {
+		this.sample = sample;
+	}
+
+	public void removeBarcodeSpec(int index) {
+		if (barcodeSpecs == null || barcodeSpecs.length < 1 || index > barcodeSpecs.length - 1)
+			return;
+
+		List<GUIBarcodeSpec> newSpecs = new ArrayList<GUIBarcodeSpec>();
+		for (int i = 0; i < barcodeSpecs.length; i++) {
+			if (i != index)
+				newSpecs.add(barcodeSpecs[i]);
+		}
+
+		barcodeSpecs = newSpecs.toArray(new GUIBarcodeSpec[0]);
+	}
+
+	public void appendBarcodeSpec(GUIBarcodeSpec a) {
+		List<GUIBarcodeSpec> newSpecs = new ArrayList<GUIBarcodeSpec>();
+		if (getBarcodeSpecs() != null)
+			newSpecs.addAll(Arrays.asList(getBarcodeSpecs()));
+		newSpecs.add(a);
+		barcodeSpecs = newSpecs.toArray(new GUIBarcodeSpec[0]);
+	}
+
+	public Integer getRendRes() {
+		return rendRes;
+	}
+
+	public void setRendRes(Integer rendRes) {
+		this.rendRes = rendRes;
 	}
 }

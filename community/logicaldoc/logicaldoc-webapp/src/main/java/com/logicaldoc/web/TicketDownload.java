@@ -14,17 +14,14 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.jfree.util.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.store.Storer;
@@ -101,10 +98,10 @@ public class TicketDownload extends HttpServlet {
 
 			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			String tenantName = tenantDao.getTenantName(ticket.getTenantId());
-			
+
 			request.setAttribute("open", Boolean.toString("display".equals(
 					Context.get().getProperties().getProperty(tenantName + ".downloadticket.behavior", "download"))));
-			
+
 			downloadDocument(request, response, doc, null, suffix, ticketId);
 			ticket.setCount(ticket.getCount() + 1);
 			ticketDao.store(ticket);
@@ -156,11 +153,9 @@ public class TicketDownload extends HttpServlet {
 		if (suffix != null && suffix.contains("pdf"))
 			filename = doc.getFileName() + ".pdf";
 
-		InputStream is = null;
 		OutputStream os = null;
-		try {
+		try(InputStream is = storer.getStream(doc.getId(), resource)) {
 			long size = storer.size(doc.getId(), resource);
-			is = storer.getStream(doc.getId(), resource);
 
 			// get the mimetype
 			String mimetype = MimeType.getByFilename(filename);
@@ -185,15 +180,11 @@ public class TicketDownload extends HttpServlet {
 			if (os != null)
 				os.flush();
 			os.close();
-			if (is != null)
-				is.close();
 		}
 
 		// Add an history entry to track the download of the document
 		DocumentHistory history = new DocumentHistory();
-		history.setDocId(doc.getId());
-		history.setFilename(doc.getFileName());
-		history.setVersion(doc.getVersion());
+		history.setDocument(doc);
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
@@ -202,11 +193,7 @@ public class TicketDownload extends HttpServlet {
 		history.setFolderId(doc.getFolder().getId());
 		history.setComment("Ticket " + ticket);
 
-		DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		try {
-			hdao.store(history);
-		} catch (PersistenceException e) {
-			Log.error(e.getMessage(), e);
-		}
+		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		ddao.saveDocumentHistory(doc, history);
 	}
 }

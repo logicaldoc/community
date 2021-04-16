@@ -3,12 +3,13 @@ package com.logicaldoc.gui.frontend.client.security;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
@@ -51,6 +52,8 @@ public class GroupUsersPanel extends VLayout {
 	public void onDraw() {
 		final InfoPanel infoPanel = new InfoPanel("");
 
+		AvatarListGridField avatar = new AvatarListGridField(true);
+		
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
@@ -99,7 +102,7 @@ public class GroupUsersPanel extends VLayout {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(UsersDS.get(groupId));
-		list.setFields(id, eenabled, username, firstName, name, email, cell, phone, enabled, guest);
+		list.setFields(id, eenabled, avatar, username, firstName, name, email, cell, phone, enabled, guest);
 
 		HLayout buttons = new HLayout();
 		buttons.setHeight(25);
@@ -128,7 +131,7 @@ public class GroupUsersPanel extends VLayout {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -195,7 +198,7 @@ public class GroupUsersPanel extends VLayout {
 							SecurityService.Instance.get().removeFromGroup(groupId, ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

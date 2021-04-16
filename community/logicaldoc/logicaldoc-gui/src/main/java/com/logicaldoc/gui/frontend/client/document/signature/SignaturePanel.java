@@ -5,16 +5,15 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.DocumentHistoryDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailTab;
 import com.logicaldoc.gui.frontend.client.services.SignService;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
@@ -59,12 +58,8 @@ public class SignaturePanel extends DocumentDetailTab {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
-		ListGridField signedBy = new ListGridField("comment", I18N.message("signedby"));
+		ListGridField date = new DateListGridField("date", "date");
+		ListGridField signedBy = new AvatarListGridField("comment", "userId", "signedby");
 		signedBy.setWidth("*");
 		ListGridField reasonColumn = new ListGridField("reason", I18N.message("reason"));
 		reasonColumn.setWidth(250);
@@ -122,7 +117,7 @@ public class SignaturePanel extends DocumentDetailTab {
 								@Override
 								public void onFailure(Throwable caught) {
 									ContactingServer.get().hide();
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -146,12 +141,12 @@ public class SignaturePanel extends DocumentDetailTab {
 
 		container.addMember(list);
 		container.addMember(formLayout);
-		
+
 		SignService.Instance.get().isVisualSignatureEnabled(new AsyncCallback<Boolean>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

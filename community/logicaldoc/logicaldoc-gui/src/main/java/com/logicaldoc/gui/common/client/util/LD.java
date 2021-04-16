@@ -292,12 +292,15 @@ public class LD {
 
 		item.setWidth("100%");
 		item.setName("value");
-		item.setTitle(I18N.message(message));
+		if (message == null)
+			item.setShowTitle(false);
+		else
+			item.setTitle(I18N.message(message));
 		item.setWrapTitle(false);
 		if (!(item instanceof TextAreaItem) && !(item instanceof RichTextItem))
 			/*
-			 * In case of simple input item, when the user presses the Enter key,
-			 * we consider he wants to confirm the input
+			 * In case of simple input item, when the user presses the Enter
+			 * key, we consider he wants to confirm the input
 			 */
 			item.addKeyPressHandler(new KeyPressHandler() {
 				@Override
@@ -366,16 +369,17 @@ public class LD {
 		}
 	}
 
-	public static void askforValue(String title, String message, String defaultValue, FormItem item,
+	public static void askForValue(String title, String message, String defaultValue, FormItem item,
 			final ValueCallback callback) {
 		askForValue(title, message, defaultValue, item, null, callback);
 	}
 
-	public static void askforString(String title, String message, String defaultValue, final ValueCallback callback) {
+	public static void askForString(String title, String message, String defaultValue, final ValueCallback callback) {
 		askForValue(title, message, defaultValue, new TextItem(), null, callback);
 	}
-	
-	public static void askforStringMandatory(String title, String message, String defaultValue, final ValueCallback callback) {
+
+	public static void askForStringMandatory(String title, String message, String defaultValue,
+			final ValueCallback callback) {
 		TextItem item = new TextItem();
 		item.setRequired(true);
 		askForValue(title, message, defaultValue, item, null, callback);

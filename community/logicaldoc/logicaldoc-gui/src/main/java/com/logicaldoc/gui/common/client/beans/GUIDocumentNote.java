@@ -17,7 +17,7 @@ public class GUIDocumentNote implements Serializable {
 	private long docId;
 
 	private String fileVersion;
-	
+
 	private String fileName;
 
 	private long userId;
@@ -30,33 +30,48 @@ public class GUIDocumentNote implements Serializable {
 
 	private int page = 0;
 
-	private int opacity = 80;
+	private int opacity = 70;
 
 	private String color = "#FFFF88";
 
-	private double left = 0.5;
+	private double left = 0.4;
 
-	private double top = 0.5;
+	private double top = 0.35;
 
 	private double width = 0.15;
 
-	private double height = 0.10;
+	private double height = 0.05;
 
 	/**
 	 * A type of note, for normal notes in a document it is null
 	 */
 	private String type;
-	
+
 	/**
-	 * A reference to a recipient, it could be a username or the full name of a person, normally this field is not used
+	 * A reference to a recipient, it could be a username or the full name of a
+	 * person, normally this field is not used
 	 */
 	private String recipient;
-	
+
 	/**
 	 * An email associated to the note, normally this field is not used
 	 */
 	private String recipientEmail;
+
+	private int lineOpacity = 70;
+
+	private String lineColor = "#a1a1a1";
+
+	private int lineWidth = 1;
+
+	private String shape = "square";
+
+	private double rotation = 0.0;
+
+	private boolean showKnobs = false;
 	
+	private boolean movedOrResized = false;
+
 	public long getId() {
 		return id;
 	}
@@ -199,5 +214,72 @@ public class GUIDocumentNote implements Serializable {
 
 	public void setRecipientEmail(String recipientEmail) {
 		this.recipientEmail = recipientEmail;
+	}
+
+	public int getLineOpacity() {
+		return lineOpacity;
+	}
+
+	public void setLineOpacity(int lineOpacity) {
+		this.lineOpacity = lineOpacity;
+	}
+
+	public String getLineColor() {
+		return lineColor;
+	}
+
+	public void setLineColor(String lineColor) {
+		this.lineColor = lineColor;
+	}
+
+	public int getLineWidth() {
+		return lineWidth;
+	}
+
+	public void setLineWidth(int lineWidth) {
+		this.lineWidth = lineWidth;
+	}
+
+	public String getShape() {
+		return shape;
+	}
+
+	public void setShape(String shape) {
+		this.shape = shape;
+	}
+
+	@Override
+	public int hashCode() {
+		return Long.valueOf(id).hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		GUIDocumentNote other = (GUIDocumentNote) obj;
+		return id == other.id;
+	}
+
+	public double getRotation() {
+		return rotation;
+	}
+
+	public void setRotation(double rotation) {
+		this.rotation = rotation;
+	}
+
+	public boolean isShowKnobs() {
+		return showKnobs;
+	}
+
+	public void setShowKnobs(boolean showKnobs) {
+		this.showKnobs = showKnobs;
+	}
+
+	public boolean isMovedOrResized() {
+		return movedOrResized;
+	}
+
+	public void setMovedOrResized(boolean movedOrResized) {
+		this.movedOrResized = movedOrResized;
 	}
 }

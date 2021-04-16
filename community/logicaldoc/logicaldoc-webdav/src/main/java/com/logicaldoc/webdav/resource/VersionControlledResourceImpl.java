@@ -234,7 +234,6 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 		}
 
 		throw new RuntimeException("");
-
 	}
 
 	// --------------------------------------------------------------------------
@@ -259,6 +258,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * @see DavResourceImpl#initProperties()
 	 */
 	protected void initProperties() {
+		
 		if (!propsInitialized) {
 			super.initProperties();
 
@@ -266,20 +266,20 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 
 			// DAV:auto-version property: there is no auto version, explicit
 			// EVENT_CHECKEDOUT is required.
-			properties.add(new DefaultDavProperty(AUTO_VERSION, null, false));
+			properties.add(new DefaultDavProperty<Object>(AUTO_VERSION, null, false));
 		  
 			if(resource==null)
 				return;
 			
-			properties.add(new DefaultDavProperty(DavPropertyName.DISPLAYNAME, resource.getName(), false));
-			properties.add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, AbstractWebdavServlet.getContext().getMimeType(resource.getName()), false));
+			properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, resource.getName(), false));
+			properties.add(new DefaultDavProperty<String>(DavPropertyName.GETCONTENTTYPE, AbstractWebdavServlet.getContext().getMimeType(resource.getName()), false));
 			
 			if (resource.isFolder())
 				return;
 
 			SupportedLock supportedLock = new SupportedLock();
 			supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
-			properties.add(new DefaultDavProperty(DavPropertyName.SUPPORTEDLOCK, supportedLock, false));
+			properties.add(new DefaultDavProperty<Object>(DavPropertyName.SUPPORTEDLOCK, supportedLock, false));
 
 			String baseVHref = getLocatorFromResource(resource).getHref(false);
 
@@ -290,8 +290,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 
 				DefaultActiveLock activeLock = new DefaultActiveLock();
 				activeLock.setOwner(resource.getLockUser());
-				properties.add(new DefaultDavProperty(DavPropertyName.LOCKDISCOVERY, activeLock, false));
-				properties.add(new DefaultDavProperty("activelock", activeLock, Namespace.XMLNS_NAMESPACE));
+				properties.add(new DefaultDavProperty<Object>(DavPropertyName.LOCKDISCOVERY, activeLock, false));
+				properties.add(new DefaultDavProperty<Object>("activelock", activeLock, Namespace.XMLNS_NAMESPACE));
 			} else {
 				properties.add(new HrefProperty(CHECKED_IN, locator.getResourcePath(), true));
 			}
@@ -333,7 +333,6 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * 
 	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
 	 */
-	@SuppressWarnings("deprecation")
 	protected DavResource createResourceFromLocator(DavResourceLocator loc) throws DavException {
 		DavResource res = getFactory().createResource(loc, getSession());
 		return res;

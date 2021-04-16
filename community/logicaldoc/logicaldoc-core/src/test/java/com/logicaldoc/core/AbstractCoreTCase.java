@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.FileUtils;
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlTool.SqlToolException;
 import org.junit.After;
@@ -38,9 +37,9 @@ public abstract class AbstractCoreTCase {
 
 	protected File tempDir = new File("target/tmp");
 
-	protected File dbSchemaFile;
+	protected File dbSchemaFile = new File("src/main/resources/sql/logicaldoc-core.sql");
 
-	protected File dataFile;
+	protected File dataFile = new File("src/test/resources/data.sql");
 
 	private String userHome;
 
@@ -50,43 +49,19 @@ public abstract class AbstractCoreTCase {
 
 	@Before
 	public void setUp() throws Exception {
-		tempDir = new File("target/tmp");
 		userHome = System.getProperty("user.home");
 		System.setProperty("user.home", tempDir.getPath());
-		
+
 		createTestDirs();
 		context = new ClassPathXmlApplicationContext(new String[] { "/context.xml" });
 		createTestDatabase();
 	}
 
 	protected void createTestDirs() throws IOException {
-		// Create test dirs
-		try {
-			if (tempDir.exists() && tempDir.isDirectory())
-				FileUtils.deleteDirectory(tempDir);
-			if (tempDir.exists() && tempDir.isDirectory())
-				FileUtils.deleteDirectory(tempDir);
-			if (tempDir.exists() && tempDir.isDirectory())
-				FileUtils.deleteDirectory(tempDir);
-			if (tempDir.exists() && tempDir.isDirectory())
-				FileUtils.deleteDirectory(tempDir);
-			if (tempDir.exists() && tempDir.isDirectory())
-				FileUtils.deleteDirectory(tempDir);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-
-		if (tempDir.exists())
-			throw new IOException("unable to delete folder " + tempDir.getPath());
-
+		FileUtil.strongDelete(tempDir);
+		FileUtil.strongDelete(tempDir);
+		FileUtil.strongDelete(tempDir);
 		tempDir.mkdirs();
-
-		dbSchemaFile = new File(tempDir, "logicaldoc-core.sql");
-		dataFile = new File(tempDir, "data.sql");
-
-		// Copy sql files
-		copyResource("/sql/logicaldoc-core.sql", dbSchemaFile.getCanonicalPath());
-		copyResource("/data.sql", dataFile.getCanonicalPath());
 	}
 
 	protected void copyResource(String classpath, String destinationPath) throws IOException {

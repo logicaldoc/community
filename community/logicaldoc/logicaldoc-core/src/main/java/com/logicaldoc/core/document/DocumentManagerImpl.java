@@ -449,7 +449,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			try {
 				content = parser.parse(storer.getStream(doc.getId(), resource), doc.getFileName(), null, locale,
-						tDao.findById(doc.getTenantId()).getName());
+						tDao.findById(doc.getTenantId()).getName(), doc, fileVersion);
 			} catch (IOException e) {
 				log.error("Cannot retrieve content of document {}", doc, e);
 			}
@@ -463,7 +463,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public long reindex(long docId, String content) throws Exception {
+	public long reindex(long docId, String content, DocumentHistory transaction) throws Exception {
 		Document doc = documentDAO.findById(docId);
 		if (doc == null) {
 			log.warn("Unexisting document with ID: {}", docId);
@@ -490,7 +490,11 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			// For additional safety update the DB directly
 			doc.setIndexed(AbstractDocument.INDEX_INDEXED);
-			boolean stored = documentDAO.store(doc);
+			
+			if(transaction!=null)
+				transaction.setEvent(DocumentEvent.INDEXED.toString());
+
+			boolean stored = documentDAO.store(doc, transaction);
 			if (!stored)
 				throw new Exception("Document not stored");
 
@@ -1341,7 +1345,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				Folder originalFolder = document.getFolder();
 				Version docVO = (Version) ver.clone();
 				docVO.setFolder(originalFolder);
-				docVO.setCustomId(null);
+				docVO.setCustomId(ver.getCustomId());
 				docVO.setId(0L);
 
 				if (ver.getTemplateId() != null)

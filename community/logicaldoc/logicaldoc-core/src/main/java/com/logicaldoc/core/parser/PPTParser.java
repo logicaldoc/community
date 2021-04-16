@@ -9,6 +9,7 @@ import org.apache.poi.hslf.extractor.PowerPointExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -24,7 +25,7 @@ public class PPTParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			StringBuffer content) {
+			Document document, String fileVersion, StringBuffer content) {
 		PowerPointExtractor extractor = null;
 		try {
 			extractor = new PowerPointExtractor(input);

@@ -101,7 +101,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		} catch (Throwable e) {
 			log.warn(e.getMessage(), e);
 		}
-
+		
 		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 

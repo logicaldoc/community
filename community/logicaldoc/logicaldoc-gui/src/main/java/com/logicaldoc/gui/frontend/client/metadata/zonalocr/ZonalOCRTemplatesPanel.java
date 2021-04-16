@@ -11,14 +11,16 @@ import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.beans.GUIZone;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.PrintUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ImageWithCanvases;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.metadata.template.AttributeTypeFormatter;
 import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.Canvas;
@@ -64,6 +66,8 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 
 	private ToolStripButton deleteZones;
 
+	private ToolStripButton print;
+
 	private ToolStrip toolStrip;
 
 	private HLayout editorPanel = new HLayout();
@@ -91,8 +95,6 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 	private void refresh(Long templateId, Long barcodeTemplateId) {
 		if (toolStrip != null)
 			removeMember(toolStrip);
-		if (sample != null)
-			removeMember(sample);
 
 		templateSelector = ItemFactory.newTemplateSelector(true, templateId);
 		templateSelector.setWrapTitle(false);
@@ -133,7 +135,7 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -182,7 +184,7 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 										new AsyncCallback<Void>() {
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -195,6 +197,15 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 							}
 						}
 					});
+			}
+		});
+
+		print = new ToolStripButton(I18N.message("print"));
+		print.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				PrintUtil.printScreenShot(sample.getID(),
+						I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName());
 			}
 		});
 
@@ -215,7 +226,7 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 				ZonalOCRService.Instance.get().save(selectedOcrTemplate, new AsyncCallback<GUIOCRTemplate>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -317,17 +328,19 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 		toolStrip.addButton(save);
 		toolStrip.addButton(delete);
 		toolStrip.addSeparator();
-		toolStrip.addButton(zoomIn);
-		toolStrip.addButton(zoomOut);
-		toolStrip.addSeparator();
 		toolStrip.addButton(addZone);
 		toolStrip.addButton(deleteZones);
+		toolStrip.addSeparator();
+		toolStrip.addButton(zoomIn);
+		toolStrip.addButton(zoomOut);
+		toolStrip.addButton(print);
 		toolStrip.addSeparator();
 		toolStrip.addButton(close);
 		toolStrip.addFill();
 
 		editorPanel.setWidth100();
 		editorPanel.setHeight100();
+		editorPanel.setOverflow(Overflow.AUTO);
 		setMembers(toolStrip, editorPanel);
 
 		add.setDisabled(selectedDocumentTemplate == null);
@@ -339,6 +352,7 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 		deleteZones.setDisabled(selectedOcrTemplate == null);
 		delete.setDisabled(selectedOcrTemplate == null || selectedOcrTemplate.getId() == 0L);
 		close.setDisabled(selectedOcrTemplate == null);
+		print.setDisabled(selectedOcrTemplate == null);
 		ocrTemplateSelector.setDisabled(selectedDocumentTemplate == null);
 
 		updateSample();

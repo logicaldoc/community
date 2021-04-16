@@ -34,7 +34,7 @@ import com.logicaldoc.web.util.ServletUtil;
  */
 public class ThumbnailServlet extends HttpServlet {
 
-	/** Format can be tile.jpg, thumb.png or convert.pdf */
+	/** Format can be tile.jpg, thumb.png, thumbXXX.png */
 	protected static final String SUFFIX = "suffix";
 
 	public static final String DOC_ID = "docId";
@@ -146,9 +146,21 @@ public class ThumbnailServlet extends HttpServlet {
 					log.error(t.getMessage(), t);
 				}
 			}
-		}
-
-		if (resource.endsWith(ThumbnailManager.SUFFIX_TILE))
-			return;
+		} else if (resource.contains(ThumbnailManager.THUMB)) {
+			if (storer.size(doc.getId(), resource) <= 0L) {
+				try {
+					/*
+					 * In this case the resource is like thumn450.png so we
+					 * extract the size from the name
+					 */
+					String sizeStr = resource.substring(resource.indexOf('-') + 6, resource.lastIndexOf('.'));
+					thumbManager.createTumbnail(doc, fileVersion, Integer.parseInt(sizeStr), null, sid);
+					log.debug("Created custom thumbnail {}", resource);
+				} catch (Throwable t) {
+					log.error(t.getMessage(), t);
+				}
+			}
+		} else
+			log.error("Unknow resource {}", resource);
 	}
 }

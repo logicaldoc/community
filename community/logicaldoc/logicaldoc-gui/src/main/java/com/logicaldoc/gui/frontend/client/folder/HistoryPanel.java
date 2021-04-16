@@ -4,14 +4,14 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.FolderHistoryDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.Canvas;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -36,18 +36,18 @@ public class HistoryPanel extends FolderDetailTab {
 
 	@Override
 	protected void onDraw() {
-		ListGridField user = new ListGridField("user", I18N.message("user"), 100);
+		ListGridField user = new AvatarListGridField("user", "userId", "user", 100);
 		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
 		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
-		ListGridField fileName = new ListGridField("filename", I18N.message("name"));
+		FileNameListGridField fileName = new FileNameListGridField();
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"));
 		ListGridField ip = new ListGridField("ip", I18N.message("ip"));
+		ListGridField device = new ListGridField("device", I18N.message("device"), 200);
+		device.setHidden(true);
+		ListGridField geolocation = new ListGridField("geolocation", I18N.message("geolocation"), 200);
+		geolocation.setHidden(true);
 
 		final RefreshableListGrid list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -55,7 +55,7 @@ public class HistoryPanel extends FolderDetailTab {
 		list.setAutoFetchData(true);
 		list.setDataSource(new FolderHistoryDS(folder.getId(), null));
 		if (Menu.enabled(Menu.SESSIONS))
-			list.setFields(user, event, date, comment, fileName, path, sid, ip);
+			list.setFields(user, event, date, comment, fileName, path, sid, ip, device, geolocation);
 		else
 			list.setFields(user, event, date, comment, fileName, path);
 
@@ -86,7 +86,7 @@ public class HistoryPanel extends FolderDetailTab {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 
@@ -95,7 +95,7 @@ public class HistoryPanel extends FolderDetailTab {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 

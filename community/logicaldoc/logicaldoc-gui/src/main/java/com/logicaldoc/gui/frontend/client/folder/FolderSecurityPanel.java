@@ -10,10 +10,11 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.data.RightsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -24,7 +25,6 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
@@ -83,7 +83,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -136,7 +136,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		entityId.setHidden(true);
 		entityId.setAutoFitWidth(true);
 
-		ListGridField entity = new ListGridField("entity", I18N.message("entity"), 180);
+		ListGridField entity = new AvatarListGridField("entity", "avatar", "entity", 190);
 		entity.setCanEdit(false);
 		entity.setAutoFitWidth(true);
 		entity.setRotateTitle(false);
@@ -333,6 +333,52 @@ public class FolderSecurityPanel extends FolderDetailTab {
 			}
 		});
 
+		Button inheritFromParent = new Button(I18N.message("inheritfromparent"));
+		inheritFromParent.setAutoFit(true);
+		buttons.addMember(inheritFromParent);
+		inheritFromParent.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				FolderService.Instance.get().getFolder(folder.getParentId(), false, false, false,
+						new AsyncCallback<GUIFolder>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(GUIFolder parent) {
+								LD.ask(I18N.message("inheritrights"),
+										I18N.message("inheritrightsask",
+												new String[] { folder.getName(), parent.getName() }),
+										new BooleanCallback() {
+
+											@Override
+											public void execute(Boolean value) {
+												if (value) {
+													FolderService.Instance.get().inheritRights(folder.getId(),
+															folder.getParentId(), new AsyncCallback<GUIFolder>() {
+
+																@Override
+																public void onFailure(Throwable caught) {
+																	GuiLog.serverError(caught);
+																}
+
+																@Override
+																public void onSuccess(GUIFolder arg) {
+																	FolderSecurityPanel.this.refresh(arg);
+																}
+															});
+												}
+											}
+										});
+							}
+
+						});
+			}
+		});
+
 		Button inheritRights = new Button(I18N.message("inheritrights"));
 		inheritRights.setAutoFit(true);
 		buttons.addMember(inheritRights);
@@ -370,7 +416,8 @@ public class FolderSecurityPanel extends FolderDetailTab {
 				// Update the rights table
 				ListGridRecord record = new ListGridRecord();
 				record.setAttribute("entityId", selectedRecord.getAttribute("id"));
-				record.setAttribute("entity", I18N.message("group") + ": " + selectedRecord.getAttribute("name"));
+				record.setAttribute("avatar", "group");
+				record.setAttribute("entity", selectedRecord.getAttribute("name"));
 				record.setAttribute("read", true);
 				list.addData(record);
 				group.clearValue();
@@ -403,9 +450,11 @@ public class FolderSecurityPanel extends FolderDetailTab {
 				// Update the rights table
 				ListGridRecord record = new ListGridRecord();
 				record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-				record.setAttribute("entity", I18N.message("user") + ": " + selectedRecord.getAttribute("label") + " ("
-						+ selectedRecord.getAttribute("username") + ")");
+				record.setAttribute("avatar", selectedRecord.getAttribute("id"));
+				record.setAttribute("entity",
+						selectedRecord.getAttribute("label") + " (" + selectedRecord.getAttribute("username") + ")");
 				record.setAttribute("read", true);
+
 				list.addData(record);
 				user.clearValue();
 			}
@@ -418,7 +467,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		exportButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 
@@ -428,7 +477,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		printButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 	}
@@ -528,15 +577,15 @@ public class FolderSecurityPanel extends FolderDetailTab {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void result) {
 				if (!recursive)
-					Log.info(I18N.message("appliedrights"), null);
+					GuiLog.info(I18N.message("appliedrights"), null);
 				else
-					Log.info(I18N.message("appliedrightsonsubfolders"), null);
+					GuiLog.info(I18N.message("appliedrightsonsubfolders"), null);
 
 				int totalRecords = list.getRecordList().getLength();
 				for (int i = 0; i < totalRecords; i++) {

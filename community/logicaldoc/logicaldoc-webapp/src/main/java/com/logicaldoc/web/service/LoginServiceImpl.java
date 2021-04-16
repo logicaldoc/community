@@ -25,6 +25,7 @@ import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.login.client.services.LoginService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
@@ -42,7 +43,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	private static Logger log = LoggerFactory.getLogger(InfoServiceImpl.class);
 
 	@Override
-	public int changePassword(long userId, String oldPassword, String newPassword) {
+	public GUIValue changePassword(long userId, String oldPassword, String newPassword) {
 		SecurityServiceImpl ser = new SecurityServiceImpl();
 		return ser.changePassword(userId, userId, oldPassword, newPassword, false);
 	}

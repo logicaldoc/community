@@ -16,7 +16,6 @@ import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.data.AdvancedCriteria;
-import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.OperatorId;
@@ -48,7 +47,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	private List<DetailViewerField> fields = new ArrayList<DetailViewerField>();
 
-	public DocumentsTileGrid(GUIFolder folder, final DataSource ds) {
+	public DocumentsTileGrid(GUIFolder folder) {
 		this.folder = folder;
 		setTileWidth(200);
 		setTileHeight(250);
@@ -58,6 +57,12 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		setCanReorderTiles(false);
 		setCanDrag(folder != null && folder.isMove());
 		setWidth100();
+
+		DocumentsDS ds = null;
+		if (folder != null) {
+			int max = loadGridLayout(folder);
+			ds = new DocumentsDS(folder, null, max, 1, null, false, false, null);
+		}
 
 		DetailViewerField thumbnail = new DetailViewerField("thumbnail");
 		thumbnail.setDetailFormatter(new DetailFormatter() {
@@ -161,7 +166,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	public void updateDocument(GUIDocument document) {
 		Record record = findRecord(document.getId());
 		if (record != null) {
-			GridUtil.updateRecord(document, record);
+			DocumentGridUtil.updateRecord(document, record);
 			Canvas tile = getTile(record);
 			tile.redraw();
 		}
@@ -176,7 +181,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		records = new Record[documents.length];
 		for (int i = 0; i < documents.length; i++) {
 			GUIDocument doc = documents[i];
-			Record record = GridUtil.fromDocument(doc);
+			Record record = DocumentGridUtil.fromDocument(doc);
 			records[i] = record;
 		}
 
@@ -185,17 +190,17 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	@Override
 	public GUIDocument getSelectedDocument() {
-		return GridUtil.toDocument(getSelectedRecord());
+		return DocumentGridUtil.toDocument(getSelectedRecord());
 	}
 
 	@Override
 	public GUIDocument[] getSelectedDocuments() {
-		return GridUtil.toDocuments(getSelection());
+		return DocumentGridUtil.toDocuments(getSelection());
 	}
 
 	@Override
 	public GUIDocument[] getDocuments() {
-		return GridUtil.toDocuments(getRecordList().toArray());
+		return DocumentGridUtil.toDocuments(getRecordList().toArray());
 	}
 
 	@Override
@@ -205,12 +210,12 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	@Override
 	public long[] getSelectedIds() {
-		return GridUtil.getIds(getSelection());
+		return DocumentGridUtil.getIds(getSelection());
 	}
 
 	@Override
 	public long[] getIds() {
-		return GridUtil.getIds(getRecordList().toArray());
+		return DocumentGridUtil.getIds(getRecordList().toArray());
 	}
 
 	@Override
@@ -357,7 +362,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 			if (doc != null)
 				return;
 
-			addData(GridUtil.fromDocument(document));
+			addData(DocumentGridUtil.fromDocument(document));
 			cursor.setMessage(I18N.message("showndocuments", Integer.toString(getData().length)));
 		}
 	}
@@ -461,7 +466,22 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	}
 
 	@Override
-	public void loadGridLayout(GUIFolder folder) {
-		// Function not supported byt the tiles visualization
+	public int loadGridLayout(GUIFolder folder) {
+		this.folder = folder;
+		String previouslySavedState = folder != null ? folder.getGrid() : null;
+		if (previouslySavedState == null || previouslySavedState.isEmpty())
+			previouslySavedState = Session.get().getUser().getDocsGrid();
+
+		Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(previouslySavedState);
+		if (pageSize == null)
+			pageSize = Session.get().getConfigAsInt("gui.document.pagesize");
+
+		if (getGridCursor() != null) {
+			getGridCursor().setPageSize(pageSize);
+			if (folder != null)
+				getGridCursor().setTotalRecords(folder.getDocumentCount());
+		}
+
+		return pageSize;
 	}
 }

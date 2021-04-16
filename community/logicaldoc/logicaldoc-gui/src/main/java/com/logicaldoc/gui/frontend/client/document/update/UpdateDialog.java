@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -124,7 +124,7 @@ public class UpdateDialog extends Window {
 						@Override
 						public void onFailure(Throwable error) {
 							ContactingServer.get().hide();
-							Log.serverError(error);
+							GuiLog.serverError(error);
 						}
 
 						@Override
@@ -147,13 +147,13 @@ public class UpdateDialog extends Window {
 											@Override
 											public void onFailure(Throwable error) {
 												ContactingServer.get().hide();
-												Log.serverError(error);
+												GuiLog.serverError(error);
 											}
 
 											@Override
 											public void onSuccess(Void arg) {
 												ContactingServer.get().hide();
-												Log.info(I18N.message("bulkapplied"), null);
+												GuiLog.info(I18N.message("bulkapplied"), null);
 												if (!Session.get().isServerPushEnabled())
 													DocumentsPanel.get().refresh();
 												destroy();
@@ -165,25 +165,24 @@ public class UpdateDialog extends Window {
 				else {
 					bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
 					ContactingServer.get().show();
+					hide();
 					DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing, bulkPanel.getDocument(),
 							new AsyncCallback<GUIDocument[]>() {
-
-								@Override
-								public void onSuccess(GUIDocument[] doc) {
-									destroy();
-									DocumentsPanel.get().refresh();
-									ContactingServer.get().hide();
-								}
-
 								@Override
 								public void onFailure(Throwable error) {
 									ContactingServer.get().hide();
-									Log.serverError(error);
+									GuiLog.serverError(error);
 
 									// We have to refresh the documents list
 									// because maybe
 									// some documents have been stored.
 									DocumentsPanel.get().refresh();
+								}
+								
+								@Override
+								public void onSuccess(GUIDocument[] doc) {
+									DocumentsPanel.get().refresh();
+									ContactingServer.get().hide();
 								}
 							});
 				}

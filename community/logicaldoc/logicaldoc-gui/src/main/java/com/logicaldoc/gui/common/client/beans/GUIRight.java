@@ -251,4 +251,9 @@ public class GUIRight implements Serializable {
 	public void setStorage(boolean storage) {
 		this.storage = storage;
 	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

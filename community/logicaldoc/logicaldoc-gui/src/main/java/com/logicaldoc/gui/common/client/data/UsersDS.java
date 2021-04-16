@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client.data;
 
+import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceImageField;
@@ -32,8 +33,10 @@ public class UsersDS extends DataSource {
 		DataSourceTextField cell = new DataSourceTextField("cell");
 		DataSourceTextField usergroup = new DataSourceTextField("usergroup");
 		DataSourceTextField groups = new DataSourceTextField("groups");
+		DataSourceImageField avatar = new DataSourceImageField("avatar", I18N.message("avatar"), 16);
 
-		setFields(id, username, label, eenabled, enabled, name, firstName, email, phone, cell, groups, usergroup, guest);
+		setFields(id, username, label, eenabled, enabled, name, firstName, email, phone, cell, groups, usergroup, guest,
+				avatar);
 		setDataURL("data/users.xml?1=1" + (groupIdOrName != null ? "&groupId=" + groupIdOrName : "") + "&required="
 				+ required + "&skipdisabled=" + skipDisabled);
 		setClientOnly(true);

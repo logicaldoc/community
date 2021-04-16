@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.ReportService;
 import com.smartgwt.client.types.Alignment;
@@ -63,7 +63,7 @@ public class ReportParametersForm extends Window {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -221,13 +221,13 @@ public class ReportParametersForm extends Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void arg) {
 						destroy();
-						Log.info(I18N.message("reportinexecution"), null);
+						GuiLog.info(I18N.message("reportinexecution"), null);
 						panel.update();
 					}
 				});

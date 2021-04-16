@@ -4,6 +4,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface WebsocketsMessageServiceAsync {
 
-	void getMessage(EventMessage message, AsyncCallback<EventMessage> callback);
+	void getMessage(WebsocketMessage message, AsyncCallback<WebsocketMessage> callback);
 
 }

@@ -4,14 +4,17 @@ import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
@@ -20,6 +23,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
@@ -59,19 +63,27 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 		final SpinnerItem pwdSize = ItemFactory.newSpinnerItem("pwdSize", "passwdsize", settings.getPwdSize());
 		pwdSize.setRequired(true);
-		pwdSize.setWidth(10);
+		pwdSize.setWidth(50);
 		pwdSize.setMin(4);
 		pwdSize.setStep(1);
 
-		final SpinnerItem pwdExp = ItemFactory
-				.newSpinnerItem("pwdExp", "passwdexpiration", settings.getPwdExpiration());
+		final SpinnerItem pwdExp = ItemFactory.newSpinnerItem("pwdExp", "passwdexpiration",
+				settings.getPwdExpiration());
 		pwdExp.setHint(I18N.message("days"));
 		pwdExp.setWrapTitle(false);
 		pwdExp.setRequired(true);
-		pwdExp.setWidth(10);
+		pwdExp.setWidth(50);
 		pwdExp.setMin(0);
 		pwdExp.setStep(10);
-		pwdExp.setDisabled(!Session.get().isDefaultTenant());
+
+		final SpinnerItem pwdEnforce = ItemFactory.newSpinnerItem("pwdEnforce", "enforcepasswordhistory",
+				settings.getPwdEnforceHistory());
+		pwdEnforce.setHint(I18N.message("passwords"));
+		pwdEnforce.setWrapTitle(false);
+		pwdEnforce.setRequired(true);
+		pwdEnforce.setWidth(50);
+		pwdEnforce.setMin(0);
+		pwdEnforce.setStep(1);
 
 		final RadioGroupItem savelogin = ItemFactory.newBooleanSelector("savelogin", I18N.message("savelogin"));
 		savelogin.setHint(I18N.message("saveloginhint"));
@@ -84,13 +96,19 @@ public class SecuritySettingsPanel extends AdminPanel {
 		ignorelogincase.setValue(settings.isIgnoreLoginCase() ? "yes" : "no");
 		ignorelogincase.setWrapTitle(false);
 		ignorelogincase.setRequired(true);
-		
+
+		final RadioGroupItem alertnewdevice = ItemFactory.newBooleanSelector("alertnewdevice",
+				I18N.message("alertloginfromnewdevice"));
+		alertnewdevice.setValue(settings.isIgnoreLoginCase() ? "yes" : "no");
+		alertnewdevice.setWrapTitle(false);
+		alertnewdevice.setRequired(true);
+
 		final RadioGroupItem allowSid = ItemFactory.newBooleanSelector("allowsid", I18N.message("allowsidinrequest"));
 		allowSid.setValue(settings.isAllowSidInRequest() ? "yes" : "no");
 		allowSid.setWrapTitle(false);
 		allowSid.setRequired(true);
 		allowSid.setDisabled(Session.get().isDemo());
-		
+
 		final RadioGroupItem forceSsl = ItemFactory.newBooleanSelector("forcessl", I18N.message("forcessl"));
 		forceSsl.setValue(settings.isForceSsl() ? "yes" : "no");
 		forceSsl.setWrapTitle(false);
@@ -98,9 +116,10 @@ public class SecuritySettingsPanel extends AdminPanel {
 		forceSsl.setDisabled(Session.get().isDemo());
 
 		if (Session.get().isDefaultTenant())
-			securityForm.setFields(pwdSize, pwdExp, savelogin, ignorelogincase, allowSid, forceSsl);
+			securityForm.setFields(pwdSize, pwdExp, pwdEnforce, savelogin, alertnewdevice, ignorelogincase, allowSid, forceSsl);
 		else
-			securityForm.setFields(pwdSize, pwdExp, savelogin);
+			securityForm.setFields(pwdSize, pwdExp, pwdEnforce, savelogin, alertnewdevice);
+
 		body.setMembers(securityForm);
 
 		Tab menus = new Tab();
@@ -111,25 +130,29 @@ public class SecuritySettingsPanel extends AdminPanel {
 		Tab anonymous = prepareAnonymousTab(settings);
 		tabs.addTab(anonymous);
 
+		if (Feature.visible(Feature.GEOLOCATION)) {
+			Tab geolocation = prepareGeolocationTab(settings);
+			tabs.addTab(geolocation);
+		}
+
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(new ClickHandler() {
 			@SuppressWarnings("unchecked")
 			public void onClick(ClickEvent event) {
-				vm.validate();
-
-				final Map<String, Object> values = (Map<String, Object>) vm.getValues();
-
 				if (vm.validate()) {
+					final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 					SecuritySettingsPanel.this.settings.setPwdExpiration((Integer) values.get("pwdExp"));
 					SecuritySettingsPanel.this.settings.setPwdSize((Integer) values.get("pwdSize"));
-					SecuritySettingsPanel.this.settings.setSaveLogin(values.get("savelogin").equals("yes") ? true
-							: false);
+					SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) values.get("pwdEnforce"));
+					SecuritySettingsPanel.this.settings
+							.setSaveLogin(values.get("savelogin").equals("yes") ? true : false);
 
-					SecuritySettingsPanel.this.settings.setEnableAnonymousLogin(values.get("enableanonymous").equals(
-							"yes") ? true : false);
-					SecuritySettingsPanel.this.settings.setAllowSidInRequest(values.get("allowsid").equals(
-							"yes") ? true : false);
+					SecuritySettingsPanel.this.settings
+							.setEnableAnonymousLogin(values.get("enableanonymous").equals("yes") ? true : false);
+					SecuritySettingsPanel.this.settings
+							.setAlertNewDevice(values.get("alertnewdevice").equals("yes") ? true : false);
+
 					SecuritySettingsPanel.this.settings.setAnonymousKey((String) values.get("anonymousKey"));
 
 					if (!SecuritySettingsPanel.this.settings.isEnableAnonymousLogin()) {
@@ -141,10 +164,19 @@ public class SecuritySettingsPanel extends AdminPanel {
 					}
 
 					if (Session.get().isDefaultTenant()) {
-						SecuritySettingsPanel.this.settings.setIgnoreLoginCase(values.get("ignorelogincase").equals(
-								"yes") ? true : false);
-						SecuritySettingsPanel.this.settings.setForceSsl(values.get("forcessl").equals("yes") ? true
-								: false);
+						SecuritySettingsPanel.this.settings
+						.setAllowSidInRequest(values.get("allowsid").equals("yes") ? true : false);
+						
+						SecuritySettingsPanel.this.settings
+								.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes") ? true : false);
+						SecuritySettingsPanel.this.settings
+								.setForceSsl(values.get("forcessl").equals("yes") ? true : false);
+
+						SecuritySettingsPanel.this.settings
+								.setGeolocationEnabled(values.get("geoEnabled").equals("yes") ? true : false);
+						SecuritySettingsPanel.this.settings
+								.setGeolocationCache(values.get("geoCache").equals("yes") ? true : false);
+						SecuritySettingsPanel.this.settings.setGeolocationKey((String) values.get("geoKey"));
 					}
 
 					SecurityService.Instance.get().saveSettings(SecuritySettingsPanel.this.settings,
@@ -152,14 +184,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Boolean restartRequired) {
-									Log.info(
-											I18N.message("settingssaved") + "  "
-													+ I18N.message("settingsaffectnewsessions"), null);
+									GuiLog.info(I18N.message("settingssaved") + "  "
+											+ I18N.message("settingsaffectnewsessions"), null);
 
 									if (restartRequired.booleanValue())
 										SC.warn(I18N.message("needrestart"));
@@ -170,6 +201,69 @@ public class SecuritySettingsPanel extends AdminPanel {
 		});
 
 		addMember(save);
+	}
+
+	private Tab prepareGeolocationTab(GUISecuritySettings settings) {
+		Tab geolocation = new Tab(I18N.message("geolocation"));
+
+		if (!Feature.enabled(Feature.GEOLOCATION)) {
+			geolocation.setPane(new FeatureDisabled());
+			return geolocation;
+		}
+
+		DynamicForm geolocationForm = new DynamicForm();
+		geolocationForm.setValuesManager(vm);
+		geolocationForm.setTitleOrientation(TitleOrientation.TOP);
+		geolocationForm.setNumCols(1);
+
+		final RadioGroupItem enableGeolocation = ItemFactory.newBooleanSelector("geoEnabled",
+				I18N.message("enablegeolocation"));
+		enableGeolocation.setValue(settings.isGeolocationEnabled() ? "yes" : "no");
+		enableGeolocation.setWrapTitle(false);
+		enableGeolocation.setWrap(false);
+		enableGeolocation.setRequired(true);
+
+		final RadioGroupItem useCache = ItemFactory.newBooleanSelector("geoCache", I18N.message("usecache"));
+		useCache.setValue(settings.isGeolocationCache() ? "yes" : "no");
+		useCache.setWrapTitle(false);
+		useCache.setWrap(false);
+		useCache.setRequired(true);
+
+		final TextItem licenseKey = ItemFactory.newTextItem("geoKey", "licensekey", settings.getGeolocationKey());
+		licenseKey.setWidth(200);
+		licenseKey.setHint(I18N.message("geolocationkeyhint"));
+
+		final StaticTextItem geoDBversion = ItemFactory.newStaticTextItem("geoVersion", "dbversion",
+				settings.getGeolocationDbVer());
+
+		ButtonItem syncGeoDB = new ButtonItem("geoSyncDb", I18N.message("syncgeolocationdb"));
+		syncGeoDB.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+
+			@Override
+			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+				ContactingServer.get().show();
+				SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(),
+						new AsyncCallback<String>() {
+
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+								ContactingServer.get().hide();
+							}
+
+							@Override
+							public void onSuccess(String dbVer) {
+								geoDBversion.setValue(dbVer);
+								ContactingServer.get().hide();
+							}
+						});
+			}
+		});
+
+		geolocationForm.setFields(enableGeolocation, useCache, licenseKey, geoDBversion, syncGeoDB);
+
+		geolocation.setPane(geolocationForm);
+		return geolocation;
 	}
 
 	private Tab prepareAnonymousTab(GUISecuritySettings settings) {

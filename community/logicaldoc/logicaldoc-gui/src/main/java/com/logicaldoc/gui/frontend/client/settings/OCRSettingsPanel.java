@@ -10,7 +10,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.OCRService;
@@ -22,7 +22,6 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -49,7 +48,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -145,20 +144,6 @@ public class OCRSettingsPanel extends AdminPanel {
 		maxSize.setMin(1);
 		maxSize.setStep(5);
 
-		SpinnerItem barcoderendres = ItemFactory.newSpinnerItem("ocr_rendres_barcode", I18N.message("barcoderendres"),
-				(Integer) null);
-		barcoderendres.setRequired(true);
-		barcoderendres.setWrapTitle(false);
-		barcoderendres.setHint("dpi");
-		barcoderendres.setMin(1);
-		barcoderendres.setStep(10);
-
-		MultiComboBoxItem barcodeformats = ItemFactory.newBarcodeFormatsComboBoxItem("ocr_barcode_formats",
-				I18N.message("barcodeformats"), (String) null);
-		barcodeformats.setRequired(false);
-		barcodeformats.setWrapTitle(false);
-		barcodeformats.setHint(I18N.message("barcodeformatshint"));
-
 		for (GUIParameter param : params) {
 			if (param.getName().endsWith("ocr.enabled"))
 				enabled.setValue(param.getValue().equals("true") ? "yes" : "no");
@@ -172,8 +157,6 @@ public class OCRSettingsPanel extends AdminPanel {
 				batchTimeout.setValue(Integer.parseInt(param.getValue()));
 			else if (param.getName().endsWith("ocr.rendres"))
 				ocrrendres.setValue(Integer.parseInt(param.getValue()));
-			else if (param.getName().endsWith("ocr.rendres.barcode"))
-				barcoderendres.setValue(Integer.parseInt(param.getValue()));
 			else if (param.getName().endsWith("ocr.batch"))
 				batch.setValue(Integer.parseInt(param.getValue()));
 			else if (param.getName().endsWith("ocr.maxsize"))
@@ -184,10 +167,6 @@ public class OCRSettingsPanel extends AdminPanel {
 				excludes.setValue(param.getValue());
 			else if (param.getName().endsWith("ocr.engine"))
 				engine.setValue(param.getValue());
-			else if (param.getName().endsWith("ocr.barcode.formats")) {
-				if (param.getValue() != null && !param.getValue().isEmpty())
-					barcodeformats.setValue(param.getValue().split(","));
-			}
 		}
 
 		List<FormItem> items = new ArrayList<FormItem>();
@@ -195,9 +174,9 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		if (Session.get().isDefaultTenant()) {
 			items.addAll(Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold,
-					ocrrendres, barcoderendres, barcodeformats, batch, batchTimeout, engine));
+					ocrrendres, batch, batchTimeout, engine));
 		} else
-			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold, barcodeformats));
+			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold));
 		form.setItems(items.toArray(new FormItem[0]));
 
 		IButton save = new IButton();
@@ -265,17 +244,9 @@ public class OCRSettingsPanel extends AdminPanel {
 				params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
 						(String) values.get("ocr_resolution_threshold")));
 
-			if (values.get("ocr_barcode_formats") instanceof ArrayList) {
-				String str = values.get("ocr_barcode_formats").toString();
-				str = str.replace("[", "").replace("]", "").replace(" ", "");
-				Log.info(str);
-
-				params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.barcode.formats", str));
-			}
-
 			if (Session.get().isDefaultTenant()) {
 				params.add(new GUIParameter("ocr.enabled", values.get("ocr_enabled").equals("yes") ? "true" : "false"));
-				
+
 				if (values.get("ocr_timeout") instanceof Integer)
 					params.add(new GUIParameter("ocr.timeout", ((Integer) values.get("ocr_timeout")).toString()));
 				else
@@ -291,17 +262,11 @@ public class OCRSettingsPanel extends AdminPanel {
 					params.add(new GUIParameter("ocr.maxsize", ((Integer) values.get("ocr_maxsize")).toString()));
 				else
 					params.add(new GUIParameter("ocr.maxsize", (String) values.get("ocr_maxsize")));
-				
+
 				if (values.get("ocr_rendres") instanceof Integer)
 					params.add(new GUIParameter("ocr.rendres", ((Integer) values.get("ocr_rendres")).toString()));
 				else
 					params.add(new GUIParameter("ocr.rendres", (String) values.get("ocr_rendres")));
-
-				if (values.get("ocr_rendres_barcode") instanceof Integer)
-					params.add(new GUIParameter("ocr.rendres.barcode",
-							((Integer) values.get("ocr_rendres_barcode")).toString()));
-				else
-					params.add(new GUIParameter("ocr.rendres.barcode", (String) values.get("ocr_rendres_barcode")));
 
 				if (values.get("ocr_batch") instanceof Integer)
 					params.add(new GUIParameter("ocr.batch", ((Integer) values.get("ocr_batch")).toString()));
@@ -321,12 +286,12 @@ public class OCRSettingsPanel extends AdminPanel {
 
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
 				public void onSuccess(Void ret) {
-					Log.info(I18N.message("settingssaved"), null);
+					GuiLog.info(I18N.message("settingssaved"), null);
 				}
 			});
 		}

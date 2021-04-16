@@ -145,6 +145,7 @@ public class DeletedDocsDataServlet extends HttpServlet {
 				writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
 				writer.print("<immutable>" + doc.getImmutable() + "</immutable>");
 				writer.print("<deleteUserId>" + doc.getDeleteUserId() + "</deleteUserId>");
+				writer.print("<avatar>" + doc.getDeleteUserId() + "</avatar>");
 				writer.print("<deleteUser><![CDATA[" + (doc.getDeleteUser() != null ? doc.getDeleteUser() : "")
 						+ "]]></deleteUser>");
 				writer.print("<folderId>" + doc.getFolder().getId() + "</folderId>");

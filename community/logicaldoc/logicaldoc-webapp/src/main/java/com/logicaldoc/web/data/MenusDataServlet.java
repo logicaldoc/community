@@ -32,8 +32,8 @@ public class MenusDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(MenusDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -51,7 +51,7 @@ public class MenusDataServlet extends HttpServlet {
 
 			if ("/".equals(request.getParameter("parent")))
 				parent = Menu.ROOT;
-			else if(StringUtils.isNotEmpty(request.getParameter("parent")))
+			else if (StringUtils.isNotEmpty(request.getParameter("parent")))
 				parent = Long.parseLong(request.getParameter("parent"));
 
 			PrintWriter writer = response.getWriter();
@@ -60,7 +60,7 @@ public class MenusDataServlet extends HttpServlet {
 			/*
 			 * Get the visible children
 			 */
-			List<Menu> menus = dao.findByUserId(session.getUserId(), parent);
+			List<Menu> menus = dao.findByUserId(session.getUserId(), parent, false);
 
 			/*
 			 * Iterate over records composing the response XML document
@@ -71,6 +71,7 @@ public class MenusDataServlet extends HttpServlet {
 				writer.print("<name><![CDATA[" + menu.getName() + "]]></name>");
 				writer.print("<position><![CDATA[" + menu.getPosition() + "]]></position>");
 				writer.print("<parent>" + menu.getParentId() + "</parent>");
+				writer.print("<eenabled>" + (menu.getEnabled() == 1 ? "true" : "false") + "</eenabled>");
 				writer.print("</menu>");
 			}
 

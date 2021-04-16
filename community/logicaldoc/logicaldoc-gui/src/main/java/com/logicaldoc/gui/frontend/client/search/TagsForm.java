@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.data.TagsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
@@ -205,12 +205,12 @@ public class TagsForm extends VLayout {
 									new AsyncCallback<Void>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
 										public void onSuccess(Void arg) {
-											Log.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
+											GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
 											ListGridRecord selection = tags.getSelectedRecord();
 											selection.setAttribute("word", value);
 											onLetterSelect(value.substring(0, 1));
@@ -235,12 +235,12 @@ public class TagsForm extends VLayout {
 										new AsyncCallback<Void>() {
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
 											public void onSuccess(Void arg) {
-												Log.info(I18N.message("procinexecution"),
+												GuiLog.info(I18N.message("procinexecution"),
 														I18N.message("taginexecution"));
 												tags.removeSelectedData();
 											}

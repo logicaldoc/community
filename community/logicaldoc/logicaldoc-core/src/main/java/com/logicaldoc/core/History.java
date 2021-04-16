@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -15,7 +16,7 @@ import com.logicaldoc.util.Context;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.0
  */
-public abstract class History extends PersistentObject {
+public abstract class History extends PersistentObject implements Comparable<History> {
 
 	protected Long docId;
 
@@ -54,6 +55,8 @@ public abstract class History extends PersistentObject {
 
 	private String filenameOld = null;
 
+	private Long fileSize = null;
+
 	/**
 	 * Used when storing a document
 	 */
@@ -80,6 +83,10 @@ public abstract class History extends PersistentObject {
 	public static String ASPECT = "saveHistory";
 
 	private String ip;
+
+	private String geolocation;
+
+	private String device;
 
 	public History() {
 	}
@@ -203,7 +210,7 @@ public abstract class History extends PersistentObject {
 			setTenantId(session.getTenantId());
 			setTenant(session.getTenantName());
 			if (session.getClient() != null)
-				setIp(session.getClient().getAddress());
+				setClient(session.getClient());
 		}
 	}
 
@@ -220,6 +227,36 @@ public abstract class History extends PersistentObject {
 			setUserLogin(user.getUsername());
 			setUsername(user.getFullName());
 			setTenantId(user.getTenantId());
+		}
+	}
+
+	public void setDocument(Document document) {
+		this.document = document;
+		if (document != null) {
+			this.setTenantId(document.getTenantId());
+			this.setDocId(document.getId());
+			this.setFilename(document.getFileName());
+			this.setFileSize(document.getFileSize());
+			this.setFolderId(document.getFolder().getId());
+			this.setVersion(document.getVersion());
+		}
+	}
+
+	/**
+	 * This setter sets the ip, device and other informations that can be
+	 * captured by the given client
+	 * 
+	 * @param client the client to read informations from
+	 */
+	public void setClient(Client client) {
+		if (client == null) {
+			ip = null;
+			geolocation = null;
+			device = null;
+		} else {
+			ip = client.getAddress();
+			device = client.getDevice() != null ? client.getDevice().toString() : null;
+			geolocation = client.getGeolocation() != null ? client.getGeolocation().toString() : null;
 		}
 	}
 
@@ -283,16 +320,6 @@ public abstract class History extends PersistentObject {
 		return document;
 	}
 
-	public void setDocument(Document document) {
-		this.document = document;
-		if (document != null) {
-			this.setDocId(document.getId());
-			this.setFilename(document.getFileName());
-			this.setFolderId(document.getFolder().getId());
-			this.setVersion(document.getVersion());
-		}
-	}
-
 	public Folder getFolder() {
 		return folder;
 	}
@@ -339,5 +366,35 @@ public abstract class History extends PersistentObject {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public String getGeolocation() {
+		return geolocation;
+	}
+
+	public void setGeolocation(String geolocation) {
+		this.geolocation = geolocation;
+	}
+
+	public String getDevice() {
+		return device;
+	}
+
+	public void setDevice(String device) {
+		this.device = device;
+	}
+
+	@Override
+	public int compareTo(History o) {
+		History other = (History) o;
+		return getDate().compareTo(other.getDate());
+	}
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
 	}
 }

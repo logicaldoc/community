@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.document.note;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
@@ -84,6 +84,7 @@ public class NoteUpdateDialog extends Window {
 
 		message = ItemFactory.newRichTextItemForNote("message", "message", noteMessage);
 		message.setHeight("*");
+		message.setBrowserSpellCheck(true);
 
 		save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
@@ -110,7 +111,7 @@ public class NoteUpdateDialog extends Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 						destroy();
 					}
 

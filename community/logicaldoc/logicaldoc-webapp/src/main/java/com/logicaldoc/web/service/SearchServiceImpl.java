@@ -3,10 +3,13 @@ package com.logicaldoc.web.service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -14,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.BookmarkDAO;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -26,6 +30,7 @@ import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.searchengine.folder.FolderCriterion;
 import com.logicaldoc.core.searchengine.folder.FolderSearchOptions;
+import com.logicaldoc.core.searchengine.saved.SearchDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.gui.common.client.ServerException;
@@ -136,7 +141,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 					ext.setType(e.getType());
 					ext.setParent(e.getParent());
 					ext.setStringValues(e.getStringValues());
-					if(e.getType()==Attribute.TYPE_USER)
+					if (e.getType() == Attribute.TYPE_USER)
 						ext.setUsername(ext.getStringValue());
 					extList.add(ext);
 				}
@@ -167,17 +172,15 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		try {
 			SearchOptions opt = toSearchOptions(options);
 
-			File file = UserUtil.getUserResource(session.getUserId(), "queries");
-			file = new File(file, opt.getName() + ".ser");
-			if (file.exists()) {
-				return false;
-			}
+			com.logicaldoc.core.searchengine.saved.SavedSearch search = new com.logicaldoc.core.searchengine.saved.SavedSearch();
+			search.setName(options.getName());
+			search.setUserId(session.getUserId());
+			search.setTenantId(session.getTenantId());
+			search.setDescription(options.getDescription());
+			search.saveOptions(opt);
 
-			try {
-				opt.write(file);
-			} catch (Exception e) {
-				log.error(e.getMessage());
-			}
+			SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
+			dao.store(search);
 
 			log.debug("Saved query {}", opt.getName());
 			return true;
@@ -189,40 +192,82 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 	@Override
 	public void delete(String[] names) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
-			File dir = UserUtil.getUserResource(session.getUserId(), "queries");
-
 			for (String name : names) {
-				File file = new File(dir, name + ".ser");
-				try {
-					FileUtils.forceDelete(file);
-				} catch (IOException e) {
-					log.error(e.getMessage());
-				}
+				com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(),
+						name);
+				if (search != null)
+					dao.delete(search.getId());
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
+		}
+
+		try {
+			legacyDelete(session.getUserId(), names);
+		} catch (Throwable t) {
+
+		}
+	}
+
+	/**
+	 * Deletes the searches from the filesystem (legacy format)
+	 * 
+	 * @param userId identifier of the user
+	 * @param names the searches to delete
+	 */
+	@Deprecated(forRemoval = true, since = "9.0")
+	private void legacyDelete(long userId, String[] names) {
+		File dir = UserUtil.getUserResource(userId, "queries");
+		for (String name : names) {
+			File file = new File(dir, name + ".ser");
+			try {
+				FileUtils.forceDelete(file);
+			} catch (IOException e) {
+				log.error(e.getMessage());
+			}
 		}
 	}
 
 	@Override
 	public GUISearchOptions load(String name) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
-			File dir = UserUtil.getUserResource(session.getUserId(), "queries");
-			File file = new File(dir, name + ".ser");
-			SearchOptions opt = null;
-			try {
-				opt = SearchOptions.read(file);
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-			return toGUIOptions(opt);
+			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(), name);
+			if (search != null)
+				return toGUIOptions(search.readOptions());
+			else
+				return legacyLoad(session.getUserId(), name);
 		} catch (Throwable t) {
 			return (GUISearchOptions) ServiceUtil.throwServerException(session, log, t);
 		}
+	}
+
+	/**
+	 * Loads a search from the file system (legacy format)
+	 * 
+	 * @param name name of the saved search
+	 * @param userId identifier of the user
+	 * 
+	 * @return the saved search options
+	 * 
+	 * @throws ServerException
+	 */
+	@Deprecated(forRemoval = true, since = "9.0")
+	private GUISearchOptions legacyLoad(long userId, String name) {
+		File dir = UserUtil.getUserResource(userId, "queries");
+		File file = new File(dir, name + ".ser");
+		SearchOptions opt = null;
+		try {
+			opt = SearchOptions.read(file);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+		return toGUIOptions(opt);
 	}
 
 	/**
@@ -232,8 +277,31 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 	 * @param session the current session
 	 * 
 	 * @return the list of search options
+	 * 
+	 * @throws PersistenceException A problem at db level
+	 * @throws IOException
 	 */
-	public List<SearchOptions> getSearches(Session session) {
+	public static List<SearchOptions> getSearches(Session session) throws PersistenceException, IOException {
+		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
+
+		Map<String, SearchOptions> map = new HashMap<String, SearchOptions>();
+		List<com.logicaldoc.core.searchengine.saved.SavedSearch> searches = dao.findByUserId(session.getUserId());
+		for (com.logicaldoc.core.searchengine.saved.SavedSearch search : searches) {
+			map.put(search.getName(), search.readOptions());
+		}
+
+		List<SearchOptions> lecacyList = legacyGetSearches(session);
+		for (SearchOptions searchOptions : lecacyList)
+			if (!map.containsKey(searchOptions.getName()))
+				map.put(searchOptions.getName(), searchOptions);
+
+		return map.values().stream()
+				.sorted((SearchOptions s1, SearchOptions s2) -> s1.getName().compareTo(s2.getName()))
+				.collect(Collectors.toList());
+	}
+
+	@Deprecated(forRemoval = true, since = "9.0")
+	private static List<SearchOptions> legacyGetSearches(Session session) {
 		File file = UserUtil.getUserResource(session.getUserId(), "queries");
 		if (!file.exists()) {
 			return null;
@@ -309,6 +377,34 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		}
 
 		return op;
+	}
+
+	@Override
+	public void shareSearch(String name, long[] userIds) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
+
+		try {
+			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(), name);
+			if (search == null) {
+				// Perhaps the search is not already in the database
+				GUISearchOptions legacyOptions = legacyLoad(session.getUserId(), name);
+				if (legacyOptions != null) {
+					save(legacyOptions);
+					search = dao.findByUserIdAndName(session.getUserId(), name);
+				}
+			}
+
+			if (search != null) {
+				for (long userId : userIds) {
+					com.logicaldoc.core.searchengine.saved.SavedSearch clone = search.clone();
+					clone.setUserId(userId);
+					dao.store(clone);
+				}
+			}
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
 	}
 
 	protected SearchOptions toSearchOptions(GUISearchOptions options) {

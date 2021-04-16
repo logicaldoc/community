@@ -29,16 +29,17 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 4.5
  */
 public class ThumbnailManager {
-	
+
 	public static final String SUFFIX_PREVIEW = "conversion.pdf";
 
 	public static final String SUFFIX_TILE = "tile.png";
 
-	public static final String SUFFIX_THUMB = "thumb.png";
-	
-	public static final String SUFFIX_MOBILE = "mobile.png";	
+	public static final String THUMB = "thumb";
 
-	
+	public static final String SUFFIX_THUMB = THUMB + ".png";
+
+	public static final String SUFFIX_MOBILE = "mobile.png";
+
 	protected static Logger log = LoggerFactory.getLogger(ThumbnailManager.class);
 
 	private Storer storer;
@@ -61,8 +62,39 @@ public class ThumbnailManager {
 	}
 
 	/**
-	 * Creates the tile for the specified document and file version. The
-	 * tile is an image rendering of the first page only.
+	 * Creates the thumbnail for the specified document
+	 * 
+	 * @param document The document to be treated
+	 * @param sid The session identifier (optional)
+	 * 
+	 * @throws IOException raised in case the thumbnail file cannot be created
+	 */
+	public void createTumbnail(Document document, String sid) throws IOException {
+		createTumbnail(document, null, sid);
+	}
+
+	/**
+	 * Creates the thumbnail for the specified document and file version using
+	 * given size and quality. The thumbnail is an image rendering of the first
+	 * page only.
+	 * 
+	 * @param document The document to be treated
+	 * @param fileVersion The file version(optional)
+	 * @param size The thumbnail size
+	 * @param quality Compression quality(0..100, 100 is maximum quality). If
+	 *        not specified the standard thumbnail quality will be used.
+	 * @param sid The session identifier(optional)
+	 * 
+	 * @throws IOException in case an error happens during image creation
+	 */
+	public void createTumbnail(Document document, String fileVersion, int size, Integer quality, String sid)
+			throws IOException {
+		createImage(document, fileVersion, size, quality, THUMB + size + ".png", sid);
+	}
+
+	/**
+	 * Creates the tile for the specified document and file version. The tile is
+	 * an image rendering of the first page only.
 	 * 
 	 * @param document The document to be treated
 	 * @param fileVersion The file version(optional)
@@ -73,7 +105,7 @@ public class ThumbnailManager {
 	public void createTile(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "tile", SUFFIX_TILE, sid);
 	}
-	
+
 	/**
 	 * Creates the mobile image for the specified document and file version. The
 	 * mobile is an image rendering of the first page only.
@@ -86,47 +118,17 @@ public class ThumbnailManager {
 	 */
 	public void createMobile(Document document, String fileVersion, String sid) throws IOException {
 		createImage(document, fileVersion, "mobile", SUFFIX_MOBILE, sid);
-	}	
+	}
 
-	protected void createImage(Document document, String fileVersion, String type, String suffix, String sid)
-			throws IOException {
+	protected void createImage(Document document, String fileVersion, int size, Integer quality, String suffix,
+			String sid) throws IOException {
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		Tenant tenant = tDao.findById(document.getTenantId());
-		long maxFileSize = Context.get().getProperties().getLong(tenant.getName() + ".gui.preview.maxfilesize", 0)
-				* 1024 * 1024;
-
-		if (maxFileSize > 0 && maxFileSize < document.getFileSize()) {
-			log.warn("Document {} is too big for the thumbnail", document.getId());
-			return;
-		}
 
 		ThumbnailBuilder builder = getBuilder(document);
 		if (builder == null) {
 			log.warn("No builder found for document {}", document.getId());
 			return;
-		}
-
-		String tenantName = DocUtil.getTenantName(document);
-
-		int size = 150;
-		try {
-			ContextProperties conf = Context.get().getProperties();
-			size = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".size"));
-		} catch (Throwable t) {
-			log.error(t.getMessage());
-		}
-
-		int quality = 100;
-		try {
-			ContextProperties conf = Context.get().getProperties();
-			int buf = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".quality"));
-			if (buf < 1)
-				buf = 1;
-			if (buf > 100)
-				buf = 100;
-			quality = buf;
-		} catch (Throwable t) {
-			log.error(t.getMessage());
 		}
 
 		// Prepare I/O files
@@ -136,7 +138,8 @@ public class ThumbnailManager {
 		try {
 			src = writeToTempFile(document, fileVersion);
 
-			builder.buildThumbnail(sid, document, fileVersion, src, dest, size, quality);
+			builder.buildThumbnail(sid, document, fileVersion, src, dest, size,
+					quality != null ? quality : getQuality("thumbnail", tenant.getName()));
 
 			// Put the resource
 			String resource = storer.getResourceName(document, getSuitableFileVersion(document, fileVersion), suffix);
@@ -150,16 +153,34 @@ public class ThumbnailManager {
 		}
 	}
 
-	/**
-	 * Creates the thumbnail for the specified document
-	 * 
-	 * @param document The document to be treated
-	 * @param sid The session identifier (optional)
-	 * 
-	 * @throws IOException raised in case the thumbnail file cannot be created
-	 */
-	public void createTumbnail(Document document, String sid) throws IOException {
-		createTumbnail(document, null, sid);
+	protected void createImage(Document document, String fileVersion, String type, String suffix, String sid)
+			throws IOException {
+		String tenantName = DocUtil.getTenantName(document);
+
+		int size = 150;
+		try {
+			ContextProperties conf = Context.get().getProperties();
+			size = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".size"));
+		} catch (Throwable t) {
+			log.error(t.getMessage());
+		}
+
+		createImage(document, fileVersion, size, getQuality(type, tenantName), suffix, sid);
+	}
+
+	private int getQuality(String type, String tenantName) {
+		try {
+			ContextProperties conf = Context.get().getProperties();
+			int buf = Integer.parseInt(conf.getProperty(tenantName + ".gui." + type + ".quality"));
+			if (buf < 1)
+				buf = 1;
+			if (buf > 100)
+				buf = 100;
+			return buf;
+		} catch (Throwable t) {
+			log.error(t.getMessage());
+			return 100;
+		}
 	}
 
 	/**

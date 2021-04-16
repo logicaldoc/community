@@ -48,7 +48,7 @@ public interface Authenticator {
 	 * @return The user, or null if the authentication was unsuccessful
 	 */
 	public User authenticate(String username, String password, String key, Client client) throws AuthenticationException;
-
+	
 	public boolean canAuthenticateUser(String user);
 
 	/**
@@ -57,4 +57,13 @@ public interface Authenticator {
 	 * @return if this authenticator is enabled
 	 */
 	public boolean isEnabled();
+	
+	/**
+	 * This method does not authenticate the user but just retrieves his details
+	 * 
+	 * @param username username of the user to find
+	 * 
+	 * @return object representation of the user
+	 */
+	public User pickUser(String username);
 }

@@ -5,17 +5,19 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.LockedDocsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -68,7 +70,7 @@ public class LockedDocsReport extends AdminPanel {
 
 		userSelector = ItemFactory.newUserSelector("user", "user", null, false, false);
 		userSelector.setWrapTitle(false);
-		userSelector.setWidth(100);
+		userSelector.setWidth(150);
 		userSelector.addChangedHandler(new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
@@ -83,7 +85,7 @@ public class LockedDocsReport extends AdminPanel {
 		print.setAutoFit(true);
 		print.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addSeparator();
@@ -99,7 +101,7 @@ public class LockedDocsReport extends AdminPanel {
 			export.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					Util.exportCSV(list, false);
+					GridUtil.exportCSV(list, false);
 				}
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -124,16 +126,6 @@ public class LockedDocsReport extends AdminPanel {
 		size.setCanFilter(false);
 		size.setCanGroupBy(false);
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-		icon.setCanGroupBy(false);
-
 		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
 		version.setAlign(Alignment.CENTER);
 		version.setCanFilter(false);
@@ -145,15 +137,11 @@ public class LockedDocsReport extends AdminPanel {
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setCanGroupBy(false);
 
-		ListGridField user = new ListGridField("username", I18N.message("lockedby"), 200);
-		user.setAlign(Alignment.CENTER);
+		ListGridField user = new AvatarListGridField("username", "userId", "lockedby", 200);
+		user.setAlign(Alignment.LEFT);
 		user.setCanFilter(true);
 		user.setCanGroupBy(true);
 
@@ -163,7 +151,8 @@ public class LockedDocsReport extends AdminPanel {
 		customId.setCanGroupBy(false);
 		customId.setCanFilter(true);
 
-		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
+		FileNameListGridField filename = new FileNameListGridField();
+		filename.setWidth(200);
 		filename.setCanFilter(true);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
@@ -239,7 +228,7 @@ public class LockedDocsReport extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setShowFilterEditor(true);
-		list.setFields(statusIcons, icon, filename, version, fileVersion, size, lastModified, user, customId, type);
+		list.setFields(statusIcons, filename, version, fileVersion, size, lastModified, user, customId, type);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -265,7 +254,7 @@ public class LockedDocsReport extends AdminPanel {
 		});
 
 		body.setMembers(toolStrip, infoPanel, list);
-		refresh(null);
+		list.refresh(new LockedDocsDS(null));
 	}
 
 	private void refresh(Long userId) {
@@ -290,7 +279,7 @@ public class LockedDocsReport extends AdminPanel {
 				DocumentService.Instance.get().unlock(ids, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -313,7 +302,7 @@ public class LockedDocsReport extends AdminPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

@@ -107,6 +107,8 @@ public class GUIUser implements Serializable {
 
 	private GUIDashlet[] dashlets = new GUIDashlet[0];
 
+	private GUIMenu[] customActions = new GUIMenu[0];
+
 	private Long defaultWorkspace;
 
 	private Date certExpire = null;
@@ -118,9 +120,10 @@ public class GUIUser implements Serializable {
 	private String key = null;
 
 	private int type = 0;
-	
+
 	/**
-	 * Description of the grid that displays the list of documents, a JSON format
+	 * Description of the grid that displays the list of documents, a JSON
+	 * format
 	 */
 	private String docsGrid;
 
@@ -590,5 +593,21 @@ public class GUIUser implements Serializable {
 
 	public void setHitsGrid(String hitsGrid) {
 		this.hitsGrid = hitsGrid;
+	}
+
+	public GUIMenu[] getCustomActions() {
+		return customActions;
+	}
+
+	public void setCustomActions(GUIMenu[] customActions) {
+		this.customActions = customActions;
+	}
+
+	public void updateCustomAction(GUIMenu action) {
+		if (customActions != null)
+			for (int i = 0; i < customActions.length; i++) {
+				if (customActions[i].getId() == action.getId())
+					customActions[i] = action;
+			}
 	}
 }

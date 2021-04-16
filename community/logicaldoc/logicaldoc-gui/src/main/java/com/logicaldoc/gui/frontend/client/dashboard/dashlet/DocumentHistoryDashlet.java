@@ -6,23 +6,22 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.DocumentHistoryDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HeaderControl;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -69,20 +68,9 @@ public class DocumentHistoryDashlet extends Dashlet {
 
 	private void init() {
 		ListGridField version = new ListGridField("version", I18N.message("version"), 70);
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
-		ListGridField fileName = new ListGridField("filename", I18N.message("filename"));
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
+		
+		FileNameListGridField fileName = new FileNameListGridField();
 
 		list = new RefreshableListGrid() {
 			@Override
@@ -106,7 +94,7 @@ public class DocumentHistoryDashlet extends Dashlet {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -127,7 +115,7 @@ public class DocumentHistoryDashlet extends Dashlet {
 		list.setHeight100();
 		list.setBorder("0px");
 		list.setDataSource(getDataSource());
-		list.setFields(icon, fileName, version, date);
+		list.setFields(fileName, version, date);
 
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
 			@Override
@@ -147,7 +135,7 @@ public class DocumentHistoryDashlet extends Dashlet {
 					@Override
 					public void onFailure(Throwable caught) {
 						ContactingServer.get().hide();
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -163,11 +151,12 @@ public class DocumentHistoryDashlet extends Dashlet {
 				});
 			}
 		});
+		markAsRead.setTooltip(I18N.message("maskallasread"));
 
 		HeaderControl exportControl = new HeaderControl(HeaderControl.SAVE, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 		exportControl.setTooltip(I18N.message("export"));
@@ -175,7 +164,7 @@ public class DocumentHistoryDashlet extends Dashlet {
 		HeaderControl printControl = new HeaderControl(HeaderControl.PRINT, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		printControl.setTooltip(I18N.message("print"));
@@ -246,7 +235,7 @@ public class DocumentHistoryDashlet extends Dashlet {
 					DocumentService.Instance.get().unlock(new long[] { document.getId() }, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override

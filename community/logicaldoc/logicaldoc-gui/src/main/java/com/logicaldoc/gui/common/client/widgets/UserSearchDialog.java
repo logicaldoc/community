@@ -3,7 +3,7 @@ package com.logicaldoc.gui.common.client.widgets;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.HeaderControls;
@@ -107,7 +107,7 @@ public class UserSearchDialog extends Window {
 			@Override
 			public void onFailure(Throwable caught) {
 				ContactingServer.get().hide();
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

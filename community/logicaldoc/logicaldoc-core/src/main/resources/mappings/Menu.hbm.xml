@@ -20,7 +20,10 @@
 		<property name="securityRef" type="long" column="ld_securityref" />
 		<property name="icon" type="string" column="ld_icon" length="255" />
 		<property name="type" type="int" column="ld_type" not-null="true" />
+		<property name="enabled" type="int" column="ld_enabled" not-null="true" />
 		<property name="description" type="string" column="ld_description" length="4000" />
+		<property name="routineId" type="long" column="ld_routineid" />
+		<property name="automation" type="string" column="ld_automation" />
 		<set name="menuGroups" table="ld_menugroup" cascade="all">
 			<key column="ld_menuid" />
 			<composite-element class="com.logicaldoc.core.security.MenuGroup">

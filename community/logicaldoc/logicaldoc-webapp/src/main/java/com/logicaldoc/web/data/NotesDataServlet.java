@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
+import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServiceUtil;
 
@@ -115,8 +117,11 @@ public class NotesDataServlet extends HttpServlet {
 				writer.print("<date>" + (date != null ? df.format(date) : "") + "</date>");
 				writer.print("<message><![CDATA[" + set.getString(2) + "]]></message>");
 				writer.print("<docId>" + set.getLong(5) + "</docId>");
-				writer.print("<docFilename><![CDATA[" + set.getString(6) + "]]></docFilename>");
-				writer.print("<userId><![CDATA[" + set.getString(7) + "]]></userId>");
+				writer.print("<filename><![CDATA[" + set.getString(6) + "]]></filename>");
+				writer.print("<icon>"
+						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils
+								.getExtension(set.getString(6)))) + "</icon>");
+				writer.print("<userId>" + set.getString(7) + "</userId>");
 				writer.print("<fileVersion><![CDATA[" + set.getString(10) + "]]></fileVersion>");
 				writer.print("</post>");
 			}

@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
@@ -84,7 +84,7 @@ public class UserDetailsPanel extends VLayout {
 					SecurityService.Instance.get().getUser(user.getId(), new AsyncCallback<GUIUser>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -181,7 +181,7 @@ public class UserDetailsPanel extends VLayout {
 				&& !Session.get().getUser().getUsername().equalsIgnoreCase("admin"))
 			changeHandler = null;
 
-		propertiesPanel = new UserPropertiesPanel(user, changeHandler);
+		propertiesPanel = new UserPropertiesPanel(user, changeHandler, usersPanel);
 		propertiesTabPanel.addMember(propertiesPanel);
 
 		/*
@@ -264,7 +264,7 @@ public class UserDetailsPanel extends VLayout {
 		boolean guiValid = true;
 		if (guiPanel != null)
 			guiValid = guiPanel.validate();
-		
+
 		if (!stdValid)
 			tabSet.selectTab(TABID_PROPERTIES);
 		else if (quotaPanel != null && !quotaValid)
@@ -280,13 +280,14 @@ public class UserDetailsPanel extends VLayout {
 	public void onSave() {
 		if (validate()) {
 			final boolean createNew = user.getId() == 0;
+			final boolean notifyCredentials = user.isNotifyCredentials();
 
 			ContactingServer.get().show();
 			SecurityService.Instance.get().saveUser(user, Session.get().getInfo(), new AsyncCallback<GUIUser>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					ContactingServer.get().hide();
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
@@ -294,13 +295,13 @@ public class UserDetailsPanel extends VLayout {
 					ContactingServer.get().hide();
 					tabSet.hideSave();
 					if (createNew && user.getWelcomeScreen() == -99) {
-						Log.warn(I18N.message("usernamealreadyinuse"), I18N.message("usernamealreadyinuse"));
+						GuiLog.warn(I18N.message("usernamealreadyinuse"), I18N.message("usernamealreadyinuse"));
 						SC.warn(I18N.message("usernamealreadyinuse"));
 						return;
 					}
 
-					if (createNew && user.isNotifyCredentials())
-						Log.info(I18N.message("emailnotifyaccountsent"), I18N.message("emailnotifyaccountsent"));
+					if (createNew && notifyCredentials)
+						GuiLog.info(I18N.message("emailnotifyaccountsent"), I18N.message("emailnotifyaccountsent"));
 					if (user != null) {
 						usersPanel.updateRecord(user);
 						usersPanel.showUserDetails(user);

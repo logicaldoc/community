@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.folder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
@@ -125,13 +125,13 @@ public class FolderInterfacePanel extends FolderDetailTab {
 					@Override
 					public void onFailure(Throwable caught) {
 						ContactingServer.get().hide();
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void arg0) {
 						ContactingServer.get().hide();
-						Log.info(I18N.message("appliedgridonsubfolders"));
+						GuiLog.info(I18N.message("appliedgridonsubfolders"));
 					}
 				});
 			}

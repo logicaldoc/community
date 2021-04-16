@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.5.2</version>
+		<version>8.6.1</version>
 	</parent>
 	<artifactId>logicaldoc-core</artifactId>
 	<name>logicaldoc-core</name>
@@ -53,7 +53,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
-			<type>jar</type>
 		</dependency>
 		<dependency>
 			<groupId>net.lingala.zip4j</groupId>
@@ -127,7 +126,6 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
@@ -137,11 +135,6 @@
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>sqltool</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>xml-apis</groupId>
-			<artifactId>xml-apis</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -487,6 +480,26 @@
 			<artifactId>EpubParser</artifactId>
 			<version>1.0.95</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.bitwalker</groupId>
+			<artifactId>UserAgentUtils</artifactId>
+			<version>1.21</version>
+		</dependency>
+		<dependency>
+			<groupId>com.maxmind.geoip2</groupId>
+			<artifactId>geoip2</artifactId>
+			<version>2.15.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.timgroup</groupId>
+			<artifactId>jgravatar</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.talanlabs</groupId>
+			<artifactId>avatar-generator</artifactId>
+			<version>1.1.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -562,6 +575,10 @@
 									<exclude name="ffmpeg*" />
 									<exclude name="metrics-core*" />
 									<exclude name="Epub*" />
+									<exclude name="UserAgent*" />
+									<exclude name="geoip*" />
+									<exclude name="maxmind*" />
+									<exclude name="*avatar*" />
 								</delete>
 								<delete dir="target/plugin/WEB-INF/lib">
 									<include name="opencv-*-android-*" />

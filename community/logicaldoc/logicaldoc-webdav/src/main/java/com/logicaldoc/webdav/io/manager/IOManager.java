@@ -10,7 +10,6 @@ import org.apache.jackrabbit.webdav.DavResource;
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.context.ImportContext;
 import com.logicaldoc.webdav.io.handler.IOHandler;
-import com.logicaldoc.webdav.resource.RangeResourceImpl;
 
 /**
  * For more informations, please visit

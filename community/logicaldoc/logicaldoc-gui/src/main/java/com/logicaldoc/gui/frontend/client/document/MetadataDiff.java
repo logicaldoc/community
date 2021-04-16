@@ -87,6 +87,9 @@ public class MetadataDiff extends Window {
 				version1.getStopPublishing() != null ? I18N.formatDate(version1.getStopPublishing()) : null,
 				version2.getStopPublishing() != null ? I18N.formatDate(version2.getStopPublishing()) : null, 0));
 
+		records.add(new DiffRecord(I18N.message("workflowstatus"), I18N.message("workflowstatus"), version1.getWorkflowStatus(),
+				version2.getWorkflowStatus(), 0));
+		
 		records.add(new DiffRecord(I18N.message("template"), I18N.message("template"), version1.getTemplate(),
 				version2.getTemplate(), 0));
 		printExtendedAttributes(records, version1, version2);

@@ -22,13 +22,12 @@ public class DeletedFoldersDS extends DataSource {
 		id.setPrimaryKey(true);
 		id.setHidden(true);
 		id.setRequired(true);
-		DataSourceImageField icon = new DataSourceImageField("icon");
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 		DataSourceTextField parentIdField = new DataSourceTextField("parentId");
 		DataSourceImageField deleteUserId = new DataSourceImageField("deleteUserId");
 		DataSourceTextField deleteUser = new DataSourceTextField("deleteUser");
 		
-		setFields(id, name, lastModified, icon, parentIdField, deleteUser, deleteUserId);
+		setFields(id, name, lastModified, parentIdField, deleteUser, deleteUserId);
 		setClientOnly(true);
 
 		String url = "data/deletedfolders.xml?1=1";

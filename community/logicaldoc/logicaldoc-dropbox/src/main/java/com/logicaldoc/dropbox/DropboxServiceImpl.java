@@ -22,7 +22,6 @@ import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
@@ -192,7 +191,6 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private void uploadDocument(Long docId, String path, Dropbox dropbox, Session session) throws IOException {
 		Storer store = (Storer) Context.get().getBean(Storer.class);
-		DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		File temp = null;
@@ -211,13 +209,14 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			history.setFolderId(doc.getFolder().getId());
 			history.setComment("Exported into Dropbox");
 			history.setSession(session);
+			history.setDocument(doc);
 
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			history.setPath(fdao.computePathExtended(doc.getFolder().getId()));
 			history.setEvent(DocumentEvent.DOWNLOADED.toString());
 
 			try {
-				hdao.store(history);
+				ddao.saveDocumentHistory(doc, history);
 			} catch (Throwable t) {
 				log.error(t.getMessage(), t);
 			}

@@ -12,11 +12,13 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUICriterion;
+import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.frontend.client.search.ParameterConditionRow;
@@ -68,14 +70,24 @@ public abstract class FolderSearchForm extends VLayout {
 
 		setOverflow(Overflow.AUTO);
 
+		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders2"));
+		subfolders.setEndRow(true);
+
 		folder = new FolderSelector(null, true);
 		folder.setTitle(I18N.message("parent"));
 		folder.setEndRow(true);
 		folder.setWidth(160);
-
-		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders2"));
-		subfolders.setEndRow(true);
-
+		folder.addFolderChangeListener(new FolderChangeListener() {
+			
+			@Override
+			public void onChanged(GUIFolder folder) {
+				if(folder!=null)
+					subfolders.setValue(true);
+				else
+					subfolders.setValue(false);
+			}
+		});
+		
 		final DynamicForm folderForm = new DynamicForm();
 		folderForm.setValuesManager(vm);
 		folderForm.setTitleOrientation(TitleOrientation.TOP);
@@ -132,7 +144,7 @@ public abstract class FolderSearchForm extends VLayout {
 								new AsyncCallback<GUITemplate>() {
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override

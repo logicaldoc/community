@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.smartgwt.client.util.SC;
@@ -67,7 +67,7 @@ public class TenantDetailsPanel extends VLayout {
 					TenantService.Instance.get().load(tenant.getId(), new AsyncCallback<GUITenant>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -223,11 +223,11 @@ public class TenantDetailsPanel extends VLayout {
 	public void onSave() {
 		if (validate()) {
 			final boolean newTenant = TenantDetailsPanel.this.tenant.getId() == 0L;
-
+			
 			TenantService.Instance.get().save(tenant, new AsyncCallback<GUITenant>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override

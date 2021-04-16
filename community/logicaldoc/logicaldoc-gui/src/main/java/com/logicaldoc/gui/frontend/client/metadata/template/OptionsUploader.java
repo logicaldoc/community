@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.metadata.template;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.smartgwt.client.types.Alignment;
@@ -104,7 +104,7 @@ public class OptionsUploader extends Window {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 				options.refresh();
 				ContactingServer.get().hide();
 			}

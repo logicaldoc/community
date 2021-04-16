@@ -58,6 +58,7 @@ public class Dashlet extends Portlet {
 				refresh();
 			}
 		});
+		refreshControl.setTooltip(I18N.message("refresh"));
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, refreshControl, HeaderControls.MINIMIZE_BUTTON,
 				HeaderControls.MAXIMIZE_BUTTON, HeaderControls.CLOSE_BUTTON);

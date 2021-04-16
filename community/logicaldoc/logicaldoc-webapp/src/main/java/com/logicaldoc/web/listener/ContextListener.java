@@ -24,7 +24,6 @@ public class ContextListener extends ContextLoaderListener {
 	@Override
 	public void contextDestroyed(ServletContextEvent event) {
 		cleanupSessions();
-
 		super.contextDestroyed(event);
 	}
 
@@ -38,12 +37,14 @@ public class ContextListener extends ContextLoaderListener {
 	private void cleanupSessions() {
 		try {
 			log.info("Cleanup past sessions of the current node {}", SystemInfo.get().getInstallationId());
-			SessionDAO sessionDAO = (SessionDAO) Context.get().getBean(SessionDAO.class);
-			sessionDAO.deleteCurrentNodeSessions();
+			if (Context.get() != null) {
+				SessionDAO sessionDAO = (SessionDAO) Context.get().getBean(SessionDAO.class);
+				sessionDAO.deleteCurrentNodeSessions();
 
-			ContextProperties config = (ContextProperties) Context.get().getProperties();
-			int sessionTtl = config.getInt("session.ttl", -1);
-			sessionDAO.cleanOldSessions(sessionTtl);
+				ContextProperties config = (ContextProperties) Context.get().getProperties();
+				int sessionTtl = config.getInt("session.ttl", -1);
+				sessionDAO.cleanOldSessions(sessionTtl);
+			}
 		} catch (Throwable e) {
 			log.warn(e.getMessage(), e);
 		}

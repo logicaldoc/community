@@ -3,7 +3,8 @@ package com.logicaldoc.gui.frontend.client.security.twofactorsauth;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.TwoFactorsAuthenticationService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.IButton;
@@ -39,18 +40,25 @@ public class TwoFactorsAuthenticationDialog extends Window {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (panel.validate()) {
+					ContactingServer.get().show();
+					save.setDisabled(true);
 					TwoFactorsAuthenticationService.Instance.get().changeTwoFactorsAuthentication(user.getId(),
 							panel.getFactor(), panel.getKey(), panel.getAccount(), panel.isNotify(),
 							new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									ContactingServer.get().hide();
+									save.setDisabled(false);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void arg) {
-									user.setSecondFactor(panel.getFactor());
-									user.setKey(panel.getKey());
+									ContactingServer.get().hide();
+									if(panel!=null) {
+									 user.setSecondFactor(panel.getFactor());
+									 user.setKey(panel.getKey());
+									}
 									TwoFactorsAuthenticationDialog.this.destroy();
 								}
 							});

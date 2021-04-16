@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.dashboard.chat;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.ChatService;
 import com.smartgwt.client.types.Alignment;
@@ -45,6 +45,7 @@ public class ChatPanel extends VLayout {
 
 		TextItem postMessage = ItemFactory.newTextItem("post", "post", null);
 		postMessage.setShowTitle(false);
+		postMessage.setBrowserSpellCheck(true);
 		postMessage.setWidth("100%");
 
 		ButtonItem postButton = new ButtonItem(I18N.message("post"));
@@ -86,7 +87,7 @@ public class ChatPanel extends VLayout {
 		ChatService.Instance.get().post(message, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

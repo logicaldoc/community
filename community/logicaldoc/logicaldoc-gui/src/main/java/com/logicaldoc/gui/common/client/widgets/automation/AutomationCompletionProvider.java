@@ -40,6 +40,9 @@ public class AutomationCompletionProvider implements AceCompletionProvider {
 				new AceCompletionValue("$AutomationTool", "$AutomationTool", "variable", 10),
 				new AceCompletionValue("$ContextTool", "$ContextTool", "variable", 10),
 				new AceCompletionValue("$ZonalOCRTool", "$ZonalOCRTool", "variable", 10),
+				new AceCompletionValue("$WebsocketTool", "$WebsocketTool", "variable", 10),
+				new AceCompletionValue("$UserTool", "$UserTool", "variable", 10),
+				new AceCompletionValue("$SecurityTool", "$SecurityTool", "variable", 10),
 				
 				new AceCompletionValue("$I18N", "$I18N", "variable", 10),
 				new AceCompletionValue("$log", "$log", "variable", 10),

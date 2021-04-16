@@ -8,11 +8,11 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DuplicatesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -22,6 +22,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -32,7 +33,6 @@ import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
@@ -156,7 +156,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 												@Override
 												public void onFailure(Throwable caught) {
 													ContactingServer.get().hide();
-													Log.serverError(caught);
+													GuiLog.serverError(caught);
 												}
 
 												@Override
@@ -179,7 +179,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 		print.setAutoFit(true);
 		print.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addSeparator();
@@ -195,7 +195,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 			export.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					Util.exportCSV(list, false);
+					GridUtil.exportCSV(list, false);
 				}
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -234,11 +234,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 		version.setCanFilter(true);
 		version.setCanGroupBy(false);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setCanGroupBy(false);
 
 		ListGridField publisher = new ListGridField("publisher", I18N.message("publisher"), 90);
@@ -378,7 +374,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 								DocumentService.Instance.get().delete(ids, new AsyncCallback<Void>() {
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -402,7 +398,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

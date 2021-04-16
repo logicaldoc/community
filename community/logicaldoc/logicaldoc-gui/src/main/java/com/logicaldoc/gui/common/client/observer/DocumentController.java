@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 
 /**
  * Implements the Observer pattern to distribute events on the documents

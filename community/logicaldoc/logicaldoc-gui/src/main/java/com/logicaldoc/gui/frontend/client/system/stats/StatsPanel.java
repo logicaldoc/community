@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.system.stats;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Label;
@@ -28,7 +28,7 @@ public class StatsPanel extends VLayout {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

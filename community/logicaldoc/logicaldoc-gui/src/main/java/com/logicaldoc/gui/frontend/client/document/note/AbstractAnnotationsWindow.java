@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -12,20 +14,39 @@ import com.google.gwt.widgetideas.graphics.client.ImageLoader.CallBack;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ImageWithCanvases;
+import com.logicaldoc.gui.common.client.widgets.ImageDrawingPane;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.smartgwt.client.types.ArrowStyle;
+import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.types.KnobType;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.TitleRotationMode;
 import com.smartgwt.client.widgets.Window;
+import com.smartgwt.client.widgets.drawing.CloseCommand;
+import com.smartgwt.client.widgets.drawing.DrawGroup;
+import com.smartgwt.client.widgets.drawing.DrawItem;
+import com.smartgwt.client.widgets.drawing.DrawLabel;
+import com.smartgwt.client.widgets.drawing.DrawLine;
+import com.smartgwt.client.widgets.drawing.DrawOval;
+import com.smartgwt.client.widgets.drawing.DrawRect;
+import com.smartgwt.client.widgets.drawing.DrawShape;
+import com.smartgwt.client.widgets.drawing.LineToCommand;
+import com.smartgwt.client.widgets.drawing.MoveToCommand;
+import com.smartgwt.client.widgets.drawing.Point;
+import com.smartgwt.client.widgets.drawing.events.MovedEvent;
+import com.smartgwt.client.widgets.drawing.events.MovedHandler;
+import com.smartgwt.client.widgets.drawing.events.ResizedEvent;
+import com.smartgwt.client.widgets.drawing.events.ResizedHandler;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.SpinnerItem;
+import com.smartgwt.client.widgets.form.fields.SliderItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -37,15 +58,25 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public abstract class AbstractAnnotationsWindow extends Window {
 
-	protected SpinnerItem pageCursor;
+	protected SliderItem pageCursor;
 
-	protected HLayout bottom = new HLayout();
+	protected SliderItem zoomItem;
+
+	protected VLayout bottom = new VLayout();
 
 	protected GUIDocument document;
 
-	protected ImageWithCanvases pageImage;
+	protected ImageDrawingPane pageDrawingPane;
 
+	/**
+	 * List of all the notes in all the pages
+	 */
 	protected List<GUIDocumentNote> notes = new ArrayList<GUIDocumentNote>();
+
+	/**
+	 * Map of the items in the current page
+	 */
+	protected Map<DrawItem, GUIDocumentNote> currentPageItems = new HashMap<DrawItem, GUIDocumentNote>();
 
 	protected String fileVersion = null;
 
@@ -85,7 +116,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -97,33 +128,62 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	}
 
 	protected void showAnnotations(int page) {
+		currentPageItems.clear();
 		for (GUIDocumentNote note : notes)
 			if (note.getPage() == page) {
-				Canvas noteCanvas = getAnnotationCanvas(note);
-				pageImage.addCanvas(noteCanvas);
+				DrawItem noteDrawItem = prepareAnnotationItem(note);
+				if (noteDrawItem != null) {
+					note.setShowKnobs(false);
+					pageDrawingPane.addDrawItem(noteDrawItem, false);
+					noteDrawItem.draw();
+					currentPageItems.put(noteDrawItem, note);
+				}
 			}
 	}
 
 	/**
-	 * Concrete implementations should provide a Canvas representing the passed
-	 * note
+	 * Concrete implementations should provide a DwarItem representing the
+	 * passed note
 	 * 
-	 * @param note the note to use to create the Canvas
+	 * @param note the note to use to create the DrawingItem
 	 * 
-	 * @return The Canvas displaying the note
+	 * @return The DrawItem displaying the note
 	 */
-	protected abstract Canvas getAnnotationCanvas(GUIDocumentNote note);
+	protected abstract DrawItem prepareAnnotationItem(GUIDocumentNote note);
 
 	/**
-	 * Saves the actual positions of the notes in the current page
+	 * Saves the actual positions of the notes in the current page that were
+	 * modified
 	 */
 	protected void captureNotesPosition() {
-		if (pageImage != null && pageImage.getCanvases() != null) {
-			List<Canvas> canvases = pageImage.getCanvases();
-			for (Canvas canvas : canvases) {
-				AnnotationCanvas noteCanvas = (AnnotationCanvas) canvas;
-				noteCanvas.captureNotePosition();
-			}
+		if (pageDrawingPane != null && pageDrawingPane.getDrawItems() != null) {
+			DrawItem[] items = pageDrawingPane.getDrawItems();
+			if (items != null)
+				for (DrawItem item : items) {
+					GUIDocumentNote note = currentPageItems.get(item);
+					if (note != null) {
+						if (item.getRotationAsDouble() != note.getRotation()) {
+							note.setMovedOrResized(true);
+							note.setRotation(item.getRotationAsDouble());
+						}
+
+						if (note.isMovedOrResized()) {
+							if (item instanceof DrawLine) {
+								DrawLine line = (DrawLine) item;
+								note.setLeft(line.getStartLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
+								note.setTop(line.getStartTopAsDouble() / (double) pageDrawingPane.getImageHeight());
+								note.setWidth(line.getEndLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
+								note.setHeight(line.getEndTopAsDouble() / (double) pageDrawingPane.getImageHeight());
+							} else {
+								Double[] box = item.getBoundingBoxAsDouble();							
+								note.setLeft(box[0] / (double) pageDrawingPane.getImageWidth());
+								note.setTop(box[1] / (double) pageDrawingPane.getImageHeight());
+								note.setWidth((box[2] - box[0]) / (double) pageDrawingPane.getImageWidth());
+								note.setHeight((box[3] - box[1]) / (double) pageDrawingPane.getImageHeight());
+							}
+						}
+					}
+				}
 		}
 	}
 
@@ -136,7 +196,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 				new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -146,19 +206,13 @@ public abstract class AbstractAnnotationsWindow extends Window {
 				});
 	}
 
-	public void deleteNote(GUIDocumentNote note) {
-		notes.remove(note);
-		showCurrentPage();
-	}
-
 	protected void initGUI() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 
-		ToolStripButton close = new ToolStripButton();
-		close.setTitle(I18N.message("close"));
+		ToolStripButton close = new ToolStripButton(I18N.message("close"));
 		close.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -166,39 +220,21 @@ public abstract class AbstractAnnotationsWindow extends Window {
 			}
 		});
 
-		ToolStripButton zoomIn = new ToolStripButton();
-		zoomIn.setTitle(I18N.message("zoomin"));
-		zoomIn.addClickHandler(new ClickHandler() {
+		ToolStripButton print = new ToolStripButton(I18N.message("print"));
+		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (pageImage != null) {
-					captureNotesPosition();
-					pageImage.clearCanvases();
-					pageImage.resize(100);
-					showAnnotations((Integer) pageCursor.getValue());
-				}
+				DrawItem[] items = pageDrawingPane.getDrawItems();
+				if(items!=null)
+					for (DrawItem item : items)
+						item.hideAllKnobs();
+				showPrintPreview(pageDrawingPane);
 			}
 		});
 
-		ToolStripButton zoomOut = new ToolStripButton();
-		zoomOut.setTitle(I18N.message("zoomout"));
-		zoomOut.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (pageImage != null) {
-					captureNotesPosition();
-					pageImage.clearCanvases();
-					pageImage.resize(-100);
-					showAnnotations((Integer) pageCursor.getValue());
-				}
-			}
-		});
-
-		pageCursor = ItemFactory.newSpinnerItem("page", "page", 1, 1,
-				document.getPages() > 0 ? document.getPages() : 1);
-		pageCursor.setHint("/" + (document.getPages() > 0 ? document.getPages() : 1));
-		pageCursor.setSaveOnEnter(true);
-		pageCursor.setImplicitSave(true);
+		pageCursor = ItemFactory.newSliderItem("page", "page", 1.0, 1.0,
+				document.getPages() > 0 ? document.getPages() : 1.0);
+		pageCursor.setNumValues(document.getPages() > 0 ? document.getPages() : 1);
 		pageCursor.addChangedHandler(new ChangedHandler() {
 
 			@Override
@@ -208,15 +244,32 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		});
 
 		toolStrip.addFormItem(pageCursor);
-		toolStrip.addButton(zoomIn);
-		toolStrip.addButton(zoomOut);
+
+		zoomItem = ItemFactory.newSliderItem("zoom", "zoom", 1.0, 0.1, 6.0);
+		zoomItem.setTitle(I18N.message("zoom"));
+		zoomItem.setNumValues(600);
+		zoomItem.setRoundValues(false);
+		zoomItem.setRoundPrecision(2);
+		zoomItem.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				pageDrawingPane.zoom((Double) event.getValue());
+			}
+		});
+		toolStrip.addFormItem(zoomItem);
+
 		toolStrip.addSeparator();
 
 		prepareAdditionalActions(toolStrip);
 
+		toolStrip.addButton(print);
+		toolStrip.addSeparator();
 		toolStrip.addButton(close);
 
 		addItem(toolStrip);
+
+		bottom.setOverflow(Overflow.AUTO);
 		addItem(bottom);
 
 		showPage(1);
@@ -229,8 +282,8 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 */
 	protected abstract void prepareAdditionalActions(ToolStrip toolStrip);
 
-	public ImageWithCanvases getPageImage() {
-		return pageImage;
+	public ImageDrawingPane getPageDrawingPane() {
+		return pageDrawingPane;
 	}
 
 	/**
@@ -238,13 +291,13 @@ public abstract class AbstractAnnotationsWindow extends Window {
 	 */
 	protected abstract void onNotesSaved();
 
-	void showPage(int page) {
-		if (pageImage != null) {
+	protected void showPage(int page) {
+		if (pageDrawingPane != null) {
 			captureNotesPosition();
 			bottom.removeMembers(bottom.getMembers());
 		}
 
-		pageImage = new ImageWithCanvases(getPageUrl(page), null, new CallBack() {
+		pageDrawingPane = new ImageDrawingPane(getPageUrl(page), null, new CallBack() {
 
 			@Override
 			public void onImagesLoaded(ImageElement[] imageElements) {
@@ -254,28 +307,180 @@ public abstract class AbstractAnnotationsWindow extends Window {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(GUIDocument dc) {
 							document.setPages(dc.getPages());
-							pageCursor.setMax(document.getPages());
-							pageCursor.setHint("/" + (document.getPages() > 0 ? document.getPages() : 1));
+							pageCursor.setMaxValue((double) document.getPages());
+							pageCursor.setNumValues(document.getPages());
 						}
 					});
+
 				showAnnotations(page);
+
+				// Calculate the zoom to see the complete page without scroll
+				double zoom = (double) bottom.getHeight() / (double) pageDrawingPane.getImageHeight();
+				zoomItem.setValue(zoom);
+				pageDrawingPane.zoom(zoom);
 			}
 		});
-		bottom.addMember(pageImage);
+		bottom.addMember(pageDrawingPane);
 	}
 
-	private String getPageUrl(int page) {
+	protected String getPageUrl(int page) {
 		return Util.contextPath() + "convertjpg?docId=" + document.getId() + "&fileVersion=" + fileVersion + "&page="
 				+ page + "&random=" + new Date().getTime();
 	}
 
 	protected void showCurrentPage() {
 		showPage((Integer) pageCursor.getValue());
+	}
+
+	/**
+	 * Factory method to create the proper item for drawing an annotation
+	 * 
+	 * @param note The annotation to show
+	 * @param drawingPane the drawing panel
+	 * 
+	 * @return the proper item
+	 */
+	protected DrawItem newAnnotationItem(GUIDocumentNote note) {
+		double left = (note.getLeft() * (double) pageDrawingPane.getImageWidth());
+		double top = (note.getTop() * (double) pageDrawingPane.getImageHeight());
+		double width = (note.getWidth() * (double) pageDrawingPane.getImageWidth());
+		double height = (note.getHeight() * (double) pageDrawingPane.getImageHeight());
+
+		final DrawItem drawItem;
+
+		if (note.getShape() == null || note.getShape().isEmpty() || "square".equals(note.getShape())) {
+			DrawRect square = new DrawRect();
+			square.setLeft((int) Math.round(left));
+			square.setTop((int) Math.round(top));
+			square.setWidth((int) Math.round(width));
+			square.setHeight((int) Math.round(height));
+			drawItem = square;
+		} else if ("circle".equals(note.getShape())) {
+			DrawOval circle = new DrawOval();
+			circle.setLeft((int) Math.round(left));
+			circle.setTop((int) Math.round(top));
+			circle.setWidth((int) Math.round(width));
+			circle.setHeight((int) Math.round(height));
+			drawItem = circle;
+		} else if ("line".equals(note.getShape()) || "arrow".equals(note.getShape())) {
+			DrawLine line = new DrawLine();
+			line.setStartLeft((int) Math.round(left));
+			line.setStartTop((int) Math.round(top));
+			line.setEndLeft((int) Math.round(width));
+			line.setEndTop((int) Math.round(height));
+			if ("arrow".equals(note.getShape()))
+				line.setEndArrow(ArrowStyle.OPEN);
+			drawItem = line;
+		} else if ("label".equals(note.getShape())) {
+			DrawLabel label = new DrawLabel();
+			label.setLeft((int) Math.round(left));
+			label.setTop((int) Math.round(top));
+			label.setFontSize(note.getLineWidth() > 5 ? note.getLineWidth() : 25);
+			label.setFontFamily("Arial, Helvetica, sans-serif");
+			label.setContents(Util.strip(note.getMessage()));
+			drawItem = label;
+		} else if ("thickarrow".equals(note.getShape())) {
+			int virtualPixelWidth = (int) Math.round(width / 10);
+			int virtualPixelHeight = (int) Math.round(height / 10);
+
+			DrawShape shape = new DrawShape();
+			shape.setCommands(new MoveToCommand(new Point(left, top + 3d * virtualPixelHeight)),
+					new LineToCommand(new Point(left + 7d * virtualPixelWidth, top + 3d * virtualPixelHeight),
+							new Point(left + 7d * virtualPixelWidth, top + 2d * virtualPixelHeight),
+							new Point(left + width, top + (height / 2d)),
+							new Point(left + 7d * virtualPixelWidth, top + 8d * virtualPixelHeight),
+							new Point(left + 7d * virtualPixelWidth, top + 7d * virtualPixelHeight),
+							new Point(left, top + 7d * virtualPixelHeight)),
+					new CloseCommand());
+			drawItem = shape;
+		} else if ("comment".equals(note.getShape())) {
+			int virtualPixelWidth = (int) Math.round(width / 10);
+			int virtualPixelHeight = (int) Math.round(height / 10);
+
+			DrawShape shape = new DrawShape();
+			shape.setCommands(new MoveToCommand(new Point(left, top)),
+					new LineToCommand(new Point(left + width, top),
+							new Point(left + width, top + 8d * virtualPixelHeight),
+							new Point(left + 6d * virtualPixelWidth, top + 8d * virtualPixelHeight),
+							new Point(left + 4d * virtualPixelWidth, top + height),
+							new Point(left + 4d * virtualPixelWidth, top + 8d * virtualPixelHeight),
+							new Point(left, top + 8d * virtualPixelHeight), new Point(left, top)),
+					new CloseCommand());
+			drawItem = shape;
+		} else
+			return null;
+
+		if (!(drawItem instanceof DrawLine)) {
+			drawItem.setFillColor(note.getColor());
+			drawItem.setFillOpacity((float) note.getOpacity() / 100.0f);
+		}
+
+		drawItem.setCursor(Cursor.HAND);
+		drawItem.setCanHover(true);
+		drawItem.setLineColor(note.getLineColor());
+		drawItem.setLineWidth(note.getLineWidth());
+		drawItem.setLineOpacity((float) note.getLineOpacity() / 100.0f);
+		drawItem.setShowResizeOutline(false);
+		drawItem.setKeepInParentRect(true);
+		drawItem.setTitleAutoFit(true);
+		drawItem.setTitleRotationMode(TitleRotationMode.NEVER_ROTATE);
+		drawItem.setPrompt(note.getMessage());
+		drawItem.setRotation(note.getRotation());
+
+		if (!(drawItem instanceof DrawLabel))
+			drawItem.setTitle(Util.strip(note.getMessage()));
+
+		if (note.isShowKnobs())
+			showKnowbs(drawItem);
+
+		drawItem.addMovedHandler(new MovedHandler() {
+
+			@Override
+			public void onMoved(MovedEvent event) {
+				note.setMovedOrResized(true);
+			}
+		});
+		drawItem.addResizedHandler(new ResizedHandler() {
+
+			@Override
+			public void onResized(ResizedEvent event) {
+				note.setMovedOrResized(true);
+			}
+		});
+
+		return drawItem;
+	}
+
+	/**
+	 * Shows the knobs to edit an item
+	 * 
+	 * @param drawItem the item to process
+	 */
+	public static void showKnowbs(DrawItem drawItem) {
+		drawItem.setCanDrag(true);
+		if (drawItem instanceof DrawRect || drawItem instanceof DrawShape || drawItem instanceof DrawGroup)
+			drawItem.showKnobs(KnobType.RESIZE, KnobType.ROTATE);
+		else if (drawItem instanceof DrawOval)
+			drawItem.showKnobs(KnobType.RESIZE);
+		else if (drawItem instanceof DrawLabel)
+			drawItem.showKnobs(KnobType.ROTATE);
+		else if (drawItem instanceof DrawLine)
+			drawItem.showKnobs(KnobType.STARTPOINT, KnobType.ENDPOINT);
+	}
+
+	/**
+	 * Hides the knobs to edit an item
+	 * 
+	 * @param drawItem the item to process
+	 */
+	public static void hideKnowbs(DrawItem drawItem) {
+		drawItem.setCanDrag(false);
+		drawItem.hideAllKnobs();
 	}
 }

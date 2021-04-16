@@ -59,7 +59,7 @@ public interface DocumentHistoryDAO extends PersistentObjectDAO<DocumentHistory>
 	 * 
 	 * @param max Optional maximum number of records
 	 * 
-	 * @return list of histories
+	 * @return list of histories ordered by date asc
 	 */
 	public List<DocumentHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max);

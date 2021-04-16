@@ -6,7 +6,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.MenusDS;
 import com.logicaldoc.gui.common.client.formatters.I18NCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
@@ -85,11 +85,11 @@ public class MenusPanel extends VLayout {
 				Record record = menus.getSelectedRecord();
 				if (record != null)
 					SecurityService.Instance.get().getMenu(Long.parseLong(record.getAttributeAsString("id")),
-							new AsyncCallback<GUIMenu>() {
+							I18N.getLocale(), new AsyncCallback<GUIMenu>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -135,7 +135,7 @@ public class MenusPanel extends VLayout {
 
 	public void showRights(GUIMenu menu) {
 		rightsContainer.removeMember(rights);
-		rights = new MenuRightsPanel(menu);
+		rights = new MenuRightsPanel(menu, true);
 		rightsContainer.addMember(rights);
 	}
 }

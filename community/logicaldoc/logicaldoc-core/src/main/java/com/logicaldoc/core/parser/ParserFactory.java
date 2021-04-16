@@ -15,6 +15,7 @@ import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.parser.wordperfect.WordPerfectParser;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
@@ -96,7 +97,7 @@ public class ParserFactory {
 		parsers.put("txt", new TXTParser());
 		parsers.put("csv", new TXTParser());
 		parsers.put("dbf", new TXTParser());
-		
+
 		parsers.put("xml", new XMLParser());
 		parsers.put("xls", new XLSParser());
 		parsers.put("xlt", new XLSParser());
@@ -144,15 +145,17 @@ public class ParserFactory {
 	 * @param encoding encoding of the stream
 	 * @param locale the locale
 	 * @param tenantId identifier of the tenant
+	 * @param document the document the file belongs to (optional)
+	 * @param fileVersion the file version being processed (optional)
 	 * 
 	 * @return the text extracted from the input
 	 */
-	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId) {
+	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId, Document document, String fileVersion) {
 		Parser parser = getParser(filename);
 		if (parser != null) {
 			TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			Tenant t = dao.findById(tenantId);
-			return parser.parse(input, filename, encoding, locale, t != null ? t.getName() : Tenant.DEFAULT_NAME);
+			return parser.parse(input, filename, encoding, locale, t != null ? t.getName() : Tenant.DEFAULT_NAME, document, fileVersion);
 		} else
 			return "";
 	}
@@ -184,8 +187,8 @@ public class ParserFactory {
 		}
 
 		if (parser == null) {
-			log.warn("Unable to find a parser for extension {}", ext);
-			parser = new DummyParser();
+			log.warn("Unable to find a specific parser for extension {}", ext);
+			parser = new CatchAllParser();
 		}
 
 		return parser;

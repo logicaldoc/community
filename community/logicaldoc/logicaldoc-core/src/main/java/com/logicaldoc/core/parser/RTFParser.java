@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -34,7 +35,8 @@ public class RTFParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(RTFParser.class);
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			Document document, String fileVersion, StringBuffer content) {
 		try {
 			BufferedInputStream bis0 = new BufferedInputStream(input);
 			bis0.mark(Integer.MAX_VALUE);

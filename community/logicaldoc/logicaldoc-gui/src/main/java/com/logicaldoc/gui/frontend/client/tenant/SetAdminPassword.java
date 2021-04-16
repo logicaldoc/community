@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.tenant;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
@@ -85,7 +85,7 @@ public class SetAdminPassword extends Window {
 								public void onSuccess(Void arg) {
 									apply.setDisabled(false);
 									SetAdminPassword.this.destroy();
-									Log.info(I18N.message("event.user.passwordchanged"), null);
+									GuiLog.info(I18N.message("event.user.passwordchanged"), null);
 								}
 							});
 				}

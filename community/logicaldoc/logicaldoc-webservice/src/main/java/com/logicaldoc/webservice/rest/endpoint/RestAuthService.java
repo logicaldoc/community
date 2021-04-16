@@ -22,10 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.logicaldoc.webservice.rest.AuthService;
 import com.logicaldoc.webservice.soap.endpoint.SoapAuthService;
 
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/")
-@Api(value = "author")
+@Tag(name = "author")
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestAuthService extends SoapAuthService implements AuthService {
@@ -41,13 +41,13 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	}
 
 	@GET
-	@Path("/login")
+    @Path("/login")
 	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) throws Exception {
 		return super.login(username, password);
 	}
 
 	@POST
-	@Path("/login")
+    @Path("/login")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public String loginPost(@FormParam("username") String username, @FormParam("password") String password)
 			throws Exception {
@@ -55,8 +55,8 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	}
 
 	@POST
-	@Path("/login")
-	@Consumes(MediaType.APPLICATION_JSON)
+    @Path("/login")
+	@Consumes(MediaType.APPLICATION_JSON)	
 	public String loginPostJSON(String jsonstr) throws Exception {
 		log.debug("loginPostJSON({})", jsonstr);
 
@@ -72,7 +72,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	}
 
 	@DELETE
-	@Path("/logout")
+    @Path("/logout")
 	public void logout(@QueryParam("sid") String sid) {
 		log.debug("logout({})", sid);
 		if (sid != null)
@@ -80,7 +80,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	}
 
 	@GET
-	@Path("/getSid")
+    @Path("/getSid")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
 	public String getSid() {
 		return getCurrentSessionId();

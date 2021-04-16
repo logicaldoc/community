@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 /**
  * The client side stub for the Security Service. This service gives all needed
@@ -36,11 +37,12 @@ public interface SecurityService extends RemoteService {
 	 * @param oldPassword can be null
 	 * @param newPassword the new password
 	 * @param notify If the new credentials have to be notified
-	 * @return 0 if all is ok, 1 if the password is incorrect, 2 if the new
-	 *         password cannot be notified, otherwise a positive number grater
-	 *         than 2
+	 * 
+	 * @return the error code and message. 0 if all went ok, 1 if the password is incorrect, 2 if the new
+	 *         password cannot be notified, 3 if the password has been already used, otherwise a positive number grater
+	 *         than 3
 	 */
-	public int changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
+	public GUIValue changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
 			boolean notify);
 
 	/**
@@ -72,15 +74,18 @@ public interface SecurityService extends RemoteService {
 	/**
 	 * Replicates the settings of a given user to a selection of other users
 	 * 
-	 * @param masterUserId identifier of the user with the settings you want to replicate
+	 * @param masterUserId identifier of the user with the settings you want to
+	 *        replicate
 	 * @param userIds identifiers of the users to replicate the settings to
 	 * @param gui if the user interface settings must be replicated
-	 * @param groups if the groups must be replicated(the read-only users will not be affected by this flag)
+	 * @param groups if the groups must be replicated(the read-only users will
+	 *        not be affected by this flag)
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public void replicateUsersSettings(long masterUserId, Long[] userIds, boolean gui, boolean groups) throws ServerException;
-	
+	public void replicateUsersSettings(long masterUserId, Long[] userIds, boolean gui, boolean groups)
+			throws ServerException;
+
 	/**
 	 * Saves the profile data only
 	 * 
@@ -102,7 +107,7 @@ public interface SecurityService extends RemoteService {
 	 * @throws ServerException error generated in the server application
 	 */
 	public GUIUser saveInterfaceSettings(GUIUser user) throws ServerException;
-	
+
 	/**
 	 * Loads a given user from the database
 	 * 
@@ -207,12 +212,57 @@ public interface SecurityService extends RemoteService {
 	 * Retrieves the specified menu
 	 * 
 	 * @param id identifier of the menu
+	 * @param locale currently selected locale
 	 * 
 	 * @return the menu retrieved from the server application
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public GUIMenu getMenu(long id) throws ServerException;
+	public GUIMenu getMenu(long id, String locale) throws ServerException;
+
+	/**
+	 * Retrieves the accessible menus children of a given parent
+	 * 
+	 * @param parentId identifier of the parent menu
+	 * @param locale currently selected locale
+	 * @param enabledOnly to retrieve just the enabled menus
+	 * 
+	 * @return the accessible children
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public GUIMenu[] getMenus(long parentId, String locale, boolean enabledOnly) throws ServerException;
+
+	/**
+	 * Saves a set of menus
+	 * 
+	 * @param menus the menus to save
+	 * @param locale currently selected locale
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void saveMenus(GUIMenu[] menus, String locale) throws ServerException;
+
+	/**
+	 * Saves a menu
+	 * 
+	 * @param menu the menu to save
+	 * @param locale currently selected locale
+	 * 
+	 * @returns the saved menu
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public GUIMenu saveMenu(GUIMenu menu, String locale) throws ServerException;
+
+	/**
+	 * Deletes a menu but only if is not a legacy menu (type not 0)
+	 * 
+	 * @param menuId the menu to delete
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void deleteMenu(long menuId) throws ServerException;
 
 	/**
 	 * Searches for users
@@ -244,6 +294,63 @@ public interface SecurityService extends RemoteService {
 	 * @throws ServerException error generated in the server application
 	 */
 	public void removeBlockedEntities(long[] id) throws ServerException;
+
+	/**
+	 * Permanently trusts the current device for the current user
+	 * 
+	 * @return the ID of the trusted device
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public String trustDevice() throws ServerException;
+
+	/**
+	 * Check if the saved device ID is trusted for the current user
+	 * 
+	 * @param device identifier of the device
+	 * 
+	 * @return if the device is trusted or not
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public Boolean isTrustedDevice(String device) throws ServerException;
+
+	/**
+	 * Deletes a set of trusted devices for the current user
+	 * 
+	 * @param deviceIds identifiers of the devices to delete
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void deleteTrustedDevices(String[] deviceIds) throws ServerException;
+
+	/**
+	 * Downloads the most recent version of the Geolocation database
+	 * 
+	 * @key the API key
+	 * @return the current database version
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public String syncGeolocationDB(String key) throws ServerException;
+
+	/**
+	 * Saves an uploaded image as the user's avatar
+	 * 
+	 * @param userId Identifier of the user
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	void saveAvatar(long userId) throws ServerException;
+
+	/**
+	 * Resets tha avatar to the default one
+	 * 
+	 * @param userId Identifier of the user
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	void resetAvatar(long userId) throws ServerException;
 
 	public static class Instance {
 		private static SecurityServiceAsync instance;

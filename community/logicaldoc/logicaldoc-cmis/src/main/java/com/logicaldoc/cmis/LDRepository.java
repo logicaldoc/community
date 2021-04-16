@@ -193,6 +193,7 @@ public class LDRepository {
 	private DocumentDAO documentDao;
 
 	private DocumentHistoryDAO historyDao;
+
 	private FolderHistoryDAO folderHistoryDao;
 
 	private TemplateDAO templateDao;
@@ -879,7 +880,7 @@ public class LDRepository {
 	}
 
 	public void checkOut(Holder<String> objectId, Holder<Boolean> contentCopied) {
-		//debug("checkOut " + objectId.getValue());
+		// debug("checkOut " + objectId.getValue());
 		log.debug("checkOut {}", objectId);
 		validatePermission(objectId.getValue(), null, Permission.WRITE);
 
@@ -945,7 +946,7 @@ public class LDRepository {
 
 	public void checkIn(Holder<String> objectId, Boolean major, ContentStream contentStream, Properties properties,
 			String checkinComment) {
-		//debug("checkin " + objectId);
+		// debug("checkin " + objectId);
 		log.debug("checkin {}", objectId);
 		validatePermission(objectId.getValue(), null, Permission.WRITE);
 
@@ -1168,7 +1169,10 @@ public class LDRepository {
 			transaction.setDocId(doc.getId());
 			transaction.setVersion(doc.getVersion());
 			transaction.setFilename(doc.getFileName());
+			transaction.setFileSize(doc.getFileSize());
 			transaction.setNotified(0);
+			if (doc instanceof Document)
+				transaction.setDocument((Document) doc);
 
 			if (doc instanceof Document) {
 				transaction.setFolderId(doc.getFolder().getId());
@@ -1197,7 +1201,6 @@ public class LDRepository {
 			return (ContentStream) catchError(t);
 		}
 	}
-
 
 	private Object catchError(Throwable t) {
 		if (t instanceof CmisObjectNotFoundException)
@@ -2503,7 +2506,7 @@ public class LDRepository {
 			// create principal
 //			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl();
 //			principal.setPrincipalId(ue.getKey());
-			
+
 			// create principal
 			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl(ue.getKey());
 
@@ -2678,7 +2681,7 @@ public class LDRepository {
 	}
 
 	private void debug(String msg) {
-		//debug(msg, null);
+		// debug(msg, null);
 		log.debug("<{}> {}", id, msg);
 	}
 
@@ -2741,11 +2744,12 @@ public class LDRepository {
 		this.templateDao = templateDao;
 	}
 
-	public ObjectList getContentChangesXXXX(Holder<String> changeLogToken, int max) throws CmisPermissionDeniedException {
-		
+	public ObjectList getContentChangesXXXX(Holder<String> changeLogToken, int max)
+			throws CmisPermissionDeniedException {
+
 		if (changeLogToken == null)
 			throw new CmisInvalidArgumentException("Missing change log token holder");
-		
+
 		long minDate;
 
 		try {
@@ -2787,7 +2791,7 @@ public class LDRepository {
 		for (DocumentHistory logEntry : entries) {
 			ObjectDataImpl od = new ObjectDataImpl();
 			ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
-			
+
 			// change type
 			String eventId = logEntry.getEvent();
 			ChangeType changeType;
@@ -2803,14 +2807,14 @@ public class LDRepository {
 				continue;
 			}
 			cei.setChangeType(changeType);
-			
+
 			// change time
 			GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
 			date = logEntry.getDate();
 			changeTime.setTime(date);
 			cei.setChangeTime(changeTime);
 			od.setChangeEventInfo(cei);
-			
+
 			// properties: id, doc type
 			PropertiesImpl properties = new PropertiesImpl();
 			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, ID_PREFIX_DOC + logEntry.getDocId()));
@@ -2827,14 +2831,14 @@ public class LDRepository {
 
 		return ol;
 	}
-	
+
 	public ObjectList getContentChanges(Holder<String> changeLogToken, int max) throws CmisPermissionDeniedException {
-		
+
 		log.debug("getContentChanges {}", changeLogToken.getValue());
-		
-		if (changeLogToken == null) 
+
+		if (changeLogToken == null)
 			throw new CmisInvalidArgumentException("Missing change log token holder");
-		
+
 		long minDate;
 
 		try {
@@ -2842,22 +2846,22 @@ public class LDRepository {
 		} catch (NumberFormatException e) {
 			throw new CmisInvalidArgumentException("Invalid change log token");
 		}
-		
+
 		ObjectListImpl ol = new ObjectListImpl();
-		
+
 		List<ObjectData> odsDocs = getDocumentLastChanges(minDate, max);
 		List<ObjectData> odsFolders = getFolderLastChanges(minDate, max);
-		
-		//put together the 2 lists
+
+		// put together the 2 lists
 		List<ObjectData> complex = new ArrayList<ObjectData>();
 		complex.addAll(odsDocs);
 		complex.addAll(odsFolders);
-		
+
 //	    log.debug("Before sort");
 //	    for (ObjectData objectData : complex) {
 //	    	log.debug("ChangeTime {}", objectData.getChangeEventInfo().getChangeTime().getTime());
 //		}		
-		
+
 		// sort the content of list complex by date
 		Collections.sort(complex, new Comparator<ObjectData>() {
 			public int compare(ObjectData o1, ObjectData o2) {
@@ -2865,26 +2869,26 @@ public class LDRepository {
 						.compareTo(o2.getChangeEventInfo().getChangeTime().getTime());
 			}
 		});
-		
+
 //	    log.debug("After sort");
 //	    for (ObjectData objectData : complex) {
 //	    	log.debug("ChangeTime {} {} {} {}", objectData.getChangeEventInfo().getChangeType(), objectData.getId() ,objectData.getChangeEventInfo().getChangeTime().getTime(), objectData.getChangeEventInfo().getChangeTime().getTime().getTime());
 //		}
-	    
-	    boolean hasMoreItems = complex.size() > max;
-        if (hasMoreItems) {
-        	complex = complex.subList(0, max);
-        }
+
+		boolean hasMoreItems = complex.size() > max;
+		if (hasMoreItems) {
+			complex = complex.subList(0, max);
+		}
 
 		ol.setObjects(complex);
-		
+
 		Date date = null;
 		if (complex.size() > 0) {
-			//ol.setNumItems(BigInteger.valueOf(complex.size()));
+			// ol.setNumItems(BigInteger.valueOf(complex.size()));
 			ol.setNumItems(BigInteger.valueOf(-1));
-			//ol.setHasMoreItems(true);
+			// ol.setHasMoreItems(true);
 			ol.setHasMoreItems(Boolean.valueOf(hasMoreItems));
-			date = ((ObjectData)complex.get(complex.size() -1)).getChangeEventInfo().getChangeTime().getTime();
+			date = ((ObjectData) complex.get(complex.size() - 1)).getChangeEventInfo().getChangeTime().getTime();
 // 			log.debug("date {}", date);
 // 			log.debug("date.getTime {}", date.getTime());
 		} else {
@@ -2898,9 +2902,9 @@ public class LDRepository {
 
 		return ol;
 	}
-	
+
 	public List<ObjectData> getDocumentLastChanges(long minDate, int max) {
-		
+
 		StringBuffer query = new StringBuffer(" _entity.tenantId=?1 and _entity.date >= ?2 ");
 		query.append(" and _entity.event in ('");
 		query.append(DocumentEvent.STORED);
@@ -2908,7 +2912,7 @@ public class LDRepository {
 		query.append(DocumentEvent.CHECKEDIN);
 		query.append("','");
 		query.append(DocumentEvent.MOVED);
-		query.append("','");		
+		query.append("','");
 		query.append(DocumentEvent.RENAMED);
 		query.append("','");
 		query.append(DocumentEvent.DELETED);
@@ -2928,7 +2932,7 @@ public class LDRepository {
 		for (DocumentHistory logEntry : entries) {
 			ObjectDataImpl od = new ObjectDataImpl();
 			ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
-			
+
 			// change type
 			String eventId = logEntry.getEvent();
 			ChangeType changeType;
@@ -2944,14 +2948,14 @@ public class LDRepository {
 				continue;
 			}
 			cei.setChangeType(changeType);
-			
+
 			// change time
 			GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
 			date = logEntry.getDate();
 			changeTime.setTime(date);
 			cei.setChangeTime(changeTime);
 			od.setChangeEventInfo(cei);
-			
+
 			// properties: id, doc type
 			PropertiesImpl properties = new PropertiesImpl();
 			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, ID_PREFIX_DOC + logEntry.getDocId()));
@@ -2961,10 +2965,9 @@ public class LDRepository {
 		}
 		return ods;
 	}
-	
-	
+
 	public List<ObjectData> getFolderLastChanges(long minDate, int max) {
-		
+
 		StringBuffer query = new StringBuffer(" _entity.tenantId=?1 and _entity.date >= ?2 ");
 		query.append(" and _entity.event in ('");
 		query.append(FolderEvent.CREATED);
@@ -2972,7 +2975,7 @@ public class LDRepository {
 		query.append(FolderEvent.RENAMED);
 		query.append("','");
 		query.append(FolderEvent.MOVED);
-		query.append("','");		
+		query.append("','");
 		query.append(FolderEvent.DELETED);
 		query.append("')");
 
@@ -2990,13 +2993,13 @@ public class LDRepository {
 		for (FolderHistory logEntry : entries) {
 			ObjectDataImpl od = new ObjectDataImpl();
 			ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
-			
+
 			// change type
 			String eventId = logEntry.getEvent();
 			ChangeType changeType;
 			if (FolderEvent.CREATED.toString().equals(eventId)) {
 				changeType = ChangeType.CREATED;
-			} else if (FolderEvent.RENAMED.toString().equals(eventId) || FolderEvent.MOVED.toString().equals(eventId) ) {
+			} else if (FolderEvent.RENAMED.toString().equals(eventId) || FolderEvent.MOVED.toString().equals(eventId)) {
 				changeType = ChangeType.UPDATED;
 			} else if (FolderEvent.DELETED.toString().equals(eventId)) {
 				changeType = ChangeType.DELETED;
@@ -3004,14 +3007,14 @@ public class LDRepository {
 				continue;
 			}
 			cei.setChangeType(changeType);
-			
+
 			// change time
 			GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
 			date = logEntry.getDate();
 			changeTime.setTime(date);
 			cei.setChangeTime(changeTime);
 			od.setChangeEventInfo(cei);
-			
+
 			// properties: id, doc type
 			PropertiesImpl properties = new PropertiesImpl();
 			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, ID_PREFIX_FLD + logEntry.getFolderId()));
@@ -3020,7 +3023,7 @@ public class LDRepository {
 			ods.add(od);
 		}
 		return ods;
-	}	
+	}
 
 	public Folder getRoot() {
 		return root;

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.5.2</version>
+		<version>8.6.1</version>
 	</parent>
 	<artifactId>logicaldoc-util</artifactId>
 	<name>logicaldoc-util</name>
@@ -60,6 +60,11 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

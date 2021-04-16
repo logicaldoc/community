@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
 
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -22,25 +24,38 @@ import com.logicaldoc.core.security.SessionManager;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
  */
-public class LDAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 	private static Logger log = LoggerFactory.getLogger(LDAuthenticationSuccessHandler.class);
 
 	private static final String PARAM_SUCCESSURL = "j_successurl";
 
+	private static RequestCache myCache = new HttpSessionRequestCache();
+	
+	public LDAuthenticationSuccessHandler() {
+		setRequestCache(myCache);
+	}
+	
+	
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws IOException, ServletException {
-		String param = request.getParameter(PARAM_SUCCESSURL);
 		
+		/*
+		 * Deduct the destination URL
+		 */
+		String requestedUrl = request.getParameter(PARAM_SUCCESSURL);
+		if(requestedUrl==null && request.getSession(false)!=null)
+			request.getSession(false).removeAttribute(LDAccessDecisionManager.REQUESTED_URL);
+			
 		LDAuthenticationToken token = (LDAuthenticationToken) authentication;
 		
 		Cookie sidCookie = new Cookie(LDAuthenticationToken.COOKIE_SID, token.getSid());
 		sidCookie.setHttpOnly(true);
 		response.addCookie(sidCookie);
 
-		if (param != null) {
-			StringBuffer successUrl = new StringBuffer(param);
-			if (param.indexOf('?') != -1)
+		if (requestedUrl != null) {
+			StringBuffer successUrl = new StringBuffer(requestedUrl);
+			if (requestedUrl.indexOf('?') != -1)
 				successUrl.append("&");
 			else
 				successUrl.append("?");

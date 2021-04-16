@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.settings.messages;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
@@ -85,7 +85,7 @@ public class MessageTemplatesPanel extends VLayout {
 				langSelector.setValue("en");
 				TextItem item = ItemFactory.newSimpleTextItem("name", "", null);
 				item.setRequired(true);
-				LD.askforValue(I18N.message("newmessagetemplate"), I18N.message("name"), null, item,
+				LD.askForValue(I18N.message("newmessagetemplate"), I18N.message("name"), null, item,
 						new ValueCallback() {
 							@Override
 							public void execute(String value) {
@@ -237,12 +237,12 @@ public class MessageTemplatesPanel extends VLayout {
 		MessageService.Instance.get().saveTemplates(templates, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void arg0) {
-				Log.info(I18N.message("settingssaved"), null);
+				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
 	}
@@ -265,7 +265,7 @@ public class MessageTemplatesPanel extends VLayout {
 				MessageService.Instance.get().deleteTemplates(ids, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -284,7 +284,7 @@ public class MessageTemplatesPanel extends VLayout {
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -308,7 +308,7 @@ public class MessageTemplatesPanel extends VLayout {
 		MessageService.Instance.get().loadTemplates(lang, null, new AsyncCallback<GUIMessageTemplate[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

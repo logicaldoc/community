@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client.util;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.Constants;
@@ -22,13 +24,7 @@ import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.EventPanel;
-import com.logicaldoc.gui.common.client.log.Log;
-import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.RecordList;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.grid.ListGrid;
-import com.smartgwt.client.widgets.grid.ListGridField;
 
 public class Util {
 	public static String[] OFFICE_EXTS = new String[] { ".doc", ".xls", ".xlsm", ".ppt", ".docx", ".docxm", ".dotm",
@@ -224,20 +220,81 @@ public class Util {
 		return imagePrefix() + imageName;
 	}
 
+	public static String fileNameIcon(String iconName, int size) {
+		if (!iconName.toLowerCase().endsWith(".png"))
+			iconName += ".png";
+		return "<img class='filenameIcon' src='" + imageUrl(iconName) + "' width='" + size + "px' height='" + size
+				+ "px' />";
+	}
+
+	public static String iconWithFilename(String iconName, String fileName) {
+		return "<div class='box'>" + fileNameIcon(iconName, 16) + " " + fileName + "</div>";
+	}
+
+	public static String avatarWithText(String userIdOrName, String text) {
+		return "<div class='box'>" + avatarImg(userIdOrName, 16) + " " + text + "</div>";
+	}
+
+	public static String avatarWithText(Long userId, String text) {
+		return "<div class='box'>" + avatarImg(userId != null ? "" + userId : "0", 16) + " " + text + "</div>";
+	}
+
+	public static String textWithAvatar(Long userId, String text) {
+		return "<div class='box'>" + text + " " + avatarImg(userId != null ? "" + userId : "0", 16) + "</div>";
+	}
+
+	public static String avatarImg(Long userId, int size) {
+		return avatarImg(userId != null ? "" + userId : "0", size);
+	}
+
+	public static String avatarImg(String userIdOrName, int size) {
+		String url = avatarUrl(userIdOrName != null ? "" + userIdOrName : "0", false);
+		return "<img class='avatarIcon' src='" + url + "' width='" + size + "px' height='" + size + "px' />";
+	}
+
+	public static String avatarUrl(long userId) {
+		return avatarUrl("" + userId, false);
+	}
+
+	public static String avatarUrl(String userIdOrName) {
+		return avatarUrl(userIdOrName, false);
+	}
+
+	public static String avatarUrl(String userIdOrName, boolean avoidCaching) {
+		String url = GWT.getHostPageBaseURL() + "avatar?userId=" + userIdOrName.trim()
+				+ (avoidCaching ? "&random=" + new Date().getTime() : "");
+		return url;
+	}
+
 	public static String licenseUrl() {
 		return contextPath() + "license";
 	}
 
 	public static String websocketUrl() {
 		String url = contextPath() + "wk-event";
-		return "ws" + url.substring(url.indexOf(':'));
+		if (url.toLowerCase().startsWith("https"))
+			return "wss" + url.substring(url.indexOf(':'));
+		else
+			return "ws" + url.substring(url.indexOf(':'));
 	}
 
 	public static String strip(String src) {
 		if (src == null)
 			return null;
 		else
-			return src.replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+			return src.replaceAll("\\<.*?\\>", "").replaceAll("&nbsp;", " ");
+	}
+
+	public static String toString(Object[] elements) {
+		if (elements == null || elements.length == 0)
+			return null;
+		try {
+			String str = Arrays.asList(elements).toString();
+			return str.substring(1, str.length() - 1);
+		} catch (Throwable t) {
+
+			return null;
+		}
 	}
 
 	public static String contextPath() {
@@ -247,7 +304,7 @@ public class Util {
 		return url;
 	}
 
-	private static String currentSkin() {
+	public static String currentSkin() {
 		String skin = null;
 		try {
 			if (Session.get() != null && Session.get().getInfo() != null
@@ -260,7 +317,7 @@ public class Util {
 		}
 
 		if (skin == null)
-			skin = "Simplicity";
+			skin = "Tahoe";
 		return skin;
 	}
 
@@ -701,118 +758,6 @@ public class Util {
 	}
 
 	/**
-	 * Exports into the CSV format the content of a ListGrid.
-	 * 
-	 * @param listGrid Grid containing the data
-	 * @param allFields True if all the fields(even if hidden) have to be
-	 *        extracted
-	 */
-	public static void exportCSV(ListGrid listGrid, boolean allFields) {
-		StringBuilder stringBuilder = new StringBuilder(); // csv data in here
-
-		// column names
-		ListGridField[] fields = listGrid.getFields();
-		if (allFields)
-			fields = listGrid.getAllFields();
-		for (int i = 0; i < fields.length; i++) {
-			ListGridField listGridField = fields[i];
-			if (listGridField.getType().equals(ListGridFieldType.ICON)
-					|| listGridField.getType().equals(ListGridFieldType.IMAGE)
-					|| listGridField.getType().equals(ListGridFieldType.IMAGEFILE)
-					|| listGridField.getType().equals(ListGridFieldType.BINARY) || "".equals(listGridField.getTitle())
-					|| "&nbsp;".equals(listGridField.getTitle()))
-				continue;
-
-			stringBuilder.append("\"");
-			stringBuilder.append(listGridField.getTitle());
-			stringBuilder.append("\";");
-		}
-		stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove last
-																// ";"
-		stringBuilder.append("\n");
-
-		// column data
-		Record[] records = new Record[0];
-		try {
-			records = listGrid.getRecords();
-		} catch (Throwable t) {
-		}
-
-		if (records == null || records.length < 1) {
-			/*
-			 * In case of data bound grid, we need to call the original records
-			 * list
-			 */
-			RecordList buf = listGrid.getOriginalRecordList();
-			if (buf != null) {
-				records = new Record[buf.getLength()];
-				for (int i = 0; i < records.length; i++)
-					records[i] = buf.get(i);
-			}
-		}
-
-		for (int i = 0; i < records.length; i++) {
-			Record record = records[i];
-
-			for (int j = 0; j < fields.length; j++) {
-				try {
-					ListGridField listGridField = fields[j];
-					if (listGridField.getType().equals(ListGridFieldType.ICON)
-							|| listGridField.getType().equals(ListGridFieldType.IMAGE)
-							|| listGridField.getType().equals(ListGridFieldType.IMAGEFILE)
-							|| listGridField.getType().equals(ListGridFieldType.BINARY)
-							|| "".equals(listGridField.getTitle()) || "&nbsp;".equals(listGridField.getTitle()))
-						continue;
-
-					stringBuilder.append("\"");
-					if (listGridField.getType().equals(ListGridFieldType.DATE)) {
-						Date val = record.getAttributeAsDate(listGridField.getName());
-						stringBuilder.append(val == null ? "" : I18N.formatDateShort(val));
-					} else {
-						Object val = record.getAttribute(listGridField.getName());
-						stringBuilder.append(val == null || "null".equals(val.toString()) ? "" : val.toString());
-					}
-					stringBuilder.append("\";");
-				} catch (Throwable t) {
-					/*
-					 * May be that not all the rows are available, since we can
-					 * count just on the rows that were rendered.
-					 */
-				}
-			}
-			stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove
-																	// last ";"
-			stringBuilder.append("\n");
-		}
-		String content = stringBuilder.toString();
-
-		/*
-		 * Now post the CSV content to the server
-		 */
-		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
-				Util.contextPath().endsWith("/") ? Util.contextPath() + "csv" : Util.contextPath() + "/csv");
-		builder.setHeader("Content-type", "application/csv");
-
-		try {
-			builder.sendRequest(content, new RequestCallback() {
-				public void onError(Request request, Throwable exception) {
-					Log.error(exception.getMessage(), null, exception);
-				}
-
-				public void onResponseReceived(Request request, Response response) {
-					/*
-					 * Now we can download the complete file
-					 */
-					WindowUtils.openUrl(GWT.getHostPageBaseURL().endsWith("/") ? GWT.getHostPageBaseURL() + "csv"
-							: GWT.getHostPageBaseURL() + "/csv");
-				}
-			});
-		} catch (RequestException e) {
-			GWT.log("error", e);
-		}
-	}
-
-	/**
 	 * Checks if the passed filename can be uploaded or not on the basis of what
 	 * configured in 'upload.disallow'
 	 * 
@@ -900,7 +845,18 @@ public class Util {
 		}
 
 		return key;
+	}
 
+	public static String getParameter(String name) {
+		String val = null;
+
+		try {
+			RequestInfo request = WindowUtils.getRequestInfo();
+			val = request.getParameter(name);
+		} catch (Throwable t) {
+		}
+
+		return val;
 	}
 
 	/**
@@ -949,7 +905,10 @@ public class Util {
 	public static void redirectToSuccessUrl(String locale) {
 		String url = Util.getJavascriptVariable("j_successurl");
 		if (locale != null && !"".equals(locale))
-			url += "?locale=" + locale;
+			if (url.contains("?"))
+				url += "&locale=" + locale;
+			else
+				url += "?locale=" + locale;
 		Util.redirect(url);
 	}
 
@@ -1073,6 +1032,17 @@ public class Util {
 	}
 
 	/**
+	 * Converts some HTML specific cahrd into it's entity
+	 * 
+	 * @param originalText the original string to filter
+	 * 
+	 * @return the escaped string
+	 */
+	public static String escapeHTML(String originalText) {
+		return originalText.replace("<", "&lt;").replace(">", "&gt;");
+	}
+
+	/**
 	 * Formats a set of tags into an HTML grid
 	 * 
 	 * @param tags the tags to format
@@ -1090,6 +1060,11 @@ public class Util {
 			}
 		buf.append("</div>");
 		return buf.toString();
+	}
+
+	public static String formatDateShortISO(Date date) {
+		DateTimeFormat fmt = DateTimeFormat.getFormat("yyyy-MM-dd");
+		return fmt.format(date);
 	}
 
 	public static native String getJavascriptVariable(String jsVar)/*-{

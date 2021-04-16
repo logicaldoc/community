@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.system;
 
 import com.google.gwt.core.client.GWT;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.PrintUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.smartgwt.client.types.ContentsType;
@@ -40,8 +41,8 @@ public class LogPanel extends VLayout {
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
+		
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
-		toolStrip.addButton(refresh);
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -50,8 +51,8 @@ public class LogPanel extends VLayout {
 				htmlPane.setHeight100();
 			}
 		});
+		
 		ToolStripButton download = new ToolStripButton(I18N.message("downloadlogs"));
-		toolStrip.addButton(download);
 		download.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -62,6 +63,9 @@ public class LogPanel extends VLayout {
 				}
 			}
 		});
+		
+		toolStrip.addButton(refresh);
+		toolStrip.addButton(download);
 		toolStrip.addFill();
 		addMember(toolStrip);
 		addMember(htmlPane);

@@ -61,6 +61,21 @@ public class WSNote {
 	@WSDoc(description = "height(0..1)")
 	private double height = 0.10;
 
+	@WSDoc(description = "the opacity of the line")
+	private int lineOpacity = 80;
+
+	@WSDoc(description = "the color of the line")
+	private String lineColor = "#a1a1a1";
+
+	@WSDoc(description = "rotation(-90, +90)")
+	private double rotation = 0.0;
+	
+	@WSDoc(description = "the width of the line")
+	private int lineWidth = 1;
+
+	@WSDoc(description = "shape (square, circle, line, arrow, thickarrow, comment, label)")
+	private String shape = "square";
+	
 	public DocumentNote toDocumentNote() {
 		DocumentNote note = new DocumentNote();
 		note.setId(getId());
@@ -78,6 +93,11 @@ public class WSNote {
 		note.setHeight(getHeight());
 		note.setFileVersion(getFileVersion());
 		note.setFileName(getFileName());
+		note.setShape(getShape());
+		note.setLineColor(getLineColor());
+		note.setLineOpacity(getLineOpacity());
+		note.setLineWidth(getLineWidth());
+		note.setRotation(getRotation());
 		return note;
 	}
 
@@ -98,6 +118,11 @@ public class WSNote {
 		wsNote.setHeight(note.getHeight());
 		wsNote.setFileVersion(note.getFileVersion());
 		wsNote.setFileName(note.getFileName());
+		wsNote.setShape(note.getShape());
+		wsNote.setLineColor(note.getLineColor());
+		wsNote.setLineOpacity(note.getLineOpacity());
+		wsNote.setLineWidth(note.getLineWidth());
+		wsNote.setRotation(note.getRotation());
 		return wsNote;
 	}
 
@@ -219,5 +244,45 @@ public class WSNote {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public int getLineOpacity() {
+		return lineOpacity;
+	}
+
+	public void setLineOpacity(int lineOpacity) {
+		this.lineOpacity = lineOpacity;
+	}
+
+	public String getLineColor() {
+		return lineColor;
+	}
+
+	public void setLineColor(String lineColor) {
+		this.lineColor = lineColor;
+	}
+
+	public int getLineWidth() {
+		return lineWidth;
+	}
+
+	public void setLineWidth(int lineWidth) {
+		this.lineWidth = lineWidth;
+	}
+
+	public String getShape() {
+		return shape;
+	}
+
+	public void setShape(String shape) {
+		this.shape = shape;
+	}
+
+	public double getRotation() {
+		return rotation;
+	}
+
+	public void setRotation(double rotation) {
+		this.rotation = rotation;
 	}
 }

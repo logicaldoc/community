@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -24,7 +25,9 @@ public class BarcodeTemplatesDS extends DataSource {
 		id.setPrimaryKey(true);
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField description = new DataSourceTextField("description");
-		setFields(id, name, description);
+		DataSourceBooleanField zonal = new DataSourceBooleanField("zonal");
+		zonal.setHidden(true);
+		setFields(id, name, zonal, description);
 		setDataURL("data/barcodetemplates.xml?withempty=" + withEmpty
 				+ (templateId != null ? "&templateId=" + templateId : ""));
 		setClientOnly(true);

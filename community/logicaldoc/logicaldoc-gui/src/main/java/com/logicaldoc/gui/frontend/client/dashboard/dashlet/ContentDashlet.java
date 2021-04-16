@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.services.DashletService;
 import com.smartgwt.client.types.Overflow;
@@ -29,7 +29,7 @@ public class ContentDashlet extends Dashlet {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

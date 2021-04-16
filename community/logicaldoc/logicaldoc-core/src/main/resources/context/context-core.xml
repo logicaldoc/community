@@ -16,12 +16,16 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
    
-   <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector" init-method="start" destroy-method="stop">
+   <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector" init-method="start">
       <property name="config" ref="ContextProperties" />
    </bean>
     
    <!-- System Load Monitor -->
    <bean id="SystemLoadMonitor" abstract="false" autowire="default" class="${load}" lazy-init="default" init-method="start" destroy-method="stop">
+      <property name="config" ref="ContextProperties" />
+   </bean>
+   
+   <bean id="ThreadPools" abstract="false" autowire="default" class="com.logicaldoc.core.threading.ThreadPools" lazy-init="default" init-method="start" destroy-method="shutdown">
       <property name="config" ref="ContextProperties" />
    </bean>
    
@@ -56,10 +60,18 @@
             <property name="sessionFactory" ref="SessionFactory" />
             <property name="userHistoryDAO" ref="UserHistoryDAO" />
             <property name="genericDAO" ref="GenericDAO" />
+            <property name="passwordHistoryDAO" ref="PasswordHistoryDAO" />
             <property name="userListenerManager" ref="UserListenerManager" />
          </bean>
       </property>
    </bean>
+   <bean id="PasswordHistoryDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+      <property name="target">
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernatePasswordHistoryDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
+      </property>
+   </bean>   
    <bean id="MenuDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
       <property name="target">
          <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateMenuDAO" lazy-init="default">
@@ -251,6 +263,21 @@
          </bean>
       </property>
    </bean>
+   <bean id="DeviceDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+      <property name="target">
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.security.dao.HibernateDeviceDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+            <property name="userDAO" ref="UserDAO" />
+         </bean>
+      </property>
+   </bean>
+   <bean id="SearchDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+      <property name="target">
+         <bean abstract="false" autowire="default" class="com.logicaldoc.core.searchengine.saved.HibernateSearchDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
+      </property>
+   </bean>
    
    <!-- Managers -->   
    <bean id="SecurityManager" abstract="false" autowire="default" class="com.logicaldoc.core.security.SecurityManagerImpl" lazy-init="default">
@@ -302,7 +329,8 @@
       <property name="password" value="${default.smtp.password}" />
       <property name="sender" value="${default.smtp.sender}" />
       <property name="authEncripted" value="${default.smtp.authEncripted}" />
-      <property name="connectionSecurity" value="${default.smtp.connectionSecurity}" />
+      <property name="folderId" value="${default.smtp.save.folderId}" />
+      <property name="foldering" value="${default.smtp.save.foldering}" />
    </bean>
    <!-- Tasks -->
    <bean id="IndexOptimizer" class="com.logicaldoc.core.searchengine.IndexOptimizer">

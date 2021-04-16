@@ -5,11 +5,11 @@ import java.util.Collection;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.DocuSignEnvelopesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
@@ -116,21 +116,12 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 		subject.setCanFilter(true);
 		subject.setWidth("*");
 
-		ListGridField created = new ListGridField("created", I18N.message("createdon"));
-		created.setCanFilter(true);
-		created.setWidth(110);
-		created.setCellFormatter(new DateCellFormatter(false));
+		ListGridField created = new DateListGridField("created", "createdon");
 
-		ListGridField expire = new ListGridField("expire", I18N.message("expireson"));
-		expire.setCanFilter(true);
-		expire.setWidth(110);
-		expire.setCellFormatter(new DateCellFormatter(false));
+		ListGridField expire = new DateListGridField("expire", "expireson");
 
-		ListGridField updated = new ListGridField("updated", I18N.message("lastmodified"));
-		updated.setCanFilter(true);
-		updated.setWidth(110);
+		ListGridField updated = new DateListGridField("updated", "lastmodified");
 		updated.setHidden(true);
-		updated.setCellFormatter(new DateCellFormatter(false));
 
 		ListGridField status = new ListGridField("status", I18N.message("status"));
 		status.setCanFilter(true);
@@ -175,7 +166,7 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override

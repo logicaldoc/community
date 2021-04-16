@@ -7,10 +7,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
@@ -38,6 +39,8 @@ public class OutgoingEmailPanel extends AdminPanel {
 
 	private GUIEmailSettings emailSettings;
 
+	private FolderSelector targetSelector;
+
 	public OutgoingEmailPanel(GUIEmailSettings settings) {
 		super("outgoingemail");
 		this.emailSettings = settings;
@@ -61,14 +64,13 @@ public class OutgoingEmailPanel extends AdminPanel {
 		port.setRequired(true);
 
 		// Username
-		TextItem username = ItemFactory.newTextItem("username", "username", this.emailSettings.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", this.emailSettings.getUsername());
 		username.setWidth(350);
 		username.setWrapTitle(false);
 
 		// Password
-		PasswordItem password = new PasswordItem("password", I18N.message("password"));
-		password.setName("password");
-		password.setValue(this.emailSettings.getPwd());
+		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", this.emailSettings.getPwd());
+		password.setWrapTitle(false);
 
 		// Connection Security
 		SelectItem connSecurity = new SelectItem();
@@ -107,6 +109,19 @@ public class OutgoingEmailPanel extends AdminPanel {
 		userAsSender.setValue(emailSettings.isUserAsFrom());
 		userAsSender.setWrapTitle(false);
 
+		// Target folder where outgoing messages are saved
+		targetSelector = new FolderSelector("target", true);
+		targetSelector.setTitle(I18N.message("targetfolder"));
+		targetSelector.setHint(I18N.message("smtptargetfolderhint"));
+		targetSelector.setWidth(250);
+		targetSelector.setRequired(false);
+		if (emailSettings.getTargetFolder() != null)
+			targetSelector.setFolder(emailSettings.getTargetFolder());
+
+		SelectItem foldering = ItemFactory.newEmailFolderingSelector("foldering", "foldering");
+		foldering.setRequired(false);
+		foldering.setValue("" + emailSettings.getFoldering());
+
 		ButtonItem save = new ButtonItem("save", I18N.message("save"));
 		save.setStartRow(true);
 		save.setEndRow(false);
@@ -126,27 +141,29 @@ public class OutgoingEmailPanel extends AdminPanel {
 					OutgoingEmailPanel.this.emailSettings.setUsername((String) values.get("username"));
 					OutgoingEmailPanel.this.emailSettings.setPwd((String) values.get("password"));
 					OutgoingEmailPanel.this.emailSettings.setConnSecurity((String) values.get("connSecurity"));
-					OutgoingEmailPanel.this.emailSettings.setSecureAuth(values.get("secureAuth").toString()
-							.equals("true") ? true : false);
+					OutgoingEmailPanel.this.emailSettings
+							.setSecureAuth(values.get("secureAuth").toString().equals("true") ? true : false);
 					OutgoingEmailPanel.this.emailSettings.setSenderEmail((String) values.get("senderEmail"));
-					OutgoingEmailPanel.this.emailSettings.setUserAsFrom(values.get("userasfrom").toString()
-							.equals("true") ? true : false);
+					OutgoingEmailPanel.this.emailSettings
+							.setUserAsFrom(values.get("userasfrom").toString().equals("true") ? true : false);
+					OutgoingEmailPanel.this.emailSettings
+							.setFoldering(Integer.parseInt(values.get("foldering").toString()));
+					OutgoingEmailPanel.this.emailSettings.setTargetFolder(targetSelector.getFolder());
 
 					SettingService.Instance.get().saveEmailSettings(OutgoingEmailPanel.this.emailSettings,
 							new AsyncCallback<Void>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									Session.get()
-											.getInfo()
-											.setConfig(Session.get().getTenantName() + ".smtp.userasfrom",
-													"" + OutgoingEmailPanel.this.emailSettings.isUserAsFrom());
-									Log.info(I18N.message("settingssaved"), null);
+									Session.get().getInfo().setConfig(
+											Session.get().getTenantName() + ".smtp.userasfrom",
+											"" + OutgoingEmailPanel.this.emailSettings.isUserAsFrom());
+									GuiLog.info(I18N.message("settingssaved"), null);
 								}
 							});
 				}
@@ -167,7 +184,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 									SettingService.Instance.get().testEmail(value, new AsyncCallback<Boolean>() {
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 											ContactingServer.get().hide();
 										}
 
@@ -186,8 +203,21 @@ public class OutgoingEmailPanel extends AdminPanel {
 			}
 		});
 
-		emailForm.setItems(smtpServer, port, username, password, connSecurity, secureAuth, senderEmail, userAsSender,
-				save, test);
+		/*
+		 * Two invisible fields to 'mask' the real credentials to the browser
+		 * and prevent it to auto-fill the username and password we really use.
+		 */
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
+				this.emailSettings.getUsername());
+		fakeUsername.setCellStyle("nodisplay");
+		fakeUsername.setTitleStyle("nodisplay");
+		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
+				this.emailSettings.getPwd());
+		fakePassword.setCellStyle("nodisplay");
+		fakePassword.setTitleStyle("nodisplay");
+
+		emailForm.setItems(smtpServer, port, fakeUsername, fakePassword, username, password, connSecurity, secureAuth,
+				senderEmail, userAsSender, targetSelector, foldering, save, test);
 		body.setMembers(emailForm);
 
 		tabs.addTab(templates);

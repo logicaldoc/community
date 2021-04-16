@@ -180,6 +180,7 @@ public class DocUtil {
 			html = "<div><span class='fa-layers fa-fw'>";
 			html += "<i class='" + AwesomeFactory.getCssClassPrefix() + " fa-lg fa-fw fa-"
 					+ (open ? "folder-open" : "folder") + "'></i>";
+			// This is the small alias arrow
 			html += "<i class='fas fa-lg fa-fw fa-share' data-fa-transform='shrink-10 down-2 right-2'></i></span>&nbsp;&nbsp;&nbsp;";
 			html += name + "</div>";
 		} else {

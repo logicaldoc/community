@@ -5,7 +5,7 @@ import java.util.Map;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.login.client.services.LoginService;
 import com.logicaldoc.gui.login.client.services.LoginServiceAsync;
@@ -79,7 +79,7 @@ public class ResetPassword extends Window {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 							buttonForm.setDisabled(false);
 						}
 

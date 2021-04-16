@@ -17,15 +17,19 @@ import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.DocumentLink;
 import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.DocumentNote;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
+import com.logicaldoc.core.document.dao.DocumentLinkDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.TenantDAO;
@@ -263,6 +267,29 @@ public class DocTool {
 		transaction.setUser(user);
 
 		return manager.copyToFolder(doc, folder, transaction);
+	}
+
+	/**
+	 * Links two documents
+	 * 
+	 * @param doc1 first document
+	 * @param doc2 second document
+	 * @param type type of link(optional)
+	 * 
+	 * @throws Exception a generic error happened
+	 */
+	public void link(Document doc1, Document doc2, String type) throws Exception {
+		DocumentLinkDAO linkDao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
+		DocumentLink link = linkDao.findByDocIdsAndType(doc1.getId(), doc2.getId(), "default");
+		if (link == null) {
+			// The link doesn't exist and must be created
+			link = new DocumentLink();
+			link.setTenantId(doc1.getTenantId());
+			link.setDocument1(doc1);
+			link.setDocument2(doc2);
+			link.setType(StringUtils.isEmpty(type) ? "default" : type);
+			linkDao.store(link);
+		}
 	}
 
 	/**
@@ -688,5 +715,30 @@ public class DocTool {
 	 */
 	public String calculateNextVersion(String currentVersion, boolean major) {
 		return Version.calculateNewVersion(currentVersion, major);
+	}
+
+	/**
+	 * This method finds a template by name
+	 * 
+	 * @param name Name of the template
+	 * @param tenantId Identifier of the owning tenant
+	 * 
+	 * @return Template with given name
+	 */
+	public Template findTemplateByName(String name, long tenantId) {
+		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		return dao.findByName(name, tenantId);
+	}
+
+	/**
+	 * This method finds a template by ID
+	 * 
+	 * @param templateId Identifier of the template
+	 * 
+	 * @return Template with given name
+	 */
+	public Template findTemplateById(long templateId) {
+		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		return dao.findById(templateId);
 	}
 }

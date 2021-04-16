@@ -11,12 +11,10 @@ import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.EventPanel;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.validators.EmailValidator;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
-import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.types.HeaderControls;
@@ -106,12 +104,14 @@ public class EmailDialog extends Window {
 		form.setNumCols(2);
 
 		final TextItem subject = ItemFactory.newTextItemForAutomation("subject", "subject", docTitle, null);
+		subject.setBrowserSpellCheck(true);
 		subject.setRequired(true);
 		subject.setWidth(350);
 
 		message = ItemFactory.newRichTextItemForEmail("message", "message", null, null);
 		message.setWidth("*");
 		message.setHeight(200);
+		message.setBrowserSpellCheck(true);
 		message.setColSpan(2);
 
 		from.addChangedHandler(new ChangedHandler() {
@@ -133,12 +133,12 @@ public class EmailDialog extends Window {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(GUIMessageTemplate t) {
-									Log.info(t.getSubject());
+									GuiLog.info(t.getSubject());
 
 									subject.setValue(t.getSubject());
 									message.setValue(t.getBody());
@@ -251,7 +251,7 @@ public class EmailDialog extends Window {
 								@Override
 								public void onFailure(Throwable caught) {
 									ContactingServer.get().hide();
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 									send.enable();
 									destroy();
 								}
@@ -261,10 +261,10 @@ public class EmailDialog extends Window {
 									ContactingServer.get().hide();
 									send.enable();
 									if ("ok".equals(result)) {
-										ToastNotification.showNotification(
+										GuiLog.info(
 												I18N.message("messagesent") + ". " + I18N.message("documentcopysent"));
 									} else {
-										EventPanel.get().error(I18N.message("messagenotsent"), null);
+										GuiLog.error(I18N.message("messagenotsent"), null, null);
 									}
 									destroy();
 								}
@@ -286,7 +286,7 @@ public class EmailDialog extends Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

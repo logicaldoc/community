@@ -6,7 +6,7 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
-import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
@@ -95,18 +95,20 @@ public class SearchHitsGrid extends DocumentsListGrid {
 	}
 
 	@Override
-	public void loadGridLayout(GUIFolder folder) {
+	public int loadGridLayout(GUIFolder folder) {
 		String previouslySavedState = Session.get().getUser().getHitsGrid();
 
-		Integer pageSize = GridUtil.getPageSizeFromSpec(previouslySavedState);
+		Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(previouslySavedState);
 		if (pageSize == null)
 			pageSize = Session.get().getConfigAsInt("search.hits");
 		if (SearchPanel.get().getListingPanel() != null
 				&& SearchPanel.get().getListingPanel().getSearchCursor() != null)
 			SearchPanel.get().getListingPanel().getSearchCursor().setPageSize(pageSize);
 
-		String gridLayout = GridUtil.getGridLayoutFromSpec(previouslySavedState);
+		String gridLayout = DocumentGridUtil.getGridLayoutFromSpec(previouslySavedState);
 		if (gridLayout != null)
 			setViewState(gridLayout);
+		
+		return pageSize;
 	}
 }

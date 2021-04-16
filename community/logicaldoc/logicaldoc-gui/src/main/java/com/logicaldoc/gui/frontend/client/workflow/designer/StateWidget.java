@@ -28,7 +28,7 @@ public class StateWidget extends Label {
 
 	private GUITransition transition;
 
-	private DrawingPanel drawingPanel;
+	private WorkflowDrawingPanel drawingPanel;
 
 	private DiagramController diagramController;
 
@@ -124,7 +124,7 @@ public class StateWidget extends Label {
 		this(connection, diagramController, new GUITransition(name, color));
 	}
 
-	public StateWidget(DrawingPanel dp, GUIWFState state) {
+	public StateWidget(WorkflowDrawingPanel dp, GUIWFState state) {
 		this(null, dp.getDiagramController(), "<b>" + state.getName() + "</b>&nbsp;", null);
 		this.wfState = state;
 		this.drawingPanel = dp;
@@ -242,7 +242,7 @@ public class StateWidget extends Label {
 		return wfState;
 	}
 
-	public DrawingPanel getDrawingPanel() {
+	public WorkflowDrawingPanel getDrawingPanel() {
 		return drawingPanel;
 	}
 

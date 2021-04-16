@@ -7,7 +7,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.DashletService;
@@ -76,7 +76,7 @@ public class DashletsPanel extends VLayout {
 			public void onClick(ClickEvent event) {
 				TextItem item = ItemFactory.newSimpleTextItem("name", "", null);
 				item.setRequired(true);
-				LD.askforValue(I18N.message("newtemplate"), I18N.message("name"), null, item, new ValueCallback() {
+				LD.askForValue(I18N.message("newdashlet"), I18N.message("name"), null, item, new ValueCallback() {
 					@Override
 					public void execute(String value) {
 						GUIDashlet dashlet = new GUIDashlet();
@@ -220,12 +220,12 @@ public class DashletsPanel extends VLayout {
 		DashletService.Instance.get().saveDashlets(dashlets.toArray(new GUIDashlet[0]), new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void arg0) {
-				Log.info(I18N.message("settingssaved"), null);
+				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
 	}
@@ -263,7 +263,7 @@ public class DashletsPanel extends VLayout {
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -284,7 +284,7 @@ public class DashletsPanel extends VLayout {
 		DashletService.Instance.get().loadDashlets(new AsyncCallback<GUIDashlet[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

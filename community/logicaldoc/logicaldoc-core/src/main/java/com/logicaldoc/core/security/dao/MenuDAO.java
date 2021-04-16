@@ -49,29 +49,32 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 * 
 	 * @param userId The user identifier
 	 * @param permission The permission to check
-
+	 * @param enabledOnly if the menus must also be enabled
+	 * 
 	 * @return list of folder IDs
 	 */
-	public List<Long> findMenuIdByUserIdAndPermission(long userId, Permission permission);
+	public List<Long> findMenuIdByUserIdAndPermission(long userId, Permission permission, boolean enabledOnly);
 
 	/**
 	 * Finds direct children of a menu
 	 * 
 	 * @param userId identifier of the user
 	 * @param parentId MenuId of the menu which children are wanted
+	 * @param enabledOnly if the menus must also be enabled
 	 * 
 	 * @return List of found menus sorted by name
 	 */
-	public List<Menu> findByUserId(long userId, long parentId);
+	public List<Menu> findByUserId(long userId, long parentId, boolean enabledOnly);
 
 	/**
 	 * Finds all children(direct and indirect) by parentId
 	 * 
 	 * @param parentId identifier of the parent menu
+	 * @param enabledOnly if the menus must also be enabled
 	 * 
 	 * @return list of children menus
 	 */
-	public List<Menu> findByParentId(long parentId);
+	public List<Menu> findByParentId(long parentId, boolean enabledOnly);
 
 	/**
 	 * Finds direct children of a menu.
@@ -127,10 +130,11 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 * authorized
 	 * 
 	 * @param userId ID of the user
+	 * @param enabledOnly if the menus must also be enabled
 	 * 
 	 * @return List of selected menuId's
 	 */
-	public List<Long> findMenuIdByUserId(long userId);
+	public List<Long> findMenuIdByUserId(long userId, boolean enabledOnly);
 
 	/**
 	 * This method selects only the menuId from the menus for which a user is
@@ -204,13 +208,31 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 
 	/**
 	 * Dynamically computes the path extended for the specified menu. The path
-	 * extended is a human readable path in the form: /folder1/folder2/folder3
+	 * extended is a human readable path in the form: /menu1/menu2/menu3
 	 * 
 	 * @param id identifier of the menu
 	 * 
 	 * @return full path of the menu
 	 */
 	public String computePathExtended(long id);
+
+	/**
+	 * Creates the menu for the specified path. All unexisting nodes specified
+	 * in the path will be created.
+	 * 
+	 * @param parentId Identifier of the parent menu
+	 * @param tenantId Identifier of the tenant that will own the new menu
+	 * @param type The type of the created menus
+	 * @param path The folder path(for example /dog/cat/mouse)
+	 * @param inheritSecurity If true the new menus will 'point' to the parent
+	 *        for the security policies.
+	 * 
+	 * @return The created folder
+	 * 
+	 * @throws PersistenceException in case of database error
+	 */
+	public Menu createPath(long parentId, long tenantId, int type, String path, boolean inheritSecurity)
+			throws PersistenceException;
 
 	/**
 	 * Propagates the security policies of a node to the whole subtree

@@ -6,10 +6,10 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.data.GroupsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
@@ -98,7 +98,7 @@ public class GroupsPanel extends AdminPanel {
 		export.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 		if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -113,7 +113,7 @@ public class GroupsPanel extends AdminPanel {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addFill();
@@ -137,7 +137,7 @@ public class GroupsPanel extends AdminPanel {
 		ListGridField source = new ListGridField("source", I18N.message("source"), 100);
 		source.setCanFilter(true);
 		source.setHidden(true);
-		
+
 		ListGridField description = new ListGridField("description", I18N.message("description"), 200);
 		description.setCanFilter(true);
 
@@ -172,7 +172,7 @@ public class GroupsPanel extends AdminPanel {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -242,7 +242,7 @@ public class GroupsPanel extends AdminPanel {
 							SecurityService.Instance.get().deleteGroup(id, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -261,7 +261,7 @@ public class GroupsPanel extends AdminPanel {
 
 		if (Constants.GROUP_ADMIN.equals(record.getAttributeAsString("name"))
 				|| Constants.GROUP_PUBLISHER.equals(record.getAttributeAsString("name"))
-						|| Constants.GROUP_GUEST.equals(record.getAttributeAsString("name"))) {
+				|| Constants.GROUP_GUEST.equals(record.getAttributeAsString("name"))) {
 			delete.setEnabled(false);
 		}
 

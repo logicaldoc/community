@@ -41,6 +41,16 @@ public interface SearchService extends RemoteService {
 	public boolean save(GUISearchOptions options) throws ServerException;
 
 	/**
+	 * Re-create a saved search in other user profiles
+	 * 
+	 * @param name name of the search to replicate
+	 * @param userIds identifiers of the users
+	 * 
+	 * @throws ServerException error in the server application
+	 */
+	public void shareSearch(String name, long[] userIds) throws ServerException;
+
+	/**
 	 * Deletes a previously saved search
 	 * 
 	 * @param names The saved search names

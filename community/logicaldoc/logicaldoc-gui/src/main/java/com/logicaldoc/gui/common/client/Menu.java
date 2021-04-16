@@ -27,6 +27,8 @@ public class Menu {
 
 	public static final long ADMINISTRATION = 2;
 
+	public static final long ACCOUNT = 40;
+	
 	public static final long DOCUMENTS = 1500;
 	
 	public static final long HISTORY = 1600;
@@ -41,11 +43,13 @@ public class Menu {
 	
 	public static final long SIGNATURE = 1607;
 	
-	public static final long DOCUMENT_OCR = 1608;
+	public static final long CAPTURE = 1608;
 	
 	public static final long DASHBOARD_CALENDAR = 1526;
 
 	public static final long SEARCH = 1510;
+	
+	public static final long SHARE_SEARCH = 1511;
 
 	public static final long DASHBOARD = 1520;
 	
@@ -160,6 +164,8 @@ public class Menu {
 	public static final long SYNDICATION = 2000;
 	
 	public static final long ZONAL_OCR = 2100;
+	
+	public static final long CUSTOM_ACTIONS = 1300;
 	
 	private static Set<Long> menus = new HashSet<Long>();
 

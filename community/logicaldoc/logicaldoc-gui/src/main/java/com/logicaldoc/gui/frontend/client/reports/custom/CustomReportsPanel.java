@@ -6,15 +6,15 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
 import com.logicaldoc.gui.common.client.data.ReportsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -106,11 +106,7 @@ public class CustomReportsPanel extends AdminPanel {
 		runningIcon.setImageURLSuffix(".gif");
 		runningIcon.setCanFilter(false);
 
-		ListGridField lastRun = new ListGridField("lastRun", I18N.message("lastrun"), 110);
-		lastRun.setType(ListGridFieldType.DATE);
-		lastRun.setCellFormatter(new DateCellFormatter(false));
-		lastRun.setCanFilter(false);
-		lastRun.setAlign(Alignment.CENTER);
+		ListGridField lastRun = new DateListGridField("lastRun", "lastrun");
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -210,7 +206,7 @@ public class CustomReportsPanel extends AdminPanel {
 		ReportService.Instance.get().getReports(new AsyncCallback<GUIReport[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -272,7 +268,7 @@ public class CustomReportsPanel extends AdminPanel {
 				ReportService.Instance.get().getReport(selectedId, false, new AsyncCallback<GUIReport>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -312,7 +308,7 @@ public class CustomReportsPanel extends AdminPanel {
 							ReportService.Instance.get().delete(selectedId, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -337,7 +333,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -360,7 +356,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -398,7 +394,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -464,7 +460,7 @@ public class CustomReportsPanel extends AdminPanel {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override

@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -126,7 +127,8 @@ public class PSParser extends AbstractParser {
 	}
 
 	@Override
-	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant, StringBuffer content) {
+	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
+			Document document, String fileVersion, StringBuffer content) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 			String version = "";

@@ -14,8 +14,13 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.SystemInfo;
+import com.logicaldoc.core.communication.EMail;
+import com.logicaldoc.core.communication.EMailSender;
+import com.logicaldoc.core.communication.Recipient;
+import com.logicaldoc.core.security.dao.DeviceDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserHistoryDAO;
 import com.logicaldoc.util.Context;
@@ -160,7 +165,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.status = STATUS_EXPIRED;
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT.toString(), null, null, sid);
+		userHistoryDAO.createUserHistory(user, UserEvent.TIMEOUT.toString(), null, sid, client);
 	}
 
 	public void setClosed() {
@@ -170,7 +175,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.status = STATUS_CLOSED;
 		// Add a user history entry
 		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, null, sid);
+		userHistoryDAO.createUserHistory(user, UserEvent.LOGOUT.toString(), null, sid, client);
 	}
 
 	private Session() {
@@ -190,30 +195,82 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.node = SystemInfo.get().getInstallationId();
 		this.setLastRenew(creation);
 
-		// Set the sid
-		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		Tenant tenant = tenantDAO.findById(tenantId);
 		if (tenant != null)
 			tenantName = tenant.getName();
 
 		/*
-		 * Store in the history comment the remote host and IP
+		 * The history comment the remote host and IP
 		 */
-		String comment = "";
+		String historyComment = "";
 		if (client != null) {
 			String addr = client.getAddress();
 			String host = client.getHost();
 			if (StringUtils.isNotEmpty(host) && !host.equals(addr))
-				comment = host + " (" + addr + ") ";
+				historyComment = host + " (" + addr + ") ";
 			else
-				comment = addr;
+				historyComment = addr;
 		}
 
 		// Add a user history entry
-		userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), comment,
-				client != null ? client.getAddress() : null, sid);
+		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment,
+				sid, client);
+		
+		/*
+		 * Add / update the device in the DB
+		 */
+		if (client!=null && client.getDevice() != null) {
+			client.getDevice().setUserId(user.getId());
+			client.getDevice().setUsername(user.getFullName());
+
+			DeviceDAO deviceDAO = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+			Device device = deviceDAO.findByDevice(client.getDevice());
+			if (device == null)
+				device = client.getDevice();
+
+			device.setUserId(user.getId());
+			device.setUsername(user.getFullName());
+			device.setLastLogin(creation);
+			device.setIp(client.getAddress());
+
+			try {
+				boolean newDevice = device.getId() == 0L;
+				deviceDAO.store(device);
+				client.setDevice(device);
+				history.setDevice(client.getDevice().toString());
+				if(client.getGeolocation()!=null)
+					history.setGeolocation(client.getGeolocation().toString());
+				userHistoryDAO.store(history);
+
+				// Send an email alert to the user in case of new device
+				if (newDevice && Context.get().getProperties().getBoolean(tenantName + ".alertnewdevice", true)) {
+					Map<String, Object> dictionary = new HashMap<String, Object>();
+					dictionary.put("user", user);
+					dictionary.put("device", device);
+					dictionary.put("client", client);
+					dictionary.put("location", client.getGeolocation());
+					dictionary.put("event", history);
+
+					EMail email = new EMail();
+					email.setTenantId(tenantId);
+					email.setHtml(1);
+					email.setLocale(user.getLocale());
+					Recipient recipient = new Recipient();
+					recipient.setAddress(user.getEmail());
+					recipient.setName(user.getFullName());
+					recipient.setMode(Recipient.MODE_EMAIL_TO);
+					email.getRecipients().add(recipient);
+
+					EMailSender sender = (EMailSender) Context.get().getBean(EMailSender.class);
+					sender.sendAsync(email, "newdevice", dictionary);
+				}
+
+			} catch (PersistenceException e) {
+				log.warn("Cannot record the device {}", device);
+			}
+		}
 
 		log.info("Session {} has been started", getSid());
 		logInfo("Session started");

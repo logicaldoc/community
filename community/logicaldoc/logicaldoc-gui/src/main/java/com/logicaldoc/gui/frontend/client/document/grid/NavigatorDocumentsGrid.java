@@ -23,14 +23,14 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 
 	private long lastChangedSortFolder = 0L;
 
-	public NavigatorDocumentsGrid(GUIFolder folder, Integer max) {
+	public NavigatorDocumentsGrid(GUIFolder folder) {
 		super(folder);
 		setSelectionType(SelectionStyle.MULTIPLE);
 		this.lastChangedSortFolder = folder.getId();
 
-		loadGridLayout(folder);
-
-		DocumentsDS dataSource = new DocumentsDS(folder, null, max, 1, null, false, false, GridUtil.getSortSpec(this));
+		int pageSize = loadGridLayout(folder);
+		DocumentsDS dataSource = new DocumentsDS(folder, null, pageSize, 1, null, false, false,
+				DocumentGridUtil.getSortSpec(this));
 		setDataSource(dataSource);
 
 		final List<ListGridField> fields = new ArrayList<ListGridField>();
@@ -147,7 +147,7 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 					// the recodrs from the server using the right sorting
 					DocumentsDS dataSource = new DocumentsDS(getFolder(), null, getGridCursor().getPageSize(),
 							getGridCursor().getCurrentPage(), null, false, false,
-							GridUtil.getSortSpec(event.getSortSpecifiers()));
+							DocumentGridUtil.getSortSpec(event.getSortSpecifiers()));
 					refresh(dataSource);
 				} else {
 					// save the current folder's ID

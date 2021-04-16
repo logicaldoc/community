@@ -193,7 +193,7 @@ public class StandardSearchEngine implements SearchEngine {
 		String contentString = null;
 
 		if (doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA)
-			ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId());
+			ParserFactory.parse(content, doc.getFileName(), null, locale, doc.getTenantId(), doc, null);
 
 		addHit(doc, contentString);
 	}

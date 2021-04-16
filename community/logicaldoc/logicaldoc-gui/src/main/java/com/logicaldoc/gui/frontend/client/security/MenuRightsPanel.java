@@ -5,10 +5,11 @@ import com.logicaldoc.gui.common.client.beans.GUIMenu;
 import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.data.RightsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
@@ -40,10 +41,13 @@ public class MenuRightsPanel extends VLayout {
 
 	private ListGrid list;
 
-	private GUIMenu menu;
+	protected GUIMenu menu;
 
-	public MenuRightsPanel(final GUIMenu menu) {
+	boolean withApplyButton = false;
+	
+	public MenuRightsPanel(final GUIMenu menu, boolean withApplyButton) {
 		this.menu = menu;
+		this.withApplyButton=withApplyButton;
 	}
 
 	@Override
@@ -56,7 +60,7 @@ public class MenuRightsPanel extends VLayout {
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 
-		ListGridField entity = new ListGridField("entity", I18N.message("entity"), 200);
+		ListGridField entity = new AvatarListGridField("entity", "avatar", "entity", 190);  
 		entity.setCanEdit(false);
 
 		list = new ListGrid();
@@ -97,7 +101,8 @@ public class MenuRightsPanel extends VLayout {
 				onApply();
 			}
 		});
-		buttons.addMember(applyRights);
+		if(withApplyButton)
+			buttons.addMember(applyRights);
 
 		// Prepare the combo and button for adding a new Group
 		final DynamicForm groupForm = new DynamicForm();
@@ -125,7 +130,8 @@ public class MenuRightsPanel extends VLayout {
 				// Update the rights table
 				ListGridRecord record = new ListGridRecord();
 				record.setAttribute("entityId", selectedRecord.getAttribute("id"));
-				record.setAttribute("entity", I18N.message("group") + ": " + selectedRecord.getAttribute("name"));
+				record.setAttribute("entity", selectedRecord.getAttribute("name"));
+				record.setAttribute("avatar", "group");
 				record.setAttribute("read", true);
 				list.addData(record);
 				group.clearValue();
@@ -156,8 +162,9 @@ public class MenuRightsPanel extends VLayout {
 				// Update the rights table
 				ListGridRecord record = new ListGridRecord();
 				record.setAttribute("entityId", selectedRecord.getAttribute("usergroup"));
-				record.setAttribute("entity", I18N.message("user") + ": " + selectedRecord.getAttribute("label") + " ("
+				record.setAttribute("entity", selectedRecord.getAttribute("label") + " ("
 						+ selectedRecord.getAttribute("username") + ")");
+				record.setAttribute("avatar", selectedRecord.getAttribute("id"));
 				record.setAttribute("read", true);
 				list.addData(record);
 				user.clearValue();
@@ -211,6 +218,8 @@ public class MenuRightsPanel extends VLayout {
 					public void execute(Boolean value) {
 						if (value) {
 							list.removeSelectedData();
+							if(!withApplyButton)
+								onApply();
 						}
 					}
 				});
@@ -223,18 +232,18 @@ public class MenuRightsPanel extends VLayout {
 
 	public void onApply() {
 		// Apply all rights
-		menu.setRights(this.getRights());
+		menu.setRights(getRights());
 
 		SecurityService.Instance.get().applyRights(menu, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void result) {
-				Log.info(I18N.message("appliedrightsmenu"), null);
+				GuiLog.info(I18N.message("appliedrightsmenu"), null);
 			}
 		});
 

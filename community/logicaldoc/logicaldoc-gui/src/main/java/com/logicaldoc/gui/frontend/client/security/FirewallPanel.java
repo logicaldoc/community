@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
@@ -115,7 +115,7 @@ public class FirewallPanel extends VLayout {
 					new String[] { "firewall.whitelist", "firewall.blacklist" }, new AsyncCallback<GUIParameter[]>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
@@ -146,13 +146,13 @@ public class FirewallPanel extends VLayout {
 		SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void params) {
 				if (user == null)
-					Log.info(I18N.message("settingssaved"), null);
+					GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
 	}

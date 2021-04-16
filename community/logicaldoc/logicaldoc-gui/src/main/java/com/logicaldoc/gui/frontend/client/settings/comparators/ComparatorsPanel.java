@@ -10,7 +10,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.data.ComparatorsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -349,12 +349,12 @@ public class ComparatorsPanel extends AdminPanel {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void arg) {
-				Log.info(I18N.message("settingssaved"), null);
+				GuiLog.info(I18N.message("settingssaved"), null);
 
 				// Replicate the settings in the current session
 				for (GUIParameter setting : settings)
@@ -386,7 +386,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override
@@ -430,7 +430,7 @@ public class ComparatorsPanel extends AdminPanel {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										Log.serverError(caught);
+										GuiLog.serverError(caught);
 									}
 
 									@Override

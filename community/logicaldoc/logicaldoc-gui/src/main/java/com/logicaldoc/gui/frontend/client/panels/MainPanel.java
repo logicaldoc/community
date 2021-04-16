@@ -165,7 +165,7 @@ public class MainPanel extends VLayout implements SessionObserver {
 		/*
 		 * Check if there are alerts
 		 */
-		if (user.isMemberOf("admin")) {
+		if (user.isMemberOf("admin") && !Session.get().isDemo()) {
 			InfoService.Instance.get().getInfo(I18N.getLocale(), Session.get().getTenantName(), false,
 					new AsyncCallback<GUIInfo>() {
 						@Override

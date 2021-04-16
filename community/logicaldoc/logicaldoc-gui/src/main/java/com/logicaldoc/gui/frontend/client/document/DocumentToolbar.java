@@ -15,7 +15,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -65,7 +65,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	protected ToolStripButton dropSpot = AwesomeFactory.newToolStripButton("eye-dropper", "dropspot");
 
-	protected ToolStripButton scan = AwesomeFactory.newToolStripButton("image", "scandocument");
+	protected ToolStripButton scan = AwesomeFactory.newToolStripButton("scanner-image", "scandocument");
 
 	protected ToolStripButton archive = AwesomeFactory.newToolStripButton("archive", "sendtoexparchive");
 
@@ -279,7 +279,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			@Override
 			public void onClick(ClickEvent event) {
 				CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_LIST);
-				DocumentsPanel.get().refresh(null, DocumentsGrid.MODE_LIST);
+				DocumentsPanel.get().refresh(DocumentsGrid.MODE_LIST);
 			}
 		});
 		list.setDisabled(Session.get().getCurrentFolder() == null);
@@ -291,7 +291,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			public void onClick(ClickEvent event) {
 				if (Session.get().getCurrentFolder() != null)
 					CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_GALLERY);
-				DocumentsPanel.get().refresh(null, DocumentsGrid.MODE_GALLERY);
+				DocumentsPanel.get().refresh(DocumentsGrid.MODE_GALLERY);
 			}
 		});
 		gallery.setDisabled(
@@ -718,13 +718,13 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		SecurityService.Instance.get().saveInterfaceSettings(Session.get().getUser(), new AsyncCallback<GUIUser>() {
 
 			@Override
-			public void onSuccess(GUIUser usr) {
-
+			public void onFailure(Throwable e) {
+				GuiLog.serverError(e);
 			}
 
 			@Override
-			public void onFailure(Throwable e) {
-				Log.info(I18N.message("settingssaved"));
+			public void onSuccess(GUIUser usr) {
+				GuiLog.info(I18N.message("settingssaved"));
 			}
 		});
 	}

@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security.dao;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,12 +49,16 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(0, histories.size());
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
-	public void testFindByUserId() {
-		Collection histories = dao.findByUserId(1);
+	public void testFindByUserIdAndType() {
+		List<UserHistory> histories = dao.findByUserId(1);
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
+
+		histories = dao.findByUserIdAndEvent(1L, "data test 02");
+		Assert.assertNotNull(histories);
+		Assert.assertEquals(1, histories.size());
+		Assert.assertEquals("data test 02", histories.get(0).getEvent());
 
 		// Try with unexisting user
 		histories = dao.findByUserId(99);
@@ -83,14 +88,14 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 		Collection<UserHistory> histories = (Collection<UserHistory>) dao.findByUserId(3);
 		Assert.assertNotNull(histories);
 		Assert.assertFalse(histories.isEmpty());
-		
+
 		UserHistory hStored = null;
-        for (UserHistory userHistory2 : histories) {
+		for (UserHistory userHistory2 : histories) {
 			if (userHistory2.getId() == newUserHistory.getId()) {
 				hStored = userHistory2;
 				break;
 			}
-		}		
+		}
 
 		Assert.assertTrue(hStored.equals(newUserHistory));
 		Assert.assertEquals(hStored.getDate().getTime(), DateBean.dateFromCompactString("20061220").getTime());
@@ -98,14 +103,13 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(hStored.getEvent(), "second test User History store");
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Test
 	public void testCleanOldHistories() {
 		dao.cleanOldHistories(5);
 
 		UserHistory history = dao.findById(1);
 		Assert.assertNull(history);
-		Collection histories = dao.findAll();
+		List<UserHistory> histories = dao.findAll();
 		Assert.assertEquals(0, histories.size());
 	}
 }

@@ -5,7 +5,7 @@ import java.util.Date;
 
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.frontend.client.document.grid.GridUtil;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 
 /**
  * Search options
@@ -82,7 +82,7 @@ public class GUISearchOptions implements Serializable {
 	public GUISearchOptions() {
 		try {
 			if (Session.get() != null) {
-				Integer pageSize = GridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
+				Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
 				if (pageSize == null)
 					pageSize = Session.get().getConfigAsInt("search.hits");
 				maxHits = pageSize;

@@ -19,6 +19,7 @@ import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Group;
+import com.logicaldoc.core.security.PasswordHistory;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserEvent;
@@ -27,6 +28,7 @@ import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.UserListener;
 import com.logicaldoc.core.security.UserListenerManager;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -44,6 +46,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	private GenericDAO genericDAO;
 
 	private UserHistoryDAO userHistoryDAO;
+
+	private PasswordHistoryDAO passwordHistoryDAO;
 
 	private UserListenerManager userListenerManager;
 
@@ -125,20 +129,37 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 	}
 
+	private void checkAlreadyUsedPassword(User user) throws PersistenceException {
+		int enforce = getPasswordEnforce(user);
+		if (enforce < 1)
+			return;
+
+		PasswordHistory hist = passwordHistoryDAO.findByUserIdAndPassword(user.getId(), user.getPassword(), enforce);
+		if (hist != null)
+			throw new PasswordAlreadyUsedException(hist.getDate());
+	}
+
 	@Override
 	public boolean store(User user) {
 		return store(user, null);
 	}
 
 	@Override
-	public boolean store(User user, UserHistory transaction) {
+	public boolean store(User user, UserHistory transaction) throws PasswordAlreadyUsedException {
 		if (!checkStoringAspect())
 			return false;
 
 		boolean result = true;
 		boolean newUser = user.getId() == 0;
+		boolean passwordChanged = false;
 
 		try {
+			String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
+			passwordChanged = currentPassword == null || !currentPassword.equals(user.getPassword());
+
+			if (passwordChanged)
+				checkAlreadyUsedPassword(user);
+
 			if ("admin".equals(user.getUsername()) && user.getType() != User.TYPE_DEFAULT)
 				throw new Exception("User admin must be default type");
 			if (newUser && findByUsernameIgnoreCase(user.getUsername()) != null)
@@ -162,11 +183,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 			log.debug("Invoke listeners before store");
 			for (UserListener listener : userListenerManager.getListeners())
-				try {
-					listener.beforeStore(user, transaction, dictionary);
-				} catch (Throwable t) {
-					log.warn(t.getMessage(), t);
-				}
+				listener.beforeStore(user, transaction, dictionary);
 
 			if (newUser)
 				user.setCreation(new Date());
@@ -201,13 +218,20 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				}
 			}
 
+			// Save the password history to track the password change
+			if (passwordChanged && user.getPasswordExpired() == 0) {
+				PasswordHistory pHist = new PasswordHistory();
+				pHist.setDate(transaction != null ? transaction.getDate() : new Date());
+				pHist.setUserId(user.getId());
+				pHist.setPassword(user.getPassword());
+				pHist.setTenantId(user.getTenantId());
+				passwordHistoryDAO.store(pHist);
+				passwordHistoryDAO.cleanOldHistories(user.getId(), getPasswordEnforce(user) * 2);
+			}
+
 			log.debug("Invoke listeners after store");
 			for (UserListener listener : userListenerManager.getListeners())
-				try {
-					listener.afterStore(user, transaction, dictionary);
-				} catch (Throwable t) {
-					log.warn(t.getMessage(), t);
-				}
+				listener.afterStore(user, transaction, dictionary);
 
 			if (newUser) {
 				// Save default dashlets
@@ -254,14 +278,19 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			}
 
 			if (user.isReadonly()) {
+				user=findById(user.getId());
+				initialize(user);
 				for (Group group : user.getGroups())
 					groupDAO.fixGuestPermissions(group);
 			}
 		} catch (Throwable e) {
-			if (e instanceof AuthenticationException)
+			if (e instanceof AuthenticationException) {
 				throw (AuthenticationException) e;
-			log.error(e.getMessage(), e);
-			result = false;
+			} else {
+				log.error(e.getMessage(), e);
+				result = false;
+				throw new RuntimeException(e.getMessage());
+			}
 		}
 
 		return result;
@@ -285,7 +314,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				return false;
 
 			// Check the password match
-			if (!user.getPassword().equals(CryptUtil.cryptString(password)))
+			if (user.getPassword()==null || !user.getPassword().equals(CryptUtil.cryptString(password)))
 				result = false;
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -324,13 +353,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		return true;
 	}
 
-	public int getPasswordTtl() {
-		int value = 90;
-		if (config.getProperty("password.ttl") != null)
-			value = config.getInt("password.ttl");
-		return value;
-	}
-
 	@Override
 	public boolean isPasswordExpired(String username) {
 		try {
@@ -341,7 +363,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			if (user.getPasswordExpired() == 1)
 				return true;
 
-			if (getPasswordTtl() <= 0)
+			String tenantName = ((TenantDAO) Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
+			int passwordTtl = config.getInt(tenantName + ".password.ttl", 90);
+			if (passwordTtl <= 0)
 				return false;
 
 			// Check if the password is expired
@@ -363,7 +387,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				calendar.set(Calendar.MINUTE, 0);
 				calendar.set(Calendar.HOUR, 0);
 
-				calendar.add(Calendar.DAY_OF_MONTH, -getPasswordTtl());
+				calendar.add(Calendar.DAY_OF_MONTH, -passwordTtl);
 				Date date = calendar.getTime();
 
 				return (lastChange.before(date));
@@ -449,6 +473,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 	}
 
+	private int getPasswordEnforce(User user) {
+		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		String tenant = tenantDAO.getTenantName(user.getTenantId());
+		return config.getInt(tenant + ".password.enforcehistory", 10);
+	}
+
 	public UserHistoryDAO getUserHistoryDAO() {
 		return userHistoryDAO;
 	}
@@ -522,10 +552,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return findByUsername("admin" + StringUtils.capitalize(tenantName));
 	}
 
-	public void setConfig(ContextProperties config) {
-		this.config = config;
-	}
-
 	@Override
 	public Set<User> findByGroup(long groupId) {
 		List<Long> docIds = new ArrayList<Long>();
@@ -568,5 +594,13 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			user = findByUsername(username);
 		initialize(user);
 		return user;
+	}
+
+	public void setPasswordHistoryDAO(PasswordHistoryDAO passwordHistoryDAO) {
+		this.passwordHistoryDAO = passwordHistoryDAO;
+	}
+
+	public void setConfig(ContextProperties config) {
+		this.config = config;
 	}
 }

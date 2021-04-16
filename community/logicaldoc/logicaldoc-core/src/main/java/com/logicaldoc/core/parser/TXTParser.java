@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.charset.CharsetDetector;
@@ -31,7 +32,8 @@ public class TXTParser extends AbstractParser {
 	protected static Logger log = LoggerFactory.getLogger(TXTParser.class);
 
 	@Override
-	public String parse(File file, String filename, String encoding, Locale locale, String tenant) {
+	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
+			String fileVersion) {
 		FileInputStream fis = null;
 		BufferedInputStream bis = null;
 		try {
@@ -53,7 +55,7 @@ public class TXTParser extends AbstractParser {
 					log.warn("Error during TXT fileNameCharset detection", th);
 				}
 			}
-			return parse(bis, filename, enc, locale, tenant);
+			return parse(bis, filename, enc, locale, tenant, document, fileVersion);
 		} catch (Throwable ex) {
 			log.warn("Failed to extract TXT text content", ex);
 		} finally {
@@ -71,7 +73,7 @@ public class TXTParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			StringBuffer content) {
+			Document document, String fileVersion, StringBuffer content) {
 		try {
 			if (input != null)
 				content.append(StringUtil.writeToString(getLimitedStream(input, tenant), encoding));

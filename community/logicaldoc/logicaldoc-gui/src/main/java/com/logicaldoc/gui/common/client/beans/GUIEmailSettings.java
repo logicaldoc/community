@@ -36,6 +36,10 @@ public class GUIEmailSettings implements Serializable {
 
 	private boolean userAsFrom = true;
 
+	private int foldering = 3;
+
+	private GUIFolder targetFolder;
+
 	public String getSmtpServer() {
 		return smtpServer;
 	}
@@ -98,5 +102,21 @@ public class GUIEmailSettings implements Serializable {
 
 	public void setUserAsFrom(boolean userAsFrom) {
 		this.userAsFrom = userAsFrom;
+	}
+
+	public int getFoldering() {
+		return foldering;
+	}
+
+	public void setFoldering(int foldering) {
+		this.foldering = foldering;
+	}
+
+	public GUIFolder getTargetFolder() {
+		return targetFolder;
+	}
+
+	public void setTargetFolder(GUIFolder targetFolder) {
+		this.targetFolder = targetFolder;
 	}
 }

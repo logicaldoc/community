@@ -7,15 +7,14 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.SubscriptionsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
-import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -64,14 +63,10 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 		userId.setCanEdit(false);
 		userId.setHidden(true);
 
-		ListGridField userName = new ListGridField("userName", I18N.message("user"), 200);
+		ListGridField userName = new AvatarListGridField("userName", "userId", "user", 200);
 		userName.setCanEdit(false);
 
-		ListGridField created = new ListGridField("created", I18N.message("subscription"), 110);
-		created.setAlign(Alignment.CENTER);
-		created.setType(ListGridFieldType.DATE);
-		created.setCellFormatter(new DateCellFormatter(false));
-		created.setCanFilter(false);
+		DateListGridField created = new DateListGridField("created", "subscription");
 
 		ListGridField events = new ListGridField("events", I18N.message("notifyon"));
 		events.setWidth("*");
@@ -150,7 +145,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -177,7 +172,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -213,7 +208,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 							AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

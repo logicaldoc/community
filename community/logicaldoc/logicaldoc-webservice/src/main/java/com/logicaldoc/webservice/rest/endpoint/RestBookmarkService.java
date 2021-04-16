@@ -1,7 +1,5 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
-import io.swagger.annotations.Api;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -18,8 +16,10 @@ import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.rest.BookmarkService;
 import com.logicaldoc.webservice.soap.endpoint.SoapBookmarkService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Path("/")
-@Api(value = "bookmark")
+@Tag(name = "bookmark")
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestBookmarkService extends SoapBookmarkService implements BookmarkService {

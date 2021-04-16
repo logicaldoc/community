@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.frontend.client.document.DocumentExtendedPropertiesPanel;
-import com.logicaldoc.gui.frontend.client.document.DocumentOCRPanel;
+import com.logicaldoc.gui.frontend.client.document.DocumentCapturePanel;
 import com.logicaldoc.gui.frontend.client.document.PublishingPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.Side;
@@ -49,7 +49,7 @@ public class UpdatePanel extends VLayout {
 
 	protected UpdateNotificationPanel notificationPanel;
 
-	protected DocumentOCRPanel ocrPanel;
+	protected DocumentCapturePanel ocrPanel;
 
 	protected TabSet tabSet = new TabSet();
 
@@ -144,7 +144,7 @@ public class UpdatePanel extends VLayout {
 				|| Session.get().getUser().isMemberOf(Constants.GROUP_PUBLISHER)))
 			tabSet.addTab(retentionPoliciesTab);
 
-		if (Menu.enabled(Menu.DOCUMENT_OCR))
+		if (Menu.enabled(Menu.CAPTURE))
 			tabSet.addTab(ocrTab);
 
 		if (showNotificationPanel)
@@ -201,7 +201,7 @@ public class UpdatePanel extends VLayout {
 			if (ocrTabPanel.contains(ocrPanel))
 				ocrTabPanel.removeMember(ocrPanel);
 		}
-		ocrPanel = new DocumentOCRPanel(document, nothingToDo, false);
+		ocrPanel = new DocumentCapturePanel(document, nothingToDo, false);
 		ocrTabPanel.addMember(ocrPanel);
 
 		/*

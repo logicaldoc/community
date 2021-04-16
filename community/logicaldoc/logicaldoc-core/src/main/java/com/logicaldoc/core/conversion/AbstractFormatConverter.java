@@ -120,6 +120,11 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 		return this.getClass().getSimpleName().hashCode();
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return hashCode() == obj.hashCode();
+	}
+	
 	/**
 	 * Gets the extension for the given filename, if an alias is found then the
 	 * value of the alias is returned as well. For instance if in the settings

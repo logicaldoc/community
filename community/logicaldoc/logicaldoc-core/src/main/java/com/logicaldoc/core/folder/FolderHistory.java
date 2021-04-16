@@ -33,7 +33,10 @@ public class FolderHistory extends History {
 		history.setUserLogin(getUserLogin());
 		history.setNotifyEvent(isNotifyEvent());
 		history.setIp(getIp());
-
+		history.setDevice(getDevice());
+		history.setGeolocation(getGeolocation());
+		history.setFileSize(getFileSize());
+		
 		return history;
 	}
 }

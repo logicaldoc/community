@@ -14,8 +14,6 @@ public class GUILDAPServer implements Serializable {
 
 	private long id;
 
-	private String implementation = "basic";
-
 	private boolean enabled = false;
 
 	private boolean anon = false;
@@ -72,14 +70,6 @@ public class GUILDAPServer implements Serializable {
 
 	public void setPosition(int position) {
 		this.position = position;
-	}
-
-	public String getImplementation() {
-		return implementation;
-	}
-
-	public void setImplementation(String implementation) {
-		this.implementation = implementation;
 	}
 
 	public boolean isEnabled() {

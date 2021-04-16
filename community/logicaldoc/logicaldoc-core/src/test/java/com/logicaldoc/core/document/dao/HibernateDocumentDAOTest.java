@@ -323,20 +323,20 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 
 		doc.setValues("multi", new String[] { "value1", "value2", "value3" });
 		Assert.assertTrue(dao.store(doc));
-		
+
 		doc = dao.findById(doc.getId());
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);
-		
+
 		Assert.assertEquals("value2", doc.getValue("multi-0001"));
 		Assert.assertEquals("value3", doc.getValue("multi-0002"));
 		Assert.assertEquals("multi", doc.getAttribute("multi-0002").getParent());
-		
+
 		Assert.assertEquals(3, doc.getValueAttributes("multi").size());
-		
+
 		doc.setValues("multi", new String[] { "A", "B" });
 		dao.store(doc);
-		
+
 		doc = dao.findById(doc.getId());
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);
@@ -671,5 +671,12 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);
 		Assert.assertNull(doc.getTransactionId());
+	}
+
+	@Test
+	public void cleanUnexistingUniqueTags() throws PersistenceException {
+		Assert.assertEquals(2, dao.queryForInt("select count(*) from ld_uniquetag"));
+		dao.cleanUnexistingUniqueTags();
+		Assert.assertEquals(0, dao.queryForInt("select count(*) from ld_uniquetag"));
 	}
 }

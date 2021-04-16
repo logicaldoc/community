@@ -6,16 +6,15 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.GarbageDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
@@ -55,24 +54,12 @@ public class TrashPanel extends VLayout {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		ListGridField fileName = new ListGridField("filename", I18N.message("name"));
+		FileNameListGridField fileName = new FileNameListGridField();
+		fileName.setTitle(I18N.message("name"));
 		fileName.setCanFilter(true);
 		fileName.setWidth("*");
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
+		DateListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setHidden(true);
 
 		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
@@ -85,7 +72,7 @@ public class TrashPanel extends VLayout {
 		list.setWidth100();
 		list.setHeight100();
 		list.setAutoFetchData(true);
-		list.setFields(icon, fileName, customId, lastModified);
+		list.setFields(fileName, customId, lastModified);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setDataSource(new GarbageDS());
 		list.setShowFilterEditor(true);
@@ -113,13 +100,13 @@ public class TrashPanel extends VLayout {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void ret) {
 						list.removeSelectedData();
-						Log.info(I18N.message("documentrestored"),
+						GuiLog.info(I18N.message("documentrestored"),
 								I18N.message("documentrestoreddetail", Long.toString(id)));
 
 						// Force a refresh
@@ -134,13 +121,13 @@ public class TrashPanel extends VLayout {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void ret) {
 						list.removeSelectedData();
-						Log.info(I18N.message("folderrestored"),
+						GuiLog.info(I18N.message("folderrestored"),
 								I18N.message("folderrestoreddetail", Long.toString(id)));
 
 						// Force a reload
@@ -189,7 +176,7 @@ public class TrashPanel extends VLayout {
 
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -203,7 +190,7 @@ public class TrashPanel extends VLayout {
 
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -229,7 +216,7 @@ public class TrashPanel extends VLayout {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

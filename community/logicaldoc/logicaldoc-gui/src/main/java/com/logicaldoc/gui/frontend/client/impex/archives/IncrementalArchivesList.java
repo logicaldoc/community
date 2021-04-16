@@ -6,7 +6,7 @@ import com.logicaldoc.gui.common.client.beans.GUIIncrementalArchive;
 import com.logicaldoc.gui.common.client.data.IncrementalArchivesDS;
 import com.logicaldoc.gui.common.client.formatters.DaysCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
@@ -145,7 +145,7 @@ public class IncrementalArchivesList extends VLayout {
 						new AsyncCallback<GUIIncrementalArchive>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -198,7 +198,7 @@ public class IncrementalArchivesList extends VLayout {
 							ImpexService.Instance.get().deleteIncremental(id, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

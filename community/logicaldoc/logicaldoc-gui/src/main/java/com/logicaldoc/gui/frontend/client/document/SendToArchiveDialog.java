@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.document;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.HeaderControls;
@@ -72,12 +72,12 @@ public class SendToArchiveDialog extends Window {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void result) {
-							Log.info(I18N.message("documentsaddedtoarchive"), null);
+							GuiLog.info(I18N.message("documentsaddedtoarchive"), null);
 							destroy();
 						}
 					});
@@ -87,12 +87,12 @@ public class SendToArchiveDialog extends Window {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void result) {
-							Log.info(I18N.message("documentsaddedtoarchive"), null);
+							GuiLog.info(I18N.message("documentsaddedtoarchive"), null);
 							destroy();
 						}
 					});

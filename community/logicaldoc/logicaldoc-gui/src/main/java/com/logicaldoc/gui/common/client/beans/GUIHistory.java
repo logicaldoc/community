@@ -25,7 +25,7 @@ public class GUIHistory implements Serializable {
 	private String event = "";
 
 	private String comment = "";
-	
+
 	private String reason = "";
 
 	private String fileName = null;
@@ -40,8 +40,14 @@ public class GUIHistory implements Serializable {
 
 	private String ip = null;
 
+	private String device = null;
+
+	private String geolocation = null;
+
 	private String userLogin = null;
 
+	private String icon = null;
+	
 	public long getDocId() {
 		return docId;
 	}
@@ -160,5 +166,29 @@ public class GUIHistory implements Serializable {
 
 	public void setReason(String reason) {
 		this.reason = reason;
+	}
+
+	public String getDevice() {
+		return device;
+	}
+
+	public void setDevice(String device) {
+		this.device = device;
+	}
+
+	public String getGeolocation() {
+		return geolocation;
+	}
+
+	public void setGeolocation(String geolocation) {
+		this.geolocation = geolocation;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
 	}
 }

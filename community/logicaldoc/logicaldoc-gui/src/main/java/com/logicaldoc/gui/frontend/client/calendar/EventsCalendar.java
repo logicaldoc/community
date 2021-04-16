@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.CalendarEventsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.CalendarService;
 import com.smartgwt.client.types.TimeDisplayFormat;
@@ -68,7 +68,7 @@ public class EventsCalendar extends Calendar {
 						new AsyncCallback<GUICalendarEvent>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -92,7 +92,7 @@ public class EventsCalendar extends Calendar {
 																		event.getEvent().getAttribute("parentId")),
 																new AsyncCallback<GUICalendarEvent>() {
 																	public void onFailure(Throwable caught) {
-																		Log.serverError(caught);
+																		GuiLog.serverError(caught);
 																	}
 
 																	@Override

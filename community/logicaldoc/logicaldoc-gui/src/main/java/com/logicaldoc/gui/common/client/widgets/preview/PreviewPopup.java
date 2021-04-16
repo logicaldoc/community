@@ -131,12 +131,14 @@ public class PreviewPopup extends Window {
 	 */
 	public PreviewPopup(GUIDocument doc) {
 		this();
-		setTitle(I18N.message("preview") + " - " + doc.getFileName());
+		setTitle(I18N.message("preview") + " - " + doc.getFileName()
+				+ (doc.getFileVersion() != null ? " v" + doc.getFileVersion() : ""));
 		reloadPreview(doc);
 	}
 
 	private void reloadPreview(GUIDocument doc) {
-		setTitle(I18N.message("preview") + " - " + doc.getFileName());
+		setTitle(I18N.message("preview") + " - " + doc.getFileName()
+				+ (doc.getFileVersion() != null ? " v" + doc.getFileVersion() : ""));
 
 		if (previewPanel != null)
 			previewSlot.removeMember(previewPanel);

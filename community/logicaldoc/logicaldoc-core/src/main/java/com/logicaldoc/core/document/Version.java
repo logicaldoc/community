@@ -211,6 +211,8 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		version.setUsername(user.getFullName());
 		version.setOcrTemplateId(document.getOcrTemplateId());
 		version.setBarcodeTemplateId(document.getBarcodeTemplateId());
+		version.setWorkflowStatus(document.getWorkflowStatus());
+		version.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
 		
 		if (document.getTemplate() != null) {
 			version.setTemplateId(document.getTemplate().getId());

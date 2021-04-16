@@ -8,6 +8,7 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
 
@@ -24,7 +25,7 @@ public class ZipParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			StringBuffer content) throws Exception {
+			Document document, String fileVersion, StringBuffer content) throws Exception {
 		File zipFile = File.createTempFile("parsezip", "zip");
 		try {
 			FileUtil.writeFile(input, zipFile.getAbsolutePath());

@@ -19,6 +19,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
 
 /**
@@ -39,7 +40,7 @@ public class XMLParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			StringBuffer content) {
+			Document document, String fileVersion, StringBuffer content) {
 		try {
 			CharArrayWriter writer = new CharArrayWriter();
 			ExtractorHandler handler = new ExtractorHandler(writer);

@@ -1,10 +1,18 @@
 package com.logicaldoc.core.communication;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -28,9 +36,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.automation.Automation;
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.DocumentManager;
+import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
+import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 
 import net.sf.jmimemagic.Magic;
 import net.sf.jmimemagic.MagicMatch;
@@ -42,6 +60,8 @@ import net.sf.jmimemagic.MagicMatch;
  * @author Matteo Caruso - LogicalDOC
  */
 public class EMailSender {
+	private static final String THREAD_POOL = "Email";
+
 	private static Logger log = LoggerFactory.getLogger(EMailSender.class);
 
 	public static final int SECURITY_NONE = 0;
@@ -66,6 +86,18 @@ public class EMailSender {
 
 	private int connectionSecurity = SECURITY_NONE;
 
+	public static int FOLDERING_NONE = 0;
+
+	public static int FOLDERING_YEAR = 1;
+
+	public static int FOLDERING_MONTH = 2;
+
+	public static int FOLDERING_DAY = 3;
+
+	public int foldering = FOLDERING_DAY;
+
+	public Long folderId;
+
 	public EMailSender(long tenant) {
 		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		loadSettings(tenantDao.findById(tenant).getName());
@@ -86,6 +118,8 @@ public class EMailSender {
 			sender = config.getProperty(tenant + ".smtp.sender");
 			authEncripted = "true".equals(config.getProperty(tenant + ".smtp.authEncripted"));
 			connectionSecurity = config.getInt(tenant + ".smtp.connectionSecurity");
+			folderId = config.getLong(tenant + ".smtp.save.folderId", 0);
+			foldering = config.getInt(tenant + ".smtp.save.foldering", FOLDERING_DAY);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 		}
@@ -143,13 +177,14 @@ public class EMailSender {
 	 * @param dictionary map of variable to pass to the automation
 	 */
 	public void sendAsync(EMail email, String templateName, Map<String, Object> dictionary) {
-		new Thread(() -> {
+		ThreadPools tPools = (ThreadPools) Context.get().getBean(ThreadPools.class);
+		tPools.execute(() -> {
 			try {
 				send(email, templateName, dictionary);
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
 			}
-		}).start();
+		}, THREAD_POOL);
 	}
 
 	/**
@@ -183,13 +218,14 @@ public class EMailSender {
 	 * @param email the email to send
 	 */
 	public void sendAsync(EMail email) {
-		new Thread(() -> {
+		ThreadPools tPools = (ThreadPools) Context.get().getBean(ThreadPools.class);
+		tPools.execute(() -> {
 			try {
 				send(email);
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
 			}
-		}).start();
+		}, THREAD_POOL);
 	}
 
 	/**
@@ -210,6 +246,7 @@ public class EMailSender {
 			props.put("mail.transport.protocol", "smtps");
 			props.put("mail.smtps.host", host);
 			props.put("mail.smtps.port", port);
+			props.put("mail.smtps.ssl.protocols", "TLSv1.1 TLSv1.2");
 			if (connectionSecurity == SECURITY_TLS_IF_AVAILABLE)
 				props.put("mail.smtps.starttls.enable", "true");
 			if (connectionSecurity == SECURITY_TLS)
@@ -234,6 +271,7 @@ public class EMailSender {
 			}
 		}
 
+		props.put("mail.smtp.ssl.protocols", "TLSv1.1 TLSv1.2");
 		props.put("mail.smtp.ssl.checkserveridentity", "false");
 		props.put("mail.smtp.ssl.trust", "*");
 		// props.put("mail.debug", "true");
@@ -346,12 +384,119 @@ public class EMailSender {
 		MailDateFormat formatter = new MailDateFormat();
 		formatter.setTimeZone(TimeZone.getTimeZone("GMT")); // always use UTC
 															// for outgoing mail
-		message.setHeader("Date", formatter.format(new Date()));
+		Date now = new Date();
+		message.setHeader("Date", formatter.format(now));
 
 		trans.sendMessage(message, adr);
 		trans.close();
-		
+
 		log.info("Sent email with subject '{}' to rececipients {}", email.getSubject(), email.getAllRecipientsEmails());
+
+		/*
+		 * If the case, we save the email as document in LogicalDOC's repository
+		 */
+		email.setSentDate(now);
+		historycizeOutgoingEmail(email, message, from);
+	}
+
+	/**
+	 * Saved the email as a document in the documents repository
+	 * 
+	 * @param email The email represetnation
+	 * @param message The mime message sent
+	 * @param from email address the email was sent from
+	 */
+	private void historycizeOutgoingEmail(EMail email, MimeMessage message, InternetAddress from) {
+		if(folderId==null)
+			return;
+		
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		Folder saveFolder = folderId != null && folderId != 0 ? folderDao.findFolder(folderId) : null;
+
+		if (saveFolder == null)
+			return;
+
+		File emlFile = null;
+		try {
+			emlFile = File.createTempFile("emailsender", ".eml");
+			message.writeTo(new FileOutputStream(emlFile));
+
+			Folder folder = null;
+			if (foldering == FOLDERING_YEAR) {
+				DateFormat df = new SimpleDateFormat("yyyy");
+				folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
+			} else if (foldering == FOLDERING_MONTH) {
+				DateFormat df = new SimpleDateFormat("yyyy/MM");
+				folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
+			} else if (foldering == FOLDERING_DAY) {
+				DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
+				folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
+			}
+
+			Document emailDocument = new Document();
+			emailDocument.setFileName(email.getSubject() + ".eml");
+			emailDocument.setType("eml");
+			emailDocument.setLocale(email.getLocale() != null ? email.getLocale() : Locale.ENGLISH);
+			emailDocument.setFolder(folder);
+			emailDocument.setTenantId(folder.getTenantId());
+			emailDocument.setTemplate(templateDao.findByName("email", folder.getTenantId()));
+			if (emailDocument.getTemplate() != null) {
+				Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+				Attribute ext = new Attribute();
+				ext.setStringValue(StringUtils.substring(from.getAddress(), 0, 3999));
+				attributes.put("from", ext);
+
+				if (email.getAddresses() != null) {
+					ext = new Attribute();
+					ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddresses()).stream()
+							.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
+					attributes.put("to", ext);
+				}
+
+				if (email.getAddressesCC() != null) {
+					ext = new Attribute();
+					ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddressesCC()).stream()
+							.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
+					attributes.put("cc", ext);
+				}
+
+				ext = new Attribute();
+				ext.setStringValue(StringUtils.substring(email.getSubject(), 0, 3999));
+				attributes.put("subject", ext);
+
+				ext = new Attribute();
+				ext.setStringValue(StringUtils.substring(email.getAuthor(), 0, 3999));
+				attributes.put("sendername", ext);
+
+				ext = new Attribute();
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				ext.setStringValue(df.format(email.getSentDate()));
+				attributes.put("sentdate", ext);
+
+				ext = new Attribute();
+				ext.setBooleanValue(email.getAttachmentsCount() > 0);
+				attributes.put("attachments", ext);
+
+				emailDocument.setAttributes(attributes);
+			}
+
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setComment("saved for history");
+			transaction.setUser(userDao.findByUsername("_system"));
+
+			manager.create(emlFile, emailDocument, transaction);
+			log.debug("Historycizes the email with subject '{}' sent to {}", email.getSubject(),
+					email.getAllRecipientsEmails());
+		} catch (Throwable t) {
+			log.warn("Cannot historycize the email with subject '{}' sent to {}", email.getSubject(),
+					email.getAllRecipientsEmails(), t);
+		} finally {
+			if (emlFile != null && emlFile.exists())
+				FileUtil.strongDelete(emlFile);
+		}
 	}
 
 	public boolean isAuthEncripted() {
@@ -368,5 +513,21 @@ public class EMailSender {
 
 	public void setConnectionSecurity(int connectionSecurity) {
 		this.connectionSecurity = connectionSecurity;
+	}
+
+	public int getFoldering() {
+		return foldering;
+	}
+
+	public void setFoldering(int foldering) {
+		this.foldering = foldering;
+	}
+
+	public Long getFolderId() {
+		return folderId;
+	}
+
+	public void setFolderId(Long folderId) {
+		this.folderId = folderId;
 	}
 }

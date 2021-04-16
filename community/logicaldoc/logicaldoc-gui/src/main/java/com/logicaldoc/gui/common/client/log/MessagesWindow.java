@@ -1,13 +1,11 @@
 package com.logicaldoc.gui.common.client.log;
 
 import com.logicaldoc.gui.common.client.beans.GUIEvent;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.smartgwt.client.types.Alignment;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.HeaderControl;
@@ -70,11 +68,7 @@ public class MessagesWindow extends Window {
 		grid.setCanFreezeFields(false);
 		grid.setCanGroupBy(false);
 
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date");
 
 		ListGridField detail = new ListGridField("detail", I18N.message("detail"));
 		detail.setWidth("*");

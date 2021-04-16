@@ -4,6 +4,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
@@ -45,5 +47,16 @@ public class SecurityTool {
 	public User getUser(long userId) {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		return userDao.findById(userId);
+	}
+
+	/**
+	 * Retrieves a session by it's identifier
+	 * 
+	 * @param sid identifier of the session
+	 * 
+	 * @return the session that matches the identifier
+	 */
+	public Session getSession(String sid) {
+		return SessionManager.get().get(sid);
 	}
 }

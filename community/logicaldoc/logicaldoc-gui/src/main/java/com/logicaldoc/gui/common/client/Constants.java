@@ -149,6 +149,8 @@ public final class Constants {
 
 	public static final String SKIN = "skin";
 	
+	public static final String FOLDER_PATH = "folderPath";
+	
 	public static final String FOLDER_ID = "folderId";
 
 	public static final String DOC_ID = "docId";

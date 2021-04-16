@@ -169,6 +169,7 @@ public class Automation {
 
 		// This is needed to format dates
 		DateTool dateTool = new DateTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
+				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_datelong"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_dateshort"));
 		dictionary.put(DateTool.class.getSimpleName(), dateTool);
 
@@ -239,9 +240,11 @@ public class Automation {
 		try {
 			if (StringUtils.isNotEmpty(expression)) {
 				VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
-
+				
 				Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine",
-						expression.replace("\n", "${nl}"));
+						expression);
+//				Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine",
+//						expression.replace("\n", "${nl}"));
 			}
 			return writer.toString();
 		} catch (Throwable e) {

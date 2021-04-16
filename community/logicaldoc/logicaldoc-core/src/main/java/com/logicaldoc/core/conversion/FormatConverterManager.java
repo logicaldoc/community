@@ -307,6 +307,7 @@ public class FormatConverterManager {
 				history.setSession(session);
 				history.setEvent(UserEvent.FILE_CONVERSION.toString());
 				history.setFilename(FilenameUtils.getBaseName(inFilename) + "." + outFormat.toLowerCase());
+				history.setFileSize(in.length());
 				history.setFilenameOld(inFilename);
 				history.setComment(String.format("%s -> %s", history.getFilenameOld(), history.getFilename()));
 				history.setIp(session.getClient().getAddress());

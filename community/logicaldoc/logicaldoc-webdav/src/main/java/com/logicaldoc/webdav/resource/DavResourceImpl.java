@@ -267,7 +267,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	/**
 	 * @see DavResource#getProperty(org.apache.jackrabbit.webdav.property.DavPropertyName)
 	 */
-	public DavProperty getProperty(DavPropertyName name) {
+	public DavProperty<?> getProperty(DavPropertyName name) {
 
 		initProperties();
 
@@ -321,6 +321,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * Fill the set of properties
 	 */
 	protected void initProperties() {
+		
 		if (!exists() || propsInitialized) {
 			return;
 		}
@@ -332,11 +333,11 @@ public class DavResourceImpl implements DavResource, Serializable {
 		if (isCollection()) {
 			properties.add(new ResourceType(ResourceType.COLLECTION));
 			// Windows XP support
-			properties.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION, "1"));
+			properties.add(new DefaultDavProperty<String>(DavPropertyName.ISCOLLECTION, "1"));
 		} else {
 			properties.add(new ResourceType(ResourceType.DEFAULT_RESOURCE));
 			// Windows XP support
-			properties.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION, "0"));
+			properties.add(new DefaultDavProperty<String>(DavPropertyName.ISCOLLECTION, "0"));
 		}
 
 		/*
@@ -349,7 +350,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		// SupportedLock supportedLock = new SupportedLock();
 		// supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
 		// properties.add(supportedLock);
-		properties.add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
+		properties.add(new DefaultDavProperty<Long>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
 
 		// Set Dav property LastModified
 		long lastmodTime = IOUtil.UNDEFINED_TIME;
@@ -358,16 +359,15 @@ public class DavResourceImpl implements DavResource, Serializable {
 		}
 
 		String lastModified = IOUtil.getLastModified(lastmodTime);
-		properties.add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, lastModified));
+		properties.add(new DefaultDavProperty<String>(DavPropertyName.GETLASTMODIFIED, lastModified));
 
 		// Set Dav property CreationDate
-
 		long creationTime = IOUtil.UNDEFINED_TIME;
 		if (this.resource.getCreationDate() != null) {
 			creationTime = this.resource.getCreationDate().getTime();
 		}
 		String creationDate = IOUtil.getCreated(creationTime);
-		properties.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, creationDate));
+		properties.add(new DefaultDavProperty<String>(DavPropertyName.CREATIONDATE, creationDate));
 
 		propsInitialized = true;
 	}
@@ -864,10 +864,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 		throw new UnsupportedOperationException();
 	}
 
-	public DavResourceFactory getFactoryXXXX() {
-		return this.factory;
-	}
-
 	/**
 	 * @see org.apache.jackrabbit.webdav.DavResource#getSession()
 	 * 
@@ -875,15 +871,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 */
 	public org.apache.jackrabbit.webdav.DavSession getSession() {
 		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @see org.apache.jackrabbit.webdav.DavResource#getSession()
-	 * 
-	 * @return the session
-	 */
-	public DavSession getSessionXXX() {
-		return this.session;
 	}
 
 	/**
@@ -895,23 +882,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 		return this.resource;
 	}
 
-	/**
-	 * Returns the current resource that holds this object
-	 * 
-	 * @return the resource
-	 */
-	public Resource getResourceXXX() {
-		return this.resource;
-	}
-
-	/**
-	 * Returns the current resource that holds this object
-	 * 
-	 * @return the resource
-	 */
-	public ResourceConfig getConfigXXX() {
-		return this.config;
-	}
 
 	/**
 	 * Gets the customized factory
@@ -967,7 +937,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	}
 
 	@Override
-	public void setProperty(DavProperty arg0) throws DavException {
+	public void setProperty(DavProperty<?> arg0) throws DavException {
 		throw new UnsupportedOperationException();
 	}
 }

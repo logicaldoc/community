@@ -184,6 +184,8 @@ public interface DocumentsGrid {
 	 * Loads the layout of the grid(columns, ordering ...)
 	 * 
 	 * @param folder Optional folder to take the layout from
+	 * 
+	 * @return the page size
 	 */
-	public void loadGridLayout(GUIFolder folder);
+	public int loadGridLayout(GUIFolder folder);
 }

@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.dashboard.dashlet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.DashletService;
 import com.smartgwt.client.types.HeaderControls;
@@ -66,7 +66,7 @@ public class DashletSelector extends Window {
 				DashletService.Instance.get().get(form.getValueAsString("dashlet"), new AsyncCallback<GUIDashlet>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 					
 					@Override

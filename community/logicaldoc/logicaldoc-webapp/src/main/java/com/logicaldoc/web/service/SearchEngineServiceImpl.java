@@ -142,9 +142,9 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 			conf.setProperty(session.getTenantName() + ".index.includes",
 					searchEngine.getIncludePatters() != null ? searchEngine.getIncludePatters() : "");
 			conf.setProperty(session.getTenantName() + ".index.excludes.metadata",
-					searchEngine.getExcludePatters() != null ? searchEngine.getExcludePatternsMetadata() : "");
+					searchEngine.getExcludePatternsMetadata() != null ? searchEngine.getExcludePatternsMetadata() : "");
 			conf.setProperty(session.getTenantName() + ".index.includes.metadata",
-					searchEngine.getIncludePatters() != null ? searchEngine.getIncludePattersMetadata() : "");
+					searchEngine.getIncludePattersMetadata() != null ? searchEngine.getIncludePattersMetadata() : "");
 			conf.setProperty(session.getTenantName() + ".parser.timeout",
 					searchEngine.getParsingTimeout() != null ? Integer.toString(searchEngine.getParsingTimeout()) : "");
 			conf.setProperty(session.getTenantName() + ".parser.txt.maxsize",

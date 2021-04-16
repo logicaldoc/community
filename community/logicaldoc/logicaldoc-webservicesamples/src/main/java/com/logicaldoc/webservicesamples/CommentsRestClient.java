@@ -33,22 +33,23 @@ import com.logicaldoc.webservice.mobile.CommentVO;
  */
 public class CommentsRestClient {
 
-	private static final String BASE_PATH = "http://localhost:8080";
+	//private static final String BASE_PATH = "http://localhost:8080";
+	private static final String BASE_PATH = "http://localhost/logicaldoc";
 
 	public static void main(String[] args) {
 
 		CommentsRestClient restClient = new CommentsRestClient();
 		
 		try {
-			String sid = restClient.doPostLogin("admin", "admin123");
+			String sid = restClient.doPostLogin("admin", "admin");
 			//String sid = restClient.doPostLoginJSON("admin", "admin123");
 			System.out.println("sid: " + sid);
 
-			long docID = 25069329L;
+			long docID = 100L;
 			restClient.getComments(sid, docID);
 			
 			//restClient.addCommentJSON(sid, docID);
-			//restClient.addCommentForm(sid, docID);
+		    //restClient.addCommentForm(sid, docID);
 		} catch (Exception e) {
 			e.printStackTrace(); 
 		}
@@ -134,7 +135,7 @@ public class CommentsRestClient {
 			HttpGet method = new HttpGet(url.toString());
 			method.setHeader("Accept", "application/json");
 			
-			CloseableHttpClient httpclient = getHTTPClient("admin", "admin123");
+			CloseableHttpClient httpclient = getHTTPClient("admin", "admin");
 			CloseableHttpResponse response1 = httpclient.execute(method);
 
 			try {
@@ -185,7 +186,7 @@ public class CommentsRestClient {
 		url = url.replace("$SID", sid);
 		url = url.replace("$ID", docID.toString());
 
-		CloseableHttpClient httpclient = getHTTPClient("admin", "admin123");
+		CloseableHttpClient httpclient = getHTTPClient("admin", "admin");
 
 			//Use Jackson to fill just one attribute
 			JSONObject site = new JSONObject();
@@ -252,7 +253,7 @@ public class CommentsRestClient {
 			//httppost.addHeader(new BasicHeader("Accept", "application/xml"));
 			httppost.setEntity(entity);	
 			
-			CloseableHttpClient httpclient = getHTTPClient("admin", "admin123");
+			CloseableHttpClient httpclient = getHTTPClient("admin", "admin");
 			CloseableHttpResponse response = httpclient.execute(httppost);
 			
 			try {

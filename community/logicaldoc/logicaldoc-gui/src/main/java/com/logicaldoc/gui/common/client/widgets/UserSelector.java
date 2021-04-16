@@ -6,6 +6,12 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.FormItemValueFormatter;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -33,12 +39,18 @@ public class UserSelector extends SelectItem {
 		setName(name);
 		setTitle(I18N.message(title));
 		setWrapTitle(false);
+
+		ListGridField id = new ListGridField("id", I18N.message("id"));
+		id.setHidden(true);
 		ListGridField username = new ListGridField("username", I18N.message("username"));
 		ListGridField label = new ListGridField("label", I18N.message("name"));
+		AvatarListGridField avatar = new AvatarListGridField();
+
 		setValueField("id");
 		setDisplayField("username");
 		setPickListWidth(300);
-		setPickListFields(username, label);
+		setPickListFields(id, avatar, username, label);
+
 		setPickListProperties(new UserPickListProperties());
 		setOptionDataSource(new UsersDS(groupIdOrName, allowNull, skipDisabled));
 		setHintStyle("hint");
@@ -71,6 +83,8 @@ public class UserSelector extends SelectItem {
 		if (additionalIcons != null && !additionalIcons.isEmpty())
 			icons.addAll(additionalIcons);
 		setIcons(icons.toArray(new FormItemIcon[0]));
+
+		setValueFormatter(new AvatarFormItemValueFormatter());
 	}
 
 	public GUIUser getUser() {
@@ -82,5 +96,15 @@ public class UserSelector extends SelectItem {
 			user.setUsername(selection.getAttributeAsString("username"));
 		}
 		return user;
+	}
+
+	private class AvatarFormItemValueFormatter implements FormItemValueFormatter {
+		@Override
+		public String formatValue(Object value, Record record, DynamicForm form, FormItem item) {
+			if (value == null)
+				return "";
+			else
+				return Util.avatarWithText(value.toString(), value.toString());
+		}
 	}
 }

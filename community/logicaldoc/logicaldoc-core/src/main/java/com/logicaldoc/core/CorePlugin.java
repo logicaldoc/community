@@ -36,9 +36,7 @@ public class CorePlugin extends LogicalDOCPlugin {
 		} catch (Throwable t) {
 			log.error("Unable to register some tasks", t);
 		}
-		
-		
-		
+
 	}
 
 	@Override
@@ -49,8 +47,13 @@ public class CorePlugin extends LogicalDOCPlugin {
 			for (RunLevel level : RunLevel.values())
 				pbean.setProperty("aspect." + aspect + "." + level.toString(), "true");
 		}
+
+		pbean.setProperty("threadpool.Email.type", "default");
+		pbean.setProperty("threadpool.EventCollector.max", "20");
+		pbean.setProperty("threadpool.EventCollector.type", "default");
+
 		pbean.write();
-		
+
 		// Register the needed servlets
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();

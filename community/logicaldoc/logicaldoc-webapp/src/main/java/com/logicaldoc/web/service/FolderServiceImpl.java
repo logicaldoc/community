@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
@@ -93,11 +94,19 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				/*
 				 * Just apply the current security settings to the whole subtree
 				 */
-				FolderHistory history = new FolderHistory();
-				history.setSession(session);
-				history.setEvent(FolderEvent.PERMISSION.toString());
+				Runnable runnable = new Runnable() {
 
-				fdao.applyRightToTree(folder.getId(), history);
+					@Override
+					public void run() {
+						FolderHistory history = new FolderHistory();
+						history.setSession(session);
+						history.setEvent(FolderEvent.PERMISSION.toString());
+						fdao.applyRightToTree(folder.getId(), history);
+					}
+
+				};
+
+				ServiceUtil.executeLongRunningOperation("Apply Rights to Tree", runnable, session);
 			} else {
 				saveRules(session, f, session.getUserId(), folder.getRights());
 			}
@@ -111,10 +120,24 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			FolderHistory transaction = new FolderHistory();
-			transaction.setSession(session);
-			fdao.applyMetadataToTree(parentId, transaction);
+			Runnable runnable = new Runnable() {
+
+				@Override
+				public void run() {
+					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+					FolderHistory transaction = new FolderHistory();
+					transaction.setSession(session);
+
+					try {
+						fdao.applyMetadataToTree(parentId, transaction);
+					} catch (PersistenceException e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				}
+
+			};
+
+			ServiceUtil.executeLongRunningOperation("Apply Folder Metadata", runnable, session);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -1164,10 +1187,23 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			FolderHistory transaction = new FolderHistory();
-			transaction.setSession(session);
-			fdao.applyTagsToTree(parentId, transaction);
+			Runnable runnable = new Runnable() {
+
+				@Override
+				public void run() {
+					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+					FolderHistory transaction = new FolderHistory();
+					transaction.setSession(session);
+					try {
+						fdao.applyTagsToTree(parentId, transaction);
+					} catch (PersistenceException e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				}
+
+			};
+
+			ServiceUtil.executeLongRunningOperation("Apply Tags", runnable, session);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -1191,15 +1227,23 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			Runnable runnable = new Runnable() {
 
-			/*
-			 * Just apply the current security settings to the whole subtree
-			 */
-			FolderHistory history = new FolderHistory();
-			history.setSession(session);
+				@Override
+				public void run() {
+					/*
+					 * Just apply the current security settings to the whole
+					 * subtree
+					 */
+					FolderHistory history = new FolderHistory();
+					history.setSession(session);
+					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+					fdao.applyGridToTree(folderId, history);
+				}
 
-			fdao.applyGridToTree(folderId, history);
+			};
+
+			ServiceUtil.executeLongRunningOperation("Apply Grid Layout", runnable, session);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -1210,10 +1254,23 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			FolderHistory transaction = new FolderHistory();
-			transaction.setSession(session);
-			fdao.applyOCRToTree(parentId, transaction);
+			Runnable runnable = new Runnable() {
+
+				@Override
+				public void run() {
+					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+					FolderHistory transaction = new FolderHistory();
+					transaction.setSession(session);
+					try {
+						fdao.applyOCRToTree(parentId, transaction);
+					} catch (PersistenceException e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				}
+
+			};
+
+			ServiceUtil.executeLongRunningOperation("Apply OCR", runnable, session);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -1224,11 +1281,24 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
-			ServiceUtil.checkPermission(Permission.STORAGE, session.getUser(), parentId);
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			FolderHistory transaction = new FolderHistory();
-			transaction.setSession(session);
-			fdao.applyStorageToTree(parentId, transaction);
+			Runnable runnable = new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						ServiceUtil.checkPermission(Permission.STORAGE, session.getUser(), parentId);
+						FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+						FolderHistory transaction = new FolderHistory();
+						transaction.setSession(session);
+						fdao.applyStorageToTree(parentId, transaction);
+					} catch (Exception e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				}
+
+			};
+
+			ServiceUtil.executeLongRunningOperation("Apply Storage", runnable, session);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}

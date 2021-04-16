@@ -60,10 +60,10 @@ public class LoginThrottle {
 	/**
 	 * Saves the login failure in the database
 	 * 
-	 * @param username the username 
-	 * @param ip the IP address from which the login intent comes from
+	 * @param username the username
+	 * @param clien the client address from which the login intent comes from
 	 */
-	public static void recordFailure(String username, String ip) {
+	public static void recordFailure(String username, Client client) {
 
 		// Update the failed login counters
 		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
@@ -71,8 +71,8 @@ public class LoginThrottle {
 			if (StringUtils.isNotEmpty(username)) {
 				sDao.next(LOGINFAIL_USERNAME + username, 0L, Tenant.SYSTEM_ID);
 			}
-			if (StringUtils.isNotEmpty(ip))
-				sDao.next(LOGINFAIL_IP + ip, 0L, Tenant.SYSTEM_ID);
+			if (StringUtils.isNotEmpty(client.getAddress()))
+				sDao.next(LOGINFAIL_IP + client.getAddress(), 0L, Tenant.SYSTEM_ID);
 		}
 
 		// Record the failed login attempt
@@ -84,13 +84,13 @@ public class LoginThrottle {
 			user.setName(username);
 		}
 		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(), ip, ip, null);
+		dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(), null, null, client);
 	}
 
 	/**
 	 * Performs anti brute force attack checks
 	 * 
-	 * @param username the username 
+	 * @param username the username
 	 * @param ip the IP address from which the login intent comes from
 	 * 
 	 * @throws AuthenticationException if the authentication fails

@@ -151,22 +151,7 @@
             access="isAuthenticated()" />
         <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
     </security:http>
-    
-    <security:http pattern="/download/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
-    </security:http>    
-    
+       
     <security:http pattern="/download-ticket/**" use-expressions="true"
         create-session="never" disable-url-rewriting="true" auto-config="false"
         access-decision-manager-ref="LDAccessDecisionManager"
@@ -181,21 +166,6 @@
             access="isAuthenticated()" />
         <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
     </security:http>    
-    
-    <security:http pattern="/display/**" use-expressions="true"
-        create-session="never" disable-url-rewriting="true" auto-config="false"
-        access-decision-manager-ref="LDAccessDecisionManager"
-        authentication-manager-ref="AuthenticationManager"
-        security-context-repository-ref="LDSecurityContextRepository">
-        
-        <security:headers disabled="true" />
-        <security:csrf disabled="true" />
-        
-        <!-- Protected areas -->
-        <security:intercept-url pattern="/**"
-            access="isAuthenticated()" />
-        <security:http-basic entry-point-ref="LDBasicAuthenticationEntryPoint" />
-    </security:http>   
     
     <security:http use-expressions="true" create-session="never"
         disable-url-rewriting="true" auto-config="false"
@@ -220,7 +190,11 @@
             access="isAuthenticated()" />
         <security:intercept-url pattern="/mobile/**"
             access="isAuthenticated()" />
-        
+        <security:intercept-url pattern="/display/**"
+            access="isAuthenticated()" />
+        <security:intercept-url pattern="/download/**"
+            access="isAuthenticated()" />
+                
         <!-- Login page -->
         <security:form-login login-page="/login.jsp"
             login-processing-url="/j_spring_security_check"

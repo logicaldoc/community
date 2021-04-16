@@ -3,14 +3,14 @@ package com.logicaldoc.gui.frontend.client.impex.archives;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.VersionsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -93,29 +93,17 @@ public class VersionsPanel extends VLayout {
 		ListGridField docid = new ListGridField("docid", I18N.message("id"), 80);
 
 		ListGridField customid = new ListGridField("customid", I18N.message("customid"), 100);
-		ListGridField fileName = new ListGridField("filename", I18N.message("filename"), 200);
+		FileNameListGridField fileName = new FileNameListGridField();
 
 		ListGridField version = new ListGridField("version", I18N.message("version"), 70);
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
+
+		ListGridField date = new DateListGridField("date", "date");
 
 		ListGridField size = new ListGridField("size", I18N.message("size"), 70);
 		size.setAlign(Alignment.CENTER);
 		size.setType(ListGridFieldType.FLOAT);
 		size.setCellFormatter(new FileSizeCellFormatter());
 		size.setCanFilter(false);
-
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
 
 		ListGridField template = new ListGridField("template", I18N.message("template"), 200);
 
@@ -125,7 +113,7 @@ public class VersionsPanel extends VLayout {
 		listGrid.setAutoFetchData(true);
 		dataSource = new VersionsDS(null, archiveId, max);
 		listGrid.setDataSource(dataSource);
-		listGrid.setFields(id, docid, customid, icon, fileName, version, date, size, template);
+		listGrid.setFields(id, docid, customid, fileName, version, date, size, template);
 		addMember(listGrid, 1);
 
 		listGrid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -176,7 +164,7 @@ public class VersionsPanel extends VLayout {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -184,8 +172,8 @@ public class VersionsPanel extends VLayout {
 									ListGridRecord selectedRecord = archivesList.getList().getSelectedRecord();
 									if (selectedRecord != null) {
 										selectedRecord.setAttribute("size", archive.getSize());
-										archivesList.getList().refreshRow(
-												archivesList.getList().getRecordIndex(selectedRecord));
+										archivesList.getList()
+												.refreshRow(archivesList.getList().getRecordIndex(selectedRecord));
 									}
 								}
 							});

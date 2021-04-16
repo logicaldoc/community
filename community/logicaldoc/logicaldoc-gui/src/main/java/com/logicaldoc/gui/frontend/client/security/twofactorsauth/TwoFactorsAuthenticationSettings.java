@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -41,7 +41,7 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -65,7 +65,15 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 		enable2fa.setWrap(false);
 		enable2fa.setRequired(true);
 		enable2fa.setDisabled(Session.get().isDemo());
-		form.setFields(enable2fa);
+		
+		final RadioGroupItem allowTrustedDevices = ItemFactory.newBooleanSelector("allowtrusted",
+				I18N.message("alwaysallowtrusteddev"));
+		allowTrustedDevices.setValue("true".equals(settings.get("allowtrusted")) ? "yes" : "no");
+		allowTrustedDevices.setWrapTitle(false);
+		allowTrustedDevices.setWrap(false);
+		allowTrustedDevices.setRequired(true);
+
+		form.setFields(enable2fa, allowTrustedDevices);
 
 		/*
 		 * GoogleAuthenticator section
@@ -79,8 +87,8 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
 		final RadioGroupItem enableGoolge = ItemFactory.newBooleanSelector("enableGoolge",
 				I18N.message("enablegoogleauthenticator"));
-		enableGoolge.setValue("true".equals(settings.get(Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled")) ? "yes"
-				: "no");
+		enableGoolge.setValue(
+				"true".equals(settings.get(Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled")) ? "yes" : "no");
 		enableGoolge.setWrapTitle(false);
 		enableGoolge.setWrap(false);
 		enableGoolge.setRequired(true);
@@ -115,6 +123,8 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 					final List<GUIParameter> params = new ArrayList<GUIParameter>();
 					params.add(new GUIParameter(tenant + ".2fa.enabled",
 							vm.getValueAsString("enable2fa").equals("yes") ? "true" : "false"));
+					params.add(new GUIParameter(tenant + ".2fa.allowtrusted",
+							vm.getValueAsString("allowtrusted").equals("yes") ? "true" : "false"));
 					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled",
 							vm.getValueAsString("enableGoolge").equals("yes") ? "true" : "false"));
 					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_YUBIKEY + ".enabled",
@@ -124,13 +134,13 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void arg) {
 									Session.get().updateConfig(params);
-									Log.info(I18N.message("settingssaved"), null);
+									GuiLog.info(I18N.message("settingssaved"), null);
 								}
 							});
 				}

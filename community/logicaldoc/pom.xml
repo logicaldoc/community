@@ -4,11 +4,11 @@
     <parent>
         <groupId>com.logicaldoc</groupId>
         <artifactId>logicaldoc-parent-pom</artifactId>
-        <version>96</version>
+        <version>97</version>
     </parent>
     <groupId>com.logicaldoc</groupId>
     <artifactId>logicaldoc</artifactId>
-    <version>8.5.2</version>
+    <version>8.6.1</version>
     <packaging>pom</packaging>
     <name>logicaldoc</name>
     <description>LogicalDOC is an open-source enterprise class Document Management System developed by LogicalDOC Srl, based on the Java Platform.</description>
@@ -101,6 +101,7 @@
         <module>logicaldoc-dropbox</module>
         <module>logicaldoc-i18n</module>
         <module>logicaldoc-gui</module>
+        <module>logicaldoc-android</module>
         <module>logicaldoc-webapp</module>
         <module>logicaldoc-webservicesamples</module>
     </modules>

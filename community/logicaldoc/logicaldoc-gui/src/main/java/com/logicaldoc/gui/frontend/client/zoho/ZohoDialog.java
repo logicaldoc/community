@@ -6,7 +6,7 @@ import java.util.List;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
@@ -106,7 +106,7 @@ public class ZohoDialog extends Dialog {
 								@Override
 								public void onFailure(Throwable caught) {
 									ContactingServer.get().hide();
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -150,7 +150,7 @@ public class ZohoDialog extends Dialog {
 								@Override
 								public void onFailure(Throwable caught) {
 									ContactingServer.get().hide();
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

@@ -129,6 +129,19 @@ public class WindowUtils {
 		return navigator.userAgent.toLowerCase();
 	}-*/;
 
+	/**
+	 * Opens a given HTML document in new popup windows
+	 *  
+	 * @param title window titlew
+	 * @param html the HTML code to display
+	 */
+	public static native void openHtmlInWindow(String title, String html) /*-{
+	    var printWindow = $wnd.open("", title, "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes");
+        // printWindow.document.body.innerHTML = body;        
+        printWindow.document.write(html);
+ 		printWindow.focus();
+    }-*/;
+	
 	public static boolean isChrome() {
 		return getUserAgent().toLowerCase().contains("chrome");
 	}

@@ -6,8 +6,10 @@ import java.util.Map;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.login.client.services.LoginService;
 import com.logicaldoc.gui.login.client.services.LoginServiceAsync;
 import com.smartgwt.client.types.Alignment;
@@ -58,9 +60,7 @@ public class ChangePassword extends Window {
 		form.setWidth(300);
 		form.setMargin(5);
 
-		PasswordItem password = new PasswordItem();
-		password.setName(PASSWORD);
-		password.setTitle(I18N.message("currentpassword"));
+		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete(PASSWORD, "currentpassword", null);
 		password.setRequired(true);
 
 		MatchesFieldValidator equalsValidator = new MatchesFieldValidator();
@@ -72,15 +72,11 @@ public class ChangePassword extends Window {
 				.setErrorMessage(I18N.message("errorfieldminlenght", Integer.toString(user.getPasswordMinLenght())));
 		sizeValidator.setMin(user.getPasswordMinLenght());
 
-		PasswordItem newPass = new PasswordItem();
-		newPass.setName(NEWPASSWORD);
-		newPass.setTitle(I18N.message(NEWPASSWORD));
+		PasswordItem newPass = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORD, NEWPASSWORD, null);
 		newPass.setRequired(true);
 		newPass.setValidators(equalsValidator, sizeValidator);
 
-		PasswordItem newPassAgain = new PasswordItem();
-		newPassAgain.setName(NEWPASSWORDAGAIN);
-		newPassAgain.setTitle(I18N.message(NEWPASSWORDAGAIN));
+		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN, null);
 		newPassAgain.setWrapTitle(false);
 		newPassAgain.setRequired(true);
 
@@ -99,7 +95,7 @@ public class ChangePassword extends Window {
 					}
 
 					loginService.changePassword(user.getId(), vm.getValueAsString(PASSWORD),
-							vm.getValueAsString(NEWPASSWORD), new AsyncCallback<Integer>() {
+							vm.getValueAsString(NEWPASSWORD), new AsyncCallback<GUIValue>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -107,21 +103,23 @@ public class ChangePassword extends Window {
 								}
 
 								@Override
-								public void onSuccess(Integer ret) {
-									if (ret.intValue() > 0) {
-										// Alert the user and maintain the popup
-										// opened
+								public void onSuccess(GUIValue val) {
+									int ret = Integer.parseInt(val.getCode());
+									if (ret > 0) {
+										// Alert the user
 										if (ret == 1)
-											SC.warn(I18N.message("wrongpassword"));
+											GuiLog.warn(I18N.message("wrongpassword"), null);
 										else if (ret == 2)
-											SC.warn(I18N.message("passwdnotnotified"));
+											GuiLog.warn(I18N.message("passwdnotnotified"), null);
+										else if (ret == 3)
+											GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
 										else
-											SC.warn(I18N.message("genericerror"));
+											GuiLog.warn(I18N.message("genericerror"), null);
 									} else {
 										// Close the popup
 										ChangePassword.this.destroy();
 										SC.say(I18N.message("yourpasswordhaschanged"));
-										Log.info(I18N.message("event.user.passwordchanged"), null);
+										GuiLog.info(I18N.message("event.user.passwordchanged"), null);
 									}
 								}
 							});

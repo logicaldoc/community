@@ -48,12 +48,12 @@ import com.logicaldoc.webservice.model.WSSearchOptions;
 
 public class HttpRestWb {
 
-	//public static String BASE_PATH = "http://localhost:8080/logicaldoc";
-	public static String BASE_PATH = "http://localhost:1000";
+	//public static String BASE_PATH = "http://localhost/logicaldoc";
+	public static String BASE_PATH = "http://localhost:8086";
 	
 	public static String USERNAME = "admin";
 	
-	public static String PASSWORD = "12345678";
+	public static String PASSWORD = "admin";
 
 	public static void main(String[] args) throws Exception {
 
@@ -66,7 +66,7 @@ public class HttpRestWb {
                 .setDefaultCredentialsProvider(credsProvider)
                 .setConnectionTimeToLive(1, TimeUnit.MINUTES)
                 .build();
-/*        
+       
 		URL url = new URL(BASE_PATH);
 		
 		HttpHost targetHost = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
@@ -77,24 +77,27 @@ public class HttpRestWb {
 		// Add AuthCache to the execution context
 		HttpClientContext context = HttpClientContext.create();
 		context.setCredentialsProvider(credsProvider);
-		context.setAuthCache(authCache);*/
+		context.setAuthCache(authCache);
         
-        uploadDocument(httpclient);
+        //uploadDocument(httpclient);
         
-        /*        
-		createFolderSimpleForm(httpclient);
-		createFolderSimpleJSON(httpclient);
-
+        
+		//createFolderSimpleForm(httpclient);
+		//createFolderSimpleJSON(httpclient);
+        
 		createDocument( httpclient);
-		listDocuments(httpclient, 04L);
-		listChildren(httpclient, 04L);
+		/* 		
 		
-		long start_time = System.nanoTime();
+		//listDocuments(httpclient, 04L);				
+		//listChildren(httpclient, 04L);		
+		
+		//long start_time = System.nanoTime();
 				
-        WSSearchOptions wsso = buildSearchOptions("en", "document management system");
-		find(httpclient, wsso);
-		*/
+//        WSSearchOptions wsso = buildSearchOptions("en", "document management system");
+//		find(httpclient, wsso);
 		
+
+
 		/*
         wsso = buildSearchOptions("en", "document management");
 		find(sid, wsso);
@@ -131,6 +134,7 @@ public class HttpRestWb {
 		System.out.println("Total Exec. time (ms): " +difference);
 		*/
 		
+		
 		// Total Exec. time (ms): 681.909198
 		// Total Exec. time (ms): 737.044408
 		// Total Exec. time (ms): 705.149953
@@ -146,6 +150,7 @@ public class HttpRestWb {
 		// Total Exec. time (ms): 1064.021243
 		
 		//createPath(httpclient, 04L, "/sgsgsgs/Barisoni/rurururu");
+		//if (1 == 1) return;
 		
         String sid = getSid(httpclient);
         
@@ -367,8 +372,10 @@ public class HttpRestWb {
 
 		System.out.println("createDocument(CloseableHttpClient)");
 		//CloseableHttpClient httpclient = HttpClients.createDefault();
-		
-        HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/create");
+
+        //HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/create");		
+		HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/createDocument02");
+
 
 		File f = new File("C:/tmp/InvoiceProcessing01-workflow.png");
 		System.out.println(f.getName());
@@ -444,7 +451,7 @@ public class HttpRestWb {
 //		CloseableHttpClient httpclient = HttpClients.createDefault();
 
 		// This will create a tree starting from the Default workspace
-		String folderPath = "/Default/USA/NJ/Fair Lawn/createSimple/JSON";
+		String folderPath = "/Default/USA/NJ/Fair Lawn/createFolder/Simple/JSON";
 		String input = "{ \"folderPath\" : \"" + folderPath + "\" }";
 		System.out.println(input);
 
@@ -563,13 +570,12 @@ public class HttpRestWb {
 		
         HttpPost httppost = new HttpPost(BASE_PATH + "/services/rest/document/upload");
        
-        // File file = new File("c:/users/shatz/Downloads/logicaldocsecurity-171122130133.pdf");
-        File file = new File("C:/tmp/alphatypes.txt");  
+        File file = new File("C:/tmp/serv.txt");  
                 
 		System.out.println(file.getName());	
 		System.out.println(file.getAbsolutePath());	
 		
-		long folderID = 103645184L;
+		long folderID = 100L;
 		
 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();         
 		builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);

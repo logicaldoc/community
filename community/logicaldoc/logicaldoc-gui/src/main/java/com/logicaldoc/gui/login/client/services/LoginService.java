@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 /**
  * The client side stub for the Login Service. This service gives all needed
@@ -18,11 +19,11 @@ public interface LoginService extends RemoteService {
 	 * @param oldPassword can be null or is the old password
 	 * @param newPassword the new password
 	 * 
-	 * @return 0 if all is ok, 1 if the password is incorrect, 2 if the new
-	 *         password cannot be notified, otherwise a positive number grater
-	 *         than 2
+	 * @return the error code and message. 0 if all went ok, 1 if the password is incorrect, 2 if the new
+	 *         password cannot be notified, 3 if the password has been already used, otherwise a positive number grater
+	 *         than 3
 	 */
-	public int changePassword(long userId, String oldPassword, String newPassword);
+	public GUIValue changePassword(long userId, String oldPassword, String newPassword);
 
 	/**
 	 * Reset the password for the given email.

@@ -14,7 +14,7 @@
 		
 		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
 
-		<echo message="${pom.artifactId} is deployed" />
+		<echo message="${pom.artifactId} has been deployed" />
 	</target>
     
     <target name="deploy-classes" depends="init-all" description="Copy classes into a deployed webapp">

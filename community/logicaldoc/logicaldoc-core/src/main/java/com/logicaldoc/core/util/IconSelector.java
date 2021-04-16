@@ -23,7 +23,7 @@ public class IconSelector {
 	/**
 	 * Returns the icon by parsing the provided file extension
 	 * 
-	 * @param ext the gile extensions
+	 * @param ext the file extension(or file name)
 	 * @param shortcut If the icon displays a shortcut
 	 * 
 	 * @return the icon file name
@@ -31,17 +31,18 @@ public class IconSelector {
 	public static String selectIcon(String ext, boolean shortcut) {
 		String icon = "";
 		if (ext != null)
-			ext = ext.toLowerCase();
+			ext = ext.contains(".") ? FilenameUtils.getExtension(ext).toLowerCase() : ext.toLowerCase();
 
 		if (ext == null || ext.equalsIgnoreCase(""))
 			icon = "generic.png";
 		else if (ext.equals("pdf"))
 			icon = "pdf.png";
-		else if (ext.equals("txt") || ext.equals("properties") || ext.equals("log") || ext.equals("csv") || ext.equals("json"))
+		else if (ext.equals("txt") || ext.equals("properties") || ext.equals("log") || ext.equals("csv")
+				|| ext.equals("json"))
 			icon = "text.png";
-		else if (ext.equals("doc") || ext.equals("docm") || ext.equals("docx") || ext.equals("docxm") || ext.equals("dotm")
-				|| ext.equals("odt") || ext.equals("rtf") || ext.equals("ott") || ext.equals("sxw") || ext.equals("wpd")
-				|| ext.equals("kwd") || ext.equals("dot"))
+		else if (ext.equals("doc") || ext.equals("docm") || ext.equals("docx") || ext.equals("docxm")
+				|| ext.equals("dotm") || ext.equals("odt") || ext.equals("rtf") || ext.equals("ott")
+				|| ext.equals("sxw") || ext.equals("wpd") || ext.equals("kwd") || ext.equals("dot"))
 			icon = "word.png";
 		else if (ext.equals("xls") || ext.equals("xlsm") || ext.equals("xlsb") || ext.equals("xlsx")
 				|| ext.equals("xlsxm") || ext.equals("ods") || ext.equals("xlt") || ext.equals("ots")
@@ -92,12 +93,12 @@ public class IconSelector {
 	 * @param ext the file extension
 	 * 
 	 * @return if ext is a video
-	 */	
+	 */
 	private static boolean isVideo(String ext) {
 
-		return (ext.equals("avi") || ext.equals("mpg") || ext.equals("mp4") || ext.equals("mov") 
-				|| ext.equals("wmv") || ext.equals("mkv") || ext.equals("mpeg") || ext.equals("m4v") 
-				|| ext.equals("divx") || ext.equals("flv") || ext.equals("m2v") || ext.equals("m2ts"));
+		return (ext.equals("avi") || ext.equals("mpg") || ext.equals("mp4") || ext.equals("mov") || ext.equals("wmv")
+				|| ext.equals("mkv") || ext.equals("mpeg") || ext.equals("m4v") || ext.equals("divx")
+				|| ext.equals("flv") || ext.equals("m2v") || ext.equals("m2ts"));
 	}
 
 	/**
@@ -108,7 +109,7 @@ public class IconSelector {
 	 * @return if ext is an image
 	 */
 	public static boolean isPicture(String ext) {
-		
+
 		if (ext != null)
 			ext = ext.toLowerCase();
 

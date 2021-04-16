@@ -5,14 +5,15 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.MessagesDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.observer.UserObserver;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -81,14 +82,10 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		ListGridField subject = new ListGridField("subject", I18N.message("subject"));
 		subject.setCanFilter(true);
 
-		ListGridField from = new ListGridField("from", I18N.message("from"), 150);
+		AvatarListGridField from = new AvatarListGridField("from", "avatar", I18N.message("from"), 160);
 		from.setCanFilter(true);
 
-		ListGridField sent = new ListGridField("sent", I18N.message("sent"), 110);
-		sent.setAlign(Alignment.CENTER);
-		sent.setType(ListGridFieldType.DATE);
-		sent.setCellFormatter(new DateCellFormatter(false));
-		sent.setCanFilter(false);
+		ListGridField sent = new DateListGridField("sent", "sent");
 
 		grid = new RefreshableListGrid() {
 			@Override
@@ -141,7 +138,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -224,7 +221,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 							MessageService.Instance.get().delete(ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

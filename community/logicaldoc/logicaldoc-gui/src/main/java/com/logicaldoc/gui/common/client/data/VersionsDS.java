@@ -33,9 +33,13 @@ public class VersionsDS extends DataSource {
 		DataSourceTextField template = new DataSourceTextField("template");
 		DataSourceTextField type = new DataSourceTextField("type");
 		DataSourceTextField fileName = new DataSourceTextField("filename");
+		DataSourceTextField wfStatus = new DataSourceTextField("workflowStatus");
+		DataSourceTextField wfStatusDisplay = new DataSourceTextField("workflowStatusDisplay");
+		DataSourceImageField avatar = new DataSourceImageField("userId", I18N.message("avatar"), 24);
+		wfStatusDisplay.setHidden(true);
 
-		setFields(id, user, event, version, fileVersion, date, comment, docid, customid, type, size, icon,
-				template, fileName);
+		setFields(id, avatar, user, event, version, fileVersion, date, comment, docid, customid, type, size, icon,
+				template, fileName, wfStatus, wfStatusDisplay);
 		setClientOnly(true);
 		setDataURL("data/versions.xml?max=" + max + (docId != null ? "&docId=" + docId : "&archiveId=" + archiveId)
 				+ "&locale=" + I18N.getLocale());

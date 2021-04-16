@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ApplicationRestarting;
@@ -17,6 +17,7 @@ import com.logicaldoc.gui.frontend.client.services.UpdateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.types.Visibility;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
@@ -60,7 +61,7 @@ public class UpdatePanel extends VLayout {
 					@Override
 					public void onFailure(Throwable caught) {
 						ContactingServer.get().hide();
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 						onUpdateUnavailable();
 					}
 
@@ -68,7 +69,11 @@ public class UpdatePanel extends VLayout {
 					public void onSuccess(GUIParameter[] parameters) {
 						ContactingServer.get().hide();
 
-						if (parameters != null) {
+						if (parameters == null) {
+							onUpdateUnavailable();
+						} else if (parameters.length == 1 && parameters[0].getName().equals("error")) {
+							onUpdateTemporarilyUnavailable(parameters[0].getValue());
+						} else if (parameters != null) {
 							DynamicForm form = new DynamicForm();
 							form.setWidth(300);
 							form.setTitleOrientation(TitleOrientation.LEFT);
@@ -113,23 +118,34 @@ public class UpdatePanel extends VLayout {
 							body.setMembers(infoPanel, notesPanel);
 
 							setMembers(message, body);
-						} else {
-							onUpdateUnavailable();
 						}
 					}
 				});
 	}
 
 	private void onUpdateUnavailable() {
-		Label message = new Label();
-		message.setContents(I18N.message("updatepackagenotfound"));
-		message.setWrap(false);
-		message.setAlign(Alignment.LEFT);
-		message.setStyleName("updateunavailable");
-		message.setLayoutAlign(Alignment.LEFT);
-		message.setLayoutAlign(VerticalAlignment.TOP);
-		message.setHeight(20);
-		setMembers(message);
+		Label label = new Label(I18N.message("updatepackagenotfound"));
+		label.setPadding(10);
+		label.setWrap(false);
+		label.setIcon("[SKIN]/Dialog/stop.png");
+		label.setShowEdges(true);
+        label.setValign(VerticalAlignment.CENTER);  
+        label.setAlign(Alignment.LEFT);
+        label.setWrap(true);
+		addMember(label);
+	}
+
+	private void onUpdateTemporarilyUnavailable(String reason) {
+		Label label = new Label(I18N.message("updatepackagetemporarilynotavailable",
+				I18N.message("updatepackagetemporarilynotavailable." + reason)));
+		label.setPadding(10);
+		label.setWrap(false);
+		label.setIcon("[SKIN]/Dialog/warn.png");
+		label.setShowEdges(true);
+        label.setValign(VerticalAlignment.CENTER);  
+        label.setAlign(Alignment.LEFT);
+        label.setWrap(true);
+		addMember(label);
 	}
 
 	private VLayout prepareDownloadProgress(final GUIParameter[] parameters) {
@@ -168,7 +184,7 @@ public class UpdatePanel extends VLayout {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -208,7 +224,7 @@ public class UpdatePanel extends VLayout {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 								download.setDisabled(false);
 							}
 
@@ -222,7 +238,7 @@ public class UpdatePanel extends VLayout {
 
 											@Override
 											public void onFailure(Throwable caught) {
-												Log.serverError(caught);
+												GuiLog.serverError(caught);
 											}
 
 											@Override
@@ -258,7 +274,7 @@ public class UpdatePanel extends VLayout {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

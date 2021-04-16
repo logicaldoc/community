@@ -37,8 +37,8 @@ public class VersionsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(VersionsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			ServiceUtil.validateSession(request);
 
@@ -69,7 +69,8 @@ public class VersionsDataServlet extends HttpServlet {
 
 			List<Object> parameters = new ArrayList<Object>();
 			StringBuffer query = new StringBuffer(
-					"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName, A.customId, A.fileSize, A.type, A.templateName ");
+					"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
+							+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId ");
 			if (request.getParameter("docId") != null) {
 				query.append(" from Version A where A.deleted = 0 and A.docId = ?1 ");
 				parameters.add(Long.parseLong(request.getParameter("docId")));
@@ -104,13 +105,19 @@ public class VersionsDataServlet extends HttpServlet {
 				writer.print("<filename><![CDATA[" + (String) cols[8] + "]]></filename>");
 				writer.print("<customid><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></customid>");
 				writer.print("<size>" + cols[10] + "</size>");
-				writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[11]))
-						+ "</icon>");
+				writer.print(
+						"<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[11])) + "</icon>");
 				writer.print("<type>" + (String) cols[11] + "</type>");
 				if (cols[12] != null)
 					writer.print("<template><![CDATA[" + cols[12] + "]]></template>");
 				else
 					writer.print("<template></template>");
+
+				writer.print("<workflowStatus><![CDATA[" + (cols[13] != null ? cols[13] : "") + "]]></workflowStatus>");
+				writer.print("<workflowStatusDisplay><![CDATA[" + (cols[14] != null ? cols[14] : "")
+						+ "]]></workflowStatusDisplay>");
+				writer.print("<userId>" + cols[15] + "</userId>");
+				
 				writer.print("</version>");
 			}
 

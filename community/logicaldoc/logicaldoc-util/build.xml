@@ -14,6 +14,6 @@
 		
 		<copy file="target/${pom.artifactId}-${pom.version}.${pom.packaging}" todir="${logicaldoc.webroot}/WEB-INF/lib"/>
 		
-		<echo message="${pom.artifactId} is deployed" />
+		<echo message="${pom.artifactId} has been deployed" />
 	</target>
 </project>

@@ -1,7 +1,7 @@
 -- timestamp -> datetime
 -- double -> float
 -- add column -> add
--- mediumtext -> text
+-- mediumtext -> nvarchar(max)
 -- varchar -> nvarchar
 
 create table ld_bookmark (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
@@ -46,10 +46,11 @@ create table ld_group (ld_id bigint not null, ld_lastmodified datetime not null,
                        ld_description nvarchar(255), ld_type int not null, ld_source nvarchar(255), primary key (ld_id));
 create table ld_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                          ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint, 
-                         ld_folderid bigint, ld_userid bigint, ld_date datetime, ld_username nvarchar(255), ld_event nvarchar(255), 
+                         ld_folderid bigint, ld_userid bigint, ld_date datetime2(3), ld_username nvarchar(255), ld_event nvarchar(255), 
                          ld_comment nvarchar(4000), ld_reason nvarchar(4000), ld_version nvarchar(255), ld_path nvarchar(4000), 
                          ld_pathold nvarchar(4000), ld_notified int not null, ld_sessionid nvarchar(255), ld_new int, ld_filename nvarchar(255),
-                         ld_filenameold nvarchar(255), ld_userlogin nvarchar(255), ld_ip nvarchar(255), primary key (ld_id));
+                         ld_filenameold nvarchar(255), ld_userlogin nvarchar(255), ld_ip nvarchar(255),
+                         ld_geolocation varchar(255), ld_device varchar(255), ld_filesize bigint,  primary key (ld_id));
 create table ld_tag (ld_docid bigint, ld_tenantid bigint not null, ld_tag nvarchar(255));
 create table ld_foldertag (ld_folderid bigint not null, ld_tenantid bigint not null, ld_tag nvarchar(255));
 create table ld_link (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,  
@@ -60,7 +61,7 @@ create table ld_menu (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_deleted int not null, ld_tenantid bigint not null, ld_name nvarchar(255), 
                       ld_parentid bigint not null, ld_securityref bigint, ld_icon nvarchar(255), 
                       ld_type int not null, ld_description nvarchar(4000), ld_position int not null, 
-                      primary key (ld_id));
+                      ld_enabled int not null, ld_routineid bigint, ld_automation varchar(4000), primary key (ld_id));
 create table ld_menugroup (ld_menuid bigint not null, ld_groupid bigint not null, ld_write int not null, constraint PK_LD_MENUGROUP primary key (ld_menuid, ld_groupid));
 create table ld_recipient (ld_messageid bigint not null, ld_name nvarchar(255) not null, ld_address nvarchar(255) not null, ld_mode nvarchar(255) not null, ld_type int not null, ld_read int not null);
 create table ld_systemmessage (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
@@ -101,16 +102,17 @@ create table ld_user (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_telephone2 nvarchar(255), ld_type int not null, ld_passwordchanged datetime, ld_passwordexpires int not null,
                       ld_source int not null, ld_quota bigint not null, ld_welcomescreen int null, ld_ipwhitelist nvarchar(1000), 
                       ld_ipblacklist nvarchar(1000), ld_passwordexpired int not null, ld_defworkspace bigint,
-                      ld_email2 nvarchar(255), ld_emailsignature2 nvarchar(1000),
+                      ld_email2 nvarchar(255), ld_emailsignature2 nvarchar(1000), ld_avatar nvarchar(max),
                       ld_certexpire datetime, ld_certdn nvarchar(1000), 
                       ld_secondfactor nvarchar(255), ld_key nvarchar(255), 
                       ld_docsgrid varchar(4000), ld_hitsgrid varchar(4000), ld_creation datetime, primary key (ld_id));
 create table ld_user_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                               ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint, 
-                              ld_date datetime, ld_username nvarchar(255), ld_event nvarchar(255), 
+                              ld_date datetime2(3), ld_username nvarchar(255), ld_event nvarchar(255), 
                               ld_comment nvarchar(4000), ld_reason nvarchar(4000), ld_notified int not null, ld_sessionid nvarchar(255), 
                               ld_new int, ld_filename nvarchar(255), ld_userlogin nvarchar(255), ld_ip nvarchar(255), 
-                              ld_author nvarchar(255), primary key (ld_id));
+                              ld_author nvarchar(255), ld_geolocation varchar(255), ld_device varchar(255),
+                              ld_filesize bigint, primary key (ld_id));
 create table ld_usergroup (ld_groupid bigint not null, ld_userid bigint not null, primary key (ld_groupid, ld_userid));
 create table ld_version (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                          ld_deleted int not null, ld_tenantid bigint not null, ld_immutable int not null, ld_customid nvarchar(200),
@@ -148,11 +150,12 @@ create table ld_folder_ext (ld_folderid bigint not null, ld_mandatory int not nu
                             ld_parent nvarchar(255), primary key (ld_folderid, ld_name));
 create table ld_folder_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                                 ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint, 
-                                ld_folderid bigint, ld_userid bigint, ld_date datetime, ld_username nvarchar(255), 
+                                ld_folderid bigint, ld_userid bigint, ld_date datetime2(3), ld_username nvarchar(255), 
                                 ld_event nvarchar(255), ld_comment nvarchar(4000), ld_reason nvarchar(4000), ld_version nvarchar(255), 
                                 ld_path nvarchar(4000), ld_pathold nvarchar(4000), ld_notified int not null, ld_sessionid nvarchar(255),
                                 ld_new int, ld_filename nvarchar(255), ld_userlogin nvarchar(255), ld_filenameold nvarchar(255),
-                                ld_ip nvarchar(255), primary key (ld_id));
+                                ld_ip nvarchar(255), ld_geolocation varchar(255), ld_device varchar(255), 
+                                ld_filesize bigint, primary key (ld_id));
 create table ld_foldergroup (ld_folderid bigint not null, ld_groupid bigint not null, ld_write int not null, 
                              ld_add int not null, ld_security int not null, ld_immutable int not null, ld_delete int not null, 
                              ld_rename int not null, ld_import int not null, ld_export int not null, ld_sign int not null, 
@@ -168,7 +171,9 @@ create table ld_note (ld_id bigint not null, ld_lastmodified datetime not null, 
                       ld_message nvarchar(4000), ld_page int not null, ld_fileversion varchar(10), 
                       ld_opacity int not null, ld_color varchar(255), ld_left float not null,
  					  ld_top float not null, ld_width float not null, ld_height float not null, 
- 					  ld_type varchar(255), ld_recipient varchar(255), ld_recipientemail varchar(255), primary key (ld_id));
+ 					  ld_type varchar(255), ld_recipient varchar(255), ld_recipientemail varchar(255),
+ 					  ld_shape varchar(255), ld_linecolor varchar(255), ld_lineopacity int not null, ld_linewidth int not null, ld_rotation float not null, 
+ 					  primary key (ld_id));
 create table ld_messagetemplate (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                                  ld_deleted int not null, ld_tenantid bigint not null, ld_name nvarchar(255) not null, ld_language nvarchar(10) not null,
                                  ld_description nvarchar(1000), ld_body nvarchar(4000), ld_type nvarchar(255),
@@ -207,7 +212,19 @@ create table ld_session(ld_id bigint not null, ld_lastmodified datetime not null
                           ld_clientid nvarchar(255), ld_clientaddr nvarchar(255), ld_clienthost nvarchar(255), primary key (ld_id));
 create table ld_dashlet(ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_name nvarchar(255), ld_title nvarchar(255), 
-                        ld_type nvarchar(255), ld_query nvarchar(4000), ld_content nvarchar(4000), ld_max int, primary key (ld_id));                           
+                        ld_type nvarchar(255), ld_query nvarchar(4000), ld_content nvarchar(4000), ld_max int, primary key (ld_id));
+create table ld_device (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
+                        ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint, 
+                        ld_deviceid varchar(255) not null, ld_creation datetime, ld_username varchar(255),
+                        ld_browser varchar(255), ld_browserversion varchar(255), ld_operativesystem varchar(255),
+                        ld_type varchar(255), ld_ip varchar(255), ld_trusted int, ld_lastlogin datetime, primary key (ld_id)); 
+create table ld_password_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
+                                  ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, 
+                                  ld_password varchar(255), ld_date datetime, primary key (ld_id));
+create table ld_search (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
+                        ld_deleted int not null, ld_tenantid bigint not null, ld_userid bigint not null, 
+                        ld_name varchar(255), ld_description varchar(1000), ld_options varchar(4000),
+                        ld_date datetime, ld_type int not null, primary key (ld_id));                                                  
                           
 create table hibernate_sequences (sequence_name nvarchar(40) NOT NULL, next_val bigint NOT NULL, primary key (sequence_name));
 
@@ -252,6 +269,8 @@ create unique index AK_EXTOPTION on ld_extoption (ld_setid, ld_attribute, ld_val
 create unique index AK_ATTRIBUTESET on ld_attributeset (ld_name, ld_tenantid);
 create unique index AK_SESSION on ld_session (ld_sid);
 create unique index AK_DASHLET on ld_dashlet (ld_name, ld_tenantid);
+create unique index AK_DEVICE on ld_device (ld_deviceid);
+create unique index AK_SEARCH on ld_search (ld_userid, ld_name);
 
 --Prepare some indexes
 create index LD_DOC_LUID on ld_document (ld_lockuserid);
@@ -272,184 +291,191 @@ create index LD_FLD_NAME on ld_folder (ld_name);
 create index LD_FLD_PATH on ld_folder (ld_path);
 create index LD_FLD_FOLDREF on ld_folder (ld_foldref);
 create index LD_RCP_MID_NAME on ld_recipient (ld_messageid, ld_name);
+create index LD_DEV_USERID on ld_device (ld_userid);
+create index LD_PHIST_USERID on ld_password_history (ld_userid);
 
 insert into ld_tenant(ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_expire,ld_recordversion)
 values     (1,CURRENT_TIMESTAMP,0,1,'default','Default',0,1,null,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1,CURRENT_TIMESTAMP,0,'/',1,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1,CURRENT_TIMESTAMP,0,'/',1,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (2,CURRENT_TIMESTAMP,0,'administration',1,'menu.png',1,1,1,20);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (2,CURRENT_TIMESTAMP,0,'administration',1,'menu.png',1,1,1,20,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (9,CURRENT_TIMESTAMP,0,'security',2,'menu.png',1,1,1,20);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (9,CURRENT_TIMESTAMP,0,'security',2,'menu.png',1,1,1,20,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (8,CURRENT_TIMESTAMP,0,'impex',2,'menu.png',1,1,1,40);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (8,CURRENT_TIMESTAMP,0,'impex',2,'menu.png',1,1,1,40,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (25,CURRENT_TIMESTAMP,0,'documentmetadata',2,'menu.png',1,1,1,30);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (25,CURRENT_TIMESTAMP,0,'documentmetadata',2,'menu.png',1,1,1,30,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (7,CURRENT_TIMESTAMP,0,'settings',2,'menu.png',1,1,1,60);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (7,CURRENT_TIMESTAMP,0,'settings',2,'menu.png',1,1,1,60,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (5,CURRENT_TIMESTAMP,0,'frontend',1,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (5,CURRENT_TIMESTAMP,0,'frontend',1,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1500,CURRENT_TIMESTAMP,0,'documents',5,'menu.png',1,1,1,50);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1500,CURRENT_TIMESTAMP,0,'documents',5,'menu.png',1,1,1,50,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1600,CURRENT_TIMESTAMP,0,'history',1500,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1600,CURRENT_TIMESTAMP,0,'history',1500,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1601,CURRENT_TIMESTAMP,0,'sessions',1600,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1601,CURRENT_TIMESTAMP,0,'sessions',1600,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1602,CURRENT_TIMESTAMP,0,'trash',1500,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1602,CURRENT_TIMESTAMP,0,'trash',1500,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1603,CURRENT_TIMESTAMP,0,'versions',1500,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1603,CURRENT_TIMESTAMP,0,'versions',1500,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1605,CURRENT_TIMESTAMP,0,'aliases',1500,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1605,CURRENT_TIMESTAMP,0,'aliases',1500,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1606,CURRENT_TIMESTAMP,0,'calendar',1500,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1606,CURRENT_TIMESTAMP,0,'calendar',1500,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1607,CURRENT_TIMESTAMP,0,'signature',1500,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1607,CURRENT_TIMESTAMP,0,'signature',1500,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1608,CURRENT_TIMESTAMP,0,'ocr',1500,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1608,CURRENT_TIMESTAMP,0,'capture',1500,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1510,CURRENT_TIMESTAMP,0,'search',5,'menu.png',1,1,1,60);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1510,CURRENT_TIMESTAMP,0,'search',5,'menu.png',1,1,1,60,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1520,CURRENT_TIMESTAMP,0,'dashboard',5,'menu.png',1,1,1,40);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1511,CURRENT_TIMESTAMP,0,'sharesearch',1510,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1525,CURRENT_TIMESTAMP,0,'messages',1520,'menu.png',1,1,1,40);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1520,CURRENT_TIMESTAMP,0,'dashboard',5,'menu.png',1,1,1,40,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1526,CURRENT_TIMESTAMP,0,'calendar',1520,'menu.png',1,1,1,40);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1525,CURRENT_TIMESTAMP,0,'messages',1520,'menu.png',1,1,1,40,1);
+
+insert into ld_menu
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1526,CURRENT_TIMESTAMP,0,'calendar',1520,'menu.png',1,1,1,40,1);
 
 insert into ld_menu 
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (80,CURRENT_TIMESTAMP,0,'system',2,'system.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (80,CURRENT_TIMESTAMP,0,'system',2,'system.png',1,1,1,10,1);
 
 insert into ld_menu 
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (90,CURRENT_TIMESTAMP,0,'reports',2,'reports.png',1,1,1,50);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (90,CURRENT_TIMESTAMP,0,'reports',2,'reports.png',1,1,1,50,1);
 
 insert into ld_menu 
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (100,CURRENT_TIMESTAMP,0,'parameters',7,'settings.png',1,1,1,60);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (100,CURRENT_TIMESTAMP,0,'parameters',7,'settings.png',1,1,1,60,1);
 
 insert into ld_menu 
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (105,CURRENT_TIMESTAMP,0,'repositories',7,'repositories.png',1,1,1,60);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (105,CURRENT_TIMESTAMP,0,'repositories',7,'repositories.png',1,1,1,60,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (14,CURRENT_TIMESTAMP,0,'scheduledtasks',80,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (14,CURRENT_TIMESTAMP,0,'scheduledtasks',80,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (-2,CURRENT_TIMESTAMP,0,'lastchanges',90,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (-2,CURRENT_TIMESTAMP,0,'lastchanges',90,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (-3,CURRENT_TIMESTAMP,0,'lockeddocs',90,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (-3,CURRENT_TIMESTAMP,0,'lockeddocs',90,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (-5,CURRENT_TIMESTAMP,0,'deleteddocs',90,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (-5,CURRENT_TIMESTAMP,0,'deleteddocs',90,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (-6,CURRENT_TIMESTAMP,0,'deletedfolders',90,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (-6,CURRENT_TIMESTAMP,0,'deletedfolders',90,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (-7,CURRENT_TIMESTAMP,0,'downloadtickets',90,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (-7,CURRENT_TIMESTAMP,0,'downloadtickets',90,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (3,CURRENT_TIMESTAMP,0,'protocols',7,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (3,CURRENT_TIMESTAMP,0,'protocols',7,'menu.png',1,1,1,1,1);
 
 insert into ld_menu 
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (110,CURRENT_TIMESTAMP,0,'mainmenu',5,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (110,CURRENT_TIMESTAMP,0,'mainmenu',5,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (16,CURRENT_TIMESTAMP,0,'tools',110,'menu.png',1,1,1,20);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (16,CURRENT_TIMESTAMP,0,'tools',110,'menu.png',1,1,1,20,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (40,CURRENT_TIMESTAMP,0,'personal',110,'menu.png',1,1,1,10);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (40,CURRENT_TIMESTAMP,0,'account',110,'menu.png',1,1,1,10,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1530,CURRENT_TIMESTAMP,0,'contacts',40,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1530,CURRENT_TIMESTAMP,0,'contacts',40,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (1535,CURRENT_TIMESTAMP,0,'interfacedensity',110,'menu.png',1,1,1,5);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (1535,CURRENT_TIMESTAMP,0,'interfacedensity',110,'menu.png',1,1,1,5,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (70,CURRENT_TIMESTAMP,0,'general',80,'menu.png',1,1,1,20);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (70,CURRENT_TIMESTAMP,0,'general',80,'menu.png',1,1,1,20,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (71,CURRENT_TIMESTAMP,0,'sessions',70,'menu.png',1,1,1,20);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (71,CURRENT_TIMESTAMP,0,'sessions',70,'menu.png',1,1,1,20,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (72,CURRENT_TIMESTAMP,0,'logs',70,'menu.png',1,1,1,20);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (72,CURRENT_TIMESTAMP,0,'logs',70,'menu.png',1,1,1,20,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (73,CURRENT_TIMESTAMP,0,'runlevel',70,'menu.png',1,1,1,20);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (73,CURRENT_TIMESTAMP,0,'runlevel',70,'menu.png',1,1,1,20,1);
 
-insert into ld_menu (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_recordversion,ld_tenantid,ld_position)
-values (200,CURRENT_TIMESTAMP,0,'textcontent',16,'text.png',1,1,1,1);
-
-insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (10,CURRENT_TIMESTAMP,0,'index',1500,'menu.png',1,1,1,1);
+insert into ld_menu 
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_recordversion,ld_tenantid,ld_position,ld_enabled)
+values     (200,CURRENT_TIMESTAMP,0,'textcontent',16,'text.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (11,CURRENT_TIMESTAMP,0,'userinterface',1500,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (10,CURRENT_TIMESTAMP,0,'index',1500,'menu.png',1,1,1,1,1);
 
 insert into ld_menu
-           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position)
-values     (12,CURRENT_TIMESTAMP,0,'dropspot',1500,'menu.png',1,1,1,1);
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (11,CURRENT_TIMESTAMP,0,'userinterface',1500,'menu.png',1,1,1,1,1);
+
+insert into ld_menu
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_icon,ld_type,ld_tenantid,ld_recordversion,ld_position,ld_enabled)
+values     (12,CURRENT_TIMESTAMP,0,'dropspot',1500,'menu.png',1,1,1,1,1);
 
 insert into ld_group
            (ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_description,ld_type,ld_recordversion,ld_source)
@@ -567,6 +593,7 @@ insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) values (1607,-10000,0)
 insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 10,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 11,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
 insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 12,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
+insert into ld_menugroup(ld_menuid, ld_groupid, ld_write) select 40,ld_id,0 from ld_group where ld_type=0 and not ld_name='admin';
 
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (5,CURRENT_TIMESTAMP,0,'/',5,1,CURRENT_TIMESTAMP,0,1,1,1,0,'/');
@@ -621,7 +648,7 @@ values(4, CURRENT_TIMESTAMP,0,'newdoc','system','en', '$product - $I18N.get(''ne
 <hr/>
 $message
 <hr/>
-$I18N.get(''user''): <b>$creator.fullName</b><br/>
+$I18N.get(''user''): <b>$creator.fullName</b> $UserTool.getAvatarImg($creator.id, 16) <br/>
 $I18N.get(''date''): <b>$DateTool.format($CURRENT_DATE, true)</b><br/>
 <hr/>
 <b>$I18N.get(''documents'')</b>:
@@ -631,6 +658,22 @@ $I18N.get(''date''): <b>$DateTool.format($CURRENT_DATE, true)</b><br/>
 
 insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
 values(5, CURRENT_TIMESTAMP,0,'empty','user','en', null,null,1,1);
+
+insert into ld_messagetemplate (ld_id, ld_lastmodified, ld_deleted, ld_name, ld_type, ld_language, ld_subject, ld_body,ld_tenantid,ld_recordversion)
+values(7, CURRENT_TIMESTAMP,0,'newdevice','system','en', '$I18N.get(''newloginto'') $product $I18N.get(''ffrom'') $device.browser $I18N.get(''on'') $device.operativeSystem',
+'$I18N.get(''wenoticednewlogin'') <b>$user.username</b> $I18N.get(''fromnewdevice'')<br/>
+$I18N.get(''device''): $device.browser $I18N.get(''on'') $device.operativeSystem<br/>
+$I18N.get(''dateandtime''): $DateTool.formatDate($event.date)<br/>
+$I18N.get(''ipaddress''): $client.address<br/>
+#if($client.geolocation)
+$I18N.get(''ipgeolocation''): $client.geolocation<br/>
+#end
+<br/>
+<b>$I18N.get(''ifthiswasyou'')</b><br/>$I18N.get(''youcanignore'')
+<br/><br/>
+<b>$I18N.get(''ifthiswasnotyou'')</b><br/>$I18N.get(''stepstoprotect'')<ul>
+<li>$I18N.get(''changeyourpasswd'')</li>
+<li>$I18N.get(''reporttosysadmin'')</li></ul>',1,1);
 
 insert into ld_dashlet	(ld_id, ld_lastmodified, ld_deleted, ld_recordversion, ld_tenantid, ld_name, ld_title, ld_query, ld_content, ld_type, ld_max)
 values(1,CURRENT_TIMESTAMP,0,1,1,'checkout','event.checkedoutdocs','from Document where lockUserId=$user.id and status=1 order by date desc',null,'document', 10);
@@ -671,3 +714,6 @@ insert into hibernate_sequences(sequence_name, next_val) values ('ld_extoption',
 insert into hibernate_sequences(sequence_name, next_val) values ('ld_attributeset', 100);
 insert into hibernate_sequences(sequence_name, next_val) values ('ld_session', 100);
 insert into hibernate_sequences(sequence_name, next_val) values ('ld_dashlet', 100);
+insert into hibernate_sequences(sequence_name, next_val) values ('ld_device', 100);
+insert into hibernate_sequences(sequence_name, next_val) values ('ld_password_history', 100);
+insert into hibernate_sequences(sequence_name, next_val) values ('ld_search', 100);

@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.smartgwt.client.types.ViewName;
 import com.smartgwt.client.widgets.calendar.Calendar;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -69,7 +69,7 @@ public class UserCalendarPanel extends VLayout {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

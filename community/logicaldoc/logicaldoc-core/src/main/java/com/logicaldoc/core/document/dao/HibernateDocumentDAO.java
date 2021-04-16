@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
@@ -164,7 +165,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 				// Remove versions
 				try {
-
 					for (Version version : versionDAO.findByDocId(docId)) {
 						version.setDeleted(delCode);
 						saveOrUpdate(version);
@@ -1027,6 +1027,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		transaction.setFolderId(doc.getFolder().getId());
 		transaction.setVersion(doc.getVersion());
 		transaction.setFilename(doc.getFileName());
+		transaction.setFileSize(doc.getFileSize());
 		transaction.setPath(folderDAO.computePathExtended(doc.getFolder().getId()));
 		transaction.setNotified(0);
 		transaction.setDocument(doc);
@@ -1182,8 +1183,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void cleanExpiredTransactions() throws PersistenceException {
 		// Retrieve the actual registered locks on transactions
-		@SuppressWarnings("unchecked")
-		List<String> transactionIds = transactionIds = queryForList(
+		List<String> transactionIds = queryForList(
 				"select ld_string1 from ld_generic where ld_type='lock' and ld_string1 is not null", String.class);
 		String transactionIdsStr = transactionIds.toString().replace("[", "('").replace("]", "')").replace(", ", "','");
 
@@ -1198,25 +1198,71 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void cleanUnexistingUniqueTags() {
-		StringBuffer deleteStatement = new StringBuffer("delete from ld_uniquetag where ");
+		StringBuffer deleteStatement = new StringBuffer("delete from ld_uniquetag UT where ");
+
+		// tags no more existing in the ld_tag table or that belong to deleted
+		// documents
 		deleteStatement.append(
-				" not ld_tag in (select distinct(B.ld_tag) from ld_tag B where ld_tenantid=B.ld_tenantid and ld_tag=B.ld_tag) ");
+				" not UT.ld_tag in (select distinct(B.ld_tag) from ld_tag B, ld_document C where UT.ld_tenantid=B.ld_tenantid and UT.ld_tag=B.ld_tag and C.ld_id=B.ld_docid and C.ld_deleted=0) ");
+
+		// tags no more existing in the ld_foldertag table or that belong to
+		// deleted folders
 		deleteStatement.append(
-				" and not ld_tag in (select distinct(C.ld_tag) from ld_foldertag C where ld_tenantid=C.ld_tenantid and ld_tag=C.ld_tag) ");
+				" and not UT.ld_tag in (select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where UT.ld_tenantid=D.ld_tenantid and UT.ld_tag=D.ld_tag and E.ld_id=D.ld_folderid and E.ld_deleted=0) ");
 
 		try {
 			jdbcUpdate(deleteStatement.toString());
 		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
+			/*
+			 * The unique SQL query failed, so we do the same deletion
+			 * programmatically
+			 */
+			try {
+				List<Long> tenantIds = tenantDAO.findAllIds();
+				for (Long tenantId : tenantIds) {
+					log.debug("Clean unique tags of tenant {}", tenantId);
+
+					// Collect the currently unique used tags
+					@SuppressWarnings("unchecked")
+					Set<String> currentlyUsedTags = ((Map<String, String>) queryForList(
+							"select distinct(B.ld_tag) from ld_tag B, ld_document C where B.ld_tenantid="
+									+ tenantId + " and C.ld_id=B.ld_docid and C.ld_deleted=0 "
+									+ " UNION select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where D.ld_tenantid="
+									+ tenantId + " and E.ld_id=D.ld_folderid and E.ld_deleted=0",
+							String.class).stream().collect(Collectors.groupingBy(Function.identity()))).keySet();
+
+					// Delete all currently recorded unique tags no more used
+					if (isOracle()) {
+						/*
+						 * In Oracle the limit of 1000 elements applies to sets
+						 * of single items: (x) IN ((1), (2), (3), ...). There
+						 * is no limit if the sets contain two or more items:
+						 * (x, 0) IN ((1,0), (2,0), (3,0), ...):
+						 */
+						String currentlyUsedTagsStr = currentlyUsedTags.stream()
+								.map(tag -> ("('" + SqlUtil.doubleQuotes(tag) + "',0)"))
+								.collect(Collectors.joining(","));
+						jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId + " and (ld_tag,0) not in ("
+								+ currentlyUsedTagsStr + ")");
+					} else {
+						String currentlyUsedTagsStr = currentlyUsedTags.stream()
+								.map(tag -> ("'" + SqlUtil.doubleQuotes(tag) + "'")).collect(Collectors.joining(","));
+						jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId + " and ld_tag not in ("
+								+ currentlyUsedTagsStr + ")");
+					}
+				}
+			} catch (Throwable t) {
+				log.warn(t.getMessage(), t);
+			}
 		}
 	}
 
 	@Override
 	public void insertNewUniqueTags() {
 		StringBuffer insertStatement = new StringBuffer("insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) ");
-		insertStatement.append(" select distinct(B.ld_tag), B.ld_tenantid, 0 from ld_tag B ");
+		insertStatement.append(" select distinct(B.ld_tag), B.ld_tenantid, 0 from ld_tag B, ld_document D ");
 		insertStatement.append(
-				" where B.ld_tag not in (select A.ld_tag from ld_uniquetag A where A.ld_tenantid=B.ld_tenantid) ");
+				" where B.ld_docid = D.ld_id and D.ld_deleted = 0 and B.ld_tag not in (select A.ld_tag from ld_uniquetag A where A.ld_tenantid=B.ld_tenantid) ");
 		try {
 			jdbcUpdate(insertStatement.toString());
 		} catch (PersistenceException e) {
@@ -1224,9 +1270,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 
 		insertStatement = new StringBuffer("insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) ");
-		insertStatement.append(" select distinct(B.ld_tag), B.ld_tenantid, 0 from ld_foldertag B ");
+		insertStatement.append(" select distinct(B.ld_tag), B.ld_tenantid, 0 from ld_foldertag B, ld_folder F ");
 		insertStatement.append(
-				" where B.ld_tag not in (select A.ld_tag from ld_uniquetag A where A.ld_tenantid=B.ld_tenantid) ");
+				" where B.ld_folderid = F.ld_id and F.ld_deleted = 0 and B.ld_tag not in (select A.ld_tag from ld_uniquetag A where A.ld_tenantid=B.ld_tenantid) ");
 		try {
 			jdbcUpdate(insertStatement.toString());
 		} catch (PersistenceException e) {
@@ -1247,12 +1293,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				log.error(e.getMessage(), e);
 			}
 
-			// Update the count for each tag
+			// Update the count for each tag skipping those tags that belong to
+			// deleted documents
 			for (String tag : uniqueTags) {
 				try {
-					jdbcUpdate("update ld_uniquetag set ld_count = (select count(ld_tag) from ld_tag where ld_tag='"
-							+ SqlUtil.doubleQuotes(tag) + "' and ld_tenantid=" + tenantId + ") where ld_tag='"
-							+ SqlUtil.doubleQuotes(tag) + "' and ld_tenantid=" + tenantId);
+					jdbcUpdate(
+							"update ld_uniquetag set ld_count = (select count(T.ld_tag) from ld_tag T, ld_document D where T.ld_tag='"
+									+ SqlUtil.doubleQuotes(tag) + "' and T.ld_tenantid=" + tenantId
+									+ " and T.ld_docid = D.ld_id and D.ld_deleted=0 ) where ld_tag='"
+									+ SqlUtil.doubleQuotes(tag) + "' and ld_tenantid=" + tenantId);
 				} catch (PersistenceException e) {
 					log.warn(e.getMessage(), e);
 				}

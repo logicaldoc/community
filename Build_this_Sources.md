@@ -1,6 +1,6 @@
 # Build this Sources
 
-You need JDK 11, Maven 3.3.3, Ant 1.9.5 to build this sources
+You need JDK 11, Maven 3.6.3, Ant 1.9.5 to build this sources
 
 1. Open a command shell to the folder where you unzipped the archive
 

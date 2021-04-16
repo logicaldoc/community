@@ -59,8 +59,7 @@ public class FolderSearch extends Search {
 		// Traverse the results checking visibility and count
 		Collection<Long> accessibleFolderIds = findAccessibleFolderIds(user);
 		for (Hit folder : folders) {
-			if (accessibleFolderIds.contains(folder.getId())
-					|| (accessibleFolderIds.isEmpty() && user.isMemberOf("admin")))
+			if (accessibleFolderIds.contains(folder.getId()) || user.isMemberOf("admin"))
 				hits.add(folder);
 			if (hits.size() >= options.getMaxHits())
 				break;
@@ -145,7 +144,7 @@ public class FolderSearch extends Search {
 			}
 
 		query.append(" where A.ld_deleted=0 and A.ld_hidden=0 ");
-		query.append(" and A.ld_type=" + (searchAliases ? Folder.TYPE_ALIAS : Folder.TYPE_DEFAULT) + "  ");
+		query.append(" and " + (searchAliases ? "" : "not") + " A.ld_type=" + Folder.TYPE_ALIAS);
 
 		long tenantId = Tenant.DEFAULT_ID;
 		if (options.getTenantId() != null)
@@ -435,7 +434,7 @@ public class FolderSearch extends Search {
 		 * In case of normal user and without a folder criterion, we have to
 		 * collect all accessible folders.
 		 */
-		if (ids.isEmpty() && !user.isMemberOf("admin"))
+		if (!user.isMemberOf("admin"))
 			ids = folderDAO.findFolderIdByUserIdInPath(options.getUserId(), null);
 
 		return ids;

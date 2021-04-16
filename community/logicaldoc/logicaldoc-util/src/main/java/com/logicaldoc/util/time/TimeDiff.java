@@ -42,26 +42,20 @@ public class TimeDiff {
 	public static long getTimeDifference(Date d1, Date d2, TimeField field) {
 		return TimeDiff.getTimeDifference(d1, d2)[field.ordinal()];
 	}
-
+	
 	/**
-	 * Calculate the absolute difference between two Date without regard for
+	 * Calculate the absolute difference between two dates without regard for
 	 * time offsets
 	 * 
-	 * @param d1 Date one
-	 * @param d2 Date two
+	 * @param d1 Date one expressed in millisconds
+	 * @param d2 Date two expressed in millisconds
 	 *
 	 * @return The fields day, hour, minute, second and millisecond
 	 */
-	public static long[] getTimeDifference(Date d1, Date d2) {
+	public static long[] getTimeDifference(long t1, long t2) {
 		long[] result = new long[5];
-		Calendar cal = Calendar.getInstance();
-		cal.setTimeZone(TimeZone.getTimeZone("UTC"));
-		cal.setTime(d1);
-
-		long t1 = cal.getTimeInMillis();
-		cal.setTime(d2);
-
-		long diff = cal.getTimeInMillis() - t1;
+		
+		long diff = t2 - t1;
 		final int ONE_DAY = 1000 * 60 * 60 * 24;
 		final int ONE_HOUR = ONE_DAY / 24;
 		final int ONE_MINUTE = ONE_HOUR / 60;
@@ -85,6 +79,27 @@ public class TimeDiff {
 		result[4] = ms;
 
 		return result;
+	}
+	
+	/**
+	 * Calculate the absolute difference between two Date without regard for
+	 * time offsets
+	 * 
+	 * @param d1 Date one
+	 * @param d2 Date two
+	 *
+	 * @return The fields day, hour, minute, second and millisecond
+	 */
+	public static long[] getTimeDifference(Date d1, Date d2) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+		cal.setTime(d1);
+		long t1 = cal.getTimeInMillis();
+		
+		cal.setTime(d2);
+		long t2 = cal.getTimeInMillis();
+		
+		return getTimeDifference(t1, t2);
 	}
 
 	public static String printDuration(Date start, Date stop) {

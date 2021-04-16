@@ -43,12 +43,13 @@ public class RestWorkbench {
 
 	private static RestBookmarkClient bookmarkClient = null;
 
-	private static String BASE_PATH = "http://localhost:9080";
+	//private static String BASE_PATH = "http://localhost:9080";
+	private static String BASE_PATH = "http://localhost/logicaldoc";
 
 	public static void main(String[] args) throws Exception {
 
 		String username = "admin";
-		String password = "12345678";
+		String password = "admin";
 
 		authClient = new RestAuthClient(BASE_PATH + "/services/rest/auth");
 		docClient = new RestDocumentClient(BASE_PATH + "/services/rest/document", username, password);
@@ -92,9 +93,9 @@ public class RestWorkbench {
 
 		// getFolder(04L);
 
-		// checkout(3574819L);
-		// checkin(3574819L);
-		// getContentVersion(3574819L, "1.4");
+		//checkout(735L);
+		//checkin(735L);
+		getVersionContent(735L, "1.2");
 
 		/*
 		 * WSDocument myDoc = getDocument(3407874L);
@@ -341,24 +342,32 @@ public class RestWorkbench {
 	}
 
 	private static void checkin(long docId) throws Exception {
+		
 		try {
 			docClient.checkout(docId);
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println("Captured exception: " + e.getMessage());
+			//e.printStackTrace();
 		}
 
 		// verify document status
 		WSDocument xxx = docClient.getDocument(docId);
 		System.out.println("Doc status: " + xxx.getStatus());
 
-		File packageFile = new File("C:/Users/Alle/Downloads/c04462171.pdf");
-		String result = docClient.checkin(docId, "comment", false, packageFile);
-		System.out.println("Checkin result: " + result);
+		File packageFile = new File("C:/tmp/simply.pdf");
+		docClient.checkin(docId, "comment", false, packageFile);
+		System.out.println("Checkin completed");
 	}
 
 	private static void checkout(long docId) throws Exception {
 
-		docClient.checkout(docId);
+		try {
+			docClient.checkout(docId);
+		} catch (Exception e) {
+			// Captured exception
+			System.err.println("Captured exception: " + e.getMessage());
+			//e.printStackTrace();			
+		}
 
 		// verify document status
 		WSDocument xxx = docClient.getDocument(docId);

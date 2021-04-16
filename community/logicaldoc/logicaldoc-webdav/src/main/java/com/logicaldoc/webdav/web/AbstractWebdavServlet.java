@@ -58,7 +58,6 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DavResourceImpl;
-import com.logicaldoc.webdav.resource.RangeResourceImpl;
 import com.logicaldoc.webdav.session.DavSession;
 import com.logicaldoc.webdav.session.DavSessionImpl;
 
@@ -154,6 +153,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				Session session = SessionManager.get().getSession(request);
 				if (session == null)
 					throw new DavException(DavServletResponse.SC_FORBIDDEN);
+				
 				SessionManager.get().renew(session.getSid());
 
 				DavSessionImpl davSession = new DavSessionImpl();
@@ -172,8 +172,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 					throw new DavException(DavServletResponse.SC_NOT_FOUND);
 
 				// check matching if=header for lock-token relevant operations
-				DavResource resource = getResourceFactory().createResource(webdavRequest.getRequestLocator(),
-						webdavRequest, davSession);
+				DavResource resource = getResourceFactory().createResource(webdavRequest.getRequestLocator(), webdavRequest, davSession);
 
 				if (!isPreconditionValid(webdavRequest, resource)) {
 					webdavResponse.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
@@ -318,15 +317,6 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		} catch (DavException dave) {
 			log.debug(dave.getMessage(), dave);
 			response.setStatus(dave.getErrorCode());
-
-//			if (dave.getErrorCode() == DavServletResponse.SC_FORBIDDEN) {
-//				response.setStatus(dave.getErrorCode());
-//				
-//				Writer writer = new OutputStreamWriter(response.getOutputStream(),"UTF-8");
-//			    writer.write(dave.getMessage());
-//			    writer.close();
-//			}
-
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -377,8 +367,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				// Enforce download permission
 				ExportContext exportCtx = dri.getExportContext(oc);
 				if (!exportCtx.getResource().isDownloadEnabled()) {
-					throw new DavException(DavServletResponse.SC_FORBIDDEN,
-							"Download permission not granted to this user");
+					throw new DavException(DavServletResponse.SC_FORBIDDEN, "Download permission not granted to this user");
 				}
 
 				// Deals with ranges
@@ -393,10 +382,14 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					resource = new RangeResourceImpl(dri.getLocator(), dri.getFactoryXXXX(), dri.getSessionXXX(),
-							dri.getConfigXXX(), dri.getResourceXXX(), parsedRange);
+					
+//					resource = new RangeResourceImpl(dri.getLocator(), dri.getFactoryLD(), dri.getSessionLD(),
+//							dri.getConfig(), dri.getResource(), parsedRange);
+					
+					DavSession session = (com.logicaldoc.webdav.session.DavSession) request.getDavSession();
+					resource = getResourceFactory().createRangeResource(dri.getLocator(), session, parsedRange);
 
-					log.debug("converted resource to RangeResourceImpl {}", resource);
+					log.debug("Create RangeResourceImpl {}", resource);
 
 					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 					response.setHeader(HttpHeaders.PRAGMA, "no-cache");
@@ -572,18 +565,18 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				status = DavServletResponse.SC_CREATED;
 			}
 
-			boolean isChunkedUpload = false;
-			if (request.getHeader("LD-Chunked") != null) {
-				isChunkedUpload = true;
-			}
+//			boolean isChunkedUpload = false;
+//			if (request.getHeader("LD-Chunked") != null) {
+//				isChunkedUpload = true;
+//			}
 
 			parentResource.addMember(resource, getInputContext(request, request.getInputStream()));
 
-			if (!isChunkedUpload) {
-				WebdavRequest webdavRequest = new WebdavRequestImpl(request, getLocatorFactory());
-				webdavRequest.setDavSession(request.getDavSession());
-				DavSession session = (com.logicaldoc.webdav.session.DavSession) webdavRequest.getDavSession();
-			}
+//			if (!isChunkedUpload) {
+//				WebdavRequest webdavRequest = new WebdavRequestImpl(request, getLocatorFactory());
+//				webdavRequest.setDavSession(request.getDavSession());
+//				DavSession session = (com.logicaldoc.webdav.session.DavSession) webdavRequest.getDavSession();
+//			} 
 
 			response.setStatus(status);
 		} catch (DavException dave) {
@@ -687,6 +680,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 */
 	protected void doCopy(WebdavRequest request, WebdavResponse response, DavResource resource)
 			throws IOException, DavException {
+		
 		log.debug("doCopy");
 		// only depth 0 and infinity is allowed
 		int depth = request.getDepth(DEPTH_INFINITY);
@@ -701,6 +695,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		} catch (Throwable e) {
 			destResource = resource.getCollection();
 		}
+		
 		int status = validateDestination(destResource, request);
 		if (status > DavServletResponse.SC_NO_CONTENT) {
 			response.sendError(status);
@@ -725,6 +720,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws IOException, DavException {
 
 		log.debug("doMove");
+		
 		WebdavRequest webdavRequest = new WebdavRequestImpl(request, getLocatorFactory());
 		webdavRequest.setDavSession(request.getDavSession());
 		DavSession session = (com.logicaldoc.webdav.session.DavSession) webdavRequest.getDavSession();
@@ -737,8 +733,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			}
 
 			int status = validateDestination(destResource, request);
-
 			log.debug("status = " + status);
+			
 			if (status > DavServletResponse.SC_NO_CONTENT) {
 				log.debug("status > DavServletResponse.SC_NO_CONTENT");
 				response.sendError(status);

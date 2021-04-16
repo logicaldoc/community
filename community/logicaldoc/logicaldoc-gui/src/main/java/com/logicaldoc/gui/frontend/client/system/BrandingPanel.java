@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.system;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.logicaldoc.gui.frontend.client.tenant.TenantBrandingPanel;
@@ -30,7 +30,7 @@ public class BrandingPanel extends AdminPanel {
 		TenantService.Instance.get().load(tenantId, new AsyncCallback<GUITenant>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -70,13 +70,13 @@ public class BrandingPanel extends AdminPanel {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(GUITenant ten) {
 				BrandingPanel.this.tenant = ten;
-				Log.info(I18N.message("settingssaved"), null);
+				GuiLog.info(I18N.message("settingssaved"), null);
 			}
 		});
 	}

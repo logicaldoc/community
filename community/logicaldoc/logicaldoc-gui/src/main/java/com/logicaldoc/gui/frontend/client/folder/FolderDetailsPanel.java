@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
@@ -112,7 +112,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -183,19 +183,22 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				tabSet.addTab(subscriptionsTab);
 			}
 
-		quotaTab = new Tab(I18N.message("quota"));
-		if (folder.isWorkspace() && folder.hasPermission(Constants.PERMISSION_WRITE))
-			if (Feature.visible(Feature.QUOTAS)) {
-				if (Feature.enabled(Feature.QUOTAS)) {
-					quotaTabPanel = new HLayout();
-					quotaTabPanel.setWidth100();
-					quotaTabPanel.setHeight100();
-				} else {
-					quotaTabPanel = new FeatureDisabled();
+		try {
+			quotaTab = new Tab(I18N.message("quota"));
+			if (folder.isWorkspace() && folder.hasPermission(Constants.PERMISSION_WRITE))
+				if (Feature.visible(Feature.QUOTAS)) {
+					if (Feature.enabled(Feature.QUOTAS)) {
+						quotaTabPanel = new HLayout();
+						quotaTabPanel.setWidth100();
+						quotaTabPanel.setHeight100();
+					} else {
+						quotaTabPanel = new FeatureDisabled();
+					}
+					quotaTab.setPane(quotaTabPanel);
+					tabSet.addTab(quotaTab);
 				}
-				quotaTab.setPane(quotaTabPanel);
-				tabSet.addTab(quotaTab);
-			}
+		} catch (Throwable t) {
+		}
 
 		Tab aliasesTab = new Tab(I18N.message("aliases"));
 		aliasesTabPanel = new HLayout();
@@ -228,7 +231,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 			tabSet.addTab(interfaceTab);
 		}
 
-		if (Menu.enabled(Menu.DOCUMENT_OCR)) {
+		if (Menu.enabled(Menu.CAPTURE)) {
 			ocrTab = new Tab(I18N.message("ocr"));
 			ocrTabPanel = new HLayout();
 			ocrTabPanel.setWidth100();
@@ -377,7 +380,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				interfaceTabPanel.addMember(interfacePanel);
 			}
 
-			if (Menu.enabled(Menu.DOCUMENT_OCR)) {
+			if (Menu.enabled(Menu.CAPTURE)) {
 				/*
 				 * Prepare the OCR tab
 				 */
@@ -389,7 +392,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				ocrTabPanel.addMember(ocrPanel);
 			}
 		} catch (Throwable r) {
-			Log.error(r.getMessage(), null, r);
+			GuiLog.error(r.getMessage(), null, r);
 		}
 	}
 
@@ -444,7 +447,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 			FolderService.Instance.get().save(folder, new AsyncCallback<GUIFolder>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override

@@ -11,6 +11,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.CharacterCodingException;
+import java.text.DecimalFormat;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,7 +74,7 @@ public class StringUtil {
 	 * @return a string with the contents readed from the <code>reader</code>
 	 * 
 	 * @throws IOException raised in case the <code>reader</code> failed to read
-	 *        or if the string cannot be written
+	 *         or if the string cannot be written
 	 */
 	public static String writeToString(Reader reader) throws IOException {
 		return writeToString(reader, "UTF-8");
@@ -172,6 +173,9 @@ public class StringUtil {
 	 *         excludes
 	 */
 	public static boolean matches(String str, String[] includes, String[] excludes) {
+		if ((excludes == null || excludes.length == 0) && (includes == null || includes.length == 0))
+			return true;
+
 		// First of all check if the string must be excluded
 		if (excludes != null && excludes.length > 0)
 			for (String s : excludes)
@@ -199,5 +203,20 @@ public class StringUtil {
 	 */
 	public static String unaccent(String src) {
 		return Normalizer.normalize(src, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+	}
+
+	/**
+	 * Formats a file size in human readable form (KB, MB, GB, TB)
+	 * 
+	 * @param size the size to format
+	 * 
+	 * @return the formatted string
+	 */
+	public static String printFileSize(long size) {
+		if (size <= 0)
+			return "0";
+		final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
+		int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
 	}
 }

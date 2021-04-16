@@ -32,8 +32,9 @@ public class TicketsDS extends DataSource {
 		DataSourceIntegerField maxCount = new DataSourceIntegerField("maxCount");
 		DataSourceTextField suffix = new DataSourceTextField("maxCount");
 		DataSourceBooleanField valid = new DataSourceBooleanField("valid");
-		DataSourceTextField fileName = new DataSourceTextField("fileName");
+		DataSourceTextField fileName = new DataSourceTextField("filename");
 		DataSourceImageField icon = new DataSourceImageField("icon");
+		icon.setHidden(true);
 		DataSourceImageField enabled = new DataSourceImageField("eenabled");
 
 		setFields(id, ticketId, docId, creation, expired, count, maxCount, suffix, enabled, valid, icon, fileName,

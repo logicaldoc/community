@@ -239,6 +239,14 @@ public class ContextProperties extends OrderedProperties {
 				oldBackups[i].delete();
 	}
 
+	public String getString(String property) {
+		return getProperty(property);
+	}
+
+	public String getString(String property, String defaultValue) {
+		return getProperty(property, defaultValue);
+	}
+
 	public int getInt(String property) {
 		return getInt(property, 0);
 	}

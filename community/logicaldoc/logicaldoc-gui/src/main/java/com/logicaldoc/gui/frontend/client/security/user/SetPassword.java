@@ -2,8 +2,9 @@ package com.logicaldoc.gui.frontend.client.security.user;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.smartgwt.client.types.AutoComplete;
@@ -86,7 +87,8 @@ public class SetPassword extends Window {
 				if (!vm.hasErrors()) {
 					apply.setDisabled(true);
 					SecurityService.Instance.get().changePassword(Session.get().getUser().getId(), userId, null,
-							vm.getValueAsString(NEWPASSWORD), notify.getValueAsBoolean(), new AsyncCallback<Integer>() {
+							vm.getValueAsString(NEWPASSWORD), notify.getValueAsBoolean(),
+							new AsyncCallback<GUIValue>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -95,17 +97,19 @@ public class SetPassword extends Window {
 								}
 
 								@Override
-								public void onSuccess(Integer ret) {
+								public void onSuccess(GUIValue val) {
 									apply.setDisabled(false);
-									if (ret.intValue() > 0) {
-										// Alert the user and maintain the popup
-										// opened
+									int ret = Integer.parseInt(val.getCode());
+									if (ret > 0) {
+										// Alert the user
 										if (ret == 1)
-											Log.warn(I18N.message("wrongpassword"), null);
+											GuiLog.warn(I18N.message("wrongpassword"), null);
 										else if (ret == 2)
-											Log.warn(I18N.message("passwdnotnotified"), null);
+											GuiLog.warn(I18N.message("passwdnotnotified"), null);
+										else if (ret == 3)
+											GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
 										else
-											Log.warn(I18N.message("genericerror"), null);
+											GuiLog.warn(I18N.message("genericerror"), null);
 									}
 									SetPassword.this.destroy();
 								}

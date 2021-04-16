@@ -6,6 +6,7 @@ import java.util.List;
 import javax.jcr.RepositoryException;
 import javax.jcr.version.VersionHistory;
 
+import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
@@ -55,7 +56,7 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 	}
 
     public DavResourceIterator getMembers() {
-        return new DavResourceIteratorImpl(Collections.EMPTY_LIST);
+        return new DavResourceIteratorImpl(Collections.emptyList());
     }
 
     public void addMember(DavResource member, InputContext inputContext) throws DavException {
@@ -67,7 +68,7 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
         throw new DavException(DavServletResponse.SC_FORBIDDEN);
     }
 
-    public void setProperty(DavProperty property) throws DavException {
+    public void setProperty(DavProperty<?> property) throws DavException {
         throw new DavException(DavServletResponse.SC_FORBIDDEN);
     }
 
@@ -105,17 +106,17 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
     }
 
     protected void initProperties() {
+    	
         if (!propsInitialized) {
             super.initProperties();
             
-            properties.add(new DefaultDavProperty(VERSION_NAME, resource
-					.getVersionLabel(), true));
-			properties.add(new DefaultDavProperty(DavPropertyName.CREATIONDATE,
-					resource.getVersionDate()));
-			properties.add(new HrefProperty(VersionResource.VERSION_HISTORY,
-					locator.getResourcePath() + resource.getID(), true));
-			properties.add(new DefaultDavProperty(DeltaVConstants.COMMENT,
-				resource.getComment()));
+            properties.add(new DefaultDavProperty<String>(VERSION_NAME, resource.getVersionLabel(), true));
+            
+            //properties.add(new DefaultDavProperty<String>(DavPropertyName.CREATIONDATE, resource.getVersionDate()));
+            String creationDate = IOUtil.getCreated(resource.getVersionDate().getTime());			
+            properties.add(new DefaultDavProperty<String>(DavPropertyName.CREATIONDATE, creationDate));
+			properties.add(new HrefProperty(VersionResource.VERSION_HISTORY, locator.getResourcePath() + resource.getID(), true));
+			properties.add(new DefaultDavProperty<String>(DeltaVConstants.COMMENT, resource.getComment()));		
         }
     }
     

@@ -9,12 +9,11 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.smartgwt.client.types.SelectionType;
 import com.smartgwt.client.widgets.Canvas;
@@ -69,7 +68,10 @@ public class SearchToolbar extends ToolStrip {
 		ToolStripButton print = AwesomeFactory.newToolStripButton("print", "print");
 		print.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { hitsPanel.getGrid() });
+				if (hitsPanel.getGrid() instanceof ListGrid)
+					GridUtil.print((ListGrid) hitsPanel.getGrid());
+				else
+					Canvas.printComponents(new Object[] { hitsPanel.getGrid() });
 			}
 		});
 		addSeparator();
@@ -81,7 +83,7 @@ public class SearchToolbar extends ToolStrip {
 			export.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					Util.exportCSV((ListGrid) hitsPanel.getGrid(), false);
+					GridUtil.exportCSV((ListGrid) hitsPanel.getGrid(), false);
 				}
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -223,7 +225,7 @@ public class SearchToolbar extends ToolStrip {
 
 			@Override
 			public void onSuccess(GUIUser usr) {
-				Log.info(I18N.message("settingssaved"));
+				GuiLog.info(I18N.message("settingssaved"));
 			}
 		});
 	}

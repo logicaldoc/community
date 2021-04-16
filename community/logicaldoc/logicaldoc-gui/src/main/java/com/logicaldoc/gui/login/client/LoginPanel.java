@@ -17,8 +17,10 @@ import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIMessage;
+import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.RequestInfo;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -28,6 +30,7 @@ import com.logicaldoc.gui.login.client.services.LoginService;
 import com.logicaldoc.gui.login.client.services.LoginServiceAsync;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.VerticalAlignment;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Img;
@@ -374,7 +377,7 @@ public class LoginPanel extends VLayout {
 	protected void prepareSwitchViewLink() {
 		String url = "mobile".equals(Util.getJavascriptVariable("j_layout")) ? (Util.contextPath() + "login.jsp")
 				: (Util.contextPath() + "login-mobile.jsp");
-		url += "?tenant=" + Util.detectTenant();
+		url += "?switch=true&tenant=" + Util.detectTenant();
 		String label = "mobile".equals(Util.getJavascriptVariable("j_layout")) ? I18N.message("viewclassicweb")
 				: I18N.message("viewmobileweb");
 
@@ -472,8 +475,10 @@ public class LoginPanel extends VLayout {
 		try {
 			String data = "j_username=" + URL.encodeQueryString((String) username.getValue());
 			data += "&j_password=" + URL.encodeQueryString((String) password.getValue());
-			if (secretKey.getValue() != null)
+			if (secretKey!=null && secretKey.getValue() != null)
 				data += "&j_secretkey=" + URL.encodeQueryString((String) secretKey.getValue());
+			if (CookiesManager.getSavedDevice() != null)
+				data += "&device=" + URL.encodeQueryString(CookiesManager.getSavedDevice());
 			data += "&" + PARAM_SUCCESSURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_SUCCESSURL));
 			data += "&" + PARAM_FAILUREURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_FAILUREURL));
 
@@ -486,7 +491,19 @@ public class LoginPanel extends VLayout {
 				public void onResponseReceived(Request request, Response response) {
 					loggingIn = false;
 					if (response.getStatusCode() == 200) {
-						onAuthenticationSuccess();
+						SecurityService.Instance.get().getSession(language.getValueAsString(),
+								new AsyncCallback<GUISession>() {
+
+									@Override
+									public void onFailure(Throwable caught) {
+										SC.warn("Login request error: {}", caught.getMessage());
+									}
+
+									@Override
+									public void onSuccess(GUISession sess) {
+										onAuthenticationSuccess(sess);
+									}
+								});
 					} else {
 						onAuthenticationFailure();
 					}
@@ -502,11 +519,60 @@ public class LoginPanel extends VLayout {
 		pwdReset.show();
 	}
 
-	protected void onAuthenticationSuccess() {
+	protected void onAuthenticationSuccess(GUISession session) {
 		boolean saveLoginEnabled = "true".equals(info.getConfig("gui.savelogin"));
 		CookiesManager.saveLogin(saveLoginEnabled, rememberMe.getValueAsBoolean(), username.getValueAsString(),
 				password.getValueAsString());
-		Util.redirectToSuccessUrl(language.getValueAsString());
+
+		if (!"true".contentEquals(session.getInfo().getConfig("2fa.enabled"))
+				|| !"true".contentEquals(session.getInfo().getConfig("2fa.allowtrusted"))) {
+			Util.redirectToSuccessUrl(language.getValueAsString());
+		} else {
+			SecurityService.Instance.get().isTrustedDevice(CookiesManager.getSavedDevice(),
+					new AsyncCallback<Boolean>() {
+
+						@Override
+						public void onFailure(Throwable caught) {
+							Util.redirectToSuccessUrl(language.getValueAsString());
+						}
+
+						@Override
+						public void onSuccess(Boolean trusted) {
+							if (trusted.booleanValue()) {
+								Util.redirectToSuccessUrl(language.getValueAsString());
+							} else {
+								SC.ask(I18N.message("trustdevice"), I18N.message("trustdevicequestion"),
+										new BooleanCallback() {
+
+											@Override
+											public void execute(Boolean choice) {
+												if (!choice) {
+													Util.redirectToSuccessUrl(language.getValueAsString());
+												} else {
+													SecurityService.Instance.get()
+															.trustDevice(new AsyncCallback<String>() {
+
+																@Override
+																public void onFailure(Throwable caught) {
+																	Util.redirectToSuccessUrl(
+																			language.getValueAsString());
+																}
+
+																@Override
+																public void onSuccess(String deviceId) {
+																	CookiesManager.saveDevice(deviceId);
+																	Util.redirectToSuccessUrl(
+																			language.getValueAsString());
+																}
+															});
+												}
+											}
+										});
+							}
+
+						}
+					});
+		}
 	}
 
 	protected void onAuthenticationFailure() {

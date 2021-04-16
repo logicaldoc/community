@@ -29,7 +29,7 @@ import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.common.client.websockets.EventMessage;
+import com.logicaldoc.gui.common.client.websockets.WebsocketMessage;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.web.service.DocumentServiceImpl;
@@ -53,12 +53,13 @@ public class EventEndpoint implements EventListener {
 			DocumentEvent.CHECKEDOUT.toString(), DocumentEvent.IMMUTABLE.toString(), DocumentEvent.LOCKED.toString(),
 			DocumentEvent.UNLOCKED.toString(), DocumentEvent.SIGNED.toString(), DocumentEvent.STAMPED.toString(),
 			DocumentEvent.MOVED.toString(), DocumentEvent.DELETED.toString(), DocumentEvent.RENAMED.toString(),
-			DocumentEvent.RESTORED.toString(), DocumentEvent.PASSWORD_PROTECTED.toString(),
-			DocumentEvent.MOVED.toString(), DocumentEvent.PASSWORD_UNPROTECTED.toString(),
-			DocumentEvent.WORKFLOWSTATUS.toString(), FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(),
-			FolderEvent.CHANGED.toString(), FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(),
-			UserEvent.MESSAGE_RECEIVED.toString(), UserEvent.LOGIN.toString(), UserEvent.LOGOUT.toString(),
-			UserEvent.TIMEOUT.toString(), "event.chat.newmessage" }));
+			DocumentEvent.INDEXED.toString(), DocumentEvent.RESTORED.toString(),
+			DocumentEvent.PASSWORD_PROTECTED.toString(), DocumentEvent.MOVED.toString(),
+			DocumentEvent.PASSWORD_UNPROTECTED.toString(), DocumentEvent.WORKFLOWSTATUS.toString(),
+			FolderEvent.RENAMED.toString(), FolderEvent.CREATED.toString(), FolderEvent.CHANGED.toString(),
+			FolderEvent.MOVED.toString(), FolderEvent.DELETED.toString(), UserEvent.MESSAGE_RECEIVED.toString(),
+			UserEvent.LOGIN.toString(), UserEvent.LOGOUT.toString(), UserEvent.TIMEOUT.toString(),
+			"event.chat.newmessage" }));
 
 	private static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
 
@@ -105,7 +106,7 @@ public class EventEndpoint implements EventListener {
 				&& MONITORED_EVENTS.contains(event.getEvent()) && event.isNotifyEvent()) {
 
 			try {
-				EventMessage message = new EventMessage(event.getSessionId(), event.getEvent());
+				WebsocketMessage message = new WebsocketMessage(event.getSessionId(), event.getEvent());
 				message.setFolderId(event.getFolderId());
 				message.setDocId(event.getDocId());
 				message.setUserId(event.getUserId());
@@ -158,12 +159,25 @@ public class EventEndpoint implements EventListener {
 
 				message.setDocument(document);
 
-				for (Session peer : peers)
-					peer.getAsyncRemote().sendText(serializeMessage(message));
+				distributeMessage(message);
 			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
 			}
 		}
+	}
+
+	/**
+	 * Distributes a message to all the connected clients
+	 * 
+	 * @param message The message to be sent
+	 */
+	public static void distributeMessage(WebsocketMessage message) {
+		for (Session peer : peers)
+			try {
+				peer.getAsyncRemote().sendText(serializeMessage(message));
+			} catch (SerializationException e) {
+				log.error("Error preparing websocket message {}", message.getEvent(), e);
+			}
 	}
 
 	// Until now we do not need deserialization
@@ -185,7 +199,7 @@ public class EventEndpoint implements EventListener {
 	// return message;
 	// }
 
-	private String serializeMessage(final EventMessage messageDto) throws SerializationException {
+	private static String serializeMessage(final WebsocketMessage messageDto) throws SerializationException {
 		ServerSerializationStreamWriter serverSerializationStreamWriter = new ServerSerializationStreamWriter(
 				new SimpleSerializationPolicy());
 		serverSerializationStreamWriter.writeObject(messageDto);

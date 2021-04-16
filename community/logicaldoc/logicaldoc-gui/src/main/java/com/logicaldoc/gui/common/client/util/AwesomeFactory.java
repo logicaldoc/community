@@ -3,7 +3,9 @@ package com.logicaldoc.gui.common.client.util;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
+import com.smartgwt.client.widgets.toolbar.ToolStripMenuButton;
 
 /**
  * Factory of objects that make use of font awesome
@@ -41,6 +43,27 @@ public class AwesomeFactory {
 		button.setTitle(getIconHtml(icon, text));
 		button.setAutoFit(true);
 		return button;
+	}
+
+	/**
+	 * Creates a ToolStripButton using font-awesome icon
+	 * 
+	 * @param icon the icon file name
+	 * @param rotation rotation specification for the icon
+	 * @param title title of the button
+	 * @param toolTip the message to display when the user moves the cursor over
+	 *        the button
+	 * @param menu the menu to display
+	 * 
+	 * @return the new button
+	 */
+	public static ToolStripMenuButton newToolStripToolStripMenuButton(String icon, String rotation, String title,
+			String toolTip, Menu menu) {
+		ToolStripMenuButton menuButton = new ToolStripMenuButton(AwesomeFactory.getIconHtml(icon), menu);
+		menuButton.setTooltip(I18N.message(toolTip));
+		menuButton.setTitle(getIconHtml(icon, rotation, title));
+		menuButton.setAutoFit(true);
+		return menuButton;
 	}
 
 	/**
@@ -111,7 +134,7 @@ public class AwesomeFactory {
 			return "<i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-spinner' aria-hidden='true'></i>";
 		else
 			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon
-					+ " fa-lg fa-fw fa-spinner' aria-hidden='true'></i>&nbsp;" + text + "</div>";
+					+ " fa-lg fa-fw fa-spinner' aria-hidden='true'></i>&nbsp;" + I18N.message(text) + "</div>";
 	}
 
 	public static String getIconHtml(String icon, String text) {
@@ -119,6 +142,15 @@ public class AwesomeFactory {
 			return "<i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg' aria-hidden='true'></i>";
 		else
 			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-fw' aria-hidden='true'></i> "
-					+ text + "</div>";
+					+ I18N.message(text) + "</div>";
+	}
+
+	public static String getIconHtml(String icon, String rotation, String text) {
+		if (text == null || text.isEmpty())
+			return "<i class='" + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "")
+					+ " fa-lg' aria-hidden='true'></i>";
+		else
+			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + (rotation != null ? " " + rotation : "")
+					+ " fa-lg fa-fw' aria-hidden='true'></i> " + I18N.message(text) + "</div>";
 	}
 }

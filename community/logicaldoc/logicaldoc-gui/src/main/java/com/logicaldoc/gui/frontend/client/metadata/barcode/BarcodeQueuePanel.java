@@ -2,15 +2,16 @@ package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.types.Alignment;
@@ -100,12 +101,12 @@ public class BarcodeQueuePanel extends VLayout {
 
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
 										public void onSuccess(Void ret) {
-											Log.info(I18N.message("docsrescheduledprocessing"), null);
+											GuiLog.info(I18N.message("docsrescheduledprocessing"), null);
 											maxRecords = (Integer) max.getValue();
 											list.refresh(new DocumentsDS(null, null, maxRecords, 1, null, true, false,
 													null));
@@ -146,31 +147,19 @@ public class BarcodeQueuePanel extends VLayout {
 		version.setAlign(Alignment.CENTER);
 		version.setCanFilter(true);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 
 		ListGridField publisher = new ListGridField("publisher", I18N.message("publisher"), 90);
 		publisher.setAlign(Alignment.CENTER);
 		publisher.setCanFilter(true);
 
-		ListGridField published = new ListGridField("published", I18N.message("publishedon"), 110);
-		published.setAlign(Alignment.CENTER);
-		published.setType(ListGridFieldType.DATE);
-		published.setCellFormatter(new DateCellFormatter(false));
-		published.setCanFilter(false);
+		ListGridField published = new DateListGridField("published", "publishedon");
 
 		ListGridField creator = new ListGridField("creator", I18N.message("creator"), 90);
 		creator.setAlign(Alignment.CENTER);
 		creator.setCanFilter(true);
 
-		ListGridField created = new ListGridField("created", I18N.message("createdon"), 110);
-		created.setAlign(Alignment.CENTER);
-		created.setType(ListGridFieldType.DATE);
-		created.setCellFormatter(new DateCellFormatter(false));
-		created.setCanFilter(false);
+		ListGridField created = new DateListGridField("created","createdon");
 
 		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
@@ -279,7 +268,7 @@ public class BarcodeQueuePanel extends VLayout {
 				BarcodeService.Instance.get().markUnprocessable(ids, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override

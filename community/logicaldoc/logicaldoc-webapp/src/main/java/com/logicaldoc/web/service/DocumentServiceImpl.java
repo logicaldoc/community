@@ -161,19 +161,42 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		}
 	}
 
-	@Override
-	public void indexDocuments(Long[] docIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-
+	private void index(Long[] docIds, Session session) {
+		if (docIds == null)
+			return;
+		log.info("Indexing documents {}", docIds.toString());
 		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		for (Long id : docIds) {
 			if (id != null)
 				try {
-					documentManager.reindex(id, null);
+					DocumentHistory transaction = new DocumentHistory();
+					transaction.setSession(session);
+					documentManager.reindex(id, null, transaction);
 				} catch (Throwable e) {
-					ServiceUtil.throwServerException(session, log, e);
+					throw new RuntimeException(e.getMessage(), e);
 				}
 		}
+	}
+
+	@Override
+	public void indexDocuments(Long[] docIds) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			Runnable runnable = new Runnable() {
+
+				@Override
+				public void run() {
+					index(docIds, session);
+				}
+
+			};
+
+			ServiceUtil.executeLongRunningOperation("Index Documents", runnable, session);
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+
 	}
 
 	@Override
@@ -181,163 +204,186 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			final GUIDocument metadata) throws ServerException {
 		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		List<GUIDocument> createdDocs = new ArrayList<GUIDocument>();
-		List<Document> docs = new ArrayList<Document>();
-
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
-		log.debug("Uploading {} files", uploadedFilesMap.size());
-
-		Map<String, String> uploadedFileNames = UploadServlet.getReceivedFileNames(getThreadLocalRequest(),
-				session.getSid());
-
-		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		final Folder parent = folderDao.findFolder(metadata.getFolder().getId());
-		if (uploadedFilesMap.isEmpty())
-			ServiceUtil.throwServerException(session, log, new Exception("No file uploaded"));
-
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!fdao.isWriteEnabled(metadata.getFolder().getId(), session.getUserId()))
-			ServiceUtil.throwServerException(session, log,
-					new Exception("The user doesn't have the write permission on the current folder"));
-
-		List<Long> docsToIndex = new ArrayList<Long>();
-
 		try {
-			for (String fileId : uploadedFilesMap.keySet()) {
-				final File file = uploadedFilesMap.get(fileId);
-				final String filename = uploadedFileNames.get(fileId);
+			List<GUIDocument> createdDocs = new ArrayList<GUIDocument>();
+			HttpServletRequest servletRequest = getThreadLocalRequest();
 
-				if (filename.endsWith(".zip") && importZip) {
-					log.debug("zip file = {}", file);
+			Runnable runnable = new Runnable() {
 
-					// copy the file into the user folder
-					final File destFile = new File(UserUtil.getUserResource(session.getUserId(), "zip"), filename);
-					FileUtils.copyFile(file, destFile);
+				@Override
+				public void run() {
+					List<Document> docs = new ArrayList<Document>();
 
-					final long userId = session.getUserId();
-					final String sessionId = session.getSid();
-					// Prepare the import thread
-					Thread zipImporter = new Thread(new Runnable() {
-						public void run() {
-							/*
-							 * Prepare the Master document used to create the
-							 * new one
-							 */
-							try {
+					Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(servletRequest,
+							session.getSid());
+					log.debug("Uploading {} files", uploadedFilesMap.size());
+
+					Map<String, String> uploadedFileNames = UploadServlet.getReceivedFileNames(servletRequest,
+							session.getSid());
+
+					DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+
+					FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+					final Folder parent = folderDao.findFolder(metadata.getFolder().getId());
+					if (uploadedFilesMap.isEmpty())
+						throw new RuntimeException(new Exception("No file uploaded"));
+
+					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+					if (!fdao.isWriteEnabled(metadata.getFolder().getId(), session.getUserId()))
+						throw new RuntimeException("The user doesn't have the write permission on the current folder");
+
+					List<Long> docsToIndex = new ArrayList<Long>();
+
+					for (String fileId : uploadedFilesMap.keySet()) {
+						try {
+							final File file = uploadedFilesMap.get(fileId);
+							final String filename = uploadedFileNames.get(fileId);
+
+							if (filename.endsWith(".zip") && importZip) {
+								log.debug("zip file = {}", file);
+
+								// copy the file into the user folder
+								final File destFile = new File(UserUtil.getUserResource(session.getUserId(), "zip"),
+										filename);
+								FileUtils.copyFile(file, destFile);
+
+								final long userId = session.getUserId();
+								final String sessionId = session.getSid();
+								// Prepare the import thread
+								Thread zipImporter = new Thread(new Runnable() {
+									public void run() {
+										/*
+										 * Prepare the Master document used to
+										 * create the new one
+										 */
+										try {
+											Document doc = toDocument(metadata);
+											doc.setTenantId(session.getTenantId());
+											doc.setCreation(new Date());
+
+											InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
+											importer.process(destFile, parent, userId, sessionId);
+										} catch (Throwable e) {
+											log.error("Unable to delete {}", destFile, e);
+										} finally {
+											FileUtil.strongDelete(destFile);
+										}
+									}
+								});
+
+								// And launch it
+								zipImporter.start();
+							} else {
+								// Create the document history event
+								DocumentHistory transaction = new DocumentHistory();
+								transaction.setSession(session);
+								transaction.setEvent(DocumentEvent.STORED.toString());
+								transaction.setComment(metadata.getComment());
+
+								/*
+								 * Prepare the Master document used to create
+								 * the new one
+								 */
 								Document doc = toDocument(metadata);
 								doc.setTenantId(session.getTenantId());
 								doc.setCreation(new Date());
+								doc.setFileName(filename);
 
-								InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
-								importer.process(destFile, parent, userId, sessionId);
-							} catch (Throwable e) {
-								log.error("Unable to delete {}", destFile, e);
-							} finally {
-								FileUtil.strongDelete(destFile);
+								// Create the new document
+								doc = documentManager.create(file, doc, transaction);
+
+								if (immediateIndexing && doc.getIndexed() == Document.INDEX_TO_INDEX)
+									docsToIndex.add(doc.getId());
+
+								createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
+								docs.add(doc);
 							}
+						} catch (Throwable t) {
+							throw new RuntimeException(t.getMessage(), t);
 						}
-					});
-
-					// And launch it
-					zipImporter.start();
-				} else {
-					// Create the document history event
-					DocumentHistory transaction = new DocumentHistory();
-					transaction.setSession(session);
-					transaction.setEvent(DocumentEvent.STORED.toString());
-					transaction.setComment(metadata.getComment());
+					}
 
 					/*
-					 * Prepare the Master document used to create the new one
+					 * Clean the uploaded files
 					 */
-					Document doc = toDocument(metadata);
-					doc.setTenantId(session.getTenantId());
-					doc.setCreation(new Date());
-					doc.setFileName(filename);
+					for (String uploadedEntry : uploadedFilesMap.keySet())
+						UploadServlet.cleanReceivedFile(servletRequest.getSession(), uploadedEntry);
 
-					// Create the new document
-					doc = documentManager.create(file, doc, transaction);
+					if (!docsToIndex.isEmpty())
+						index(docsToIndex.toArray(new Long[0]), session);
 
-					if (immediateIndexing && doc.getIndexed() == Document.INDEX_TO_INDEX)
-						docsToIndex.add(doc.getId());
+					/*
+					 * We have to notify the specified users in a separate
+					 * thread
+					 */
+					if (metadata.getNotifyUsers() != null && metadata.getNotifyUsers().length > 0) {
+						Thread notifier = new Thread(new Runnable() {
+							public void run() {
+								try {
+									UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+									for (long userId : metadata.getNotifyUsers()) {
+										User user = uDao.findById(userId);
 
-					createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
-					docs.add(doc);
-				}
-			}
-			UploadServlet.cleanReceivedFiles(getThreadLocalRequest().getSession());
+										EMail mail = new EMail();
+										mail.setHtml(1);
+										mail.setTenantId(session.getTenantId());
 
-			if (!docsToIndex.isEmpty())
-				indexDocuments(docsToIndex.toArray(new Long[0]));
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
+										mail.setAccountId(-1);
+										mail.setAuthor(session.getUser().getUsername());
+										mail.setAuthorAddress(session.getUser().getEmail());
 
-		/*
-		 * We have to notify the specified users in a separate thread
-		 */
-		if (metadata.getNotifyUsers() != null && metadata.getNotifyUsers().length > 0) {
-			Thread notifier = new Thread(new Runnable() {
-				public void run() {
-					try {
-						UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-						for (long userId : metadata.getNotifyUsers()) {
-							User user = uDao.findById(userId);
+										mail.setFolder("outbox");
+										mail.setSentDate(new Date());
+										mail.setUsername(session.getUsername());
 
-							EMail mail = new EMail();
-							mail.setHtml(1);
-							mail.setTenantId(session.getTenantId());
+										Recipient recipient = new Recipient();
+										recipient.setName(user.getUsername());
+										recipient.setAddress(user.getEmail());
+										recipient.setType(Recipient.TYPE_EMAIL);
+										recipient.setMode(Recipient.MODE_EMAIL_TO);
+										recipient.setRead(1);
+										HashSet<Recipient> recipients = new HashSet<Recipient>();
+										recipients.add(recipient);
+										mail.setRecipients(recipients);
 
-							mail.setAccountId(-1);
-							mail.setAuthor(session.getUser().getUsername());
-							mail.setAuthorAddress(session.getUser().getEmail());
+										MessageTemplateDAO tDao = (MessageTemplateDAO) Context.get()
+												.getBean(MessageTemplateDAO.class);
+										MessageTemplate template = tDao.findByNameAndLanguage("newdoc",
+												user.getLanguage(), user.getTenantId());
 
-							mail.setFolder("outbox");
-							mail.setSentDate(new Date());
-							mail.setUsername(session.getUsername());
+										Map<String, Object> dictionary = new HashMap<String, Object>();
+										dictionary.put("creator", session.getUser());
+										dictionary.put("documents", docs);
+										dictionary.put("document", docs.get(0));
+										dictionary.put("message", metadata.getNotifyMessage());
+										dictionary.put(Automation.LOCALE, user.getLocale());
 
-							Recipient recipient = new Recipient();
-							recipient.setName(user.getUsername());
-							recipient.setAddress(user.getEmail());
-							recipient.setType(Recipient.TYPE_EMAIL);
-							recipient.setMode(Recipient.MODE_EMAIL_TO);
-							recipient.setRead(1);
-							HashSet<Recipient> recipients = new HashSet<Recipient>();
-							recipients.add(recipient);
-							mail.setRecipients(recipients);
+										mail.setSubject(template.getFormattedSubject(dictionary));
+										mail.setMessageText("<html><body>" + template.getFormattedBody(dictionary)
+												+ "</html></body>");
 
-							MessageTemplateDAO tDao = (MessageTemplateDAO) Context.get()
-									.getBean(MessageTemplateDAO.class);
-							MessageTemplate template = tDao.findByNameAndLanguage("newdoc", user.getLanguage(),
-									user.getTenantId());
-
-							Map<String, Object> dictionary = new HashMap<String, Object>();
-							dictionary.put("creator", session.getUser());
-							dictionary.put("documents", docs);
-							dictionary.put("document", docs.get(0));
-							dictionary.put("message", metadata.getNotifyMessage());
-							dictionary.put(Automation.LOCALE, user.getLocale());
-
-							mail.setSubject(template.getFormattedSubject(dictionary));
-							mail.setMessageText(
-									"<html><body>" + template.getFormattedBody(dictionary) + "</html></body>");
-
-							log.info("Notify the creation of new documents {} to {}", docs.toString(),
-									mail.getRecipients().toString());
-							EMailSender sender = new EMailSender(session.getTenantName());
-							sender.send(mail);
-						}
-					} catch (Throwable e) {
-						log.warn(e.getMessage(), e);
+										log.info("Notify the creation of new documents {} to {}", docs.toString(),
+												mail.getRecipients().toString());
+										EMailSender sender = new EMailSender(session.getTenantName());
+										sender.send(mail);
+									}
+								} catch (Throwable e) {
+									log.warn(e.getMessage(), e);
+								}
+							}
+						});
+						notifier.start();
 					}
 				}
-			});
-			notifier.start();
-		}
+			};
 
-		return createdDocs.toArray(new GUIDocument[0]);
+			if (ServiceUtil.executeLongRunningOperation("Add Documents", runnable, session))
+				return createdDocs.toArray(new GUIDocument[0]);
+			else
+				return null;
+		} catch (Throwable t) {
+			return (GUIDocument[]) ServiceUtil.throwServerException(session, log, t);
+		}
 	}
 
 	@Override
@@ -429,23 +475,47 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	@Override
-	public void checkout(long docId) throws ServerException {
+	public void checkout(long[] docIds) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		// Create the document history event
-		DocumentHistory transaction = new DocumentHistory();
-		transaction.setSession(session);
-		transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
-		transaction.setComment("");
-
-		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Document doc = dao.findById(docId);
-		if (doc.getDocRef() != null)
-			docId = doc.getDocRef().longValue();
-
+		// Checkout the document; throws an exception if something
+		// goes wrong
 		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
-			documentManager.checkout(docId, transaction);
+			// Create the document history event
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSession(session);
+			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
+			for (long id : docIds) {
+				Document doc = dao.findDocument(id);
+				if (doc != null)
+					documentManager.checkout(doc.getId(), transaction.clone());
+			}
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public void lock(long[] docIds, String comment) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		// Unlock the document; throws an exception if something
+		// goes wrong
+		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		try {
+			// Create the document history event
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSession(session);
+			transaction.setEvent(DocumentEvent.LOCKED.toString());
+			transaction.setComment(comment);
+			for (long id : docIds) {
+				Document doc = dao.findDocument(id);
+				if (doc != null)
+					documentManager.lock(doc.getId(), Document.DOC_LOCKED, transaction.clone());
+			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -775,8 +845,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		document.setVersion(realDoc.getVersion());
 		document.setCreation(realDoc.getCreation());
 		document.setCreator(realDoc.getCreator());
+		document.setCreatorId(realDoc.getCreatorId());
 		document.setDate(realDoc.getDate());
 		document.setPublisher(realDoc.getPublisher());
+		document.setPublisherId(realDoc.getPublisherId());
 		document.setFileVersion(realDoc.getFileVersion());
 		document.setLanguage(realDoc.getLanguage());
 		document.setTemplateId(realDoc.getTemplateId());
@@ -1019,27 +1091,6 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			} catch (Throwable t) {
 				ServiceUtil.throwServerException(session, log, t);
 			}
-		}
-	}
-
-	@Override
-	public void lock(long[] docIds, String comment) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-
-		// Unlock the document; throws an exception if something
-		// goes wrong
-		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-		try {
-			// Create the document history event
-			DocumentHistory transaction = new DocumentHistory();
-			transaction.setSession(session);
-			transaction.setEvent(DocumentEvent.LOCKED.toString());
-			transaction.setComment(comment);
-			for (long id : docIds) {
-				documentManager.lock(id, Document.DOC_LOCKED, transaction);
-			}
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
 		}
 	}
 
@@ -1512,17 +1563,16 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 						doc = documentDao.findById(doc.getDocRef());
 
 					// Create the document history event
-					DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 					DocumentHistory history = new DocumentHistory();
 					history.setSession(session);
-					history.setDocId(doc.getId());
+					history.setDocument(doc);
 					history.setEvent(DocumentEvent.SENT.toString());
 					history.setComment(
 							StringUtils.abbreviate(StringUtil.collectionToString(mail.getRecipients(), ", "), 4000));
 					history.setFilename(doc.getFileName());
 					history.setVersion(doc.getVersion());
 					history.setPath(fDao.computePathExtended(doc.getFolder().getId()));
-					dao.store(history);
+					documentDao.saveDocumentHistory(doc, history);
 				}
 
 				/*
@@ -1848,6 +1898,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				guiNote.setType(note.getType());
 				guiNote.setRecipient(note.getRecipient());
 				guiNote.setRecipientEmail(note.getRecipientEmail());
+				guiNote.setLineColor(note.getLineColor());
+				guiNote.setLineWidth(note.getLineWidth());
+				guiNote.setLineOpacity(note.getLineOpacity());
+				guiNote.setShape(note.getShape());
+				guiNote.setRotation(note.getRotation());
 				guiNotes.add(guiNote);
 			}
 
@@ -1908,6 +1963,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				note.setType(guiNote.getType());
 				note.setRecipient(guiNote.getRecipient());
 				note.setRecipientEmail(guiNote.getRecipientEmail());
+				note.setShape(guiNote.getShape());
+				note.setLineColor(guiNote.getLineColor());
+				note.setLineOpacity(guiNote.getLineOpacity());
+				note.setLineWidth(guiNote.getLineWidth());
+				note.setRotation(guiNote.getRotation());
 
 				if (note.getId() == 0L) {
 					DocumentHistory transaction = new DocumentHistory();
@@ -2509,61 +2569,67 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
 			String resource = storer.getResourceName(docId, fileVersion, null);
-			is = storer.getStream(docId, resource);
+			is = storer.getStream(doc.getId(), resource);
 
 			EMail email = null;
-			if (doc.getFileName().toLowerCase().endsWith(".eml"))
-				email = MailUtil.messageToMail(is, true);
-			else
-				email = MailUtil.msgToMail(is, true);
+			try {
+				if (doc.getFileName().toLowerCase().endsWith(".eml"))
+					email = MailUtil.messageToMail(is, true);
+				else
+					email = MailUtil.msgToMail(is, true);
+			} catch (Throwable t) {
+				log.warn("Cannot render the email document {}", docId);
+			}
 
 			GUIEmail guiMail = new GUIEmail();
-			if (email.getFrom() != null)
-				guiMail.setFrom(new GUIContact(email.getFrom().getName(), null, email.getFrom().getAddress()));
 
-			guiMail.setSent(email.getSentDate());
-			guiMail.setReceived(email.getReceivedDate() != null ? email.getReceivedDate() : doc.getCreation());
-			guiMail.setSubject(email.getSubject());
-			guiMail.setMessage(
-					email.isHtml() ? HTMLSanitizer.sanitize(email.getMessageText()) : email.getMessageText());
-			guiMail.setSigned(email.isSigned());
+			if (email != null) {
+				if (email.getFrom() != null)
+					guiMail.setFrom(new GUIContact(email.getFrom().getName(), null, email.getFrom().getAddress()));
 
-			Set<Recipient> recipients = email.getRecipients();
-			List<GUIContact> contacts = new ArrayList<GUIContact>();
-			for (Recipient rec : recipients)
-				contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-			guiMail.setTos(contacts.toArray(new GUIContact[0]));
+				guiMail.setSent(email.getSentDate());
+				guiMail.setReceived(email.getReceivedDate() != null ? email.getReceivedDate() : doc.getCreation());
+				guiMail.setSubject(email.getSubject());
+				guiMail.setMessage(
+						email.isHtml() ? HTMLSanitizer.sanitize(email.getMessageText()) : email.getMessageText());
+				guiMail.setSigned(email.isSigned());
 
-			recipients = email.getRecipientsCC();
-			contacts = new ArrayList<GUIContact>();
-			for (Recipient rec : recipients)
-				contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-			guiMail.setCcs(contacts.toArray(new GUIContact[0]));
+				Set<Recipient> recipients = email.getRecipients();
+				List<GUIContact> contacts = new ArrayList<GUIContact>();
+				for (Recipient rec : recipients)
+					contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
+				guiMail.setTos(contacts.toArray(new GUIContact[0]));
 
-			recipients = email.getRecipientsBCC();
-			contacts = new ArrayList<GUIContact>();
-			for (Recipient rec : recipients)
-				contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-			guiMail.setBccs(contacts.toArray(new GUIContact[0]));
+				recipients = email.getRecipientsCC();
+				contacts = new ArrayList<GUIContact>();
+				for (Recipient rec : recipients)
+					contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
+				guiMail.setCcs(contacts.toArray(new GUIContact[0]));
 
-			recipients = email.getReplyTo();
-			contacts = new ArrayList<GUIContact>();
-			for (Recipient rec : recipients)
-				contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
-			guiMail.setReplyTo(contacts.toArray(new GUIContact[0]));
+				recipients = email.getRecipientsBCC();
+				contacts = new ArrayList<GUIContact>();
+				for (Recipient rec : recipients)
+					contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
+				guiMail.setBccs(contacts.toArray(new GUIContact[0]));
 
-			List<GUIDocument> attachments = new ArrayList<GUIDocument>();
-			for (int i = 1; i <= email.getAttachmentsCount(); i++) {
-				EMailAttachment att = email.getAttachment(i);
-				GUIDocument d = new GUIDocument();
-				d.setFileName(att.getFileName());
-				d.setFileSize(Float.valueOf(att.getSize()));
-				d.setIcon(IconSelector.selectIcon(FilenameUtils.getExtension(att.getFileName())));
-				d.setFolder(doc.getFolder());
-				attachments.add(d);
+				recipients = email.getReplyTo();
+				contacts = new ArrayList<GUIContact>();
+				for (Recipient rec : recipients)
+					contacts.add(new GUIContact(rec.getName(), null, rec.getAddress()));
+				guiMail.setReplyTo(contacts.toArray(new GUIContact[0]));
+
+				List<GUIDocument> attachments = new ArrayList<GUIDocument>();
+				for (int i = 1; i <= email.getAttachmentsCount(); i++) {
+					EMailAttachment att = email.getAttachment(i);
+					GUIDocument d = new GUIDocument();
+					d.setFileName(att.getFileName());
+					d.setFileSize(Float.valueOf(att.getSize()));
+					d.setIcon(IconSelector.selectIcon(FilenameUtils.getExtension(att.getFileName())));
+					d.setFolder(doc.getFolder());
+					attachments.add(d);
+				}
+				guiMail.setAttachments(attachments.toArray(new GUIDocument[0]));
 			}
-			guiMail.setAttachments(attachments.toArray(new GUIDocument[0]));
-
 			return guiMail;
 		} catch (Throwable t) {
 			return (GUIEmail) ServiceUtil.throwServerException(session, log, t);
@@ -2737,7 +2803,6 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		docDao.jdbcUpdate(updateStatement.toString());
 
 		log.debug("Prepare the histories");
-		DocumentHistoryDAO hDao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		for (Document doc : duplications) {
 			if (doc.getId() == maintainedDoc.getId())
 				continue;
@@ -2749,7 +2814,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			transaction.setFilename(doc.getFileName());
 			transaction.setVersion(doc.getVersion());
 			transaction.setPath(doc.getFolder().getPathExtended());
-			hDao.store(transaction);
+			docDao.saveDocumentHistory(doc, transaction);
 		}
 
 		// Create the aliases

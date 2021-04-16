@@ -118,6 +118,6 @@ public class Hits implements Iterator<Hit> {
 			tgreen = 1;
 		}
 
-		return new Integer(tgreen);
+		return tgreen;
 	}
 }

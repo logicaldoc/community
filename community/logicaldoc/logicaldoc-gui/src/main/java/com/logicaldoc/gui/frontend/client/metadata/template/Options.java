@@ -4,9 +4,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.data.AttributeOptionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -125,7 +125,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -145,7 +145,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		export.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, false);
+				GridUtil.exportCSV(list, false);
 			}
 		});
 		if (Feature.visible(Feature.EXPORT_CSV)) {
@@ -229,7 +229,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 			@Override
 			public void onFailure(Throwable caught) {
 				ContactingServer.get().hide();
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -254,7 +254,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		AttributeSetService.Instance.get().deleteOptions(setId, attribute, values, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override

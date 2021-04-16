@@ -23,7 +23,6 @@ import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServiceUtil;
 
@@ -138,12 +137,13 @@ public class RightsDataServlet extends HttpServlet {
 			writer.print("<right>");
 			writer.print("<entityId>" + groupId + "</entityId>");
 
-			if (groupType == Group.TYPE_DEFAULT)
-				writer.print("<entity><![CDATA[" + I18N.message("group", locale) + ": " + groupName + "]]></entity>");
-			else
-				writer.print(
-						"<entity><![CDATA[" + I18N.message("user", locale) + ": " + users.get(userId) + "]]></entity>");
-
+			if (groupType == Group.TYPE_DEFAULT) {
+				writer.print("<entity><![CDATA[" + groupName + "]]></entity>");
+				writer.print("<avatar>group</avatar>");
+			} else {
+				writer.print("<entity><![CDATA[" + users.get(userId) + "]]></entity>");
+				writer.print("<avatar>" + userId + "</avatar>");
+			}
 			writer.print("<read>true</read>");
 			writer.print("<write>" + (set.getInt(4) == 1 ? true : false) + "</write>");
 			writer.print("<add>" + (set.getInt(5) == 1 ? true : false) + "</add>");
@@ -208,11 +208,13 @@ public class RightsDataServlet extends HttpServlet {
 			writer.print("<right>");
 			writer.print("<entityId>" + groupId + "</entityId>");
 
-			if (groupType == Group.TYPE_DEFAULT)
-				writer.print("<entity><![CDATA[" + I18N.message("group", locale) + ": " + groupName + "]]></entity>");
-			else
-				writer.print(
-						"<entity><![CDATA[" + I18N.message("user", locale) + ": " + users.get(userId) + "]]></entity>");
+			if (groupType == Group.TYPE_DEFAULT) {
+				writer.print("<entity><![CDATA[" + groupName + "]]></entity>");
+				writer.print("<avatar>group</avatar>");
+			} else {
+				writer.print("<entity><![CDATA[" + users.get(userId) + "]]></entity>");
+				writer.print("<avatar>" + userId + "</avatar>");
+			}
 
 			writer.print("<type>" + groupType + "</type>");
 			writer.print("</right>");

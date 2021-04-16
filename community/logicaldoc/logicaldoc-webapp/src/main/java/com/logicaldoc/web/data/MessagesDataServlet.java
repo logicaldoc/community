@@ -70,6 +70,7 @@ public class MessagesDataServlet extends HttpServlet {
 				writer.print("<subject><![CDATA[" + record.getSubject() + "]]></subject>");
 				writer.print("<priority>" + record.getPrio() + "</priority>");
 				writer.print("<from><![CDATA[" + record.getAuthor() + "]]></from>");
+				writer.print("<avatar><![CDATA[" + record.getAuthor() + "]]></avatar>");
 				writer.print("<sent>" + df.format(record.getSentDate()) + "</sent>");
 				writer.print("<read>false</read>");
 				writer.print("<text><![CDATA[" + record.getMessageText() + "]]></text>");
@@ -83,6 +84,7 @@ public class MessagesDataServlet extends HttpServlet {
 				writer.print("<subject><![CDATA[" + record.getSubject() + "]]></subject>");
 				writer.print("<priority>" + record.getPrio() + "</priority>");
 				writer.print("<from><![CDATA[" + record.getAuthor() + "]]></from>");
+				writer.print("<avatar><![CDATA[" + record.getAuthor() + "]]></avatar>");
 				writer.print("<sent>" + df.format(record.getSentDate()) + "</sent>");
 				writer.print("<read>true</read>");
 				writer.print("<text><![CDATA[" + record.getMessageText() + "]]></text>");

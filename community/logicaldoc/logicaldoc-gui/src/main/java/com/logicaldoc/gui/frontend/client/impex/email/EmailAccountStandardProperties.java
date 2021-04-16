@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
+import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -71,14 +72,14 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		mailaddress.addChangedHandler(changedHandler);
 		mailaddress.setRequired(true);
 
-		TextItem username = ItemFactory.newTextItem("username", "username", account.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", account.getUsername());
 		username.addChangedHandler(changedHandler);
 		username.setWidth(180);
 
-		TextItem password = ItemFactory.newPasswordItem("password", "password", account.getPassword());
+		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", account.getPassword());
 		password.addChangedHandler(changedHandler);
 		password.setWidth(180);
-		
+
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, false);
 		language.addChangedHandler(changedHandler);
 		language.setRequired(true);
@@ -107,7 +108,20 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		foldering.setRequired(true);
 		foldering.setValue("" + account.getFoldering());
 
-		form.setItems(mailaddress, server, targetSelector, username, password, foldering, language, protocol, port, ssl);
+		/*
+		 * Two invisible fields to 'mask' the real credentials to the browser
+		 * and prevent it to auto-fill the username and password we really use.
+		 */
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", account.getUsername());
+		fakeUsername.setCellStyle("nodisplay");
+		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
+				account.getPassword());
+		fakePassword.setCellStyle("nodisplay");
+		TextItem fakeUsernameAgain = ItemFactory.newTextItem("prevent_autofill2", "prevent_autofill", account.getUsername());
+		fakeUsernameAgain.setCellStyle("nodisplay");
+
+		form.setItems(mailaddress, server, targetSelector, fakeUsername, fakeUsernameAgain, fakePassword, username, password, foldering,
+				language, protocol, port, ssl);
 
 		formsContainer.addMember(form);
 	}

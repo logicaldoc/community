@@ -89,6 +89,7 @@ public class DocumentsDS extends DataSource {
 		DataSourceTextField filename = new DataSourceTextField("filename");
 
 		DataSourceImageField icon = new DataSourceImageField("icon");
+		icon.setHidden(true);
 		DataSourceTextField customId = new DataSourceTextField("customId");
 		DataSourceTextField type = new DataSourceTextField("type");
 		DataSourceTextField version = new DataSourceTextField("version");
@@ -129,6 +130,8 @@ public class DocumentsDS extends DataSource {
 		DataSourceIntegerField order = new DataSourceIntegerField("order");
 		DataSourceTextField language = new DataSourceTextField("language");
 		DataSourceTextField tags = new DataSourceTextField("tags");
+		DataSourceImageField creatorId = new DataSourceImageField("creatorId", "", 24);
+		DataSourceImageField publisherId = new DataSourceImageField("publisherId", "", 24);
 
 		List<DataSourceField> fields = new ArrayList<DataSourceField>();
 		fields.add(id);
@@ -136,6 +139,7 @@ public class DocumentsDS extends DataSource {
 		fields.add(filename);
 		fields.add(type);
 		fields.add(size);
+		fields.add(publisherId);
 		fields.add(publisher);
 		fields.add(version);
 		fields.add(docref);
@@ -143,6 +147,7 @@ public class DocumentsDS extends DataSource {
 		fields.add(lastModified);
 		fields.add(published);
 		fields.add(created);
+		fields.add(creatorId);
 		fields.add(creator);
 		fields.add(customId);
 		fields.add(immutable);

@@ -585,7 +585,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertTrue(folders.isEmpty());
 
 		// Try with umlauts
-		Assert.assertNotNull(dao.findByName(dao.findById(Folder.DEFAULTWORKSPACEID), "ölard", null, false));
+		Assert.assertNotNull(dao.findByName(dao.findById(Folder.DEFAULTWORKSPACEID), "ï¿½lard", null, false));
 	}
 
 	@Test
@@ -632,8 +632,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testFindByPath() {
-		Assert.assertNotNull(dao.findByPathExtended("/Default/ölard", 1L));
-		Assert.assertNull(dao.findByPathExtended("/Default/ölard", 99L));
+		Assert.assertNotNull(dao.findByPathExtended("/Default/Elard", 1L));
+		Assert.assertNull(dao.findByPathExtended("/Default/Elard", 99L));
 	}
 
 	@Test
@@ -989,8 +989,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindbyPath() {
-		Folder folder = dao.findByPathExtended("/Default/ölard", 1L);
+	public void testFindbyPathExtended() {
+		Folder folder = dao.findByPathExtended("/Default/Elard", 1L);
 		Assert.assertNotNull(folder);
 	}
 

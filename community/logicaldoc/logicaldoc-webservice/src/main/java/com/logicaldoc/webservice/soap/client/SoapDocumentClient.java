@@ -126,12 +126,12 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	public DataHandler getResource(String sid, long docId, String fileVersion, String suffix) throws Exception {
 		return client.getResource(sid, docId, fileVersion, suffix);
 	}
-	
+
 	public void downloadContent(String sid, long docId, File out) throws Exception {
 		DataHandler data = client.getContent(sid, docId);
 		data.writeTo(new FileOutputStream(out));
 	}
-	
+
 	public void downloadVersionContent(String sid, long docId, String version, File out) throws Exception {
 		DataHandler data = client.getVersionContent(sid, docId, version);
 		data.writeTo(new FileOutputStream(out));
@@ -141,11 +141,6 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 			throws Exception {
 		DataHandler data = client.getResource(sid, docId, fileVersion, suffix);
 		data.writeTo(new FileOutputStream(out));
-	}
-
-	@Override
-	public WSDocument[] getVersions(String sid, long docId) throws Exception {
-		return client.getVersions(sid, docId);
 	}
 
 	@Override
@@ -306,5 +301,15 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	public long upload(String sid, Long docId, Long folderId, boolean release, String filename, String language,
 			DataHandler content) throws Exception {
 		return client.upload(sid, docId, folderId, release, filename, language, content);
+	}
+
+	@Override
+	public WSDocument[] getVersions(String sid, long docId) throws Exception {
+		return client.getVersions(sid, docId);
+	}
+
+	@Override
+	public WSDocument getVersion(String sid, long docId, String version) throws Exception {
+		return client.getVersion(sid, docId, version);
 	}
 }

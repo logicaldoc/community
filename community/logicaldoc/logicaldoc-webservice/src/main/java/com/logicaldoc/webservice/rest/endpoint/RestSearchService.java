@@ -1,11 +1,5 @@
 package com.logicaldoc.webservice.rest.endpoint;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Example;
-import io.swagger.annotations.ExampleProperty;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -24,8 +18,13 @@ import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.rest.SearchService;
 import com.logicaldoc.webservice.soap.endpoint.SoapSearchService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Path("/")
-@Api(value = "search")
+@Tag(name = "search")
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestSearchService extends SoapSearchService implements SearchService {
@@ -33,10 +32,15 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 	protected static Logger log = LoggerFactory.getLogger(RestSearchService.class);
 
 	@POST
-	@Path("/find")
-	@ApiOperation(value = "Search documents", notes = "Runs a search on the server")
+    @Path("/find")
+	//@ApiOperation(value = "Search documents", notes = "Runs a search on the server")
+	@Operation(summary = "Search documents", description = "Runs a search on the server")
 	public WSSearchResult find(
-			@ApiParam(value = "Search options", required = true, examples = @Example(value = { @ExampleProperty(value = "{\"maxHits\":50,\"expression\":\"document management system\",\"expressionLanguage\":\"en\",\"language\":\"en\"}") })) WSSearchOptions opt)
+			@Parameter(
+					description = "Search options", required = true,
+					example = "{\"maxHits\":50,\"expression\":\"document management system\",\"expressionLanguage\":\"en\",\"language\":\"en\"}",
+					schema = @Schema(implementation = WSSearchOptions.class))
+			WSSearchOptions opt)
 			throws Exception {
 		String sid = validateSession();
 		return super.find(sid, opt);
@@ -45,8 +49,9 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 	@Override
 	@GET
 	@Path("/findByFilename")
-	@ApiOperation(value = "Search documents by Filename", notes = "Finds authorized documents for the current user containing the given filename (like operator is used)")
-	public WSDocument[] findByFilename(@QueryParam("filename") @ApiParam(value = "Filename of the document", required = true) String filename) throws Exception {
+	//@ApiOperation(value = "Search documents by Filename", notes = "Finds authorized documents for the current user containing the given filename (like operator is used)")
+	@Operation(summary = "Search documents by Filename", description = "Finds authorized documents for the current user containing the given filename (like operator is used)")
+	public WSDocument[] findByFilename(@Parameter(description = "Filename of the document", required = true) @QueryParam("filename") String filename) throws Exception {
 		String sid = validateSession();
 		return super.findByFilename(sid, filename);
 	}
@@ -54,8 +59,9 @@ public class RestSearchService extends SoapSearchService implements SearchServic
 	@Override
 	@GET
 	@Path("/findFolders")
-	@ApiOperation(value = "Search folders by name", notes = "Finds authorized folders for the current user containing the given name (like operator is used)")	
-	public WSFolder[] findFolders(@QueryParam("name") @ApiParam(value = "Name of the folder", required = true) String name) throws Exception {
+	//@ApiOperation(value = "Search folders by name", notes = "Finds authorized folders for the current user containing the given name (like operator is used)")
+	@Operation(summary = "Search folders by name", description = "Finds authorized folders for the current user containing the given name (like operator is used)")
+	public WSFolder[] findFolders(@Parameter(description = "Name of the folder", required = true) @QueryParam("name") String name) throws Exception {
 		String sid = validateSession();
 		return super.findFolders(sid, name);
 	}

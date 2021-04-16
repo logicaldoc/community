@@ -68,17 +68,6 @@ public abstract class PersistentObject {
 		this.deleted = deleted;
 	}
 
-	public boolean equals(Object obj) {
-		if (!(obj instanceof PersistentObject))
-			return false;
-		PersistentObject other = (PersistentObject) obj;
-		return other.getId() == this.getId();
-	}
-
-	public int hashCode() {
-		return Long.valueOf(getId()).hashCode();
-	}
-
 	public String toString() {
 		return Long.toString(getId());
 	}
@@ -98,4 +87,16 @@ public abstract class PersistentObject {
 	public void setRecordVersion(long recordVersion) {
 		this.recordVersion = recordVersion;
 	}
+
+	public boolean equals(Object obj) {
+		if (!(obj instanceof PersistentObject))
+			return false;
+		PersistentObject other = (PersistentObject) obj;
+		return other.getId() == this.getId();
+	}
+
+	public int hashCode() {
+		return Long.valueOf(getId()).hashCode();
+	}
+
 }

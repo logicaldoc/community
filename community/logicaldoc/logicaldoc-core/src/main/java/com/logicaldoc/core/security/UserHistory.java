@@ -11,7 +11,7 @@ import com.logicaldoc.core.History;
 public class UserHistory extends History {
 
 	public String author;
-	
+
 	public String getAuthor() {
 		return author;
 	}
@@ -42,9 +42,12 @@ public class UserHistory extends History {
 		history.setUsername(getUsername());
 		history.setUserLogin(getUserLogin());
 		history.setNotifyEvent(isNotifyEvent());
-		history.setIp(getIp());
 		history.setAuthor(getAuthor());
-
+		history.setIp(getIp());
+		history.setDevice(getDevice());
+		history.setGeolocation(getGeolocation());
+		history.setFileSize(getFileSize());
+		
 		return history;
 	}
 }

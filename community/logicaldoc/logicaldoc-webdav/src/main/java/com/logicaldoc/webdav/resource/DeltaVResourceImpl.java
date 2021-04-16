@@ -128,7 +128,6 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 		return loc;
 	}
 
-	@SuppressWarnings("deprecation")
 	protected DavResource createResourceFromLocator(DavResourceLocator loc) throws DavException {
 		DavResource res = getFactory().createResource(loc, getSession());
 		return res;

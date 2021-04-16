@@ -8,13 +8,14 @@ import com.logicaldoc.gui.common.client.beans.GUISecuritySettings;
 import com.logicaldoc.gui.common.client.beans.GUISequence;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 public interface SecurityServiceAsync {
 
 	void logout(AsyncCallback<Void> callback);
 
 	void changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword, boolean notify,
-			AsyncCallback<Integer> callback);
+			AsyncCallback<GUIValue> callback);
 
 	void deleteUser(long userId, AsyncCallback<Void> callback);
 
@@ -39,10 +40,12 @@ public interface SecurityServiceAsync {
 	void kill(String sid, AsyncCallback<Void> callback);
 
 	void saveProfile(GUIUser user, AsyncCallback<GUIUser> callback);
+	
+	void saveAvatar(long userId, AsyncCallback<Void> callback);
 
 	void applyRights(GUIMenu menu, AsyncCallback<Void> callback);
 
-	void getMenu(long id, AsyncCallback<GUIMenu> callback);
+	void getMenu(long id, String locale, AsyncCallback<GUIMenu> callback);
 
 	void searchUsers(String username, String groupId, AsyncCallback<GUIUser[]> callback);
 
@@ -56,4 +59,22 @@ public interface SecurityServiceAsync {
 
 	void replicateUsersSettings(long masterUserId, Long[] userIds, boolean gui, boolean groups,
 			AsyncCallback<Void> callback);
+
+	void deleteMenu(long menuId, AsyncCallback<Void> callback);
+
+	void getMenus(long parentId, String locale, boolean enabledOnly, AsyncCallback<GUIMenu[]> callback);
+
+	void saveMenus(GUIMenu[] menus, String locale, AsyncCallback<Void> callback);
+
+	void saveMenu(GUIMenu menu, String locale, AsyncCallback<GUIMenu> callback);
+
+	void trustDevice(AsyncCallback<String> callback);
+
+	void isTrustedDevice(String device, AsyncCallback<Boolean> callback);
+
+	void deleteTrustedDevices(String[] deviceIds, AsyncCallback<Void> callback);
+
+	void syncGeolocationDB(String key, AsyncCallback<String> callback);
+
+	void resetAvatar(long userId, AsyncCallback<Void> callback);
 }

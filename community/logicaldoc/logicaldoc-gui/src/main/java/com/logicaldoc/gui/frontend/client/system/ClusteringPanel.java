@@ -5,7 +5,7 @@ import java.util.Map;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
@@ -88,12 +88,12 @@ public class ClusteringPanel extends AdminPanel {
 					SettingService.Instance.get().saveSettings(settings, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void result) {
-							Log.info(I18N.message("settingssaved") + " " + I18N.message("needrestart"), null);
+							GuiLog.info(I18N.message("settingssaved") + " " + I18N.message("needrestart"), null);
 						}
 					});
 				}

@@ -5,10 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
@@ -18,6 +14,8 @@ import com.logicaldoc.core.History;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.core.threading.ThreadPools;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**
@@ -40,8 +38,6 @@ public class EventCollector {
 
 	private ContextProperties config;
 
-	private ExecutorService threadPoolExecutor = null;
-
 	// Maintain a fifos for the history IDs. Key is the class name, value is a
 	// FIFO queue
 	private Map<String, Queue<Long>> fifos = new HashMap<String, Queue<Long>>();
@@ -52,34 +48,6 @@ public class EventCollector {
 
 	public void start() {
 		EventCollector.instance = this;
-
-		if (threadPoolExecutor != null)
-			stop();
-
-		if (!isEnabled()) {
-			log.warn("Aspect {} not enabled", ASPECT);
-			return;
-		}
-
-		int corePoolSize = 5;
-
-		int maxPoolSize = config.getInt("eventcollector.maxpool", 20);
-
-		long keepAliveTime = config.getInt("eventcollector.keepalive", 5);
-
-		threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>());
-		log.info("Installed message collector thread executor");
-	}
-
-	public void stop() {
-		if (threadPoolExecutor != null) {
-			threadPoolExecutor.shutdownNow();
-			try {
-				threadPoolExecutor.awaitTermination(3, TimeUnit.SECONDS);
-			} catch (InterruptedException e) {
-			}
-		}
 	}
 
 	public void addListener(EventListener listener) {
@@ -157,8 +125,12 @@ public class EventCollector {
 			}
 		};
 
-		if (threadPoolExecutor != null)
-			threadPoolExecutor.execute(notifier);
+		if (isEnabled()) {
+			ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);
+			pools.execute(notifier, "EventCollector");
+		} else {
+			log.debug("Aspect {} not enabled", ASPECT);
+		}
 	}
 
 	public ContextProperties getConfig() {

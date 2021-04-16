@@ -6,6 +6,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIBarcodeSpec;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
@@ -65,7 +66,6 @@ public interface BarcodeService extends RemoteService {
 	 */
 	public GUIBarcodeTemplate getTemplate(long templateId) throws ServerException;
 
-	
 	/**
 	 * Processes the given document
 	 * 
@@ -76,7 +76,18 @@ public interface BarcodeService extends RemoteService {
 	 * @throws ServerException an error happened during the barcode processing
 	 */
 	public GUIDocument process(long docId) throws ServerException;
-	
+
+	/**
+	 * Updates a single zone, if the zone does not exist it will be created
+	 * 
+	 * @param zone the zone to update
+	 * 
+	 * @return the newly added zone
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIBarcodeSpec updateZone(GUIBarcodeSpec zone) throws ServerException;
+
 	public static class Instance {
 		private static BarcodeServiceAsync instance;
 

@@ -195,7 +195,6 @@ public class DashletContent extends HttpServlet {
 						writer.write("<docrefType>" + record.getDocRefType() + "</docrefType>");
 				}
 
-				writer.write("<icon>" + FilenameUtils.getBaseName(record.getIcon()) + "</icon>");
 				writer.write("<version>" + record.getVersion() + "</version>");
 				writer.write(
 						"<lastModified>" + (record.getLastModified() != null ? df.format(record.getLastModified()) : "")
@@ -220,6 +219,8 @@ public class DashletContent extends HttpServlet {
 				if (record.getLockUser() != null)
 					writer.write("<lockUser><![CDATA[" + record.getLockUser() + "]]></lockUser>");
 				writer.write("<filename><![CDATA[" + record.getFileName() + "]]></filename>");
+				writer.write("<icon>" + FilenameUtils.getBaseName(
+						IconSelector.selectIcon(FilenameUtils.getExtension(record.getFileName()))) + "</icon>");
 				writer.write("<type><![CDATA[" + record.getType() + "]]></type>");
 
 				writer.write("<rating>" + (record.getRating() != null ? record.getRating() : "0") + "</rating>");
@@ -287,6 +288,8 @@ public class DashletContent extends HttpServlet {
 				writer.write("<message><![CDATA[" + record.getMessage() + "]]></message>");
 				writer.write("<docId>" + record.getDocId() + "</docId>");
 				writer.write("<filename><![CDATA[" + record.getFileName() + "]]></filename>");
+				writer.write("<icon>" + FilenameUtils.getBaseName(
+						IconSelector.selectIcon(FilenameUtils.getExtension(record.getFileName()))) + "</icon>");
 				writer.write("<userId><![CDATA[" + record.getUserId() + "]]></userId>");
 				writer.write("</post>");
 			}

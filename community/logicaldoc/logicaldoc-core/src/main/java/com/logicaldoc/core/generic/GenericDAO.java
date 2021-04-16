@@ -16,7 +16,7 @@ public interface GenericDAO extends PersistentObjectDAO<Generic> {
 	 * 
      * @param type The type(you can use like jollies and can be null)
 	 * @param subtype The sub-type(you can use like jollies and can be null)
-	 * @param tenantId ID of the owning tenant (optional)
+	 * @param tenantId ID of the owning tenant
 	 * @param qualifier the qualifier, can be null
 	 * 
 	 * @return Wanted generic or null

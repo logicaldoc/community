@@ -8,13 +8,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUIExternalCall;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
-import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.types.TitleOrientation;
@@ -24,15 +22,11 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 
 /**
@@ -57,10 +51,6 @@ public class ProtocolsPanel extends AdminPanel {
 
 	private GUIParameter wdDepth = null;
 
-	private CheckboxItem extCallParamUser;
-
-	private CheckboxItem extCallParamTitle;
-
 	private GUIParameter ftpEnabled = null;
 
 	private GUIParameter ftpPort = null;
@@ -69,9 +59,11 @@ public class ProtocolsPanel extends AdminPanel {
 
 	private GUIParameter ftpKeystoreFile = null;
 
+	private GUIParameter ftpKeystorePassword = null;
+
 	private GUIParameter ftpKeystoreAlias = null;
 
-	private GUIParameter ftpKeystorePassword = null;
+	private GUIParameter ftpKeystoreAliasPassword = null;
 
 	public ProtocolsPanel() {
 		super("webservice");
@@ -79,11 +71,11 @@ public class ProtocolsPanel extends AdminPanel {
 
 	@Override
 	protected void onDraw() {
-		SettingService.Instance.get().loadClientSettings(new AsyncCallback<GUIParameter[]>() {
+		SettingService.Instance.get().loadProtocolSettings(new AsyncCallback<GUIParameter[]>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 			}
 
 			@Override
@@ -117,6 +109,8 @@ public class ProtocolsPanel extends AdminPanel {
 				ftpKeystoreFile = parameter;
 			else if (parameter.getName().equals("ftp.keystore.alias"))
 				ftpKeystoreAlias = parameter;
+			else if (parameter.getName().equals("ftp.keystore.alias.password"))
+				ftpKeystoreAliasPassword = parameter;
 			else if (parameter.getName().equals("ftp.keystore.password"))
 				ftpKeystorePassword = parameter;
 		}
@@ -229,13 +223,6 @@ public class ProtocolsPanel extends AdminPanel {
 		ftpEnabledItem.setRequired(true);
 		ftpEnabledItem.setWrapTitle(false);
 		ftpEnabledItem.setValue(ftpEnabled.getValue().equals("true") ? "yes" : "no");
-		ftpEnabledItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onFtpChanges();
-			}
-		});
 
 		// FTP port
 		IntegerItem ftpPortItem = ItemFactory.newIntegerItem("ftpPort", "port", 21);
@@ -243,63 +230,37 @@ public class ProtocolsPanel extends AdminPanel {
 		ftpPortItem.setWrapTitle(false);
 		ftpPortItem.setWidth(80);
 		ftpPortItem.setValue(Integer.parseInt(ftpPort.getValue()));
-		ftpPortItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onFtpChanges();
-			}
-		});
 
 		// FTP security
 		RadioGroupItem ftpSslItem = ItemFactory.newBooleanSelector("ftpSsl", "encryptionftps");
 		ftpSslItem.setRequired(true);
 		ftpSslItem.setWrapTitle(false);
 		ftpSslItem.setValue(ftpSsl.getValue().equals("true") ? "yes" : "no");
-		ftpSslItem.addChangedHandler(new ChangedHandler() {
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onFtpChanges();
-			}
-		});
 		TextItem ftpKeystoreFileItem = ItemFactory.newTextItem("ftpKeystoreFile", "keystore",
 				ftpKeystoreFile.getValue());
 		ftpKeystoreFileItem.setRequired(false);
 		ftpKeystoreFileItem.setWrapTitle(false);
 		ftpKeystoreFileItem.setWidth(400);
 		ftpKeystoreFileItem.setValue(ftpKeystoreFile.getValue());
-		ftpKeystoreFileItem.addChangedHandler(new ChangedHandler() {
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onFtpChanges();
-			}
-		});
-		TextItem ftpKeystoreAliasItem = ItemFactory.newTextItem("ftpKeystoreAlias", "keystorealias",
-				ftpKeystoreAlias.getValue());
-		ftpKeystoreAliasItem.setRequired(false);
-		ftpKeystoreAliasItem.setWrapTitle(false);
-		ftpKeystoreAliasItem.setValue(ftpKeystoreAlias.getValue());
-		ftpKeystoreAliasItem.addChangedHandler(new ChangedHandler() {
-
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onFtpChanges();
-			}
-		});
 		TextItem ftpKeystorePasswordItem = ItemFactory.newTextItem("ftpKeystorePassword", "keystorepasswd",
 				ftpKeystorePassword.getValue());
 		ftpKeystorePasswordItem.setRequired(false);
 		ftpKeystorePasswordItem.setWrapTitle(false);
 		ftpKeystorePasswordItem.setValue(ftpKeystorePassword.getValue());
-		ftpKeystorePasswordItem.addChangedHandler(new ChangedHandler() {
 
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onFtpChanges();
-			}
-		});
+		TextItem ftpKeystoreAliasItem = ItemFactory.newTextItem("ftpKeystoreAlias", "keystorealias",
+				ftpKeystoreAlias.getValue());
+		ftpKeystoreAliasItem.setRequired(false);
+		ftpKeystoreAliasItem.setWrapTitle(false);
+		ftpKeystoreAliasItem.setValue(ftpKeystoreAlias.getValue());
+
+		TextItem ftpKeystoreAliasPasswordItem = ItemFactory.newTextItem("ftpKeystoreAliasPassword",
+				"keystorealiaspassword", ftpKeystoreAliasPassword.getValue());
+		ftpKeystoreAliasPasswordItem.setRequired(false);
+		ftpKeystoreAliasPasswordItem.setWrapTitle(false);
+		ftpKeystoreAliasPasswordItem.setValue(ftpKeystoreAliasPassword.getValue());
 
 		Tab ftp = new Tab();
 		ftp.setTitle(I18N.message("fftp"));
@@ -309,12 +270,9 @@ public class ProtocolsPanel extends AdminPanel {
 		ftpForm.setNumCols(2);
 		ftpForm.setColWidths(1, "*");
 		ftpForm.setPadding(5);
-		ftpForm.setItems(ftpEnabledItem, ftpPortItem, ftpSslItem, ftpKeystoreFileItem, ftpKeystoreAliasItem,
-				ftpKeystorePasswordItem);
+		ftpForm.setItems(ftpEnabledItem, ftpPortItem, ftpSslItem, ftpKeystoreFileItem, ftpKeystorePasswordItem,
+				ftpKeystoreAliasItem, ftpKeystoreAliasPasswordItem);
 		ftp.setPane(ftpForm);
-
-		// External Call
-		Tab extCall = prepareExternalCall(settings);
 
 		if (Feature.visible(Feature.CMIS)) {
 			tabs.addTab(cmis);
@@ -332,12 +290,6 @@ public class ProtocolsPanel extends AdminPanel {
 			tabs.addTab(ftp);
 			if (!Feature.enabled(Feature.FTP))
 				ftp.setPane(new FeatureDisabled());
-		}
-
-		if (Feature.visible(Feature.EXTERNAL_CALL)) {
-			tabs.addTab(extCall);
-			if (!Feature.enabled(Feature.EXTERNAL_CALL))
-				extCall.setPane(new FeatureDisabled());
 		}
 
 		IButton save = new IButton();
@@ -371,6 +323,8 @@ public class ProtocolsPanel extends AdminPanel {
 						ProtocolsPanel.this.ftpSsl.setValue(values.get("ftpSsl").equals("yes") ? "true" : "false");
 						ProtocolsPanel.this.ftpKeystoreFile.setValue(values.get("ftpKeystoreFile").toString());
 						ProtocolsPanel.this.ftpKeystoreAlias.setValue(values.get("ftpKeystoreAlias").toString());
+						ProtocolsPanel.this.ftpKeystoreAliasPassword
+								.setValue(values.get("ftpKeystoreAliasPassword").toString());
 						ProtocolsPanel.this.ftpKeystorePassword.setValue(values.get("ftpKeystorePassword").toString());
 					}
 
@@ -385,56 +339,21 @@ public class ProtocolsPanel extends AdminPanel {
 					params.add(ProtocolsPanel.this.ftpPort);
 					params.add(ProtocolsPanel.this.ftpSsl);
 					params.add(ProtocolsPanel.this.ftpKeystoreFile);
-					params.add(ProtocolsPanel.this.ftpKeystoreAlias);
 					params.add(ProtocolsPanel.this.ftpKeystorePassword);
-
-					// External Call
-					try {
-						GUIExternalCall extCall = new GUIExternalCall();
-						extCall.setName(values.get("extCallName") == null ? "" : values.get("extCallName").toString());
-						extCall.setBaseUrl(
-								values.get("extCallBaseUrl") == null ? "" : values.get("extCallBaseUrl").toString());
-						extCall.setSuffix(
-								values.get("extCallSuffix") == null ? "" : values.get("extCallSuffix").toString());
-						extCall.setTargetWindow(
-								values.get("extCallWindow") == null ? "" : values.get("extCallWindow").toString());
-						if ("yes".equals(values.get("extCallEnabled")))
-							Session.get().getSession().setExternalCall(extCall);
-						else
-							Session.get().getSession().setExternalCall(null);
-
-						String tenant = Session.get().getTenantName();
-						params.add(new GUIParameter(tenant + ".extcall.enabled",
-								"yes".equals(values.get("extCallEnabled")) ? "true" : "false"));
-						params.add(new GUIParameter(tenant + ".extcall.name", extCall.getName()));
-						params.add(new GUIParameter(tenant + ".extcall.baseurl", extCall.getBaseUrl()));
-						params.add(new GUIParameter(tenant + ".extcall.suffix", extCall.getSuffix()));
-						params.add(new GUIParameter(tenant + ".extcall.window", extCall.getTargetWindow()));
-
-						ArrayList<String> buf = new ArrayList<String>();
-						if (extCallParamUser.getValueAsBoolean() != null
-								&& extCallParamUser.getValueAsBoolean().booleanValue())
-							buf.add("user");
-						if (extCallParamTitle.getValueAsBoolean() != null
-								&& extCallParamTitle.getValueAsBoolean().booleanValue())
-							buf.add("filename");
-						String paramsStr = buf.toString().substring(1, buf.toString().length() - 1);
-
-						extCall.setParametersStr(paramsStr);
-						params.add(new GUIParameter(tenant + ".extcall.params", buf.isEmpty() ? "" : paramsStr));
-					} catch (Throwable t) {
-					}
+					params.add(ProtocolsPanel.this.ftpKeystoreAlias);
+					params.add(ProtocolsPanel.this.ftpKeystoreAliasPassword);
 
 					SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]),
 							new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									Log.info(I18N.message("settingssaved"), null);
+									GuiLog.info(I18N.message("settingssaved"), null);
+									GuiLog.info(I18N.message("needrestart"), null);
 								}
 							});
 				} else {
@@ -449,77 +368,5 @@ public class ProtocolsPanel extends AdminPanel {
 			// In demo mode you cannot alter the client configurations
 			save.setDisabled(true);
 		}
-	}
-
-	protected void onFtpChanges() {
-		ToastNotification.showNotification(I18N.message("needrestart"));
-	}
-
-	private Tab prepareExternalCall(GUIParameter[] settings) {
-		VLayout pane = new VLayout();
-
-		Tab extCall = new Tab();
-		extCall.setTitle(I18N.message("externalcall"));
-		DynamicForm extCallForm = new DynamicForm();
-		extCallForm.setWidth(400);
-		extCallForm.setIsGroup(true);
-		extCallForm.setNumCols(2);
-		extCallForm.setPadding(2);
-		extCallForm.setGroupTitle(I18N.message("externalcall"));
-		extCallForm.setValuesManager(vm);
-		extCallForm.setTitleOrientation(TitleOrientation.LEFT);
-		final RadioGroupItem extCallEnabled = ItemFactory.newBooleanSelector("extCallEnabled", "enabled");
-		extCallEnabled.setRequired(true);
-		extCallEnabled.setRedrawOnChange(true);
-		extCallEnabled.setValue("no");
-
-		TextItem extCallName = ItemFactory.newTextItem("extCallName", I18N.message("name"), null);
-		TextItem extCallBaseUrl = ItemFactory.newTextItem("extCallBaseUrl", I18N.message("baseurl"), null);
-		extCallBaseUrl.setWidth(300);
-		TextItem extCallSuffix = ItemFactory.newTextItem("extCallSuffix", I18N.message("suffix"), null);
-		extCallSuffix.setWidth(300);
-		TextItem extCallWindow = ItemFactory.newTextItem("extCallWindow", I18N.message("targetwindow"), "_blank");
-
-		extCallForm.setItems(extCallEnabled, extCallName, extCallBaseUrl, extCallSuffix, extCallWindow);
-
-		// Use a second form to group the parameters section
-		DynamicForm parametersForm = new DynamicForm();
-		parametersForm.setWidth(400);
-		parametersForm.setIsGroup(true);
-		parametersForm.setGroupTitle(I18N.message("parameters"));
-		parametersForm.setNumCols(4);
-		extCallForm.setPadding(2);
-		parametersForm.setValuesManager(vm);
-		extCallParamUser = ItemFactory.newCheckbox("extCallParamUser", "user");
-		extCallParamTitle = ItemFactory.newCheckbox("extCallParamTitle", "filename");
-		parametersForm.setItems(extCallParamUser, extCallParamTitle);
-
-		pane.setMembers(extCallForm, parametersForm);
-		extCall.setPane(pane);
-
-		String tenant = Session.get().getTenantName();
-		for (GUIParameter s : settings) {
-			if ((tenant + ".extcall.enabled").equals(s.getName()))
-				extCallEnabled.setValue("true".equals(s.getValue()) ? "yes" : "no");
-			else if ((tenant + ".extcall.name").equals(s.getName()))
-				extCallName.setValue(s.getValue());
-			else if ((tenant + ".extcall.baseurl").equals(s.getName()))
-				extCallBaseUrl.setValue(s.getValue());
-			else if ((tenant + ".extcall.suffix").equals(s.getName()))
-				extCallSuffix.setValue(s.getValue());
-			else if ((tenant + ".extcall.window").equals(s.getName()))
-				extCallWindow.setValue(s.getValue());
-			else if ((tenant + ".extcall.params").equals(s.getName())) {
-				String[] tokens = s.getValue().split(",");
-				for (String param : tokens) {
-					if ("user".equals(param.trim()))
-						extCallParamUser.setValue("true");
-					else if ("filename".equals(param.trim()))
-						extCallParamTitle.setValue("true");
-				}
-			}
-		}
-
-		return extCall;
 	}
 }

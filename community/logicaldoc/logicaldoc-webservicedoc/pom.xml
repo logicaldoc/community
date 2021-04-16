@@ -4,11 +4,15 @@
     <parent>
         <groupId>com.logicaldoc</groupId>
         <artifactId>logicaldoc</artifactId>
-        <version>8.5.2</version>
+        <version>8.6.1</version>
     </parent>
     <artifactId>logicaldoc-webservicedoc</artifactId>
     <name>logicaldoc-webservicedoc</name>
     <packaging>jar</packaging>
+    <properties>
+        <cxf.swagger.ui.version>3.38.0</cxf.swagger.ui.version>
+        <cxf.swagger.v3.version>2.1.6</cxf.swagger.v3.version>    
+    </properties>    
     <dependencies>
         <dependency>
             <groupId>com.logicaldoc</groupId>
@@ -47,8 +51,24 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>3.1.6</version>
-        </dependency>        
+            <!--version>3.1.6</version-->
+        </dependency>
+        
+<dependency>
+    <groupId>org.apache.cxf</groupId>
+    <artifactId>cxf-rt-rs-service-description-openapi-v3</artifactId>
+    <version>3.2.14</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.cxf</groupId>
+    <artifactId>cxf-rt-rs-service-description-swagger-ui</artifactId>
+    <version>3.2.14</version>
+</dependency>
+<dependency>
+    <groupId>org.apache.cxf</groupId>
+    <artifactId>cxf-rt-rs-service-description-common-openapi</artifactId>
+    <version>3.2.14</version>
+</dependency>      
 
         <dependency>
             <groupId>net.sf.jpf</groupId>
@@ -91,6 +111,7 @@
 
     
         <!-- Swagger dependencies -->
+        <!--
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-jaxrs</artifactId>
@@ -106,44 +127,63 @@
                 </exclusion>                
             </exclusions>
         </dependency>
+        -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
+            <version>${cxf.swagger.v3.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>        
+        
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>${cxf.swagger.ui.version}</version>
+        </dependency>        
+        
+        <!--
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>swagger-ui</artifactId>
             <version>2.1.0</version>
             <scope>provided</scope>
         </dependency>
+        -->
+        
+        
         
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>2.6.5</version>
         </dependency>           
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.6.5</version>
         </dependency> 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.6.5</version>
         </dependency>
 		<dependency>
 		    <groupId>com.fasterxml.jackson.core</groupId>
 		    <artifactId>jackson-annotations</artifactId>
-		    <version>2.6.5</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml -->
 		<dependency>
 		    <groupId>com.fasterxml.jackson.dataformat</groupId>
 		    <artifactId>jackson-dataformat-yaml</artifactId>
-		    <version>2.6.5</version>
+            <version>${jackson.version}</version>
 		</dependency>		      
                  
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
+            <version>2.1.1</version>
         </dependency>
 		
 		<dependency>
@@ -169,8 +209,6 @@
 		    <artifactId>validation-api</artifactId>
 		    <version>1.1.0.Final</version>
 		</dependency>					
-		
-<!-- 		jackson-core-2.3.0-rc1.jar -->
 		
     </dependencies>
     <build>
@@ -215,10 +253,12 @@
                                     dest="target/plugin" />
                                 <delete
                                     dir="target/${project.artifactId}-${project.version}-plugin.zip" />
+                                    <!-- 
                                 <delete>
                                     <fileset dir="target/plugin/WEB-INF/lib"
                                         includes="*logicaldoc*,*spring*,*velocity*,*geronimo*,*aopalliance*,*saaj*,ant*,hibernate*,ehcache*,jetty*,joda*" />
                                 </delete>
+                                -->
                                 <copy
                                     file="target/${project.artifactId}-${project.version}.${project.packaging}"
                                     tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />

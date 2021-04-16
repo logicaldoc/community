@@ -6,18 +6,20 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.ArchivedDocsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -27,7 +29,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
@@ -99,7 +100,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		print.setAutoFit(true);
 		print.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 		toolStrip.addSeparator();
@@ -115,7 +116,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 			export.addClickHandler(new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					Util.exportCSV(list, false);
+					GridUtil.exportCSV(list, false);
 				}
 			});
 			if (!Feature.enabled(Feature.EXPORT_CSV)) {
@@ -140,16 +141,6 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		size.setCanFilter(false);
 		size.setCanGroupBy(false);
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-		icon.setCanGroupBy(false);
-
 		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
 		version.setAlign(Alignment.CENTER);
 		version.setCanFilter(false);
@@ -161,19 +152,12 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setCanFilter(false);
 		lastModified.setCanGroupBy(false);
 		lastModified.setHidden(true);
 
-		ListGridField created = new ListGridField("created", I18N.message("createdon"), 110);
-		created.setAlign(Alignment.CENTER);
-		created.setType(ListGridFieldType.DATE);
-		created.setCellFormatter(new DateCellFormatter(false));
-		created.setCanFilter(false);
+		ListGridField created = new DateListGridField("created", "createdon");
 
 		ListGridField folder = new ListGridField("folder", I18N.message("folder"), 200);
 		folder.setAlign(Alignment.CENTER);
@@ -185,7 +169,8 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		customId.setHidden(true);
 		customId.setCanGroupBy(false);
 
-		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
+		FileNameListGridField filename = new FileNameListGridField();
+		filename.setWidth(200);
 		filename.setCanFilter(true);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
@@ -204,7 +189,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		list.setShowFilterEditor(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 
-		list.setFields(icon, filename, version, fileVersion, size, created, lastModified, folder, id, customId, type);
+		list.setFields(filename, version, fileVersion, size, created, lastModified, folder, id, customId, type);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -254,7 +239,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -295,13 +280,13 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 				DocumentService.Instance.get().unarchiveDocuments(docIds, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void arg0) {
 						list.removeSelectedData();
-						Log.info(I18N.message("docsrestored"), null);
+						GuiLog.info(I18N.message("docsrestored"), null);
 					}
 				});
 			}
@@ -322,7 +307,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 							DocumentService.Instance.get().delete(docIds, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override

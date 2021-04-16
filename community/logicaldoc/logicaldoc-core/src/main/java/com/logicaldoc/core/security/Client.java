@@ -1,5 +1,12 @@
 package com.logicaldoc.core.security;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A remote client connected to LogicalDOC
  * 
@@ -8,6 +15,8 @@ package com.logicaldoc.core.security;
  */
 public class Client {
 
+	private static Logger log = LoggerFactory.getLogger(Client.class);
+
 	/**
 	 * An optional Identifier of the client, you must guarantee that this is
 	 * unique.
@@ -15,16 +24,21 @@ public class Client {
 	private String id;
 
 	private String username;
-	
+
 	private String address;
 
 	private String host;
 
+	private Device device;
+
+	private Geolocation geolocation;
+
 	public Client() {
 	}
 
-	Client(String address, String host) {
-		this(null, address, host);
+	public Client(HttpServletRequest req) {
+		this(null, req.getRemoteAddr(), req.getRemoteHost());
+		device = new Device(req);
 	}
 
 	public Client(String id, String address, String host) {
@@ -32,6 +46,11 @@ public class Client {
 		this.id = id;
 		this.address = address;
 		this.host = host;
+		try {
+			this.geolocation = Geolocation.get(address);
+		} catch (IOException e) {
+			log.debug("Geolocalization: " + e.getMessage(), address);
+		}
 	}
 
 	public String getId() {
@@ -84,5 +103,21 @@ public class Client {
 
 	public void setUsername(String username) {
 		this.username = username;
+	}
+
+	public Device getDevice() {
+		return device;
+	}
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
+	public Geolocation getGeolocation() {
+		return geolocation;
+	}
+
+	public void setGeolocation(Geolocation geolocation) {
+		this.geolocation = geolocation;
 	}
 }

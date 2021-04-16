@@ -23,5 +23,5 @@ public interface WebsocketsMessageService extends RemoteService {
 	 * 
 	 * @return the event message
 	 */
-	public EventMessage getMessage(EventMessage message);
+	public WebsocketMessage getMessage(WebsocketMessage message);
 }

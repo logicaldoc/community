@@ -143,7 +143,11 @@ public class DocumentsDataServlet extends HttpServlet {
 			} else if (StringUtils.isNotEmpty(request.getParameter("docIds"))) {
 				String[] idsArray = request.getParameter("docIds").split(",");
 				for (String id : idsArray) {
-					Document doc = dao.findById(Long.parseLong(id));
+					Document doc = null;
+					try {
+						doc = dao.findById(Long.parseLong(id));
+					} catch (Throwable t) {
+					}
 					if (doc == null || doc.getDeleted() == 1)
 						continue;
 					if (!fDao.isReadEnabled(doc.getFolder().getId(), session.getUserId()))
@@ -222,7 +226,7 @@ public class DocumentsDataServlet extends HttpServlet {
 								+ " A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,"
 								+ " A.startPublishing, A.stopPublishing, A.published, A.extResId,"
 								+ " B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages, "
-								+ " A.workflowStatusDisplay, A.language, A.links, A.tgs from Document as A left outer join A.template as B ");
+								+ " A.workflowStatusDisplay, A.language, A.links, A.tgs, A.creatorId, A.publisherId from Document as A left outer join A.template as B ");
 				query.append(" where A.deleted = 0 and not A.status=" + AbstractDocument.DOC_ARCHIVED);
 				if (folderId != null)
 					query.append(" and A.folder.id=" + folderId);
@@ -235,8 +239,10 @@ public class DocumentsDataServlet extends HttpServlet {
 					values = new Object[] { "%" + filename.toLowerCase() + "%" };
 				}
 
-				List<Object> records = (List<Object>) dao.findByQuery(query.toString(), values, null);
 				List<Document> documents = new ArrayList<Document>();
+				List<Object> records = new ArrayList<Object>();
+				if (folderId != null || filename != null || StringUtils.isNotEmpty(request.getParameter("indexed")))
+					records = (List<Object>) dao.findByQuery(query.toString(), values, null);
 
 				/*
 				 * Iterate over records enriching the data
@@ -315,6 +321,8 @@ public class DocumentsDataServlet extends HttpServlet {
 							doc.setLanguage((String) cols[33]);
 							doc.setLinks((Integer) cols[34]);
 							doc.setTgs((String) cols[35]);
+							doc.setCreatorId((Long) cols[36]);
+							doc.setPublisherId((Long) cols[37]);
 
 							if (!extValues.isEmpty())
 								for (String name : attrs) {
@@ -328,8 +336,8 @@ public class DocumentsDataServlet extends HttpServlet {
 
 					if (doc.isPublishing() || user.isMemberOf("admin") || user.isMemberOf("publisher"))
 						documents.add(doc);
-				}			
-				
+				}
+
 				// If a sorting is specified sort the collection of documents
 				if (StringUtils.isNotEmpty(sort)) {
 					// make the sorting to be case insensitive (add lower
@@ -410,6 +418,8 @@ public class DocumentsDataServlet extends HttpServlet {
 						+ "</bookmarked>");
 				writer.print("<language>" + doc.getLanguage() + "</language>");
 				writer.print("<links>" + doc.getLinks() + "</links>");
+				writer.print("<publisherId>" + doc.getPublisherId() + "</publisherId>");
+				writer.print("<creatorId>" + doc.getCreatorId() + "</creatorId>");
 
 				if (doc.getLockUserId() != null)
 					writer.print("<lockUserId>" + doc.getLockUserId() + "</lockUserId>");

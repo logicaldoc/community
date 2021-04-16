@@ -16,6 +16,8 @@ public class GUISecuritySettings implements Serializable {
 
 	private int pwdExpiration;
 
+	private int pwdEnforceHistory;
+
 	private boolean saveLogin = false;
 
 	private boolean ignoreLoginCase = false;
@@ -26,9 +28,19 @@ public class GUISecuritySettings implements Serializable {
 
 	private boolean allowSidInRequest = false;
 
+	private boolean alertNewDevice = true;
+
 	private GUIUser anonymousUser = null;
 
 	private String anonymousKey = null;
+
+	private String geolocationKey = null;
+
+	private String geolocationDbVer = null;
+
+	private boolean geolocationEnabled = true;
+
+	private boolean geolocationCache = false;
 
 	public int getPwdSize() {
 		return pwdSize;
@@ -100,5 +112,53 @@ public class GUISecuritySettings implements Serializable {
 
 	public void setAllowSidInRequest(boolean allowSidInRequest) {
 		this.allowSidInRequest = allowSidInRequest;
+	}
+
+	public boolean isAlertNewDevice() {
+		return alertNewDevice;
+	}
+
+	public void setAlertNewDevice(boolean alertNewDevice) {
+		this.alertNewDevice = alertNewDevice;
+	}
+
+	public String getGeolocationKey() {
+		return geolocationKey;
+	}
+
+	public void setGeolocationKey(String geolocationKey) {
+		this.geolocationKey = geolocationKey;
+	}
+
+	public String getGeolocationDbVer() {
+		return geolocationDbVer;
+	}
+
+	public void setGeolocationDbVer(String geolocationDbVer) {
+		this.geolocationDbVer = geolocationDbVer;
+	}
+
+	public boolean isGeolocationEnabled() {
+		return geolocationEnabled;
+	}
+
+	public void setGeolocationEnabled(boolean geolocationEnabled) {
+		this.geolocationEnabled = geolocationEnabled;
+	}
+
+	public boolean isGeolocationCache() {
+		return geolocationCache;
+	}
+
+	public void setGeolocationCache(boolean geolocationCache) {
+		this.geolocationCache = geolocationCache;
+	}
+
+	public int getPwdEnforceHistory() {
+		return pwdEnforceHistory;
+	}
+
+	public void setPwdEnforceHistory(int pwdEnforceHistory) {
+		this.pwdEnforceHistory = pwdEnforceHistory;
 	}
 }

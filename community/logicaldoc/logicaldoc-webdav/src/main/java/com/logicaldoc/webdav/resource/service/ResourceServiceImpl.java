@@ -175,6 +175,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public Resource getResource(String requestPath, DavSession session) throws DavException {
+		
 		log.trace("Find DAV resource: {}", requestPath);
 
 		long userId = 0;
@@ -238,7 +239,8 @@ public class ResourceServiceImpl implements ResourceService {
 	 * @see ResourceService#getChildByName(Resource, String)
 	 */
 	public Resource getParentResource(String resourcePath, long userId, DavSession session) {
-		log.debug("Find parent DAV resource: " + resourcePath);
+		
+		log.debug("Find parent DAV resource: {}", resourcePath);
 
 		long tenantId = Tenant.DEFAULT_ID;
 		if (session != null) {
@@ -251,19 +253,19 @@ public class ResourceServiceImpl implements ResourceService {
 		resourcePath = resourcePath.replaceFirst("/store", "").replaceFirst("/vstore", "");
 		if (!resourcePath.startsWith("/"))
 			resourcePath = "/" + resourcePath;
-
+		
 		String name = "";
 		resourcePath = resourcePath.substring(0, resourcePath.lastIndexOf('/'));
 		if (!resourcePath.isEmpty()) {
 			name = resourcePath.substring(resourcePath.lastIndexOf('/'));
 			resourcePath = resourcePath.substring(0, resourcePath.lastIndexOf('/'));
 		}
-
+		
 		resourcePath = resourcePath + "/";
-		if (name.startsWith("/"))
+		if (name.startsWith("/")) 
 			name = name.substring(1);
 
-		log.debug("Find DMS resource " + name + " in path " + resourcePath);
+		log.debug("Find DMS resource {} in path {}", name, resourcePath);
 
 		Folder folder = null;
 		if ("/".equals(resourcePath.trim()) && "".equals(name))
@@ -272,12 +274,6 @@ public class ResourceServiceImpl implements ResourceService {
 			folder = folderDAO.findByPathExtended(resourcePath + "/" + name, tenantId);
 
 		return marshallFolder(folder, userId, session);
-
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
 	}
 
 	public Resource createResource(Resource parentResource, String name, boolean isCollection, ImportContext context,
@@ -491,11 +487,12 @@ public class ResourceServiceImpl implements ResourceService {
 	private Resource folderRenameOrMove(Resource source, Resource destination, DavSession session, String sid)
 			throws DavException {
 
-		log.info("Rename or Move folder " + source.getPath() + " to " + destination.getPath());
+		log.info("Rename or Move folder {} to {}", source.getPath(), destination.getPath());
 
 		Folder currentFolder = folderDAO.findById(Long.parseLong(source.getID()));
 		if (currentFolder.getType() == Folder.TYPE_WORKSPACE)
 			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot move nor rename a workspace");
+		
 		folderDAO.initialize(currentFolder);
 
 		long currentParentFolder = currentFolder.getParentId();
@@ -564,6 +561,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public void deleteResource(Resource resource, DavSession session) throws DavException {
+		
 		String sid = (String) session.getObject("sid");
 		Folder folder = folderDAO.findById(Long.parseLong(resource.getID()));
 		User user = userDAO.findById(resource.getRequestedPerson());

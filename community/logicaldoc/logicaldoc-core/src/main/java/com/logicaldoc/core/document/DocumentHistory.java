@@ -37,7 +37,9 @@ public class DocumentHistory extends History {
 		history.setTenant(getTenant());
 		history.setNotifyEvent(isNotifyEvent());
 		history.setIp(getIp());
-
+		history.setDevice(getDevice());
+		history.setGeolocation(getGeolocation());
+		history.setFileSize(getFileSize());
 		return history;
 	}
 }

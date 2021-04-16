@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.common.client.data;
 
+import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.fields.DataSourceDateTimeField;
 import com.smartgwt.client.data.fields.DataSourceFloatField;
@@ -39,9 +40,10 @@ public class DeletedDocsDS extends DataSource {
 		DataSourceImageField locked = new DataSourceImageField("locked");
 		DataSourceImageField deleteUserId = new DataSourceImageField("deleteUserId");
 		DataSourceTextField deleteUser = new DataSourceTextField("deleteUser");
+		DataSourceTextField avatar = new DataSourceTextField("avatar", I18N.message("avatar"), 24);
 
 		setFields(id, userIdItem, username, size, version, fileVersion, lastModified, customId, icon, filename, digest,
-				immutable, fid, deleteUserId, deleteUser, type, locked);
+				immutable, fid, deleteUserId, avatar, deleteUser, type, locked);
 		setClientOnly(true);
 
 		String url = "data/deleteddocs.xml?1=1";

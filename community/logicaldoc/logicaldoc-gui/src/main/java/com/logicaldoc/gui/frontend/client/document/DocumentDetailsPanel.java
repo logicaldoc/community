@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -70,7 +70,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected Layout subscriptionsTabPanel;
 
-	protected Layout ocrTabPanel;
+	protected Layout captureTabPanel;
 
 	protected StandardPropertiesPanel propertiesPanel;
 
@@ -96,7 +96,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected PublishingPanel retentionPoliciesPanel;
 
-	protected DocumentOCRPanel ocrPanel;
+	protected DocumentCapturePanel ocrPanel;
 
 	protected EditingTabSet tabSet;
 
@@ -124,7 +124,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected Tab subscriptionsTab;
 
-	protected Tab ocrTab;
+	protected Tab captureTab;
 
 	public DocumentDetailsPanel() {
 		super();
@@ -208,11 +208,11 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		retentionPoliciesTabPanel.setHeight100();
 		retentionPoliciesTab.setPane(retentionPoliciesTabPanel);
 
-		ocrTab = new Tab(I18N.message("ocr"));
-		ocrTabPanel = new HLayout();
-		ocrTabPanel.setWidth100();
-		ocrTabPanel.setHeight100();
-		ocrTab.setPane(ocrTabPanel);
+		captureTab = new Tab(I18N.message("capture"));
+		captureTabPanel = new HLayout();
+		captureTabPanel.setWidth100();
+		captureTabPanel.setHeight100();
+		captureTab.setPane(captureTabPanel);
 
 		calendarTab = new Tab(I18N.message("calendar"));
 		calendarTabPanel = new HLayout();
@@ -246,7 +246,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -375,9 +375,9 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			});
 		}
 
-		if (Menu.enabled(Menu.DOCUMENT_OCR)) {
-			tabSet.addTab(ocrTab);
-			ocrTab.addTabSelectedHandler(new TabSelectedHandler() {
+		if (Menu.enabled(Menu.CAPTURE)) {
+			tabSet.addTab(captureTab);
+			captureTab.addTabSelectedHandler(new TabSelectedHandler() {
 				@Override
 				public void onTabSelected(TabSelectedEvent event) {
 					ocrPanel.onTabSelected();
@@ -444,11 +444,11 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		 */
 		if (ocrPanel != null) {
 			ocrPanel.destroy();
-			if (ocrTabPanel.contains(ocrPanel))
-				ocrTabPanel.removeMember(ocrPanel);
+			if (captureTabPanel.contains(ocrPanel))
+				captureTabPanel.removeMember(ocrPanel);
 		}
-		ocrPanel = new DocumentOCRPanel(document, changeHandler, true);
-		ocrTabPanel.addMember(ocrPanel);
+		ocrPanel = new DocumentCapturePanel(document, changeHandler, true);
+		captureTabPanel.addMember(ocrPanel);
 
 		/*
 		 * Prepare the versions tab
@@ -604,7 +604,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		else if (!publishingValid)
 			tabSet.selectTab(2);
 		else if (!ocrValid)
-			tabSet.selectTab(ocrTab);
+			tabSet.selectTab(captureTab);
 		return stdValid && extValid && publishingValid && ocrValid;
 	}
 
@@ -632,7 +632,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	private void saveDocument() {
 		if (Session.get().getConfigAsBoolean("gui.onsave.askversioncomment")) {
-			LD.askforString(I18N.message("versioncomment"), I18N.message("versioncomment"), null, new ValueCallback() {
+			LD.askForString(I18N.message("versioncomment"), I18N.message("versioncomment"), null, new ValueCallback() {
 
 				@Override
 				public void execute(String comment) {
@@ -650,7 +650,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		DocumentService.Instance.get().save(document, new AsyncCallback<GUIDocument>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Log.serverError(caught);
+				GuiLog.serverError(caught);
 				displaySave();
 			}
 

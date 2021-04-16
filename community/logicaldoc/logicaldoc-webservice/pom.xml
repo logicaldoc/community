@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.5.2</version>
+		<version>8.6.1</version>
 	</parent>
 	<artifactId>logicaldoc-webservice</artifactId>
 	<name>logicaldoc-webservice</name>
@@ -37,11 +37,12 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
-			<groupId>io.swagger</groupId>
+			<groupId>io.swagger.core.v3</groupId>
 			<artifactId>swagger-annotations</artifactId>
-			<version>1.5.8</version>
 		</dependency>
+
 		<dependency>
 			<groupId>net.sf.jpf</groupId>
 			<artifactId>jpf-boot</artifactId>
@@ -66,8 +67,8 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<scope>provided</scope>
-		</dependency>		
-				
+		</dependency>
+
 		<!-- CXF dependencies -->
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
@@ -133,7 +134,7 @@
 			<artifactId>spring-context-support</artifactId>
 			<scope>provided</scope>
 		</dependency>
-        <dependency>
+		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
 			<scope>provided</scope>
@@ -152,7 +153,7 @@
 					<groupId>xml-apis</groupId>
 					<artifactId>xml-apis</artifactId>
 				</exclusion>
-			</exclusions>			
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -163,7 +164,7 @@
 			<groupId>org.apache.ant</groupId>
 			<artifactId>ant</artifactId>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>

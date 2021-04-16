@@ -3,12 +3,12 @@ package com.logicaldoc.gui.frontend.client.gdrive;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.smartgwt.client.types.Alignment;
@@ -95,11 +95,7 @@ public class GDriveImport extends Window {
 		editor.setAlign(Alignment.CENTER);
 		editor.setCanFilter(true);
 
-		ListGridField lastModified = new ListGridField("lastModified", I18N.message("lastmodified"), 110);
-		lastModified.setAlign(Alignment.CENTER);
-		lastModified.setType(ListGridFieldType.DATE);
-		lastModified.setCellFormatter(new DateCellFormatter(false));
-		lastModified.setCanFilter(false);
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 
 		final ListGrid grid = new ListGrid();
 		grid.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -125,7 +121,7 @@ public class GDriveImport extends Window {
 					@Override
 					public void onFailure(Throwable caught) {
 						ContactingServer.get().hide();
-						Log.serverError(caught);
+						GuiLog.serverError(caught);
 					}
 
 					@Override
@@ -171,7 +167,7 @@ public class GDriveImport extends Window {
 							@Override
 							public void onFailure(Throwable caught) {
 								ContactingServer.get().hide();
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override

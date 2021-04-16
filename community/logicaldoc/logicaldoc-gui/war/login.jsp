@@ -11,9 +11,27 @@
 
 <script type="text/javascript">
 	var j_loginurl='${pageContext.request.contextPath}/<%=LOGIN_PAGE%>';
-	var j_successurl='${pageContext.request.contextPath}/frontend.jsp';
 	var j_failureurl=j_loginurl;
 	var j_layout='desktop';
+    
+<%
+  if(request.getParameter("switch") != null && request.getSession(false)!=null)
+    request.getSession(false).removeAttribute("RequestedUrl");
+%>
+    
+<%
+  if(request.getSession(false) != null && request.getSession(false).getAttribute("RequestedUrl")!=null 
+     && !request.getSession(false).getAttribute("RequestedUrl").toString().contains("/ace/")
+     && !request.getSession(false).getAttribute("RequestedUrl").toString().contains("/sc/")) {
+%>
+    var j_successurl='<%=request.getSession(false).getAttribute("RequestedUrl")%>';
+<%
+  } else {
+%>
+    var j_successurl='${pageContext.request.contextPath}/frontend.jsp';
+<%
+  }
+%>		
 </script>
 
 <%

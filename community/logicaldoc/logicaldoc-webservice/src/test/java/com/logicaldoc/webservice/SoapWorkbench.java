@@ -12,6 +12,7 @@ import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
+import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
 import com.logicaldoc.webservice.model.WSRating;
 import com.logicaldoc.webservice.model.WSSearchOptions;
@@ -29,7 +30,9 @@ import com.logicaldoc.webservice.soap.client.SoapSystemClient;
 import com.logicaldoc.webservice.soap.client.SoapTagClient;
 
 public class SoapWorkbench {
-	final static String BASE = "http://localhost:8080/services";
+	
+	//final static String BASE = "http://localhost:8080/services";
+	final static String BASE = "http://localhost/logicaldoc/services";
 
 	public static void main(String[] args) throws Exception {
 
@@ -56,8 +59,10 @@ public class SoapWorkbench {
 			
 			// securityStuff(sid);
 
-			//documentStuff(sid);
-			searchByFilename(sid);
+			documentStuff(sid);
+			
+			// This will search by filename using LIKE %filename%
+			//searchByFilename(sid, "simply");
 
 			// folderStuff(sid);
 
@@ -480,10 +485,10 @@ public class SoapWorkbench {
 
 	}
 	
-	private static void searchByFilename(String sid) throws Exception {
+	private static void searchByFilename(String sid, String filename) throws Exception {
 		SoapSearchClient searchClient = new SoapSearchClient(BASE + "/Search");
 
-		WSDocument[] documents = searchClient.findByFilename(sid, "LogicalDOC");
+		WSDocument[] documents = searchClient.findByFilename(sid, filename);
 		if (documents != null) {
 			System.out.println("---- " + documents.length);
 
@@ -502,23 +507,28 @@ public class SoapWorkbench {
 	}	
 
 	private static void documentStuff(String sid) throws Exception {
+		
 		SoapDocumentClient documentClient = new SoapDocumentClient(BASE + "/Document");
 
-		// WSDocument doc = documentClient.getDocument(sid, 312508417L);
+		//WSDocument doc = documentClient.getDocument(sid, 735L);
+		
+		documentClient.deleteLink(sid, 102L);
 
-		// WSLink link = documentClient.link(sid, 3621L, 3176L, "testws");
-		// System.out.println("Created link "+link.getId());
+		WSLink link = documentClient.link(sid, 101L, 734L, "testws");
+		System.out.println("Created link "+link.getId());
 
-		// documentClient.deleteLink(sid, 30081024L);
-		//
-		// WSLink[] links = documentClient.getLinks(sid, 3176L);
-		// for (WSLink lnk : links) {
-		// System.out.println("Link " + lnk.getType() + " - > " + lnk.getDoc2()
-		// + " (" + lnk.getId() + ")");
-		// }
+		documentClient.deleteLink(sid, link.getId());
+		System.out.println("Deleted link "+link.getId());
+	
+		WSLink[] links = documentClient.getLinks(sid, 100L);
+		if (links != null) {
+			for (WSLink lnk : links) {
+				System.out.println("Link " + lnk.getType() + " - > " + lnk.getDoc2() + " (" + lnk.getId() + ")");
+			}
+		}
 
 		// Update a document
-		WSDocument wsDoc = documentClient.getDocument(sid, 330792960L);
+		WSDocument wsDoc = documentClient.getDocument(sid, 735L);
 		String[] tags = wsDoc.getTags();
 		for (String tag : tags) {
 			System.out.println("tag: "+tag);

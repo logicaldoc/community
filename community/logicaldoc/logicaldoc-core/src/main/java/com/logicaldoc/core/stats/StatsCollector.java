@@ -60,6 +60,8 @@ public class StatsCollector extends Task {
 
 	private static String userno = "community";
 
+	private static String sid;
+
 	private static String product = "LogicalDOC";
 
 	private static String productName = "LogicalDOC Community";
@@ -201,7 +203,7 @@ public class StatsCollector extends Task {
 		long totaldocs = docStats[3];
 		long archiveddocs = docStats[4];
 		long docdir = docStats[5];
-		
+
 		List<Tenant> tenants = tenantDAO.findAll();
 		for (Tenant tenant : tenants)
 			extractDocStats(tenant.getId());
@@ -255,6 +257,8 @@ public class StatsCollector extends Task {
 			// Add all statistics as parameters
 			postParams.add(new BasicNameValuePair("id", id != null ? id : ""));
 			postParams.add(new BasicNameValuePair("userno", userno != null ? userno : ""));
+			postParams.add(new BasicNameValuePair("sid", sid != null ? sid : ""));
+
 			postParams.add(new BasicNameValuePair("product_release", release != null ? release : ""));
 			postParams.add(new BasicNameValuePair("email", email != null ? email : ""));
 			postParams.add(
@@ -684,6 +688,10 @@ public class StatsCollector extends Task {
 
 	public static void setUserno(String userno) {
 		StatsCollector.userno = userno;
+	}
+
+	public static void setSID(String sid) {
+		StatsCollector.sid = sid;
 	}
 
 	public static void setProduct(String product) {

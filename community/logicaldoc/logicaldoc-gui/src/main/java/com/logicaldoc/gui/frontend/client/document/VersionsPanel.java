@@ -6,13 +6,16 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.data.VersionsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.note.VersionNotesWindow;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -20,7 +23,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
@@ -56,17 +58,13 @@ public class VersionsPanel extends DocumentDetailTab {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		ListGridField user = new ListGridField("user", I18N.message("user"), 100);
+		ListGridField user = new AvatarListGridField("user", "userId", "user", 110);
 		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
 		ListGridField version = new ListGridField("version", I18N.message("version"), 70);
 		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 70);
-		ListGridField date = new ListGridField("date", I18N.message("date"), 110);
-		date.setAlign(Alignment.CENTER);
-		date.setType(ListGridFieldType.DATE);
-		date.setCellFormatter(new DateCellFormatter(false));
-		date.setCanFilter(false);
+		ListGridField date = new DateListGridField("date", "date");
 		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
-		ListGridField fileName = new ListGridField("filename", I18N.message("filename"), 200);
+		FileNameListGridField fileName = new FileNameListGridField();
 
 		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
 		type.setType(ListGridFieldType.TEXT);
@@ -87,13 +85,30 @@ public class VersionsPanel extends DocumentDetailTab {
 			}
 		});
 
+		ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 150);
+		wfStatus.setHidden(false);
+		wfStatus.setCanFilter(true);
+		wfStatus.setCanSort(true);
+		wfStatus.setAlign(Alignment.LEFT);
+		wfStatus.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				String display = record.getAttributeAsString("workflowStatusDisplay");
+				if (display != null && !display.isEmpty())
+					return "<span style='color: " + display + ";'>" + value + "</span>";
+				else
+					return value != null ? value.toString() : "";
+			}
+		});
+
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
 		list.setDataSource(new VersionsDS(document.getId(), null, 100));
 		if (document.getFolder().isDownload())
-			list.setFields(user, event, fileName, type, fileVersion, version, date, permalink, comment);
+			list.setFields(user, event, fileName, type, fileVersion, version, date, permalink, wfStatus, comment);
 		else
 			list.setFields(user, event, fileName, type, fileVersion, version, date, comment);
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -135,7 +150,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				Util.exportCSV(list, true);
+				GridUtil.exportCSV(list, true);
 			}
 		});
 
@@ -145,7 +160,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Canvas.printComponents(new Object[] { list });
+				GridUtil.print(list);
 			}
 		});
 
@@ -161,6 +176,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 	protected void onPreview(final GUIDocument document, ListGridRecord record) {
 		GUIVersion version = new GUIVersion();
+		version.setId(document.getId());
 		version.setFolder(document.getFolder());
 		version.setDocId(document.getId());
 		version.setId(document.getId());
@@ -168,6 +184,7 @@ public class VersionsPanel extends DocumentDetailTab {
 		version.setFileVersion(record.getAttribute("fileVersion"));
 		version.setType(record.getAttribute("type"));
 		version.setFileName(record.getAttribute("filename"));
+		version.setFileSize(document.getFileSize());
 		PreviewPopup iv = new PreviewPopup(version);
 		iv.show();
 	}
@@ -187,7 +204,7 @@ public class VersionsPanel extends DocumentDetailTab {
 						Long.parseLong(selection[1].getAttribute("id")), new AsyncCallback<GUIVersion[]>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -207,7 +224,7 @@ public class VersionsPanel extends DocumentDetailTab {
 						Long.parseLong(selection[1].getAttribute("id")), new AsyncCallback<GUIVersion[]>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override
@@ -249,7 +266,7 @@ public class VersionsPanel extends DocumentDetailTab {
 
 										@Override
 										public void onFailure(Throwable caught) {
-											Log.serverError(caught);
+											GuiLog.serverError(caught);
 										}
 
 										@Override
@@ -282,7 +299,7 @@ public class VersionsPanel extends DocumentDetailTab {
 											new AsyncCallback<GUIDocument>() {
 												@Override
 												public void onFailure(Throwable caught) {
-													Log.serverError(caught);
+													GuiLog.serverError(caught);
 												}
 
 												@Override
@@ -340,7 +357,8 @@ public class VersionsPanel extends DocumentDetailTab {
 		}
 
 		if (Feature.visible(Feature.COMPARISON))
-			contextMenu.setItems(preview, download, notes, compareMetadata, compareContent, delete, promote, replaceFile);
+			contextMenu.setItems(preview, download, notes, compareMetadata, compareContent, delete, promote,
+					replaceFile);
 		else
 			contextMenu.setItems(preview, download, notes, compareMetadata, delete, promote, replaceFile);
 

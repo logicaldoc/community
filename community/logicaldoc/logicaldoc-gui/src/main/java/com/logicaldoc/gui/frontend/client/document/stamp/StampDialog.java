@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIStamp;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.ContactingServer;
@@ -90,20 +90,20 @@ public class StampDialog extends Window {
 				@Override
 				public void onFailure(Throwable caught) {
 					ContactingServer.get().hide();
-					Log.serverError(caught);
+					GuiLog.serverError(caught);
 				}
 
 				@Override
 				public void onSuccess(Void result) {
 					ContactingServer.get().hide();
-					Log.info(I18N.message("event.stamped"), null);
+					GuiLog.info(I18N.message("event.stamped"), null);
 					GUIDocument[] docs = sourceGrid.getSelectedDocuments();
 					for (GUIDocument doc : docs) {
 						DocumentService.Instance.get().getById(doc.getId(), new AsyncCallback<GUIDocument>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
-								Log.serverError(caught);
+								GuiLog.serverError(caught);
 							}
 
 							@Override

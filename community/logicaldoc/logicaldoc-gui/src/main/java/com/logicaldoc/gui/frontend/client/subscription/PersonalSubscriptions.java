@@ -4,12 +4,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.SubscriptionsDS;
-import com.logicaldoc.gui.common.client.formatters.DateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.Log;
+import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -115,12 +115,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		name.setWidth("*");
 		name.setCanFilter(true);
 
-		ListGridField created = new ListGridField("created", I18N.message("date"), 120);
-		created.setAlign(Alignment.CENTER);
-		created.setType(ListGridFieldType.DATE);
-		created.setCellFormatter(new DateCellFormatter(false));
-		created.setCanFilter(false);
-		created.setHidden(true);
+		ListGridField created = new DateListGridField("created", "date");
 
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -187,7 +182,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 							AuditService.Instance.get().deleteSubscriptions(ids, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									Log.serverError(caught);
+									GuiLog.serverError(caught);
 								}
 
 								@Override
@@ -225,7 +220,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							Log.serverError(caught);
+							GuiLog.serverError(caught);
 						}
 
 						@Override

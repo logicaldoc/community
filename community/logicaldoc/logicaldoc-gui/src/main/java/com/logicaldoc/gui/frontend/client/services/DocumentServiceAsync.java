@@ -39,7 +39,7 @@ public interface DocumentServiceAsync {
 	void addDocuments(String language, long folderId, boolean importZip, String charset, boolean immediateIndexing,
 			Long templateId, AsyncCallback<GUIDocument[]> callback);
 
-	void checkout(long id, AsyncCallback<Void> callback);
+	void checkout(long[] docIds, AsyncCallback<Void> callback);
 
 	void checkin(GUIDocument document, boolean major, AsyncCallback<GUIDocument> callback);
 
