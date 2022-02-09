@@ -86,7 +86,7 @@
     <properties>
         <spring.version>4.3.20.RELEASE</spring.version>
         <spring-security.version>4.2.8.RELEASE</spring-security.version>
-        <hibernate.version>5.2.12.Final</hibernate.version>
+        <hibernate.version>5.4.24.Final</hibernate.version>
         <ehcache.version>2.10.4</ehcache.version>
         <lucene.version>8.5.1</lucene.version>
         <solr.version>8.5.1</solr.version>
