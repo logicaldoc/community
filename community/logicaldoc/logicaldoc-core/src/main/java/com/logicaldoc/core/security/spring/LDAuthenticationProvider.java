@@ -24,7 +24,10 @@ import com.logicaldoc.core.security.LoginThrottle;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.authentication.AccountDisabledException;
+import com.logicaldoc.core.security.authentication.AccountExpiredException;
+import com.logicaldoc.core.security.authentication.AccountInactiveException;
 import com.logicaldoc.core.security.authentication.AccountNotFoundException;
+import com.logicaldoc.core.security.authentication.OutsideWorkingTimeException;
 import com.logicaldoc.core.security.authentication.PasswordExpiredException;
 
 /**
@@ -49,6 +52,18 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 
 		HttpServletRequest httpReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
+		String jPassword = httpReq.getParameter("j_password");
+		if (jPassword != null && !jPassword.equals(password)) {
+			/*
+			 * When the password contains a % followed by two digits the
+			 * password read by Spring Security gets wrong. For instance the
+			 * password xx%89xx! is returned as xx?xx! So in case the password
+			 * is different from j_password parameter, we must use the
+			 * j_password
+			 */
+			password = jPassword;
+		}
+
 		String key = httpReq.getParameter("key");
 
 		if (authentication.getDetails() instanceof LDAuthenticationDetails) {
@@ -86,24 +101,60 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 		} catch (AccountNotFoundException nf) {
 			String message = String.format("Username %s not found", username);
 			log.warn(message);
+
+			// Register a new login failure
+			LoginThrottle.recordFailure(username, client, nf);
+
 			throw new UsernameNotFoundException(nf.getMessage());
 		} catch (AccountDisabledException ad) {
 			String message = String.format("User %s is disabled", username);
 			log.warn(message);
+
+			// Register a new login failure
+			LoginThrottle.recordFailure(username, client, ad);
+
 			throw new DisabledException(ad.getMessage());
 		} catch (PasswordExpiredException pe) {
 			String message = String.format("Credentials expired for user %s", username);
 			log.warn(message);
+
+			// Register a new login failure
+			LoginThrottle.recordFailure(username, client, pe);
+
 			throw new CredentialsExpiredException(pe.getMessage());
-		} catch (com.logicaldoc.core.security.authentication.AuthenticationException ae) {
+		} catch (AccountExpiredException aee) {
+			String message = String.format("User %s expired on %s", username, aee.getDate());
+			log.warn(message);
+
+			// Register a new login failure
+			LoginThrottle.recordFailure(username, client, aee);
+
+			throw new CredentialsExpiredException(aee.getMessage());
+		} catch (AccountInactiveException aie) {
+			String message = String.format(
+					"User %s was considered inactive because there were no interactions for too many days", username);
+			log.warn(message);
+
+			// Register a new login failure
+			LoginThrottle.recordFailure(username, client, aie);
+
+			throw new CredentialsExpiredException(aie.getMessage());
+		} catch (OutsideWorkingTimeException owte) {
+			String message = String.format("User %s tried to enter outside his working hours", username);
+			log.warn(message);
+
+			// Register a new login failure
+			LoginThrottle.recordFailure(username, client, owte);
+
+			throw new CredentialsExpiredException(owte.getMessage());
+		} catch (Throwable ae) {
 			String message = String.format("Security checks failed for user %s - %s", username, ae.getMessage());
 			log.warn(message);
+
+			if (ae instanceof com.logicaldoc.core.security.authentication.AuthenticationException)
+				LoginThrottle.recordFailure(username, client,
+						(com.logicaldoc.core.security.authentication.AuthenticationException) ae);
 			throw new CredentialsExpiredException(ae.getMessage() != null ? ae.getMessage() : "badcredentials");
-		} finally {
-			if (session == null) {
-				// Register a new login failure
-				LoginThrottle.recordFailure(username, client);
-			}
 		}
 	}
 

@@ -69,6 +69,16 @@ public class MailUtil {
 		return false;
 	}
 
+	public static int countEmlAttachments(InputStream is) {
+		try {
+			EMail email = messageToMail(is, true);
+			return email.getAttachmentsCount();
+		} catch (Throwable t) {
+			log.warn(t.getMessage(), t);
+		}
+		return 0;
+	}
+
 	/**
 	 * Builds an EMail from a .msg file
 	 * 
@@ -129,10 +139,11 @@ public class MailUtil {
 	}
 
 	private static void copyMetadata(EMail email, com.auxilii.msgparser.Message msg) {
-		
+
 		email.setSubject(msg.getSubject() == null || msg.getSubject().isEmpty() ? NO_SUBJECT : msg.getSubject());
 
-		// Note: with com.auxilii.msgparser.Message you can't get sentDate and receivedDate, they are the same
+		// Note: with com.auxilii.msgparser.Message you can't get sentDate and
+		// receivedDate, they are the same
 		email.setSentDate(msg.getDate());
 		email.setReceivedDate(email.getSentDate());
 
@@ -553,6 +564,19 @@ public class MailUtil {
 		}
 	}
 
+	public static int countMsgAttachments(File msgFile) {
+		InputStream is = null;
+		try {
+			is = new FileInputStream(msgFile);
+			return countMsgAttachments(is);
+		} catch (Throwable t) {
+			log.warn(t.getMessage(), t);
+			return 0;
+		} finally {
+			IOUtils.closeQuietly(is);
+		}
+	}
+
 	public static boolean msgContainsAttachments(File msgFile) {
 		InputStream is = null;
 		try {
@@ -564,6 +588,33 @@ public class MailUtil {
 		} finally {
 			IOUtils.closeQuietly(is);
 		}
+	}
+
+	public static int countMsgAttachments(InputStream is) {
+		MsgParser msgp = new MsgParser();
+
+		try {
+			com.auxilii.msgparser.Message msg = msgp.parseMsg(is);
+			String messageClass = msg.getMessageClass();
+			if (messageClass.toLowerCase().contains(IPM_NOTE_SMIME.toLowerCase())) {
+				FileAttachment p7mAttachment = (FileAttachment) msg.getAttachments().get(0);
+				byte[] p7mBytes = p7mAttachment.getData();
+				File tmp = File.createTempFile("msg", null);
+				try {
+					P7M p7m = new P7M(p7mBytes);
+					p7m.extractOriginalFile(tmp);
+					return countEmlAttachments(new FileInputStream(tmp));
+				} finally {
+					FileUtils.deleteQuietly(tmp);
+				}
+			}
+
+			return msg.getAttachments() != null ? msg.getAttachments().size() : 0;
+		} catch (Throwable t) {
+			log.warn(t.getMessage(), t);
+		}
+
+		return 0;
 	}
 
 	public static boolean msgContainsAttachments(InputStream is) {
@@ -592,16 +643,21 @@ public class MailUtil {
 		return false;
 	}
 
+	public static int countEmlAttachments(File emlFile) {
+		try (InputStream is = new FileInputStream(emlFile)) {
+			return countEmlAttachments(is);
+		} catch (Throwable t) {
+			log.warn(t.getMessage(), t);
+			return 0;
+		}
+	}
+
 	public static boolean emlContainsAttachments(File emlFile) {
-		InputStream is = null;
-		try {
-			is = new FileInputStream(emlFile);
+		try (InputStream is = new FileInputStream(emlFile)) {
 			return emlContainsAttachments(is);
 		} catch (Throwable t) {
 			log.warn(t.getMessage(), t);
 			return false;
-		} finally {
-			IOUtils.closeQuietly(is);
 		}
 	}
 

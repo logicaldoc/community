@@ -17,6 +17,7 @@ import com.smartgwt.client.data.Record;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.ColorItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
@@ -27,7 +28,6 @@ import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -41,7 +41,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 
 	private VLayout container = new VLayout();
 
-	private HLayout formsContainer = new HLayout();
+	private VLayout formsContainer = new VLayout();
 
 	private ValuesManager vm = new ValuesManager();
 
@@ -89,9 +89,12 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		if (document.getLanguage() != null)
 			language = ItemFactory.newLanguageSelector("language", false, false);
 		language.setDisabled(!updateEnabled);
-
 		language.setValue(document.getLanguage());
 		items.add(language);
+
+		ColorItem color = ItemFactory.newColorItemPicker("color", "color", document.getColor(), true, changedHandler);
+		color.setDisabled(!updateEnabled);
+		items.add(color);
 
 		if (Feature.enabled(Feature.TAGS)) {
 			String mode = Session.get().getConfig("tag.mode");
@@ -157,7 +160,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 			final StaticTextItem tagsString = ItemFactory.newStaticTextItem("tags", "tag",
 					Util.getTagsHTML(document.getTags()));
 			tagsString.setEndRow(true);
-			
+
 			FormItemIcon editTags = new FormItemIcon();
 			editTags.setPrompt(I18N.message("edittags"));
 			editTags.setSrc("[SKIN]/actions/edit.png");
@@ -176,7 +179,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 				}
 			});
 			tagsString.setIcons(editTags);
-			
+
 			if (updateEnabled) {
 				items.add(tagsString);
 				items.add(tagItem);
@@ -196,6 +199,7 @@ public class UpdateStandardPropertiesPanel extends DocumentDetailTab {
 		vm.validate();
 		if (!vm.hasErrors()) {
 			document.setLanguage((String) values.get("language"));
+			document.setColor((String) values.get("color"));
 			document.setTags(tagItem.getValues());
 		}
 		return !vm.hasErrors();

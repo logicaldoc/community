@@ -33,4 +33,6 @@ public interface SettingServiceAsync {
 	void saveExtensionAliases(String extension, String aliases, AsyncCallback<Void> callback);
 
 	void removeStorage(int storageId, AsyncCallback<String[]> callback);
+
+	void loadWebserviceStats(Long tenantId, AsyncCallback<GUIParameter[]> callback);
 }

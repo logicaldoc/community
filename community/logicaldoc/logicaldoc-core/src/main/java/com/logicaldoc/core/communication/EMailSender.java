@@ -66,7 +66,7 @@ public class EMailSender {
 
 	public static final int SECURITY_NONE = 0;
 
-	public static final int SECURITY_TLS_IF_AVAILABLE = 1;
+	public static final int SECURITY_STARTTLS = 1;
 
 	public static final int SECURITY_TLS = 2;
 
@@ -121,7 +121,7 @@ public class EMailSender {
 			folderId = config.getLong(tenant + ".smtp.save.folderId", 0);
 			foldering = config.getInt(tenant + ".smtp.save.foldering", FOLDERING_DAY);
 		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
+			log.warn(t.getMessage(), t);
 		}
 	}
 
@@ -201,7 +201,7 @@ public class EMailSender {
 		MessageTemplate template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
 				email.getTenantId());
 		if (template == null) {
-			log.error("Template {} was not found", templateName);
+			log.warn("Template {} was not found", templateName);
 			return;
 		}
 
@@ -237,6 +237,15 @@ public class EMailSender {
 	 * @throws Exception raised if the email cannot be sent
 	 */
 	public void send(EMail email) throws Exception {
+		try {
+			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			String tenantName = tDao.getTenantName(email.getTenantId());
+			if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
+				email.setAuthorAddress(null);
+		} catch (Throwable t) {
+			log.warn(t.getMessage(), t);
+		}
+
 		Properties props = new Properties();
 		if (!StringUtils.isEmpty(username))
 			props.put("mail.smtp.auth", "true");
@@ -247,26 +256,24 @@ public class EMailSender {
 			props.put("mail.smtps.host", host);
 			props.put("mail.smtps.port", port);
 			props.put("mail.smtps.ssl.protocols", "TLSv1.1 TLSv1.2");
-			if (connectionSecurity == SECURITY_TLS_IF_AVAILABLE)
+			if (connectionSecurity == SECURITY_STARTTLS)
 				props.put("mail.smtps.starttls.enable", "true");
 			if (connectionSecurity == SECURITY_TLS)
 				props.put("mail.smtps.starttls.required", "true");
 			if (connectionSecurity == SECURITY_SSL) {
 				// Necessary property to send e-mails with SSL
-				props.put("mail.smtps.starttls.enable", "true");
 				props.put("mail.smtps.ssl.enable", "true");
 			}
 		} else {
 			props.put("mail.transport.protocol", "smtp");
 			props.put("mail.smtp.host", host);
 			props.put("mail.smtp.port", port);
-			if (connectionSecurity == SECURITY_TLS_IF_AVAILABLE)
+			if (connectionSecurity == SECURITY_STARTTLS)
 				props.put("mail.smtp.starttls.enable", "true");
 			if (connectionSecurity == SECURITY_TLS)
 				props.put("mail.smtp.starttls.required", "true");
 			if (connectionSecurity == SECURITY_SSL) {
 				// Necessary property to send e-mails with SSL
-				props.put("mail.smtp.starttls.enable", "true");
 				props.put("mail.smtp.ssl.enable", "true");
 			}
 		}
@@ -280,13 +287,13 @@ public class EMailSender {
 
 		try {
 			if (!StringUtils.isEmpty(username))
-				sess = Session.getDefaultInstance(props, new Authenticator() {
+				sess = Session.getInstance(props, new Authenticator() {
 					protected PasswordAuthentication getPasswordAuthentication() {
 						return new PasswordAuthentication(username, password);
 					}
 				});
 			else
-				sess = Session.getDefaultInstance(props);
+				sess = Session.getInstance(props);
 		} catch (SecurityException e) {
 			if (!StringUtils.isEmpty(username))
 				sess = Session.getInstance(props, new Authenticator() {
@@ -390,7 +397,7 @@ public class EMailSender {
 		trans.sendMessage(message, adr);
 		trans.close();
 
-		log.info("Sent email with subject '{}' to rececipients {}", email.getSubject(), email.getAllRecipientsEmails());
+		log.info("Sent email with subject '{}' to recipients {}", email.getSubject(), email.getAllRecipientsEmails());
 
 		/*
 		 * If the case, we save the email as document in LogicalDOC's repository
@@ -402,14 +409,14 @@ public class EMailSender {
 	/**
 	 * Saved the email as a document in the documents repository
 	 * 
-	 * @param email The email represetnation
+	 * @param email The email representation
 	 * @param message The mime message sent
 	 * @param from email address the email was sent from
 	 */
 	private void historycizeOutgoingEmail(EMail email, MimeMessage message, InternetAddress from) {
-		if(folderId==null)
+		if (folderId == null || !email.isHistoricyze())
 			return;
-		
+
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -424,7 +431,7 @@ public class EMailSender {
 			emlFile = File.createTempFile("emailsender", ".eml");
 			message.writeTo(new FileOutputStream(emlFile));
 
-			Folder folder = null;
+			Folder folder = saveFolder;
 			if (foldering == FOLDERING_YEAR) {
 				DateFormat df = new SimpleDateFormat("yyyy");
 				folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);

@@ -3,11 +3,10 @@ package com.logicaldoc.gui.frontend.client.workflow;
 import java.util.ArrayList;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.Session;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -30,7 +29,7 @@ public class WorkflowDashboard extends VLayout {
 
 	public static int TASKS_SUSPENDED = 2;
 
-	public static int TASKS_ADMIN = 3;
+	public static int TASKS_ALL = 3;
 
 	public static int TASKS_SUPERVISOR = 4;
 
@@ -38,18 +37,18 @@ public class WorkflowDashboard extends VLayout {
 
 	private static WorkflowDashboard instance;
 
-	private WorkflowPortlet assignedTasks = null;
+	private WorkflowDashlet assignedTasks = null;
 
-	private WorkflowPortlet canOwnTasks = null;
+	private WorkflowDashlet canOwnTasks = null;
 
-	private WorkflowPortlet adminTasks = null;
+	private WorkflowDashlet adminTasks = null;
 
-	private WorkflowPortlet supervisorTasks = null;
+	private WorkflowDashlet supervisorTasks = null;
 
 	/*
 	 * Portlet that shows the workflows the current user was involved in.
 	 */
-	private WorkflowPortlet involvedTasks = null;
+	private WorkflowDashlet involvedTasks = null;
 
 	private PortalLayout portalLayout = null;
 
@@ -69,7 +68,7 @@ public class WorkflowDashboard extends VLayout {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				refresh();
+				refresh(null);
 			}
 		});
 		ToolStripButton history = new ToolStripButton();
@@ -93,21 +92,25 @@ public class WorkflowDashboard extends VLayout {
 		portalLayout.setColumnBorder("0px");
 
 		// Place the portlets
-		assignedTasks = new WorkflowPortlet(this, TASKS_ASSIGNED);
+		assignedTasks = new WorkflowDashlet(this, TASKS_ASSIGNED);
 		portalLayout.addPortlet(assignedTasks, 0, 0);
-		canOwnTasks = new WorkflowPortlet(this, TASKS_I_CAN_OWN);
+		canOwnTasks = new WorkflowDashlet(this, TASKS_I_CAN_OWN);
 		portalLayout.addPortlet(canOwnTasks, 0, 1);
 
-		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
-			adminTasks = new WorkflowPortlet(this, TASKS_ADMIN);
+		if (Menu.enabled(Menu.DASHBOARD_WORKFLOW_ALLWORKFLOWS)) {
+			// In case of administrator you see all the workflows
+			adminTasks = new WorkflowDashlet(this, TASKS_ALL);
 			portalLayout.addPortlet(adminTasks, 1, 0);
-		} else {
-			supervisorTasks = new WorkflowPortlet(this, TASKS_SUPERVISOR);
+		} else if (Menu.enabled(Menu.DASHBOARD_WORKFLOW_WORKFLOWSYOUSUPERVISE)) {
+			// Otherwise you see the workflows you are the supervisor
+			supervisorTasks = new WorkflowDashlet(this, TASKS_SUPERVISOR);
 			portalLayout.addPortlet(supervisorTasks, 1, 1);
 		}
 
-		involvedTasks = new WorkflowPortlet(this, TASKS_INVOLVED);
-		portalLayout.addPortlet(involvedTasks, 1, 1);
+		if (Menu.enabled(Menu.DASHBOARD_WORKFLOW_WORKFLOWSINVOLVEDIN)) {
+			involvedTasks = new WorkflowDashlet(this, TASKS_INVOLVED);
+			portalLayout.addPortlet(involvedTasks, 1, 1);
+		}
 
 		addMember(toolStrip);
 		addMember(portalLayout);
@@ -119,12 +122,12 @@ public class WorkflowDashboard extends VLayout {
 	 * @param instanceIds Id of the instances to kill
 	 */
 	public void killWorkflows(ArrayList<String> instanceIds) {
-		ContactingServer.get().show();
+		LD.contactingServer();
 		WorkflowService.Instance.get().deleteInstances(instanceIds.toArray(new String[0]), new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 			}
 
 			@Override
@@ -141,22 +144,27 @@ public class WorkflowDashboard extends VLayout {
 					if (involvedTasks != null)
 						involvedTasks.onDeletedWorkflow(id);
 				}
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 			}
 		});
 	}
 
-	public void refresh() {
+	/**
+	 * Refreshes all the dashlets related to the given workflow instance
+	 * 
+	 * @param processId Identifier of the instance(use null for all the instances)
+	 */
+	public void refresh(String processId) {
 		if (assignedTasks != null)
-			assignedTasks.refresh();
+			assignedTasks.refresh(processId);
 		if (canOwnTasks != null)
-			canOwnTasks.refresh();
+			canOwnTasks.refresh(processId);
 		if (adminTasks != null)
-			adminTasks.refresh();
+			adminTasks.refresh(processId);
 		if (supervisorTasks != null)
-			supervisorTasks.refresh();
+			supervisorTasks.refresh(processId);
 		if (involvedTasks != null)
-			involvedTasks.refresh();
+			involvedTasks.refresh(processId);
 	}
 
 	public static WorkflowDashboard get() {

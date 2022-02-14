@@ -45,29 +45,29 @@ import com.smartgwt.client.widgets.layout.HLayout;
  */
 public class ExtendedPropertiesPanel extends HLayout {
 
-	private GUIExtensibleObject object;
+	protected GUIExtensibleObject object;
 
-	private ChangedHandler changedHandler;
+	protected ChangedHandler changedHandler;
 
-	private ChangedHandler templateChangedHandler;
+	protected ChangedHandler templateChangedHandler;
 
-	private boolean updateEnabled = false;
+	protected boolean updateEnabled = false;
 
-	private boolean checkMandatory = false;
+	protected boolean checkMandatory = false;
 
-	private boolean allowTemplateSelection = true;
+	protected boolean allowTemplateSelection = true;
 
-	private DynamicForm templateForm = new DynamicForm();
+	protected DynamicForm templateForm = new DynamicForm();
 
-	private DynamicForm attributesForm = new DynamicForm();
+	protected DynamicForm attributesForm = new DynamicForm();
 
-	private ValuesManager vm = new ValuesManager();
+	protected ValuesManager vm = new ValuesManager();
 
-	private List<FormItem> standardItems = new ArrayList<FormItem>();
+	protected List<FormItem> standardItems = new ArrayList<FormItem>();
 
-	private SelectItem templateItem = null;
+	protected SelectItem templateItem = null;
 
-	private List<FormItem> extendedItems = new ArrayList<FormItem>();
+	protected List<FormItem> extendedItems = new ArrayList<FormItem>();
 
 	public ExtendedPropertiesPanel(GUIExtensibleObject object, ChangedHandler changedHandler,
 			ChangedHandler templateChangedHandler, boolean updateEnabled, boolean checkMandatory,
@@ -99,7 +99,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		this(object, changedHandler, null, updateEnabled, checkMandatory, allowTemplateSelection);
 	}
 
-	private void adaptForms() {
+	protected void adaptForms() {
 		if (templateItem != null && templateItem.getValue() != null) {
 			int maxExtCols = ((int) getWidth() - 500) / 160; // 160 = length of
 																// an item
@@ -118,7 +118,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		}
 	}
 
-	private void refresh() {
+	protected void refresh() {
 		vm.clearValues();
 		vm.clearErrors(false);
 		extendedItems.clear();
@@ -142,7 +142,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			standardItems.add(customId);
 		}
 
-		templateItem = ItemFactory.newTemplateSelector(true, null);
+		templateItem = ItemFactory.newTemplateSelector(true, object.getTemplateId());
 		if (changedHandler != null)
 			templateItem.addChangedHandler(changedHandler);
 		templateItem.setMultiple(false);
@@ -192,19 +192,29 @@ public class ExtendedPropertiesPanel extends HLayout {
 			prepareExtendedAttributes(object.getTemplateId());
 	}
 
+	/**
+	 * Instantiates a new DynamicForm suitable for editing extended attributes
+	 * 
+	 * @return a new instance of DynamicForm
+	 */
+	protected DynamicForm newAttributesForm() {
+		DynamicForm form = new DynamicForm();
+		form.setTitleOrientation(TitleOrientation.TOP);
+		return form;
+	}
+
 	private void refreshAttributesForm() {
 		if (attributesForm != null) {
 			vm.removeMembers(attributesForm);
 			removeMember(attributesForm);
 		}
 
-		attributesForm = new DynamicForm();
+		attributesForm = newAttributesForm();
 		attributesForm.setValuesManager(vm);
-		attributesForm.setTitleOrientation(TitleOrientation.TOP);
 		attributesForm.clearValues();
 		attributesForm.clear();
 
-		if (object.getAttributes() != null && object.getAttributes().length > 0)
+		if (object.getAttributes() != null && object.getAttributes().length > 0 && extendedItems != null)
 			attributesForm.setItems(extendedItems.toArray(new FormItem[0]));
 
 		addMember(attributesForm);
@@ -292,7 +302,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		refreshAttributesForm();
 	}
 
-	private FormItem prepareAttributeItem(GUIAttribute att) {
+	protected FormItem prepareAttributeItem(GUIAttribute att) {
 		List<FormItemIcon> multiValIcons = prepareMultiValueIcons(att);
 
 		FormItem item;
@@ -593,7 +603,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	private void onValueAdd(GUIAttribute att) {
-		copyValuesToObject(att);
+		copyValuesToObject();
 
 		// Add the new attribute and redisplay
 		object.addAttributeValue(att.getName());
@@ -602,7 +612,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	}
 
 	private void onValueShift(GUIAttribute att, boolean up) {
-		copyValuesToObject(att);
+		copyValuesToObject();
 		object.shiftValue(att.getName(), up);
 		displayAttributeItems();
 		changedHandler.onChanged(null);
@@ -611,7 +621,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 	/**
 	 * Copies the actual form's values to the object without validating.
 	 */
-	private void copyValuesToObject(GUIAttribute att) {
+	private void copyValuesToObject() {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> valuesMap = (Map<String, Object>) attributesForm.getValues();
 		for (String name : valuesMap.keySet()) {
@@ -619,23 +629,37 @@ public class ExtendedPropertiesPanel extends HLayout {
 				String nm = name.substring(1).replaceAll(Constants.BLANK_PLACEHOLDER, " ");
 				Object val = valuesMap.get(name);
 				FormItem item = attributesForm.getItem(name);
+
+				GUIAttribute attribute = object.getAttribute(nm);
+				int originalType = attribute.getType();
+
 				if (item instanceof UserSelector) {
-					GUIAttribute attr = object.getAttribute(nm);
 					UserSelector userSelector = (UserSelector) item;
 					GUIUser user = userSelector.getUser();
-					attr.setIntValue(user.getId());
-					attr.setStringValue(user.getUsername());
-					attr.setType(att.getType());
+					if (user != null) {
+						attribute.setIntValue(user.getId());
+						attribute.setStringValue(user.getUsername());
+					} else {
+						attribute.setIntValue(null);
+						attribute.setStringValue(null);
+					}
 				} else if (item instanceof FolderSelector) {
-					GUIAttribute attr = object.getAttribute(nm);
 					FolderSelector userSelector = (FolderSelector) item;
 					GUIFolder folder = userSelector.getFolder();
-					attr.setIntValue(folder.getId());
-					attr.setStringValue(folder.getName());
-					attr.setType(att.getType());
+					if (folder != null) {
+						attribute.setIntValue(folder.getId());
+						attribute.setStringValue(folder.getName());
+					} else {
+						attribute.setIntValue(null);
+						attribute.setStringValue(null);
+					}
+				} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
+					object.setValue(nm, val != null && ("1".equals(val.toString()) || "yes".equals(val.toString())));
 				} else {
 					object.setValue(nm, val);
 				}
+
+				attribute.setType(originalType);
 			}
 		}
 	}

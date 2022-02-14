@@ -76,7 +76,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 				onPageChange();
 			}
 		});
-		pageItem.setHint("/" + currentPagination.getTotalPages());
+		pageItem.setHint("/" + (currentPagination.getTotalPages() > 0 ? currentPagination.getTotalPages() : 1));
 
 		SpacerItem spacer2 = new SpacerItem("spc2");
 		spacer2.setWidth(6);
@@ -92,7 +92,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		currentPagination.setPageSize(pageSize);
 		update();
 	}
-	
+
 	public void setTotalRecords(int totalRecords) {
 		currentPagination.setTotalElements(totalRecords);
 		update();
@@ -151,7 +151,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 		maxItem.setValue(currentPagination.getPageSize());
 		pageItem.setValue(currentPagination.getPage());
 		pageItem.setMax(currentPagination.getTotalPages());
-		pageItem.setHint("/" + currentPagination.getTotalPages());
+		pageItem.setHint("/" + (currentPagination.getTotalPages() > 0 ? currentPagination.getTotalPages() : 1));
 	}
 
 	public boolean hasMorePages() {
@@ -207,7 +207,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
-
+		onFolderCancelEditing(folder);
 	}
 
 	@Override
@@ -223,6 +223,18 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 	@Override
 	public void onFolderMoved(GUIFolder folder) {
 
+	}
+
+	@Override
+	public void onFolderBeginEditing(GUIFolder folder) {
+		if (currentPagination.getFolderId() == folder.getId())
+			disable();
+	}
+
+	@Override
+	public void onFolderCancelEditing(GUIFolder folder) {
+		if (currentPagination.getFolderId() == folder.getId())
+			enable();
 	}
 
 	public FolderPagination getCurrentPagination() {

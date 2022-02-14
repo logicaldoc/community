@@ -26,11 +26,81 @@ public class ZipConverter extends AbstractFormatConverter {
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+		if ((document != null && document.getFileName() != null
+				&& document.getFileName().toLowerCase().endsWith(".zip"))
+				|| (src != null && src.getName().toLowerCase().endsWith(".zip")))
+			convertZip(sid, document, src, dest);
+		else
+			convertGZip(sid, document, src, dest);
+	}
 
-		File tempFile = File.createTempFile("zipconvert", "txt");
-		try (FileWriter writer = new FileWriter(tempFile);) {
+	private void convertGZip(String sid, Document document, File src, File dest) throws IOException {
+		File ungzippedFile = null;
+		try {
+			ungzippedFile = gunzip(src,
+					(document != null && document.getFileName() != null) ? document.getFileName() : src.getName());
+			FormatConverterManager manager = (FormatConverterManager) Context.get()
+					.getBean(FormatConverterManager.class);
+			FormatConverter converter = manager.getConverter(ungzippedFile.getName(), dest.getName());
+			if (converter != null)
+				converter.convert(sid, document, ungzippedFile, dest);
+		} finally {
+			if (ungzippedFile != null)
+				FileUtil.strongDelete(ungzippedFile);
+		}
+	}
+
+	private File gunzip(File input, String fileName) throws IOException {
+		String unpackedFileName = fileName.toLowerCase().endsWith(".tgz")
+				? FilenameUtils.getBaseName(fileName) + ".tar.gz"
+				: fileName;
+		unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
+		File ungzippedFile = File.createTempFile("parsegzip",
+				"." + FilenameUtils.getExtension(unpackedFileName).toLowerCase());
+		ZipUtil zipUtil = new ZipUtil();
+		zipUtil.unGZip(input, ungzippedFile);
+		return ungzippedFile;
+	}
+
+	private void convertZip(String sid, Document document, File src, File dest) throws IOException {
+		ZipUtil zipUtil = new ZipUtil();
+		List<String> entries = zipUtil.listEntries(src);
+		if (entries.size() > 1)
+			unzipMultipleEntries(sid, document, src, dest, entries);
+		else
+			unzipSingleEntry(sid, document, src, dest, entries.get(0));
+
+	}
+
+	private void unzipSingleEntry(String sid, Document document, File src, File dest, String entry) throws IOException {
+		String entryExtension = FilenameUtils.getExtension(entry);
+		File uncompressedEntryFile = File.createTempFile("unzip", "." + entryExtension);
+
+		String targetExtension = FilenameUtils.getExtension(dest.getName()).toLowerCase();
+		
+		try {
 			ZipUtil zipUtil = new ZipUtil();
-			List<String> entries = zipUtil.listEntries(src);
+			zipUtil.unzipEntry(src, entry, uncompressedEntryFile);
+			FormatConverterManager manager = (FormatConverterManager) Context.get()
+					.getBean(FormatConverterManager.class);
+			FormatConverter converter = manager.getConverter(entryExtension, targetExtension);
+
+			if (converter == null)
+				throw new IOException(
+						String.format("Unable to find a converter from %s to %s", entryExtension, targetExtension));
+			Document clone=document.clone();
+			clone.setFileName(uncompressedEntryFile.getName());
+			converter.convert(sid, document, uncompressedEntryFile, dest);
+		} finally {
+			if (uncompressedEntryFile != null)
+				FileUtil.strongDelete(uncompressedEntryFile);
+		}
+	}
+
+	private void unzipMultipleEntries(String sid, Document document, File src, File dest, List<String> entries)
+			throws IOException {
+		File tempFile = File.createTempFile("zipconvert", ".txt");
+		try (FileWriter writer = new FileWriter(tempFile);) {
 			for (String line : entries) {
 				writer.write(line);
 				writer.write("\n");

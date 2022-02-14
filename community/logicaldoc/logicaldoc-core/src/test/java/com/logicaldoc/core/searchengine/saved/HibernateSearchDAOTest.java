@@ -1,7 +1,9 @@
 package com.logicaldoc.core.searchengine.saved;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +12,7 @@ import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.searchengine.FulltextSearchOptions;
 import com.logicaldoc.core.searchengine.SearchOptions;
+import com.logicaldoc.util.Context;
 
 import junit.framework.Assert;
 
@@ -66,6 +69,39 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 
 		searches = dao.findByUserId(5L);
 		Assert.assertEquals(0, searches.size());
+	}
+	
+	@Test
+	public void testCharsets() {
+		FulltextSearchOptions opt = new FulltextSearchOptions();
 
+		opt.setLanguage("it");
+		opt.setExpression("ואתם נהנים");
+		opt.setExpressionLanguage("it");
+		opt.setTemplate(1L);
+		opt.setSizeMax(3000L);
+		opt.setSizeMin(2L);
+		opt.setType(SearchOptions.TYPE_FULLTEXT);
+		opt.setUserId(1);
+
+		Map<String, Charset> charsets = Charset.availableCharsets();
+		for (String name : charsets.keySet()) {
+			try {
+             				
+				Context.get().getProperties().setProperty("default.charset", name);
+			SavedSearch saved = new SavedSearch();
+			saved.setName("ואתם נהנים מהטבה ייחודית");
+			saved.saveOptions(opt);
+			String xml = saved.getOptions();
+			// System.out.println(xml);
+
+			saved = new SavedSearch();
+			saved.setOptions(xml);
+			SearchOptions options = saved.readOptions();
+
+			System.out.println(name + " > " + options.getExpression());
+			}catch(Throwable t) {
+			}
+		}
 	}
 }

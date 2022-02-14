@@ -66,6 +66,14 @@ public class GUIBranding implements Serializable {
 
 	private String css = null;
 
+	private String head = null;
+
+	private String top = null;
+
+	private String bottom = null;
+
+	private String footer = null;
+
 	public String getProduct() {
 		return product;
 	}
@@ -177,11 +185,11 @@ public class GUIBranding implements Serializable {
 			return null;
 		return logoMenuSrc.replace(SRC_PREFIX, "");
 	}
-	
+
 	public String getLogoMenuSrc() {
 		return logoMenuSrc;
 	}
-	
+
 	public void setLogoMenuSrc(String logoMenuSrc) {
 		if (logoMenuSrc != null && !logoMenuSrc.startsWith(SRC_PREFIX))
 			logoMenuSrc = SRC_PREFIX + logoMenuSrc;
@@ -300,5 +308,37 @@ public class GUIBranding implements Serializable {
 
 	public void setCss(String css) {
 		this.css = css;
+	}
+
+	public String getHead() {
+		return head;
+	}
+
+	public void setHead(String head) {
+		this.head = head;
+	}
+
+	public String getTop() {
+		return top;
+	}
+
+	public void setTop(String top) {
+		this.top = top;
+	}
+
+	public String getBottom() {
+		return bottom;
+	}
+
+	public void setBottom(String bottom) {
+		this.bottom = bottom;
+	}
+
+	public String getFooter() {
+		return footer;
+	}
+
+	public void setFooter(String footer) {
+		this.footer = footer;
 	}
 }

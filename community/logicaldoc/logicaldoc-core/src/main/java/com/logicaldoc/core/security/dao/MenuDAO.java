@@ -112,7 +112,7 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 * @param id ID of the menu
 	 * @param userId ID of the user
 	 * 
-	 * @return id the user can access the menu
+	 * @return if the user can access the menu
 	 */
 	public boolean isReadEnable(long id, long userId);
 

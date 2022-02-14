@@ -48,6 +48,10 @@ public class MetadataDiff extends Window {
 				version2.getFileVersion(), 0));
 		records.add(new DiffRecord(I18N.message("filename"), I18N.message("filename"), version1.getFileName(),
 				version2.getFileName(), 0));
+		records.add(new DiffRecord(I18N.message("size"), I18N.message("size"), Util.formatSizeW7((double)version1.getFileSize()),
+				Util.formatSizeW7((double)version2.getFileSize()), 0));
+		records.add(new DiffRecord(I18N.message("pages"), I18N.message("pages"), Util.formatInt(version1.getPages()),
+				Util.formatInt(version2.getPages()), 0));
 		records.add(new DiffRecord(I18N.message("username"), I18N.message("username"), version1.getUsername(),
 				version2.getUsername(), 0));
 		records.add(new DiffRecord(I18N.message("comment"), I18N.message("comment"), version1.getComment(),
@@ -72,6 +76,9 @@ public class MetadataDiff extends Window {
 				version2.getFolder().getId() == Constants.DOCUMENTS_FOLDERID ? "/" : version2.getFolder().getName(),
 				0));
 
+		records.add(new DiffRecord(I18N.message("color"), I18N.message("color"), version1.getColor(),
+				version2.getColor(), 0));
+		
 		records.add(new DiffRecord(I18N.message("tags"), I18N.message("tags"), version1.getTagsString(),
 				version2.getTagsString(), 0));
 
@@ -87,9 +94,9 @@ public class MetadataDiff extends Window {
 				version1.getStopPublishing() != null ? I18N.formatDate(version1.getStopPublishing()) : null,
 				version2.getStopPublishing() != null ? I18N.formatDate(version2.getStopPublishing()) : null, 0));
 
-		records.add(new DiffRecord(I18N.message("workflowstatus"), I18N.message("workflowstatus"), version1.getWorkflowStatus(),
-				version2.getWorkflowStatus(), 0));
-		
+		records.add(new DiffRecord(I18N.message("workflowstatus"), I18N.message("workflowstatus"),
+				version1.getWorkflowStatus(), version2.getWorkflowStatus(), 0));
+
 		records.add(new DiffRecord(I18N.message("template"), I18N.message("template"), version1.getTemplate(),
 				version2.getTemplate(), 0));
 		printExtendedAttributes(records, version1, version2);

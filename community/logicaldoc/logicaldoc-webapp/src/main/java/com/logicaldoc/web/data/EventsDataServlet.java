@@ -36,6 +36,7 @@ public class EventsDataServlet extends HttpServlet {
 			boolean folder = Boolean.parseBoolean(request.getParameter("folder"));
 			boolean workflow = Boolean.parseBoolean(request.getParameter("workflow"));
 			boolean user = Boolean.parseBoolean(request.getParameter("user"));
+			boolean importfolder = Boolean.parseBoolean(request.getParameter("importfolder"));
 
 			response.setContentType("text/xml");
 			response.setCharacterEncoding("UTF-8");
@@ -87,6 +88,18 @@ public class EventsDataServlet extends HttpServlet {
 					writer.print("</event>");
 				}
 			}
+			
+			if (importfolder) {
+				String[] events = new String[] { "event.importfolder.imported", "event.importfolder.updated", "event.importfolder.error"};
+				for (String event : events) {
+					writer.print("<event>");
+					writer.print("<code>" + event + "</code>");
+					writer.print("<label><![CDATA[" + I18N.message(event, locale) + "]]></label>");
+					writer.print("<type>workflow</type>");
+					writer.print("</event>");
+				}
+			}
+			
 			writer.write("</list>");
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);

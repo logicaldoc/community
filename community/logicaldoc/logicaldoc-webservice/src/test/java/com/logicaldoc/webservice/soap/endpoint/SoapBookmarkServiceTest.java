@@ -4,10 +4,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.logicaldoc.webservice.AbstractWebServiceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSBookmark;
 
-public class SoapBookmarkServiceTest extends AbstractWebServiceTestCase {
+public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 
 	// Instance under test
 	private SoapBookmarkService bookmarkService;

@@ -37,9 +37,9 @@ public abstract class DocumentDetailTab extends HLayout {
 			updateEnabled = true;
 			deleteEnabled = true;
 		} else {
-			updateEnabled = (document.getImmutable() == 0 && document.getStatus() == Constants.DOC_UNLOCKED && document
+			updateEnabled = (document.getImmutable() == 0 && (document.getStatus() == Constants.DOC_UNLOCKED || document.getLockUserId()==Session.get().getUser().getId()) && document
 					.getFolder().isWrite());
-			deleteEnabled = (document.getImmutable() == 0 && document.getStatus() == Constants.DOC_UNLOCKED && document
+			deleteEnabled = (document.getImmutable() == 0 && (document.getStatus() == Constants.DOC_UNLOCKED || document.getLockUserId()==Session.get().getUser().getId()) && document
 					.getFolder().isDelete());
 		}
 
@@ -51,12 +51,5 @@ public abstract class DocumentDetailTab extends HLayout {
 
 	public ChangedHandler getChangedHandler() {
 		return changedHandler;
-	}
-
-	/**
-	 * Place here special logic that will be invoked when the user opens the tab
-	 */
-	public void onTabSelected() {
-
 	}
 }

@@ -4,15 +4,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIArchive;
 import com.logicaldoc.gui.common.client.data.ArchivesDS;
-import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.ImpexService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -104,10 +104,7 @@ public class ExportArchivesList extends VLayout {
 		ListGridField closer = new ListGridField("closer", I18N.message("closedby"), 110);
 		closer.setCanFilter(true);
 
-		ListGridField size = new ListGridField("size", I18N.message("size"), 70);
-		size.setAlign(Alignment.CENTER);
-		size.setType(ListGridFieldType.FLOAT);
-		size.setCellFormatter(new FileSizeCellFormatter());
+		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 		size.setCanFilter(false);
 
 		ListGridField aosManager = new ListGridField("aosmanager", I18N.message("aosmanager"), 110);

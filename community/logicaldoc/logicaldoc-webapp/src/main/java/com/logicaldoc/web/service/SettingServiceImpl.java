@@ -1,5 +1,6 @@
 package com.logicaldoc.web.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,9 +21,12 @@ import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.conversion.FormatConverter;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.generic.Generic;
+import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
+import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.store.StorerManager;
 import com.logicaldoc.gui.common.client.ServerException;
@@ -105,6 +109,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 
 			conf.write();
 
+			// Always update the settings for the default sencer
 			EMailSender sender = (EMailSender) Context.get().getBean(EMailSender.class);
 			sender.setHost(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.host"));
 			sender.setPort(Integer.parseInt(conf.getProperty(Tenant.DEFAULT_NAME + ".smtp.port")));
@@ -159,7 +164,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 					|| name.startsWith("converter.") || name.startsWith("firewall.") || name.contains(".2fa.")
 					|| name.startsWith("ftp.") || name.startsWith("cas.") || name.startsWith("cache.")
 					|| name.startsWith("jdbc.") || name.startsWith("comparator.") || name.contains(".via.")
-					|| name.contains(".downloadticket.") || name.startsWith("zonalocr."))
+					|| name.contains(".downloadticket.") || name.startsWith("zonalocr.") || name.endsWith(".charset"))
 				continue;
 
 			sortedSet.add(key.toString());
@@ -178,15 +183,13 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 
 	@Override
 	public GUIParameter[] loadProtocolSettings() throws ServerException {
-		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
+		ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 
 		ContextProperties conf = Context.get().getProperties();
 		List<GUIParameter> params = new ArrayList<GUIParameter>();
 		for (Object key : conf.keySet()) {
-			if (key.toString().equals("webservice.enabled") || key.toString().startsWith("webdav")
-					|| key.toString().startsWith("cmis") || key.toString().startsWith("command.")
-					|| key.toString().startsWith("ftp.")
-					|| key.toString().startsWith(session.getTenantName() + ".extcall.")) {
+			if (key.toString().startsWith("webservice.") || key.toString().startsWith("webdav")
+					|| key.toString().startsWith("cmis") || key.toString().startsWith("ftp.")) {
 				GUIParameter p = new GUIParameter(key.toString(), conf.getProperty(key.toString()));
 				params.add(p);
 			}
@@ -200,14 +203,37 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.ADMINISTRATION);
 
 		try {
+			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 			int counter = 0;
-
 			ContextProperties conf = Context.get().getProperties();
 			for (int i = 0; i < settings.length; i++) {
 				if (settings[i] == null || StringUtils.isEmpty(settings[i].getName()))
 					continue;
-				conf.setProperty(settings[i].getName(), settings[i].getValue() != null ? settings[i].getValue() : "");
-				counter++;
+
+				if (settings[i].getName().endsWith("gui.welcome")) {
+					/*
+					 * This is a setting we save into the database
+					 */
+					Generic setting = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, session.getTenantId());
+					if (setting == null)
+						setting = new Generic("guisetting", "gui.welcome", 0L, session.getTenantId());
+					setting.setString1(settings[i].getValue());
+					gDao.store(setting);
+				} else if (settings[i].getName().endsWith("gui.tag.vocabulary")) {
+					/*
+					 * This is a setting we save into the database
+					 */
+					Generic setting = gDao.findByAlternateKey("guisetting", "gui.tag.vocabulary", 0L,
+							session.getTenantId());
+					if (setting == null)
+						setting = new Generic("guisetting", "gui.tag.vocabulary", 0L, session.getTenantId());
+					setting.setString1(settings[i].getValue());
+					gDao.store(setting);
+				} else {
+					conf.setProperty(settings[i].getName(),
+							settings[i].getValue() != null ? settings[i].getValue() : "");
+					counter++;
+				}
 			}
 
 			conf.write();
@@ -279,29 +305,37 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 	@Override
 	public GUIParameter[] loadGUISettings() throws ServerException {
 		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
+		String tenantName = session.getTenantName();
 
 		ContextProperties conf = Context.get().getProperties();
 
 		List<GUIParameter> params = new ArrayList<GUIParameter>();
 		for (Object name : conf.keySet()) {
-			if (name.toString().startsWith(session.getTenantName() + ".gui"))
+			if (name.toString().startsWith(tenantName + ".gui"))
 				params.add(new GUIParameter(name.toString(), conf.getProperty(name.toString())));
 		}
-		if (session.getTenantName().equals(Tenant.DEFAULT_NAME))
-			params.add(new GUIParameter(session.getTenantName() + ".upload.maxsize",
-					conf.getProperty(session.getTenantName() + ".upload.maxsize")));
-		params.add(new GUIParameter(session.getTenantName() + ".upload.disallow",
-				conf.getProperty(session.getTenantName() + ".upload.disallow")));
-		params.add(new GUIParameter(session.getTenantName() + ".search.hits",
-				conf.getProperty(session.getTenantName() + ".search.hits")));
-		params.add(new GUIParameter(session.getTenantName() + ".search.extattr",
-				conf.getProperty(session.getTenantName() + ".search.extattr")));
-		params.add(new GUIParameter(session.getTenantName() + ".session.timeout",
-				conf.getProperty(session.getTenantName() + ".session.timeout")));
-		params.add(new GUIParameter(session.getTenantName() + ".session.heartbeat",
-				conf.getProperty(session.getTenantName() + ".session.heartbeat")));
-		params.add(new GUIParameter(session.getTenantName() + ".downloadticket.behavior",
-				conf.getProperty(session.getTenantName() + ".downloadticket.behavior")));
+
+		params.add(new GUIParameter(tenantName + ".upload.maxsize", conf.getProperty(tenantName + ".upload.maxsize")));
+		params.add(
+				new GUIParameter(tenantName + ".upload.disallow", conf.getProperty(tenantName + ".upload.disallow")));
+		params.add(new GUIParameter(tenantName + ".search.hits", conf.getProperty(tenantName + ".search.hits")));
+		params.add(new GUIParameter(tenantName + ".search.extattr", conf.getProperty(tenantName + ".search.extattr")));
+		params.add(
+				new GUIParameter(tenantName + ".session.timeout", conf.getProperty(tenantName + ".session.timeout")));
+		params.add(new GUIParameter(tenantName + ".session.heartbeat",
+				conf.getProperty(tenantName + ".session.heartbeat")));
+		params.add(new GUIParameter(tenantName + ".downloadticket.behavior",
+				conf.getProperty(tenantName + ".downloadticket.behavior")));
+		params.add(new GUIParameter(tenantName + ".charset", conf.getProperty(tenantName + ".charset")));
+
+		/*
+		 * Now go into the DB
+		 */
+		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+		List<Generic> generics = gDao.findByTypeAndSubtype("guisetting", null, null, session.getTenantId());
+		for (Generic gen : generics) {
+			params.add(new GUIParameter(tenantName + "." + gen.getSubtype(), gen.getString1()));
+		}
 
 		return params.toArray(new GUIParameter[0]);
 	}
@@ -414,6 +448,33 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 			config.write();
 		} catch (Throwable e) {
 			ServiceUtil.throwServerException(session, log, e);
+		}
+	}
+
+	@Override
+	public GUIParameter[] loadWebserviceStats(Long tenantId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
+
+			List<GUIParameter> params = new ArrayList<GUIParameter>();
+
+			// Retrieve API calls stats
+			SequenceDAO dao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+			GUIParameter p = new GUIParameter("webservice.apicalls",
+					"" + dao.getCurrentValue("wscall", 0, tenantId != null ? tenantId : Tenant.SYSTEM_ID));
+			params.add(p);
+
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMM");
+			p = new GUIParameter("webservice.apicalls.current",
+					"" + dao.getCurrentValue("wscall-" + df.format(new Date()), 0,
+							tenantId != null ? tenantId : Tenant.SYSTEM_ID));
+			params.add(p);
+
+			return params.toArray(new GUIParameter[0]);
+		} catch (Throwable e) {
+			return (GUIParameter[]) ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 }

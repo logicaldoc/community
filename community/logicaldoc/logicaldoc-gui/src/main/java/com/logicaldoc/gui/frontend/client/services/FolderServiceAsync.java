@@ -35,7 +35,7 @@ public interface FolderServiceAsync {
 
 	void restore(Long[] folderIds, long parentId, AsyncCallback<Void> callback);
 
-	void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, boolean inheritSecurity,
+	void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, String securityOption, GUIFolder model,
 			AsyncCallback<Void> callback);
 
 	void inheritRights(long folderId, long rightsFolderId, AsyncCallback<GUIFolder> callback);
@@ -55,4 +55,6 @@ public interface FolderServiceAsync {
 	void applyOCR(long parentId, AsyncCallback<Void> callback);
 
 	void applyStorage(long parentId, AsyncCallback<Void> callback);
+
+	void merge(long[] folderIds, long targetId, AsyncCallback<Void> callback);
 }

@@ -14,9 +14,9 @@ import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.setup.client.services.SetupService;
 import com.logicaldoc.gui.setup.client.services.SetupServiceAsync;
 import com.smartgwt.client.types.Alignment;
@@ -418,18 +418,18 @@ public class Setup implements EntryPoint {
 						data.setDbValidationQuery(engines.get(data.getDbEngine())[4]);
 					}
 
-					ContactingServer.get().show();
+					LD.contactingServer();
 					setupService.setup(data, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							SC.warn(caught.getMessage());
 							submit.setDisabled(false);
 						}
 
 						@Override
 						public void onSuccess(Void arg) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							SC.say(I18N.message("installationperformed"),
 									I18N.message("installationend", info.getBranding().getProduct()),
 									new BooleanCallback() {

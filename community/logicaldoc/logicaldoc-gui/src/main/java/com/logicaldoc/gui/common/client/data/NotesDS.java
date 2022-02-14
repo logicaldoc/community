@@ -40,7 +40,7 @@ public class NotesDS extends DataSource {
 		DataSourceTextField page = new DataSourceTextField("page");
 		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 		DataSourceTextField docFilename = new DataSourceTextField("filename");
-		DataSourceTextField color = new DataSourceTextField("color");
+		DataSourceTextField color = new DataSourceTextField("noteColor");
 		DataSourceTextField fileVersion = new DataSourceTextField("fileVersion");
 		DataSourceImageField icon = new DataSourceImageField("icon");
 		icon.setHidden(true);

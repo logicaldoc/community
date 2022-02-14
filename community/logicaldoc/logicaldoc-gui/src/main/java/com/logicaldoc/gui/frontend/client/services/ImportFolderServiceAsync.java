@@ -16,4 +16,6 @@ public interface ImportFolderServiceAsync {
 	void resetCache(long id, AsyncCallback<Void> callback);
 
 	void getImportFolder(long id, AsyncCallback<GUIImportFolder> callback);
+
+	void resetCounter(long id, AsyncCallback<Void> callback);
 }

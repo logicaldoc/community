@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.document.note;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
@@ -46,7 +46,7 @@ public class VersionNotesWindow extends Window {
 		ListGridField userId = new ListGridField("userId", "userid", 50);
 		userId.setHidden(true);
 
-		AvatarListGridField user = new AvatarListGridField("user", "userId", "author", 150);
+		UserListGridField user = new UserListGridField("user", "userId", "author");
 		DateListGridField date = new DateListGridField("date", "date");
 		ListGridField page = new ListGridField("page", I18N.message("page"), 50);
 		page.setAutoFitWidth(true);

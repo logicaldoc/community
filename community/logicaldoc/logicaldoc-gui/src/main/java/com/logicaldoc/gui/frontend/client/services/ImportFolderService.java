@@ -39,7 +39,7 @@ public interface ImportFolderService extends RemoteService {
 	 * 
 	 * @param id identifier of the import folder
 	 * 
-	 * @return the import folder retrieved by the server application 
+	 * @return the import folder retrieved by the server application
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
@@ -65,6 +65,15 @@ public interface ImportFolderService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void changeStatus(long id, boolean enabled) throws ServerException;
+
+	/**
+	 * Reset the import counter
+	 * 
+	 * @param id identifier of the import folder
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void resetCounter(long id) throws ServerException;
 
 	/**
 	 * Cleans the cache

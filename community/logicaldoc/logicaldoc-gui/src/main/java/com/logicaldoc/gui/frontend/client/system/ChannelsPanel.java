@@ -2,7 +2,7 @@ package com.logicaldoc.gui.frontend.client.system;
 
 import com.logicaldoc.gui.common.client.data.ChannelsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;

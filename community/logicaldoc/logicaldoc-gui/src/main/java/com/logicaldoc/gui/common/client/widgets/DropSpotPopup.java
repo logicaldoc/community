@@ -5,6 +5,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -40,7 +41,7 @@ public class DropSpotPopup extends Window {
 		panel.setHeight100();
 		String url = Util.contextPath() + "dropspot/index.jsp?&sid=" + Session.get().getSid() + "&locale="
 				+ I18N.getLocale() + "&docLocale=" + I18N.getDefaultLocaleForDoc() + "&folderId="
-				+ Session.get().getCurrentFolder().getId();
+				+ FolderController.get().getCurrentFolder().getId();
 		panel.setContents("<iframe id='dropboxframe' src='" + url + "' style='border:0px solid white; width:"
 				+ (getWidth() - 1) + "px; height:" + (getHeight() - 1)
 				+ "px; overflow:hidden;' scrolling='auto' seamless='seamless'></iframe>");

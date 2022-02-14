@@ -151,7 +151,7 @@ public class Geolocation {
 	 * 
 	 * @param key the API key
 	 * 
-	 * @throws in case of whatever problem
+	 * @throws IOException in case of whatever problem
 	 */
 	public void syncDB(String key) throws IOException {
 		File gzFile = null;

@@ -1,18 +1,21 @@
 package com.logicaldoc.web.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLDecoder;
 import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
 import org.java.plugin.registry.PluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Log4jConfigurer;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.dbinit.PluginDbInit;
@@ -198,9 +201,13 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 
 		// Refresh the current logging location
 		try {
+			// Init the logs
 			String log4jPath = URLDecoder.decode(this.getClass().getResource("/log.xml").getPath(), "UTF-8");
-			System.err.println("log4jPath = " + log4jPath);
-			Log4jConfigurer.initLogging(log4jPath);
+			System.out.println("Taking log configuration from " + log4jPath);
+			try (InputStream inputStream = new FileInputStream(log4jPath)) {
+				ConfigurationSource source = new ConfigurationSource(inputStream);
+				Configurator.initialize(null, source);
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

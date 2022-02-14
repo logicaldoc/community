@@ -14,10 +14,10 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -31,7 +31,9 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.form.fields.IntegerItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -53,7 +55,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 public class DownloadTicketsReport extends AdminPanel {
 	private RefreshableListGrid list;
 
-	private IntegerItem max;
+	private SpinnerItem max;
 
 	public DownloadTicketsReport() {
 		super("downloadtickets");
@@ -66,10 +68,17 @@ public class DownloadTicketsReport extends AdminPanel {
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 
-		max = ItemFactory.newValidateIntegerItem("max", "", 100, 1, null);
+		max = ItemFactory.newSpinnerItem("max", "", 100, 5, null);
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
-		max.setWidth(50);
+		max.setStep(10);
+		max.addChangedHandler(new ChangedHandler() {
+			
+			@Override
+			public void onChanged(ChangedEvent event) {
+				refresh();
+			}
+		});
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
@@ -232,6 +241,7 @@ public class DownloadTicketsReport extends AdminPanel {
 				});
 			}
 		});
+		preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));

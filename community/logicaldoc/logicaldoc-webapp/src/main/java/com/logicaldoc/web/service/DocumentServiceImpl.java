@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
+import com.google.common.io.Files;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
@@ -72,6 +73,7 @@ import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.imaging.ImageUtil;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
@@ -164,7 +166,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	private void index(Long[] docIds, Session session) {
 		if (docIds == null)
 			return;
-		log.info("Indexing documents {}", docIds.toString());
+		log.info("Indexing documents {}", Arrays.toString(docIds));
 		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		for (Long id : docIds) {
 			if (id != null)
@@ -234,80 +236,104 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 					List<Long> docsToIndex = new ArrayList<Long>();
 
+					/*
+					 * Move the documents in a safe temporary folder
+					 */
+					Map<File, String> files = new HashMap<File, String>();
+					File tempDir = Files.createTempDir();
 					for (String fileId : uploadedFilesMap.keySet()) {
+						final File file = uploadedFilesMap.get(fileId);
+						final String filename = uploadedFileNames.get(fileId);
+
+						File safeFile = new File(tempDir, file.getName());
 						try {
-							final File file = uploadedFilesMap.get(fileId);
-							final String filename = uploadedFileNames.get(fileId);
-
-							if (filename.endsWith(".zip") && importZip) {
-								log.debug("zip file = {}", file);
-
-								// copy the file into the user folder
-								final File destFile = new File(UserUtil.getUserResource(session.getUserId(), "zip"),
-										filename);
-								FileUtils.copyFile(file, destFile);
-
-								final long userId = session.getUserId();
-								final String sessionId = session.getSid();
-								// Prepare the import thread
-								Thread zipImporter = new Thread(new Runnable() {
-									public void run() {
-										/*
-										 * Prepare the Master document used to
-										 * create the new one
-										 */
-										try {
-											Document doc = toDocument(metadata);
-											doc.setTenantId(session.getTenantId());
-											doc.setCreation(new Date());
-
-											InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
-											importer.process(destFile, parent, userId, sessionId);
-										} catch (Throwable e) {
-											log.error("Unable to delete {}", destFile, e);
-										} finally {
-											FileUtil.strongDelete(destFile);
-										}
-									}
-								});
-
-								// And launch it
-								zipImporter.start();
-							} else {
-								// Create the document history event
-								DocumentHistory transaction = new DocumentHistory();
-								transaction.setSession(session);
-								transaction.setEvent(DocumentEvent.STORED.toString());
-								transaction.setComment(metadata.getComment());
-
-								/*
-								 * Prepare the Master document used to create
-								 * the new one
-								 */
-								Document doc = toDocument(metadata);
-								doc.setTenantId(session.getTenantId());
-								doc.setCreation(new Date());
-								doc.setFileName(filename);
-
-								// Create the new document
-								doc = documentManager.create(file, doc, transaction);
-
-								if (immediateIndexing && doc.getIndexed() == Document.INDEX_TO_INDEX)
-									docsToIndex.add(doc.getId());
-
-								createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
-								docs.add(doc);
-							}
-						} catch (Throwable t) {
-							throw new RuntimeException(t.getMessage(), t);
+							FileUtils.moveFile(file, safeFile);
+							files.put(safeFile, filename);
+						} catch (IOException e) {
+							log.error("Cannot move file {} to {}", file.getAbsolutePath(), tempDir.getAbsolutePath());
 						}
 					}
 
-					/*
-					 * Clean the uploaded files
-					 */
-					for (String uploadedEntry : uploadedFilesMap.keySet())
-						UploadServlet.cleanReceivedFile(servletRequest.getSession(), uploadedEntry);
+					try {
+						for (File file : files.keySet()) {
+							try {
+								final String filename = files.get(file);
+
+								if (filename.endsWith(".zip") && importZip) {
+									log.debug("zip file = {}", file);
+
+									// copy the file into the user folder
+									final File destFile = new File(UserUtil.getUserResource(session.getUserId(), "zip"),
+											filename);
+									FileUtils.copyFile(file, destFile);
+
+									final long userId = session.getUserId();
+									final String sessionId = session.getSid();
+									// Prepare the import thread
+									Thread zipImporter = new Thread(new Runnable() {
+										public void run() {
+											/*
+											 * Prepare the Master document used
+											 * to create the new one
+											 */
+											try {
+												Document doc = toDocument(metadata);
+												doc.setTenantId(session.getTenantId());
+												doc.setCreation(new Date());
+
+												InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
+												importer.process(destFile, parent, userId, sessionId);
+											} catch (Throwable e) {
+												log.error("Unable to delete {}", destFile, e);
+											} finally {
+												FileUtil.strongDelete(destFile);
+											}
+										}
+									});
+
+									// And launch it
+									zipImporter.start();
+								} else {
+									// Create the document history event
+									DocumentHistory transaction = new DocumentHistory();
+									transaction.setSession(session);
+									transaction.setEvent(DocumentEvent.STORED.toString());
+									transaction.setComment(metadata.getComment());
+
+									/*
+									 * Prepare the Master document used to
+									 * create the new one
+									 */
+									Document doc = toDocument(metadata);
+									doc.setTenantId(session.getTenantId());
+									doc.setCreation(new Date());
+									doc.setFileName(filename);
+
+									// Create the new document
+									doc = documentManager.create(file, doc, transaction);
+
+									if (immediateIndexing && doc.getIndexed() == Document.INDEX_TO_INDEX)
+										docsToIndex.add(doc.getId());
+
+									createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
+									docs.add(doc);
+								}
+							} catch (Throwable t) {
+								throw new RuntimeException(t.getMessage(), t);
+							} finally {
+								FileUtil.strongDelete(file);
+							}
+						}
+					} finally {
+						FileUtil.strongDelete(tempDir);
+					}
+
+					try {
+						for (String uploadedEntry : uploadedFilesMap.keySet())
+							UploadServlet.cleanReceivedFile(servletRequest.getSession(), uploadedEntry);
+					} catch (Throwable t) {
+
+					}
 
 					if (!docsToIndex.isEmpty())
 						index(docsToIndex.toArray(new Long[0]), session);
@@ -330,7 +356,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 										mail.setAccountId(-1);
 										mail.setAuthor(session.getUser().getUsername());
-										mail.setAuthorAddress(session.getUser().getEmail());
+
+										ContextProperties config = (ContextProperties) Context.get().getProperties();
+										if (config.getBoolean(session.getTenantName() + ".smtp.userasfrom", true))
+											mail.setAuthorAddress(session.getUser().getEmail());
 
 										mail.setFolder("outbox");
 										mail.setSentDate(new Date());
@@ -466,7 +495,92 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				documentManager.checkin(doc.getId(), new FileInputStream(file), fileName, major, toDocument(document),
 						transaction);
 				UploadServlet.cleanReceivedFiles(getThreadLocalRequest().getSession());
-				return getById(doc.getId());
+				GUIDocument checkedInDocument = getById(doc.getId());
+
+				/*
+				 * We have to notify the specified users in a separate thread
+				 */
+
+				if (document.getNotifyUsers() != null && document.getNotifyUsers().length > 0) {
+					Thread notifier = new Thread(new Runnable() {
+						public void run() {
+							try {
+								DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+								Document doc = dao.findById(document.getId());
+								dao.initialize(doc);
+
+								String tile = null;
+								File tileFile = null;
+								try {
+									tileFile = createTile(doc, session.getSid());
+									tile = ImageUtil.encodeImage(tileFile);
+									if (tile != null)
+										tile = "data:image/png;base64," + tile;
+								} catch (Throwable t) {
+									log.warn("Cannot generate tile of document {}", doc, t);
+								} finally {
+									FileUtil.strongDelete(tileFile);
+								}
+
+								UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+								for (long userId : document.getNotifyUsers()) {
+									User user = uDao.findById(userId);
+
+									EMail mail = new EMail();
+									mail.setHtml(1);
+									mail.setTenantId(session.getTenantId());
+
+									mail.setAccountId(-1);
+									mail.setAuthor(session.getUser().getUsername());
+
+									ContextProperties config = (ContextProperties) Context.get().getProperties();
+									if (config.getBoolean(session.getTenantName() + ".smtp.userasfrom", true))
+										mail.setAuthorAddress(session.getUser().getEmail());
+
+									mail.setFolder("outbox");
+									mail.setSentDate(new Date());
+									mail.setUsername(session.getUsername());
+
+									Recipient recipient = new Recipient();
+									recipient.setName(user.getUsername());
+									recipient.setAddress(user.getEmail());
+									recipient.setType(Recipient.TYPE_EMAIL);
+									recipient.setMode(Recipient.MODE_EMAIL_TO);
+									recipient.setRead(1);
+									HashSet<Recipient> recipients = new HashSet<Recipient>();
+									recipients.add(recipient);
+									mail.setRecipients(recipients);
+
+									MessageTemplateDAO tDao = (MessageTemplateDAO) Context.get()
+											.getBean(MessageTemplateDAO.class);
+									MessageTemplate template = tDao.findByNameAndLanguage("checkin", user.getLanguage(),
+											user.getTenantId());
+
+									Map<String, Object> dictionary = new HashMap<String, Object>();
+									dictionary.put("user", session.getUser());
+									dictionary.put("document", doc);
+									dictionary.put("message", document.getNotifyMessage());
+									dictionary.put(Automation.LOCALE, user.getLocale());
+									dictionary.put("tile", tile);
+
+									mail.setSubject(template.getFormattedSubject(dictionary));
+									mail.setMessageText(
+											"<html><body>" + template.getFormattedBody(dictionary) + "</html></body>");
+
+									log.info("Notify the checkin of document {} to {}", doc,
+											mail.getRecipients().toString());
+									EMailSender sender = new EMailSender(session.getTenantName());
+									sender.send(mail);
+								}
+							} catch (Throwable e) {
+								log.warn(e.getMessage(), e);
+							}
+						}
+					});
+					notifier.start();
+				}
+
+				return checkedInDocument;
 			} catch (Throwable t) {
 				return (GUIDocument) ServiceUtil.throwServerException(session, log, t);
 			}
@@ -611,8 +725,6 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIAttribute[] getAttributes(long templateId) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
-
 		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		Template template = templateDao.findById(templateId);
 		templateDao.initialize(template);
@@ -776,18 +888,20 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			fDao.initialize(doc.getFolder());
 			folder = FolderServiceImpl.fromFolder(doc.getFolder(), false);
 
-			Long aliasId = null;
-			String aliasFileName = null;
-			String aliasType = null;
-
-			// Check if it is an alias
-			if (doc.getDocRef() != null) {
-				aliasFileName = doc.getFileName();
-				aliasType = doc.getType();
-				long id = doc.getDocRef();
-				doc = docDao.findById(id);
-				aliasId = docId;
-			}
+//			Long aliasId = null;
+//			String aliasFileName = null;
+//			String aliasType = null;
+//			String aliasColor = null;
+//
+//			// Check if it is an alias
+//			if (doc.getDocRef() != null) {
+//				aliasFileName = doc.getFileName();
+//				aliasType = doc.getType();
+//				aliasColor = doc.getColor();
+//				long id = doc.getDocRef();
+//				doc = docDao.findById(id);
+//				aliasId = docId;
+//			}
 
 			if (session != null)
 				checkPublished(session != null ? session.getUser() : null, doc);
@@ -796,14 +910,15 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			document = fromDocument(doc, folder, session != null ? session.getUser() : null);
 
-			if (aliasId != null)
-				document.setDocRef(aliasId);
-			if (StringUtils.isNotEmpty(aliasFileName))
-				document.setFileName(aliasFileName);
-			if (StringUtils.isNotEmpty(aliasType)) {
-				document.setType(aliasType);
-				document.setIcon(aliasType + "-sc");
-			}
+//			if (aliasId != null)
+//				document.setDocRef(aliasId);
+//			if (StringUtils.isNotEmpty(aliasFileName))
+//				document.setFileName(aliasFileName);
+//			if (StringUtils.isNotEmpty(aliasColor))
+//				document.setColor(aliasColor);
+//			if (StringUtils.isNotEmpty(aliasType)) {
+//				document.setType(aliasType);
+//			}
 
 			if (session != null && folder != null) {
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -828,7 +943,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		GUIDocument document = new GUIDocument();
 		document.setId(doc.getId());
-		if (doc.getDocRef() != null && doc.getDocRef().longValue() != 0) {
+		document.setDocRef(doc.getDocRef());
+
+		if (!isFolder && doc.getDocRef() != null && doc.getDocRef().longValue() != 0) {
 			realDoc = docDao.findById(doc.getDocRef());
 			docDao.initialize(realDoc);
 			document.setDocRef(doc.getDocRef());
@@ -842,6 +959,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			document.setTags(new String[0]);
 		document.setType(doc.getType());
 		document.setFileName(doc.getFileName());
+		document.setColor(doc.getColor());
 		document.setVersion(realDoc.getVersion());
 		document.setCreation(realDoc.getCreation());
 		document.setCreator(realDoc.getCreator());
@@ -869,6 +987,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		document.setIndexed(realDoc.getIndexed());
 		document.setExtResId(realDoc.getExtResId());
 		document.setPages(realDoc.getPages());
+		document.setPreviewPages(realDoc.getPreviewPages());
 		document.setNature(realDoc.getNature());
 		document.setFormId(realDoc.getFormId());
 		document.setIcon(FilenameUtils.getBaseName(doc.getIcon()));
@@ -947,6 +1066,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				version1.setFileSize(Float.valueOf(docVersion.getFileSize()));
 				version1.setWorkflowStatus(docVersion.getWorkflowStatus());
 				version1.setWorkflowStatusDisplay(docVersion.getWorkflowStatusDisplay());
+				version1.setColor(docVersion.getColor());
 				if (docVersion.getRating() != null)
 					version1.setRating(docVersion.getRating());
 				version1.setStartPublishing(docVersion.getStartPublishing());
@@ -1009,6 +1129,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				if (docVersion.getRating() != null)
 					version2.setRating(docVersion.getRating());
 				version2.setWorkflowStatus(docVersion.getWorkflowStatus());
+				version2.setColor(docVersion.getColor());
 				version2.setStartPublishing(docVersion.getStartPublishing());
 				version2.setStopPublishing(docVersion.getStopPublishing());
 				version2.setPublished(docVersion.getPublished());
@@ -1180,42 +1301,48 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	@Override
-	public GUIDocument save(GUIDocument document) throws ServerException {
+	public GUIDocument save(GUIDocument guiDocument) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			if (document.getId() != 0) {
-				if (document.getDocRef() != null) {
-					Document alias = docDao.findById(document.getDocRef());
-					docDao.initialize(alias);
-					alias.setFileName(document.getFileName());
-					alias.setType(FilenameUtils.getExtension(alias.getFileName()).toLowerCase());
-					boolean stored = docDao.store(alias);
+			Document document = docDao.findById(guiDocument.getId());
+			docDao.initialize(document);
+
+			if (guiDocument.getId() != 0) {
+				if (guiDocument.getDocRef() != null) {
+					/*
+					 * We are saving an alias
+					 */
+
+					document.setFileName(guiDocument.getFileName());
+					document.setColor(guiDocument.getColor());
+					document.setType(FilenameUtils.getExtension(document.getFileName()).toLowerCase());
+					boolean stored = docDao.store(document);
 					if (!stored)
-						throw new Exception("Document not stored");
+						throw new Exception("Alias not stored");
+
+					// Load the real target document for further updates
+					document = docDao.findById(guiDocument.getDocRef());
+					docDao.initialize(document);
 				}
 
-				Document doc = docDao.findById(document.getId());
-				docDao.initialize(doc);
-				String originalDocFilename = doc.getFileName();
-				doc.setCustomId(document.getCustomId());
-				doc.setComment(document.getComment());
-
 				try {
-					Document docVO = toDocument(document);
-					docVO.setTenantId(session.getTenantId());
-					if (document.getDocRef() != null) {
-						docVO.setFileName(originalDocFilename);
-						docVO.setType(FilenameUtils.getExtension(originalDocFilename).toLowerCase());
+					Document docVO = toDocument(guiDocument);
+					if (guiDocument.getDocRef() != null) {
+						docVO.setDocRef(null);
+						docVO.setFileName(document.getFileName());
+						docVO.setColor(document.getColor());
+						docVO.setType(FilenameUtils.getExtension(document.getFileName()).toLowerCase());
 					}
+					docVO.setTenantId(session.getTenantId());
 
 					// Fix the name of multiple attributes
-					if (document.getAttributes() != null)
-						for (GUIAttribute att : document.getAttributes()) {
+					if (guiDocument.getAttributes() != null)
+						for (GUIAttribute att : guiDocument.getAttributes()) {
 							if (att.isMultiple()) {
 								NumberFormat nf = new DecimalFormat("0000");
-								List<GUIAttribute> values = document.getValues(att.getName());
+								List<GUIAttribute> values = guiDocument.getValues(att.getName());
 								values.remove(0);
 								int index = 1;
 								for (GUIAttribute val : values) {
@@ -1228,15 +1355,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					DocumentHistory transaction = new DocumentHistory();
 					transaction.setSession(session);
 					transaction.setEvent(DocumentEvent.CHANGED.toString());
-					transaction.setComment(document.getComment());
+					transaction.setComment(guiDocument.getComment());
 
 					DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-					documentManager.update(doc, docVO, transaction);
-
-					if (document.getDocRef() != null)
-						return getById(document.getDocRef());
-					else
-						return getById(document.getId());
+					documentManager.update(document, docVO, transaction);
+					return getById(guiDocument.getId());
 				} catch (Throwable t) {
 					log.error(t.getMessage(), t);
 					throw new RuntimeException(t.getMessage(), t);
@@ -1250,48 +1373,54 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	/**
 	 * Produces a plain new Document from a GUIDocument
+	 * 
+	 * @param guiDocument the GUI document
+	 * 
+	 * @return the core Document
 	 */
-	protected Document toDocument(GUIDocument document) {
+	public static Document toDocument(GUIDocument guiDocument) {
 		Document docVO = new Document();
-		if (document.getTags() != null && document.getTags().length > 0)
-			docVO.setTagsFromWords(new HashSet<String>(Arrays.asList(document.getTags())));
+		if (guiDocument.getTags() != null && guiDocument.getTags().length > 0)
+			docVO.setTagsFromWords(new HashSet<String>(Arrays.asList(guiDocument.getTags())));
 
-		docVO.setCustomId(document.getCustomId());
-		docVO.setFileName(document.getFileName());
-		docVO.setVersion(document.getVersion());
-		docVO.setCreation(document.getCreation());
-		docVO.setCreator(document.getCreator());
-		docVO.setDate(document.getDate());
-		docVO.setPublisher(document.getPublisher());
-		docVO.setFileVersion(document.getFileVersion());
-		docVO.setLanguage(document.getLanguage());
-		if (document.getFileSize() != null)
-			docVO.setFileSize(document.getFileSize().longValue());
+		docVO.setCustomId(guiDocument.getCustomId());
+		docVO.setFileName(guiDocument.getFileName());
+		docVO.setVersion(guiDocument.getVersion());
+		docVO.setCreation(guiDocument.getCreation());
+		docVO.setCreator(guiDocument.getCreator());
+		docVO.setDate(guiDocument.getDate());
+		docVO.setPublisher(guiDocument.getPublisher());
+		docVO.setFileVersion(guiDocument.getFileVersion());
+		docVO.setLanguage(guiDocument.getLanguage());
+		if (guiDocument.getFileSize() != null)
+			docVO.setFileSize(guiDocument.getFileSize().longValue());
 
-		docVO.setRating(document.getRating());
-		docVO.setComment(document.getComment());
-		docVO.setWorkflowStatus(document.getWorkflowStatus());
-		docVO.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
-		docVO.setStartPublishing(document.getStartPublishing());
-		docVO.setStopPublishing(document.getStopPublishing());
-		docVO.setPublished(document.getPublished());
-		docVO.setBarcoded(document.getBarcoded());
-		docVO.setExtResId(document.getExtResId());
-		docVO.setPages(document.getPages());
-		docVO.setNature(document.getNature());
-		docVO.setFormId(document.getFormId());
-		docVO.setOcrTemplateId(document.getOcrTemplateId());
-		docVO.setBarcodeTemplateId(document.getBarcodeTemplateId());
+		docVO.setRating(guiDocument.getRating());
+		docVO.setComment(guiDocument.getComment());
+		docVO.setWorkflowStatus(guiDocument.getWorkflowStatus());
+		docVO.setWorkflowStatusDisplay(guiDocument.getWorkflowStatusDisplay());
+		docVO.setColor(guiDocument.getColor());
+		docVO.setStartPublishing(guiDocument.getStartPublishing());
+		docVO.setStopPublishing(guiDocument.getStopPublishing());
+		docVO.setPublished(guiDocument.getPublished());
+		docVO.setBarcoded(guiDocument.getBarcoded());
+		docVO.setExtResId(guiDocument.getExtResId());
+		docVO.setPages(guiDocument.getPages());
+		docVO.setPreviewPages(guiDocument.getPreviewPages());
+		docVO.setNature(guiDocument.getNature());
+		docVO.setFormId(guiDocument.getFormId());
+		docVO.setOcrTemplateId(guiDocument.getOcrTemplateId());
+		docVO.setBarcodeTemplateId(guiDocument.getBarcodeTemplateId());
 
-		if (document.getTemplateId() != null) {
-			docVO.setTemplateId(document.getTemplateId());
+		if (guiDocument.getTemplateId() != null) {
+			docVO.setTemplateId(guiDocument.getTemplateId());
 			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-			Template template = templateDao.findById(document.getTemplateId());
+			Template template = templateDao.findById(guiDocument.getTemplateId());
 			templateDao.initialize(template);
 
 			docVO.setTemplate(template);
-			if (document.getAttributes().length > 0) {
-				for (GUIAttribute attr : document.getAttributes()) {
+			if (guiDocument.getAttributes().length > 0) {
+				for (GUIAttribute attr : guiDocument.getAttributes()) {
 					Attribute templateAttribute = template.getAttributes()
 							.get(attr.getParent() != null ? attr.getParent() : attr.getName());
 					// This control is necessary because, changing
@@ -1389,10 +1518,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 		}
 
-		docVO.setStatus(document.getStatus());
+		docVO.setStatus(guiDocument.getStatus());
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (document.getFolder() != null)
-			docVO.setFolder(fdao.findById(document.getFolder().getId()));
+		if (guiDocument.getFolder() != null)
+			docVO.setFolder(fdao.findById(guiDocument.getFolder().getId()));
 		return docVO;
 	}
 
@@ -1500,7 +1629,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					doc = documentDao.findById(doc.getDocRef());
 
 				try {
-					thumbnailFile = createThumbnail(doc, session.getSid());
+					thumbnailFile = createTile(doc, session.getSid());
 					if (thumbnailFile != null) {
 						String thumb = thumbnailFile.toURI().toURL().toString();
 						mail.getImages().add(thumb);
@@ -1611,23 +1740,23 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		}
 	}
 
-	private File createThumbnail(Document doc, String sid) throws IOException {
+	private File createTile(Document doc, String sid) throws IOException {
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
-		String thumbResource = storer.getResourceName(doc, doc.getFileVersion(), ThumbnailManager.SUFFIX_THUMB);
+		String tileResource = storer.getResourceName(doc, doc.getFileVersion(), ThumbnailManager.SUFFIX_TILE);
 
 		// In any case try to produce the thumbnail
-		if (storer.size(doc.getId(), thumbResource) <= 0L) {
+		if (storer.size(doc.getId(), tileResource) <= 0L) {
 			ThumbnailManager thumbManager = (ThumbnailManager) Context.get().getBean(ThumbnailManager.class);
 			try {
-				thumbManager.createTumbnail(doc, doc.getFileVersion(), sid);
+				thumbManager.createTile(doc, doc.getFileVersion(), sid);
 			} catch (Throwable t) {
 				log.error(t.getMessage(), t);
 			}
 		}
 
-		if (storer.exists(doc.getId(), thumbResource)) {
-			File file = File.createTempFile("thumb-", ".png");
-			storer.writeToFile(doc.getId(), thumbResource, file);
+		if (storer.exists(doc.getId(), tileResource)) {
+			File file = File.createTempFile("tile-", ".png");
+			storer.writeToFile(doc.getId(), tileResource, file);
 			return file;
 		}
 
@@ -1805,29 +1934,12 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			transaction.setSession(session);
 			ratingDao.store(rat, transaction);
 
-			return updateDocumentRating(rating.getDocId());
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = docDao.findById(rating.getDocId());
+			return doc.getRating();
 		} catch (Throwable t) {
 			return (Integer) ServiceUtil.throwServerException(session, log, t);
 		}
-	}
-
-	private int updateDocumentRating(long docId) {
-		RatingDAO ratingDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-
-		Rating votesDoc = ratingDao.findVotesByDocId(docId);
-		Document doc = docDao.findById(docId);
-		docDao.initialize(doc);
-		int average = 0;
-		if (votesDoc != null && votesDoc.getAverage() != null)
-			average = votesDoc.getAverage().intValue();
-		doc.setRating(average);
-		try {
-			docDao.store(doc);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-		return average;
 	}
 
 	@Override
@@ -1835,19 +1947,18 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
-			DocumentNote note = new DocumentNote();
-			note.setTenantId(session.getTenantId());
-			note.setDocId(docId);
-			note.setUserId(session.getUserId());
-			note.setUsername(session.getUser().getFullName());
-			note.setDate(new Date());
-			note.setMessage(message);
-
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document document = docDao.findDocument(docId);
 			if (document == null)
 				throw new ServerException("Unexisting document " + docId);
 
+			DocumentNote note = new DocumentNote();
+			note.setTenantId(session.getTenantId());
+			note.setDocId(document.getId());
+			note.setUserId(session.getUserId());
+			note.setUsername(session.getUser().getFullName());
+			note.setDate(new Date());
+			note.setMessage(message);
 			note.setFileName(document.getFileName());
 			note.setFileVersion(document.getFileVersion());
 
@@ -1876,13 +1987,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			List<GUIDocumentNote> guiNotes = new ArrayList<GUIDocumentNote>();
 			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 
-			List<DocumentNote> notes = dao.findByDocIdAndTypes(docId,
+			List<DocumentNote> notes = dao.findByDocIdAndTypes(document.getId(),
 					fileVersion != null ? fileVersion : document.getFileVersion(), types);
 			for (DocumentNote note : notes) {
 				GUIDocumentNote guiNote = new GUIDocumentNote();
 				guiNote.setColor(note.getColor());
 				guiNote.setDate(note.getDate());
-				guiNote.setDocId(docId);
+				guiNote.setDocId(document.getId());
 				guiNote.setFileName(note.getFileName());
 				guiNote.setHeight(note.getHeight());
 				guiNote.setId(note.getId());
@@ -1930,7 +2041,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			/*
 			 * Check for deletions
 			 */
-			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(docId, document.getFileVersion(), types);
+			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(document.getId(), document.getFileVersion(),
+					types);
 			List<Long> actualNoteIds = documentNotes.stream().map(n -> n.getId()).collect(Collectors.toList());
 			List<Long> noteIds = notesList.stream().map(n -> n.getId()).collect(Collectors.toList());
 			for (Long actualNoteId : actualNoteIds)
@@ -1945,7 +2057,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				if (note == null) {
 					note = new DocumentNote();
 					note.setTenantId(session.getTenantId());
-					note.setDocId(docId);
+					note.setDocId(document.getId());
 					note.setUserId(session.getUserId());
 					note.setUsername(session.getUser().getFullName());
 					note.setDate(new Date());
@@ -2103,9 +2215,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			if (note == null) {
 				note = new DocumentNote();
 				note.setTenantId(session.getTenantId());
-				note.setDocId(docId);
+				note.setDocId(document.getId());
 				note.setUserId(session.getUserId());
 				note.setUsername(session.getUser().getFullName());
+				note.setColor(null);
 			}
 
 			note.setFileName(document.getFileName());
@@ -2524,7 +2637,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			if (rat != null && rat.getUserId() != session.getUserId())
 				throw new Exception("Cannot delete the vote of another user");
 			rDao.delete(id);
-			return updateDocumentRating(rat.getDocId());
+
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = docDao.findById(rat.getDocId());
+			return doc.getRating();
 		} catch (Throwable t) {
 			return (Integer) ServiceUtil.throwServerException(session, log, t);
 		}
@@ -2975,6 +3091,26 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			return getDocument(session, doc.getId());
 		} catch (Throwable t) {
 			return (GUIDocument) ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public int updatePages(long docId) throws ServerException {
+		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = docDao.findDocument(docId);
+			if (doc != null) {
+				docDao.initialize(doc);
+				int pages = manager.countPages(doc);
+				doc.setPages(pages);
+				return pages;
+			}
+			return 1;
+		} catch (Throwable t) {
+			return (Integer) ServiceUtil.throwServerException(session, log, t);
 		}
 	}
 }

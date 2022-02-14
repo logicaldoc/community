@@ -39,6 +39,8 @@ public class GUISyndication implements Serializable {
 
 	private long batch = 1000;
 	
+	private int timeout = 120;
+	
 	private Date startDate = null;
 	
 	private int replicateCustomId = 1;
@@ -161,5 +163,13 @@ public class GUISyndication implements Serializable {
 
 	public void setReplicateCustomId(int replicateCustomId) {
 		this.replicateCustomId = replicateCustomId;
+	}
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
 	}
 }

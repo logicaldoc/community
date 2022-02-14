@@ -54,7 +54,7 @@ public class FolderSelector extends TextItem {
 			setWidth(180);
 
 		Date date = new Date();
-		menu.setDataSource(new FoldersDS("folderselector" + date.getTime(), true));
+		menu.setDataSource(new FoldersDS("folderselector" + date.getTime(), true, 100L));
 		menu.setWidth(130);
 		menu.setCanSelectParentItems(true);
 		menu.setAutoFetchData(true);

@@ -10,7 +10,8 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.IntegerListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.ImportFolderService;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -77,8 +78,12 @@ public class ImportFoldersPanel extends AdminPanel {
 		ListGridField src = new ListGridField("src", I18N.message("source"), 300);
 		src.setCanFilter(true);
 
-		ListGridField type = new ListGridField("type", I18N.message("type"), 120);
+		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setCanFilter(false);
+		type.setAutoFitWidth(true);
+
+		IntegerListGridField importedDocs = new IntegerListGridField("docs", I18N.message("importeddocuments"));
+		importedDocs.setAutoFitWidth(true);
 
 		ListGridField enabled = new ListGridField("eenabled", " ", 24);
 		enabled.setType(ListGridFieldType.IMAGE);
@@ -95,7 +100,7 @@ public class ImportFoldersPanel extends AdminPanel {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(enabled, id, src, type);
+		list.setFields(enabled, id, src, type, importedDocs);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -307,10 +312,37 @@ public class ImportFoldersPanel extends AdminPanel {
 			}
 		});
 
+		MenuItem resetCounter = new MenuItem();
+		resetCounter.setTitle(I18N.message("resetcounter"));
+		resetCounter.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				LD.ask(I18N.message("question"), I18N.message("confirmresetcounter"), new BooleanCallback() {
+					@Override
+					public void execute(Boolean value) {
+						if (value) {
+							ImportFolderService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(Void result) {
+									GuiLog.info(I18N.message("counterreseted"), null);
+									record.setAttribute("docs", "0");
+									list.refreshRow(list.getRecordIndex(record));
+								}
+							});
+						}
+					}
+				});
+			}
+		});
+
 		if ("0".equals(record.getAttributeAsString("eenabled")))
-			contextMenu.setItems(test, disable, delete, resetCache);
+			contextMenu.setItems(test, disable, delete, resetCache, resetCounter);
 		else
-			contextMenu.setItems(test, enable, delete, resetCache);
+			contextMenu.setItems(test, enable, delete, resetCache, resetCounter);
 		contextMenu.showContextMenu();
 	}
 

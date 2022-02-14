@@ -46,16 +46,21 @@ public class EmailAccountAutomationPanel extends EmailAccountDetailsTab {
 		form.setNumCols(1);
 		form.setTitleOrientation(TitleOrientation.TOP);
 
-		TextAreaItem automation = ItemFactory.newTextAreaItemForAutomation("automation", "automation",
+		TextAreaItem automationBefore = ItemFactory.newTextAreaItemForAutomation("automationBefore", "whenemailprocessing",
 				account.getAutomation(), changedHandler, false);
-		automation.setShowTitle(false);
-		automation.setStartRow(false);
-		automation.setRequired(false);
-		automation.setWidth("*");
-		automation.setHeight("*");
-		automation.addChangedHandler(changedHandler);
+		automationBefore.setRequired(false);
+		automationBefore.setWidth("*");
+		automationBefore.setHeight("*");
+		automationBefore.addChangedHandler(changedHandler);
 
-		form.setItems(automation);
+		TextAreaItem automationAfter = ItemFactory.newTextAreaItemForAutomation("automationAfter", "afteremailprocessed",
+				account.getAutomationAfter(), changedHandler, false);
+		automationAfter.setRequired(false);
+		automationAfter.setWidth("*");
+		automationAfter.setHeight("*");
+		automationAfter.addChangedHandler(changedHandler);
+		
+		form.setItems(automationBefore, automationAfter);
 
 		container.addMember(form);
 	}
@@ -65,7 +70,8 @@ public class EmailAccountAutomationPanel extends EmailAccountDetailsTab {
 		Map<String, Object> values = (Map<String, Object>) form.getValues();
 		form.validate();
 		if (!form.hasErrors()) {
-			account.setAutomation((String) values.get("automation"));
+			account.setAutomation((String) values.get("automationBefore"));
+			account.setAutomationAfter((String) values.get("automationAfter"));
 		}
 		return !form.hasErrors();
 	}

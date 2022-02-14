@@ -24,6 +24,8 @@ public class Tenant extends PersistentObject implements Serializable, Cloneable 
 
 	public static final long SYSTEM_ID = -1L;
 
+	public static final String SYSTEM_NAME = "system";
+	
 	public static final long DEFAULT_ID = 1L;
 
 	public static final String DEFAULT_NAME = "default";

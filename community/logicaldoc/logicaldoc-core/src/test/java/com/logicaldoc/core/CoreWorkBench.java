@@ -11,8 +11,10 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
 import javax.mail.MessagingException;
@@ -37,10 +39,64 @@ import com.talanlabs.avatargenerator.IdenticonAvatar;
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
-		Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(128, 128).build();
-		BufferedImage image = avatar.create(-1050);
-		System.out.println(image);
+
+		// Getting the current date from java.util.Date class
+		Date currentTime = new Date();
+		System.out.println("currentTime : " + currentTime);
 		
+		
+		// Date time to current timezone
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String ISTTime = dateFormatter.format(currentTime);
+		System.out.println("local time : " + ISTTime);
+
+		// Date time to PST
+		// Creating PST timezone
+		TimeZone pstTimezone = TimeZone.getTimeZone("America/Los_Angeles");
+
+		// setting pst timezone to formatter.
+		dateFormatter.setTimeZone(pstTimezone);
+
+		// converting IST to PST
+		String PSTTime = dateFormatter.format(currentTime);
+		System.out.println("PST time : " + PSTTime);
+
+		// Date time to GST - Dubai Gulf
+		// Creating GST timezone
+		TimeZone gstTimezone = TimeZone.getTimeZone("Asia/Dubai");
+
+		// setting pst timezone to formatter.
+		dateFormatter.setTimeZone(gstTimezone);
+
+		// converting IST to PST
+		String GSTTime = dateFormatter.format(currentTime);
+		System.out.println("GST time : " + GSTTime);
+		
+		
+		dateFormatter.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
+		System.out.println("Rome time : " + dateFormatter.format(currentTime));
+				
+		// getting the diff b/w two los angeles and dubai times.
+
+		// printDurationBetweenTwoDates(losAngelesDateTime, dubaiDateTime);
+
+//		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+//		Date date= df.parse("2021-11-26T10:08:55+01:00");
+//		System.out.println("date1: "+date);
+//
+//		df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+//		date= df.parse("2021-11-26T10:08:55+04:00");
+//		System.out.println("date2: "+date);
+//		
+//		df.setTimeZone(TimeZone.getTimeZone("GMT+07:00"));
+//		System.out.println("format: "+df.format(date));
+//		
+
+//		EMail email = MailUtil.msgToMail(new File("C:\\Users\\marco\\Downloads\\hebrewemail.msg"), false);
+//		System.out.println("subject: " + email.getSubject());
+
+//		avatarStuff();
+
 //		statsStuff();
 
 //		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -98,6 +154,12 @@ public class CoreWorkBench {
 //		FileUtil.writeFile(bookSection.getSectionContent(), "c:/tmp/ebook.html");
 
 //		emailStuff();
+	}
+
+	private static void avatarStuff() {
+		Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(128, 128).build();
+		BufferedImage image = avatar.create(-1050);
+		System.out.println(image);
 	}
 
 	static void statsStuff() throws ClientProtocolException, IOException {

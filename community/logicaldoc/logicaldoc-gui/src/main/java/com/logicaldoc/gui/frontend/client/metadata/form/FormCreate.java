@@ -1,8 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -72,21 +71,15 @@ public class FormCreate extends Window {
 		if (!vm.validate())
 			return;
 
-		GUIDocument vo = new GUIDocument();
-		String title = vm.getValueAsString("name").trim();
-		if (title.lastIndexOf('.') != -1)
-			title = title.substring(0, title.lastIndexOf('.'));
+		GUIForm vo = new GUIForm();
+		vo.setName(vm.getValueAsString("name").trim());
 
 		if (vm.getValueAsString("template") == null || "".equals(vm.getValueAsString("template").toString()))
 			vo.setTemplateId(null);
 		else
 			vo.setTemplateId(Long.parseLong(vm.getValueAsString("template").toString()));
 
-		vo.setFileName(title + ".html");
-		vo.setType("html");
-		vo.setNature(Constants.NATURE_FORM);
-
-		FormService.Instance.get().create(vo, new AsyncCallback<GUIDocument>() {
+		FormService.Instance.get().save(vo, new AsyncCallback<GUIForm>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
@@ -94,7 +87,7 @@ public class FormCreate extends Window {
 			}
 
 			@Override
-			public void onSuccess(GUIDocument form) {
+			public void onSuccess(GUIForm form) {
 				grid.refresh();
 				destroy();
 			}

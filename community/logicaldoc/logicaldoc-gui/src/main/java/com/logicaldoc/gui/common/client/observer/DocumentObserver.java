@@ -23,6 +23,21 @@ public interface DocumentObserver {
 	 * @param document the document that has been modified
 	 */
 	public void onDocumentModified(GUIDocument document);
+	
+	/**
+	 * Invoked after the document's properties are being edited
+	 * 
+	 * @param document the document that is being edited
+	 */
+	public void onDocumentBeginEditing(GUIDocument document);	
+	
+	/**
+	 * Invoked after the document's properties are being edited
+	 * 
+	 * @param document the document that is being edited
+	 */
+	public void onDocumentCancelEditing(GUIDocument document);
+	
 
 	/**
 	 * Invoked after the document has been stored

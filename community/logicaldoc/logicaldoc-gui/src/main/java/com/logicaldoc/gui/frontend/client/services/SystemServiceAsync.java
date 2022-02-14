@@ -12,9 +12,6 @@ public interface SystemServiceAsync {
 
 	void getStatistics(String locale, AsyncCallback<GUIParameter[][]> callback);
 
-	void search(String userName, Date from, Date till, int maxResult, String historySid, String[] event, Long rootFolderId,
-			AsyncCallback<GUIHistory[]> callback);
-
 	void loadTasks(String locale, AsyncCallback<GUITask[]> callback);
 
 	void startTask(String taskName, AsyncCallback<Boolean> callback);
@@ -36,4 +33,10 @@ public interface SystemServiceAsync {
 	void confirmUpdate(AsyncCallback<Void> callback);
 
 	void restart(AsyncCallback<Void> callback);
+
+	void search(Long userId, Date from, Date till, int maxResult, String historySid, String[] event, Long rootFolderId,
+			AsyncCallback<GUIHistory[]> callback);
+	
+	void searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri, int maxResult,
+			AsyncCallback<GUIHistory[]> callback);
 }

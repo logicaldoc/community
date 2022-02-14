@@ -27,8 +27,15 @@ public class Dashlet extends PersistentObject implements Cloneable {
 	private String name;
 
 	private String title;
-	
+
 	private Integer max;
+
+	/**
+	 * To mark that it must display just unique records
+	 */
+	private int unique = 0;
+
+	private String columns;
 
 	public String getType() {
 		return type;
@@ -94,6 +101,24 @@ public class Dashlet extends PersistentObject implements Cloneable {
 		dashlet.setTenantId(getTenantId());
 		dashlet.setTitle(title);
 		dashlet.setType(type);
+		dashlet.setColumns(columns);
+		dashlet.setUnique(unique);
 		return super.clone();
+	}
+
+	public String getColumns() {
+		return columns;
+	}
+
+	public void setColumns(String columns) {
+		this.columns = columns;
+	}
+
+	public int getUnique() {
+		return unique;
+	}
+
+	public void setUnique(int unique) {
+		this.unique = unique;
 	}
 }

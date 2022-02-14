@@ -14,16 +14,18 @@ import com.logicaldoc.gui.common.client.data.IndexingQueueDS;
 import com.logicaldoc.gui.common.client.data.LanguagesDS;
 import com.logicaldoc.gui.common.client.data.ParsersDS;
 import com.logicaldoc.gui.common.client.data.TokenFiltersDS;
-import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -43,16 +45,16 @@ import com.smartgwt.client.widgets.events.DropCompleteEvent;
 import com.smartgwt.client.widgets.events.DropCompleteHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -634,13 +636,13 @@ public class SearchIndexingPanel extends AdminPanel {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
-							ContactingServer.get().show();
+							LD.contactingServer();
 							rescheduleAll.setDisabled(true);
 							SearchEngineService.Instance.get().rescheduleAll(false, new AsyncCallback<Void>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									rescheduleAll.setDisabled(false);
 									GuiLog.serverError(caught);
 								}
@@ -649,7 +651,7 @@ public class SearchIndexingPanel extends AdminPanel {
 								public void onSuccess(Void ret) {
 									GuiLog.info(I18N.message("docsreindex"), null);
 									rescheduleAll.setDisabled(false);
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									AdminScreen.get().setContent(new SearchIndexingPanel());
 								}
 							});
@@ -669,13 +671,13 @@ public class SearchIndexingPanel extends AdminPanel {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
-							ContactingServer.get().show();
+							LD.contactingServer();
 							rescheduleAll.setDisabled(true);
 							SearchEngineService.Instance.get().rescheduleAll(true, new AsyncCallback<Void>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									dropIndex.setDisabled(false);
 									GuiLog.serverError(caught);
 								}
@@ -684,7 +686,7 @@ public class SearchIndexingPanel extends AdminPanel {
 								public void onSuccess(Void ret) {
 									GuiLog.info(I18N.message("docsreindex"), null);
 									dropIndex.setDisabled(false);
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									AdminScreen.get().setContent(new SearchIndexingPanel());
 								}
 							});
@@ -698,17 +700,17 @@ public class SearchIndexingPanel extends AdminPanel {
 		check.setTitle(I18N.message("check"));
 		check.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				SearchEngineService.Instance.get().check(new AsyncCallback<String>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 					}
 
 					@Override
 					public void onSuccess(String ret) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						SearchIndexCheckStatus sc = new SearchIndexCheckStatus(ret);
 						sc.show();
 					}
@@ -740,10 +742,17 @@ public class SearchIndexingPanel extends AdminPanel {
 	}
 
 	private void prepareIndexingQueuePanel(Integer maxValue) {
-		final IntegerItem max = ItemFactory.newValidateIntegerItem("max", "", maxValue, 1, null);
+		final SpinnerItem max = ItemFactory.newSpinnerItem("max", "", maxValue, 5, null);
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
-		max.setWidth(60);
+		max.setStep(10);
+		max.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				refreshIndexingQueue((Integer) max.getValue());
+			}
+		});
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setWidth100();
@@ -762,50 +771,41 @@ public class SearchIndexingPanel extends AdminPanel {
 		// Prepare a panel containing a title and the documents number
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		ListGridField id = new ListGridField("id", 50);
+		ListGridField id = new ColoredListGridField("id");
+		id.setWidth(50);
 		id.setHidden(true);
 
-		ListGridField size = new ListGridField("size", I18N.message("size"), 70);
+		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 		size.setAlign(Alignment.CENTER);
 		size.setType(ListGridFieldType.FLOAT);
-		size.setCellFormatter(new FileSizeCellFormatter());
 		size.setCanFilter(false);
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-
-		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
+		ListGridField version = new VersionListGridField();
 		version.setAlign(Alignment.CENTER);
 		version.setCanFilter(true);
 
 		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 
-		ListGridField publisher = new ListGridField("publisher", I18N.message("publisher"), 90);
+		ListGridField publisher = new ColoredListGridField("publisher", I18N.message("publisher"), 90);
 		publisher.setAlign(Alignment.CENTER);
 		publisher.setCanFilter(true);
 
 		ListGridField published = new DateListGridField("published", "publishedon");
 
-		ListGridField creator = new ListGridField("creator", I18N.message("creator"), 90);
+		ListGridField creator = new ColoredListGridField("creator", I18N.message("creator"), 90);
 		creator.setAlign(Alignment.CENTER);
 		creator.setCanFilter(true);
 
 		ListGridField created = new DateListGridField("created", "createdon");
 
-		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
+		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setCanFilter(false);
 
-		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
+		ListGridField filename = new FileNameListGridField();
 		filename.setCanFilter(true);
 
-		ListGridField lockUserId = new ListGridField("lockUserId", " ", 24);
+		ListGridField lockUserId = new ColoredListGridField("lockUserId", " ", 24);
 		lockUserId.setHidden(true);
 		lockUserId.setCanFilter(false);
 
@@ -849,7 +849,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		docsList.setSelectionType(SelectionStyle.MULTIPLE);
 		docsList.setShowFilterEditor(true);
 		docsList.setFilterOnKeypress(true);
-		docsList.setFields(id, icon, filename, size, lastModified, version, publisher, published, creator, created,
+		docsList.setFields(id, filename, size, lastModified, version, publisher, published, creator, created,
 				customId);
 
 		indexingQueueTabPanel = new VLayout();

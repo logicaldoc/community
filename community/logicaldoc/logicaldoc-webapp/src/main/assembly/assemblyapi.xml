@@ -16,7 +16,6 @@
 				<exclude>context.xml</exclude>
 				<exclude>ehcache.xml</exclude>
 				<exclude>log.xml</exclude>
-				<exclude>log4j.dtd</exclude>
 			</excludes>
 		</fileSet>
 	</fileSets>

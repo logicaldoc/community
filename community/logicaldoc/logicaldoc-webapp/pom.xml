@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.6.1</version>
+		<version>8.7.3</version>
 	</parent>
 	<artifactId>logicaldoc-webapp</artifactId>
 	<name>logicaldoc-webapp</name>
@@ -48,6 +48,10 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-compress</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.tukaani</groupId>
+			<artifactId>xz</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ant</groupId>
@@ -162,11 +166,7 @@
 			<artifactId>torque</artifactId>
 			<version>3.0.2</version>
 			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>jakarta-regexp</groupId>
 			<artifactId>jakarta-regexp</artifactId>
@@ -186,7 +186,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.4-1201-jdbc41</version>
+			<version>42.3.1</version>
 			<type>jar</type>
 		</dependency>
 		<dependency>
@@ -258,9 +258,13 @@
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
 		</dependency>
+        <dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+		</dependency>		
 		<dependency>
 			<groupId>net.sf.ehcache.internal</groupId>
 			<artifactId>ehcache-core</artifactId>
@@ -285,10 +289,22 @@
 		<dependency>
 			<groupId>net.sf.jpf</groupId>
 			<artifactId>jpf-boot</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>annogen</groupId>
+					<artifactId>annogen</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.jpf</groupId>
 			<artifactId>jpf</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>annogen</groupId>
+					<artifactId>annogen</artifactId>
+				</exclusion>
+			</exclusions>			
 		</dependency>
 		<dependency>
 			<groupId>annogen</groupId>
@@ -353,11 +369,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcmail-jdk15on</artifactId>
+			<artifactId>bcmail-jdk16</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
+			<artifactId>bcprov-jdk16</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.tuckey</groupId>
@@ -367,7 +383,6 @@
 		<dependency>
 			<groupId>jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.0.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -393,6 +408,15 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.owasp.esapi</groupId>
+			<artifactId>esapi</artifactId>
+			<version>2.2.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
 		</dependency>
 	</dependencies>
 	<build>
@@ -488,10 +512,7 @@
 									<type>zip</type>
 									<classifier>plugin</classifier>
 									<overWrite>true</overWrite>
-                                    <!--
 									<outputDirectory>${project.build.directory}/${project.build.finalName}/</outputDirectory>
-                                    -->
-                                    <outputDirectory>${project.build.directory}/war/</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -519,7 +540,7 @@
 								<delete dir="target/war/META-INF" />
 								<delete>
 									<fileset dir="target/war/WEB-INF/lib"
-										includes="gwt-user*,smartgwt-skin*,logicaldoc-webapp*,gwtevent*,guava-14*,guava-16*" />
+										includes="gwt-user*,smartgwt-skin*,logicaldoc-webapp*,gwtevent*,guava-14*,guava-16*,log4j-1.*,slf4j-simple*" />
 								</delete>
 								<copy file="src/main/resources/context.properties"
 									tofile="target/war/WEB-INF/classes/context.properties"
@@ -534,6 +555,17 @@
 										<include name="*-plugin.zip" />
 									</fileset>
 								</delete>
+
+								<!-- Remove the manifest file in the bcmail jar to avoid cyclic dependencies, 
+									but after dropping the support to SMBv1 this will be no more required -->
+								<unzip src="target/war/WEB-INF/lib/bcmail-jdk16-1.46.jar"
+									dest="target/war/WEB-INF/lib/bcmail" />
+								<delete dir="target/war/WEB-INF/lib/bcmail/META-INF"
+									quiet="true" />
+								<zip destfile="target/war/WEB-INF/lib/bcmail-jdk16-1.46.jar"
+									basedir="target/war/WEB-INF/lib/bcmail" />
+								<delete dir="target/war/WEB-INF/lib/bcmail" quiet="true" />
+
 								<zip
 									destfile="target/${project.artifactId}-${project.version}.war"
 									basedir="target/war" />

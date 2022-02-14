@@ -1,6 +1,5 @@
 package com.logicaldoc.gui.frontend.client.workflow.designer;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 

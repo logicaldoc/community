@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.document;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
@@ -13,6 +12,7 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.beans.GUIReminder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -24,9 +24,8 @@ import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.DropSpotPopup;
-import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.logicaldoc.gui.frontend.client.calendar.CalendarEventDialog;
-import com.logicaldoc.gui.frontend.client.document.form.AddForm;
+import com.logicaldoc.gui.frontend.client.document.form.AddDocumentUsingForm;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.signature.SignatureDialog;
 import com.logicaldoc.gui.frontend.client.document.stamp.StampDialog;
@@ -108,7 +107,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	private DocumentToolbar() {
 		setWidth100();
 
-		GUIFolder folder = Session.get().getCurrentFolder();
+		GUIFolder folder = FolderController.get().getCurrentFolder();
 		boolean downloadEnabled = folder != null && folder.isDownload();
 		boolean writeEnabled = folder != null && folder.isWrite();
 		boolean signEnabled = folder != null && folder.hasPermission(Constants.PERMISSION_SIGN);
@@ -123,11 +122,11 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (Session.get().getCurrentFolder() != null)
-					FolderNavigator.get().selectFolder(Session.get().getCurrentFolder().getId());
+				if (FolderController.get().getCurrentFolder() != null)
+					FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 			}
 		});
-		refresh.setDisabled(Session.get().getCurrentFolder() == null);
+		refresh.setDisabled(FolderController.get().getCurrentFolder() == null);
 		addButton(refresh);
 		addSeparator();
 
@@ -142,7 +141,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				if (selection.length == 1) {
 					WindowUtils.openUrl(Util.downloadURL(selection[0]));
 				} else {
-					String url = Util.contextPath() + "zip-export?folderId=" + Session.get().getCurrentFolder().getId();
+					String url = Util.contextPath() + "zip-export?folderId=" + FolderController.get().getCurrentFolder().getId();
 					for (long id : selection)
 						url += "&docId=" + Long.toString(id);
 					WindowUtils.openUrl(url);
@@ -164,7 +163,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 					String url = Util.contextPath() + "convertpdf?open=true&docId=";
 					for (long id : selection)
 						url += Long.toString(id) + ",";
-					WindowUtils.openUrl(url, "_blank");
+					Util.download(url);
 				}
 			}
 		});
@@ -190,7 +189,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		addForm.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				AddForm dialog = new AddForm();
+				AddDocumentUsingForm dialog = new AddDocumentUsingForm();
 				dialog.show();
 				event.cancel();
 			}
@@ -268,6 +267,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				calEvent.setDocuments(docs);
 				calEvent.setTitle(Util.getBaseName(docs[0].getFileName()));
 				calEvent.setType(docs[0].getTemplate());
+				calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
 				CalendarEventDialog eventDialog = new CalendarEventDialog(calEvent, null);
 				eventDialog.show();
 			}
@@ -282,20 +282,20 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				DocumentsPanel.get().refresh(DocumentsGrid.MODE_LIST);
 			}
 		});
-		list.setDisabled(Session.get().getCurrentFolder() == null);
+		list.setDisabled(FolderController.get().getCurrentFolder() == null);
 
 		gallery.setActionType(SelectionType.RADIO);
 		gallery.setRadioGroup("mode");
 		gallery.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (Session.get().getCurrentFolder() != null)
+				if (FolderController.get().getCurrentFolder() != null)
 					CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_GALLERY);
 				DocumentsPanel.get().refresh(DocumentsGrid.MODE_GALLERY);
 			}
 		});
 		gallery.setDisabled(
-				Session.get().getCurrentFolder() == null || !Session.get().getConfigAsBoolean("gui.galleryenabled"));
+				FolderController.get().getCurrentFolder() == null || !Session.get().getConfigAsBoolean("gui.galleryenabled"));
 		gallery.setVisible(Session.get().getConfigAsBoolean("gui.galleryenabled"));
 
 		int mode = DocumentsGrid.MODE_LIST;
@@ -352,7 +352,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			}
 		}
 
-		if (Feature.visible(Feature.SCAN)) {
+		if (Feature.visible(Feature.SCAN) && Menu.enabled(Menu.SCAN)) {
 			addButton(scan);
 			if (!Feature.enabled(Feature.SCAN)) {
 				scan.setDisabled(true);
@@ -374,10 +374,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			public void onClick(ClickEvent event) {
 				if (document == null)
 					return;
-
-				WindowUtils.openUrl("ldedit:" + GWT.getHostPageBaseURL() + "ldedit?action=edit&sid="
-						+ Session.get().getSid() + "&docId=" + document.getId());
-				ToastNotification.showNotification(I18N.message("officeaddinhintlauncher"));
+				Util.openEditWithOffice(document.getId());
 			}
 		});
 
@@ -388,7 +385,9 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				if (grid.getSelectedCount() == 0)
 					return;
 
-				UpdateDialog dialog = new UpdateDialog(grid.getSelectedIds(), null, UpdateDialog.CONTEXT_UPDATE, false);
+				GUIFolder currentFolder = FolderController.get().getCurrentFolder();
+				GUIDocument metadata=currentFolder.newDocument();			
+				UpdateDialog dialog = new UpdateDialog(grid.getSelectedIds(), metadata, UpdateDialog.CONTEXT_UPDATE, false);
 				dialog.show();
 			}
 		});
@@ -593,7 +592,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	public void update(final GUIDocument document, GUIFolder folder) {
 		try {
 			if (folder == null)
-				folder = Session.get().getCurrentFolder();
+				folder = FolderController.get().getCurrentFolder();
 			boolean downloadEnabled = folder != null && folder.isDownload();
 			boolean writeEnabled = folder != null && folder.isWrite();
 			boolean signEnabled = folder != null && folder.hasPermission(Constants.PERMISSION_SIGN);
@@ -710,6 +709,16 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	@Override
 	public void onFolderMoved(GUIFolder folder) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onFolderBeginEditing(GUIFolder folder) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onFolderCancelEditing(GUIFolder folder) {
 		// Nothing to do
 	}
 

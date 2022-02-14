@@ -35,5 +35,6 @@
         <property name="ip" type="string" column="ld_ip" length="255" />
         <property name="geolocation" type="string" column="ld_geolocation" length="255" />
         <property name="device" type="string" column="ld_device" length="255" />
+        <property name="color" type="string" column="ld_color" length="255" />
 	</class>
 </hibernate-mapping>

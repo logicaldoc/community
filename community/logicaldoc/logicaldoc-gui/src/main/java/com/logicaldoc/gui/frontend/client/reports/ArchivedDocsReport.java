@@ -1,25 +1,25 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.ArchivedDocsDS;
-import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -33,7 +33,9 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.form.fields.IntegerItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -57,7 +59,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 
 	private FolderSelector folderSelector;
 
-	private IntegerItem max;
+	private SpinnerItem max;
 
 	public ArchivedDocsReport() {
 		super("archiveddocs");
@@ -70,10 +72,17 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 
-		max = ItemFactory.newValidateIntegerItem("max", "", 100, 1, null);
+		max = ItemFactory.newSpinnerItem("max", "", 100, 5, null);
 		max.setHint(I18N.message("elements"));
+		max.setStep(10);
 		max.setShowTitle(false);
-		max.setWidth(50);
+		max.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				refresh();
+			}
+		});
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
@@ -130,24 +139,19 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		// Prepare a panel containing a title and the documents list
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		ListGridField id = new ListGridField("id", I18N.message("id"));
+		ListGridField id = new ColoredListGridField("id", I18N.message("id"));
 		id.setHidden(true);
 		id.setCanGroupBy(false);
 
-		ListGridField size = new ListGridField("size", I18N.message("size"), 70);
-		size.setAlign(Alignment.RIGHT);
-		size.setType(ListGridFieldType.FLOAT);
-		size.setCellFormatter(new FileSizeCellFormatter());
+		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 		size.setCanFilter(false);
 		size.setCanGroupBy(false);
 
-		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
-		version.setAlign(Alignment.CENTER);
+		ListGridField version = new VersionListGridField();
 		version.setCanFilter(false);
 		version.setCanGroupBy(false);
 
-		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 55);
-		fileVersion.setAlign(Alignment.CENTER);
+		ListGridField fileVersion = new VersionListGridField("fileVersion", "fileversion");
 		fileVersion.setCanFilter(false);
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);
@@ -159,12 +163,12 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 
 		ListGridField created = new DateListGridField("created", "createdon");
 
-		ListGridField folder = new ListGridField("folder", I18N.message("folder"), 200);
+		ListGridField folder = new ColoredListGridField("folder", I18N.message("folder"), 200);
 		folder.setAlign(Alignment.CENTER);
 		folder.setCanFilter(true);
 		folder.setCanGroupBy(true);
 
-		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
+		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setHidden(true);
 		customId.setCanGroupBy(false);
@@ -173,7 +177,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		filename.setWidth(200);
 		filename.setCanFilter(true);
 
-		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
+		ListGridField type = new ColoredListGridField("type", I18N.message("type"), 55);
 		type.setType(ListGridFieldType.TEXT);
 		type.setAlign(Alignment.CENTER);
 		type.setHidden(true);
@@ -202,8 +206,7 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 		list.addDoubleClickHandler(new DoubleClickHandler() {
 			@Override
 			public void onDoubleClick(DoubleClickEvent event) {
-				Long id = list.getSelectedRecord().getAttributeAsLong("id");
-				WindowUtils.openUrl(Util.downloadURL(id));
+				DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null);
 			}
 		});
 
@@ -250,13 +253,13 @@ public class ArchivedDocsReport extends AdminPanel implements FolderChangeListen
 				});
 			}
 		});
+		preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 		MenuItem download = new MenuItem();
 		download.setTitle(I18N.message("download"));
 		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				String id = list.getSelectedRecord().getAttribute("id");
-				WindowUtils.openUrl(GWT.getHostPageBaseURL() + "download?docId=" + id);
+				DocUtil.download(list.getSelectedRecord().getAttributeAsLong("id"), null);
 			}
 		});
 

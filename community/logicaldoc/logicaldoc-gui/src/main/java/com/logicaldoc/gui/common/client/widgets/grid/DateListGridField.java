@@ -5,8 +5,6 @@ import java.util.Date;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.widgets.grid.CellFormatter;
-import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
@@ -15,7 +13,7 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.6.1
  */
-public class DateListGridField extends ListGridField {
+public class DateListGridField extends ColoredListGridField {
 
 	public DateListGridField(String name, String title, int format) {
 		super(name, I18N.message(title));
@@ -42,7 +40,7 @@ public class DateListGridField extends ListGridField {
 	 * @author Marco Meschieri - LogicalDOC
 	 * @since 6.0
 	 */
-	public class DateCellFormatter implements CellFormatter {
+	public class DateCellFormatter extends ColoredCellFormatter {
 
 		public final static int FORMAT_DEFAULT = 0;
 
@@ -54,12 +52,21 @@ public class DateListGridField extends ListGridField {
 
 		@Override
 		public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+			if(value==null)
+				return "";
+			
+			String val = null;
 			if (format == FORMAT_SHORT)
-				return I18N.formatDateShort((Date) value);
+				val = I18N.formatDateShort((Date) value);
 			else if (format == FORMAT_LONG)
-				return I18N.formatDateLong((Date) value);
+				val = I18N.formatDateLong((Date) value);
 			else
-				return I18N.formatDate((Date) value);
+				val = I18N.formatDate((Date) value);
+			
+			if (val != null)
+				return super.format(val, record, rowNum, colNum);
+			else
+				return "";
 		}
 
 		public DateCellFormatter(int format) {

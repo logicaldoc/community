@@ -27,6 +27,7 @@ import com.logicaldoc.core.security.UserGroup;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.UserListener;
 import com.logicaldoc.core.security.UserListenerManager;
+import com.logicaldoc.core.security.WorkingTime;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.util.Context;
@@ -60,11 +61,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 	public static boolean ignoreCaseLogin() {
 		return "true".equals(Context.get().getProperties().getProperty("login.ignorecase"));
-	}
-
-	@Override
-	public boolean delete(long userId, int code) {
-		return delete(userId, null);
 	}
 
 	@Override
@@ -152,6 +148,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		boolean result = true;
 		boolean newUser = user.getId() == 0;
 		boolean passwordChanged = false;
+		boolean enabledChanged = false;
 
 		try {
 			String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
@@ -185,8 +182,29 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			for (UserListener listener : userListenerManager.getListeners())
 				listener.beforeStore(user, transaction, dictionary);
 
-			if (newUser)
+			if (newUser) {
 				user.setCreation(new Date());
+				user.setLastEnabled(user.getCreation());
+			} else {
+				int currentEnabled = queryForInt("select ld_enabled from ld_user where ld_id=" + user.getId());
+				enabledChanged = currentEnabled != user.getEnabled();
+
+				// Record the last enabled date in case the user is getting
+				// enabled
+				if (enabledChanged && user.getEnabled() == 1)
+					user.setLastEnabled(new Date());
+
+				// In any case the last enabled must at least equal the creation
+				// date
+				if (user.getLastEnabled() == null)
+					user.setLastEnabled(user.getCreation());
+
+				user.setPasswordExpired(isPasswordExpired(user) ? 1 : 0);
+			}
+
+			if ("admin".equals(user.getUsername()) && user.getPassword() == null)
+				throw new Exception(
+						String.format("Trying to alter the %s user with null password", user.getUsername()));
 
 			saveOrUpdate(user);
 
@@ -219,7 +237,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			}
 
 			// Save the password history to track the password change
-			if (passwordChanged && user.getPasswordExpired() == 0) {
+			if (passwordChanged) {
 				PasswordHistory pHist = new PasswordHistory();
 				pHist.setDate(transaction != null ? transaction.getDate() : new Date());
 				pHist.setUserId(user.getId());
@@ -278,10 +296,24 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			}
 
 			if (user.isReadonly()) {
-				user=findById(user.getId());
+				user = findById(user.getId());
 				initialize(user);
 				for (Group group : user.getGroups())
 					groupDAO.fixGuestPermissions(group);
+			}
+
+			if (enabledChanged && (transaction == null || (!transaction.getEvent().equals(UserEvent.DISABLED.toString())
+					&& !transaction.getEvent().equals(UserEvent.ENABLED.toString())))) {
+				UserHistory enabledOrDisabledHistory = new UserHistory();
+				if (transaction != null)
+					enabledOrDisabledHistory = transaction.clone();
+				else {
+					enabledOrDisabledHistory.setUser(user);
+				}
+				enabledOrDisabledHistory.setEvent(
+						user.getEnabled() == 1 ? UserEvent.ENABLED.toString() : UserEvent.DISABLED.toString());
+				enabledOrDisabledHistory.setComment(null);
+				saveUserHistory(user, enabledOrDisabledHistory);
 			}
 		} catch (Throwable e) {
 			if (e instanceof AuthenticationException) {
@@ -314,7 +346,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				return false;
 
 			// Check the password match
-			if (user.getPassword()==null || !user.getPassword().equals(CryptUtil.cryptString(password)))
+			if (user.getPassword() == null || !user.getPassword().equals(CryptUtil.cryptString(password)))
 				result = false;
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -353,50 +385,124 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		return true;
 	}
 
+	private boolean isPasswordExpired(User user) {
+		if (user == null)
+			return false;
+
+		if (user.getPasswordExpired() == 1)
+			return true;
+
+		String tenantName = ((TenantDAO) Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
+		int passwordTtl = config.getInt(tenantName + ".password.ttl", 90);
+		if (passwordTtl <= 0)
+			return false;
+
+		// Check if the password is expired
+		if (user.getPasswordExpires() == 1) {
+			Date lastChange = user.getPasswordChanged();
+			if (lastChange == null)
+				return false;
+			Calendar calendar = new GregorianCalendar();
+			calendar.setTime(lastChange);
+			calendar.set(Calendar.MILLISECOND, 0);
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.HOUR, 0);
+			lastChange = calendar.getTime();
+
+			calendar.setTime(new Date());
+			calendar.set(Calendar.MILLISECOND, 0);
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MINUTE, 0);
+			calendar.set(Calendar.HOUR, 0);
+
+			calendar.add(Calendar.DAY_OF_MONTH, -passwordTtl);
+			Date date = calendar.getTime();
+
+			return (lastChange.before(date));
+		} else
+			return false;
+	}
+
 	@Override
 	public boolean isPasswordExpired(String username) {
 		try {
 			User user = findByUsernameIgnoreCase(username);
-			if (user == null)
-				return false;
-
-			if (user.getPasswordExpired() == 1)
-				return true;
-
-			String tenantName = ((TenantDAO) Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
-			int passwordTtl = config.getInt(tenantName + ".password.ttl", 90);
-			if (passwordTtl <= 0)
-				return false;
-
-			// Check if the password is expired
-			if (user.getPasswordExpires() == 1) {
-				Date lastChange = user.getPasswordChanged();
-				if (lastChange == null)
-					return false;
-				Calendar calendar = new GregorianCalendar();
-				calendar.setTime(lastChange);
-				calendar.set(Calendar.MILLISECOND, 0);
-				calendar.set(Calendar.SECOND, 0);
-				calendar.set(Calendar.MINUTE, 0);
-				calendar.set(Calendar.HOUR, 0);
-				lastChange = calendar.getTime();
-
-				calendar.setTime(new Date());
-				calendar.set(Calendar.MILLISECOND, 0);
-				calendar.set(Calendar.SECOND, 0);
-				calendar.set(Calendar.MINUTE, 0);
-				calendar.set(Calendar.HOUR, 0);
-
-				calendar.add(Calendar.DAY_OF_MONTH, -passwordTtl);
-				Date date = calendar.getTime();
-
-				return (lastChange.before(date));
-			}
-		} catch (Exception e) {
+			return isPasswordExpired(user);
+		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			return true;
 		}
-		return false;
+	}
+
+	private boolean isInactive(User user) throws PersistenceException {
+		if (user == null)
+			return false;
+
+		if (user.getEnabled() == 0)
+			return true;
+
+		String tenantName = ((TenantDAO) Context.get().getBean(TenantDAO.class)).getTenantName(user.getTenantId());
+		int maxInactiveDays = config.getInt(tenantName + ".security.user.maxinactivity", -1);
+		if (user.getMaxInactivity() != null)
+			maxInactiveDays = user.getMaxInactivity();
+		if (maxInactiveDays <= 0)
+			return false;
+
+		log.info("Checking if the user {} has interactions in the last {} days", user.getUsername(), maxInactiveDays);
+
+		StringBuffer sb = new StringBuffer(
+				"select max(ld_date) from ld_history where ld_deleted=0 and ld_userid=" + user.getId());
+		sb.append(
+				" UNION select max(ld_date) from ld_user_history where ld_deleted=0 and not ld_event in ('event.user.updated', 'event.user.disabled', 'event.user.timeout', 'event.user.login.failed', 'event.user.deleted', 'event.user.messagereceived') and ld_userid="
+						+ user.getId());
+		sb.append(" UNION select max(ld_date) from ld_folder_history where ld_deleted=0 and ld_userid=" + user.getId()
+				+ " order by 1 desc");
+		List<Date> interactions = (List<Date>) queryForList(sb.toString(), Date.class);
+		Date lastInteraction = null;
+		if (!interactions.isEmpty())
+			lastInteraction = interactions.get(0);
+
+		// Perhaps the user never had interactions until now so we use his
+		// creation date as last interaction
+		if (lastInteraction == null)
+			lastInteraction = user.getCreation();
+
+		// In case the user has been enabled again after being disabled for
+		// inactivity we should consider the last enabled date as last
+		// interaction
+		if (user.getLastEnabled() != null && user.getLastEnabled().after(lastInteraction))
+			lastInteraction = user.getLastEnabled();
+
+		Calendar calendar = new GregorianCalendar();
+		calendar.setTime(lastInteraction);
+		calendar.set(Calendar.MILLISECOND, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.HOUR, 0);
+		lastInteraction = calendar.getTime();
+
+		calendar.setTime(new Date());
+		calendar.set(Calendar.MILLISECOND, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.HOUR, 0);
+
+		calendar.add(Calendar.DAY_OF_MONTH, -maxInactiveDays);
+		Date date = calendar.getTime();
+
+		return (lastInteraction.before(date));
+	}
+
+	@Override
+	public boolean isInactive(String username) {
+		try {
+			User user = findByUsernameIgnoreCase(username);
+			return isInactive(user);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			return true;
+		}
 	}
 
 	@Override
@@ -423,6 +529,11 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			log.error(e.getMessage(), e);
 			return 0;
 		}
+	}
+
+	@Override
+	public boolean delete(long userId, int code) {
+		return delete(userId, null);
 	}
 
 	@Override
@@ -501,6 +612,9 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			return;
 
 		refresh(user);
+
+		for (WorkingTime wt : user.getWorkingTimes())
+			wt.hashCode();
 
 		List<Long> groupIds = new ArrayList<Long>();
 		try {

@@ -14,7 +14,7 @@ public class GUIEmailSettings implements Serializable {
 
 	public static final String SECURITY_NONE = "0";
 
-	public static final String SECURITY_TLS_IF_AVAILABLE = "1";
+	public static final String SECURITY_STARTTLS = "1";
 
 	public static final String SECURITY_TLS = "2";
 

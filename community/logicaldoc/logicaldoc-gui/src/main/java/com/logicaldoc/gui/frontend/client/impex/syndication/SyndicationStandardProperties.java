@@ -13,7 +13,7 @@ import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.DateItem;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -86,10 +86,23 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		remoteUrl.setWidth(250);
 		remoteUrl.setRequired(true);
 
-		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username", syndication.getUsername());
+		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "username",
+				syndication.getUsername());
 		username.addChangedHandler(changedHandler);
 
-		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", syndication.getPassword());
+		/*
+		 * Two invisible fields to 'mask' the real credentials to the browser
+		 * and prevent it to auto-fill the username and password we really use.
+		 */
+		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
+				syndication.getUsername());
+		fakeUsername.setCellStyle("nodisplay");
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", "password_hidden",
+				syndication.getPassword());
+		hiddenPassword.setCellStyle("nodisplay");
+		hiddenPassword.addChangedHandler(changedHandler);
+		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),
+				syndication.getPassword(), hiddenPassword, changedHandler);
 		password.addChangedHandler(changedHandler);
 
 		TextItem include = ItemFactory.newTextItem("include", "include", syndication.getIncludes());
@@ -113,6 +126,14 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		batch.setMin(1);
 		batch.setStep(1000);
 		batch.addChangedHandler(changedHandler);
+
+		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", "timeout", syndication.getTimeout());
+		timeout.setRequired(true);
+		timeout.setWidth(100);
+		timeout.setMin(60);
+		timeout.setStep(10);
+		timeout.setHint(I18N.message("seconds").toLowerCase());
+		timeout.addChangedHandler(changedHandler);
 
 		final DateItem startDate = ItemFactory.newDateItem("startdate", "earliestdate");
 		startDate.addChangedHandler(changedHandler);
@@ -138,19 +159,8 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 		replicateCustomId.setValue(syndication.getReplicateCustomId() == 1 ? "yes" : "no");
 		replicateCustomId.addChangedHandler(changedHandler);
 
-		/*
-		 * Two invisible fields to 'mask' the real credentials to the browser
-		 * and prevent it to auto-fill the username and password we really use.
-		 */
-		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
-				syndication.getUsername());
-		fakeUsername.setCellStyle("nodisplay");
-		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
-				syndication.getPassword());
-		fakePassword.setCellStyle("nodisplay");
-
-		form.setItems(name, sourceSelector, remoteUrl, targetPath, fakeUsername, fakePassword, username, password,
-				include, exclude, maxPacketSize, batch, startDate, replicateCustomId);
+		form.setItems(name, sourceSelector, remoteUrl, targetPath, fakeUsername, hiddenPassword, username, password,
+				include, exclude, maxPacketSize, batch, timeout, startDate, replicateCustomId);
 
 		formsContainer.addMember(form);
 
@@ -169,14 +179,23 @@ public class SyndicationStandardProperties extends SyndicationDetailsTab {
 			syndication.setSourceFolder(sourceSelector.getFolder());
 			syndication.setIncludes((String) values.get("include"));
 			syndication.setExcludes((String) values.get("exclude"));
+			syndication.setPassword((String) values.get("password_hidden"));
+
 			if (values.get("maxPacketSize") instanceof Long)
 				syndication.setMaxPacketSize((Long) values.get("maxPacketSize"));
 			else
 				syndication.setMaxPacketSize(Long.parseLong(values.get("maxPacketSize").toString()));
+
 			if (values.get("batch") instanceof Long)
 				syndication.setBatch((Long) values.get("batch"));
 			else
 				syndication.setBatch(Long.parseLong(values.get("batch").toString()));
+
+			if (values.get("timeout") instanceof Integer)
+				syndication.setTimeout((Integer) values.get("timeout"));
+			else
+				syndication.setTimeout(Integer.parseInt(values.get("timeout").toString()));
+
 			syndication.setStartDate((Date) values.get("startdate"));
 			syndication.setReplicateCustomId("yes".equals(values.get("replicatecustomid")) ? 1 : 0);
 		}

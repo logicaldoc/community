@@ -14,9 +14,11 @@ import org.apache.commons.io.FileUtils;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +119,23 @@ public class XMLBean {
 	}
 
 	/**
+	 * Finds an element using an XPATH expression
+	 * 
+	 * @param xpathExpression the expression to evaluate
+	 * 
+	 * @return the found element
+	 */
+	public Element findElement(String xpathExpression) {
+		try {
+			XPath xpath = XPath.newInstance(xpathExpression);
+			return (Element) xpath.selectSingleNode(doc);
+		} catch (JDOMException e) {
+			log.error(e.getMessage());
+		}
+		return null;
+	}
+
+	/**
 	 * Returns the root element.
 	 * 
 	 * @return the root element
@@ -133,7 +152,6 @@ public class XMLBean {
 	 * @return the child element
 	 */
 	public Element getChild(String elemname) {
-
 		if (doc == null) {
 			return null;
 		} else {
@@ -158,7 +176,6 @@ public class XMLBean {
 	 * @return Child
 	 */
 	public Element getChild(String elemname, String attribute, String value) {
-
 		if (doc == null) {
 			return null;
 		} else {
@@ -190,7 +207,6 @@ public class XMLBean {
 	 * @return Text of the element.
 	 */
 	public String getText(Element elem) {
-
 		if (doc == null) {
 			return null;
 		} else {
@@ -200,9 +216,8 @@ public class XMLBean {
 
 	public String getText(String elemname, String attrname, String attrvalue) {
 		Element elem = getChild(elemname, attrname, attrvalue);
-
 		return elem.getText();
-	} // end method getText
+	}
 
 	/**
 	 * This method returns the text of a child element characterized by
@@ -217,7 +232,6 @@ public class XMLBean {
 	public String getChildText(String elemname, String childname, String attribute, String value) {
 		Element elem = getChild(elemname, attribute, value);
 		elem = elem.getChild(childname);
-
 		return getText(elem);
 	}
 
@@ -234,9 +248,9 @@ public class XMLBean {
 	 * @return the children's text
 	 */
 	@SuppressWarnings("rawtypes")
-	public String getAllChildText(String elemname, String attribute, String value, String separator1, String separator2) {
+	public String getAllChildText(String elemname, String attribute, String value, String separator1,
+			String separator2) {
 		String result = "";
-
 		try {
 			Element elem = getChild(elemname, attribute, value);
 			List list = elem.getChildren();
@@ -265,7 +279,6 @@ public class XMLBean {
 	 * @return Attribute
 	 */
 	public Attribute getAttribute(Element elem, String attrib) {
-
 		if (doc == null) {
 			return null;
 		} else {
@@ -352,7 +365,6 @@ public class XMLBean {
 	 */
 	@SuppressWarnings("rawtypes")
 	public List getRootChild() {
-
 		if (doc == null) {
 			return null;
 		} else {
@@ -379,13 +391,12 @@ public class XMLBean {
 	/**
 	 * Returns a list of all elements with the given element.
 	 * 
-	 * @param elemname  name of the element
+	 * @param elemname name of the element
 	 * 
 	 * @return list of the children elements
 	 */
 	@SuppressWarnings("rawtypes")
 	public List getAllChild(String elemname) {
-
 		if (doc == null) {
 			return null;
 		} else {

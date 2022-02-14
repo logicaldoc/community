@@ -27,6 +27,7 @@ import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.JSOHelper;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
@@ -67,9 +68,25 @@ public abstract class FolderSearchForm extends VLayout {
 		setMargin(3);
 		setMembersMargin(3);
 		setAlign(Alignment.LEFT);
-
 		setOverflow(Overflow.AUTO);
 
+		addResizedHandler(new ResizedHandler() {
+
+			@Override
+			public void onResized(ResizedEvent event) {
+				if (conditionsLayout.getMembers() != null)
+					for (Canvas row : conditionsLayout.getMembers()) {
+						row.setWidth(FolderSearchForm.this.getWidth() - 10);
+					}
+			}
+		});
+	}
+
+	private void initGUI() {
+		vm.clearValues();
+		if (getMembers() != null)
+			removeMembers(getMembers());
+		
 		CheckboxItem subfolders = new CheckboxItem("subfolders", I18N.message("searchinsubfolders2"));
 		subfolders.setEndRow(true);
 
@@ -78,16 +95,16 @@ public abstract class FolderSearchForm extends VLayout {
 		folder.setEndRow(true);
 		folder.setWidth(160);
 		folder.addFolderChangeListener(new FolderChangeListener() {
-			
+
 			@Override
 			public void onChanged(GUIFolder folder) {
-				if(folder!=null)
+				if (folder != null)
 					subfolders.setValue(true);
 				else
 					subfolders.setValue(false);
 			}
 		});
-		
+
 		final DynamicForm folderForm = new DynamicForm();
 		folderForm.setValuesManager(vm);
 		folderForm.setTitleOrientation(TitleOrientation.TOP);
@@ -96,6 +113,7 @@ public abstract class FolderSearchForm extends VLayout {
 
 		IButton search = new IButton(I18N.message("search"));
 		search.setAutoFit(true);
+		search.setMargin(8);
 		search.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
 			@Override
@@ -104,12 +122,27 @@ public abstract class FolderSearchForm extends VLayout {
 			}
 		});
 
-		HLayout topLayout = new HLayout(80);
-		topLayout.setMembers(folderForm, search);
-		topLayout.setTop(3);
-		topLayout.setHeight(15);
-		addMember(topLayout);
+		IButton reset = new IButton(I18N.message("reset"));
+		reset.setMargin(8);
+		reset.setAutoFit(true);
+		reset.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
+			@Override
+			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+				initGUI();
+			}
+		});
+
+		HLayout spacer = new HLayout();
+		spacer.setMinWidth(30);
+		
+		HLayout topLayout = new HLayout();
+		topLayout.setHeight(15);
+		topLayout.setWidth(1);
+		topLayout.setMembersMargin(3);
+		topLayout.setAlign(VerticalAlignment.CENTER);
+		topLayout.setMembers(folderForm, spacer, search, reset);
+		addMember(topLayout);
 		final DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
 		form.setTitleOrientation(TitleOrientation.TOP);
@@ -178,17 +211,6 @@ public abstract class FolderSearchForm extends VLayout {
 		conditionsLayout = new VLayout(3);
 		addMember(conditionsLayout);
 		addNameCondition();
-
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				if (conditionsLayout.getMembers() != null)
-					for (Canvas row : conditionsLayout.getMembers()) {
-						row.setWidth(FolderSearchForm.this.getWidth() - 10);
-					}
-			}
-		});
 	}
 
 	public void removeCondition(ParameterConditionRow criteria) {
@@ -355,4 +377,9 @@ public abstract class FolderSearchForm extends VLayout {
 	 * @param options The filter options
 	 */
 	abstract protected void search(GUISearchOptions options);
+
+	@Override
+	protected void onDraw() {
+		initGUI();
+	}
 }

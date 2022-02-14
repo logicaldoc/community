@@ -56,10 +56,6 @@ public class EventsCalendar extends Calendar {
 		else
 			setChosenDate(new Date());
 
-		// this setting setting corrupts tha Calendar if there is high event
-		// frequency(daily events)
-		// setCurrentViewName(choosenView);
-
 		addEventClickHandler(new EventClickHandler() {
 
 			@Override

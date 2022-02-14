@@ -33,7 +33,7 @@ public class TagsSettingsPanel extends VLayout {
 	private ValuesManager vm = new ValuesManager();
 
 	private GUIParameter[] settings;
-	
+
 	public TagsSettingsPanel(GUIParameter[] settings) {
 		this.settings = settings;
 		setMembersMargin(5);
@@ -57,6 +57,11 @@ public class TagsSettingsPanel extends VLayout {
 		SpinnerItem minsize = ItemFactory.newSpinnerItem("minsize", I18N.message("minsize"), (Long) null);
 		minsize.setRequired(true);
 
+		SpinnerItem selectElements = ItemFactory.newSpinnerItem("selectElements", I18N.message("tagselectelements"),
+				(Long) null);
+		selectElements.setRequired(true);
+		selectElements.setWrapTitle(false);
+
 		SpinnerItem cloudElements = ItemFactory.newSpinnerItem("cloudElements", I18N.message("tagcloudelements"),
 				(Long) null);
 		cloudElements.setRequired(true);
@@ -66,7 +71,7 @@ public class TagsSettingsPanel extends VLayout {
 		vocabulary.setRequired(true);
 		vocabulary.setWidth(300);
 
-		parametersForm.setItems(mode, maxsize, minsize, cloudElements, vocabulary);
+		parametersForm.setItems(mode, maxsize, minsize, selectElements, cloudElements, vocabulary);
 		addMember(parametersForm);
 
 		for (GUIParameter p : settings) {
@@ -80,6 +85,8 @@ public class TagsSettingsPanel extends VLayout {
 				vocabulary.setValue(p.getValue());
 			if (p.getName().endsWith("tagcloud.maxtags"))
 				cloudElements.setValue(p.getValue());
+			if (p.getName().endsWith("tag.select.maxtags"))
+				selectElements.setValue(p.getValue());
 		}
 
 		IButton save = new IButton();
@@ -92,16 +99,18 @@ public class TagsSettingsPanel extends VLayout {
 				if (vm.validate()) {
 					List<GUIParameter> params = new ArrayList<GUIParameter>();
 
-					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.mode", values.get("mode")
-							.toString()));
-					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.maxsize", values.get("maxsize")
-							.toString()));
-					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.minsize", values.get("minsize")
-							.toString()));
-					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.vocabulary", values.get(
-							"vocabulary").toString()));
-					params.add(new GUIParameter(Session.get().getTenantName() + ".tagcloud.maxtags", values.get(
-							"cloudElements").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.mode",
+							values.get("mode").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.maxsize",
+							values.get("maxsize").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.minsize",
+							values.get("minsize").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.tag.vocabulary",
+							values.get("vocabulary").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".tagcloud.maxtags",
+							values.get("cloudElements").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".tag.select.maxtags",
+							values.get("selectElements").toString()));
 
 					SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]),
 							new AsyncCallback<Void>() {
@@ -113,24 +122,21 @@ public class TagsSettingsPanel extends VLayout {
 
 								@Override
 								public void onSuccess(Void ret) {
-									Session.get()
-											.getInfo()
-											.setConfig(Session.get().getTenantName() + ".tag.mode",
-													values.get("mode").toString());
-									Session.get()
-											.getInfo()
-											.setConfig(Session.get().getTenantName() + ".tag.maxsize",
-													values.get("maxsize").toString());
+									Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.mode",
+											values.get("mode").toString());
+									Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.maxsize",
+											values.get("maxsize").toString());
 
-									Session.get()
-											.getInfo()
-											.setConfig(Session.get().getTenantName() + ".tag.minsize",
-													values.get("minsize").toString());
+									Session.get().getInfo().setConfig(Session.get().getTenantName() + ".tag.minsize",
+											values.get("minsize").toString());
 
-									Session.get()
-											.getInfo()
-											.setConfig(Session.get().getTenantName() + ".tagcloud.maxtags",
-													values.get("cloudElements").toString());
+									Session.get().getInfo().setConfig(
+											Session.get().getTenantName() + ".tagcloud.maxtags",
+											values.get("cloudElements").toString());
+
+									Session.get().getInfo().setConfig(
+											Session.get().getTenantName() + ".tag.select.maxtags",
+											values.get("selectElements").toString());
 
 									GuiLog.info(I18N.message("settingssaved"), null);
 								}

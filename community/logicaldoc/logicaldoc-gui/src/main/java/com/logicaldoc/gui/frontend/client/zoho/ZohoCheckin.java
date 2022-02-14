@@ -1,13 +1,12 @@
 package com.logicaldoc.gui.frontend.client.zoho;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.ZohoService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
@@ -41,7 +40,7 @@ public class ZohoCheckin extends Window {
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setMembersMargin(2);
+		setPadding(2);
 
 		DynamicForm form = new DynamicForm();
 		vm = new ValuesManager();
@@ -73,23 +72,23 @@ public class ZohoCheckin extends Window {
 	public void onCheckin(final GUIDocument document, final ZohoEditor parentDialog) {
 		if (!vm.validate())
 			return;
-		ContactingServer.get().show();
+		LD.contactingServer();
 		ZohoService.Instance.get().checkin(document.getId(), vm.getValueAsString("comment"),
 				"true".equals(vm.getValueAsString("majorversion")), new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 						destroy();
 					}
 
 					@Override
 					public void onSuccess(GUIDocument result) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						destroy();
 						parentDialog.destroy();
 						DocumentController.get().modified(result);
-						Session.get().setCurrentDocument(result);
+						DocumentController.get().setCurrentDocument(result);
 					}
 				});
 	}

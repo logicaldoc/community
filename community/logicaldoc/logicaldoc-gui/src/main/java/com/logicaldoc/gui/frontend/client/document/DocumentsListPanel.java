@@ -6,8 +6,9 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.observer.DocumentController;
+import com.logicaldoc.gui.common.client.observer.FolderController;
+import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
 import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
@@ -86,20 +87,20 @@ public class DocumentsListPanel extends VLayout {
 				GUIDocument doc = grid.getSelectedDocument();
 				long id = doc.getId();
 
-				if (Session.get().getCurrentFolder().isDownload()
+				if (FolderController.get().getCurrentFolder().isDownload()
 						&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
 					try {
-						WindowUtils.openUrl(Util.downloadURL(id));
+						DocUtil.download(id, null);
 					} catch (Throwable t) {
 
 					}
 				else {
 					if (doc.getDocRef() != null) {
 						/*
-						 * in case of alias the data servlet inverts the docId
-						 * and the docRef so in order to have the preview to do
-						 * the right security checks we have to restore the
-						 * correct ids
+						 * re the co * in case of alias the data servlet inverts
+						 * the docId and the docRef so in order to have the
+						 * preview to do the right security checks we have to
+						 * restorrect ids
 						 */
 						long aliasId = doc.getDocRef();
 						doc.setDocRef(doc.getId());
@@ -108,7 +109,6 @@ public class DocumentsListPanel extends VLayout {
 					PreviewPopup iv = new PreviewPopup(doc);
 					iv.show();
 				}
-
 				event.cancel();
 			}
 		});
@@ -128,7 +128,7 @@ public class DocumentsListPanel extends VLayout {
 
 							@Override
 							public void onSuccess(GUIDocument doc) {
-								Session.get().setCurrentDocument(doc);
+								DocumentController.get().setCurrentDocument(doc);
 							}
 						});
 			}
@@ -137,7 +137,7 @@ public class DocumentsListPanel extends VLayout {
 		grid.registerCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				Menu contextMenu = new ContextMenu(Session.get().getCurrentFolder(), grid);
+				Menu contextMenu = new ContextMenu(FolderController.get().getCurrentFolder(), grid);
 				contextMenu.showContextMenu();
 				if (event != null)
 					event.cancel();
@@ -153,8 +153,8 @@ public class DocumentsListPanel extends VLayout {
 	public void updateData(GUIFolder folder) {
 		if (grid.getFolder() == null || (grid.getFolder() != null && grid.getFolder().getId() != folder.getId()))
 			grid.loadGridLayout(folder);
-		DocumentsDS dataSource = new DocumentsDS(folder, null, grid.getGridCursor().getPageSize(), grid.getGridCursor().getCurrentPage(), null, false,
-				false,
+		DocumentsDS dataSource = new DocumentsDS(folder, null, grid.getGridCursor().getPageSize(),
+				grid.getGridCursor().getCurrentPage(), null, false, false,
 				(grid instanceof DocumentsListGrid ? DocumentGridUtil.getSortSpec((DocumentsListGrid) grid) : null));
 		grid.fetchNewData(dataSource);
 

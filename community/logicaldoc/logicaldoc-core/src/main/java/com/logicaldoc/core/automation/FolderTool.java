@@ -169,7 +169,8 @@ public class FolderTool {
 	 * Moves a folder into a target folder
 	 * 
 	 * @param folder the folder to move
-	 * @param targetPath the full path of the target folder(if it does not exist it will be created)
+	 * @param targetPath the full path of the target folder(if it does not exist
+	 *        it will be created)
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @throws Exception a generic error happened
@@ -191,17 +192,25 @@ public class FolderTool {
 	 * Copies a folder into another folder
 	 * 
 	 * @param source the folder to copy
-	 * @param targetPath the full path of the target folder(if it does not exist it will be created)
+	 * @param targetPath the full path of the target folder(if it does not exist
+	 *        it will be created)
 	 * @param foldersOnly true if only the folders tree has to be copied; if
 	 *        false, the documents will also be copied
-	 * @param inheritSecurity if true the new folder will 'point' to the parent
-	 *        for the security policies.
+	 * @param securityOption How to assign the security policies to the newly
+	 *        created folders:
+	 *        <ul>
+	 *        <li><b>null</b> or <b>none</b>: empty security policies</li>
+	 *        <li><b>inherit</b>: the new folder will point to the parent for
+	 *        the security policies</li>
+	 *        <li><b>replicate</b>: the new folder will have a copy of the
+	 *        security policies of the source folder</li>
+	 *        </ul>
 	 * @param username the user in whose name the method is run
 	 * @return The new folder created
 	 * 
 	 * @throws Exception a generic error happened
 	 */
-	public Folder copy(Folder source, String targetPath, boolean foldersOnly, boolean inheritSecurity, String username)
+	public Folder copy(Folder source, String targetPath, boolean foldersOnly, String securityOption, String username)
 			throws Exception {
 		User user = new SecurityTool().getUser(username);
 
@@ -213,7 +222,27 @@ public class FolderTool {
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-		return fdao.copy(source, target, foldersOnly, inheritSecurity, transaction);
+		return fdao.copy(source, target, null, foldersOnly, securityOption, transaction);
+	}
+
+	/**
+	 * Merges a folder into another folder
+	 * 
+	 * @param source the folder to merge into the target
+	 * @param target the final container
+	 * @param username the user in whose name the method is run
+	 * 
+	 * @throws Exception a generic error happened
+	 */
+	public void merge(Folder source, Folder target, String username) throws Exception {
+		User user = new SecurityTool().getUser(username);
+
+		FolderHistory transaction = new FolderHistory();
+		transaction.setFolder(source);
+		transaction.setUser(user);
+
+		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		fdao.merge(source, target, transaction);
 	}
 
 	/**

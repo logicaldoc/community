@@ -8,8 +8,8 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -93,7 +93,7 @@ public class StampUsersPanel extends VLayout {
 		userForm.setItems(user);
 		buttons.addMember(userForm);
 
-		AvatarListGridField avatar = new AvatarListGridField();
+		UserListGridField avatar = new UserListGridField();
 		
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);

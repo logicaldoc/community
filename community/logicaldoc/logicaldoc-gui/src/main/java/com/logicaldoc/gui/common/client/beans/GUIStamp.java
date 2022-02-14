@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-public class GUIStamp implements Serializable {
+public class GUIStamp extends GUIExtensibleObject implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private long id = 0L;

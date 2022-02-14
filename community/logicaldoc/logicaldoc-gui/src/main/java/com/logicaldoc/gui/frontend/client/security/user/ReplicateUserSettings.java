@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -58,19 +58,19 @@ public class ReplicateUserSettings extends Window {
 				vm.validate();
 				if (!vm.hasErrors()) {
 					long masterUserId = Long.parseLong(vm.getValueAsString("user"));
-					ContactingServer.get().show();
+					LD.contactingServer();
 					SecurityService.Instance.get().replicateUsersSettings(masterUserId, userIds.toArray(new Long[0]),
 							userInterface.getValueAsBoolean(), groups.getValueAsBoolean(), new AsyncCallback<Void>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void arg0) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.info(I18N.message("userssaved"));
 									destroy();
 									panel.refresh();

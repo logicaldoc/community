@@ -14,6 +14,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.TagService;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
@@ -71,10 +72,10 @@ public class TagsForm extends VLayout {
 	 * @param searchInHits True if the search in hits must be shown
 	 */
 	public TagsForm(final boolean admin, final boolean searchInHits) {
-		setMembersMargin(3);
-		setWidth100();
 		setHeight100();
 		setOverflow(Overflow.AUTO);
+		setMembersMargin(3);
+		setAlign(Alignment.LEFT);
 
 		this.admin = admin;
 
@@ -88,7 +89,7 @@ public class TagsForm extends VLayout {
 		vocabularyForm.setWidth(1);
 		vocabularyForm.setHeight(1);
 		List<FormItem> items = new ArrayList<FormItem>();
-		String str = Session.get().getInfo().getConfig("tag.vocabulary");
+		String str = Session.get().getInfo().getConfig("gui.tag.vocabulary", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 		for (int i = 0; i < str.length(); i++) {
 			final StaticTextItem item = ItemFactory.newStaticTextItem("" + i, "", "" + str.charAt(i));
 			item.setShowTitle(false);
@@ -210,7 +211,8 @@ public class TagsForm extends VLayout {
 
 										@Override
 										public void onSuccess(Void arg) {
-											GuiLog.info(I18N.message("procinexecution"), I18N.message("taginexecution"));
+											GuiLog.info(I18N.message("procinexecution"),
+													I18N.message("taginexecution"));
 											ListGridRecord selection = tags.getSelectedRecord();
 											selection.setAttribute("word", value);
 											onLetterSelect(value.substring(0, 1));

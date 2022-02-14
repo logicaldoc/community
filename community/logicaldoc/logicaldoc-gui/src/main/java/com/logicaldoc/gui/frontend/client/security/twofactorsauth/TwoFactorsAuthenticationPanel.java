@@ -42,8 +42,7 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 		notify.setValue(false);
 		notify.setDisabled(true);
 
-		SelectItem method = ItemFactory.new2AFMethodSelector("factor", user.getSecondFactor());
-		method.setWidth(250);
+		SelectItem method = ItemFactory.new2AFMethodSelector("factor", user.getSecondFactor(), true);
 		method.addChangedHandler(new ChangedHandler() {
 
 			@Override
@@ -63,6 +62,14 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 					setupPanel = new YubiKeySetup(TwoFactorsAuthenticationPanel.this.user);
 					notify.setValue(false);
 					notify.setDisabled(true);
+				} else if (Constants.TWOFA_EMAIL_AUTHENTICATOR.equals(event.getValue().toString())) {
+					setupPanel = new EmailAuthenticatorSetup(TwoFactorsAuthenticationPanel.this.user);
+					notify.setValue(false);
+					notify.setDisabled(true);
+				} else if (Constants.TWOFA_DUO.equals(event.getValue().toString())) {
+					setupPanel = new DuoSetup(TwoFactorsAuthenticationPanel.this.user);
+					notify.setValue(false);
+					notify.setDisabled(true);
 				}
 				addMember(setupPanel);
 			}
@@ -73,6 +80,13 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 		else
 			form.setItems(method);
 		setMembers(form);
+		
+		if (Constants.TWOFA_DUO.equals(user.getSecondFactor())) {
+			setupPanel = new DuoSetup(TwoFactorsAuthenticationPanel.this.user);
+			notify.setValue(false);
+			notify.setDisabled(true);
+			addMember(setupPanel);
+		}
 	}
 
 	public String getFactor() {
@@ -92,8 +106,11 @@ public class TwoFactorsAuthenticationPanel extends VLayout {
 	}
 
 	public boolean validate() {
-		if (vm.validate())
+		if (vm.validate() && setupPanel.validate()) {
 			user.setSecondFactor(vm.getValueAsString("factor"));
+			user.setKey(setupPanel.getKey());
+		}
+
 		return vm.validate();
 	}
 }

@@ -104,6 +104,8 @@ public class FulltextSearch extends Search {
 			hit.setPassword(rs.getString(34));
 			hit.setWorkflowStatusDisplay(rs.getString(35));
 			hit.setLanguage(rs.getString(36));
+			hit.setPages(rs.getInt(37));
+			hit.setColor(rs.getString(38));
 
 			return hit;
 		}
@@ -264,7 +266,8 @@ public class FulltextSearch extends Search {
 		richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
 		richQuery.append(
 				" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, A.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-		richQuery.append(" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language ");
+		richQuery.append(
+				" A.ld_stamped, A.ld_password, A.ld_workflowstatusdisp, A.ld_language, A.ld_pages, A.ld_color ");
 		richQuery.append(" from ld_document A ");
 		richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 		richQuery.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
@@ -287,13 +290,14 @@ public class FulltextSearch extends Search {
 			richQuery.append(
 					" REF.ld_date, REF.ld_publisher, REF.ld_creation, REF.ld_creator, REF.ld_filesize, REF.ld_immutable, ");
 			richQuery.append(
-					" REF.ld_indexed, REF.ld_lockuserid, REF.ld_filename, REF.ld_status, REF.ld_signed, REF.ld_type, ");
+					" REF.ld_indexed, REF.ld_lockuserid, A.ld_filename, REF.ld_status, REF.ld_signed, REF.ld_type, ");
 			richQuery.append(
 					" REF.ld_rating, REF.ld_fileversion, A.ld_comment, REF.ld_workflowstatus, REF.ld_startpublishing, ");
 			richQuery.append(" A.ld_stoppublishing, A.ld_published, ");
 			richQuery.append(
 					" FOLD.ld_name, A.ld_folderid, A.ld_tgs tags, REF.ld_templateid, C.ld_name, A.ld_tenantid, A.ld_docreftype, ");
-			richQuery.append(" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp, REF.ld_language ");
+			richQuery.append(
+					" REF.ld_stamped, REF.ld_password, REF.ld_workflowstatusdisp, REF.ld_language, REF.ld_pages, A.ld_color ");
 			richQuery.append(" from ld_document A  ");
 			richQuery.append(" join ld_folder FOLD on A.ld_folderid=FOLD.ld_id ");
 			richQuery.append(" join ld_document REF on A.ld_docref=REF.ld_id ");
@@ -309,7 +313,7 @@ public class FulltextSearch extends Search {
 			}
 			richQuery.append("  and A.ld_docref is not null and REF.ld_deleted=0 and not A.ld_status="
 					+ AbstractDocument.DOC_ARCHIVED + " and A.ld_docref = REF.ld_id ");
-			richQuery.append(hitsIdsCondition.toString());
+			richQuery.append(hitsIdsCondition.toString().replaceAll("A.ld_id", "A.ld_docref"));
 		}
 
 		log.debug("Execute query {}", richQuery.toString());

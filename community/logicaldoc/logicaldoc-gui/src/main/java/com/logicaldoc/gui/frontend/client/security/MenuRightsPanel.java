@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
@@ -60,7 +60,7 @@ public class MenuRightsPanel extends VLayout {
 		entityId.setCanEdit(false);
 		entityId.setHidden(true);
 
-		ListGridField entity = new AvatarListGridField("entity", "avatar", "entity", 190);  
+		ListGridField entity = new UserListGridField("entity", "avatar", "entity");  
 		entity.setCanEdit(false);
 
 		list = new ListGrid();

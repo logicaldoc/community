@@ -14,8 +14,4 @@ public class IPBlockedException extends AuthenticationException {
 	public IPBlockedException() {
 		super("ipblocked");
 	}
-
-	public IPBlockedException(String message) {
-		super(message);
-	}
 }

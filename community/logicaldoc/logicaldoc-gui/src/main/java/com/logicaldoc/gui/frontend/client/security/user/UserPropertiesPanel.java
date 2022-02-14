@@ -32,7 +32,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
- * Shows document's standard properties and read-only data
+ * Shows users's standard properties and read-only data
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
@@ -96,20 +96,6 @@ public class UserPropertiesPanel extends HLayout {
 
 		layout.addMember(form1, 1);
 
-		CheckboxItem expires = new CheckboxItem("expires", I18N.message("passwordexpires"));
-		expires.setValue(user.isPasswordExpires());
-		expires.setDisabled(readonly || (Session.get().isDemo() && Session.get().getUser().getId() == 1));
-		if (!readonly)
-			expires.addChangedHandler(changedHandler);
-
-		CheckboxItem enabled = new CheckboxItem("eenabled", I18N.message("enabled"));
-		enabled.setValue(user.isEnabled());
-		if (readonly || "admin".equals(user.getUsername())) {
-			enabled.setDisabled(true);
-		} else {
-			enabled.addChangedHandler(changedHandler);
-		}
-
 		final CheckboxItem guest = new CheckboxItem("readonly", I18N.message("readonly"));
 		guest.setValue(user.isReadOnly());
 		if (readonly || "admin".equals(user.getUsername())) {
@@ -133,10 +119,6 @@ public class UserPropertiesPanel extends HLayout {
 				}
 			});
 		}
-
-		CheckboxItem changeAtLogin = new CheckboxItem("changeAtLogin", I18N.message("changeatfirstlogin"));
-		changeAtLogin.setValue(false);
-		changeAtLogin.setVisible(user.getId() == 0);
 
 		CheckboxItem notifyCredentials = new CheckboxItem("notifyCredentials", I18N.message("notifycredentials"));
 		notifyCredentials.setValue(true);
@@ -217,11 +199,11 @@ public class UserPropertiesPanel extends HLayout {
 			email2.addChangedHandler(changedHandler);
 
 		if (user.getId() == 0L)
-			form1.setItems(changeAtLogin, notifyCredentials, guest, enabled, expires, username, email, firstname, name,
-					email2, language, address, postalcode, city, country, state, phone, cell);
+			form1.setItems(notifyCredentials, guest, username, email, firstname, name, email2, language,
+					address, postalcode, city, country, state, phone, cell);
 		else
-			form1.setItems(username, changeAtLogin, notifyCredentials, guest, enabled, expires, email, firstname, name,
-					email2, language, address, postalcode, city, country, state, phone, cell);
+			form1.setItems(username, notifyCredentials, guest, email, firstname, name, email2, language,
+					address, postalcode, city, country, state, phone, cell);
 		addMember(layout);
 
 		prepareGroupsForm(readonly);
@@ -275,9 +257,6 @@ public class UserPropertiesPanel extends HLayout {
 		vm.validate();
 		if (!vm.hasErrors()) {
 			user.setUsername((String) values.get("username"));
-			user.setPasswordExpires(Boolean.parseBoolean(values.get("expires").toString()));
-			user.setEnabled(Boolean.parseBoolean(values.get("eenabled").toString()));
-
 			user.setName((String) values.get("name"));
 			user.setFirstName((String) values.get("firstname"));
 			user.setAddress((String) values.get("address"));
@@ -291,10 +270,8 @@ public class UserPropertiesPanel extends HLayout {
 			user.setEmail((String) values.get("email"));
 			user.setEmail2((String) values.get("email2"));
 
-			if (user.getId() == 0L) {
+			if (user.getId() == 0L)
 				user.setNotifyCredentials(Boolean.parseBoolean(values.get("notifyCredentials").toString()));
-				user.setPasswordExpired(Boolean.parseBoolean(values.get("changeAtLogin").toString()));
-			}
 		}
 
 		String[] ids = groupsItem.getValues();

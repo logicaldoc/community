@@ -13,8 +13,8 @@ import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.validators.EmailValidator;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.types.HeaderControls;
@@ -244,13 +244,13 @@ public class EmailDialog extends Window {
 						bccs.add(new GUIContact(email));
 					mail.setBccs(bccs.toArray(new GUIContact[0]));
 
-					ContactingServer.get().show();
+					LD.contactingServer();
 
 					DocumentService.Instance.get().sendAsEmail(mail, Session.get().getUser().getLanguage(),
 							new AsyncCallback<String>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 									send.enable();
 									destroy();
@@ -258,7 +258,7 @@ public class EmailDialog extends Window {
 
 								@Override
 								public void onSuccess(String result) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									send.enable();
 									if ("ok".equals(result)) {
 										GuiLog.info(

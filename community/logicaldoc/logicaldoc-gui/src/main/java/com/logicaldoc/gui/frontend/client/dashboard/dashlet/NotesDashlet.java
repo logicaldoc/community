@@ -10,9 +10,10 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
@@ -53,8 +54,8 @@ public class NotesDashlet extends Dashlet {
 
 	private void init() {
 		ListGridField date = new DateListGridField("date", "date");
-		
-		ListGridField title = new ListGridField("title", I18N.message("note"));
+
+		ListGridField title = new ColoredListGridField("title", I18N.message("note"));
 		FileNameListGridField filename = new FileNameListGridField();
 		filename.setAutoFitWidth(true);
 
@@ -62,8 +63,11 @@ public class NotesDashlet extends Dashlet {
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
-		list.setShowHeader(false);
+		list.setShowHeader(true);
 		list.setCanSelectAll(false);
+		list.setCanGroupBy(false);
+		list.setCanReorderFields(false);
+		list.setCanFreezeFields(false);
 		list.setSelectionType(SelectionStyle.NONE);
 		list.setHeight100();
 		list.setBorder("0px");

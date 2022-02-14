@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.observer.FolderController;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
@@ -89,7 +89,7 @@ public class ZohoDialog extends Dialog {
 		final long[] docIds = MainPanel.get().isOnDocumentsTab() ? DocumentsPanel.get().getDocumentsGrid()
 				.getSelectedIds() : SearchPanel.get().getDocumentsGrid().getSelectedIds();
 
-		SC.ask(docIds.length == 0 ? I18N.message("exportdirtozoho", Session.get().getCurrentFolder().getName()) : I18N
+		SC.ask(docIds.length == 0 ? I18N.message("exportdirtozoho", FolderController.get().getCurrentFolder().getName()) : I18N
 				.message("exportdocstozoho"), new BooleanCallback() {
 
 			@Override
@@ -97,21 +97,21 @@ public class ZohoDialog extends Dialog {
 				if (choice.booleanValue()) {
 					String targetId = selection.getAttributeAsString("id");
 					long[] folderIds = new long[0];
-					if (docIds.length == 0 && Session.get().getCurrentFolder() != null)
-						folderIds[0] = Session.get().getCurrentFolder().getId();
+					if (docIds.length == 0 && FolderController.get().getCurrentFolder() != null)
+						folderIds[0] = FolderController.get().getCurrentFolder().getId();
 
-					ContactingServer.get().show();
+					LD.contactingServer();
 					ZohoService.Instance.get().exportDocuments(targetId, folderIds, docIds,
 							new AsyncCallback<Boolean>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Boolean result) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									if (result.booleanValue()) {
 										SC.say(I18N.message("zohoexportok"));
 										ZohoDialog.this.destroy();
@@ -137,25 +137,25 @@ public class ZohoDialog extends Dialog {
 			else
 				docIds.add(record.getAttributeAsString("id"));
 		}
-		SC.ask(I18N.message("importfromzoho", Session.get().getCurrentFolder().getName()), new BooleanCallback() {
+		SC.ask(I18N.message("importfromzoho", FolderController.get().getCurrentFolder().getName()), new BooleanCallback() {
 
 			@Override
 			public void execute(Boolean choice) {
 				if (choice.booleanValue()) {
 					ZohoDialog.this.destroy();
-					ContactingServer.get().show();
-					ZohoService.Instance.get().importDocuments(Session.get().getCurrentFolder().getId(),
+					LD.contactingServer();
+					ZohoService.Instance.get().importDocuments(FolderController.get().getCurrentFolder().getId(),
 							folderCompositeIds.toArray(new String[0]), docIds.toArray(new String[0]),
 							new AsyncCallback<Integer>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Integer count) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									FolderNavigator.get().reload();
 									SC.say(I18N.message("importeddocs2", count.toString()));
 								}

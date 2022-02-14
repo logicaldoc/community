@@ -7,21 +7,17 @@ import java.util.Set;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
-import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.SessionTimeout;
 import com.smartgwt.client.util.SC;
 
@@ -37,10 +33,6 @@ public class Session implements DocumentObserver {
 	private GUIInfo info;
 
 	private GUISession session;
-
-	private GUIFolder currentFolder;
-
-	private GUIDocument currentDocument;
 
 	private Long hiliteDocId;
 
@@ -89,6 +81,7 @@ public class Session implements DocumentObserver {
 		sessionObservers.clear();
 		if (timer != null)
 			timer.cancel();
+		Util.uninstallCloseWindowAlert();
 	}
 
 	public GUIUser getUser() {
@@ -97,6 +90,7 @@ public class Session implements DocumentObserver {
 
 	public void setUser(GUIUser user) {
 		session.setUser(user);
+		I18N.init(user);
 	}
 
 	public void init(final GUISession session) {
@@ -112,7 +106,7 @@ public class Session implements DocumentObserver {
 				Session.get().session = session;
 				Session.get().info = session.getInfo();
 
-				I18N.setLocale(session.getUser().getLanguage());
+				I18N.init(session.getUser());
 
 				Menu.init(session.getUser());
 
@@ -137,6 +131,8 @@ public class Session implements DocumentObserver {
 
 					if (!validSession)
 						onInvalidSession();
+
+					Util.installCloseWindowAlert();
 
 					if (session.getInfo().getSessionHeartbeat() > 0) {
 						/*
@@ -172,6 +168,7 @@ public class Session implements DocumentObserver {
 	public void onInvalidSession() {
 		timer.cancel();
 		SessionTimeout.get().show();
+		Util.uninstallCloseWindowAlert();
 	}
 
 	public void addObserver(SessionObserver observer) {
@@ -180,21 +177,6 @@ public class Session implements DocumentObserver {
 
 	public void removeObserver(SessionObserver observer) {
 		sessionObservers.remove(observer);
-	}
-
-	public GUIFolder getCurrentFolder() {
-		return currentFolder;
-	}
-
-	public void setCurrentFolder(GUIFolder folder) {
-		this.currentFolder = folder;
-		WindowUtils.setTitle(Session.get().getInfo(), folder.getPathExtended() != null ? folder.getPathExtended() : "");
-		FolderController.get().selected(folder);
-	}
-
-	public void setCurrentDocument(GUIDocument document) {
-		this.currentDocument = document;
-		DocumentController.get().selected(document);
 	}
 
 	public GUIInfo getInfo() {
@@ -211,10 +193,6 @@ public class Session implements DocumentObserver {
 
 	public void setSession(GUISession session) {
 		this.session = session;
-	}
-
-	public GUIDocument getCurrentDocument() {
-		return currentDocument;
 	}
 
 	public String getTenantName() {
@@ -353,6 +331,16 @@ public class Session implements DocumentObserver {
 	@Override
 	public void onDocumentUnlocked(GUIDocument document) {
 		getUser().setLockedDocs(Session.get().getUser().getLockedDocs() - 1);
+	}
+
+	@Override
+	public void onDocumentBeginEditing(GUIDocument document) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onDocumentCancelEditing(GUIDocument document) {
+		// Nothing to do
 	}
 
 	public Long getHiliteDocId() {

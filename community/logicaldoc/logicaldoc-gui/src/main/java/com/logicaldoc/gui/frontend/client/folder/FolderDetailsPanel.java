@@ -4,7 +4,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -53,9 +52,9 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private Layout interfaceTabPanel;
 
-	private Layout ocrTabPanel;
+	private Layout captureTabPanel;
 
-	private StandardPropertiesPanel propertiesPanel;
+	private FolderStandardPropertiesPanel propertiesPanel;
 
 	private FolderExtendedPropertiesPanel extendedPropertiesPanel;
 
@@ -75,7 +74,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private FolderInterfacePanel interfacePanel;
 
-	private FolderOCRPanel ocrPanel;
+	private FolderCapturePanel ocrPanel;
 
 	private EditingTabSet tabSet;
 
@@ -89,7 +88,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private Tab interfaceTab = null;
 
-	private Tab ocrTab = null;
+	private Tab captureTab = null;
 
 	public FolderDetailsPanel(GUIFolder folder) {
 		super();
@@ -232,12 +231,12 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		}
 
 		if (Menu.enabled(Menu.CAPTURE)) {
-			ocrTab = new Tab(I18N.message("ocr"));
-			ocrTabPanel = new HLayout();
-			ocrTabPanel.setWidth100();
-			ocrTabPanel.setHeight100();
-			ocrTab.setPane(ocrTabPanel);
-			tabSet.addTab(ocrTab);
+			captureTab = new Tab(I18N.message("capture"));
+			captureTabPanel = new HLayout();
+			captureTabPanel.setWidth100();
+			captureTabPanel.setHeight100();
+			captureTab.setPane(captureTabPanel);
+			tabSet.addTab(captureTab);
 		}
 
 		addMember(tabSet);
@@ -262,7 +261,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				propertiesPanel.destroy();
 				propertiesTabPanel.removeMember(propertiesPanel);
 			}
-			propertiesPanel = new StandardPropertiesPanel(folder, changeHandler);
+			propertiesPanel = new FolderStandardPropertiesPanel(folder, changeHandler);
 			propertiesTabPanel.addMember(propertiesPanel);
 
 			/*
@@ -386,10 +385,10 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				 */
 				if (ocrPanel != null) {
 					ocrPanel.destroy();
-					ocrTabPanel.removeMember(ocrPanel);
+					captureTabPanel.removeMember(ocrPanel);
 				}
-				ocrPanel = new FolderOCRPanel(folder, changeHandler);
-				ocrTabPanel.addMember(ocrPanel);
+				ocrPanel = new FolderCapturePanel(folder, changeHandler);
+				captureTabPanel.addMember(ocrPanel);
 			}
 		} catch (Throwable r) {
 			GuiLog.error(r.getMessage(), null, r);
@@ -435,7 +434,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 		if (valid && ocrPanel != null && Feature.enabled(Feature.OCR)) {
 			valid = ocrPanel.validate();
 			if (!valid)
-				tabSet.selectTab(ocrTab);
+				tabSet.selectTab(captureTab);
 		}
 
 		return valid;
@@ -453,12 +452,14 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				@Override
 				public void onSuccess(GUIFolder folder) {
 					disableSave();
-					FolderController.get().modified(folder);
-					GUIFolder current = Session.get().getCurrentFolder();
+					GUIFolder current = FolderController.get().getCurrentFolder();
 					current.setTemplate(folder.getTemplate());
 					current.setTemplateId(folder.getTemplateId());
 					current.setAttributes(folder.getAttributes());
 					current.setOcrTemplateId(folder.getOcrTemplateId());
+					current.setColor(folder.getColor());
+					current.setGrid(folder.getGrid());
+					FolderController.get().modified(folder);
 				}
 			});
 		}
@@ -492,6 +493,16 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	@Override
+	public void onFolderBeginEditing(GUIFolder folder) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onFolderCancelEditing(GUIFolder folder) {
+		// Nothing to do
+	}
+
+	@Override
 	public void destroy() {
 		FolderController.get().removeObserver(this);
 	}
@@ -519,10 +530,12 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	private void disableSave() {
+		FolderController.get().cancelEditing(folder);
 		tabSet.hideSave();
 	}
 
 	private void enableSave() {
+		FolderController.get().beginEditing(folder);
 		tabSet.displaySave();
 	}
 }

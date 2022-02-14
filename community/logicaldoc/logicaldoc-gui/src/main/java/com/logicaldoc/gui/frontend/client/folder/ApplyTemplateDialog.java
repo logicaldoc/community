@@ -54,12 +54,13 @@ public class ApplyTemplateDialog extends Dialog {
 		CheckboxItem inheritSecurity = new CheckboxItem();
 		inheritSecurity.setName("inheritSecurity");
 		inheritSecurity.setTitle(I18N.message("inheritparentsec"));
-		form.setItems(inheritSecurity);
-
+		
 		SelectItem templateSelector = ItemFactory.newFolderTemplateSelector();
 
 		if (inheritOptionEnabled)
 			form.setItems(templateSelector, inheritSecurity);
+		else
+			form.setItems(templateSelector);
 
 		Button apply = new Button(I18N.message("apply"));
 		apply.setAutoFit(true);

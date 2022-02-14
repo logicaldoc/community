@@ -58,7 +58,5 @@ public class DocumentCalendarPanel extends DocumentDetailTab {
 			choosenDate = calendar.getChosenDate();
 			choosenView = calendar.getCurrentViewName();
 		}
-
-		onTabSelected();
 	}
 }

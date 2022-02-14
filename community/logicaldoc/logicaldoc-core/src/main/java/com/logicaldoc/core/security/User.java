@@ -94,16 +94,24 @@ public class User extends PersistentObject implements Serializable {
 
 	private int enabled = 1;
 
-	// The last time the password was changed
+	/**
+	 * The last time the password was changed
+	 */
 	private Date passwordChanged = new Date();
 
-	// If the password expires or not
+	/**
+	 * If the password expires or not
+	 */
 	private int passwordExpires = 0;
 
-	// If the password already expired
+	/**
+	 * If the password already expired
+	 */
 	private int passwordExpired = 0;
 
-	// Only for GUI
+	/**
+	 * Only for GUI
+	 */
 	private String repass;
 
 	private int source = 0;
@@ -153,11 +161,54 @@ public class User extends PersistentObject implements Serializable {
 	 * Description of the grid that shows the results of a search
 	 */
 	private String hitsGrid;
-	
+
 	/**
 	 * Base64 representation of the avatar image
 	 */
 	private String avatar;
+
+	private String dateFormat;
+
+	private String dateFormatShort;
+
+	private String dateFormatLong;
+
+	/**
+	 * Comma separated list of searches that defines the order they are
+	 * displayed in the user interface
+	 */
+	private String searchPref;
+
+	/**
+	 * When this account expires
+	 */
+	private Date expire;
+
+	/**
+	 * Last time this account has been activated
+	 */
+	private Date lastEnabled;
+
+	/**
+	 * Maximum number of inactivity days after which the account gets disabled.
+	 * Possible values are:
+	 * <ul>
+	 * <li>null: the general setting is used instead</li>
+	 * <li>&lt;=0: no checks will be done for this user</li>
+	 * <li>&gt;0: number of maximum inactivity days</li>
+	 * </ul>
+	 */
+	private Integer maxInactivity;
+
+	/**
+	 * If the system must forbid the login outside the working time
+	 */
+	private int enforceWorkingTime = 0;
+
+	/**
+	 * Collection of all the admitted working times
+	 */
+	private Set<WorkingTime> workingTimes = new HashSet<WorkingTime>();
 
 	public User() {
 	}
@@ -410,6 +461,9 @@ public class User extends PersistentObject implements Serializable {
 		groupIds = null;
 		passwordExpires = 0;
 		avatar = null;
+		expire = null;
+		enforceWorkingTime = 0;
+		workingTimes = new HashSet<WorkingTime>();
 	}
 
 	public String toString() {
@@ -692,5 +746,102 @@ public class User extends PersistentObject implements Serializable {
 
 	public void setAvatar(String avatar) {
 		this.avatar = avatar;
+	}
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	public String getDateFormatShort() {
+		return dateFormatShort;
+	}
+
+	public void setDateFormatShort(String dateFormatShort) {
+		this.dateFormatShort = dateFormatShort;
+	}
+
+	public String getDateFormatLong() {
+		return dateFormatLong;
+	}
+
+	public void setDateFormatLong(String dateFormatLong) {
+		this.dateFormatLong = dateFormatLong;
+	}
+
+	public String getSearchPref() {
+		return searchPref;
+	}
+
+	public void setSearchPref(String searchPref) {
+		this.searchPref = searchPref;
+	}
+
+	public Date getExpire() {
+		return expire;
+	}
+
+	public void setExpire(Date expire) {
+		this.expire = expire;
+	}
+
+	public Date getLastEnabled() {
+		return lastEnabled;
+	}
+
+	public void setLastEnabled(Date lastEnabled) {
+		this.lastEnabled = lastEnabled;
+	}
+
+	/**
+	 * Checks if the user is expired now
+	 * 
+	 * @return true only if an expiration date has been specified and the
+	 *         current date is after it
+	 */
+	public boolean isExpired() {
+		return getExpire() != null && getExpire().before(new Date());
+	}
+
+	/**
+	 * Checks if the user falls in his working time
+	 * 
+	 * @return true only if at least a working time slot matches the current
+	 *         time
+	 */
+	public boolean isInWorkingTime() {
+		if (getWorkingTimes() != null)
+			for (WorkingTime wt : getWorkingTimes()) {
+				if (wt.matchesCurrentTime())
+					return true;
+			}
+		return false;
+	}
+
+	public int getEnforceWorkingTime() {
+		return enforceWorkingTime;
+	}
+
+	public void setEnforceWorkingTime(int enforceWorkingTime) {
+		this.enforceWorkingTime = enforceWorkingTime;
+	}
+
+	public Set<WorkingTime> getWorkingTimes() {
+		return workingTimes;
+	}
+
+	public void setWorkingTimes(Set<WorkingTime> workingTimes) {
+		this.workingTimes = workingTimes;
+	}
+
+	public Integer getMaxInactivity() {
+		return maxInactivity;
+	}
+
+	public void setMaxInactivity(Integer maxInactivity) {
+		this.maxInactivity = maxInactivity;
 	}
 }

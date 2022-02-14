@@ -26,6 +26,7 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -95,10 +96,10 @@ public class CalendarReport extends AdminPanel {
 		SelectItem statusSelector = ItemFactory.newCalendarEventStatusSelector("status", "status");
 
 		// Max results
-		TextItem displayMax = ItemFactory.newTextItem("displayMax", "displaymax", null);
+		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displayMax", "displaymax", (Integer)null);
 		displayMax.setValue(100);
 		displayMax.setDefaultValue(100);
-		displayMax.setWidth(50);
+		displayMax.setStep(10);
 		displayMax.setHint(I18N.message("elements"));
 
 		ButtonItem searchButton = new ButtonItem();

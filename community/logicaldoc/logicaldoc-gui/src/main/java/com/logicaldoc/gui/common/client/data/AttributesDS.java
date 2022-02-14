@@ -12,8 +12,20 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 7.6 n
  */
 public class AttributesDS extends DataSource {
-	
+
 	public AttributesDS() {
+		this(null, null);
+	}
+
+	public AttributesDS(String context) {
+		this(null, context);
+	}
+
+	public AttributesDS(Long templateId) {
+		this(templateId, null);
+	}
+
+	public AttributesDS(Long templateId, String context) {
 		setTitleField("attributes");
 		setRecordXPath("/list/attribute");
 		DataSourceTextField name = new DataSourceTextField("name");
@@ -26,7 +38,9 @@ public class AttributesDS extends DataSource {
 
 		setFields(name, label, type);
 		setTitleField("name");
-		setDataURL("data/attributes.xml?locale=" + I18N.getLocale());
+		setDataURL("data/attributes.xml?locale=" + I18N.getLocale()
+				+ (templateId != null ? "&templateId=" + templateId : "")
+				+ (context != null ? "&context=" + context : ""));
 		setClientOnly(true);
 	}
 }

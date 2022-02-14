@@ -58,8 +58,8 @@ public class IconSelector {
 			icon = "html.png";
 		else if (ext.equals("eml") || ext.equals("msg") || ext.equals("mail"))
 			icon = "email.png";
-		else if (ext.equals("zip") || ext.equals("rar") || ext.equals("gz") || ext.equals("tar") || ext.equals("jar")
-				|| ext.equals("7z"))
+		else if (ext.equals("zip") || ext.equals("rar") || ext.equals("gz") || ext.equals("tar") || ext.equals("tgz")
+				|| ext.equals("jar") || ext.equals("7z"))
 			icon = "zip.png";
 		else if (ext.equals("p7m") || ext.equals("m7m"))
 			icon = "p7m.png";

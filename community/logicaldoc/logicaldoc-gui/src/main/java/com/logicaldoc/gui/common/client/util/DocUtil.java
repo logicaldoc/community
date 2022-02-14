@@ -26,9 +26,9 @@ public class DocUtil {
 			@Override
 			public void onUnprotected(GUIDocument document) {
 				if (suffix != null)
-					WindowUtils.openUrl(Util.downloadURL(docId, fileVersion, false) + suffix);
+					Util.download(Util.downloadURL(docId, fileVersion, false) + suffix);
 				else
-					WindowUtils.openUrl(Util.downloadURL(docId, fileVersion, false));
+					Util.download(Util.downloadURL(docId, fileVersion, false));
 			}
 		});
 	}
@@ -39,10 +39,9 @@ public class DocUtil {
 			@Override
 			public void onUnprotected(GUIDocument document) {
 				if (fileVersion != null)
-					WindowUtils.openUrl(Util.contextPath() + "convertpdf?docId=" + docId + "&version=" + fileVersion,
-							"_blank");
+					Util.download(Util.contextPath() + "convertpdf?docId=" + docId + "&version=" + fileVersion);
 				else
-					WindowUtils.openUrl(Util.contextPath() + "convertpdf?docId=" + docId, "_blank");
+					Util.download(Util.contextPath() + "convertpdf?docId=" + docId);
 			}
 		});
 	}
@@ -171,23 +170,24 @@ public class DocUtil {
 		return html;
 	}
 
-	public static String getFolderIcon(boolean open, int type, String name) {
+	public static String getFolderIcon(boolean open, int type, String name, String color) {
 		String html = "";
 
 		if (type == GUIFolder.TYPE_WORKSPACE)
-			html = AwesomeFactory.getIconHtml("cube", name);
+			html = AwesomeFactory.getColoredIconHtml("cube", name, color);
 		else if (type == GUIFolder.TYPE_ALIAS) {
 			html = "<div><span class='fa-layers fa-fw'>";
 			html += "<i class='" + AwesomeFactory.getCssClassPrefix() + " fa-lg fa-fw fa-"
-					+ (open ? "folder-open" : "folder") + "'></i>";
+					+ (open ? "folder-open" : "folder") + " ' "
+					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i>";
 			// This is the small alias arrow
 			html += "<i class='fas fa-lg fa-fw fa-share' data-fa-transform='shrink-10 down-2 right-2'></i></span>&nbsp;&nbsp;&nbsp;";
 			html += name + "</div>";
 		} else {
 			if (open)
-				html = AwesomeFactory.getIconHtml("folder-open", name);
+				html = AwesomeFactory.getColoredIconHtml("folder-open", name, color);
 			else
-				html = AwesomeFactory.getIconHtml("folder", name);
+				html = AwesomeFactory.getColoredIconHtml("folder", name, color);
 		}
 
 		return html;

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -21,17 +20,21 @@ import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.services.SecurityService;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.RequestInfo;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.MessageLabel;
 import com.logicaldoc.gui.login.client.services.LoginService;
-import com.logicaldoc.gui.login.client.services.LoginServiceAsync;
+import com.logicaldoc.gui.login.client.services.TfaService;
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -65,8 +68,6 @@ public class LoginPanel extends VLayout {
 
 	protected static final String PARAM_FAILUREURL = "j_failureurl";
 
-	protected LoginServiceAsync loginService = (LoginServiceAsync) GWT.create(LoginService.class);
-
 	protected TextItem username = new TextItem();
 
 	protected PasswordItem password = new PasswordItem();
@@ -79,12 +80,22 @@ public class LoginPanel extends VLayout {
 
 	protected VLayout mainPanel = null;
 
-	// Flag used to handle double clicks on the login button
-	protected static boolean loggingIn = false;
+	protected DynamicForm credentialsForm = new DynamicForm();
 
-	protected DynamicForm form = new DynamicForm();
+	protected DynamicForm secretKeyForm = new DynamicForm();
 
 	protected GUIInfo info = null;
+
+	protected ButtonItem signIn = new ButtonItem(I18N.message("signin"));
+
+	// Panel containing the inputs
+	protected VLayout inputsPanel = new VLayout();
+
+	// Panel containing just the credentials
+	protected VLayout credentialsPanel = new VLayout();
+
+	// Panel containing just the secret key
+	protected VLayout secretKeyPanel = new VLayout();
 
 	public LoginPanel(GUIInfo info) {
 		setDefaultLayoutAlign(Alignment.CENTER);
@@ -139,14 +150,14 @@ public class LoginPanel extends VLayout {
 		productInfo.setWidth(COLUMN_WIDTH);
 		productInfo.setStyleName("login-product");
 
-		// Prepare the Form and all its fields
-		form = new DynamicForm();
-		form.setAlign(Alignment.CENTER);
-		form.setWidth(FORM_WIDTH);
-		form.setNumCols(saveLoginEnabled ? 3 : 1);
-		form.setTitleWidth(0);
-		form.setMargin(0);
-		form.setCellPadding(0);
+		// Prepare the Forms
+		credentialsForm = new DynamicForm();
+		credentialsForm.setAlign(Alignment.CENTER);
+		credentialsForm.setWidth(FORM_WIDTH);
+		credentialsForm.setNumCols(3);
+		credentialsForm.setTitleWidth(0);
+		credentialsForm.setMargin(0);
+		credentialsForm.setCellPadding(0);
 
 		username.setTitle(I18N.message("username"));
 		username.setShowTitle(false);
@@ -158,12 +169,12 @@ public class LoginPanel extends VLayout {
 		username.setWidth(FORM_WIDTH);
 		username.setAlign(Alignment.LEFT);
 		username.setTextBoxStyle("login-field");
-		username.setColSpan(saveLoginEnabled ? 3 : 1);
+		username.setColSpan(3);
 		username.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
 				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onSigninClicked();
+					onSignin();
 			}
 		});
 
@@ -177,30 +188,12 @@ public class LoginPanel extends VLayout {
 		password.setTextBoxStyle("login-field");
 		password.setAlign(Alignment.LEFT);
 		password.setWrapTitle(false);
-		password.setColSpan(saveLoginEnabled ? 3 : 1);
+		password.setColSpan(3);
 		password.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
 				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onSigninClicked();
-			}
-		});
-
-		secretKey.setTitle(I18N.message("secretkey"));
-		secretKey.setShowTitle(false);
-		secretKey.setHint(I18N.message("secretkey").toLowerCase());
-		secretKey.setShowHintInField(true);
-		secretKey.setWrapTitle(false);
-		secretKey.setHeight(34);
-		secretKey.setWidth(FORM_WIDTH);
-		secretKey.setAlign(Alignment.LEFT);
-		secretKey.setTextBoxStyle("secretkey-field");
-		secretKey.setColSpan(saveLoginEnabled ? 3 : 1);
-		secretKey.addKeyPressHandler(new KeyPressHandler() {
-			@Override
-			public void onKeyPress(KeyPressEvent event) {
-				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
-					onSigninClicked();
+					onSignin();
 			}
 		});
 
@@ -216,8 +209,7 @@ public class LoginPanel extends VLayout {
 		language.setControlStyle("login-language");
 		language.setTextBoxStyle("login-language-text");
 		language.setPickerIconStyle("login-language-picker");
-		language.setColSpan(saveLoginEnabled ? 3 : 1);
-
+		language.setColSpan(3);
 		RequestInfo request = WindowUtils.getRequestInfo();
 
 		// If a parameter specifies a locale, we initialize the language
@@ -235,20 +227,57 @@ public class LoginPanel extends VLayout {
 
 		SpacerItem spacerItem12 = new SpacerItem();
 		spacerItem12.setHeight(12);
-		spacerItem12.setColSpan(saveLoginEnabled ? 3 : 1);
+		spacerItem12.setColSpan(3);
 
-		ButtonItem signIn = new ButtonItem(I18N.message("signin"));
+		secretKeyForm = new DynamicForm();
+		secretKeyForm.setTitleOrientation(TitleOrientation.TOP);
+		secretKeyForm.setAlign(Alignment.CENTER);
+		secretKeyForm.setWidth(FORM_WIDTH);
+		secretKeyForm.setNumCols(3);
+		secretKeyForm.setTitleWidth(0);
+		secretKeyForm.setMargin(0);
+		secretKeyForm.setCellPadding(0);
+
+		secretKey.setTitle(I18N.message("secretkey"));
+		secretKey.setShowTitle(true);
+		secretKey.setHint(I18N.message("secretkey").toLowerCase());
+		secretKey.setShowHintInField(true);
+		secretKey.setWrapTitle(true);
+		secretKey.setHeight(34);
+		secretKey.setWidth(FORM_WIDTH);
+		secretKey.setAlign(Alignment.LEFT);
+		secretKey.setTextBoxStyle("secretkey-field");
+		secretKey.setColSpan(3);
+		secretKey.addKeyPressHandler(new KeyPressHandler() {
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				if (event.getKeyName() != null && "enter".equals(event.getKeyName().toLowerCase()))
+					onSignin();
+			}
+		});
+
+		ButtonItem back = new ButtonItem(I18N.message("back"));
+		back.setHeight(34);
+		back.setAlign(Alignment.LEFT);
+		back.setColSpan(2);
+		back.setEndRow(false);
+		back.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+			@Override
+			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+				toggleInputForm();
+			}
+		});
+
 		signIn.setBaseStyle("btn");
 		signIn.setHoverStyle("btn");
 		signIn.setHeight(34);
 		signIn.setAlign(Alignment.RIGHT);
 		signIn.setStartRow(false);
-		signIn.setWidth(saveLoginEnabled ? 120 : FORM_WIDTH);
-		signIn.setColSpan(saveLoginEnabled ? 1 : 3);
+		signIn.setWidth(120);
 		signIn.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				onSigninClicked();
+				onSignin();
 			}
 		});
 
@@ -261,16 +290,16 @@ public class LoginPanel extends VLayout {
 		rememberMe.setEndRow(false);
 		rememberMe.setColSpan(2);
 
+		SpacerItem rememberMePlaceholder = new SpacerItem();
+		rememberMePlaceholder.setEndRow(false);
+		rememberMePlaceholder.setColSpan(2);
+		rememberMePlaceholder.setWidth(rememberMe.getWidth());
+
 		List<FormItem> formItems = new ArrayList<FormItem>();
 		formItems.add(username);
 		formItems.add(spacerItem12);
 		formItems.add(password);
 		formItems.add(spacerItem12);
-
-		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) && "true".equals(info.getConfig("2fa.enabled"))) {
-			formItems.add(secretKey);
-			formItems.add(spacerItem12);
-		}
 
 		if ("true".equals(info.getConfig("gui.login.lang"))) {
 			formItems.add(language);
@@ -279,9 +308,13 @@ public class LoginPanel extends VLayout {
 
 		if (saveLoginEnabled)
 			formItems.add(rememberMe);
+		else
+			formItems.add(rememberMePlaceholder);
 		formItems.add(signIn);
 
-		form.setItems(formItems.toArray(new FormItem[0]));
+		credentialsForm.setItems(formItems.toArray(new FormItem[0]));
+		secretKeyForm.setItems(spacerItem12, spacerItem12, secretKey, spacerItem12, spacerItem12, back, signIn,
+				spacerItem12);
 
 		HTMLFlow lostPassword = new HTMLFlow(
 				"<div><a href=\"javascript:showLostDialog('" + info.getBranding().getProductName()
@@ -311,16 +344,18 @@ public class LoginPanel extends VLayout {
 		HTMLFlow licensing = new HTMLFlow(copyrightHtml + licenseeHtml);
 		licensing.setStyleName("login-copyright");
 
-		// Panel containing the inputs
-		VLayout inputsForm = new VLayout();
-		inputsForm.setMargin(0);
-		inputsForm.setWidth(FORM_WIDTH);
-		inputsForm.setStyleName("control-group");
-
 		if ("true".equals(info.getConfig("gui.lostpassword.show")))
-			inputsForm.setMembers(logoLogin, spacer15, form, lostPassword, licensing);
+			credentialsPanel.setMembers(credentialsForm, lostPassword);
 		else
-			inputsForm.setMembers(logoLogin, spacer15, form, licensing);
+			credentialsPanel.setMembers(credentialsForm);
+
+		secretKeyPanel.setMembers(secretKeyForm);
+		secretKeyPanel.setVisible(false);
+
+		inputsPanel.setMargin(0);
+		inputsPanel.setWidth(FORM_WIDTH);
+		inputsPanel.setStyleName("control-group");
+		inputsPanel.setMembers(logoLogin, spacer15, credentialsPanel, secretKeyPanel, licensing);
 
 		// Panel containing the login form
 		VLayout loginForm = new VLayout();
@@ -331,7 +366,7 @@ public class LoginPanel extends VLayout {
 		loginForm.setMargin(0);
 		loginForm.setWidth(FORM_WIDTH);
 		loginForm.setStyleName("login-form");
-		loginForm.setMembers(inputsForm);
+		loginForm.setMembers(inputsPanel);
 
 		// The login screen
 		VLayout loginScreen = new VLayout();
@@ -345,7 +380,7 @@ public class LoginPanel extends VLayout {
 		centerColumn.setMembersMargin(0);
 		centerColumn.setMargin(0);
 		centerColumn.setWidth(COLUMN_WIDTH);
-		centerColumn.setHeight(330);
+		centerColumn.setHeight(200);
 		centerColumn.setLayoutAlign(VerticalAlignment.TOP);
 		centerColumn.setLayoutAlign(Alignment.CENTER);
 		centerColumn.setAlign(VerticalAlignment.TOP);
@@ -456,17 +491,114 @@ public class LoginPanel extends VLayout {
 			mainPanel.addMember(messagesScreen);
 	}
 
-	protected void onSigninClicked() {
-		if (!form.validate()) {
+	protected void onSignin() {
+		lockInput();
+
+		if (!credentialsForm.validate()) {
 			onAuthenticationFailure();
 			return;
 		}
 
-		if (loggingIn == true)
-			return;
-		else
-			loggingIn = true;
+		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION) && "true".equals(info.getConfig("2fa.enabled"))
+				&& credentialsPanel.isVisible()) {
+			String login = username.getValueAsString();
+			LoginService.Instance.get().isSecretKeyRequired(login, CookiesManager.getSavedDevice(),
+					new AsyncCallback<Boolean>() {
 
+						@Override
+						public void onFailure(Throwable caught) {
+							SC.warn(caught.getMessage());
+							unlockInput();
+						}
+
+						@Override
+						public void onSuccess(Boolean required) {
+							if (required) {
+								LoginService.Instance.get().getUser(login, new AsyncCallback<GUIUser>() {
+
+									@Override
+									public void onFailure(Throwable caught) {
+										unlockInput();
+										SC.warn(caught.getMessage());
+									}
+
+									@Override
+									public void onSuccess(GUIUser user) {
+										TfaService.Instance.get().generateKey(user.getUsername(),
+												new AsyncCallback<String>() {
+
+													@Override
+													public void onFailure(Throwable caught) {
+														unlockInput();
+														SC.warn(caught.getMessage());
+													}
+
+													@Override
+													public void onSuccess(String transactionId) {
+														String sfa = user.getSecondFactor().toLowerCase();
+														secretKey.setTitle(
+																I18N.message(sfa + ".inputsecretkey", user.getEmail()));
+														secretKey.setHint(I18N.message(sfa + ".inputsecretkey.hint"));
+														if (transactionId != null) {
+															// Probably a push
+															// message has been
+															// sent to the
+															// user's device
+															secretKey.setValue(transactionId);
+
+															LD.prompt(AwesomeFactory.getSpinnerIconHtml("pulse",
+																	I18N.message(sfa + ".transaction.hint")));
+
+															sendAuhtenticationRequest();
+														} else {
+															unlockInput();
+															toggleInputForm();
+														}
+													}
+												});
+									}
+								});
+							} else {
+								sendAuhtenticationRequest();
+							}
+						}
+					});
+
+		} else {
+			sendAuhtenticationRequest();
+		}
+	}
+
+	protected void lockInput() {
+		secretKey.setDisabled(true);
+		username.setDisabled(true);
+		password.setDisabled(true);
+		signIn.setDisabled(true);
+	}
+
+	protected void unlockInput() {
+		secretKey.setDisabled(false);
+		username.setDisabled(false);
+		password.setDisabled(false);
+		signIn.setDisabled(false);
+	}
+
+	/**
+	 * Switches between the credentials form and the secret key form and
+	 * vice-versa.
+	 */
+	protected void toggleInputForm() {
+		if (credentialsPanel.isVisible()) {
+			credentialsPanel.setVisible(false);
+			secretKeyPanel.setVisible(true);
+			secretKey.setValue((String) null);
+		} else {
+			credentialsPanel.setVisible(true);
+			secretKeyPanel.setVisible(false);
+		}
+	}
+
+	protected void sendAuhtenticationRequest() {
 		CookiesManager.removeLogin();
 
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
@@ -475,41 +607,49 @@ public class LoginPanel extends VLayout {
 		try {
 			String data = "j_username=" + URL.encodeQueryString((String) username.getValue());
 			data += "&j_password=" + URL.encodeQueryString((String) password.getValue());
-			if (secretKey!=null && secretKey.getValue() != null)
+			if (secretKey != null && secretKey.getValue() != null)
 				data += "&j_secretkey=" + URL.encodeQueryString((String) secretKey.getValue());
 			if (CookiesManager.getSavedDevice() != null)
 				data += "&device=" + URL.encodeQueryString(CookiesManager.getSavedDevice());
 			data += "&" + PARAM_SUCCESSURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_SUCCESSURL));
 			data += "&" + PARAM_FAILUREURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_FAILUREURL));
 
+			lockInput();
 			builder.sendRequest(data, new RequestCallback() {
 				public void onError(Request request, Throwable exception) {
-					loggingIn = false;
 					onAuthenticationFailure();
 				}
 
 				public void onResponseReceived(Request request, Response response) {
-					loggingIn = false;
-					if (response.getStatusCode() == 200) {
-						SecurityService.Instance.get().getSession(language.getValueAsString(),
+					if (response != null && response.getStatusCode() >= 200 && response.getStatusCode() <= 405) {
+						SecurityService.Instance.get().getSession(language != null ? language.getValueAsString() : "en",
 								new AsyncCallback<GUISession>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
-										SC.warn("Login request error: {}", caught.getMessage());
+										onAuthenticationFailure();
 									}
 
 									@Override
 									public void onSuccess(GUISession sess) {
-										onAuthenticationSuccess(sess);
+										if (sess != null)
+											onAuthenticationSuccess(sess);
+										else {
+											onAuthenticationFailure();
+										}
 									}
 								});
 					} else {
+						// status code 405 means that the request has been
+						// received but the method used is not allowed
+//						SC.say("### response: " + response.getText() + " "
+//								+ (response != null ? response.getStatusCode() : ""));
 						onAuthenticationFailure();
 					}
 				}
 			});
 		} catch (RequestException e) {
+			unlockInput();
 			SC.warn("Login request error: {}", e.getMessage());
 		}
 	}
@@ -520,6 +660,7 @@ public class LoginPanel extends VLayout {
 	}
 
 	protected void onAuthenticationSuccess(GUISession session) {
+		SC.clearPrompt();
 		boolean saveLoginEnabled = "true".equals(info.getConfig("gui.savelogin"));
 		CookiesManager.saveLogin(saveLoginEnabled, rememberMe.getValueAsBoolean(), username.getValueAsString(),
 				password.getValueAsString());
@@ -549,22 +690,32 @@ public class LoginPanel extends VLayout {
 												if (!choice) {
 													Util.redirectToSuccessUrl(language.getValueAsString());
 												} else {
-													SecurityService.Instance.get()
-															.trustDevice(new AsyncCallback<String>() {
+													LD.askForString(I18N.message("trustdevice"),
+															I18N.message("optlabeldevice"), null, new ValueCallback() {
 
 																@Override
-																public void onFailure(Throwable caught) {
-																	Util.redirectToSuccessUrl(
-																			language.getValueAsString());
-																}
+																public void execute(String value) {
+																	SecurityService.Instance.get().trustDevice(value,
+																			new AsyncCallback<String>() {
 
-																@Override
-																public void onSuccess(String deviceId) {
-																	CookiesManager.saveDevice(deviceId);
-																	Util.redirectToSuccessUrl(
-																			language.getValueAsString());
+																				@Override
+																				public void onFailure(
+																						Throwable caught) {
+																					Util.redirectToSuccessUrl(language
+																							.getValueAsString());
+																				}
+
+																				@Override
+																				public void onSuccess(String deviceId) {
+																					CookiesManager.saveDevice(deviceId);
+																					Util.redirectToSuccessUrl(language
+																							.getValueAsString());
+																				}
+																			});
+
 																}
 															});
+
 												}
 											}
 										});
@@ -576,37 +727,42 @@ public class LoginPanel extends VLayout {
 	}
 
 	protected void onAuthenticationFailure() {
-		final String failure = CookiesManager.getFailure();
-		CookiesManager.removeLogin();
+		SC.clearPrompt();
+		lockInput();
+		LoginService.Instance.get().getUser((String) username.getValue(), new AsyncCallback<GUIUser>() {
 
-		if (failure != null && !"".equals(failure)) {
-			if ("usernameblocked".equals(failure)) {
-				SC.warn(I18N.message("usernameblockedwarn", info.getConfig("throttle.username.wait")));
-			} else if ("ipblocked".equals(failure)) {
-				SC.warn(I18N.message("ipblockedwarn", info.getConfig("throttle.ip.wait")));
-			} else {
-				loginService.getUser((String) username.getValue(), new AsyncCallback<GUIUser>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						SC.warn(I18N.message("accesdenied"));
-					}
-
-					@Override
-					public void onSuccess(GUIUser user) {
-						if (user != null && (user.getQuotaCount() >= user.getQuota() && user.getQuota() >= 0)) {
-							SC.warn(I18N.message("quotadocsexceeded"));
-						} else if ("passwordexpired".equals(failure)) {
-							ChangePassword change = new ChangePassword(user);
-							change.show();
-						} else {
-							SC.warn(I18N.message("accesdenied"));
-						}
-					}
-				});
+			@Override
+			public void onFailure(Throwable caught) {
+				unlockInput();
+				SC.warn(I18N.message("accesdenied"));
 			}
-		} else {
-			SC.warn(I18N.message("accesdenied"));
-		}
+
+			@Override
+			public void onSuccess(GUIUser user) {
+				unlockInput();
+
+				String failure = user != null ? user.getLastLoginFailureReason() : null;
+				if (user != null && user.isPasswordExpired()) {
+					ChangePassword change = new ChangePassword(user, LoginPanel.this);
+					change.show();
+				} else if (user != null && (user.getQuotaCount() >= user.getQuota() && user.getQuota() >= 0)) {
+					SC.warn(I18N.message("quotadocsexceeded"));
+				} else if ("usernameblocked".equals(failure)) {
+					SC.warn(I18N.message("usernameblockedwarn", info.getConfig("throttle.username.wait")));
+				} else if ("ipblocked".equals(failure)) {
+					SC.warn(I18N.message("ipblockedwarn", info.getConfig("throttle.ip.wait")));
+				} else
+					SC.warn(I18N.message("accesdenied"));
+
+			}
+		});
+	}
+
+	/**
+	 * Invoked when the user successfully changed his expired password
+	 */
+	public void onPasswordChanged() {
+		if (!credentialsPanel.isVisible())
+			toggleInputForm();
 	}
 }

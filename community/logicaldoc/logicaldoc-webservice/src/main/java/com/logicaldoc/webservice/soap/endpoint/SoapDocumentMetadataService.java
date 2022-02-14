@@ -17,11 +17,16 @@ import com.logicaldoc.core.metadata.AttributeSet;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.metadata.TemplateGroup;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.dao.GroupDAO;
+import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSAttributeSet;
+import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.model.WSUtil;
 import com.logicaldoc.webservice.soap.DocumentMetadataService;
@@ -42,7 +47,8 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			List<WSTemplate> templates = new ArrayList<WSTemplate>();
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			for (Template template : dao.findAll(user.getTenantId()))
-				templates.add(WSUtil.toWSTemplate(template));
+				if (dao.isReadEnable(template.getId(), user.getId()))
+					templates.add(WSUtil.toWSTemplate(template));
 			return templates.toArray(new WSTemplate[0]);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
@@ -56,7 +62,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		try {
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			Template template = dao.findByName(name, user.getTenantId());
-			if (template != null)
+			if (template != null && dao.isReadEnable(template.getId(), user.getId()))
 				return WSUtil.toWSTemplate(template);
 			else
 				return null;
@@ -68,11 +74,11 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 
 	@Override
 	public WSTemplate getTemplateById(String sid, long templateId) throws Exception {
-		validateSession(sid);
+		User user = validateSession(sid);
 		try {
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			Template template = dao.findById(templateId);
-			if (template != null)
+			if (template != null && dao.isReadEnable(template.getId(), user.getId()))
 				return WSUtil.toWSTemplate(template);
 			else
 				return null;
@@ -84,7 +90,6 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 
 	@Override
 	public long storeTemplate(String sid, WSTemplate template) throws Exception {
-		checkAdministrator(sid);
 		User user = validateSession(sid);
 
 		try {
@@ -97,6 +102,9 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 				dao.initialize(templ);
 				templ.setName(template.getName());
 				templ.setDescription(template.getDescription());
+
+				if (templ.getReadonly() == 1 || !isTemplateWritable(sid, templ.getId()))
+					throw new Exception("You do not have the permission");
 			}
 
 			if (StringUtils.isEmpty(templ.getName()))
@@ -142,13 +150,15 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 
 	@Override
 	public void deleteTemplate(String sid, long templateId) throws Exception {
-		checkAdministrator(sid);
-
 		try {
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			if (dao.countDocs(templateId) > 0)
-				throw new Exception("You cannot delete attributeSet with id " + templateId
-						+ " because some documents belongs to that attributeSet.");
+				throw new Exception("You cannot delete template with id " + templateId
+						+ " because some documents belongs to that template.");
+			Template templ = dao.findById(templateId);
+			if (templ.getReadonly() == 1 || !isTemplateWritable(sid, templateId))
+				throw new Exception("You do not have the permission");
+
 			dao.delete(templateId);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
@@ -322,10 +332,118 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	@Override
 	public void deleteAttributeSet(String sid, long setId) throws Exception {
 		checkAdministrator(sid);
-
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 			dao.delete(setId);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+			throw new Exception(t.getMessage());
+		}
+	}
+
+	@Override
+	public boolean isTemplateReadable(String sid, long templateId) throws Exception {
+		User user = validateSession(sid);
+		try {
+			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			return dao.isReadEnable(templateId, user.getId());
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+			throw new Exception(t.getMessage());
+		}
+	}
+
+	@Override
+	public boolean isTemplateWritable(String sid, long templateId) throws Exception {
+		User user = validateSession(sid);
+		try {
+			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			return dao.isWriteEnable(templateId, user.getId());
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+			throw new Exception(t.getMessage());
+		}
+	}
+
+	@Override
+	public void grantUserToTemplate(String sid, long templateId, long userId, int permissions) throws Exception {
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDao.findById(userId);
+		grantGroupToTemplate(sid, templateId, user.getUserGroup().getId(), permissions);
+	}
+
+	@Override
+	public void grantGroupToTemplate(String sid, long templateId, long groupId, int permissions) throws Exception {
+		validateSession(sid);
+		try {
+			if (!isTemplateWritable(sid, templateId))
+				throw new Exception("You do not have the permission");
+
+			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			Template templ = dao.findById(templateId);
+			if (templ == null || templ.getReadonly() == 1)
+				return;
+
+			TemplateGroup fg = new TemplateGroup();
+			fg.setGroupId(groupId);
+			fg.setPermissions(permissions);
+			templ.addTemplateGroup(fg);
+
+			dao.store(templ);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+			throw new Exception(t.getMessage());
+		}
+	}
+
+	private WSRight[] getGranted(String sid, long templateId, boolean users) throws Exception {
+		validateSession(sid);
+
+		List<WSRight> rightsList = new ArrayList<WSRight>();
+		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+		try {
+			Template template = templateDao.findById(templateId);
+			templateDao.initialize(template);
+			for (TemplateGroup tg : template.getTemplateGroups()) {
+				Group group = groupDao.findById(tg.getGroupId());
+				if (group.getName().startsWith("_user_") && users) {
+					rightsList.add(
+							new WSRight(Long.parseLong(group.getName().substring(group.getName().lastIndexOf('_') + 1)),
+									tg.getPermissions()));
+				} else if (!group.getName().startsWith("_user_") && !users)
+					rightsList.add(new WSRight(group.getId(), tg.getPermissions()));
+			}
+		} catch (Exception e) {
+			log.error("Some errors occurred", e);
+			throw new Exception("error", e);
+		}
+
+		return (WSRight[]) rightsList.toArray(new WSRight[rightsList.size()]);
+	}
+
+	@Override
+	public WSRight[] getGrantedUsers(String sid, long templateId) throws Exception {
+		validateSession(sid);
+		try {
+			if (!isTemplateReadable(sid, templateId))
+				throw new Exception("You do not have the permission");
+
+			return getGranted(sid, templateId, true);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+			throw new Exception(t.getMessage());
+		}
+	}
+
+	@Override
+	public WSRight[] getGrantedGroups(String sid, long templateId) throws Exception {
+		validateSession(sid);
+		try {
+			if (!isTemplateReadable(sid, templateId))
+				throw new Exception("You do not have the permission");
+
+			return getGranted(sid, templateId, false);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());

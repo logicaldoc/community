@@ -64,7 +64,7 @@ public class FolderHistoryDataServlet extends HttpServlet {
 
 			DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			StringBuffer query = new StringBuffer(
-					"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId from FolderHistory A where A.deleted = 0 ");
+					"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color from FolderHistory A where A.deleted = 0 ");
 			if (request.getParameter("id") != null)
 				query.append(" and A.folderId=" + request.getParameter("id"));
 			query.append(" order by A.date desc ");
@@ -100,6 +100,9 @@ public class FolderHistoryDataServlet extends HttpServlet {
 				writer.print("<device><![CDATA[" + (cols[10] == null ? "" : cols[10]) + "]]></device>");
 				writer.print("<geolocation><![CDATA[" + (cols[11] == null ? "" : cols[11]) + "]]></geolocation>");
 				writer.print("<userId>" + cols[12] + "</userId>");
+
+				if (cols[13] != null)
+					writer.print("<geolocation><![CDATA[" + cols[13] + "]]></geolocation>");
 				writer.print("</history>");
 			}
 			writer.write("</list>");

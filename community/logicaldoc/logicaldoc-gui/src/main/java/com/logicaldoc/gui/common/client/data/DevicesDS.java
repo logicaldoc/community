@@ -23,11 +23,12 @@ public class DevicesDS extends DataSource {
 		id.setHidden(true);
 		DataSourceTextField browser = new DataSourceTextField("browser");
 		DataSourceTextField os = new DataSourceTextField("os");
+		DataSourceTextField label = new DataSourceTextField("label");
 		DataSourceTextField type = new DataSourceTextField("type");
 		DataSourceDateField creation = new DataSourceDateField("creation");
 		DataSourceDateField lastlogin = new DataSourceDateField("lastlogin");
 
-		setFields(id, deviceId, browser, os, type, lastlogin, creation);
+		setFields(id, label, deviceId, browser, os, type, lastlogin, creation);
 		setDataURL("data/devices.xml?trustedonly=true");
 		setClientOnly(true);
 	}

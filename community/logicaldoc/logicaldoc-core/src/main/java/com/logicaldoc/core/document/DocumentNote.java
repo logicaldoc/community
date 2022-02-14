@@ -50,7 +50,7 @@ public class DocumentNote extends PersistentObject implements Cloneable {
 
 	private int opacity = 80;
 
-	private String color = "#FFFF88";
+	private String color = "#FFCC00";
 
 	private double left = 0.5;
 

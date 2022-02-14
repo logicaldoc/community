@@ -14,6 +14,7 @@ import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
@@ -94,18 +95,18 @@ public class UserInterfacePanel extends HLayout {
 		StaticTextItem docsGrid = ItemFactory.newStaticTextItem("docsgrid", "docsgridlayout",
 				user.getDocsGrid() != null && !user.getDocsGrid().isEmpty() ? I18N.message("customized")
 						: I18N.message("notcustomized"));
-		FormItemIcon showDocsDefinition = new FormItemIcon();
-		showDocsDefinition.setSrc("[SKIN]/paste.gif");
-		showDocsDefinition.setPrompt(I18N.message("showdefinition"));
-		showDocsDefinition.setWidth(12);
-		showDocsDefinition.setHeight(12);
-		showDocsDefinition.addFormItemClickHandler(new FormItemClickHandler() {
+		FormItemIcon editDocsLayout = new FormItemIcon();
+		editDocsLayout.setSrc("[SKIN]/paste.gif");
+		editDocsLayout.setPrompt(I18N.message("editlayout"));
+		editDocsLayout.setWidth(12);
+		editDocsLayout.setHeight(12);
+		editDocsLayout.addFormItemClickHandler(new FormItemClickHandler() {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
-				TextAreaItem textArea = ItemFactory.newTextAreaItem("griddefinition", I18N.message("griddefinition"),
+				TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"),
 						null);
 				textArea.setHeight(300);
-				LD.askForValue(I18N.message("griddefinition"), I18N.message("griddefinition"),
+				LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
 						user.getDocsGrid() != null ? user.getDocsGrid() : "", textArea, 400, new ValueCallback() {
 							@Override
 							public void execute(final String value) {
@@ -124,18 +125,18 @@ public class UserInterfacePanel extends HLayout {
 		StaticTextItem hitsGrid = ItemFactory.newStaticTextItem("hitsgrid", "hitsgridlayout",
 				user.getHitsGrid() != null && !user.getHitsGrid().isEmpty() ? I18N.message("customized")
 						: I18N.message("notcustomized"));
-		FormItemIcon showHitsDefinition = new FormItemIcon();
-		showHitsDefinition.setSrc("[SKIN]/paste.gif");
-		showHitsDefinition.setPrompt(I18N.message("showdefinition"));
-		showHitsDefinition.setWidth(12);
-		showHitsDefinition.setHeight(12);
-		showHitsDefinition.addFormItemClickHandler(new FormItemClickHandler() {
+		FormItemIcon editHitsLayout = new FormItemIcon();
+		editHitsLayout.setSrc("[SKIN]/paste.gif");
+		editHitsLayout.setPrompt(I18N.message("editlayout"));
+		editHitsLayout.setWidth(12);
+		editHitsLayout.setHeight(12);
+		editHitsLayout.addFormItemClickHandler(new FormItemClickHandler() {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
-				TextAreaItem textArea = ItemFactory.newTextAreaItem("griddefinition", I18N.message("griddefinition"),
+				TextAreaItem textArea = ItemFactory.newTextAreaItem("hitsgridlayout", I18N.message("hitsgridlayout"),
 						null);
 				textArea.setHeight(300);
-				LD.askForValue(I18N.message("griddefinition"), I18N.message("griddefinition"),
+				LD.askForValue(I18N.message("hitsgridlayout"), I18N.message("hitsgridlayout"),
 						user.getHitsGrid() != null ? user.getHitsGrid() : "", textArea, 400, new ValueCallback() {
 							@Override
 							public void execute(final String value) {
@@ -151,10 +152,14 @@ public class UserInterfacePanel extends HLayout {
 			}
 		});
 
-		docsGrid.setIcons(showDocsDefinition, clear);
-		hitsGrid.setIcons(showHitsDefinition, clear);
+		docsGrid.setIcons(editDocsLayout, clear);
+		hitsGrid.setIcons(editHitsLayout, clear);
+		
+		TextItem dateFormat = ItemFactory.newTextItem("dateFormat", "dateformat", user.getDateFormat());
+		TextItem dateFormatShort = ItemFactory.newTextItem("dateFormatShort", "dateformatshort", user.getDateFormatShort());
+		TextItem dateFormatLong = ItemFactory.newTextItem("dateFormatLong", "dateformatlong", user.getDateFormatLong());
 
-		form1.setItems(welcomeScreen, defaultWorkspace, docsGrid, hitsGrid);
+		form1.setItems(welcomeScreen, defaultWorkspace, docsGrid, hitsGrid, dateFormat, dateFormatShort, dateFormatLong);
 
 		addMember(layout);
 	}
@@ -173,6 +178,21 @@ public class UserInterfacePanel extends HLayout {
 			if (vm.getValueAsString("hitsgrid") == null || vm.getValueAsString("hitsgrid").isEmpty()
 					|| I18N.message("notcustomized").equals(vm.getValueAsString("hitsgrid")))
 				user.setHitsGrid(null);
+			
+			if (vm.getValueAsString("dateFormat") == null || vm.getValueAsString("dateFormat").isEmpty())
+				user.setDateFormat(null);
+			else
+				user.setDateFormat(vm.getValueAsString("dateFormat"));
+			
+			if (vm.getValueAsString("dateFormatShort") == null || vm.getValueAsString("dateFormatShort").isEmpty())
+				user.setDateFormatShort(null);
+			else
+				user.setDateFormatShort(vm.getValueAsString("dateFormatShort"));
+			
+			if (vm.getValueAsString("dateFormatLong") == null || vm.getValueAsString("dateFormatLong").isEmpty())
+				user.setDateFormatLong(null);
+			else
+				user.setDateFormatLong(vm.getValueAsString("dateFormatLong"));
 		}
 		return !vm.hasErrors();
 	}

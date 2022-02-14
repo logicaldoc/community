@@ -18,6 +18,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
@@ -65,15 +67,22 @@ public class VersionsDataServlet extends HttpServlet {
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
+			
 			VersionDAO dao = (VersionDAO) Context.get().getBean(VersionDAO.class);
 
 			List<Object> parameters = new ArrayList<Object>();
 			StringBuffer query = new StringBuffer(
 					"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
-							+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId ");
+							+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
 			if (request.getParameter("docId") != null) {
+				long docId=Long.parseLong(request.getParameter("docId"));				
+				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				Document doc=ddao.findDocument(docId);
+				if(doc!=null)
+					docId=doc.getId();
+				
 				query.append(" from Version A where A.deleted = 0 and A.docId = ?1 ");
-				parameters.add(Long.parseLong(request.getParameter("docId")));
+				parameters.add(docId);
 			} else {
 				query.append(" from Version A, Archive B where A.deleted = 0 and A in elements(B.entries) ");
 				query.append(" and B.id = ?1");
@@ -108,16 +117,17 @@ public class VersionsDataServlet extends HttpServlet {
 				writer.print(
 						"<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[11])) + "</icon>");
 				writer.print("<type>" + (String) cols[11] + "</type>");
+
 				if (cols[12] != null)
 					writer.print("<template><![CDATA[" + cols[12] + "]]></template>");
-				else
-					writer.print("<template></template>");
-
-				writer.print("<workflowStatus><![CDATA[" + (cols[13] != null ? cols[13] : "") + "]]></workflowStatus>");
-				writer.print("<workflowStatusDisplay><![CDATA[" + (cols[14] != null ? cols[14] : "")
-						+ "]]></workflowStatusDisplay>");
+				if (cols[13] != null)
+					writer.print("<workflowStatus><![CDATA[" + cols[13] + "]]></workflowStatus>");
+				if (cols[14] != null)
+					writer.print("<workflowStatusDisplay><![CDATA[" + cols[14] + "]]></workflowStatusDisplay>");
 				writer.print("<userId>" + cols[15] + "</userId>");
-				
+				if (cols[16] != null)
+					writer.print("<color><![CDATA[" + cols[16] + "]]></color>");
+
 				writer.print("</version>");
 			}
 

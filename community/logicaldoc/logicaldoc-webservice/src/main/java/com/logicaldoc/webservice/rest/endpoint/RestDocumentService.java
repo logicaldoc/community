@@ -54,10 +54,12 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	private static Logger log = LoggerFactory.getLogger(RestDocumentService.class);
 	
     /**
-     * Creates a new document
-     *
      * Creates a new document using the metadata document object provided as JSON/XML
-     * @throws Exception 
+     * 
+     * @param document  the document's metadata
+     * @param contentDetail the file content
+     * 
+     * @throws Exception a generic error
      *
      */
 	@Override
@@ -630,6 +632,25 @@ public class RestDocumentService extends SoapDocumentService implements Document
 		super.move(sid, docId, folderId);
 	}
 
+	@Override
+	@PUT
+	@Path("/move")
+	@Operation(summary = "Copies a document into a folder")
+	@Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = WSDocument.class))),
+        @ApiResponse(responseCode = "401", description = "Authentication failed"),
+        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+	public WSDocument copy(
+			@QueryParam("docId") @Parameter(description = "Document ID", required = true) long docId,
+			@QueryParam("folderId") @Parameter(description = "Target Folder ID", required = true) long folderId)
+			throws Exception {
+		String sid = validateSession();
+		return super.copy(sid, docId, folderId);
+	}
+	
+	
+	
 	@Override
 	@PUT
 	@Path("/createThumbnail")

@@ -1,12 +1,17 @@
 package com.logicaldoc.gui.common.client.util;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
+import com.smartgwt.client.widgets.Dialog;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -248,17 +253,16 @@ public class LD {
 	}
 
 	/**
-	 * Show a dialog asking for a value to complete an operation. The provided
-	 * form item will be used
+	 * Show a dialog asking for a set of values to complete an operation. The
+	 * provided form items will be used
 	 * 
 	 * @param title title of the dialog box
 	 * @param message text printed in the body of the dialog box
-	 * @param defaultValue default value
-	 * @param item the item used to input the value
+	 * @param items the items used to input the values
 	 * @param width width of the dialog box
 	 * @param callback call back used when the user confirms the input
 	 */
-	public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
+	public static void askForValues(String title, String message, List<FormItem> items, Integer width,
 			final ValueCallback callback) {
 		final Window dialog = new Window();
 
@@ -290,33 +294,37 @@ public class LD {
 		form.setWrapItemTitles(false);
 		form.setNumCols(1);
 
-		item.setWidth("100%");
-		item.setName("value");
-		if (message == null)
-			item.setShowTitle(false);
-		else
-			item.setTitle(I18N.message(message));
-		item.setWrapTitle(false);
-		if (!(item instanceof TextAreaItem) && !(item instanceof RichTextItem))
-			/*
-			 * In case of simple input item, when the user presses the Enter
-			 * key, we consider he wants to confirm the input
-			 */
-			item.addKeyPressHandler(new KeyPressHandler() {
-				@Override
-				public void onKeyPress(KeyPressEvent event) {
-					if (form.validate() && event.getKeyName() != null
-							&& "enter".equals(event.getKeyName().toLowerCase())) {
-						if (callback != null) {
-							dialog.close();
-							callback.execute(form.getValue("value").toString());
-							dialog.destroy();
+		for (FormItem item : items) {
+			if (items.size() == 1)
+				item.setName("value");
+
+			item.setWidth("100%");
+			if (message == null)
+				item.setShowTitle(false);
+			else
+				item.setTitle(I18N.message(message));
+			item.setWrapTitle(false);
+			if (!(item instanceof TextAreaItem) && !(item instanceof RichTextItem) && items.size() == 1)
+				/*
+				 * In case of simple input item, when the user presses the Enter
+				 * key, we consider he wants to confirm the input
+				 */
+				item.addKeyPressHandler(new KeyPressHandler() {
+					@Override
+					public void onKeyPress(KeyPressEvent event) {
+						if (form.validate() && event.getKeyName() != null
+								&& "enter".equals(event.getKeyName().toLowerCase())) {
+							if (callback != null) {
+								dialog.close();
+								callback.execute(form.getValue("value").toString());
+								dialog.destroy();
+							}
 						}
 					}
-				}
-			});
+				});
+		}
 
-		form.setFields(item);
+		form.setFields(items.toArray(new FormItem[0]));
 
 		IButton ok = new IButton(I18N.message("ok"));
 		ok.setAutoFit(true);
@@ -325,7 +333,10 @@ public class LD {
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
 				if (form.validate() && callback != null) {
 					dialog.close();
-					callback.execute(form.getValue("value") != null ? form.getValue("value").toString() : null);
+					if (callback instanceof ValuesCallback) {
+						((ValuesCallback) callback).execute(form.getValues());
+					} else
+						callback.execute(form.getValue("value") != null ? form.getValue("value").toString() : null);
 					dialog.destroy();
 				}
 			}
@@ -355,16 +366,32 @@ public class LD {
 		dialog.addItem(container);
 		dialog.show();
 
+		form.focusInItem(items.get(0));
+		form.setAutoFocus(true);
+		form.focus();
+	}
+
+	/**
+	 * Show a dialog asking for a value to complete an operation. The provided
+	 * form item will be used
+	 * 
+	 * @param title title of the dialog box
+	 * @param message text printed in the body of the dialog box
+	 * @param defaultValue default value
+	 * @param item the item used to input the value
+	 * @param width width of the dialog box
+	 * @param callback call back used when the user confirms the input
+	 */
+	public static void askForValue(String title, String message, String defaultValue, FormItem item, Integer width,
+			final ValueCallback callback) {
+		askForValues(title, message, Arrays.asList(new FormItem[] { item }), width, callback);
+
 		if (defaultValue != null) {
 			item.setValue(defaultValue);
 			if (item instanceof TextItem) {
 				((TextItem) item).selectValue();
 				if (defaultValue.length() > 0)
 					((TextItem) item).setSelectionRange(0, defaultValue.length());
-			} else {
-				form.focusInItem(item);
-				form.setAutoFocus(true);
-				form.focus();
 			}
 		}
 	}
@@ -383,5 +410,26 @@ public class LD {
 		TextItem item = new TextItem();
 		item.setRequired(true);
 		askForValue(title, message, defaultValue, item, null, callback);
+	}
+
+	public static void clearPrompt() {
+		SC.clearPrompt();
+	}
+
+	public static void prompt(String message) {
+		Dialog properties = new Dialog();
+		properties.setShowHeader(false);
+		properties.setShowHeaderBackground(false);
+		properties.setMembersMargin(0);
+		SC.showPrompt("", I18N.message(message), properties);
+	}
+
+	public static void contactingServer() {
+		Dialog properties = new Dialog();
+		properties.setShowHeader(false);
+		properties.setShowHeaderBackground(false);
+		properties.setMembersMargin(0);
+		properties.setBodyStyle("contactingserver");
+		SC.showPrompt("", AwesomeFactory.getSpinnerIconHtml("pulse", I18N.message("contactingserver")), properties);
 	}
 }

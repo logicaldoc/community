@@ -42,7 +42,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class GUIGridsPanel extends VLayout {
 
-	private ListGrid documentsGrid;
+	private ListGrid documentsFieldsGrid;
 
 	private ListGrid searchGrid;
 
@@ -84,17 +84,17 @@ public class GUIGridsPanel extends VLayout {
 		ListGridField attribute = new ListGridField("label", I18N.message("attribute"));
 		attribute.setCanEdit(false);
 
-		documentsGrid = new ListGrid();
-		documentsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		documentsGrid.setCanEdit(false);
-		documentsGrid.setWidth100();
-		documentsGrid.setHeight100();
-		documentsGrid.setSelectionType(SelectionStyle.MULTIPLE);
-		documentsGrid.setCanReorderRecords(true);
-		documentsGrid.setShowRowNumbers(true);
-		documentsGrid.setFields(attribute);
+		documentsFieldsGrid = new ListGrid();
+		documentsFieldsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		documentsFieldsGrid.setCanEdit(false);
+		documentsFieldsGrid.setWidth100();
+		documentsFieldsGrid.setHeight100();
+		documentsFieldsGrid.setSelectionType(SelectionStyle.MULTIPLE);
+		documentsFieldsGrid.setCanReorderRecords(true);
+		documentsFieldsGrid.setShowRowNumbers(true);
+		documentsFieldsGrid.setFields(attribute);
 
-		documentsGrid.addCellContextClickHandler(new CellContextClickHandler() {
+		documentsFieldsGrid.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
 				Menu contextMenu = new Menu();
@@ -102,7 +102,7 @@ public class GUIGridsPanel extends VLayout {
 				delete.setTitle(I18N.message("ddelete"));
 				delete.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 					public void onClick(MenuItemClickEvent event) {
-						documentsGrid.removeSelectedData();
+						documentsFieldsGrid.removeSelectedData();
 					}
 				});
 				contextMenu.setItems(delete);
@@ -127,12 +127,12 @@ public class GUIGridsPanel extends VLayout {
 							|| sel.getAttributeAsString("name").equals("score"))
 						continue;
 
-					Record record = documentsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
+					Record record = documentsFieldsGrid.getRecordList().find("name", sel.getAttributeAsString("name"));
 					if (record == null) {
 						ListGridRecord newRec = new ListGridRecord();
 						newRec.setAttribute("name", sel.getAttributeAsString("name"));
 						newRec.setAttribute("label", sel.getAttributeAsString("label"));
-						documentsGrid.addData(newRec);
+						documentsFieldsGrid.addData(newRec);
 					}
 				}
 				selector.clearValue();
@@ -141,7 +141,7 @@ public class GUIGridsPanel extends VLayout {
 		});
 		controls.addFormItem(selector);
 
-		documentsGrid.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
+		documentsFieldsGrid.setGridComponents(new Object[] { ListGridComponent.HEADER, ListGridComponent.BODY, controls });
 
 		String columns = Session.get().getConfig("gui.document.columns");
 
@@ -152,7 +152,7 @@ public class GUIGridsPanel extends VLayout {
 				String n = att.trim();
 				record.setAttribute("name", n);
 				record.setAttribute("label", Session.get().getInfo().getAttributeLabel(n));
-				documentsGrid.addData(record);
+				documentsFieldsGrid.addData(record);
 			}
 		}
 
@@ -171,7 +171,7 @@ public class GUIGridsPanel extends VLayout {
 		pageSize.setStep(10);
 		controls.addFormItem(pageSize);
 		
-		section.setItems(documentsGrid);
+		section.setItems(documentsFieldsGrid);
 		stack.setSections(section);
 
 		return stack;
@@ -277,7 +277,7 @@ public class GUIGridsPanel extends VLayout {
 		 * Prepare the list of columns for the documents screen
 		 */
 		StringBuffer value = new StringBuffer();
-		ListGridRecord[] attrs = documentsGrid.getRecords();
+		ListGridRecord[] attrs = documentsFieldsGrid.getRecords();
 		for (ListGridRecord att : attrs) {
 			if (value.length() > 0)
 				value.append(",");

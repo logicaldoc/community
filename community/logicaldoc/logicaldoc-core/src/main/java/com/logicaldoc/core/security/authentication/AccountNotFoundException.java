@@ -16,8 +16,11 @@ public class AccountNotFoundException extends AuthenticationException {
 		super(CODE);
 	}
 
-	public AccountNotFoundException(String message) {
-		super(message);
+	public AccountNotFoundException(Authenticator authenticator) {
+		super(authenticator, CODE);
 	}
 
+	public AccountNotFoundException(Authenticator authenticator, String message) {
+		super(authenticator, message);
+	}
 }

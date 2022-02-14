@@ -45,6 +45,10 @@ public class Menu {
 	
 	public static final long CAPTURE = 1608;
 	
+	public static final long PREVIEW = 1609;
+	
+	public static final long RATING = 1610;
+	
 	public static final long DASHBOARD_CALENDAR = 1526;
 
 	public static final long SEARCH = 1510;
@@ -84,6 +88,14 @@ public class Menu {
 	public static final long METADATA = 25;
 
 	public static final long WORKFLOW = 23;
+	
+	public static final long DASHBOARD_WORKFLOW = 1580;
+	
+	public static final long DASHBOARD_WORKFLOW_ALLWORKFLOWS = 1581;
+	
+	public static final long DASHBOARD_WORKFLOW_WORKFLOWSINVOLVEDIN = 1582;
+	
+	public static final long DASHBOARD_WORKFLOW_WORKFLOWSYOUSUPERVISE = 1583;
 
 	public static final long BARCODES = 30;
 
@@ -166,6 +178,10 @@ public class Menu {
 	public static final long ZONAL_OCR = 2100;
 	
 	public static final long CUSTOM_ACTIONS = 1300;
+	
+	public static final long SUBSCRIPTIONS_REPORT = -1125;
+	
+	public static final long SCAN = 550;
 	
 	private static Set<Long> menus = new HashSet<Long>();
 

@@ -13,7 +13,7 @@ import com.logicaldoc.core.PersistentObject;
  */
 public class Ticket extends PersistentObject {
 
-	public static final int TICKET = 0;
+	public static final int DOWNLOAD = 0;
 
 	public static final int PSW_RECOVERY = 1;
 
@@ -23,7 +23,7 @@ public class Ticket extends PersistentObject {
 
 	private long userId = -1;
 
-	private int type = TICKET;
+	private int type = DOWNLOAD;
 
 	private Date creation = new Date();
 

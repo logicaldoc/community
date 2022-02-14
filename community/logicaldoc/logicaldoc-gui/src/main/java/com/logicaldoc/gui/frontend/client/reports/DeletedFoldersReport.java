@@ -4,15 +4,16 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DeletedFoldersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.folder.RestoreDialog;
 import com.smartgwt.client.types.SelectionStyle;
@@ -21,7 +22,6 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
@@ -113,26 +113,18 @@ public class DeletedFoldersReport extends AdminPanel implements FolderChangeList
 		// Prepare a panel containing a title and the documents list
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		ListGridField id = new ListGridField("id");
+		ListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);
 		id.setCanGroupBy(false);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"), 200);
+		ListGridField name = new FolderListGridField("name", I18N.message("name"));
+		name.setWidth(200);
 		name.setCanFilter(true);
-		name.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				boolean alias = "folder_alias".equals(record.getAttributeAsString("type"));
-				String icon = DocUtil.getFolderIcon(false, alias ? GUIFolder.TYPE_ALIAS : GUIFolder.TYPE_DEFAULT, "");
-				return icon + "&nbsp;" + record.getAttributeAsString("name");
-			}
-		});
 
 		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setCanGroupBy(false);
 
-		ListGridField deleteUser = new AvatarListGridField("deleteUser", "deleteUserId", "deletedby", 200);
+		ListGridField deleteUser = new UserListGridField("deleteUser", "deleteUserId", "deletedby");
 		deleteUser.setCanFilter(true);
 
 		list = new RefreshableListGrid();

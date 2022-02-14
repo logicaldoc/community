@@ -24,6 +24,8 @@ import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.EventPanel;
+import com.logicaldoc.gui.common.client.observer.FolderController;
+import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.smartgwt.client.widgets.Canvas;
 
 public class Util {
@@ -103,6 +105,16 @@ public class Util {
 
 	public static String downloadURL(long docId) {
 		return downloadURL(docId, null, false);
+	}
+
+	public static void download(String urlToRedirectTo) {
+		uninstallCloseWindowAlert();
+		WindowUtils.openUrl(urlToRedirectTo);
+		installCloseWindowAlert();
+	}
+
+	public static void downloadDoc(long docId) {
+		download(downloadURL(docId));
 	}
 
 	public static String displayURL(Long docId, Long folderId) {
@@ -228,19 +240,19 @@ public class Util {
 	}
 
 	public static String iconWithFilename(String iconName, String fileName) {
-		return "<div class='box'>" + fileNameIcon(iconName, 16) + " " + fileName + "</div>";
+		return "<div class='box'>" + fileNameIcon(iconName, 16) + "&nbsp;" + fileName + "</div>";
 	}
 
 	public static String avatarWithText(String userIdOrName, String text) {
-		return "<div class='box'>" + avatarImg(userIdOrName, 16) + " " + text + "</div>";
+		return "<div class='box'>" + avatarImg(userIdOrName, 16) + "&nbsp;" + text + "</div>";
 	}
 
 	public static String avatarWithText(Long userId, String text) {
-		return "<div class='box'>" + avatarImg(userId != null ? "" + userId : "0", 16) + " " + text + "</div>";
+		return "<div class='box'>" + avatarImg(userId != null ? "" + userId : "0", 16) + "&nbsp;" + text + "</div>";
 	}
 
 	public static String textWithAvatar(Long userId, String text) {
-		return "<div class='box'>" + text + " " + avatarImg(userId != null ? "" + userId : "0", 16) + "</div>";
+		return "<div class='box'>" + text + "&nbsp;" + avatarImg(userId != null ? "" + userId : "0", 16) + "</div>";
 	}
 
 	public static String avatarImg(Long userId, int size) {
@@ -493,6 +505,14 @@ public class Util {
 		return str;
 	}
 
+	public static String formatInt(int number) {
+		String str;
+		NumberFormat fmt = NumberFormat.getFormat("#,###");
+		str = fmt.format(number);
+		str = str.replace(',', I18N.groupingSepator());
+		return str;
+	}
+
 	public static String formatSizeKB(Object value) {
 		if (value == null)
 			return null;
@@ -719,9 +739,36 @@ public class Util {
 			return s;
 	}
 
+	/**
+	 * Removes the javascript function used to ask confirmation on window close
+	 */
+	public static native void uninstallCloseWindowAlert() /*-{
+		$wnd.onbeforeunload = null;
+	}-*/;
+
+	/**
+	 * Declares the javascript function used to ask confirmation on window close
+	 */
+	public static native void installCloseWindowAlert() /*-{
+		$wnd.onbeforeunload = function() {
+			return "You have attempted to leave this page. Are you sure?";
+		};
+	}-*/;
+
 	private static boolean isWebstartMode() {
 		return WindowUtils.isChrome()
 				|| (WindowUtils.isWindows() && "webstart".equals(Session.get().getConfig("gui.webstart.mode")));
+	}
+
+	public static void openEditWithOffice(long docId) {
+		uninstallCloseWindowAlert();
+		try {
+			WindowUtils.openUrl("ldedit:" + GWT.getHostPageBaseURL() + "ldedit?action=edit&sid="
+					+ Session.get().getSid() + "&docId=" + docId);
+			ToastNotification.showNotification(I18N.message("officeaddinhintlauncher"));
+		} finally {
+			installCloseWindowAlert();
+		}
 	}
 
 	public static void openScan() {
@@ -729,7 +776,7 @@ public class Util {
 			return;
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("targetFolderId", "" + Session.get().getCurrentFolder().getId());
+		params.put("targetFolderId", "" + FolderController.get().getCurrentFolder().getId());
 		String url = Util.webstartURL("scan", params);
 
 		openWebstartApp(url);
@@ -737,7 +784,7 @@ public class Util {
 
 	public static void openBulkCheckout(List<Long> unlockedIds) {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("targetFolderId", "" + Session.get().getCurrentFolder().getId());
+		params.put("targetFolderId", "" + FolderController.get().getCurrentFolder().getId());
 		params.put("docIds", unlockedIds.toString().replace('[', ' ').replace(']', ' ').trim());
 		String url = Util.webstartURL("bulkcheckout", params);
 
@@ -745,15 +792,20 @@ public class Util {
 	}
 
 	private static void openWebstartApp(String url) {
-		if (isWebstartMode()) {
-			url = url.replace("=", "_x_");
-			url = url.replace("&", "_y_");
-			url = url.replace(",", "_z_");
-			WindowUtils.openUrl("ldwebstart:" + url);
-			EventPanel.get().info(I18N.message("webstarthintlauncher"), null);
-		} else {
-			WindowUtils.openUrl(url, "_self");
-			EventPanel.get().info(I18N.message("webstarthint"), null);
+		uninstallCloseWindowAlert();
+		try {
+			if (isWebstartMode()) {
+				url = url.replace("=", "_x_");
+				url = url.replace("&", "_y_");
+				url = url.replace(",", "_z_");
+				WindowUtils.openUrl("ldwebstart:" + url, "_self");
+				EventPanel.get().info(I18N.message("webstarthintlauncher"), null);
+			} else {
+				WindowUtils.openUrl(url, "_self");
+				EventPanel.get().info(I18N.message("webstarthint"), null);
+			}
+		} finally {
+			installCloseWindowAlert();
 		}
 	}
 
@@ -893,7 +945,7 @@ public class Util {
 		url += "?locale=" + I18N.getLocale() + "&tenant=" + Session.get().getTenantName();
 		if (parameters != null)
 			url += "&" + parameters;
-		Util.redirect(url);
+		Util.download(url);
 	}
 
 	/**
@@ -1043,6 +1095,21 @@ public class Util {
 	}
 
 	/**
+	 * Manipulates the given Base64 image specification into a Src to be uses in
+	 * a &lt;img&gt; tag
+	 * 
+	 * @param imageBase64 the Base64 representation of an image
+	 * 
+	 * @return The Src
+	 */
+	public static String imageBase64Src(String imageBase64) {
+		if (imageBase64 != null && !imageBase64.isEmpty() && !imageBase64.startsWith("data:image"))
+			return "data:image/png;base64," + imageBase64;
+		else
+			return imageBase64;
+	}
+
+	/**
 	 * Formats a set of tags into an HTML grid
 	 * 
 	 * @param tags the tags to format
@@ -1065,6 +1132,15 @@ public class Util {
 	public static String formatDateShortISO(Date date) {
 		DateTimeFormat fmt = DateTimeFormat.getFormat("yyyy-MM-dd");
 		return fmt.format(date);
+	}
+
+	public static String encodeUTF8(String rawString) {
+		try {
+			byte[] bytes = rawString.getBytes("UTF-8");
+			return new String(bytes, "UTF-8");
+		} catch (Throwable t) {
+			return rawString;
+		}
 	}
 
 	public static native String getJavascriptVariable(String jsVar)/*-{

@@ -9,16 +9,16 @@ import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIPatch;
-import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ApplicationRestarting;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.frontend.client.services.UpdateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ExpansionMode;
@@ -117,10 +117,8 @@ public class PatchPanel extends VLayout {
 
 		ListGridField date = new DateListGridField("date", I18N.message("date"), DateCellFormatter.FORMAT_SHORT);
 
-		ListGridField size = new ListGridField("size", I18N.getAttributeLabel("size"), 70);
-		size.setAlign(Alignment.RIGHT);
-		size.setType(ListGridFieldType.FLOAT);
-		size.setCellFormatter(new FileSizeCellFormatter());
+		ListGridField size = new FileSizeListGridField("size", I18N.getAttributeLabel("size"));
+
 		size.setCanFilter(false);
 
 		final ListGrid list = new ListGrid() {
@@ -142,7 +140,6 @@ public class PatchPanel extends VLayout {
 		list.setExpansionMode(ExpansionMode.DETAIL_FIELD);
 		list.setDetailField("description");
 		list.setFields(id, name, rating, date, size, installed, restart, file);
-		
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -184,7 +181,7 @@ public class PatchPanel extends VLayout {
 		DynamicForm form = new DynamicForm();
 		form.setWidth100();
 		form.setAlign(Alignment.LEFT);
-		form.setColWidths("1px","*");
+		form.setColWidths("1px", "*");
 		form.setTitleOrientation(TitleOrientation.LEFT);
 
 		StaticTextItem name = ItemFactory.newStaticTextItem("name", "name", patch.getName());
@@ -247,19 +244,19 @@ public class PatchPanel extends VLayout {
 	}
 
 	private void showList() {
-		ContactingServer.get().show();
+		LD.contactingServer();
 
 		UpdateService.Instance.get().checkPatch(Session.get().getInfo().getUserNo(),
 				Session.get().getInfo().getRelease(), new AsyncCallback<GUIPatch[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(GUIPatch[] patches) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						switchListView(patches);
 					}
 				});

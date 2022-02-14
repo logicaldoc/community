@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.GridUtil;
@@ -160,7 +161,7 @@ public class SearchToolbar extends ToolStrip {
 		gallery.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (Session.get().getCurrentFolder() != null)
+				if (FolderController.get().getCurrentFolder() != null)
 					CookiesManager.save(CookiesManager.COOKIE_HITSLIST_MODE, DocumentsGrid.MODE_GALLERY);
 				hitsPanel.setVisualizationMode(DocumentsGrid.MODE_GALLERY);
 				hitsPanel.initialize();

@@ -9,11 +9,16 @@
 		<echo message="Deploying ${pom.artifactId}" />
 
 		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
-		  <arg line="-o -Dmaven.test.skip=true install"/>
+			<arg line="-o -Dmaven.test.skip=true install" />
 		</exec>
-		
-		<copy file="target/${pom.artifactId}-${pom.version}.${pom.packaging}" todir="${logicaldoc.webroot}/WEB-INF/lib"/>
-		
+
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying into @{webroot}" />
+				<copy file="target/${pom.artifactId}-${pom.version}.${pom.packaging}" todir="@{webroot}/WEB-INF/lib" />
+			</sequential>
+		</for>
+
 		<echo message="${pom.artifactId} has been deployed" />
 	</target>
 </project>

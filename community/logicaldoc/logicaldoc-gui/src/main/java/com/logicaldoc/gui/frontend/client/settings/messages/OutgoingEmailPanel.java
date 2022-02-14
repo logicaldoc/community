@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
@@ -76,7 +75,7 @@ public class OutgoingEmailPanel extends AdminPanel {
 		SelectItem connSecurity = new SelectItem();
 		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
 		opts.put(GUIEmailSettings.SECURITY_NONE, I18N.message("none"));
-		opts.put(GUIEmailSettings.SECURITY_TLS_IF_AVAILABLE, I18N.message("tlsavailable"));
+		opts.put(GUIEmailSettings.SECURITY_STARTTLS, I18N.message("starttls"));
 		opts.put(GUIEmailSettings.SECURITY_TLS, I18N.message("tls"));
 		opts.put(GUIEmailSettings.SECURITY_SSL, I18N.message("ssl"));
 		connSecurity.setValueMap(opts);
@@ -180,17 +179,17 @@ public class OutgoingEmailPanel extends AdminPanel {
 
 								@Override
 								public void execute(String value) {
-									ContactingServer.get().show();
+									LD.contactingServer();
 									SettingService.Instance.get().testEmail(value, new AsyncCallback<Boolean>() {
 										@Override
 										public void onFailure(Throwable caught) {
 											GuiLog.serverError(caught);
-											ContactingServer.get().hide();
+											LD.clearPrompt();
 										}
 
 										@Override
 										public void onSuccess(Boolean result) {
-											ContactingServer.get().hide();
+											LD.clearPrompt();
 											if (result.booleanValue())
 												SC.say(I18N.message("connectionestablished"));
 											else

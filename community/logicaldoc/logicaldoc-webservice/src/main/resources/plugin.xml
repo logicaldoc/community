@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-webservice" version="8.6.1" class="com.logicaldoc.webservice.WebservicePlugin">
+<plugin id="logicaldoc-webservice" version="8.7.3" class="com.logicaldoc.webservice.WebservicePlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>
@@ -11,4 +11,12 @@
 	<extension plugin-id="logicaldoc-core" point-id="Feature" id="fws58">
 	    <parameter id="name" value="Feature_58" />
     </extension>
+    <extension plugin-id="logicaldoc-core" point-id="DbInit" id="webservicesDbInit">
+	  <parameter id="position" value="20" />
+	  <parameter id="name" value="logicaldoc-webservices" />
+	  <parameter id="sqlFile" value="sql/logicaldoc-webservices.sql" />
+    </extension>
+    <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspSaveApiCall">
+       <parameter id="code" value="saveApiCall" />
+    </extension>    
 </plugin>

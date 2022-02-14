@@ -4,25 +4,28 @@ import java.util.LinkedHashMap;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DuplicatesDS;
-import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -37,9 +40,9 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.GroupNode;
@@ -69,7 +72,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 
 	private boolean filters;
 
-	private IntegerItem max;
+	private SpinnerItem max;
 
 	private FolderSelector folderSelector;
 
@@ -84,10 +87,17 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
 
-		max = ItemFactory.newValidateIntegerItem("max", "", 500, 1, null);
+		max = ItemFactory.newSpinnerItem("max", "", 500, 5, null);
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
-		max.setWidth(50);
+		max.setStep(10);
+		max.addChangedHandler(new ChangedHandler() {
+
+			@Override
+			public void onChanged(ChangedEvent event) {
+				refresh();
+			}
+		});
 
 		ToolStripButton display = new ToolStripButton();
 		display.setTitle(I18N.message("display"));
@@ -149,19 +159,19 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 							@Override
 							public void execute(String value) {
 								if (value != null) {
-									ContactingServer.get().show();
+									LD.contactingServer();
 									DocumentService.Instance.get().deDuplicate(folderSelector.getFolderId(),
 											"newest".equals(value), new AsyncCallback<Void>() {
 
 												@Override
 												public void onFailure(Throwable caught) {
-													ContactingServer.get().hide();
+													LD.clearPrompt();
 													GuiLog.serverError(caught);
 												}
 
 												@Override
 												public void onSuccess(Void arg) {
-													ContactingServer.get().hide();
+													LD.clearPrompt();
 													refresh();
 												}
 											});
@@ -208,28 +218,15 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		ListGridField id = new ListGridField("id");
+		ListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);
 		id.setCanGroupBy(false);
 
-		ListGridField size = new ListGridField("size", I18N.message("size"), 70);
-		size.setAlign(Alignment.RIGHT);
-		size.setType(ListGridFieldType.FLOAT);
-		size.setCellFormatter(new FileSizeCellFormatter());
+		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 		size.setCanFilter(false);
 		size.setCanGroupBy(false);
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-		icon.setCanGroupBy(false);
-
-		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
+		ListGridField version = new VersionListGridField();
 		version.setAlign(Alignment.CENTER);
 		version.setCanFilter(true);
 		version.setCanGroupBy(false);
@@ -237,28 +234,29 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setCanGroupBy(false);
 
-		ListGridField publisher = new ListGridField("publisher", I18N.message("publisher"), 90);
+		ListGridField publisher = new ColoredListGridField("publisher", I18N.message("publisher"), 90);
 		publisher.setAlign(Alignment.CENTER);
 		publisher.setCanFilter(true);
 		publisher.setHidden(true);
 		publisher.setCanGroupBy(false);
 
-		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
+		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setHidden(true);
 		customId.setCanGroupBy(false);
 
-		ListGridField digest = new ListGridField("digest", I18N.message("digest"), 250);
+		ListGridField digest = new ColoredListGridField("digest", I18N.message("digest"), 250);
 		digest.setType(ListGridFieldType.TEXT);
 		digest.setCanFilter(true);
 
-		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
+		ListGridField filename = new FileNameListGridField("filename", "icon", I18N.message("filename"), 200);
 		filename.setCanFilter(true);
 
-		ListGridField folderName = new ListGridField("foldername", I18N.message("folder"), 200);
+		ListGridField folderName = new FolderListGridField("foldername", "folder");
+		folderName.setWidth(200);
 		folderName.setCanFilter(true);
 
-		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
+		ListGridField type = new ColoredListGridField("type", I18N.message("type"), 55);
 		type.setType(ListGridFieldType.TEXT);
 		type.setAlign(Alignment.CENTER);
 		type.setHidden(true);
@@ -309,7 +307,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 
 		list.setCanDrag(true);
 		list.setCanDragRecordsOut(true);
-		list.setFields(icon, filename, folderName, lastModified, size, version, publisher, customId, digest, type);
+		list.setFields(filename, folderName, lastModified, size, version, publisher, customId, digest, type);
 
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
@@ -323,7 +321,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 			@Override
 			public void onDoubleClick(DoubleClickEvent event) {
 				String id = list.getSelectedRecord().getAttribute("id");
-				if (Session.get().getCurrentFolder().isDownload())
+				if (FolderController.get().getCurrentFolder().isDownload())
 					DocUtil.download(Long.parseLong(id), null);
 			}
 		});
@@ -391,6 +389,7 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
+		preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));

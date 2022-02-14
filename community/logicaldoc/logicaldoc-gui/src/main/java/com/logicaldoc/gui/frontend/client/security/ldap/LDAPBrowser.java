@@ -11,7 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.frontend.client.services.LDAPService;
 import com.smartgwt.client.types.Alignment;
@@ -163,20 +163,20 @@ public class LDAPBrowser extends VLayout {
 
 			searchButton.setDisabled(true);
 
-			ContactingServer.get().show();
+			LD.contactingServer();
 			LDAPService.Instance.get().listUsers(username, server.getId(), new AsyncCallback<GUIUser[]>() {
 
 				@Override
 				public void onFailure(Throwable caught) {
 					searchButton.setDisabled(false);
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 					GuiLog.serverError(caught);
 				}
 
 				@Override
 				public void onSuccess(GUIUser[] result) {
 					searchButton.setDisabled(false);
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 					if (result != null && result.length > 0) {
 						ListGridRecord[] records = new ListGridRecord[result.length];
 						for (int i = 0; i < result.length; i++) {
@@ -209,18 +209,18 @@ public class LDAPBrowser extends VLayout {
 		_import.setTitle(I18N.message("iimport"));
 		_import.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				users.deselectAllRecords();
 				LDAPService.Instance.get().importUsers(usernames, server.getId(), new AsyncCallback<GUIValue[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 					}
 
 					@Override
 					public void onSuccess(GUIValue[] report) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						String message = I18N.message("importreport",
 								new String[] { report[0].getValue(), report[1].getValue(), report[2].getValue() });
 						if ("0".equals(report[2].getValue()))

@@ -18,6 +18,6 @@ If you reproduce or distribute the document without making
 any substantive modifications to its content, 
 please use the following attribution line:
 
-Copyright 2008-2021 LOGICALDOC Srl. All rights reserved.
+Copyright 2008-2022 LOGICALDOC Srl. All rights reserved.
 https://www.logicaldoc.com
 LogicalDOC is a trademark of LOGICALDOC Srl.

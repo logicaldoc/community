@@ -52,7 +52,6 @@ public class I18N {
 	}
 
 	public static String message(String key, Locale locale) {
-
 		for (String b : bundles) {
 			try {
 				ResourceBundle bundle = ResourceBundle.getBundle(b, locale);

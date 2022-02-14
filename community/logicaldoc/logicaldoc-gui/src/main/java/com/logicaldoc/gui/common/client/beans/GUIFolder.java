@@ -474,6 +474,25 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		quotaAlertRecipients = tmp;
 	}
 
+	public GUIDocument newDocument() {
+		GUIDocument document = new GUIDocument();
+		document.setBulkUpdate(true);
+		document.setStartPublishing(null);
+		document.setPublished(-1);
+
+		document.setFolder(this);
+
+		if (getTemplateLocked() == 1) {
+			document.setTemplateId(getTemplateId());
+			document.setTemplate(getTemplate());
+			document.setAttributes(getAttributes());
+		}
+		document.setOcrTemplateId(getOcrTemplateId());
+		document.setBarcodeTemplateId(getBarcodeTemplateId());
+
+		return document;
+	}
+
 	@Override
 	public String toString() {
 		return name;

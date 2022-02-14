@@ -12,6 +12,10 @@ import java.util.Date;
 public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	public static final int DOC_LOCKED = 2;
+
+	public static final int DOC_UNLOCKED = 0;
+
 	private long id;
 
 	private Long docRef;
@@ -60,7 +64,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String lockUser;
 
-	private int status = 0;
+	private int status = DOC_UNLOCKED;
 
 	private int immutable = 0;
 
@@ -80,6 +84,8 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String workflowStatusDisplay;
 
+	private String color;
+
 	private int published = 1;
 
 	private Date startPublishing = new Date();
@@ -92,7 +98,9 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String extResId;
 
-	private int pages;
+	private int pages = 1;
+
+	private int previewPages = 1;
 
 	private int nature = 0;
 
@@ -129,6 +137,12 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	 * <b>0</b> = to process, <b>1</b> = processed
 	 */
 	private int barcoded = 0;
+
+	/**
+	 * Just to indicate if this document is being used for collecting the
+	 * metadata of a bulp update
+	 */
+	private boolean bulkUpdate = false;
 
 	public long getId() {
 		return id;
@@ -604,5 +618,29 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public void setPublisherId(Long publisherId) {
 		this.publisherId = publisherId;
+	}
+
+	public int getPreviewPages() {
+		return previewPages;
+	}
+
+	public void setPreviewPages(int previewPages) {
+		this.previewPages = previewPages;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
+
+	public boolean isBulkUpdate() {
+		return bulkUpdate;
+	}
+
+	public void setBulkUpdate(boolean bulkUpdate) {
+		this.bulkUpdate = bulkUpdate;
 	}
 }

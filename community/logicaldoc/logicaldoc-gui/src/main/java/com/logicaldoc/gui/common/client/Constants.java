@@ -174,6 +174,10 @@ public final class Constants {
 	
 	public static final String TWOFA_YUBIKEY = "yubikey";
 	
+	public static final String TWOFA_EMAIL_AUTHENTICATOR = "emailauthenticator";
+	
+	public static final String TWOFA_DUO = "duo";
+	
 	public static final String[] FULLTEXT_DEFAULT_FIELDS = new String[] { FULLTEXT_FIELD_FILENAME,
 			FULLTEXT_FIELD_CONTENT, FULLTEXT_FIELD_TAGS };
 }

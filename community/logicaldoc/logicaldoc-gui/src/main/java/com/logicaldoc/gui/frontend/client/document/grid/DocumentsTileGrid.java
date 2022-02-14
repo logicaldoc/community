@@ -408,6 +408,16 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 		if (folder != null && document.getFolder().getId() != folder.getId())
 			onDocumentsDeleted(new GUIDocument[] { document });
 	}
+	
+	@Override
+	public void onDocumentBeginEditing(GUIDocument document) {
+		// Nothing to do		
+	}
+
+	@Override
+	public void onDocumentCancelEditing(GUIDocument document) {
+		// Nothing to do
+	}
 
 	private Record findRecord(long docId) {
 		Record record = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));

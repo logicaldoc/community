@@ -117,8 +117,10 @@ public class P7M {
 	 * @throws Exception in case the embedded file cannot be extracted
 	 */
 	public void extractOriginalFile(File outFile) throws Exception {
-		OutputStream os = new FileOutputStream(outFile);
-		cms.getSignedContent().write(os);
+		try(OutputStream os = new FileOutputStream(outFile)){
+			cms.getSignedContent().write(os);
+			os.flush();
+		}
 	}
 
 	public File getFile() {

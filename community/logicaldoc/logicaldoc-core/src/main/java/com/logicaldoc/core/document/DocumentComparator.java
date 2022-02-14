@@ -275,9 +275,9 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 				comp = LASTMODIFIED_SORT;
 			else if ("published".equalsIgnoreCase(field) || "date".equalsIgnoreCase(field))
 				comp = PUBLISHED_SORT;
-			else if ("created".equalsIgnoreCase(field))
+			else if ("created".equalsIgnoreCase(field) || "creation".equalsIgnoreCase(field))
 				comp = CREATED_SORT;
-			else if ("created".equalsIgnoreCase(field))
+			else if ("customId".equalsIgnoreCase(field))
 				comp = CUSTOMID_SORT;
 			else if ("type".equalsIgnoreCase(field))
 				comp = TYPE_SORT;

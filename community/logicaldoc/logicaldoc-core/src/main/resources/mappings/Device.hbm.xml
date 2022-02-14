@@ -26,5 +26,6 @@
 		<property name="lastLogin" type="timestamp" column="ld_lastlogin" />
 		<property name="trusted" type="int" column="ld_trusted" not-null="true" />
 		<property name="ip" type="string" column="ld_ip" length="255" />
+		<property name="label" type="string" column="ld_label" length="255" />
 	</class>
 </hibernate-mapping>

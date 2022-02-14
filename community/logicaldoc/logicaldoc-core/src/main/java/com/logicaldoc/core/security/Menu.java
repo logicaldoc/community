@@ -43,6 +43,10 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	public static final long VERSIONS = 1603;
 
 	public static final long ALIASES = 1605;
+	
+	public static final long PREVIEW = 1609;
+	
+	public static final long RATING = 1610;
 
 	public static final long PARAMETERS = 100;
 

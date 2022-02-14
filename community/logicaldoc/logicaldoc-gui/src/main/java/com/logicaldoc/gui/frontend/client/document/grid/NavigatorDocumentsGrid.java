@@ -32,6 +32,7 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 		DocumentsDS dataSource = new DocumentsDS(folder, null, pageSize, 1, null, false, false,
 				DocumentGridUtil.getSortSpec(this));
 		setDataSource(dataSource);
+		
 
 		final List<ListGridField> fields = new ArrayList<ListGridField>();
 
@@ -65,11 +66,15 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 			fieldsMap.get("size").setHidden(true);
 			fields.add(fieldsMap.get("size"));
 		}
+		if (!fields.contains(fieldsMap.get("pages"))) {
+			fieldsMap.get("pages").setHidden(true);
+			fields.add(fieldsMap.get("pages"));
+		}
 		if (!fields.contains(fieldsMap.get("fileVersion"))) {
 			fieldsMap.get("fileVersion").setHidden(true);
 			fields.add(fieldsMap.get("fileVersion"));
 		}
-		if (!fields.contains(fieldsMap.get("vers0ion"))) {
+		if (!fields.contains(fieldsMap.get("version"))) {
 			fieldsMap.get("version").setHidden(true);
 			fields.add(fieldsMap.get("version"));
 		}

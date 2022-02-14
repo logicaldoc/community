@@ -6,7 +6,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.ImageWithCanvases;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.types.Alignment;
@@ -43,7 +42,7 @@ public class ZoneCanvas extends Label {
 	 * Constructor
 	 * 
 	 * @param zone the zone associated to this canvas
-	 * @param ocrPanel the Barcode panel with the zones editor
+	 * @param barcodePanel the Barcode panel with the zones editor
 	 */
 	public ZoneCanvas(GUIBarcodeSpec zone, BarcodeTemplatesPanel barcodePanel) {
 		this.zone = zone;
@@ -107,17 +106,17 @@ public class ZoneCanvas extends Label {
 
 	private void onEdit() {
 		if (zone.getSample() == null || zone.getSampleText() == null) {
-			ContactingServer.get().show();
+			LD.contactingServer();
 			BarcodeService.Instance.get().updateZone(zone, new AsyncCallback<GUIBarcodeSpec>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					GuiLog.serverError(caught);
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 				}
 
 				@Override
 				public void onSuccess(GUIBarcodeSpec newZone) {
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 
 					ZoneCanvas.this.zone.setSample(newZone.getSample());
 					ZoneCanvas.this.zone.setSampleText(newZone.getSampleText());

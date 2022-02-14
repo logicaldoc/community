@@ -34,8 +34,6 @@ public class CookiesManager {
 
 	public static final String COOKIE_SID = "ldoc-sid";
 
-	public static final String COOKIE_FAILURE = "ldoc-failure";
-
 	public static final String COOKIE_DEVICE = "ldoc-device";
 
 	public static final String COOKIE_JSESSIONID = "JSESSIONID";
@@ -59,7 +57,6 @@ public class CookiesManager {
 	public static void removeLogin() {
 		try {
 			removeSid();
-			Cookies.removeCookie(COOKIE_FAILURE);
 		} catch (Throwable t) {
 
 		}
@@ -186,15 +183,6 @@ public class CookiesManager {
 		} catch (Throwable t) {
 			return new String[] { null, null };
 		}
-	}
-
-	/**
-	 * Retrieve the failure of the last login
-	 * 
-	 * @return the failure reason
-	 */
-	public static String getFailure() {
-		return Cookies.getCookie(COOKIE_FAILURE);
 	}
 
 	/**

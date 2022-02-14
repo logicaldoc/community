@@ -13,6 +13,7 @@ import com.logicaldoc.gui.common.client.beans.GUIInfo;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
@@ -151,11 +152,11 @@ public class Frontend implements EntryPoint {
 	}
 
 	public String getCurrentFolderId() {
-		return Long.toString(Session.get().getCurrentFolder().getId());
+		return Long.toString(FolderController.get().getCurrentFolder().getId());
 	}
 
 	public String checkPermission(String permission) {
-		return Boolean.toString(Session.get().getCurrentFolder().hasPermission(permission));
+		return Boolean.toString(FolderController.get().getCurrentFolder().hasPermission(permission));
 	}
 
 	public void searchTag(String tag) {

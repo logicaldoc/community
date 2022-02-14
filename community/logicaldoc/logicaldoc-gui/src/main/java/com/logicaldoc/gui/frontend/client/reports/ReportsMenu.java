@@ -119,10 +119,30 @@ public class ReportsMenu extends VLayout {
 			}
 		});
 
-		Button customreports = new Button(I18N.message("customreports"));
-		customreports.setWidth100();
-		customreports.setHeight(25);
-		customreports.addClickHandler(new ClickHandler() {
+		Button subscriptions = new Button(I18N.message("subscriptions"));
+		subscriptions.setWidth100();
+		subscriptions.setHeight(25);
+		subscriptions.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new SubscriptionsReport());
+			}
+		});
+
+		Button apiCalls = new Button(I18N.message("apicalls"));
+		apiCalls.setWidth100();
+		apiCalls.setHeight(25);
+		apiCalls.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				AdminScreen.get().setContent(new ApiCallsReport());
+			}
+		});
+
+		Button customReports = new Button(I18N.message("customreports"));
+		customReports.setWidth100();
+		customReports.setHeight(25);
+		customReports.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				AdminScreen.get().setContent(new CustomReportsPanel());
@@ -137,9 +157,9 @@ public class ReportsMenu extends VLayout {
 			}
 		}
 
-		if (Feature.visible(Feature.CALENDAR)) {
+		if (Feature.visible(Feature.CALENDAR) && Menu.enabled(Menu.CALENDAR_REPORT)) {
 			addMember(calendar);
-			if (!Feature.enabled(Feature.CALENDAR) || !Menu.enabled(Menu.CALENDAR_REPORT)) {
+			if (!Feature.enabled(Feature.CALENDAR)) {
 				calendar.setDisabled(true);
 				calendar.setTooltip(I18N.message("featuredisabled"));
 			}
@@ -147,12 +167,23 @@ public class ReportsMenu extends VLayout {
 
 		if (Menu.enabled(Menu.DOWNLOAD_TICKETS))
 			addMember(downloadTickets);
+		
+		if (Feature.visible(Feature.AUDIT) && Menu.enabled(Menu.SUBSCRIPTIONS_REPORT)) {
+			addMember(subscriptions);
+			if (!Feature.enabled(Feature.AUDIT)) {
+				subscriptions.setDisabled(true);
+				subscriptions.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
 
-		if (Feature.visible(Feature.CUSTOM_REPORTS)) {
-			addMember(customreports);
-			if (!Feature.enabled(Feature.CUSTOM_REPORTS) || !Menu.enabled(Menu.CUSTOMREPORTS)) {
-				customreports.setDisabled(true);
-				customreports.setTooltip(I18N.message("featuredisabled"));
+		if (Menu.enabled(Menu.DOWNLOAD_TICKETS))
+			addMember(apiCalls);
+		
+		if (Feature.visible(Feature.CUSTOM_REPORTS) && Menu.enabled(Menu.CUSTOMREPORTS)) {
+			addMember(customReports);
+			if (!Feature.enabled(Feature.CUSTOM_REPORTS)) {
+				customReports.setDisabled(true);
+				customReports.setTooltip(I18N.message("featuredisabled"));
 			}
 		}
 	}

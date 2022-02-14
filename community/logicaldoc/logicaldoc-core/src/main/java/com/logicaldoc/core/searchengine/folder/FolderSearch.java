@@ -85,7 +85,7 @@ public class FolderSearch extends Search {
 
 		// Find all real folders
 		query.append(
-				"select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid, A.ld_tgs ");
+				"select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid, A.ld_tgs, A.ld_color ");
 		query.append(" from ld_folder A ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
 
@@ -94,7 +94,7 @@ public class FolderSearch extends Search {
 		if (options.isRetrieveAliases()) {
 			// Append all aliases
 			query.append(
-					") UNION (select A.ld_id, A.ld_parentid, A.ld_name, REF.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid, A.ld_tgs ");
+					") UNION (select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, REF.ld_templateid, REF.ld_tgs, A.ld_color ");
 			query.append(" from ld_folder A ");
 			query.append(" join ld_folder REF on A.ld_foldref=REF.ld_id ");
 			query.append(" left outer join ld_template C on REF.ld_templateid=C.ld_id ");
@@ -486,6 +486,8 @@ public class FolderSearch extends Search {
 				}
 			}
 
+			hit.setColor(rs.getString(12));
+			
 			return hit;
 		}
 	};

@@ -79,6 +79,8 @@ public class GUIImportFolder implements Serializable {
 
 	private Long batch = 10000L;
 
+	private int recordHistory = 0;
+
 	public GUIImportFolder() {
 		super();
 	}
@@ -319,5 +321,13 @@ public class GUIImportFolder implements Serializable {
 
 	public void setBarcodeTemplateId(Long barcodeTemplateId) {
 		this.barcodeTemplateId = barcodeTemplateId;
+	}
+
+	public int getRecordHistory() {
+		return recordHistory;
+	}
+
+	public void setRecordHistory(int recordHistory) {
+		this.recordHistory = recordHistory;
 	}
 }

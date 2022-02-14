@@ -3,8 +3,10 @@ package com.logicaldoc.gui.common.client.observer;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.WindowUtils;
 
 /**
  * Implements the Observer pattern to distribute events on the folders
@@ -18,6 +20,8 @@ public class FolderController {
 
 	private Set<FolderObserver> observers = new HashSet<FolderObserver>();
 
+	private GUIFolder currentFolder;
+	
 	private FolderController() {
 	}
 
@@ -38,6 +42,10 @@ public class FolderController {
 	}
 
 	public void selected(GUIFolder folder) {
+		this.currentFolder = folder;
+		
+		WindowUtils.setTitle(Session.get().getInfo(), folder!=null && folder.getPathExtended() != null ? folder.getPathExtended() : "");
+		
 		synchronized (observers) {
 			for (FolderObserver observer : observers)
 				try {
@@ -86,5 +94,29 @@ public class FolderController {
 				} catch (Throwable t) {
 				}
 		}
+	}
+	
+	public void beginEditing(GUIFolder folder) {
+		synchronized (observers) {
+			for (FolderObserver observer : observers)
+				try {
+					observer.onFolderBeginEditing(folder);
+				} catch (Throwable t) {
+				}
+		}
+	}
+
+	public void cancelEditing(GUIFolder folder) {
+		synchronized (observers) {
+			for (FolderObserver observer : observers)
+				try {
+					observer.onFolderCancelEditing(folder);
+				} catch (Throwable t) {
+				}
+		}
+	}
+
+	public GUIFolder getCurrentFolder() {
+		return currentFolder;
 	}
 }

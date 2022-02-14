@@ -34,6 +34,10 @@ public class TemplateDetailsPanel extends VLayout {
 
 	protected TemplatePropertiesPanel propertiesPanel;
 
+	protected Layout securityTabPanel;
+
+	protected TemplateSecurityPanel securityPanel;
+
 	protected EditingTabSet tabSet;
 
 	private TemplatesPanel templatesPanel;
@@ -99,11 +103,25 @@ public class TemplateDetailsPanel extends VLayout {
 		propertiesTab.setPane(propertiesTabPanel);
 		tabSet.addTab(propertiesTab);
 
+		Tab securityTab = new Tab(I18N.message("security"));
+		securityTabPanel = new HLayout();
+		securityTabPanel.setWidth100();
+		securityTabPanel.setHeight100();
+		securityTab.setPane(securityTabPanel);
+		tabSet.addTab(securityTab);
+
 		addMember(tabSet);
 	}
 
 	protected void refresh() {
 		disableSave();
+
+		ChangedHandler changeHandler = new ChangedHandler() {
+			@Override
+			public void onChanged(ChangedEvent event) {
+				onModified();
+			}
+		};
 
 		/*
 		 * Prepare the standard properties tab
@@ -113,16 +131,19 @@ public class TemplateDetailsPanel extends VLayout {
 			if (propertiesTabPanel.contains(propertiesPanel))
 				propertiesTabPanel.removeMember(propertiesPanel);
 		}
-
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				onModified();
-			}
-		};
-
 		propertiesPanel = new TemplatePropertiesPanel(template, changeHandler, this);
 		propertiesTabPanel.addMember(propertiesPanel);
+
+		/*
+		 * Prepare the security tab
+		 */
+		if (securityPanel != null) {
+			securityPanel.destroy();
+			if (securityTabPanel.contains(securityPanel))
+				securityTabPanel.removeMember(securityPanel);
+		}
+		securityPanel = new TemplateSecurityPanel(template, changeHandler);
+		securityTabPanel.addMember(securityPanel);
 	}
 
 	public GUITemplate getTemplate() {
@@ -150,6 +171,9 @@ public class TemplateDetailsPanel extends VLayout {
 		boolean stdValid = propertiesPanel.validate();
 		if (!stdValid)
 			tabSet.selectTab(0);
+		stdValid = securityPanel.validate();
+		if (!stdValid)
+			tabSet.selectTab(1);
 		return stdValid;
 	}
 

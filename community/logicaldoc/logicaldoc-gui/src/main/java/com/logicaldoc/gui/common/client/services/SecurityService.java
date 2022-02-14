@@ -38,12 +38,23 @@ public interface SecurityService extends RemoteService {
 	 * @param newPassword the new password
 	 * @param notify If the new credentials have to be notified
 	 * 
-	 * @return the error code and message. 0 if all went ok, 1 if the password is incorrect, 2 if the new
-	 *         password cannot be notified, 3 if the password has been already used, otherwise a positive number grater
-	 *         than 3
+	 * @return the error code and message. 0 if all went ok, 1 if the password
+	 *         is incorrect, 2 if the new password cannot be notified, 3 if the
+	 *         password has been already used, otherwise a positive number
+	 *         grater than 3
 	 */
 	public GUIValue changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
 			boolean notify);
+
+	/**
+	 * Changes the status of a user
+	 * 
+	 * @param userId The user Identifier
+	 * @param enabled If the user must be enabled or not
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void changeStatus(long userId, boolean enabled) throws ServerException;
 
 	/**
 	 * Logs out the current user
@@ -249,7 +260,7 @@ public interface SecurityService extends RemoteService {
 	 * @param menu the menu to save
 	 * @param locale currently selected locale
 	 * 
-	 * @returns the saved menu
+	 * @return the saved menu
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
@@ -298,11 +309,24 @@ public interface SecurityService extends RemoteService {
 	/**
 	 * Permanently trusts the current device for the current user
 	 * 
+	 * @param label optional label to assign to the current device
+	 * 
 	 * @return the ID of the trusted device
 	 * 
 	 * @throws ServerException error generated in the server application
 	 */
-	public String trustDevice() throws ServerException;
+	public String trustDevice(String label) throws ServerException;
+
+	/**
+	 * Updates the label of a device
+	 * 
+	 * @param deviceId identifier of the device to update
+	 * @param label label to assign to the current device
+	 * 
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public void updateDeviceLabel(long deviceId, String label) throws ServerException;
 
 	/**
 	 * Check if the saved device ID is trusted for the current user
@@ -327,7 +351,8 @@ public interface SecurityService extends RemoteService {
 	/**
 	 * Downloads the most recent version of the Geolocation database
 	 * 
-	 * @key the API key
+	 * @param key the API key
+	 * 
 	 * @return the current database version
 	 * 
 	 * @throws ServerException error generated in the server application
@@ -351,6 +376,18 @@ public interface SecurityService extends RemoteService {
 	 * @throws ServerException error generated in the server application
 	 */
 	void resetAvatar(long userId) throws ServerException;
+
+	/**
+	 * Clones a work time to a set of other users
+	 * 
+	 * @param srcUserId identifier of the user with the work time you want to
+	 *        clone
+	 * @param userIds direct ids of users to clone the working time to
+	 * @param groupIds the groups of users to clone the working time to
+	 * 
+	 * @throws ServerException generic error
+	 */
+	void cloneWorkTimes(long srcUserId, long[] userIds, long[] groupIds) throws ServerException;
 
 	public static class Instance {
 		private static SecurityServiceAsync instance;

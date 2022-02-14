@@ -2,16 +2,8 @@ package com.logicaldoc.gui.common.client.util;
 
 import java.util.Date;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -34,13 +26,15 @@ public class GridUtil {
 			else
 				selectedRow = 0;
 
-			ContactingServer.get().show();
+			LD.contactingServer();
 
 			listGrid.scrollToRow(0);
 			listGrid.draw();
 
-			if (listGrid.getVisibleRows()[0] == -1)
+			if (listGrid.getVisibleRows()[0] == -1) {
+				LD.clearPrompt();
 				return;
+			}
 
 			/*
 			 * With a timer we scroll the grid in order to fetch all the data
@@ -54,7 +48,7 @@ public class GridUtil {
 							if (listener != null)
 								listener.endScroll(listGrid);
 						} finally {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 						}
 					} else if (visibleRows[0] != -1 && visibleRows[1] < listGrid.getTotalRows() - 1) {
 						listGrid.scrollToRow(visibleRows[1] + 1);
@@ -80,12 +74,12 @@ public class GridUtil {
 
 //              Uncomment to realize the preview page by our own
 //
-//				ContactingServer.get().show();
+//				LD.contactingServer();
 //				listGrid.getPrintHTML(null, new PrintHTMLCallback() {
 //
 //					@Override
 //					public void setHTML(String html) {
-//						ContactingServer.get().hide();
+//						LD.clearPrompt();
 //
 //						String title = listGrid.getTitle() != null ? listGrid.getTitle() : I18N.message("print");
 //
@@ -173,7 +167,7 @@ public class GridUtil {
 					continue;
 
 				stringBuilder.append("\"");
-				stringBuilder.append(listGridField.getTitle());
+				stringBuilder.append(Util.encodeUTF8(listGridField.getTitle()));
 				stringBuilder.append("\";");
 			}
 			stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove
@@ -220,7 +214,8 @@ public class GridUtil {
 							stringBuilder.append(val == null ? "" : I18N.formatDateShort(val));
 						} else {
 							Object val = record.getAttribute(listGridField.getName());
-							stringBuilder.append(val == null || "null".equals(val.toString()) ? "" : val.toString());
+							stringBuilder.append(val == null || "null".equals(val.toString()) ? ""
+									: Util.encodeUTF8(val.toString()));
 						}
 						stringBuilder.append("\";");
 					} catch (Throwable t) {
@@ -237,32 +232,9 @@ public class GridUtil {
 			}
 			String content = stringBuilder.toString();
 
-			/*
-			 * Now post the CSV content to the server
-			 */
-			RequestBuilder builder = new RequestBuilder(RequestBuilder.POST,
-					Util.contextPath().endsWith("/") ? Util.contextPath() + "csv" : Util.contextPath() + "/csv");
-			builder.setHeader("Content-type", "application/csv");
-
-			try {
-				builder.sendRequest(content, new RequestCallback() {
-					public void onError(Request request, Throwable exception) {
-						GuiLog.error(exception.getMessage(), null, exception);
-					}
-
-					public void onResponseReceived(Request request, Response response) {
-						/*
-						 * Now we can download the complete file
-						 */
-						WindowUtils.openUrl(GWT.getHostPageBaseURL().endsWith("/") ? GWT.getHostPageBaseURL() + "csv"
-								: GWT.getHostPageBaseURL() + "/csv");
-					}
-				});
-			} catch (RequestException e) {
-				GWT.log("error", e);
-			}
+			GridUtil.exportAsCSV(content);
 		} finally {
-			ContactingServer.get().hide();
+			LD.clearPrompt();
 		}
 	}
 
@@ -282,4 +254,17 @@ public class GridUtil {
 		 */
 		public void endScroll(ListGrid listGrid);
 	}
+
+	public static native void exportAsCSV(String content) /*-{
+		var element = $wnd.document.createElement('a');
+		element.setAttribute('href', 'data:application/csv;charset=utf-8,'
+				+ encodeURIComponent(content));
+		element.setAttribute('download', "export.csv");
+		element.style.display = 'none';
+		$wnd.document.body.appendChild(element);
+
+		element.click();
+
+		$wnd.document.body.removeChild(element);
+	}-*/;
 }

@@ -57,12 +57,14 @@
 		<property name="workflowStatus" type="string" column="ld_workflowstatus" length="1000" />
 		<property name="workflowStatusDisplay" type="string" column="ld_workflowstatusdisp"
 			length="1000" />
+		<property name="color" type="string" column="ld_color" length="255" />
 		<property name="published" type="int" column="ld_published" />
 		<property name="startPublishing" type="timestamp" column="ld_startpublishing" />
 		<property name="stopPublishing" type="timestamp" column="ld_stoppublishing" />
 		<property name="transactionId" type="string" column="ld_transactionid" length="255" />
 		<property name="extResId" type="string" column="ld_extresid" length="255" />
 		<property name="pages" type="int" column="ld_pages" not-null="true" />
+		<property name="previewPages" type="int" column="ld_previewpages" not-null="true"/>
 		<property name="nature" type="int" column="ld_nature" not-null="true" />
 		<property name="formId" type="long" column="ld_formid" />
 		<property name="password" type="string" column="ld_password" length="255" />

@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -255,6 +255,8 @@ public class TemplatesPanel extends VLayout {
 
 	protected void onAddingTemplate() {
 		list.deselectAllRecords();
-		showTemplateDetails(new GUITemplate());
+		GUITemplate newTemplate = new GUITemplate();
+		newTemplate.setPermissions(new String[] { "read", "write" });
+		showTemplateDetails(newTemplate);
 	}
 }

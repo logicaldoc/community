@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
@@ -39,7 +40,7 @@ public class WorkflowDialog extends Window {
 		setAutoSize(true);
 		centerInPage();
 
-		workflow = ItemFactory.newWorkflowSelector();
+		workflow = ItemFactory.newWorkflowSelector(Session.get().getUser().getId());
 		workflow.setTitle(I18N.message("chooseworkflow"));
 		workflow.setWrapTitle(false);
 		workflow.setRequired(true);

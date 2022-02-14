@@ -30,7 +30,7 @@ public abstract class SoapClient<T> {
 	public void setMaxChildElements(int maxChildElements) {
 		StaxUtils.setInnerElementCountThreshold(maxChildElements);
 	}
-	
+
 	/**
 	 * Constructor
 	 * 

@@ -43,4 +43,18 @@ public interface FolderObserver {
 	 * @param folder The created folder
 	 */
 	public void onFolderMoved(GUIFolder folder);
+
+	/**
+	 * Invoked after the folder's properties are being edited
+	 * 
+	 * @param folder the folder that is being edited
+	 */
+	public void onFolderBeginEditing(GUIFolder folder);
+
+	/**
+	 * Invoked after the folder's properties are being edited
+	 * 
+	 * @param folder the folder that is being edited
+	 */
+	public void onFolderCancelEditing(GUIFolder folder);
 }

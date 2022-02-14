@@ -1,10 +1,12 @@
 package com.logicaldoc.core.parser;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Locale;
 
+import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.extractor.WordExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,5 +63,15 @@ public class DOCParser extends RTFParser {
 			log.warn("Failed to extract Word text content", e);
 		}
 		return "";
+	}
+
+	@Override
+	public int countPages(InputStream input, String filename) {
+		try (HWPFDocument wordDoc = new HWPFDocument(input)) {
+			return wordDoc.getSummaryInformation().getPageCount();
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+		return 1;
 	}
 }

@@ -64,10 +64,16 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	public FulltextForm() {
 		setHeight100();
 		setOverflow(Overflow.AUTO);
-
 		setMembersMargin(3);
 		setAlign(Alignment.LEFT);
+		Search.get().addObserver(this);
+	}
 
+	private void initGUI() {
+		vm.clearValues();
+		if(getMembers()!=null)
+			removeMembers(getMembers());
+				
 		DynamicForm form1 = new DynamicForm();
 		form1.setValuesManager(vm);
 		form1.setTitleOrientation(TitleOrientation.TOP);
@@ -78,12 +84,17 @@ public class FulltextForm extends VLayout implements SearchObserver {
 				search();
 			}
 		});
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
+			public void onFormItemClick(FormItemIconClickEvent event) {
+				initGUI();
+			}
+		});
 
 		TextItem expression = ItemFactory.newTextItem("expression", "expression", I18N.message("search") + "...");
-		expression.setWidth(180);
+		expression.setWidth("*");
 		expression.setColSpan(3);
 		expression.setRequired(true);
-		expression.setIcons(searchPicker);
+		expression.setIcons(searchPicker, clear);
 		expression.addKeyPressHandler(new KeyPressHandler() {
 			@Override
 			public void onKeyPress(KeyPressEvent event) {
@@ -158,8 +169,6 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		addMember(form1);
 
 		prepareFields(null);
-
-		Search.get().addObserver(this);
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -313,5 +322,10 @@ public class FulltextForm extends VLayout implements SearchObserver {
 			vm.setValue("expression", newOptions.getExpression());
 			folder.setFolder(newOptions.getFolder(), newOptions.getFolderName());
 		}
+	}
+
+	@Override
+	protected void onDraw() {
+		initGUI();
 	}
 }

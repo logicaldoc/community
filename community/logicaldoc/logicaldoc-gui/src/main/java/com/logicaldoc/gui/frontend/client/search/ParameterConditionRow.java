@@ -204,9 +204,9 @@ public class ParameterConditionRow extends HLayout {
 		if (criteriaField == null)
 			return map;
 
-		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("rating")
-				|| criteriaField.equals("published") || criteriaField.equals("indexed")
-				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)
+		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("pages")
+				|| criteriaField.equals("rating") || criteriaField.equals("published")
+				|| criteriaField.equals("indexed") || criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)
 				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_DOUBLE)) {
 			map.put("greaterthan", I18N.message("greaterthan").toLowerCase());
 			map.put("lessthan", I18N.message("lessthan").toLowerCase());
@@ -256,9 +256,10 @@ public class ParameterConditionRow extends HLayout {
 	}
 
 	private FormItem valueItemFor(String criteriaField) {
-		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("rating")
-				|| criteriaField.equals("template") || criteriaField.equals("published")
-				|| criteriaField.equals("indexed") || criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)) {
+		if (criteriaField.equals("id") || criteriaField.equals("fileSize") || criteriaField.equals("pages")
+				|| criteriaField.equals("rating") || criteriaField.equals("template")
+				|| criteriaField.equals("published") || criteriaField.equals("indexed")
+				|| criteriaField.endsWith("type:" + GUIAttribute.TYPE_INT)) {
 			return ItemFactory.newIntegerItem("value", "integer", null);
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_DOUBLE)) {
 			return ItemFactory.newFloatItem("value", "double", null);

@@ -15,7 +15,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -169,7 +169,7 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 			public void onChanged(ChangedEvent event) {
 				refresh();
 			}
-		}, true, true, true);
+		}, true, true, true, true);
 		toolStrip.addFormItem(event);
 		
 		toolStrip.addSeparator();

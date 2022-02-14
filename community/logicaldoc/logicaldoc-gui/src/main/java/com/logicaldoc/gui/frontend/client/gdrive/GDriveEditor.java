@@ -5,9 +5,11 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.DocumentController;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.GDriveService;
@@ -64,19 +66,19 @@ public class GDriveEditor extends Window {
 				else {
 					// Creating a new document document, so delete the temporary
 					// doc in Google Drive
-					ContactingServer.get().show();
+					LD.contactingServer();
 					GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
 							new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 									destroy();
 								}
 
 								@Override
 								public void onSuccess(Void result) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									destroy();
 								}
 							});
@@ -155,20 +157,20 @@ public class GDriveEditor extends Window {
 							@Override
 							public void onSuccess(Void result) {
 								DocUtil.markUnlocked(document);
-								Session.get().setCurrentDocument(document);
-								ContactingServer.get().show();
+								DocumentController.get().setCurrentDocument(document);
+								LD.contactingServer();
 								GDriveService.Instance.get().delete(GDriveEditor.this.document.getExtResId(),
 										new AsyncCallback<Void>() {
 											@Override
 											public void onFailure(Throwable caught) {
-												ContactingServer.get().hide();
+												LD.clearPrompt();
 												GuiLog.serverError(caught);
 												destroy();
 											}
 
 											@Override
 											public void onSuccess(Void result) {
-												ContactingServer.get().hide();
+												LD.clearPrompt();
 												destroy();
 											}
 										});
@@ -187,12 +189,12 @@ public class GDriveEditor extends Window {
 					GDriveCheckin checkin = new GDriveCheckin(document, GDriveEditor.this);
 					checkin.show();
 				} else {
-					ContactingServer.get().show();
+					LD.contactingServer();
 					GDriveService.Instance.get().importDocuments(new String[] { document.getExtResId() },
-							Session.get().getCurrentFolder().getId(), document.getType(), new AsyncCallback<Void>() {
+							FolderController.get().getCurrentFolder().getId(), document.getType(), new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 									destroy();
 								}
@@ -207,14 +209,14 @@ public class GDriveEditor extends Window {
 
 												@Override
 												public void onFailure(Throwable caught) {
-													ContactingServer.get().hide();
+													LD.clearPrompt();
 													GuiLog.serverError(caught);
 													destroy();
 												}
 
 												@Override
 												public void onSuccess(Void ret) {
-													ContactingServer.get().hide();
+													LD.clearPrompt();
 													destroy();
 												}
 											});

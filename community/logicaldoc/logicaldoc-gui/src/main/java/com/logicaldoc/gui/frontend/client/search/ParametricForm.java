@@ -24,6 +24,7 @@ import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.JSOHelper;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
@@ -71,23 +72,39 @@ public class ParametricForm extends VLayout {
 
 	private ParametricForm() {
 		setHeight100();
-		setWidth100();
-		setMargin(3);
+		setOverflow(Overflow.AUTO);
 		setMembersMargin(3);
 		setAlign(Alignment.LEFT);
 
-		setOverflow(Overflow.AUTO);
+		addResizedHandler(new ResizedHandler() {
+
+			@Override
+			public void onResized(ResizedEvent event) {
+				if (conditionsLayout.getMembers() != null)
+					for (Canvas row : conditionsLayout.getMembers()) {
+						row.setWidth(ParametricForm.this.getWidth() - 10);
+					}
+			}
+		});
+	}
+
+	private void initGUI() {
+		vm.clearValues();
+		if (getMembers() != null)
+			removeMembers(getMembers());
 
 		final DynamicForm languageForm = new DynamicForm();
 		languageForm.setValuesManager(vm);
 		languageForm.setTitleOrientation(TitleOrientation.TOP);
-		languageForm.setNumCols(2);
+		languageForm.setNumCols(1);
 		SelectItem language = ItemFactory.newLanguageSelector("language", true, false);
 		language.setDefaultValue("");
+
 		languageForm.setItems(language);
 
 		IButton search = new IButton(I18N.message("search"));
 		search.setAutoFit(true);
+		search.setMargin(8);
 		search.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
 			@Override
@@ -96,10 +113,26 @@ public class ParametricForm extends VLayout {
 			}
 		});
 
-		HLayout topLayout = new HLayout(80);
-		topLayout.setMembers(languageForm, search);
-		topLayout.setTop(3);
+		IButton reset = new IButton(I18N.message("reset"));
+		reset.setMargin(8);
+		reset.setAutoFit(true);
+		reset.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
+
+			@Override
+			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
+				initGUI();
+			}
+		});
+
+		HLayout spacer = new HLayout();
+		spacer.setMinWidth(30);
+		
+		HLayout topLayout = new HLayout();
 		topLayout.setHeight(15);
+		topLayout.setWidth(1);
+		topLayout.setMembersMargin(3);
+		topLayout.setAlign(VerticalAlignment.CENTER);
+		topLayout.setMembers(languageForm, spacer, search, reset);
 		addMember(topLayout);
 
 		final DynamicForm form = new DynamicForm();
@@ -182,17 +215,6 @@ public class ParametricForm extends VLayout {
 
 		conditionsLayout = new VLayout(3);
 		addMember(conditionsLayout);
-
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				if (conditionsLayout.getMembers() != null)
-					for (Canvas row : conditionsLayout.getMembers()) {
-						row.setWidth(ParametricForm.this.getWidth() - 10);
-					}
-			}
-		});
 	}
 
 	public void removeCondition(ParameterConditionRow condition) {
@@ -306,7 +328,7 @@ public class ParametricForm extends VLayout {
 					else if (fieldValue instanceof String)
 						criterion.setStringValue((String) fieldValue);
 					else if (fieldValue instanceof JavaScriptObject) {
-						Map m = JSOHelper.convertToMap((JavaScriptObject) fieldValue);
+						JSOHelper.convertToMap((JavaScriptObject) fieldValue);
 					}
 				}
 
@@ -365,5 +387,10 @@ public class ParametricForm extends VLayout {
 
 		Search.get().setOptions(options);
 		Search.get().search();
+	}
+
+	@Override
+	protected void onDraw() {
+		initGUI();
 	}
 }

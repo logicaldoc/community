@@ -11,8 +11,8 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.SelectionStyle;
@@ -63,7 +63,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 		userId.setCanEdit(false);
 		userId.setHidden(true);
 
-		ListGridField userName = new AvatarListGridField("userName", "userId", "user", 200);
+		ListGridField userName = new UserListGridField("userName", "userId", "user");
 		userName.setCanEdit(false);
 
 		DateListGridField created = new DateListGridField("created", "subscription");

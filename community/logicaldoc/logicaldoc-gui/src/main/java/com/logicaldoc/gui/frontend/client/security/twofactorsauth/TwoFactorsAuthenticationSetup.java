@@ -25,4 +25,8 @@ public class TwoFactorsAuthenticationSetup extends VLayout {
 	public String getAccount() {
 		return account;
 	}
+	
+	public boolean validate() {
+		return true;
+	}
 }

@@ -92,8 +92,8 @@ public class TicketsDataServlet extends HttpServlet {
 				if (StringUtils.isNotEmpty(suffix))
 					writer.print("<suffix><![CDATA[" + suffix + "]]></suffix>");
 				writer.print("<eenabled>" + (enabled ? "0" : "2") + "</eenabled>");
-				writer.print("<valid>" + (enabled && (maxCount == null || maxCount > count)
-						&& (expired == null || expired.getTime() > new Date().getTime())) + "</valid>");
+				writer.print("<valid>" + (enabled && (maxCount == null || maxCount <= 0 || maxCount > count)
+						&& (expired == null || expired.after(new Date()))) + "</valid>");
 				writer.print("<filename><![CDATA[" + fileName + "]]></filename>");
 				writer.print("<icon>"
 						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils.getExtension(fileName)))

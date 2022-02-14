@@ -150,6 +150,17 @@ public interface SettingService extends RemoteService {
 	public GUIParameter[] loadConverterParameters(String converter) throws ServerException;
 
 	/**
+	 * Loads the usage stats of the webservice
+	 * 
+	 * @param tenantId identifier of the tenant to consider
+	 * 
+	 * @return all the stats
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIParameter[] loadWebserviceStats(Long tenantId) throws ServerException;
+	
+	/**
 	 * Persists new aliases for the given extension
 	 * 
 	 * @param extension the main file extension

@@ -10,5 +10,4 @@ public interface TwoFactorsAuthenticationServiceAsync {
 			AsyncCallback<Void> callback);
 
 	void generateYubiKeyCredentials(String key, AsyncCallback<String> callback);
-
 }

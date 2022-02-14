@@ -19,6 +19,7 @@ import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.model.WSUser;
+import com.logicaldoc.webservice.model.WSWorkingTime;
 import com.logicaldoc.webservice.soap.client.SoapAuthClient;
 import com.logicaldoc.webservice.soap.client.SoapBookmarkClient;
 import com.logicaldoc.webservice.soap.client.SoapDocumentClient;
@@ -31,8 +32,7 @@ import com.logicaldoc.webservice.soap.client.SoapTagClient;
 
 public class SoapWorkbench {
 	
-	//final static String BASE = "http://localhost:8080/services";
-	final static String BASE = "http://localhost/logicaldoc/services";
+	final static String BASE = "http://localhost:9080/services";
 
 	public static void main(String[] args) throws Exception {
 
@@ -45,19 +45,20 @@ public class SoapWorkbench {
 		SoapDocumentMetadataClient metadataClient = new SoapDocumentMetadataClient(BASE + "/DocumentMetadata");
 
 		// Open a session
-		//String sid = auth.login("admin", "12345678");
-		String sid = auth.login("admin", "admin");
+		String sid = auth.login("admin", "12345678");
 		System.out.println("Server date: " + systemClient.getInfo().getDate());
 		System.out.println("Sid: " + sid);
 
 		try {
+			
+			
 //			String[] features = systemClient.getInfo().getFeatures();
 //			System.out.println("Features:");
 //			for (String feature : features) {
 //				System.out.println(Arrays.asList(feature).stream().sorted().collect(Collectors.toList()));
 //			}
 			
-			// securityStuff(sid);
+//		    securityStuff(sid);
 
 			documentStuff(sid);
 			
@@ -167,24 +168,26 @@ public class SoapWorkbench {
 	private static void folderStuff(String sid) throws Exception {
 		SoapFolderClient folderClient = new SoapFolderClient(BASE + "/Folder", 1, false, 50);
 
-		WSFolder newFolder = new WSFolder();
-		newFolder.setName("ddddd");
-		newFolder.setParentId(4L);
-		newFolder.setTemplateId(1L);
-		newFolder.setTemplateLocked(1);
-
-		WSAttribute[] att = new WSAttribute[1];
-		att[0] = new WSAttribute();
-		att[0].setName("from");
-		att[0].setType(Attribute.TYPE_STRING);
-		att[0].setStringValue("pippo");
-		newFolder.setAttributes(att);
-
-		// newFolder = folderClient.create(sid, newFolder);
-
-		System.out.println(folderClient.findByPath(sid, "/Default/Kofax"));
-
-		folderClient.grantGroup(sid, 4L, 299630592L, 65537, false);
+		folderClient.getDefaultWorkspace(sid);
+		
+//		WSFolder newFolder = new WSFolder();
+//		newFolder.setName("ddddd");
+//		newFolder.setParentId(4L);
+//		newFolder.setTemplateId(1L);
+//		newFolder.setTemplateLocked(1);
+//
+//		WSAttribute[] att = new WSAttribute[1];
+//		att[0] = new WSAttribute();
+//		att[0].setName("from");
+//		att[0].setType(Attribute.TYPE_STRING);
+//		att[0].setStringValue("pippo");
+//		newFolder.setAttributes(att);
+//
+//		// newFolder = folderClient.create(sid, newFolder);
+//
+//		System.out.println(folderClient.findByPath(sid, "/Default/Kofax"));
+//
+//		folderClient.grantGroup(sid, 4L, 299630592L, 65537, false);
 	}
 
 	private static void securityStuff(String sid) throws Exception {
@@ -198,10 +201,22 @@ public class SoapWorkbench {
 		long[] ids = { 2, 3 };
 		wsUserTest.setGroupIds(ids);
 
-		Long userId = securityClient.storeUser(sid, wsUserTest);
-		System.out.println("user id: " + userId);
-		securityClient.changePassword(sid, userId, null, "marco1982");
+//		Long userId = securityClient.storeUser(sid, wsUserTest);
+//		System.out.println("user id: " + userId);
+//		securityClient.changePassword(sid, userId, null, "marco1982");
 
+		wsUserTest = securityClient.getUser(sid, 146276353L);
+		WSWorkingTime wt=new WSWorkingTime(2, 9, 0);
+		wsUserTest.setWorkingTimes(new WSWorkingTime[] {wt});
+		securityClient.storeUser(sid, wsUserTest);
+		
+//		for (WSWorkingTime wt : wsUserTest.getWorkingTimes()) {
+//			System.out.println(wt.getLabel()+" > "+wt.getHourStart()+":"+wt.getMinuteStart());
+//			System.out.println(wt.getHourEnd()+":"+wt.getMinuteEnd());
+//			System.out.println("\\n");
+//		}
+		
+		
 		// securityClient.deleteUser(sid, 4);
 
 		// WSUser user = securityClient.getUser(sid, 2L);
@@ -512,27 +527,30 @@ public class SoapWorkbench {
 
 		//WSDocument doc = documentClient.getDocument(sid, 735L);
 		
-		documentClient.deleteLink(sid, 102L);
-
-		WSLink link = documentClient.link(sid, 101L, 734L, "testws");
-		System.out.println("Created link "+link.getId());
-
-		documentClient.deleteLink(sid, link.getId());
-		System.out.println("Deleted link "+link.getId());
-	
-		WSLink[] links = documentClient.getLinks(sid, 100L);
-		if (links != null) {
-			for (WSLink lnk : links) {
-				System.out.println("Link " + lnk.getType() + " - > " + lnk.getDoc2() + " (" + lnk.getId() + ")");
-			}
-		}
-
-		// Update a document
-		WSDocument wsDoc = documentClient.getDocument(sid, 735L);
-		String[] tags = wsDoc.getTags();
-		for (String tag : tags) {
-			System.out.println("tag: "+tag);
-		}
+//		documentClient.deleteLink(sid, 102L);
+//
+//		WSLink link = documentClient.link(sid, 101L, 734L, "testws");
+//		System.out.println("Created link "+link.getId());
+//
+//		documentClient.deleteLink(sid, link.getId());
+//		System.out.println("Deleted link "+link.getId());
+//	
+//		WSLink[] links = documentClient.getLinks(sid, 100L);
+//		if (links != null) {
+//			for (WSLink lnk : links) {
+//				System.out.println("Link " + lnk.getType() + " - > " + lnk.getDoc2() + " (" + lnk.getId() + ")");
+//			}
+//		}
+//
+//		// Update a document
+//		WSDocument wsDoc = documentClient.getDocument(sid, 735L);
+//		String[] tags = wsDoc.getTags();
+//		for (String tag : tags) {
+//			System.out.println("tag: "+tag);
+//		}
+		
+//		WSDocument wsDoc = documentClient.copy(sid, 723687824L, 717513370L);
+		
 		
 		
 //		for (WSAttribute att : wsDoc.getAttributes()) {
@@ -543,10 +561,10 @@ public class SoapWorkbench {
 //		documentClient.update(sid, wsDoc);
 		
 		// Create a document with multi-value attribute
-//		WSDocument wsDoc = new WSDocument();
-//		wsDoc.setFileName("pom.xml");
-//		wsDoc.setFolderId(Folder.DEFAULTWORKSPACEID);
-//		wsDoc.setTemplateId(547815424L);
+		WSDocument wsDoc = new WSDocument();
+		wsDoc.setFileName("filename-duplicates.xlsx");
+		wsDoc.setFolderId(Folder.DEFAULTWORKSPACEID);
+		//wsDoc.setTemplateId(547815424L);
 //		
 //		WSAttribute att1=new WSAttribute();
 //		att1.setName("industries");
@@ -559,7 +577,7 @@ public class SoapWorkbench {
 //		att2.setParent("industries");
 //		wsDoc.addAttribute(att2);
 //		
-//		documentClient.create(sid, wsDoc, new File("pom.xml"));
+		documentClient.create(sid, wsDoc, new File("C:\\Users\\marco\\Downloads\\filename-duplicates.xlsx"));
 		
 		
 		
@@ -680,7 +698,7 @@ public class SoapWorkbench {
 
 		// documentClient.sendEmail("ciccio", new Long[] { 690L, 32L, 29L },
 		// "m.caruso@logicalobjects.it", "Test Invio Mail 2",
-		// "Questa mail è un test");
+		// "Questa mail ï¿½ un test");
 
 		// WSHistory[] history = documentClient.getHistory(sid, 12724);
 		// for (WSHistory h : history) {

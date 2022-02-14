@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.ticket.Ticket;
 
@@ -99,9 +100,9 @@ public interface DocumentManager {
 	 * @param status the lock type (used to populate status attribute of the
 	 *        document)
 	 * @param transaction entry to log the event (set the user)
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
-	public void lock(long docId, int status, DocumentHistory transaction) throws Exception;
+	public void lock(long docId, int status, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * UNChecks out the given document
@@ -109,9 +110,9 @@ public interface DocumentManager {
 	 * @param docId the document to be unchecked out
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
-	public void unlock(long docId, DocumentHistory transaction) throws Exception;
+	public void unlock(long docId, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Creates a new Document. Saves the information provided. That also
@@ -123,9 +124,9 @@ public interface DocumentManager {
 	 *        the comment)
 	 * @return The newly created document
 	 * 
-	 * @throws Exception raised if the document cannot be created
+	 * @throws PersistenceException raised if the document cannot be created
 	 */
-	public Document create(File file, Document docVO, DocumentHistory transaction) throws Exception;
+	public Document create(File file, Document docVO, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Creates a new Document. Saves the information provided. That also
@@ -160,9 +161,9 @@ public interface DocumentManager {
 	 * @param docId The document to be renamed
 	 * @param newName The new filename of the document
 	 * @param transaction entry to log the event (set the user)
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
-	public void rename(long docId, String newName, DocumentHistory transaction) throws Exception;
+	public void rename(long docId, String newName, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Updates an existing document and marks it to be re-indexed
@@ -171,9 +172,9 @@ public interface DocumentManager {
 	 * @param docVO value object containing the new metadata
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws Exception if an error occurs, this exception is thrown
+     * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
-	public void update(Document doc, Document docVO, DocumentHistory transaction) throws Exception;
+	public void update(Document doc, Document docVO, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Utility method for document removal from index and database update(flag
@@ -215,9 +216,9 @@ public interface DocumentManager {
 	 * @param docId identifier of the document
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws Exception raised if the document cannot be marked immutable
+	 * @throws PersistenceException raised if the document cannot be marked immutable
 	 */
-	public void makeImmutable(long docId, DocumentHistory transaction) throws Exception;
+	public void makeImmutable(long docId, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Moves a document to the specified folder. All stores(db, file system,
@@ -227,9 +228,9 @@ public interface DocumentManager {
 	 * @param folder The target folder
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws Exception raised if the document cannot be moved
+	 * @throws PersistenceException raised if the document cannot be moved
 	 */
-	public void moveToFolder(Document doc, Folder folder, DocumentHistory transaction) throws Exception;
+	public void moveToFolder(Document doc, Folder folder, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Copy a document to the specified folder.
@@ -267,9 +268,9 @@ public interface DocumentManager {
 	 * 
 	 * @return The created document
 	 * 
-	 * @throws Exception raised if the alias cannot be replaced
+	 * @throws PersistenceException raised if the alias cannot be replaced
 	 */
-	public Document replaceAlias(long aliasId, DocumentHistory transaction) throws Exception;
+	public Document replaceAlias(long aliasId, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Deletes a specific version.
@@ -279,9 +280,9 @@ public interface DocumentManager {
 	 * 
 	 * @return the latest version
 	 * 
-	 * @throws Exception If the version cannot be deleted
+	 * @throws PersistenceException If the version cannot be deleted
 	 */
-	public Version deleteVersion(long versionId, DocumentHistory transaction) throws Exception;
+	public Version deleteVersion(long versionId, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Retrieves the document's content as a string
@@ -301,9 +302,9 @@ public interface DocumentManager {
 	 * 
 	 * @return Total number of archived documents
 	 * 
-	 * @throws Exception raised if at least a document cannot be archived
+	 * @throws PersistenceException raised if at least a document cannot be archived
 	 */
-	public long archiveFolder(long folderId, DocumentHistory transaction) throws Exception;
+	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Archives all the documents in a folder's tree
@@ -311,9 +312,9 @@ public interface DocumentManager {
 	 * @param docIds Documents to be archived
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws Exception raised if at least a document cannot be archived
+	 * @throws PersistenceException raised if at least a document cannot be archived
 	 */
-	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws Exception;
+	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Creates a new download ticket.
@@ -330,10 +331,10 @@ public interface DocumentManager {
 	 * 
 	 * @return The created ticket with the url property filled
 	 * 
-	 * @throws Exception raised if the download ticket cannot be created
+	 * @throws PersistenceException raised if the download ticket cannot be created
 	 */
 	public Ticket createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws Exception;
+			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Tries to unprotect a document, If the password is correct, the document
@@ -359,11 +360,10 @@ public interface DocumentManager {
 	 * @throws Exception In case of error during the process
 	 */
 	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws Exception;
-	
-	
+
 	/**
 	 * Merges a set of documents into a single PDF file
-	 * 0
+	 * 
 	 * @param documents the list of documents to merge(the order counts)
 	 * @param targetFolderId identifier of the target folder
 	 * @param fileName name of the output file(must ends with .pdf)
@@ -373,6 +373,15 @@ public interface DocumentManager {
 	 * 
 	 * @throws Exception generic error happened
 	 */
-	public Document merge(Collection<Document> documents, long targetFolderId, String fileName, DocumentHistory transaction)
-			throws Exception;
+	public Document merge(Collection<Document> documents, long targetFolderId, String fileName,
+			DocumentHistory transaction) throws Exception;
+
+	/**
+	 * Counts the number of pages of a document
+	 * 
+	 * @param doc the document
+	 * 
+	 * @return the number of pages
+	 */
+	public int countPages(Document doc);
 }

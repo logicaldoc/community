@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
@@ -26,14 +27,19 @@ public class LinksDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(LinksDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			ServiceUtil.validateSession(request);
 
 			Long docId = null;
-			if (StringUtils.isNotEmpty(request.getParameter("docId")))
-				docId = Long.parseLong(request.getParameter("docId"));
+			if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
+				docId=Long.parseLong(request.getParameter("docId"));				
+				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				Document doc=ddao.findDocument(docId);
+				if(doc!=null)
+					docId=doc.getId();
+			}
 
 			String parent = request.getParameter("parent");
 			if (StringUtils.isEmpty(parent))
@@ -59,7 +65,8 @@ public class LinksDataServlet extends HttpServlet {
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			StringBuffer query = new StringBuffer(
 					"select A.id, B.folder.id, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
-			query.append(" A.document1.folder.id, A.document2.folder.id from DocumentLink A, Document B where A.deleted = 0 and B.deleted = 0 ");
+			query.append(
+					" A.document1.folder.id, A.document2.folder.id, A.document1.color, A.document2.color from DocumentLink A, Document B where A.deleted = 0 and B.deleted = 0 ");
 			query.append(" and ((A.document1.id = B.id and A.document1.id = " + parentDocId + ")");
 			query.append(" or  (A.document2.id = B.id and A.document2.id = " + parentDocId + ")");
 			query.append(")");
@@ -89,13 +96,18 @@ public class LinksDataServlet extends HttpServlet {
 					writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[8]))
 							+ "</icon>");
 					writer.print("<direction>out</direction>");
+					if (cols[12] != null)
+						writer.print("<color><![CDATA[" + cols[12] + "]]></color>");
 				} else {
 					writer.print("<documentId>" + parent + "-" + cols[3] + "</documentId>");
 					writer.print("<filename><![CDATA[" + (String) cols[4] + "]]></filename>");
 					writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[5]))
 							+ "</icon>");
+					if (cols[11] != null)
+						writer.print("<color><![CDATA[" + cols[11] + "]]></color>");					
 					writer.print("<direction>in</direction>");
 				}
+
 				writer.print("</link>");
 			}
 

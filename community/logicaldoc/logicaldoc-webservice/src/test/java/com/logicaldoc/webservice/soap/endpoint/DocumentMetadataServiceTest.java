@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.webservice.AbstractWebServiceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSTemplate;
 
 /**
@@ -18,7 +18,7 @@ import com.logicaldoc.webservice.model.WSTemplate;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
-public class DocumentMetadataServiceTest extends AbstractWebServiceTestCase {
+public class DocumentMetadataServiceTest extends AbstractWebserviceTestCase {
 	private TemplateDAO templateDao;
 
 	// Instance under test

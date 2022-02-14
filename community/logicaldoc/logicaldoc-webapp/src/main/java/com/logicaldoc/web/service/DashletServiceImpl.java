@@ -46,6 +46,8 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 			}
 			dashlet.setContent(guiDashlet.getContent());
 			dashlet.setMax(guiDashlet.getMax());
+			dashlet.setColumns(guiDashlet.getColumns());
+			dashlet.setUnique(guiDashlet.isUnique() ? 1 : 0);
 			dashlet.setQuery(guiDashlet.getQuery());
 			dashlet.setTitle(guiDashlet.getTitle());
 			dashlet.setType(guiDashlet.getType());
@@ -159,6 +161,8 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 		dashlet.setQuery(guiDashlet.getQuery());
 		dashlet.setContent(guiDashlet.getContent());
 		dashlet.setMax(guiDashlet.getMax());
+		dashlet.setColumns(guiDashlet.getColumns());
+		dashlet.setUnique(guiDashlet.isUnique() ? 1 : 0);
 		return dashlet;
 	}
 
@@ -171,6 +175,8 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 		guiDashlet.setQuery(dashlet.getQuery());
 		guiDashlet.setContent(dashlet.getContent());
 		guiDashlet.setMax(dashlet.getMax());
+		guiDashlet.setColumns(dashlet.getColumns());
+		guiDashlet.setUnique(dashlet.getUnique() == 1);
 		return guiDashlet;
 	}
 }

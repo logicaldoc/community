@@ -2,23 +2,28 @@ package com.logicaldoc.gui.common.client.widgets.preview;
 
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.MessageLabel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ContentsType;
+import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.ResizedEvent;
@@ -44,6 +49,8 @@ public class PreviewPanel extends VLayout {
 	private MailPreviewPanel mail = null;
 
 	private Canvas reload = null;
+	
+	private Label disabled = null;
 
 	private long docId;
 
@@ -61,67 +68,71 @@ public class PreviewPanel extends VLayout {
 		this.document = document;
 		this.docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
 
-		DocumentProtectionManager.askForPassword(docId, new DocumentProtectionHandler() {
+		if (Menu.enabled(Menu.PREVIEW)) {
+			DocumentProtectionManager.askForPassword(docId, new DocumentProtectionHandler() {
 
-			@Override
-			public void onUnprotected(GUIDocument doc) {
-				accessGranted = true;
+				@Override
+				public void onUnprotected(GUIDocument doc) {
+					accessGranted = true;
 
-				if (Util.isMediaFile(document.getFileName().toLowerCase())) {
-					reloadMedia();
-				} else if (Util.isWebContentFile(document.getFileName().toLowerCase())) {
-					reloadHTML();
-				} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
-					reloadMail();
-				} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
-					FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-							new AsyncCallback<GUIFolder>() {
+					if (Util.isMediaFile(document.getFileName().toLowerCase())) {
+						reloadMedia();
+					} else if (Util.isWebContentFile(document.getFileName().toLowerCase())) {
+						reloadHTML();
+					} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
+						reloadMail();
+					} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
+						FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
+								new AsyncCallback<GUIFolder>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-								@Override
-								public void onSuccess(GUIFolder folder) {
-									if (folder.isDownload())
-										reloadDICOM();
-									else
-										reloadPreview();
-								}
-							});
+									@Override
+									public void onSuccess(GUIFolder folder) {
+										if (folder.isDownload())
+											reloadDICOM();
+										else
+											reloadPreview();
+									}
+								});
 
-				} else {
-					reloadPreview();
+					} else {
+						reloadPreview();
+					}
+
+					redraw();
 				}
+			});
 
-				redraw();
-			}
-		});
+			addResizedHandler(new ResizedHandler() {
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				if (getWidth() < 10L) {
-					// The panel has been closed
-					clearContent();
-					width = 0;
-					height = 0;
-					html = null;
-					preview = null;
-					dicom = null;
-					media = null;
-					mail = null;
-					reload = null;
-				} else if (!redrawing && (width != getWidth() || height != getHeight())) {
-					width = getWidth();
-					height = getHeight();
-					clearContent();
-					showReloadPanel();
+				@Override
+				public void onResized(ResizedEvent event) {
+					if (getWidth() < 10L) {
+						// The panel has been closed
+						clearContent();
+						width = 0;
+						height = 0;
+						html = null;
+						preview = null;
+						dicom = null;
+						media = null;
+						mail = null;
+						reload = null;
+					} else if (!redrawing && (width != getWidth() || height != getHeight())) {
+						width = getWidth();
+						height = getHeight();
+						clearContent();
+						showReloadPanel();
+					}
 				}
-			}
-		});
+			});
+		} else {
+			showDisabledPanel();
+		}
 	}
 
 	public synchronized void redraw() {
@@ -130,23 +141,27 @@ public class PreviewPanel extends VLayout {
 			clearContent();
 			width = getWidth();
 			height = getHeight();
-			if (accessGranted) {
-				if (preview != null) {
-					if (getWidth() > 10)
-						reloadPreview();
-				} else if (html != null) {
-					if (getWidth() > 10)
-						reloadHTML();
-				} else if (dicom != null) {
-					if (getWidth() > 10)
-						reloadDICOM();
-				} else if (media != null) {
-					if (getWidth() > 10)
-						reloadMedia();
-				} else if (mail != null) {
-					if (getWidth() > 10)
-						reloadMail();
+			if (Menu.enabled(Menu.PREVIEW)) {
+				if (accessGranted) {
+					if (preview != null) {
+						if (getWidth() > 10)
+							reloadPreview();
+					} else if (html != null) {
+						if (getWidth() > 10)
+							reloadHTML();
+					} else if (dicom != null) {
+						if (getWidth() > 10)
+							reloadDICOM();
+					} else if (media != null) {
+						if (getWidth() > 10)
+							reloadMedia();
+					} else if (mail != null) {
+						if (getWidth() > 10)
+							reloadMail();
+					}
 				}
+			} else {
+				showDisabledPanel();
 			}
 		} finally {
 			redrawing = false;
@@ -280,6 +295,9 @@ public class PreviewPanel extends VLayout {
 		if (mail != null) {
 			removeMember(mail);
 		}
+		if (disabled != null) {
+			removeMember(disabled);
+		}
 	}
 
 	private void showReloadPanel() {
@@ -301,5 +319,19 @@ public class PreviewPanel extends VLayout {
 		reload.addChild(reloadButton);
 
 		addMember(reload);
+	}
+	
+	/**
+	 * Displays the label when the preview menu is not enabled
+	 */
+	private void showDisabledPanel() {
+		disabled = new MessageLabel(
+				new GUIMessage("<b>" + I18N.message("previewdisabled") + "</b>", GUIMessage.PRIO_WARN), false);
+		disabled.setHeight(30);
+		disabled.setPadding(10);
+		disabled.setAlign(Alignment.CENTER);
+		disabled.setValign(VerticalAlignment.CENTER);
+		disabled.setShowEdges(false);
+		addMember(disabled);
 	}
 }

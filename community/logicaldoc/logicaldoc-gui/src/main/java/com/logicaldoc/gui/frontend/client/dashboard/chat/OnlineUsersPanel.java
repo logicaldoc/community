@@ -12,8 +12,8 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.observer.UserObserver;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.ChatService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -53,7 +53,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 		username.setCanFilter(true);
 		username.setWidth("100%");
 
-		AvatarListGridField avatar = new AvatarListGridField();
+		UserListGridField avatar = new UserListGridField();
 
 		onlineUsers = new RefreshableListGrid(new OnlineUsersDS());
 		onlineUsers.setEmptyMessage(I18N.message("nousers"));

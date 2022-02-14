@@ -20,14 +20,14 @@ public class ResourceUtil {
 
 	public static String readAsString(String resourceName) throws IOException {
 		StringBuffer resourceData = new StringBuffer(1000);
-		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(ResourceUtil.class.getResourceAsStream(resourceName)));
-		char[] buf = new char[1024];
-		int numRead = 0;
-		while ((numRead = reader.read(buf)) != -1) {
-			resourceData.append(buf, 0, numRead);
+		try (BufferedReader reader = new BufferedReader(
+				new InputStreamReader(ResourceUtil.class.getResourceAsStream(resourceName)))) {
+			char[] buf = new char[1024];
+			int numRead = 0;
+			while ((numRead = reader.read(buf)) != -1) {
+				resourceData.append(buf, 0, numRead);
+			}
 		}
-		reader.close();
 		return resourceData.toString();
 	}
 
@@ -41,18 +41,14 @@ public class ResourceUtil {
 	 *         output file cannot be written
 	 */
 	public static void copyResource(String classpath, File out) throws IOException {
-		InputStream is = new BufferedInputStream(ResourceUtil.class.getResource(classpath).openStream());
-		OutputStream os = new BufferedOutputStream(new FileOutputStream(out));
-		try {
+		try (InputStream is = new BufferedInputStream(ResourceUtil.class.getResource(classpath).openStream());
+				OutputStream os = new BufferedOutputStream(new FileOutputStream(out));) {
 			for (;;) {
 				int b = is.read();
 				if (b == -1)
 					break;
 				os.write(b);
 			}
-		} finally {
-			is.close();
-			os.close();
 		}
 	}
 

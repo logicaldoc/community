@@ -180,9 +180,26 @@ public class EmailAccountDetailsPanel extends VLayout {
 
 	private boolean validate() {
 		boolean stdValid = standardPanel.validate();
-		boolean extValid = advancedPanel.validate();
-		boolean filtValid = filtersPanel.validate();
-		boolean automationValid = automationPanel.validate();
+		boolean extValid = true;
+		try {
+			extValid = advancedPanel.validate();
+		} catch (Throwable t) {
+
+		}
+
+		boolean automationValid = true;
+		try {
+			automationValid = automationPanel.validate();
+		} catch (Throwable t) {
+
+		}
+
+		boolean filtValid = true;
+		try {
+			filtValid = filtersPanel.validate();
+		} catch (Throwable t) {
+
+		}
 
 		if (!stdValid)
 			tabSet.selectTab(0);

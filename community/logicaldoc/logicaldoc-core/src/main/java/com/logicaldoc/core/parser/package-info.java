@@ -4,7 +4,7 @@
  * a specific file type.<br>
  * <br>
  * The parsers are used by the full-text engine to extract the contents for
- * indexing your documents
+ * indexing your documents and calculating the number of pages.
  *
  * @since 1.0
  */

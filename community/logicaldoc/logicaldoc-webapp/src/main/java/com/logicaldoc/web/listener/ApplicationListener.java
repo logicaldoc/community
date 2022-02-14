@@ -1,8 +1,10 @@
 package com.logicaldoc.web.listener;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.sql.Driver;
@@ -19,9 +21,15 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.impl.Log4jContextFactory;
+import org.apache.logging.log4j.core.util.DefaultShutdownCallbackRegistry;
+import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Log4jConfigurer;
+import org.slf4j.impl.StaticLoggerBinder;
 
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.util.config.ContextProperties;
@@ -101,7 +109,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		} catch (Throwable e) {
 			log.warn(e.getMessage(), e);
 		}
-		
+
 		Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
 		Thread[] threadArray = threadSet.toArray(new Thread[threadSet.size()]);
 
@@ -149,7 +157,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				lconf.write();
 
 				// Init the logs
-				Log4jConfigurer.initLogging(log4jPath);
+				System.out.println("Taking log configuration from " + log4jPath);
+				Configurator.initialize(null, log4jPath);
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
@@ -175,8 +184,12 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			// Reinitialize logging because some plugins may have added new
 			// categories
 			try {
-				Log4jConfigurer.shutdownLogging();
-				Log4jConfigurer.initLogging(log4jPath);
+				final LoggerContextFactory factory = LogManager.getFactory();
+
+				if (factory instanceof Log4jContextFactory) {
+					Log4jContextFactory contextFactory = (Log4jContextFactory) factory;
+					((DefaultShutdownCallbackRegistry) contextFactory.getShutdownCallbackRegistry()).stop();
+				}
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}

@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.settings.gui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -45,9 +44,6 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class DashletsPanel extends VLayout {
 
-	private List<String> systemDashlets = Arrays.asList(
-			new String[] { "checkin", "checkout", "locked", "download", "locket", "change", "tagcloud", "notes" });
-
 	private ListGrid grid;
 
 	private ListGridRecord rollOverRecord;
@@ -84,9 +80,9 @@ public class DashletsPanel extends VLayout {
 						dashlet.setType("content");
 						dashlet.setId(-1L);
 						dashlets.add(dashlet);
-						
+
 						refreshGrid();
-						
+
 						DashletEditor editor = new DashletEditor(dashlet, DashletsPanel.this);
 						editor.show();
 					}
@@ -274,7 +270,7 @@ public class DashletsPanel extends VLayout {
 			}
 		});
 
-		delete.setEnabled(!systemDashlets.contains(grid.getSelectedRecord().getAttributeAsString("name")));
+		delete.setEnabled(!GUIDashlet.isSystemDashlet(grid.getSelectedRecord().getAttributeAsString("name")));
 
 		contextMenu.setItems(delete);
 		contextMenu.showContextMenu();

@@ -18,6 +18,8 @@ public class GUISecuritySettings implements Serializable {
 
 	private int pwdEnforceHistory;
 
+	private Integer maxInactivity;
+
 	private boolean saveLogin = false;
 
 	private boolean ignoreLoginCase = false;
@@ -41,6 +43,11 @@ public class GUISecuritySettings implements Serializable {
 	private boolean geolocationEnabled = true;
 
 	private boolean geolocationCache = false;
+
+	/**
+	 * Value for the Content-Security-Policy HTTP header
+	 */
+	private String contentSecurityPolicy = null;
 
 	public int getPwdSize() {
 		return pwdSize;
@@ -160,5 +167,21 @@ public class GUISecuritySettings implements Serializable {
 
 	public void setPwdEnforceHistory(int pwdEnforceHistory) {
 		this.pwdEnforceHistory = pwdEnforceHistory;
+	}
+
+	public Integer getMaxInactivity() {
+		return maxInactivity;
+	}
+
+	public void setMaxInactivity(Integer maxInactivity) {
+		this.maxInactivity = maxInactivity;
+	}
+
+	public String getContentSecurityPolicy() {
+		return contentSecurityPolicy;
+	}
+
+	public void setContentSecurityPolicy(String contentSecurityPolicy) {
+		this.contentSecurityPolicy = contentSecurityPolicy;
 	}
 }

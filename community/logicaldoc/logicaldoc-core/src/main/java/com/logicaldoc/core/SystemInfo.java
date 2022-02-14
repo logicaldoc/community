@@ -25,11 +25,11 @@ public class SystemInfo {
 
 	protected String product = "LogicalDOC";
 
-	protected String release = "8.6.1";
+	protected String release = "8.7.3";
 
 	protected String year = "2006-2021";
 
-	protected String help = "https://help.logicaldoc.com";
+	protected String help = "https://docs.logicaldoc.com";
 
 	protected String bugs = "https://bugs.logicaldoc.com";
 

@@ -83,8 +83,7 @@ public class AutomationTriggerProperties extends AutomationTriggerDetailsTab {
 		form1.setValuesManager(vm);
 		form1.setHeight100();
 
-		SelectItem events = ItemFactory.newEventsSelector("events", I18N.message("triggeron"), changedHandler, true, true,
-				true);
+		SelectItem events = ItemFactory.newEventsSelector("events", I18N.message("triggeron"), changedHandler, true, true, true, true);
 		events.setRowSpan(3);
 		events.setValues(trigger.getEventsArray());
 

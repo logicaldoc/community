@@ -34,8 +34,8 @@ public class BookmarksDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(BookmarksDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -57,24 +57,24 @@ public class BookmarksDataServlet extends HttpServlet {
 			BookmarkDAO dao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 
 			/*
-			 * Search for folders first.
+			 * Search for documents first.
 			 */
 			StringBuffer query = new StringBuffer(
-					"select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, B.folder.id "
+					"select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, B.folder.id, B.color "
 							+ " from Bookmark A, Document B where A.type=" + Bookmark.TYPE_DOCUMENT
 							+ " and A.deleted = 0 and B.deleted = 0 and A.targetId = B.id and A.userId = "
 							+ session.getUserId());
 			records.addAll(dao.findByQuery(query.toString(), null, null));
 
 			/*
-			 * Than for documents
+			 * Than for folders
 			 */
 			query = new StringBuffer(
-					"select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, A.targetId "
-							+ " from Bookmark A where A.type=" + Bookmark.TYPE_FOLDER + " and A.deleted = 0 and A.userId = "
-							+ session.getUserId());
+					"select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, A.targetId, B.color "
+							+ " from Bookmark A, Folder B where A.targetId = B.id and A.type=" + Bookmark.TYPE_FOLDER
+							+ " and A.deleted = 0 and A.userId = " + session.getUserId());
 			records.addAll(dao.findByQuery(query.toString(), null, null));
-			
+
 			/*
 			 * Iterate over records composing the response XML document
 			 */
@@ -83,11 +83,11 @@ public class BookmarksDataServlet extends HttpServlet {
 
 				writer.print("<bookmark>");
 				writer.print("<id>" + cols[0] + "</id>");
-				if(cols[7].toString().equals("0"))
-				writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[1]))
-						+ "</icon>");
+				if (cols[7].toString().equals("0"))
+					writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[1]))
+							+ "</icon>");
 				else
-					writer.print("<icon>folder</icon>");	
+					writer.print("<icon>folder</icon>");
 				writer.print("<name><![CDATA[" + (cols[2] == null ? "" : cols[2]) + "]]></name>");
 				writer.print("<description><![CDATA[" + (cols[3] == null ? "" : cols[3]) + "]]></description>");
 				writer.print("<position>" + (cols[4] == null ? "" : cols[4]) + "</position>");
@@ -95,6 +95,8 @@ public class BookmarksDataServlet extends HttpServlet {
 				writer.print("<targetId>" + (cols[6] == null ? "" : cols[6]) + "</targetId>");
 				writer.print("<type>" + (cols[7] == null ? "" : cols[7]) + "</type>");
 				writer.print("<folderId>" + (cols[8] == null ? "" : cols[8]) + "</folderId>");
+				if (cols[9] != null)
+					writer.print("<color><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></color>");
 				writer.print("</bookmark>");
 			}
 			writer.write("</list>");

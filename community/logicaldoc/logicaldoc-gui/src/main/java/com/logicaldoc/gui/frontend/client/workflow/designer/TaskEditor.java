@@ -12,8 +12,8 @@ import com.logicaldoc.gui.common.client.beans.GUIWFState;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.types.HeaderControls;
@@ -69,10 +69,6 @@ public class TaskEditor extends Window {
 	private GUIWFState state;
 
 	private ListGrid participantsGrid;
-
-	private HLayout participantsLayout;
-
-	private Button removeParticipant = null;
 
 	private StateWidget widget;
 
@@ -448,7 +444,7 @@ public class TaskEditor extends Window {
 		name.setCanFilter(false);
 		name.setHidden(true);
 
-		AvatarListGridField avatar = new AvatarListGridField();
+		UserListGridField avatar = new UserListGridField();
 		participantsGrid = new RefreshableListGrid();
 		participantsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		participantsGrid.setCanFreezeFields(true);

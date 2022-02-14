@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceBooleanField;
 import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
@@ -18,8 +19,10 @@ public class FormsDS extends DataSource {
 		id.setPrimaryKey(true);
 		DataSourceTextField name = new DataSourceTextField("name");
 		DataSourceTextField templateId = new DataSourceTextField("templateId");
-
-		setFields(id, name, templateId);
+		DataSourceTextField formId = new DataSourceTextField("formId");
+		DataSourceBooleanField webEnabled = new DataSourceBooleanField("webEnabled");
+		
+		setFields(id, formId, name, webEnabled, templateId);
 		setDataURL("data/forms.xml");
 		setClientOnly(true);
 	}

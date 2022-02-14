@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.UserEvent;
+import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
@@ -33,11 +35,6 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	private List<Authenticator> authenticators = new ArrayList<Authenticator>();
 
 	@Override
-	public final User authenticate(String username, String password, String key) throws AuthenticationException {
-		return authenticate(username, password, key, null);
-	}
-
-	@Override
 	public final User authenticate(String username, String password) throws AuthenticationException {
 		return authenticate(username, password, null, null);
 	}
@@ -48,7 +45,9 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		if (authenticators == null || authenticators.isEmpty())
 			init();
 
-		User user = checkAnonymousLogin(username, key);
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+
+		User user = checkAnonymousLogin(username, key, client);
 		if (user != null)
 			return user;
 
@@ -62,7 +61,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			// DefaultAuthentication)
 			if (cmp.canAuthenticateUser(username)) {
 				try {
-					user = cmp.authenticate(username, password);
+					user = cmp.authenticate(username, password, key, client);
 				} catch (AuthenticationException ae) {
 					errors.add(ae);
 				}
@@ -71,8 +70,21 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			if (user != null)
 				break;
 		}
+
+		/*
+		 * At the end we need to do in any case some default validations
+		 */
+		try {
+			defaultValidations(username, client);
+		} catch (AuthenticationException ae) {
+			errors.clear();
+			errors.add(ae);
+			user = null;
+		}
+
+		if (errors != null && !errors.isEmpty())
+			log.debug("Collected authentication errors: {}", errors);
 		
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		if (user != null) {
 			userDao.initialize(user);
 		} else if (!errors.isEmpty()) {
@@ -85,15 +97,40 @@ public class AuthenticationChain extends AbstractAuthenticator {
 						throw err;
 			throw errors.get(0);
 		}
-		
+
 		return user;
 	}
-	
+
+	protected void defaultValidations(String username, Client client) throws AuthenticationException {
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDao.findByUsername(username);
+		if (user == null)
+			return;
+
+		DefaultAuthenticator defaultValidator = (DefaultAuthenticator) Context.get()
+				.getBean(DefaultAuthenticator.class);
+		try {
+			defaultValidator.validateUser(user);
+		} catch (AccountInactiveException ie) {
+			userDao.initialize(user);
+			UserHistory transaction = new UserHistory();
+			transaction.setUser(user);
+			transaction.setClient(client);
+			transaction.setEvent(UserEvent.DISABLED.toString());
+			transaction.setComment("inactive for too many days");
+
+			user.setEnabled(0);
+			userDao.store(user, transaction);
+
+			throw ie;
+		}
+	}
+
 	@Override
 	public User pickUser(String username) {
 		if (authenticators == null || authenticators.isEmpty())
 			init();
-		
+
 		User user = null;
 		for (Authenticator cmp : authenticators) {
 			if (!cmp.isEnabled())
@@ -113,7 +150,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			if (user != null)
 				break;
 		}
-		
+
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		if (user != null)
 			userDao.initialize(user);
@@ -123,17 +160,13 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	/*
 	 * Checks the anonymous login
 	 */
-	protected User checkAnonymousLogin(String username, String key) {
+	protected User checkAnonymousLogin(String username, String key, Client client) {
 		String tenant = Tenant.DEFAULT_NAME;
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		User user = userDao.getUser(username);
 
-		if (user.getEnabled() == 0)
-			throw new AccountDisabledException();
-
-		if (userDao.isPasswordExpired(username))
-			throw new PasswordExpiredException();
+		defaultValidations(username, client);
 
 		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		Tenant t = tdao.findById(user.getTenantId());
@@ -185,14 +218,14 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 		for (Extension extension : sortedExts) {
 			// Retrieve the authenticator bean id
-			authenticators.add((Authenticator) context.getBean(extension.getParameter("authenticatorId")
-					.valueAsString()));
+			authenticators
+					.add((Authenticator) context.getBean(extension.getParameter("authenticatorId").valueAsString()));
 		}
 
 		if (sortedExts.isEmpty())
 			authenticators.add((Authenticator) context.getBean(DefaultAuthenticator.class));
 
-		for (Authenticator auth : authenticators) {	
+		for (Authenticator auth : authenticators) {
 			log.warn("Added authenticator {}", auth.getClass().getSimpleName());
 		}
 		log.warn("Authentication chain initialized");

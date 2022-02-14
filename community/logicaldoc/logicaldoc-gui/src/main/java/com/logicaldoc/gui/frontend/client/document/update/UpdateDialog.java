@@ -8,21 +8,17 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.widgets.StickyWindow;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
-import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -36,7 +32,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.3
  */
-public class UpdateDialog extends Window {
+public class UpdateDialog extends StickyWindow {
 
 	public final static String CONTEXT_CHECKIN = "checkin";
 
@@ -52,24 +48,35 @@ public class UpdateDialog extends Window {
 
 	private String charset = "UTF-8";
 
-	public UpdateDialog(final long[] ids, final GUIDocument metadata, final String context,
-			final boolean majorVersion) {
-		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
+	private String context;
 
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				destroy();
-			}
-		});
+	private GUIDocument metadata;
 
-		setTitle(I18N.message(context));
-		setWidth(800);
-		setHeight(300);
-		setCanDragResize(true);
-		setIsModal(true);
-		setShowModalMask(true);
-		centerInPage();
+	private boolean majorVersion = false;
+
+	private final long[] ids;
+
+	public UpdateDialog(long[] ids, GUIDocument metadata, String context, boolean majorVersion, String charset) {
+		super(context);
+		this.context = context;
+		this.metadata = metadata;
+		this.majorVersion = majorVersion;
+		this.ids = ids;
+		this.charset = charset != null ? charset : Session.get().getConfig("charset");
+	}
+
+	public UpdateDialog(long[] ids, GUIDocument metadata, String context, boolean majorVersion) {
+		this(ids, metadata, context, majorVersion, null);
+	}
+
+	@Override
+	protected WindowStatus getDefaultStatus() {
+		return new WindowStatus(800, 350);
+	}
+
+	@Override
+	protected void onDraw() {
+		super.onDraw();
 
 		/*
 		 * Since the document is locked, temporarily alter the status to have
@@ -80,7 +87,8 @@ public class UpdateDialog extends Window {
 			originalStatus = metadata.getStatus();
 			metadata.setStatus(0);
 		}
-		bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context));
+
+		bulkPanel = new UpdatePanel(metadata, CONTEXT_UPLOAD.equals(context) || CONTEXT_CHECKIN.equals(context));
 		bulkPanel.setWidth100();
 		bulkPanel.setHeight("*");
 		bulkPanel.setShowResizeBar(false);
@@ -118,18 +126,18 @@ public class UpdateDialog extends Window {
 					return;
 
 				if (CONTEXT_CHECKIN.equals(context)) {
-					ContactingServer.get().show();
+					LD.contactingServer();
 					DocumentService.Instance.get().checkin(metadata, majorVersion, new AsyncCallback<GUIDocument>() {
 
 						@Override
 						public void onFailure(Throwable error) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.serverError(error);
 						}
 
 						@Override
 						public void onSuccess(GUIDocument doc) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							DocUtil.markCheckedIn(doc);
 							destroy();
 						}
@@ -140,19 +148,19 @@ public class UpdateDialog extends Window {
 						public void execute(Boolean value) {
 							if (value) {
 								bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
-								ContactingServer.get().show();
+								LD.contactingServer();
 								DocumentService.Instance.get().bulkUpdate(ids, bulkPanel.getDocument(),
 										"true".equals(saveForm.getValueAsString("ignoreemptyfields")),
 										new AsyncCallback<Void>() {
 											@Override
 											public void onFailure(Throwable error) {
-												ContactingServer.get().hide();
+												LD.clearPrompt();
 												GuiLog.serverError(error);
 											}
 
 											@Override
 											public void onSuccess(Void arg) {
-												ContactingServer.get().hide();
+												LD.clearPrompt();
 												GuiLog.info(I18N.message("bulkapplied"), null);
 												if (!Session.get().isServerPushEnabled())
 													DocumentsPanel.get().refresh();
@@ -164,13 +172,13 @@ public class UpdateDialog extends Window {
 					});
 				else {
 					bulkPanel.getDocument().setComment(saveForm.getValueAsString("versionComment"));
-					ContactingServer.get().show();
+					LD.contactingServer();
 					hide();
 					DocumentService.Instance.get().addDocuments(zip, charset, immediteIndexing, bulkPanel.getDocument(),
 							new AsyncCallback<GUIDocument[]>() {
 								@Override
 								public void onFailure(Throwable error) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(error);
 
 									// We have to refresh the documents list
@@ -178,11 +186,11 @@ public class UpdateDialog extends Window {
 									// some documents have been stored.
 									DocumentsPanel.get().refresh();
 								}
-								
+
 								@Override
 								public void onSuccess(GUIDocument[] doc) {
 									DocumentsPanel.get().refresh();
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 								}
 							});
 				}
@@ -204,7 +212,6 @@ public class UpdateDialog extends Window {
 		content.setWidth100();
 		content.setHeight100();
 		content.setMembersMargin(3);
-
 		content.setMembers(bulkPanel, savePanel);
 
 		addItem(content);

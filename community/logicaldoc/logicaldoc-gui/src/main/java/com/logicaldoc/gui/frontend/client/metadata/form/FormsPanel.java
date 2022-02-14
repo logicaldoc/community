@@ -1,16 +1,18 @@
 package com.logicaldoc.gui.frontend.client.metadata.form;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.data.FormsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
-import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FormService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -21,8 +23,7 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.events.DoubleClickEvent;
-import com.smartgwt.client.widgets.events.DoubleClickHandler;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -65,15 +66,33 @@ public class FormsPanel extends AdminPanel {
 		// Initialize the listing panel
 		Layout listing = new VLayout();
 		listing.setAlign(Alignment.CENTER);
-		listing.setHeight("60%");
+		listing.setHeight("55%");
 		listing.setShowResizeBar(true);
 
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		ListGridField id = new ListGridField("id", 50);
+		ListGridField id = new ListGridField("id", 70);
 		id.setHidden(true);
 
 		ListGridField name = new ListGridField("name", I18N.message("name"), 150);
+
+		ListGridField formId = new ListGridField("formId", 150);
+		formId.setHidden(true);
+
+		ListGridField webEnabled = new ListGridField("webEnabled", I18N.message("web"), 50);
+
+		ListGridField permaLink = new ListGridField("preview", I18N.message("preview"), 90);
+		permaLink.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				if (record.getAttributeAsBoolean("webEnabled")) {
+					return "<a href='" + webformURL(record.getAttributeAsString("formId")) + "' target='_blank'>"
+							+ I18N.message("preview") + "</a>";
+				} else
+					return "";
+			}
+		});
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -81,7 +100,6 @@ public class FormsPanel extends AdminPanel {
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(id, name);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -90,6 +108,11 @@ public class FormsPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setDataSource(new FormsDS());
 
+		if(Feature.enabled(Feature.WEB_FORM))
+			list.setFields(id, formId, name, webEnabled, permaLink);
+		else
+			list.setFields(id, formId, name);
+		
 		listing.addMember(infoPanel);
 		listing.addMember(list);
 
@@ -120,14 +143,6 @@ public class FormsPanel extends AdminPanel {
 			}
 		});
 
-		list.addDoubleClickHandler(new DoubleClickHandler() {
-
-			@Override
-			public void onDoubleClick(DoubleClickEvent event) {
-				onEdit();
-			}
-		});
-
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
@@ -141,8 +156,8 @@ public class FormsPanel extends AdminPanel {
 			public void onSelectionChanged(SelectionEvent event) {
 				Record record = list.getSelectedRecord();
 				if (record != null)
-					DocumentService.Instance.get().getById(Long.parseLong(record.getAttributeAsString("id")),
-							new AsyncCallback<GUIDocument>() {
+					FormService.Instance.get().getById(Long.parseLong(record.getAttributeAsString("id")),
+							new AsyncCallback<GUIForm>() {
 
 								@Override
 								public void onFailure(Throwable caught) {
@@ -150,7 +165,7 @@ public class FormsPanel extends AdminPanel {
 								}
 
 								@Override
-								public void onSuccess(GUIDocument form) {
+								public void onSuccess(GUIForm form) {
 									showFormDetails(form);
 								}
 							});
@@ -175,6 +190,7 @@ public class FormsPanel extends AdminPanel {
 
 		final ListGridRecord record = list.getSelectedRecord();
 		final long id = Long.parseLong(record.getAttributeAsString("id"));
+		final String formId = record.getAttributeAsString("formId");
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -212,11 +228,35 @@ public class FormsPanel extends AdminPanel {
 			}
 		});
 
-		contextMenu.setItems(edit, delete);
+		MenuItem preview = new MenuItem();
+		preview.setTitle(I18N.message("preview"));
+		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				WindowUtils.openUrlInNewTab(webformURL(formId));
+			}
+		});
+		preview.setEnabled(record.getAttributeAsBoolean("webEnabled"));
+
+		MenuItem invite = new MenuItem();
+		invite.setTitle(I18N.message("invite"));
+		invite.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				FormInvitationDialog invitation = new FormInvitationDialog(getSelectedForm().getId());
+				invitation.show();
+			}
+		});
+		invite.setEnabled(record.getAttributeAsBoolean("webEnabled"));
+
+		if(Feature.enabled(Feature.WEB_FORM))
+			contextMenu.setItems(edit, preview, invite, delete);
+		else
+			contextMenu.setItems(edit, delete);
 		contextMenu.showContextMenu();
 	}
 
-	public void showFormDetails(GUIDocument form) {
+	public void showFormDetails(GUIForm form) {
 		detailsContainer.removeMember(details);
 
 		if (form != null) {
@@ -238,28 +278,32 @@ public class FormsPanel extends AdminPanel {
 	 * 
 	 * @param form updates the form document
 	 */
-	public void updateRecord(GUIDocument form) {
+	public void updateRecord(GUIForm form) {
 		Record record = list.find(new AdvancedCriteria("id", OperatorId.EQUALS, form.getId()));
 		if (record == null) {
 			record = new ListGridRecord();
 			// Append a new record
 			record.setAttribute("id", form.getId());
+			record.setAttribute("formId", form.getFormId());
+			record.setAttribute("name", form.getName());
+			record.setAttribute("webEnabled", form.isWebEnabled());
 			list.addData(record);
 			list.selectRecord(record);
 		}
 
-		record.setAttribute("name", form.getFileName());
+		record.setAttribute("name", form.getName());
+		record.setAttribute("webEnabled", form.isWebEnabled());
 		list.refreshRow(list.getRecordIndex(record));
 	}
 
-	private GUIDocument getSelectedForm() {
+	private GUIForm getSelectedForm() {
 		ListGridRecord record = list.getSelectedRecord();
 		if (record == null)
 			return null;
 
-		GUIDocument form = new GUIDocument();
+		GUIForm form = new GUIForm();
 		form.setId(Long.parseLong(record.getAttributeAsString("id")));
-		form.setFileName(record.getAttributeAsString("name"));
+		form.setName(record.getAttributeAsString("name"));
 		return form;
 	}
 
@@ -271,7 +315,14 @@ public class FormsPanel extends AdminPanel {
 	}
 
 	private void onEdit() {
-		FormEditor popup = new FormEditor(getSelectedForm());
-		popup.show();
+		if (details instanceof FormDetailsPanel) {
+			if (((FormDetailsPanel) details).getForm().getId() == getSelectedForm().getId())
+				((FormDetailsPanel) details).openContentEditor();
+		}
+	}
+
+	public static String webformURL(String formId) {
+		String url = Util.contextPath() + "webform/" + formId;
+		return url;
 	}
 }

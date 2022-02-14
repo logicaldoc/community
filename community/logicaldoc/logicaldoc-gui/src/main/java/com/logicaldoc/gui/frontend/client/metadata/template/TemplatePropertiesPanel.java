@@ -126,8 +126,8 @@ public class TemplatePropertiesPanel extends HLayout {
 		attributesList.setSelectionType(SelectionStyle.MULTIPLE);
 		attributesList.setCanEdit(false);
 		attributesList.setShowRowNumbers(true);
-		attributesList.setCanReorderRecords(!template.isReadonly());
-		attributesList.setCanAcceptDroppedRecords(!template.isReadonly());
+		attributesList.setCanReorderRecords(!template.isReadonly() && template.isWrite());
+		attributesList.setCanAcceptDroppedRecords(!template.isReadonly() &&  template.isWrite());
 		attributesList.setAutoFetchData(true);
 		attributesList.setShowRecordComponents(true);
 		attributesList.setShowRecordComponentsByCell(true);
@@ -135,7 +135,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		attributesList.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				if (!TemplatePropertiesPanel.this.template.isReadonly())
+				if (!TemplatePropertiesPanel.this.template.isReadonly() && TemplatePropertiesPanel.this.template.isWrite())
 					showContextMenu();
 				event.cancel();
 			}
@@ -205,7 +205,7 @@ public class TemplatePropertiesPanel extends HLayout {
 				dialog.show();
 			}
 		});
-
+		
 		SectionStack attributesStack = new SectionStack();
 		attributesStack.setHeight100();
 		attributesStack.setWidth(680);
@@ -214,7 +214,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		section.setCanCollapse(false);
 		section.setExpanded(true);
 
-		if (template.isReadonly())
+		if (template.isReadonly() || !template.isWrite())
 			section.setItems(attributesList);
 		else
 			section.setItems(attributesList, addAttributes);
@@ -393,18 +393,18 @@ public class TemplatePropertiesPanel extends HLayout {
 		templateForm.setNumCols(1);
 		templateForm.setValuesManager(vm);
 		templateForm.setTitleOrientation(TitleOrientation.LEFT);
-
+		
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(template.getId()));
 		id.setDisabled(true);
 
 		TextItem name = ItemFactory.newSimpleTextItem("name", I18N.message("name"), template.getName());
 		name.setRequired(true);
-		name.setDisabled(template.isReadonly());
-		if (!template.isReadonly())
+		name.setDisabled(template.isReadonly() || !template.isWrite());
+		if (!template.isReadonly() && template.isWrite())
 			name.addChangedHandler(changedHandler);
 
 		TextAreaItem description = ItemFactory.newTextAreaItem("description", "description", template.getDescription());
-		description.setDisabled(template.isReadonly());
+		description.setDisabled(template.isReadonly() || !template.isWrite());
 
 		PickerIcon computeStat = new PickerIcon(PickerIconName.REFRESH, new FormItemClickHandler() {
 			public void onFormItemClick(final FormItemIconClickEvent event) {
@@ -432,7 +432,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		docs.setIcons(computeStat);
 		docs.setWidth("1%");
 
-		if (!template.isReadonly())
+		if (!template.isReadonly() && template.isWrite())
 			description.addChangedHandler(changedHandler);
 
 		templateForm.setItems(id, name, description, docs);

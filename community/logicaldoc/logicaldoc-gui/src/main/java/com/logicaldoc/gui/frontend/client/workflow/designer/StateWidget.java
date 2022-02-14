@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.orange.links.client.DiagramController;
 import com.orange.links.client.connection.Connection;
+import com.orange.links.client.shapes.FunctionShape;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.BooleanCallback;
@@ -102,9 +103,15 @@ public class StateWidget extends Label {
 
 				if (isTask())
 					contextMenu.setItems(edit, makeStart, delete);
-				else if (isConnection())
-					contextMenu.setItems(edit, straight, delete);
-				else
+				else if (isConnection()) {
+					StateWidget start = (StateWidget) ((FunctionShape) connection.getStartShape()).getWidget();
+					if (start.isFork())
+						// No edit in case the transition starts from a fork
+						// node
+						contextMenu.setItems(straight, delete);
+					else
+						contextMenu.setItems(edit, straight, delete);
+				} else
 					contextMenu.setItems(edit, delete);
 				contextMenu.showContextMenu();
 				event.cancel();
@@ -173,7 +180,7 @@ public class StateWidget extends Label {
 			setBorder("3px solid " + wfState.getColor());
 	}
 
-	public void edit() {
+	private void edit() {
 		if (isTask() || isEnd()) {
 			TaskEditor dialog = new TaskEditor(StateWidget.this);
 			dialog.show();
@@ -186,7 +193,7 @@ public class StateWidget extends Label {
 		}
 	}
 
-	public void delete() {
+	private void delete() {
 		if (wfState != null) {
 			diagramController.deleteWidget(this);
 		} else {
@@ -195,7 +202,7 @@ public class StateWidget extends Label {
 		}
 	}
 
-	public void makeStartState() {
+	private void makeStartState() {
 		WorkflowDesigner workflowDesigner = getDrawingPanel().getWorkflowDesigner();
 		try {
 			workflowDesigner.saveModel();

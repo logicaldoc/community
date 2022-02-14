@@ -2,16 +2,18 @@ package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
-import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.types.Alignment;
@@ -125,43 +127,30 @@ public class BarcodeQueuePanel extends VLayout {
 		// Prepare a panel containing a title and the documents number
 		infoPanel = new InfoPanel("");
 
-		ListGridField id = new ListGridField("id");
+		ListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);
 
-		ListGridField size = new ListGridField("size", I18N.message("size"), 70);
-		size.setAlign(Alignment.CENTER);
-		size.setType(ListGridFieldType.FLOAT);
-		size.setCellFormatter(new FileSizeCellFormatter());
+		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 		size.setCanFilter(false);
 
-		ListGridField icon = new ListGridField("icon", " ", 24);
-		icon.setType(ListGridFieldType.IMAGE);
-		icon.setCanSort(false);
-		icon.setAlign(Alignment.CENTER);
-		icon.setShowDefaultContextMenu(false);
-		icon.setImageURLPrefix(Util.imagePrefix());
-		icon.setImageURLSuffix(".png");
-		icon.setCanFilter(false);
-
-		ListGridField version = new ListGridField("version", I18N.message("version"), 55);
-		version.setAlign(Alignment.CENTER);
+		ListGridField version = new VersionListGridField();
 		version.setCanFilter(true);
 
 		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 
-		ListGridField publisher = new ListGridField("publisher", I18N.message("publisher"), 90);
+		ListGridField publisher = new ColoredListGridField("publisher", I18N.message("publisher"), 90);
 		publisher.setAlign(Alignment.CENTER);
 		publisher.setCanFilter(true);
 
 		ListGridField published = new DateListGridField("published", "publishedon");
 
-		ListGridField creator = new ListGridField("creator", I18N.message("creator"), 90);
+		ListGridField creator = new ColoredListGridField("creator", I18N.message("creator"), 90);
 		creator.setAlign(Alignment.CENTER);
 		creator.setCanFilter(true);
 
-		ListGridField created = new DateListGridField("created","createdon");
+		ListGridField created = new DateListGridField("created", "createdon");
 
-		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
+		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setCanFilter(false);
 
@@ -183,10 +172,11 @@ public class BarcodeQueuePanel extends VLayout {
 		locked.setImageURLSuffix(".png");
 		locked.setCanFilter(false);
 
-		ListGridField filename = new ListGridField("filename", I18N.message("filename"), 200);
+		ListGridField filename = new FileNameListGridField();
+		filename.setWidth(200);
 		filename.setCanFilter(true);
 
-		ListGridField lockUserId = new ListGridField("lockUserId", " ", 24);
+		ListGridField lockUserId = new ColoredListGridField("lockUserId", " ", 24);
 		lockUserId.setHidden(true);
 		lockUserId.setCanFilter(false);
 
@@ -231,8 +221,8 @@ public class BarcodeQueuePanel extends VLayout {
 		list.setShowFilterEditor(true);
 		list.setFilterOnKeypress(true);
 		list.setDataSource(new DocumentsDS(null, null, maxRecords, 1, null, true, false, null));
-		list.setFields(locked, immutable, icon, filename, size, lastModified, version, publisher, published, creator,
-				created, customId);
+		list.setFields(locked, immutable, filename, size, lastModified, version, publisher, published, creator, created,
+				customId);
 
 		setMembers(toolStrip, infoPanel, list);
 	}

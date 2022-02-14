@@ -2,9 +2,7 @@ package com.logicaldoc.gui.frontend.client.system;
 
 import com.google.gwt.core.client.GWT;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.common.client.util.PrintUtil;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.smartgwt.client.types.ContentsType;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -20,7 +18,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @since 6.0
  */
 public class LogPanel extends VLayout {
-	
+
 	private String appender;
 
 	public LogPanel(String appender) {
@@ -41,7 +39,7 @@ public class LogPanel extends VLayout {
 		toolStrip.setHeight(20);
 		toolStrip.setWidth100();
 		toolStrip.addSpacer(2);
-		
+
 		ToolStripButton refresh = new ToolStripButton(I18N.message("refresh"));
 		refresh.addClickHandler(new ClickHandler() {
 			@Override
@@ -51,19 +49,15 @@ public class LogPanel extends VLayout {
 				htmlPane.setHeight100();
 			}
 		});
-		
+
 		ToolStripButton download = new ToolStripButton(I18N.message("downloadlogs"));
 		download.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				try {
-					WindowUtils.openUrl(Util.contextPath() + "log?appender=all");
-				} catch (Throwable t) {
-
-				}
+				Util.download(Util.contextPath() + "log?appender=all");
 			}
 		});
-		
+
 		toolStrip.addButton(refresh);
 		toolStrip.addButton(download);
 		toolStrip.addFill();

@@ -11,7 +11,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 6.0
  */
 public class TemplatesDS extends DataSource {
-	public TemplatesDS(boolean withEmpty, Long folderId, Integer type) {
+	public TemplatesDS(boolean withEmpty, Long templateId, Integer type) {
 		setTitleField("template");
 		setRecordXPath("/list/template");
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -21,7 +21,7 @@ public class TemplatesDS extends DataSource {
 		DataSourceIntegerField documents = new DataSourceIntegerField("documents");
 		DataSourceIntegerField ttype = new DataSourceIntegerField("type");
 		setFields(id, name, documents, readonly, ttype);
-		setDataURL("data/templates.xml?withempty=" + withEmpty + (folderId != null ? "&folderId=" + folderId : "")
+		setDataURL("data/templates.xml?withempty=" + withEmpty + (templateId != null ? "&templateId=" + templateId : "")
 				+ (type != null ? "&type=" + type : ""));
 		setClientOnly(true);
 	}

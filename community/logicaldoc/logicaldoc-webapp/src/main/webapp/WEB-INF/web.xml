@@ -24,10 +24,19 @@
     <param-name>noDataTimeout</param-name>
     <param-value>60000</param-value>
   </context-param>
+  <context-param>
+    <!-- This is for the CORS checks of the GWT upload servlet -->
+    <param-name>corsDomainsRegex</param-name>
+    <param-value>.*</param-value>
+  </context-param>  
   <session-config>
     <session-timeout>30</session-timeout>
     <tracking-mode>COOKIE</tracking-mode>
   </session-config>
+  <filter>
+    <filter-name>XssFilter</filter-name>
+    <filter-class>com.logicaldoc.web.xss.XssFilter</filter-class>
+  </filter>  
   <filter>
     <filter-name>CharsetFilter</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -52,8 +61,7 @@
     <filter-name>springSecurityFilterChain</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
   </filter>
-  <!--
-  <filter>
+    <filter>
     <filter-name>IndexRequestFilter</filter-name>
     <filter-class>com.logicaldoc.enterprise.cluster.IndexRequestFilter</filter-class>
   </filter>
@@ -61,7 +69,6 @@
     <filter-name>XssFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  -->
   <filter-mapping>
     <filter-name>CharsetFilter</filter-name>
     <url-pattern>/*</url-pattern>
@@ -368,7 +375,7 @@
       <param-name>resource-config</param-name>
       <param-value>/WEB-INF/config.xml</param-value>
     </init-param>
-  </servlet>
+  </servlet> 
   <servlet>
     <servlet-name>Cmis</servlet-name>
     <servlet-class>com.logicaldoc.cmis.CmisServlet</servlet-class>
@@ -421,7 +428,15 @@
     <servlet-name>Avatar</servlet-name>
     <servlet-class>com.logicaldoc.web.AvatarServlet</servlet-class>
   </servlet>  
-  
+  <servlet>
+    <servlet-name>WebserviceChart</servlet-name>
+    <servlet-class>com.logicaldoc.webservice.WebserviceChartServlet</servlet-class>
+  </servlet>
+  <servlet>
+	<servlet-name>TemplateRightsData</servlet-name>
+	<servlet-class>com.logicaldoc.web.data.TemplateRightsDataServlet</servlet-class>
+  </servlet>
+    
   <servlet-mapping>
     <servlet-name>DashletsData</servlet-name>
     <url-pattern>/data/dashlets.xml</url-pattern>
@@ -769,7 +784,16 @@
   <servlet-mapping>
     <servlet-name>Avatar</servlet-name>
     <url-pattern>/avatar</url-pattern>
-  </servlet-mapping>  
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>WebserviceChart</servlet-name>
+    <url-pattern>/webservicechart</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>TemplateRightsData</servlet-name>
+    <url-pattern>/data/templaterights.xml</url-pattern>
+  </servlet-mapping>
+    
   <welcome-file-list>
     <welcome-file>index.jsp</welcome-file>
     <welcome-file>index.html</welcome-file>

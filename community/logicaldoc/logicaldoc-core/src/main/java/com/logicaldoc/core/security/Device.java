@@ -70,6 +70,11 @@ public class Device extends PersistentObject implements Serializable {
 
 	private int trusted = 0;
 
+	/**
+	 * Optional label assigned to the device
+	 */
+	private String label;
+
 	public Device() {
 
 	}
@@ -184,6 +189,14 @@ public class Device extends PersistentObject implements Serializable {
 		this.username = username;
 	}
 
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
@@ -216,6 +229,9 @@ public class Device extends PersistentObject implements Serializable {
 	private static String getDeviceId(HttpServletRequest request) {
 		if (request.getParameter(PARAM_DEVICE) != null)
 			return request.getParameter(PARAM_DEVICE);
+
+		if (request.getAttribute(PARAM_DEVICE) != null)
+			return request.getAttribute(PARAM_DEVICE).toString();
 
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null)

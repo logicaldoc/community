@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.common.client.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.Session;
@@ -48,7 +49,7 @@ public class DocumentsDS extends DataSource {
 	 */
 	private DocumentsDS(Long folderId, String fileFilter, Integer max, int page, Integer indexed, boolean barcoded,
 			boolean ocrd, String sortSpec) {
-		prepareFields();
+		prepareFields(null);
 
 		if (!barcoded && !ocrd) {
 			setDataURL("data/documents.xml?locale=" + Session.get().getUser().getLanguage() + "&folderId="
@@ -64,21 +65,25 @@ public class DocumentsDS extends DataSource {
 	}
 
 	public DocumentsDS(String docIds) {
-		prepareFields();
+		prepareFields(null);
 		setDataURL("data/documents.xml?docIds=" + docIds);
 	}
 
 	public DocumentsDS(int status, int max) {
-		prepareFields();
+		prepareFields(null);
 		setDataURL("data/documents.xml?status=" + status + "&max=" + max);
 	}
 
-	public DocumentsDS(String url, String locale) {
-		prepareFields();
+	public DocumentsDS(String url, String locale, List<String> extendedAttributes) {
+		prepareFields(extendedAttributes);
 		setDataURL(url);
 	}
 
-	private void prepareFields() {
+	public DocumentsDS(String url, String locale) {
+		this(url, locale, null);
+	}
+
+	private void prepareFields(List<String> extendedAttributes) {
 		setTitleField("filename");
 		setRecordXPath("/list/document");
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -100,6 +105,7 @@ public class DocumentsDS extends DataSource {
 		DataSourceTextField publisher = new DataSourceTextField("publisher");
 		DataSourceTextField creator = new DataSourceTextField("creator");
 		DataSourceFloatField size = new DataSourceFloatField("size");
+		DataSourceIntegerField pages = new DataSourceIntegerField("pages");
 		DataSourceDateTimeField lastModified = new DataSourceDateTimeField("lastModified");
 		DataSourceDateTimeField published = new DataSourceDateTimeField("published");
 		DataSourceDateTimeField created = new DataSourceDateTimeField("created");
@@ -124,6 +130,8 @@ public class DocumentsDS extends DataSource {
 		wfStatusDisplay.setHidden(true);
 		DataSourceTextField publishedStatus = new DataSourceTextField("publishedStatus");
 		publishedStatus.setHidden(true);
+		DataSourceTextField color = new DataSourceTextField("color");
+		color.setHidden(true);
 		DataSourceDateTimeField startPublishing = new DataSourceDateTimeField("startPublishing");
 		DataSourceDateTimeField stopPublishing = new DataSourceDateTimeField("stopPublishing");
 		DataSourceTextField extResId = new DataSourceTextField("extResId");
@@ -132,6 +140,7 @@ public class DocumentsDS extends DataSource {
 		DataSourceTextField tags = new DataSourceTextField("tags");
 		DataSourceImageField creatorId = new DataSourceImageField("creatorId", "", 24);
 		DataSourceImageField publisherId = new DataSourceImageField("publisherId", "", 24);
+		DataSourceDateTimeField date = new DataSourceDateTimeField("date");
 
 		List<DataSourceField> fields = new ArrayList<DataSourceField>();
 		fields.add(id);
@@ -139,6 +148,7 @@ public class DocumentsDS extends DataSource {
 		fields.add(filename);
 		fields.add(type);
 		fields.add(size);
+		fields.add(pages);
 		fields.add(publisherId);
 		fields.add(publisher);
 		fields.add(version);
@@ -164,6 +174,7 @@ public class DocumentsDS extends DataSource {
 		fields.add(comment);
 		fields.add(wfStatus);
 		fields.add(wfStatusDisplay);
+		fields.add(color);
 		fields.add(publishedStatus);
 		fields.add(startPublishing);
 		fields.add(stopPublishing);
@@ -172,32 +183,34 @@ public class DocumentsDS extends DataSource {
 		fields.add(language);
 		fields.add(tags);
 		fields.add(order);
+		fields.add(date);
 
-		String attrs = Session.get().getInfo().getConfig("search.extattr");
-		if (attrs != null && !attrs.isEmpty()) {
-			String[] extNames = attrs.split(",");
-			for (String name : extNames) {
-				DataSourceTextField ext = new DataSourceTextField("ext_" + name, name);
-				ext.setHidden(true);
-				ext.setCanFilter(true);
+		if (extendedAttributes == null) {
+			String attrs = Session.get().getInfo().getConfig("search.extattr");
+			extendedAttributes = Arrays.asList(attrs.split(","));
+		}
 
-				GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
+		for (String name : extendedAttributes) {
+			DataSourceTextField ext = new DataSourceTextField("ext_" + name, name);
+			ext.setHidden(true);
+			ext.setCanFilter(true);
 
-				if (attDef != null) {
-					if (attDef.getType() == GUIAttribute.TYPE_DATE) {
-						ext.setType(FieldType.DATE);
-						ext.setCanFilter(false);
-					} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
-						ext.setType(FieldType.INTEGER);
-						ext.setCanFilter(false);
-					} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
-						ext.setType(FieldType.FLOAT);
-						ext.setCanFilter(false);
-					}
+			GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
+
+			if (attDef != null) {
+				if (attDef.getType() == GUIAttribute.TYPE_DATE) {
+					ext.setType(FieldType.DATE);
+					ext.setCanFilter(false);
+				} else if (attDef.getType() == GUIAttribute.TYPE_INT) {
+					ext.setType(FieldType.INTEGER);
+					ext.setCanFilter(false);
+				} else if (attDef.getType() == GUIAttribute.TYPE_DOUBLE) {
+					ext.setType(FieldType.FLOAT);
+					ext.setCanFilter(false);
 				}
-
-				fields.add(ext);
 			}
+
+			fields.add(ext);
 		}
 
 		setFields(fields.toArray(new DataSourceField[0]));

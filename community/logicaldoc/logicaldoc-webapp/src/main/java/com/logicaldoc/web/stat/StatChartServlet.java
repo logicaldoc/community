@@ -61,8 +61,10 @@ public class StatChartServlet extends HttpServlet {
 				index = 0;
 			else if ("documents".equals(chart))
 				index = 1;
-			if ("folders".equals(chart))
+			else if ("pages".equals(chart))
 				index = 2;
+			if ("folders".equals(chart))
+				index = 3;
 
 			DefaultPieDataset dataset = new DefaultPieDataset();
 			long total = 0;
@@ -103,14 +105,14 @@ public class StatChartServlet extends HttpServlet {
 			}
 
 			JFreeChart chrt = ChartFactory.createPieChart(font != null ? I18N.message(chart, user.getLocale()) : null,
-					dataset, font!=null ? true : false, false, false);
+					dataset, font != null ? true : false, false, false);
 			chrt.setBorderVisible(false);
 			PiePlot plot = (PiePlot) chrt.getPlot();
 			plot.setLabelGenerator(null);
 
 			if (font == null) {
 				log.warn("cannot find any usable font");
-				chrt.setTitle((String)null);
+				chrt.setTitle((String) null);
 			} else {
 				chrt.getTitle().setPaint(new Color(110, 110, 110));
 				chrt.getLegend().setBorder(0, 0, 0, 0);

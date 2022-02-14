@@ -62,7 +62,7 @@ public class SecurityMenu extends VLayout {
 		firewall.setWidth100();
 		firewall.setHeight(25);
 
-		Button bruteForcePrevention = new Button(I18N.message("buteforceattack"));
+		Button bruteForcePrevention = new Button(I18N.message("bruteforceprevention"));
 		bruteForcePrevention.setWidth100();
 		bruteForcePrevention.setHeight(25);
 

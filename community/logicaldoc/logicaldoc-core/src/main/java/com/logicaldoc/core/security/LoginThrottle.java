@@ -61,9 +61,12 @@ public class LoginThrottle {
 	 * Saves the login failure in the database
 	 * 
 	 * @param username the username
-	 * @param clien the client address from which the login intent comes from
+	 * @param client the client address from which the login intent comes from
+	 * @param exception the authentication exception
 	 */
-	public static void recordFailure(String username, Client client) {
+	public static void recordFailure(String username, Client client, AuthenticationException exception) {
+		if (exception==null || !exception.mustRecordFailure())
+			return;
 
 		// Update the failed login counters
 		if (Context.get().getProperties().getBoolean(THROTTLE_ENABLED)) {
@@ -84,7 +87,8 @@ public class LoginThrottle {
 			user.setName(username);
 		}
 		UserHistoryDAO dao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(), null, null, client);
+		dao.createUserHistory(user, UserEvent.LOGIN_FAILED.toString(),
+				exception != null ? exception.getMessage() : null, null, client);
 	}
 
 	/**

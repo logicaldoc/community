@@ -118,6 +118,7 @@ public class ReportDetailsPanel extends VLayout {
 		standardTabPanel.addMember(standardPanel);
 
 		logLabel = new Label(report.getLog() != null ? report.getLog() : "");
+		logLabel.setCanSelectText(true);
 		logLabel.setWidth100();
 		logLabel.setHeight100();
 		logTabPanel.addMember(logLabel);

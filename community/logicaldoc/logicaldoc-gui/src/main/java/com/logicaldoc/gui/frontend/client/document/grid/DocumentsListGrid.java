@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -15,24 +16,29 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
-import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager;
 import com.logicaldoc.gui.common.client.util.DocumentProtectionManager.DocumentProtectionHandler;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.IntegerListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RatingListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.document.RatingDialog;
 import com.logicaldoc.gui.frontend.client.folder.FolderCursor;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.logicaldoc.gui.frontend.client.workflow.WorkflowTaskNameListGridField;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
@@ -78,7 +84,20 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	// Stores all the possible fields we can use in a grid of documents
 	protected Map<String, ListGridField> fieldsMap = new HashMap<String, ListGridField>();
 
-	public DocumentsListGrid(GUIFolder folder) {
+	protected String groupField = null;
+
+	/**
+	 * The list of all extended attribute names to display
+	 */
+	List<String> extendedAttributes = new ArrayList<String>();
+
+	public DocumentsListGrid(GUIFolder folder, List<String> extendedAttributes) {
+		this.folder = folder;
+		if (extendedAttributes != null)
+			this.extendedAttributes = extendedAttributes;
+		else
+			this.extendedAttributes = Arrays.asList(Session.get().getInfo().getConfig("search.extattr").split(","));
+
 		this.folder = folder;
 		setEmptyMessage(I18N.message("notitemstoshow"));
 		setCanFreezeFields(true);
@@ -137,6 +156,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 						setSort(newSpecs);
 					}
 					selectDocument(Session.get().getHiliteDocId());
+				} else if (groupField != null) {
+					groupBy(groupField);
 				}
 			}
 		});
@@ -144,20 +165,32 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		DocumentController.get().addObserver(this);
 	}
 
+	public DocumentsListGrid(GUIFolder folder) {
+		this(folder, null);
+	}
+
+	public DocumentsListGrid() {
+		this(null, null);
+	}
+
+	public DocumentsListGrid(List<String> extendedAttributes) {
+		this(null, extendedAttributes);
+	}
+
 	/**
 	 * Prepares the map that contains all the possible fields we can use
 	 */
-	private void prepareFieldsMap() {
+	protected void prepareFieldsMap() {
 		ListGridField id = new ListGridField("id", I18N.getAttributeLabel("id"), 60);
 		id.setHidden(true);
 		fieldsMap.put(id.getName(), id);
 
-		ListGridField size = new ListGridField("size", I18N.getAttributeLabel("size"), 70);
-		size.setAlign(Alignment.RIGHT);
-		size.setType(ListGridFieldType.FLOAT);
-		size.setCellFormatter(new FileSizeCellFormatter());
-		size.setCanFilter(false);
+		ListGridField size = new FileSizeListGridField("size", I18N.getAttributeLabel("size"));
 		fieldsMap.put(size.getName(), size);
+
+		ListGridField pages = new IntegerListGridField("pages", I18N.getAttributeLabel("pages"));
+		pages.setHidden(true);
+		fieldsMap.put(pages.getName(), pages);
 
 		ListGridField icon = new ListGridField("icon", " ", 21);
 		icon.setType(ListGridFieldType.IMAGE);
@@ -170,17 +203,17 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		icon.setImageURLSuffix(".png");
 		fieldsMap.put(icon.getName(), icon);
 
-		ListGridField version = new ListGridField("version", I18N.getAttributeLabel("version"), 55);
-		version.setAlign(Alignment.CENTER);
+		ListGridField version = new VersionListGridField();
 		version.setHidden(true);
 		version.setCanFilter(true);
 		fieldsMap.put(version.getName(), version);
 
-		ListGridField lastModified = new DateListGridField("lastModified", "lastModified");
+		ListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setHidden(true);
 		fieldsMap.put(lastModified.getName(), lastModified);
 
-		ListGridField publisher = new AvatarListGridField("publisher", "publisherId", "publisher", 110);
+		ListGridField publisher = new UserListGridField("publisher", "publisherId", "publisher",
+				Session.get().getConfigAsBoolean("gui.avatar.showingrids"));
 		publisher.setTitle(I18N.message("publisher"));
 		publisher.setCanFilter(true);
 		publisher.setCanSort(true);
@@ -189,7 +222,8 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		DateListGridField published = new DateListGridField("published", "published");
 		fieldsMap.put(published.getName(), published);
 
-		ListGridField creator = new AvatarListGridField("creator", "creatorId", "creator", 110);
+		ListGridField creator = new UserListGridField("creator", "creatorId", "creator",
+				Session.get().getConfigAsBoolean("gui.avatar.showingrids"));
 		creator.setCanFilter(true);
 		creator.setHidden(true);
 		creator.setCanSort(true);
@@ -199,22 +233,22 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		created.setHidden(true);
 		fieldsMap.put(created.getName(), created);
 
-		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
+		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
 		fieldsMap.put(customId.getName(), customId);
 
-		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
+		ListGridField type = new ColoredListGridField("type", I18N.message("type"), 55);
 		type.setType(ListGridFieldType.TEXT);
 		type.setAlign(Alignment.CENTER);
 		fieldsMap.put(type.getName(), type);
 
-		ListGridField statusIcons = new ListGridField("statusIcons", " ");
+		ListGridField statusIcons = new ColoredListGridField("statusIcons", " ");
 		statusIcons.setWidth(110);
 		statusIcons.setCanFilter(false);
 		statusIcons.setCanSort(false);
 		fieldsMap.put(statusIcons.getName(), statusIcons);
 
-		ListGridField indexed = new ListGridField("indexed", " ", 20);
+		ListGridField indexed = new ColoredListGridField("indexed", " ", 20);
 		indexed.setType(ListGridFieldType.IMAGE);
 		indexed.setCanSort(false);
 		indexed.setAlign(Alignment.CENTER);
@@ -229,30 +263,19 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		filename.setCanFilter(true);
 		fieldsMap.put(filename.getName(), filename);
 
-		ListGridField lockUserId = new ListGridField("lockUserId", " ", 24);
+		ListGridField lockUserId = new ColoredListGridField("lockUserId", " ", 24);
 		lockUserId.setHidden(true);
 		lockUserId.setCanFilter(false);
 		lockUserId.setCanSort(false);
 		fieldsMap.put(lockUserId.getName(), lockUserId);
 
-		ListGridField rating = new ListGridField("rating", I18N.message("rating"), 95);
-		rating.setType(ListGridFieldType.IMAGE);
-		rating.setCanSort(true);
-		rating.setCanFilter(true);
-		rating.setAlign(Alignment.CENTER);
+		ListGridField rating = new RatingListGridField("rating", I18N.message("rating"));
 		rating.setHidden(true);
-		rating.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				return DocUtil.getRatingIcon((Integer) value);
-			}
-		});
 		fieldsMap.put(rating.getName(), rating);
 
 		final LinkedHashMap<String, String> languages = I18N.getSupportedLanguages(false);
 
-		ListGridField language = new ListGridField("language", I18N.message("language"), 100);
+		ListGridField language = new ColoredListGridField("language", I18N.message("language"), 100);
 		language.setType(ListGridFieldType.TEXT);
 		language.setCanFilter(false);
 		language.setAlign(Alignment.CENTER);
@@ -266,40 +289,25 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		});
 		fieldsMap.put(language.getName(), language);
 
-		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 70);
+		ListGridField fileVersion = new VersionListGridField("fileVersion", "fileversion");
 		fileVersion.setHidden(false);
 		fileVersion.setCanFilter(true);
-		fileVersion.setAlign(Alignment.CENTER);
 		fieldsMap.put(fileVersion.getName(), fileVersion);
 
-		ListGridField comment = new ListGridField("comment", I18N.message("comment"), 300);
+		ListGridField comment = new ColoredListGridField("comment", I18N.message("comment"), 300);
 		comment.setHidden(true);
 		comment.setCanFilter(true);
 		comment.setCanSort(true);
 		fieldsMap.put(comment.getName(), comment);
 
-		ListGridField tags = new ListGridField("tags", I18N.message("tags"), 200);
+		ListGridField tags = new ColoredListGridField("tags", I18N.message("tags"), 200);
 		tags.setHidden(true);
 		tags.setCanFilter(true);
 		tags.setCanSort(true);
 		fieldsMap.put(tags.getName(), tags);
 
-		ListGridField wfStatus = new ListGridField("workflowStatus", I18N.message("workflowstatus"), 150);
+		ListGridField wfStatus = new WorkflowTaskNameListGridField();
 		wfStatus.setHidden(true);
-		wfStatus.setCanFilter(true);
-		wfStatus.setCanSort(true);
-		wfStatus.setAlign(Alignment.LEFT);
-		wfStatus.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				String display = record.getAttributeAsString("workflowStatusDisplay");
-				if (display != null && !display.isEmpty())
-					return "<span style='color: " + display + ";'>" + value + "</span>";
-				else
-					return value != null ? value.toString() : "";
-			}
-		});
 		fieldsMap.put(wfStatus.getName(), wfStatus);
 
 		ListGridField startPublishing = new DateListGridField("startPublishing", "startpublishing");
@@ -310,13 +318,13 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		stopPublishing.setHidden(true);
 		fieldsMap.put(stopPublishing.getName(), stopPublishing);
 
-		ListGridField publishedStatus = new ListGridField("publishedStatus", I18N.message("published"), 50);
+		ListGridField publishedStatus = new ColoredListGridField("publishedStatus", I18N.message("published"), 50);
 		publishedStatus.setHidden(true);
 		publishedStatus.setCanFilter(true);
 		publishedStatus.setCanSort(true);
 		fieldsMap.put(publishedStatus.getName(), publishedStatus);
 
-		ListGridField template = new ListGridField("template", I18N.message("template"), 150);
+		ListGridField template = new ColoredListGridField("template", I18N.message("template"), 150);
 		template.setAlign(Alignment.LEFT);
 		template.setHidden(true);
 		template.setCanFilter(true);
@@ -331,7 +339,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			@Override
 			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
 				try {
-					return Util.thumbnailImgageHTML(Long.parseLong(record.getAttribute("id")), null, 200, null);
+					if (record.getAttribute("docId") != null)
+						return Util.thumbnailImgageHTML(Long.parseLong(record.getAttribute("docId")), null, 200, null);
+					else
+						return Util.thumbnailImgageHTML(Long.parseLong(record.getAttribute("id")), null, 200, null);
 				} catch (Throwable e) {
 					return "";
 				}
@@ -340,14 +351,14 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		fieldsMap.put(thumbnail.getName(), thumbnail);
 
 		// For search only
-		ListGridField folder = new ListGridField("folder", I18N.message("folder"), 200);
+		ListGridField folder = new ColoredListGridField("folder", I18N.message("folder"), 200);
 		folder.setWidth(200);
 		folder.setHidden(true);
 		folder.setCanSort(false);
 		fieldsMap.put(folder.getName(), folder);
 
 		// For search only
-		ListGridField score = new ListGridField("score", I18N.message("score"), 120);
+		ListGridField score = new ColoredListGridField("score", I18N.message("score"), 120);
 		score.setCanFilter(false);
 		score.setHidden(true);
 		score.setCellFormatter(new CellFormatter() {
@@ -366,11 +377,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		});
 		fieldsMap.put(score.getName(), score);
 
-		String[] extNames = Session.get().getInfo().getConfig("search.extattr").split(",");
-		for (String name : extNames) {
+		for (String name : extendedAttributes) {
 			if (name != null && !"".equals(name)) {
-				ListGridField ext = new ListGridField("ext_" + name, Session.get().getInfo().getAttributeLabel(name),
-						100);
+				ListGridField ext = new ColoredListGridField("ext_" + name,
+						Session.get().getInfo().getAttributeLabel(name), 100);
 				GUIAttribute attDef = Session.get().getInfo().getAttributeDefinition(name);
 				if (attDef != null) {
 					if (attDef.getType() == GUIAttribute.TYPE_DATE) {
@@ -385,8 +395,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 						ext.setType(ListGridFieldType.FLOAT);
 						ext.setCanFilter(false);
 					} else if (attDef.getType() == GUIAttribute.TYPE_USER) {
-						ext = new AvatarListGridField("ext_" + name, "ext_" + name,
-								Session.get().getInfo().getAttributeLabel(name), 100);
+						ext = new UserListGridField("ext_" + name, "ext_" + name,
+								Session.get().getInfo().getAttributeLabel(name),
+								Session.get().getConfigAsBoolean("gui.avatar.showingrids"));
 						ext.setTitle(Session.get().getInfo().getAttributeLabel(name));
 					}
 				}
@@ -397,10 +408,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				fieldsMap.put(ext.getName(), ext);
 			}
 		}
-	}
-
-	public DocumentsListGrid() {
-		this(null);
 	}
 
 	@Override
@@ -661,8 +668,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	@Override
 	protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
-
 		String fieldName = this.getFieldName(colNum);
+
+		String color = record.getAttributeAsString("color");
 
 		if (fieldName.equals("statusIcons")) {
 			HLayout statusCanvas = new HLayout(3);
@@ -676,7 +684,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				if (record.getAttribute("bookmarked") != null) {
 					Boolean bookmarked = record.getAttributeAsBoolean("bookmarked");
 					if (bookmarked != null && bookmarked) {
-						ToolStripButton bookmarkedIcon = AwesomeFactory.newIconButton("bookmark", "bookmarked");
+						ToolStripButton bookmarkedIcon = AwesomeFactory.newColoredIconButton("bookmark", "bookmarked",
+								color);
+						bookmarkedIcon.setBaseStyle("statusIcon");
+						bookmarkedIcon.setMargin(2);
 						statusCanvas.addMember(bookmarkedIcon);
 						bookmarkedIcon.setPrompt(I18N.message("bookmarked"));
 					}
@@ -689,14 +700,16 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 					Integer indexed = record.getAttributeAsInt("indexed");
 					if (indexed != null && indexed.intValue() != Constants.INDEX_TO_INDEX
 							&& indexed.intValue() != Constants.INDEX_TO_INDEX_METADATA) {
-						ToolStripButton indexedIcon = AwesomeFactory.newIndexedButton(indexed);
+						ToolStripButton indexedIcon = AwesomeFactory.newIndexedButton(indexed, color);
+						indexedIcon.setBaseStyle("statusIcon");
+						indexedIcon.setMargin(2);
 						statusCanvas.addMember(indexedIcon);
 						if (indexed.intValue() == Constants.INDEX_INDEXED) {
 							indexedIcon.addClickHandler(new ClickHandler() {
 								public void onClick(ClickEvent event) {
 									Long id = record.getAttributeAsLong("id");
-									if (Session.get().getCurrentFolder().isDownload())
-										WindowUtils.openUrl(Util.downloadURL(id) + "&downloadText=true");
+									if (FolderController.get().getCurrentFolder().isDownload())
+										Util.download(Util.downloadURL(id) + "&downloadText=true");
 								}
 							});
 						}
@@ -710,7 +723,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 					Integer status = record.getAttributeAsInt("status");
 					if (status != null && status.intValue() > 0) {
 						ToolStripButton statusIcon = AwesomeFactory.newLockedButton(status,
-								record.getAttributeAsString("lockUser"));
+								record.getAttributeAsString("lockUser"), color);
+						statusIcon.setBaseStyle("statusIcon");
+						statusIcon.setMargin(2);
 						statusCanvas.addMember(statusIcon);
 					}
 				}
@@ -721,7 +736,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				if (record.getAttribute("immutable") != null) {
 					Integer immutable = record.getAttributeAsInt("immutable");
 					if (immutable != null && immutable.intValue() == 1) {
-						ToolStripButton immutableIcon = AwesomeFactory.newIconButton("hand-paper", "immutable");
+						ToolStripButton immutableIcon = AwesomeFactory.newColoredIconButton("hand-paper", "immutable",
+								color);
+						immutableIcon.setBaseStyle("statusIcon");
+						immutableIcon.setMargin(2);
 						statusCanvas.addMember(immutableIcon);
 					}
 				}
@@ -732,7 +750,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				if (record.getAttribute("password") != null) {
 					Boolean password = record.getAttributeAsBoolean("password");
 					if (password != null && password.booleanValue()) {
-						ToolStripButton passwordIcon = AwesomeFactory.newIconButton("key", "passwordprotected");
+						ToolStripButton passwordIcon = AwesomeFactory.newColoredIconButton("key", "passwordprotected",
+								color);
+						passwordIcon.setBaseStyle("statusIcon");
+						passwordIcon.setMargin(2);
 						statusCanvas.addMember(passwordIcon);
 					}
 				}
@@ -743,7 +764,10 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				if (record.getAttribute("signed") != null) {
 					Integer signed = record.getAttributeAsInt("signed");
 					if (signed != null && signed.intValue() == 1) {
-						ToolStripButton signedIcon = AwesomeFactory.newIconButton("badge-check ", "signed");
+						ToolStripButton signedIcon = AwesomeFactory.newColoredIconButton("badge-check ", "signed",
+								color);
+						signedIcon.setBaseStyle("statusIcon");
+						signedIcon.setMargin(2);
 						statusCanvas.addMember(signedIcon);
 						signedIcon.addClickHandler(new ClickHandler() {
 
@@ -766,14 +790,16 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				if (record.getAttribute("stamped") != null) {
 					Integer stamped = record.getAttributeAsInt("stamped");
 					if (stamped != null && stamped.intValue() == 1) {
-						ToolStripButton stampedIcon = AwesomeFactory.newIconButton("tint", "stamped");
+						ToolStripButton stampedIcon = AwesomeFactory.newColoredIconButton("tint", "stamped", color);
+						stampedIcon.setBaseStyle("statusIcon");
+						stampedIcon.setMargin(2);
 						statusCanvas.addMember(stampedIcon);
 						if (Feature.enabled(Feature.STAMP)) {
 							stampedIcon.addClickHandler(new ClickHandler() {
 								public void onClick(ClickEvent event) {
 									final long id = record.getAttributeAsLong("id");
 									String fileVersion = record.getAttribute("fileVersion");
-									if (Session.get().getCurrentFolder().isDownload())
+									if (FolderController.get().getCurrentFolder().isDownload())
 										DocUtil.downloadPdfConversion(id, fileVersion);
 								}
 							});
@@ -787,7 +813,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				if (record.getAttribute("links") != null) {
 					Integer links = record.getAttributeAsInt("links");
 					if (links != null && links.intValue() > 0) {
-						ToolStripButton stampedIcon = AwesomeFactory.newIconButton("link", "withlinks");
+						ToolStripButton stampedIcon = AwesomeFactory.newColoredIconButton("link", "withlinks", color);
+						stampedIcon.setBaseStyle("statusIcon");
+						stampedIcon.setMargin(2);
 						statusCanvas.addMember(stampedIcon);
 					}
 				}
@@ -878,10 +906,18 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			onDocumentsDeleted(new GUIDocument[] { document });
 	}
 
+	@Override
+	public void onDocumentBeginEditing(GUIDocument document) {
+		// Noting to do
+	}
+
+	@Override
+	public void onDocumentCancelEditing(GUIDocument document) {
+		// Noting to do
+	}
+
 	private Record findRecord(long docId) {
 		Record record = find(new AdvancedCriteria("id", OperatorId.EQUALS, docId));
-		if (record == null)
-			record = find(new AdvancedCriteria("docref", OperatorId.EQUALS, docId));
 		return record;
 	}
 
@@ -944,14 +980,30 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				getGridCursor().setTotalRecords(folder.getDocumentCount());
 		}
 
+		/*
+		 * Must parse the state to check if there is a grouping field
+		 */
+		if (gridState != null && gridState.contains("group:[{fieldName:")) {
+			String fieldName = gridState
+					.substring(gridState.lastIndexOf("group:[{fieldName:") + "group:[{fieldName:".length() + 1);
+			fieldName = fieldName.substring(0, fieldName.indexOf('\"'));
+			groupField = fieldName;
+		} else
+			groupField = null;
+
 		return pageSize;
 	}
 
 	public String getGridLayout() {
 		if (getGridCursor() != null)
-			return "|"+(Session.get().getConfigAsBoolean("gui.folder.pagination") ? FolderCursor.get().getCurrentPagination().getPageSize() + "|" : "") + getGridCursor().getPageSize() + "|"
-					+ getViewState();
+			return "|" + (Session.get().getConfigAsBoolean("gui.folder.pagination")
+					? FolderCursor.get().getCurrentPagination().getPageSize() + "|"
+					: "") + getGridCursor().getPageSize() + "|" + getViewState();
 		else
 			return getViewState();
+	}
+
+	public Map<String, ListGridField> getFieldsMap() {
+		return fieldsMap;
 	}
 }

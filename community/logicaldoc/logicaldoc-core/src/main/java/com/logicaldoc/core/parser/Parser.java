@@ -16,8 +16,8 @@ import com.logicaldoc.core.document.Document;
 public interface Parser {
 
 	/**
-	 * Same as the other method that accept an input stream, use this when you
-	 * have a file rather than a stream.
+	 * Same as {@link #parse(InputStream, String, String, Locale, String)}, use
+	 * this when you have a file rather than a stream.
 	 * 
 	 * @param file the file
 	 * @param filename name of the file
@@ -30,8 +30,9 @@ public interface Parser {
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant);
 
 	/**
-	 * Same as the other method that accept an input stream, use this when you
-	 * have a file rather than a stream.
+	 * Same as
+	 * {@link #parse(InputStream, String, String, Locale, String, Document, String)},
+	 * but use this when you have a file rather than a stream.
 	 * 
 	 * @param file the file
 	 * @param filename name of the file
@@ -124,4 +125,25 @@ public interface Parser {
 	 * @return the extracted text
 	 */
 	public String parse(InputStream input, String filename, String encoding, Locale locale, String tenant);
+
+	/**
+	 * Counts the number of pages of the given binary document.
+	 * 
+	 * @param input binary content from which to extract the text
+	 * @param filename name of the file
+	 * 
+	 * @return the number of pages
+	 */
+	public int countPages(InputStream input, String filename);
+
+	/**
+	 * Same as the other {@link #countPages(InputStream, String)}, but use this
+	 * when you have a file rather than a stream.
+	 * 
+	 * @param file the file
+	 * @param filename name of the file
+	 * 
+	 * @return the number of pages
+	 */
+	public int countPages(File file, String filename);
 }

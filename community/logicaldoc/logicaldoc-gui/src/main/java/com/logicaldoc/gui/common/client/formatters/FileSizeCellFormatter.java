@@ -16,7 +16,7 @@ public class FileSizeCellFormatter implements CellFormatter {
 	public FileSizeCellFormatter() {
 		super();
 	}
-	
+
 	public FileSizeCellFormatter(boolean win7format) {
 		super();
 		this.win7format = win7format;

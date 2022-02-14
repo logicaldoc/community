@@ -6,7 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -20,9 +23,12 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jdom.Element;
 import org.jdom.ProcessingInstruction;
 import org.jdom.input.SAXBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,57 +44,94 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class XMLConverter extends AbstractFormatConverter {
 
+	private static final String STYLE_SHEETS = "styleSheets";
+
 	protected static Logger log = LoggerFactory.getLogger(XMLConverter.class);
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
 		String destExt = FilenameUtils.getExtension(dest.getName()).toLowerCase();
 		File xslt = null;
+		File xml = null;
 		String xsltOutFormat = null;
 		try {
+			xslt = File.createTempFile("xslt", ".xsl");
+			xml = File.createTempFile("xml", ".xml");
+			FileUtil.copyFile(src, xml);
+
 			// Parse the XML searching for a stylesheet
 			SAXBuilder saxBuilder = new SAXBuilder();
-			org.jdom.Document doc = saxBuilder.build(src);
+			org.jdom.Document doc = saxBuilder.build(xml);
 			List<Object> contents = doc.getContent();
+
+			boolean containsStyleReference = false;
 			for (Object content : contents) {
 				if (content instanceof ProcessingInstruction) {
 					ProcessingInstruction pi = (ProcessingInstruction) content;
 					if ("text/xsl".equals(pi.getPseudoAttributeValue("type"))) {
+						containsStyleReference = true;
+
 						// Found a style sheet, download it and check the output
 						// format
-						xslt = File.createTempFile("xslt", ".xsl");
-						FileUtils.copyURLToFile(new URL(pi.getPseudoAttributeValue("href")), xslt);
-						org.jdom.Document xsltDoc = saxBuilder.build(xslt);
-						Element root = xsltDoc.getRootElement();
-						Element outputElem = root.getChild("output", root.getNamespace());
-						if (outputElem != null)
-							xsltOutFormat = outputElem.getAttributeValue("method").toLowerCase();
+						try {
+							FileUtils.copyURLToFile(new URL(pi.getPseudoAttributeValue("href")), xslt);
+							org.jdom.Document xsltDoc = saxBuilder.build(xslt);
+							Element root = xsltDoc.getRootElement();
+							Element outputElem = root.getChild("output", root.getNamespace());
+							if (outputElem != null)
+								xsltOutFormat = outputElem.getAttributeValue("method").toLowerCase();
+						} catch (FileNotFoundException e) {
+							log.warn("Cannot find the referenced style sheet {}", pi.getPseudoAttributeValue("href"));
+						}
 					}
 				}
 			}
 
-			FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(
-					FormatConverterManager.class);
+			String rootElmentName = doc.getRootElement().getName();
+			String style = getStyleByRootElement(rootElmentName);
+
+			if (StringUtils.isNotEmpty(style)) {
+				log.debug("Force the stylesheed {} for converting xml file {}", style, document.getFileName());
+
+				try {
+					FileUtils.copyURLToFile(new URL(style), xslt);
+					xsltOutFormat = "html";
+					String newStyleSpec = "<?xml-stylesheet type=\"text/xsl\" href=\"" + style + "\" ?>";
+					if (containsStyleReference) {
+						FileUtil.replaceInFile(xml.getAbsolutePath(), "<\\?xml-stylesheet type=\\\"text/xsl\\\".*\\?>",
+								newStyleSpec);
+					} else {
+						FileUtil.replaceInFile(xml.getAbsolutePath(), "<" + doc.getRootElement().getQualifiedName(),
+								"\n" + newStyleSpec + "\n<" + doc.getRootElement().getQualifiedName());
+					}
+				} catch (FileNotFoundException e) {
+					log.warn("Cannot find the referenced style sheet {}", style);
+				} catch (Throwable t) {
+					log.warn("Cannot elaborate the style sheet {}", style, t);
+				}
+			}
+
+			FormatConverterManager manager = (FormatConverterManager) Context.get()
+					.getBean(FormatConverterManager.class);
 			if (xsltOutFormat == null) {
 				FormatConverter converter = manager.getConverter("txt", destExt);
 				if (converter == null)
 					throw new IOException(String.format("Unable to find a converter from txt to %s", destExt));
-				converter.convert(sid, document, src, dest);
+				converter.convert(sid, document, xml, dest);
 			} else {
 				try {
 					// Create transformer factory
 					TransformerFactory factory = TransformerFactory.newInstance();
 
 					// Use the factory to create a template containing the
-					// xsl
-					// file
+					// xsl file
 					Templates template = factory.newTemplates(new StreamSource(new FileInputStream(xslt)));
 
 					// Use the template to create a transformer
 					Transformer xformer = template.newTransformer();
 
 					// Prepare the input file
-					Source source = new StreamSource(new FileInputStream(src));
+					Source source = new StreamSource(new FileInputStream(xml));
 
 					if (xsltOutFormat.equals(destExt)) {
 						// The XSLT is for transforming to the wanted output, so
@@ -110,6 +153,22 @@ public class XMLConverter extends AbstractFormatConverter {
 							// the result to the output file
 							xformer.transform(source, result);
 
+							if ("html".equals(xsltOutFormat.toLowerCase())) {
+								// Sometimes the converter adds a not closed
+								// element <META http-equiv="Content-Type"
+								// content="text/html; charset=UTF-8">, so we
+								// must strip not closed <meta> tags
+								String htmlContent = FileUtil.readFile(transformedFile);
+								org.jsoup.nodes.Document htmlDoc = Jsoup.parse(htmlContent);
+								Elements elements = htmlDoc.select("meta");
+								for (org.jsoup.nodes.Element element : elements) {
+									if (!element.toString().endsWith("/>"))
+										element.remove();
+								}
+								htmlContent = htmlDoc.html();
+								FileUtil.writeFile(htmlContent, transformedFile.getAbsolutePath());
+							}
+
 							FormatConverter converter = manager.getConverter(xsltOutFormat, destExt);
 							if (converter == null)
 								throw new IOException(String.format("Unable to find a converter from %s to %s",
@@ -121,10 +180,11 @@ public class XMLConverter extends AbstractFormatConverter {
 						}
 					}
 				} catch (FileNotFoundException e) {
+					log.warn("File not found", e);
 				} catch (TransformerConfigurationException e) {
-					log.warn("An error occurred in the XSL file");
+					log.warn("An error occurred in the XSL file", e);
 				} catch (TransformerException e) {
-					log.warn("An error occurred while applying the XSL file; row:{}, col:{}");
+					log.warn("An error occurred while applying the XSL file; row:{}, col:{}", e);
 				}
 			}
 		} catch (Throwable t) {
@@ -135,6 +195,35 @@ public class XMLConverter extends AbstractFormatConverter {
 		} finally {
 			if (xslt != null)
 				FileUtil.strongDelete(xslt);
+			if (xml != null)
+				FileUtil.strongDelete(xml);
 		}
+	}
+
+	private String getStyleByRootElement(String rootElementName) {
+		Map<String, String> styles = loadStyleSheets();
+		return styles.get(rootElementName);
+	}
+
+	private Map<String, String> loadStyleSheets() {
+		Map<String, String> map = new HashMap<String, String>();
+		String value = getParameter(STYLE_SHEETS);
+		if (StringUtils.isNotEmpty(value)) {
+			String[] styles = value.split("\\,");
+			for (String style : styles) {
+				if (StringUtils.isNoneEmpty(style)) {
+					if (style.contains("|")) {
+						String[] tokens = style.trim().split("\\|");
+						map.put(tokens[0].trim(), tokens[1].trim());
+					}
+				}
+			}
+		}
+		return map;
+	}
+
+	@Override
+	public List<String> getParameterNames() {
+		return Arrays.asList(new String[] { STYLE_SHEETS });
 	}
 }

@@ -69,6 +69,17 @@ public interface ContactService extends RemoteService {
 			boolean skipFirstRow, int firstName, int lastName, int email, int company, int phone, int mobile,
 			int address) throws ServerException;
 	
+	/**
+	 * Shares contacts among a set of users and groups
+	 * 
+	 * @param contactIds identifiers of the contacts to share
+	 * @param userIds direct ids of users to share the contacts with
+	 * @param groupIds the groups of users to share the contacts with
+	 * 
+	 * @throws ServerException share the search to
+	 */
+	void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException;
+	
 	public static class Instance {
 		private static ContactServiceAsync instance;
 

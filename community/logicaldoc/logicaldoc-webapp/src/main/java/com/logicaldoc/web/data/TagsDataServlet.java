@@ -68,7 +68,7 @@ public class TagsDataServlet extends HttpServlet {
 			if (request.getParameter("folderId") != null)
 				folderId = Long.parseLong(request.getParameter("folderId"));
 
-			long max = 1000L;
+			long max = config.getLong(session.getTenantName() + ".tag.select.maxtags", 1000l);
 			if (request.getParameter("max") != null)
 				max = Long.parseLong(request.getParameter("max"));
 
@@ -92,7 +92,7 @@ public class TagsDataServlet extends HttpServlet {
 			Collections.sort(words);
 
 			// Limit the collection
-			if (words.size() > max)
+			if (words.size() > max && max > 0)
 				words = words.stream().limit(max).collect(Collectors.toList());
 
 			if (docId != null) {

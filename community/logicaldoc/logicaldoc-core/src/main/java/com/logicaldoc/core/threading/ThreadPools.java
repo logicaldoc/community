@@ -100,7 +100,7 @@ public class ThreadPools {
 		if (pool instanceof ScheduledExecutorService)
 			((ScheduledExecutorService) pool).schedule(task, delay, TimeUnit.MILLISECONDS);
 		else {
-			log.warn("Pool {} does not support scheduling so the task has been started immediately", poolName);
+			log.debug("Pool {} does not support scheduling so the task has been started immediately", poolName);
 			execute(task, poolName);
 		}
 	}

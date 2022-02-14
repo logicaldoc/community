@@ -34,8 +34,12 @@ import com.logicaldoc.core.document.DocumentManager;
 import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.GroupDAO;
@@ -436,7 +440,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public List<Long> findIdsByParentId(long parentId) {
 		List<Folder> coll = findByParentId(parentId);
-		return coll.stream().map(f -> f.getId()).collect(Collectors.toList());
+		if (coll == null || coll.isEmpty())
+			return new ArrayList<Long>();
+		else
+			try {
+				return coll.stream().map(f -> f.getId()).collect(Collectors.toList());
+			} catch (NullPointerException e) {
+				return new ArrayList<Long>();
+			}
 	}
 
 	@Override
@@ -736,6 +747,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		transaction.setPath(pathExtended);
 		transaction.setFolder(folder);
+		transaction.setColor(folder.getColor());
 
 		try {
 			historyDAO.store(transaction);
@@ -761,6 +773,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				parentHistory.setComment(transaction.getComment());
 				parentHistory.setPathOld(transaction.getPathOld());
 				parentHistory.setFilenameOld(transaction.getFilenameOld());
+				parentHistory.setColor(transaction.getColor());
 
 				if (transaction.getEvent().equals(FolderEvent.CREATED.toString())
 						|| transaction.getEvent().equals(FolderEvent.MOVED.toString())) {
@@ -1217,9 +1230,22 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			prepareHistory(folder, delCode, transaction);
 			result = store(folder, transaction);
 		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			result = false;
+		}
+
+		/**
+		 * Delete the aliases pointing to this deleted folder
+		 */
+		if (folder.getFoldRef() == null && folder.getType() != Folder.TYPE_ALIAS) {
+			List<Folder> aliases = findAliases(folder.getId(), folder.getTenantId());
+			if (aliases != null && !aliases.isEmpty()) {
+				String aliasIds = aliases.stream().map(f -> Long.toString(f.getId())).collect(Collectors.joining(","));
+				log.debug("Deleting the aliases to folder {}: {}", folder, aliasIds);
+				int count = jdbcUpdate(
+						"update set ld_deleted=" + delCode + " from ld_folder where ld_foldref in (" + aliasIds + ")");
+				log.info("Removed {} aliases pointing to the deleted folder {}", count, folderId);
+			}
 		}
 
 		return result;
@@ -1315,6 +1341,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		Folder folderVO = new Folder();
 		folderVO.setName(targetFolder.getName());
 		folderVO.setDescription(targetFolder.getDescription());
+		folderVO.setColor(targetFolder.getColor());
 		folderVO.setTenantId(targetFolder.getTenantId());
 		folderVO.setType(Folder.TYPE_ALIAS);
 		if (targetFolder.getSecurityRef() != null)
@@ -1495,23 +1522,60 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		List<String> collisions = new ArrayList<String>();
 
 		try {
-			collisions = (List<String>) queryForList(
-					"select lower(ld_name) from ld_folder where ld_deleted=0 and ld_parentid=" + folder.getParentId()
-							+ " and lower(ld_name) like'" + SqlUtil.doubleQuotes(folderName.toLowerCase())
-							+ "%' and not ld_id=" + folder.getId(),
-					String.class);
+			collisions = (List<String>) queryForList("select ld_name from ld_folder where ld_deleted=0 and ld_parentid="
+					+ folder.getParentId() + " and ld_name like'" + SqlUtil.doubleQuotes(folderName)
+					+ "%' and not ld_id=" + folder.getId(), String.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
 
-		while (collisions.contains(folder.getName().toLowerCase()))
+		while (collisions.contains(folder.getName()))
 			folder.setName(folderName + "(" + (counter++) + ")");
 	}
 
 	@Override
-	public Folder copy(Folder source, Folder target, boolean foldersOnly, boolean inheritSecurity,
+	public Folder copy(Folder source, Folder target, String newName, boolean foldersOnly, String securityOption,
 			FolderHistory transaction) throws PersistenceException {
+		Folder newFolder = internalCopy(source, target, newName, foldersOnly, securityOption, transaction);
+		
+		if ("replicate".equals(securityOption)) {
+			String sourcePath = computePathExtended(source.getId());
+			String newPath = computePathExtended(newFolder.getId());
 
+			Set<Long> childrenIds = findFolderIdInTree(newFolder.getId(), false);
+			for (Long childId : childrenIds) {
+				Folder child = findById(childId);
+				if (child.getSecurityRef() != null && isInPath(source.getId(), child.getSecurityRef())) {
+					initialize(child);
+
+					/*
+					 * This node references the security of another node in the
+					 * source tree, so we should adjust it
+					 */
+
+					// Get the path of the referenced folder in the source tree
+					String relativeSourcePathSecurityRef = computePathExtended(child.getSecurityRef())
+							.substring(sourcePath.length());
+
+					// Compute the same path but in the copied tree
+					String copiedPathSecurityRef = newPath + relativeSourcePathSecurityRef;
+
+					Folder copiedPathSecurityRefFolder = findByPathExtended(copiedPathSecurityRef,
+							target.getTenantId());
+					if (copiedPathSecurityRefFolder != null) {
+						child.setSecurityRef(copiedPathSecurityRefFolder.getId());
+						store(child);
+					}
+				}
+			}
+		}
+
+		return newFolder;
+	}
+
+	private Folder internalCopy(Folder source, Folder target, String newName, boolean foldersOnly,
+			String securityOption, FolderHistory transaction) throws PersistenceException {
+		assert (securityOption == null || "inherit".equals(securityOption) || "replicate".equals(securityOption));
 		assert (source != null);
 		assert (target != null);
 		assert (transaction != null);
@@ -1524,22 +1588,44 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		// Create the same folder in the target
 		Folder newFolder = null;
-		newFolder = createPath(target, source.getName(), inheritSecurity, (FolderHistory) transaction.clone());
+		newFolder = createPath(target, StringUtils.isNotEmpty(newName) ? newName : source.getName(),
+				"inherit".equals(securityOption), (FolderHistory) transaction.clone());
 		newFolder.setFoldRef(source.getFoldRef());
+
+		if ("replicate".equals(securityOption) && newFolder.getFoldRef() == null) {
+			initialize(source);
+			initialize(newFolder);
+
+			if (source.getSecurityRef() != null) {
+				newFolder.setSecurityRef(source.getSecurityRef());
+			} else {
+				newFolder.getFolderGroups().clear();
+				for (FolderGroup fg : source.getFolderGroups()) {
+					newFolder.addFolderGroup(fg.clone());
+				}
+			}
+			store(newFolder);
+		}
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		DocumentManager docMan = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
 		// List source docs and create them in the new folder
 		if (!foldersOnly) {
+			/*
+			 * By initializing the templates makes the following
+			 * query(findByFolder) to run properly without exception due to
+			 * template.templateGroups
+			 */
+			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+			List<Template> templates = tDao.findAll(source.getTenantId());
+			for (Template template : templates)
+				tDao.initialize(template);
+
 			List<Document> srcDocs = docDao.findByFolder(source.getId(), null);
 			for (Document srcDoc : srcDocs) {
 				docDao.initialize(srcDoc);
-				Document newDoc = null;
-				try {
-					newDoc = (Document) srcDoc.clone();
-				} catch (CloneNotSupportedException e) {
-				}
+				Document newDoc = srcDoc.clone();
 				newDoc.setId(0L);
 				newDoc.setCustomId(null);
 				newDoc.setVersion(null);
@@ -1578,7 +1664,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		List<Folder> children = findChildren(source.getId(), transaction.getUser().getId());
 		for (Folder child : children) {
-			copy(child, newFolder, foldersOnly, inheritSecurity, transaction);
+			internalCopy(child, newFolder, null, foldersOnly, securityOption, transaction);
 		}
 
 		return newFolder;
@@ -1700,11 +1786,21 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 */
 		evict(folder);
 		int records = jdbcUpdate("update ld_folder set ld_deleted=" + delCode + " where  ld_id in " + treeIdsString);
+		log.warn("Deleted {} folders in tree {} - {}", records, folder.getName(), folder.getId());
+
+		/*
+		 * Delete the aliases
+		 */
+		int aliases = jdbcUpdate(
+				"update ld_folder set ld_deleted=" + delCode + " where  ld_foldref in " + treeIdsString);
+		log.warn("Deleted {} folder aliases in tree {} - {}", aliases, folder.getName(), folder.getId());
 
 		/*
 		 * Delete the documents as well
 		 */
-		jdbcUpdate("update ld_document set ld_deleted=" + delCode + " where ld_folderid in " + treeIdsString);
+		int documents = jdbcUpdate(
+				"update ld_document set ld_deleted=" + delCode + " where ld_folderid in " + treeIdsString);
+		log.warn("Deleted {} documents in tree {} - {}", documents, folder.getName(), folder.getId());
 
 		if (getSessionFactory().getCache() != null)
 			getSessionFactory().getCache().evictEntityRegions();
@@ -1840,7 +1936,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public List<Folder> findDeleted(long userId, Integer maxHits) {
 		List<Folder> results = new ArrayList<Folder>();
 		try {
-			String query = "select ld_id, ld_name, ld_lastmodified from ld_folder where ld_deleted=1 and ld_deleteuserid = "
+			String query = "select ld_id, ld_name, ld_lastmodified, ld_color from ld_folder where ld_deleted=1 and ld_deleteuserid = "
 					+ userId;
 
 			@SuppressWarnings("rawtypes")
@@ -1850,6 +1946,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 					fld.setId(rs.getLong(1));
 					fld.setName(rs.getString(2));
 					fld.setLastModified(rs.getTimestamp(3));
+					fld.setColor(rs.getString(4));
 					return fld;
 				}
 			};
@@ -2312,6 +2409,68 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<String>();
+		}
+	}
+
+	@Override
+	public void merge(Folder source, Folder target, FolderHistory transaction) throws PersistenceException {
+		assert (source != null);
+		assert (target != null);
+		assert (transaction != null);
+		assert (transaction.getUser() != null);
+
+		if (!checkStoringAspect())
+			return;
+
+		log.debug("merge folder {} into folder {}", target, source);
+
+		Set<Long> treeIds = findFolderIdInTree(target.getId(), true);
+		if (treeIds.contains(source.getId()))
+			throw new PersistenceException("You cannot merge a folder inside a parent");
+
+		Session session = null;
+		if (transaction != null && transaction.getSessionId() != null)
+			session = SessionManager.get().get(transaction.getSessionId());
+
+		/*
+		 * Process the document first
+		 */
+		log.debug("move documents fom folder {} to folder {}", source, target);
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		List<Document> docs = docDao.findByFolder(source.getId(), null);
+		for (Document document : docs) {
+			DocumentHistory hist = new DocumentHistory();
+			hist.setDocument(document);
+			hist.setSessionId(transaction.getSessionId());
+			if (session != null)
+				hist.setSession(session);
+			hist.setUser(transaction.getUser());
+			manager.moveToFolder(document, target, hist);
+		}
+
+		log.debug("move non-clashing folders fom folder {} to folder {}", source, target);
+		List<Folder> foldersInSource = findByParentId(source.getId());
+		for (Folder folder : foldersInSource) {
+			// Move only non-clashing folders
+			if (findByNameAndParentId(folder.getName(), target.getId()).isEmpty())
+				move(folder, target, transaction != null ? transaction.clone() : null);
+		}
+
+		/*
+		 * Now iterate over the clashes doing recursive merges
+		 */
+		foldersInSource = findByParentId(source.getId());
+		for (Folder fldSource : foldersInSource) {
+			List<Folder> foldersInTarget = findByNameAndParentId(fldSource.getName(), target.getId());
+			if (foldersInTarget.isEmpty())
+				continue;
+			merge(fldSource, foldersInTarget.get(0), transaction != null ? transaction.clone() : null);
+		}
+
+		log.debug("delete the empty source folder {}", source);
+		if (docDao.findByFolder(source.getId(), null).isEmpty() && findByParentId(source.getId()).isEmpty()) {
+			delete(source.getId(), transaction != null ? transaction.clone() : null);
 		}
 	}
 }

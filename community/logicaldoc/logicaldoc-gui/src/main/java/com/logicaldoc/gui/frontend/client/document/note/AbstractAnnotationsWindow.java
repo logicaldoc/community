@@ -233,8 +233,8 @@ public abstract class AbstractAnnotationsWindow extends Window {
 		});
 
 		pageCursor = ItemFactory.newSliderItem("page", "page", 1.0, 1.0,
-				document.getPages() > 0 ? document.getPages() : 1.0);
-		pageCursor.setNumValues(document.getPages() > 0 ? document.getPages() : 1);
+				document.getPreviewPages() > 0 ? document.getPreviewPages() : 1.0);
+		pageCursor.setNumValues(document.getPreviewPages() > 0 ? document.getPreviewPages() : 1);
 		pageCursor.addChangedHandler(new ChangedHandler() {
 
 			@Override
@@ -302,7 +302,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 			@Override
 			public void onImagesLoaded(ImageElement[] imageElements) {
 				// Reload the document to update the pages count
-				if (document.getPages() <= 1)
+				if (document.getPreviewPages() <= 1)
 					DocumentService.Instance.get().getById(document.getId(), new AsyncCallback<GUIDocument>() {
 
 						@Override
@@ -312,9 +312,9 @@ public abstract class AbstractAnnotationsWindow extends Window {
 
 						@Override
 						public void onSuccess(GUIDocument dc) {
-							document.setPages(dc.getPages());
-							pageCursor.setMaxValue((double) document.getPages());
-							pageCursor.setNumValues(document.getPages());
+							document.setPages(dc.getPreviewPages());
+							pageCursor.setMaxValue((double) document.getPreviewPages());
+							pageCursor.setNumValues(document.getPreviewPages());
 						}
 					});
 

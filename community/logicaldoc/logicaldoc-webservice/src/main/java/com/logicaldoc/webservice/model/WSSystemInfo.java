@@ -14,17 +14,17 @@ public class WSSystemInfo {
 
 	protected String product = "LogicalDOC";
 
-	protected String release = "7.5";
+	protected String release = "8.6";
 
-	protected String year = "2006-2016";
+	protected String year = "2006-2021";
 
-	protected String help = "http://help.logicaldoc.com";
+	protected String help = "https://docs.logicaldoc.com";
 
-	protected String bugs = "http://bugs.logicaldoc.com";
+	protected String bugs = "https://bugs.logicaldoc.com";
 
-	protected String url = "http://www.logicaldoc.com";
+	protected String url = "https://www.logicaldoc.com";
 
-	protected String forum = "http://forums.logicaldoc.com";
+	protected String forum = "https://forums.logicaldoc.com";
 
 	protected String vendor = "LogicalDOC";
 

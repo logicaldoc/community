@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +74,8 @@ public class UploadServlet extends UploadAction {
 			if (session == null) {
 				// No SID already associated to the current session, so do it
 				session = request.getSession();
-				LDSecurityContextRepository.bindServletSession(sid, request);
+				if (sid != null)
+					LDSecurityContextRepository.bindServletSession(sid, request);
 			}
 
 			/**
@@ -110,7 +110,8 @@ public class UploadServlet extends UploadAction {
 
 			try {
 				Session sess = ServiceUtil.validateSession(request);
-				tenant = sess.getTenantName();
+				if (sess != null)
+					tenant = sess.getTenantName();
 			} catch (Throwable t) {
 				// ok no session, but was the security checks passed?
 				if (request.getAttribute("__spring_security_session_mgmt_filter_applied") == null || !"true"
@@ -124,7 +125,7 @@ public class UploadServlet extends UploadAction {
 
 				if (false == item.isFormField()) {
 					if (!isAllowedForUpload(item.getName(), tenant))
-						throw new UploadActionException("Invalid file name " + uploadedFileName);
+						throw new UploadActionException("File name not allowed: " + item.getName());
 
 					OutputStream os = null;
 					try {
@@ -254,7 +255,6 @@ public class UploadServlet extends UploadAction {
 		String fieldName = request.getParameter(UConsts.PARAM_SHOW);
 
 		HttpSession session = SessionManager.get().getServletSession(SessionManager.get().getSessionId(request));
-
 		if (session == null)
 			session = request.getSession();
 

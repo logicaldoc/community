@@ -130,7 +130,7 @@ public class PDFParserTest extends AbstractCoreTCase {
 			PDFParser pdfp = (PDFParser) parser;
 			if (i % 2 == 0) {
 				String content = pdfp.parse(file1, filename1, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
-				assertEquals(28385, content.length());
+				assertEquals(28388, content.length());
 			} else {
 				String content = pdfp.parse(file2, filename2, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 				assertEquals(8759, content.length());

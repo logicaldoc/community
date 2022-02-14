@@ -68,7 +68,7 @@ public class Exec {
 			if (worker.getExit() == null)
 				throw new TimeoutException();
 		} catch (TimeoutException e) {
-			log.error("Command timed out");
+			log.error("Command timed out {}", commandLine);
 		} catch (InterruptedException ex) {
 			worker.interrupt();
 			Thread.currentThread().interrupt();
@@ -188,10 +188,9 @@ public class Exec {
 				exit = future.get(timeout, TimeUnit.SECONDS);
 			} catch (TimeoutException e) {
 				process.destroy();
-				String message = "Timeout command " + commandLine;
-				log.warn(message);
+				log.warn("Timeout command {}", commandLine);
 			} catch (Exception e) {
-				log.warn("Command failed to execute - " + commandLine);
+				log.warn("Command failed to execute - {}", commandLine);
 				exit = 1;
 			} finally {
 				service.shutdown();

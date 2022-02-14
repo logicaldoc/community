@@ -73,11 +73,18 @@
   font-size: 24pt;
 }
 
-.contactingserver {
+.normal, .normalFocused, .normalDisabled {
+    color: rgb(40, 40, 40);
+    font-family: RobotoLight;
+    font-size: 12px;
+}
+
+.contactingserver, .contactingserver  td[class|=normal] {
   font-family: Arial, Bitstream Vera Sans, sans-serif; 
   font-size: 16pt;
   font-weight: bold;
   white-space: nowrap;
+  background-color: white;
 }
 
 .sessiontimeout {
@@ -340,4 +347,20 @@
 .printPanel.default ul a {
 	background-color: #44A8D9;
 	border: 1px solid #2589b4;
+}
+
+.event-ok {
+	color: DarkGreen;
+}
+
+.event-med {
+	color: DarkCyan;
+}
+
+.event-error {
+	color: DarkRed;
+}
+
+.calendar-without-label table[role="presentation"] td.normal b {
+   display: none;
 }

@@ -104,7 +104,7 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	public boolean validateUser(String username, String password);
 
 	/**
-	 * Validates an username only (the password content is not inspectged.
+	 * Validates an username only (the password content is not inspected).
 	 * 
 	 * @param username Username of the User to be validated.
 	 * 
@@ -115,11 +115,23 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	/**
 	 * Is password expired.
 	 * 
-	 * @param username Username of the User to be validate.
+	 * @param username Username of the User to be validated.
 	 * 
 	 * @return True if the password is expired
 	 */
 	public boolean isPasswordExpired(String username);
+
+	/**
+	 * Checks if a user is inactive, that is a user without interactions in the
+	 * last X days after it has last enabled. We look at the
+	 * {@link User#getMaxInactivity()} first en then we fallback to the general
+	 * parameter security.user.maxinactivity
+	 * 
+	 * @param username identifier of the user
+	 * 
+	 * @return the last interaction time
+	 */
+	public boolean isInactive(String username);
 
 	/**
 	 * This method deletes the user object and insert a new user history entry.

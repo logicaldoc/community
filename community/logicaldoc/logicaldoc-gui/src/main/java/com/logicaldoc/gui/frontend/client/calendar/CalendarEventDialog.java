@@ -1,5 +1,6 @@
 package com.logicaldoc.gui.frontend.client.calendar;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
@@ -9,14 +10,16 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
+import com.logicaldoc.gui.common.client.beans.GUIReminder;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -25,10 +28,12 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -36,6 +41,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.DateItem;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
@@ -43,7 +49,10 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.TimeItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
+import com.smartgwt.client.widgets.grid.ListGridEditorContext;
+import com.smartgwt.client.widgets.grid.ListGridEditorCustomizer;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
@@ -55,6 +64,7 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.TabSet;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This is the form used for editing a calendar event.
@@ -73,6 +83,8 @@ public class CalendarEventDialog extends Window {
 	private DynamicForm detailsForm = new DynamicForm();
 
 	private boolean readOnly = false;
+
+	private ListGrid remindersGrid;
 
 	private AsyncCallback<Void> onChangedCallback;
 
@@ -96,11 +108,12 @@ public class CalendarEventDialog extends Window {
 		centerInPage();
 		setPadding(5);
 
-		Tab detailsTab = prepareDetailsTab();
+		Tab detailsTab = prepareDetails();
 		Tab participantsTab = prepareParticipants();
 		Tab documentsTab = prepareDocuments();
+		Tab remindersTab = prepareReminders();
 
-		tabs.setTabs(detailsTab, participantsTab, documentsTab);
+		tabs.setTabs(detailsTab, remindersTab, participantsTab, documentsTab);
 		tabs.setHeight100();
 		addItem(tabs);
 
@@ -135,6 +148,164 @@ public class CalendarEventDialog extends Window {
 			addItem(buttonsPanel);
 	}
 
+	private Tab prepareReminders() {
+		ListGridField value = new ListGridField("value", I18N.message("value"), 60);
+		value.setType(ListGridFieldType.INTEGER);
+
+		ListGridField unit = new ListGridField("unit", I18N.message("unit"), 100);
+		unit.setAutoFitWidth(true);
+		unit.setCellFormatter(new CellFormatter() {
+
+			@Override
+			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
+				if ("minute".equals(value))
+					return I18N.message("minutes").toLowerCase() + " "
+							+ I18N.message(record.getAttributeAsString("when")).toLowerCase();
+				else if ("hour".equals(value))
+					return I18N.message("hours").toLowerCase() + " "
+							+ I18N.message(record.getAttributeAsString("when")).toLowerCase();
+				else if ("day".equals(value))
+					return I18N.message("ddays").toLowerCase() + " "
+							+ I18N.message(record.getAttributeAsString("when")).toLowerCase();
+				else
+					return value != null ? value.toString() : "";
+			}
+		});
+
+		ListGridField ddelete = new ListGridField("ddelete", I18N.message("delete"));
+		ddelete.setWidth("*");
+		ddelete.setCanEdit(false);
+
+		remindersGrid = new ListGrid() {
+			@Override
+			protected Canvas createRecordComponent(final ListGridRecord record, Integer colNum) {
+				String fieldName = this.getFieldName(colNum);
+
+				HLayout iconCanvas = new HLayout(3);
+				iconCanvas.setHeight(22);
+				iconCanvas.setWidth100();
+				iconCanvas.setMembersMargin(1);
+				iconCanvas.setAlign(Alignment.LEFT);
+
+				if ("ddelete".equals(fieldName)) {
+					ToolStripButton deleteIcon = AwesomeFactory.newIconButton("trash-alt", "ddelete");
+					deleteIcon.setBaseStyle("statusIcon");
+					deleteIcon.setMargin(2);
+					deleteIcon.addClickHandler(new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent event) {
+							LD.ask(I18N.message("question"), I18N.message("confirmdelete"), new BooleanCallback() {
+								@Override
+								public void execute(Boolean value) {
+									if (value) {
+										remindersGrid.removeData(record);
+									}
+								}
+							});
+						}
+					});
+
+					ToolStripButton addIcon = AwesomeFactory.newIconButton("plus", "add");
+					addIcon.setBaseStyle("statusIcon");
+					addIcon.setMargin(2);
+					addIcon.addClickHandler(new ClickHandler() {
+
+						@Override
+						public void onClick(ClickEvent event) {
+							addNewReminder();
+						}
+					});
+
+					iconCanvas.setMembers(deleteIcon, addIcon);
+					return iconCanvas;
+				} else
+					return null;
+			}
+		};
+
+		remindersGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		remindersGrid.setWidth100();
+		remindersGrid.setHeight100();
+		remindersGrid.setAutoFetchData(true);
+		remindersGrid.setCanSelectAll(false);
+		remindersGrid.setSelectionType(SelectionStyle.SINGLE);
+		remindersGrid.setShowHeader(false);
+		remindersGrid.setCanEdit(!readOnly);
+		remindersGrid.setAutoConfirmSaveEdits(true);
+		remindersGrid.setEditByCell(true);
+		remindersGrid.setCanReorderRecords(true);
+		remindersGrid.setShowRecordComponents(true);
+		remindersGrid.setShowRecordComponentsByCell(true);
+		remindersGrid.setFields(value, unit, ddelete);
+
+		remindersGrid.setEditorCustomizer(new ListGridEditorCustomizer() {
+			public FormItem getEditor(ListGridEditorContext context) {
+				ListGridField field = context.getEditField();
+				if (field.getName().equals("value")) {
+					SpinnerItem remindValue = new SpinnerItem();
+					remindValue.setDefaultValue(0);
+					remindValue.setMin(0);
+					remindValue.setStep(1);
+					remindValue.setWidth(50);
+					remindValue.setRequired(true);
+					return remindValue;
+				} else if (field.getName().equals("unit")) {
+					SelectItem unitSelector = ItemFactory.newDueTimeSelector("remindUnit", "");
+					LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+					map.put("minute", I18N.message("minutes"));
+					map.put("hour", I18N.message("hours"));
+					map.put("day", I18N.message("ddays"));
+					unitSelector.setValueMap(map);
+					unitSelector.setRequired(true);
+					return unitSelector;
+				} else
+					return null;
+			}
+		});
+
+		fillRemindersGrid(remindersGrid);
+
+		VLayout layout = new VLayout();
+		layout.setWidth100();
+		layout.setHeight100();
+		layout.setAlign(Alignment.CENTER);
+		layout.setMembersMargin(3);
+
+		IButton addReminder = new IButton(I18N.message("newreminder"));
+		addReminder.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				addNewReminder();
+			}
+		});
+
+		HLayout buttons = new HLayout();
+		buttons.setAlign(Alignment.RIGHT);
+		buttons.setMembers(addReminder);
+
+		layout.setMembers(remindersGrid, buttons);
+
+		Tab remindersTab = new Tab();
+		remindersTab.setTitle(I18N.message("reminders"));
+		remindersTab.setPane(layout);
+		return remindersTab;
+	}
+
+	private void fillRemindersGrid(ListGrid list) {
+		ListGridRecord[] records = new ListGridRecord[calendarEvent.getReminders().length];
+		for (int i = 0; i < calendarEvent.getReminders().length; i++) {
+			records[i] = new ListGridRecord();
+			records[i].setAttribute("value", calendarEvent.getReminders()[i].getValue());
+			records[i].setAttribute("unit", calendarEvent.getReminders()[i].getUnit());
+			records[i].setAttribute("when", "before");
+			records[i].setAttribute("date", calendarEvent.getReminders()[i].getDate());
+			records[i].setAttribute("reminded", calendarEvent.getReminders()[i].getReminded());
+		}
+		list.setRecords(records);
+	}
+
 	private Tab prepareParticipants() {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
@@ -143,7 +314,7 @@ public class CalendarEventDialog extends Window {
 		ListGridField username = new ListGridField("username", I18N.message("username"));
 		username.setWidth(110);
 
-		AvatarListGridField avatar = new AvatarListGridField();
+		UserListGridField avatar = new UserListGridField();
 
 		final ListGrid list = new ListGrid();
 		list.setHeight100();
@@ -280,6 +451,8 @@ public class CalendarEventDialog extends Window {
 				});
 			}
 		});
+		preview.setEnabled(
+				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 		MenuItem delete = new MenuItem();
 		delete.setTitle(I18N.message("ddelete"));
@@ -296,11 +469,22 @@ public class CalendarEventDialog extends Window {
 			}
 		});
 
+		MenuItem openInFolder = new MenuItem();
+		openInFolder.setTitle(I18N.message("openinfolder"));
+		openInFolder.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				ListGridRecord selection = list.getSelectedRecord();
+				if (selection != null)
+					DocumentsPanel.get().openInFolder(Long.parseLong(selection.getAttributeAsString("folderId")),
+							Long.parseLong(selection.getAttributeAsString("id")));
+			}
+		});
+
 		Menu contextMenu = new Menu();
 		if (!readOnly)
-			contextMenu.setItems(preview, delete);
+			contextMenu.setItems(preview, openInFolder, delete);
 		else
-			contextMenu.setItems(preview);
+			contextMenu.setItems(preview, openInFolder);
 		list.setContextMenu(contextMenu);
 
 		list.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -308,8 +492,8 @@ public class CalendarEventDialog extends Window {
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
 				destroy();
 				Record record = event.getRecord();
-				DocumentsPanel.get().openInFolder(Long.parseLong(record.getAttributeAsString("folderId")),
-						Long.parseLong(record.getAttributeAsString("id")));
+				DocumentsPanel.get().openInFolder(record.getAttributeAsLong("folderId"),
+						record.getAttributeAsLong("id"));
 			}
 		});
 
@@ -357,17 +541,19 @@ public class CalendarEventDialog extends Window {
 		for (int i = 0; i < calendarEvent.getDocuments().length; i++) {
 			records[i] = new ListGridRecord();
 			records[i].setAttribute("id", calendarEvent.getDocuments()[i].getId());
+			records[i].setAttribute("folderId", calendarEvent.getDocuments()[i].getFolder().getId());
 			records[i].setAttribute("icon", calendarEvent.getDocuments()[i].getIcon());
 			records[i].setAttribute("version", calendarEvent.getDocuments()[i].getVersion());
 			records[i].setAttribute("fileVersion", calendarEvent.getDocuments()[i].getFileVersion());
 			records[i].setAttribute("filename", calendarEvent.getDocuments()[i].getFileName());
 			records[i].setAttribute("lastModified", calendarEvent.getDocuments()[i].getLastModified());
 			records[i].setAttribute("docRef", calendarEvent.getDocuments()[i].getDocRef());
+			records[i].setAttribute("color", calendarEvent.getDocuments()[i].getColor());
 		}
 		list.setRecords(records);
 	}
 
-	private Tab prepareDetailsTab() {
+	private Tab prepareDetails() {
 		Tab details = new Tab();
 		details.setTitle(I18N.message("details"));
 
@@ -463,29 +649,6 @@ public class CalendarEventDialog extends Window {
 			}
 		});
 
-		SpinnerItem remindTimeNumber = new SpinnerItem("remindTime");
-		remindTimeNumber.setTitle(I18N.message("remindtime"));
-		remindTimeNumber.setTitleOrientation(TitleOrientation.LEFT);
-		remindTimeNumber.setWrapTitle(false);
-		remindTimeNumber.setDefaultValue(0);
-		remindTimeNumber.setMin(0);
-		remindTimeNumber.setStep(1);
-		remindTimeNumber.setWidth(50);
-		remindTimeNumber.setValue(calendarEvent.getRemindTime());
-		remindTimeNumber.setCanEdit(!readOnly);
-		SelectItem remindTimeUnit = ItemFactory.newDueTimeSelector("remindUnit", "");
-		remindTimeUnit.setShowTitle(false);
-		remindTimeUnit.setWrapTitle(false);
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-		map.put("minute", I18N.message("minutes"));
-		map.put("hour", I18N.message("hours"));
-		map.put("day", I18N.message("ddays"));
-		remindTimeUnit.setValueMap(map);
-		remindTimeUnit.setValue(calendarEvent.getRemindUnit());
-		remindTimeUnit.setColSpan(3);
-		remindTimeUnit.setAlign(Alignment.LEFT);
-		remindTimeUnit.setCanEdit(!readOnly);
-
 		final DateItem completionDate = ItemFactory.newDateItem("completionDate", "completedon");
 		completionDate.setRequired(false);
 		completionDate.setShowTitle(false);
@@ -520,9 +683,8 @@ public class CalendarEventDialog extends Window {
 		description.setCanEdit(!readOnly);
 
 		detailsForm.setFields(title, type, subType, ItemFactory.newRowSpacer(), startDate, startTime, expirationDate,
-				expirationTime, ItemFactory.newRowSpacer(), frequency, deadline, ItemFactory.newRowSpacer(),
-				remindTimeNumber, remindTimeUnit, ItemFactory.newRowSpacer(), status, completionDate,
-				ItemFactory.newRowSpacer(), description);
+				expirationTime, ItemFactory.newRowSpacer(), frequency, deadline, ItemFactory.newRowSpacer(), status,
+				completionDate, ItemFactory.newRowSpacer(), description);
 		details.setPane(detailsForm);
 		return details;
 	}
@@ -541,8 +703,6 @@ public class CalendarEventDialog extends Window {
 			calendarEvent.setType(vm.getValueAsString("type"));
 			calendarEvent.setSubType(vm.getValueAsString("subType"));
 			calendarEvent.setDescription(vm.getValueAsString("description"));
-			calendarEvent.setRemindTime(Integer.parseInt(vm.getValueAsString("remindTime")));
-			calendarEvent.setRemindUnit(vm.getValueAsString("remindUnit"));
 
 			if (vm.getValue("frequency") != null)
 				calendarEvent.setFrequency(Integer.parseInt(vm.getValueAsString("frequency").trim()));
@@ -588,6 +748,8 @@ public class CalendarEventDialog extends Window {
 			else
 				calendarEvent.setDeadline(null);
 
+			saveReminders(calendarEvent);
+
 			CalendarService.Instance.get().saveEvent(calendarEvent, new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable caught) {
@@ -602,6 +764,20 @@ public class CalendarEventDialog extends Window {
 				}
 			});
 		}
+	}
+
+	private void saveReminders(GUICalendarEvent calendarEvent) {
+		ArrayList<GUIReminder> reminders = new ArrayList<GUIReminder>();
+		ListGridRecord[] records = remindersGrid.getRecords();
+		if (records != null)
+			for (ListGridRecord record : records) {
+				GUIReminder reminder = new GUIReminder(record.getAttributeAsInt("value"),
+						record.getAttributeAsString("unit"));
+				reminder.setDate(record.getAttributeAsDate("date"));
+				reminder.setReminded(record.getAttributeAsInt("reminded"));
+				reminders.add(reminder);
+			}
+		calendarEvent.setReminders(reminders.toArray(new GUIReminder[0]));
 	}
 
 	/**
@@ -685,5 +861,23 @@ public class CalendarEventDialog extends Window {
 			user.setFirstName(name);
 			CalendarEventDialog.this.calendarEvent.addParticipant(user);
 		}
+	}
+
+	private void addNewReminder() {
+		ListGridRecord newRecord = new ListGridRecord();
+		ListGridRecord[] records = remindersGrid.getRecords();
+		if (records != null && records.length > 0) {
+			ListGridRecord lastRecord = records[records.length - 1];
+			newRecord.setAttribute("value", lastRecord.getAttributeAsInt("value") + 1);
+			newRecord.setAttribute("unit", lastRecord.getAttributeAsString("unit"));
+			newRecord.setAttribute("reminded", 0);
+			newRecord.setAttribute("when", "before");
+		} else {
+			newRecord.setAttribute("value", 0);
+			newRecord.setAttribute("unit", GUIReminder.TIME_UNIT_MINUTE);
+			newRecord.setAttribute("reminded", 0);
+			newRecord.setAttribute("when", "before");
+		}
+		remindersGrid.addData(newRecord);
 	}
 }

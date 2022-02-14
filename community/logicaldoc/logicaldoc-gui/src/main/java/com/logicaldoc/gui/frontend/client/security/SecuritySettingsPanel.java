@@ -12,8 +12,8 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.smartgwt.client.types.TitleOrientation;
@@ -69,7 +69,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 		final SpinnerItem pwdExp = ItemFactory.newSpinnerItem("pwdExp", "passwdexpiration",
 				settings.getPwdExpiration());
-		pwdExp.setHint(I18N.message("days"));
+		pwdExp.setHint(I18N.message("daysafteruserdisabled"));
 		pwdExp.setWrapTitle(false);
 		pwdExp.setRequired(true);
 		pwdExp.setWidth(50);
@@ -84,6 +84,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdEnforce.setWidth(50);
 		pwdEnforce.setMin(0);
 		pwdEnforce.setStep(1);
+
+		final SpinnerItem maxInactivity = ItemFactory.newSpinnerItem("maxinactivity", "maxinactivity",
+				settings.getMaxInactivity());
+		maxInactivity.setRequired(false);
+		maxInactivity.setHint(I18N.message("daysafteruserdisabled"));
+		maxInactivity.setWidth(50);
+		maxInactivity.setStep(1);
 
 		final RadioGroupItem savelogin = ItemFactory.newBooleanSelector("savelogin", I18N.message("savelogin"));
 		savelogin.setHint(I18N.message("saveloginhint"));
@@ -115,10 +122,16 @@ public class SecuritySettingsPanel extends AdminPanel {
 		forceSsl.setRequired(true);
 		forceSsl.setDisabled(Session.get().isDemo());
 
+		final TextItem contentSecurityPolicy = ItemFactory.newTextItem("contentsecuritypolicy", "contentsecuritypolicy",
+				settings.getContentSecurityPolicy());
+		contentSecurityPolicy.setHint(I18N.message("contentsecuritypolicyhint"));
+		contentSecurityPolicy.setWidth(400);
+
 		if (Session.get().isDefaultTenant())
-			securityForm.setFields(pwdSize, pwdExp, pwdEnforce, savelogin, alertnewdevice, ignorelogincase, allowSid, forceSsl);
+			securityForm.setFields(pwdSize, pwdExp, pwdEnforce, maxInactivity, savelogin, alertnewdevice,
+					ignorelogincase, allowSid, forceSsl, contentSecurityPolicy);
 		else
-			securityForm.setFields(pwdSize, pwdExp, pwdEnforce, savelogin, alertnewdevice);
+			securityForm.setFields(pwdSize, pwdExp, pwdEnforce, maxInactivity, savelogin, alertnewdevice);
 
 		body.setMembers(securityForm);
 
@@ -145,6 +158,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 					SecuritySettingsPanel.this.settings.setPwdExpiration((Integer) values.get("pwdExp"));
 					SecuritySettingsPanel.this.settings.setPwdSize((Integer) values.get("pwdSize"));
 					SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) values.get("pwdEnforce"));
+					SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) values.get("maxinactivity"));
 					SecuritySettingsPanel.this.settings
 							.setSaveLogin(values.get("savelogin").equals("yes") ? true : false);
 
@@ -165,12 +179,16 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 					if (Session.get().isDefaultTenant()) {
 						SecuritySettingsPanel.this.settings
-						.setAllowSidInRequest(values.get("allowsid").equals("yes") ? true : false);
-						
+								.setAllowSidInRequest(values.get("allowsid").equals("yes") ? true : false);
+
 						SecuritySettingsPanel.this.settings
 								.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes") ? true : false);
 						SecuritySettingsPanel.this.settings
 								.setForceSsl(values.get("forcessl").equals("yes") ? true : false);
+						SecuritySettingsPanel.this.settings
+								.setContentSecurityPolicy(values.get("contentsecuritypolicy") != null
+										? values.get("contentsecuritypolicy").toString()
+										: null);
 
 						SecuritySettingsPanel.this.settings
 								.setGeolocationEnabled(values.get("geoEnabled").equals("yes") ? true : false);
@@ -241,20 +259,20 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				SecurityService.Instance.get().syncGeolocationDB(licenseKey.getValueAsString(),
 						new AsyncCallback<String>() {
 
 							@Override
 							public void onFailure(Throwable caught) {
 								GuiLog.serverError(caught);
-								ContactingServer.get().hide();
+								LD.clearPrompt();
 							}
 
 							@Override
 							public void onSuccess(String dbVer) {
 								geoDBversion.setValue(dbVer);
-								ContactingServer.get().hide();
+								LD.clearPrompt();
 							}
 						});
 			}

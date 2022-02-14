@@ -11,7 +11,7 @@ import com.logicaldoc.core.History;
 public class FolderHistory extends History {
 
 	@Override
-	public Object clone() {
+	public FolderHistory clone() {
 		FolderHistory history = new FolderHistory();
 		history.setDate(getDate());
 		history.setDocId(getDocId());

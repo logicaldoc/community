@@ -18,7 +18,9 @@ public enum UserEvent {
     FILE_CONVERSION("event.user.fileconversion"),
     MESSAGE_RECEIVED("event.user.messagereceived"),
     CREATED("event.user.created"),
-    UPDATED("event.user.updated");
+    UPDATED("event.user.updated"),
+    DISABLED("event.user.disabled"),
+    ENABLED("event.user.enabled");
 	
     private String event;
 

@@ -14,7 +14,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -136,7 +136,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		entityId.setHidden(true);
 		entityId.setAutoFitWidth(true);
 
-		ListGridField entity = new AvatarListGridField("entity", "avatar", "entity", 190);
+		ListGridField entity = new UserListGridField("entity", "avatar", "entity");
 		entity.setCanEdit(false);
 		entity.setAutoFitWidth(true);
 		entity.setRotateTitle(false);

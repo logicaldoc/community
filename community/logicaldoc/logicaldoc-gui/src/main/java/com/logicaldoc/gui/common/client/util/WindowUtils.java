@@ -105,6 +105,10 @@ public class WindowUtils {
 		$wnd.location = url;
 	}-*/;
 
+	public static native void openUrlInNewTab(String url)/*-{
+	    $wnd.open(url, '_blank', null);
+    }-*/;
+	
 	public static native void openUrl(String url, String window)/*-{
 		$wnd.open(url, window, null);
 	}-*/;
@@ -112,7 +116,7 @@ public class WindowUtils {
 	public static native void openUrl(String url, String window, String specs)/*-{
 		$wnd.open(url, window, specs);
 	}-*/;
-
+	
 	public static native void focus()/*-{
 		$wnd.focus();
 	}-*/;
@@ -131,17 +135,21 @@ public class WindowUtils {
 
 	/**
 	 * Opens a given HTML document in new popup windows
-	 *  
+	 * 
 	 * @param title window titlew
 	 * @param html the HTML code to display
 	 */
 	public static native void openHtmlInWindow(String title, String html) /*-{
-	    var printWindow = $wnd.open("", title, "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes");
-        // printWindow.document.body.innerHTML = body;        
-        printWindow.document.write(html);
- 		printWindow.focus();
-    }-*/;
-	
+		var printWindow = $wnd
+				.open(
+						"",
+						title,
+						"toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes");
+		// printWindow.document.body.innerHTML = body;        
+		printWindow.document.write(html);
+		printWindow.focus();
+	}-*/;
+
 	public static boolean isChrome() {
 		return getUserAgent().toLowerCase().contains("chrome");
 	}

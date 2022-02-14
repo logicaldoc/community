@@ -42,10 +42,10 @@ public class ChangePassword extends Window {
 	private static final String NEWPASSWORD = "newpassword";
 
 	private LoginServiceAsync loginService = (LoginServiceAsync) GWT.create(LoginService.class);
-
-	public ChangePassword(final GUIUser user) {
+	
+	public ChangePassword(final GUIUser user, final LoginPanel loginPanel) {
 		super();
-
+		
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("changepassword"));
 		setWidth(300);
@@ -120,6 +120,8 @@ public class ChangePassword extends Window {
 										ChangePassword.this.destroy();
 										SC.say(I18N.message("yourpasswordhaschanged"));
 										GuiLog.info(I18N.message("event.user.passwordchanged"), null);
+										if(loginPanel!=null)
+											loginPanel.onPasswordChanged();
 									}
 								}
 							});

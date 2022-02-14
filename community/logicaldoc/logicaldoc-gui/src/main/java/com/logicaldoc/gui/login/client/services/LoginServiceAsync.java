@@ -11,4 +11,6 @@ public interface LoginServiceAsync {
 	void getUser(String username, AsyncCallback<GUIUser> callback);
 
 	void resetPassword(String username, String emailAddress, String productName, AsyncCallback<Void> callback);
+
+	void isSecretKeyRequired(String username, String deviceId, AsyncCallback<Boolean> callback);
 }

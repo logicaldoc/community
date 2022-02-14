@@ -30,7 +30,7 @@ public class Feature {
 	public static final int PDF = 8;
 
 	public static final int LICENSE = 9;
-	
+
 	public static final int EMAIL_IMPORT = 10;
 
 	public static final int TRASH = 11;
@@ -42,7 +42,7 @@ public class Feature {
 	public static final int INCREMENTAL_ARCHIVES = 14;
 
 	public static final int SINGLE_SIGNON = 15;
-	
+
 	public static final int SCAN = 16;
 
 	public static final int AUDIT = 17;
@@ -64,9 +64,9 @@ public class Feature {
 	public static final int INDEX_LANGUAGES = 25;
 
 	public static final int TASK_REPORT_NOTIFICATION = 26;
-	
+
 	public static final int SPLIT = 27;
-	
+
 	public static final int BULK_UPDATE = 28;
 
 	public static final int CMIS = 29;
@@ -94,7 +94,7 @@ public class Feature {
 	public static final int SHOW_LICENSEE = 40;
 
 	public static final int PATCHES = 41;
-	
+
 	public static final int FOLDER_TEMPLATE = 42;
 
 	public static final int GDRIVE = 43;
@@ -106,9 +106,9 @@ public class Feature {
 	public static final int CLOUD_STORAGE = 46;
 
 	public static final int VIA = 47;
-	
+
 	public static final int AUTOMATION = 48;
-	
+
 	public static final int ZONAL_OCR = 49;
 
 	public static final int SHOW_DISABLED = 50;
@@ -190,7 +190,7 @@ public class Feature {
 	public static final int AUTO_NAMING = 88;
 
 	public static final int AUTO_FOLDING = 89;
-	
+
 	public static final int DOCUSIGN = 90;
 
 	public static final int HOT_FOLDER = 91;
@@ -200,14 +200,18 @@ public class Feature {
 	public static final int WEBDAV_BASIC = 93;
 
 	public static final int TWO_FACTORS_AUTHENTICATION = 94;
-	
+
 	public static final int CHAT = 95;
-	
+
 	public static final int SYNDICATION = 96;
-	
+
 	public static final int GEOLOCATION = 97;
-	
+
 	public static final int ZONAL_BARCODE = 98;
+
+	public static final int WEB_FORM = 99;
+	
+	public static final int DIGITAL_SIGNATURE_CLIENT = 100;
 
 	private static Set<String> features = new HashSet<String>();
 

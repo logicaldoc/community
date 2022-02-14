@@ -10,6 +10,7 @@ import com.logicaldoc.gui.common.client.beans.GUIGroup;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.data.UsersDS;
 import com.logicaldoc.gui.common.client.formatters.UserCellFormatter;
+import com.logicaldoc.gui.common.client.formatters.UserDateCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
@@ -18,8 +19,9 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.security.twofactorsauth.TwoFactorsAuthenticationDialog;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -165,17 +167,21 @@ public class UsersPanel extends AdminPanel {
 		ListGridField email = new ListGridField("email", I18N.message("email"), 200);
 		email.setCanFilter(true);
 		email.setCellFormatter(new UserCellFormatter());
+		
+		DateListGridField expire = new DateListGridField("expire", "expireson",
+				DateListGridField.DateCellFormatter.FORMAT_SHORT);
+		expire.setCellFormatter(new UserDateCellFormatter());
 
-		ListGridField eenabled = new ListGridField("eenabled", " ", 24);
-		eenabled.setType(ListGridFieldType.IMAGE);
-		eenabled.setCanSort(false);
-		eenabled.setAlign(Alignment.CENTER);
-		eenabled.setShowDefaultContextMenu(false);
-		eenabled.setImageURLPrefix(Util.imagePrefix());
-		eenabled.setImageURLSuffix(".gif");
-		eenabled.setCanFilter(false);
+		ListGridField enabledIcon = new ListGridField("enabledIcon", " ", 24);
+		enabledIcon.setType(ListGridFieldType.IMAGE);
+		enabledIcon.setCanSort(false);
+		enabledIcon.setAlign(Alignment.CENTER);
+		enabledIcon.setShowDefaultContextMenu(false);
+		enabledIcon.setImageURLPrefix(Util.imagePrefix());
+		enabledIcon.setImageURLSuffix(".gif");
+		enabledIcon.setCanFilter(false);
 
-		ListGridField enabled = new ListGridField("_enabled", I18N.message("enabled"), 55);
+		ListGridField enabled = new ListGridField("eenabled", I18N.message("enabled"), 55);
 		enabled.setCanFilter(true);
 		enabled.setHidden(true);
 
@@ -187,7 +193,7 @@ public class UsersPanel extends AdminPanel {
 		groups.setCanFilter(true);
 		groups.setCellFormatter(new UserCellFormatter());
 
-		AvatarListGridField avatar = new AvatarListGridField(true);
+		UserListGridField avatar = new UserListGridField(true);
 
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -197,7 +203,8 @@ public class UsersPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new UsersDS(null, true, false));
-		list.setFields(id, eenabled, avatar, username, firstName, name, email, phone, cell, groups, enabled, guest);
+		list.setFields(id, enabledIcon, avatar, username, firstName, name, email, expire, phone, cell, groups, enabled,
+				guest);
 
 		listing.addMember(infoPanel);
 		listing.addMember(list);
@@ -219,19 +226,7 @@ public class UsersPanel extends AdminPanel {
 			public void onSelectionChanged(SelectionEvent event) {
 				Record record = list.getSelectedRecord();
 				if (record != null)
-					SecurityService.Instance.get().getUser(Long.parseLong(record.getAttributeAsString("id")),
-							new AsyncCallback<GUIUser>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									GuiLog.serverError(caught);
-								}
-
-								@Override
-								public void onSuccess(GUIUser user) {
-									showUserDetails(user);
-								}
-							});
+					onSelectUser(record.getAttributeAsLong("id"));
 			}
 		});
 
@@ -245,6 +240,22 @@ public class UsersPanel extends AdminPanel {
 		body.addMembers(toolStrip, listing, detailsContainer);
 	}
 
+	private void onSelectUser(long userId) {
+		SecurityService.Instance.get().getUser(userId,
+				new AsyncCallback<GUIUser>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(GUIUser user) {
+						showUserDetails(user);
+					}
+				});
+	}
+	
 	/**
 	 * Updates the selected record with new data
 	 * 
@@ -267,10 +278,12 @@ public class UsersPanel extends AdminPanel {
 		record.setAttribute("email", user.getEmail());
 		record.setAttribute("cell", user.getCell());
 		record.setAttribute("phone", user.getPhone());
+		record.setAttribute("expire", user.getExpire());
+		record.setAttribute("eenabled", user.isEnabled());
 		if (user.isEnabled())
-			record.setAttribute("eenabled", "0");
+			record.setAttribute("enabledIcon", "0");
 		else
-			record.setAttribute("eenabled", "2");
+			record.setAttribute("enabledIcon", "2");
 		record.setAttribute("guest", user.isReadOnly());
 
 		GUIGroup[] groups = user.getGroups();
@@ -286,6 +299,7 @@ public class UsersPanel extends AdminPanel {
 		record.setAttribute("groups", gnames);
 
 		list.refreshRow(list.getRecordIndex(record));
+		list.redraw();
 	}
 
 	public void showUserDetails(GUIUser user) {
@@ -373,14 +387,79 @@ public class UsersPanel extends AdminPanel {
 			}
 		});
 
+		MenuItem enableUser = new MenuItem();
+		enableUser.setTitle(I18N.message("enable"));
+		enableUser.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), true,
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+								list.getSelectedRecord().setAttribute("enabledIcon", "0");
+								list.getSelectedRecord().setAttribute("eenabled", true);
+								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+								onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));					
+							}
+						});
+			}
+		});
+
+		MenuItem disableUser = new MenuItem();
+		disableUser.setTitle(I18N.message("disable"));
+		disableUser.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				SecurityService.Instance.get().changeStatus(list.getSelectedRecord().getAttributeAsLong("id"), false,
+						new AsyncCallback<Void>() {
+							@Override
+							public void onFailure(Throwable caught) {
+								GuiLog.serverError(caught);
+							}
+
+							@Override
+							public void onSuccess(Void result) {
+								list.getSelectedRecord().setAttribute("enabledIcon", "2");
+								list.getSelectedRecord().setAttribute("eenabled", false);
+								list.refreshRow(list.getRecordIndex(list.getSelectedRecord()));
+								onSelectUser(list.getSelectedRecord().getAttributeAsLong("id"));	
+							}
+						});
+
+			}
+		});
+
+		List<MenuItem> items = new ArrayList<MenuItem>();
+		if (!Session.get().isAdmin()) {
+			if (list.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+				items.add(disableUser);
+			else
+				items.add(enableUser);
+		}
+		items.add(password);
+
+		if (!"admin".equals(list.getSelectedRecord().getAttributeAsString("username")))
+			if (list.getSelectedRecord().getAttributeAsBoolean("eenabled"))
+				items.add(disableUser);
+			else
+				items.add(enableUser);
+
 		if (Feature.enabled(Feature.TWO_FACTORS_AUTHENTICATION))
-			contextMenu.setItems(password, replicate, twoTactorsAuth, delete);
-		else
-			contextMenu.setItems(password, replicate, delete);
+			items.add(twoTactorsAuth);
+
+		items.add(replicate);
+		items.add(delete);
+
+		contextMenu.setItems(items.toArray(new MenuItem[0]));
 
 		password.setEnabled(records.length == 1 && !Session.get().isDemo());
 		twoTactorsAuth.setEnabled(records.length == 1 && !Session.get().isDemo());
 		delete.setEnabled(records.length == 1 && !Session.get().isDemo());
+		enableUser.setEnabled(records.length == 1);
+		disableUser.setEnabled(records.length == 1);
 		replicate.setEnabled(!Session.get().isDemo());
 
 		if ("admin".equals(records[0].getAttributeAsString("username"))) {

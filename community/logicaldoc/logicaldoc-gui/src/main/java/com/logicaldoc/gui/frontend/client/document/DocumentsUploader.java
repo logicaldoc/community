@@ -12,6 +12,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.document.update.UpdateDialog;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -150,6 +151,7 @@ public class DocumentsUploader extends Window {
 		fileNameWaring.setRequired(true);
 
 		final SelectItem charset = ItemFactory.newCharsetSelector("charset");
+		charset.setValue(Session.get().getConfig("charset") != null ? Session.get().getConfig("charset") : "UTF-8");
 		charset.setHidden(true);
 
 		final CheckboxItem zipItem = new CheckboxItem();
@@ -174,7 +176,7 @@ public class DocumentsUploader extends Window {
 		immediateIndexing.setValue(false);
 		immediateIndexing.setTitleAlign(Alignment.LEFT);
 
-		if (!Session.get().getCurrentFolder().hasPermission(Constants.PERMISSION_IMPORT)) {
+		if (!FolderController.get().getCurrentFolder().hasPermission(Constants.PERMISSION_IMPORT)) {
 			zipItem.setDisabled(true);
 			zipItem.setValue(false);
 		}
@@ -210,9 +212,9 @@ public class DocumentsUploader extends Window {
 		if (!vm.validate())
 			return;
 
-		GUIFolder folder = Session.get().getCurrentFolder();
+		GUIFolder folder = FolderController.get().getCurrentFolder();
 		GUIDocument metadata = new GUIDocument();
-		metadata.setFolder(Session.get().getCurrentFolder());
+		metadata.setFolder(FolderController.get().getCurrentFolder());
 		metadata.setLanguage(I18N.getDefaultLocaleForDoc());
 		metadata.setTemplateId(folder.getTemplateId());
 		metadata.setTemplate(folder.getTemplate());
@@ -220,12 +222,12 @@ public class DocumentsUploader extends Window {
 		metadata.setTags(folder.getTags());
 		metadata.setOcrTemplateId(folder.getOcrTemplateId());
 
-		UpdateDialog bulk = new UpdateDialog(null, metadata, UpdateDialog.CONTEXT_UPLOAD, false);
+		UpdateDialog bulk = new UpdateDialog(null, metadata, UpdateDialog.CONTEXT_UPLOAD, false, vm.getValueAsString("charset"));
 		bulk.setZip(getImportZip());
 		bulk.setCharset(getCharset());
 		bulk.setImmediateIndexing(getImmediateIndexing());
-
 		bulk.show();
+		
 		destroy();
 	}
 

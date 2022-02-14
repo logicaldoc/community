@@ -6,8 +6,10 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.UserController;
+import com.logicaldoc.gui.common.client.observer.UserObserver;
 import com.logicaldoc.gui.common.client.services.SecurityService;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
 import com.logicaldoc.gui.frontend.client.security.FirewallPanel;
@@ -28,9 +30,13 @@ import com.smartgwt.client.widgets.tab.Tab;
  * @since 6.0
  * 
  */
-public class UserDetailsPanel extends VLayout {
+public class UserDetailsPanel extends VLayout implements UserObserver {
 
 	private static final String TABID_USERINTERFACE = "userinterface";
+
+	private static final String TABID_SECURITY = "security";
+
+	private static final String TABID_WORKINGTIME = "workingtime";
 
 	private static final String TABID_FIREWALL = "firewall";
 
@@ -48,9 +54,17 @@ public class UserDetailsPanel extends VLayout {
 
 	private Layout firewallTabPanel;
 
+	private Layout securityTabPanel;
+
+	private Layout workingTimeTabPanel;
+
 	private Layout guiTabPanel;
 
 	private UserPropertiesPanel propertiesPanel;
+
+	private UserSecurityPanel securityPanel;
+
+	private WorkingTimePanel workingTimePanel;
 
 	private EditingTabSet tabSet;
 
@@ -66,6 +80,7 @@ public class UserDetailsPanel extends VLayout {
 
 	public UserDetailsPanel(UsersPanel usersPanel) {
 		super();
+		UserController.get().addObserver(this);
 		this.usersPanel = usersPanel;
 
 		setHeight100();
@@ -106,6 +121,22 @@ public class UserDetailsPanel extends VLayout {
 		propertiesTabPanel.setHeight100();
 		propertiesTab.setPane(propertiesTabPanel);
 		tabSet.addTab(propertiesTab);
+
+		Tab securityTab = new Tab(I18N.message(TABID_SECURITY));
+		securityTab.setID(TABID_SECURITY);
+		securityTabPanel = new HLayout();
+		securityTabPanel.setWidth100();
+		securityTabPanel.setHeight100();
+		securityTab.setPane(securityTabPanel);
+		tabSet.addTab(securityTab);
+
+		Tab workingTimeTab = new Tab(I18N.message(TABID_WORKINGTIME));
+		workingTimeTab.setID(TABID_WORKINGTIME);
+		workingTimeTabPanel = new HLayout();
+		workingTimeTabPanel.setWidth100();
+		workingTimeTabPanel.setHeight100();
+		workingTimeTab.setPane(workingTimeTabPanel);
+		tabSet.addTab(workingTimeTab);
 
 		Tab quotaTab = new Tab(I18N.message(TABID_QUOTA));
 		quotaTab.setID(TABID_QUOTA);
@@ -161,14 +192,8 @@ public class UserDetailsPanel extends VLayout {
 		tabSet.hideSave();
 
 		/*
-		 * Prepare the standard properties tab
+		 * Prepare the change handler
 		 */
-		if (propertiesPanel != null) {
-			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
-				propertiesTabPanel.removeMember(propertiesPanel);
-		}
-
 		ChangedHandler changeHandler = new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
@@ -181,8 +206,38 @@ public class UserDetailsPanel extends VLayout {
 				&& !Session.get().getUser().getUsername().equalsIgnoreCase("admin"))
 			changeHandler = null;
 
+		/*
+		 * Prepare the standard properties tab
+		 */
+		if (propertiesPanel != null) {
+			propertiesPanel.destroy();
+			if (propertiesTabPanel.contains(propertiesPanel))
+				propertiesTabPanel.removeMember(propertiesPanel);
+		}
 		propertiesPanel = new UserPropertiesPanel(user, changeHandler, usersPanel);
 		propertiesTabPanel.addMember(propertiesPanel);
+
+		/*
+		 * Prepare the security tab
+		 */
+		if (securityPanel != null) {
+			securityPanel.destroy();
+			if (securityTabPanel.contains(securityPanel))
+				securityTabPanel.removeMember(securityPanel);
+		}
+		securityPanel = new UserSecurityPanel(user, changeHandler);
+		securityTabPanel.addMember(securityPanel);
+
+		/*
+		 * Prepare the working time tab
+		 */
+		if (workingTimePanel != null) {
+			workingTimePanel.destroy();
+			if (workingTimeTabPanel.contains(workingTimePanel))
+				workingTimeTabPanel.removeMember(workingTimePanel);
+		}
+		workingTimePanel = new WorkingTimePanel(user, changeHandler);
+		workingTimeTabPanel.addMember(workingTimePanel);
 
 		/*
 		 * Prepare the quota tab
@@ -231,8 +286,6 @@ public class UserDetailsPanel extends VLayout {
 		}
 		historyPanel = new UserHistoryPanel(user.getId());
 		historyTabPanel.addMember(historyPanel);
-
-		tabSet.selectTab(0);
 	}
 
 	public GUIUser getUser() {
@@ -255,6 +308,9 @@ public class UserDetailsPanel extends VLayout {
 
 	private boolean validate() {
 		boolean stdValid = propertiesPanel.validate();
+		boolean securityValid = securityPanel.validate();
+		boolean workingTimeValid = workingTimePanel.validate();
+
 		boolean quotaValid = true;
 		if (quotaPanel != null)
 			quotaValid = quotaPanel.validate();
@@ -267,6 +323,10 @@ public class UserDetailsPanel extends VLayout {
 
 		if (!stdValid)
 			tabSet.selectTab(TABID_PROPERTIES);
+		else if (!securityValid)
+			tabSet.selectTab(TABID_SECURITY);
+		else if (!workingTimeValid)
+			tabSet.selectTab(TABID_WORKINGTIME);
 		else if (quotaPanel != null && !quotaValid)
 			tabSet.selectTab(TABID_QUOTA);
 		else if (firewallPanel != null && !firewallValid)
@@ -274,7 +334,7 @@ public class UserDetailsPanel extends VLayout {
 		else if (guiPanel != null && !guiValid)
 			tabSet.selectTab(TABID_USERINTERFACE);
 
-		return stdValid && quotaValid && firewallValid && guiValid;
+		return stdValid && securityValid && workingTimeValid && quotaValid && firewallValid && guiValid;
 	}
 
 	public void onSave() {
@@ -282,17 +342,17 @@ public class UserDetailsPanel extends VLayout {
 			final boolean createNew = user.getId() == 0;
 			final boolean notifyCredentials = user.isNotifyCredentials();
 
-			ContactingServer.get().show();
+			LD.contactingServer();
 			SecurityService.Instance.get().saveUser(user, Session.get().getInfo(), new AsyncCallback<GUIUser>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 					GuiLog.serverError(caught);
 				}
 
 				@Override
 				public void onSuccess(GUIUser user) {
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 					tabSet.hideSave();
 					if (createNew && user.getWelcomeScreen() == -99) {
 						GuiLog.warn(I18N.message("usernamealreadyinuse"), I18N.message("usernamealreadyinuse"));
@@ -310,4 +370,33 @@ public class UserDetailsPanel extends VLayout {
 			});
 		}
 	}
+
+	@Override
+	public void onUserChanged(GUIUser user) {
+		if (user.getId() == this.user.getId()) {
+			this.user = user;
+			refresh();
+		}
+	}
+
+	@Override
+	public void onUserLogin(String username) {
+
+	}
+
+	@Override
+	public void onUserLogout(String username) {
+
+	}
+
+	@Override
+	public void destroy() {
+		UserController.get().removeObserver(this);
+	}
+
+	@Override
+	protected void finalize() {
+		destroy();
+	}
+	
 }

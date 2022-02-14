@@ -7,8 +7,9 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.logicaldoc.gui.frontend.client.document.DocumentExtendedPropertiesPanel;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.frontend.client.document.DocumentCapturePanel;
+import com.logicaldoc.gui.frontend.client.document.DocumentExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.document.PublishingPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.Side;
@@ -35,7 +36,7 @@ public class UpdatePanel extends VLayout {
 
 	protected Layout extendedPropertiesTabPanel;
 
-	protected Layout ocrTabPanel;
+	protected Layout captureTabPanel;
 
 	protected Layout retentionPoliciesTabPanel;
 
@@ -49,7 +50,7 @@ public class UpdatePanel extends VLayout {
 
 	protected UpdateNotificationPanel notificationPanel;
 
-	protected DocumentCapturePanel ocrPanel;
+	protected DocumentCapturePanel capturePanel;
 
 	protected TabSet tabSet = new TabSet();
 
@@ -61,7 +62,7 @@ public class UpdatePanel extends VLayout {
 
 	protected Tab notificationTab;
 
-	protected Tab ocrTab;
+	protected Tab captureTab;
 
 	public UpdatePanel(GUIDocument metadata, boolean showNotificationPanel) {
 		super();
@@ -69,19 +70,8 @@ public class UpdatePanel extends VLayout {
 		if (metadata != null)
 			document = metadata;
 		else {
-			document.setStartPublishing(null);
-			document.setPublished(-1);
-
-			GUIFolder currentFolder = Session.get().getCurrentFolder();
-			document.setFolder(currentFolder);
-
-			if (currentFolder.getTemplateLocked() == 1) {
-				document.setTemplateId(currentFolder.getTemplateId());
-				document.setTemplate(currentFolder.getTemplate());
-				document.setAttributes(currentFolder.getAttributes());
-			}
-
-			document.setOcrTemplateId(currentFolder.getOcrTemplateId());
+			GUIFolder currentFolder = FolderController.get().getCurrentFolder();
+			document = currentFolder.newDocument();
 		}
 
 		setHeight100();
@@ -112,11 +102,11 @@ public class UpdatePanel extends VLayout {
 		extendedPropertiesTabPanel.setHeight100();
 		extendedPropertiesTab.setPane(extendedPropertiesTabPanel);
 
-		ocrTab = new Tab(I18N.message("ocr"));
-		ocrTabPanel = new HLayout();
-		ocrTabPanel.setWidth100();
-		ocrTabPanel.setHeight100();
-		ocrTab.setPane(ocrTabPanel);
+		captureTab = new Tab(I18N.message("capture"));
+		captureTabPanel = new HLayout();
+		captureTabPanel.setWidth100();
+		captureTabPanel.setHeight100();
+		captureTab.setPane(captureTabPanel);
 
 		retentionPoliciesTab = new Tab(I18N.message("publishing"));
 		retentionPoliciesTabPanel = new HLayout();
@@ -145,7 +135,7 @@ public class UpdatePanel extends VLayout {
 			tabSet.addTab(retentionPoliciesTab);
 
 		if (Menu.enabled(Menu.CAPTURE))
-			tabSet.addTab(ocrTab);
+			tabSet.addTab(captureTab);
 
 		if (showNotificationPanel)
 			tabSet.addTab(notificationTab);
@@ -178,10 +168,10 @@ public class UpdatePanel extends VLayout {
 			public void onChanged(ChangedEvent event) {
 				document.setOcrTemplateId(null);
 				document.setBarcodeTemplateId(null);
-				ocrPanel.refresh(document.getTemplateId());
+				capturePanel.refresh(document.getTemplateId());
 			}
 		};
-		
+
 		/*
 		 * Prepare the extended properties tab
 		 */
@@ -196,13 +186,13 @@ public class UpdatePanel extends VLayout {
 		/*
 		 * Prepare the OCR settings tab
 		 */
-		if (ocrPanel != null) {
-			ocrPanel.destroy();
-			if (ocrTabPanel.contains(ocrPanel))
-				ocrTabPanel.removeMember(ocrPanel);
+		if (capturePanel != null) {
+			capturePanel.destroy();
+			if (captureTabPanel.contains(capturePanel))
+				captureTabPanel.removeMember(capturePanel);
 		}
-		ocrPanel = new DocumentCapturePanel(document, nothingToDo, false);
-		ocrTabPanel.addMember(ocrPanel);
+		capturePanel = new DocumentCapturePanel(document, nothingToDo, false);
+		captureTabPanel.addMember(capturePanel);
 
 		/*
 		 * Prepare the retention policies tab
@@ -235,7 +225,7 @@ public class UpdatePanel extends VLayout {
 		boolean stdValid = propertiesPanel.validate();
 		boolean extValid = extendedPropertiesPanel.validate();
 		boolean publishingValid = retentionPoliciesPanel.validate();
-		boolean ocrValid = ocrPanel.validate();
+		boolean captureValid = capturePanel.validate();
 		notificationPanel.validate();
 
 		if (!stdValid)
@@ -244,8 +234,8 @@ public class UpdatePanel extends VLayout {
 			tabSet.selectTab(extendedPropertiesTab);
 		else if (!publishingValid)
 			tabSet.selectTab(retentionPoliciesTab);
-		else if (!ocrValid)
-			tabSet.selectTab(ocrTab);
-		return stdValid && extValid && publishingValid && ocrValid;
+		else if (!captureValid)
+			tabSet.selectTab(captureTab);
+		return stdValid && extValid && publishingValid && captureValid;
 	}
 }

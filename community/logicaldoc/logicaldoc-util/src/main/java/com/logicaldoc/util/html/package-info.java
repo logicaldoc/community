@@ -1,5 +1,5 @@
 /**
- * Utility classes to handle HTML conents
+ * Utility classes to handle HTML contents
  *
  * @since 1.0
  */

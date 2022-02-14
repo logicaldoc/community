@@ -1,5 +1,8 @@
 package com.logicaldoc.gui.frontend.client.personal.contacts;
 
+import java.util.Arrays;
+import java.util.Map;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
@@ -7,10 +10,15 @@ import com.logicaldoc.gui.common.client.data.ContactsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
+import com.logicaldoc.gui.common.client.util.GridUtil.EndScrollListener;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.util.ValuesCallback;
+import com.logicaldoc.gui.common.client.widgets.GroupSelectorCombo;
+import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
@@ -20,6 +28,7 @@ import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.events.ResizedEvent;
 import com.smartgwt.client.widgets.events.ResizedHandler;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -74,6 +83,22 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 			@Override
 			public void onClick(ClickEvent event) {
 				refresh();
+			}
+		});
+
+		ToolStripButton selectAll = new ToolStripButton();
+		selectAll.setTitle(I18N.message("selectall"));
+		toolStrip.addButton(selectAll);
+		selectAll.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				GridUtil.scrollGrid(list, new EndScrollListener() {
+
+					@Override
+					public void endScroll(ListGrid listGrid) {
+						list.selectAllRecords();
+					}
+				});
 			}
 		});
 
@@ -179,7 +204,8 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
 		list.setAutoFetchData(true);
-		list.setSelectionType(SelectionStyle.MULTIPLE);
+		list.setSelectionType(SelectionStyle.SIMPLE);
+		list.setSelectionAppearance(SelectionAppearance.CHECKBOX);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(true);
 		list.setDataSource(new ContactsDS());
@@ -213,6 +239,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 	public void refresh() {
 		list.setDataSource(new ContactsDS());
 		list.fetchData();
+		GridUtil.scrollGrid(list, null);
 	}
 
 	private void showContextMenu() {
@@ -260,8 +287,54 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 			}
 		});
 
-		contextMenu.setItems(edit, delete);
+		MenuItem share = new MenuItem();
+		share.setTitle(I18N.message("share"));
+		share.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				onShare();
+			}
+		});
+
+		contextMenu.setItems(edit, share, delete);
 		contextMenu.showContextMenu();
+	}
+
+	protected void onShare() {
+		ListGridRecord[] selection = list.getSelectedRecords();
+
+		long[] ids = new long[selection.length];
+		for (int i = 0; i < ids.length; i++)
+			ids[i] = selection[i].getAttributeAsLong("id");
+
+		final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
+
+		final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
+
+		LD.askForValues("sharecontacts", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }), 350,
+				new ValuesCallback() {
+					@Override
+					public void execute(String value) {
+					}
+
+					@Override
+					public void execute(Map<String, Object> values) {
+						LD.contactingServer();
+						ContactService.Instance.get().shareContacts(ids, usersSelector.getUserIds(),
+								groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
+
+									@Override
+									public void onFailure(Throwable caught) {
+										LD.clearPrompt();
+										GuiLog.serverError(caught);
+									}
+
+									@Override
+									public void onSuccess(Void arg0) {
+										LD.clearPrompt();
+									}
+								});
+					}
+				});
 	}
 
 	private void onEdit() {
@@ -281,5 +354,10 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 						}
 					}
 				});
+	}
+
+	@Override
+	protected void onDraw() {
+		GridUtil.scrollGrid(list, null);
 	}
 }

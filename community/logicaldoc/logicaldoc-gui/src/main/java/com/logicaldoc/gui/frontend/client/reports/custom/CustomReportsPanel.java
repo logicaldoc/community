@@ -10,11 +10,10 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
@@ -248,8 +247,7 @@ public class CustomReportsPanel extends AdminPanel {
 	}
 
 	private boolean canUploadDesign() {
-		return Session.get().getUser().getTenant().isDefault()
-				&& Session.get().getUser().isMemberOf("admin");
+		return Session.get().getUser().getTenant().isDefault() && Session.get().getUser().isMemberOf("admin");
 	}
 
 	private void showContextMenu() {
@@ -257,8 +255,9 @@ public class CustomReportsPanel extends AdminPanel {
 
 		final ListGridRecord record = list.getSelectedRecord();
 		final long selectedId = Long.parseLong(record.getAttributeAsString("id"));
-		final Long outputDocId = record.getAttribute("outputDocId") != null ? Long.parseLong(record
-				.getAttributeAsString("outputDocId")) : null;
+		final Long outputDocId = record.getAttribute("outputDocId") != null
+				? Long.parseLong(record.getAttributeAsString("outputDocId"))
+				: null;
 		final long outputFolderId = Long.parseLong(record.getAttributeAsString("outputFolderId"));
 
 		MenuItem execute = new MenuItem();
@@ -382,7 +381,7 @@ public class CustomReportsPanel extends AdminPanel {
 		download.setTitle(I18N.message("download"));
 		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				WindowUtils.openUrl(Util.downloadURL(outputDocId));
+				Util.downloadDoc(outputDocId);
 			}
 		});
 
@@ -406,10 +405,19 @@ public class CustomReportsPanel extends AdminPanel {
 			}
 		});
 
+		MenuItem export = new MenuItem();
+		export.setTitle(I18N.message("export"));
+		export.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				Util.download(Util.contextPath() + "report/controller?command=export&reportId="
+						+ record.getAttributeAsString("id"));
+			}
+		});
+
 		if (outputDocId != null)
-			contextMenu.setItems(execute, upload, enable, disable, delete, openInFolder, download, preview);
+			contextMenu.setItems(execute, upload, export, enable, disable, delete, openInFolder, download, preview);
 		else
-			contextMenu.setItems(execute, upload, enable, disable, delete, openInFolder);
+			contextMenu.setItems(execute, upload, export, enable, disable, delete, openInFolder);
 		contextMenu.showContextMenu();
 	}
 

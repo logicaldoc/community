@@ -5,10 +5,10 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
- * Superclass for all tab panels in the import folders details area
+ * Superclass for all tab panels in the automation routine details area
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since 6.0
+ * @since 8.6.1
  */
 public abstract class AutomationRoutineDetailsTab extends HLayout {
 

@@ -37,8 +37,8 @@ public class GarbageDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(GarbageDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -68,9 +68,11 @@ public class GarbageDataServlet extends HttpServlet {
 				writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");
 				writer.print("<folderId>" + doc.getFolder().getId() + "</folderId>");
 				writer.print("<type>document</type>");
+				if (doc.getColor() != null)
+					writer.print("<color><![CDATA[" + doc.getColor() + "]]></color>");
 				writer.print("</entry>");
 			}
-			
+
 			for (Folder fld : folderDAO.findDeleted(session.getUserId(), 100)) {
 				writer.print("<entry>");
 				writer.print("<id>" + fld.getId() + "</id>");
@@ -79,8 +81,10 @@ public class GarbageDataServlet extends HttpServlet {
 				writer.print("<lastModified>" + df.format(fld.getLastModified()) + "</lastModified>");
 				writer.print("<folderId>" + fld.getParentId() + "</folderId>");
 				writer.print("<type>folder</type>");
+				if (fld.getColor() != null)
+					writer.print("<color><![CDATA[" + fld.getColor() + "]]></color>");
 				writer.print("</entry>");
-			}	
+			}
 			writer.write("</list>");
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);

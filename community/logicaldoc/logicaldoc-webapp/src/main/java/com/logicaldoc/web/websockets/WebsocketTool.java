@@ -25,7 +25,7 @@ public class WebsocketTool {
 	 * 
 	 * @param session the current session
 	 * @param message the message to display
-	 * @param the priority, it could be: <b>info</b>, <b>warn</b> or
+	 * @param level the priority, it could be: <b>info</b>, <b>warn</b> or
 	 *        <b>error</b>
 	 */
 	public void showMessage(Session session, String message, String level) {
@@ -44,7 +44,7 @@ public class WebsocketTool {
 	 * 
 	 * @param session the current session
 	 * @param url the url to open
-	 * @param the target windows, if not specified the '_blank' target will be
+	 * @param target the target windows, if not specified the '_blank' target will be
 	 *        used
 	 */
 	public void openUrl(Session session, String url, String target) {

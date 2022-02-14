@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-core" version="8.6.1" class="com.logicaldoc.core.CorePlugin">
+<plugin id="logicaldoc-core" version="8.7.3" class="com.logicaldoc.core.CorePlugin">
   <extension-point id="DbInit">
     <parameter-def id="name" />
     <parameter-def id="sqlFile" />
@@ -183,6 +183,10 @@
     <parameter id="locale" value="pl" />
     <parameter id="analyzer" value="-" />
   </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Language" id="idLanguage">
+	<parameter id="locale" value="id" />
+	<parameter id="analyzer" value="-" />
+  </extension>  
 
   <extension plugin-id="logicaldoc-core" point-id="ThumbnailBuilder" id="jpgThumb">
     <parameter id="extension" value="jpg" />
@@ -365,7 +369,27 @@
 		<parameter id="in" value="zip"/>
 		<parameter id="out" value="pdf,txt"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.ZipConverter"/>
-  </extension>    
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="gzConv">
+		<parameter id="in" value="gz,tgz"/>
+		<parameter id="out" value="pdf"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.ZipConverter"/>
+  </extension>  
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="rarConv">
+		<parameter id="in" value="rar"/>
+		<parameter id="out" value="pdf,txt"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.RarConverter"/>
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="tarConv">
+		<parameter id="in" value="tar"/>
+		<parameter id="out" value="pdf,txt"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.TarConverter"/>
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="sevenzConv">
+		<parameter id="in" value="7z"/>
+		<parameter id="out" value="pdf,txt"/>
+		<parameter id="class" value="com.logicaldoc.core.conversion.SevenZipConverter"/>
+  </extension>                        
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="catchallConv">
 		<parameter id="in" value="*"/>
 		<parameter id="out" value="pdf"/>

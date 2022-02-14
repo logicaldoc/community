@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.workflow.designer;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUITransition;
 import com.logicaldoc.gui.common.client.beans.GUIWFState;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
@@ -11,8 +12,6 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.PrintUtil;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.util.BooleanCallback;
@@ -62,6 +61,8 @@ public class WorkflowToolStrip extends ToolStrip {
 	private ToolStripButton load = null;
 
 	private ToolStripButton settings = null;
+
+	private ToolStripButton security = null;
 
 	private SelectItem workflowSelect = null;
 
@@ -179,6 +180,7 @@ public class WorkflowToolStrip extends ToolStrip {
 								if (value != null && !value.trim().isEmpty()) {
 									GUIWorkflow newWF = new GUIWorkflow();
 									newWF.setName(value);
+									newWF.setPermissions(new String[] { "write" });
 									AdminScreen.get().setContent(new WorkflowDesigner(newWF));
 								}
 							}
@@ -196,6 +198,16 @@ public class WorkflowToolStrip extends ToolStrip {
 			}
 		});
 		addButton(settings);
+
+		security = new ToolStripButton(I18N.message("security"));
+		security.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				WorkflowSecurity sec = new WorkflowSecurity(designer.getWorkflow());
+				sec.show();
+			}
+		});
+		addButton(security);
 
 		save = new ToolStripButton(I18N.message("save"));
 		save.addClickHandler(new ClickHandler() {
@@ -257,17 +269,17 @@ public class WorkflowToolStrip extends ToolStrip {
 				else if (transitionErrorFound)
 					SC.warn(I18N.message("workflowtransitiontarget"));
 				else {
-					ContactingServer.get().show();
+					LD.contactingServer();
 					WorkflowService.Instance.get().deploy(currentWorkflow, new AsyncCallback<GUIWorkflow>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(GUIWorkflow result) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.info(I18N.message("workflowdeployed", currentWorkflow.getName()));
 							currentWorkflow = result;
 							reload(currentWorkflow.getName());
@@ -379,7 +391,7 @@ public class WorkflowToolStrip extends ToolStrip {
 		export.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				WindowUtils.openUrl(
+				Util.download(
 						Util.contextPath() + "workflow/controller?command=export&wfId=" + currentWorkflow.getId());
 			}
 		});
@@ -389,8 +401,8 @@ public class WorkflowToolStrip extends ToolStrip {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				PrintUtil.printScreenShot(designer.getDrawingPanel().getID(),
-						I18N.message("workflow") + " - " + designer.getWorkflow().getName()+" v"+designer.getWorkflow().getVersion());
+				PrintUtil.printScreenShot(designer.getDrawingPanel().getID(), I18N.message("workflow") + " - "
+						+ designer.getWorkflow().getName() + " v" + designer.getWorkflow().getVersion());
 			}
 		});
 		addButton(print);
@@ -426,26 +438,31 @@ public class WorkflowToolStrip extends ToolStrip {
 				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
 		_import.setDisabled(currentWorkflow == null || currentWorkflow.getName() == null
 				|| currentWorkflow.getName().isEmpty() || !currentWorkflow.isLatestVersion());
-		save.setDisabled(currentWorkflow == null || currentWorkflow.getName() == null
-				|| currentWorkflow.getName().isEmpty() || !currentWorkflow.isLatestVersion());
+		save.setDisabled(
+				currentWorkflow == null || currentWorkflow.getName() == null || currentWorkflow.getName().isEmpty()
+						|| !currentWorkflow.isLatestVersion() || !currentWorkflow.isWrite());
 		clone.setDisabled(
 				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
 		deploy.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
 				|| "0".equals(currentWorkflow.getId()) || !currentWorkflow.isLatestVersion());
 		undeploy.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
 				|| "0".equals(currentWorkflow.getId()) || !currentWorkflow.isLatestVersion());
-		delete.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
-				|| "0".equals(currentWorkflow.getId()) || !currentWorkflow.isLatestVersion());
-		settings.setDisabled(currentWorkflow == null || currentWorkflow.getId() == null
-				|| "0".equals(currentWorkflow.getId()) || !currentWorkflow.isLatestVersion());
+		delete.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId())
+						|| !currentWorkflow.isLatestVersion() || !currentWorkflow.isWrite());
+		settings.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId())
+						|| !currentWorkflow.isLatestVersion() || !currentWorkflow.isWrite());
+		security.setDisabled(
+				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId())
+						|| !currentWorkflow.isLatestVersion() || !currentWorkflow.isWrite());
 		print.setDisabled(
 				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
 		load.setDisabled(
 				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
-		close.setDisabled(
-				currentWorkflow == null || currentWorkflow.getId() == null || "0".equals(currentWorkflow.getId()));
+		close.setDisabled(currentWorkflow == null);
 
-		workflowSelect.setOptionDataSource(new WorkflowsDS(false, false));
+		workflowSelect.setOptionDataSource(new WorkflowsDS(false, false, Session.get().getUser().getId()));
 
 		if (currentWorkflow != null && !currentWorkflow.getName().trim().isEmpty()) {
 			workflowSelect.setValue(currentWorkflow.getName());
@@ -465,17 +482,17 @@ public class WorkflowToolStrip extends ToolStrip {
 
 		currentWorkflow = designer.getWorkflow();
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 		WorkflowService.Instance.get().save(currentWorkflow, new AsyncCallback<GUIWorkflow>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(GUIWorkflow result) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				if (result == null) {
 					SC.warn(I18N.message("workflowalreadyexist"));
 				} else {
@@ -492,7 +509,8 @@ public class WorkflowToolStrip extends ToolStrip {
 	}
 
 	protected void updateVersionSelect() {
-		versionSelect.setOptionDataSource(new WorkflowsDS(currentWorkflow.getName(), false, false));
+		versionSelect.setOptionDataSource(
+				new WorkflowsDS(currentWorkflow.getName(), false, false, Session.get().getUser().getId()));
 		versionSelect.setValue(currentWorkflow.getVersion());
 	}
 

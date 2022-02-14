@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIResult;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
@@ -68,13 +68,13 @@ public class Search {
 	}
 
 	public void search() {
-		ContactingServer.get().show();
+		LD.contactingServer();
 
 		SearchService.Instance.get().search(options, new AsyncCallback<GUIResult>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 			}
 
@@ -84,12 +84,11 @@ public class Search {
 					time = result.getTime();
 					estimatedHits = result.getEstimatedHits();
 					hasMore = result.isHasMore();
-					lastResult = result.getHits();
-
+					lastResult = result.getHits();				
 					for (SearchObserver observer : observers)
 						observer.onSearchArrived();
 				} finally {
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 					SearchPanel.get().onDraw();
 					MainPanel.get().selectSearchTab();
 				}

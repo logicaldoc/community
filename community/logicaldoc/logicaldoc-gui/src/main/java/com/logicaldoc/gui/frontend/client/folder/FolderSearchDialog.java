@@ -6,7 +6,7 @@ import com.logicaldoc.gui.common.client.beans.GUIResult;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 import com.smartgwt.client.types.HeaderControls;
@@ -98,7 +98,7 @@ public class FolderSearchDialog extends Window {
 		SearchService.Instance.get().search(options, new AsyncCallback<GUIResult>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 			}
 

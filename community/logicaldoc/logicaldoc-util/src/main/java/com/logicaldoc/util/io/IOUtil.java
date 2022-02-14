@@ -56,27 +56,16 @@ public class IOUtil {
 	}
 
 	public static String getStringFromInputStream(InputStream is) throws IOException {
-		BufferedReader br = null;
 		StringBuilder sb = new StringBuilder();
-
 		String line;
-		try {
-			br = new BufferedReader(new InputStreamReader(is));
+		try(BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+			
 			while ((line = br.readLine()) != null) {
 				if (sb.length() > 0)
 					sb.append("\n");
 				sb.append(line);
 			}
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
-
 		return sb.toString();
 
 	}

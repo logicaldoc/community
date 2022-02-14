@@ -1,7 +1,10 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import com.logicaldoc.gui.common.client.Constants;
 
@@ -132,6 +135,30 @@ public class GUIUser implements Serializable {
 	 */
 	private String hitsGrid;
 
+	private String dateFormat;
+
+	private String dateFormatShort;
+
+	private String dateFormatLong;
+
+	private String searchPref;
+
+	private Date expire;
+
+	/**
+	 * If the system must forbid the login outside the working time
+	 */
+	private boolean enforceWorkingTime = false;
+
+	private GUIWorkingTime[] workingTimes = new GUIWorkingTime[0];
+
+	private Integer maxInactivity;
+	
+	/**
+	 * The reason why the last login failed
+	 */
+	private String lastLoginFailureReason;
+	
 	public GUIUser() {
 		tenant = new GUITenant();
 		tenant.setId(Constants.TENANT_DEFAULTID);
@@ -609,5 +636,86 @@ public class GUIUser implements Serializable {
 				if (customActions[i].getId() == action.getId())
 					customActions[i] = action;
 			}
+	}
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	public String getDateFormatShort() {
+		return dateFormatShort;
+	}
+
+	public void setDateFormatShort(String dateFormatShort) {
+		this.dateFormatShort = dateFormatShort;
+	}
+
+	public String getDateFormatLong() {
+		return dateFormatLong;
+	}
+
+	public void setDateFormatLong(String dateFormatLong) {
+		this.dateFormatLong = dateFormatLong;
+	}
+
+	public String getSearchPref() {
+		return searchPref;
+	}
+
+	public void setSearchPref(String searchPref) {
+		this.searchPref = searchPref;
+	}
+
+	public List<String> orderedSearches() {
+		List<String> searches = new ArrayList<String>();
+		if (searchPref != null && !searchPref.isEmpty()) {
+			searches = Arrays.asList(searchPref.replaceAll(" ", "").split(","));
+		} else
+			searches = Arrays.asList("fulltext", "parameters", "tags", "folders");
+		return searches;
+	}
+
+	public Date getExpire() {
+		return expire;
+	}
+
+	public void setExpire(Date expire) {
+		this.expire = expire;
+	}
+
+	public boolean isEnforceWorkingTime() {
+		return enforceWorkingTime;
+	}
+
+	public void setEnforceWorkingTime(boolean enforceWorkingTime) {
+		this.enforceWorkingTime = enforceWorkingTime;
+	}
+
+	public GUIWorkingTime[] getWorkingTimes() {
+		return workingTimes;
+	}
+
+	public void setWorkingTimes(GUIWorkingTime[] workingTimes) {
+		this.workingTimes = workingTimes;
+	}
+
+	public Integer getMaxInactivity() {
+		return maxInactivity;
+	}
+
+	public void setMaxInactivity(Integer maxInactivity) {
+		this.maxInactivity = maxInactivity;
+	}
+
+	public String getLastLoginFailureReason() {
+		return lastLoginFailureReason;
+	}
+
+	public void setLastLoginFailureReason(String lastLoginFailureReason) {
+		this.lastLoginFailureReason = lastLoginFailureReason;
 	}
 }

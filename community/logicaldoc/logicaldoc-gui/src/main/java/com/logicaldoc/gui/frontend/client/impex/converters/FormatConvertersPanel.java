@@ -166,8 +166,8 @@ public class FormatConvertersPanel extends AdminPanel {
 		associationsGrid.setShowRecordComponents(true);
 		associationsGrid.setShowRecordComponentsByCell(true);
 
-		ListGridField in = new ListGridField("in", I18N.message("in"), 40);
-		ListGridField out = new ListGridField("out", I18N.message("out"), 40);
+		ListGridField in = new ListGridField("in", I18N.message("in"), 50);
+		ListGridField out = new ListGridField("out", I18N.message("out"), 50);
 		ListGridField converter = new ListGridField("converter", I18N.message("converter"));
 		converter.setWidth("*");
 		converter.setCanEdit(!Session.get().isDemo());

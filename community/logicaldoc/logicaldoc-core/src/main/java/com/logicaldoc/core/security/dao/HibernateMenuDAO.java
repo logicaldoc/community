@@ -73,7 +73,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				return findAll();
 
 			Set<Group> precoll = user.getGroups();
-			Iterator iter = precoll.iterator();
+			Iterator<Group> iter = precoll.iterator();
 			if (!precoll.isEmpty()) {
 				// First of all collect all menus that define it's own policies
 				StringBuffer query = new StringBuffer("select distinct(_menu) from Menu _menu  ");

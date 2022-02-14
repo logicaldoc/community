@@ -3,8 +3,6 @@ package com.logicaldoc.gui.common.client.beans;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.logicaldoc.gui.common.client.Constants;
-
 /**
  * This class represents an event in a calendar. An event is always associated
  * to a selection of documents and users.
@@ -54,11 +52,9 @@ public class GUICalendarEvent implements Serializable {
 
 	private GUIDocument[] documents = new GUIDocument[0];
 
+	private GUIReminder[] reminders = new GUIReminder[0];
+
 	private int frequency = 0;
-
-	private int remindTime = 1;
-
-	private String remindUnit = Constants.TIME_HOUR;
 
 	private long creatorId;
 
@@ -234,20 +230,13 @@ public class GUICalendarEvent implements Serializable {
 		documents = newDocs;
 	}
 
-	public int getRemindTime() {
-		return remindTime;
-	}
-
-	public void setRemindTime(int remindTime) {
-		this.remindTime = remindTime;
-	}
-
-	public String getRemindUnit() {
-		return remindUnit;
-	}
-
-	public void setRemindUnit(String remindUnit) {
-		this.remindUnit = remindUnit;
+	public void addReminder(GUIReminder reminder) {
+		GUIReminder[] newRem = new GUIReminder[reminders.length + 1];
+		for (int i = 0; i < reminders.length; i++) {
+			newRem[i] = reminders[i];
+		}
+		newRem[reminders.length] = reminder;
+		reminders = newRem;
 	}
 
 	public long getCreatorId() {
@@ -312,5 +301,13 @@ public class GUICalendarEvent implements Serializable {
 
 	public void setSubType(String subType) {
 		this.subType = subType;
+	}
+
+	public GUIReminder[] getReminders() {
+		return reminders;
+	}
+
+	public void setReminders(GUIReminder[] reminders) {
+		this.reminders = reminders;
 	}
 }

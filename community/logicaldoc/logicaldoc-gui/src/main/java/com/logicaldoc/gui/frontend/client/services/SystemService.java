@@ -40,10 +40,7 @@ public interface SystemService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIParameter[][] getStatistics(String locale) throws ServerException;
-
-	public GUIHistory[] search(String userName, Date from, Date till, int maxResult, String historySid, String[] event,
-			Long rootFolderId) throws ServerException;
-
+	
 	/**
 	 * Retrieves all tasks.
 	 * 
@@ -152,6 +149,11 @@ public interface SystemService extends RemoteService {
 	 */
 	public void restart() throws ServerException;
 
+	public GUIHistory[] search(Long userId, Date from, Date till, int maxResult, String historySid, String[] event,
+			Long rootFolderId) throws ServerException;
+
+	public GUIHistory[] searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri, int maxResult) throws ServerException;
+	
 	public static class Instance {
 		private static SystemServiceAsync instance;
 

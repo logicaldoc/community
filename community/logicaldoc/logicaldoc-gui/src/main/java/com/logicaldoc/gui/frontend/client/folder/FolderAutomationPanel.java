@@ -10,7 +10,6 @@ import com.logicaldoc.gui.common.client.data.AutomationTriggersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -161,18 +160,18 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		applyToSubfolders.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				AutomationService.Instance.get().applyTriggersToTree(folder.getId(), new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void arg) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 					}
 				});
 			}

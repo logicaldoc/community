@@ -3,6 +3,8 @@ package com.logicaldoc.gui.common.client.beans;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.logicaldoc.gui.common.client.Constants;
+
 /**
  * Workflow bean as used in the GUI
  * 
@@ -47,6 +49,10 @@ public class GUIWorkflow implements Serializable {
 	private Date date = new Date();
 
 	private boolean latestVersion = true;
+
+	private GUIRight[] rights = new GUIRight[] {};
+
+	private String[] permissions = new String[] {};
 
 	public GUIWFState getStateById(String id) {
 		if (states != null && states.length > 0) {
@@ -212,5 +218,34 @@ public class GUIWorkflow implements Serializable {
 
 	public void setLatestVersion(boolean latestVersion) {
 		this.latestVersion = latestVersion;
+	}
+
+	public GUIRight[] getRights() {
+		return rights;
+	}
+
+	public void setRights(GUIRight[] rights) {
+		this.rights = rights;
+	}
+
+	public String[] getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(String[] permissions) {
+		this.permissions = permissions;
+	}
+
+	public boolean isWrite() {
+		return hasPermission(Constants.PERMISSION_WRITE);
+	}
+
+	public boolean hasPermission(String permission) {
+		if (permissions == null)
+			return false;
+		for (String p : permissions)
+			if (p.equals(permission))
+				return true;
+		return false;
 	}
 }

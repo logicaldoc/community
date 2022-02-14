@@ -47,8 +47,8 @@ public class TimeDiff {
 	 * Calculate the absolute difference between two dates without regard for
 	 * time offsets
 	 * 
-	 * @param d1 Date one expressed in millisconds
-	 * @param d2 Date two expressed in millisconds
+	 * @param t1 Date one expressed in millisconds
+	 * @param t2 Date two expressed in millisconds
 	 *
 	 * @return The fields day, hour, minute, second and millisecond
 	 */

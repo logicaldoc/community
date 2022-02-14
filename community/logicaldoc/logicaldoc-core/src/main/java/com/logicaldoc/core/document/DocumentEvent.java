@@ -47,7 +47,9 @@ public enum DocumentEvent {
 	VERSION_REPLACED("event.version.replaced"),
 	COMPARED("event.compared"),
 	COPYED("event.copyed"),
-	ESIGNED("event.esigned");
+	ESIGNED("event.esigned"),
+	FORM_SUBMITTED("event.form.submitted"),
+	FORM_EDITED("event.form.edited");
 	
     private String event;
 

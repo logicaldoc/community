@@ -2,8 +2,10 @@ package com.logicaldoc.web.service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
@@ -11,9 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.contact.Contact;
 import com.logicaldoc.core.contact.ContactDAO;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
@@ -79,7 +84,7 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 			Contact contact = dao.findById(id);
 			return fromContact(contact);
 		} catch (Throwable t) {
-			return (GUIContact)ServiceUtil.throwServerException(session, log, t);
+			return (GUIContact) ServiceUtil.throwServerException(session, log, t);
 		}
 	}
 
@@ -101,9 +106,9 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 	}
 
 	@Override
-	public GUIContact[] parseContacts(boolean preview, String separator, String delimiter,
-			boolean skipFirstRow, int firstName, int lastName, int email, int company, int phone, int mobile,
-			int address) throws ServerException {
+	public GUIContact[] parseContacts(boolean preview, String separator, String delimiter, boolean skipFirstRow,
+			int firstName, int lastName, int email, int company, int phone, int mobile, int address)
+			throws ServerException {
 		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
@@ -130,8 +135,8 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 				long i = 1;
 				while (fields != null) {
 					String emailStr = fields.get(email - 1);
-					
-					//Skip rows without an email
+
+					// Skip rows without an email
 					if (StringUtils.isEmpty(emailStr)) {
 						fields = reader.readFields();
 						continue;
@@ -196,5 +201,48 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 		}
 
 		return contacts.toArray(new GUIContact[0]);
+	}
+
+	@Override
+	public void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException {
+		ServiceUtil.validateSession(getThreadLocalRequest());
+		try {
+			HashSet<Long> users = new HashSet<Long>();
+			if (userIds != null)
+				for (Long uId : userIds) {
+					if (!users.contains(uId))
+						users.add(uId);
+				}
+			if (groupIds != null) {
+				UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
+				for (Long gId : groupIds) {
+					Set<User> usrs = gDao.findByGroup(gId);
+					for (User user : usrs) {
+						if (!users.contains(user.getId()))
+							users.add(user.getId());
+					}
+				}
+			}
+
+			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
+			for (Long cId : contactIds) {
+				Contact originalContact = dao.findById(cId);
+				for (Long userId : users) {
+					List<Contact> userContacts = dao.findByUser(userId, originalContact.getEmail());
+					if (userContacts.isEmpty()) {
+						Contact cloned = originalContact.clone();
+						cloned.setId(0L);
+						cloned.setUserId(userId);
+						try {
+							dao.store(cloned);
+						} catch (PersistenceException e) {
+							log.warn("Cannot share contact {} with user {}", originalContact.getEmail(), userId);
+						}
+					}
+				}
+			}
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 }

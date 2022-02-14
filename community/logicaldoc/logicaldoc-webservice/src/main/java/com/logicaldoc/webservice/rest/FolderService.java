@@ -219,13 +219,21 @@ public interface FolderService {
 	 * @param folderId The folder id
 	 * @param targetId The folder id of the target folder
 	 * @param foldersOnly If 1, only the folders will be copied and not the documents
-	 * @param inheritSecurity If 1, the new folders will inherit the target's security policies
+	 * @param securityOption How to assign the security policies to the newly
+	 *        created folders:
+	 *        <ul>
+	 *        <li><b>null</b> or <b>none</b>: empty security policies</li>
+	 *        <li><b>inherit</b>: the new folder will point to the parent for
+	 *        the security policies</li>
+	 *        <li><b>replicate</b>: the new folder will have a copy of the
+	 *        security policies of the source folder</li>
+	 *        </ul>
 	 * 
 	 * @throws Exception error during copy
 	 */
 	@POST
 	@Path("/copy")
-	public void copy(@FormParam("folderId") long folderId, @FormParam("targetId") long targetId, @FormParam("foldersOnly") int foldersOnly, @FormParam("inheritSecurity") int inheritSecurity) throws Exception;
+	public void copy(@FormParam("folderId") long folderId, @FormParam("targetId") long targetId, @FormParam("foldersOnly") int foldersOnly, @FormParam("securityOption") String securityOption) throws Exception;
 	
 	
 	/**

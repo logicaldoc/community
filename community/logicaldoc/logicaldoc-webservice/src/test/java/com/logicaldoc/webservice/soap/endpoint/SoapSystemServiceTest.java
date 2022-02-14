@@ -4,7 +4,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import com.logicaldoc.webservice.AbstractWebServiceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSParameter;
 import com.logicaldoc.webservice.model.WSSystemInfo;
 
@@ -14,7 +14,7 @@ import com.logicaldoc.webservice.model.WSSystemInfo;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
-public class SoapSystemServiceTest extends AbstractWebServiceTestCase {
+public class SoapSystemServiceTest extends AbstractWebserviceTestCase {
 	// Instance under test
 	private SoapSystemService systemServiceImpl;
 
@@ -33,7 +33,7 @@ public class SoapSystemServiceTest extends AbstractWebServiceTestCase {
 		Assert.assertEquals("via Aldo Moro interna, 3", info.getVendorAddress());
 		Assert.assertEquals("1234567890", info.getInstallationId());
 		Assert.assertEquals("6.1 Beta2", info.getRelease());
-		Assert.assertEquals("2011", info.getYear());
+		Assert.assertEquals("2006-2021", info.getYear());
 	}
 
 	@Test

@@ -8,7 +8,7 @@ import com.logicaldoc.core.PersistentObject;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
-public class Contact extends PersistentObject {
+public class Contact extends PersistentObject implements Cloneable {
 	private Long userId;
 
 	private String firstName;
@@ -95,5 +95,20 @@ public class Contact extends PersistentObject {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	@Override
+	public Contact clone() {
+		Contact clone = new Contact();
+		clone.setAddress(address);
+		clone.setCompany(company);
+		clone.setEmail(email);
+		clone.setLastName(lastName);
+		clone.setFirstName(firstName);
+		clone.setMobile(mobile);
+		clone.setTenantId(getTenantId());
+		clone.setId(getId());
+		clone.setUserId(userId);
+		return clone;
 	}
 }

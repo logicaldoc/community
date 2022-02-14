@@ -1,16 +1,20 @@
 package com.logicaldoc.gui.frontend.client.search;
 
+import java.util.Arrays;
+import java.util.Map;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.common.client.data.SavedSearchesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.ValuesCallback;
+import com.logicaldoc.gui.common.client.widgets.GroupSelectorCombo;
 import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.ValueCallback;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -122,28 +126,35 @@ public class SavedSearchesPanel extends VLayout {
 				ListGridRecord selection = list.getSelectedRecord();
 
 				final UserSelectorCombo usersSelector = new UserSelectorCombo("users", "users", null, true, true);
-				usersSelector.setRequired(true);
-				LD.askForValue("sharesearch", null, null, usersSelector, new ValueCallback() {
+				
+				final GroupSelectorCombo groupsSelector = new GroupSelectorCombo("groups", "groups");
+				
+				LD.askForValues("sharesearch", null, Arrays.asList(new FormItem[] { usersSelector, groupsSelector }),
+						350, new ValuesCallback() {
+							@Override
+							public void execute(String value) {
 
-					@Override
-					public void execute(String value) {
-						ContactingServer.get().show();
-						SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
-								usersSelector.getUserIds(), new AsyncCallback<Void>() {
+							}
 
-									@Override
-									public void onFailure(Throwable caught) {
-										ContactingServer.get().hide();
-										GuiLog.serverError(caught);
-									}
+							@Override
+							public void execute(Map<String, Object> values) {
+								LD.contactingServer();
+								SearchService.Instance.get().shareSearch(selection.getAttributeAsString("name"),
+										usersSelector.getUserIds(), groupsSelector.getGroupIds(), new AsyncCallback<Void>() {
 
-									@Override
-									public void onSuccess(Void arg0) {
-										ContactingServer.get().hide();
-									}
-								});
-					}
-				});
+											@Override
+											public void onFailure(Throwable caught) {
+												LD.clearPrompt();
+												GuiLog.serverError(caught);
+											}
+
+											@Override
+											public void onSuccess(Void arg0) {
+												LD.clearPrompt();
+											}
+										});
+							}
+						});
 			}
 		});
 

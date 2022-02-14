@@ -11,9 +11,9 @@ import com.logicaldoc.gui.common.client.observer.UserController;
 import com.logicaldoc.gui.common.client.observer.UserObserver;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -82,7 +82,7 @@ public class MessagesPanel extends VLayout implements UserObserver {
 		ListGridField subject = new ListGridField("subject", I18N.message("subject"));
 		subject.setCanFilter(true);
 
-		AvatarListGridField from = new AvatarListGridField("from", "avatar", I18N.message("from"), 160);
+		UserListGridField from = new UserListGridField("from", "avatar", I18N.message("from"));
 		from.setCanFilter(true);
 
 		ListGridField sent = new DateListGridField("sent", "sent");

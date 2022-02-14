@@ -17,9 +17,26 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 @RemoteServiceRelativePath("zoho")
 public interface ZohoService extends RemoteService {
 
-	public void saveAuthToken(String authToken) throws ServerException;
+	/**
+	 * Save the settings used by the Zoho module
+	 *
+	 * @param clientId identifier of the client
+	 * @param clientSecret the secret key specified by he user
+	 * 
+	 * @return The URL of the consent page
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public String saveSettings(String clientId, String clientSecret) throws ServerException;
 
-	public String loadAuthToken() throws ServerException;
+	/**
+	 * Save the settings used by the Zoho module
+	 * 
+	 * @return clientId, clientSecret
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public String[] loadSettings() throws ServerException;
 
 	/**
 	 * Exports documents and folders into Zoho

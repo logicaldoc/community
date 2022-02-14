@@ -64,6 +64,7 @@ public class FoldersDataServlet extends HttpServlet {
 			}
 
 			boolean nopagination = "true".equals(request.getParameter("nopagination"));
+			Long max = request.getParameter("max") != null ? Long.parseLong(request.getParameter("max")) : null;
 
 			Session session = ServiceUtil.validateSession(request);
 			long tenantId = session.getTenantId();
@@ -97,7 +98,7 @@ public class FoldersDataServlet extends HttpServlet {
 
 			Folder parentFolder = folderDao.findFolder(parentFolderId);
 			if (parentFolder == null)
-				log.error("No folder found with ID={} parent {}" + parentFolderId, parent);
+				log.error("No folder found with ID={} parent {}", parentFolderId, parent);
 
 			Context context = Context.get();
 			UserDAO udao = (UserDAO) context.getBean(UserDAO.class);
@@ -132,6 +133,8 @@ public class FoldersDataServlet extends HttpServlet {
 					startRecord = (long) pagination[0];
 					endRecord = startRecord + pagination[1] - 1;
 				}
+			} else {
+				endRecord = max;
 			}
 
 			PrintWriter writer = response.getWriter();
@@ -216,7 +219,7 @@ public class FoldersDataServlet extends HttpServlet {
 
 			if (request.getParameter("withdocs") != null) {
 				query = new StringBuffer(
-						"select ld_id, ld_filename, ld_filesize, ld_published, ld_startpublishing, ld_stoppublishing, ld_status from ld_document where ld_deleted=0 and ld_folderid=? ");
+						"select ld_id, ld_filename, ld_filesize, ld_published, ld_startpublishing, ld_stoppublishing, ld_status, ld_color from ld_document where ld_deleted=0 and ld_folderid=? ");
 				if (!user.isMemberOf("admin") && !user.isMemberOf("publisher")) {
 					query.append(" and ld_published=1");
 					query.append(" and (ld_startpublishing is null or CURRENT_TIMESTAMP > ld_startpublishing) ");
@@ -243,6 +246,8 @@ public class FoldersDataServlet extends HttpServlet {
 						writer.print("<size>" + rs.getInt(3) + "</size>");
 						writer.print("<status>" + rs.getInt(7) + "</status>");
 						writer.print("<publishedStatus>" + (published ? "yes" : "no") + "</publishedStatus>");
+						if (StringUtils.isNotEmpty(rs.getString(8)))
+							writer.print("<color><![CDATA[" + rs.getString(8) + "]]></color>");
 						writer.print("<position>0</position>");
 						writer.print("</folder>");
 					}

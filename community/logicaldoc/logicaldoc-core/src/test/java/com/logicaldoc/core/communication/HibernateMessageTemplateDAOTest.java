@@ -33,7 +33,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTCase {
 	@Test
 	public void testFindByLanguage() {
 		Collection<MessageTemplate> coll = dao.findByLanguage("en", 1L);
-		Assert.assertEquals(8, coll.size());
+		Assert.assertEquals(9, coll.size());
 		coll = dao.findByLanguage("it", 1L);
 		Assert.assertEquals(1, coll.size());
 		coll = dao.findByLanguage("de", 1L);
@@ -53,7 +53,7 @@ public class HibernateMessageTemplateDAOTest extends AbstractCoreTCase {
 	@Test
 	public void testFindByTypeLanguage() {
 		Collection<MessageTemplate> coll = dao.findByTypeAndLanguage(MessageTemplate.TYPE_SYSTEM,"en", 1L);
-		Assert.assertEquals(5, coll.size());
+		Assert.assertEquals(6, coll.size());
 		coll = dao.findByTypeAndLanguage("xxx","en", 1L);
 		Assert.assertEquals(0, coll.size());
 	}

@@ -112,6 +112,14 @@ input:focus {
     line-height: 30px;
 }
 
+.btnDisabled {
+	background-color: #ccd9ed;
+	color: black;
+	border: 2px solid transparent;
+	font-size: 16px;
+    line-height: 30px;
+}
+
 .login-link, a.login-link {
 	font-size: 12px;
 	color: white;

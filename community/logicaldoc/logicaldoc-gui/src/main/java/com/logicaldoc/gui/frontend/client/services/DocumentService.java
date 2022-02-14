@@ -661,6 +661,19 @@ public interface DocumentService extends RemoteService {
 	 */
 	public GUIDocument merge(long[] docIds, long targetFolderId, String fileName) throws ServerException;
 	
+	
+	/**
+	 * Counts the pages of a document and updates the DB.
+	 * 
+	 * @param docId identifier of the document
+	 * 
+	 * @return number of pages
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public int updatePages(long docId) throws ServerException;
+	
+	
 	public static class Instance {
 		private static DocumentServiceAsync instance;
 

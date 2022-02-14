@@ -77,8 +77,8 @@ public class CreateDialog extends Dialog {
 		});
 
 		form.setItems(name, inheritSecurity, create);
-		inheritSecurity.setValue(Session.get().getConfigAsBoolean("gui.security.inheritoption.default"));
-		
+		inheritSecurity.setValue("inherit".equals(Session.get().getConfig("gui.security.inheritoption.default")));
+
 		VLayout content = new VLayout();
 		content.setTop(10);
 		content.setWidth100();

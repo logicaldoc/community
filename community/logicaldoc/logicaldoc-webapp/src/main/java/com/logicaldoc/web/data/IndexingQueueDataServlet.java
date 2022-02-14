@@ -76,8 +76,8 @@ public class IndexingQueueDataServlet extends HttpServlet {
 			List<Object> records = (List<Object>) dao.findByQuery(
 					"select _entity.id, _entity.customId, _entity.docRef, _entity.docRefType, _entity.lastModified, "
 							+ "_entity.version, _entity.date, _entity.publisher, _entity.creation, _entity.creator, "
-							+ "_entity.fileSize, _entity.fileName from Document _entity  where " + query[0]
-							+ (StringUtils.isNotEmpty(query[1]) ? " order by " + query[1] : ""),
+							+ "_entity.fileSize, _entity.fileName, _entity.color from Document _entity  where "
+							+ query[0] + (StringUtils.isNotEmpty(query[1]) ? " order by " + query[1] : ""),
 					null, max);
 
 			/*
@@ -100,6 +100,7 @@ public class IndexingQueueDataServlet extends HttpServlet {
 				doc.setCreator((String) cols[9]);
 				doc.setFileSize((Long) cols[10]);
 				doc.setFileName((String) cols[11]);
+				doc.setColor((String) cols[12]);
 
 				writer.print("<document>");
 				writer.print("<id>" + doc.getId() + "</id>");
@@ -122,6 +123,9 @@ public class IndexingQueueDataServlet extends HttpServlet {
 				writer.print("<creator><![CDATA[" + doc.getCreator() + "]]></creator>");
 				writer.print("<size>" + doc.getFileSize() + "</size>");
 				writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
+
+				if (doc.getColor() != null)
+					writer.print("<color><![CDATA[" + doc.getColor() + "]]></color>");
 				writer.print("</document>");
 			}
 

@@ -103,15 +103,11 @@ public class EventCollector {
 			 * Do not use the original document because to avoid interactions
 			 * with Hibernate session.
 			 */
-			try {
-				Document clone = (Document) history.getDocument().clone();
-				// Restore some attributes skipped by the clone method
-				clone.setCustomId(history.getDocument().getCustomId());
-				clone.setStatus(history.getDocument().getStatus());
-				history.setDocument(clone);
-			} catch (CloneNotSupportedException e) {
-				log.error(e.getMessage());
-			}
+			Document clone = (Document) history.getDocument().clone();
+			// Restore some attributes skipped by the clone method
+			clone.setCustomId(history.getDocument().getCustomId());
+			clone.setStatus(history.getDocument().getStatus());
+			history.setDocument(clone);
 		}
 
 		Runnable notifier = new Runnable() {

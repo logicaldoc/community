@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.log.EventPanel;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.ListGridEditEvent;
@@ -172,7 +172,7 @@ public class MessageDialog extends Window {
 		section.setCanCollapse(false);
 		section.setExpanded(true);
 
-		AvatarListGridField avatar = new AvatarListGridField();
+		UserListGridField avatar = new UserListGridField();
 		
 		ListGridField name = new ListGridField("label", I18N.message("name"));
 		name.setCanFilter(true);

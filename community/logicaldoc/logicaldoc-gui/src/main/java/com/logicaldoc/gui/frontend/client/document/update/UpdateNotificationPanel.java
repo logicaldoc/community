@@ -6,14 +6,13 @@ import com.logicaldoc.gui.common.client.widgets.UserSelectorCombo;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailTab;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
-import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
  * Shows a list of users and a brief message to notify them about the document
- * creation
+ * creation or checkin
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.6
@@ -43,7 +42,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 		formContainer.setMembersMargin(10);
 
 		container.setMembers(formContainer);
-		
+
 		refresh();
 	}
 
@@ -66,7 +65,7 @@ public class UpdateNotificationPanel extends DocumentDetailTab {
 		form = new DynamicForm();
 		form.setWidth100();
 		form.setValuesManager(vm);
-		
+
 		usersItem = new UserSelectorCombo("users", "users", null, true, true);
 
 		usersItem.setDisabled(!updateEnabled);

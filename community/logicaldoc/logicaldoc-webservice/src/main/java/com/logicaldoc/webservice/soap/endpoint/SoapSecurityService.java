@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
+import com.logicaldoc.core.security.WorkingTime;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
@@ -19,6 +21,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSUser;
+import com.logicaldoc.webservice.model.WSWorkingTime;
 import com.logicaldoc.webservice.soap.SecurityService;
 
 /**
@@ -109,9 +112,10 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			if (user.getId() != 0) {
 				usr = dao.findById(user.getId());
-				if (usr.getType() != User.TYPE_DEFAULT) {
+				if (usr.getType() != User.TYPE_DEFAULT)
 					throw new Exception("You cannot edit user with id " + usr.getId() + " because it is a system user");
-				}
+				dao.initialize(usr);
+
 				usr.setCity(user.getCity());
 				usr.setCountry(user.getCountry());
 				usr.setEmail(user.getEmail());
@@ -132,6 +136,16 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setQuota(user.getQuota());
 				usr.setType(user.getType());
 				usr.setSource(user.getSource());
+				usr.setDateFormat(user.getDateFormat());
+				usr.setDateFormatShort(user.getDateFormatShort());
+				usr.setDateFormatLong(user.getDateFormatLong());
+
+				if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0)
+					for (WSWorkingTime wswt : user.getWorkingTimes()) {
+						WorkingTime wt = new WorkingTime();
+						BeanUtils.copyProperties(wt, wswt);
+						usr.getWorkingTimes().add(wt);
+					}
 			}
 
 			if (StringUtils.isEmpty(usr.getUsername()))
@@ -228,7 +242,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			throw new Exception("Unable to delete the user with id " + userId);
 		}
 	}
-	
+
 	@Override
 	public void deleteGroup(String sid, long groupId) throws Exception {
 		checkAdministrator(sid);

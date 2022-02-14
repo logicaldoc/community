@@ -3,6 +3,7 @@ package com.logicaldoc.webservice.soap.client;
 import java.io.IOException;
 
 import com.logicaldoc.webservice.model.WSAttributeSet;
+import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.soap.DocumentMetadataService;
 
@@ -16,6 +17,10 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 
 	public SoapDocumentMetadataClient(String endpoint) throws IOException {
 		super(endpoint, DocumentMetadataService.class, -1, true, -1);
+	}
+
+	public SoapDocumentMetadataClient(String endpoint, int timeout) throws IOException {
+		super(endpoint, DocumentMetadataService.class, -1, true, timeout);
 	}
 
 	@Override
@@ -76,5 +81,35 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 	@Override
 	public void deleteAttributeSet(String sid, long setId) throws Exception {
 		client.deleteAttributeSet(sid, setId);
+	}
+
+	@Override
+	public boolean isTemplateReadable(String sid, long templateId) throws Exception {
+		return client.isTemplateReadable(sid, templateId);
+	}
+
+	@Override
+	public boolean isTemplateWritable(String sid, long templateId) throws Exception {
+		return client.isTemplateWritable(sid, templateId);
+	}
+
+	@Override
+	public void grantUserToTemplate(String sid, long templateId, long userId, int permissions) throws Exception {
+		client.grantUserToTemplate(sid, templateId, userId, permissions);
+	}
+
+	@Override
+	public void grantGroupToTemplate(String sid, long templateId, long groupId, int permissions) throws Exception {
+		client.grantGroupToTemplate(sid, templateId, groupId, permissions);
+	}
+
+	@Override
+	public WSRight[] getGrantedUsers(String sid, long groupId) throws Exception {
+		return client.getGrantedUsers(sid, groupId);
+	}
+
+	@Override
+	public WSRight[] getGrantedGroups(String sid, long groupId) throws Exception {
+		return client.getGrantedGroups(sid, groupId);
 	}
 }

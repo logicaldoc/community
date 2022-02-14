@@ -33,126 +33,189 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public interface DocumentService {
-    
-    @POST
-    @Path("/create")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Creates a new document")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = WSDocument.class))),
-        @ApiResponse(responseCode = "401", description = "Authentication failed"),
-        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
-    public WSDocument create(
-    		@Multipart(value = "document", required = true, type = "application/json") WSDocument document,  
-    		@Multipart(value = "content" , required = true, type = "application/octet-stream") Attachment contentDetail) throws Exception;    
 
+	/**
+	 * Creates a new document
+	 * 
+	 * @param document the document's metadata
+	 * @param contentDetail the file binaries
+	 * 
+	 * @return data structure representing the created document
+	 * 
+	 * @throws Exception a generic error
+	 */
+	@POST
+	@Path("/create")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Creates a new document")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = WSDocument.class))),
+			@ApiResponse(responseCode = "401", description = "Authentication failed"),
+			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+	public WSDocument create(@Multipart(value = "document", required = true, type = "application/json")
+	WSDocument document, @Multipart(value = "content", required = true, type = "application/octet-stream")
+	Attachment contentDetail) throws Exception;
+
+	/**
+	 * Retrieves a document from the database
+	 * 
+	 * @param docId identifier of the document
+	 * @return the document object representation
+	 * 
+	 * @throws Exception a generic error
+	 */
 	@GET
 	@Path("/getDocument")
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	WSDocument getDocument(@QueryParam("docId") long docId) throws Exception;
+	WSDocument getDocument(@QueryParam("docId")
+	long docId) throws Exception;
 
+	/**
+	 * Executed the checkout
+	 * 
+	 * @param docId identifier of the document
+	 * @throws Exception a generic error
+	 */
 	@POST
 	@Path("/checkout")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	void checkout(@FormParam("docId") long docId) throws Exception;
-	
-	/*
+	void checkout(@FormParam("docId")
+	long docId) throws Exception;
+
+	/**
+	 * Check-in an existing document
+	 *
+	 * Performs a check-in (commit) operation of new content over an existing
+	 * document. The document must be in checked-out status
+	 * 
+	 * @param docId identifier of the document
+	 * @param comment version comment
+	 * @param release it this is a major version or not
+	 * @param filename filename of the document
+	 * @param filedataDetail binary content of the file
+	 * 
+	 * @throws Exception a generic error
+	 */
 	@POST
 	@Path("/checkin")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	Response checkin(List<Attachment> attachments) throws Exception; */
-	
-	/**
-     * Check-in an existing document
-     *
-     * Performs a check-in (commit) operation of new content over an existing document. The document must be in checked-out status
-     *
-     */
-    @POST
-    @Path("/checkin")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Operation(summary = "Check-in an existing document", description = "Performs a check-in (commit) operation of new content over an existing document. The document must be in checked-out status")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "204", description = "Successful operation"),	
-        @ApiResponse(responseCode = "401", description = "Authentication failed"),
-        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
-    public void checkin(@Multipart(value = "docId", required = true) Integer docId, @Multipart(value = "comment", required = false)  String comment, @Multipart(value = "release", required = false)  String release, @Multipart(value = "filename", required = true)  String filename,  @Multipart(value = "filedata" , required = true) Attachment filedataDetail)  throws Exception;        
+	@Operation(summary = "Check-in an existing document", description = "Performs a check-in (commit) operation of new content over an existing document. The document must be in checked-out status")
+	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Successful operation"),
+			@ApiResponse(responseCode = "401", description = "Authentication failed"),
+			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+	public void checkin(@Multipart(value = "docId", required = true)
+	Integer docId, @Multipart(value = "comment", required = false)
+	String comment, @Multipart(value = "release", required = false)
+	String release, @Multipart(value = "filename", required = true)
+	String filename, @Multipart(value = "filedata", required = true)
+	Attachment filedataDetail) throws Exception;
 
-    /*
+	/**
+	 * Replace the file of a version. Replaces the file associated to a given
+	 * version.
+	 * 
+	 * @param docId identifier of the document
+	 * @param comment version comment
+	 * @param fileVersion the file version
+	 * @param filedataDetail binary content of the file
+	 * 
+	 * @throws Exception a generic error
+	 */
 	@POST
 	@Path("/replaceFile")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	Response replaceFile(List<Attachment> attachments) throws Exception;
-	*/
-    
-    /**
-     * Replace the file of a version
-     *
-     * Replaces the file associated to a given version.
-     *
-     */
-    @POST
-    @Path("/replaceFile")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Operation(summary = "Replace the file of a version", description = "Replaces the file associated to a given version.")
-    @ApiResponses(value = { 
-        	@ApiResponse(responseCode = "204", description = "successful operation"),
-        	@ApiResponse(responseCode = "400", description = "bad request"),       		
-        @ApiResponse(responseCode = "401", description = "Authentication failed"),
-        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
-    public void replaceFile(@Multipart(value = "docId", required = false)  Integer docId, @Multipart(value = "fileVersion", required = false)  String fileVersion, @Multipart(value = "comment", required = false)  String comment,  @Multipart(value = "filedata" , required = false) Attachment filedataDetail)  throws Exception;    
-	
-/*	
+	@Operation(summary = "Replace the file of a version", description = "Replaces the file associated to a given version.")
+	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "successful operation"),
+			@ApiResponse(responseCode = "400", description = "bad request"),
+			@ApiResponse(responseCode = "401", description = "Authentication failed"),
+			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+	public void replaceFile(@Multipart(value = "docId", required = false)
+	Integer docId, @Multipart(value = "fileVersion", required = false)
+	String fileVersion, @Multipart(value = "comment", required = false)
+	String comment, @Multipart(value = "filedata", required = false)
+	Attachment filedataDetail) throws Exception;
+
+	/**
+	 * Uploads a document
+	 *
+	 * Creates or updates an existing document, if used in update mode docId
+	 * must be provided, when used in create mode folderId is required. Returns
+	 * the ID of the created/updated document. &lt;br/&gt;Example: curl -u
+	 * admin:admin -H &#x27;&#x27;Accept: application/json&#x27;&#x27; -X POST
+	 * -F folderId&#x3D;4 -F filename&#x3D;newDoc.txt -F
+	 * filedata&#x3D;@newDoc.txt
+	 * http://localhost:8080/services/rest/document/upload
+	 * 
+	 * @param docId identifier of the document
+	 * @param folderId identifier of the folder
+	 * @param release if the upload must produce a major release or now
+	 * @param filename name of the file
+	 * @param language the document's language
+	 * @param filedataDetail the binary content
+	 * 
+	 * @return identifier of the updated document
+	 * 
+	 * @throws Exception a generic error
+	 */
 	@POST
 	@Path("/upload")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	Response upload(List<Attachment> attachments) throws Exception;
-*/
-	
-    /**
-     * Uploads a document
-     *
-     * Creates or updates an existing document, if used in update mode docId must be provided, when used in create mode folderId is required. Returns the ID of the created/updated document. &lt;br/&gt;Example: curl -u admin:admin -H &#x27;&#x27;Accept: application/json&#x27;&#x27; -X POST -F folderId&#x3D;4 -F filename&#x3D;newDoc.txt -F filedata&#x3D;@newDoc.txt http://localhost:8080/services/rest/document/upload
-     *
-     */
-    @POST
-    @Path("/upload")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Operation(summary = "Uploads a document", description = "Creates or updates an existing document, if used in update mode docId must be provided, when used in create mode folderId is required. Returns the ID of the created/updated document. &lt;br/&gt;Example: curl -u admin:admin -H ''Accept: application/json'' -X POST -F folderId=4 -F filename=newDoc.txt -F filedata=@newDoc.txt http://localhost:8080/services/rest/document/upload")
-//	@ApiImplicitParams({
-//	@ApiImplicitParam(name = "docId", value = "The ID of an existing document to update", required = false, dataType = "integer", paramType = "form"),
-//	@ApiImplicitParam(name = "folderId", value = "Folder ID where to place the document", required = false, dataType = "string", paramType = "form"),
-//	@ApiImplicitParam(name = "release", value = "Indicates whether to create or not a new major release of an updated document", required = false, dataType = "string", paramType = "form", allowableValues = "true, false"),
-//	@ApiImplicitParam(name = "filename", value = "File name", required = true, dataType = "string", paramType = "form"),
-//	@ApiImplicitParam(name = "language", value = "Language of the document (ISO 639-2)", required = false, dataType = "string", paramType = "form", defaultValue = "en"),
-//	@ApiImplicitParam(name = "filedata", value = "File data", required = true, dataType = "file", paramType = "form") })    
-    @ApiResponses(value = { 
-   		@ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Long.class, description = "The ID of the document created or updated"))),	
-        @ApiResponse(responseCode = "401", description = "Authentication failed"),
-        @ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
-    public Long upload(
-    		@Multipart(value = "docId", required = false) Integer docId, @Multipart(value = "folderId", required = false) String folderId, 
-    		@Multipart(value = "release", required = false)  String release, @Multipart(value = "filename", required = true)  String filename, 
-    		@Multipart(value = "language", required = false)  String language,  @Multipart(value = "filedata" , required = true) Attachment filedataDetail) throws Exception;
-	
+	@Operation(summary = "Uploads a document", description = "Creates or updates an existing document, if used in update mode docId must be provided, when used in create mode folderId is required. Returns the ID of the created/updated document. &lt;br/&gt;Example: curl -u admin:admin -H ''Accept: application/json'' -X POST -F folderId=4 -F filename=newDoc.txt -F filedata=@newDoc.txt http://localhost:8080/services/rest/document/upload")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Long.class, description = "The ID of the document created or updated"))),
+			@ApiResponse(responseCode = "401", description = "Authentication failed"),
+			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+	public Long upload(@Multipart(value = "docId", required = false)
+	Integer docId, @Multipart(value = "folderId", required = false)
+	String folderId, @Multipart(value = "release", required = false)
+	String release, @Multipart(value = "filename", required = true)
+	String filename, @Multipart(value = "language", required = false)
+	String language, @Multipart(value = "filedata", required = true)
+	Attachment filedataDetail) throws Exception;
 
+	/**
+	 * Deletes a document
+	 * 
+	 * @param docId identifier of the document to delete
+	 * 
+	 * @throws Exception a generic error
+	 */
 	@DELETE
 	@Path("/delete")
-	void delete(@QueryParam("docId") long docId) throws Exception;
+	void delete(@QueryParam("docId")
+	long docId) throws Exception;
 
+	/**
+	 * Lists the documents in a folder
+	 * 
+	 * @param folderId identifier of the folder
+	 * 
+	 * @return array of documents contained in the folder
+	 * 
+	 * @throws Exception a generic error
+	 */
 	@GET
 	@Path("/list")
 	@Produces({ MediaType.APPLICATION_JSON })
-	WSDocument[] list(@QueryParam("folderId") long folderId) throws Exception;
+	WSDocument[] list(@QueryParam("folderId")
+	long folderId) throws Exception;
 
+	/**
+	 * Lists the documents in a folder
+	 * 
+	 * @param folderId identifier of the folder
+	 * @param fileName a file name to use as filter
+	 * 
+	 * @return array of documents contained in the folder
+	 * 
+	 * @throws Exception a generic error
+	 */
 	@GET
 	@Path("/listDocuments")
-	WSDocument[] listDocuments(@QueryParam("folderId") long folderId, @QueryParam("fileName") String fileName)
-			throws Exception;
+	WSDocument[] listDocuments(@QueryParam("folderId")
+	long folderId, @QueryParam("fileName")
+	String fileName) throws Exception;
 
 	/**
 	 * Updates an existing document with the value object containing the
@@ -166,16 +229,37 @@ public interface DocumentService {
 	@Path("/update")
 	void update(WSDocument document) throws Exception;
 
+	/**
+	 * Retrieves the file content of a document.
+	 * 
+	 * @param docId identifier of the document
+	 * 
+	 * @return the contents
+	 * 
+	 * @throws Exception error in the server application
+	 */
 	@GET
 	@Path("/getContent")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	DataHandler getContent(@QueryParam("docId") long docId) throws Exception;
+	DataHandler getContent(@QueryParam("docId")
+	long docId) throws Exception;
 
+	/**
+	 * Retrieves the file content of a version.
+	 * 
+	 * @param docId identifier of the document
+	 * @param version version specification
+	 * 
+	 * @return the contents
+	 * 
+	 * @throws Exception error in the server application
+	 */
 	@GET
 	@Path("/getVersionContent")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	DataHandler getVersionContent(@QueryParam("docId") long docId, @QueryParam("version") String version)
-			throws Exception;
+	DataHandler getVersionContent(@QueryParam("docId")
+	long docId, @QueryParam("version")
+	String version) throws Exception;
 
 	/**
 	 * Adds a new note for the given document
@@ -190,7 +274,9 @@ public interface DocumentService {
 	@POST
 	@Path("/addNote")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
-	public WSNote addNote(@FormParam("docId") long docId, @FormParam("note") String note) throws Exception;
+	public WSNote addNote(@FormParam("docId")
+	long docId, @FormParam("note")
+	String note) throws Exception;
 
 	/**
 	 * Deletes a new note by note identifier
@@ -201,7 +287,8 @@ public interface DocumentService {
 	 */
 	@DELETE
 	@Path("/deleteNote")
-	public void deleteNote(@QueryParam("noteId") long noteId) throws Exception;
+	public void deleteNote(@QueryParam("noteId")
+	long noteId) throws Exception;
 
 	/**
 	 * Gets the notes for the given document
@@ -214,7 +301,8 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getNotes")
-	public WSNote[] getNotes(@QueryParam("docId") long docId) throws Exception;
+	public WSNote[] getNotes(@QueryParam("docId")
+	long docId) throws Exception;
 
 	/**
 	 * Puts a new rating on the given document
@@ -228,7 +316,9 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/rateDocument")
-	public WSRating rateDocument(@QueryParam("docId") long docId, @QueryParam("vote") int vote) throws Exception;
+	public WSRating rateDocument(@QueryParam("docId")
+	long docId, @QueryParam("vote")
+	int vote) throws Exception;
 
 	/**
 	 * Gets all the ratings of the given document
@@ -241,7 +331,8 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getRatings")
-	public WSRating[] getRatings(@QueryParam("docId") long docId) throws Exception;
+	public WSRating[] getRatings(@QueryParam("docId")
+	long docId) throws Exception;
 
 	/**
 	 * Deletes a version by document identifier and version ID. You can not
@@ -256,8 +347,9 @@ public interface DocumentService {
 	 */
 	@DELETE
 	@Path("/deleteVersion")
-	public String deleteVersion(@QueryParam("docId") long docId, @QueryParam("version") String version)
-			throws Exception;
+	public String deleteVersion(@QueryParam("docId")
+	long docId, @QueryParam("version")
+	String version) throws Exception;
 
 	/**
 	 * Moves an existing document with the given identifier
@@ -269,7 +361,31 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/move")
-	public void move(@QueryParam("docId") long docId, @QueryParam("folderId") long folderId) throws Exception;
+	public void move(@QueryParam("docId")
+	long docId, @QueryParam("folderId")
+	long folderId) throws Exception;
+
+	/**
+	 * Copies a document into another folder
+	 * 
+	 * @param docId The document id
+	 * @param folderId Identifier of the new document's folder
+	 *
+	 * @return The new copy
+	 * 
+	 * @throws Exception error in the server application
+	 */
+	@PUT
+	@Path("/copy")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Operation(summary = "Copies a document")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = WSDocument.class))),
+			@ApiResponse(responseCode = "401", description = "Authentication failed"),
+			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
+	public WSDocument copy(@QueryParam("docId")
+	long docId, @QueryParam("folderId")
+	long folderId) throws Exception;
 
 	/**
 	 * Creates the thumbail of the given document; if the thumbnail was already
@@ -283,16 +399,29 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/createThumbnail")
-	public void createThumbnail(@QueryParam("docId") long docId, @QueryParam("fileVersion") String fileVersion, @QueryParam("type") String type)
-			throws Exception;
+	public void createThumbnail(@QueryParam("docId")
+	long docId, @QueryParam("fileVersion")
+	String fileVersion, @QueryParam("type")
+	String type) throws Exception;
 
-	// @Produces(MediaType.APPLICATION_OCTET_STREAM)
-
+	/**
+	 * Retrieves the thumbnail image
+	 * 
+	 * @param type type of the thumbnail
+	 * @param docPath path of the document
+	 * @param docPathList path of the document
+	 * 
+	 * @return image content
+	 * 
+	 * @throws Exception a generic error
+	 */
 	@GET
 	@Path("/thumbnail/{type}/{docpath:.*}")
 	@Produces("image/jpeg")
-	public DataHandler getThumbnail(@PathParam("type") String type,
-			@PathParam("docpath") String docPath, @PathParam("docpath") List<PathSegment> docPathList) throws Exception;
+	public DataHandler getThumbnail(@PathParam("type")
+	String type, @PathParam("docpath")
+	String docPath, @PathParam("docpath")
+	List<PathSegment> docPathList) throws Exception;
 
 	/**
 	 * Creates the PDF conversion of the given document; if the PDF conversion
@@ -305,8 +434,9 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/createPdf")
-	public void createPdf(@QueryParam("docId") long docId, @QueryParam("fileVersion") String fileVersion)
-			throws Exception;
+	public void createPdf(@QueryParam("docId")
+	long docId, @QueryParam("fileVersion")
+	String fileVersion) throws Exception;
 
 	/**
 	 * Promotes an old version to the current default one. If you promote a
@@ -320,7 +450,9 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/promoteVersion")
-	public void promoteVersion(@QueryParam("docId") long docId, @QueryParam("version") String version) throws Exception;
+	public void promoteVersion(@QueryParam("docId")
+	long docId, @QueryParam("version")
+	String version) throws Exception;
 
 	/**
 	 * Renames the title of an existing document with the given identifier.
@@ -332,7 +464,9 @@ public interface DocumentService {
 	 */
 	@PUT
 	@Path("/rename")
-	public void rename(@QueryParam("docId") long docId, @QueryParam("name") String name) throws Exception;
+	public void rename(@QueryParam("docId")
+	long docId, @QueryParam("name")
+	String name) throws Exception;
 
 	/**
 	 * Gets the version history of an existing document with the given
@@ -346,7 +480,8 @@ public interface DocumentService {
 	 */
 	@GET
 	@Path("/getVersions")
-	public WSDocument[] getVersions(@QueryParam("docId") long docId) throws Exception;
+	public WSDocument[] getVersions(@QueryParam("docId")
+	long docId) throws Exception;
 
 	/**
 	 * Creates a new document alias for the given document inside a specified
@@ -536,30 +671,28 @@ public interface DocumentService {
 	public void reindex(long docId, String content) throws Exception;
 
 	/**
+	 * Uploads a new resource of the document
+	 *
 	 * Uploads a new resource attached to the given document. If the resource
-	 * already exists it is overwritten.
+	 * already exists it is overwritten
 	 * 
-	 * @param attachments the attachments to upload
+	 * @param docId identifier of the document
+	 * @param fileVersion version of the file
+	 * @param suffix suffix specification
+	 * @param contentDetail file content
 	 * 
-	 * @throws Exception error in the server application
-
+	 * @throws Exception a generic error
+	 */
+	@POST
+	@Path("/uploadResource")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public void uploadResource(List<Attachment> attachments) throws Exception;
-		 */
-	
-    /**
-     * Uploads a new resource of the document
-     *
-     * Uploads a new resource attached to the given document. If the resource already exists it is overwritten
-     *
-     */
-    @POST
-    @Path("/uploadResource")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Operation(summary = "Uploads a new resource of the document")
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "204", description = "successful operation") })
-    public void uploadResource(@Multipart(value = "docId", required = false)  Integer docId, @Multipart(value = "fileVersion", required = false)  String fileVersion, @Multipart(value = "suffix", required = false)  String suffix,  @Multipart(value = "content" , required = false) Attachment contentDetail)  throws Exception;	
+	@Operation(summary = "Uploads a new resource of the document")
+	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "successful operation") })
+	public void uploadResource(@Multipart(value = "docId", required = false)
+	Integer docId, @Multipart(value = "fileVersion", required = false)
+	String fileVersion, @Multipart(value = "suffix", required = false)
+	String suffix, @Multipart(value = "content", required = false)
+	Attachment contentDetail) throws Exception;
 
 	/**
 	 * Restores a deleted document
@@ -637,5 +770,4 @@ public interface DocumentService {
 	 * @throws Exception error in the server application
 	 */
 	public void unsetPassword(long docId, String currentPassword) throws Exception;
-
 }

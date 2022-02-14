@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.util.Locale;
 
 import org.apache.poi.hslf.extractor.PowerPointExtractor;
+import org.apache.poi.hslf.usermodel.HSLFSlideShowImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,5 +46,15 @@ public class PPTParser extends AbstractParser {
 				} catch (IOException e) {
 				}
 		}
+	}
+
+	@Override
+	public int countPages(InputStream input, String filename) {
+		try (HSLFSlideShowImpl pptDoc = new HSLFSlideShowImpl(input)) {
+			return pptDoc.getSummaryInformation().getPageCount();
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+		return 1;
 	}
 }

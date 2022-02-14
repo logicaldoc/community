@@ -43,9 +43,11 @@ public class AutomationCompletionProvider implements AceCompletionProvider {
 				new AceCompletionValue("$WebsocketTool", "$WebsocketTool", "variable", 10),
 				new AceCompletionValue("$UserTool", "$UserTool", "variable", 10),
 				new AceCompletionValue("$SecurityTool", "$SecurityTool", "variable", 10),
-				
+				new AceCompletionValue("$FormTool", "$FormTool", "variable", 10),
+				new AceCompletionValue("$ReportTool", "$ReportTool", "variable", 10),
 				new AceCompletionValue("$I18N", "$I18N", "variable", 10),
 				new AceCompletionValue("$log", "$log", "variable", 10),
+				
 				new AceCompletionSnippet("info",
 						new AceCompletionSnippetSegment[] { new AceCompletionSnippetSegmentLiteral("$log.info( "),
 								new AceCompletionSnippetSegmentTabstopItem("$message"),

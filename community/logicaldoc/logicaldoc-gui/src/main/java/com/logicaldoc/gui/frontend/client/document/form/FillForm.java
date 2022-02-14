@@ -4,16 +4,17 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.ExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
-import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This popup window is used get the form's fields values
@@ -24,19 +25,25 @@ import com.smartgwt.client.widgets.layout.VLayout;
 public class FillForm extends Window {
 	private ExtendedPropertiesPanel propertiesPanel;
 
-	public FillForm(GUIDocument frm) {
+	private GUIDocument document;
+
+	public FillForm(GUIDocument document) {
+		this.document = document;
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 
-		setTitle(I18N.message("form") + " - " + Util.getBaseName(frm.getFileName()));
-		setWidth(500);
-		setHeight(400);
+		setTitle(I18N.message("form") + " - " + Util.getBaseName(document.getFileName()));
+		setDefaultWidth(500);
+		setDefaultHeight(400);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		
-		IButton save = new IButton();
-		save.setTitle(I18N.message("save"));
+	}
+
+	@Override
+	protected void onDraw() {
+		ToolStripButton save = new ToolStripButton(I18N.message("save"));
 		save.setAutoFit(true);
 		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 			@Override
@@ -45,38 +52,41 @@ public class FillForm extends Window {
 			}
 		});
 
-		HLayout buttonsBar = new HLayout();
+		ToolStrip buttonsBar = new ToolStrip();
 		buttonsBar.setWidth100();
-		buttonsBar.setHeight(25);
-		buttonsBar.setMembers(save);
-		
-		
-		propertiesPanel = new ExtendedPropertiesPanel(frm, null, true, true, false);
-		
-		VLayout layout = new VLayout();
-		layout.setMargin(3);
-		layout.setMembersMargin(3);
-		layout.setMembers(propertiesPanel, buttonsBar);
-		
-		addItem(layout);
+		buttonsBar.addButton(save);
+
+		propertiesPanel = new ExtendedPropertiesPanel(document, null, true, true, false);
+
+		VLayout propertiesContainer = new VLayout();
+		propertiesContainer.setWidth100();
+		propertiesContainer.setHeight100();
+		propertiesContainer.setMargin(3);
+		propertiesContainer.setMembersMargin(3);
+		propertiesContainer.setOverflow(Overflow.AUTO);
+		propertiesContainer.setAlwaysShowScrollbars(false);
+		propertiesContainer.setMembers(propertiesPanel);
+
+		addItem(buttonsBar);
+		addItem(propertiesContainer);
 	}
 
 	public void onSave() {
 		if (!propertiesPanel.validate())
 			return;
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 		DocumentService.Instance.get().createWithContent((GUIDocument) propertiesPanel.getObject(), null,
 				new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(GUIDocument doc) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						DocumentsPanel.get().refresh();
 						destroy();
 					}

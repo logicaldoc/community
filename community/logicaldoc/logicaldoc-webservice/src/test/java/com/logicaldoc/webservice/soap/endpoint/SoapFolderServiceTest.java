@@ -10,7 +10,7 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.webservice.AbstractWebServiceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSRight;
 
@@ -22,7 +22,7 @@ import junit.framework.Assert;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
-public class SoapFolderServiceTest extends AbstractWebServiceTestCase {
+public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 
 	private FolderDAO folderDao;
 

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.websocket.OnClose;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -119,9 +120,11 @@ public class EventEndpoint implements EventListener {
 					message.setAuthor(((UserHistory) event).getAuthor());
 
 				GUIFolder folder = null;
-				if (event.getFolder() != null)
+				if (event.getFolder() != null) {
+					String color = event.getFolder().getColor();
 					folder = FolderServiceImpl.fromFolder(event.getFolder(), true);
-				else if (event.getFolderId() != null)
+					folder.setColor(color);
+				} else if (event.getFolderId() != null)
 					folder = FolderServiceImpl.getFolder(null, event.getFolderId(), true);
 				if (folder != null)
 					message.setFolder(folder);
@@ -164,6 +167,12 @@ public class EventEndpoint implements EventListener {
 				log.error(e.getMessage(), e);
 			}
 		}
+	}
+
+	@OnError
+	public void error(Session session, Throwable t) {
+		log.warn(t.getMessage());
+		log.debug(t.getMessage(), t);
 	}
 
 	/**

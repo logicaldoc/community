@@ -167,6 +167,7 @@
       <property name="target">
          <bean abstract="false" autowire="default" class="com.logicaldoc.core.metadata.HibernateTemplateDAO" lazy-init="default">
             <property name="sessionFactory" ref="SessionFactory" />
+            <property name="userDAO" ref="UserDAO" />
          </bean>
       </property>
    </bean>
@@ -397,6 +398,7 @@
       <property name="genericDAO" ref="GenericDAO" />
       <property name="groupDAO" ref="GroupDAO" />
       <property name="tenantDAO" ref="TenantDAO" />
+      <property name="sequenceDAO" ref="SequenceDAO" />
       <property name="config" ref="ContextProperties" />
       <property name="sender" ref="EMailSender" />
       <property name="userDao" ref="UserDAO" />

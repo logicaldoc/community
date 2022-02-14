@@ -9,11 +9,11 @@ import org.junit.Test;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.webservice.AbstractWebServiceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 
-public class SoapSearchServiceTest extends AbstractWebServiceTestCase {
+public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
 
 	private DocumentDAO docDao;
 

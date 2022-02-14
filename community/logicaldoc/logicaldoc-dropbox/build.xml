@@ -9,10 +9,15 @@
 		<echo message="Deploying ${pom.artifactId}" />
 
 		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
-		  <arg line="-o -Dmaven.test.skip=true install"/>
+			<arg line="-o -Dmaven.test.skip=true install" />
 		</exec>
-		
-		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
+
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying into @{webroot}" />
+				<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="@{webroot}" />
+			</sequential>
+		</for>
 
 		<echo message="${pom.artifactId} has been deployed" />
 	</target>

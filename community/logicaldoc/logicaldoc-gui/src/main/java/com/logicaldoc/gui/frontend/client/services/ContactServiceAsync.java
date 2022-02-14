@@ -15,4 +15,5 @@ public interface ContactServiceAsync {
 			int firstName, int lastName, int email, int company, int phone, int mobile, int address,
 			AsyncCallback<GUIContact[]> callback);
 
+	void shareContacts(long[] contactIds, long[] userIds, long[] groupIds, AsyncCallback<Void> callback);
 }

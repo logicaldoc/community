@@ -8,10 +8,10 @@ import com.logicaldoc.gui.common.client.data.DocumentHistoryDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailTab;
 import com.logicaldoc.gui.frontend.client.services.SignService;
 import com.smartgwt.client.types.TitleOrientation;
@@ -59,7 +59,7 @@ public class SignaturePanel extends DocumentDetailTab {
 		id.setHidden(true);
 
 		ListGridField date = new DateListGridField("date", "date");
-		ListGridField signedBy = new AvatarListGridField("comment", "userId", "signedby");
+		ListGridField signedBy = new UserListGridField("comment", "userId", "signedby");
 		signedBy.setWidth("*");
 		ListGridField reasonColumn = new ListGridField("reason", I18N.message("reason"));
 		reasonColumn.setWidth(250);
@@ -85,10 +85,10 @@ public class SignaturePanel extends DocumentDetailTab {
 		visualPositioning.setName("visualpositioning");
 		visualPositioning.setTitle(I18N.message("visualpositioning"));
 		visualPositioning.setDisabled(true);
-
+		
 		String url = Util.contextPath() + "export-keystore?cert=true&tenantId=" + Session.get().getTenantId();
 		StaticTextItem rootCert = ItemFactory.newStaticTextItem("rootcertificate", "rootcertificate",
-				"<a href='" + url + "'>" + I18N.message("downloadrootcert") + "</a>");
+				"<a href='" + url + "' target='_blank'>" + I18N.message("downloadrootcert") + "</a>");
 		rootCert.setRequired(true);
 		rootCert.setWrap(false);
 		rootCert.setColSpan(5);
@@ -111,18 +111,18 @@ public class SignaturePanel extends DocumentDetailTab {
 							new long[] { document.getId() }, form.getValueAsString("reason"));
 					dialog.show();
 				} else {
-					ContactingServer.get().show();
+					LD.contactingServer();
 					SignService.Instance.get().signDocuments(new long[] { document.getId() },
 							form.getValueAsString("reason"), 1, null, null, null, new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									refresh(document);
 								}
 							});

@@ -11,8 +11,9 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
 import com.smartgwt.client.types.SelectionStyle;
@@ -60,33 +61,42 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 		if (list != null)
 			container.removeMember(list);
 
-		ListGridField userId = new ListGridField("userId", "userId", 50);
+		ListGridField userId = new ColoredListGridField("userId", "userId");
+		userId.setWidth(50);
 		userId.setCanEdit(false);
 		userId.setHidden(true);
 
-		ListGridField userName = new AvatarListGridField("userName", "userId", "user", 200);
+		ListGridField userName = new UserListGridField("userName", "userId", "user");
 		userName.setCanEdit(false);
 
 		ListGridField created = new DateListGridField("created", "subscription");
 
-		ListGridField option = new ListGridField("folderOption", I18N.message("option"), 50);
+		ListGridField option = new ColoredListGridField("folderOption", I18N.message("option"), 60);
 		option.setCanEdit(false);
 		option.setCellFormatter(new CellFormatter() {
 
 			@Override
 			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
 				try {
-					if ("1".equals(value.toString())) {
-						return I18N.message("tree");
-					} else
-						return I18N.message("folder");
+					String decoded = I18N.message("document");
+					if ("folder".equals(record.getAttributeAsString("type")))
+						if ("1".equals(value.toString()))
+							decoded = I18N.message("tree");
+						else
+							decoded = I18N.message("folder");
+
+					String colorSpec = record.getAttributeAsString("color");
+					if (colorSpec != null && !colorSpec.isEmpty())
+						return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
+					else
+						return decoded != null ? decoded : "";
 				} catch (Throwable e) {
 					return "";
 				}
 			}
 		});
 
-		ListGridField events = new ListGridField("events", I18N.message("notifyon"));
+		ListGridField events = new ColoredListGridField("events", I18N.message("notifyon"));
 		events.setWidth("*");
 		events.setCanEdit(false);
 		events.setCellFormatter(new CellFormatter() {
@@ -94,6 +104,7 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 			@Override
 			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
 				try {
+					String decoded = "document";
 					if (value != null && !value.toString().isEmpty()) {
 						// Translate the set of events
 						String[] key = null;
@@ -110,7 +121,13 @@ public class FolderSubscriptionsPanel extends FolderDetailTab {
 						}
 
 						String str = labels.toString().substring(1);
-						return str.substring(0, str.length() - 1);
+						decoded = str.substring(0, str.length() - 1);
+
+						String colorSpec = record.getAttributeAsString("color");
+						if (colorSpec != null && !colorSpec.isEmpty())
+							return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
+						else
+							return decoded != null ? decoded : "";
 					} else
 						return "";
 				} catch (Throwable e) {

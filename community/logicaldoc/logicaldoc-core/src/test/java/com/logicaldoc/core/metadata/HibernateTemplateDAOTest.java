@@ -102,4 +102,19 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 		Assert.assertTrue(template.getAttributes().containsKey("a2"));
 		Assert.assertTrue(template.getAttributes().containsKey("object"));
 	}
+	
+	@Test
+	public void testPermissions() {
+		Template template = dao.findById(1L);
+		Assert.assertNotNull(template);
+		
+		Assert.assertTrue(dao.isReadEnable(1L, 1L));
+		Assert.assertTrue(dao.isWriteEnable(1L, 1L));
+		
+		Assert.assertTrue(dao.isReadEnable(1L, 3L));
+		Assert.assertTrue(dao.isWriteEnable(1L, 3L));
+		
+		Assert.assertFalse(dao.isReadEnable(1L, 5L));
+		Assert.assertFalse(dao.isWriteEnable(1L, 5L));
+	}
 }

@@ -88,6 +88,8 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private String device;
 
+	private String color;
+
 	public History() {
 	}
 
@@ -239,6 +241,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 			this.setFileSize(document.getFileSize());
 			this.setFolderId(document.getFolder().getId());
 			this.setVersion(document.getVersion());
+			this.setColor(document.getColor());
 		}
 	}
 
@@ -396,5 +399,13 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	public void setFileSize(Long fileSize) {
 		this.fileSize = fileSize;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}
 }

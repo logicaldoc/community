@@ -28,9 +28,13 @@ public class ImportFolderDetailsPanel extends VLayout {
 
 	private Layout advancedTabPanel;
 
+	private Layout historyTabPanel;
+
 	private ImportFolderStandardProperties standardPanel;
 
 	private ImportFolderAdvancedProperties advancedPanel;
+
+	private ImportFolderHistoryPanel historyPanel;
 
 	private EditingTabSet tabSet;
 
@@ -49,7 +53,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 			public void onClick(ClickEvent event) {
 				onSave();
 			}
-		},  new ClickHandler() {
+		}, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (importFolder.getId() != 0) {
@@ -72,7 +76,7 @@ public class ImportFolderDetailsPanel extends VLayout {
 				}
 				tabSet.hideSave();
 			}
-		} );
+		});
 
 		Tab propertiesTab = new Tab(I18N.message("properties"));
 		standardTabPanel = new HLayout();
@@ -87,7 +91,14 @@ public class ImportFolderDetailsPanel extends VLayout {
 		advancedTabPanel.setHeight100();
 		extendedPropertiesTab.setPane(advancedTabPanel);
 		tabSet.addTab(extendedPropertiesTab);
-		
+
+		Tab historyTab = new Tab(I18N.message("history"));
+		historyTabPanel = new HLayout();
+		historyTabPanel.setWidth100();
+		historyTabPanel.setHeight100();
+		historyTab.setPane(historyTabPanel);
+		tabSet.addTab(historyTab);
+
 		addMember(tabSet);
 	}
 
@@ -122,6 +133,17 @@ public class ImportFolderDetailsPanel extends VLayout {
 		}
 		advancedPanel = new ImportFolderAdvancedProperties(importFolder, changeHandler);
 		advancedTabPanel.addMember(advancedPanel);
+
+		/*
+		 * Prepare the history tab
+		 */
+		if (historyPanel != null) {
+			historyPanel.destroy();
+			if (historyTabPanel.contains(historyPanel))
+				historyTabPanel.removeMember(historyPanel);
+		}
+		historyPanel = new ImportFolderHistoryPanel(importFolder, changeHandler);
+		historyTabPanel.addMember(historyPanel);
 	}
 
 	public GUIImportFolder getShare() {
@@ -138,13 +160,35 @@ public class ImportFolderDetailsPanel extends VLayout {
 	}
 
 	private boolean validate() {
-		boolean stdValid = standardPanel.validate();
-		boolean extValid = advancedPanel.validate();
+		boolean stdValid = true;
+		boolean extValid = true;
+		boolean histValid = true;
+
+		try {
+			stdValid = standardPanel.validate();
+		} catch (Throwable t) {
+
+		}
+
+		try {
+			extValid = advancedPanel.validate();
+		} catch (Throwable t) {
+
+		}
+
+		try {
+			histValid = historyPanel.validate();
+		} catch (Throwable t) {
+
+		}
+
 		if (!stdValid)
 			tabSet.selectTab(0);
 		else if (!extValid)
 			tabSet.selectTab(1);
-		return stdValid && extValid;
+		else if (!histValid)
+			tabSet.selectTab(2);
+		return stdValid && extValid && histValid;
 	}
 
 	public void onSave() {

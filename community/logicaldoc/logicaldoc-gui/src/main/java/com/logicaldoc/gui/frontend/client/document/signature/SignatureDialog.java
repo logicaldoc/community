@@ -4,7 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.SignService;
 import com.smartgwt.client.types.AutoComplete;
 import com.smartgwt.client.types.HeaderControls;
@@ -115,19 +115,19 @@ public class SignatureDialog extends Window {
 			destroy();
 		} else {
 			destroy();
-			ContactingServer.get().show();
+			LD.contactingServer();
 			SignService.Instance.get().signDocuments(docIds, vm.getValueAsString("reason"), 1, null, null, null,
 					new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void arg) {
 							GuiLog.info(I18N.message("event.signed"), null);
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 						}
 					});
 		}

@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 
 <!--add loading indicator while the app is being loaded-->
-<body>
+<body dir="<%=dir%>">
 <div id="loadingwrapper-<%=MODULE%>">
 	<div id="loading">
 		<div class="loadingIndicator">
@@ -48,7 +48,7 @@
 
 <!--load localizations-->
 <script type="text/javascript">
-	document.getElementById('loadingMsg').innerHTML = 'Loading messages...';	
+	document.getElementById('loadingMsg').innerHTML = '';	
 </script>
 
 <!--include the nocache JS-->

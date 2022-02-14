@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.SplitService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.TitleOrientation;
@@ -45,11 +45,10 @@ public class SplitDialog extends Window {
 		setTitle(I18N.message("split") + " - " + document.getFileName());
 		setCanDragResize(true);
 		setIsModal(true);
+		setAutoSize(true);
 		setShowModalMask(true);
 		centerInPage();
 		setPadding(4);
-		setWidth(400);
-		setHeight(200);
 
 		final DynamicForm form = new DynamicForm();
 		form.setValuesManager(vm);
@@ -109,20 +108,20 @@ public class SplitDialog extends Window {
 				Map<String, Object> values = (Map<String, Object>) vm.getValues();
 				vm.validate();
 				if (!vm.hasErrors()) {
-					ContactingServer.get().show();
+					LD.contactingServer();
 					SplitService.Instance.get().split(document.getId(),
 							Integer.parseInt((String) values.get("splittingpolicy")),
 							Integer.parseInt((String) values.get("separatorhandling")),
 							(String) values.get("expression"), new AsyncCallback<Void>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(Void ret) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									destroy();
 								}
 							});

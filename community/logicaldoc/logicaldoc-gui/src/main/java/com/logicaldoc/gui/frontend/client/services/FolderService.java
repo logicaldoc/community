@@ -114,7 +114,7 @@ public interface FolderService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void applyStorage(long parentId) throws ServerException;
-	
+
 	/**
 	 * Applies all OCR settings to a sub-tree
 	 * 
@@ -123,7 +123,7 @@ public interface FolderService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void applyOCR(long parentId) throws ServerException;
-	
+
 	/**
 	 * Gets the Folder initializing the permissions.
 	 * 
@@ -180,18 +180,29 @@ public interface FolderService extends RemoteService {
 	public void move(long[] folderIds, long targetId) throws ServerException;
 
 	/**
+	 * Merges some folders to a target folder
+	 * 
+	 * @param folderIds identifiers of the folders
+	 * @param targetId identifier of the folder that will receive the merge
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void merge(long[] folderIds, long targetId) throws ServerException;
+
+	/**
 	 * Copies a folder under a target folder
 	 * 
 	 * @param folderIds identifiers of the folders
 	 * @param targetId identifier of the folder that will receive the copy
 	 * @param foldersOnly flag to copy just the folders and not the documents
-	 * @param inheritSecurity flag to inherit the security policies from
-	 *        <code>targetId</code>
+	 * @param securityOption how to setup the security for the new folder'none',
+	 *        'inherit' or 'replicate'
+	 * @param model a model to use for creating the new folder
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, boolean inheritSecurity)
-			throws ServerException;
+	public void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, String securityOption,
+			GUIFolder model) throws ServerException;
 
 	/**
 	 * Pastes documents into the target folder

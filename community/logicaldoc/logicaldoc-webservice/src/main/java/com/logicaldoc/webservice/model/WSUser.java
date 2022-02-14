@@ -2,12 +2,18 @@ package com.logicaldoc.webservice.model;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.commons.beanutils.BeanUtils;
+
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.WorkingTime;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -23,13 +29,13 @@ import com.logicaldoc.webservice.doc.WSDoc;
 public class WSUser {
 	@WSDoc(documented = false)
 	public static int TYPE_DEFAULT = 0;
-	
+
 	@WSDoc(documented = false)
 	public static int TYPE_SYSTEM = 1;
 
 	@WSDoc(documented = false)
 	public static int TYPE_GUEST = 2;
-	
+
 	@WSDoc(documented = false)
 	public static int SOURCE_DEFAULT = 0;
 
@@ -102,6 +108,9 @@ public class WSUser {
 	@WSDoc(description = "if <b>1</b> the user is enabled, if <b>0</b> the user is disabled")
 	private int enabled = 1;
 
+	@WSDoc(description = "if <b>1</b> the user can connect during working time only")
+	private int enforceWorkingTime = 0;
+
 	@WSDoc(description = "last time the password was changed (format must be 'yyyy-MM-dd HH:mm:ss' or 'yyyy-MM-dd')", required = false)
 	private String passwordChanged = "";
 
@@ -120,6 +129,27 @@ public class WSUser {
 	@WSDoc(required = false)
 	private String lastModified;
 
+	@WSDoc(description = "date format to use when display dates")
+	private String dateFormat;
+
+	@WSDoc(description = "date format to use when display dates in short format")
+	private String dateFormatShort;
+
+	@WSDoc(description = "date format to use when display dates and times")
+	private String dateFormatLong;
+
+	@WSDoc(description = "comma separated list of searches that defines the order they are displayed in the user interface")
+	private String searchPref;
+
+	@WSDoc(required = false, description = "when this account expires")
+	private String expire;
+
+	@WSDoc(required = false, description = "the working time specification")
+	private WSWorkingTime[] workingTimes = null;
+
+	@WSDoc(required = false, description = "Maximum number of inactivity days after which the account gets disabled")
+	private Integer maxInactivity;
+	
 	public long getId() {
 		return id;
 	}
@@ -255,7 +285,8 @@ public class WSUser {
 	}
 
 	/**
-	 * @return the name of the group associated to this user, that is '_user_'+id
+	 * @return the name of the group associated to this user, that is
+	 *         '_user_'+id
 	 */
 	public String getUserGroupName() {
 		return "_user_" + getId();
@@ -312,7 +343,6 @@ public class WSUser {
 	 * 
 	 * @see User#SOURCE_DEFAULT
 	 * @see User#SOURCE_LDAP
-	 * @see User#SOURCE_ACTIVE_DIRECTORY
 	 * 
 	 * @return the source
 	 */
@@ -375,6 +405,13 @@ public class WSUser {
 			user.setPasswordChanged(new Date());
 			user.setEmailSignature(getEmailSignature());
 			user.setEmailSignature2(getEmailSignature2());
+			user.setDateFormat(getDateFormat());
+			user.setDateFormatShort(getDateFormatShort());
+			user.setDateFormatLong(getDateFormatLong());
+			user.setSearchPref(getSearchPref());
+			user.setExpire(WSUtil.convertStringToDate(getExpire()));
+			user.setEnforceWorkingTime(getEnforceWorkingTime());
+			user.setMaxInactivity(getMaxInactivity());
 
 			if (getGroupIds().length > 0) {
 				GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
@@ -387,6 +424,13 @@ public class WSUser {
 				if (groups.size() > 0)
 					user.setGroups(groups);
 			}
+
+			if (workingTimes != null && workingTimes.length > 0)
+				for (WSWorkingTime wswt : workingTimes) {
+					WorkingTime wt = new WorkingTime();
+					BeanUtils.copyProperties(wt, wswt);
+					user.getWorkingTimes().add(wt);
+				}
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -423,6 +467,13 @@ public class WSUser {
 			wsUser.setLastModified(WSUtil.convertDateToString(user.getLastModified()));
 			wsUser.setEmailSignature(user.getEmailSignature());
 			wsUser.setEmailSignature2(user.getEmailSignature2());
+			wsUser.setDateFormat(user.getDateFormat());
+			wsUser.setDateFormatShort(user.getDateFormatShort());
+			wsUser.setDateFormatLong(user.getDateFormatLong());
+			wsUser.setSearchPref(user.getSearchPref());
+			wsUser.setExpire(WSUtil.convertDateToString(user.getExpire()));
+			wsUser.setEnforceWorkingTime(user.getEnforceWorkingTime());
+			wsUser.setMaxInactivity(user.getMaxInactivity());
 
 			if (user.getGroups() != null && user.getGroups().size() > 0) {
 				long[] groupIds = new long[user.getGroups().size()];
@@ -434,6 +485,24 @@ public class WSUser {
 					}
 				}
 				wsUser.setGroupIds(groupIds);
+			}
+
+			if (user.getWorkingTimes() != null && !user.getWorkingTimes().isEmpty()) {
+				List<WSWorkingTime> tmp = user.getWorkingTimes().stream()
+						.map(new Function<WorkingTime, WSWorkingTime>() {
+
+							@Override
+							public WSWorkingTime apply(WorkingTime wt) {
+								WSWorkingTime wswt = new WSWorkingTime();
+								try {
+									BeanUtils.copyProperties(wswt, wt);
+								} catch (Throwable t) {
+
+								}
+								return wswt;
+							}
+						}).collect(Collectors.toList());
+				wsUser.setWorkingTimes(tmp.toArray(new WSWorkingTime[0]));
 			}
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -472,5 +541,69 @@ public class WSUser {
 
 	public void setEmailSignature2(String emailSignature2) {
 		this.emailSignature2 = emailSignature2;
+	}
+
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
+	}
+
+	public String getDateFormatShort() {
+		return dateFormatShort;
+	}
+
+	public void setDateFormatShort(String dateFormatShort) {
+		this.dateFormatShort = dateFormatShort;
+	}
+
+	public String getDateFormatLong() {
+		return dateFormatLong;
+	}
+
+	public void setDateFormatLong(String dateFormatLong) {
+		this.dateFormatLong = dateFormatLong;
+	}
+
+	public String getSearchPref() {
+		return searchPref;
+	}
+
+	public void setSearchPref(String searchPref) {
+		this.searchPref = searchPref;
+	}
+
+	public String getExpire() {
+		return expire;
+	}
+
+	public void setExpire(String expire) {
+		this.expire = expire;
+	}
+
+	public int getEnforceWorkingTime() {
+		return enforceWorkingTime;
+	}
+
+	public void setEnforceWorkingTime(int enforceWorkingTime) {
+		this.enforceWorkingTime = enforceWorkingTime;
+	}
+
+	public WSWorkingTime[] getWorkingTimes() {
+		return workingTimes;
+	}
+
+	public void setWorkingTimes(WSWorkingTime[] workingTimes) {
+		this.workingTimes = workingTimes;
+	}
+
+	public Integer getMaxInactivity() {
+		return maxInactivity;
+	}
+
+	public void setMaxInactivity(Integer maxInactivity) {
+		this.maxInactivity = maxInactivity;
 	}
 }

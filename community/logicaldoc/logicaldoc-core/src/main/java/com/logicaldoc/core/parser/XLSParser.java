@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.util.Locale;
 
 import org.apache.poi.hssf.extractor.ExcelExtractor;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,5 +48,15 @@ public class XLSParser extends AbstractParser {
 				} catch (IOException e) {
 				}
 		}
+	}
+	
+	@Override
+	public int countPages(InputStream input, String filename) {
+		try (HSSFWorkbook excelDoc = new HSSFWorkbook(input)) {
+			return excelDoc.getNumberOfSheets();
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+		return 1;
 	}
 }

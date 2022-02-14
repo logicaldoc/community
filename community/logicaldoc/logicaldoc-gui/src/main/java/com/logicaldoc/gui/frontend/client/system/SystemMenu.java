@@ -172,7 +172,7 @@ public class SystemMenu extends VLayout {
 		license.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				WindowUtils.openUrl(Util.licenseUrl(), "_blank");
+				WindowUtils.openUrlInNewTab(Util.licenseUrl());
 			}
 		});
 

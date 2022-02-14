@@ -69,7 +69,7 @@ public class DeletedFoldersDataServlet extends HttpServlet {
 			writer.write("<list>");
 
 			StringBuffer query = new StringBuffer(
-					"select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid, ld_deleteuser ");
+					"select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid, ld_deleteuser, ld_color ");
 			query.append(" from ld_folder ");
 			query.append(" where ld_tenantid = ");
 			query.append(Long.toString(session.getTenantId()));
@@ -102,6 +102,7 @@ public class DeletedFoldersDataServlet extends HttpServlet {
 					folder.setDeleteUserId(rs.getLong(5));
 					folder.setParentId(rs.getLong(6));
 					folder.setDeleteUser(rs.getString(7));
+					folder.setColor(rs.getString(8));
 					return folder;
 				}
 			}, max);
@@ -119,6 +120,8 @@ public class DeletedFoldersDataServlet extends HttpServlet {
 						+ "]]></deleteUser>");
 				writer.print("<parentId>" + fld.getParentId() + "</parentId>");
 				writer.print("<type>" + fld.getType() + "</type>");
+				if (fld.getColor() != null)
+					writer.print("<color><![CDATA[" + fld.getColor() + "]]></color>");
 				writer.print("</folder>");
 			}
 			writer.write("</list>");

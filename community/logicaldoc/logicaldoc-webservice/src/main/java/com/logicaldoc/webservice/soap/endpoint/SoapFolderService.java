@@ -61,12 +61,12 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			folderVO.setHidden(folder.getHidden());
 			folderVO.setFoldRef(folder.getFoldRef());
 			folderVO.setStorage(folder.getStorage());
-			folderVO.setMaxVersions(folder.getMaxVersions());			
+			folderVO.setMaxVersions(folder.getMaxVersions());
 			folderVO.setSecurityRef(folder.getSecurityRef());
 			folderVO.setFoldRef(folder.getFoldRef());
 			folderVO.setOcrTemplateId(folder.getOcrTemplateId());
 			folderVO.setBarcodeTemplateId(folder.getBarcodeTemplateId());
-			
+
 			Set<String> tagsSet = new TreeSet<String>();
 			if (folder.getTags() != null) {
 				for (int i = 0; i < folder.getTags().length; i++) {
@@ -252,7 +252,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	}
 
 	@Override
-	public void copy(String sid, long folderId, long targetId, int foldersOnly, int inheritSecurity) throws Exception {
+	public void copy(String sid, long folderId, long targetId, int foldersOnly, String securityOption) throws Exception {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -284,7 +284,8 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		transaction.setSessionId(sid);
 		transaction.setUser(user);
 
-		folderDao.copy(folderToCopy, destTargetFolder, 1 == foldersOnly, 1 == inheritSecurity, transaction);
+		folderDao.copy(folderToCopy, destTargetFolder, null, 1 == foldersOnly, securityOption,
+				transaction);
 	}
 
 	@Override
@@ -329,7 +330,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public WSFolder getRootFolder(String sid) throws Exception {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		
+
 		Folder folder = folderDao.findRoot(user.getTenantId());
 		folderDao.initialize(folder);
 
@@ -597,5 +598,49 @@ public class SoapFolderService extends AbstractService implements FolderService 
 			}
 		}
 		return wsFolders.toArray(new WSFolder[0]);
+	}
+
+	@Override
+	public void merge(String sid, long sourceId, long targetId) throws Exception {
+		User user = validateSession(sid);
+		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+		if (targetId == folderDao.findRoot(user.getTenantId()).getId()) {
+			log.error("Cannot move folders in the root");
+			throw new Exception("Cannot move folders in the root");
+		}
+
+		Folder destTargetFolder = folderDao.findById(targetId);
+		Folder folderToCopy = folderDao.findById(sourceId);
+
+		// Check destParentId: Must be different from the current folder
+		// parentId
+		if (targetId == folderToCopy.getParentId())
+			throw new SecurityException("No Changes");
+
+		// Check destParentId: Must be different from the current folder Id
+		// A folder cannot be children of herself
+		if (targetId == folderToCopy.getId())
+			throw new SecurityException("Not Allowed");
+
+		// Check add permission on destParentFolder
+		boolean addEnabled = folderDao.isPermissionEnabled(Permission.ADD, destTargetFolder.getId(), user.getId());
+		if (!addEnabled)
+			throw new SecurityException("Add Child rights not granted on the target folder");
+
+		boolean writeEnabled = folderDao.isPermissionEnabled(Permission.WRITE, destTargetFolder.getId(), user.getId());
+		if (!writeEnabled)
+			throw new SecurityException("Write rights not granted on the target folder");
+
+		boolean delEnabled = folderDao.isPermissionEnabled(Permission.DELETE, sourceId, user.getId());
+		if (!delEnabled)
+			throw new SecurityException("Delete rights not granted on the source folder");
+
+		// Add a folder history entry
+		FolderHistory transaction = new FolderHistory();
+		transaction.setSessionId(sid);
+		transaction.setUser(user);
+
+		folderDao.merge(folderToCopy, destTargetFolder, transaction);
 	}
 }

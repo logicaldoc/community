@@ -48,8 +48,13 @@ public class NotesDataServlet extends HttpServlet {
 				userId = Long.parseLong(request.getParameter("userId"));
 
 			Long docId = null;
-			if (request.getParameter("docId") != null)
-				docId = Long.parseLong(request.getParameter("docId"));
+			if (request.getParameter("docId") != null) {
+				docId=Long.parseLong(request.getParameter("docId"));				
+				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				Document doc=ddao.findDocument(docId);
+				if(doc!=null)
+					docId=doc.getId();
+			}
 
 			String fileVersion = null;
 			if (request.getParameter("fileVersion") != null)
@@ -103,7 +108,7 @@ public class NotesDataServlet extends HttpServlet {
 				writer.print("<id>" + set.getLong(1) + "</id>");
 				writer.print("<title><![CDATA[" + StringUtils.abbreviate(set.getString(2), 100) + "]]></title>");
 				if (set.getString(9) != null)
-					writer.print("<color><![CDATA[" + set.getString(9) + "]]></color>");
+					writer.print("<noteColor><![CDATA[" + set.getString(9) + "]]></noteColor>");
 				writer.print("<page>" + set.getInt(8) + "</page>");
 				writer.print("<user><![CDATA[" + set.getString(3) + "]]></user>");
 

@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.GarbageDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
@@ -62,7 +63,7 @@ public class TrashPanel extends VLayout {
 		DateListGridField lastModified = new DateListGridField("lastModified", "lastmodified");
 		lastModified.setHidden(true);
 
-		ListGridField customId = new ListGridField("customId", I18N.message("customid"), 110);
+		ListGridField customId = new ColoredListGridField("customId", I18N.message("customid"), 110);
 		customId.setType(ListGridFieldType.TEXT);
 		customId.setCanFilter(true);
 		customId.setHidden(true);
@@ -79,7 +80,7 @@ public class TrashPanel extends VLayout {
 		list.setFilterOnKeypress(true);
 		addMember(list);
 
-		if (Session.get().getCurrentFolder() != null && Session.get().getCurrentFolder().isWrite())
+		if (FolderController.get().getCurrentFolder() != null && FolderController.get().getCurrentFolder().isWrite())
 			list.addCellContextClickHandler(new CellContextClickHandler() {
 				@Override
 				public void onCellContextClick(CellContextClickEvent event) {
@@ -95,7 +96,7 @@ public class TrashPanel extends VLayout {
 	}
 
 	private void restoreDocument(final long id) {
-		DocumentService.Instance.get().restore(new Long[] { id }, Session.get().getCurrentFolder().getId(),
+		DocumentService.Instance.get().restore(new Long[] { id }, FolderController.get().getCurrentFolder().getId(),
 				new AsyncCallback<Void>() {
 
 					@Override
@@ -110,13 +111,13 @@ public class TrashPanel extends VLayout {
 								I18N.message("documentrestoreddetail", Long.toString(id)));
 
 						// Force a refresh
-						Session.get().setCurrentFolder(Session.get().getCurrentFolder());
+						FolderController.get().selected(FolderController.get().getCurrentFolder());
 					}
 				});
 	}
 
 	private void restoreFolder(final long id) {
-		FolderService.Instance.get().restore(new Long[] { id }, Session.get().getCurrentFolder().getId(),
+		FolderService.Instance.get().restore(new Long[] { id }, FolderController.get().getCurrentFolder().getId(),
 				new AsyncCallback<Void>() {
 
 					@Override

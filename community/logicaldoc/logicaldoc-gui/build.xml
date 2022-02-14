@@ -15,35 +15,53 @@
 			<arg line="-o -Dmaven.test.skip=true install" />
 		</exec>
 
-		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip"
-			dest="${logicaldoc.webroot}" />
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying into @{webroot}" />
+				<unzip
+					src="target/${pom.artifactId}-${pom.version}-plugin.zip"
+					dest="@{webroot}" />
 
-		<copy todir="${logicaldoc.webroot}/fontawesome" overwrite="true"
-			failonerror="false">
-			<fileset
-				dir="../../../enterprise/logicaldoc/logicaldoc-enterprise-gui/war/fontawesome"
-				includes="**" />
-		</copy>
+				<copy todir="@{webroot}/fontawesome" overwrite="true"
+					failonerror="false">
+					<fileset
+						dir="../../../enterprise/logicaldoc/logicaldoc-enterprise-gui/war/fontawesome"
+						includes="**" />
+				</copy>
+			</sequential>
+		</for>
 
 		<echo message="${pom.artifactId} has been deployed" />
 	</target>
 
-	<target name="deploy-resources">
-		<copy todir="${logicaldoc.webroot}">
-			<fileset dir="war">
-				<exclude name="fontawesome/" />
-				<exclude name="common/" />
-				<exclude name="WEB-INF/**" />
-				<exclude name="*.jsp" />
-			</fileset>
-		</copy>
+	<target name="deploy-resources" depends="init-all">
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying resources into @{webroot}" />
+				<copy todir="@{webroot}">
+					<fileset dir="war">
+						<exclude name="fontawesome/" />
+						<!-- exclude name="frontend/ace/**" />
+						<exclude name="frontend/sc/**" />
+						<exclude name="common/" />
+						<exclude name="setup/" />
+						<exclude name="login/" / -->
+						<exclude name="WEB-INF/**" />
+						<!-- exclude name="skin/" />
+						<exclude name="skin-Tahoe/" />
+						<exclude name="prev/" />
+						<exclude name="*.jsp" / -->
+					</fileset>
+				</copy>
+			</sequential>
+		</for>
 	</target>
 
-	<target name="compile-deploy-frontend">
+	<target name="compile-deploy-frontend" depends="init-all">
 		<replace dir=".">
-    		<include name="**/Common.gwt.xml" />
-    		<replacetoken>"gecko1_8,safari"</replacetoken>
-    		<replacevalue>"gecko1_8"</replacevalue>
+			<include name="**/Common.gwt.xml" />
+			<replacetoken>"gecko1_8,safari"</replacetoken>
+			<replacevalue>"gecko1_8"</replacevalue>
 		</replace>
 		<exec executable="mvn.cmd" resolveexecutable="true"
 			searchpath="true">
@@ -52,9 +70,28 @@
 		</exec>
 		<antcall target="deploy-resources" />
 		<replace dir=".">
-    		<include name="**/Common.gwt.xml" />
-    		<replacetoken>"gecko1_8"</replacetoken>
-    		<replacevalue>"gecko1_8,safari"</replacevalue>
+			<include name="**/Common.gwt.xml" />
+			<replacetoken>"gecko1_8"</replacetoken>
+			<replacevalue>"gecko1_8,safari"</replacevalue>
 		</replace>
 	</target>
+	
+	<target name="compile-deploy-login" depends="init-all">
+		<replace dir=".">
+			<include name="**/Common.gwt.xml" />
+			<replacetoken>"gecko1_8,safari"</replacetoken>
+			<replacevalue>"gecko1_8"</replacevalue>
+		</replace>
+		<exec executable="mvn.cmd" resolveexecutable="true"
+			searchpath="true">
+			<arg
+				line="-o -Dgwt.compiler.force=true -Dgwt.module=com.logicaldoc.gui.login.Login gwt:compile" />
+		</exec>
+		<antcall target="deploy-resources" />
+		<replace dir=".">
+			<include name="**/Common.gwt.xml" />
+			<replacetoken>"gecko1_8"</replacetoken>
+			<replacevalue>"gecko1_8,safari"</replacevalue>
+		</replace>
+	</target>	
 </project>

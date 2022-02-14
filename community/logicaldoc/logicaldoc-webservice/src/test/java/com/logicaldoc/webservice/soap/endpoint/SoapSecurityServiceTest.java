@@ -11,7 +11,7 @@ import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.webservice.AbstractWebServiceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSUser;
 
@@ -21,7 +21,7 @@ import com.logicaldoc.webservice.model.WSUser;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
-public class SoapSecurityServiceTest extends AbstractWebServiceTestCase {
+public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 	private UserDAO userDao;
 
 	private GroupDAO groupDao;

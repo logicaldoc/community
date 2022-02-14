@@ -37,7 +37,7 @@ public interface TwoFactorsAuthenticationService extends RemoteService {
 	 * @throws ServerException error in the server application
 	 */
 	public String generateYubiKeyCredentials(String key) throws ServerException;
-
+	
 	/**
 	 * Changed the two factors authentication for a user
 	 * 

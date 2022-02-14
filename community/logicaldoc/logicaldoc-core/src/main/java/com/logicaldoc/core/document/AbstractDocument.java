@@ -65,8 +65,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public static final int NATURE_DOC = 0;
 
-	public static final int NATURE_FORM = 1;
-
 	private String comment;
 
 	private long fileSize = 0;
@@ -120,7 +118,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private int barcoded = 0;
 
 	private int signed = 0;
-	
+
 	private int stamped = 0;
 
 	private Set<Tag> tags = new HashSet<Tag>();
@@ -154,6 +152,8 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private String workflowStatus;
 
 	private String workflowStatusDisplay;
+	
+	private String color;
 
 	private int published = 1;
 
@@ -168,7 +168,9 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	 */
 	private String templateName;
 
-	private int pages = -1;
+	private int pages = 1;
+
+	private int previewPages = -1;
 
 	private int links = 0;
 
@@ -912,6 +914,54 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	public boolean isPasswordProtected() {
 		return StringUtils.isNotEmpty(getPassword());
 	}
+	
+	public int getLinks() {
+		return links;
+	}
+
+	public void setLinks(int links) {
+		this.links = links;
+	}
+
+	public Long getOcrTemplateId() {
+		return ocrTemplateId;
+	}
+
+	public void setOcrTemplateId(Long ocrTemplateId) {
+		this.ocrTemplateId = ocrTemplateId;
+	}
+
+	public int getOcrd() {
+		return ocrd;
+	}
+
+	public void setOcrd(int ocrd) {
+		this.ocrd = ocrd;
+	}
+
+	public Long getBarcodeTemplateId() {
+		return barcodeTemplateId;
+	}
+
+	public void setBarcodeTemplateId(Long barcodeTemplateId) {
+		this.barcodeTemplateId = barcodeTemplateId;
+	}
+
+	public int getPreviewPages() {
+		return previewPages;
+	}
+
+	public void setPreviewPages(int previewPages) {
+		this.previewPages = previewPages;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
+	}
 
 	/**
 	 * Copies in the current instance the attributes of the passed values
@@ -947,6 +997,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		setPages(docVO.getPages());
 		setWorkflowStatus(docVO.getWorkflowStatus());
 		setWorkflowStatusDisplay(docVO.getWorkflowStatusDisplay());
+		setColor(docVO.getColor());
 
 		setAttributes(new HashMap<String, Attribute>());
 		try {
@@ -965,37 +1016,5 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		} catch (LazyInitializationException x) {
 			// may happen do nothing
 		}
-	}
-
-	public int getLinks() {
-		return links;
-	}
-
-	public void setLinks(int links) {
-		this.links = links;
-	}
-
-	public Long getOcrTemplateId() {
-		return ocrTemplateId;
-	}
-
-	public void setOcrTemplateId(Long ocrTemplateId) {
-		this.ocrTemplateId = ocrTemplateId;
-	}
-
-	public int getOcrd() {
-		return ocrd;
-	}
-
-	public void setOcrd(int ocrd) {
-		this.ocrd = ocrd;
-	}
-
-	public Long getBarcodeTemplateId() {
-		return barcodeTemplateId;
-	}
-
-	public void setBarcodeTemplateId(Long barcodeTemplateId) {
-		this.barcodeTemplateId = barcodeTemplateId;
 	}
 }

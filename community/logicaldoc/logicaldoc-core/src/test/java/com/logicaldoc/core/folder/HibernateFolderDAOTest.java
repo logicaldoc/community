@@ -1,6 +1,7 @@
 package com.logicaldoc.core.folder;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -145,7 +146,6 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testCopy() throws Exception {
-
 		/*
 		 * Create a tree and populate it
 		 */
@@ -196,7 +196,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals("email", target.getTemplate().getName());
 		Assert.assertEquals("test@acme.com", target.getValue("from"));
 
-		dao.copy(source, target, false, true, tr);
+		dao.copy(source, target, null, false, "inherit", tr);
 
 		Folder folder = dao.findByPathExtended("/Default/target/pippo/pluto", Tenant.DEFAULT_ID);
 		dao.initialize(target);
@@ -207,6 +207,51 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 		List<Document> docs = docDao.findByFolder(folder.getId(), null);
 		Assert.assertEquals(1, docs.size());
+
+		folder = dao.findById(6L);
+		dao.initialize(folder);
+		Assert.assertEquals(3, folder.getFolderGroups().size());
+
+		newFolder = dao.copy(folder, dao.findById(1210L), null, false, "replicate", tr);
+		dao.initialize(newFolder);
+		Assert.assertEquals(3, newFolder.getFolderGroups().size());
+	}
+
+	@Test
+	public void testCopy2() throws Exception {
+		Folder defaultWorkspace = dao.findById(Folder.DEFAULTWORKSPACEID);
+		dao.createPath(defaultWorkspace, "A/B/C/D", false, null);
+
+		Folder B = dao.findByPathExtended("/Default/A/B", 1L);
+		Assert.assertNull(B.getSecurityRef());
+		System.out.println("B folder is " + B.getId());
+
+		Folder C = dao.findByPathExtended("/Default/A/B/C", 1L);
+		dao.initialize(C);
+		Assert.assertNull(C.getSecurityRef());
+		C.setSecurityRef(B.getId());
+		dao.store(C);
+
+		Folder D = dao.findByPathExtended("/Default/A/B/C/D", 1L);
+		dao.initialize(D);
+		Assert.assertNull(D.getSecurityRef());
+		D.setSecurityRef(B.getId());
+		dao.store(D);
+
+		Folder target = dao.createPath(defaultWorkspace, "TARGET", false, null);
+		Folder source = dao.findByPathExtended("/Default/A", 1L);
+
+		FolderHistory tr = new FolderHistory();
+		tr.setNotified(0);
+		tr.setComment("");
+		tr.setUser(userDao.findByUsername("admin"));
+		dao.copy(source, target, null, false, "replicate", tr);
+
+		B = dao.findByPathExtended("/Default/TARGET/A/B", 1L);
+		C = dao.findByPathExtended("/Default/TARGET/A/B/C", 1L);
+		D = dao.findByPathExtended("/Default/TARGET/A/B/C/D", 1L);
+		Assert.assertEquals(B.getId(), C.getSecurityRef().longValue());
+		Assert.assertEquals(B.getId(), D.getSecurityRef().longValue());
 	}
 
 	@Test
@@ -1019,5 +1064,83 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		folders = dao.findByUserIdAndTag(1L, "unexisting", null);
 		Assert.assertNotNull(folders);
 		Assert.assertEquals(0, folders.size());
+	}
+
+	@Test
+	public void testMerge() throws FileNotFoundException, Exception {
+		Folder root = dao.findById(5L);
+		dao.createPath(root, "/Default/Target/Pippo", false, null);
+		dao.createPath(root, "/Default/Target/Pluto", false, null);
+		dao.createPath(root, "/Default/Target/Pluto/Paperino", false, null);
+		dao.createPath(root, "/Default/Target/Pluto/Paperina", false, null);
+
+		dao.createPath(root, "/Default/Source/Pippo", false, null);
+		dao.createPath(root, "/Default/Source/Pluto", false, null);
+		dao.createPath(root, "/Default/Source/Pluto/Paperino", false, null);
+		dao.createPath(root, "/Default/Source/Pluto/Paperina", false, null);
+		dao.createPath(root, "/Default/Source/Pollo/ABC", false, null);
+		dao.createPath(root, "/Default/Source/Pollo/DEF", false, null);
+
+		User user = userDao.findByUsername("admin");
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setUser(user);
+		transaction.setUserId(1L);
+		transaction.setNotified(0);
+
+		FolderHistory fTransaction = new FolderHistory();
+		fTransaction.setUser(user);
+		fTransaction.setUserId(1L);
+		fTransaction.setNotified(0);
+
+		Document doc = docDao.findById(1);
+		Assert.assertNotNull(doc);
+
+		docDao.initialize(doc);
+		doc = doc.clone();
+		doc.setId(0);
+		doc.setFolder(dao.findByPathExtended("/Default/Target/Pippo", 1L));
+		doc.setFileName("doc1.txt");
+		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+
+		doc = doc.clone();
+		doc.setId(0);
+		doc.setFolder(dao.findByPathExtended("/Default/Source/Pippo", 1L));
+		doc.setFileName("doc1.txt");
+		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+
+		doc = doc.clone();
+		doc.setId(0);
+		doc.setFolder(dao.findByPathExtended("/Default/Source/Pippo", 1L));
+		doc.setFileName("doc2.txt");
+		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+
+		doc = doc.clone();
+		doc.setId(0);
+		doc.setFolder(dao.findByPathExtended("/Default/Source/Pluto/Paperina", 1L));
+		doc.setFileName("doc3.txt");
+		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+
+		doc = doc.clone();
+		doc.setId(0);
+		doc.setFolder(dao.findByPathExtended("/Default/Source/Pollo/DEF", 1L));
+		doc.setFileName("doc4.txt");
+		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
+
+		Folder target = dao.findByPathExtended("/Default/Target", 1L);
+		Folder source = dao.findByPathExtended("/Default/Source", 1L);
+		dao.merge(source, target, fTransaction);
+
+		source = dao.findByPathExtended("/Default/Source", 1L);
+		Assert.assertTrue(source == null || source.getDeleted() != 0);
+
+		target = dao.findByPathExtended("/Default/Target", 1L);
+		Assert.assertNotNull(target);
+
+		Folder folder = dao.findByPathExtended("/Default/Target/Pollo/ABC", 1L);
+		Assert.assertTrue(folder == null || folder.getDeleted() != 0);
+		folder = dao.findByPathExtended("/Default/Target/Pollo/DEF", 1L);
+		Assert.assertTrue(folder == null || folder.getDeleted() != 0);
+
+		docDao.findByPath("/Default/Target/Pollo/DEF/doc4.txt", 1L);
 	}
 }

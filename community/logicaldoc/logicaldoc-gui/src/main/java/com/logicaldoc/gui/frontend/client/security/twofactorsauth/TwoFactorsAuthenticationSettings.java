@@ -21,6 +21,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -65,7 +66,7 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 		enable2fa.setWrap(false);
 		enable2fa.setRequired(true);
 		enable2fa.setDisabled(Session.get().isDemo());
-		
+
 		final RadioGroupItem allowTrustedDevices = ItemFactory.newBooleanSelector("allowtrusted",
 				I18N.message("alwaysallowtrusteddev"));
 		allowTrustedDevices.setValue("true".equals(settings.get("allowtrusted")) ? "yes" : "no");
@@ -74,6 +75,26 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 		allowTrustedDevices.setRequired(true);
 
 		form.setFields(enable2fa, allowTrustedDevices);
+
+		/*
+		 * EmailAuthenticator section
+		 */
+		DynamicForm emailForm = new DynamicForm();
+		emailForm.setValuesManager(vm);
+		emailForm.setTitleOrientation(TitleOrientation.TOP);
+		emailForm.setIsGroup(true);
+		emailForm.setGroupTitle("Email Authenticator");
+		emailForm.setNumCols(1);
+
+		final RadioGroupItem enableEmail = ItemFactory.newBooleanSelector("enableEmail",
+				I18N.message("enableemailthenticator"));
+		enableEmail
+				.setValue("true".equals(settings.get(Constants.TWOFA_EMAIL_AUTHENTICATOR + ".enabled")) ? "yes" : "no");
+		enableEmail.setWrapTitle(false);
+		enableEmail.setWrap(false);
+		enableEmail.setRequired(true);
+		enableEmail.setDisabled(Session.get().isDemo());
+		emailForm.setFields(enableEmail);
 
 		/*
 		 * GoogleAuthenticator section
@@ -114,6 +135,35 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 		enableYubikey.setDisabled(Session.get().isDemo());
 		yubikeyForm.setFields(enableYubikey);
 
+		/*
+		 * Duo section
+		 */
+		DynamicForm duoForm = new DynamicForm();
+		duoForm.setValuesManager(vm);
+		duoForm.setTitleOrientation(TitleOrientation.TOP);
+		duoForm.setIsGroup(true);
+		duoForm.setGroupTitle("Duo");
+		duoForm.setNumCols(1);
+
+		RadioGroupItem enableDuo = ItemFactory.newBooleanSelector("enableDuo", I18N.message("enableduo"));
+		enableDuo.setValue("true".equals(settings.get(Constants.TWOFA_DUO + ".enabled")) ? "yes" : "no");
+		enableDuo.setWrapTitle(false);
+		enableDuo.setWrap(false);
+		enableDuo.setRequired(true);
+		enableDuo.setDisabled(Session.get().isDemo());
+
+		TextItem duoIntegrationKey = ItemFactory.newTextItem("duoIntegrationKey", I18N.message("integrationkey"),
+				settings.get(Constants.TWOFA_DUO + ".integrationkey"));
+		duoIntegrationKey.setWidth(350);
+		TextItem duoSecretKey = ItemFactory.newPasswordItem("duoSecretKey", I18N.message("secretkey"),
+				settings.get(Constants.TWOFA_DUO + ".secretkey"));
+		duoSecretKey.setWidth(350);
+		TextItem duoApiHostname = ItemFactory.newTextItem("duoApiHostname", I18N.message("apihostname"),
+				settings.get(Constants.TWOFA_DUO + ".apihost"));
+		duoApiHostname.setWidth(350);
+		
+		duoForm.setFields(enableDuo, duoIntegrationKey, duoSecretKey, duoApiHostname);
+
 		IButton save = new IButton();
 		save.setTitle(I18N.message("save"));
 		save.addClickHandler(new ClickHandler() {
@@ -129,6 +179,16 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 							vm.getValueAsString("enableGoolge").equals("yes") ? "true" : "false"));
 					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_YUBIKEY + ".enabled",
 							vm.getValueAsString("enableYubikey").equals("yes") ? "true" : "false"));
+					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_EMAIL_AUTHENTICATOR + ".enabled",
+							vm.getValueAsString("enableEmail").equals("yes") ? "true" : "false"));
+					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".enabled",
+							vm.getValueAsString("enableDuo").equals("yes") ? "true" : "false"));
+					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".integrationkey",
+							vm.getValueAsString("duoIntegrationKey")));
+					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".secretkey",
+							vm.getValueAsString("duoSecretKey")));
+					params.add(new GUIParameter(tenant + ".2fa." + Constants.TWOFA_DUO + ".apihost",
+							vm.getValueAsString("duoApiHostname")));
 					SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]),
 							new AsyncCallback<Void>() {
 
@@ -149,7 +209,8 @@ public class TwoFactorsAuthenticationSettings extends AdminPanel {
 
 		VLayout panel = new VLayout();
 		panel.setWidth100();
-		panel.setMembers(form, googleForm, yubikeyForm);
+		panel.setMembersMargin(8);
+		panel.setMembers(form, emailForm, googleForm, yubikeyForm, duoForm);
 
 		body.setMembers(panel);
 		addMember(save);

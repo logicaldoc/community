@@ -1,5 +1,4 @@
-<project name="logicaldoc-webservice" default="deploy" basedir="."
-	xmlns:artifact="urn:maven-artifact-ant">
+<project name="logicaldoc-webservice" default="deploy" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 	<property file="${user.home}/logicaldoc-dev.properties" />
 	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
 
@@ -13,48 +12,50 @@
 			<arg line="-o -Dmaven.test.skip=true install" />
 		</exec>
 
-		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying into @{webroot}" />
+				<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="@{webroot}" />
+			</sequential>
+		</for>
 
 		<echo message="${pom.artifactId} has been deployed" />
 	</target>
 
-	<target name="deploy-classes" depends="init-all"
-		description="Copy classes into a deployed webapp">
+	<target name="deploy-classes" depends="init-all" description="Copy classes into a deployed webapp">
 		<property environment="env" />
 		<property id="properties" file="build.properties" />
 
-		<copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
-			<fileset dir="target/classes">
-				<include name="com/logicaldoc/webservice/**" />
-			</fileset>
-		</copy>
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying classes into @{webroot}" />
+				<copy todir="@{webroot}/WEB-INF/classes" verbose="true">
+					<fileset dir="target/classes">
+						<include name="com/logicaldoc/webservice/**" />
+					</fileset>
+				</copy>
+			</sequential>
+		</for>
 	</target>
 
 	<target name="mydep" description="Updates a deployed wwww">
-		<copy todir="${logicaldoc.webroot}/WEB-INF/classes" verbose="true">
-			<!-- <fileset dir="target/classes"> <exclude name="**/*.xml" /> <exclude name="**/*.properties" /> 
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying into @{webroot}" />
+				<copy todir="@{webroot}/WEB-INF/classes" verbose="true">
+					<!-- <fileset dir="target/classes"> <exclude name="**/*.xml" /> <exclude name="**/*.properties" /> 
 				<exclude name="**/*.dtd" /> </fileset> -->
-			<fileset dir="target/classes">
-				<!-- <include name="**/WSDocument.class" /> <include name="**/DocumentService.class" /> <include 
+					<fileset dir="target/classes">
+						<!-- <include name="**/WSDocument.class" /> <include name="**/DocumentService.class" /> <include 
 					name="**/context-webservice.xml" /> -->
-				<include name="**/AuthService.class" />
-				<include name="**/Rest*.class" />
-				<include name="**/context-webservice.xml" />
-			</fileset>
-		</copy>
+						<include name="**/AuthService.class" />
+						<include name="**/Rest*.class" />
+						<include name="**/context-webservice.xml" />
+					</fileset>
+				</copy>
+			</sequential>
+		</for>
+
 		<echo message="xxx has been deployed" />
 	</target>
-
-
-	<target name="mydep2" description="Updates a deployed wwww">
-		<copy todir="C:/LogicalDOCE86/tomcat/webapps/ROOT/WEB-INF/classes" verbose="true">
-			<fileset dir="target/classes">
-				<exclude name="**/*.xml" />
-				<exclude name="**/*.properties" />
-				<exclude name="**/*.dtd" />
-			</fileset>
-		</copy>
-		<echo message="xxx has been deployed" />
-	</target>
-
 </project>

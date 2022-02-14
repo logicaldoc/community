@@ -134,7 +134,7 @@ public class NotifyingThread extends Thread {
 	 * Concrete implementations should override this method to implement their
 	 * own processing.
 	 * 
-	 * @throw whatever error that happens during the elaboration
+	 * @throws Throwable whatever error that happens during the elaboration
 	 */
 	public void doRun() throws Throwable {
 	}

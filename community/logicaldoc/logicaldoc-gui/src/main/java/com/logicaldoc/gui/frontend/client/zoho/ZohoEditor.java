@@ -1,13 +1,13 @@
 package com.logicaldoc.gui.frontend.client.zoho;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.ZohoService;
 import com.smartgwt.client.types.Alignment;
@@ -84,7 +84,7 @@ public class ZohoEditor extends Window {
 					url = "https://docs.zoho.com/show/open/";
 				url += document.getExtResId();
 
-				WindowUtils.openUrl(url, "_blank");
+				WindowUtils.openUrlInNewTab(url);
 			}
 		});
 
@@ -144,20 +144,20 @@ public class ZohoEditor extends Window {
 					@Override
 					public void onSuccess(Void result) {
 						DocUtil.markUnlocked(document);
-						Session.get().setCurrentDocument(document);
-						ContactingServer.get().show();
+						DocumentController.get().setCurrentDocument(document);
+						LD.contactingServer();
 						ZohoService.Instance.get().delete(ZohoEditor.this.document.getExtResId(),
 								new AsyncCallback<Void>() {
 									@Override
 									public void onFailure(Throwable caught) {
-										ContactingServer.get().hide();
+										LD.clearPrompt();
 										GuiLog.serverError(caught);
 										destroy();
 									}
 
 									@Override
 									public void onSuccess(Void result) {
-										ContactingServer.get().hide();
+										LD.clearPrompt();
 										destroy();
 									}
 								});

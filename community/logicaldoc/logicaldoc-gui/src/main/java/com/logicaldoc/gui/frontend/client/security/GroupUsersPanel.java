@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SelectionStyle;
@@ -52,7 +52,7 @@ public class GroupUsersPanel extends VLayout {
 	public void onDraw() {
 		final InfoPanel infoPanel = new InfoPanel("");
 
-		AvatarListGridField avatar = new AvatarListGridField(true);
+		UserListGridField avatar = new UserListGridField(true);
 		
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);

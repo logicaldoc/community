@@ -141,4 +141,6 @@ public interface DocumentServiceAsync {
 	void enforceFilesIntoFolderStorage(long folderId, AsyncCallback<Void> callback);
 
 	void merge(long[] docIds, long targetFolderId, String fileName, AsyncCallback<GUIDocument> callback);
+
+	void updatePages(long docId, AsyncCallback<Integer> callback);
 }

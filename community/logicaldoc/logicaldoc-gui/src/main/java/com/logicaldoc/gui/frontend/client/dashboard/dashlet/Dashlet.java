@@ -118,6 +118,7 @@ public class Dashlet extends Portlet {
 				iv.show();
 			}
 		});
+		preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 		MenuItem openInFolder = new MenuItem();
 		openInFolder.setTitle(I18N.message("openinfolder"));

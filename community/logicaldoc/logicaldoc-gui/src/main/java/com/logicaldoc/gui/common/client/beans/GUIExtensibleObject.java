@@ -43,6 +43,14 @@ public class GUIExtensibleObject implements Serializable {
 		return attributes;
 	}
 
+	public String[] getAttributeNames() {
+		List<String> names = new ArrayList<String>();
+		if (attributes != null)
+			for (GUIAttribute guiAttribute : attributes)
+				names.add(guiAttribute.getName());
+		return names.toArray(new String[0]);
+	}
+
 	public void setAttributes(GUIAttribute[] attributes) {
 		this.attributes = attributes;
 	}

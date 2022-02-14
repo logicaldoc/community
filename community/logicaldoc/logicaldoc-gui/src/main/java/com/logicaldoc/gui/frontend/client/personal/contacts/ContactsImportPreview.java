@@ -7,7 +7,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -52,7 +52,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 		importButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				try {
 					ContactService.Instance.get().parseContacts(false, settings.getSeparator(),
 							settings.getTextDelimiter(), settings.isSkipFirstRow(), settings.getFirstNameIndex(),
@@ -62,13 +62,13 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(GUIContact[] contacts) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									settings.destroy();
 									destroy();
 
@@ -79,7 +79,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 								}
 							});
 				} catch (Throwable t) {
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 				}
 			}
 		});

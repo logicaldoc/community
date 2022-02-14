@@ -9,11 +9,11 @@ import org.junit.Test;
 
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
-import com.logicaldoc.webservice.AbstractWebServiceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 
-public class SoapTagServiceTest extends AbstractWebServiceTestCase {
+public class SoapTagServiceTest extends AbstractWebserviceTestCase {
 
 	private FolderDAO folderDao;
 

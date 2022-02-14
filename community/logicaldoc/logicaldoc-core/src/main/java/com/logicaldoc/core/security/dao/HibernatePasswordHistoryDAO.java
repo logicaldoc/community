@@ -53,7 +53,7 @@ public class HibernatePasswordHistoryDAO extends HibernatePersistentObjectDAO<Pa
 				if (i >= max)
 					return null;
 				PasswordHistory history = histories.get(i);
-				if (history.getPassword().equals(password))
+				if (history.getPassword()!=null && history.getPassword().equals(password))
 					return history;
 			}
 		}

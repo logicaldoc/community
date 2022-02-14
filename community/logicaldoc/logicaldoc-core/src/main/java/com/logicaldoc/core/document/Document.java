@@ -17,7 +17,7 @@ public class Document extends AbstractDocument {
 	 * Clones the document but does not replicate the CustomID
 	 */
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public Document clone() {
 		Document cloned = new Document();
 		cloned.copyAttributes((Document) this);
 		cloned.setId(getId());

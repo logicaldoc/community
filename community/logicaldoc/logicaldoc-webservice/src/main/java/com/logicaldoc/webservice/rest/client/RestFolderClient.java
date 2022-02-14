@@ -33,10 +33,6 @@ public class RestFolderClient extends AbstractRestClient {
 		if ((username == null) || (password == null)) {
 			proxy = JAXRSClientFactory.create(endpoint, FolderService.class, Arrays.asList(provider));
 		} else {
-			// proxy = JAXRSClientFactory.create(endpoint, FolderService.class,
-			// Arrays.asList(provider));
-			// create(String baseAddress, Class<T> cls, List<?> providers,
-			// String username, String password, String configLocation)
 			proxy = JAXRSClientFactory.create(endpoint, FolderService.class, Arrays.asList(provider), username,
 					password, null);
 		}

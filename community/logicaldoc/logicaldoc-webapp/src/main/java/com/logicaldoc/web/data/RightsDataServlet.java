@@ -90,7 +90,7 @@ public class RightsDataServlet extends HttpServlet {
 				null, null);
 		Map<Long, String> users = new HashMap<Long, String>();
 		while (set.next())
-			users.put(set.getLong(1), set.getString(4) + " " + set.getString(3) + " (" + set.getString(2) + ")");
+			users.put(set.getLong(1), set.getString(3) + " " + set.getString(4) + " (" + set.getString(2) + ")");
 		return users;
 	}
 
@@ -180,7 +180,7 @@ public class RightsDataServlet extends HttpServlet {
 		menuDao.initialize(menu);
 
 		// Prepare a map of users
-		Map<Long, String> users = getUsers(menu.getTenantId());
+		Map<Long, String> users = getUsers(tenantId);
 
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
@@ -189,7 +189,7 @@ public class RightsDataServlet extends HttpServlet {
 		StringBuffer query = new StringBuffer(
 				"select A.ld_groupid, B.ld_name, B.ld_type from ld_menugroup as A, ld_group B where A.ld_menuid = ");
 		query.append("" + menu.getId());
-		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + menu.getTenantId());
+		query.append(" and B.ld_deleted=0 and A.ld_groupid = B.ld_id and B.ld_tenantid = " + tenantId);
 		query.append(" order by B.ld_type asc, B.ld_name asc");
 
 		SqlRowSet set = menuDao.queryForRowSet(query.toString(), null, null);

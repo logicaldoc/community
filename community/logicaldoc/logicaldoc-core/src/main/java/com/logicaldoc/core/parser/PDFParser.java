@@ -1,6 +1,7 @@
 package com.logicaldoc.core.parser;
 
 import java.io.CharArrayWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -142,6 +143,46 @@ public class PDFParser extends AbstractParser {
 			content.append(" = ");
 			content.append(field.getValueAsString());
 			content.append(" \n ");
+		}
+	}
+
+	@Override
+	public int countPages(File file, String filename) {
+		try {
+			return internalCountPages(PDDocument.load(file));
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			return 1;
+		}
+	}
+
+	@Override
+	public int countPages(InputStream input, String filename) {
+		try {
+			return internalCountPages(PDDocument.load(input));
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			return 1;
+		}
+	}
+
+	private int internalCountPages(PDDocument pdfDocument) {
+		try {
+			if (pdfDocument == null) {
+				throw new Exception("Can not get pdf document for parsing");
+			} else {
+				return pdfDocument.getNumberOfPages();
+			}
+		} catch (Throwable ex) {
+			log.error(ex.getMessage(), ex);
+			return 1;
+		} finally {
+			try {
+				if (pdfDocument != null)
+					pdfDocument.close();
+			} catch (Throwable e) {
+				log.error(e.getMessage(), e);
+			}
 		}
 	}
 }

@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
+import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.smartgwt.client.types.DateDisplayFormat;
 
@@ -25,7 +26,7 @@ public class I18N {
 	private static HashMap<String, String> bundle = new HashMap<String, String>();
 
 	private static DateTimeFormat dateFormatLong = null;
-	
+
 	private static DateTimeFormat dateFormatShort = null;
 
 	private static DateTimeFormat dateFormat = null;
@@ -149,6 +150,12 @@ public class I18N {
 		for (GUIValue val : messages) {
 			bundle.put(val.getCode(), val.getValue());
 		}
+
+		String[] dayNames = new String[7];
+		for (int i = 0; i < 7; i++)
+			dayNames[i] = message("dayname_" + i);
+
+		com.smartgwt.client.util.DateUtil.setDayNames(dayNames);
 	}
 
 	public static void init(GUIInfo info) {
@@ -159,9 +166,31 @@ public class I18N {
 		/*
 		 * Prepare the date formatters
 		 */
-		dateFormatShort = DateTimeFormat.getFormat(message("format_dateshort"));
 		dateFormat = DateTimeFormat.getFormat(message("format_date"));
+		dateFormatShort = DateTimeFormat.getFormat(message("format_dateshort"));
 		dateFormatLong = DateTimeFormat.getFormat(message("format_datelong"));
+	}
+
+	public static void init(GUIUser user) {
+		setLocale(user.getLanguage());
+
+		/*
+		 * Prepare the date formatters
+		 */
+		if (user.getDateFormat() != null && !user.getDateFormat().isEmpty())
+			dateFormat = DateTimeFormat.getFormat(user.getDateFormat());
+		else
+			dateFormat = DateTimeFormat.getFormat(message("format_date"));
+
+		if (user.getDateFormatShort() != null && !user.getDateFormatShort().isEmpty())
+			dateFormatShort = DateTimeFormat.getFormat(user.getDateFormatShort());
+		else
+			dateFormatShort = DateTimeFormat.getFormat(message("format_dateshort"));
+
+		if (user.getDateFormatLong() != null && !user.getDateFormatLong().isEmpty())
+			dateFormatLong = DateTimeFormat.getFormat(user.getDateFormatLong());
+		else
+			dateFormatLong = DateTimeFormat.getFormat(message("format_datelong"));
 	}
 
 	public static GUIValue[] getGuiLanguages() {
@@ -189,7 +218,7 @@ public class I18N {
 			return null;
 		return dateFormatLong.format(new Date(date.getTime()));
 	}
-	
+
 	public static DateTimeFormat getDateFormatShort() {
 		return dateFormatShort;
 	}

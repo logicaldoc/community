@@ -3,12 +3,14 @@ package com.logicaldoc.web.service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +19,15 @@ import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
+import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.UserEvent;
+import com.logicaldoc.core.security.UserHistory;
+import com.logicaldoc.core.security.dao.DeviceDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.security.dao.UserHistoryDAO;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.gui.common.client.ServerException;
@@ -52,6 +59,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 	public GUIUser getUser(String username) {
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			UserHistoryDAO userHistoryDao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 			TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 
 			User user = userDao.findByUsername(username);
@@ -61,14 +69,26 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			// Get just a few informations needed by the login
 			GUIUser usr = new GUIUser();
 			usr.setId(user.getId());
+			usr.setUsername(user.getUsername());
 			usr.setTenant(SecurityServiceImpl.getTenant(user.getTenantId()));
 			usr.setPasswordExpires(user.getPasswordExpires() == 1);
-			usr.setPasswordExpired(user.getPasswordExpired() == 1);
+			usr.setPasswordExpired(userDao.isPasswordExpired(username));
+			usr.setEmail(user.getEmail());
+			usr.setEmail2(user.getEmail2());
+			usr.setName(user.getName());
+			usr.setFirstName(user.getFirstName());
+			usr.setSecondFactor(user.getSecondFactor());
 
 			Tenant tenant = tenantDao.findById(user.getTenantId());
 
 			ContextProperties config = Context.get().getProperties();
 			usr.setPasswordMinLenght(Integer.parseInt(config.getProperty(tenant.getName() + ".password.size")));
+
+			// Retrieve the reason for the last login failure
+			List<UserHistory> failures = userHistoryDao.findByUserIdAndEvent(user.getId(),
+					UserEvent.LOGIN_FAILED.toString());
+			if (failures != null && !failures.isEmpty())
+				usr.setLastLoginFailureReason(failures.get(0).getComment());
 
 			return usr;
 		} catch (Throwable t) {
@@ -88,17 +108,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			throw new ServerException(String.format("Email %s is wrong", emailAddress));
 
 		try {
-			EMail email;
-			email = new EMail();
-			email.setHtml(1);
-			email.setTenantId(user.getTenantId());
-			Recipient recipient = new Recipient();
-			recipient.setAddress(user.getEmail());
-			recipient.setRead(1);
-			email.addRecipient(recipient);
-			email.setFolder("outbox");
-
-			// Prepare a new download ticket
+			// Prepare a new password ticket
 			String ticketid = (UUID.randomUUID().toString());
 			Ticket ticket = new Ticket();
 			ticket.setTicketId(ticketid);
@@ -107,7 +117,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			ticket.setTenantId(user.getTenantId());
 			ticket.setType(Ticket.PSW_RECOVERY);
 			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.MINUTE, +5);
+			cal.add(Calendar.MINUTE, +15);
 			ticket.setExpired(cal.getTime());
 
 			// Store the ticket
@@ -119,6 +129,15 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 
 			Locale locale = user.getLocale();
 
+			EMail email = new EMail();
+			email.setHistoricyze(false);
+			email.setHtml(1);
+			email.setTenantId(user.getTenantId());
+			Recipient recipient = new Recipient();
+			recipient.setAddress(user.getEmail());
+			recipient.setRead(1);
+			email.addRecipient(recipient);
+			email.setFolder("outbox");
 			email.setLocale(locale);
 			email.setSentDate(new Date());
 			email.setUsername(user.getUsername());
@@ -143,5 +162,34 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			log.error(e.getMessage(), e);
 			throw new ServerException(e.getMessage());
 		}
+	}
+
+	@Override
+	public boolean isSecretKeyRequired(String username, String deviceId) throws ServerException {
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDao.findByUsername(username);
+		if (user == null)
+			return false;
+
+		userDao.initialize(user);
+
+		if (StringUtils.isEmpty(user.getSecondFactor()))
+			return false;
+
+		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		String tenant = tDao.findById(user.getTenantId()).getName();
+		ContextProperties config = (ContextProperties) Context.get().getProperties();
+		if (!config.getBoolean(tenant + ".2fa.enabled", false)
+				|| !config.getBoolean(tenant + ".2fa." + user.getSecondFactor().toLowerCase() + ".enabled", false))
+			return false;
+
+		if (config.getBoolean(tenant + ".2fa.allowtrusted", true)) {
+			HttpServletRequest request = getThreadLocalRequest();
+			request.setAttribute(Device.PARAM_DEVICE, deviceId);
+
+			DeviceDAO deviceDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+			return !deviceDao.isTrustedDevice(username, request);
+		} else
+			return true;
 	}
 }

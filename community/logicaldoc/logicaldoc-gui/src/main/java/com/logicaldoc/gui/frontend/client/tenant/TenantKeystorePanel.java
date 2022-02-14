@@ -9,9 +9,8 @@ import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.SignService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.BooleanCallback;
@@ -210,17 +209,17 @@ public class TenantKeystorePanel extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (validate()) {
-					ContactingServer.get().show();
+					LD.contactingServer();
 					SignService.Instance.get().generateNewKeystore(keystore, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void arg) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							init();
 						}
 					});
@@ -234,17 +233,17 @@ public class TenantKeystorePanel extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (validate()) {
-					ContactingServer.get().show();
+					LD.contactingServer();
 					SignService.Instance.get().saveKeystore(keystore, new AsyncCallback<Void>() {
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(Void arg) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 						}
 					});
 				}
@@ -257,7 +256,7 @@ public class TenantKeystorePanel extends VLayout {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				WindowUtils.openUrl(Util.contextPath() + "export-keystore?tenantId=" + tenantId);
+				Util.download(Util.contextPath() + "export-keystore?tenantId=" + tenantId);
 			}
 		});
 
@@ -306,7 +305,7 @@ public class TenantKeystorePanel extends VLayout {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				WindowUtils.openUrl(Util.contextPath() + "export-keystore?cert=true&tenantId=" + tenantId);
+				Util.download(Util.contextPath() + "export-keystore?cert=true&tenantId=" + tenantId);
 			}
 		});
 

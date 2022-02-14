@@ -10,13 +10,13 @@ public interface ZohoServiceAsync {
 	void importDocuments(long targetFolder, String[] folderCompositeIds, String[] documentIds,
 			AsyncCallback<Integer> callback);
 
-	void loadAuthToken(AsyncCallback<String> callback);
-
-	void saveAuthToken(String authToken, AsyncCallback<Void> callback);
-
 	void upload(long docId, AsyncCallback<String> callback);
 
 	void delete(String resourceId, AsyncCallback<Void> callback);
 
 	void checkin(long docId, String comment, boolean major, AsyncCallback<GUIDocument> callback);
+
+	void saveSettings(String clientId, String clientSecret, AsyncCallback<String> callback);
+
+	void loadSettings(AsyncCallback<String[]> callback);
 }

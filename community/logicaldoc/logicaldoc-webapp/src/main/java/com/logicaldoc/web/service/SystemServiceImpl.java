@@ -14,7 +14,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -31,8 +33,10 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.stats.StatsCollector;
 import com.logicaldoc.core.task.Task;
@@ -54,6 +58,7 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.web.util.ServiceUtil;
+import com.logicaldoc.web.websockets.WebsocketTool;
 
 /**
  * Implementation of the SystemService
@@ -129,7 +134,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
-		GUIParameter[][] parameters = new GUIParameter[4][8];
+		GUIParameter[][] parameters = new GUIParameter[5][8];
 		try {
 			/*
 			 * Repository statistics
@@ -246,26 +251,62 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			parameters[1][4] = archivedDocs;
 
 			/*
+			 * Pages statistics
+			 */
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexedpages", null, session.getTenantId());
+			GUIParameter notIndexedPages = new GUIParameter();
+			notIndexedPages.setName("notindexed");
+			notIndexedPages.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters[2][0] = notIndexedPages;
+
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "notindexablepages", null, session.getTenantId());
+			GUIParameter notIndexablePages = new GUIParameter();
+			notIndexablePages.setName("notindexablepages");
+			notIndexablePages.setLabel("notindexable");
+			notIndexablePages.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters[2][1] = notIndexableDocs;
+
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "indexedpages", null, session.getTenantId());
+			GUIParameter indexedPages = new GUIParameter();
+			indexedPages.setName("indexed");
+			indexedPages.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters[2][2] = indexedPages;
+
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedpages", null, session.getTenantId());
+			GUIParameter deletedPages = new GUIParameter();
+			deletedPages.setName("pagestrash");
+			deletedPages.setLabel("trash");
+			deletedPages.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters[2][3] = deletedPages;
+
+			gen = genDao.findByAlternateKey(StatsCollector.STAT, "archivedpages", null, session.getTenantId());
+			GUIParameter archivedPages = new GUIParameter();
+			archivedPages.setName("archivedpages");
+			archivedPages.setLabel("archiveds");
+			archivedPages.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
+			parameters[2][4] = archivedPages;
+
+			/*
 			 * Folders statistics
 			 */
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "withdocs", null, session.getTenantId());
 			GUIParameter notEmptyFolders = new GUIParameter();
 			notEmptyFolders.setName("withdocs");
 			notEmptyFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[2][0] = notEmptyFolders;
+			parameters[3][0] = notEmptyFolders;
 
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "empty", null, session.getTenantId());
 			GUIParameter emptyFolders = new GUIParameter();
 			emptyFolders.setName("empty");
 			emptyFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[2][1] = emptyFolders;
+			parameters[3][1] = emptyFolders;
 
 			gen = genDao.findByAlternateKey(StatsCollector.STAT, "deletedfolders", null, session.getTenantId());
 			GUIParameter deletedFolders = new GUIParameter();
 			deletedFolders.setName("folderstrash");
 			deletedFolders.setLabel("trash");
 			deletedFolders.setValue(gen != null ? Long.toString(gen.getInteger1()) : "0");
-			parameters[2][2] = deletedFolders;
+			parameters[3][2] = deletedFolders;
 
 			/*
 			 * Last run
@@ -280,7 +321,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			} else {
 				lastrun.setValue("");
 			}
-			parameters[3][0] = lastrun;
+			parameters[4][0] = lastrun;
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 		}
@@ -494,217 +535,6 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public GUIHistory[] search(String userName, Date from, Date till, int maxResult, String historySid, String[] event,
-			Long rootFolderId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-
-		StringBuffer folderPredicate = new StringBuffer();
-		if (rootFolderId != null) {
-			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			Collection<Long> tree = fDao.findFolderIdInTree(rootFolderId, false);
-			if (fDao.isOracle()) {
-				/*
-				 * In Oracle The limit of 1000 elements applies to sets of
-				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
-				 * if the sets contain two or more items: (x, 0) IN ((1,0),
-				 * (2,0), (3,0), ...):
-				 */
-				folderPredicate.append(" and (A.ld_folderid,0) in ( ");
-				boolean firstItem = true;
-				for (Long folderId : tree) {
-					if (!firstItem)
-						folderPredicate.append(",");
-					folderPredicate.append("(");
-					folderPredicate.append(folderId);
-					folderPredicate.append(",0)");
-					firstItem = false;
-				}
-				folderPredicate.append(" )");
-			} else {
-				folderPredicate.append(" and A.ld_folderid in ");
-				folderPredicate.append(tree.toString().replace('[', '(').replace(']', ')'));
-			}
-		}
-
-		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		List<GUIHistory> histories = new ArrayList<GUIHistory>();
-		try {
-
-			// Search in the document/folder history
-			StringBuffer query = new StringBuffer(
-					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation from ld_history A where A.ld_tenantid = "
-							+ session.getTenantId());
-			if (userName != null && StringUtils.isNotEmpty(userName))
-				query.append(" and lower(A.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
-			if (historySid != null && StringUtils.isNotEmpty(historySid))
-				query.append(" and A.ld_sessionid='" + historySid + "' ");
-			if (from != null) {
-				query.append(" and A.ld_date > '" + new Timestamp(from.getTime()) + "'");
-			}
-			if (till != null) {
-				query.append(" and A.ld_date < '" + new Timestamp(till.getTime()) + "'");
-			}
-			if (rootFolderId != null) {
-				query.append(folderPredicate.toString());
-			}
-			if (event.length > 0) {
-				boolean first = true;
-				for (String e : event) {
-					if (first)
-						query.append(" and (");
-					else
-						query.append(" or ");
-
-					query.append(" A.ld_event = '" + SqlUtil.doubleQuotes(e) + "'");
-					first = false;
-				}
-				query.append(" ) ");
-			}
-
-			// Search in the folder history
-			query.append(
-					" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment, B.ld_reason, B.ld_device, B.ld_geolocation from ld_folder_history B where B.ld_tenantid = "
-							+ session.getTenantId());
-			if (userName != null && StringUtils.isNotEmpty(userName))
-				query.append(" and lower(B.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
-			if (historySid != null && StringUtils.isNotEmpty(historySid))
-				query.append(" and B.ld_sessionid='" + historySid + "' ");
-			if (from != null) {
-				query.append(" and B.ld_date > '" + new Timestamp(from.getTime()) + "'");
-			}
-			if (till != null) {
-				query.append(" and B.ld_date < '" + new Timestamp(till.getTime()) + "'");
-			}
-			if (rootFolderId != null) {
-				query.append(folderPredicate.toString().replace('A', 'B'));
-			}
-			if (event.length > 0) {
-				boolean first = true;
-				for (String e : event) {
-					if (first)
-						query.append(" and (");
-					else
-						query.append(" or ");
-
-					query.append(" B.ld_event = '" + SqlUtil.doubleQuotes(e) + "'");
-					first = false;
-				}
-				query.append(" ) ");
-			}
-
-			// Search in the user history
-			if (rootFolderId == null) {
-				query.append(
-						" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment, C.ld_reason, C.ld_device, C.ld_geolocation from ld_user_history C where C.ld_tenantid = "
-								+ session.getTenantId());
-				if (userName != null && StringUtils.isNotEmpty(userName))
-					query.append(
-							" and lower(C.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
-				if (historySid != null && StringUtils.isNotEmpty(historySid))
-					query.append(" and C.ld_sessionid='" + historySid + "' ");
-				if (from != null) {
-					query.append(" and C.ld_date > '" + new Timestamp(from.getTime()) + "'");
-				}
-				if (till != null) {
-					query.append(" and C.ld_date < '" + new Timestamp(till.getTime()) + "'");
-				}
-				if (event.length > 0) {
-					boolean first = true;
-					for (String e : event) {
-						if (first)
-							query.append(" and (");
-						else
-							query.append(" or ");
-
-						query.append(" C.ld_event = '" + SqlUtil.doubleQuotes(e) + "'");
-						first = false;
-					}
-					query.append(" ) ");
-				}
-			}
-
-			if (Arrays.asList(SystemInfo.get().getFeatures()).contains("Feature_19")) {
-
-				// Search in the workflow history
-				query.append(
-						" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment, D.ld_reason, D.ld_device, D.ld_geolocation from ld_workflowhistory D where D.ld_tenantid = "
-								+ session.getTenantId());
-				if (userName != null && StringUtils.isNotEmpty(userName))
-					query.append(
-							" and lower(D.ld_username) like '%" + SqlUtil.doubleQuotes(userName.toLowerCase()) + "%'");
-				if (historySid != null && StringUtils.isNotEmpty(historySid))
-					query.append(" and D.ld_sessionid='" + historySid + "' ");
-				if (from != null) {
-					query.append(" and D.ld_date > '" + new Timestamp(from.getTime()) + "'");
-				}
-				if (till != null) {
-					query.append(" and D.ld_date < '" + new Timestamp(till.getTime()) + "'");
-				}
-				if (rootFolderId != null) {
-					query.append(folderPredicate.toString().replace('A', 'D'));
-				}
-				if (event.length > 0) {
-					boolean first = true;
-					for (String e : event) {
-						if (first)
-							query.append(" and (");
-						else
-							query.append(" or ");
-
-						query.append(" D.ld_event = '" + SqlUtil.doubleQuotes(e.trim()) + "'");
-						first = false;
-					}
-					query.append(" ) ");
-				}
-			}
-
-			query.append(" order by 3 desc ");
-
-			histories = (List<GUIHistory>) dao.query(query.toString(), null, new RowMapper<GUIHistory>() {
-
-				@Override
-				public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {
-					GUIHistory history = new GUIHistory();
-					history.setUsername(rs.getString(1));
-					history.setEvent(rs.getString(2));
-					if (rs.getObject(3) instanceof Timestamp)
-						history.setDate(rs.getTimestamp(3));
-					else
-						history.setDate(rs.getDate(3));
-
-					history.setFileName(rs.getString(4));
-					history.setFolderId(rs.getLong(5));
-					history.setPath(rs.getString(6));
-					history.setSessionId(rs.getString(7));
-					history.setDocId(rs.getLong(8));
-					history.setUserId(rs.getLong(9));
-					history.setIp(rs.getString(10));
-					history.setUserLogin(rs.getString(11));
-					history.setComment(rs.getString(12));
-					history.setReason(rs.getString(13));
-					history.setDevice(rs.getString(14));
-					history.setGeolocation(rs.getString(15));
-
-					if (history.getFileName() != null && history.getDocId() != 0L)
-						history.setIcon(IconSelector.selectIcon(history.getFileName()));
-					else if (history.getFileName() != null && history.getDocId() == 0L && history.getFolderId() != 0L)
-						history.setIcon("folder");
-
-					return history;
-				}
-
-			}, maxResult);
-
-			return histories.toArray(new GUIHistory[histories.size()]);
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-		}
-
-		return null;
-	}
-
 	@Override
 	public boolean startTask(String taskName) {
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
@@ -814,6 +644,13 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 		ServiceUtil.validateSession(getThreadLocalRequest());
 
 		try {
+			log.warn("Alerting the connected users about the shutdown");
+			List<Session> sessions = SessionManager.get().getSessions();
+			WebsocketTool websocket = new WebsocketTool();
+			for (Session session : sessions)
+				websocket.showMessage(session, I18N.message("systemisshuttingdown", session.getUser().getLocale()),
+						"warn");
+
 			SecurityServiceImpl secService = new SecurityServiceImpl();
 			secService.logout();
 
@@ -827,5 +664,321 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public GUIHistory[] search(Long userId, Date from, Date till, int maxResult, String historySid, String[] event,
+			Long rootFolderId) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		StringBuffer folderPredicate = new StringBuffer();
+		if (rootFolderId != null) {
+			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			Collection<Long> tree = fDao.findFolderIdInTree(rootFolderId, false);
+			if (fDao.isOracle()) {
+				/*
+				 * In Oracle The limit of 1000 elements applies to sets of
+				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
+				 * if the sets contain two or more items: (x, 0) IN ((1,0),
+				 * (2,0), (3,0), ...):
+				 */
+				folderPredicate.append(" and (A.ld_folderid,0) in ( ");
+				boolean firstItem = true;
+				for (Long folderId : tree) {
+					if (!firstItem)
+						folderPredicate.append(",");
+					folderPredicate.append("(");
+					folderPredicate.append(folderId);
+					folderPredicate.append(",0)");
+					firstItem = false;
+				}
+				folderPredicate.append(" )");
+			} else {
+				folderPredicate.append(" and A.ld_folderid in ");
+				folderPredicate.append(tree.toString().replace('[', '(').replace(']', ')'));
+			}
+		}
+
+		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
+		List<GUIHistory> histories = new ArrayList<GUIHistory>();
+		try {
+
+			// Search in the document/folder history
+			StringBuffer query = new StringBuffer(
+					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation from ld_history A where A.ld_tenantid = "
+							+ session.getTenantId());
+			if (userId != null)
+				query.append(" and A.ld_userid = " + userId);
+			if (historySid != null && StringUtils.isNotEmpty(historySid))
+				query.append(" and A.ld_sessionid='" + historySid + "' ");
+			if (from != null) {
+				query.append(" and A.ld_date > '" + new Timestamp(from.getTime()) + "' ");
+			}
+			if (till != null) {
+				query.append(" and A.ld_date < '" + new Timestamp(till.getTime()) + "' ");
+			}
+			if (rootFolderId != null) {
+				query.append(folderPredicate.toString());
+			}
+			if (event.length > 0) {
+				boolean first = true;
+				for (String e : event) {
+					if (first)
+						query.append(" and (");
+					else
+						query.append(" or ");
+
+					query.append(" A.ld_event = '" + SqlUtil.doubleQuotes(e) + "'");
+					first = false;
+				}
+				query.append(" ) ");
+			}
+
+			// Search in the folder history
+			query.append(
+					" union select B.ld_username, B.ld_event, B.ld_date, B.ld_filename, B.ld_folderid, B.ld_path, B.ld_sessionid, B.ld_docid, B.ld_userid, B.ld_ip as ip, B.ld_userlogin, B.ld_comment, B.ld_reason, B.ld_device, B.ld_geolocation from ld_folder_history B where B.ld_tenantid = "
+							+ session.getTenantId());
+			if (userId != null)
+				query.append(" and B.ld_userid = " + userId);
+
+			if (historySid != null && StringUtils.isNotEmpty(historySid))
+				query.append(" and B.ld_sessionid='" + historySid + "' ");
+			if (from != null) {
+				query.append(" and B.ld_date > '" + new Timestamp(from.getTime()) + "' ");
+			}
+			if (till != null) {
+				query.append(" and B.ld_date < '" + new Timestamp(till.getTime()) + "' ");
+			}
+			if (rootFolderId != null) {
+				query.append(folderPredicate.toString().replace('A', 'B'));
+			}
+			if (event.length > 0) {
+				boolean first = true;
+				for (String e : event) {
+					if (first)
+						query.append(" and (");
+					else
+						query.append(" or ");
+
+					query.append(" B.ld_event = '" + SqlUtil.doubleQuotes(e) + "' ");
+					first = false;
+				}
+				query.append(" ) ");
+			}
+
+			// Search in the user history
+			if (rootFolderId == null) {
+				query.append(
+						" union select C.ld_username, C.ld_event, C.ld_date, null, null, null, C.ld_sessionid, null, C.ld_userid, C.ld_ip as ip, C.ld_userlogin, C.ld_comment, C.ld_reason, C.ld_device, C.ld_geolocation from ld_user_history C where C.ld_tenantid = "
+								+ session.getTenantId());
+				if (userId != null)
+					query.append(" and C.ld_userid = " + userId);
+				if (historySid != null && StringUtils.isNotEmpty(historySid))
+					query.append(" and C.ld_sessionid='" + historySid + "' ");
+				if (from != null) {
+					query.append(" and C.ld_date > '" + new Timestamp(from.getTime()) + "' ");
+				}
+				if (till != null) {
+					query.append(" and C.ld_date < '" + new Timestamp(till.getTime()) + "' ");
+				}
+				if (event.length > 0) {
+					boolean first = true;
+					for (String e : event) {
+						if (first)
+							query.append(" and (");
+						else
+							query.append(" or ");
+
+						query.append(" C.ld_event = '" + SqlUtil.doubleQuotes(e) + "'");
+						first = false;
+					}
+					query.append(" ) ");
+				}
+			}
+
+			if (Arrays.asList(SystemInfo.get().getFeatures()).contains("Feature_19")) {
+
+				// Search in the workflow history
+				query.append(
+						" union select D.ld_username, D.ld_event, D.ld_date, null, null, null, D.ld_sessionid, D.ld_docid, D.ld_userid, '' as ip, D.ld_userlogin, D.ld_comment, D.ld_reason, D.ld_device, D.ld_geolocation from ld_workflowhistory D where D.ld_tenantid = "
+								+ session.getTenantId());
+				if (userId != null)
+					query.append(" and D.ld_userid = " + userId);
+				if (historySid != null && StringUtils.isNotEmpty(historySid))
+					query.append(" and D.ld_sessionid='" + historySid + "' ");
+				if (from != null) {
+					query.append(" and D.ld_date > '" + new Timestamp(from.getTime()) + "'");
+				}
+				if (till != null) {
+					query.append(" and D.ld_date < '" + new Timestamp(till.getTime()) + "'");
+				}
+				if (rootFolderId != null) {
+					query.append(folderPredicate.toString().replace('A', 'D'));
+				}
+				if (event.length > 0) {
+					boolean first = true;
+					for (String e : event) {
+						if (first)
+							query.append(" and (");
+						else
+							query.append(" or ");
+
+						query.append(" D.ld_event = '" + SqlUtil.doubleQuotes(e.trim()) + "' ");
+						first = false;
+					}
+					query.append(" ) ");
+				}
+			}
+
+			if (Arrays.asList(SystemInfo.get().getFeatures()).contains("Feature_1")) {
+				// Search in the workflow history
+				query.append(
+						" union select E.ld_username, E.ld_event, E.ld_date, E.ld_filename, E.ld_folderid, E.ld_path, null, E.ld_docid, E.ld_userid, null as ip, E.ld_userlogin, E.ld_comment, null, null, null  from ld_importfolder_history E where E.ld_tenantid = "
+								+ session.getTenantId());
+				if (userId != null)
+					query.append(" and E.ld_userid = " + userId);
+				if (StringUtils.isNotEmpty(historySid))
+					query.append(" and 1 = 2 ");
+				if (from != null) {
+					query.append(" and E.ld_date > '" + new Timestamp(from.getTime()) + "'");
+				}
+				if (till != null) {
+					query.append(" and E.ld_date < '" + new Timestamp(till.getTime()) + "'");
+				}
+				if (rootFolderId != null) {
+					query.append(folderPredicate.toString().replace('A', 'E'));
+				}
+				if (event.length > 0) {
+					boolean first = true;
+					for (String e : event) {
+						if (first)
+							query.append(" and (");
+						else
+							query.append(" or ");
+
+						query.append(" E.ld_event = '" + SqlUtil.doubleQuotes(e.trim()) + "' ");
+						first = false;
+					}
+					query.append(" ) ");
+				}
+			}
+
+			query.append(" order by 3 desc ");
+
+			histories = (List<GUIHistory>) dao.query(query.toString(), null, new RowMapper<GUIHistory>() {
+
+				@Override
+				public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {
+					GUIHistory history = new GUIHistory();
+					history.setTenant(session.getTenantName());
+					history.setTenantId(session.getTenantId());
+					history.setUsername(rs.getString(1));
+					history.setEvent(rs.getString(2));
+					if (rs.getObject(3) instanceof Timestamp)
+						history.setDate(rs.getTimestamp(3));
+					else
+						history.setDate(rs.getDate(3));
+
+					history.setFileName(rs.getString(4));
+					history.setFolderId(rs.getLong(5));
+					history.setPath(rs.getString(6));
+					history.setSessionId(rs.getString(7));
+					history.setDocId(rs.getLong(8));
+					history.setUserId(rs.getLong(9));
+					history.setIp(rs.getString(10));
+					history.setUserLogin(rs.getString(11));
+					history.setComment(rs.getString(12));
+					history.setReason(rs.getString(13));
+					history.setDevice(rs.getString(14));
+					history.setGeolocation(rs.getString(15));
+
+					if (history.getFileName() != null && history.getDocId() != 0L)
+						history.setIcon(IconSelector.selectIcon(history.getFileName()));
+					else if (history.getFileName() != null && history.getDocId() == 0L && history.getFolderId() != 0L)
+						history.setIcon("folder");
+
+					return history;
+				}
+
+			}, maxResult);
+
+			return histories.toArray(new GUIHistory[histories.size()]);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+		}
+
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public GUIHistory[] searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri,
+			int maxResult) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		List<GUIHistory> calls = new ArrayList<GUIHistory>();
+		try {
+			TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			Map<Long, String> tenants = dao.findAll().stream()
+					.collect(Collectors.toMap(Tenant::getId, Tenant::getName));
+			tenants.put(Tenant.SYSTEM_ID, "system");
+
+			// Search in the document/folder history
+			StringBuffer query = new StringBuffer(
+					"select ld_username, ld_date, ld_path, ld_sessionid, ld_userid, ld_ip as ip, ld_userlogin, ld_comment, ld_device, ld_geolocation, ld_protocol, ld_tenantId from ld_webservicecall where 1 = 1 ");
+			if (userId != null)
+				query.append(" and ld_userid = " + userId);
+			if (callSid != null && StringUtils.isNotEmpty(callSid))
+				query.append(" and ld_sessionid='" + callSid + "' ");
+			if (from != null) {
+				query.append(" and ld_date > '" + new Timestamp(from.getTime()) + "' ");
+			}
+			if (till != null) {
+				query.append(" and ld_date < '" + new Timestamp(till.getTime()) + "' ");
+			}
+			if (protocol != null) {
+				query.append(" and ld_protocol = '" + protocol + "' ");
+			}
+
+			if (session.getTenantId() != Tenant.DEFAULT_ID)
+				query.append(" and ld_tenantid = " + session.getTenantId());
+
+			query.append(" order by 3 desc ");
+
+			calls = (List<GUIHistory>) dao.query(query.toString(), null, new RowMapper<GUIHistory>() {
+
+				@Override
+				public GUIHistory mapRow(ResultSet rs, int arg1) throws SQLException {
+					GUIHistory history = new GUIHistory();
+					history.setUsername(rs.getString(1));
+					if (rs.getObject(2) instanceof Timestamp)
+						history.setDate(rs.getTimestamp(2));
+					else
+						history.setDate(rs.getDate(2));
+
+					history.setPath(rs.getString(3));
+					history.setSessionId(rs.getString(4));
+					history.setUserId(rs.getLong(5));
+					history.setIp(rs.getString(6));
+					history.setUserLogin(rs.getString(7));
+					history.setComment(rs.getString(8));
+					history.setDevice(rs.getString(9));
+					history.setGeolocation(rs.getString(10));
+					history.setProtocol(rs.getString(11));
+					history.setTenantId(rs.getLong(12));
+					history.setTenant(tenants.get(history.getTenantId()));
+
+					return history;
+				}
+
+			}, maxResult);
+
+			return calls.toArray(new GUIHistory[calls.size()]);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+		}
+
+		return null;
 	}
 }

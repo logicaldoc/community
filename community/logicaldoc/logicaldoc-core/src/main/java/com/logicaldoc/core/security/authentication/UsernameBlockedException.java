@@ -14,8 +14,4 @@ public class UsernameBlockedException extends AuthenticationException {
 	public UsernameBlockedException() {
 		super("usernameblocked");
 	}
-
-	public UsernameBlockedException(String message) {
-		super(message);
-	}
 }

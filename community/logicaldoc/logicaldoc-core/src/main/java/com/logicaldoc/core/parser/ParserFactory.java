@@ -107,8 +107,19 @@ public class ParserFactory {
 		parsers.put("pps", new PPTParser());
 		parsers.put("pot", new PPTParser());
 
-		// Zip
+		// Zip and GZip
 		parsers.put("zip", new ZipParser());
+		parsers.put("gz", new ZipParser());
+		parsers.put("tgz", new ZipParser());
+
+		// Rar
+		parsers.put("rar", new RarParser());
+
+		// Tar
+		parsers.put("tar", new TarParser());
+
+		// 7z
+		parsers.put("7z", new SevenZipParser());
 
 		// Epub
 		parsers.put("epub", new EpubParser());
@@ -150,12 +161,14 @@ public class ParserFactory {
 	 * 
 	 * @return the text extracted from the input
 	 */
-	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId, Document document, String fileVersion) {
+	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId,
+			Document document, String fileVersion) {
 		Parser parser = getParser(filename);
 		if (parser != null) {
 			TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 			Tenant t = dao.findById(tenantId);
-			return parser.parse(input, filename, encoding, locale, t != null ? t.getName() : Tenant.DEFAULT_NAME, document, fileVersion);
+			return parser.parse(input, filename, encoding, locale, t != null ? t.getName() : Tenant.DEFAULT_NAME,
+					document, fileVersion);
 		} else
 			return "";
 	}

@@ -47,7 +47,13 @@ public class GUIHistory implements Serializable {
 	private String userLogin = null;
 
 	private String icon = null;
+
+	private String protocol = null;
 	
+	private String tenant = null;
+	
+	private Long tenantId = null;
+
 	public long getDocId() {
 		return docId;
 	}
@@ -190,5 +196,29 @@ public class GUIHistory implements Serializable {
 
 	public void setIcon(String icon) {
 		this.icon = icon;
+	}
+
+	public String getProtocol() {
+		return protocol;
+	}
+
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
+	}
+
+	public String getTenant() {
+		return tenant;
+	}
+
+	public void setTenant(String tenant) {
+		this.tenant = tenant;
+	}
+
+	public Long getTenantId() {
+		return tenantId;
+	}
+
+	public void setTenantId(Long tenantId) {
+		this.tenantId = tenantId;
 	}
 }

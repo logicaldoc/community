@@ -6,13 +6,13 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -39,14 +39,12 @@ public class UserSearchDialog extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("users"));
-		setWidth(500);
-		setHeight(400);
 		setIsModal(true);
 		setShowModalMask(true);
 		setCanDragResize(true);
 		centerInPage();
-		setMembersMargin(5);
-		setAutoSize(true);
+		setWidth(500);
+		setHeight(300);
 
 		final TextItem username = ItemFactory.newTextItem("username", "username", null);
 		final SelectItem group = ItemFactory.newGroupSelector("group", "group");
@@ -69,13 +67,14 @@ public class UserSearchDialog extends Window {
 		toolStrip.addFormItem(group);
 		toolStrip.addButton(search);
 
+		UserListGridField avatar = new UserListGridField();
 		ListGridField usernameField = new ListGridField("username", I18N.message("username"));
 		ListGridField nameField = new ListGridField("firstname", I18N.message("firstname"));
 		ListGridField lastnameField = new ListGridField("lastname", I18N.message("lastname"));
 
-		grid.setFields(usernameField, nameField, lastnameField);
+		grid.setFields(avatar, usernameField, nameField, lastnameField);
 		grid.setWidth100();
-		grid.setHeight(getHeight());
+		grid.setHeight100();
 		grid.setSelectionType(SelectionStyle.SINGLE);
 		grid.setEmptyMessage(I18N.message("notitemstoshow"));
 		grid.setCanFreezeFields(true);
@@ -90,14 +89,6 @@ public class UserSearchDialog extends Window {
 			}
 		});
 
-		addResizedHandler(new ResizedHandler() {
-
-			@Override
-			public void onResized(ResizedEvent event) {
-				grid.setHeight(getHeight() - 68);
-			}
-		});
-
 		addItem(toolStrip);
 		addItem(grid);
 	}
@@ -106,7 +97,7 @@ public class UserSearchDialog extends Window {
 		SecurityService.Instance.get().searchUsers(username, groupId, new AsyncCallback<GUIUser[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 			}
 
@@ -117,6 +108,7 @@ public class UserSearchDialog extends Window {
 					GUIUser hit = result[i];
 					ListGridRecord record = new ListGridRecord();
 					lastResult[i] = record;
+					record.setAttribute("avatar", hit.getId());
 					record.setAttribute("id", hit.getId());
 					record.setAttribute("username", hit.getUsername());
 					record.setAttribute("firstname", hit.getFirstName());

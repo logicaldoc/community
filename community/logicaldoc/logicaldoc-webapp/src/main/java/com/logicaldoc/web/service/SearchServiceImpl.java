@@ -32,6 +32,8 @@ import com.logicaldoc.core.searchengine.folder.FolderCriterion;
 import com.logicaldoc.core.searchengine.folder.FolderSearchOptions;
 import com.logicaldoc.core.searchengine.saved.SearchDAO;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
@@ -106,6 +108,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 				GUIDocument h = null;
 				if (hit.getType().startsWith("folder")) {
 					h = DocumentServiceImpl.fromDocument(hit, null, null);
+					h.setIcon(hit.getType());
 				} else {
 					Document doc = docDao.findById(hit.getId());
 					if (doc != null) {
@@ -237,7 +240,8 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
-			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(), name);
+			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(),
+					name);
 			if (search != null)
 				return toGUIOptions(search.readOptions());
 			else
@@ -279,7 +283,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 	 * @return the list of search options
 	 * 
 	 * @throws PersistenceException A problem at db level
-	 * @throws IOException
+	 * @throws IOException a generic IO error
 	 */
 	public static List<SearchOptions> getSearches(Session session) throws PersistenceException, IOException {
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
@@ -287,7 +291,11 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		Map<String, SearchOptions> map = new HashMap<String, SearchOptions>();
 		List<com.logicaldoc.core.searchengine.saved.SavedSearch> searches = dao.findByUserId(session.getUserId());
 		for (com.logicaldoc.core.searchengine.saved.SavedSearch search : searches) {
-			map.put(search.getName(), search.readOptions());
+			try {
+				map.put(search.getName(), search.readOptions());
+			} catch (Throwable e) {
+				log.error("Cannot process saved search {} of user {}", search.getName(), session.getUsername(), e);
+			}
 		}
 
 		List<SearchOptions> lecacyList = legacyGetSearches(session);
@@ -380,12 +388,13 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 	}
 
 	@Override
-	public void shareSearch(String name, long[] userIds) throws ServerException {
+	public void shareSearch(String name, long[] userIds, long[] groupIds) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
-			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(), name);
+			com.logicaldoc.core.searchengine.saved.SavedSearch search = dao.findByUserIdAndName(session.getUserId(),
+					name);
 			if (search == null) {
 				// Perhaps the search is not already in the database
 				GUISearchOptions legacyOptions = legacyLoad(session.getUserId(), name);
@@ -396,10 +405,31 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 			}
 
 			if (search != null) {
-				for (long userId : userIds) {
-					com.logicaldoc.core.searchengine.saved.SavedSearch clone = search.clone();
-					clone.setUserId(userId);
-					dao.store(clone);
+				HashSet<Long> users = new HashSet<Long>();
+				if (userIds != null)
+					for (Long uId : userIds) {
+						if (!users.contains(uId))
+							users.add(uId);
+					}
+				if (groupIds != null) {
+					UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
+					for (Long gId : groupIds) {
+						Set<User> usrs = gDao.findByGroup(gId);
+						for (User user : usrs) {
+							if (!users.contains(user.getId()))
+								users.add(user.getId());
+						}
+					}
+				}
+
+				for (Long userId : users) {
+					try {
+						com.logicaldoc.core.searchengine.saved.SavedSearch clone = search.clone();
+						clone.setUserId(userId);
+						dao.store(clone);
+					} catch (Throwable t) {
+						log.warn("Cannot save search {} for user {}", search.getName(), userId, t);
+					}
 				}
 			}
 		} catch (Throwable t) {

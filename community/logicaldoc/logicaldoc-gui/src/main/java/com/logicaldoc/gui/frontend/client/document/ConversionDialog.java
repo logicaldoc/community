@@ -3,15 +3,14 @@ package com.logicaldoc.gui.frontend.client.document;
 import java.util.LinkedHashMap;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -67,7 +66,7 @@ public class ConversionDialog extends Window {
 			}
 		});
 
-		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false, 
+		FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
 				new AsyncCallback<GUIFolder>() {
 
 					@Override
@@ -99,30 +98,31 @@ public class ConversionDialog extends Window {
 
 		String format = form.getValueAsString("format");
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 		if ("save".equals(form.getValueAsString("action"))) {
 			DocumentService.Instance.get().convert(document.getId(), document.getFileVersion(), format,
 					new AsyncCallback<GUIDocument>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(GUIDocument doc) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							if (MainPanel.get().isOnDocumentsTab())
-								if (Session.get().getCurrentFolder() != null)
-									FolderNavigator.get().selectFolder(Session.get().getCurrentFolder().getId());
+								if (FolderController.get().getCurrentFolder() != null)
+									FolderNavigator.get()
+											.selectFolder(FolderController.get().getCurrentFolder().getId());
 							destroy();
 						}
 					});
 		} else {
-			WindowUtils.openUrl(Util.contextPath() + "convert?docId=" + document.getId() + "&fileVersion="
+			Util.download(Util.contextPath() + "convert?docId=" + document.getId() + "&fileVersion="
 					+ document.getFileVersion() + "&format=" + format);
-			ContactingServer.get().hide();
+			LD.clearPrompt();
 			destroy();
 		}
 	}

@@ -1,12 +1,19 @@
 package com.logicaldoc.webservice.rest;
 
-import javax.jws.WebParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSTemplate;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Document Metadata Service definition interface for REST.
@@ -17,46 +24,42 @@ import com.logicaldoc.webservice.model.WSTemplate;
  */
 @Consumes({ MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
+@Path("/")
+@Tag(name = "documentMetadata")
 public interface DocumentMetadataService {
-	
 
 	/**
 	 * Saves the options for the given attribute
 	 * 
-
+	 * 
 	 * @param setId The attribute set's id
 	 * @param attribute The attribute's name
 	 * @param values The attribute's options
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	public void setAttributeOptions(long setId, String attribute, String[] values) throws Exception;
-	
-	/**
-	 * Retrieves the options for the given attribute
-	 * 
-	 * @param setId The attribute set's id
-	 * @param attribute The attribute's name
-	 * 
-	 * @return the list of all the attribute's options
-	 * 
-	 * @throws Exception error in the server application
-	 */
-	public String[] getAttributeOptions(long setId, String attribute) throws Exception;	
+	@PUT
+	@Path("/setAttributeOptions")
+	public void setAttributeOptions(@QueryParam("setId")
+	long setId, @QueryParam("attribute")
+	String attribute, @QueryParam("values")
+	String[] values) throws Exception;
 
 	/**
 	 * Create/Update an attribute set. You can completely customize the
 	 * attribute set through a value object containing the attribute set's
 	 * metadata.
 	 * 
-	 * @param attributeSet set's value object containing the attribute set's metadata
+	 * @param attributeSet set's value object containing the attribute set's
+	 *        metadata
 	 * 
 	 * @return The ID of the new attribute set
 	 * 
 	 * @throws Exception error in the server application
 	 */
+	@POST
+	@Path("/storeAttributeSet")
 	public long storeAttributeSet(WSAttributeSet attributeSet) throws Exception;
-
 
 	/**
 	 * Create/Update a template. You can completely customize the template
@@ -68,9 +71,10 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
+	@POST
+	@Path("/storeTemplate")
 	public long storeTemplate(WSTemplate template) throws Exception;
-	
-	
+
 	/**
 	 * Gets attribute set's metadata
 	 * 
@@ -80,8 +84,11 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	public WSAttributeSet getAttributeSetById(long setId) throws Exception;	
-	
+	@GET
+	@Path("/getAttributeSetById")
+	public WSAttributeSet getAttributeSetById(@QueryParam("setId")
+	long setId) throws Exception;
+
 	/**
 	 * Gets attribute set's metadata
 	 * 
@@ -91,8 +98,10 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	public WSAttributeSet getAttributeSet(String name) throws Exception;
-	
+	@GET
+	@Path("/getAttributeSet")
+	public WSAttributeSet getAttributeSet(@QueryParam("name")
+	String name) throws Exception;
 
 	/**
 	 * Gets template's metadata
@@ -103,7 +112,10 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	public WSTemplate getTemplate(String name) throws Exception;
+	@GET
+	@Path("/getTemplate")
+	public WSTemplate getTemplate(@QueryParam("name")
+	String name) throws Exception;
 
 	/**
 	 * Gets template's metadata
@@ -114,18 +126,27 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	public WSTemplate getTemplateById(long templateId) throws Exception;
-	
+	@GET
+	@Path("/getTemplateById")
+	public WSTemplate getTemplateById(@QueryParam("templateId")
+	long templateId) throws Exception;
+
 	/**
-	 * Gets metadata of all existing templates.
+	 * Retrieves the options for the given attribute
 	 * 
-	 * @return The list of all templates
+	 * @param setId The attribute set's id
+	 * @param attribute The attribute's name
+	 * 
+	 * @return the list of all the attribute's options
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	public WSTemplate[] listTemplates() throws Exception;
+	@GET
+	@Path("/getAttributeOptions")
+	public String[] getAttributeOptions(@QueryParam("setId")
+	long setId, @QueryParam("attribute")
+	String attribute) throws Exception;
 
-	
 	/**
 	 * Gets metadata of all existing attribute sets.
 	 * 
@@ -133,8 +154,9 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
+	@GET
+	@Path("/listAttributeSets")
 	public WSAttributeSet[] listAttributeSets() throws Exception;
-
 
 	/**
 	 * Deletes an existing attribute set with the given identifier.
@@ -143,9 +165,11 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	public void deleteAttributeSet(@WebParam(name = "setId") long setId) throws Exception;
+	@DELETE
+	@Path("/deleteAttributeSet")
+	public void deleteAttributeSet(@QueryParam("setId")
+	long setId) throws Exception;
 
-	
 	/**
 	 * Deletes an existing template with the given identifier
 	 * 
@@ -153,6 +177,19 @@ public interface DocumentMetadataService {
 	 * 
 	 * @throws Exception error in the server application
 	 */
-	public void deleteTemplate(long templateId) throws Exception;	
-	
+	@DELETE
+	@Path("/deleteTemplate")
+	public void deleteTemplate(@QueryParam("templateId")
+	long templateId) throws Exception;
+
+	/**
+	 * Gets metadata of all existing templates.
+	 * 
+	 * @return The list of all templates
+	 * 
+	 * @throws Exception error in the server application
+	 */
+	@GET
+	@Path("/listTemplates")
+	public WSTemplate[] listTemplates() throws Exception;
 }

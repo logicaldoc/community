@@ -212,14 +212,13 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	}
 
 	public void refresh() {
-		refresh(null);
+		refresh((Integer) null);
 	}
 
 	public void refresh(Integer visualizationMode) {
 		if (visualizationMode != null)
 			this.visualizationMode = visualizationMode;
 		updateListingPanel(folder);
-
 		scheduleFolderDetailsRefresh();
 	}
 
@@ -228,8 +227,10 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
 			((DocumentsListPanel) listingPanel).updateData(folder);
 		} else {
-			listing.removeMember(listingPanel);
-			listingPanel.destroy();
+			if (listingPanel != null) {
+				listing.removeMember(listingPanel);
+				listingPanel.destroy();
+			}
 			listingPanel = new DocumentsListPanel(folder, visualizationMode);
 			listing.addMember(listingPanel);
 			listing.redraw();
@@ -257,8 +258,10 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 				&& ((DocumentsListPanel) listingPanel).getVisualizationMode() == visualizationMode) {
 			((DocumentsListPanel) listingPanel).updateData(folder);
 		} else {
-			listing.removeMember(listingPanel);
-			listingPanel.destroy();
+			if(listingPanel!=null) {
+				listing.removeMember(listingPanel);
+				listingPanel.destroy();
+			}
 			listingPanel = new DocumentsListPanel(folder, visualizationMode);
 			listing.addMember(listingPanel);
 			listing.redraw();
@@ -321,9 +324,42 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	@Override
 	public void onDocumentModified(GUIDocument document) {
-		if (Session.get().getCurrentDocument() != null
-				&& Session.get().getCurrentDocument().getId() == document.getId())
+		if (DocumentController.get().getCurrentDocument() != null
+				&& DocumentController.get().getCurrentDocument().getId() == document.getId()
+				&& !DocumentController.get().isEditing(document)) {
 			previewPanel.setDocument(document);
+
+			if (DocumentController.get().isEditing(document))
+				onDocumentCancelEditing(document);
+		}
+	}
+
+	@Override
+	public void onDocumentBeginEditing(GUIDocument document) {
+		DocumentsGrid grid = getDocumentsGrid();
+		if (grid.getSelectedDocument().getId() == document.getId()) {
+			disableAll();
+		}
+	}
+
+	@Override
+	public void onDocumentCancelEditing(GUIDocument document) {
+		DocumentsGrid grid = getDocumentsGrid();
+		if (grid.getSelectedDocument().getId() == document.getId()) {
+			enableAll();
+		}
+	}
+
+	private void enableAll() {
+		listingPanel.enable();
+		DocumentToolbar.get().enable();
+		documentsMenu.enable();
+	}
+
+	private void disableAll() {
+		listingPanel.disable();
+		DocumentToolbar.get().disable();
+		documentsMenu.disable();
 	}
 
 	@Override
@@ -331,7 +367,9 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		if (!MainPanel.get().isOnDocumentsTab())
 			return;
 
-		if (folder.getId() != document.getFolder().getId())
+		if (folder.getFoldRef() != null && folder.getFoldRef() != document.getFolder().getId())
+			return;
+		else if (folder.getFoldRef() == null && folder.getId() != document.getFolder().getId())
 			return;
 
 		if (detailPanel != null && !(detailPanel instanceof DocumentDetailsPanel)) {
@@ -401,7 +439,15 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 
 	@Override
 	public void onFolderChanged(GUIFolder folder) {
-		// Nothing to do
+		if (FolderController.get().getCurrentFolder().getId() == folder.getId()) {
+			enableAll();
+			if (listingPanel != null) {
+				listing.removeMember(listingPanel);
+				listingPanel.destroy();
+				listingPanel = null;
+			}
+			onFolderSelected(folder);
+		}
 	}
 
 	@Override
@@ -421,6 +467,16 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		if (listingPanel != null && listingPanel instanceof DocumentsListPanel)
 			((DocumentsListPanel) listingPanel).getGrid().getGridCursor().setCurrentPage(1);
 		refresh();
+	}
+
+	@Override
+	public void onFolderBeginEditing(GUIFolder folder) {
+		if (FolderController.get().getCurrentFolder().getId() == folder.getId())
+			disableAll();
+	}
+
+	@Override
+	public void onFolderCancelEditing(GUIFolder folder) {
 	}
 
 	@Override

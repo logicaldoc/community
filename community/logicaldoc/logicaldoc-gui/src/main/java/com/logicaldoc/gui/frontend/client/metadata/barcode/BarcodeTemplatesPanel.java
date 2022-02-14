@@ -74,7 +74,9 @@ public class BarcodeTemplatesPanel extends VLayout {
 	private ToolStrip toolStrip;
 
 	private HLayout editorPanel;
-	
+
+	private HTMLFlow hint;
+
 	public BarcodeTemplatesPanel(GUITemplate selectedDocumentTemplate) {
 		setWidth100();
 		setHeight100();
@@ -84,10 +86,6 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 	@Override
 	public void onDraw() {
-		HTMLFlow hint = new HTMLFlow(I18N.message("barcodepatternhint"));
-		hint.setMargin(3);
-		setMembers(hint);
-
 		refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null, null);
 	}
 
@@ -125,10 +123,15 @@ public class BarcodeTemplatesPanel extends VLayout {
 	}
 
 	private void refresh(Long documentTemplateId, Long barcodeTemplateId) {
+		if (hint != null)
+			removeMember(hint);
 		if (toolStrip != null)
 			removeMember(toolStrip);
 		if (editorPanel != null)
 			removeMember(editorPanel);
+
+		hint = new HTMLFlow(I18N.message("barcodepatternhint"));
+		hint.setMargin(3);
 
 		templateSelector = ItemFactory.newTemplateSelector(true, documentTemplateId);
 		templateSelector.setWrapTitle(false);
@@ -334,12 +337,12 @@ public class BarcodeTemplatesPanel extends VLayout {
 		toolStrip.addSeparator();
 		toolStrip.addButton(close);
 		toolStrip.addFill();
-		
-		editorPanel=new HLayout();
+
+		editorPanel = new HLayout();
 		editorPanel.setWidth100();
 		editorPanel.setHeight100();
 		editorPanel.setOverflow(Overflow.AUTO);
-		setMembers(toolStrip, editorPanel);
+		setMembers(hint, toolStrip, editorPanel);
 
 		if (selectedBarcodeTemplate != null && selectedBarcodeTemplate.isZonal()) {
 			String url = Util.contextPath() + "barcodetemplateimage/" + selectedBarcodeTemplate.getId() + "?random="
@@ -356,8 +359,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 			positionalGrid = new PositionalBarcodesGrid(selectedBarcodeTemplate);
 			editorPanel.addMember(positionalGrid);
 		}
-		
-		
+
 		settings.setDisabled(selectedBarcodeTemplate == null);
 		save.setDisabled(selectedBarcodeTemplate == null);
 		append.setDisabled(selectedBarcodeTemplate == null);

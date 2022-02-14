@@ -31,7 +31,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
-public abstract class AbstractWebServiceTestCase {
+public abstract class AbstractWebserviceTestCase {
 
 	protected ApplicationContext context;
 
@@ -40,6 +40,8 @@ public abstract class AbstractWebServiceTestCase {
 	protected File tempDir = new File("target/tmp");
 
 	protected File coreSchemaFile;
+	
+	protected File wsSchemaFile;
 
 	protected File dataFile;
 
@@ -66,10 +68,12 @@ public abstract class AbstractWebServiceTestCase {
 		Assert.assertTrue(tempDir.exists() && tempDir.isDirectory());
 
 		coreSchemaFile = new File(tempDir, "logicaldoc-core.sql");
+		wsSchemaFile = new File(tempDir, "logicaldoc-webservice.sql");
 		dataFile = new File(tempDir, "data.sql");
 
 		// Copy sql files
 		copyResource("/sql/logicaldoc-core.sql", coreSchemaFile.getCanonicalPath());
+		copyResource("/sql/logicaldoc-webservice.sql", wsSchemaFile.getCanonicalPath());
 		copyResource("/data.sql", dataFile.getCanonicalPath());
 	}
 
@@ -147,6 +151,11 @@ public abstract class AbstractWebServiceTestCase {
 			sqlFile.setConnection(con);
 			sqlFile.execute();
 
+			// Load webservice
+			sqlFile = new SqlFile(wsSchemaFile, "Cp1252", false);
+			sqlFile.setConnection(con);
+			sqlFile.execute();
+			
 			// Load data
 			sqlFile = new SqlFile(dataFile, "Cp1252", false);
 			sqlFile.setConnection(con);

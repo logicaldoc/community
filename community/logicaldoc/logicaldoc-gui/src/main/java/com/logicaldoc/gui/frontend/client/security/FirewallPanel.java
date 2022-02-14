@@ -14,6 +14,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -87,6 +88,17 @@ public class FirewallPanel extends VLayout {
 			form.setNumCols(2);
 		else
 			form.setNumCols(1);
+
+		RadioGroupItem enabled = ItemFactory.newBooleanSelector("eenabled", "enabled");
+		enabled.setValue(Session.get().getConfigAsBoolean("firewall.enabled"));
+		enabled.setWrapTitle(false);
+		enabled.setRequired(true);
+		if (changedHandler != null)
+			enabled.addChangedHandler(changedHandler);
+		if (Session.get().isDemo())
+			enabled.setDisabled(true);
+		
+		
 		final TextAreaItem whitelist = ItemFactory.newTextAreaItem("whitelist", "whitelist", null);
 		whitelist.setHeight(120);
 		whitelist.setWidth(350);
@@ -105,14 +117,14 @@ public class FirewallPanel extends VLayout {
 		if (Session.get().isDemo())
 			blacklist.setDisabled(true);
 
-		form.setItems(whitelist, blacklist);
-
 		if (user == null) {
 			/*
 			 * We are operating on general filters
 			 */
+			form.setItems(enabled, whitelist, blacklist);
 			SettingService.Instance.get().loadSettingsByNames(
-					new String[] { "firewall.whitelist", "firewall.blacklist" }, new AsyncCallback<GUIParameter[]>() {
+					new String[] { "firewall.enabled", "firewall.whitelist", "firewall.blacklist" },
+					new AsyncCallback<GUIParameter[]>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
@@ -120,28 +132,33 @@ public class FirewallPanel extends VLayout {
 
 						@Override
 						public void onSuccess(GUIParameter[] params) {
-							whitelist.setValue(params[0].getValue().replace(',', '\n'));
-							blacklist.setValue(params[1].getValue().replace(',', '\n'));
+							enabled.setValue("true".equals(params[0].getValue()) ? "yes" : "no");
+							whitelist.setValue(params[1].getValue().replace(',', '\n'));
+							blacklist.setValue(params[2].getValue().replace(',', '\n'));
 						}
 					});
 		} else {
 			/*
 			 * We are operating on user's specific filters
 			 */
+			form.setItems(whitelist, blacklist);
 			whitelist.setValue(user.getIpWhitelist() != null ? user.getIpWhitelist().replace(',', '\n') : "");
 			blacklist.setValue(user.getIpBlacklist() != null ? user.getIpBlacklist().replace(',', '\n') : "");
 		}
 	}
 
 	public void onSave() {
+		String enabled = "yes".equals(vm.getValueAsString("eenabled")) ? "true" : "false";
 		String whitelist = vm.getValueAsString("whitelist");
 		String blacklist = vm.getValueAsString("blacklist");
 
-		GUIParameter[] params = new GUIParameter[2];
-		params[0] = new GUIParameter("firewall.whitelist", whitelist != null ? whitelist.replace('\n', ',').replaceAll(
-				" ", "") : null);
-		params[1] = new GUIParameter("firewall.blacklist", blacklist != null ? blacklist.replace('\n', ',').replaceAll(
-				" ", "") : null);
+		GUIParameter[] params = new GUIParameter[3];
+
+		params[0] = new GUIParameter("firewall.enabled", enabled);
+		params[1] = new GUIParameter("firewall.whitelist",
+				whitelist != null ? whitelist.replace('\n', ',').replaceAll(" ", "") : null);
+		params[2] = new GUIParameter("firewall.blacklist",
+				blacklist != null ? blacklist.replace('\n', ',').replaceAll(" ", "") : null);
 
 		SettingService.Instance.get().saveSettings(params, new AsyncCallback<Void>() {
 			@Override

@@ -105,16 +105,16 @@ public class WebsocketListener implements com.sksamuel.gwt.websockets.WebsocketL
 					|| "event.password.protected".equals(event.getEvent())
 					|| "event.password.unprotected".equals(event.getEvent())
 					|| "event.workflowstatus".equals(event.getEvent())) {
-				if (Session.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
-					event.getDocument().setFolder(Session.get().getCurrentFolder());
+				if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
+					event.getDocument().setFolder(FolderController.get().getCurrentFolder());
 				DocumentController.get().modified(event.getDocument());
 			} else if ("event.stored".equals(event.getEvent())) {
-				if (Session.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
-					event.getDocument().setFolder(Session.get().getCurrentFolder());
+				if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
+					event.getDocument().setFolder(FolderController.get().getCurrentFolder());
 				DocumentController.get().stored(event.getDocument());
 			} else if ("event.moved".equals(event.getEvent())) {
-				if (Session.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
-					event.getDocument().setFolder(Session.get().getCurrentFolder());
+				if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
+					event.getDocument().setFolder(FolderController.get().getCurrentFolder());
 				DocumentController.get().moved(event.getDocument());
 			} else if ("event.deleted".equals(event.getEvent())) {
 				DocumentController.get().deleted(new GUIDocument[] { event.getDocument() });

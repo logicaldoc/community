@@ -19,6 +19,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -88,12 +89,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 		TextItem username = ItemFactory.newTextItemPreventAutocomplete("username", "user", this.server.getUsername());
 		username.setCellStyle("warn");
 		username.setWidth(300);
-
-		// Password
-		PasswordItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", I18N.message("password"),
-				this.server.getPassword());
-		password.setCellStyle("warn");
-		password.setWidth(300);
 
 		// User type
 		SelectItem userType = ItemFactory.newUserTypeSelector("usertype", this.server.getUserType());
@@ -194,11 +189,17 @@ public class LDAPServerDetailsPanel extends VLayout {
 		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
 				this.server.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
-		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
+		PasswordItem hiddenPassword = ItemFactory.newPasswordItem("password_hidden", "password_hidden",
 				this.server.getPassword());
-		fakePassword.setCellStyle("nodisplay");
+		hiddenPassword.setCellStyle("nodisplay");
 
-		ldapForm.setItems(enabled, url, fakeUsername, fakePassword, username, password, anon, syncTtl, pageSize,
+		// Password
+		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),
+				this.server.getPassword(), hiddenPassword, null);
+		password.setCellStyle("warn");
+		password.setWidth(300);
+
+		ldapForm.setItems(enabled, url, fakeUsername, hiddenPassword, username, password, anon, syncTtl, pageSize,
 				timeout, language, userType, keepMembership, userIdentifierAttr, grpIdentifierAttr, userClass,
 				groupClass, usersBaseNode, groupsBaseNode, userInclude, groupInclude, userExclude, groupExclude,
 				logonAttr, realm, validation);
@@ -233,7 +234,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 							.setKeepLocalMemberships(values.get("keepmembership").equals("yes") ? true : false);
 					LDAPServerDetailsPanel.this.server.setUrl((String) values.get("url"));
 					LDAPServerDetailsPanel.this.server.setUsername((String) values.get("username"));
-					LDAPServerDetailsPanel.this.server.setPassword((String) values.get("password"));
 					LDAPServerDetailsPanel.this.server.setRealm((String) values.get("realm"));
 					LDAPServerDetailsPanel.this.server.setUserIdentifierAttr((String) values.get("useridentifierattr"));
 					LDAPServerDetailsPanel.this.server.setGroupIdentifierAttr((String) values.get("grpidentifierattr"));
@@ -249,10 +249,14 @@ public class LDAPServerDetailsPanel extends VLayout {
 					LDAPServerDetailsPanel.this.server.setLanguage((String) values.get("language"));
 					LDAPServerDetailsPanel.this.server.setValidation((String) values.get("validation"));
 
+					LDAPServerDetailsPanel.this.server.setPassword((String) values.get("password_hidden"));
+					
 					if (browser != null && browser instanceof LDAPBrowser)
 						browser.setServer(LDAPServerDetailsPanel.this.server);
 
 					listing.updateRecord(LDAPServerDetailsPanel.this.server);
+
+
 
 					LDAPService.Instance.get().testConnection(LDAPServerDetailsPanel.this.server,
 							new AsyncCallback<Boolean>() {
@@ -317,7 +321,6 @@ public class LDAPServerDetailsPanel extends VLayout {
 							.setKeepLocalMemberships(values.get("keepmembership").equals("yes") ? true : false);
 					LDAPServerDetailsPanel.this.server.setUrl((String) values.get("url"));
 					LDAPServerDetailsPanel.this.server.setUsername((String) values.get("username"));
-					LDAPServerDetailsPanel.this.server.setPassword((String) values.get("password"));
 					LDAPServerDetailsPanel.this.server.setRealm((String) values.get("realm"));
 					LDAPServerDetailsPanel.this.server.setUserIdentifierAttr((String) values.get("useridentifierattr"));
 					LDAPServerDetailsPanel.this.server.setGroupIdentifierAttr((String) values.get("grpidentifierattr"));
@@ -337,6 +340,8 @@ public class LDAPServerDetailsPanel extends VLayout {
 					LDAPServerDetailsPanel.this.server.setValidation((String) values.get("validation"));
 					LDAPServerDetailsPanel.this.server.setTimeout(Integer.parseInt(values.get("timeout").toString()));
 
+					LDAPServerDetailsPanel.this.server.setPassword((String) values.get("password_hidden"));
+					
 					LDAPService.Instance.get().save(LDAPServerDetailsPanel.this.server,
 							new AsyncCallback<GUILDAPServer>() {
 

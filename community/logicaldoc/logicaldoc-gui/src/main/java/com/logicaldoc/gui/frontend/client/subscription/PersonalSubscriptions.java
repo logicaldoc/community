@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
@@ -99,7 +100,8 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 			list.destroy();
 		}
 
-		ListGridField id = new ListGridField("id", 50);
+		ListGridField id = new ColoredListGridField("id");
+		id.setWidth(50);
 		id.setHidden(true);
 
 		ListGridField icon = new ListGridField("icon", " ", 25);
@@ -111,7 +113,7 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 		icon.setImageURLSuffix(".png");
 		icon.setCanFilter(false);
 
-		ListGridField name = new ListGridField("name", I18N.message("name"));
+		ListGridField name = new ColoredListGridField("name", I18N.message("name"));
 		name.setWidth("*");
 		name.setCanFilter(true);
 
@@ -145,8 +147,10 @@ public class PersonalSubscriptions extends com.smartgwt.client.widgets.Window {
 				Long id = list.getSelectedRecord().getAttributeAsLong("objectid");
 				if ("document".equals(type)) {
 					DocUtil.download(id, null);
-				} else
+				} else {
 					DocumentsPanel.get().openInFolder(id, null);
+					close();
+				}
 			}
 		});
 

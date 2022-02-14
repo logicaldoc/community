@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
@@ -32,7 +33,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hsqldb.lib.StringUtil;
 import org.jfree.util.Log;
 
-import com.ibm.icu.util.Calendar;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;

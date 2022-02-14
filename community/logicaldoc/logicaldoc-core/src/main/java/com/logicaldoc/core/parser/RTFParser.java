@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * @author Michael Scholz
@@ -98,5 +99,27 @@ public class RTFParser extends AbstractParser {
 		rek.read(input, doc, 0);
 		String text = doc.getText(0, doc.getLength());
 		return text;
+	}
+
+	@Override
+	public int countPages(InputStream input, String filename) {
+		try {
+			String text = StringUtil.writeToString(input, "utf8");
+			return text != null ? text.split("\\page").length : 1;
+		} catch (Throwable e) {
+			log.error(e.getMessage());
+		}
+		return 1;
+	}
+
+	@Override
+	public int countPages(File input, String filename) {
+		try {
+			String text = FileUtil.readFile(input);
+			return text != null ? text.split("\\\\page").length : 1;
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+		}
+		return 1;
 	}
 }

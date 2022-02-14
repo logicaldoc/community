@@ -21,9 +21,9 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.DocumentCheckin;
@@ -44,8 +44,6 @@ import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
-import com.smartgwt.client.widgets.events.CloseClickEvent;
-import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -143,14 +141,6 @@ public class TaskDetailsDialog extends Window {
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-
-		addCloseClickHandler(new CloseClickHandler() {
-			@Override
-			public void onCloseClick(CloseClickEvent event) {
-				workflowDashboard.refresh();
-				destroy();
-			}
-		});
 
 		tabs = new TabSet();
 		tabs.setWidth100();
@@ -264,6 +254,9 @@ public class TaskDetailsDialog extends Window {
 
 		StaticTextItem taskName = ItemFactory.newStaticTextItem("taskName", I18N.message("name"),
 				workflow.getSelectedTask().getName());
+		if (workflow.getSelectedTask().getDisplay() != null)
+			taskName.setValue("<span style='color:" + workflow.getSelectedTask().getDisplay() + "'>"
+					+ workflow.getSelectedTask().getName() + "</span>");
 
 		StaticTextItem taskDescription = ItemFactory.newStaticTextItem("taskDescription", I18N.message("description"),
 				workflow.getSelectedTask().getDescription());
@@ -271,7 +264,8 @@ public class TaskDetailsDialog extends Window {
 
 		StaticTextItem taskAssignee = ItemFactory.newStaticTextItem("taskAssignee", I18N.message("assignee"), "");
 		if (workflow.getSelectedTask().getOwner() != null && !workflow.getSelectedTask().getOwner().trim().isEmpty())
-			taskAssignee.setValue(workflow.getSelectedTask().getOwner());
+			taskAssignee.setValue(
+					Util.avatarWithText(workflow.getSelectedTask().getOwner(), workflow.getSelectedTask().getOwner()));
 		else if (workflow.getSelectedTask().getPooledActors() != null
 				&& !workflow.getSelectedTask().getPooledActors().trim().isEmpty())
 			taskAssignee.setValue(workflow.getSelectedTask().getPooledActors());
@@ -305,11 +299,10 @@ public class TaskDetailsDialog extends Window {
 			public void onClick(com.smartgwt.client.widgets.events.ClickEvent event) {
 				final Window window = new Window();
 				window.setTitle(I18N.message("workflowtaskreassign"));
-				window.setWidth(250);
-				window.setHeight(120);
 				window.setCanDragResize(true);
 				window.setIsModal(true);
 				window.setShowModalMask(true);
+				window.setAutoSize(true);
 				window.centerInPage();
 
 				DynamicForm reassignUserForm = new DynamicForm();
@@ -317,6 +310,7 @@ public class TaskDetailsDialog extends Window {
 				reassignUserForm.setNumCols(1);
 				reassignUserForm.setValuesManager(vm);
 				user = ItemFactory.newUserSelector("user", I18N.message("user"), null, true, true);
+				user.setWidth(250);
 				user.setShowTitle(true);
 				user.setDisplayField("username");
 
@@ -344,6 +338,7 @@ public class TaskDetailsDialog extends Window {
 											window.destroy();
 											workflow = result;
 											reload(workflow);
+											workflowDashboard.refresh(workflow.getId());
 										}
 									}
 								});
@@ -379,7 +374,7 @@ public class TaskDetailsDialog extends Window {
 								workflow = result;
 								result.getSelectedTask().setOwner(Session.get().getUser().getUsername());
 								reload(workflow);
-								TaskDetailsDialog.this.workflowDashboard.refresh();
+								TaskDetailsDialog.this.workflowDashboard.refresh(workflow.getId());
 							}
 						});
 			}
@@ -416,7 +411,7 @@ public class TaskDetailsDialog extends Window {
 											@Override
 											public void onSuccess(GUIWorkflow result) {
 												destroy();
-												TaskDetailsDialog.this.workflowDashboard.refresh();
+												TaskDetailsDialog.this.workflowDashboard.refresh(workflow.getId());
 											}
 										});
 							}
@@ -562,6 +557,11 @@ public class TaskDetailsDialog extends Window {
 		tabs.selectTab(notesTab);
 	}
 
+	public void onNewNote(String note) {
+		refreshAndSelectNotesTab();
+		workflowDashboard.refresh(workflow.getId());
+	}
+	
 	private void prepareNotesPanel() {
 		ListGridField id = new ListGridField("id", I18N.message("id"), 50);
 		id.setHidden(true);
@@ -573,7 +573,7 @@ public class TaskDetailsDialog extends Window {
 		taskId.setHidden(true);
 
 		ListGridField task = new ListGridField("name", I18N.message("task"), 150);
-		ListGridField user = new AvatarListGridField("user", "userId", "user", 160);
+		ListGridField user = new UserListGridField("user", "userId", "user");
 		ListGridField date = new DateListGridField("date", "date");
 
 		notesGrid = new ListGrid() {
@@ -971,7 +971,8 @@ public class TaskDetailsDialog extends Window {
 									@Override
 									public void onSuccess(GUIFolder folder) {
 										if (folder != null) {
-											preview.setEnabled(true);
+											preview.setEnabled(com.logicaldoc.gui.common.client.Menu
+													.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 											open.setEnabled(true);
 											if (folder.isDownload())
 												download.setEnabled(true);
@@ -1067,7 +1068,7 @@ public class TaskDetailsDialog extends Window {
 
 			@Override
 			public void onSuccess(Void result) {
-				TaskDetailsDialog.this.workflowDashboard.refresh();
+				TaskDetailsDialog.this.workflowDashboard.refresh(workflow.getId());
 				destroy();
 			}
 		});

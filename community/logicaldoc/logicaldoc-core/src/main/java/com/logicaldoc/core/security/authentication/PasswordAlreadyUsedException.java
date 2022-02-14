@@ -18,12 +18,7 @@ public class PasswordAlreadyUsedException extends AuthenticationException {
 		super("passwordalreadyused");
 		this.date = date;
 	}
-
-	public PasswordAlreadyUsedException(String message, Date date) {
-		super(message);
-		this.date = date;
-	}
-
+	
 	public Date getDate() {
 		return date;
 	}
@@ -43,5 +38,10 @@ public class PasswordAlreadyUsedException extends AuthenticationException {
 			return super.getMessage();
 		else
 			return super.getMessage() + " - " + getFormattedDate();
+	}
+
+	@Override
+	public boolean mustRecordFailure() {
+		return false;
 	}
 }

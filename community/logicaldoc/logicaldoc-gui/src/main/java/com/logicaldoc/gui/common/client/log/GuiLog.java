@@ -5,8 +5,8 @@ import com.google.gwt.http.client.RequestTimeoutException;
 import com.logicaldoc.gui.common.client.InvalidSessionException;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.smartgwt.client.util.SC;
 
 /**
@@ -32,7 +32,7 @@ public class GuiLog {
 	 */
 	public static void serverError(String message, Throwable caught) {
 		try {
-			ContactingServer.get().hide();
+			LD.clearPrompt();
 
 			// Hide download exceptions that normally are raised on double
 			// click.

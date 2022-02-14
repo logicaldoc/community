@@ -53,8 +53,9 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	}
 
 	@Override
-	public void copy(String sid, long folderId, long parentId, int foldersOnly, int inheritSecurity) throws Exception {
-		client.copy(sid, folderId, parentId, foldersOnly, inheritSecurity);
+	public void copy(String sid, long folderId, long parentId, int foldersOnly, String securityOption)
+			throws Exception {
+		client.copy(sid, folderId, parentId, foldersOnly, securityOption);
 	}
 
 	@Override
@@ -136,5 +137,10 @@ public class SoapFolderClient extends SoapClient<FolderService> implements Folde
 	@Override
 	public WSFolder createAlias(String sid, long parentId, long foldRef) throws Exception {
 		return client.createAlias(sid, parentId, foldRef);
+	}
+
+	@Override
+	public void merge(String sid, long sourceId, long targetId) throws Exception {
+		client.merge(sid, sourceId, targetId);
 	}
 }

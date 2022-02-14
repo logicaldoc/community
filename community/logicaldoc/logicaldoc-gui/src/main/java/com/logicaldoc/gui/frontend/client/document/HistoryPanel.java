@@ -8,11 +8,12 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
@@ -43,9 +44,9 @@ public class HistoryPanel extends DocumentDetailTab {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		ListGridField user = new AvatarListGridField("user", "userId", "user", 110);
+		ListGridField user = new UserListGridField("user", "userId", "user");
 		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
-		ListGridField version = new ListGridField("version", I18N.message("version"), 70);
+		ListGridField version = new VersionListGridField();
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
 
 		ListGridField comment = new ListGridField("comment", I18N.message("comment"));

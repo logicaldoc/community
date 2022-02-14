@@ -70,6 +70,8 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 		if (device == null)
 			device = requestDevice;
 
+		if (StringUtils.isNotEmpty(requestDevice.getLabel()))
+			device.setLabel(requestDevice.getLabel());
 		device.setTrusted(1);
 		device.setUserId(user.getId());
 		device.setUsername(user.getFullName());
@@ -176,6 +178,28 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 				return null;
 			}
 		}
+	}
+
+	@Override
+	public boolean delete(long deviceId, int code) {
+		if (!checkStoringAspect())
+			return false;
+
+		boolean result = true;
+
+		try {
+			Device device = (Device) findById(deviceId);
+			if (device != null) {
+				device.setDeleted(code);
+				device.setDeviceId(device.getId() + "." + device.getDeviceId());
+				saveOrUpdate(device);
+			}
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			result = false;
+		}
+
+		return result;
 	}
 
 	public void setUserDAO(UserDAO userDAO) {

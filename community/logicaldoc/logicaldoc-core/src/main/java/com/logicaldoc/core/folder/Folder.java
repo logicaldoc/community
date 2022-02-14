@@ -593,4 +593,9 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	public void setBarcodeTemplateId(Long barcodeTemplateId) {
 		this.barcodeTemplateId = barcodeTemplateId;
 	}
+
+	@Override
+	public String toString() {
+		return getName() + "(" + getId() + ")";
+	}
 }

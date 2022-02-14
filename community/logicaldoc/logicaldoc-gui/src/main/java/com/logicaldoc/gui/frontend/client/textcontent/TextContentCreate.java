@@ -1,8 +1,8 @@
 package com.logicaldoc.gui.frontend.client.textcontent;
 
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.smartgwt.client.types.HeaderControls;
@@ -88,7 +88,7 @@ public class TextContentCreate extends Window {
 		vo.setFileName(filename);
 		vo.setStatus(1);
 		vo.setLanguage(I18N.getDefaultLocaleForDoc());
-		vo.setFolder(Session.get().getCurrentFolder());
+		vo.setFolder(FolderController.get().getCurrentFolder());
 
 		TextContentEditor popup = new TextContentEditor(vo, "");
 		popup.show();

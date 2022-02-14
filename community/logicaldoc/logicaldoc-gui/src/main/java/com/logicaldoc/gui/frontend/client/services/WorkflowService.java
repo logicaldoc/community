@@ -61,7 +61,7 @@ public interface WorkflowService extends RemoteService {
 	/**
 	 * Deletes a given workflow instances
 	 * 
-	 * @param id sidentifiers of the workflow instances
+	 * @param ids identifiers of the workflow instances
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */

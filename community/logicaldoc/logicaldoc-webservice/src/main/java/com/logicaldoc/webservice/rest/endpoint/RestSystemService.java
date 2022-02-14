@@ -27,8 +27,7 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 	
 	@Override
 	@GET
-    @Path("/getInfo")
-	//@ApiOperation(value = "Get system information", notes = "Retrieves information about the Installation")	
+    @Path("/getInfo")	
 	@Operation(summary = "Get system information", description = "Retrieves information about the Installation")
 	public WSSystemInfo getInfo() throws Exception {
 		return super.getInfo();
@@ -37,7 +36,6 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 	@Override
 	@GET
     @Path("/getStatistics")
-	//@ApiOperation(value = "Get system statistics", notes ="Retrieves the system statistics")
 	@Operation(summary = "Get system statistics", description = "Retrieves the system statistics")
 	public WSParameter[] getStatistics() throws Exception {
 		String sid = validateSession();
@@ -47,7 +45,6 @@ public class RestSystemService extends SoapSystemService implements SystemServic
 	@Override
 	@GET
 	@Path("/getLanguages")
-	//@ApiOperation(value = "Get enabled languages", notes = "Retrieves the languages enabled in the server")
 	@Operation(summary = "Get enabled languages", description = "Retrieves the languages enabled in the server")
 	public String[] getLanguages() throws Exception {
 		String sid = validateSession();

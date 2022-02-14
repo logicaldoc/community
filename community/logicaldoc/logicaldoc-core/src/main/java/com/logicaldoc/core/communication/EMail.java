@@ -62,9 +62,14 @@ public class EMail extends Message {
 	private int signed = 0;
 
 	/**
-	 * Indicates if the image must be discarded by the elaboration
+	 * Indicates if the email must be discarded by the elaboration
 	 */
 	private boolean skip = false;
+
+	/**
+	 * If this message supports the historycization in case of ourgoing message
+	 */
+	private boolean historicyze = true;
 
 	/**
 	 * Folder where the document representing this email will be saved in
@@ -308,7 +313,15 @@ public class EMail extends Message {
 						&& !emails.contains(recipient.getAddress().toLowerCase()))
 					emails.add(recipient.getAddress().toLowerCase());
 		}
-		
+
 		return emails;
+	}
+
+	public boolean isHistoricyze() {
+		return historicyze;
+	}
+
+	public void setHistoricyze(boolean historicyze) {
+		this.historicyze = historicyze;
 	}
 }

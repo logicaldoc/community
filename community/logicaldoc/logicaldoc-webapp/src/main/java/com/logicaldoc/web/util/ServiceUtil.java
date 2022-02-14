@@ -1,9 +1,12 @@
 package com.logicaldoc.web.util;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.ExtensibleObject;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Session.Log;
@@ -25,6 +32,7 @@ import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
 import com.logicaldoc.gui.common.client.InvalidSessionException;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.websockets.WebsocketTool;
@@ -244,5 +252,102 @@ public class ServiceUtil {
 		}
 
 		return task.isOver();
+	}
+	
+	/**
+	 * Prepares the extended attributes of an extensible object
+	 * 
+	 * @param template The template to consider
+	 * @param extensibleObject The GUI object to consider
+	 * 
+	 * @return The array of attributes
+	 */
+	public static GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
+		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		tDao.initialize(template);
+
+		List<GUIAttribute> attributes = new ArrayList<GUIAttribute>();
+		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
+			return new GUIAttribute[0];
+		try {
+			if (template != null) {
+				for (String attrName : template.getAttributeNames()) {
+					Attribute templateExtAttr = template.getAttributes().get(attrName);
+					GUIAttribute att = new GUIAttribute();
+					att.setName(attrName);
+					att.setSetId(templateExtAttr.getSetId());
+					att.setPosition(templateExtAttr.getPosition());
+					att.setLabel(templateExtAttr.getLabel());
+					att.setMandatory(templateExtAttr.getMandatory() == 1);
+					att.setHidden(templateExtAttr.getHidden() == 1);
+					att.setMultiple(templateExtAttr.getMultiple() == 1);
+					att.setParent(templateExtAttr.getParent());
+					att.setStringValues(templateExtAttr.getStringValues());
+					att.setEditor(templateExtAttr.getEditor());
+					att.setStringValue(templateExtAttr.getStringValue());
+					att.setIntValue(templateExtAttr.getIntValue());
+					att.setBooleanValue(templateExtAttr.getBooleanValue());
+					att.setDoubleValue(templateExtAttr.getDoubleValue());
+					att.setDateValue(templateExtAttr.getDateValue());
+					att.setOptions(new String[] { templateExtAttr.getStringValue() });
+
+					if (extensibleObject != null) {
+						Attribute attribute = extensibleObject.getAttribute(attrName);
+						if (attribute != null) {
+							att.setStringValues(attribute.getStringValues());
+							att.setStringValue(attribute.getStringValue());
+							att.setIntValue(attribute.getIntValue());
+							att.setBooleanValue(attribute.getBooleanValue());
+							att.setDoubleValue(attribute.getDoubleValue());
+							att.setDateValue(attribute.getDateValue());
+						} else
+							att.setValue(templateExtAttr.getValue());
+					}
+
+					// Normalize dates
+					if (att.getValue() instanceof Date)
+						att.setValue(ServiceUtil.convertToDate((Date) att.getValue()));
+
+					att.setType(templateExtAttr.getType());
+					attributes.add(att);
+
+					if (att.isMultiple() && extensibleObject != null) {
+						// Get the other values
+						List<Attribute> values = extensibleObject.getValueAttributes(att.getName());
+						if (values.size() > 1) {
+							// Skip the parent attribute
+							values.remove(0);
+
+							// Create the GUI attributes for the values
+							for (Attribute valAttribute : values) {
+								GUIAttribute valAtt = (GUIAttribute) att.clone();
+								valAtt.setName(valAttribute.getName());
+								valAtt.setParent(att.getName());
+								valAtt.setMultiple(false);
+								valAtt.setPosition(att.getPosition());
+								valAtt.setPosition(att.getPosition());
+								valAtt.setBooleanValue(valAttribute.getBooleanValue());
+								valAtt.setDateValue(valAttribute.getDateValue());
+								valAtt.setDoubleValue(valAttribute.getDoubleValue());
+								valAtt.setIntValue(valAttribute.getIntValue());
+								valAtt.setStringValue(valAttribute.getStringValue());
+								valAtt.setStringValues(null);
+
+								// Normalize dates
+								if (valAtt.getValue() instanceof Date)
+									valAtt.setValue(ServiceUtil.convertToDate((Date) valAtt.getValue()));
+								attributes.add(valAtt);
+							}
+						}
+					}
+				}
+			}
+
+			Collections.sort(attributes);
+			return attributes.toArray(new GUIAttribute[0]);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+			return null;
+		}
 	}
 }

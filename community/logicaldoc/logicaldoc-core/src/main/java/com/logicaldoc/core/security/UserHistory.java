@@ -21,7 +21,7 @@ public class UserHistory extends History {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
+	public UserHistory clone() {
 		UserHistory history = new UserHistory();
 		history.setDate(getDate());
 		history.setDocId(getDocId());

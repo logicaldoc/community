@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.search;
 
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.CookiesManager;
 import com.logicaldoc.gui.common.client.Session;
@@ -14,15 +13,16 @@ import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.observer.FolderObserver;
-import com.logicaldoc.gui.common.client.util.Util;
+import com.logicaldoc.gui.common.client.util.DocUtil;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.ContextMenu;
 import com.logicaldoc.gui.frontend.client.document.grid.Cursor;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsTileGrid;
-import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
@@ -55,14 +55,14 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 	public HitsListPanel() {
 		try {
-			if (CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE) != null) {				
+			if (CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE) != null) {
 				visualizationMode = Integer
 						.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE).toString());
 			}
 		} catch (Throwable t) {
 
 		}
-		
+
 		Search.get().addObserver(this);
 		DocumentController.get().addObserver(this);
 		FolderController.get().addObserver(this);
@@ -73,7 +73,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		if (grid != null)
 			removeMember((Canvas) grid);
 
-		ListGridField id = new ListGridField("id", 60);
+		ListGridField id = new ColoredListGridField("id", "id", 60);
 		id.setHidden(true);
 
 		if (visualizationMode == DocumentsGrid.MODE_LIST)
@@ -95,9 +95,9 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 				final String type = doc.getType();
 				long id = doc.getFolder().getId();
 
-				if (type == null || (!type.contains("folder") && Session.get().getCurrentDocument() != null
-						&& Session.get().getCurrentDocument().getId() == id)) {
-					showContextMenu(Session.get().getCurrentDocument().getFolder(), true);
+				if (type == null || (!type.contains("folder") && DocumentController.get().getCurrentDocument() != null
+						&& DocumentController.get().getCurrentDocument().getId() == id)) {
+					showContextMenu(DocumentController.get().getCurrentDocument().getFolder(), true);
 				} else {
 					/*
 					 * We need to retrieve the folder from the server
@@ -137,7 +137,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 								public void onSuccess(GUIFolder folder) {
 									if (folder.isDownload()
 											&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
-										Window.open(Util.downloadURL(doc.getId()), "_blank", "");
+										DocUtil.download(doc.getId(), null);
 									else {
 										PreviewPopup iv = new PreviewPopup(doc);
 										iv.show();
@@ -211,7 +211,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 		final GUIDocument hit = grid.getSelectedDocument();
 		if (hit != null)
-			if ("folder".equals(hit.getType()))
+			if (hit.getType().contains("folder"))
 				SearchPanel.get().onSelectedFolderHit(hit.getId());
 			else
 				SearchPanel.get().onSelectedDocumentHit(hit.getId());
@@ -286,6 +286,16 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	}
 
 	@Override
+	public void onFolderBeginEditing(GUIFolder folder) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onFolderCancelEditing(GUIFolder folder) {
+		// Nothing to do
+	}
+
+	@Override
 	public void onDocumentSelected(GUIDocument document) {
 		// Nothing to do
 	}
@@ -329,6 +339,16 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	@Override
 	public void onDocumentStored(GUIDocument document) {
 
+	}
+
+	@Override
+	public void onDocumentBeginEditing(GUIDocument document) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onDocumentCancelEditing(GUIDocument document) {
+		// Nothing to do
 	}
 
 	@Override

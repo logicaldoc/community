@@ -68,7 +68,7 @@ public interface SecurityServiceAsync {
 
 	void saveMenu(GUIMenu menu, String locale, AsyncCallback<GUIMenu> callback);
 
-	void trustDevice(AsyncCallback<String> callback);
+	void trustDevice(String label, AsyncCallback<String> callback);
 
 	void isTrustedDevice(String device, AsyncCallback<Boolean> callback);
 
@@ -77,4 +77,10 @@ public interface SecurityServiceAsync {
 	void syncGeolocationDB(String key, AsyncCallback<String> callback);
 
 	void resetAvatar(long userId, AsyncCallback<Void> callback);
+
+	void cloneWorkTimes(long srcUserId, long[] userIds, long[] groupIds, AsyncCallback<Void> callback);
+
+	void changeStatus(long userId, boolean enabled, AsyncCallback<Void> callback);
+
+	void updateDeviceLabel(long deviceId, String label, AsyncCallback<Void> callback);
 }

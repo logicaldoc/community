@@ -23,16 +23,13 @@ public class MoveDialog extends Dialog {
 		super();
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("move"));
-		setWidth(250);
-		setHeight(270);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
-		setPadding(3);
+		setAutoSize(true);
 
 		VLayout content = new VLayout();
-		content.setTop(10);
 		content.setWidth100();
 		content.setHeight100();
 		content.setMembersMargin(3);
@@ -40,10 +37,10 @@ public class MoveDialog extends Dialog {
 		final TreeGrid folders = new FolderTree();
 		folders.setWidth100();
 		folders.setHeight100();
+		folders.setMinHeight(300);
 
 		VLayout buttons = new VLayout();
 		buttons.setWidth100();
-		buttons.setHeight(30);
 
 		Button move = new Button(I18N.message("move"));
 		move.setAutoFit(true);

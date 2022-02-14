@@ -1,14 +1,15 @@
 package com.logicaldoc.gui.frontend.client.gdrive;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
-import com.logicaldoc.gui.common.client.formatters.FileSizeCellFormatter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.FolderController;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.smartgwt.client.types.Alignment;
@@ -71,10 +72,7 @@ public class GDriveImport extends Window {
 		fileName.setCanFilter(true);
 		fileName.setWidth("*");
 
-		ListGridField size = new ListGridField("size", I18N.message("size"), 70);
-		size.setAlign(Alignment.RIGHT);
-		size.setType(ListGridFieldType.FLOAT);
-		size.setCellFormatter(new FileSizeCellFormatter());
+		ListGridField size = new FileSizeListGridField("size", I18N.message("size"));
 		size.setCanFilter(false);
 		size.setHidden(true);
 
@@ -86,8 +84,7 @@ public class GDriveImport extends Window {
 		icon.setImageURLPrefix(Util.imagePrefix());
 		icon.setCanFilter(false);
 
-		ListGridField version = new ListGridField("version", I18N.message("version"), 90);
-		version.setAlign(Alignment.CENTER);
+		ListGridField version = new VersionListGridField();
 		version.setCanFilter(true);
 		version.setHidden(true);
 
@@ -116,17 +113,17 @@ public class GDriveImport extends Window {
 		toolStrip.addFormItem(new SearchBox() {
 			@Override
 			protected void onSearch() {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				GDriveService.Instance.get().search(this.getValueAsString(), new AsyncCallback<GUIDocument[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(GUIDocument[] hits) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						ListGridRecord[] records = new ListGridRecord[hits.length];
 						int i = 0;
 						for (GUIDocument hit : hits) {
@@ -161,18 +158,18 @@ public class GDriveImport extends Window {
 				for (int i = 0; i < resIds.length; i++)
 					resIds[i] = selection[i].getAttributeAsString("resourceId");
 
-				ContactingServer.get().show();
-				GDriveService.Instance.get().importDocuments(resIds, Session.get().getCurrentFolder().getId(), null,
+				LD.contactingServer();
+				GDriveService.Instance.get().importDocuments(resIds, FolderController.get().getCurrentFolder().getId(), null,
 						new AsyncCallback<Void>() {
 							@Override
 							public void onFailure(Throwable caught) {
-								ContactingServer.get().hide();
+								LD.clearPrompt();
 								GuiLog.serverError(caught);
 							}
 
 							@Override
 							public void onSuccess(Void ret) {
-								ContactingServer.get().hide();
+								LD.clearPrompt();
 								DocumentsPanel.get().refresh();
 							}
 						});

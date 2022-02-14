@@ -2,18 +2,6 @@
 	<property file="${user.home}/logicaldoc-dev.properties" />
 	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
 
-
-  <target name="mydep" description="Updates a deployed wwww">
-		<copy todir="C:/JavaSuite/apache-tomcat-7.0.22/webapps/logicaldoc/WEB-INF/classes" verbose="true">
-			<fileset dir="target/classes">
-				<exclude name="**/*.xml" />
-				<exclude name="**/*.properties" />
-				<exclude name="**/*.dtd" />
-			</fileset>
-		</copy>
-		<echo message="xxx has been deployed" />
-	</target>
-
 	<target name="deploy" depends="init-all" description="Updates a deployed webapp">
 		<property environment="env" />
 		<property id="properties" file="build.properties" />
@@ -21,10 +9,15 @@
 		<echo message="Deploying ${pom.artifactId}" />
 
 		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
-		  <arg line="-o -Dmaven.test.skip=true install"/>
+			<arg line="-o -Dmaven.test.skip=true install" />
 		</exec>
-		
-		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
+
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying into @{webroot}" />
+				<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="@{webroot}" />
+			</sequential>
+		</for>
 
 		<echo message="${pom.artifactId} has been deployed" />
 	</target>

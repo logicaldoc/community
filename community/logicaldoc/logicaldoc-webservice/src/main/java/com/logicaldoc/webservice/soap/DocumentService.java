@@ -121,6 +121,27 @@ public interface DocumentService {
 			@WSDoc(description = "Document ID") @WebParam(name = "docId") long docId,
 			@WSDoc(description = "identifier of the new document's folder") @WebParam(name = "folderId") long folderId)
 			throws Exception;
+	
+	/**
+	 * Copies a document into another folder.
+	 * 
+	 * @param sid identifier of the session
+	 * @param docId The document id
+	 * @param folderId Identifier of the new document's folder
+	 * 
+	 * @return The created copy
+	 * 
+	 * @throws Exception error in the server application
+	 */
+	@WebMethod
+	@WebResult(name = "document")
+	@WSDoc(description = "copies a document into a folder")
+	public WSDocument copy(
+			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
+			@WSDoc(description = "Document ID") @WebParam(name = "docId") long docId,
+			@WSDoc(description = "identifier of the new document's folder") @WebParam(name = "folderId") long folderId)
+			throws Exception;
+	
 
 	/**
 	 * Gets the metadata of an existing document with the given identifier

@@ -10,8 +10,8 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -31,8 +31,6 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 	private HLayout formsContainer = new HLayout();
 
 	private FolderSelector targetSelector;
-
-	private PasswordItem password;
 
 	public ImportFolderStandardProperties(GUIImportFolder importFolder, final ChangedHandler changedHandler) {
 		super(importFolder, changedHandler);
@@ -92,9 +90,6 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 				importFolder.getUsername());
 		username.addChangedHandler(changedHandler);
 
-		password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", importFolder.getPassword());
-		password.addChangedHandler(changedHandler);
-
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, false);
 		language.addChangedHandler(changedHandler);
 		language.setRequired(true);
@@ -120,11 +115,15 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill",
 				importFolder.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
-		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", "password_hidden",
 				importFolder.getPassword());
-		fakePassword.setCellStyle("nodisplay");
+		hiddenPassword.setCellStyle("nodisplay");
+		hiddenPassword.addChangedHandler(changedHandler);
+		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"),
+				importFolder.getPassword(), hiddenPassword, changedHandler);
+		password.addChangedHandler(changedHandler);
 
-		form.setItems(provider, path, language, targetSelector, server, port, fakeUsername, fakePassword, username,
+		form.setItems(provider, path, language, targetSelector, server, port, fakeUsername, hiddenPassword, username,
 				password, domain, batch, include, exclude);
 
 		formsContainer.addMember(form);
@@ -140,7 +139,6 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 			importFolder.setProvider((String) values.get("provider"));
 			importFolder.setPath((String) values.get("path"));
 			importFolder.setUsername((String) values.get("username"));
-			importFolder.setPassword((String) values.get("password"));
 			importFolder.setDomain((String) values.get("domain"));
 			importFolder.setTarget(targetSelector.getFolder());
 			importFolder.setLanguage((String) values.get("language"));
@@ -152,6 +150,8 @@ public class ImportFolderStandardProperties extends ImportFolderDetailsTab {
 				importFolder.setBatch((Long) values.get("batch"));
 			else
 				importFolder.setBatch(Long.valueOf(values.get("batch").toString()));
+
+			importFolder.setPassword((String) values.get("password_hidden"));
 		}
 		return !form.hasErrors();
 	}

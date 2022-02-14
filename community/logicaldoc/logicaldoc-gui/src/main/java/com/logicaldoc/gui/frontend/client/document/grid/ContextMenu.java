@@ -13,13 +13,13 @@ import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.document.ComparisonWindow;
@@ -131,7 +131,7 @@ public class ContextMenu extends Menu {
 									// deletion doesn't work, so refresh the
 									// screen.
 									if (grid.getFolder() != null
-											&& grid.getFolder().getId() == Session.get().getCurrentFolder().getId())
+											&& grid.getFolder().getId() == FolderController.get().getCurrentFolder().getId())
 										DocumentsPanel.get().refresh();
 									DocumentController.get().deleted(grid.getSelectedDocuments());
 								}
@@ -201,7 +201,7 @@ public class ContextMenu extends Menu {
 
 									@Override
 									public void onSuccess(GUIDocument doc) {
-										Session.get().setCurrentDocument(doc);
+										DocumentController.get().setCurrentDocument(doc);
 									}
 								});
 					}
@@ -421,7 +421,7 @@ public class ContextMenu extends Menu {
 					return;
 				long id = selection.getId();
 				final String filename = selection.getFileName();
-				
+
 				// Just to clean the upload folder
 				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
@@ -503,10 +503,10 @@ public class ContextMenu extends Menu {
 						GUIDocument[] selection = grid.getSelectedDocuments();
 						for (GUIDocument record : selection) {
 							record.setBookmarked(true);
-							if (Session.get().getCurrentDocument() != null
-									&& Session.get().getCurrentDocument().getId() == record.getId()) {
-								Session.get().getCurrentDocument().setBookmarked(true);
-								DocumentController.get().modified(Session.get().getCurrentDocument());
+							if (DocumentController.get().getCurrentDocument() != null
+									&& DocumentController.get().getCurrentDocument().getId() == record.getId()) {
+								DocumentController.get().getCurrentDocument().setBookmarked(true);
+								DocumentController.get().modified(DocumentController.get().getCurrentDocument());
 							} else {
 								DocumentController.get().modified(record);
 							}
@@ -534,10 +534,10 @@ public class ContextMenu extends Menu {
 					public void onSuccess(Void result) {
 						for (GUIDocument record : selection) {
 							record.setIndexed(Constants.INDEX_SKIP);
-							if (Session.get().getCurrentDocument() != null
-									&& Session.get().getCurrentDocument().getId() == record.getId()) {
-								Session.get().getCurrentDocument().setIndexed(Constants.INDEX_SKIP);
-								DocumentController.get().modified(Session.get().getCurrentDocument());
+							if (DocumentController.get().getCurrentDocument() != null
+									&& DocumentController.get().getCurrentDocument().getId() == record.getId()) {
+								DocumentController.get().getCurrentDocument().setIndexed(Constants.INDEX_SKIP);
+								DocumentController.get().modified(DocumentController.get().getCurrentDocument());
 							} else {
 								DocumentController.get().modified(record);
 							}
@@ -565,10 +565,10 @@ public class ContextMenu extends Menu {
 							public void onSuccess(Void result) {
 								for (GUIDocument record : selection) {
 									record.setIndexed(Constants.INDEX_TO_INDEX);
-									if (Session.get().getCurrentDocument() != null
-											&& Session.get().getCurrentDocument().getId() == record.getId()) {
-										Session.get().getCurrentDocument().setIndexed(Constants.INDEX_TO_INDEX);
-										DocumentController.get().modified(Session.get().getCurrentDocument());
+									if (DocumentController.get().getCurrentDocument() != null
+											&& DocumentController.get().getCurrentDocument().getId() == record.getId()) {
+										DocumentController.get().getCurrentDocument().setIndexed(Constants.INDEX_TO_INDEX);
+										DocumentController.get().modified(DocumentController.get().getCurrentDocument());
 									} else {
 										DocumentController.get().modified(record);
 									}
@@ -596,11 +596,11 @@ public class ContextMenu extends Menu {
 							public void onSuccess(Void result) {
 								for (GUIDocument record : selection) {
 									record.setIndexed(Constants.INDEX_TO_INDEX_METADATA);
-									if (Session.get().getCurrentDocument() != null
-											&& Session.get().getCurrentDocument().getId() == record.getId()) {
-										Session.get().getCurrentDocument()
+									if (DocumentController.get().getCurrentDocument() != null
+											&& DocumentController.get().getCurrentDocument().getId() == record.getId()) {
+										DocumentController.get().getCurrentDocument()
 												.setIndexed(Constants.INDEX_TO_INDEX_METADATA);
-										DocumentController.get().modified(Session.get().getCurrentDocument());
+										DocumentController.get().modified(DocumentController.get().getCurrentDocument());
 									} else {
 										DocumentController.get().modified(record);
 									}
@@ -621,23 +621,23 @@ public class ContextMenu extends Menu {
 				for (int i = 0; i < selectionIds.length; i++)
 					ids[i] = selectionIds[i];
 
-				ContactingServer.get().show();
+				LD.contactingServer();
 				DocumentService.Instance.get().indexDocuments(ids, new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void result) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						for (GUIDocument record : selection) {
 							record.setIndexed(Constants.INDEX_INDEXED);
-							if (Session.get().getCurrentDocument() != null
-									&& Session.get().getCurrentDocument().getId() == record.getId()) {
-								Session.get().getCurrentDocument().setIndexed(Constants.INDEX_INDEXED);
-								DocumentController.get().modified(Session.get().getCurrentDocument());
+							if (DocumentController.get().getCurrentDocument() != null
+									&& DocumentController.get().getCurrentDocument().getId() == record.getId()) {
+								DocumentController.get().getCurrentDocument().setIndexed(Constants.INDEX_INDEXED);
+								DocumentController.get().modified(DocumentController.get().getCurrentDocument());
 							} else {
 								DocumentController.get().modified(record);
 							}
@@ -855,19 +855,19 @@ public class ContextMenu extends Menu {
 
 					@Override
 					public void execute(String value) {
-						ContactingServer.get().show();
+						LD.contactingServer();
 						DocumentService.Instance.get().merge(selectionIds, folder.getId(), value,
 								new AsyncCallback<GUIDocument>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
 										GuiLog.serverError(caught);
-										ContactingServer.get().hide();
+										LD.clearPrompt();
 									}
 
 									@Override
 									public void onSuccess(GUIDocument mergedDoc) {
-										ContactingServer.get().hide();
+										LD.clearPrompt();
 										DocumentController.get().stored(mergedDoc);
 									}
 								});
@@ -930,7 +930,8 @@ public class ContextMenu extends Menu {
 			boolean justOneSelected = someSelection && selection.length == 1;
 			boolean immutablesInSelection = someSelection && checkImmutablesInSelection(selection);
 
-			preview.setEnabled(someSelection);
+			preview.setEnabled(someSelection
+					&& com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 			cut.setEnabled(someSelection && !immutablesInSelection
 					&& checkStatusInSelection(Constants.DOC_UNLOCKED, selection) && folder.isMove());
 			unlock.setEnabled(
@@ -997,6 +998,7 @@ public class ContextMenu extends Menu {
 			} else
 				compare.setEnabled(false);
 
+			automation.setEnabled(Feature.enabled(Feature.AUTOMATION) && folder.hasPermission(Constants.PERMISSION_AUTOMATION));
 		}
 	}
 
@@ -1018,55 +1020,71 @@ public class ContextMenu extends Menu {
 						/**
 						 * Check on the server if the action has been modified
 						 */
-						SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+						SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(),
+								new AsyncCallback<GUIMenu>() {
 
-							@Override
-							public void onFailure(Throwable caught) {
-								GuiLog.serverError(caught);
-							}
+									@Override
+									public void onFailure(Throwable caught) {
+										GuiLog.serverError(caught);
+									}
 
-							@Override
-							public void onSuccess(GUIMenu action) {
-								Session.get().getUser().updateCustomAction(action);
-								
-								if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
-										&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
-									/*
-									 * An automation cript is specified directly, so launch it's execution
-									 */
-									GUIAutomationRoutine routine = new GUIAutomationRoutine();
-									routine.setAutomation(action.getAutomation());
-									executeRoutine(folderId, selectedDocIds, routine);
-								} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
-									AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-											new AsyncCallback<GUIAutomationRoutine>() {
+									@Override
+									public void onSuccess(GUIMenu action) {
+										Session.get().getUser().updateCustomAction(action);
 
-												@Override
-												public void onFailure(Throwable caught) {
-													GuiLog.serverError(caught);
-												}
+										if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
+												&& action.getAutomation() != null
+												&& !action.getAutomation().trim().isEmpty()) {
+											/*
+											 * An automation cript is specified
+											 * directly, so launch it's
+											 * execution
+											 */
+											GUIAutomationRoutine routine = new GUIAutomationRoutine();
+											routine.setAutomation(action.getAutomation());
+											executeRoutine(folderId, selectedDocIds, routine);
+										} else if (action.getRoutineId() != null
+												&& action.getRoutineId().longValue() != 0L) {
+											AutomationService.Instance.get().getRoutine(action.getRoutineId(),
+													new AsyncCallback<GUIAutomationRoutine>() {
 
-												@Override
-												public void onSuccess(GUIAutomationRoutine routine) {
-													if (routine.getTemplateId() != null
-															&& routine.getTemplateId().longValue() != 0L) {
-														/*
-														 * A routine with parameters is referenced, so open the input popup
-														 */
-														FillRoutineParams dialog = new FillRoutineParams(action.getName(),
-																routine, folderId, selectedDocIds);
-														dialog.show();
-													} else {
-														/*
-														 * A routine without parameters is referenced, so launch directly
-														 */
-														executeRoutine(folderId, selectedDocIds, routine);
-													}
-												}
-											});
-								}								
-							}
-						});
+														@Override
+														public void onFailure(Throwable caught) {
+															GuiLog.serverError(caught);
+														}
+
+														@Override
+														public void onSuccess(GUIAutomationRoutine routine) {
+															if (routine.getTemplateId() != null
+																	&& routine.getTemplateId().longValue() != 0L) {
+																/*
+																 * A routine
+																 * with
+																 * parameters is
+																 * referenced,
+																 * so open the
+																 * input popup
+																 */
+																FillRoutineParams dialog = new FillRoutineParams(
+																		action.getName(), routine, folderId,
+																		selectedDocIds);
+																dialog.show();
+															} else {
+																/*
+																 * A routine
+																 * without
+																 * parameters is
+																 * referenced,
+																 * so launch
+																 * directly
+																 */
+																executeRoutine(folderId, selectedDocIds, routine);
+															}
+														}
+													});
+										}
+									}
+								});
 					}
 				});
 			}
@@ -1117,7 +1135,7 @@ public class ContextMenu extends Menu {
 				}
 				url += "&docId=" + record.getId();
 			}
-			WindowUtils.openUrl(url);
+			Util.download(url);
 		}
 	}
 

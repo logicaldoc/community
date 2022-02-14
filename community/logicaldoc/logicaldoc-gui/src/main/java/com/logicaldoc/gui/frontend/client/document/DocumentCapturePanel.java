@@ -9,7 +9,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
 import com.smartgwt.client.types.TitleOrientation;
@@ -68,18 +68,18 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		processOcr.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				ZonalOCRService.Instance.get().process(document.getId(), new AsyncCallback<GUIDocument>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(GUIDocument result) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						DocumentController.get().modified(result);
 					}
 				});
@@ -107,17 +107,17 @@ public class DocumentCapturePanel extends DocumentDetailTab {
 		processBarcode.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				BarcodeService.Instance.get().process(document.getId(), new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(GUIDocument result) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						DocumentController.get().modified(result);
 					}
 				});

@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.metadata.AttributeOption;
 import com.logicaldoc.core.metadata.AttributeOptionDAO;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * This servlet retrieves the options for extended attributes
@@ -30,11 +29,9 @@ public class AttributeOptionsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(AttributeOptionsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
-			ServiceUtil.validateSession(request);
-
 			response.setContentType("text/xml");
 			response.setCharacterEncoding("UTF-8");
 
@@ -50,11 +47,10 @@ public class AttributeOptionsDataServlet extends HttpServlet {
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
-			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(
-					AttributeOptionDAO.class);
+			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 			List<AttributeOption> options = dao.findBySetIdAndAttribute(setId, attribute);
 
-			if(withempty){
+			if (withempty) {
 				writer.print("<option>");
 				writer.print("<id>-1</id>");
 				writer.print("<attribute></attribute>");
@@ -62,7 +58,7 @@ public class AttributeOptionsDataServlet extends HttpServlet {
 				writer.print("<position></position>");
 				writer.print("</option>");
 			}
-			
+
 			for (AttributeOption option : options) {
 				writer.print("<option>");
 				writer.print("<id>" + option.getId() + "</id>");

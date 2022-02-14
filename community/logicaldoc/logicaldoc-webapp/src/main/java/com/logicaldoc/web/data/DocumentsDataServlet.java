@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -25,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.ibm.icu.util.StringTokenizer;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
@@ -116,6 +116,8 @@ public class DocumentsDataServlet extends HttpServlet {
 			 * Retrieve the names of the extended attributes to show
 			 */
 			String extattrs = config.getProperty(session.getTenantName() + ".search.extattr");
+			if (request.getParameter("extattr") != null)
+				extattrs = request.getParameter("extattr");
 			List<String> attrs = new ArrayList<String>();
 			if (StringUtils.isNotEmpty(extattrs)) {
 				StringTokenizer st = new StringTokenizer(extattrs.trim(), ",;");
@@ -166,6 +168,15 @@ public class DocumentsDataServlet extends HttpServlet {
 					throw new Exception(
 							String.format("Folder %s is not accessible by user %s", folderId, session.getUsername()));
 
+				// Check if the folderId is an alias
+				Folder folder = fDao.findById(folderId);
+				if (folder.getFoldRef() != null)
+					folderId = folder.getFoldRef();
+
+				Long formId = null;
+				if (StringUtils.isNotEmpty(request.getParameter("formId")))
+					formId = Long.parseLong(request.getParameter("formId"));
+
 				String filename = null;
 				if (StringUtils.isNotEmpty(request.getParameter("filename")))
 					filename = request.getParameter("filename");
@@ -179,6 +190,8 @@ public class DocumentsDataServlet extends HttpServlet {
 					query.append("select D.ld_id from ld_document D where D.ld_deleted=0 ");
 					if (folderId != null)
 						query.append(" and D.ld_folderid=" + Long.toString(folderId));
+					if (formId != null)
+						query.append(" and D.ld_formid=" + Long.toString(formId));
 					query.append(") and ld_name in ");
 					query.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')").replaceAll(",", "','")
 							.replaceAll(" ", ""));
@@ -205,7 +218,7 @@ public class DocumentsDataServlet extends HttpServlet {
 								extValues.put(key, rs.getDouble(6));
 							} else if (type == Attribute.TYPE_DATE) {
 								extValues.put(key, rs.getTimestamp(7));
-							} else if (type == Attribute.TYPE_USER) {
+							} else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER) {
 								extValues.put(key, rs.getString(4));
 							} else if (type == Attribute.TYPE_BOOLEAN) {
 								extValues.put(key,
@@ -226,10 +239,12 @@ public class DocumentsDataServlet extends HttpServlet {
 								+ " A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,"
 								+ " A.startPublishing, A.stopPublishing, A.published, A.extResId,"
 								+ " B.name, A.docRefType, A.stamped, A.lockUser, A.password, A.pages, "
-								+ " A.workflowStatusDisplay, A.language, A.links, A.tgs, A.creatorId, A.publisherId from Document as A left outer join A.template as B ");
+								+ " A.workflowStatusDisplay, A.language, A.links, A.tgs, A.creatorId, A.publisherId, A.color from Document as A left outer join A.template as B ");
 				query.append(" where A.deleted = 0 and not A.status=" + AbstractDocument.DOC_ARCHIVED);
 				if (folderId != null)
 					query.append(" and A.folder.id=" + folderId);
+				if (formId != null)
+					query.append(" and A.formId=" + Long.toString(formId));
 				if (StringUtils.isNotEmpty(request.getParameter("indexed")))
 					query.append(" and A.indexed=" + request.getParameter("indexed"));
 
@@ -241,7 +256,8 @@ public class DocumentsDataServlet extends HttpServlet {
 
 				List<Document> documents = new ArrayList<Document>();
 				List<Object> records = new ArrayList<Object>();
-				if (folderId != null || filename != null || StringUtils.isNotEmpty(request.getParameter("indexed")))
+				if (folderId != null || filename != null || formId != null
+						|| StringUtils.isNotEmpty(request.getParameter("indexed")))
 					records = (List<Object>) dao.findByQuery(query.toString(), values, null);
 
 				/*
@@ -256,6 +272,7 @@ public class DocumentsDataServlet extends HttpServlet {
 					doc.setFileName((String) cols[14]);
 					doc.setType((String) cols[17]);
 					doc.setDocRefType((String) cols[27]);
+					doc.setColor((String) cols[38]);
 
 					if (folderId != null) {
 						Folder f = new Folder();
@@ -269,6 +286,7 @@ public class DocumentsDataServlet extends HttpServlet {
 						long aliasDocRef = doc.getDocRef();
 						String aliasDocRefType = doc.getDocRefType();
 						String aliasFileName = doc.getFileName();
+						String aliasColor = doc.getColor();
 						String aliasType = doc.getType();
 						doc = dao.findById(aliasDocRef);
 
@@ -278,12 +296,21 @@ public class DocumentsDataServlet extends HttpServlet {
 							doc.setDocRef(aliasDocRef);
 							doc.setDocRefType(aliasDocRefType);
 							doc.setFileName(aliasFileName);
+							doc.setColor(aliasColor);
 							doc.setType(aliasType);
+							doc.setTemplateName(doc.getTemplate().getName());
 
 							for (String name : attrs) {
 								String key = aliasId + "-" + name;
-								if (!extValues.containsKey(key) && doc.getValue(name) != null)
-									extValues.put(key, doc.getValue(name));
+								if (!extValues.containsKey(key) && doc.getValue(name) != null) {
+									Attribute att = doc.getAttribute(name);
+									if (att != null && (att.getType() == Attribute.TYPE_FOLDER
+											|| att.getType() == Attribute.TYPE_USER)) {
+										extValues.put(key, att.getStringValue());
+										doc.setValue(name, att.getStringValue());
+									} else
+										extValues.put(key, doc.getValue(name));
+								}
 							}
 
 						} else
@@ -368,9 +395,8 @@ public class DocumentsDataServlet extends HttpServlet {
 				// Always add the hilight doc as first element of the collection
 				if (hiliteDocId != null) {
 					hiliteDoc = dao.findById(hiliteDocId);
-					if (folderId != null && hiliteDoc != null && hiliteDoc.getFolder() != null
+					if (hiliteDoc!=null && folderId != null && hiliteDoc != null && hiliteDoc.getFolder() != null
 							&& hiliteDoc.getFolder().getId() == folderId) {
-						hiliteDoc = dao.findDocument(hiliteDocId);
 						dao.initialize(hiliteDoc);
 					} else
 						hiliteDoc = null;
@@ -407,6 +433,7 @@ public class DocumentsDataServlet extends HttpServlet {
 						"<created>" + (doc.getCreation() != null ? df.format(doc.getCreation()) : "") + "</created>");
 				writer.print("<creator><![CDATA[" + doc.getCreator() + "]]></creator>");
 				writer.print("<size>" + doc.getFileSize() + "</size>");
+				writer.print("<pages>" + doc.getPages() + "</pages>");
 
 				writer.print("<status>" + doc.getStatus() + "</status>");
 				writer.print("<immutable>" + doc.getImmutable() + "</immutable>");
@@ -437,14 +464,20 @@ public class DocumentsDataServlet extends HttpServlet {
 				writer.print("<workflowStatusDisplay><![CDATA["
 						+ (doc.getWorkflowStatusDisplay() != null ? doc.getWorkflowStatusDisplay() : "")
 						+ "]]></workflowStatusDisplay>");
+
+				if (StringUtils.isNotEmpty(doc.getColor()))
+					writer.print("<color><![CDATA[" + doc.getColor() + "]]></color>");
+
 				if (doc.getStartPublishing() != null)
 					writer.print("<startPublishing>" + df.format(doc.getStartPublishing()) + "</startPublishing>");
 				else
 					writer.print("<startPublishing></startPublishing>");
+
 				if (doc.getStopPublishing() != null)
 					writer.print("<stopPublishing>" + df.format(doc.getStopPublishing()) + "</stopPublishing>");
 				else
 					writer.print("<stopPublishing></stopPublishing>");
+
 				writer.print("<publishedStatus>" + (doc.isPublishing() ? "yes" : "no") + "</publishedStatus>");
 
 				if (doc.getExtResId() != null)

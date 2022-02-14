@@ -25,6 +25,7 @@ import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.rest.client.RestAuthClient;
 import com.logicaldoc.webservice.rest.client.RestBookmarkClient;
 import com.logicaldoc.webservice.rest.client.RestDocumentClient;
+import com.logicaldoc.webservice.rest.client.RestDocumentMetadataClient;
 import com.logicaldoc.webservice.rest.client.RestFolderClient;
 import com.logicaldoc.webservice.rest.client.RestSearchClient;
 import com.logicaldoc.webservice.rest.client.RestTagClient;
@@ -34,6 +35,8 @@ public class RestWorkbench {
 	private static RestAuthClient authClient = null;
 
 	private static RestDocumentClient docClient = null;
+	
+	private static RestDocumentMetadataClient docMetadataClient = null;
 
 	private static RestFolderClient fldClient = null;
 
@@ -43,13 +46,12 @@ public class RestWorkbench {
 
 	private static RestBookmarkClient bookmarkClient = null;
 
-	//private static String BASE_PATH = "http://localhost:9080";
-	private static String BASE_PATH = "http://localhost/logicaldoc";
+	private static String BASE_PATH = "http://localhost:1000";
 
 	public static void main(String[] args) throws Exception {
 
 		String username = "admin";
-		String password = "admin";
+		String password = "12345678";
 
 		authClient = new RestAuthClient(BASE_PATH + "/services/rest/auth");
 		docClient = new RestDocumentClient(BASE_PATH + "/services/rest/document", username, password);
@@ -57,10 +59,13 @@ public class RestWorkbench {
 		searchClient = new RestSearchClient(BASE_PATH + "/services/rest/search", username, password);
 		tagClient = new RestTagClient(BASE_PATH + "/services/rest/tag", username, password);
 		bookmarkClient = new RestBookmarkClient(BASE_PATH + "/services/rest/bookmark", username, password);
+		docMetadataClient = new RestDocumentMetadataClient(BASE_PATH + "/services/rest/documentMetadata", username, password);
 
 		
 		String sid = authClient.loginPost(username, password);
 		System.err.println(sid);
+		
+		docMetadataClient.setAttributeOptions(188055552L, "test", new String[] {"value1", "value2", "value3"});
 		
 		authClient.logout(sid);
 		System.err.println("op finished");
@@ -95,7 +100,7 @@ public class RestWorkbench {
 
 		//checkout(735L);
 		//checkin(735L);
-		getVersionContent(735L, "1.2");
+		// getVersionContent(735L, "1.2");
 
 		/*
 		 * WSDocument myDoc = getDocument(3407874L);

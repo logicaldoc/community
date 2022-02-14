@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import com.logicaldoc.gui.common.client.Constants;
+
 /**
  * This user interface bean to model a document template
  * 
@@ -29,6 +31,10 @@ public class GUITemplate implements Serializable {
 	private int type = TYPE_DEFAULT;
 
 	private GUIAttribute[] attributes;
+
+	private GUIRight[] rights = new GUIRight[] {};
+	
+	private String[] permissions = new String[] {};
 
 	public long getId() {
 		return id;
@@ -130,5 +136,34 @@ public class GUITemplate implements Serializable {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public GUIRight[] getRights() {
+		return rights;
+	}
+
+	public void setRights(GUIRight[] rights) {
+		this.rights = rights;
+	}
+
+	public String[] getPermissions() {
+		return permissions;
+	}
+
+	public void setPermissions(String[] permissions) {
+		this.permissions = permissions;
+	}
+
+	public boolean isWrite() {
+		return hasPermission(Constants.PERMISSION_WRITE);
+	}
+
+	public boolean hasPermission(String permission) {
+		if (permissions == null)
+			return false;
+		for (String p : permissions)
+			if (p.equals(permission))
+				return true;
+		return false;
 	}
 }

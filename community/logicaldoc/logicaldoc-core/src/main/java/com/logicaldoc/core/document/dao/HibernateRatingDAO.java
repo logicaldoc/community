@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.document.Rating;
@@ -38,15 +39,15 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 		boolean result = super.store(rating);
 		if (!result)
 			return false;
-
+		flush();
+		
+		
 		try {
 			if (transaction != null) {
 				transaction.setEvent(DocumentEvent.RATING_NEW.toString());
 				transaction.setComment("rating: " + rating.getVote());
-
-				DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-				documentDao.saveDocumentHistory(documentDao.findById(rating.getDocId()), transaction);
 			}
+			updateDocumentRating(rating.getDocId(), transaction);
 		} catch (Throwable e) {
 			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());
@@ -57,6 +58,23 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 		}
 
 		return result;
+	}
+
+	@Override
+	public int updateDocumentRating(long docId, DocumentHistory transaction) throws PersistenceException {
+		Rating votesDoc = findVotesByDocId(docId);
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Document doc = docDao.findById(docId);
+		if (doc == null)
+			return 0;
+
+		docDao.initialize(doc);
+		int average = 0;
+		if (votesDoc != null && votesDoc.getAverage() != null)
+			average = votesDoc.getAverage().intValue();
+		doc.setRating(average);
+		docDao.store(doc, transaction);
+		return average;
 	}
 
 	@Override
@@ -126,7 +144,12 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 		if (!checkStoringAspect())
 			return false;
 
+		Rating rat = findById(id);
+		long docId = rat.getDocId();
+
 		jdbcUpdate("delete from ld_rating where ld_id=" + id);
+
+		updateDocumentRating(docId, null);
 		return true;
 	}
 }

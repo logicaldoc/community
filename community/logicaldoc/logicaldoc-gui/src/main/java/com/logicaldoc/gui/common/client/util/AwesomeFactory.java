@@ -87,6 +87,24 @@ public class AwesomeFactory {
 	 * @param icon the icon file name
 	 * @param toolTip the message to display when the user moves the cursor over
 	 *        the button
+	 * @param color the color of the icon
+	 * 
+	 * @return the new button
+	 */
+	public static ToolStripButton newColoredIconButton(String icon, String toolTip, String color) {
+		ToolStripButton button = newIconButton(icon, toolTip, null);
+		if (color != null && !color.isEmpty())
+			button.setTitle("<span style='color: " + color + "'>" + getIconHtml(icon, null, null) + "</span>");
+		return button;
+	}
+
+	/**
+	 * Creates a ToolStripButton using font-awesome icon useful for small icons
+	 * (16x16)
+	 * 
+	 * @param icon the icon file name
+	 * @param toolTip the message to display when the user moves the cursor over
+	 *        the button
 	 * @param text title of the button
 	 * 
 	 * @return the new button
@@ -102,9 +120,13 @@ public class AwesomeFactory {
 		return button;
 	}
 
-	public static ToolStripButton newLockedButton(Integer status, String user) {
-		ToolStripButton button = AwesomeFactory.newIconButton("edit", "");
-		button.setTitle(DocUtil.getLockedIcon(status));
+	public static ToolStripButton newLockedButton(Integer status, String user, String color) {
+		ToolStripButton button = AwesomeFactory.newColoredIconButton("edit", "", color);
+
+		if (color != null && !color.isEmpty())
+			button.setTitle("<span style='color:" + color + "'>" + DocUtil.getLockedIcon(status) + "</span>");
+		else
+			button.setTitle(DocUtil.getLockedIcon(status));
 
 		String prompt = "";
 		if (status == Constants.DOC_CHECKED_OUT || status == Constants.DOC_LOCKED)
@@ -115,9 +137,12 @@ public class AwesomeFactory {
 		return button;
 	}
 
-	public static ToolStripButton newIndexedButton(Integer indexed) {
-		ToolStripButton button = AwesomeFactory.newIconButton("database", "indexed");
-		button.setTitle(DocUtil.getIndexedIcon(indexed));
+	public static ToolStripButton newIndexedButton(Integer indexed, String color) {
+		ToolStripButton button = AwesomeFactory.newColoredIconButton("database", "indexed", color);
+		if (color != null && !color.isEmpty())
+			button.setTitle("<span style='color:" + color + "'>" + DocUtil.getIndexedIcon(indexed) + "</span>");
+		else
+			button.setTitle(DocUtil.getIndexedIcon(indexed));
 		return button;
 	}
 
@@ -138,10 +163,16 @@ public class AwesomeFactory {
 	}
 
 	public static String getIconHtml(String icon, String text) {
+		return getColoredIconHtml(icon, text, null);
+	}
+
+	public static String getColoredIconHtml(String icon, String text, String color) {
 		if (text == null || text.isEmpty())
-			return "<i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg' aria-hidden='true'></i>";
+			return "<i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg' aria-hidden='true'  "
+					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i>";
 		else
-			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-fw' aria-hidden='true'></i> "
+			return "<div><i class='" + getCssClassPrefix() + " fa-" + icon + " fa-lg fa-fw' aria-hidden='true'"
+					+ (color != null && !color.isEmpty() ? "style='color: " + color + "'" : "") + "></i> "
 					+ I18N.message(text) + "</div>";
 	}
 

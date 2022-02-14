@@ -58,6 +58,14 @@ public class FileUtil {
 
 	protected static Logger log = LoggerFactory.getLogger(FileUtil.class);
 
+	/**
+	 * Writes a stream to a file and then closes the same stream.
+	 * 
+	 * @param in the input stream
+	 * @param filepath the target file path
+	 * 
+	 * @throws Exception raised in case of I/O error
+	 */
 	public static void writeFile(InputStream in, String filepath) throws Exception {
 		OutputStream os = null;
 		try {

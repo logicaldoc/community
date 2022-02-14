@@ -15,8 +15,8 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.ImageCropper;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -63,8 +63,9 @@ public class VisualPositioningStampDialog extends Window {
 
 	private ImageCropper cropper;
 
-	public VisualPositioningStampDialog(DocumentsGrid sourceGrid, long stampId) {
+	public VisualPositioningStampDialog(DocumentsGrid sourceGrid, GUIStamp stamp) {
 		this.sourceGrid = sourceGrid;
+		this.stamp = stamp;
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("applystamp"));
@@ -76,7 +77,7 @@ public class VisualPositioningStampDialog extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 
 		// Prepare the conversion in JPG first
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, getPageUrl(1));
@@ -84,45 +85,31 @@ public class VisualPositioningStampDialog extends Window {
 			builder.sendRequest("", new RequestCallback() {
 				public void onError(Request request, Throwable exception) {
 					GuiLog.serverError(exception);
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 				}
 
 				public void onResponseReceived(Request request, Response response) {
-					StampService.Instance.get().getStamp(stampId, new AsyncCallback<GUIStamp>() {
+					firstSelectedDoc = sourceGrid.getSelectedDocument();
+
+					DocumentService.Instance.get().getById(firstSelectedDoc.getId(), new AsyncCallback<GUIDocument>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
 							GuiLog.serverError(caught);
+							LD.clearPrompt();
 						}
 
 						@Override
-						public void onSuccess(GUIStamp stamp) {
-							VisualPositioningStampDialog.this.stamp = stamp;
-							firstSelectedDoc = sourceGrid.getSelectedDocument();
-
-							DocumentService.Instance.get().getById(firstSelectedDoc.getId(),
-									new AsyncCallback<GUIDocument>() {
-
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-											ContactingServer.get().hide();
-										}
-
-										@Override
-										public void onSuccess(GUIDocument doc) {
-											ContactingServer.get().hide();
-											firstSelectedDoc = doc;
-											initGUI();
-										}
-									});
+						public void onSuccess(GUIDocument doc) {
+							LD.clearPrompt();
+							firstSelectedDoc = doc;
+							initGUI();
 						}
 					});
 				}
 			});
 		} catch (RequestException e) {
-			ContactingServer.get().hide();
+			LD.clearPrompt();
 			GuiLog.error(e.getMessage(), null, e);
 		}
 	}
@@ -159,19 +146,19 @@ public class VisualPositioningStampDialog extends Window {
 			stamp.setPageSelection(pageSelection.getValueAsString());
 		}
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 
 		StampService.Instance.get().applyStamp(sourceGrid.getSelectedIds(), stamp, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void result) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.info(I18N.message("event.stamped"), null);
 				GUIDocument[] docs = sourceGrid.getSelectedDocuments();
 				for (GUIDocument doc : docs) {
@@ -239,8 +226,8 @@ public class VisualPositioningStampDialog extends Window {
 		});
 
 		pageCursor = ItemFactory.newSpinnerItem("page", "page", 1, 1,
-				firstSelectedDoc.getPages() > 0 ? firstSelectedDoc.getPages() : 1);
-		pageCursor.setHint("/" + (firstSelectedDoc.getPages() > 0 ? firstSelectedDoc.getPages() : 1));
+				firstSelectedDoc.getPreviewPages() > 0 ? firstSelectedDoc.getPreviewPages() : 1);
+		pageCursor.setHint("/" + (firstSelectedDoc.getPreviewPages() > 0 ? firstSelectedDoc.getPreviewPages() : 1));
 		pageCursor.setSaveOnEnter(true);
 		pageCursor.setImplicitSave(true);
 		pageCursor.addChangedHandler(new ChangedHandler() {

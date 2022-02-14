@@ -1,46 +1,51 @@
-The LogicalDOC development team is proud to announce the availability of LogicalDOC CE 8.6.1
+The development team at LogicalDOC is pleased to announce the release of LogicalDOC CE 8.7.3.
 
-You can get this distribution in Tomcat-bundle archive from SourceForge: 
-https://sourceforge.net/projects/logicaldoc/files/distribution/LogicalDOC%20CE%208.6/logicaldoc-8.6.1-tomcat-bundle.zip/download
+This distribution is available from SourceForge as a Tomcat-bundle archive: 
+https://sourceforge.net/projects/logicaldoc/files/distribution/LogicalDOC%20CE%208.7/logicaldoc-8.7.3-tomcat-bundle.zip/download
 
-LogicalDOC Community Edition is free (libre) software (FLOSS) and allows organizations and individuals to centralize the management, storage, retrieval and distribution of documents.
+LogicalDOC Community Edition is a free (libre) software (FLOSS) application that allows businesses and individuals to centralize document management, storage, retrieval, and dissemination.
 
-LogicalDoc Community Edition offers a lot for your document management needs with a multilingual, 
-desktop interface and user-friendly features such as multilingual full-text indexing, full version control, task manager, 
-importing from zip files, and document searching to keep control of your documents.
+With a multilingual, desktop interface and user-friendly features including multilingual full-text indexing, complete version control, task manager, importing from zip files, and document searching, LogicalDoc Community Edition provides a lot for your document management requirements.
 
-LogicalDOC is localized in many languages: Russian, English, Chinese, Korean, Japanese, Italian and many others and one of its most interesting features is its ability to index the content of documents using different algorithms depending on the language of the document.
-This allows later to perform "smart" full-text searches.
+LogicalDOC is available in a variety of languages, including Russian, English, Chinese, Korean, Japanese, Italian, and many more, and one of its most intriguing characteristics is its ability to index document content using different algorithms based on the document's language.
+This enables for "smart" full-text searches afterwards.
 
-LogicalDOC Community provides a set of SOAP and REST API interfaces that allow the system to be integrated with other applications
-The web-service API documentation is available in the LogicalDOC Documentation website https://docs.logicaldoc.com/en/web-services-api
+The LogicalDOC Community provides a set of SOAP and REST API interfaces for integrating the system with other applications.
+The web-service API documentation may be found at https://docs.logicaldoc.com/en/web-services-api on the LogicalDOC Documentation website.
 
-In addition, a WebDAV and a CMIS interface are available.
-Native apps for Android and iOS are published and available for free download on Google Play and iTunes.
-   
-For a complete list of features, take a look at https://www.logicaldoc.com/features
+A WebDAV and a CMIS interface are also provided.
+On Google Play and iTunes, native applications for Android and iOS have been released and are available for free download.
+
+Visit https://www.logicaldoc.com/features for a comprehensive list of features.
 
 
-Some changes since version 8.5.2:
-Support for the new Android app LogicalDOC Mobile - https://play.google.com/store/apps/details?id=com.logicaldoc.mobile
-1066	Geolocation of requests
-1055	Customizable thumbnail generation
-1059	Option to save correctly sent emails as LogicalDOC's documents
-1067	Redesign of main menu: search on the left, removed Personal menu, added Account menu
-1077	Error in CustomID generation on version promotion
-1071	GUI Setting to Show / Hide the application banner
-1072	Display total pages number in the folders navigator cursor
-1075	Improved  the quality of grids prints
-1078	Enforce password history
-1081	Improve the Search Folder form
-1084	"Oracle database does not support ""as"" for aliasing table names in from cluase" 
+Some changes since version 8.6.1:
+Compatibility with PostgreSQL 14
+#1129	Configurable columns set in dashlets of type Document and Document Event
+#1130	Specify new folder metadata when copying an existing one to a different location
+#1132	Changed the signature of webservice method FolderService.copy
+#1117	Restrict the visibility of templates to certain users and groups
+#1120	Option to enforce the user's working time
+#1116	SMTP connection issues with Gmail
+#1121	Disable users inactive after a configurable amount of days
+#1095	Resize columns in a Dashlet
+#1104	Option to notify users at checkin as during the creation
+#1107	Added color attribute to documents
+#1108	Share contacts among users and groups
+#1109	Customizable display date format
+#1101	Flag to enable / disable avatars in the documents and search grid
+#1102	Implementation of copy method in Document web service
+#1106	Updated the document preview engine
+#1085	Document pages counter
+#1090	Alert the user to stay on page when he closes the browser's window
+#1091	API calls counter
+#1092	Ability to update the right panels by pressing spacer on the keyboard
+#1099	Prevent a user from selecting another file during metadata editing
 
 	
 
-The LogicalDOC documentation is available at the following address
-https://docs.logicaldoc.com
+The LogicalDOC documentation may be found at https://docs.logicaldoc.com
 
-Please note that this documentation is related to LogicalDOC Enterprise, and that some features may not be available in the Community version
-
+Please keep in mind that this documentation is for LogicalDOC Enterprise, and some functionality may be unavailable in the Community edition.
 
 The LogicalDOC development Team

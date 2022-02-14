@@ -92,7 +92,7 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 
 		histories = dao.findByFolderIdAndEvent(5, "data test 03", cal.getTime());
 		Assert.assertEquals(1, histories.size());
-		
+
 		histories = dao.findByFolderIdAndEvent(5, "data test 03", new Date());
 		Assert.assertEquals(0, histories.size());
 	}

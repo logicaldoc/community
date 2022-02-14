@@ -9,6 +9,8 @@ import java.util.Date;
 
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.searchengine.SearchOptions;
+import com.logicaldoc.core.security.dao.TenantDAO;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.StringOutputStream;
 
 /**
@@ -37,8 +39,13 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 	public void saveOptions(SearchOptions opt) throws IOException {
 		this.setType(opt.getType());
 		StringBuffer sb = new StringBuffer();
+
+		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		String tenantName = tenantDao.getTenantName(getTenantId());		
+		String charset = Context.get().getProperties().getProperty(tenantName+".charset", "UTF-8");
+		
 		try (StringOutputStream out = new StringOutputStream(sb);
-				XMLEncoder encoder = new XMLEncoder(out, "UTF-8", false, 0)) {
+				XMLEncoder encoder = new XMLEncoder(out, charset, true, 0)) {
 			encoder.writeObject(opt);
 		}
 		setOptions(sb.toString());
@@ -46,7 +53,10 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 
 	public SearchOptions readOptions() throws IOException {
 		try (XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(getOptions().getBytes()))) {
-			return (SearchOptions) decoder.readObject();
+			SearchOptions options = (SearchOptions) decoder.readObject();
+			options.setName(getName());
+			options.setDescription(getDescription());
+			return options;
 		}
 	}
 

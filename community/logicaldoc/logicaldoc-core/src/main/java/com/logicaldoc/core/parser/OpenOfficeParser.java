@@ -1,5 +1,6 @@
 package com.logicaldoc.core.parser;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Locale;
@@ -19,6 +20,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
+import com.logicaldoc.util.io.IOUtil;
+import com.logicaldoc.util.io.ZipUtil;
 
 /**
  * Text extractor for OpenOffice/OpenDocument documents.
@@ -34,6 +37,12 @@ public class OpenOfficeParser extends AbstractParser {
 
 	protected static Logger log = LoggerFactory.getLogger(OpenOfficeParser.class);
 
+	/**
+	 * XML handler to extract the texts crom the ODF content.xml
+	 * 
+	 * @author Marco Meschieri - LogicalDOC
+	 * @since 8.6.1
+	 */
 	private class OpenOfficeContentHandler extends DefaultHandler {
 
 		private StringBuffer content;
@@ -83,16 +92,88 @@ public class OpenOfficeParser extends AbstractParser {
 		}
 	}
 
+	/**
+	 * XML handler to extract the pages stats from the meta.xml
+	 * 
+	 * @author Marco Meschieri - LogicalDOC
+	 * @since 8.6.1
+	 */
+	private class OpenOfficeMetadataHandler extends DefaultHandler {
+		int pages = -1;
+
+		public int getPages() {
+			return pages;
+		}
+
+		@Override
+		public void startElement(String namespaceURI, String localName, String rawName, Attributes atts)
+				throws SAXException {
+			if (rawName.toLowerCase().contains("document-statistic")) {
+				// Look for the presence of the page-count attribute
+				for (int i = 0; i < atts.getLength(); i++) {
+					if (atts.getQName(i).toLowerCase().contains("page-count")) {
+						pages = Integer.parseInt(atts.getValue(i));
+						return;
+					}
+				}
+
+				// Look for the presence of the table-count attribute (typical
+				// in ods sheets)
+				for (int i = 0; i < atts.getLength(); i++) {
+					if (atts.getQName(i).toLowerCase().contains("table-count")) {
+						pages = Integer.parseInt(atts.getValue(i));
+						return;
+					}
+				}
+			}
+		}
+
+		@Override
+		public void characters(char[] ch, int start, int length) throws SAXException {
+		}
+
+		public void endElement(java.lang.String namespaceURI, java.lang.String localName, java.lang.String qName)
+				throws SAXException {
+		}
+	}
+
+	/**
+	 * XML handler to extract the slides of a presentation
+	 * 
+	 * @author Marco Meschieri - LogicalDOC
+	 * @since 8.6.1
+	 */
+	private class OpenOfficePresentationMetadataHandler extends DefaultHandler {
+		int pages = -1;
+
+		public int getPages() {
+			return pages;
+		}
+
+		@Override
+		public void startElement(String namespaceURI, String localName, String rawName, Attributes atts)
+				throws SAXException {
+			if (rawName.toLowerCase().endsWith(":page")) {
+				if (pages == -1)
+					pages = 1;
+				else
+					pages++;
+			}
+		}
+
+		@Override
+		public void characters(char[] ch, int start, int length) throws SAXException {
+		}
+
+		public void endElement(java.lang.String namespaceURI, java.lang.String localName, java.lang.String qName)
+				throws SAXException {
+		}
+	}
+
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuffer content) {
 		try {
-			try {
-				Thread.sleep(4000);
-			} catch (Throwable t) {
-
-			}
-
 			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 			saxParserFactory.setValidating(false);
 			SAXParser saxParser = saxParserFactory.newSAXParser();
@@ -100,23 +181,72 @@ public class OpenOfficeParser extends AbstractParser {
 			xmlReader.setFeature("http://xml.org/sax/features/validation", false);
 			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
-			ZipInputStream zis = new ZipInputStream(input);
-			ZipEntry ze = zis.getNextEntry();
-			while (ze != null && !ze.getName().equals("content.xml")) {
-				ze = zis.getNextEntry();
-			}
+			try (ZipInputStream zis = new ZipInputStream(input)) {
+				ZipEntry ze = zis.getNextEntry();
+				while (ze != null && !ze.getName().equals("content.xml")) {
+					ze = zis.getNextEntry();
+				}
 
-			OpenOfficeContentHandler contentHandler = new OpenOfficeContentHandler();
-			xmlReader.setContentHandler(contentHandler);
-			try {
+				OpenOfficeContentHandler contentHandler = new OpenOfficeContentHandler();
+				xmlReader.setContentHandler(contentHandler);
 				xmlReader.parse(new InputSource(zis));
-			} finally {
-				zis.close();
+				content.append(StringUtil.writeToString(new StringReader(contentHandler.getContent())));
+			}
+		} catch (Throwable e) {
+			log.warn("Failed to extract OpenOffice text content", e);
+		}
+	}
+
+	@Override
+	public int countPages(InputStream input, String filename) {
+		File tmp = null;
+		try {
+			tmp = File.createTempFile("countpages", null);
+			IOUtil.write(input, tmp);
+			return countPages(tmp, filename);
+		} catch (Throwable e) {
+			log.warn("Failed to extract OpenOffice metadata", e);
+			return 1;
+		}
+	}
+
+	@Override
+	public int countPages(File input, String filename) {
+		try {
+			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+			saxParserFactory.setValidating(false);
+			SAXParser saxParser = saxParserFactory.newSAXParser();
+			XMLReader xmlReader = saxParser.getXMLReader();
+			xmlReader.setFeature("http://xml.org/sax/features/validation", false);
+			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+			int pages = 1;
+			ZipUtil zipUtil = new ZipUtil();
+			try (InputStream is = zipUtil.getEntryStream(input, "meta.xml")) {
+				OpenOfficeMetadataHandler metadataHandler = new OpenOfficeMetadataHandler();
+				xmlReader.setContentHandler(metadataHandler);
+				xmlReader.parse(new InputSource(is));
+				if (metadataHandler.getPages() > pages)
+					pages = metadataHandler.getPages();
+			} catch (Throwable t) {
+				log.warn("Failed to extract OpenOffice meta.xml entry", t);
 			}
 
-			content.append(StringUtil.writeToString(new StringReader(contentHandler.getContent())));
-		} catch (Exception e) {
-			log.warn("Failed to extract OpenOffice text content", e);
+			try (InputStream is = zipUtil.getEntryStream(input, "content.xml")) {
+				OpenOfficePresentationMetadataHandler metadataHandler = new OpenOfficePresentationMetadataHandler();
+				xmlReader.setContentHandler(metadataHandler);
+				xmlReader.parse(new InputSource(is));
+				if (metadataHandler.getPages() > pages)
+					pages = metadataHandler.getPages();
+			} catch (Throwable t) {
+				log.warn("Failed to extract OpenOffice content.xml entry", t);
+			}
+
+			return pages;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			log.warn("Failed to extract OpenOffice metadata", e);
+			return 1;
 		}
 	}
 }

@@ -1,6 +1,9 @@
 package com.logicaldoc.gui.common.client.beans;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Setting for the dashlet visualization.
@@ -10,6 +13,9 @@ import java.io.Serializable;
  */
 public class GUIDashlet implements Serializable {
 
+	private static List<String> systemDashlets = Arrays.asList(
+			new String[] { "checkin", "checkout", "locked", "download", "locket", "change", "tagcloud", "notes", "lastaccessed" });
+
 	public final static String TYPE_DOCEVENT = "docevent";
 
 	public final static String TYPE_DOCUMENT = "document";
@@ -17,7 +23,7 @@ public class GUIDashlet implements Serializable {
 	public final static String TYPE_NOTE = "note";
 
 	public final static String TYPE_CONTENT = "content";
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private long id;
@@ -35,11 +41,15 @@ public class GUIDashlet implements Serializable {
 	private String name;
 
 	private String title;
-	
+
 	private String type;
 
 	private Integer max;
-	
+
+	private String columns;
+
+	private boolean unique = false;
+
 	public GUIDashlet() {
 	}
 
@@ -129,5 +139,57 @@ public class GUIDashlet implements Serializable {
 
 	public void setMax(Integer max) {
 		this.max = max;
+	}
+
+	public boolean isSystemDashlet() {
+		return isSystemDashlet(name);
+	}
+
+	public static boolean isSystemDashlet(String name) {
+		return systemDashlets.contains(name);
+	}
+
+	public String getColumns() {
+		return columns;
+	}
+
+	public void setColumns(String columns) {
+		this.columns = columns;
+	}
+
+	public List<String> getColumnsList() {
+		List<String> set = new ArrayList<String>();
+		if (columns != null && !columns.isEmpty()) {
+			if (!columns.contains(",")) {
+				set.add(columns.trim());
+			} else {
+				String[] tokens = columns.split(",");
+				for (String token : tokens)
+					set.add(token.trim());
+			}
+		}
+		return set;
+	}
+
+	/**
+	 * Retrieve the names of those columns that refer to extended attributes
+	 * 
+	 * @return the extended attribute names
+	 */
+	public List<String> getExtendedAttributes() {
+		List<String> set = new ArrayList<String>();
+		for (String column : getColumnsList()) {
+			if (column.startsWith("ext_"))
+				set.add(column.substring(4));
+		}
+		return set;
+	}
+
+	public boolean isUnique() {
+		return unique;
+	}
+
+	public void setUnique(boolean unique) {
+		this.unique = unique;
 	}
 }

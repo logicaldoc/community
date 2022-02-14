@@ -3,6 +3,7 @@ package com.logicaldoc.core.automation;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -27,6 +28,10 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 
 	private String dateFormat;
 
+	public DateTool(Locale locale) {
+		this(I18N.message("format_date", locale), I18N.message("format_datelong", locale), I18N.message("format_dateshort", locale));
+	}
+
 	public DateTool(String dateFormat, String dateFormatLong, String dateFormatShort) {
 		super();
 		this.dateFormat = dateFormat != null ? dateFormat : I18N.message("format_date");
@@ -50,6 +55,9 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	 * @return the formatted string
 	 */
 	public String format(Date date, boolean time) {
+		if(date==null)
+			return "";
+		
 		if (time) {
 			SimpleDateFormat df = new SimpleDateFormat(dateFormat);
 			return df.format(date);
@@ -67,6 +75,9 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	 * @return the formatted string
 	 */
 	public String formatDate(Date date) {
+		if(date==null)
+			return "";
+		
 		SimpleDateFormat df = new SimpleDateFormat(dateFormat);
 		return df.format(date);
 	}
@@ -79,6 +90,9 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	 * @return the formatted string
 	 */
 	public String formatDateShort(Date date) {
+		if(date==null)
+			return "";
+		
 		SimpleDateFormat df = new SimpleDateFormat(dateFormatShort);
 		return df.format(date);
 	}
@@ -92,6 +106,9 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	 * @return the formatted string
 	 */
 	public String formatDateLong(Date date) {
+		if(date==null)
+			return "";
+		
 		SimpleDateFormat df = new SimpleDateFormat(dateFormatLong);
 		return df.format(date);
 	}
@@ -104,8 +121,26 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	 * @return the formatted string
 	 */
 	public String formatISO(Date date) {
+		if(date==null)
+			return "";
+		
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return df.format(date);
+	}
+	
+	/**
+	 * Formats a date using the SQL format: <code>yyyy-MM-dd</code>
+	 * 
+	 * @param date the date to format
+	 * 
+	 * @return the formatted string
+	 */
+	public String formatSQL(Date date) {
+		if(date==null)
+			return "";
+		
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		return df.format(date);
 	}
 
@@ -120,6 +155,9 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	 * @return the formatted string
 	 */
 	public String format(Date date, String format) {
+		if(date==null)
+			return "";
+		
 		SimpleDateFormat df = new SimpleDateFormat(format);
 		return df.format(date);
 	}

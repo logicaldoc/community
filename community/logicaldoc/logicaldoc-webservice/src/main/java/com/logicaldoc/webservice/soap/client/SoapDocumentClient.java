@@ -80,6 +80,11 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
+	public WSDocument copy(String sid, long docId, long folderId) throws Exception {
+		return client.copy(sid, docId, folderId);
+	}
+
+	@Override
 	public void unlock(String sid, long docId) throws Exception {
 		client.unlock(sid, docId);
 	}

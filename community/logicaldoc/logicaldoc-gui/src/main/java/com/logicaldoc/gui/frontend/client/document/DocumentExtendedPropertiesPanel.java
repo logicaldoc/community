@@ -21,8 +21,8 @@ public class DocumentExtendedPropertiesPanel extends DocumentDetailTab {
 		setHeight100();
 		setMembersMargin(1);
 
-		extPropertiesPanel = new ExtendedPropertiesPanel(document, changedHandler, templateChangedHandler, updateEnabled,
-				true, true);
+		extPropertiesPanel = new ExtendedPropertiesPanel(document, changedHandler, templateChangedHandler,
+				updateEnabled, !document.isBulkUpdate(), true);
 		setMembers(extPropertiesPanel);
 	}
 

@@ -119,12 +119,12 @@ public class MessageTemplatesPanel extends VLayout {
 		toolStrip.setWidth100();
 
 		ListGridField name = new ListGridField("name", I18N.message("name"));
-		name.setWidth(80);
+		name.setAutoFitWidth(true);
 		name.setRequired(true);
 		name.setCanEdit(false);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
-		type.setWidth(80);
+		type.setWidth(60);
 		type.setCanEdit(false);
 
 		ListGridField subject = new ListGridField("subject", I18N.message("subject"));

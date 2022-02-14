@@ -12,8 +12,8 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.common.client.widgets.ImageCropper;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.SignService;
@@ -63,7 +63,7 @@ public class VisualPositioningSignatureDialog extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 
 		// Prepare the conversion in JPG first
 		RequestBuilder builder = new RequestBuilder(RequestBuilder.GET, getPageUrl(1));
@@ -71,7 +71,7 @@ public class VisualPositioningSignatureDialog extends Window {
 			builder.sendRequest("", new RequestCallback() {
 				public void onError(Request request, Throwable exception) {
 					GuiLog.serverError(exception);
-					ContactingServer.get().hide();
+					LD.clearPrompt();
 				}
 
 				public void onResponseReceived(Request request, Response response) {
@@ -80,12 +80,12 @@ public class VisualPositioningSignatureDialog extends Window {
 						@Override
 						public void onFailure(Throwable caught) {
 							GuiLog.serverError(caught);
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 						}
 
 						@Override
 						public void onSuccess(GUIDocument doc) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							firstSelectedDoc = doc;
 							initGUI();
 						}
@@ -93,7 +93,7 @@ public class VisualPositioningSignatureDialog extends Window {
 				}
 			});
 		} catch (RequestException e) {
-			ContactingServer.get().hide();
+			LD.clearPrompt();
 			GuiLog.error(e.getMessage(), null, e);
 		}
 	}
@@ -143,8 +143,8 @@ public class VisualPositioningSignatureDialog extends Window {
 		});
 
 		pageCursor = ItemFactory.newSpinnerItem("page", "page", 1, 1,
-				firstSelectedDoc.getPages() > 0 ? firstSelectedDoc.getPages() : 1);
-		pageCursor.setHint("/" + (firstSelectedDoc.getPages() > 0 ? firstSelectedDoc.getPages() : 1));
+				firstSelectedDoc.getPreviewPages() > 0 ? firstSelectedDoc.getPreviewPages() : 1);
+		pageCursor.setHint("/" + (firstSelectedDoc.getPreviewPages() > 0 ? firstSelectedDoc.getPreviewPages() : 1));
 		pageCursor.setSaveOnEnter(true);
 		pageCursor.setImplicitSave(true);
 		pageCursor.addChangedHandler(new ChangedHandler() {
@@ -189,13 +189,13 @@ public class VisualPositioningSignatureDialog extends Window {
 				+ (double) cropper.getSelectionYCoordinate() / (double) cropper.getImageHeight();
 		String exprW = "$PAGE_WIDTH * " + (double) cropper.getSelectionWidth() / (double) cropper.getImageWidth();
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 
 		SignService.Instance.get().signDocuments(docIds, reason, page, exprX, exprY, exprW, new AsyncCallback<Void>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 			}
 
@@ -203,7 +203,7 @@ public class VisualPositioningSignatureDialog extends Window {
 			public void onSuccess(Void arg0) {
 				destroy();
 				GuiLog.info(I18N.message("event.signed"), null);
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 			}
 		});
 	}

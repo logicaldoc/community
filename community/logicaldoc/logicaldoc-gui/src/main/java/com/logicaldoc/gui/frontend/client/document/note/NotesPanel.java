@@ -8,7 +8,7 @@ import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailTab;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -71,7 +71,7 @@ public class NotesPanel extends DocumentDetailTab {
 		ListGridField userId = new ListGridField("userId", "userid", 50);
 		userId.setHidden(true);
 
-		AvatarListGridField user = new AvatarListGridField("user", "userId", "author", 150);
+		UserListGridField user = new UserListGridField("user", "userId", "author");
 		ListGridField date = new DateListGridField("date", "date");
 
 		ListGridField page = new ListGridField("page", I18N.message("page"), 50);

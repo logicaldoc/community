@@ -453,9 +453,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			 * Update the aliases
 			 */
 			if (doc.getDocRef() == null)
-				jdbcUpdate(
-						"update ld_document set ld_filesize= " + doc.getFileSize() + ", ld_version='" + doc.getVersion()
-								+ "', ld_fileversion='" + doc.getFileVersion() + "' where ld_docref= " + doc.getId());
+				jdbcUpdate("update ld_document set ld_filesize= " + doc.getFileSize() + ", ld_pages= " + doc.getPages()
+						+ ", ld_version='" + doc.getVersion() + "', ld_fileversion='" + doc.getFileVersion()
+						+ "' where ld_docref= " + doc.getId());
 		} catch (Throwable e) {
 			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());
@@ -736,7 +736,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 					coll.add(myDoc);
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 		}
 
 		return coll;
@@ -749,7 +749,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		try {
 			return (List<Long>) queryForList(sql, null, Long.class, max);
 		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 			return new ArrayList<Long>();
 		}
 	}
@@ -759,7 +759,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		try {
 			return findByWhere("_entity.folder.id = ?1 ", new Object[] { Long.valueOf(folderId) }, null, max);
 		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 			return new ArrayList<Document>();
 		}
 	}
@@ -771,7 +771,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 					"_entity.folder.id = " + folderId + " and _entity.status=" + AbstractDocument.DOC_ARCHIVED, null,
 					null);
 		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 			return new ArrayList<Document>();
 		}
 	}
@@ -797,9 +797,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(" and not _entity.status=" + AbstractDocument.DOC_ARCHIVED);
 
 			coll = (List<Document>) findByQuery(query.toString(), new Object[] { docId }, null);
-
 		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 		}
 
 		return coll;
@@ -873,7 +872,6 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			};
 
 			coll = (List<Document>) query(query, new Object[] {}, docMapper, null);
-
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
 				log.error(e.getMessage(), e);
@@ -1067,7 +1065,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public List<Document> findDeleted(long userId, Integer maxHits) {
 		List<Document> results = new ArrayList<Document>();
 		try {
-			String query = "select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid from ld_document where ld_deleted=1 and ld_deleteuserid = "
+			String query = "select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid, ld_color from ld_document where ld_deleted=1 and ld_deleteuserid = "
 					+ userId + " order by ld_lastmodified desc";
 
 			@SuppressWarnings("rawtypes")
@@ -1084,6 +1082,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 					folder.setId(rs.getLong(6));
 					doc.setFolder(folder);
 
+					doc.setColor(rs.getString(7));
 					return doc;
 				}
 			};
@@ -1225,8 +1224,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 					// Collect the currently unique used tags
 					@SuppressWarnings("unchecked")
 					Set<String> currentlyUsedTags = ((Map<String, String>) queryForList(
-							"select distinct(B.ld_tag) from ld_tag B, ld_document C where B.ld_tenantid="
-									+ tenantId + " and C.ld_id=B.ld_docid and C.ld_deleted=0 "
+							"select distinct(B.ld_tag) from ld_tag B, ld_document C where B.ld_tenantid=" + tenantId
+									+ " and C.ld_id=B.ld_docid and C.ld_deleted=0 "
 									+ " UNION select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where D.ld_tenantid="
 									+ tenantId + " and E.ld_id=D.ld_folderid and E.ld_deleted=0",
 							String.class).stream().collect(Collectors.groupingBy(Function.identity()))).keySet();
@@ -1242,13 +1241,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 						String currentlyUsedTagsStr = currentlyUsedTags.stream()
 								.map(tag -> ("('" + SqlUtil.doubleQuotes(tag) + "',0)"))
 								.collect(Collectors.joining(","));
-						jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId + " and (ld_tag,0) not in ("
-								+ currentlyUsedTagsStr + ")");
+						if (StringUtils.isNotEmpty(currentlyUsedTagsStr))
+							jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId
+									+ " and (ld_tag,0) not in (" + currentlyUsedTagsStr + ")");
 					} else {
 						String currentlyUsedTagsStr = currentlyUsedTags.stream()
 								.map(tag -> ("'" + SqlUtil.doubleQuotes(tag) + "'")).collect(Collectors.joining(","));
-						jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId + " and ld_tag not in ("
-								+ currentlyUsedTagsStr + ")");
+						if (StringUtils.isNotEmpty(currentlyUsedTagsStr))
+							jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId + " and ld_tag not in ("
+									+ currentlyUsedTagsStr + ")");
 					}
 				}
 			} catch (Throwable t) {

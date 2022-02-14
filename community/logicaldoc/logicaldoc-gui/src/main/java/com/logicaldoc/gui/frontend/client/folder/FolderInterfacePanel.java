@@ -6,10 +6,10 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.TitleOrientation;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
@@ -42,7 +42,13 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		setWidth100();
 		setHeight100();
 		setMembersMargin(20);
-		refresh();
+
+		try {
+			refresh();
+		} catch (Throwable t) {
+			GuiLog.error(t.getMessage(),null,null);
+			SC.warn(t.getMessage());
+		}
 	}
 
 	private void refresh() {
@@ -87,21 +93,25 @@ public class FolderInterfacePanel extends FolderDetailTab {
 			}
 		});
 
-		FormItemIcon showDefinition = new FormItemIcon();
-		showDefinition.setSrc("[SKIN]/paste.gif");
-		showDefinition.setPrompt(I18N.message("showdefinition"));
-		showDefinition.setWidth(12);
-		showDefinition.setHeight(12);
-		showDefinition.addFormItemClickHandler(new FormItemClickHandler() {
+		FormItemIcon editLayout = new FormItemIcon();
+		editLayout.setSrc("[SKIN]/paste.gif");
+		editLayout.setPrompt(I18N.message("editlayout"));
+		editLayout.setWidth(12);
+		editLayout.setHeight(12);
+		editLayout.addFormItemClickHandler(new FormItemClickHandler() {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
-				TextAreaItem textArea = ItemFactory.newTextAreaItem("griddefinition", I18N.message("griddefinition"),
+				TextAreaItem textArea = ItemFactory.newTextAreaItem("docsgridlayout", I18N.message("docsgridlayout"),
 						null);
 				textArea.setHeight(300);
-				LD.askForValue(I18N.message("griddefinition"), I18N.message("griddefinition"),
+				LD.askForValue(I18N.message("docsgridlayout"), I18N.message("docsgridlayout"),
 						folder.getGrid() != null ? folder.getGrid() : "", textArea, 400, new ValueCallback() {
 							@Override
 							public void execute(final String value) {
+								vm.setValue("grid",
+										(value != null && !value.trim().isEmpty()) ? I18N.message("customized")
+												: I18N.message("notcustomized"));
+
 								folder.setGrid(value);
 								if (changedHandler != null)
 									changedHandler.onChanged(null);
@@ -120,17 +130,17 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		applyToSubFolders.addFormItemClickHandler(new FormItemClickHandler() {
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				FolderService.Instance.get().applyGridLayout(folder.getId(), new AsyncCallback<Void>() {
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void arg0) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.info(I18N.message("appliedgridonsubfolders"));
 					}
 				});
@@ -150,12 +160,15 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		clear.setWidth(12);
 		clear.setHeight(12);
 
-		docsGrid.setIcons(copyCurrentLayout, applyToSubFolders, showDefinition, clear);
+		docsGrid.setIcons(copyCurrentLayout, applyToSubFolders, editLayout, clear);
 
 		if (folder.isWrite()) {
-			color.addChangedHandler(changedHandler);
-			position.addChangedHandler(changedHandler);
-			docsGrid.addChangedHandler(changedHandler);
+			if (changedHandler != null) {
+				color.addChangedHandler(changedHandler);
+				position.addChangedHandler(changedHandler);
+				docsGrid.addChangedHandler(changedHandler);
+			} else
+				docsGrid.setHidden(true);
 		} else {
 			color.setDisabled(true);
 			position.setDisabled(true);
@@ -166,7 +179,7 @@ public class FolderInterfacePanel extends FolderDetailTab {
 		addMember(form);
 	}
 
-	boolean validate() {
+	public boolean validate() {
 		vm.validate();
 		if (!vm.hasErrors()) {
 			folder.setPosition(

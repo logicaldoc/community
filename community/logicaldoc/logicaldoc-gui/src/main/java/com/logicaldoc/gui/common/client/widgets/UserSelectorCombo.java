@@ -29,6 +29,8 @@ public class UserSelectorCombo extends MultiComboBoxItem {
 		setOptionDataSource(new UsersDS(groupIdOrName, allowNull, skipDisabled));
 		setHintStyle("hint");
 
+		setEmptyDisplayValue(I18N.message("selectuser"));
+		
 		setWidth("*");
 
 		setValueFormatter(new AvatarFormItemValueFormatter());

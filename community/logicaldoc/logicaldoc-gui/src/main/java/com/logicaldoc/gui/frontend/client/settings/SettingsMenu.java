@@ -5,7 +5,6 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIEmailSettings;
-import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
@@ -14,6 +13,7 @@ import com.logicaldoc.gui.frontend.client.settings.automation.AutomationSettings
 import com.logicaldoc.gui.frontend.client.settings.comparators.ComparatorsPanel;
 import com.logicaldoc.gui.frontend.client.settings.gui.GUISettingsPanel;
 import com.logicaldoc.gui.frontend.client.settings.messages.OutgoingEmailPanel;
+import com.logicaldoc.gui.frontend.client.settings.protocols.ProtocolsPanel;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -205,19 +205,7 @@ public class SettingsMenu extends VLayout {
 		parameters.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				SettingService.Instance.get().loadSettings(new AsyncCallback<GUIParameter[]>() {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
-
-					@Override
-					public void onSuccess(GUIParameter[] settings) {
-						AdminScreen.get().setContent(new ParametersPanel(settings));
-					}
-
-				});
+				AdminScreen.get().setContent(new ParametersPanel());
 			}
 		});
 

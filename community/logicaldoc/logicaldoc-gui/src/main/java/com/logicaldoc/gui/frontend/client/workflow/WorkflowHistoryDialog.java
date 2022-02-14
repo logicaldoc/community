@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowHistoriesDS;
 import com.logicaldoc.gui.common.client.data.WorkflowsDS;
@@ -9,10 +10,11 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.HeaderControls;
@@ -75,7 +77,7 @@ public class WorkflowHistoryDialog extends Window {
 		workflow.setValueField("id");
 		workflow.setDisplayField("name");
 		workflow.setPickListFields(name);
-		workflow.setOptionDataSource(new WorkflowsDS(false, false));
+		workflow.setOptionDataSource(new WorkflowsDS(false, false, Session.get().getUser().getId()));
 		if (selectedWorkflow != null)
 			workflow.setValue(selectedWorkflow.getName());
 
@@ -170,7 +172,7 @@ public class WorkflowHistoryDialog extends Window {
 		
 		ListGridField endDate = new DateListGridField("enddate", "enddate", DateCellFormatter.FORMAT_LONG);
 		
-		ListGridField version = new ListGridField("templateVersion", I18N.message("version"), 70);
+		ListGridField version = new VersionListGridField("templateVersion", I18N.message("version"));
 		version.setHidden(true);
 		ListGridField templateId = new ListGridField("templateId", I18N.message("templateid"), 70);
 		templateId.setHidden(true);
@@ -178,7 +180,7 @@ public class WorkflowHistoryDialog extends Window {
 		ListGridField documents = new ListGridField("documents", I18N.message("documents"), 250);
 		ListGridField documentIds = new ListGridField("documentIds", I18N.message("documentids"), 300);
 		documentIds.setHidden(true);
-		ListGridField initiator = new AvatarListGridField("initiator", "initiatorId", "initiator", 100);
+		ListGridField initiator = new UserListGridField("initiator", "initiatorId", "initiator");
 
 		instancesGrid = new RefreshableListGrid();
 		instancesGrid.setCanFreezeFields(true);

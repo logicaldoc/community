@@ -9,13 +9,15 @@ import com.logicaldoc.gui.common.client.data.VersionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.note.VersionNotesWindow;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -58,20 +60,20 @@ public class VersionsPanel extends DocumentDetailTab {
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 
-		ListGridField user = new AvatarListGridField("user", "userId", "user", 110);
-		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
-		ListGridField version = new ListGridField("version", I18N.message("version"), 70);
-		ListGridField fileVersion = new ListGridField("fileVersion", I18N.message("fileversion"), 70);
+		ListGridField user = new UserListGridField("user", "userId", "user");
+		ListGridField event = new ColoredListGridField("event", I18N.message("event"), 200);
+		ListGridField version = new ColoredListGridField("version", I18N.message("version"), 70);
+		ListGridField fileVersion = new ColoredListGridField("fileVersion", I18N.message("fileversion"), 70);
 		ListGridField date = new DateListGridField("date", "date");
-		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
+		ListGridField comment = new ColoredListGridField("comment", I18N.message("comment"));
 		FileNameListGridField fileName = new FileNameListGridField();
 
-		ListGridField type = new ListGridField("type", I18N.message("type"), 55);
+		ListGridField type = new ColoredListGridField("type", I18N.message("type"), 55);
 		type.setType(ListGridFieldType.TEXT);
 		type.setAlign(Alignment.CENTER);
 		type.setHidden(true);
 
-		ListGridField permalink = new ListGridField("permalink", I18N.message("permalink"), 90);
+		ListGridField permalink = new ColoredListGridField("permalink", I18N.message("permalink"), 90);
 		permalink.setAlign(Alignment.CENTER);
 		permalink.setCellFormatter(new CellFormatter() {
 
@@ -80,7 +82,7 @@ public class VersionsPanel extends DocumentDetailTab {
 				long docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
 				String fileVersion = record.getAttributeAsString("fileVersion");
 				String downloadUrl = Util.downloadURL(docId, fileVersion);
-				String perma = "<a href='" + downloadUrl + "'>" + I18N.message("download") + "</a>";
+				String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message("download") + "</a>";
 				return perma;
 			}
 		});
@@ -115,7 +117,7 @@ public class VersionsPanel extends DocumentDetailTab {
 			@Override
 			public void onCellDoubleClick(CellDoubleClickEvent event) {
 				ListGridRecord record = event.getRecord();
-				if (Session.get().getCurrentFolder().isDownload()
+				if (FolderController.get().getCurrentFolder().isDownload()
 						&& "download".equals(Session.get().getInfo().getConfig("gui.doubleclick")))
 					onDownload(document, record);
 				else
@@ -252,6 +254,7 @@ public class VersionsPanel extends DocumentDetailTab {
 				onPreview(document, selection[0]);
 			}
 		});
+		preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 		MenuItem promote = new MenuItem();
 		promote.setTitle(I18N.message("promote"));
@@ -261,16 +264,19 @@ public class VersionsPanel extends DocumentDetailTab {
 					@Override
 					public void execute(Boolean value) {
 						if (value) {
+							LD.contactingServer();
 							DocumentService.Instance.get().promoteVersion(document.getId(),
 									selection[0].getAttributeAsString("version"), new AsyncCallback<GUIDocument>() {
 
 										@Override
 										public void onFailure(Throwable caught) {
+											LD.clearPrompt();
 											GuiLog.serverError(caught);
 										}
 
 										@Override
 										public void onSuccess(GUIDocument document) {
+											LD.clearPrompt();
 											DocumentController.get().checkedIn(document);
 											destroy();
 										}

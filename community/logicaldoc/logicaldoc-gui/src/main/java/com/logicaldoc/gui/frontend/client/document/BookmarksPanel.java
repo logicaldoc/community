@@ -8,8 +8,9 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.ListGridEditEvent;
@@ -60,7 +61,7 @@ public class BookmarksPanel extends VLayout {
 		name.setWidth("*");
 		name.setValidators(validator);
 
-		ListGridField description = new ListGridField("description", I18N.message("description"));
+		ListGridField description = new ColoredListGridField("description", I18N.message("description"));
 		description.setValidators(validator);
 		description.setHidden(true);
 

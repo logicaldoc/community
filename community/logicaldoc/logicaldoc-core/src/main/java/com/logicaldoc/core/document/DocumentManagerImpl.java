@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
-import com.logicaldoc.core.communication.MailUtil;
 import com.logicaldoc.core.conversion.FormatConverterManager;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
@@ -231,12 +230,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					document.setFileVersion(originalFileVersion);
 				}
 
-				try {
-					checkEmailAttachments(file, document);
-				} catch (Throwable t) {
-					log.warn("Unable to detect the presence of attachments in the email file");
-					log.debug(t.getMessage(), t);
-				}
+				countPages(file, document);
 
 				Map<String, Object> dictionary = new HashMap<String, Object>();
 
@@ -248,7 +242,6 @@ public class DocumentManagerImpl implements DocumentManager {
 				document.setSigned(0);
 				document.setOcrd(0);
 				document.setBarcoded(0);
-				document.setPages(-1);
 
 				if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
 					document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
@@ -344,14 +337,14 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public void checkout(long docId, DocumentHistory transaction) throws Exception {
+	public void checkout(long docId, DocumentHistory transaction) throws PersistenceException {
 		if (transaction.getEvent() == null)
 			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
 		lock(docId, Document.DOC_CHECKED_OUT, transaction);
 	}
 
 	@Override
-	public void lock(long docId, int status, DocumentHistory transaction) throws Exception {
+	public void lock(long docId, int status, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -368,8 +361,9 @@ public class DocumentManagerImpl implements DocumentManager {
 			}
 
 			if (document.getStatus() != Document.DOC_UNLOCKED)
-				throw new Exception(String.format("Document %s is already locked by user %s and cannot be locked by %s",
-						document, document.getLockUser(), transaction.getUser().getFullName()));
+				throw new PersistenceException(
+						String.format("Document %s is already locked by user %s and cannot be locked by %s", document,
+								document.getLockUser(), transaction.getUser().getFullName()));
 
 			documentDAO.initialize(document);
 			document.setLockUserId(transaction.getUser().getId());
@@ -383,7 +377,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			// Modify document history entry
 			boolean stored = documentDAO.store(document, transaction);
 			if (!stored)
-				throw new Exception("Document not locked");
+				throw new PersistenceException("Document not locked");
 		}
 
 		log.debug("locked document {}", docId);
@@ -490,8 +484,8 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			// For additional safety update the DB directly
 			doc.setIndexed(AbstractDocument.INDEX_INDEXED);
-			
-			if(transaction!=null)
+
+			if (transaction != null)
 				transaction.setEvent(DocumentEvent.INDEXED.toString());
 
 			boolean stored = documentDAO.store(doc, transaction);
@@ -518,7 +512,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public void update(Document doc, Document docVO, DocumentHistory transaction) throws Exception {
+	public void update(Document doc, Document docVO, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 		assert (doc != null);
@@ -552,6 +546,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
 
 					doc.setWorkflowStatus(docVO.getWorkflowStatus());
+					doc.setColor(docVO.getColor());
 
 					// Save retention policies
 					doc.setPublished(docVO.getPublished());
@@ -644,12 +639,12 @@ public class DocumentManagerImpl implements DocumentManager {
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			throw e;
+			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
-	public void moveToFolder(Document doc, Folder folder, DocumentHistory transaction) throws Exception {
+	public void moveToFolder(Document doc, Folder folder, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -690,13 +685,13 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				boolean stored = documentDAO.store(doc, transaction);
 				if (!stored)
-					throw new Exception("Document not stored");
+					throw new PersistenceException("Document not stored");
 				stored = versionDAO.store(version);
 				if (!stored)
-					throw new Exception("Version not stored");
+					throw new PersistenceException("Version not stored");
 			}
 		} else {
-			throw new Exception("Document is immutable");
+			throw new PersistenceException("Document is immutable");
 		}
 	}
 
@@ -717,7 +712,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public Document create(File file, Document docVO, DocumentHistory transaction) throws Exception {
+	public Document create(File file, Document docVO, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (docVO != null);
 
@@ -767,18 +762,13 @@ public class DocumentManagerImpl implements DocumentManager {
 			 * multi-threading may lead to hibernate's sessions rollbacks
 			 */
 			synchronized (this) {
+				countPages(file, docVO);
+
 				if (docVO.getTemplate() == null && docVO.getTemplateId() != null)
 					docVO.setTemplate(templateDAO.findById(docVO.getTemplateId()));
 
 				if (file != null)
 					transaction.setFile(file.getAbsolutePath());
-
-				try {
-					checkEmailAttachments(file, docVO);
-				} catch (Throwable t) {
-					log.warn("Unable to detect the presence of attachments in the email file");
-					log.debug(t.getMessage(), t);
-				}
 
 				// Create the record
 				transaction.setEvent(DocumentEvent.STORED.toString());
@@ -807,25 +797,38 @@ public class DocumentManagerImpl implements DocumentManager {
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			throw new Exception(e);
+			throw new PersistenceException(e);
 		}
 	}
 
 	/**
-	 * In case of email, put pages to 2 to mark the existence of attachments
+	 * Processes a file trying to calculate the pages and updates the pages
+	 * property of the given document.
 	 * 
-	 * @throws Exception
+	 * @param file The document's file
+	 * @param doc The document
 	 */
-	private void checkEmailAttachments(File file, Document doc) throws Exception {
-		if (doc.getFileName().toLowerCase().endsWith(".eml") || doc.getFileName().toLowerCase().endsWith(".msg")) {
-			boolean attachments = doc.getFileName().endsWith(".eml") ? MailUtil.emlContainsAttachments(file)
-					: MailUtil.msgContainsAttachments(file);
-			if (attachments)
-				doc.setPages(2);
+	private void countPages(File file, Document doc) {
+		try {
+			Parser parser = ParserFactory.getParser(doc.getFileName());
+			log.debug("Using parser {} to count pages of document {}", parser.getClass().getName(), doc);
+			if (parser != null)
+				doc.setPages(parser.countPages(file, doc.getFileName()));
+		} catch (Throwable e) {
+			log.warn("Cannot count pages of document {}", doc, e);
+		}
+	}
 
-			if (doc.getTemplate() != null && doc.getTemplate().getName().equals("email")
-					&& doc.getValue("attachments") != null && "true".equals(doc.getValue("attachments")))
-				doc.setPages(2);
+	@Override
+	public int countPages(Document doc) {
+		try {
+			Parser parser = ParserFactory.getParser(doc.getFileName());
+			Storer storer = (Storer) Context.get().getBean(Storer.class);
+			return parser.countPages(storer.getStream(doc.getId(), storer.getResourceName(doc, null, null)),
+					doc.getFileName());
+		} catch (Throwable e) {
+			log.warn("Cannot count pages of document {}", doc, e);
+			return 1;
 		}
 	}
 
@@ -877,7 +880,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public void unlock(long docId, DocumentHistory transaction) throws Exception {
+	public void unlock(long docId, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUserId() != null);
 
@@ -901,7 +904,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				 */
 				String message = String.format("The document %s is locked by %s and cannot be unlocked by %s", document,
 						document.getLockUser(), transaction.getUser().getFullName());
-				throw new Exception(message);
+				throw new PersistenceException(message);
 			}
 
 			document.setLockUserId(null);
@@ -913,13 +916,13 @@ public class DocumentManagerImpl implements DocumentManager {
 			transaction.setEvent(DocumentEvent.UNLOCKED.toString());
 			boolean stored = documentDAO.store(document, transaction);
 			if (!stored)
-				throw new Exception("Document not unlocked");
+				throw new PersistenceException("Document not unlocked");
 		}
 		log.debug("Unlocked document {}", docId);
 	}
 
 	@Override
-	public void makeImmutable(long docId, DocumentHistory transaction) throws Exception {
+	public void makeImmutable(long docId, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -931,12 +934,12 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			log.debug("The document {} has been marked as immutable", docId);
 		} else {
-			throw new Exception("Document is immutable");
+			throw new PersistenceException("Document is immutable");
 		}
 	}
 
 	@Override
-	public void rename(long docId, String newName, DocumentHistory transaction) throws Exception {
+	public void rename(long docId, String newName, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -966,18 +969,18 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				transaction.setEvent(DocumentEvent.RENAMED.toString());
 				if (documentDAO.store(document, transaction) == false)
-					throw new Exception(String.format("Errors saving document %s", document.getId()));
+					throw new PersistenceException(String.format("Errors saving document %s", document.getId()));
 
 				markAliasesToIndex(docId);
 				log.debug("Document renamed: {}", document.getId());
 			} else {
-				throw new Exception("Document is immutable");
+				throw new PersistenceException("Document is immutable");
 			}
 		}
 	}
 
 	@Override
-	public Document replaceAlias(long aliasId, DocumentHistory transaction) throws Exception {
+	public Document replaceAlias(long aliasId, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -1001,13 +1004,13 @@ public class DocumentManagerImpl implements DocumentManager {
 			return copyToFolder(originalDoc, folder, (DocumentHistory) transaction.clone());
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			throw e;
+			throw new PersistenceException(e);
 		}
 	}
 
 	@Override
 	public Document createAlias(Document doc, Folder folder, String aliasType, DocumentHistory transaction)
-			throws Exception {
+			throws PersistenceException {
 		assert (doc != null);
 		assert (folder != null);
 		assert (transaction != null);
@@ -1059,9 +1062,9 @@ public class DocumentManagerImpl implements DocumentManager {
 			documentDAO.store(alias, transaction);
 
 			return alias;
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			throw e;
+			throw new PersistenceException(e);
 		}
 	}
 
@@ -1097,7 +1100,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public Version deleteVersion(long versionId, DocumentHistory transaction) throws Exception {
+	public Version deleteVersion(long versionId, DocumentHistory transaction) throws PersistenceException {
 		Version versionToDelete = versionDAO.findById(versionId);
 		assert (versionToDelete != null);
 
@@ -1134,7 +1137,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		boolean deleted = versionDAO.delete(versionId);
 		if (!deleted)
-			throw new Exception("Version not deleted from the database");
+			throw new PersistenceException("Version not deleted from the database");
 
 		// Save the version deletion history
 		DocumentHistory delHistory = null;
@@ -1173,7 +1176,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			boolean stored = documentDAO.store(document, transaction);
 			if (!stored)
-				throw new Exception("Document not stored");
+				throw new PersistenceException("Document not stored");
 		}
 
 		return lastVersion;
@@ -1184,7 +1187,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public long archiveFolder(long folderId, DocumentHistory transaction) throws Exception {
+	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException {
 		List<Long> docIds = new ArrayList<Long>();
 		Folder root = folderDAO.findFolder(folderId);
 
@@ -1209,7 +1212,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws Exception {
+	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction.getUser() != null);
 		List<Long> idsList = new ArrayList<Long>();
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1239,12 +1242,12 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public Ticket createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws Exception {
+			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws PersistenceException {
 		assert (transaction.getUser() != null);
 
 		Document document = documentDAO.findById(docId);
 		if (document == null)
-			throw new Exception("Unexisting document");
+			throw new PersistenceException("Unexisting document");
 
 		if (!folderDAO.isDownloadEnabled(document.getFolder().getId(), transaction.getUserId()))
 			throw new RuntimeException("You don't have the download permission");

@@ -20,6 +20,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
@@ -42,8 +44,8 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(DocumentHistoryDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -72,10 +74,15 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 			List<Object> parameters = new ArrayList<Object>();
 			DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			StringBuffer query = new StringBuffer(
-					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation from DocumentHistory A where 1=1 and A.deleted = 0 ");
+					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color from DocumentHistory A where 1=1 and A.deleted = 0 ");
 			if (request.getParameter("docId") != null) {
+				Long docId = Long.parseLong(request.getParameter("docId"));
+				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+				Document doc = ddao.findDocument(docId);
+				if (doc != null)
+					docId = doc.getId();
 				query.append(" and A.docId = ?" + (parameters.size() + 1));
-				parameters.add(Long.parseLong(request.getParameter("docId")));
+				parameters.add(docId);
 			}
 			if (request.getParameter("userId") != null) {
 				query.append(" and A.userId = ?" + (parameters.size() + 1));
@@ -116,9 +123,8 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 				writer.print("<date>" + df.format((Date) cols[3]) + "</date>");
 				writer.print("<comment><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></comment>");
 				writer.print("<filename><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></filename>");
-				writer.print("<icon>"
-						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils
-								.getExtension((String) cols[5]))) + "</icon>");
+				writer.print("<icon>" + FilenameUtils.getBaseName(
+						IconSelector.selectIcon(FilenameUtils.getExtension((String) cols[5]))) + "</icon>");
 				writer.print("<new>" + (1 == (Integer) cols[6]) + "</new>");
 				writer.print("<folderId>" + cols[7] + "</folderId>");
 				writer.print("<docId>" + cols[8] + "</docId>");
@@ -130,6 +136,9 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 				writer.print("<ip><![CDATA[" + (cols[13] == null ? "" : cols[13]) + "]]></ip>");
 				writer.print("<device><![CDATA[" + (cols[14] == null ? "" : cols[14]) + "]]></device>");
 				writer.print("<geolocation><![CDATA[" + (cols[15] == null ? "" : cols[15]) + "]]></geolocation>");
+
+				if (cols[16] != null)
+					writer.write("<color><![CDATA[" + cols[16] + "]]></color>");
 				writer.print("</history>");
 			}
 			writer.write("</list>");

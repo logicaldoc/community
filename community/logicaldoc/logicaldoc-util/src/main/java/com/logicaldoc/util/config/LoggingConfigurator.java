@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.jdom.CDATA;
 import org.jdom.Element;
 
 /**
@@ -32,45 +32,27 @@ public class LoggingConfigurator {
 		xml = new XMLBean(configFile);
 	}
 
-	/**
-	 * This method selects all file appenders
-	 * 
-	 * @return collection of the appender names
-	 */
-	public Collection<String> getLoggingFiles() {
-		Collection<String> result = new ArrayList<String>();
-		List list = xml.getAllChild("appender");
-		Iterator iter = list.iterator();
-
-		while (iter.hasNext()) {
-			Element elem = (Element) iter.next();
-			List childs = elem.getChildren("param");
-			Iterator children = childs.iterator();
-
-			while (children.hasNext()) {
-				Element child = (Element) children.next();
-
-				if (child.getAttributeValue("name").equals("File")) {
-					result.add(elem.getAttributeValue("name"));
-				}
-			}
-		}
-
-		return result;
+	public String getProperty(String name) {
+		Element elem = xml.findElement("//Property[@name='" + name + "']");
+		if (elem != null)
+			return elem.getTextTrim();
+		else
+			return null;
 	}
 
 	/**
-	 * This method selects all file appenders suitable for web visualization
+	 * This method selects all the log files
 	 * 
-	 * @return collection of the appender names
+	 * @return collection of the log file paths
 	 */
-	public Collection<String> getWebLoggingFiles() {
+	public Collection<String> getLoggingFiles() {
 		Collection<String> result = new ArrayList<String>();
-		// Filter appenders not ending by '_WEB'
-		for (Iterator iter = getLoggingFiles().iterator(); iter.hasNext();) {
-			String element = (String) iter.next();
-			if (element.endsWith("_WEB"))
-				result.add(element);
+		Element appenders = xml.findElement("//Appenders");
+		List list = appenders.getChildren("RollingFile");
+		Iterator iter = list.iterator();
+		while (iter.hasNext()) {
+			Element elem = (Element) iter.next();
+			result.add(elem.getAttributeValue("name"));
 		}
 		return result;
 	}
@@ -97,18 +79,11 @@ public class LoggingConfigurator {
 	 */
 	public String getFile(String appender, boolean replaceVariables) {
 		String result = null;
-		Element elem = xml.getChild("appender", "name", appender);
+		Element elem = xml.findElement("//RollingFile[@name='" + appender + "']");
 		if (elem != null) {
-			List childs = elem.getChildren("param");
-			Iterator children = childs.iterator();
-
-			while (children.hasNext()) {
-				Element child = (Element) children.next();
-
-				if (child.getAttributeValue("name").equals("File")) {
-					result = child.getAttributeValue("value");
-				}
-			}
+			result = elem.getAttributeValue("fileName");
+			if (result.contains("${root}"))
+				result = result.replace("${root}", getProperty("root"));
 
 			if (replaceVariables) {
 				result = StrSubstitutor.replaceSystemProperties(result);
@@ -118,107 +93,72 @@ public class LoggingConfigurator {
 		return result;
 	}
 
-	/**
-	 * This method sets a file of an appender.
-	 * 
-	 * @param appender name of the appender
-	 * @param file path of the log file
-	 */
-	public void setFile(String appender, String file) {
-		Element elem = xml.getChild("appender", "name", appender);
-		List childs = elem.getChildren("param");
-		Iterator children = childs.iterator();
-
-		while (children.hasNext()) {
-			Element child = (Element) children.next();
-
-			if (child.getAttributeValue("name").equals("File")) {
-				child.setAttribute("value", file);
-			}
-		}
-	}
-
 	public void addTextAppender(String name) {
-		// Check appender existence
-		if (xml.getChild("appender", "name", name) != null)
+		if (xml.findElement("//RollingFile[@name='" + name + "']") != null)
 			return;
 
 		// Get the DMS appender and use it as a model
-		Element model = xml.getChild("appender", "name", "DMS");
+		Element model = xml.findElement("//RollingFile[@name='DMS']");
 
-		// Clone the model and add to the root
+		// Clone the model and add to the appenders
 		Element newAppender = (Element) model.clone();
-		List appenders = xml.getRootElement().getChildren("appender");
-		xml.getRootElement().addContent(0, newAppender);
+		Element appenders = xml.findElement("//Appenders");
+		appenders.addContent(0, newAppender);
 
 		// Setup the appender name
 		newAppender.setAttribute("name", name);
 
 		// Now setup the file name
-		Iterator params = newAppender.getChildren("param").iterator();
-		while (params.hasNext()) {
-			Element child = (Element) params.next();
-			if (child.getAttributeValue("name").equals("File")) {
-				String logfile = name.trim().toLowerCase() + ".log";
-				child.setAttribute("value", child.getAttributeValue("value").replaceAll("dms.log", logfile));
-				break;
-			}
-		}
+		String logfile = name.trim().toLowerCase() + ".log";
+		newAppender.setAttribute("fileName", newAppender.getAttributeValue("fileName").replaceAll("dms.log", logfile));
+		newAppender.setAttribute("filePattern",
+				newAppender.getAttributeValue("filePattern").replaceAll("dms.log", logfile));
 	}
 
 	public void addHtmlAppender(String name) {
-		// Check appender existence
-		if (xml.getChild("appender", "name", name) != null)
+		if (xml.findElement("//RollingFile[@name='" + name + "']") != null)
 			return;
 
-		// Get the DMS_WEB appender and use it as a model
-		Element model = xml.getChild("appender", "name", "DMS_WEB");
+		// Get the DMS appender and use it as a model
+		Element model = xml.findElement("//RollingFile[@name='DMS_WEB']");
 
-		// Clone the model and add to the root
+		// Clone the model and add to the appenders
 		Element newAppender = (Element) model.clone();
-		List appenders = xml.getRootElement().getChildren("appender");
-		xml.getRootElement().addContent(0, newAppender);
+		Element appenders = xml.findElement("//Appenders");
+		appenders.addContent(0, newAppender);
 
 		// Setup the appender name
 		newAppender.setAttribute("name", name);
 
 		// Now setup the file name
-		Iterator params = newAppender.getChildren("param").iterator();
-		while (params.hasNext()) {
-			Element child = (Element) params.next();
-			if (child.getAttributeValue("name").equals("File")) {
-				String logfile = name.trim().toLowerCase() + ".log.html";
-				child.setAttribute("value", child.getAttributeValue("value").replaceAll("dms.log.html", logfile));
-				break;
-			}
-		}
+		String logfile = name.trim().toLowerCase() + ".log.html";
+		newAppender.setAttribute("fileName",
+				newAppender.getAttributeValue("fileName").replaceAll("dms.log.html", logfile));
+		newAppender.setAttribute("filePattern",
+				newAppender.getAttributeValue("filePattern").replaceAll("dms.log.html", logfile));
 	}
 
-	public void addCategory(Class clazz, String[] appenders) {
-		addCategory(clazz.getCanonicalName(), appenders);
-	}
-
-	public void addCategory(String name, String[] appenders) {
+	public void addLogger(String name, String[] appenders) {
 		// Check category existence
-		if (xml.getChild("category", "name", name) != null)
+		if (xml.findElement("//Logger[@name='" + name + "']") != null)
 			return;
 
-		Element category = new Element("category");
-		category.setAttribute("name", name);
-		category.setAttribute("additivity", "false");
-		Element priority = new Element("priority");
-		priority.setAttribute("value", "info");
-		category.addContent(priority);
+		Element logger = new Element("Logger");
+		logger.setAttribute("name", name);
+		logger.setAttribute("additivity", "false");
+		logger.setAttribute("level", "info");
 
 		for (int i = 0; i < appenders.length; i++) {
-			Element appender = new Element("appender-ref");
+			Element appender = new Element("AppenderRef");
 			appender.setAttribute("ref", appenders[i]);
-			category.addContent(appender);
+			logger.addContent(appender);
 		}
 
+		Element loggers = new Element("Loggers");
+
 		// Place the new category just before the root category
-		Element rootCategory = xml.getChild("root");
-		xml.getRootElement().addContent(xml.getRootElement().indexOf(rootCategory) - 1, category);
+		Element rootElement = xml.findElement("//Root");
+		xml.getRootElement().addContent(loggers.indexOf(rootElement) - 1, logger);
 	}
 
 	/**
@@ -227,24 +167,13 @@ public class LoggingConfigurator {
 	 * @param rootPath The path to be used
 	 */
 	public void setLogsRoot(String rootPath) {
-		List list = xml.getAllChild("appender");
-		Iterator iter = list.iterator();
+		Element elem = xml.findElement("//Property[@name='root']");
+		if (elem != null)
+			elem.setContent(new CDATA(rootPath.trim()));
+	}
 
-		while (iter.hasNext()) {
-			Element elem = (Element) iter.next();
-			List<Element> childs = elem.getChildren("param");
-			Iterator<Element> children = childs.iterator();
-
-			while (children.hasNext()) {
-				Element child = children.next();
-
-				if (child.getAttributeValue("name").equals("File")) {
-					String file = child.getAttributeValue("value");
-					file = FilenameUtils.concat(rootPath, FilenameUtils.getName(file));
-					child.getAttribute("value").setValue(file.replaceAll("\\\\", "/"));
-				}
-			}
-		}
+	public String getLogsRoot() {
+		return getProperty("root");
 	}
 
 	public boolean write() {

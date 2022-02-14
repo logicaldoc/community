@@ -11,7 +11,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.SearchPanel;
@@ -132,18 +132,18 @@ public class EnvelopeDetails extends Window {
 		for (GUIDocument document : documents)
 			docIds.add(document.getId());
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 		DocuSignService.Instance.get().validateEnvelope(docIds, new AsyncCallback<Collection<GUIDocument>>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Collection<GUIDocument> docs) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				if (!docs.isEmpty()) {
 					String message = I18N.message("providesignheretabfordocs") + ": <ul>";
 					for (GUIDocument doc : docs) {
@@ -158,18 +158,18 @@ public class EnvelopeDetails extends Window {
 					settings.setMessage(form.getValueAsString("message"));
 					settings.setSubject(form.getValueAsString("subject"));
 
-					ContactingServer.get().show();
+					LD.contactingServer();
 					DocuSignService.Instance.get().sendEnvelope(settings, new AsyncCallback<String>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(String envelopeId) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							SC.say(I18N.message("sentenvelope", envelopeId));
 							destroy();
 						}

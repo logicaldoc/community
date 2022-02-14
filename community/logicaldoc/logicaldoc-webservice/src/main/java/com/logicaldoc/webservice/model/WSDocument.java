@@ -176,6 +176,9 @@ public class WSDocument implements Serializable {
 	@WSDoc(required = false, description = "Current workflow's status display informations")
 	private String workflowStatusDisplay;
 
+	@WSDoc(required = false, description = "Optional color assigned to the document")
+	private String color;
+	
 	@WSDoc(required = false, description = "If it is not set to <b>1</b>, the document is marked as not published")
 	private int published = 1;
 
@@ -185,7 +188,7 @@ public class WSDocument implements Serializable {
 	@WSDoc(required = false)
 	private String stopPublishing;
 
-	@WSDoc(required = false, description = "number of pages (default <b>-1</b>)")
+	@WSDoc(required = false, description = "number of pages (default <b>1</b>)")
 	private int pages = -1;
 
 	@WSDoc(required = false, description = "<b>0</b> = document, <b>1</b> = form")
@@ -654,5 +657,13 @@ public class WSDocument implements Serializable {
 
 	public void setBarcoded(int barcoded) {
 		this.barcoded = barcoded;
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(String color) {
+		this.color = color;
 	}
 }

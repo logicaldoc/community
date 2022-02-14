@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -28,7 +29,7 @@ public class PluginsPanel extends VLayout {
 		ListGridField name = new ListGridField("name", I18N.message("name"), 250);
 		name.setCanEdit(false);
 
-		ListGridField version = new ListGridField("version", I18N.message("version"));
+		ListGridField version = new VersionListGridField();
 		version.setCanEdit(false);
 
 		final ListGrid list = new ListGrid();

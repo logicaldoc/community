@@ -18,7 +18,9 @@
 		<property name="title" type="string" column="ld_title" length="255" not-null="true"/>
 		<property name="type" type="string" column="ld_type" length="255" not-null="true" />
 		<property name="max" type="int" column="ld_max" />
+		<property name="unique" type="int" column="ld_unique" not-null="true"/>
 		<property name="query" type="string" column="ld_query" />
-		<property name="content" type="string" column="ld_content" />		
+		<property name="content" type="string" column="ld_content" />
+		<property name="columns" type="string" column="ld_columns" />
 	</class>
 </hibernate-mapping>

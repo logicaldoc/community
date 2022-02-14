@@ -151,4 +151,27 @@ public abstract class AbstractParser implements Parser {
 	 */
 	abstract protected void internalParse(InputStream is, String filename, String encoding, Locale locale,
 			String tenant, Document document, String fileVersion, StringBuffer output) throws Exception;
+
+	@Override
+	public int countPages(InputStream input, String filename) {
+		return 1;
+	}
+
+	@Override
+	public int countPages(File file, String filename) {
+		InputStream is = null;
+		try {
+			is = new FileInputStream(file);
+			return countPages(is, filename);
+		} catch (FileNotFoundException e) {
+			log.error(e.getMessage());
+			return 1;
+		} finally {
+			if (is != null)
+				try {
+					is.close();
+				} catch (IOException e) {
+				}
+		}
+	}
 }

@@ -5,7 +5,7 @@ import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.ExtendedPropertiesPanel;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.smartgwt.client.types.TitleOrientation;
@@ -47,18 +47,18 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 		applyMetadata.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				FolderService.Instance.get().applyMetadata(folder.getId(), new AsyncCallback<Void>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.serverError(caught);
 					}
 
 					@Override
 					public void onSuccess(Void v) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 					}
 				});
 			}

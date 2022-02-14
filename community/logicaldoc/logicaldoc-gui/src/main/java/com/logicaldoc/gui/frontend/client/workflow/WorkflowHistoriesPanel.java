@@ -8,11 +8,12 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.GridUtil;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
-import com.logicaldoc.gui.common.client.widgets.RefreshableListGrid;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -79,11 +80,11 @@ public class WorkflowHistoriesPanel extends VLayout {
 		historyId.setHidden(true);
 
 		ListGridField historyEvent = new ListGridField("event", I18N.message("event"), 200);
-		ListGridField historyName = new ListGridField("name", I18N.message("task"), 150);
+		ListGridField historyName = new WorkflowTaskNameListGridField("name", "display", I18N.message("task"));
 
 		ListGridField historyDate = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
 
-		ListGridField historyUser = new AvatarListGridField("user", "userId", "user", 130);
+		ListGridField historyUser = new UserListGridField("user", "userId", "user");
 		ListGridField historyComment = new ListGridField("comment", I18N.message("comment"));
 		historyComment.setWidth("*");
 		historyComment.setHidden(!showComment);
@@ -97,7 +98,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 
 		ListGridField templateId = new ListGridField("templateId", I18N.message("templateid"), 70);
 		templateId.setHidden(true);
-		ListGridField templateVersion = new ListGridField("templateVersion", I18N.message("version"), 70);
+		ListGridField templateVersion = new VersionListGridField("templateVersion", "version");
 		templateVersion.setHidden(true);
 
 		historiesGrid.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -109,6 +110,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 		historiesGrid.setWidth100();
 		historiesGrid.sort("date", SortDirection.ASCENDING);
 		historiesGrid.setBorder("1px solid #E1E1E1");
+
 		if (wfInstanceId != null && wfTemplateId != null)
 			historiesGrid.setDataSource(new WorkflowHistoriesDS(wfInstanceId, wfTemplateId, null, null, null));
 		if (Menu.enabled(Menu.SESSIONS))
@@ -189,6 +191,7 @@ public class WorkflowHistoriesPanel extends VLayout {
 
 						final MenuItem preview = new MenuItem();
 						preview.setTitle(I18N.message("preview"));
+						preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 						preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 							public void onClick(MenuItemClickEvent event) {
 								PreviewPopup iv = new PreviewPopup(doc);

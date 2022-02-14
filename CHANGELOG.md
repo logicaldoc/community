@@ -11,6 +11,31 @@
                     LogicalDOC Community Edition
 
 
+                    LogicalDOC-CE 8.7.3 (2022-02-08; logicaldoc-8.7.3)
+================================================================================
+Compatibility with PostgreSQL 14
++ Configurable columns set in dashlets of type Document and Document Event ([#1129](https://bugs.logicaldoc.com/ticket/1129))
++ Specify new folder metadata when copying an existing one to a different location ([#1130](https://bugs.logicaldoc.com/ticket/1130))
++ Changed the signature of webservice method FolderService.copy ([#1132](https://bugs.logicaldoc.com/ticket/1132))
++ Restrict the visibility of templates to certain users and groups ([#1117](https://bugs.logicaldoc.com/ticket/1117))
++ Option to enforce the user's working time ([#1120](https://bugs.logicaldoc.com/ticket/1120))
++ SMTP connection issues with Gmail ([#1116](https://bugs.logicaldoc.com/ticket/1116))
++ Disable users inactive after a configurable amount of days ([#1121](https://bugs.logicaldoc.com/ticket/1121))
++ Resize columns in a Dashlet ([#1095](https://bugs.logicaldoc.com/ticket/1095))
++ Option to notify users at checkin as during the creation ([#1104](https://bugs.logicaldoc.com/ticket/1104))
++ Added color attribute to documents ([#1107](https://bugs.logicaldoc.com/ticket/1107))
++ Share contacts among users and groups ([#1108](https://bugs.logicaldoc.com/ticket/1108))
++ Customizable display date format ([#1109](https://bugs.logicaldoc.com/ticket/1109))
++ Flag to enable / disable avatars in the documents and search grid ([#1101](https://bugs.logicaldoc.com/ticket/1101))
++ Implementation of copy method in Document web service ([#1102](https://bugs.logicaldoc.com/ticket/1102))
++ Updated the document preview engine ([#1106](https://bugs.logicaldoc.com/ticket/1106))
++ Document pages counter ([#1085](https://bugs.logicaldoc.com/ticket/1085))
++ Alert the user to stay on page when he closes the browser's window ([#1090](https://bugs.logicaldoc.com/ticket/1090))
++ API calls counter ([#1091](https://bugs.logicaldoc.com/ticket/1091))
++ Ability to update the right panels by pressing spacer on the keyboard ([#1092](https://bugs.logicaldoc.com/ticket/1092))
++ Prevent a user from selecting another file during metadata editing ([#1099](https://bugs.logicaldoc.com/ticket/1099))
+
+
                     LogicalDOC-CE 8.6.1 (2021-04-15; logicaldoc-8.6.1)
 ================================================================================
 + Support for the new Android app LogicalDOC Mobile - https://play.google.com/store/apps/details?id=com.logicaldoc.mobile

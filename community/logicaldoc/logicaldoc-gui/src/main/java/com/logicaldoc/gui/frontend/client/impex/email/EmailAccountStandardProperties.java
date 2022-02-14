@@ -10,8 +10,8 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.RadioGroupItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -76,10 +76,6 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		username.addChangedHandler(changedHandler);
 		username.setWidth(180);
 
-		TextItem password = ItemFactory.newPasswordItemPreventAutocomplete("password", "password", account.getPassword());
-		password.addChangedHandler(changedHandler);
-		password.setWidth(180);
-
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, false);
 		language.addChangedHandler(changedHandler);
 		language.setRequired(true);
@@ -114,14 +110,19 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 		 */
 		TextItem fakeUsername = ItemFactory.newTextItem("prevent_autofill", "prevent_autofill", account.getUsername());
 		fakeUsername.setCellStyle("nodisplay");
-		PasswordItem fakePassword = ItemFactory.newPasswordItem("password_fake", "password_fake",
-				account.getPassword());
-		fakePassword.setCellStyle("nodisplay");
-		TextItem fakeUsernameAgain = ItemFactory.newTextItem("prevent_autofill2", "prevent_autofill", account.getUsername());
+		TextItem fakeUsernameAgain = ItemFactory.newTextItem("prevent_autofill2", "prevent_autofill",
+				account.getUsername());
 		fakeUsernameAgain.setCellStyle("nodisplay");
+		TextItem hiddenPassword = ItemFactory.newTextItem("password_hidden", "password_hidden", account.getPassword());
+		hiddenPassword.setCellStyle("nodisplay");
+		hiddenPassword.addChangedHandler(changedHandler);
+		FormItem password = ItemFactory.newSafePasswordItem("password", I18N.message("password"), account.getPassword(),
+				hiddenPassword, changedHandler);
+		password.addChangedHandler(changedHandler);
+		password.setWidth(180);
 
-		form.setItems(mailaddress, server, targetSelector, fakeUsername, fakeUsernameAgain, fakePassword, username, password, foldering,
-				language, protocol, port, ssl);
+		form.setItems(mailaddress, server, targetSelector, fakeUsername, fakeUsernameAgain, hiddenPassword, username,
+				password, foldering, language, protocol, port, ssl);
 
 		formsContainer.addMember(form);
 	}
@@ -134,7 +135,6 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 			account.setMailAddress((String) values.get("mailaddress"));
 			account.setHost((String) values.get("server"));
 			account.setUsername((String) values.get("username"));
-			account.setPassword((String) values.get("password"));
 			account.setTarget(targetSelector.getFolder());
 			account.setLanguage((String) values.get("language"));
 			account.setProvider((String) values.get("protocol"));
@@ -144,6 +144,8 @@ public class EmailAccountStandardProperties extends EmailAccountDetailsTab {
 				account.setPort(Integer.parseInt((String) values.get("port")));
 			account.setSsl("yes".equals((String) values.get("ssl")));
 			account.setFoldering(Integer.parseInt((String) values.get("foldering")));
+
+			account.setPassword((String) values.get("password_hidden"));
 		}
 		return !form.hasErrors();
 	}

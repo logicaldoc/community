@@ -69,6 +69,8 @@ public class GUIEmailAccount implements Serializable {
 	private GUIEmailRule[] rules;
 
 	private String automation;
+	
+	private String automationAfter;
 
 	public GUIEmailAccount() {
 		super();
@@ -241,5 +243,13 @@ public class GUIEmailAccount implements Serializable {
 
 	public void setAutomation(String automation) {
 		this.automation = automation;
+	}
+
+	public String getAutomationAfter() {
+		return automationAfter;
+	}
+
+	public void setAutomationAfter(String automationAfter) {
+		this.automationAfter = automationAfter;
 	}
 }

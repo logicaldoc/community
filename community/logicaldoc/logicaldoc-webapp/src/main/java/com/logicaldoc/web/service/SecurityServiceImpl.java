@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.ibm.icu.util.Calendar;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.EMail;
@@ -35,6 +35,7 @@ import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.generic.Generic;
+import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Device;
 import com.logicaldoc.core.security.Geolocation;
 import com.logicaldoc.core.security.Group;
@@ -47,6 +48,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
+import com.logicaldoc.core.security.WorkingTime;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.core.security.dao.DeviceDAO;
 import com.logicaldoc.core.security.dao.GroupDAO;
@@ -68,11 +70,13 @@ import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.gui.common.client.beans.GUITenant;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.beans.GUIValue;
+import com.logicaldoc.gui.common.client.beans.GUIWorkingTime;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.config.SecurityConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.util.io.FileUtil;
@@ -190,9 +194,9 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			/*
 			 * Prepare an incoming message, if any
 			 */
-			ContextProperties config = Context.get().getProperties();
-			String welcomeMessage = config.getProperty(sess.getTenantName() + ".gui.welcome");
-			if (StringUtils.isNotEmpty(welcomeMessage)) {
+			GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			Generic welcome = gDao.findByAlternateKey("guisetting", "gui.welcome", 0L, sess.getTenantId());
+			if (welcome != null && StringUtils.isNotEmpty(welcome.getString1())) {
 				Map<String, Object> dictionary = new HashMap<String, Object>();
 				dictionary.put(Automation.LOCALE, user.getLocale());
 				dictionary.put(Automation.TENANT_ID, sess.getTenantId());
@@ -200,7 +204,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				dictionary.put("user", session.getUser());
 
 				Automation automation = new Automation("incomingmessage");
-				welcomeMessage = automation.evaluate(welcomeMessage, dictionary);
+				String welcomeMessage = automation.evaluate(welcome.getString1(), dictionary);
 				session.setWelcomeMessage(welcomeMessage != null ? welcomeMessage.trim() : null);
 			}
 
@@ -208,6 +212,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			sess.getDictionary().put(ServiceUtil.LOCALE, user.getLocale());
 			sess.getDictionary().put(ServiceUtil.USER, user);
 
+			ContextProperties config = Context.get().getProperties();
 			guiUser.setPasswordMinLenght(Integer.parseInt(config.getProperty(sess.getTenantName() + ".password.size")));
 
 			return session;
@@ -426,6 +431,13 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				guiUser.setType(user.getType());
 				guiUser.setDocsGrid(user.getDocsGrid());
 				guiUser.setHitsGrid(user.getHitsGrid());
+				guiUser.setDateFormat(user.getDateFormat());
+				guiUser.setDateFormatShort(user.getDateFormatShort());
+				guiUser.setDateFormatLong(user.getDateFormatLong());
+				guiUser.setSearchPref(user.getSearchPref());
+				guiUser.setExpire(user.getExpire());
+				guiUser.setEnforceWorkingTime(user.getEnforceWorkingTime() == 1);
+				guiUser.setMaxInactivity(user.getMaxInactivity());
 
 				GUIGroup[] grps = new GUIGroup[user.getGroups().size()];
 				int i = 0;
@@ -451,6 +463,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 						Integer.parseInt(config.getProperty(guiUser.getTenant().getName() + ".password.size")));
 
 				loadDashlets(guiUser);
+
+				loadWorkingTimes(guiUser);
 
 				guiUser.setCustomActions(getMenus(Menu.CUSTOM_ACTIONS, guiUser.getLanguage(), true));
 
@@ -550,7 +564,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	}
 
 	@Override
-	public GUIUser saveUser(GUIUser user, GUIInfo info) throws ServerException {
+	public GUIUser saveUser(GUIUser guiUser, GUIInfo info) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -560,12 +574,12 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		try {
 			// Disallow the editing of other users if you do not have access to
 			// the Security
-			if (user.getId() != session.getUserId() && getThreadLocalRequest() != null)
+			if (guiUser.getId() != session.getUserId() && getThreadLocalRequest() != null)
 				ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SECURITY);
 
 			User usr;
-			if (user.getId() != 0) {
-				usr = userDao.findById(user.getId());
+			if (guiUser.getId() != 0) {
+				usr = userDao.findById(guiUser.getId());
 				userDao.initialize(usr);
 			} else {
 				usr = new User();
@@ -573,40 +587,59 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			}
 
 			usr.setTenantId(session.getTenantId());
-			usr.setCity(user.getCity());
-			usr.setCountry(user.getCountry());
-			usr.setEmail(user.getEmail());
-			usr.setEmail2(user.getEmail2());
-			usr.setFirstName(user.getFirstName());
-			usr.setName(user.getName());
-			usr.setLanguage(user.getLanguage());
-			usr.setPostalcode(user.getPostalCode());
-			usr.setState(user.getState());
-			usr.setStreet(user.getAddress());
-			usr.setTelephone(user.getPhone());
-			usr.setTelephone2(user.getCell());
-			usr.setUsername(user.getUsername());
-			usr.setEnabled(user.isEnabled() ? 1 : 0);
-			usr.setPasswordExpires(user.isPasswordExpires() ? 1 : 0);
-			usr.setPasswordExpired(user.isPasswordExpired() ? 1 : 0);
-			usr.setWelcomeScreen(user.getWelcomeScreen());
-			usr.setIpWhiteList(user.getIpWhitelist());
-			usr.setIpBlackList(user.getIpBlacklist());
-			usr.setEmailSignature(user.getEmailSignature());
-			usr.setDefaultWorkspace(user.getDefaultWorkspace());
-			usr.setQuota(user.getQuota());
-			usr.setSecondFactor(StringUtils.isEmpty(user.getSecondFactor()) ? null : user.getSecondFactor());
-			usr.setKey(user.getKey());
-			usr.setType(user.getType());
-			usr.setDocsGrid(user.getDocsGrid());
-			usr.setHitsGrid(user.getHitsGrid());
+			usr.setCity(guiUser.getCity());
+			usr.setCountry(guiUser.getCountry());
+			usr.setEmail(guiUser.getEmail());
+			usr.setEmail2(guiUser.getEmail2());
+			usr.setFirstName(guiUser.getFirstName());
+			usr.setName(guiUser.getName());
+			usr.setLanguage(guiUser.getLanguage());
+			usr.setPostalcode(guiUser.getPostalCode());
+			usr.setState(guiUser.getState());
+			usr.setStreet(guiUser.getAddress());
+			usr.setTelephone(guiUser.getPhone());
+			usr.setTelephone2(guiUser.getCell());
+			usr.setUsername(guiUser.getUsername());
+			usr.setEnabled(guiUser.isEnabled() ? 1 : 0);
+			usr.setPasswordExpires(guiUser.isPasswordExpires() ? 1 : 0);
+			usr.setPasswordExpired(guiUser.isPasswordExpired() ? 1 : 0);
+			usr.setWelcomeScreen(guiUser.getWelcomeScreen());
+			usr.setIpWhiteList(guiUser.getIpWhitelist());
+			usr.setIpBlackList(guiUser.getIpBlacklist());
+			usr.setEmailSignature(guiUser.getEmailSignature());
+			usr.setDefaultWorkspace(guiUser.getDefaultWorkspace());
+			usr.setQuota(guiUser.getQuota());
+			usr.setSecondFactor(StringUtils.isEmpty(guiUser.getSecondFactor()) ? null : guiUser.getSecondFactor());
+			usr.setKey(guiUser.getKey());
+			usr.setType(guiUser.getType());
+			usr.setDocsGrid(guiUser.getDocsGrid());
+			usr.setHitsGrid(guiUser.getHitsGrid());
+			usr.setDateFormat(guiUser.getDateFormat());
+			usr.setDateFormatShort(guiUser.getDateFormatShort());
+			usr.setDateFormatLong(guiUser.getDateFormatLong());
+			usr.setSearchPref(guiUser.getSearchPref());
+			usr.setEnforceWorkingTime(guiUser.isEnforceWorkingTime() ? 1 : 0);
+			usr.setSecondFactor(guiUser.getSecondFactor());
+			usr.setMaxInactivity(guiUser.getMaxInactivity() == null || guiUser.getMaxInactivity() == 0 ? null
+					: guiUser.getMaxInactivity());
+
+			if (guiUser.getExpire() != null) {
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(guiUser.getExpire());
+				cal.set(Calendar.HOUR_OF_DAY, 23);
+				cal.set(Calendar.MINUTE, 59);
+				cal.set(Calendar.SECOND, 59);
+				cal.set(Calendar.MILLISECOND, 0);
+				usr.setExpire(cal.getTime());
+			} else
+				usr.setExpire(null);
 
 			if (createNew) {
-				User existingUser = userDao.findByUsername(user.getUsername());
+				User existingUser = userDao.findByUsername(guiUser.getUsername());
 				if (existingUser != null) {
-					log.warn("Tried to create duplicate username {}", user.getUsername());
-					user.setWelcomeScreen(-99);
-					return user;
+					log.warn("Tried to create duplicate username {}", guiUser.getUsername());
+					guiUser.setWelcomeScreen(-99);
+					return guiUser;
 				}
 
 				// Generate an initial password(that must be changed)
@@ -618,19 +651,21 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				usr.setPasswordChanged(new Date());
 			}
 
+			saveWorkingTimes(usr, guiUser.getWorkingTimes());
+
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
 			transaction.setEvent(UserEvent.UPDATED.toString());
 			boolean stored = userDao.store(usr, transaction);
 			if (!stored)
 				throw new Exception("User not stored");
-			user.setId(usr.getId());
+			guiUser.setId(usr.getId());
 
 			GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			usr.removeGroupMemberships(null);
-			long[] ids = new long[user.getGroups().length];
-			for (int i = 0; i < user.getGroups().length; i++) {
-				ids[i] = user.getGroups()[i].getId();
+			long[] ids = new long[guiUser.getGroups().length];
+			for (int i = 0; i < guiUser.getGroups().length; i++) {
+				ids[i] = guiUser.getGroups()[i].getId();
 				usr.addGroup(groupDao.findById(ids[i]));
 			}
 			userDao.store(usr);
@@ -639,23 +674,88 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			groupDao.initialize(adminGroup);
 
 			// The admin user must be always member of admin group
-			if ("admin".equals(user.getUsername()) && !user.isMemberOf("admin")) {
+			if ("admin".equals(guiUser.getUsername()) && !guiUser.isMemberOf("admin")) {
 				usr.addGroup(adminGroup);
 				userDao.store(usr);
 			}
 
 			// Notify the user by email
-			if (createNew && user.isNotifyCredentials())
+			if (createNew && guiUser.isNotifyCredentials())
 				try {
 					notifyAccount(usr, decodedPassword);
 				} catch (Throwable e) {
 					log.warn(e.getMessage(), e);
 				}
 
-			return getUser(user.getId());
+			return getUser(guiUser.getId());
 		} catch (Throwable t) {
 			return (GUIUser) ServiceUtil.throwServerException(session, log, t);
 		}
+	}
+
+	private void saveWorkingTimes(User user, GUIWorkingTime[] guiWts) {
+		if (user.getWorkingTimes() != null)
+			user.getWorkingTimes().clear();
+		if (guiWts == null || guiWts.length < 1)
+			return;
+
+		Calendar cal = Calendar.getInstance();
+		for (GUIWorkingTime guiWorkingTime : guiWts) {
+			cal.setTime(guiWorkingTime.getStart());
+			int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+			int hourStart = cal.get(Calendar.HOUR_OF_DAY);
+			int minuteStart = cal.get(Calendar.MINUTE);
+			WorkingTime wt = new WorkingTime(dayOfWeek, hourStart, minuteStart);
+
+			cal.setTime(guiWorkingTime.getEnd());
+			wt.setHourEnd(cal.get(Calendar.HOUR_OF_DAY));
+			wt.setMinuteEnd(cal.get(Calendar.MINUTE));
+
+			wt.setLabel(guiWorkingTime.getLabel());
+			wt.setDescription(guiWorkingTime.getDescription());
+
+			user.getWorkingTimes().add(wt);
+		}
+	}
+
+	private void loadWorkingTimes(GUIUser guiUser) {
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDao.findById(guiUser.getId());
+		if (user == null)
+			return;
+		else
+			userDao.initialize(user);
+
+		List<GUIWorkingTime> guiWts = new ArrayList<GUIWorkingTime>();
+		if (user.getWorkingTimes() != null)
+			for (WorkingTime workingTime : user.getWorkingTimes()) {
+				int dayOfWeek = workingTime.getDayOfWeek();
+
+				Calendar cal = Calendar.getInstance();
+				// Set the calendar to the last Sunday
+				cal.add(Calendar.DAY_OF_WEEK, -(cal.get(Calendar.DAY_OF_WEEK) - 1));
+
+				// Now shift the day of week of the working time
+				cal.add(Calendar.DAY_OF_WEEK, dayOfWeek - 1);
+				cal.set(Calendar.HOUR_OF_DAY, workingTime.getHourStart());
+				cal.set(Calendar.MINUTE, workingTime.getMinuteStart());
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 99);
+				Date start = cal.getTime();
+
+				cal.set(Calendar.HOUR_OF_DAY, workingTime.getHourEnd());
+				cal.set(Calendar.MINUTE, workingTime.getMinuteEnd());
+				cal.set(Calendar.SECOND, 0);
+				cal.set(Calendar.MILLISECOND, 99);
+				Date end = cal.getTime();
+
+				GUIWorkingTime guiWt = new GUIWorkingTime(workingTime.getLabel(), start, end);
+				guiWt.setDescription(workingTime.getDescription());
+
+				guiWts.add(guiWt);
+			}
+
+		guiUser.setWorkingTimes(guiWts.toArray(new GUIWorkingTime[0]));
 	}
 
 	/**
@@ -730,6 +830,11 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			usr.setDocsGrid(user.getDocsGrid());
 			usr.setHitsGrid(user.getHitsGrid());
 
+			usr.setDateFormat(user.getDateFormat());
+			usr.setDateFormatShort(user.getDateFormatShort());
+			usr.setDateFormatLong(user.getDateFormatLong());
+			usr.setSearchPref(user.getSearchPref());
+
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
 			transaction.setEvent(UserEvent.UPDATED.toString());
@@ -801,7 +906,11 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 			securitySettings.setPwdExpiration(pbean.getInt(session.getTenantName() + ".password.ttl", 90));
 			securitySettings.setPwdSize(pbean.getInt(session.getTenantName() + ".password.size", 8));
-			securitySettings.setPwdEnforceHistory(pbean.getInt(session.getTenantName() + ".password.enforcehistory", 0));
+			securitySettings.setPwdEnforceHistory(
+					pbean.getProperty(session.getTenantName() + ".password.enforcehistory") != null
+							? pbean.getInt(session.getTenantName() + ".password.enforcehistory")
+							: null);
+			securitySettings.setMaxInactivity(pbean.getInt(session.getTenantName() + ".security.user.maxinactivity"));
 			if (StringUtils.isNotEmpty(pbean.getProperty(session.getTenantName() + ".gui.savelogin")))
 				securitySettings
 						.setSaveLogin("true".equals(pbean.getProperty(session.getTenantName() + ".gui.savelogin")));
@@ -826,6 +935,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			securitySettings.setGeolocationCache(pbean.getBoolean("security.geolocation.cache", false));
 			securitySettings.setGeolocationKey(pbean.getProperty("security.geolocation.apikey"));
 			securitySettings.setGeolocationDbVer(Geolocation.get().getDatabaseVersion());
+
+			securitySettings.setContentSecurityPolicy(new SecurityConfigurator().getContentSecurityPolicy());
 
 			log.debug("Security settings data loaded successfully.");
 		} catch (Exception e) {
@@ -860,7 +971,16 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					WebConfigurator configurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
 					restartRequired = configurator.setTransportGuarantee(policy);
 				} catch (Throwable t) {
-					log.error(t.getMessage());
+					log.error(t.getMessage(), t);
+				}
+
+				// Update the context-security.xml
+				try {
+					SecurityConfigurator configurator = new SecurityConfigurator();
+					restartRequired = restartRequired
+							|| configurator.setContentSecurityPolicy(settings.getContentSecurityPolicy());
+				} catch (Throwable t) {
+					log.error(t.getMessage(), t);
 				}
 
 				// Invalidate then Geolocation
@@ -868,7 +988,11 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			}
 
 			conf.setProperty(session.getTenantName() + ".password.ttl", Integer.toString(settings.getPwdExpiration()));
-			conf.setProperty(session.getTenantName() + ".password.enforcehistory", Integer.toString(settings.getPwdEnforceHistory()));
+			conf.setProperty(session.getTenantName() + ".security.user.maxinactivity",
+					settings.getMaxInactivity() == null || settings.getMaxInactivity().intValue() <= 0 ? ""
+							: Integer.toString(settings.getMaxInactivity()));
+			conf.setProperty(session.getTenantName() + ".password.enforcehistory",
+					Integer.toString(settings.getPwdEnforceHistory()));
 			conf.setProperty(session.getTenantName() + ".password.size", Integer.toString(settings.getPwdSize()));
 			conf.setProperty(session.getTenantName() + ".gui.savelogin", Boolean.toString(settings.isSaveLogin()));
 			conf.setProperty(session.getTenantName() + ".alertnewdevice",
@@ -1269,13 +1393,30 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	}
 
 	@Override
-	public String trustDevice() throws ServerException {
+	public void updateDeviceLabel(long deviceId, String label) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		try {
+			DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
+			Device device = dDao.findById(deviceId);
+			if (device != null) {
+				device.setLabel(StringUtils.isNotEmpty(label) ? label.trim() : null);
+				dDao.store(device);
+			}
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public String trustDevice(String label) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
 			if (session.getClient() != null && session.getClient().getDevice() != null) {
 				Device device = session.getClient().getDevice();
+				if (label != null)
+					device.setLabel(label);
 				DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
-				device = dDao.trustDevice(session.getUser(), session.getClient().getDevice());
+				device = dDao.trustDevice(session.getUser(), device);
 				return device.getDeviceId();
 			} else
 				return null;
@@ -1302,18 +1443,15 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	}
 
 	@Override
-	public void deleteTrustedDevices(String[] deviceIds) throws ServerException {
+	public void deleteTrustedDevices(String[] ids) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
-			if (deviceIds == null || deviceIds.length < 1)
+			if (ids == null || ids.length < 1)
 				return;
 
 			DeviceDAO dDao = (DeviceDAO) Context.get().getBean(DeviceDAO.class);
-			for (String deviceId : deviceIds) {
-				Device device = dDao.findByDeviceId(deviceId);
-				if (device != null)
-					dDao.delete(device.getId());
-			}
+			for (String id : ids)
+				dDao.delete(Long.parseLong(id));
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -1368,5 +1506,72 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		User user = userDao.findById(userId);
 		if (user != null)
 			UserUtil.generateDefaultAvatar(user);
+	}
+
+	@Override
+	public void cloneWorkTimes(long srcUserId, long[] userIds, long[] groupIds) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+
+		try {
+			HashSet<Long> users = new HashSet<Long>();
+			if (userIds != null)
+				for (Long uId : userIds) {
+					if (!users.contains(uId))
+						users.add(uId);
+				}
+			if (groupIds != null) {
+				UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
+				for (Long gId : groupIds) {
+					Set<User> usrs = gDao.findByGroup(gId);
+					for (User user : usrs) {
+						if (!users.contains(user.getId()))
+							users.add(user.getId());
+					}
+				}
+			}
+
+			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			User srcUser = userDao.findById(srcUserId);
+			userDao.initialize(srcUser);
+
+			for (Long userId : users) {
+				User user = userDao.findById(userId);
+				userDao.initialize(user);
+				if (srcUser.getWorkingTimes() != null)
+					for (WorkingTime wt : srcUser.getWorkingTimes())
+						user.getWorkingTimes().add(wt.clone());
+				UserHistory transaction = new UserHistory();
+				transaction.setSession(session);
+				transaction.setEvent(UserEvent.UPDATED.toString());
+				userDao.store(user, transaction);
+			}
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+
+	@Override
+	public void changeStatus(long userId, boolean enabled) throws ServerException {
+		ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+		Session session = ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SECURITY);
+
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDao.findById(userId, true);
+		try {
+			if (user == null)
+				throw new ServerException(String.format("User %s not found", userId));
+
+			if (!enabled && "admin".equals(user.getUsername()))
+				throw new ServerException("Cannot diable the admin user");
+
+			UserHistory transaction = new UserHistory();
+			transaction.setSession(session);
+			transaction.setEvent(enabled ? UserEvent.UPDATED.toString() : UserEvent.DISABLED.toString());
+
+			user.setEnabled(enabled ? 1 : 0);
+			userDao.store(user, transaction);
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
 	}
 }

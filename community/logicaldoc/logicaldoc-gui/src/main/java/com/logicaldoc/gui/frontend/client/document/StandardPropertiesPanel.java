@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIRating;
@@ -20,15 +21,18 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewTile;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.ColorItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.MultiComboBoxItem;
+import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -127,6 +131,35 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 				Util.formatSizeW7(document.getFileSize().doubleValue()) + " ("
 						+ Util.formatSizeBytes(document.getFileSize()) + ")");
 
+		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", "pages", Util.formatInt(document.getPages()));
+		pages.setIconHSpace(2);
+		pages.setIconWidth(16);
+		pages.setIconHeight(16);
+		pages.setWidth("1%");
+		PickerIcon countPages = new PickerIcon(PickerIconName.REFRESH, new FormItemClickHandler() {
+			public void onFormItemClick(final FormItemIconClickEvent event) {
+				event.getItem().setValue(I18N.message("computing") + "...");
+				DocumentService.Instance.get().updatePages(document.getId(), new AsyncCallback<Integer>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
+
+					@Override
+					public void onSuccess(Integer docPages) {
+						if (docPages != null) {
+							document.setPages(docPages.intValue());
+							pages.setValue(Util.formatInt(document.getPages()));
+						}
+					}
+				});
+			}
+		});
+		countPages.setPrompt(I18N.message("countpages"));
+		if (document.getId() != 0)
+			pages.setIcons(countPages);
+
 		TextItem fileName = ItemFactory.newTextItem("fileName", "filename", document.getFileName());
 		fileName.addChangedHandler(changedHandler);
 		fileName.setRequired(true);
@@ -172,18 +205,20 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		folder.setWidth(DEFAULT_ITEM_WIDTH);
 		folder.setIcons(copyPath);
 
-		String downloadUrl = Util.downloadURL(document.getDocRef() != null ? document.getDocRef() : document.getId());
-		String displayUrl = Util.displayURL(document.getDocRef() != null ? document.getDocRef() : document.getId(),
-				null);
-		String perma = "<a href='" + downloadUrl + "'>" + I18N.message("download") + "</a> | " + "<a href='"
-				+ displayUrl + "'>" + I18N.message("details") + "</a>";
+		ColorItem color = ItemFactory.newColorItemPicker("color", "color", document.getColor(), true, changedHandler);
+		color.setDisabled(!updateEnabled);
+
+		String downloadUrl = Util.downloadURL(document.getId());
+		String displayUrl = Util.displayURL(document.getId(), null);
+		String perma = "<a href='" + downloadUrl + "' target='_blank'>" + I18N.message("download") + "</a> | "
+				+ "<a href='" + displayUrl + "' target='_blank'>" + I18N.message("details") + "</a>";
 
 		StaticTextItem permaLink = ItemFactory.newStaticTextItem("permalink", "permalink", perma);
 
 		if (Feature.enabled(Feature.WORKFLOW))
-			form1.setItems(id, fileName, folder, size, version, wfStatus, creation, published, permaLink);
+			form1.setItems(id, fileName, folder, size, pages, version, creation, published, wfStatus, color, permaLink);
 		else
-			form1.setItems(id, fileName, folder, size, version, creation, published, permaLink);
+			form1.setItems(id, fileName, folder, size, pages, version, creation, published, color, permaLink);
 
 		columns.addMember(form1);
 
@@ -237,8 +272,9 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 					});
 				}
 			});
-		items.add(rating);
 		rating.setDisabled(!updateEnabled);
+		if (Menu.enabled(Menu.BRANDING))
+			items.add(rating);
 
 		SelectItem language = ItemFactory.newLanguageSelector("language", false, false);
 		language.setEndRow(true);
@@ -359,6 +395,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 		if (!vm.hasErrors()) {
 			document.setFileName((String) values.get("fileName"));
 			document.setLanguage((String) values.get("language"));
+			document.setColor((String) values.get("color"));
 			document.setTags(tagItem.getValues());
 		}
 		return !vm.hasErrors();

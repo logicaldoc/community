@@ -14,6 +14,31 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
 public class SubscriptionsDS extends DataSource {
 
 	public SubscriptionsDS(Long folderId, Long docId) {
+		init();
+		String dataUrl = "data/subscriptions.xml?1=1";
+		if (folderId != null)
+			dataUrl += "&folderId=" + folderId;
+		if (docId != null)
+			dataUrl += "&docId=" + docId;
+		setDataURL(dataUrl);
+	}
+
+	public SubscriptionsDS(Long folderId, Long userId, String type, String event, int max) {
+		init();
+		String dataUrl = "data/subscriptions.xml?report=true&max=" + max;
+		if (folderId != null)
+			dataUrl += "&folderId=" + folderId + "&type=folder";
+		if (userId != null)
+			dataUrl += "&userId=" + userId;
+		if (type != null && folderId == null)
+			dataUrl += "&type=" + type;
+		if (event != null)
+			dataUrl += "&event=" + event;
+
+		setDataURL(dataUrl);
+	}
+
+	private void init() {
 		setTitleField("name");
 		setRecordXPath("/list/subscription");
 		DataSourceTextField id = new DataSourceTextField("id");
@@ -29,14 +54,9 @@ public class SubscriptionsDS extends DataSource {
 		DataSourceTextField userName = new DataSourceTextField("userName");
 		DataSourceTextField userId = new DataSourceTextField("userId");
 		DataSourceTextField folderOption = new DataSourceTextField("folderOption");
+		DataSourceTextField path = new DataSourceTextField("path");
 
-		setFields(id, icon, name, created, type, objectId, events, userName, userId, folderOption);
+		setFields(id, icon, name, created, type, objectId, events, userName, userId, folderOption, path);
 		setClientOnly(true);
-		String dataUrl = "data/subscriptions.xml?1=1";
-		if (folderId != null)
-			dataUrl += "&folderId=" + folderId;
-		if (docId != null)
-			dataUrl += "&docId=" + docId;
-		setDataURL(dataUrl);
 	}
 }

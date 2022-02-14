@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.6.1</version>
+		<version>8.7.3</version>
 	</parent>
 	<artifactId>logicaldoc-gui</artifactId>
 	<name>logicaldoc-gui</name>
@@ -78,8 +78,8 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -128,7 +128,7 @@
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>2.8.2</version>
 				<configuration>
-					<extraJvmArgs>-XX:-UseGCOverheadLimit -Xmx3000m</extraJvmArgs>
+					<extraJvmArgs>-XX:-UseGCOverheadLimit -Xmx4000m</extraJvmArgs>
 					<webappDirectory>./war</webappDirectory>
 					<gwtVersion>${gwt.version}</gwtVersion>
 					<modules>

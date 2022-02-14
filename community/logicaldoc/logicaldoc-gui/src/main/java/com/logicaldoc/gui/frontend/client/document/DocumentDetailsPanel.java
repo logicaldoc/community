@@ -19,7 +19,6 @@ import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.util.ValueCallback;
-import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -28,8 +27,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.widgets.tab.events.TabSelectedEvent;
-import com.smartgwt.client.widgets.tab.events.TabSelectedHandler;
 
 /**
  * This panel collects all documents details
@@ -96,7 +93,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	protected PublishingPanel retentionPoliciesPanel;
 
-	protected DocumentCapturePanel ocrPanel;
+	protected DocumentCapturePanel capturePanel;
 
 	protected EditingTabSet tabSet;
 
@@ -258,132 +255,52 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		});
 
 		tabSet.addTab(propertiesTab);
-		propertiesTab.addTabSelectedHandler(new TabSelectedHandler() {
-			@Override
-			public void onTabSelected(TabSelectedEvent event) {
-				propertiesPanel.onTabSelected();
-			}
-		});
 
 		tabSet.addTab(extendedPropertiesTab);
-		propertiesTab.addTabSelectedHandler(new TabSelectedHandler() {
-			@Override
-			public void onTabSelected(TabSelectedEvent event) {
-				extendedPropertiesPanel.onTabSelected();
-			}
-		});
 
-		if (Menu.enabled(Menu.VERSIONS)) {
+		if (Menu.enabled(Menu.VERSIONS))
 			tabSet.addTab(versionsTab);
-			versionsTab.addTabSelectedHandler(new TabSelectedHandler() {
-				@Override
-				public void onTabSelected(TabSelectedEvent event) {
-					versionsPanel.onTabSelected();
-				}
-			});
-		}
 
-		tabSet.addTab(previewTab);
-		previewTab.addTabSelectedHandler(new TabSelectedHandler() {
-			@Override
-			public void onTabSelected(TabSelectedEvent event) {
-				previewPanel.onTabSelected();
-			}
-		});
+		if (Menu.enabled(Menu.PREVIEW))
+			tabSet.addTab(previewTab);
 
 		if (Feature.visible(Feature.NOTES)) {
 			tabSet.addTab(notesTab);
 			notesTab.setDisabled(!Feature.enabled(Feature.NOTES));
-			notesTab.addTabSelectedHandler(new TabSelectedHandler() {
-				@Override
-				public void onTabSelected(TabSelectedEvent event) {
-					notesPanel.onTabSelected();
-				}
-			});
 		}
 
 		tabSet.addTab(linksTab);
-		linksTab.addTabSelectedHandler(new TabSelectedHandler() {
-			@Override
-			public void onTabSelected(TabSelectedEvent event) {
-				linksPanel.onTabSelected();
-			}
-		});
 
 		if (Menu.enabled(Menu.HISTORY)) {
 			tabSet.addTab(historyTab);
-			historyTab.addTabSelectedHandler(new TabSelectedHandler() {
-				@Override
-				public void onTabSelected(TabSelectedEvent event) {
-					historyPanel.onTabSelected();
-				}
-			});
 		}
 
 		if (Feature.visible(Feature.DIGITAL_SIGNATURE) && Menu.enabled(Menu.SIGNATURE)) {
 			tabSet.addTab(signatureTab);
 			signatureTab.setDisabled(!Feature.enabled(Feature.DIGITAL_SIGNATURE));
-			signatureTab.addTabSelectedHandler(new TabSelectedHandler() {
-				@Override
-				public void onTabSelected(TabSelectedEvent event) {
-					signaturePanel.onTabSelected();
-				}
-			});
 		}
 
-		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
+		if ((Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
 				|| Session.get().getUser().isMemberOf(Constants.GROUP_PUBLISHER))
-			if (Feature.visible(Feature.RETENTION_POLICIES))
-				tabSet.addTab(retentionPoliciesTab);
+				&& Feature.visible(Feature.RETENTION_POLICIES))
+			tabSet.addTab(retentionPoliciesTab);
 		retentionPoliciesTab.setDisabled(!Feature.enabled(Feature.RETENTION_POLICIES));
-		retentionPoliciesTab.addTabSelectedHandler(new TabSelectedHandler() {
-			@Override
-			public void onTabSelected(TabSelectedEvent event) {
-				retentionPoliciesPanel.onTabSelected();
-			}
-		});
 
 		if (Feature.visible(Feature.CALENDAR) && Menu.enabled(Menu.DOCUMENT_CALENDAR)) {
 			tabSet.addTab(calendarTab);
 			calendarTab.setDisabled(!Feature.enabled(Feature.CALENDAR));
-			calendarTab.addTabSelectedHandler(new TabSelectedHandler() {
-				@Override
-				public void onTabSelected(TabSelectedEvent event) {
-					calendarPanel.onTabSelected();
-				}
-			});
 		}
 
 		if (Feature.visible(Feature.AUDIT)) {
 			tabSet.addTab(subscriptionsTab);
 			subscriptionsTab.setDisabled(!Feature.enabled(Feature.AUDIT));
-			subscriptionsTab.addTabSelectedHandler(new TabSelectedHandler() {
-				@Override
-				public void onTabSelected(TabSelectedEvent event) {
-					subscriptionsPanel.onTabSelected();
-				}
-			});
 		}
 
-		if (Menu.enabled(Menu.ALIASES)) {
+		if (Menu.enabled(Menu.ALIASES))
 			tabSet.addTab(aliasesTab);
-			aliasesTab.addTabSelectedHandler(new TabSelectedHandler() {
-				@Override
-				public void onTabSelected(TabSelectedEvent event) {
-					aliasesPanel.onTabSelected();
-				}
-			});
-		}
 
-		if (Menu.enabled(Menu.CAPTURE)) {
+		if (Menu.enabled(Menu.CAPTURE))
 			tabSet.addTab(captureTab);
-			captureTab.addTabSelectedHandler(new TabSelectedHandler() {
-				@Override
-				public void onTabSelected(TabSelectedEvent event) {
-					ocrPanel.onTabSelected();
-				}
-			});
-		}
 
 		addMember(tabSet);
 	}
@@ -406,8 +323,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				displaySave();
 			}
 		};
-		propertiesPanel = new StandardPropertiesPanel(document, changeHandler);
-		propertiesTabPanel.addMember(propertiesPanel);
+		try {
+			propertiesPanel = new StandardPropertiesPanel(document, changeHandler);
+			propertiesTabPanel.addMember(propertiesPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the extended properties tab
@@ -422,11 +343,17 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			public void onChanged(ChangedEvent event) {
 				document.setOcrTemplateId(null);
 				document.setBarcodeTemplateId(null);
-				ocrPanel.refresh(document.getTemplateId());
+				if (capturePanel != null)
+					capturePanel.refresh(document.getTemplateId());
 			}
 		};
-		extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, changeHandler, templateChangedHandler);
-		extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
+		try {
+			extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, changeHandler,
+					templateChangedHandler);
+			extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the retention policies tab
@@ -436,19 +363,27 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (retentionPoliciesTabPanel.contains(retentionPoliciesPanel))
 				retentionPoliciesTabPanel.removeMember(retentionPoliciesPanel);
 		}
-		retentionPoliciesPanel = new PublishingPanel(document, changeHandler);
-		retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
+		try {
+			retentionPoliciesPanel = new PublishingPanel(document, changeHandler);
+			retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the OCR tab
 		 */
-		if (ocrPanel != null) {
-			ocrPanel.destroy();
-			if (captureTabPanel.contains(ocrPanel))
-				captureTabPanel.removeMember(ocrPanel);
+		if (capturePanel != null) {
+			capturePanel.destroy();
+			if (captureTabPanel.contains(capturePanel))
+				captureTabPanel.removeMember(capturePanel);
 		}
-		ocrPanel = new DocumentCapturePanel(document, changeHandler, true);
-		captureTabPanel.addMember(ocrPanel);
+		try {
+			capturePanel = new DocumentCapturePanel(document, changeHandler, true);
+			captureTabPanel.addMember(capturePanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the versions tab
@@ -458,8 +393,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (versionsTabPanel.contains(versionsPanel))
 				versionsTabPanel.removeMember(versionsPanel);
 		}
-		versionsPanel = new VersionsPanel(document);
-		versionsTabPanel.addMember(versionsPanel);
+		try {
+			versionsPanel = new VersionsPanel(document);
+			versionsTabPanel.addMember(versionsPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the history tab
@@ -469,8 +408,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (historyTabPanel.contains(historyPanel))
 				historyTabPanel.removeMember(historyPanel);
 		}
-		historyPanel = new HistoryPanel(document);
-		historyTabPanel.addMember(historyPanel);
+		try {
+			historyPanel = new HistoryPanel(document);
+			historyTabPanel.addMember(historyPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the aliases tab
@@ -482,10 +425,14 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		}
 
 		if (document.getDocRef() == null && Menu.enabled(Menu.ALIASES)) {
-			aliasesPanel = new AliasesPanel(document);
-			aliasesTabPanel.addMember(aliasesPanel);
-			if (tabSet.getTab(ID_TAB_ALIASES) == null)
-				tabSet.addTab(aliasesTab);
+			try {
+				aliasesPanel = new AliasesPanel(document);
+				aliasesTabPanel.addMember(aliasesPanel);
+				if (tabSet.getTab(ID_TAB_ALIASES) == null)
+					tabSet.addTab(aliasesTab);
+			} catch (Throwable t) {
+
+			}
 		} else
 			tabSet.removeTab(aliasesTab);
 
@@ -497,8 +444,13 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (linksTabPanel.contains(linksPanel))
 				linksTabPanel.removeMember(linksPanel);
 		}
-		linksPanel = new LinksPanel(document);
-		linksTabPanel.addMember(linksPanel);
+
+		try {
+			linksPanel = new LinksPanel(document);
+			linksTabPanel.addMember(linksPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the signature tab
@@ -508,8 +460,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (signatureTabPanel.contains(signaturePanel))
 				signatureTabPanel.removeMember(signaturePanel);
 		}
-		signaturePanel = new SignaturePanel(document);
-		signatureTabPanel.addMember(signaturePanel);
+		try {
+			signaturePanel = new SignaturePanel(document);
+			signatureTabPanel.addMember(signaturePanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the notes tab
@@ -519,8 +475,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (notesTabPanel.contains(notesPanel))
 				notesTabPanel.removeMember(notesPanel);
 		}
-		notesPanel = new NotesPanel(document);
-		notesTabPanel.addMember(notesPanel);
+		try {
+			notesPanel = new NotesPanel(document);
+			notesTabPanel.addMember(notesPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the preview tab
@@ -530,8 +490,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (previewTabPanel.contains(previewPanel))
 				previewTabPanel.removeMember(previewPanel);
 		}
-		previewPanel = new DetailsPreviewPanel(document);
-		previewTabPanel.addMember(previewPanel);
+		try {
+			previewPanel = new DetailsPreviewPanel(document);
+			previewTabPanel.addMember(previewPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the calendar tab
@@ -541,8 +505,12 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			if (calendarTabPanel.contains(calendarPanel))
 				calendarTabPanel.removeMember(calendarPanel);
 		}
-		calendarPanel = new DocumentCalendarPanel(document);
-		calendarTabPanel.addMember(calendarPanel);
+		try {
+			calendarPanel = new DocumentCalendarPanel(document);
+			calendarTabPanel.addMember(calendarPanel);
+		} catch (Throwable t) {
+
+		}
 
 		/*
 		 * Prepare the subscriptions tab
@@ -555,18 +523,16 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			}
 
 			if (document.getFolder().hasPermission(Constants.PERMISSION_SUBSCRIPTION)) {
-				subscriptionsPanel = new DocumentSubscriptionsPanel(document);
-				subscriptionsTabPanel.addMember(subscriptionsPanel);
-				if (tabSet.getTab(ID_TAB_SUBSCRIPTIONS) == null)
-					tabSet.addTab(subscriptionsTab);
+				try {
+					subscriptionsPanel = new DocumentSubscriptionsPanel(document);
+					subscriptionsTabPanel.addMember(subscriptionsPanel);
+					if (tabSet.getTab(ID_TAB_SUBSCRIPTIONS) == null)
+						tabSet.addTab(subscriptionsTab);
+				} catch (Throwable t) {
+
+				}
 			} else
 				tabSet.removeTab(subscriptionsTab);
-		}
-
-		if (tabSet != null && tabSet.getSelectedTab() != null) {
-			Tab selectedTab = tabSet.getSelectedTab();
-			Canvas pane = selectedTab.getPane();
-			((DocumentDetailTab) pane.getChildren()[0]).onTabSelected();
 		}
 	}
 
@@ -581,14 +547,17 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	private void disableSave() {
+		DocumentController.get().cancelEditing(document);
 		tabSet.disableSave();
 	}
 
 	private void hideSave() {
+		DocumentController.get().cancelEditing(document);
 		tabSet.hideSave();
 	}
 
 	private void displaySave() {
+		DocumentController.get().beginEditing(document);
 		tabSet.displaySave();
 	}
 
@@ -596,7 +565,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 		boolean stdValid = propertiesPanel.validate();
 		boolean extValid = extendedPropertiesPanel.validate();
 		boolean publishingValid = retentionPoliciesPanel.validate();
-		boolean ocrValid = ocrPanel.validate();
+		boolean ocrValid = capturePanel.validate();
 		if (!stdValid)
 			tabSet.selectTab(0);
 		else if (!extValid)
@@ -669,7 +638,9 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	@Override
 	public void onDocumentModified(GUIDocument document) {
-		if (this.document != null && this.document.getId() == document.getId())
+		if (this.document != null && this.document.getId() == document.getId()
+				&& (!DocumentController.get().isEditing(document) || (document.getLockUserId() != null
+						&& document.getLockUserId().longValue() != Session.get().getUser().getId())))
 			setDocument(document);
 	}
 
@@ -700,11 +671,27 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	@Override
 	public void onDocumentsDeleted(GUIDocument[] documents) {
-		removeMembers(getMembers());
+		if (document != null && documents!=null)
+			for (GUIDocument deletedDoc : documents) {
+				if (deletedDoc.getId() == document.getId()) {
+					removeMembers(getMembers());
+					return;
+				}
+			}
 	}
 
 	@Override
 	public void onDocumentMoved(GUIDocument document) {
+
+	}
+
+	@Override
+	public void onDocumentBeginEditing(GUIDocument document) {
+
+	}
+
+	@Override
+	public void onDocumentCancelEditing(GUIDocument document) {
 
 	}
 

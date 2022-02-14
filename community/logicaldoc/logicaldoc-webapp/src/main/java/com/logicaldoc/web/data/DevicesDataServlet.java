@@ -72,6 +72,8 @@ public class DevicesDataServlet extends HttpServlet {
 
 				writer.print("<device>");
 				writer.print("<id>" + device.getId() + "</id>");
+				if (device.getLabel() != null)
+					writer.print("<label><![CDATA[" + device.getLabel() + "]]></label>");
 				writer.print("<deviceId>" + device.getDeviceId() + "</deviceId>");
 				if (device.getBrowser() != null)
 					writer.print("<browser><![CDATA[" + device.getBrowser() + " v" + device.getBrowserVersion()

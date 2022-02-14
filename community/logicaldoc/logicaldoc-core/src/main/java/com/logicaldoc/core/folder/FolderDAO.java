@@ -471,15 +471,22 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param source The folder to copy
 	 * @param target The target folder
-	 * @param foldersOnly True if only the folders tree has to be copied; if false, the documents will also be copied
-	 * @param inheritSecurity If true the new folder will 'point' to the parent
-	 *        for the security policies.
+	 * @param newName optional new name of the copied folder
+	 * @param foldersOnly True if only the folders tree has to be copied; if
+	 *        false, the documents will also be copied
+	 * @param securityOption How to assign the security policies to the newly created folders:
+	 * <ul>
+	 * <li><b>null</b> or <b>none</b>: empty security policies</li>
+	 * <li><b>inherit</b>: the new folder will point to the parent for the security policies</li>
+	 * <li><b>replicate</b>: the new folder will have a copy of the security policies of the source folder</li>
+	 * </ul>
+	 *        
 	 * @param transaction entry to log the event (set the user)
 	 * @return The new folder created
 	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public Folder copy(Folder source, Folder target, boolean foldersOnly, boolean inheritSecurity,
+	public Folder copy(Folder source, Folder target, String newName, boolean foldersOnly, String securityOption,
 			FolderHistory transaction) throws PersistenceException;
 
 	/**
@@ -557,13 +564,13 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * Checks if a folder with the given folderId is parent of the folder with
 	 * the given targetId
 	 * 
-	 * @param folderId The folder to be checked
-	 * @param targetId The target folder
+	 * @param parentId The folder to be checked
+	 * @param childId The target folder
 	 * 
-	 * @return True if the folder with the given folderId is parent of the
-	 *         folder with the given targetId
+	 * @return True if the folder with the given parentId is parent of the
+	 *         folder with the given childId
 	 */
-	public boolean isInPath(long folderId, long targetId);
+	public boolean isInPath(long parentId, long childId);
 
 	/**
 	 * Propagates the security policies of a node to the whole subtree
@@ -632,7 +639,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @throws PersistenceException in case of database error
 	 */
 	public boolean applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException;
-	
+
 	/**
 	 * Propagates the OCR settings to the whole subree
 	 * 
@@ -709,4 +716,16 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @return list of tags
 	 */
 	public List<String> findTags(long folderId);
+
+	/**
+	 * Merges the contents of two folders
+	 * 
+	 * @param source The folder whose contents must be merged inside
+	 *        <b>folderA</b>
+	 * @param target The main folder to use as container
+	 * @param transaction the session informations
+	 * 
+	 * @throws PersistenceException in case of database or logical error
+	 */
+	public void merge(Folder source, Folder target, FolderHistory transaction) throws PersistenceException;
 }

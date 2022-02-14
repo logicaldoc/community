@@ -2,6 +2,8 @@ package com.logicaldoc.util.http;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -61,6 +63,14 @@ public class UrlUtil {
 		}
 		return query_pairs;
 	}
+	
+	public static String getQueryParam(String url, String parameter) throws MalformedURLException {
+		try {
+			return getParams(url).get(parameter);
+		} catch (UnsupportedEncodingException ex) {
+			throw new AssertionError(ex);
+		}
+	}
 
 	/**
 	 * Translates a string into application/x-www-form-urlencoded format using a
@@ -75,5 +85,11 @@ public class UrlUtil {
 	 */
 	public static String encode(String s, String enc) throws UnsupportedEncodingException {
 		return URLEncoder.encode(s, enc);
+	}
+
+	public static String normalize(String inputUrl) throws URISyntaxException {
+		URI inputUri = new URI(inputUrl);
+		URI normalizedUri = inputUri.normalize();
+		return normalizedUri.toString();
 	}
 }

@@ -12,12 +12,12 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
-import com.logicaldoc.gui.common.client.widgets.FileNameListGridField;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
-import com.logicaldoc.gui.common.client.widgets.grid.AvatarListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SystemService;
 import com.smartgwt.client.types.Alignment;
@@ -31,6 +31,7 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.DateItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
@@ -79,7 +80,7 @@ public class LastChangesReport extends AdminPanel {
 		form.setWrapItemTitles(false);
 
 		// Username
-		TextItem user = ItemFactory.newTextItem("user", "user", null);
+		SelectItem user = ItemFactory.newUserSelector("user", "user", null, false, false);
 		user.setColSpan(4);
 
 		// From
@@ -98,11 +99,9 @@ public class LastChangesReport extends AdminPanel {
 		folder.setWidth(200);
 
 		// Max results
-		TextItem displayMax = ItemFactory.newTextItem("displayMax", "displaymax", null);
-		displayMax.setValue(100);
-		displayMax.setDefaultValue(100);
-		displayMax.setWidth(50);
+		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displayMax", "displaymax", 100, 5, null);
 		displayMax.setHint(I18N.message("elements"));
+		displayMax.setStep(10);
 
 		ButtonItem searchButton = new ButtonItem();
 		searchButton.setTitle(I18N.message("search"));
@@ -168,7 +167,7 @@ public class LastChangesReport extends AdminPanel {
 		eventForm.setColWidths(1, "*");
 
 		// Event
-		SelectItem event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, true, true);
+		SelectItem event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, true, true, true);
 		event.setColSpan(2);
 		event.setEndRow(true);
 
@@ -190,7 +189,7 @@ public class LastChangesReport extends AdminPanel {
 
 		ListGridField date = new DateListGridField("date", "date");
 
-		ListGridField userField = new AvatarListGridField("user", "userId", "user", 110);
+		ListGridField userField = new UserListGridField("user", "userId", "user");
 		userField.setCanFilter(true);
 		userField.setAlign(Alignment.CENTER);
 
@@ -298,9 +297,14 @@ public class LastChangesReport extends AdminPanel {
 				eventValues = buf.split(",");
 			}
 
-			String userValue = null;
-			if ((values.get("user") != null))
-				userValue = (String) values.get("user");
+			Long userId = null;
+			if (values.get("user") != null) {
+				if (values.get("user") instanceof Long)
+					userId = (Long) values.get("user");
+				else
+					userId = Long.parseLong(values.get("user").toString());
+			}
+			
 			Date fromValue = null;
 			if (values.get("fromDate") != null)
 				fromValue = (Date) values.get("fromDate");
@@ -324,19 +328,19 @@ public class LastChangesReport extends AdminPanel {
 
 			}
 
-			ContactingServer.get().show();
-			SystemService.Instance.get().search(userValue, fromValue, tillValue, displayMaxValue, sid, eventValues,
+			LD.contactingServer();
+			SystemService.Instance.get().search(userId, fromValue, tillValue, displayMaxValue, sid, eventValues,
 					folder.getFolderId(), new AsyncCallback<GUIHistory[]>() {
 
 						@Override
 						public void onFailure(Throwable caught) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 							GuiLog.serverError(caught);
 						}
 
 						@Override
 						public void onSuccess(GUIHistory[] result) {
-							ContactingServer.get().hide();
+							LD.clearPrompt();
 
 							if (result != null && result.length > 0) {
 								ListGridRecord[] records = new ListGridRecord[result.length];

@@ -32,7 +32,7 @@ public class GUIDocumentNote implements Serializable {
 
 	private int opacity = 70;
 
-	private String color = "#FFFF88";
+	private String color = "#FFCC00";
 
 	private double left = 0.4;
 

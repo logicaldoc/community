@@ -186,7 +186,7 @@ public abstract class Search {
 					public Long mapRow(ResultSet rs, int row) throws SQLException {
 						Long docId = rs.getLong(1);
 						String name = rs.getString(2);
-						
+
 						Attribute ext = new Attribute();
 						ext.setName(name);
 						ext.setStringValue(rs.getString(4));
@@ -206,7 +206,7 @@ public abstract class Search {
 			for (Hit h : hits) {
 				for (String name : attrs) {
 					Attribute att = extAtt.get(h.getId() + "-" + name);
-					if (att == null)
+					if (h.getDocRef() != null && h.getDocRef().longValue()!=0L)
 						att = extAtt.get(h.getDocRef() + "-" + name);
 					if (att != null)
 						h.getAttributes().put(name, att);

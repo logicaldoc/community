@@ -29,6 +29,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.TenantDAO;
+import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.util.config.ContextProperties;
@@ -58,6 +59,8 @@ public class StatsCollector extends Task {
 
 	protected ContextProperties config;
 
+	private SequenceDAO sequenceDAO;
+	
 	private static String userno = "community";
 
 	private static String sid;
@@ -73,7 +76,7 @@ public class StatsCollector extends Task {
 
 	@Override
 	public long getSize() {
-		return 8;
+		return 9;
 	}
 
 	@Override
@@ -203,16 +206,31 @@ public class StatsCollector extends Task {
 		long totaldocs = docStats[3];
 		long archiveddocs = docStats[4];
 		long docdir = docStats[5];
-
+		
 		List<Tenant> tenants = tenantDAO.findAll();
 		for (Tenant tenant : tenants)
 			extractDocStats(tenant.getId());
 
-		log.info("Saved documents statistics");
+		log.info("Saved documents statistics");		
 		next();
 		if (interruptRequested)
 			return;
 
+		/*
+		 * Collect pages statistics
+		 */
+		long[] pageStats = extractPageStats(Tenant.SYSTEM_ID);
+		long totalpages = pageStats[3];
+
+		tenants = tenantDAO.findAll();
+		for (Tenant tenant : tenants)
+			extractPageStats(tenant.getId());
+
+		log.info("Saved pages statistics");		
+		next();
+		if (interruptRequested)
+			return;
+		
 		/*
 		 * Collect folders statistics
 		 */
@@ -228,7 +246,7 @@ public class StatsCollector extends Task {
 		next();
 		if (interruptRequested)
 			return;
-
+		
 		/*
 		 * Collect sizing statistics
 		 */
@@ -237,6 +255,7 @@ public class StatsCollector extends Task {
 		long histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_history");
 		long user_histories = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_user_history");
 		long votes = folderDAO.queryForLong("SELECT COUNT(*) FROM ld_rating");
+		long wsCalls = sequenceDAO.getCurrentValue("wscall", 0, Tenant.SYSTEM_ID);
 
 		/*
 		 * Save the last update time
@@ -283,6 +302,8 @@ public class StatsCollector extends Task {
 			postParams.add(new BasicNameValuePair("guests", Integer.toString(guests)));
 			postParams.add(new BasicNameValuePair("groups", Integer.toString(groups)));
 			postParams.add(new BasicNameValuePair("docs", Long.toString(totaldocs)));
+			postParams.add(new BasicNameValuePair("pages", Long.toString(totalpages)));
+
 			postParams.add(new BasicNameValuePair("archived_docs", Long.toString(archiveddocs)));
 			postParams.add(new BasicNameValuePair("folders", Long.toString(withdocs + empty + deletedfolders)));
 			postParams.add(new BasicNameValuePair("tags", Long.toString(tags)));
@@ -290,6 +311,7 @@ public class StatsCollector extends Task {
 			postParams.add(new BasicNameValuePair("histories", Long.toString(histories)));
 			postParams.add(new BasicNameValuePair("user_histories", Long.toString(user_histories)));
 			postParams.add(new BasicNameValuePair("votes", Long.toString(votes)));
+			postParams.add(new BasicNameValuePair("wscalls", Long.toString(wsCalls)));
 
 			collectFeatureUsageStats(postParams);
 			next();
@@ -439,8 +461,7 @@ public class StatsCollector extends Task {
 
 		long forms = 0;
 		try {
-			forms = documentDAO.queryForLong("select count(ld_id) from ld_document where ld_deleted=0 and ld_nature="
-					+ AbstractDocument.NATURE_FORM);
+			forms = documentDAO.queryForLong("select count(ld_id) from ld_form where ld_deleted=0");
 		} catch (Throwable t) {
 			log.warn("Unable to calculate forms statistics - {}", t.getMessage());
 		}
@@ -554,6 +575,90 @@ public class StatsCollector extends Task {
 		saveStatistic("archiveddocs", stats[4], tenantId);
 		saveStatistic("docdir", stats[5], tenantId);
 		saveStatistic("notindexabledocs", stats[6], tenantId);
+
+		return stats;
+	}
+
+	/**
+	 * Retrieves the pages stats of a specific tenant and saves the results in
+	 * the database
+	 * 
+	 * @param tenantId The tenant Id if the system tenant is used the whole
+	 *        stats are computed
+	 * @return Ordered list of stats<br/>
+	 *         <ol>
+	 *         <li>notindexedpages</li>
+	 *         <li>indexedpages</li>
+	 *         <li>deletedpages</li>
+	 *         <li>totalpages</li>
+	 *         <li>archivedpages</li>
+	 *         <li>notindexablepages</li>
+	 *         </ol>
+	 */
+	private long[] extractPageStats(long tenantId) {
+		long[] stats = new long[6];
+
+		stats[0] = 0;
+		try {
+			stats[0] = documentDAO.queryForLong(
+					"SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_pages > 0 and A.ld_indexed = 0 and A.ld_deleted = 0 "
+							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
+							+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		stats[1] = 0;
+		try {
+			stats[1] = documentDAO.queryForLong(
+					"SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_pages > 0 and A.ld_indexed = 1 and A.ld_deleted = 0 "
+							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "")
+							+ " and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+		
+		stats[2] = 0;
+		try {
+			stats[2] = documentDAO.queryForLong("SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_deleted  > 0 "
+					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		stats[3] = 0;
+		try {
+			stats[3] = documentDAO.queryForLong("SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_pages > 0 "
+					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		stats[4] = 0;
+		try {
+			stats[4] = documentDAO.queryForLong(
+					"SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_status = " + AbstractDocument.DOC_ARCHIVED
+							+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : ""));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		stats[5] = 0;
+		try {
+			stats[5] = documentDAO.queryForLong("SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_indexed = "
+					+ AbstractDocument.INDEX_SKIP + " and A.ld_deleted = 0 "
+					+ (tenantId != Tenant.SYSTEM_ID ? " and A.ld_tenantid=" + tenantId : "") + " and not A.ld_status="
+					+ AbstractDocument.DOC_ARCHIVED);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
+
+		saveStatistic("notindexedpages", stats[0], tenantId);
+		saveStatistic("indexedpages", stats[1], tenantId);
+		saveStatistic("deletedpages", stats[2], tenantId);
+		saveStatistic("totalpages", stats[3], tenantId);
+		saveStatistic("archivedpages", stats[4], tenantId);
+		saveStatistic("notindexablepages", stats[5], tenantId);
 
 		return stats;
 	}
@@ -704,5 +809,9 @@ public class StatsCollector extends Task {
 
 	public void setTenantDAO(TenantDAO tenantDAO) {
 		this.tenantDAO = tenantDAO;
+	}
+
+	public void setSequenceDAO(SequenceDAO sequenceDAO) {
+		this.sequenceDAO = sequenceDAO;
 	}
 }

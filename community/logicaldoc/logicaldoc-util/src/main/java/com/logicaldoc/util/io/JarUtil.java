@@ -93,29 +93,15 @@ public class JarUtil {
 		if (jare.isDirectory()) {
 			file.mkdirs();
 		} else {
-			java.io.InputStream is = null;
-			BufferedInputStream bis = null;
-			BufferedOutputStream bos = null;
-			FileOutputStream fos = null;
-			try {
-				is = jar.getInputStream(jare);
-				bis = new BufferedInputStream(is);
+			try (java.io.InputStream is = jar.getInputStream(jare);
+					BufferedInputStream bis = new BufferedInputStream(is);
+					FileOutputStream fos = new FileOutputStream(file);
+					BufferedOutputStream bos = new BufferedOutputStream(fos);) {
 				File dir = new File(file.getParent());
 				dir.mkdirs();
-
-				fos = new FileOutputStream(file);
-				bos = new BufferedOutputStream(fos);
-
 				for (int letter = 0; (letter = bis.read()) != -1;) {
 					bos.write((byte) letter);
 				}
-			} finally {
-				if (bos != null)
-					bos.close();
-				if (fos != null)
-					fos.close();
-				if (bis != null)
-					bis.close();
 			}
 		}
 	}

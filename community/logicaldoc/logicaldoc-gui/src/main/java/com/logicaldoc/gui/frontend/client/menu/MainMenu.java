@@ -24,21 +24,21 @@ import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.common.client.util.AwesomeFactory;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
-import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.docusign.DocuSignSettings;
 import com.logicaldoc.gui.frontend.client.docusign.EnvelopeDetails;
 import com.logicaldoc.gui.frontend.client.docusign.Envelopes;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxAuthorizationWizard;
 import com.logicaldoc.gui.frontend.client.dropbox.DropboxDialog;
+import com.logicaldoc.gui.frontend.client.gdrive.GDriveAuthorization;
 import com.logicaldoc.gui.frontend.client.gdrive.GDriveCreate;
 import com.logicaldoc.gui.frontend.client.gdrive.GDriveEditor;
 import com.logicaldoc.gui.frontend.client.gdrive.GDriveImport;
-import com.logicaldoc.gui.frontend.client.gdrive.GDriveSettings;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.Search;
 import com.logicaldoc.gui.frontend.client.services.DocuSignService;
@@ -55,9 +55,9 @@ import com.logicaldoc.gui.frontend.client.textcontent.TextContentCreate;
 import com.logicaldoc.gui.frontend.client.textcontent.TextContentEditor;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentCreate;
 import com.logicaldoc.gui.frontend.client.webcontent.WebcontentEditor;
+import com.logicaldoc.gui.frontend.client.zoho.ZohoAuthorization;
 import com.logicaldoc.gui.frontend.client.zoho.ZohoDialog;
 import com.logicaldoc.gui.frontend.client.zoho.ZohoEditor;
-import com.logicaldoc.gui.frontend.client.zoho.ZohoSettings;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Img;
@@ -108,19 +108,19 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		boolean banner = Session.get().getConfigAsBoolean("gui.banner");
 
-		if (!banner)
+		if (!banner) {
 			addLogo();
-
-		addSearchBox();
-
-		addFill();
-
-		addToolsButton(Session.get().getCurrentFolder(), null);
+		} else {
+			addSpacer(10);
+		}
 
 		addAccountButton();
+		addToolsButton(FolderController.get().getCurrentFolder(), null);
 
-		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.INTERFACE_DENSITY))
+		if (com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.INTERFACE_DENSITY)) {
+			addSeparator();
 			addFormItem(getDensitySelector());
+		}
 
 		if (Feature.enabled(Feature.MULTI_TENANT)) {
 			if (Session.get().getUser().isMemberOf("admin")
@@ -153,15 +153,17 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		}
 
-		if (banner) {
-			addSupportButton();
-			addLogoutButton();
-		}
+		addSeparator();
+		addSupportButton();
+		addLogoutButton();
+		
+		addFill();
+		
+		addSearchBox();
 
-		AwesomeFactory.getIconHtml("user");
+		onFolderSelected(FolderController.get().getCurrentFolder());
+	}	
 
-		onFolderSelected(Session.get().getCurrentFolder());
-	}
 
 	/**
 	 * Adds the logo image into the main menu
@@ -190,7 +192,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 // Uncomment to show the avatar		
 //		account.setTitle("<div><img class='accountIcon' src='" + Util.avatarUrl(Session.get().getUser().getId()) + "' />"
 //				+ I18N.message("account") + "</div>");
-		addButton(account);
+		
+		addButton(account, 1);
 	}
 
 	private void onSearch() {
@@ -234,6 +237,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void addSearchBox() {
+		
 		searchBox.setShowTitle(false);
 		searchBox.setDefaultValue(I18N.message("search") + "...");
 		searchBox.setWidth(160);
@@ -268,8 +272,9 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		addFormItem(searchBox);
 
-		if (Feature.enabled(Feature.PARAMETRIC_SEARCHES))
+		if (Feature.enabled(Feature.PARAMETRIC_SEARCHES)) {
 			addFormItem(searchType);
+		}
 
 		ToolStripButton searchButton = AwesomeFactory.newToolStripButton("search", "search");
 		searchButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
@@ -501,12 +506,12 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 					}
 
 					@Override
 					public void onSuccess(Boolean authorized) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						if (authorized) {
 							ShareFileDialog dialog = new ShareFileDialog(false);
 							dialog.show();
@@ -562,18 +567,18 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		sendEnvelope.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 					}
 
 					@Override
 					public void onSuccess(Boolean authorized) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						if (authorized) {
 							new EnvelopeDetails().show();
 						} else {
@@ -596,18 +601,18 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		envelopes.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				ContactingServer.get().show();
+				LD.contactingServer();
 				DocuSignService.Instance.get().isAuthorized(new AsyncCallback<Boolean>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 					}
 
 					@Override
 					public void onSuccess(Boolean authorized) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						if (authorized) {
 							new Envelopes().show();
 						} else {
@@ -660,17 +665,17 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
 				final long[] ids = grid.getSelectedIds();
 
-				ContactingServer.get().show();
+				LD.contactingServer();
 				GDriveService.Instance.get().exportDocuments(ids, new AsyncCallback<String[]>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						GuiLog.serverError(caught);
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 					}
 
 					@Override
 					public void onSuccess(String[] settings) {
-						ContactingServer.get().hide();
+						LD.clearPrompt();
 						GuiLog.info(I18N.message("gdriveexportok"), null);
 					}
 				});
@@ -680,7 +685,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		authorize.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				new GDriveSettings().show();
+				new GDriveAuthorization().show();
 			}
 		});
 
@@ -709,17 +714,17 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 							Session.get().getUser().setCheckedOutDocs(Session.get().getUser().getCheckedOutDocs() + 1);
 							GuiLog.info(I18N.message("documentcheckedout"), null);
 
-							ContactingServer.get().show();
+							LD.contactingServer();
 							GDriveService.Instance.get().upload(document.getId(), new AsyncCallback<String>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(String resourceId) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									if (resourceId == null) {
 										GuiLog.error(I18N.message("gdriveerror"), null, null);
 										return;
@@ -752,7 +757,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		});
 
-		menu.setItems(importDocs, exportDocs, edit, create, authorize);
+		menu.setItems(authorize, importDocs, exportDocs, edit, create);
 
 		importDocs.setEnabled(folder != null && folder.isDownload() && folder.isWrite()
 				&& Feature.enabled(Feature.GDRIVE) && MainPanel.get().isOnDocumentsTab());
@@ -774,6 +779,14 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		menu.setShowShadow(true);
 		menu.setShadowDepth(3);
 
+		final MenuItem authorize = new MenuItem(I18N.message("authorize"));
+		authorize.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(MenuItemClickEvent event) {
+				new ZohoAuthorization().show();
+			}
+		});
+		
 		final MenuItem importDocs = new MenuItem(I18N.message("importfromzoho"));
 		importDocs.addClickHandler(new ClickHandler() {
 			@Override
@@ -788,13 +801,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			public void onClick(MenuItemClickEvent event) {
 				ZohoDialog dialog = new ZohoDialog(true);
 				dialog.show();
-			}
-		});
-		final MenuItem settings = new MenuItem(I18N.message("settings"));
-		settings.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(MenuItemClickEvent event) {
-				new ZohoSettings().show();
 			}
 		});
 
@@ -817,17 +823,17 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 						public void onSuccess(Void result) {
 							DocUtil.markCheckedOut(document);
 
-							ContactingServer.get().show();
+							LD.contactingServer();
 							ZohoService.Instance.get().upload(document.getId(), new AsyncCallback<String>() {
 								@Override
 								public void onFailure(Throwable caught) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									GuiLog.serverError(caught);
 								}
 
 								@Override
 								public void onSuccess(String resourceId) {
-									ContactingServer.get().hide();
+									LD.clearPrompt();
 									if (resourceId == null) {
 										GuiLog.error(I18N.message("zohoerror"), null, null);
 										return;
@@ -851,12 +857,12 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 			}
 		});
 
-		menu.setItems(importDocs, exportDocs, edit, settings);
+		menu.setItems(authorize, importDocs, exportDocs, edit);
 
 		importDocs.setEnabled(folder != null && folder.isDownload() && folder.isWrite() && Feature.enabled(Feature.ZOHO)
 				&& MainPanel.get().isOnDocumentsTab());
 		exportDocs.setEnabled(folder != null && folder.isDownload() && Feature.enabled(Feature.ZOHO));
-		settings.setEnabled(Feature.enabled(Feature.ZOHO));
+		authorize.setEnabled(Feature.enabled(Feature.ZOHO));
 		edit.setEnabled(document != null && document.getImmutable() == 0 && folder != null && folder.isDownload()
 				&& folder.isWrite() && Feature.enabled(Feature.ZOHO));
 
@@ -904,7 +910,8 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				menu.showContextMenu();
 			}
 		});
-		addButton(tools);
+		
+		addButton(tools, 2);
 	}
 
 	public Menu buildToolsMenu(GUIFolder folder, GUIDocument document) {
@@ -1001,7 +1008,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 				Session.get().getInfo().setConfig(Session.get().getTenantName() + ".gui.density", newDensity);
 				CookiesManager.save(CookiesManager.COOKIE_DENSITY, newDensity);
 				Util.setupDensity(Session.get().getInfo());
-				com.google.gwt.user.client.Window.Location.reload();
+				Util.redirectToRoot();
 			}
 		});
 		return density;
@@ -1138,6 +1145,16 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	@Override
+	public void onFolderBeginEditing(GUIFolder folder) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onFolderCancelEditing(GUIFolder folder) {
+		// Nothing to do
+	}
+	
+	@Override
 	public void onDocumentsDeleted(GUIDocument[] documents) {
 		// Nothing to do
 	}
@@ -1172,6 +1189,16 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	}
 
+	@Override
+	public void onDocumentBeginEditing(GUIDocument document) {
+		// Nothing to do
+	}
+
+	@Override
+	public void onDocumentCancelEditing(GUIDocument document) {
+		// Nothing to do
+	}
+	
 	/**
 	 * Invoked when a tab of the main panel is selected
 	 * 
@@ -1179,7 +1206,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	 */
 	public void onTabSeleted(String tab) {
 		if ("documents".equals(tab)) {
-			onFolderSelected(Session.get().getCurrentFolder());
+			onFolderSelected(FolderController.get().getCurrentFolder());
 		} else {
 			updateToolsMenu(null, null);
 		}
@@ -1209,11 +1236,10 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	private void updateToolsMenu(GUIFolder folder, GUIDocument document) {
-		int position = getMemberNumber(account);
 		if (tools != null)
 			removeMember(tools);
 
 		addToolsButton(folder, document);
-		addMember(tools, position - 1);
+		addMember(tools, 2);
 	}
 }

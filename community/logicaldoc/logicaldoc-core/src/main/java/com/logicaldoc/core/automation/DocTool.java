@@ -741,4 +741,16 @@ public class DocTool {
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		return dao.findById(templateId);
 	}
+
+	/**
+	 * Counts the number of pages of a document
+	 * 
+	 * @param document the document
+	 * 
+	 * @return the number of pages
+	 */
+	public int countPages(Document document) {
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		return manager.countPages(document);
+	}
 }

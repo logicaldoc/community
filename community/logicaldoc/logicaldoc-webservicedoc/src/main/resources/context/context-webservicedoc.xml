@@ -188,7 +188,6 @@
         <jaxrs:features>
             <ref bean="openApiFeature" />
         </jaxrs:features>               
-    </jaxrs:server>                             
-
-   
+    </jaxrs:server>     
+ 	                               
 </beans>

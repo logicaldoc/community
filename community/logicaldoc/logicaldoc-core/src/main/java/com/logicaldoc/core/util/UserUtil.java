@@ -111,6 +111,7 @@ public class UserUtil {
 	 * Updates the avatar of a user with a given .png image
 	 * 
 	 * @param user The user to elaborate
+	 * @param avatarImageFile The file containing the avatar image
 	 */
 	public static void saveAvatar(User user, File avatarImageFile) {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -164,7 +165,10 @@ public class UserUtil {
 				userDao.jdbcUpdate("update ld_user set ld_avatar = ? where ld_username = ?", user.getAvatar(),
 						user.getUsername());
 		} catch (Throwable t) {
-			log.warn("Error generating default the avatar for user {}", user, t);
+			if (user.getType() == User.TYPE_DEFAULT)
+				log.warn("Error generating default the avatar for user {}", user, t);
+			else
+				log.debug("Error generating default the avatar for user {}", user, t);
 		} finally {
 			FileUtil.strongDelete(tmpAvatarImage);
 		}
@@ -180,29 +184,42 @@ public class UserUtil {
 		 * Check Gravatar with main email
 		 */
 		BufferedImage avatarImage = null;
-		byte[] bytes = gravatar.download(user.getEmail());
-		if (bytes != null && bytes.length > 0)
-			avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+		byte[] bytes;
+		try {
+			bytes = gravatar.download(user.getEmail());
+			if (bytes != null && bytes.length > 0)
+				avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+		} catch (Throwable t) {
+			log.warn("Cannot download gravatar for email {}", user.getEmail(), t);
+		}
 
 		/*
 		 * Check Gravatar with secondary email
 		 */
 		if (avatarImage == null && StringUtils.isNotEmpty(user.getEmail2())) {
-			bytes = gravatar.download(user.getEmail());
-			if (bytes != null && bytes.length > 0)
-				avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+			try {
+				bytes = gravatar.download(user.getEmail2());
+				if (bytes != null && bytes.length > 0)
+					avatarImage = ImageIO.read(new ByteArrayInputStream(bytes));
+			} catch (Throwable t) {
+				log.warn("Cannot download gravatar for email {}", user.getEmail2(), t);
+			}
 		}
 
 		/*
 		 * Now generate one from scratch
 		 */
 		if (avatarImage == null) {
-			Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(size, size).build();
-			avatarImage = avatar.create(user.getId());
+			try {
+				Avatar avatar = IdenticonAvatar.newAvatarBuilder().size(size, size).build();
+				avatarImage = avatar.create(user.getId());
+			} catch (Throwable t) {
+				log.warn("Cannot generate avatar for user {}", user, t);
+			}
 		}
 
 		// If the image is bigger, then get the central square
-		if (avatarImage.getWidth() > size || avatarImage.getHeight() > size) {
+		if (avatarImage != null && (avatarImage.getWidth() > size || avatarImage.getHeight() > size)) {
 			avatarImage = ImageUtil.cropCenterSquare(avatarImage, size);
 		}
 

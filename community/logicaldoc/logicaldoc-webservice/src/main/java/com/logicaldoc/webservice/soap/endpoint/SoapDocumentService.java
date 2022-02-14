@@ -488,6 +488,43 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	@Override
+	public WSDocument copy(String sid, long docId, long folderId) throws Exception {
+		User user = validateSession(sid);
+		try {
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			long rootId = fdao.findRoot(user.getTenantId()).getId();
+
+			if (folderId == rootId) {
+				log.error("Cannot create documents in the root");
+				throw new Exception("Cannot create documents in the root");
+			}
+
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = docDao.findById(docId);
+			checkWriteEnable(user, folderId);
+
+			doc = docDao.findDocument(docId);
+			checkPublished(user, doc);
+			
+			// Create the document history event
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSessionId(sid);
+			transaction.setEvent(DocumentEvent.COPYED.toString());
+			transaction.setComment("");
+			transaction.setUser(user);
+			
+			Folder folder=fdao.findFolder(folderId);
+
+			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+			Document createdDoc = documentManager.copyToFolder(doc, folder, transaction);
+			return getDoc(createdDoc.getId());
+		} catch (Throwable t) {
+			logAndRethrow(log, t);
+			return null;
+		}
+	}
+	
+	@Override
 	public void rename(String sid, long docId, String name) throws Exception {
 		User user = validateSession(sid);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);

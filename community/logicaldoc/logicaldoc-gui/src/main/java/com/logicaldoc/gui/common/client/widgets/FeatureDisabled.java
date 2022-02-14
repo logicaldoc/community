@@ -24,9 +24,8 @@ public class FeatureDisabled extends VLayout {
 			label = new MessageLabel(new GUIMessage("<b>" + I18N.message("featuredisabled") + "</b>",
 					GUIMessage.PRIO_WARN), false);
 		else
-			label = new MessageLabel(new GUIMessage("<b>" + I18N.message("feature_" + feature) + " "
+			label = new MessageLabel(new GUIMessage("<b>" + I18N.message("Feature_" + feature) + " "
 					+ I18N.message("disabled") + "</b>", GUIMessage.PRIO_WARN), false);
-		new Label();
 		label.setHeight(30);
 		label.setPadding(10);
 		label.setAlign(Alignment.CENTER);

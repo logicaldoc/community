@@ -1,10 +1,12 @@
 package com.logicaldoc.core.parser;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hslf.usermodel.HSLFSlideShow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,5 +60,15 @@ public class EpubParser extends AbstractParser {
 		} finally {
 			FileUtil.strongDelete(tmpFile);
 		}
+	}
+
+	@Override
+	public int countPages(InputStream input, String filename) {
+		try (HSLFSlideShow pptDoc = new HSLFSlideShow(input)) {
+			return pptDoc.getSlides().size();
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+		return 1;
 	}
 }

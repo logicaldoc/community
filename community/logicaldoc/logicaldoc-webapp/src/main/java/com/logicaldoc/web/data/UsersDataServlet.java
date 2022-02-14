@@ -2,9 +2,12 @@ package com.logicaldoc.web.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -53,6 +56,9 @@ public class UsersDataServlet extends HttpServlet {
 			response.setHeader("Cache-Control", "no-store");
 			response.setDateHeader("Expires", 0);
 
+			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+			df.setTimeZone(TimeZone.getTimeZone("UTC"));
+
 			PrintWriter writer = response.getWriter();
 			writer.print("<list>");
 
@@ -94,11 +100,8 @@ public class UsersDataServlet extends HttpServlet {
 				writer.print("<user>");
 				writer.print("<id>" + user.getId() + "</id>");
 				writer.print("<username><![CDATA[" + user.getUsername() + "]]></username>");
-				if (user.getEnabled() == 1)
-					writer.print("<eenabled>0</eenabled>");
-				else if (user.getEnabled() == 0)
-					writer.print("<eenabled>2</eenabled>");
-				writer.print("<_enabled>" + (user.getEnabled() == 1 ? "true" : "false") + "</_enabled>");
+				writer.print("<enabledIcon>" + (user.getEnabled() == 1 ? "0" : "2") + "</enabledIcon>");
+				writer.print("<eenabled>" + (user.getEnabled() == 1 ? "true" : "false") + "</eenabled>");
 				writer.print("<guest>" + user.isReadonly() + "</guest>");
 				writer.print("<name><![CDATA[" + (user.getName() == null ? "" : user.getName()) + "]]></name>");
 				writer.print("<firstName><![CDATA[" + (user.getFirstName() == null ? "" : user.getFirstName())
@@ -110,6 +113,8 @@ public class UsersDataServlet extends HttpServlet {
 						"<phone><![CDATA[" + (user.getTelephone() == null ? "" : user.getTelephone()) + "]]></phone>");
 				writer.print(
 						"<cell><![CDATA[" + (user.getTelephone2() == null ? "" : user.getTelephone2()) + "]]></cell>");
+				if (user.getExpire() != null)
+					writer.print("<expire>" + df.format(user.getExpire()) + "</expire>");
 				if (user.getUserGroup() != null)
 					writer.print("<usergroup><![CDATA[" + user.getUserGroup().getId() + "]]></usergroup>");
 

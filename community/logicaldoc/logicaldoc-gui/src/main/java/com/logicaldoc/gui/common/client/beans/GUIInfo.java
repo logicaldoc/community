@@ -16,7 +16,7 @@ public class GUIInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String release = "8.6.1";
+	private String release = "8.7.3";
 
 	private String year = "2006-2021";
 
@@ -166,9 +166,11 @@ public class GUIInfo implements Serializable {
 	 * </ol>
 	 * 
 	 * @param name Name of the property
+	 * @param defaultValue value to return in case the property is undefined
+	 * 
 	 * @return The value
 	 */
-	public String getConfig(String name) {
+	public String getConfig(String name, String defaultValue) {
 		String tenantName = Constants.TENANT_DEFAULTNAME;
 		if (tenant != null)
 			tenantName = tenant.getName();
@@ -188,7 +190,22 @@ public class GUIInfo implements Serializable {
 			if (name.equals(val.getCode()))
 				return val.getValue();
 		}
-		return null;
+
+		return defaultValue;
+	}
+
+	/**
+	 * Search for the given configuration property. this is the lookup logic:
+	 * <ol>
+	 * <li><b>current_tenant</b>.name</li>
+	 * <li>name</li>
+	 * </ol>
+	 * 
+	 * @param name Name of the property
+	 * @return The value
+	 */
+	public String getConfig(String name) {
+		return getConfig(name, null);
 	}
 
 	public void setConfig(String name, String value) {
@@ -269,7 +286,7 @@ public class GUIInfo implements Serializable {
 				return val;
 		}
 		return null;
-}
+	}
 
 	public String getAttributeLabel(String name) {
 		String n = name;
@@ -277,7 +294,7 @@ public class GUIInfo implements Serializable {
 			n = name.substring(4);
 		for (GUIAttribute val : attributeDefinitions) {
 			if (val.getName().equals(n))
-				return val.getLabel()!=null && !val.getLabel().isEmpty() ? val.getLabel() : val.getName();
+				return val.getLabel() != null && !val.getLabel().isEmpty() ? val.getLabel() : val.getName();
 		}
 		return I18N.message(n);
 	}

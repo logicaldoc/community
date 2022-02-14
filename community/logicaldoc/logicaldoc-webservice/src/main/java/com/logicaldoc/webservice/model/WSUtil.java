@@ -40,6 +40,7 @@ public class WSUtil {
 			wsDoc.setComment(document.getComment());
 			wsDoc.setWorkflowStatus(document.getWorkflowStatus());
 			wsDoc.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
+			wsDoc.setColor(document.getColor());
 			if (document.getTemplate() != null)
 				wsDoc.setTemplateId(document.getTemplate().getId());
 			wsDoc.setImmutable(document.getImmutable());
@@ -190,6 +191,7 @@ public class WSUtil {
 		doc.setComment(wsDoc.getComment());
 		doc.setWorkflowStatus(wsDoc.getWorkflowStatus());
 		doc.setWorkflowStatusDisplay(wsDoc.getWorkflowStatusDisplay());
+		doc.setColor(wsDoc.getColor());
 		doc.setLocale(LocaleUtil.toLocale(wsDoc.getLanguage()));
 		doc.setTagsFromWords(tagsSet);
 		doc.setTemplate(template);
@@ -210,7 +212,7 @@ public class WSUtil {
 		doc.setPages(wsDoc.getPages());
 		doc.setNature(wsDoc.getNature());
 		doc.setFormId(wsDoc.getFormId());
-
+		
 		Date creationDate = null;
 		if (StringUtils.isNotEmpty(wsDoc.getCreation()))
 			creationDate = convertStringToDate(wsDoc.getCreation());
@@ -237,10 +239,16 @@ public class WSUtil {
 		doc.setOcrTemplateId(wsDoc.getOcrTemplateId());
 		doc.setBarcodeTemplateId(wsDoc.getBarcodeTemplateId());
 
+		doc.setSigned(wsDoc.getSigned());
+		doc.setBarcoded(wsDoc.getBarcoded());
+		
 		return doc;
 	}
 
 	public static String convertDateToString(Date date) {
+		if(date==null)
+			return null;
+		
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 		try {
 			return df.format(date);
@@ -251,10 +259,14 @@ public class WSUtil {
 			} catch (Exception e1) {
 			}
 		}
+		
 		return null;
 	}
-	
+
 	public static String convertDateToStringWithMillis(Date date) {
+		if(date==null)
+			return null;
+		
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
 		try {
 			return df.format(date);
@@ -265,9 +277,9 @@ public class WSUtil {
 			} catch (Exception e1) {
 			}
 		}
+		
 		return null;
 	}
-
 
 	public static Date convertStringToDate(String date) {
 		if (StringUtils.isEmpty(date))

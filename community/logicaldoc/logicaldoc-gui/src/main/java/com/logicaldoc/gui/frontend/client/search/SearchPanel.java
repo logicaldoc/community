@@ -1,7 +1,6 @@
 package com.logicaldoc.gui.frontend.client.search;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
@@ -9,6 +8,8 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
+import com.logicaldoc.gui.common.client.observer.FolderController;
+import com.logicaldoc.gui.common.client.observer.FolderObserver;
 import com.logicaldoc.gui.frontend.client.document.DocumentDetailsPanel;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
@@ -32,7 +33,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class SearchPanel extends HLayout implements SearchObserver, DocumentObserver {
+public class SearchPanel extends HLayout implements SearchObserver, DocumentObserver, FolderObserver {
 
 	private Layout listing = new VLayout();
 
@@ -50,6 +51,8 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	private boolean drawn = false;
 
+	private SearchToolbar toolbar;
+
 	private SearchPanel() {
 		setWidth100();
 		setOverflow(Overflow.HIDDEN);
@@ -57,6 +60,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 		Search.get().addObserver(this);
 		DocumentController.get().addObserver(this);
+		FolderController.get().addObserver(this);
 	}
 
 	public static SearchPanel get() {
@@ -109,7 +113,8 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 		bodyPanel.setWidth100();
 		bodyPanel.setMembers(listingAndDetails, previewPanel);
 
-		body.setMembers(new SearchToolbar(listingPanel), bodyPanel);
+		toolbar = new SearchToolbar(listingPanel);
+		body.setMembers(toolbar, bodyPanel);
 
 		setMembers(searchMenu, body);
 	}
@@ -124,7 +129,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 				@Override
 				public void onSuccess(GUIDocument result) {
-					Session.get().setCurrentDocument(result);
+					DocumentController.get().setCurrentDocument(result);
 				}
 			});
 		} else
@@ -161,6 +166,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	public void onSearchArrived() {
 		onSelectedDocumentHit(-1);
 		previewPanel.reset();
+		enableAll();
 	}
 
 	@Override
@@ -222,8 +228,10 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	@Override
 	public void onDocumentModified(GUIDocument document) {
-		if (getGrid().getSelectedDocument() != null && getGrid().getSelectedDocument().getId() == document.getId())
+		if (getGrid().getSelectedDocument() != null && getGrid().getSelectedDocument().getId() == document.getId()) {
 			previewPanel.setDocument(document);
+			onDocumentCancelEditing(document);
+		}
 	}
 
 	public SearchPreviewPanel getPreviewPanel() {
@@ -262,7 +270,39 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	@Override
 	public void onDocumentStored(GUIDocument document) {
+		// Nothing to do
+	}
 
+	@Override
+	public void onDocumentBeginEditing(GUIDocument document) {
+		DocumentsGrid grid = getGrid();
+		if (grid.getSelectedDocument().getId() == document.getId()) {
+			disableAll();
+		}
+	}
+
+	@Override
+	public void onDocumentCancelEditing(GUIDocument document) {
+		DocumentsGrid grid = getGrid();
+		if (grid.getSelectedDocument().getId() == document.getId()) {
+			enableAll();
+		}
+	}
+
+	private void enableAll() {
+		if (listingPanel != null)
+			listingPanel.enable();
+		if (toolbar != null)
+			toolbar.enable();
+		SearchMenu.get().enable();
+	}
+
+	private void disableAll() {
+		if (listingPanel != null)
+			listingPanel.disable();
+		if (toolbar != null)
+			toolbar.disable();
+		SearchMenu.get().disable();
 	}
 
 	@Override
@@ -299,5 +339,47 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 				return null;
 		} else
 			return null;
+	}
+
+	@Override
+	public void onFolderSelected(GUIFolder folder) {
+		// Noting to do
+	}
+
+	@Override
+	public void onFolderChanged(GUIFolder folder) {
+		// Noting to do
+	}
+
+	@Override
+	public void onFolderDeleted(GUIFolder folder) {
+		// Noting to do
+	}
+
+	@Override
+	public void onFolderCreated(GUIFolder folder) {
+		// Noting to do
+	}
+
+	@Override
+	public void onFolderMoved(GUIFolder folder) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onFolderBeginEditing(GUIFolder folder) {
+		DocumentsGrid grid = getGrid();
+		if (grid.getSelectedDocument().getId() == folder.getId()) {
+			disableAll();
+		}
+	}
+
+	@Override
+	public void onFolderCancelEditing(GUIFolder folder) {
+		DocumentsGrid grid = getGrid();
+		if (grid.getSelectedDocument().getId() == folder.getId()) {
+			enableAll();
+		}
 	}
 }

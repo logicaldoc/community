@@ -7,7 +7,6 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.data.Record;
@@ -224,17 +223,17 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		for (Record record : records)
 			values[i++] = record.getAttributeAsString("value");
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 			}
 
 			@Override
 			public void onSuccess(Void arg0) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				SC.say(I18N.message("optionssaved"));
 			}
 		});

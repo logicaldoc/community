@@ -8,14 +8,15 @@ package com.logicaldoc.core.security.authentication;
  */
 public class PasswordExpiredException extends AuthenticationException {
 
+	public static final String CODE = "passwordexpired";
+	
 	private static final long serialVersionUID = 1L;
 
 	public PasswordExpiredException() {
-		super("passwordexpired");
+		super(CODE);
 	}
 
-	public PasswordExpiredException(String message) {
-		super(message);
+	public PasswordExpiredException(Authenticator authenticator) {
+		super(authenticator, CODE);
 	}
-
 }

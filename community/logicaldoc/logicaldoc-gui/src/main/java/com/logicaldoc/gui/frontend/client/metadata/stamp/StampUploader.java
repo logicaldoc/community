@@ -31,9 +31,9 @@ public class StampUploader extends Window {
 
 	private long stampId;
 
-	private StampDetailsPanel panel;
+	private StampProperties panel;
 
-	public StampUploader(long stampId, StampDetailsPanel panel) {
+	public StampUploader(long stampId, StampProperties panel) {
 		this.stampId = stampId;
 		this.panel = panel;
 

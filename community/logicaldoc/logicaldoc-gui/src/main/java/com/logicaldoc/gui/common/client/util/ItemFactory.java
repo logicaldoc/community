@@ -224,7 +224,7 @@ public class ItemFactory {
 		IntegerItem.setDefaultProperties(integerItem);
 
 		ColorPickerItem colorPickerItem = new ColorPickerItem();
-		colorPickerItem.setWidth(180);
+		colorPickerItem.setWidth(200);
 		colorPickerItem.setRequiredMessage(I18N.message("fieldrequired"));
 		colorPickerItem.setHintStyle("hint");
 		colorPickerItem.setBrowserSpellCheck(false);
@@ -258,7 +258,7 @@ public class ItemFactory {
 		colorItemPicker.setWidth(115);
 		colorItemPicker.setBrowserSpellCheck(false);
 		ColorPickerItem.setDefaultProperties(colorItemPicker);
-		
+
 		RichTextItem richTextItem = new RichTextItem();
 		richTextItem.setBrowserSpellCheck(false);
 		RichTextItem.setDefaultProperties(richTextItem);
@@ -362,6 +362,8 @@ public class ItemFactory {
 			List<FormItemIcon> additionalIcons) {
 		final TextItem item = new FolderSelector("_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER), !allowsNull,
 				additionalIcons);
+		if (title != null)
+			item.setTitle(I18N.message(title));
 		return item;
 	}
 
@@ -783,13 +785,16 @@ public class ItemFactory {
 		ListGridField id = new ListGridField("id", I18N.message("id"));
 		id.setHidden(true);
 		ListGridField _name = new ListGridField("name", I18N.message("name"));
+		_name.setAutoFitWidth(true);
 		ListGridField displayName = new ListGridField("displayName", I18N.message("displayname"));
+		displayName.setWidth("*");
 		tenant.setValueField("id");
 		tenant.setDisplayField("displayName");
 		tenant.setPickListWidth(300);
 		tenant.setWidth(150);
 		tenant.setPickListFields(id, _name, displayName);
 		tenant.setOptionDataSource(new TenantsDS());
+		tenant.setEmptyDisplayValue(" ");
 		return tenant;
 	}
 
@@ -980,34 +985,6 @@ public class ItemFactory {
 		return select;
 	}
 
-	public static SelectItem newEventsSelector(String name, String title, final ChangedHandler handler, boolean folder,
-			boolean workflow, boolean user) {
-		final SelectItem select = newMultipleSelector(filterItemName(name), title);
-		select.setWidth(350);
-		select.setHeight(250);
-		select.setMultipleAppearance(MultipleAppearance.GRID);
-		select.setMultiple(true);
-		select.setOptionDataSource(new EventsDS(folder, workflow, user));
-		select.setValueField("code");
-		select.setDisplayField("label");
-		if (handler != null)
-			select.addChangedHandler(handler);
-
-		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
-			@Override
-			public void onFormItemClick(FormItemIconClickEvent event) {
-				select.clearValue();
-				select.setValue((String) null);
-				if (handler != null)
-					handler.onChanged(null);
-			}
-		});
-		select.setIcons(clear);
-		select.setIconVAlign(VerticalAlignment.TOP);
-
-		return select;
-	}
-
 	public static SelectItem newOCRStatusSelector(Integer value) {
 		SelectItem select = new SelectItem("ocrstatus", I18N.message("processedbyzonalocr"));
 		select.setWidth(150);
@@ -1023,12 +1000,32 @@ public class ItemFactory {
 		return select;
 	}
 
-	public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler, boolean folder,
-			boolean workflow, boolean user) {
-		final SelectItem select = newSelectItem(filterItemName(name), title);
+	public static SelectItem newFolderSecurityOption(String name, String title) {
+		SelectItem securityOption = newSelectItem(name, title);
+		securityOption.setWidth("*");
+		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		opts.put("none", I18N.message("none").toLowerCase());
+		opts.put("inherit", I18N.message("inheritparentsec").toLowerCase());
+		opts.put("replicate", I18N.message("replicatesourcesec").toLowerCase());
+		securityOption.setValueMap(opts);
+
+		String defaultSetting = Session.get().getInfo().getConfig("gui.security.inheritoption.default");
+		if (defaultSetting == null || (!"none".equals(defaultSetting) && !"inherit".equals(defaultSetting)
+				&& !"replicate".equals(defaultSetting)))
+			securityOption.setValue("none");
+		else
+			securityOption.setValue(defaultSetting);
+		return securityOption;
+	}
+
+	public static SelectItem newEventsSelector(String name, String title, final ChangedHandler handler, boolean folder,
+			boolean workflow, boolean user, boolean importfolder) {
+		final SelectItem select = newMultipleSelector(filterItemName(name), title);
 		select.setWidth(350);
-		select.setMultiple(false);
-		select.setOptionDataSource(new EventsDS(folder, workflow, user));
+		select.setHeight(250);
+		select.setMultipleAppearance(MultipleAppearance.GRID);
+		select.setMultiple(true);
+		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder));
 		select.setValueField("code");
 		select.setDisplayField("label");
 		if (handler != null)
@@ -1043,8 +1040,36 @@ public class ItemFactory {
 					handler.onChanged(null);
 			}
 		});
+		clear.setWidth(12);
+		clear.setHeight(12);
 		select.setIcons(clear);
-		select.setIconVAlign(VerticalAlignment.TOP);
+
+		return select;
+	}
+
+	public static SelectItem newEventSelector(String name, String title, final ChangedHandler handler, boolean folder,
+			boolean workflow, boolean user, boolean importfolder) {
+		final SelectItem select = newSelectItem(filterItemName(name), title);
+		select.setWidth(350);
+		select.setMultiple(false);
+		select.setOptionDataSource(new EventsDS(folder, workflow, user, importfolder));
+		select.setValueField("code");
+		select.setDisplayField("label");
+		if (handler != null)
+			select.addChangedHandler(handler);
+
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
+			@Override
+			public void onFormItemClick(FormItemIconClickEvent event) {
+				select.clearValue();
+				select.setValue((String) null);
+				if (handler != null)
+					handler.onChanged(null);
+			}
+		});
+		clear.setWidth(12);
+		clear.setHeight(12);
+		select.setIcons(clear);
 
 		return select;
 	}
@@ -1224,11 +1249,12 @@ public class ItemFactory {
 			item = newTextItem(itemName, itemName, initialValue);
 
 			if (!InputValues.getInputs(itemName).isEmpty()) {
-				item = new ComboBoxItem(itemName);
-				item.setValueMap(InputValues.getInputsAsStrings(itemName).toArray(new String[0]));
-				item.setShowPickerIcon(false);
-				item.setTextBoxStyle("textItem");
-				item.setValue(initialValue);
+				item = formItemWithSuggestions(item);
+//				item = new ComboBoxItem(itemName);
+//				item.setValueMap(InputValues.getInputsAsStrings(itemName).toArray(new String[0]));
+//				item.setShowPickerIcon(false);
+//				item.setTextBoxStyle("textItemLite");
+//				item.setValue(initialValue);
 			}
 
 			if (att.getEditor() == GUIAttribute.EDITOR_LISTBOX && att.getSetId() != null) {
@@ -1303,6 +1329,67 @@ public class ItemFactory {
 		PasswordItem password = newPasswordItem(name, title, value);
 		password.setAutoCompleteKeywords("new-password");
 		return password;
+	}
+
+	/**
+	 * Provides a control that does not display the password input directly, it
+	 * uses a second item to store the password in an hidden attribute of the
+	 * form.
+	 * 
+	 * @param name Name of the field
+	 * @param title The title
+	 * @param value Current password value
+	 * @param hiddenPasswordItem The item that stores the real password
+	 * @param changedHandler optional handler to invoke when the password has
+	 *        been changed
+	 * 
+	 * @return the opaque item
+	 */
+	public static StaticTextItem newSafePasswordItem(String name, String title, String value,
+			FormItem hiddenPasswordItem, ChangedHandler changedHandler) {
+		StaticTextItem item = newStaticTextItem(name, title,
+				value == null || value.toString().isEmpty() ? "" : "*****");
+
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
+			@Override
+			public void onFormItemClick(FormItemIconClickEvent event) {
+				item.setValue((String) null);
+				hiddenPasswordItem.setValue((String) null);
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			}
+		});
+
+		FormItemIcon edit = new FormItemIcon();
+		edit.setName("edit");
+		edit.setWidth(16);
+		edit.setHeight(16);
+		edit.setSrc("[SKIN]/edit.png");
+		edit.setPrompt(I18N.message("changepassword"));
+		edit.addFormItemClickHandler(new FormItemClickHandler() {
+
+			@Override
+			public void onFormItemClick(FormItemIconClickEvent event) {
+				PasswordItem password = newPasswordItem("psw", title, null);
+				password.setAutoCompleteKeywords("new-password");
+				password.setShowTitle(false);
+				LD.askForValue(title, "password", null, password, new ValueCallback() {
+
+					@Override
+					public void execute(String value) {
+						item.setValue("*****");
+						hiddenPasswordItem.setValue(value);
+						if (changedHandler != null)
+							changedHandler.onChanged(null);
+					}
+				});
+			}
+		});
+
+		item.setIcons(edit, clear);
+		item.setIconVAlign(VerticalAlignment.CENTER);
+
+		return item;
 	}
 
 	/**
@@ -1502,8 +1589,8 @@ public class ItemFactory {
 	 * @param name name of the item
 	 * @param title title of the item(optional)
 	 * @param value default value(optional)
-	 * @param min minimum value
-	 * @param max maximum value
+	 * @param minValue minimum value
+	 * @param maxValue maximum value
 	 * 
 	 * @return the new item
 	 */
@@ -1597,6 +1684,15 @@ public class ItemFactory {
 			}
 		});
 		return editHtml;
+	}
+
+	public static TextAreaItem newTextAreaItemForHTML(String name, String title, String value, ChangedHandler handler) {
+		TextAreaItem item = newTextAreaItem(name, title, value);
+		item.setIcons(prepareEditHtmlIcon(item, handler));
+		item.setIconVAlign(VerticalAlignment.CENTER);
+		if (handler != null)
+			item.addChangedHandler(handler);
+		return item;
 	}
 
 	public static SelectItem newDueTimeSelector(String name, String title) {
@@ -1701,16 +1797,20 @@ public class ItemFactory {
 		return selectItem;
 	}
 
-	public static SelectItem newAttributesSelector() {
+	public static SelectItem newAttributesSelector(String context) {
 		final SelectItem selectItem = new SelectItem("attributes", I18N.message("attributes"));
 		selectItem.setMultiple(true);
 		selectItem.setMultipleAppearance(MultipleAppearance.PICKLIST);
 		selectItem.setDisplayField("label");
 		selectItem.setValueField("name");
 		selectItem.setPickListWidth(150);
-		selectItem.setOptionDataSource(new AttributesDS());
+		selectItem.setOptionDataSource(new AttributesDS(context));
 		selectItem.setWrapTitle(false);
 		return selectItem;
+	}
+
+	public static SelectItem newAttributesSelector() {
+		return newAttributesSelector(null);
 	}
 
 	public static SelectItem newFrequencySelector(String name, String title) {
@@ -1828,7 +1928,7 @@ public class ItemFactory {
 		return item;
 	}
 
-	public static SelectItem newWorkflowSelector() {
+	public static SelectItem newWorkflowSelector(Long userId) {
 		SelectItem item = new SelectItem("workflow", I18N.message("workflow"));
 		item.setRequiredMessage(I18N.message("fieldrequired"));
 		ListGridField name = new ListGridField("name", I18N.message("name"));
@@ -1839,7 +1939,7 @@ public class ItemFactory {
 		item.setDisplayField("name");
 		item.setValueField("id");
 		item.setWrapTitle(false);
-		item.setOptionDataSource(new WorkflowsDS(false, true));
+		item.setOptionDataSource(new WorkflowsDS(false, true, userId));
 		if (!Feature.enabled(Feature.WORKFLOW))
 			item.setDisabled(true);
 		return item;
@@ -1931,7 +2031,7 @@ public class ItemFactory {
 		item = new ComboBoxItem(srcItem.getName(), srcItem.getTitle());
 		item.setValueMap(InputValues.getInputsAsStrings(srcItem.getName()).toArray(new String[0]));
 		item.setShowPickerIcon(false);
-		item.setTextBoxStyle("textItem");
+		item.setTextBoxStyle("textItemLite");
 		if (srcItem.getValue() != null)
 			item.setValue(srcItem.getValue());
 		return item;
@@ -2101,16 +2201,22 @@ public class ItemFactory {
 		return selector;
 	}
 
-	public static SelectItem new2AFMethodSelector(String name, String value) {
+	public static SelectItem new2AFMethodSelector(String name, String value, boolean enabledOnly) {
 		SelectItem select = new SelectItem(filterItemName(name), I18N.message("authenticationmethod"));
-		select.setWidth(150);
+		select.setWidth(250);
 		select.setWrapTitle(false);
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		map.put("", I18N.message("disable2fa"));
-		if (Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled"))
+		if (!enabledOnly
+				|| Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_GOOGLE_AUTHENTICATOR + ".enabled"))
 			map.put(Constants.TWOFA_GOOGLE_AUTHENTICATOR, "Google Authenticator");
-		if (Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_YUBIKEY + ".enabled"))
+		if (!enabledOnly || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_YUBIKEY + ".enabled"))
 			map.put(Constants.TWOFA_YUBIKEY, "Yubikey");
+		if (!enabledOnly
+				|| Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_EMAIL_AUTHENTICATOR + ".enabled"))
+			map.put(Constants.TWOFA_EMAIL_AUTHENTICATOR, "Email");
+		if (!enabledOnly || Session.get().getTenantConfigAsBoolean("2fa." + Constants.TWOFA_DUO + ".enabled"))
+			map.put(Constants.TWOFA_DUO, "Duo");
 		select.setValueMap(map);
 		if (value != null && map.get(value) != null)
 			select.setValue(value.toString());
@@ -2143,6 +2249,29 @@ public class ItemFactory {
 		select.setValue("0");
 		select.setWidth(200);
 		return select;
+	}
+
+	public static SelectItem newSubscriptionTypeSelector() {
+		SelectItem selector = new SelectItem("subscriptionType", I18N.message("type"));
+		LinkedHashMap<String, String> opts = new LinkedHashMap<String, String>();
+		opts.put("document", I18N.message("document").toLowerCase());
+		opts.put("folder", I18N.message("folder").toLowerCase());
+		selector.setValueMap(opts);
+		selector.setRequired(false);
+
+		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
+			@Override
+			public void onFormItemClick(FormItemIconClickEvent event) {
+				selector.clearValue();
+				selector.setValue((String) null);
+				selector.fireEvent(new ChangedEvent(selector.getJsObj()));
+			}
+		});
+		clear.setWidth(12);
+		clear.setHeight(12);
+		selector.setIcons(clear);
+
+		return selector;
 	}
 
 	/**

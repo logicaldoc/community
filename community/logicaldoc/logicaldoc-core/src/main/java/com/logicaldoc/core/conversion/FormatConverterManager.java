@@ -435,7 +435,7 @@ public class FormatConverterManager {
 			log.warn("No format converter for file " + inFileName);
 
 		// Get the first available converter
-		FormatConverter converter = converters.get(0);
+		FormatConverter converter = converters!=null ? converters.get(0) : null;
 
 		// Check if a special binding is configured
 		String currentConverter = config.getProperty("converter." + inOutkey);

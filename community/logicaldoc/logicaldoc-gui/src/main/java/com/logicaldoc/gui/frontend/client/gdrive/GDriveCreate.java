@@ -7,7 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.GDriveService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
@@ -82,7 +82,7 @@ public class GDriveCreate extends Window {
 		if (!vm.validate())
 			return;
 		hide();
-		ContactingServer.get().show();
+		LD.contactingServer();
 
 		final String type = vm.getValueAsString("type");
 		String filename = vm.getValueAsString("fileName");
@@ -93,14 +93,14 @@ public class GDriveCreate extends Window {
 		GDriveService.Instance.get().create(filename, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GuiLog.serverError(caught);
 				destroy();
 			}
 
 			@Override
 			public void onSuccess(String resId) {
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				GUIDocument document = new GUIDocument();
 				document.setFileName(fn);
 				document.setType(type);

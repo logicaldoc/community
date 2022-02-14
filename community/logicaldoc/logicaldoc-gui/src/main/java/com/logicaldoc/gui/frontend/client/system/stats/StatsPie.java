@@ -30,7 +30,9 @@ public class StatsPie extends HLayout {
 
 	private static final int STATS_DOCUMENTS = 1;
 
-	private static final int STATS_FOLDERS = 2;
+	private static final int STATS_PAGES = 2;
+
+	private static final int STATS_FOLDERS = 3;
 
 	public StatsPie(GUIParameter[][] parameters) {
 		super();
@@ -62,7 +64,7 @@ public class StatsPie extends HLayout {
 		repository.addMember(spacer);
 
 		try {
-			repository.addMember(prepareLegend(parameters[0], STATS_REPOSITORY));
+			repository.addMember(prepareLegend(parameters[STATS_REPOSITORY], STATS_REPOSITORY));
 			addMember(repository);
 		} catch (Throwable t) {
 		}
@@ -78,12 +80,30 @@ public class StatsPie extends HLayout {
 		documents.addMember(spacer);
 
 		try {
-			documents.addMember(prepareLegend(parameters[1], STATS_DOCUMENTS));
+			documents.addMember(prepareLegend(parameters[STATS_DOCUMENTS], STATS_DOCUMENTS));
 			addMember(documents);
 		} catch (Throwable t) {
 
 		}
 
+		
+		VLayout pages = new VLayout();
+		pieImage = new Image(Util.contextPath() + "stat?chart=pages&random=" + new Date().getTime());
+		pieImage.setWidth("250px");
+		pieImage.setHeight("250px");
+		pages.addMember(pieImage);
+
+		spacer = new HLayout();
+		spacer.setHeight(15);
+		pages.addMember(spacer);
+
+		try {
+			pages.addMember(prepareLegend(parameters[STATS_PAGES], STATS_PAGES));
+			addMember(pages);
+		} catch (Throwable t) {
+
+		}
+		
 		VLayout folders = new VLayout();
 		pieImage = new Image(Util.contextPath() + "stat?sid=" + Session.get().getSid() + "&chart=folders&random="
 				+ new Date().getTime());
@@ -96,7 +116,7 @@ public class StatsPie extends HLayout {
 		folders.addMember(spacer);
 
 		try {
-			folders.addMember(prepareLegend(parameters[2], STATS_FOLDERS));
+			folders.addMember(prepareLegend(parameters[STATS_FOLDERS], STATS_FOLDERS));
 			addMember(folders);
 		} catch (Throwable t) {
 
@@ -105,7 +125,7 @@ public class StatsPie extends HLayout {
 
 	private DynamicForm prepareLegend(GUIParameter[] parameters, int type) {
 		NumberFormat fmt = NumberFormat.getFormat("#############");
-		
+
 		// Calculate the total value
 		double count = 0;
 		for (GUIParameter parameter : parameters) {
@@ -142,12 +162,19 @@ public class StatsPie extends HLayout {
 			if (type == STATS_REPOSITORY) {
 				item.setValue(Util.formatSize(fmt.parse(parameter.getValue())) + " ( "
 						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-			} else if (type == STATS_DOCUMENTS)
-				item.setValue(Util.formatLong((long)fmt.parse(parameter.getValue())) + " " + I18N.message("documents").toLowerCase() + " " + "( "
+			} else if (type == STATS_DOCUMENTS) {
+				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+						+ I18N.message("documents").toLowerCase() + " " + "( "
 						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-			else if (type == STATS_FOLDERS)
-				item.setValue(Util.formatLong((long)fmt.parse(parameter.getValue())) + " " + I18N.message("folders").toLowerCase() + " " + " ( "
+			} else if (type == STATS_PAGES) {
+				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+						+ I18N.message("pages").toLowerCase() + " " + "( "
 						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+			} else if (type == STATS_FOLDERS) {
+				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+						+ I18N.message("folders").toLowerCase() + " " + " ( "
+						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+			}
 
 			item.setRequired(true);
 			item.setShouldSaveValue(false);
@@ -161,9 +188,11 @@ public class StatsPie extends HLayout {
 		if (type == STATS_REPOSITORY)
 			total.setValue(Util.formatSize(count));
 		else if (type == STATS_DOCUMENTS)
-			total.setValue(Util.formatLong((long)count) + " " + I18N.message("documents").toLowerCase());
+			total.setValue(Util.formatLong((long) count) + " " + I18N.message("documents").toLowerCase());
+		else if (type == STATS_PAGES)
+			total.setValue(Util.formatLong((long) count) + " " + I18N.message("pages").toLowerCase());
 		else if (type == STATS_FOLDERS)
-			total.setValue(Util.formatLong((long)count) + " " + I18N.message("folders").toLowerCase());
+			total.setValue(Util.formatLong((long) count) + " " + I18N.message("folders").toLowerCase());
 		total.setRequired(true);
 		total.setShouldSaveValue(false);
 		items[i++] = total;

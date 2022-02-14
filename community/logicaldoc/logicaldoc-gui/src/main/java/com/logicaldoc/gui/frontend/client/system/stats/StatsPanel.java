@@ -34,7 +34,7 @@ public class StatsPanel extends VLayout {
 			@Override
 			public void onSuccess(GUIParameter[][] parameters) {
 				Label lastUpdateLabel = new Label("<b>" + I18N.message("lastupdate") + ": "
-						+ parameters[3][0].getValue() + "</b>");
+						+ parameters[4][0].getValue() + "</b>");
 				lastUpdateLabel.setHeight(30);
 				lastUpdateLabel.setAlign(Alignment.RIGHT);
 

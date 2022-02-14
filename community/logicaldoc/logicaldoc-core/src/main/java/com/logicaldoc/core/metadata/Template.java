@@ -1,5 +1,8 @@
 package com.logicaldoc.core.metadata;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * A template collects a set of attributesets ant is itself an extensible
  * object.
@@ -18,6 +21,8 @@ public class Template extends ExtensibleObject {
 	private int readonly = 0;
 
 	private int type = TYPE_DEFAULT;
+
+	protected Set<TemplateGroup> templateGroups = new HashSet<TemplateGroup>();
 
 	public String getName() {
 		return name;
@@ -49,5 +54,32 @@ public class Template extends ExtensibleObject {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public Set<TemplateGroup> getTemplateGroups() {
+		return templateGroups;
+	}
+
+	public void setTemplateGroups(Set<TemplateGroup> templateGroups) {
+		this.templateGroups = templateGroups;
+	}
+
+	/**
+	 * Adds a new element, substituting a previous one with the same groupId.
+	 * 
+	 * @param tg the template group
+	 */
+	public void addTemplateGroup(TemplateGroup tg) {
+		TemplateGroup m = getWorkflowGroup(tg.getGroupId());
+		getTemplateGroups().remove(m);
+		getTemplateGroups().add(tg);
+	}
+
+	public TemplateGroup getWorkflowGroup(long groupId) {
+		for (TemplateGroup tg : templateGroups) {
+			if (tg.getGroupId() == groupId)
+				return tg;
+		}
+		return null;
 	}
 }

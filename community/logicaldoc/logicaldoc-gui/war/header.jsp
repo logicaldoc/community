@@ -185,5 +185,3 @@ body {
 <script src="./frontend/ace/theme-eclipse.js" type="text/javascript" charset="utf-8"></script>
 
 </head>
-
-<body dir="<%=dir%>">

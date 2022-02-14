@@ -87,7 +87,7 @@ public class SubscriptionDialog extends Window {
 		notifyon.setValue((events == null || events.length == 0) ? "all" : "selection");
 
 		final SelectItem event;
-		event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, false, false);
+		event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, false, false, false);
 		event.setEndRow(true);
 		event.setDisabled(events == null || events.length == 0);
 		if (events != null)
@@ -198,9 +198,9 @@ public class SubscriptionDialog extends Window {
 
 		final SelectItem event;
 		if (folderId != null)
-			event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, false, false);
+			event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, true, false, false, false);
 		else
-			event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, false, false, false);
+			event = ItemFactory.newEventsSelector("event", I18N.message("event"), null, false, false, false, false);
 		event.setEndRow(true);
 		event.setDisabled(true);
 

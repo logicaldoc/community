@@ -83,14 +83,14 @@ public class GUISettingsPanel extends AdminPanel {
 		Tab customActions = new Tab();
 		customActions.setTitle(I18N.message("customactions"));
 		customActions.setPane(new CustomActionsPanel());
-		
+
 		if (Feature.visible(Feature.CUSTOM_ACTIONS)) {
 			tabs.addTab(customActions);
 			if (!Feature.enabled(Feature.CUSTOM_ACTIONS)) {
 				customActions.setPane(new FeatureDisabled());
 			}
 		}
-		
+
 		if (Feature.visible(Feature.GUI_LANGUAGES)) {
 			tabs.addTab(languages);
 			if (!Feature.enabled(Feature.GUI_LANGUAGES)) {
@@ -123,10 +123,9 @@ public class GUISettingsPanel extends AdminPanel {
 		previewSize.setMin(1);
 		previewSize.setStep(10);
 
-		RadioGroupItem banner = ItemFactory.newBooleanSelector("banner",
-				I18N.message("banner"));
+		RadioGroupItem banner = ItemFactory.newBooleanSelector("banner", I18N.message("banner"));
 		banner.setWrapTitle(false);
-		
+
 		RadioGroupItem openPreviewPanel = ItemFactory.newBooleanSelector("openpreviewpanel",
 				I18N.message("openpreviewpanel"));
 		openPreviewPanel.setWrapTitle(false);
@@ -146,6 +145,10 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem showUpdateAlertsInLogin = ItemFactory.newBooleanSelector("showupdatealertsinlogin",
 				I18N.message("showupdatealertsinlogin"));
 		showUpdateAlertsInLogin.setWrapTitle(false);
+
+		RadioGroupItem showVersionAlertsInLogin = ItemFactory.newBooleanSelector("showversionalertsinlogin",
+				I18N.message("showversionalertsinlogin"));
+		showVersionAlertsInLogin.setWrapTitle(false);
 
 		RadioGroupItem showPatchAlertsInLogin = ItemFactory.newBooleanSelector("showpatchalertsinlogin",
 				I18N.message("showpatchalertsinlogin"));
@@ -271,13 +274,13 @@ public class GUISettingsPanel extends AdminPanel {
 
 		TextItem disallow = ItemFactory.newTextItem("disallow", I18N.message("disallowedext"), null);
 		disallow.setHint(I18N.message("separatedcomma"));
-		disallow.setWidth(400);
+		disallow.setWidth(350);
 		disallow.setRequired(false);
 		disallow.setWrapTitle(false);
 
 		TextItem textExtensions = ItemFactory.newTextItem("textextensions", I18N.message("textextensions"), null);
 		textExtensions.setHint(I18N.message("separatedcomma"));
-		textExtensions.setWidth(400);
+		textExtensions.setWidth(350);
 		textExtensions.setRequired(false);
 		textExtensions.setWrapTitle(false);
 
@@ -317,18 +320,18 @@ public class GUISettingsPanel extends AdminPanel {
 				I18N.message("autoclosefoldernodes"));
 		autocloseFolderNodes.setWrapTitle(false);
 
-		RadioGroupItem inheritSecurityOption = ItemFactory.newBooleanSelector("inheritsecurityoption",
-				I18N.message("inheritsecurityoption"));
-		inheritSecurityOption.setWrapTitle(false);
+		RadioGroupItem securityOption = ItemFactory.newBooleanSelector("securityoption",
+				I18N.message("securityoption"));
+		securityOption.setWrapTitle(false);
 
-		RadioGroupItem inheritSecurityOptionDefault = ItemFactory.newBooleanSelector("inheritsecurityoptiondef",
-				I18N.message("inheritsecurityoptiondef"));
-		inheritSecurityOptionDefault.setWrapTitle(false);
+		SelectItem securitySecurityOptionDefault = ItemFactory.newFolderSecurityOption("securityoptiondef",
+				I18N.message("securityoptiondef"));
+		securitySecurityOptionDefault.setWrapTitle(false);
 
 		TextItem webcontentFolders = ItemFactory.newTextItem("webcontentfolders", I18N.message("webcontentfolders"),
 				null);
 		webcontentFolders.setHint(I18N.message("commaseplistofids"));
-		webcontentFolders.setWidth(400);
+		webcontentFolders.setWidth(350);
 
 		SpinnerItem sessionTimeout = ItemFactory.newSpinnerItem("sessiontimeout", I18N.message("sessiontimeout"),
 				(Integer) null);
@@ -364,13 +367,29 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem askVersionCommentOnSave = ItemFactory.newBooleanSelector("askversioncommentonsave",
 				I18N.message("askversioncommentonsave"));
 		askVersionCommentOnSave.setWrapTitle(false);
-		
+
+		RadioGroupItem lockOnEditing = ItemFactory.newBooleanSelector("lockonediting", I18N.message("lockonediting"));
+		lockOnEditing.setWrapTitle(false);
+
 		SpinnerItem avatarSize = ItemFactory.newSpinnerItem("avatarsize", I18N.message("avatarsize"), (Integer) null);
 		avatarSize.setHint("pixels");
 		avatarSize.setRequired(true);
 		avatarSize.setWrapTitle(false);
 		avatarSize.setStep(16);
 		avatarSize.setMin(16);
+
+		SpinnerItem wfDashletRows = ItemFactory.newSpinnerItem("wfDashletRows", I18N.message("wfdashletrows"),
+				(Integer) null);
+		wfDashletRows.setRequired(true);
+		wfDashletRows.setWrapTitle(false);
+		wfDashletRows.setMin(5);
+		wfDashletRows.setStep(10);
+
+		RadioGroupItem showAvatarsInGrids = ItemFactory.newBooleanSelector("showavatarsingrids",
+				I18N.message("showavatasringrids"));
+		showAvatarsInGrids.setWrapTitle(false);
+
+		SelectItem charset = ItemFactory.newCharsetSelector("charset");
 
 		for (GUIParameter p : settings) {
 			if (p.getName().endsWith("gui.banner"))
@@ -389,6 +408,8 @@ public class GUISettingsPanel extends AdminPanel {
 				reactToRemoteEvents.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.license.showloginalerts"))
 				showLicenseAlertsInLogin.setValue(p.getValue().equals("true") ? "yes" : "no");
+			if (p.getName().endsWith("gui.version.showloginalerts"))
+				showVersionAlertsInLogin.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.quota.showloginalerts"))
 				showQuotaAlertsInLogin.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.update.showloginalerts"))
@@ -456,9 +477,9 @@ public class GUISettingsPanel extends AdminPanel {
 			if (p.getName().endsWith("session.heartbeat"))
 				sessionHeartbeat.setValue(p.getValue());
 			if (p.getName().endsWith("security.inheritoption"))
-				inheritSecurityOption.setValue(p.getValue().equals("true") ? "yes" : "no");
+				securityOption.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("security.inheritoption.default"))
-				inheritSecurityOptionDefault.setValue(p.getValue().equals("true") ? "yes" : "no");
+				securitySecurityOptionDefault.setValue(p.getValue());
 			if (p.getName().endsWith("security.serverpush"))
 				reactToRemoteEvents.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("downloadticket.behavior"))
@@ -467,6 +488,8 @@ public class GUISettingsPanel extends AdminPanel {
 				webstartMode.setValue(p.getValue());
 			if (p.getName().endsWith("gui.onsave.askversioncomment".toLowerCase()))
 				askVersionCommentOnSave.setValue(p.getValue().equals("true") ? "yes" : "no");
+			if (p.getName().endsWith("gui.onedit.lock".toLowerCase()))
+				lockOnEditing.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.galleryenabled".toLowerCase()))
 				galleryEnabled.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.preview.maxfilesize"))
@@ -475,7 +498,12 @@ public class GUISettingsPanel extends AdminPanel {
 				saveInputs.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.avatar.size"))
 				avatarSize.setValue(Long.parseLong(p.getValue().trim()));
-
+			if (p.getName().endsWith("gui.wf.dashlet.rows"))
+				wfDashletRows.setValue(Long.parseLong(p.getValue().trim()));
+			if (p.getName().endsWith("gui.avatar.showingrids"))
+				showAvatarsInGrids.setValue(p.getValue().equals("true") ? "yes" : "no");
+			if (p.getName().endsWith("charset"))
+				charset.setValue(p.getValue());
 		}
 
 		ButtonItem save = new ButtonItem();
@@ -551,12 +579,14 @@ public class GUISettingsPanel extends AdminPanel {
 							"yes".equals(values.get("showquotaalertsinlogin")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.update.showloginalerts",
 							"yes".equals(values.get("showupdatealertsinlogin")) ? "true" : "false"));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.version.showloginalerts",
+							"yes".equals(values.get("showversionalertsinlogin")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.patch.showloginalerts",
 							"yes".equals(values.get("showpatchalertsinlogin")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption",
-							"yes".equals(values.get("inheritsecurityoption")) ? "true" : "false"));
+							"yes".equals(values.get("securityoption")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.security.inheritoption.default",
-							"yes".equals(values.get("inheritsecurityoptiondef")) ? "true" : "false"));
+							values.get("securityoptiondef").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.login.lang",
 							"yes".equals(values.get("showlanguageinlogin")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.lostpassword.show",
@@ -575,6 +605,8 @@ public class GUISettingsPanel extends AdminPanel {
 							values.get("downloadticketbehavior").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.onsave.askversioncomment",
 							"yes".equals(values.get("askversioncommentonsave")) ? "true" : "false"));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.onedit.lock",
+							"yes".equals(values.get("lockonediting")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.galleryenabled",
 							"yes".equals(values.get("galleryenabled")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.preview.maxfilesize",
@@ -585,6 +617,12 @@ public class GUISettingsPanel extends AdminPanel {
 							"yes".equals(values.get("saveinputs")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.avatar.size",
 							values.get("avatarsize").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.wf.dashlet.rows",
+							values.get("wfDashletRows").toString()));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.avatar.showingrids",
+							"yes".equals(values.get("showavatarsingrids")) ? "true" : "false"));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".charset",
+							values.get("charset").toString()));
 
 					// Update the current session parameters.
 					for (GUIParameter p : params)
@@ -607,14 +645,15 @@ public class GUISettingsPanel extends AdminPanel {
 			}
 		});
 
-		parametersForm.setItems(welcome, density, banner, previewSize, previewTimeout, previewMaxFileSize, uploadMax, thumbSize,
-				thumbQuality, tileSize, tileQuality, mobileSize, mobileQuality, avatarSize, disallow, textExtensions,
-				attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize, emailMaxSize, ondoubleclick, docTab,
-				foldSorting, inheritSecurityOption, inheritSecurityOptionDefault, foldOpentree, foldPagination,
-				foldMaxChildren, openPreviewPanel, maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled,
-				webcontentFolders, downloadTicketBehavior, saveLogin, sessionTimeout, rpcTimeout, sessionHeartbeat,
-				popupTimeout, askVersionCommentOnSave, reactToRemoteEvents, showLicenseAlertsInLogin,
-				showQuotaAlertsInLogin, showUpdateAlertsInLogin, showPatchAlertsInLogin, showLanguageInLogin,
-				saveInputs, showLostPassword, save);
+		parametersForm.setItems(welcome, density, banner, previewSize, previewTimeout, previewMaxFileSize, uploadMax,
+				thumbSize, thumbQuality, tileSize, tileQuality, mobileSize, mobileQuality, avatarSize, disallow,
+				showAvatarsInGrids, textExtensions, attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize,
+				emailMaxSize, wfDashletRows, ondoubleclick, docTab, foldSorting, securityOption,
+				securitySecurityOptionDefault, foldOpentree, foldPagination, foldMaxChildren, openPreviewPanel,
+				maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled, webcontentFolders,
+				downloadTicketBehavior, saveLogin, sessionTimeout, rpcTimeout, sessionHeartbeat, popupTimeout, charset,
+				lockOnEditing, askVersionCommentOnSave, reactToRemoteEvents, saveInputs, showVersionAlertsInLogin,
+				showLicenseAlertsInLogin, showQuotaAlertsInLogin, showUpdateAlertsInLogin, showPatchAlertsInLogin,
+				showLanguageInLogin, showLostPassword, save);
 	}
 }

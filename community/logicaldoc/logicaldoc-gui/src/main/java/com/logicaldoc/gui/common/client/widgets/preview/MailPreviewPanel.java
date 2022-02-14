@@ -1,12 +1,12 @@
 package com.logicaldoc.gui.common.client.widgets.preview;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
@@ -204,8 +204,8 @@ public class MailPreviewPanel extends VLayout {
 							@Override
 							public void onSuccess(GUIDocument doc) {
 								if (MainPanel.get().isOnDocumentsTab())
-									if (Session.get().getCurrentFolder() != null)
-										FolderNavigator.get().selectFolder(Session.get().getCurrentFolder().getId());
+									if (FolderController.get().getCurrentFolder() != null)
+										FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
 							}
 						});
 			}

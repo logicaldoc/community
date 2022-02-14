@@ -1,6 +1,7 @@
 package com.logicaldoc.util.io;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,12 +48,12 @@ public class ZipUtil {
 		this.fileNameCharset = charset;
 	}
 
-	public List<ZipEntry> listZipEntries(File zipsource) {
+	public List<ZipEntry> listZipEntries(File zipFile) {
 		List<ZipEntry> files = new ArrayList<ZipEntry>();
 
-		try (java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(zipsource)) {
+		try (java.util.zip.ZipFile zFile = new java.util.zip.ZipFile(zipFile)) {
 			@SuppressWarnings("unchecked")
-			Enumeration<ZipEntry> e = (Enumeration<ZipEntry>) zipFile.entries();
+			Enumeration<ZipEntry> e = (Enumeration<ZipEntry>) zFile.entries();
 			while (e.hasMoreElements()) {
 				ZipEntry zipEntry = (ZipEntry) e.nextElement();
 				files.add(zipEntry);
@@ -71,17 +72,16 @@ public class ZipUtil {
 		return files;
 	}
 
-	public List<String> listEntries(File zipsource) {
+	public List<String> listEntries(File zipFile) {
 		List<String> files = new ArrayList<String>();
 		try {
-			ZipFile zipFile = new ZipFile(zipsource);
-			setCharset(zipFile);
+			ZipFile zFile = new ZipFile(zipFile);
+			setCharset(zFile);
 
 			@SuppressWarnings("unchecked")
-			List<FileHeader> fileHeaders = zipFile.getFileHeaders();
-			for (FileHeader fileHeader : fileHeaders) {
+			List<FileHeader> fileHeaders = zFile.getFileHeaders();
+			for (FileHeader fileHeader : fileHeaders)
 				files.add(fileHeader.getFileName());
-			}
 		} catch (Throwable e) {
 			logError(e.getMessage());
 		}
@@ -91,16 +91,16 @@ public class ZipUtil {
 	/**
 	 * This method extracts all entries of a zip-file.
 	 * 
-	 * @param zipsource Path of the zip-file.
+	 * @param zipFile Path of the zip-file.
 	 * @param target Path of the extracted files.
 	 * @return True if successfully extracted.
 	 */
-	public boolean unzip(String zipsource, String target) {
+	public boolean unzip(String zipFile, String target) {
 		boolean result = true;
 		try {
-			ZipFile zipFile = new ZipFile(zipsource);
-			setCharset(zipFile);
-			zipFile.extractAll(target);
+			ZipFile zFile = new ZipFile(zipFile);
+			setCharset(zFile);
+			zFile.extractAll(target);
 		} catch (Throwable e) {
 			result = false;
 			logError(e.getMessage());
@@ -111,22 +111,23 @@ public class ZipUtil {
 	/**
 	 * Read the entry inside the file zip resource.
 	 * 
-	 * @param zipsource File to read inside it
+	 * @param zipFile File to read inside it
 	 * @param entry The entry to be read
+	 * 
 	 * @return The bytes of the entry
 	 */
-	public byte[] getEntryBytes(File zipsource, String entry) {
+	public byte[] getEntryBytes(File zipFile, String entry) {
 		if (entry.startsWith("/"))
 			entry = entry.substring(1);
 
 		InputStream entryStream = null;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
-			ZipFile zipFile = new ZipFile(zipsource);
-			setCharset(zipFile);
-			FileHeader header = zipFile.getFileHeader(entry);
+			ZipFile zFile = new ZipFile(zipFile);
+			setCharset(zFile);
+			FileHeader header = zFile.getFileHeader(entry);
 
-			entryStream = zipFile.getInputStream(header);
+			entryStream = zFile.getInputStream(header);
 			IOUtils.copy(entryStream, baos);
 			baos.flush();
 		} catch (Throwable e) {
@@ -141,6 +142,23 @@ public class ZipUtil {
 		return baos.toByteArray();
 	}
 
+	/**
+	 * This method extracts a specific entry of a zip-file.
+	 * 
+	 * @param zipFile File to read inside it
+	 * @param entry The entry to be read
+	 * @param target The extracted file
+	 */
+	public void unzipEntry(File zipFile, String entry, File target) {
+		try (InputStream is = getEntryStream(zipFile, entry);
+				OutputStream os = new BufferedOutputStream(new FileOutputStream(target))) {
+			is.transferTo(os);
+			os.flush();
+		} catch (Throwable e) {
+			logError(e.getMessage());
+		}
+	}
+
 	private void setCharset(ZipFile zipFile) throws ZipException {
 		if (fileNameCharset != null && !"auto".equals(fileNameCharset))
 			zipFile.setFileNameCharset(fileNameCharset);
@@ -149,19 +167,19 @@ public class ZipUtil {
 	/**
 	 * Read the entry inside the file zip resource.
 	 * 
-	 * @param zip File to read inside it
+	 * @param zipFile File to read inside it
 	 * @param entry The entry to be read
 	 * @return The stream of the entry
 	 */
-	public InputStream getEntryStream(File zip, String entry) {
+	public InputStream getEntryStream(File zipFile, String entry) {
 		if (entry.startsWith("/"))
 			entry = entry.substring(1);
 
 		try {
-			ZipFile zipFile = new ZipFile(zip);
-			setCharset(zipFile);
-			FileHeader header = zipFile.getFileHeader(entry);
-			return zipFile.getInputStream(header);
+			ZipFile zFile = new ZipFile(zipFile);
+			setCharset(zFile);
+			FileHeader header = zFile.getFileHeader(entry);
+			return zFile.getInputStream(header);
 		} catch (Throwable e) {
 			logError(e.getMessage());
 			return null;
@@ -349,12 +367,45 @@ public class ZipUtil {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
 			logError(e.getMessage());
 		} finally {
 			if (tarFile != null && tarFile.exists())
 				FileUtil.strongDelete(tarFile);
 		}
+	}
 
+	/**
+	 * UnGunzips a given .gz file
+	 * 
+	 * @param gzFile the .gz file
+	 * @param targetFile the target file to unpack to
+	 */
+	public void unGZip(File gzFile, File targetFile) {
+		try {
+			unGZip(new FileInputStream(gzFile), targetFile);
+		} catch (IOException e) {
+			logError(e.getMessage());
+		}
+	}
+
+	/**
+	 * UnGunzips a given .gz stream
+	 * 
+	 * @param gzStream the .gz stream
+	 * 
+	 * @param targetFile the target file to unpack to
+	 */
+	public void unGZip(InputStream gzStream, File targetFile) {
+		try {
+			/*
+			 * Ungzip file to extract TAR file.
+			 */
+			try (GzipCompressorInputStream archive = new GzipCompressorInputStream(new BufferedInputStream(gzStream))) {
+				OutputStream out = Files.newOutputStream(targetFile.toPath());
+				IOUtils.copy(archive, out);
+			}
+		} catch (IOException e) {
+			logError(e.getMessage());
+		}
 	}
 }

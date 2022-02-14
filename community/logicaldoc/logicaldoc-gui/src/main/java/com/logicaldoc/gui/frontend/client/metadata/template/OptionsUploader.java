@@ -3,7 +3,7 @@ package com.logicaldoc.gui.frontend.client.metadata.template;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
-import com.logicaldoc.gui.common.client.widgets.ContactingServer;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
@@ -99,20 +99,20 @@ public class OptionsUploader extends Window {
 		if (!vm.validate())
 			return;
 
-		ContactingServer.get().show();
+		LD.contactingServer();
 		AttributeSetService.Instance.get().parseOptions(options.getSetId(), options.getAttribute(), new AsyncCallback<String[]>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);
 				options.refresh();
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 			}
 
 			@Override
 			public void onSuccess(String[] ret) {
 				options.refresh();
-				ContactingServer.get().hide();
+				LD.clearPrompt();
 				destroy();
 			}
 		});

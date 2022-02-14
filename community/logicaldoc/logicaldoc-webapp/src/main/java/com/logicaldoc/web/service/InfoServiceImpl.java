@@ -16,6 +16,8 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
+import com.logicaldoc.core.generic.Generic;
+import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.i18n.Language;
 import com.logicaldoc.core.i18n.LanguageManager;
 import com.logicaldoc.core.metadata.Attribute;
@@ -236,10 +238,15 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 				pair.setValue(config.getProperty((String) key));
 				values.add(pair);
 			}
+
+			GenericDAO dao = (GenericDAO) Context.get().getBean(GenericDAO.class);
+			List<Generic> dbSettings = dao.findByTypeAndSubtype("guisetting", null, 0L, tenant.getId());
+			for (Generic generic : dbSettings)
+				values.add(new GUIValue(generic.getSubtype(), generic.getString1()));
+
 			info.setConfig(values.toArray(new GUIValue[0]));
 		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			throw new RuntimeException(t.getMessage(), t);
+			log.warn("vannot load GUI settings", t);
 		}
 
 		/*

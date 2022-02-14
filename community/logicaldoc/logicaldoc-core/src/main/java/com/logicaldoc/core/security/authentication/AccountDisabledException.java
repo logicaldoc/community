@@ -9,14 +9,15 @@ package com.logicaldoc.core.security.authentication;
  */
 public class AccountDisabledException extends AuthenticationException {
 
+	public static final String CODE = "disabled";
+	
 	private static final long serialVersionUID = 1L;
 
 	public AccountDisabledException() {
-		super("disabled");
+		super(CODE);
 	}
 
-	public AccountDisabledException(String message) {
-		super(message);
+	public AccountDisabledException(Authenticator authenticator) {
+		super(authenticator, CODE);
 	}
-
 }

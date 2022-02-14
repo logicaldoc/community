@@ -2,6 +2,8 @@ package com.logicaldoc.web.data;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -16,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSetDAO;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
@@ -52,144 +56,200 @@ public class AttributesDataServlet extends HttpServlet {
 			if (StringUtils.isNotEmpty(request.getParameter("locale")))
 				locale = LocaleUtil.toLocale(request.getParameter("locale"));
 
+			Long templateId = null;
+			if (StringUtils.isNotEmpty(request.getParameter("templateId")))
+				templateId = Long.parseLong(request.getParameter("templateId"));
+
+			boolean docevent = "docevent".equals(request.getParameter("context"));
+
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
-
-			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 
 			/*
 			 * Put the standard attributes
 			 */
-			writer.print("<attribute>");
-			writer.print("<name>filename</name>");
-			writer.print("<label><![CDATA[" + I18N.message("filename", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+			if (templateId == null) {
+				if (docevent) {
+					writer.print("<attribute>");
+					writer.print("<name>date</name>");
+					writer.print("<label><![CDATA[" + I18N.message("date", locale) + "]]></label>");
+					writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
+					writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>customId</name>");
-			writer.print("<label><![CDATA[" + I18N.message("customid", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+					writer.print("<attribute>");
+					writer.print("<name>event</name>");
+					writer.print("<label><![CDATA[" + I18N.message("event", locale) + "]]></label>");
+					writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+					writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>lastModified</name>");
-			writer.print("<label><![CDATA[" + I18N.message("lastmodified", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
-			writer.print("</attribute>");
+					writer.print("<attribute>");
+					writer.print("<name>path</name>");
+					writer.print("<label><![CDATA[" + I18N.message("path", locale) + "]]></label>");
+					writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+					writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>created</name>");
-			writer.print("<label><![CDATA[" + I18N.message("createdon", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
-			writer.print("</attribute>");
+					writer.print("<attribute>");
+					writer.print("<name>reason</name>");
+					writer.print("<label><![CDATA[" + I18N.message("reason", locale) + "]]></label>");
+					writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+					writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>published</name>");
-			writer.print("<label><![CDATA[" + I18N.message("publishedon", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
-			writer.print("</attribute>");
+					writer.print("<attribute>");
+					writer.print("<name>user</name>");
+					writer.print("<label><![CDATA[" + I18N.message("user", locale) + "]]></label>");
+					writer.print("<type>" + Attribute.TYPE_USER + "</type>");
+					writer.print("</attribute>");
+				}
 
-			writer.print("<attribute>");
-			writer.print("<name>fileVersion</name>");
-			writer.print("<label><![CDATA[" + I18N.message("fileversion", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>filename</name>");
+				writer.print("<label><![CDATA[" + I18N.message("filename", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>version</name>");
-			writer.print("<label><![CDATA[" + I18N.message("version", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>customId</name>");
+				writer.print("<label><![CDATA[" + I18N.message("customid", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>type</name>");
-			writer.print("<label><![CDATA[" + I18N.message("type", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>lastModified</name>");
+				writer.print("<label><![CDATA[" + I18N.message("lastmodified", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>size</name>");
-			writer.print("<label><![CDATA[" + I18N.message("size", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_INT + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>created</name>");
+				writer.print("<label><![CDATA[" + I18N.message("createdon", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>creator</name>");
-			writer.print("<label><![CDATA[" + I18N.message("creator", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>published</name>");
+				writer.print("<label><![CDATA[" + I18N.message("publishedon", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>publisher</name>");
-			writer.print("<label><![CDATA[" + I18N.message("publisher", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>fileVersion</name>");
+				writer.print("<label><![CDATA[" + I18N.message("fileversion", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>comment</name>");
-			writer.print("<label><![CDATA[" + I18N.message("comment", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>version</name>");
+				writer.print("<label><![CDATA[" + I18N.message("version", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>template</name>");
-			writer.print("<label><![CDATA[" + I18N.message("template", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>type</name>");
+				writer.print("<label><![CDATA[" + I18N.message("type", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>tags</name>");
-			writer.print("<label><![CDATA[" + I18N.message("tags", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
-			
-			writer.print("<attribute>");
-			writer.print("<name>workflowStatus</name>");
-			writer.print("<label><![CDATA[" + I18N.message("workflowstatus", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>size</name>");
+				writer.print("<label><![CDATA[" + I18N.message("size", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_INT + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>startPublishing</name>");
-			writer.print("<label><![CDATA[" + I18N.message("startpublishing", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>pages</name>");
+				writer.print("<label><![CDATA[" + I18N.message("pages", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_INT + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>stopPublishing</name>");
-			writer.print("<label><![CDATA[" + I18N.message("stoppublishing", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>creator</name>");
+				writer.print("<label><![CDATA[" + I18N.message("creator", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>folder</name>");
-			writer.print("<label><![CDATA[" + I18N.message("folder", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>publisher</name>");
+				writer.print("<label><![CDATA[" + I18N.message("publisher", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>score</name>");
-			writer.print("<label><![CDATA[" + I18N.message("score", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_INT + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>comment</name>");
+				writer.print("<label><![CDATA[" + I18N.message("comment", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>rating</name>");
-			writer.print("<label><![CDATA[" + I18N.message("rating", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_INT + "</type>");
-			writer.print("</attribute>");
+				writer.print("<attribute>");
+				writer.print("<name>template</name>");
+				writer.print("<label><![CDATA[" + I18N.message("template", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
 
-			writer.print("<attribute>");
-			writer.print("<name>language</name>");
-			writer.print("<label><![CDATA[" + I18N.message("language", locale) + "]]></label>");
-			writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
-			writer.print("</attribute>");
-			
+				writer.print("<attribute>");
+				writer.print("<name>tags</name>");
+				writer.print("<label><![CDATA[" + I18N.message("tags", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
+
+				writer.print("<attribute>");
+				writer.print("<name>workflowStatus</name>");
+				writer.print("<label><![CDATA[" + I18N.message("workflowstatus", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
+
+				writer.print("<attribute>");
+				writer.print("<name>startPublishing</name>");
+				writer.print("<label><![CDATA[" + I18N.message("startpublishing", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
+				writer.print("</attribute>");
+
+				writer.print("<attribute>");
+				writer.print("<name>stopPublishing</name>");
+				writer.print("<label><![CDATA[" + I18N.message("stoppublishing", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_DATE + "</type>");
+				writer.print("</attribute>");
+
+				writer.print("<attribute>");
+				writer.print("<name>folder</name>");
+				writer.print("<label><![CDATA[" + I18N.message("folder", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
+
+				writer.print("<attribute>");
+				writer.print("<name>score</name>");
+				writer.print("<label><![CDATA[" + I18N.message("score", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_INT + "</type>");
+				writer.print("</attribute>");
+
+				writer.print("<attribute>");
+				writer.print("<name>rating</name>");
+				writer.print("<label><![CDATA[" + I18N.message("rating", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_INT + "</type>");
+				writer.print("</attribute>");
+
+				writer.print("<attribute>");
+				writer.print("<name>language</name>");
+				writer.print("<label><![CDATA[" + I18N.message("language", locale) + "]]></label>");
+				writer.print("<type>" + Attribute.TYPE_STRING + "</type>");
+				writer.print("</attribute>");
+			}
+
 			/*
 			 * Iterate over the collection of extended attributes
 			 */
-			Map<String, Attribute> attributes = dao.findAttributes(session.getTenantId(), null);
+			Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+			if (templateId == null) {
+				AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+				attributes = dao.findAttributes(session.getTenantId(), null);
+			} else {
+				TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+				Template template = dao.findById(templateId);
+				dao.initialize(template);
+				List<String> names = template.getAttributeNames();
+				for (String name : names)
+					attributes.put(name, template.getAttribute(name));
+			}
+
 			for (String name : attributes.keySet()) {
 				Attribute attribute = attributes.get(name);
 				if (attribute.getHidden() == 1)

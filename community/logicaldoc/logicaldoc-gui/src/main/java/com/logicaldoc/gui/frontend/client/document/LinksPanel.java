@@ -10,10 +10,13 @@ import com.logicaldoc.gui.common.client.data.LinksDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
+import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
+import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
@@ -55,7 +58,7 @@ public class LinksPanel extends DocumentDetailTab {
 
 	@Override
 	protected void onDraw() {
-		ListGridField type = new ListGridField("type", I18N.message("type"), 100);
+		ListGridField type = new ColoredListGridField("type", I18N.message("type"), 100);
 		type.setCanEdit(true);
 
 		ListGridField direction = new ListGridField("direction", I18N.message("direction"), 60);
@@ -68,10 +71,10 @@ public class LinksPanel extends DocumentDetailTab {
 		direction.setImageURLSuffix(".png");
 		direction.setCanEdit(false);
 
-		ListGridField fileName = new ListGridField("filename", I18N.message("link"), 250);
+		ListGridField fileName = new FileNameListGridField("filename", "noicon" ,I18N.message("link"), 250);
 		fileName.setCanEdit(false);
 
-		GUIFolder folder = Session.get().getCurrentFolder();
+		GUIFolder folder = FolderController.get().getCurrentFolder();
 
 		treeGrid = new TreeGrid() {
 
@@ -169,6 +172,7 @@ public class LinksPanel extends DocumentDetailTab {
 						onPreview(treeGrid.getSelectedRecord());
 					}
 				});
+				preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 
 				final MenuItem download = new MenuItem();
 				download.setTitle(I18N.message("download"));

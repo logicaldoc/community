@@ -26,9 +26,10 @@ public class CorePlugin extends LogicalDOCPlugin {
 	@Override
 	protected void start() throws Exception {
 		ContextProperties pbean = new ContextProperties();
-		if (StringUtils.isEmpty(pbean.getProperty("id")))
+		if (StringUtils.isEmpty(pbean.getProperty("id"))) {
 			pbean.setProperty("id", UUID.randomUUID().toString());
-		pbean.write();
+			pbean.write();
+		}
 
 		try {
 			TaskManager manager = new TaskManager();

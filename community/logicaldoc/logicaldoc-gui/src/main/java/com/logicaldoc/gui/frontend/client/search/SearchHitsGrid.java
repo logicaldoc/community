@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
-import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.logicaldoc.gui.frontend.client.document.grid.DocumentGridUtil;
+import com.logicaldoc.gui.frontend.client.document.grid.DocumentsListGrid;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
@@ -21,7 +21,7 @@ public class SearchHitsGrid extends DocumentsListGrid {
 	private List<ListGridField> fields = new ArrayList<ListGridField>();
 
 	public SearchHitsGrid() {
-		super(null);
+		super();
 		setShowRecordComponents(true);
 		setShowRecordComponentsByCell(true);
 		setSelectionType(Session.get().isAdmin() ? SelectionStyle.MULTIPLE : SelectionStyle.SINGLE);
@@ -54,6 +54,8 @@ public class SearchHitsGrid extends DocumentsListGrid {
 			fields.add(fieldsMap.get("type"));
 		if (!fields.contains(fieldsMap.get("size")))
 			fields.add(fieldsMap.get("size"));
+		if (!fields.contains(fieldsMap.get("pages")))
+			fields.add(fieldsMap.get("pages"));		
 		if (!fields.contains(fieldsMap.get("fileVersion")))
 			fields.add(fieldsMap.get("fileVersion"));
 		if (!fields.contains(fieldsMap.get("version")))
