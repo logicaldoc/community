@@ -1,0 +1,164 @@
+<project name="logicaldoc-i18n" default="po2prop" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+	<property file="${user.home}/logicaldoc-dev.properties" />
+	<property file="src/main/resources/i18n/i18n.properties" />
+	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
+	<property name="i18n.root" location="." />
+
+	<target name="deploy" depends="init-all" description="Updates a deployed webapp">
+		<property environment="env" />
+		<property id="properties" file="build.properties" />
+
+		<echo message="Deploying ${pom.artifactId}" />
+
+		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
+			<arg line="-o -Dmaven.test.skip=true install" />
+		</exec>
+
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying into @{webroot}" />
+				<copy file="target/${pom.artifactId}-${pom.version}.jar" todir="@{webroot}/WEB-INF/lib" />
+			</sequential>
+		</for>
+
+		<echo message="${pom.artifactId} has been deployed" />
+	</target>
+
+	<!--
+	 In order to execute this build please make sure to have installed Translate Toolkit
+     (http://sourceforge.net/projects/translate/files/Translate%20Toolkit/)
+    -->
+
+	<target name="purify" depends="init-all">
+		<echo>Purify all bundles</echo>
+		<java classname="com.logicaldoc.i18n.PurifyRB">
+			<classpath>
+				<pathelement location="target/classes" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="prop2po" depends="init-all">
+		<delete file="target/po" failonerror="no" />
+
+		<echo>Produce the master pots</echo>
+		<for list="${bundles}" param="bundle">
+			<sequential>
+				<mkdir dir="target/po/@{bundle}" />
+				<exec executable="prop2po" searchpath="true" resolveexecutable="true" description="Generate the PO template">
+					<arg value="--duplicates=merge" />
+					<arg value="-P" />
+					<arg value="${i18n.root}${file.separator}src${file.separator}main${file.separator}resources${file.separator}i18n${file.separator}@{bundle}.properties" />
+					<arg value="${i18n.root}${file.separator}target${file.separator}po${file.separator}@{bundle}${file.separator}@{bundle}.pot" />
+				</exec>
+			</sequential>
+		</for>
+
+		<echo>Create the translated pos</echo>
+		<for list="${bundles}" param="bundle">
+			<sequential>
+				<for list="${locales}" param="locale">
+					<sequential>
+						<exec executable="prop2po" searchpath="true" resolveexecutable="true" description="Generate translated POs">
+							<arg value="--duplicates=merge" />
+							<arg value="-t" />
+							<arg value="${i18n.root}${file.separator}src${file.separator}main${file.separator}resources${file.separator}i18n${file.separator}@{bundle}.properties" />
+							<arg value="${i18n.root}${file.separator}target${file.separator}classes${file.separator}i18n${file.separator}@{bundle}_@{locale}.properties" />
+							<arg value="${i18n.root}${file.separator}target${file.separator}po${file.separator}@{bundle}${file.separator}@{locale}.po" />
+						</exec>
+					</sequential>
+				</for>
+			</sequential>
+		</for>
+
+
+		<delete file="target/po" failonerror="no" />
+
+		<!-- Delete not needed POs -->
+		<delete failonerror="no">
+			<fileset dir="target/po/" casesensitive="yes">
+				<include name="**/en.po" />
+			</fileset>
+		</delete>
+
+		<!-- Rename the norwegian PO (no to nb) -->
+		<for list="${bundles}" param="bundle">
+			<sequential>
+				<move file="target/po/@{bundle}/no.po" tofile="target/po/@{bundle}/nb.po" failonerror="false" />
+			</sequential>
+		</for>
+
+		<!-- Rename the hebrew PO (iw to he) -->
+		<for list="${bundles}" param="bundle">
+			<sequential>
+				<move file="target/po/@{bundle}/iw.po" tofile="target/po/@{bundle}/he.po" failonerror="false" />
+			</sequential>
+		</for>
+
+		<echo>Building tarball</echo>
+		<tar destfile="target/${pom.artifactId}-${pom.version}.tar">
+			<tarfileset dir="target/po" preserveLeadingSlashes="true">
+			</tarfileset>
+		</tar>
+	</target>
+
+	<target name="po2prop" depends="init-all">
+		<echo>Produce the properties bak</echo>
+		<mkdir dir="${i18n.root}${file.separator}target${file.separator}properties" />
+		<mkdir dir="${i18n.root}${file.separator}target${file.separator}po" />
+
+		<if>
+			<available file="${i18n.root}${file.separator}target${file.separator}launchpad-export.tar.gz" />
+			<then>
+				<gunzip src="${i18n.root}${file.separator}target${file.separator}launchpad-export.tar.gz" />
+				<untar src="${i18n.root}${file.separator}target${file.separator}launchpad-export.tar" dest="${i18n.root}${file.separator}target${file.separator}po" />
+				<delete file="${i18n.root}${file.separator}target${file.separator}launchpad-export.tar" />
+			</then>
+		</if>
+
+		<for list="${bundles}" param="bundle">
+			<sequential>
+				<for list="${locales}" param="locale">
+					<sequential>
+						<mkdir dir="${logicaldoc.devroot}${file.separator}community${file.separator}logicaldoc${file.separator}logicaldoc-i18n${file.separator}target${file.separator}properties" />
+
+						<if>
+							<!-- Norwegian is no in Java and nb in the POs -->
+							<equals arg1="@{locale}" arg2="no" />
+							<then>
+								<exec executable="po2prop" searchpath="true" resolveexecutable="true" failonerror="false">
+									<arg value="-t" />
+									<arg value="${i18n.root}${file.separator}src${file.separator}main${file.separator}resources${file.separator}i18n${file.separator}@{bundle}.properties" />
+									<arg value="${i18n.root}${file.separator}target${file.separator}po${file.separator}@{bundle}${file.separator}@{bundle}-nb.po" />
+									<arg value="${i18n.root}${file.separator}target${file.separator}properties${file.separator}@{bundle}_@{locale}.properties" />
+								</exec>
+							</then>
+							<else>
+								<if>
+									<!-- Hebrew is iw in Java and he in the POs -->
+									<equals arg1="@{locale}" arg2="iw" />
+									<then>
+										<exec executable="po2prop" searchpath="true" resolveexecutable="true" failonerror="false">
+											<arg value="-t" />
+											<arg value="${i18n.root}${file.separator}src${file.separator}main${file.separator}resources${file.separator}i18n${file.separator}@{bundle}.properties" />
+											<arg value="${i18n.root}${file.separator}target${file.separator}po${file.separator}@{bundle}${file.separator}@{bundle}-he.po" />
+											<arg value="${i18n.root}${file.separator}target${file.separator}properties${file.separator}@{bundle}_@{locale}.properties" />
+										</exec>
+									</then>
+									<else>
+										<exec executable="po2prop" searchpath="true" resolveexecutable="true" failonerror="false">
+											<arg value="-t" />
+											<arg value="${i18n.root}${file.separator}src${file.separator}main${file.separator}resources${file.separator}i18n${file.separator}@{bundle}.properties" />
+											<arg value="${i18n.root}${file.separator}target${file.separator}po${file.separator}@{bundle}${file.separator}@{bundle}-@{locale}.po" />
+											<arg value="${i18n.root}${file.separator}target${file.separator}properties${file.separator}@{bundle}_@{locale}.properties" />
+										</exec>
+									</else>
+								</if>
+							</else>
+						</if>
+					</sequential>
+				</for>
+			</sequential>
+		</for>
+	</target>
+</project>

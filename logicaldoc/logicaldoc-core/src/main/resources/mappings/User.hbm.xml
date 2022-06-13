@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping default-lazy="false" auto-import="false">
+	<class name="com.logicaldoc.core.security.User" table="ld_user" where="ld_deleted=0">
+		<cache usage="read-write" />
+		<id name="id" type="long" column="ld_id" unsaved-value="0">
+			<generator class="org.hibernate.id.enhanced.TableGenerator">
+				<param name="segment_value">ld_user</param>
+				<param name="optimizer">org.hibernate.id.enhanced.HiLoOptimizer</param>
+			</generator>
+		</id>
+		<version name="recordVersion" column="ld_recordversion" type="long" />
+		<property name="lastModified" type="timestamp" column="ld_lastmodified" />
+		<property name="deleted" type="int" column="ld_deleted" not-null="true" />
+		<property name="tenantId" type="long" column="ld_tenantid" not-null="true" />
+		<property name="enabled" type="int" column="ld_enabled" not-null="true" />
+		<property name="username" type="string" column="ld_username" length="255" not-null="true" />
+		<property name="password" type="string" column="ld_password" length="255" />
+		<property name="passwordmd4" type="string" column="ld_passwordmd4" length="255" />
+		<property name="passwordChanged" type="timestamp" column="ld_passwordchanged" />
+		<property name="passwordExpires" type="int" column="ld_passwordexpires" not-null="true" />
+		<property name="passwordExpired" type="int" column="ld_passwordexpired" not-null="true" />
+		<property name="name" type="string" column="ld_name" length="255" />
+		<property name="firstName" type="string" column="ld_firstname" length="255" />
+		<property name="street" type="string" column="ld_street" length="255" />
+		<property name="postalcode" type="string" column="ld_postalcode" length="255" />
+		<property name="city" type="string" column="ld_city" length="255" />
+		<property name="country" type="string" column="ld_country" length="255" />
+		<property name="state" type="string" column="ld_state" length="255" />
+		<property name="language" type="string" column="ld_language" length="10" />
+		<property name="email" type="string" column="ld_email" length="255" />
+		<property name="emailSignature" type="string" column="ld_emailsignature" length="1000" />
+		<property name="email2" type="string" column="ld_email2" length="255" />
+		<property name="emailSignature2" type="string" column="ld_emailsignature2" length="1000" />
+		<property name="telephone" type="string" column="ld_telephone" length="255" />
+		<property name="telephone2" type="string" column="ld_telephone2" length="255" />
+		<property name="type" type="int" column="ld_type" not-null="true" />
+		<property name="source" type="int" column="ld_source" not-null="true" />
+		<property name="quota" type="long" column="ld_quota" not-null="true" />
+		<property name="welcomeScreen" type="int" column="ld_welcomescreen" not-null="false" />
+		<property name="defaultWorkspace" type="long" column="ld_defworkspace" />
+		<property name="ipWhiteList" type="string" column="ld_ipwhitelist" length="1000"
+			not-null="false" />
+		<property name="ipBlackList" type="string" column="ld_ipblacklist" length="1000"
+			not-null="false" />
+		<property name="certExpire" type="timestamp" column="ld_certexpire" />
+		<property name="certDN" type="string" column="ld_certdn" length="1000" />
+		<property name="secondFactor" type="string" column="ld_secondfactor" length="255" />
+		<property name="key" type="string" column="ld_key" length="255" />
+        <property name="creation" type="timestamp" column="ld_creation" />
+        <property name="docsGrid" type="string" column="ld_docsgrid" not-null="false" />
+        <property name="hitsGrid" type="string" column="ld_hitsgrid" not-null="false" />
+		<property name="dateFormat" type="string" column="ld_dateformat" length="255" />
+		<property name="dateFormatShort" type="string" column="ld_dateformatshort" length="255" />
+		<property name="dateFormatLong" type="string" column="ld_dateformatlong" length="255" />
+		<property name="searchPref" type="string" column="ld_searchpref" length="255" />
+		
+		<property name="lastEnabled" type="timestamp" column="ld_lastenabled" />
+		<property name="expire" type="timestamp" column="ld_expire" />
+		<property name="enforceWorkingTime" type="int" column="ld_enforcewrktime" not-null="true"/>
+		<property name="maxInactivity" type="int" column="ld_maxinactivity" />
+		
+	    <set name="workingTimes" table="ld_workingtime" lazy="true" cascade="all" order-by="ld_dayofweek, ld_hourstart, ld_minutestart">
+            <key column="ld_userid" />
+            <composite-element class="com.logicaldoc.core.security.WorkingTime">
+		   	   <property name="dayOfWeek" type="int" column="ld_dayofweek" not-null="true"/>
+		   	   <property name="hourStart" type="int" column="ld_hourstart" not-null="true"/>
+		   	   <property name="minuteStart" type="int" column="ld_minutestart" not-null="true"/>
+		   	   <property name="hourEnd" type="int" column="ld_hourend" not-null="true"/>
+			   <property name="minuteEnd" type="int" column="ld_minuteend" not-null="true"/>
+			   <property name="label" type="string" column="ld_label" length="255" />
+			   <property name="description" type="string" column="ld_description" length="1000" />
+		   </composite-element>
+        </set>
+		
+		<property name="avatar" type="text" column="ld_avatar" />
+	</class>
+</hibernate-mapping>

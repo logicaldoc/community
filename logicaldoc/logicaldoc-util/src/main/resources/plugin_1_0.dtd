@@ -1,0 +1,290 @@
+<!--
+JPF plug-in manifest DTD file.
+
+XML document created according to this DTD will represent a JPF plug-in
+or plug-in fragment manifest and can be provided to plug-in registry
+(class org.java.plugin.PluginRegistry) for "registration".
+
+To refer to this DTD, insert following string in the beginning of XML file
+(the most important part here is public ID "-//JPF//Java Plug-in Manifest 1.0",
+it is used by framework registry when it tries to locate DTD):
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+or
+<!DOCTYPE plugin-fragment PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+
+$Id: plugin_1_0.dtd,v 1.2 2007/05/19 14:25:13 ddimon Exp $
+-->
+
+<!--
+	PLUG-IN
+	This is container for all other plug-in manifest elements.
+	
+	"docs-path": path to documentation folder, relative to plug-in context
+	             (home) folder
+-->
+<!ELEMENT plugin (doc?, attributes?, requires?, runtime?,
+                  (extension-point|extension)*)>
+<!ATTLIST plugin id         CDATA #REQUIRED>
+<!ATTLIST plugin version    CDATA #REQUIRED>
+<!ATTLIST plugin vendor     CDATA #IMPLIED>
+<!ATTLIST plugin class      CDATA #IMPLIED>
+<!ATTLIST plugin docs-path  CDATA #IMPLIED>
+
+<!--
+	PLUG-IN FRAGMENT
+	This is container for all other plug-in fragment manifest elements.
+	Plug-in fragments contribute some specific resources and code to
+	their "master" plug-in. The fragment may contribute to the several versions
+	of the plug-in at the same time.
+	It is maybe convenient to put platform specific libraries to separate
+	fragments of the same plug-in. Or have localization resources in
+	different fragments (one fragment per language). Or application "skins".
+	Or something else...
+	
+	"docs-path": path to documentation folder, relative to plug-in context
+	             (home) folder
+-->
+<!ELEMENT plugin-fragment (doc?, attributes?, requires?, runtime?,
+                           (extension-point|extension)*)>
+<!ATTLIST plugin-fragment id              CDATA #REQUIRED>
+<!ATTLIST plugin-fragment version         CDATA #REQUIRED>
+<!ATTLIST plugin-fragment vendor          CDATA #IMPLIED>
+<!ATTLIST plugin-fragment plugin-id       CDATA #REQUIRED>
+<!ATTLIST plugin-fragment plugin-version  CDATA #IMPLIED>
+<!ATTLIST plugin-fragment match           (equal | equivalent | compatible
+                                          | greater-or-equal) "compatible">
+<!ATTLIST plugin-fragment docs-path       CDATA #IMPLIED>
+
+<!--
+	PLUG-IN ATTRIBUTES
+	Plug-in attribute is a name-value pair of any strings. The framework
+	doesn't care about meaning of them but provide an API to access to all
+	defined plug-in attributes. It is for plug-in developer to use these
+	attributes.
+-->
+<!ELEMENT attributes (attribute+)>
+
+<!--
+	PLUG-IN ATTRIBUTE
+-->
+<!ELEMENT attribute (doc?, attribute*)>
+<!ATTLIST attribute id     CDATA #REQUIRED>
+<!ATTLIST attribute value  CDATA #IMPLIED>
+
+
+<!--
+	DOCUMENTATION
+	Tag "doc" is a generic mechanizm to provide documentation for any plug-in
+	element.
+	These tags may be processed automatically to generate something like
+	javadoc for Java sources but for plug-ins. They can also be just a
+	readable information for developers.
+	To refer to other documentation parts within your documentation notes,
+	use ${relativePath} parameter as a placeholder for relative path to the
+	documentation root.
+	For details, see javadoc for classes
+	org.java.plugin.tools.docgen.DocGenerator
+	org.java.plugin.tools.ant.DocTask
+
+	Document your plug-ins! Especially if they define extension points!!!
+-->
+<!ELEMENT doc (doc-ref*, doc-text?)>
+<!ATTLIST doc caption  CDATA #IMPLIED>
+
+<!--
+	DOCUMENTATION REFERENCE
+	How path will be interpreted:
+	1. If java.net.URL instance, created for this path has "protocol" part,
+	   the path assumed to be an absolute URL. In this case a link with this
+	   URL will be inserted into documentation.
+	2. All other paths are treated as relative against plug-in docs home folder.
+-->
+<!ELEMENT doc-ref EMPTY>
+<!ATTLIST doc-ref path     CDATA #REQUIRED>
+<!ATTLIST doc-ref caption  CDATA #REQUIRED>
+
+<!--
+	DOCUMENTATION TEXT
+-->
+<!ELEMENT doc-text (#PCDATA)>
+
+<!--
+	PLUG-IN PREREQUISITES
+	This is for inter plug-ins dependencies. If your plug-in depends on
+	another, you should specify this fact here.
+-->
+<!ELEMENT requires (import+)>
+
+<!--
+	PLUG-IN PREREQUISITE
+	
+	"id":             will be generated automatically, if not specified
+	"exported":       if "true", plug-ins that depend on this one will see
+	                  imported plug-in also
+    "optional":       if "true" than absense of plug-in to be imported will not
+                      cause runtime error
+	"reverse-lookup": setting this attribute to "true" allows imported plug-in
+	                  to see classes in this plug-in
+-->
+<!ELEMENT import (doc?)>
+<!ATTLIST import id              CDATA #IMPLIED>
+<!ATTLIST import plugin-id       CDATA #REQUIRED>
+<!ATTLIST import plugin-version  CDATA #IMPLIED>
+<!ATTLIST import match           (equal | equivalent | compatible
+                                 | greater-or-equal) "compatible">
+<!ATTLIST import exported        (true | false) "false">
+<!ATTLIST import optional        (true | false) "false">
+<!ATTLIST import reverse-lookup  (true | false) "false">
+
+
+<!--
+	PLUG-IN RUNTIME
+	This tag declares code and resources the plug-in contributes to the system.
+-->
+<!ELEMENT runtime (library+)>
+
+<!--
+	PLUG-IN RUNTIME LIBRARY
+	
+	"path":    path to classes or resources folder or to jar archive file,
+	           relative to plug-in context (home) folder
+	"type":    library type, code libraries form plug-in classes pool, resources
+	           libraries may contain any kind of files and native libraries
+	"version": version identifier of the library, not used by the Framework
+	           runtime but available for plug-in developers via API
+-->
+<!ELEMENT library (doc?, export*)>
+<!ATTLIST library id       CDATA #REQUIRED>
+<!ATTLIST library path     CDATA #REQUIRED>
+<!ATTLIST library type     (code | resources) #REQUIRED>
+<!ATTLIST library version  CDATA #IMPLIED>
+
+<!--
+	LIBRARY EXPORT CONFIGURATION
+	
+	For code library, prefix is a package name, for resource library, the same
+	rules applied to relative resource path calculated against library path
+	(you can replace slash characters in path with dots).
+	
+	"prefix": "*" OR "package.name.*" OR "package.name.ClassName"
+-->
+<!ELEMENT export EMPTY>
+<!ATTLIST export prefix  CDATA #REQUIRED>
+
+
+<!--
+	EXTENSION POINT
+	Tags extension-point describe the places where the functionality of
+	this plug-in can be extended.
+	
+	Extension point multiplicity attribute description:
+	any             any number of extensions can be available
+	one             only one extension can be available
+	one-per-plugin  only one extension can be defined in one plug-in
+	none            no extension can be defined for this point
+	                (used to declare "abstract" extension points, that can
+					be only "inherited" by other points using "parent"
+					attributes)
+-->
+<!ELEMENT extension-point (doc?, parameter-def*)>
+<!ATTLIST extension-point id                CDATA #REQUIRED>
+<!ATTLIST extension-point parent-plugin-id  CDATA #IMPLIED>
+<!ATTLIST extension-point parent-point-id   CDATA #IMPLIED>
+<!ATTLIST extension-point extension-multiplicity  (any | one | one-per-plugin
+                                                  | none) "any">
+
+<!--
+	EXTENSION POINT PARAMETER DEFINITION
+	Here can be declared a hierarchy of parameters that should be provided
+	by an extension of this point.
+	
+	Parameter definition's multiplicity attribute description:
+	one          exactly one parameter required
+	any          any number of parameters can be specified
+	none-or-one  if parameter presents it should be one
+	one-or-more  one or more parameters can be specified
+
+	Parameter definition's type formats (locale neural):
+	string:             any string
+	boolean:            true/false (empty value means NULL)
+	number:             12345 or 123.45 (empty value means NULL)
+	date:               yyyy-MM-dd (assumed time zone is GMT 0, empty value
+	                    means NULL)
+	time:               HH:mm:ss (assumed time zone is GMT 0, empty value means
+	                    NULL)
+	date-time:          yyyy-MM-dd HH:mm:ss (assumed time zone is GMT 0, empty
+	                    value means NULL)
+	null:               parameter value will be ignored (not validated) by the
+                        Framework and passed to client code "as is", useful as
+						hierarchical parameters placeholders
+	any:                means that here may be any sub parameters with any ID
+	                    and any value, parameter value will be ignored (not
+						validated) by the Framework and passed to client code
+						"as is"
+	plugin-id:          plug-in ID (empty value means NULL)
+	extension-point-id: extension point unique ID (empty value means NULL), see
+	                    "custom-data" attribute for additional possibilities
+	extension-id:       extension unique ID (empty value means NULL), see
+	                    "custom-data" attribute for additional possibilities
+	fixed:              value may be one from predefined list, see "custom-data"
+	                    attribute for additional possibilities
+    resource:           absolute or plug-in home relative URL (see "doc-ref" tag
+	                    notes for details about URL interpreting)
+	
+	Note:
+	If attribute "type" is set to "any", all definitions, nested into this one
+	will be ignored and not validated by Framework but corresponding parameters
+	values steel be available via API to client code. Such behavior allows to
+	achieve very complex parameters hierarchies (but without robust support from
+	the Framework side).
+	
+	"custom-data" attribute may contain:
+		- pipe ('|' character) separated list of possible parameter values
+		  if type is "fixed";
+		- allowed extension point UID if type is "extension-point-id" or
+		  "extension-id" (successors of that extension point will be allowed
+		  also).
+	
+	"id": should be unique within same level
+-->
+<!ELEMENT parameter-def (doc?, parameter-def*)>
+<!ATTLIST parameter-def id             CDATA #REQUIRED>
+<!ATTLIST parameter-def multiplicity   (one | any | none-or-one | one-or-more)
+                                       "one">
+<!ATTLIST parameter-def type           (string | boolean | number | date | time
+                                       | date-time | null | any | plugin-id
+									   | extension-point-id | extension-id
+									   | fixed | resource) "string">
+<!ATTLIST parameter-def custom-data    CDATA #IMPLIED>
+<!ATTLIST parameter-def default-value  CDATA #IMPLIED>
+
+
+<!--
+	EXTENSION
+	Tags extension describe the functionality the plug-in contribute to the
+	system.
+-->
+<!ELEMENT extension (doc?, parameter*)>
+<!ATTLIST extension plugin-id  CDATA #REQUIRED>
+<!ATTLIST extension point-id   CDATA #REQUIRED>
+<!ATTLIST extension id         CDATA #REQUIRED>
+
+<!--
+	EXTENSION PARAMETER
+	
+	If both attribute and tag "value" present, only attribute will be taken
+	into account, the content of tag will be ignored.
+	Parameter value will be validated according to parameter definition
+	with corresponding ID.
+-->
+<!ELEMENT parameter (doc?, value?, parameter*)>
+<!ATTLIST parameter id     CDATA #REQUIRED>
+<!ATTLIST parameter value  CDATA #IMPLIED>
+
+<!--
+	EXTENSION PARAMETER VALUE
+	This tag is used to define large size value for extension parameter.
+	For small size values it is recommended to use "value" attribute of
+	tag "parameter".
+-->
+<!ELEMENT value (#PCDATA)>

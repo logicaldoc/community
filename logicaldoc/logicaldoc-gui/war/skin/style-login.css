@@ -1,0 +1,187 @@
+body {
+	font-family: Arial;
+	background-color: #3A3A3A;
+	padding: 50px;
+}
+
+.login {
+	margin: 20px auto;
+}
+
+.login-product {
+	padding-bottom: 6px;
+}
+
+.login-screen {
+	background-color: white;
+	padding-top: 10px;
+	padding-left: 20px;
+	padding-right: 20px;
+	padding-bottom: 10px;
+	border-radius: 5px
+}
+
+.app-title {
+	text-align: center;
+	color: #777;
+	padding: 10px;
+}
+
+.login-form {
+	text-align: center;
+}
+
+.control-group {
+	margin-bottom: 10px;
+}
+
+.control-group input {
+	text-align: center;
+	color: #777;
+	background-color: #ECF0F1;
+	border: 2px solid transparent;
+	border-radius: 3px;
+	font-size: 16px;
+	font-weight: 200;
+	transition: border .5s;
+}
+
+.control-group label {
+	color: #777;
+}
+
+.login-language, .login-languageOver{
+	background-color: #ECF0F1;
+	color: #777;
+	border: 2px solid transparent;
+	border-radius: 3px;
+	font-size: 16px;
+	font-weight: 200;
+	transition: border .5s;
+}
+
+.login-language, .login-languageOver, 
+.login-languageHint, .login-language-text, .login-language-textHint,
+.login-language-textFocused {
+	border: 2px solid transparent;
+	background-color: #ECF0F1;
+	color: #777;
+	border-radius: 3px;
+	font-size: 16px;
+	font-weight: 200;
+	transition: border .5s;
+}
+
+.login-languageFocused, .login-languageFocusedOver{
+	border: 2px solid #3498DB;
+	background-color: #ECF0F1;
+	color: #777;
+	border-radius: 3px;
+	font-size: 16px;
+	font-weight: 200;
+	transition: border .5s;
+}
+
+input:focus {
+	border: 2px solid #3498DB;
+	box-shadow: none;
+}
+
+.btn {
+	background-color: #F56C13;
+	color: #ffffff;
+	border: 2px solid transparent;
+	font-size: 16px;
+	line-height: 30px;
+}
+
+
+.btnOver, .btnFocused, .btnFocusedOver {
+	background-color: #D8590A;
+	color: #ffffff;
+	border: 2px solid transparent;
+	font-size: 16px;
+	line-height: 30px;
+}
+
+.btnDown, .btnFocusedDown {
+	background-color: #D8590A;
+	color: black;
+	border: 2px solid transparent;
+	font-size: 16px;
+    line-height: 30px;
+}
+
+.btnDisabled {
+	background-color: #ccd9ed;
+	color: black;
+	border: 2px solid transparent;
+	font-size: 16px;
+    line-height: 30px;
+}
+
+.login-link, a.login-link {
+	font-size: 12px;
+	color: white;
+	display: block;
+	margin-bottom: 3px;
+}
+
+.login-lost, a.login-lost {
+	font-size: 11px;
+	color: #777;
+	display: block;
+	margin-bottom: 3px;
+	text-align: right;
+}
+
+.login-copyright, a.login-copyright {
+	font-size: 11px;
+	color: #777;
+	display: block;
+	text-align: left;
+	margin-top: 10px;
+}
+
+.login-copyright-link, a.login-copyright-link {
+	font-size: 11px;
+	color: #777;
+	display: block;
+	text-align: left;
+}
+
+
+.login-switchview, a.login-switchview {
+	font-size: 11px;
+	color: white;
+	display: block;
+	text-align: right;
+}
+
+.login-link:link, .login-lost:link, a.login-copyright-link:link,
+	a.login-switchview:link {
+	text-decoration: none;
+    outline: 0;
+}
+
+a.login-link:visited, a.login-lost:visited, a.login-copyright-link:visited,
+	a.login-switchview:visited {
+	text-decoration: none;
+    outline: 0;
+}
+
+a.login-link:hover, a.login-lost:hover, a.login-copyright-link:hover,
+	a.ogin-switchview:hover {
+	text-decoration: underline;
+    outline: 0;
+}
+
+a.login-link:active, a.login-lost:active, a.login-copyright-link:active,
+	a.login-switchview:active {
+	text-decoration: underline;
+    outline: 0;
+}
+
+.login-product-info {
+	margin-bottom: 10px;
+}

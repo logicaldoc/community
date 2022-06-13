@@ -1,0 +1,60 @@
+<project name="logicaldoc-webservice" default="deploy" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+	<property file="${user.home}/logicaldoc-dev.properties" />
+	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
+
+	<target name="deploy" depends="init-all" description="Updates a deployed webapp">
+		<property environment="env" />
+		<property id="properties" file="build.properties" />
+
+		<echo message="Deploying ${pom.artifactId}" />
+
+    <!--
+		<exec executable="mvn.cmd" resolveexecutable="true" searchpath="true">
+		  <arg line="-o -Dmaven.test.skip=true install"/>
+		</exec>
+    -->
+		
+		<unzip src="target/${pom.artifactId}-${pom.version}-plugin.zip" dest="${logicaldoc.webroot}" />
+
+		<echo message="${pom.artifactId} has been deployed" />
+	</target>
+	
+  <target name="mydep" description="Updates a deployed wwww">
+		<copy todir="C:/LogicalDOC842mdb/tomcat/webapps/ROOT/WEB-INF/classes" verbose="true">
+      <!-- 
+			<fileset dir="target/classes">
+				<exclude name="**/*.xml" />
+				<exclude name="**/*.properties" />
+				<exclude name="**/*.dtd" />
+			</fileset>
+      -->
+			<fileset dir="target/classes">
+		        <!--
+		        <include name="**/WSDocument.class" />
+		        <include name="**/DocumentService.class" />
+		        <include name="**/context-webservice.xml" />
+		        -->
+		        <include name="**/AuthService.class" />
+		        <include name="**/Rest*.class" />
+				<include name="**/Adgfdgfsadas.class" />
+		        <include name="**/context-webservicedoc.xml" />
+			</fileset>      
+		</copy>
+		<echo message="xxx has been deployed" />
+	</target>
+  
+  
+    <target name="mydep2" description="Updates a deployed wwww">
+		<copy todir="C:/LogicalDOC86EE/tomcat/webapps/ROOT/WEB-INF/classes" verbose="true">
+			<fileset dir="target/classes">
+        <!--
+				<exclude name="**/*.xml" />
+        -->
+				<exclude name="**/*.properties" />
+				<exclude name="**/*.dtd" />
+			</fileset>
+		</copy>
+		<echo message="xxx has been deployed" />
+	</target>
+		
+</project>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="no" default-lazy-init="false"
+    xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:security="http://www.springframework.org/schema/security"
+    xsi:schemaLocation="
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util 
+            http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security.xsd">
+  <import resource="classpath*:context/context-core.xml" />
+  <import resource="classpath*:context/context-webservice.xml" />
+
+  <!-- This post processor ensures placeholders substitutions -->
+  <bean id="PropertyPlaceholderConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="false" abstract="false"
+		autowire="default" >
+		<property name="locations">
+			<list>
+				<value>classpath*:context.properties</value>
+			</list>
+		</property>
+  </bean>
+
+  <bean id="ContextProperties" class="com.logicaldoc.util.config.ContextProperties">
+  </bean>
+
+  <bean id="Context" class="com.logicaldoc.util.Context" abstract="false" lazy-init="default" autowire="default"
+     />
+
+    <!-- DataSource -->
+    <bean id="HikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <property name="driverClassName" value="org.hsqldb.jdbc.JDBCDriver" />
+        <property name="jdbcUrl" value="jdbc:hsqldb:mem:logicaldoc" />
+        <property name="username" value="sa" />
+        <property name="password" value="" />
+    </bean>    
+    <bean id="DataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+    	<constructor-arg ref="HikariConfig" />
+  	</bean>
+
+	<!-- Hibernate SessionFactory -->
+	<bean id="SessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean"
+		abstract="false" lazy-init="default" autowire="default"
+		>
+		<property name="dataSource">
+			<ref bean="DataSource" />
+		</property>
+
+		<property name="mappingLocations">
+			<value>classpath*:mappings/*.hbm.xml</value>
+		</property>
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.HSQLDialect
+				</prop>
+				<prop key="hibernate.cache.use_second_level_cache">
+					true
+				</prop>
+                <prop key="hibernate.cache.region.factory_class">
+                    org.hibernate.cache.ehcache.EhCacheRegionFactory
+                </prop>
+			</props>
+		</property>
+	</bean>
+
+
+	<!--Transaction management-->
+	<bean id="TransactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+		abstract="false" lazy-init="default" autowire="default"
+		>
+		<property name="sessionFactory" ref="SessionFactory" />
+	</bean>
+
+	<!--Transactional proxy-->
+	<bean id="ApplicationBaseTransactionProxy"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+		lazy-init="true" abstract="false" autowire="default"
+		>
+		<property name="transactionManager">
+			<ref bean="TransactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+</beans>
