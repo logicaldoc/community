@@ -1,9 +1,0 @@
-WebDrive commands
-
-webdrive.exe /s:"LogicalDOC2" /d:W 
-
-webdrive.exe /lock:"W:\Default\New Document For Test.docx"
-
-webdrive.exe /lockinfo:"W:\Default\New Document For Test.docx"
-
-webdrive.exe /unlock:"W:\Default\New Document For Test.docx"
