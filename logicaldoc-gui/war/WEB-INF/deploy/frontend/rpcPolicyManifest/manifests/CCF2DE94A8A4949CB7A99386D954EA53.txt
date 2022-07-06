@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.TenantService
+path: 38394C621CA0C5A81BBD1626F0642BB2.gwt.rpc

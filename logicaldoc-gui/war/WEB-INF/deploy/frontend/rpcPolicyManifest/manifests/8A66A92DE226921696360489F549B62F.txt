@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.DropboxService
+path: D22670D0D995AC0766DF594C9D4750B9.gwt.rpc

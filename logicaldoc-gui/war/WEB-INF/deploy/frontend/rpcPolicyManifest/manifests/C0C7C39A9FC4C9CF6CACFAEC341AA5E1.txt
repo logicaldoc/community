@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.OCRService
+path: D3A11F656E8CE09724127231672E54D0.gwt.rpc

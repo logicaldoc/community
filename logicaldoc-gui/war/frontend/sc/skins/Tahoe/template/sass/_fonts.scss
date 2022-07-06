@@ -1,0 +1,40 @@
+
+@font-face {
+	font-family: 'RobotoLight';
+
+    /* see comment on @font-face above */
+    src: url("fonts/RobotoLight/RobotoLight.otf");
+    src: url("fonts/RobotoLight/RobotoLight.eot")\9;
+    src: local("☺"), url("../../system/helpers/fonts/RobotoLight/RobotoLight.woff2") format("woff2"),
+                     url("fonts/RobotoLight/RobotoLight.woff2") format("woff2"), 
+                     url("fonts/RobotoLight/RobotoLight.woff") format("woff"), 
+                     url("fonts/RobotoLight/RobotoLight.otf") format("opentype"), 
+                     url("fonts/RobotoLight/RobotoLight.ttf") format("truetype");
+
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'corbel';
+
+    /* see comment on @font-face above */
+    src: url('fonts/corbel/corbel.ttf');
+    src: url('fonts/corbel/corbel.eot')\9;
+    src: local('☺'), url('../../system/helpers/fonts/corbel/corbel.woff') format('woff'),
+                     url('fonts/corbel/corbel.woff') format('woff'),
+                     url('fonts/corbel/corbel.otf') format('opentype'),
+                     url('fonts/corbel/corbel.ttf') format('truetype'),
+                     url('fonts/corbel/corbel.svg') format('svg');
+
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'calibri';
+	src: local("☺"), url('../../system/helpers/fonts/calibri/CALIBRI_1.TTF'),
+                     url('fonts/calibri/CALIBRI_1.TTF');
+	font-weight: normal;
+	font-style: normal;
+}

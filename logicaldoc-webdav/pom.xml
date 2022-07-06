@@ -1,0 +1,168 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.logicaldoc</groupId>
+        <artifactId>logicaldoc</artifactId>
+        <version>8.8.1</version>
+    </parent>
+    <artifactId>logicaldoc-webdav</artifactId>
+    <name>logicaldoc-webdav</name>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-api</artifactId>
+            <version>2.16.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-jcr-commons</artifactId>
+            <version>2.16.9</version>
+        </dependency>        
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-webdav</artifactId>
+            <version>2.16.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-jcr-server</artifactId>
+            <version>2.16.9</version>
+        </dependency>        
+        <dependency>
+            <groupId>org.apache.jackrabbit</groupId>
+            <artifactId>jackrabbit-webapp</artifactId>
+            <version>2.16.9</version>
+        </dependency>      
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <scope>provided</scope>
+        </dependency>        
+        <dependency>
+            <groupId>com.logicaldoc</groupId>
+            <artifactId>logicaldoc-core</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.logicaldoc</groupId>
+            <artifactId>logicaldoc-util</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>  
+        <dependency>
+            <groupId>net.sf.ehcache.internal</groupId>
+            <artifactId>ehcache-core</artifactId>
+            <scope>provided</scope>
+        </dependency>            
+        <dependency>
+            <groupId>net.sf.jpf</groupId>
+            <artifactId>jpf-boot</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jpf</groupId>
+            <artifactId>jpf</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<scope>provided</scope>
+		</dependency>
+                        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor> src/main/assembly/assemblyplugin.xml 
+                        </descriptor>
+                    </descriptors>
+                </configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete dir="target/plugin" quiet="true" />
+                                <unzip
+                                    src="target/${project.artifactId}-${project.version}-plugin.zip"
+                                    dest="target/plugin" />
+                                <delete
+                                    dir="target/${project.artifactId}-${project.version}-plugin.zip" />
+                                <delete>
+                                    <fileset dir="target/plugin/WEB-INF/lib">
+                                        <exclude name="jackrabbit-web*" />
+                                        <exclude name="jackrabbit-jcr-*" />
+                                        <exclude name="jackrabbit-core*" />
+                                        <exclude name="jackrabbit-api*" />
+                                        <exclude name="jackrabbit-data*" />
+                                        <exclude name="jcr*" />
+                                        <include name="*.jar" />
+                                    </fileset>
+                                </delete>
+                                <copy
+                                    file="target/${project.artifactId}-${project.version}.${project.packaging}"
+                                    tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
+                                <zip
+                                    destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
+                                    basedir="target/plugin" />
+                                <move
+                                    file="target/${project.artifactId}-${project.version}-plugin2.zip"
+                                    tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.ReportService
+path: 6662C71C25E1F0020857C03FC3A7428A.gwt.rpc

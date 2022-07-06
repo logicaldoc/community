@@ -1,0 +1,14 @@
+isc.DataSource.create({
+    isServerDS:true,
+    allowAdvancedCriteria:true,
+    ID:"QuartzTimeZone",
+    fields:[
+        {
+            name:"ID",
+            type:"string",
+            validators:[
+            ],
+            primaryKey:true
+        }
+    ]
+})

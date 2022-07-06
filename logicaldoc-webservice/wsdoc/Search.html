@@ -1,0 +1,2787 @@
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+	<html>
+		<head>
+			<style type="text/css">
+				body {background-color: rgb(246,246,246); }
+				h1 { color: rgb(0,51,102); font-family: helvetica; font-size: 15pt; font-weight: bold; }
+				h2 { color: rgb(0,51,102); font-family: helvetica; font-size: 13pt; font-weight: bold; }
+				h3 { color: rgb(0,51,102); font-family: helvetica; font-size: 9pt; font-weight: bold; }
+				p { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				a { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				a.th { color: rgb(246,246,246); background-color: rgb(102,102,102); font-family: helvetica; font-size: 10pt; font-weight: bold; }
+				p.error { color: rgb(255,0,0); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				th.color { color: rgb(246,246,246); background-color: rgb(102,102,102); font-family: helvetica; font-size: 10pt; font-weight: bold; }
+				th.no_color { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: bold; }
+				td.color { color: rgb(0,51,102); background-color: rgb(255,225,225); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				td.color_pre { color: rgb(0,51,102); background-color: rgb(255,225,225); font-family: helvetica; font-size: 10pt; font-weight: normal; white-space: pre }
+				td.no_color { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				td.no_color_pre { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: normal; white-space: pre }
+				.methodBody {padding-top: 50px}
+			</style>
+		
+			<title>
+				LogicalDOC API - Search 
+			</title>
+		</head>	
+		<body>
+			<h1>Webservice: Search</h1>
+			<h2>
+					search operations
+			</h2>
+			
+			<table cellspacing="1" cellpadding="1" border="0">
+				<tbody>
+						<tr valign="top">
+							<th align="left" class="color">Index</th>
+							<th class="no_color"/>
+							<th align="left" class="color">Method</th>				
+							<th class="no_color"/>
+							<th align="left" class="color">Request(s)</th>
+							<th class="no_color"/>
+							<th align="left" class="color">Response</th>
+							<th class="no_color"/>
+							<th align="left" class="color">Description</th>																												
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method1">1</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method1">find</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 options<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									searchResult
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									performs a search by the search options
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method2">2</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method2">getTags</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									tag
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									retrieves all the tags in the repository
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method3">3</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method3">getTagCloud</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									tagCloud
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									retrieves all tag clouds in the repository
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method4">4</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method4">findByFilename</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 filename<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									document
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									finds authorized documents for the current user with the given filename (like '%' operator is used)
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method5">5</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method5">findFolders</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 name<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folder
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									finds authorized folders for the current user containing the given name (like '%' operator is used)
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method6">6</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method6">findByTag</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 tag<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									document
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									finds authorized documents for the current user having a specified tag
+							</td>								
+						</tr>
+				</tbody>
+			</table>
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method1"><h2>Method #1: find</h2><p>performs a search by the search options</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													options
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSSearchOptions
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													maxHits
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													type
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													expression
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													topOperator
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													caseSensitive
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													retrieveAliases
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													filterIds
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													searchInSubPath
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													expressionLanguage
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sizeMin
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sizeMax
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													format
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													fields
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													language
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													dateFrom
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													dateTo
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sourceDateFrom
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sourceDateTo
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													creationFrom
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													creationTo
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													template
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													searchResult
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSSearchResult
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													time
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													estimatedHitsNumber
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													hits
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSDocument
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_UNLOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_CHECKED_OUT
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_LOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													EXPORT_UNLOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													EXPORT_LOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_TO_INDEX
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_INDEXED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_SKIP
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													fileSize
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													title
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													exportVersion
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													type
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													fileName
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													moreHits
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													totalHits
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method2"><h2>Method #2: getTags</h2><p>retrieves all the tags in the repository</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													tag
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method3"><h2>Method #3: getTagCloud</h2><p>retrieves all tag clouds in the repository</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													tagCloud
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSTagCloud
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													tag
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													count
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													scale
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method4"><h2>Method #4: findByFilename</h2><p>finds authorized documents for the current user with the given filename (like '%' operator is used)</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													filename
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													document
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSDocument
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_UNLOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_CHECKED_OUT
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_LOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													EXPORT_UNLOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													EXPORT_LOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_TO_INDEX
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_INDEXED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_SKIP
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													fileSize
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													title
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													exportVersion
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													type
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													fileName
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method5"><h2>Method #5: findFolders</h2><p>finds authorized folders for the current user containing the given name (like '%' operator is used)</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method6"><h2>Method #6: findByTag</h2><p>finds authorized documents for the current user having a specified tag</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													tag
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													document
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSDocument
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_UNLOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_CHECKED_OUT
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													DOC_LOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													EXPORT_UNLOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													EXPORT_LOCKED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_TO_INDEX
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_INDEXED
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													INDEX_SKIP
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													fileSize
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													title
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													exportVersion
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													type
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													fileName
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		</body>
+	</html>  

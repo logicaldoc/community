@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+<plugin id="logicaldoc-audit" version="8.7.5" class="com.logicaldoc.audit.AuditPlugin">
+	<requires>
+		<import plugin-id="logicaldoc-core" />
+		<import plugin-id="logicaldoc-enterprise-core" />
+	</requires>
+	
+	<extension plugin-id="logicaldoc-core" point-id="DbInit" id="auditDbInit">
+		<parameter id="position" value="1300" />
+		<parameter id="name" value="logicaldoc-audit" />
+		<parameter id="sqlFile" value="sql/logicaldoc-audit.sql" />
+	</extension>
+
+    <extension plugin-id="logicaldoc-enterprise-core" point-id="Cleaner" id="auditCleaner">
+		<parameter id="class" value="com.logicaldoc.audit.AuditCleaner" />
+		<parameter id="position" value="100" />
+	</extension>
+	
+	<extension plugin-id="logicaldoc-core" point-id="Task" id="auditTask">
+		<parameter id="name" value="Audit" />
+	</extension>
+	<extension plugin-id="logicaldoc-core" point-id="UserListener" id="userCreationListener">
+		<parameter id="position" value="5" />
+		<parameter id="class" value="com.logicaldoc.audit.AuditUser" />
+	</extension>
+	
+    <extension plugin-id="logicaldoc-core" point-id="Feature" id="fau17">
+	    <parameter id="name" value="Feature_17" />
+    </extension>
+</plugin>

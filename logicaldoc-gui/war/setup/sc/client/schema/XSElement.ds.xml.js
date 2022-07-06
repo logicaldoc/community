@@ -1,0 +1,10 @@
+isc.DataSource.create({
+    inheritsFrom:"DataSource",
+    Constructor:"XSElement",
+    isServerDS:true,
+    allowAdvancedCriteria:true,
+    addGlobalId:false,
+    ID:"XSElement",
+    fields:[
+    ]
+})

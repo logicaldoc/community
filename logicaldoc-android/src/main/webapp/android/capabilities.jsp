@@ -1,0 +1,3 @@
+<%@ page language="java" contentType="application/json" pageEncoding="UTF-8"%>
+<%@ page import="com.logicaldoc.core.*" %>
+{"lds":{"meta":{"status":"ok","statuscode":100,"message":null},"data":{"capabilities":{"files":{"versioning":true,"undelete":true,"bigfilechunking":true},"files_sharing":{"public":{"enabled":true,"password":{"enforced":false},"expire_date":{"enabled":false},"send_mail":false},"user":{"send_mail":false},"resharing":true},"core":{"pollinterval":60}},"version":{"major":<%=SystemInfo.get().getMajor()%>,"minor":<%=SystemInfo.get().getMinor()%>,"micro":<%=SystemInfo.get().getMicro()%>,"string":"<%=SystemInfo.get().getRelease()%>","edition":""}}}}

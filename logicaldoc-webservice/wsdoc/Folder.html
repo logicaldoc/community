@@ -1,0 +1,4578 @@
+	<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+	<html>
+		<head>
+			<style type="text/css">
+				body {background-color: rgb(246,246,246); }
+				h1 { color: rgb(0,51,102); font-family: helvetica; font-size: 15pt; font-weight: bold; }
+				h2 { color: rgb(0,51,102); font-family: helvetica; font-size: 13pt; font-weight: bold; }
+				h3 { color: rgb(0,51,102); font-family: helvetica; font-size: 9pt; font-weight: bold; }
+				p { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				a { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				a.th { color: rgb(246,246,246); background-color: rgb(102,102,102); font-family: helvetica; font-size: 10pt; font-weight: bold; }
+				p.error { color: rgb(255,0,0); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				th.color { color: rgb(246,246,246); background-color: rgb(102,102,102); font-family: helvetica; font-size: 10pt; font-weight: bold; }
+				th.no_color { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: bold; }
+				td.color { color: rgb(0,51,102); background-color: rgb(255,225,225); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				td.color_pre { color: rgb(0,51,102); background-color: rgb(255,225,225); font-family: helvetica; font-size: 10pt; font-weight: normal; white-space: pre }
+				td.no_color { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: normal; }
+				td.no_color_pre { color: rgb(0,51,102); font-family: helvetica; font-size: 10pt; font-weight: normal; white-space: pre }
+				.methodBody {padding-top: 50px}
+			</style>
+		
+			<title>
+				LogicalDOC API - Folder 
+			</title>
+		</head>	
+		<body>
+			<h1>Webservice: Folder</h1>
+			<h2>
+					folders handling and CRUD operations
+			</h2>
+			
+			<table cellspacing="1" cellpadding="1" border="0">
+				<tbody>
+						<tr valign="top">
+							<th align="left" class="color">Index</th>
+							<th class="no_color"/>
+							<th align="left" class="color">Method</th>				
+							<th class="no_color"/>
+							<th align="left" class="color">Request(s)</th>
+							<th class="no_color"/>
+							<th align="left" class="color">Response</th>
+							<th class="no_color"/>
+							<th align="left" class="color">Description</th>																												
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method1">1</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method1">update</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folder<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									updates an existing folder; you need the RENAME permission
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method2">2</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method2">delete</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									deletes an existing folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method3">3</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method3">copy</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+									 targetId<br/>
+									 foldersOnly<br/>
+									 inheritSecurity<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									copies an existing folder into another location
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method4">4</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method4">getPath</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folders
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									computes the path from the root to the target folder; returns the array of folders, the first is the root
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method5">5</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method5">rename</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+									 name<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									renames an existing folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method6">6</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method6">create</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folder<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folder
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									Creates a new folder; returns the newly created folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method7">7</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method7">getDefaultWorkspace</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									workspace
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									gets the default workspace
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method8">8</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method8">move</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+									 parentId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									moves an existing folder with the given identifier
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method9">9</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method9">getFolder</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folder
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									gets an existing folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method10">10</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method10">getGrantedGroups</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									retrieves the list of granted groups for the given folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method11">11</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method11">listWorkspaces</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									workspaces
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									retrieves the list of all workspaces
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method12">12</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method12">isWriteable</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									tests if a folder is writeable
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method13">13</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method13">isGranted</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+									 permission<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									tests if the current user has a specific permission on a folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method14">14</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method14">grantUser</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+									 userId<br/>
+									 permissions<br/>
+									 recursive<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									grants user permission to the folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method15">15</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method15">isReadable</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									tests if a folder is readable
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method16">16</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method16">createAlias</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 arg1<br/>
+									 arg2<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folder
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									creates a new folder alias; returns the newly created alias
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method17">17</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method17">listChildren</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folder
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									lists all direct children of a parent folder: readable only sub-folders are returned
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method18">18</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method18">grantGroup</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+									 groupId<br/>
+									 permissions<br/>
+									 recursive<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									grants group permission to the folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method19">19</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method19">createPath</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 parentId<br/>
+									 path<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folder
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									creates the folder for the specified path; all unexisting nodes will be created
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method20">20</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method20">findByPath</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 path<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folder
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									finds the folder at the specified path
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method21">21</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method21">getRootFolder</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folder
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									gets the root folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method22">22</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method22">getGrantedUsers</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 folderId<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									retrieves the list of granted users for the given folder
+							</td>								
+						</tr>
+						<tr class="no_color">
+							<td/>
+						</tr>					
+						<tr valign="top">
+							<td align="left" class="color"><a href="#method23">23</a></td>				
+							<td class="no_color"/>		
+							<td align="left" class="color"><a href="#method23">createFolder</a></td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									 sid<br/>
+									 parentId<br/>
+									 name<br/>
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									folderId
+							</td>
+							<td class="no_color"/>
+							<td align="left" class="color">
+									creates a new folder; returns the newly created folder
+							</td>								
+						</tr>
+				</tbody>
+			</table>
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method1"><h2>Method #1: update</h2><p>updates an existing folder; you need the RENAME permission</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method2"><h2>Method #2: delete</h2><p>deletes an existing folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method3"><h2>Method #3: copy</h2><p>copies an existing folder into another location</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													targetId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the new folder's parent
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													foldersOnly
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    <b>0</b> = copy folders and files, <b>1</b> = copy just folders
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													inheritSecurity
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    <b>0</b> = no sec. policies are inherited, <b>1</b> = sec. policies are inherited from the new parent folder
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method4"><h2>Method #4: getPath</h2><p>computes the path from the root to the target folder; returns the array of folders, the first is the root</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folders
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method5"><h2>Method #5: rename</h2><p>renames an existing folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the new folder's name
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method6"><h2>Method #6: create</h2><p>Creates a new folder; returns the newly created folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    definition of the new folder
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method7"><h2>Method #7: getDefaultWorkspace</h2><p>gets the default workspace</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													workspace
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method8"><h2>Method #8: move</h2><p>moves an existing folder with the given identifier</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													parentId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the new folder's parent
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method9"><h2>Method #9: getFolder</h2><p>gets an existing folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method10"><h2>Method #10: getGrantedGroups</h2><p>retrieves the list of granted groups for the given folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSRight
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method11"><h2>Method #11: listWorkspaces</h2><p>retrieves the list of all workspaces</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													workspaces
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method12"><h2>Method #12: isWriteable</h2><p>tests if a folder is writeable</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Boolean
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method13"><h2>Method #13: isGranted</h2><p>tests if the current user has a specific permission on a folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													permission
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the permissions' integer representation
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Boolean
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method14"><h2>Method #14: grantUser</h2><p>grants user permission to the folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													userId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													permissions
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the permission integer representation; if '0', the user will be not granted to access the folder
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													recursive
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Boolean
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the grant operation is applied also to the subfolders
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method15"><h2>Method #15: isReadable</h2><p>tests if a folder is readable</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Boolean
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method16"><h2>Method #16: createAlias</h2><p>creates a new folder alias; returns the newly created alias</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													arg1
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    identifier of the folder in which the alias will be created
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													arg2
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    identifier of the referenced folder
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method17"><h2>Method #17: listChildren</h2><p>lists all direct children of a parent folder: readable only sub-folders are returned</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method18"><h2>Method #18: grantGroup</h2><p>grants group permission to the folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													groupId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													permissions
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the permission integer representation; if '0', the group will be not granted to access the folder
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													recursive
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Boolean
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the grant operation is applied also to the subfolders
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method19"><h2>Method #19: createPath</h2><p>creates the folder for the specified path; all unexisting nodes will be created</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													parentId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													path
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the folder's path(for example /Default/dog/cat/mouse)
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method20"><h2>Method #20: findByPath</h2><p>finds the folder at the specified path</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													path
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    the folder's path(for example /Default/dog/cat/mouse)
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method21"><h2>Method #21: getRootFolder</h2><p>gets the root folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folder
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSFolder
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													serialVersionUID
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													log
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Logger
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													description
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													position
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Int
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method22"><h2>Method #22: getGrantedUsers</h2><p>retrieves the list of granted users for the given folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													WSRight
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		    	<div class="methodBody"> 		    		
+		    		<hr/>		
+					<a name="method23"><h2>Method #23: createFolder</h2><p>creates a new folder; returns the newly created folder</p></a>
+							<h3>Request</h3>
+							<table cellspacing="1" cellpadding="1" border="0">
+								<tbody>
+										<tr valign="top">
+											<th align="left" class="color">Name</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Type</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Required</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Multiple</th>
+											<th class="no_color"/>
+											<th align="left" class="color">Description</th>
+										</tr>
+			
+										
+										
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													sid
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													parentId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													name
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													String
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+										
+			
+								</tbody>
+							</table>
+			
+								<h3>Response</h3>
+								<table cellspacing="1" cellpadding="1" border="0">
+									<tbody>
+											<tr valign="top">
+												<th align="left" class="color">Name</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Type</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Required</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Multiple</th>
+												<th class="no_color"/>
+												<th align="left" class="color">Description</th>
+											</tr>
+											<tr class="no_color">
+												<td/>
+											</tr>					
+											<tr valign="top">
+												<td align="left" class="color">
+													  	&nbsp;&nbsp;&nbsp;&nbsp;
+													folderId
+													<br/>
+												</td>		
+												<td class="no_color"/>		
+												<td align="left" class="color">
+																													Long
+
+												</td>
+												<td class="no_color"/>		
+												<td align="left" class="color">Y</td>
+												<td class="no_color"/>		
+												<td align="left" class="color"></td>
+												<td class="no_color"/>		
+												<td align="left" class="color">
+													    
+												</td>																									
+											</tr>								 
+									</tbody>
+								</table>					
+							
+						 
+					</div>				
+		</body>
+	</html>  

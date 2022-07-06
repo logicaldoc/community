@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="no" default-lazy-init="false"
+    xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:p="http://www.springframework.org/schema/p" xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:cxf="http://cxf.apache.org/core" xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="
+            http://www.springframework.org/schema/beans 
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util 
+            http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd
+            http://www.springframework.org/schema/aop
+            http://www.springframework.org/schema/aop/spring-aop.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security.xsd
+            http://cxf.apache.org/jaxws
+            http://cxf.apache.org/schemas/jaxws.xsd
+            http://cxf.apache.org/jaxrs
+            http://cxf.apache.org/schemas/jaxrs.xsd">
+    <import resource="classpath:META-INF/cxf/cxf.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+    
+    <bean id="WebserviceCallDAO" abstract="false" autowire="default" lazy-init="default" parent="ApplicationBaseTransactionProxy">
+      <property name="target">
+         <bean abstract="false" autowire="default" class="com.logicaldoc.webservice.HibernateWebserviceCallDAO" lazy-init="default">
+            <property name="sessionFactory" ref="SessionFactory" />
+         </bean>
+      </property>
+    </bean>  
+    
+    
+    <bean id="GZIPInInterceptor" class="org.apache.cxf.transport.common.gzip.GZIPInInterceptor" />
+    <bean id="GZIPOutInterceptor" class="com.logicaldoc.webservice.GZIPOutInterceptor">
+        <property name="threshold" value="${webservice.gzip}" />
+    </bean>
+    <bean id="WebserviceInterceptor" class="${webservice.interceptor}" destroy-method="shutdown">
+        <property name="settings" ref="ContextProperties" />
+    	<property name="sequenceDAO" ref="SequenceDAO" />
+    </bean>
+    
+    <!-- ############################## -->
+    <!-- ####### JAX-WS (SOAP) ######## -->
+    <!-- ############################## -->
+    <jaxws:endpoint id="auth"
+        implementor="com.logicaldoc.webservice.soap.endpoint.SoapAuthService"
+        address="/Auth">
+        <jaxws:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>        
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="${webservice.mtom}"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="document"
+        implementor="com.logicaldoc.webservice.soap.endpoint.SoapDocumentService"
+        address="/Document">
+        <jaxws:inInterceptors>
+            <ref bean="GZIPInInterceptor" />
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="GZIPOutInterceptor" />
+        </jaxws:outInterceptors>
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="${webservice.mtom}" />
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="folder"
+        implementor="com.logicaldoc.webservice.soap.endpoint.SoapFolderService"
+        address="/Folder">
+        <jaxws:inInterceptors>
+            <ref bean="GZIPInInterceptor" />
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="GZIPOutInterceptor" />
+        </jaxws:outInterceptors>
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="${webservice.mtom}" />
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="search"
+        implementor="com.logicaldoc.webservice.soap.endpoint.SoapSearchService"
+        address="/Search">
+        <jaxws:inInterceptors>
+            <ref bean="GZIPInInterceptor" />
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="GZIPOutInterceptor" />
+        </jaxws:outInterceptors>
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="${webservice.mtom}" />
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="tag"
+        implementor="com.logicaldoc.webservice.soap.endpoint.SoapTagService"
+        address="/Tag">
+        <jaxws:inInterceptors>
+            <ref bean="GZIPInInterceptor" />
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="GZIPOutInterceptor" />
+        </jaxws:outInterceptors>
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="${webservice.mtom}" />
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="bookmark"
+        implementor="com.logicaldoc.webservice.soap.endpoint.SoapBookmarkService"
+        address="/Bookmark">
+        <jaxws:inInterceptors>
+            <ref bean="GZIPInInterceptor" />
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>
+        <jaxws:outInterceptors>
+            <ref bean="GZIPOutInterceptor" />
+        </jaxws:outInterceptors>
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="${webservice.mtom}" />
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="system"
+        implementor="com.logicaldoc.webservice.soap.endpoint.SoapSystemService"
+        address="/System">
+        <jaxws:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>        
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="${webservice.mtom}" />
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint id="security"
+        implementor="com.logicaldoc.webservice.soap.endpoint.SoapSecurityService"
+        address="/Security">
+        <jaxws:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>        
+        <jaxws:properties>
+            <entry key="mtom-enabled" value="${webservice.mtom}" />
+        </jaxws:properties>
+    </jaxws:endpoint>
+	<jaxws:endpoint id="documentMetadata"
+		implementor="com.logicaldoc.webservice.soap.endpoint.SoapDocumentMetadataService"
+		address="/DocumentMetadata">
+        <jaxws:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxws:inInterceptors>		
+		<jaxws:properties>
+			<entry key="mtom-enabled" value="${webservice.mtom}" />
+		</jaxws:properties>
+	</jaxws:endpoint>    
+    
+    <!-- ############################## -->
+    <!-- ###### JAX-RS (RESTful) ###### -->
+    <!-- ############################## -->
+    
+    <!-- to support Java-to-JSON and vice-versa conversion -->    
+    <!-- JAXRS providers -->
+    <bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+<!--     <bean id="multipartProvider" class="org.apache.cxf.jaxrs.provider.MultipartProvider" /> -->
+    
+    <jaxrs:server id="commentservice" address="/mobile/comments">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>    
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.mobile.CommentService" />
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider" />
+        </jaxrs:providers>
+    </jaxrs:server>
+    
+    <!-- REST Web-services  -->
+    <jaxrs:server id="restAuth" address="/rest/auth">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestAuthService">
+                <aop:scoped-proxy />
+            </bean>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
+    <jaxrs:server id="restDocument" address="/rest/document">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestDocumentService">
+                <aop:scoped-proxy />
+            </bean>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider" />
+        </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server id="restFolder" address="/rest/folder">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestFolderService" />
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider" />
+        </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server id="restSearch" address="/rest/search">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestSearchService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+       		<ref bean="jsonProvider"/>
+    	</jaxrs:providers>
+    </jaxrs:server>  
+
+    <jaxrs:server id="restTag" address="/rest/tag">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>    
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestTagService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider"/>
+      </jaxrs:providers>
+    </jaxrs:server> 
+    
+    <jaxrs:server id="restBookmark" address="/rest/bookmark">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>    
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestBookmarkService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider"/>
+      </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server id="restSystem" address="/rest/system">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>    
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestSystemService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider"/>
+      </jaxrs:providers>
+    </jaxrs:server>
+    
+    <jaxrs:server id="restDocumentMetadata" address="/rest/documentMetadata">
+        <jaxrs:inInterceptors>
+            <ref bean="WebserviceInterceptor" />
+        </jaxrs:inInterceptors>    
+        <jaxrs:serviceBeans>
+            <bean class="com.logicaldoc.webservice.rest.endpoint.RestDocumentMetadataService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jsonProvider"/>
+      </jaxrs:providers>
+    </jaxrs:server>              
+</beans>

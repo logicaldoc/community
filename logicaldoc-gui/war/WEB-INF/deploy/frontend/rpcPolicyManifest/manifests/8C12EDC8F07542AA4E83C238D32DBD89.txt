@@ -1,0 +1,2 @@
+serviceClass: com.logicaldoc.gui.frontend.client.services.AttributeSetService
+path: 0756620D000C82D718E5CD96D9DAB27F.gwt.rpc
