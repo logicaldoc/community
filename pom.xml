@@ -4,11 +4,11 @@
     <parent>
         <groupId>com.logicaldoc</groupId>
         <artifactId>logicaldoc-parent-pom</artifactId>
-        <version>99</version>
+        <version>101</version>
     </parent>
     <groupId>com.logicaldoc</groupId>
     <artifactId>logicaldoc</artifactId>
-    <version>8.7.3</version>
+    <version>8.8.1</version>
     <packaging>pom</packaging>
     <name>logicaldoc</name>
     <description>LogicalDOC is an open-source enterprise class Document Management System developed by LogicalDOC Srl, based on the Java Platform.</description>
@@ -91,6 +91,75 @@
         <developerConnection>scm:svn:https://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/community/logicaldoc/trunk</developerConnection>
         <url>http://logicaldoc.svn.sourceforge.net/svnroot/logicaldoc/logicaldoc/trunk</url>
     </scm>
+	
+    <build>
+        <plugins>
+            <!-- Part of Maven - specified version explicitly for compatibility with the maven-project-info-reports-plugin 3.0.0-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.7.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.2</version>		
+            </plugin>
+			  <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>3.0.0-M6</version>
+			  </plugin>		
+        </plugins>
+    </build>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>	
+    
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.1.2</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <!-- select reports -->
+                            <report>index</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.1.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.16.0</version>
+            </plugin>
+			<plugin>
+				  <groupId>org.apache.maven.plugins</groupId>
+				  <artifactId>maven-surefire-report-plugin</artifactId>
+				  <version>3.0.0-M6</version>
+				  <configuration>
+					<aggregate>true</aggregate>
+					<!--also set this to link to generated source reports-->
+					<linkXRef>true</linkXRef>
+				  </configuration>
+			</plugin>
+        </plugins>
+    </reporting>
+    
     <modules>
         <module>logicaldoc-util</module>
         <module>logicaldoc-core</module>
@@ -103,6 +172,9 @@
         <module>logicaldoc-gui</module>
         <module>logicaldoc-android</module>
         <module>logicaldoc-webapp</module>
+        <!--
         <module>logicaldoc-webservicesamples</module>
+        -->
     </modules>
+    
 </project>
