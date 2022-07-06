@@ -1,5 +1,0 @@
-Documento di test
-
-		DataHandler dh=new DataHandler(new FileDataSource(new File("test.txt")));
-		String newDocId=client.createDocument(sid, 5, "test", "", "", "marco", null, null, "it", null, "xyz", "text.txt", null, null, null, null, null, null, null);
-		System.out.println("Creato documento "+newDocId);

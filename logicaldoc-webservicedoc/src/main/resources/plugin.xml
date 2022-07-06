@@ -1,8 +1,0 @@
-<?xml version="1.0" ?>
-<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-webservicedoc" version="8.7.3" class="com.logicaldoc.webservicedoc.WebserviceDocPlugin">
-	<requires>
-		<import plugin-id="logicaldoc-core" />
-		<import plugin-id="logicaldoc-webservice" />
-	</requires>
-</plugin>
