@@ -1,3 +1,0 @@
-rem mvn deploy:deploy-file -Dfile=morena-7.1.31.jar -DgroupId=morena -DartifactId=morena -Dversion=7.1.31 -Dpackaging=jar -DrepositoryId=logicaldoc-enterprise -Durl=sftp://repo.logicaldoc.com/srv/maven/repository1
-rem mvn deploy:deploy-file -Dfile=morena_windows-7.1.31.jar -DgroupId=morena -DartifactId=morena_windows -Dversion=7.1.31 -Dpackaging=jar -DrepositoryId=logicaldoc-enterprise -Durl=sftp://repo.logicaldoc.com/srv/maven/repository1
-mvn deploy:deploy-file -Dfile=morena_license-ldoc201805.jar -DgroupId=morena -DartifactId=morena_license -Dversion=ldoc201805 -Dpackaging=jar -DrepositoryId=logicaldoc-enterprise -Durl=sftp://repo.logicaldoc.com/srv/maven/repository1
