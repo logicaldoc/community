@@ -189,7 +189,9 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				}
 			} catch (Throwable e) {
 				if (e instanceof UnsupportedOperationException) {
-					log.warn("Unsupported Operation: {} {}", request.getMethod(), methodCode);
+					log.warn("{}: {} {}", e.getClass().getName(), request.getMethod(), methodCode);
+				} else if (e.getClass().getName().contains("ClientAbortException")) {
+					log.warn("{}: {} {} {}", e.getClass().getName(), e.getMessage(), request.getMethod(), methodCode);
 				} else {
 					log.error(e.getMessage(), e);
 					throw new RuntimeException(e);
