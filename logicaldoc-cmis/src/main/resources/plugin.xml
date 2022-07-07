@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-cmis" version="8.8.1" class="com.logicaldoc.cmis.CmisPlugin">
+<plugin id="logicaldoc-cmis" version="8.8.2" class="com.logicaldoc.cmis.CmisPlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
 	</requires>

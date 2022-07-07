@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
-<plugin id="logicaldoc-core" version="8.8.1" class="com.logicaldoc.core.CorePlugin">
+<plugin id="logicaldoc-core" version="8.8.2" class="com.logicaldoc.core.CorePlugin">
   <extension-point id="DbInit">
     <parameter-def id="name" />
     <parameter-def id="sqlFile" />
