@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.DocuSignService
-path: 716A8E6B88206A6A124F1C21B1F4540B.gwt.rpc

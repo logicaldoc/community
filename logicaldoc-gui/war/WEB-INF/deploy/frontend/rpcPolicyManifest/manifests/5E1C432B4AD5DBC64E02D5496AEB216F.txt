@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.SchemeService
-path: D1F08D60A759FAC1E6DCF067EBA71410.gwt.rpc

@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.ShareFileService
-path: E2D0FA11AE9576DD59B1BFEBF48B3593.gwt.rpc

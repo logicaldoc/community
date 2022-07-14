@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.ImportFolderService
-path: A6ACA67E27716A5AE4BDB5A87E0E59A4.gwt.rpc

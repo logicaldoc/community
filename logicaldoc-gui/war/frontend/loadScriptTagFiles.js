@@ -1,1 +1,0 @@
-if (!window.__gwt_scriptsLoaded) window.__gwt_scriptsLoaded = {};if (!__gwt_scriptsLoaded['frontend/sc/modules/ISC_Drawing.js?isc_version=13.0p_2022-05-22.js']) {__gwt_scriptsLoaded['frontend/sc/modules/ISC_Drawing.js?isc_version=13.0p_2022-05-22.js'] = true;document.write('<script src="frontend/sc/modules/ISC_Drawing.js?isc_version=13.0p_2022-05-22.js"></script>');}

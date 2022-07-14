@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.UpdateService
-path: EE294AD3F7B1A5880903C25DB898A742.gwt.rpc

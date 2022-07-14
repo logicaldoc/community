@@ -1,6 +1,0 @@
-# Module login
-# RPC service class, partial path of RPC policy file
-com.logicaldoc.gui.login.client.services.TfaService, 64DACABD03B4BEB53BBD4785B0D5CEE0.gwt.rpc
-com.logicaldoc.gui.login.client.services.LoginService, 519A336972AE061EA63A3C0F00A9C548.gwt.rpc
-com.logicaldoc.gui.common.client.services.InfoService, 030DD84BD260D8917488844F7B7718E4.gwt.rpc
-com.logicaldoc.gui.common.client.services.SecurityService, 67DEB406DF937B2762D12C0174E8F300.gwt.rpc

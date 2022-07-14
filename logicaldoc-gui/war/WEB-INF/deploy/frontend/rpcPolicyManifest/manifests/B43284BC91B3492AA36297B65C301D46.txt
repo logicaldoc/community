@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.DocumentService
-path: 3351433D1BC57D40B64D0CE1270BD8C3.gwt.rpc

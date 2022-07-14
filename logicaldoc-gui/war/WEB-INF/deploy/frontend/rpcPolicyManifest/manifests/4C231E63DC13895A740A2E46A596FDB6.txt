@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.GDriveService
-path: CCFD99BA66FC22A10DD861B2482B466F.gwt.rpc

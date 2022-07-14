@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.SignService
-path: 5FEE134BB2ED6571EE5220C075C8BCEE.gwt.rpc

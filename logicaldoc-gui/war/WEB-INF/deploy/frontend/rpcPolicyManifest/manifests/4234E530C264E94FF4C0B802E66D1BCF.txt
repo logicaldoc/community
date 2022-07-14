@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.DashletService
-path: 7A29A7259914F257808987786D9439C6.gwt.rpc

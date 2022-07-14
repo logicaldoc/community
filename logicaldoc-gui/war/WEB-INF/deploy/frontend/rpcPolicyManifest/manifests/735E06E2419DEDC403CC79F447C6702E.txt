@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.FormService
-path: C37ECAF819A6F5C1B080009F6603DFF1.gwt.rpc

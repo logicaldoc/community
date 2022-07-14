@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.ImpexService
-path: A56A2E1EA5A0FFA1DF93A466108866F0.gwt.rpc

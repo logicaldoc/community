@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.login.client.services.TfaService
-path: 64DACABD03B4BEB53BBD4785B0D5CEE0.gwt.rpc

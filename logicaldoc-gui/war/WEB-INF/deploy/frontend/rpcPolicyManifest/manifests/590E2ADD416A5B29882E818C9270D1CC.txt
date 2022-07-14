@@ -1,2 +1,0 @@
-serviceClass: com.logicaldoc.gui.frontend.client.services.StampService
-path: 95F95EFBCA26F3C9A01BFE22D895F3C4.gwt.rpc
