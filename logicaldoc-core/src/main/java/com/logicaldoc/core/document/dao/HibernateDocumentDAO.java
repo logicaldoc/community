@@ -357,7 +357,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			if (doc.getDocRef() == null) {
 				/*
-				 * In case of a regular document, check for attributes defaults
+				 * In case of a regular document, check for attributes defaults specified at folder's level
 				 */
 				if (doc.getFolder().getTemplate() != null) {
 					folderDAO.initialize(doc.getFolder());

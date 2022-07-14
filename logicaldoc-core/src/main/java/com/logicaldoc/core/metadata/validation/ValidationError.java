@@ -1,4 +1,4 @@
-package com.logicaldoc.core.validation;
+package com.logicaldoc.core.metadata.validation;
 
 import org.apache.commons.lang.StringUtils;
 

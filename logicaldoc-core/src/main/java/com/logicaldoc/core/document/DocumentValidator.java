@@ -5,8 +5,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.validation.ValidationException;
-import com.logicaldoc.core.validation.Validator;
+import com.logicaldoc.core.metadata.validation.ValidationException;
+import com.logicaldoc.core.metadata.validation.Validator;
 
 /**
  * This listener takes care of logically validate a document. If the document

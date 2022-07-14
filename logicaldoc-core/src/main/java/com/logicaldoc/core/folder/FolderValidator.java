@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.DocumentValidator;
-import com.logicaldoc.core.validation.Validator;
+import com.logicaldoc.core.metadata.validation.Validator;
 
 /**
  * This listener takes care of logically validate a folder. If the document has
@@ -28,7 +28,7 @@ public class FolderValidator extends Validator implements FolderListener {
 					|| "true".equals(System.getProperty("ld.bulkloadextreme")))
 				return;
 
-			// Skip validation if the document is not being changed nor stored
+			// Skip validation if the folder is not being changed nor stored
 			if (transaction == null || (!FolderEvent.CHANGED.toString().equals(transaction.getEvent())
 					&& !FolderEvent.CREATED.toString().equals(transaction.getEvent())))
 				return;

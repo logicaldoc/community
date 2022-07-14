@@ -80,6 +80,11 @@ public class Attribute implements Comparable<Attribute> {
 	 */
 	private String validation;
 
+	/**
+	 * Optional script that defines the initial value
+	 */
+	private String initialization;
+
 	public String getStringValue() {
 		return stringValue;
 	}
@@ -312,6 +317,14 @@ public class Attribute implements Comparable<Attribute> {
 		this.validation = validation;
 	}
 
+	public String getInitialization() {
+		return initialization;
+	}
+
+	public void setInitialization(String initialization) {
+		this.initialization = initialization;
+	}
+
 	@Override
 	public Attribute clone() {
 		Attribute clone = new Attribute();
@@ -331,7 +344,7 @@ public class Attribute implements Comparable<Attribute> {
 		clone.setParent(parent);
 		clone.setName(name);
 		clone.setValidation(validation);
-
+		clone.setInitialization(initialization);
 		return clone;
 	}
 }

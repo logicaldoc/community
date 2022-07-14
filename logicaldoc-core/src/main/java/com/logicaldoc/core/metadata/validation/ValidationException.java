@@ -1,4 +1,4 @@
-package com.logicaldoc.core.validation;
+package com.logicaldoc.core.metadata.validation;
 
 import java.util.Collection;
 import java.util.HashMap;

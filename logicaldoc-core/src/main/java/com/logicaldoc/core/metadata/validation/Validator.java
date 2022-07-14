@@ -1,4 +1,4 @@
-package com.logicaldoc.core.validation;
+package com.logicaldoc.core.metadata.validation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 
 /**
- * A validator perfomrs the checks on a generic {@link ExtensibleObject}
+ * A validator performs the checks on a generic {@link ExtensibleObject}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.1
