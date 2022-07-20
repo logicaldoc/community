@@ -70,12 +70,12 @@ create table ld_systemmessage (ld_id bigint not null, ld_lastmodified timestamp 
                                ld_type int not null, ld_html int not null, primary key (ld_id));
 create table ld_template (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, 
-                          ld_description varchar(2000), ld_readonly int not null, ld_type int not null, ld_validation varchar(4000), 
+                          ld_description varchar(2000), ld_readonly int not null, ld_type int not null, ld_validation varchar(4000),
                           primary key (ld_id));                         
 create table ld_template_ext (ld_templateid bigint not null, ld_mandatory int not null, ld_type int not null, 
                               ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                               ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, ld_validation varchar(4000),
-                              ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint,
+                              ld_initialization varchar(4000), ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint,
                               ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), primary key (ld_templateid, ld_name));
 create table ld_templategroup (ld_templateid bigint not null, ld_groupid bigint not null, ld_write int not null, 
                                primary key (ld_templateid, ld_groupid));                              
@@ -86,7 +86,7 @@ create table ld_attributeset (ld_id bigint not null, ld_lastmodified timestamp n
 create table ld_attributeset_ext (ld_attsetid bigint not null, ld_mandatory int not null, ld_type int not null, 
                                   ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                                   ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, ld_validation varchar(4000),
-                                  ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
+                                  ld_initialization varchar(4000), ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
                                   ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), primary key (ld_setid, ld_name));
 create table ld_ticket (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_ticketid varchar(255) not null, 

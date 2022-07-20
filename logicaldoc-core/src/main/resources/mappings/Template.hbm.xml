@@ -46,6 +46,7 @@
 				<property name="doubleValue" type="double" column="ld_doublevalue" />
 				<property name="dateValue" type="timestamp" column="ld_datevalue" />
 				<property name="validation" type="string" column="ld_validation" />
+				<property name="initialization" type="string" column="ld_initialization" />
 			</composite-element>
 		</map>		
 	</class>

@@ -355,7 +355,10 @@
   </extension>
   <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspValidation">
     <parameter id="code" value="validation" />
-  </extension>  
+  </extension>
+  <extension plugin-id="logicaldoc-core" point-id="Aspect" id="aspInitialization">
+    <parameter id="code" value="initialization" />
+  </extension>
   
   <extension plugin-id="logicaldoc-core" point-id="FormatConverter" id="imageConv">
 		<parameter id="in" value="png,gif,jpg,jpeg,jfif,tif,tiff,bmp,psd,webp"/>
@@ -407,14 +410,23 @@
 		<parameter id="out" value="jpg,png,tif"/>
 		<parameter id="class" value="com.logicaldoc.core.conversion.GhostscriptConverter"/>
   </extension>
-  
+
+
+  <extension plugin-id="logicaldoc-core" point-id="DocumentListener" id="documentInitializationListener">
+		<parameter id="position" value="1" />
+		<parameter id="class" value="com.logicaldoc.core.document.DocumentInitializer" />
+  </extension>  
   <extension plugin-id="logicaldoc-core" point-id="DocumentListener" id="documentValidatorListener">
 		<parameter id="position" value="2" />
 		<parameter id="class" value="com.logicaldoc.core.document.DocumentValidator" />
   </extension>
   
   <extension plugin-id="logicaldoc-core" point-id="FolderListener" id="folderValidatorListener">
-		<parameter id="position" value="2" />
+		<parameter id="position" value="1" />
 		<parameter id="class" value="com.logicaldoc.core.folder.FolderValidator" />
   </extension> 
+  <extension plugin-id="logicaldoc-core" point-id="FolderListener" id="folderInitializerListener">
+		<parameter id="position" value="2" />
+		<parameter id="class" value="com.logicaldoc.core.folder.FolderInitializer" />
+  </extension>   
 </plugin>

@@ -523,6 +523,7 @@
     <Logger name="com.logicaldoc.web" level="info" additivity="true" />
     <Logger name="com.logicaldoc.webdav" level="info" additivity="true" />
     <Logger name="com.logicaldoc.core.security" level="warn" additivity="true" />
+    <Logger name="com.logicaldoc.enterprise.security" level="info" additivity="true" />
     <Logger name="org.apache.cxf" level="error" additivity="true">
       <Appender-Ref ref="WEBSERVICE" />
     </Logger>

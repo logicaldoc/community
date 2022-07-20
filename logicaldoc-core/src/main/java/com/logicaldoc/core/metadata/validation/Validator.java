@@ -3,6 +3,7 @@ package com.logicaldoc.core.metadata.validation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +23,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 
 /**
- * A validator performs the checks on a generic {@link ExtensibleObject}
+ * A Validator performs the checks on a generic {@link ExtensibleObject}
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.1
@@ -46,7 +47,7 @@ public class Validator {
 		if (!RunLevel.current().aspectEnabled("validation"))
 			return;
 
-		// Skip validation if the document is not being changed nor stored
+		// Skip validation if the object is not being changed nor stored
 		if (transaction == null)
 			return;
 
@@ -89,8 +90,8 @@ public class Validator {
 
 				ValidationError error = new ValidationError(attributeName, attribute.getLabel(), null);
 				fieldValidationDictionary.put("error", error);
-				Automation script = new Automation("validator-" + attributeName, user.getLocale(),
-						object.getTenantId());
+				Automation script = new Automation("validator-" + attributeName,
+						user != null ? user.getLocale() : Locale.getDefault(), object.getTenantId());
 				script.evaluate(templateAttribute.getValidation(), fieldValidationDictionary);
 
 				if (StringUtils.isNotEmpty(error.getDescription()))
