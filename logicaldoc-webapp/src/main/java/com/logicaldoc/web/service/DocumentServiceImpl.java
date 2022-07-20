@@ -15,8 +15,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -77,8 +74,6 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.imaging.ImageUtil;
 import com.logicaldoc.core.metadata.Attribute;
-import com.logicaldoc.core.metadata.AttributeSet;
-import com.logicaldoc.core.metadata.AttributeSetDAO;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
@@ -786,152 +781,6 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	@Override
-	public GUIAttribute[] getAttributes(long templateId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-
-		try {
-
-			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-			Template template = templateDao.findById(templateId);
-			templateDao.initialize(template);
-
-			GUIAttribute[] attributes = prepareGUIAttributes(template, null);
-			Arrays.sort(attributes, new Comparator<GUIAttribute>() {
-
-				@Override
-				public int compare(GUIAttribute o1, GUIAttribute o2) {
-					return Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition()));
-				}
-			});
-
-			return attributes;
-		} catch (Throwable t) {
-			return (GUIAttribute[]) ServiceUtil.throwServerException(session, log, t);
-		}
-	}
-
-	private static GUIAttribute[] prepareGUIAttributes(Template template, Document doc) {
-		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-		tDao.initialize(template);
-
-		AttributeSetDAO setDao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
-
-		List<GUIAttribute> attributes = new ArrayList<GUIAttribute>();
-		if (template == null || template.getAttributes() == null || template.getAttributes().isEmpty())
-			return new GUIAttribute[0];
-		try {
-			if (template != null) {
-				Map<Long, AttributeSet> sets = setDao.load(template.getTenantId());
-				for (String attrName : template.getAttributeNames()) {
-					Attribute templateExtAttr = template.getAttributes().get(attrName);
-					AttributeSet aSet = sets.get(templateExtAttr.getSetId());
-					Attribute setExtAttr = aSet != null ? aSet.getAttribute(attrName) : null;
-
-					GUIAttribute guiAttribute = new GUIAttribute();
-					guiAttribute.setName(attrName);
-					guiAttribute.setSetId(templateExtAttr.getSetId());
-					guiAttribute.setPosition(templateExtAttr.getPosition());
-					guiAttribute.setLabel(templateExtAttr.getLabel());
-					guiAttribute.setMandatory(templateExtAttr.getMandatory() == 1);
-					guiAttribute.setHidden(templateExtAttr.getHidden() == 1);
-					guiAttribute.setMultiple(templateExtAttr.getMultiple() == 1);
-					guiAttribute.setParent(templateExtAttr.getParent());
-					guiAttribute.setStringValues(templateExtAttr.getStringValues());
-					guiAttribute.setEditor(templateExtAttr.getEditor());
-					guiAttribute.setStringValue(templateExtAttr.getStringValue());
-					guiAttribute.setIntValue(templateExtAttr.getIntValue());
-					guiAttribute.setBooleanValue(templateExtAttr.getBooleanValue());
-					guiAttribute.setDoubleValue(templateExtAttr.getDoubleValue());
-					guiAttribute.setDateValue(templateExtAttr.getDateValue());
-
-					if (doc != null) {
-						Attribute attribute = doc.getAttribute(attrName);
-						if (attribute != null) {
-							guiAttribute.setStringValues(attribute.getStringValues());
-							guiAttribute.setStringValue(attribute.getStringValue());
-							guiAttribute.setIntValue(attribute.getIntValue());
-							guiAttribute.setBooleanValue(attribute.getBooleanValue());
-							guiAttribute.setDoubleValue(attribute.getDoubleValue());
-							guiAttribute.setDateValue(attribute.getDateValue());
-							if (attribute.getType() == Attribute.TYPE_USER)
-								guiAttribute.setUsername(attribute.getStringValue());
-						} else
-							guiAttribute.setValue(templateExtAttr.getValue());
-					}
-
-					// Normalize dates
-					if (guiAttribute.getValue() instanceof Date)
-						guiAttribute.setValue(ServiceUtil.convertToDate((Date) guiAttribute.getValue()));
-
-					guiAttribute.setType(templateExtAttr.getType());
-					attributes.add(guiAttribute);
-
-					if (guiAttribute.isMultiple() && doc != null) {
-						// Get the other values
-						List<Attribute> values = doc.getValueAttributes(guiAttribute.getName());
-						if (values.size() > 1) {
-							// Skip the parent attribute
-							values.remove(0);
-
-							// Create the GUI attributes for the values
-							for (Attribute valAttribute : values) {
-								GUIAttribute valAtt = (GUIAttribute) guiAttribute.clone();
-								valAtt.setName(valAttribute.getName());
-								valAtt.setParent(guiAttribute.getName());
-								valAtt.setMultiple(false);
-								valAtt.setPosition(guiAttribute.getPosition());
-								valAtt.setBooleanValue(valAttribute.getBooleanValue());
-								valAtt.setDateValue(valAttribute.getDateValue());
-								valAtt.setDoubleValue(valAttribute.getDoubleValue());
-								valAtt.setIntValue(valAttribute.getIntValue());
-								valAtt.setStringValue(valAttribute.getStringValue());
-								valAtt.setStringValues(null);
-
-								// Normalize dates
-								if (valAtt.getValue() instanceof Date)
-									valAtt.setValue(ServiceUtil.convertToDate((Date) valAtt.getValue()));
-
-								if (valAtt.getType() == Attribute.TYPE_USER)
-									valAtt.setUsername(valAttribute.getStringValue());
-
-								attributes.add(valAtt);
-							}
-						}
-					}
-
-					if (templateExtAttr.getType() == Attribute.TYPE_USER
-							|| templateExtAttr.getEditor() == Attribute.EDITOR_LISTBOX) {
-
-						String buf = setExtAttr != null ? (String) setExtAttr.getStringValue()
-								: (String) templateExtAttr.getStringValue();
-
-						List<String> list = new ArrayList<String>();
-						if (buf != null) {
-							if (buf.contains(",")) {
-								StringTokenizer st = new StringTokenizer(buf, ",");
-								while (st.hasMoreElements()) {
-									String val = (String) st.nextElement();
-									if (!list.contains(val))
-										list.add(val);
-								}
-							} else
-								list.add(buf.trim());
-							guiAttribute.setStringValue(buf);
-						}
-						guiAttribute.setOptions(list.toArray(new String[0]));
-					}
-				}
-			}
-
-			Collections.sort(attributes);
-			return attributes.toArray(new GUIAttribute[0]);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			return null;
-		}
-	}
-
-	@Override
 	public GUIDocument getById(long docId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
@@ -1089,7 +938,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				document.setBookmarked(bDao.isDocBookmarkedByUser(document.getDocRef(), sessionUser.getId()));
 		}
 
-		GUIAttribute[] attributes = prepareGUIAttributes(realDoc.getTemplate(), realDoc);
+		GUIAttribute[] attributes = TemplateServiceImpl.prepareGUIAttributes(realDoc.getTemplate(), realDoc, sessionUser);
 		document.setAttributes(attributes);
 
 		if (folder != null) {

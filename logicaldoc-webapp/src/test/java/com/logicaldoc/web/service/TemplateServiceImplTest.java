@@ -7,6 +7,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.web.AbstractWebappTCase;
 
@@ -63,5 +64,26 @@ public class TemplateServiceImplTest extends AbstractWebappTCase {
 
 		template = service.getTemplate(8);
 		Assert.assertNull(template);
+	}
+	
+	@Test
+	public void testGetAttributes() throws ServerException, PersistenceException {
+		Template template = new Template();
+		template.setName("test3");
+		template.setValue("attr1", "v1");
+		template.setValue("a2", 23L);
+		Assert.assertTrue(templateDao.store(template));
+
+		GUIAttribute[] extAttr = service.getAttributes(template.getId(), null);
+		for (GUIAttribute at : extAttr) {
+			if ("attr1".equals(at.getName())) {
+				Assert.assertEquals(GUIAttribute.TYPE_STRING, at.getType());
+				Assert.assertEquals("v1", at.getValue());
+			}
+			if ("a2".equals(at.getName())) {
+				Assert.assertEquals(GUIAttribute.TYPE_INT, at.getType());
+				Assert.assertEquals((Long) 23L, at.getIntValue());
+			}
+		}
 	}
 }

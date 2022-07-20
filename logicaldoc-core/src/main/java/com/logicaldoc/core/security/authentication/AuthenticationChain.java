@@ -172,11 +172,11 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		Tenant t = null;
 		try {
-			t = tdao.findById(user.getTenantId());
+			t = user != null ? tdao.findById(user.getTenantId()) : null;
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
-		
+
 		if (t != null)
 			tenant = t.getName();
 

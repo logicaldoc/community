@@ -6,6 +6,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAttribute;
+import com.logicaldoc.gui.common.client.beans.GUIExtensibleObject;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 
 /**
@@ -55,7 +57,20 @@ public interface TemplateService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public long countDocuments(long templateId) throws ServerException;
-	
+
+	/**
+	 * Retrieves all attributes of the specified template
+	 * 
+	 * @param templateId identifier of the template
+	 * @param extensibleObject this is optional and is the object for which the
+	 *        attributes must be retrieved
+	 * 
+	 * @return the attributes
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public GUIAttribute[] getAttributes(long templateId, GUIExtensibleObject extensibleObject) throws ServerException;
+
 	public static class Instance {
 		private static TemplateServiceAsync instance;
 

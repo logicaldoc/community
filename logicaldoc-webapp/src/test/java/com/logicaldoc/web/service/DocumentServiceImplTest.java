@@ -17,10 +17,7 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.document.dao.DocumentLinkDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
-import com.logicaldoc.core.metadata.Template;
-import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
@@ -37,8 +34,6 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	private DocumentLinkDAO linkDao;
 
-	private TemplateDAO templateDao;
-
 	private DocumentNoteDAO noteDao;
 
 	private BookmarkDAO bookDao;
@@ -50,7 +45,6 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		super.setUp();
 
 		docDao = (DocumentDAO) context.getBean("DocumentDAO");
-		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
 		linkDao = (DocumentLinkDAO) context.getBean("DocumentLinkDAO");
 		noteDao = (DocumentNoteDAO) context.getBean("DocumentNoteDAO");
 		documentHistoryDao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
@@ -62,27 +56,6 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		GUIVersion[] versions = service.getVersionsById(1, 2);
 		Assert.assertNotNull(versions);
 		Assert.assertEquals(2, versions.length);
-	}
-
-	@Test
-	public void testGetAttributes() throws ServerException, PersistenceException {
-		Template template = new Template();
-		template.setName("test3");
-		template.setValue("attr1", "v1");
-		template.setValue("a2", 23L);
-		Assert.assertTrue(templateDao.store(template));
-
-		GUIAttribute[] extAttr = service.getAttributes(template.getId());
-		for (GUIAttribute at : extAttr) {
-			if ("attr1".equals(at.getName())) {
-				Assert.assertEquals(GUIAttribute.TYPE_STRING, at.getType());
-				Assert.assertEquals("v1", at.getValue());
-			}
-			if ("a2".equals(at.getName())) {
-				Assert.assertEquals(GUIAttribute.TYPE_INT, at.getType());
-				Assert.assertEquals((Long) 23L, at.getIntValue());
-			}
-		}
 	}
 
 	@Test

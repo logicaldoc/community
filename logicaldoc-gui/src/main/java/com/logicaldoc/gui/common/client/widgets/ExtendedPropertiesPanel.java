@@ -18,7 +18,7 @@ import com.logicaldoc.gui.common.client.beans.GUIUser;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ResizedEvent;
@@ -233,7 +233,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 			return;
 		}
 
-		DocumentService.Instance.get().getAttributes(templateId, new AsyncCallback<GUIAttribute[]>() {
+		TemplateService.Instance.get().getAttributes(templateId, object, new AsyncCallback<GUIAttribute[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

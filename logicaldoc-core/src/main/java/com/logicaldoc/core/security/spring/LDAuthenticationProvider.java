@@ -49,7 +49,7 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
 		String username = String.valueOf(auth.getPrincipal());
 		String password = String.valueOf(auth.getCredentials());
-
+		
 		HttpServletRequest httpReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 		String jPassword = httpReq.getParameter("j_password");

@@ -69,20 +69,20 @@ public class Initializer {
 				try {
 					Attribute attribute = object.getAttribute(attributeName);
 					Attribute templateAttribute = template.getAttribute(attributeName);
-					if (attribute.getValue() == null && StringUtils.isNotEmpty(templateAttribute.getInitialization())) {
-						System.out.println("found initialization for " + attributeName + " : "
-								+ templateAttribute.getInitialization());
+					if (attribute != null && templateAttribute != null)
+						if (attribute.getValue() == null
+								&& StringUtils.isNotEmpty(templateAttribute.getInitialization())) {
 
-						Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
-						fieldValidationDictionary.put("object", object);
-						fieldValidationDictionary.put("event", transaction);
-						fieldValidationDictionary.put("attributeName", attributeName);
-						fieldValidationDictionary.put("attribute", attribute);
+							Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
+							fieldValidationDictionary.put("object", object);
+							fieldValidationDictionary.put("event", transaction);
+							fieldValidationDictionary.put("attributeName", attributeName);
+							fieldValidationDictionary.put("attribute", attribute);
 
-						Automation script = new Automation("initializer-" + attributeName,
-								user != null ? user.getLocale() : Locale.getDefault(), object.getTenantId());
-						script.evaluate(templateAttribute.getInitialization(), fieldValidationDictionary);
-					}
+							Automation script = new Automation("initializer-" + attributeName,
+									user != null ? user.getLocale() : Locale.getDefault(), object.getTenantId());
+							script.evaluate(templateAttribute.getInitialization(), fieldValidationDictionary);
+						}
 				} catch (Throwable e) {
 					log.error(e.getMessage(), e);
 				}

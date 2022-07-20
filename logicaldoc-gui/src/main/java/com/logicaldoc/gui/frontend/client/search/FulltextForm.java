@@ -15,7 +15,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
-import com.logicaldoc.gui.frontend.client.services.DocumentService;
+import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.TitleOrientation;
@@ -303,7 +303,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		if (templateId == null)
 			return;
 
-		DocumentService.Instance.get().getAttributes(templateId, new AsyncCallback<GUIAttribute[]>() {
+		TemplateService.Instance.get().getAttributes(templateId, null, new AsyncCallback<GUIAttribute[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				GuiLog.serverError(caught);

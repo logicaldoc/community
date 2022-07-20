@@ -9,7 +9,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
@@ -53,10 +52,11 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @param document The document to validate
 	 * 
-	 * @throws ServerException in case of invalid instance, this exception contains the errors
+	 * @throws ServerException in case of invalid instance, this exception
+	 *         contains the errors
 	 */
 	public void validate(GUIDocument document) throws ServerException;
-	
+
 	/**
 	 * Renames the given document
 	 * 
@@ -68,17 +68,6 @@ public interface DocumentService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIDocument rename(long documentId, String name) throws ServerException;
-
-	/**
-	 * Retrieves all attributes of the specified template
-	 * 
-	 * @param templateId identifier of the template
-	 * 
-	 * @return the attributes
-	 * 
-	 * @throws ServerException an error happened in the server application
-	 */
-	public GUIAttribute[] getAttributes(long templateId) throws ServerException;
 
 	/**
 	 * Retrieves two specific versions by its ID
@@ -312,7 +301,8 @@ public interface DocumentService extends RemoteService {
 	 * @param expireDate the exact expiration date
 	 * @param maxDownloads maximum number of allowed downloads
 	 * 
-	 * @return the generated ticket ID, a sample URL using the browser's URL, a sample URL using the server.url setting
+	 * @return the generated ticket ID, a sample URL using the browser's URL, a
+	 *         sample URL using the server.url setting
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
