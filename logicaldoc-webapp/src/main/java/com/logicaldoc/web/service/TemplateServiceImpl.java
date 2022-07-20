@@ -131,6 +131,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 							att.setSetId(attribute.getSetId());
 							att.setPosition(attribute.getPosition());
 							att.setValidation(attribute.getValidation());
+							att.setInitialization(attribute.getInitialization());
 							if (StringUtils.isEmpty(attribute.getLabel()))
 								att.setLabel(attribute.getName());
 							if (attribute.getValue() instanceof String)
@@ -236,6 +237,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 				att.setStringValues(templateExtAttr.getStringValues());
 				att.setType(templateExtAttr.getType());
 				att.setValidation(templateExtAttr.getValidation());
+				att.setInitialization(templateExtAttr.getInitialization());
 
 				if (StringUtils.isEmpty(templateExtAttr.getLabel()))
 					att.setLabel(attrName);

@@ -97,6 +97,16 @@ public interface AttributeSetService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	void applyValidationToTemplates(long setId, String attribute) throws ServerException;
+
+	/**
+	 * Forces the initialization of an attribute to all those templates that use it
+	 * 
+	 * @param setId identifier of the set
+	 * @param attribute name of the attribute
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	void applyInitializationToTemplates(long setId, String attribute) throws ServerException;
 	
 	public static class Instance {
 		private static AttributeSetServiceAsync instance;

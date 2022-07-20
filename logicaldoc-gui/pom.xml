@@ -278,7 +278,6 @@
 									<fileset dir="war/skin-Tahoe" includes="**" />
 								</copy>
 
-
 								<!-- Change some styles of the Tahoe skin -->
 								<replaceregexp file="target/plugin/frontend/sc/skins/Tahoe/skin_styles.css"
 									match=".treeCellOverDark \{\n  background: #b6e3ff;\n  color: white;"
@@ -307,6 +306,11 @@
 									excludes="mode-velocity.js,mode-java.js,theme-eclipse.js" />
 								<delete dir="target/plugin/frontend/ace/snippets" includes="*.js"
 									excludes="velocity.js" />
+
+                                <!-- Delete all .txt files -->
+								<delete>
+									<fileset dir="target/plugin" excludes="**/*.txt" />
+								</delete>	
 
 								<!-- Delete all the sources from the smartgwt jar -->
 								<delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false" />

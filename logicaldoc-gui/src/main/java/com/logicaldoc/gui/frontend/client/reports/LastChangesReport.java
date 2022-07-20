@@ -82,38 +82,43 @@ public class LastChangesReport extends AdminPanel {
 		form.setValuesManager(vm);
 		form.setAlign(Alignment.LEFT);
 		form.setTitleOrientation(TitleOrientation.LEFT);
-		form.setNumCols(4);
+		form.setNumCols(8);
 		form.setWrapItemTitles(false);
 
 		// Username
 		SelectItem user = ItemFactory.newUserSelector("user", "user", null, false, false);
-		user.setColSpan(4);
+		user.setEndRow(true);
 
 		// From
 		DateItem fromDate = ItemFactory.newDateItem("fromDate", "from");
+		fromDate.setColSpan(4);
 
 		// To
 		DateItem tillDate = ItemFactory.newDateItem("tillDate", "till");
+		tillDate.setEndRow(true);
+		tillDate.setColSpan(4);
 
 		// Session ID
 		TextItem sessionId = ItemFactory.newTextItem("sid", "sid", null);
-		sessionId.setColSpan(4);
 		sessionId.setWidth(250);
+		sessionId.setColSpan(8);
+		sessionId.setEndRow(true);
 
 		folder = new FolderSelector(null, true);
-		folder.setColSpan(3);
 		folder.setWidth(200);
+		folder.setEndRow(true);
+		folder.setColSpan(8);
 
 		// Max results
 		SpinnerItem displayMax = ItemFactory.newSpinnerItem("displayMax", "displaymax", 100, 5, null);
 		displayMax.setHint(I18N.message("elements"));
 		displayMax.setStep(10);
+		displayMax.setStartRow(true);
 
 		ButtonItem searchButton = new ButtonItem();
 		searchButton.setTitle(I18N.message("search"));
 		searchButton.setAutoFit(true);
-		searchButton.setEndRow(true);
-		searchButton.setColSpan(2);
+		searchButton.setEndRow(false);
 		searchButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -132,6 +137,7 @@ public class LastChangesReport extends AdminPanel {
 		resetButton.setColSpan(2);
 		resetButton.setAutoFit(true);
 		resetButton.setEndRow(true);
+		resetButton.setStartRow(false);
 
 		ButtonItem print = new ButtonItem();
 		print.setTitle(I18N.message("print"));
@@ -142,7 +148,8 @@ public class LastChangesReport extends AdminPanel {
 			}
 		});
 		print.setAutoFit(true);
-		print.setEndRow(false);
+		print.setEndRow(true);
+		print.setStartRow(false);
 
 		ButtonItem export = new ButtonItem();
 		export.setTitle(I18N.message("export"));
@@ -157,11 +164,12 @@ public class LastChangesReport extends AdminPanel {
 			export.setTooltip(I18N.message("featuredisabled"));
 		}
 		export.setAutoFit(true);
-		export.setEndRow(true);
+		export.setStartRow(true);
+		export.setEndRow(false);
 
 		if (Feature.visible(Feature.EXPORT_CSV))
-			form.setItems(user, sessionId, fromDate, tillDate, folder, displayMax, searchButton, resetButton, print,
-					export);
+			form.setItems(user, sessionId, fromDate, tillDate, folder, displayMax, searchButton, resetButton, export,
+					print);
 		else
 			form.setItems(user, sessionId, fromDate, tillDate, folder, displayMax, searchButton, resetButton, print);
 

@@ -146,6 +146,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 						att.setLabel(attribute.getLabel());
 						att.setEditor(attribute.getEditor());
 						att.setValidation(attribute.getValidation());
+						att.setInitialization(attribute.getInitialization());
 						att.setStringValue(attribute.getStringValue());
 						if (StringUtils.isEmpty(attribute.getLabel()))
 							att.setLabel(attribute.getName());
@@ -222,6 +223,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				att.setMultiple(extAttr.getMultiple() == 1 ? true : false);
 				att.setType(extAttr.getType());
 				att.setValidation(extAttr.getValidation());
+				att.setInitialization(extAttr.getInitialization());
 				if (StringUtils.isEmpty(extAttr.getLabel()))
 					att.setLabel(attrName);
 				else
@@ -341,8 +343,28 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 			if (setAttribute == null)
 				return;
 
-			dao.jdbcUpdate("update ld_template_ext set ld_validation = ? where ld_setid=" + setId + " and ld_name = ?",
+			int count = dao.jdbcUpdate("update ld_template_ext set ld_validation = ? where ld_setid=" + setId + " and ld_name = ?",
 					setAttribute.getValidation(), attribute);
+			log.info("Updated the validation of {} template attributes named {}", count, attribute);
+		} catch (Throwable t) {
+			ServiceUtil.throwServerException(session, log, t);
+		}
+	}
+	
+	@Override
+	public void applyInitializationToTemplates(long setId, String attribute) throws ServerException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		try {
+			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
+			AttributeSet set = dao.findById(setId);
+			dao.initialize(set);
+			Attribute setAttribute = set.getAttribute(attribute);
+			if (setAttribute == null)
+				return;
+
+			int count = dao.jdbcUpdate("update ld_template_ext set ld_initialization = ? where ld_setid=" + setId + " and ld_name = ?",
+					setAttribute.getInitialization(), attribute);
+			log.info("Updated the initialization of {} template attributes named {}", count, attribute);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}

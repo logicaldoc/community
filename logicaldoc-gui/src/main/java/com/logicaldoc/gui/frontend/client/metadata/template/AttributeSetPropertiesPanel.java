@@ -29,6 +29,7 @@ import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.LinkItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.SpacerItem;
 import com.smartgwt.client.widgets.form.fields.StaticTextItem;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -61,9 +62,13 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  */
 public class AttributeSetPropertiesPanel extends HLayout {
 
-	protected DynamicForm form1 = new DynamicForm();
+	protected DynamicForm setPropertiesForm = new DynamicForm();
 
-	protected DynamicForm form2 = new DynamicForm();
+	protected DynamicForm attributeSettingsForm1 = new DynamicForm();
+
+	protected DynamicForm attributeSettingsForm2 = new DynamicForm();
+
+	protected DynamicForm attributeButtonsForm = new DynamicForm();
 
 	protected ValuesManager vm = new ValuesManager();
 
@@ -192,13 +197,13 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		vm.clearValues();
 		vm.clearErrors(false);
 
-		if (form1 != null)
-			form1.destroy();
+		if (setPropertiesForm != null)
+			setPropertiesForm.destroy();
 
-		if (contains(form1))
-			removeChild(form1);
+		if (contains(setPropertiesForm))
+			removeChild(setPropertiesForm);
 		addMetadata();
-		addMember(form1);
+		addMember(setPropertiesForm);
 
 		attributesList.addSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override
@@ -221,27 +226,49 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		 */
 		VLayout attributesLayout = new VLayout();
 
-		if (form2 != null)
-			form2.destroy();
-		if (contains(form2))
-			removeChild(form2);
-		form2 = new DynamicForm();
-		form2.setWidth100();
-		form2.setHeight100();
+		if (attributeSettingsForm1 != null)
+			attributeSettingsForm1.destroy();
+		if (contains(attributeSettingsForm1))
+			removeChild(attributeSettingsForm1);
+		attributeSettingsForm1 = new DynamicForm();
+		attributeSettingsForm1.setTitleOrientation(TitleOrientation.LEFT);
+		attributeSettingsForm1.setNumCols(9);
+		attributeSettingsForm1.setWidth(1);
+
+		if (attributeSettingsForm2 != null)
+			attributeSettingsForm2.destroy();
+		if (contains(attributeSettingsForm2))
+			removeChild(attributeSettingsForm2);
+		attributeSettingsForm2 = new DynamicForm();
+		attributeSettingsForm2.setTitleOrientation(TitleOrientation.TOP);
+		attributeSettingsForm2.setNumCols(5);
+		attributeSettingsForm2.setWidth100();
+		attributeSettingsForm2.setHeight100();
+
+		if (attributeButtonsForm != null)
+			attributeButtonsForm.destroy();
+		if (contains(attributeButtonsForm))
+			removeChild(attributeButtonsForm);
+		attributeButtonsForm = new DynamicForm();
+		attributeButtonsForm.setTitleOrientation(TitleOrientation.TOP);
+		attributeButtonsForm.setNumCols(2);
+		attributeButtonsForm.setWidth(1);
 
 		// Attribute Name
 		final TextItem attributeName = ItemFactory.newSimpleTextItem("attributeName", "attributename", null);
 		attributeName.setRequired(true);
+		attributeName.setWidth(180);
 		PickerIcon cleanPicker = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
 			public void onFormItemClick(FormItemIconClickEvent event) {
 				clean();
-				form2.getField("mandatory").setDisabled(false);
-				form2.getField("hidden").setDisabled(false);
-				form2.getField("multiple").setDisabled(false);
-				form2.getField("type").setDisabled(false);
-				form2.getField("editor").setDisabled(false);
-				form2.getField("group").setDisabled(true);
-				form2.getField("validation").setDisabled(false);
+				attributeSettingsForm1.getField("mandatory").setDisabled(false);
+				attributeSettingsForm1.getField("hidden").setDisabled(false);
+				attributeSettingsForm1.getField("multiple").setDisabled(false);
+				attributeSettingsForm2.getField("type").setDisabled(false);
+				attributeSettingsForm2.getField("editor").setDisabled(false);
+				attributeSettingsForm2.getField("group").setDisabled(true);
+				attributeSettingsForm2.getField("validation").setDisabled(false);
+				attributeSettingsForm2.getField("initialization").setDisabled(false);
 				refreshFieldForm();
 			}
 		});
@@ -253,7 +280,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 
 		// Attribute Name
 		final TextItem label = ItemFactory.newTextItem("label", "label", null);
-		label.setWidth(250);
+		label.setWidth(400);
 
 		// Mandatory
 		final CheckboxItem mandatory = new CheckboxItem();
@@ -281,10 +308,10 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		multiple.setWidth(50);
 		multiple.setDefaultValue(false);
 		multiple.setDisabled(attributeSet.isReadonly());
+		multiple.setEndRow(true);
 
 		// Editor
 		editor = new SelectItem("editor", I18N.message("inputmode"));
-		editor.setEndRow(true);
 		LinkedHashMap<String, String> editors = new LinkedHashMap<String, String>();
 		editors.put("" + GUIAttribute.EDITOR_DEFAULT, I18N.message("free"));
 		editors.put("" + GUIAttribute.EDITOR_TEXTAREA, I18N.message("freetextarea"));
@@ -326,12 +353,10 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		group = ItemFactory.newTextItem("group", "group", null);
 		group.setHint(I18N.message("groupname"));
 		group.setDisabled(attributeSet.isReadonly());
-		group.setStartRow(true);
 
 		// Options (for preset editor)
 		options = ItemFactory.newLinkItem("options", I18N.message("options"));
 		options.setLinkTitle(I18N.message("attributeoptions"));
-		options.setStartRow(true);
 		options.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
@@ -349,14 +374,16 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				false);
 		validation.setWidth("*");
 		validation.setDisabled(attributeSet.isReadonly());
+		validation.setStartRow(true);
+		validation.setColSpan(7);
 
-		FormItemIcon composer = new FormItemIcon();
-		composer.setName("composer");
-		composer.setWidth(16);
-		composer.setHeight(16);
-		composer.setSrc("[SKIN]/cog.png");
-		composer.setPrompt(I18N.message("openvalidatorcomposer"));
-		composer.addFormItemClickHandler(new FormItemClickHandler() {
+		FormItemIcon validationComposer = new FormItemIcon();
+		validationComposer.setName("composer");
+		validationComposer.setWidth(16);
+		validationComposer.setHeight(16);
+		validationComposer.setSrc("[SKIN]/cog.png");
+		validationComposer.setPrompt(I18N.message("openvalidatorcomposer"));
+		validationComposer.addFormItemClickHandler(new FormItemClickHandler() {
 
 			@Override
 			public void onFormItemClick(FormItemIconClickEvent event) {
@@ -367,18 +394,48 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				composer.show();
 			}
 		});
-		List<FormItemIcon> icons = new ArrayList<FormItemIcon>();
-		icons.addAll(Arrays.asList(validation.getIcons()));
-		icons.add(composer);
-		validation.setIcons(icons.toArray(new FormItemIcon[0]));
+		List<FormItemIcon> validationIcons = new ArrayList<FormItemIcon>();
+		validationIcons.addAll(Arrays.asList(validation.getIcons()));
+		validationIcons.add(validationComposer);
+		validation.setIcons(validationIcons.toArray(new FormItemIcon[0]));
+
+		TextAreaItem initialization = ItemFactory.newTextAreaItemForAutomation("initialization", "initialization", null,
+				null, false);
+		initialization.setWidth("*");
+		initialization.setDisabled(attributeSet.isReadonly());
+		initialization.setStartRow(true);
+		initialization.setColSpan(6);
+
+		FormItemIcon initializationComposer = new FormItemIcon();
+		initializationComposer.setName("composer");
+		initializationComposer.setWidth(16);
+		initializationComposer.setHeight(16);
+		initializationComposer.setSrc("[SKIN]/cog.png");
+		initializationComposer.setPrompt(I18N.message("openinitializercomposer"));
+		initializationComposer.addFormItemClickHandler(new FormItemClickHandler() {
+
+			@Override
+			public void onFormItemClick(FormItemIconClickEvent event) {
+				AttributeInitializerComposer composer = new AttributeInitializerComposer(initialization,
+						type.getValue() != null && !type.getValue().toString().isEmpty()
+								? Integer.parseInt(type.getValueAsString())
+								: GUIAttribute.TYPE_STRING);
+				composer.show();
+			}
+		});
+		List<FormItemIcon> initializationIcons = new ArrayList<FormItemIcon>();
+		initializationIcons.addAll(Arrays.asList(initialization.getIcons()));
+		initializationIcons.add(initializationComposer);
+		initialization.setIcons(initializationIcons.toArray(new FormItemIcon[0]));
 
 		ButtonItem save = new ButtonItem();
 		save.setTitle(I18N.message("save"));
 		save.setAutoFit(true);
+		save.setEndRow(false);
 		save.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-				if (!form2.validate()) {
+				if (!attributeSettingsForm1.validate()) {
 					return;
 				} else {
 					String name = (String) attributeName.getValue();
@@ -401,11 +458,12 @@ public class AttributeSetPropertiesPanel extends HLayout {
 						att.setType(Integer.parseInt((String) type.getValueAsString()));
 						att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
 						att.setValidation(validation.getValueAsString());
+						att.setInitialization(initialization.getValueAsString());
 
 						if (att.getType() == GUIAttribute.TYPE_USER)
 							att.setStringValue(group.getValueAsString());
 
-						if (form2.validate()) {
+						if (attributeSettingsForm1.validate()) {
 							changedHandler.onChanged(null);
 							addAttribute(att);
 						}
@@ -425,11 +483,13 @@ public class AttributeSetPropertiesPanel extends HLayout {
 							else
 								att.setStringValue(null);
 							att.setValidation(validation.getValueAsString());
+							att.setInitialization(initialization.getValueAsString());
 
 							ListGridRecord record = attributesList.getSelectedRecord();
 							record.setAttribute("name", att.getName());
 							record.setAttribute("label", att.getLabel());
 							record.setAttribute("validation", att.getValidation());
+							record.setAttribute("initialization", att.getInitialization());
 
 							changedHandler.onChanged(null);
 						}
@@ -441,6 +501,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		ButtonItem clean = new ButtonItem();
 		clean.setTitle(I18N.message("clean"));
 		clean.setAutoFit(true);
+		clean.setStartRow(false);
 		clean.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
 			@Override
 			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
@@ -448,10 +509,11 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			}
 		});
 
-		form2.setItems(attributeName, label, mandatory, hidden, multiple, type, editor, group, options, validation,
-				save, clean);
+		attributeSettingsForm1.setItems(attributeName, new SpacerItem(), mandatory, hidden, multiple);
+		attributeSettingsForm2.setItems(label, type, editor, group, options, initialization, validation);
+		attributeButtonsForm.setItems(save, clean);
 
-		attributesLayout.setMembers(form2);
+		attributesLayout.setMembers(attributeSettingsForm1, attributeSettingsForm2, attributeButtonsForm);
 		attributesLayout.setMembersMargin(10);
 		attributesLayout.setWidth100();
 		addMember(attributesLayout);
@@ -460,10 +522,10 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	protected void addMetadata() {
-		form1 = new DynamicForm();
-		form1.setNumCols(1);
-		form1.setValuesManager(vm);
-		form1.setTitleOrientation(TitleOrientation.LEFT);
+		setPropertiesForm = new DynamicForm();
+		setPropertiesForm.setNumCols(1);
+		setPropertiesForm.setValuesManager(vm);
+		setPropertiesForm.setTitleOrientation(TitleOrientation.LEFT);
 
 		StaticTextItem id = ItemFactory.newStaticTextItem("id", "id", Long.toString(attributeSet.getId()));
 		id.setDisabled(true);
@@ -481,9 +543,9 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (!attributeSet.isReadonly())
 			description.addChangedHandler(changedHandler);
 
-		form1.setItems(id, name, description);
+		setPropertiesForm.setItems(id, name, description);
 
-		form1.setWidth(200);
+		setPropertiesForm.setWidth(200);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -510,19 +572,20 @@ public class AttributeSetPropertiesPanel extends HLayout {
 	}
 
 	private void clean() {
-		form2.clearValues();
-		form2.getField("attributeName").setDisabled(false);
-		form2.setValue("attributeName", "");
+		attributeSettingsForm1.clearValues();
+		attributeSettingsForm1.getField("attributeName").setDisabled(false);
+		attributeSettingsForm1.setValue("attributeName", "");
 		updatingAttributeName = "";
 
-		form2.setValue("label", (String) null);
-		form2.setValue("mandatory", false);
-		form2.setValue("hidden", false);
-		form2.setValue("multiple", false);
-		form2.setValue("type", GUIAttribute.TYPE_STRING);
-		form2.setValue("editor", GUIAttribute.EDITOR_DEFAULT);
-		form2.setValue("group", (String) null);
-		form2.setValue("validation", (String) null);
+		attributeSettingsForm1.setValue("label", (String) null);
+		attributeSettingsForm1.setValue("mandatory", false);
+		attributeSettingsForm1.setValue("hidden", false);
+		attributeSettingsForm1.setValue("multiple", false);
+		attributeSettingsForm2.setValue("type", GUIAttribute.TYPE_STRING);
+		attributeSettingsForm2.setValue("editor", GUIAttribute.EDITOR_DEFAULT);
+		attributeSettingsForm2.setValue("group", (String) null);
+		attributeSettingsForm2.setValue("validation", (String) null);
+		attributeSettingsForm2.setValue("initialization", (String) null);
 
 		attributesList.deselectAllRecords();
 	}
@@ -589,7 +652,40 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		});
 		applyValidationToTemplates.setEnabled(attributeSet.getId() != 0L);
 
-		contextMenu.setItems(applyValidationToTemplates, delete);
+		MenuItem applyInitializationToTemplates = new MenuItem();
+		applyInitializationToTemplates.setTitle(I18N.message("applyinitializationtotemplates"));
+		applyInitializationToTemplates.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				final ListGridRecord selection = attributesList.getSelectedRecord();
+
+				LD.ask(I18N.message("applyinitializationtotemplates"),
+						I18N.message("applyinitializationtotemplatesquestion"), new BooleanCallback() {
+							@Override
+							public void execute(Boolean value) {
+								if (value) {
+									LD.contactingServer();
+									AttributeSetService.Instance.get().applyInitializationToTemplates(
+											attributeSet.getId(), selection.getAttributeAsString("name"),
+											new AsyncCallback<Void>() {
+												@Override
+												public void onFailure(Throwable caught) {
+													GuiLog.serverError(caught);
+													LD.clearPrompt();
+												}
+
+												@Override
+												public void onSuccess(Void arg0) {
+													LD.clearPrompt();
+												}
+											});
+								}
+							}
+						});
+			}
+		});
+		applyInitializationToTemplates.setEnabled(attributeSet.getId() != 0L);
+
+		contextMenu.setItems(applyInitializationToTemplates, applyValidationToTemplates, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -597,15 +693,16 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (record != null) {
 			String selectedAttributeName = record.getAttributeAsString("name");
 			GUIAttribute extAttr = attributeSet.getAttribute(selectedAttributeName);
-			form2.setValue("attributeName", extAttr.getName());
-			form2.setValue("label", extAttr.getLabel());
-			form2.setValue("mandatory", extAttr.isMandatory());
-			form2.setValue("hidden", extAttr.isHidden());
-			form2.setValue("multiple", extAttr.isMultiple());
-			form2.setValue("type", extAttr.getType());
-			form2.setValue("editor", extAttr.getEditor());
-			form2.setValue("group", extAttr.getStringValue());
-			form2.setValue("validation", extAttr.getValidation());
+			attributeSettingsForm1.setValue("attributeName", extAttr.getName());
+			attributeSettingsForm1.setValue("label", extAttr.getLabel());
+			attributeSettingsForm1.setValue("mandatory", extAttr.isMandatory());
+			attributeSettingsForm1.setValue("hidden", extAttr.isHidden());
+			attributeSettingsForm1.setValue("multiple", extAttr.isMultiple());
+			attributeSettingsForm2.setValue("type", extAttr.getType());
+			attributeSettingsForm2.setValue("editor", extAttr.getEditor());
+			attributeSettingsForm2.setValue("group", extAttr.getStringValue());
+			attributeSettingsForm2.setValue("validation", extAttr.getValidation());
+			attributeSettingsForm2.setValue("initialization", extAttr.getInitialization());
 			updatingAttributeName = selectedAttributeName;
 			refreshFieldForm();
 		}
@@ -615,6 +712,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		if (type.getValueAsString().equals("" + GUIAttribute.TYPE_STRING)) {
 			editor.setVisible(true);
 			group.setVisible(false);
+			group.setValue("");
 
 			if (editor.getValueAsString().equals("" + GUIAttribute.EDITOR_LISTBOX)) {
 				options.setVisible(true);
@@ -628,6 +726,8 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		} else if (type.getValueAsString().equals("" + GUIAttribute.TYPE_FOLDER)) {
 			editor.setVisible(false);
 			options.setVisible(false);
+			group.setVisible(false);
+			group.setValue("");
 		} else {
 			editor.setVisible(false);
 			group.setVisible(false);
@@ -636,9 +736,10 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		}
 
 		if (!updatingAttributeName.isEmpty())
-			form2.getItem("attributeName").setDisabled(true);
+			attributeSettingsForm1.getItem("attributeName").setDisabled(true);
 
-		form2.markForRedraw();
+		attributeSettingsForm1.markForRedraw();
+		attributeSettingsForm2.markForRedraw();
 	}
 
 	protected boolean isMandatory(int category, String attributeName) {

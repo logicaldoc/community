@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
- * A visual editor for validation procedures
+ * A visual editor for validation routines
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.1
@@ -107,11 +107,11 @@ public class AttributeValidatorComposer extends Window {
 			String maxStr = min != null ? DateUtil.format(max, "yyyy-MM-dd") : null;
 
 			if (minStr != null) {
-				sb.append("#set($min = $DateTool.parse('2022-06-01', 'yyyy-MM-dd'))\n");
+				sb.append("#set($min = $DateTool.parse('"+minStr+"', 'yyyy-MM-dd'))\n");
 				sb.append("#if($min.after($value)) $error.setDescription($I18N.get('dateoutofrange')); #end\n\n");
 			}
 			if (maxStr != null) {
-				sb.append("#set($max = $DateTool.parse('2022-06-30', 'yyyy-MM-dd'))\n");
+				sb.append("#set($max = $DateTool.parse('"+maxStr+"', 'yyyy-MM-dd'))\n");
 				sb.append("#if($max.before($value)) $error.setDescription($I18N.get('dateoutofrange')); #end\n\n");
 			}
 		} else if (attributeType == GUIAttribute.TYPE_INT || attributeType == GUIAttribute.TYPE_DOUBLE) {

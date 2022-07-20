@@ -85,6 +85,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	private String stringValues;
 
 	private String validation;
+	
+	private String initialization;
 
 	public static boolean isForbidden(String name) {
 		for (String forbidden : FORBIDDEN_NAMES) {
@@ -320,6 +322,38 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		this.parent = parent;
 	}
 
+	public String getStringValues() {
+		return stringValues;
+	}
+
+	public void setStringValues(String stringValues) {
+		this.stringValues = stringValues;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getValidation() {
+		return validation;
+	}
+
+	public void setValidation(String validation) {
+		this.validation = validation;
+	}
+
+	public String getInitialization() {
+		return initialization;
+	}
+
+	public void setInitialization(String initialization) {
+		this.initialization = initialization;
+	}
+	
 	public GUIAttribute clone() {
 		GUIAttribute newAttr = new GUIAttribute();
 		newAttr.setBooleanValue(booleanValue);
@@ -343,6 +377,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		newAttr.setType(type);
 		newAttr.setUsername(username);
 		newAttr.setValidation(validation);
+		newAttr.setInitialization(initialization);
 
 		return newAttr;
 	}
@@ -350,29 +385,5 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	@Override
 	public String toString() {
 		return getName() + "=" + getValue();
-	}
-
-	public String getStringValues() {
-		return stringValues;
-	}
-
-	public void setStringValues(String stringValues) {
-		this.stringValues = stringValues;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getValidation() {
-		return validation;
-	}
-
-	public void setValidation(String validation) {
-		this.validation = validation;
 	}
 }

@@ -43,6 +43,7 @@ public class UserSelector extends SelectItem {
 
 		setValueField("id");
 		setDisplayField("username");
+		setSortField("label");
 		setPickListWidth(300);
 		setPickListFields(id, avatar, username, label);
 

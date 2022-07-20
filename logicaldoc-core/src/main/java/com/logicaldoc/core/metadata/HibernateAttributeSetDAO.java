@@ -137,15 +137,18 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 					// the attribute exists both in template and set so update
 					// it but preserve the position and the validation(if any)
 					// declared in the template
-
 					Attribute templateAttribute = template.getAttribute(name);
 					int currentPosition = templateAttribute.getPosition();
 					String currentValidation = templateAttribute.getValidation();
+					String currentInitialization = templateAttribute.getInitialization();
+					
 
 					Attribute clonedAttribute = (Attribute) setAttribute.clone();
 					clonedAttribute.setPosition(currentPosition);
 					if(StringUtils.isNotEmpty(currentValidation))
 						clonedAttribute.setValidation(currentValidation);
+					if(StringUtils.isNotEmpty(currentInitialization))
+						clonedAttribute.setInitialization(currentInitialization);
 					template.getAttributes().put(name, clonedAttribute);
 				} else {
 					// the attribute exists in template but not in the set so

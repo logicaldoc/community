@@ -102,6 +102,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
 			att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
 			att.setValidation(rec.getAttributeAsString("validation"));
+			att.setInitialization(rec.getAttributeAsString("initialization"));
 
 			template.appendAttribute(att);
 
@@ -420,8 +421,87 @@ public class TemplatePropertiesPanel extends HLayout {
 				});
 			}
 		});
+		
+		MenuItem initialization = new MenuItem();
+		initialization.setTitle(I18N.message("initialization"));
+		initialization.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				ListGridRecord selection = attributesList.getSelectedRecord();
+				TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation("initialization", "initialization", null,
+						null, false);
+				initializationItem.setWidth(600);
+				initializationItem.setHeight(400);
 
-		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeHidden, validation, resetValidation, delete);
+				GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
+
+				LD.askForValue(I18N.message("initialization"), I18N.message("initialization"), attribute.getInitialization(),
+						initializationItem, 600, new ValueCallback() {
+
+							@Override
+							public void execute(String initializationScript) {
+								attribute.setInitialization(initializationScript);
+								fillAttributesList();
+								if (changedHandler != null)
+									changedHandler.onChanged(null);
+							}
+						});
+			}
+		});
+		
+		MenuItem resetInitialization = new MenuItem();
+		resetInitialization.setTitle(I18N.message("resetinitialization"));
+		resetInitialization.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				ListGridRecord[] selection = attributesList.getSelectedRecords();		
+
+				LD.ask(I18N.message("resetinitialization"), I18N.message("resetinitializationnquestion"), new BooleanCallback() {
+
+					@Override
+					public void execute(Boolean value) {
+						if (value) {
+							LD.contactingServer();
+							AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									LD.clearPrompt();
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(GUIAttributeSet[] sets) {
+									LD.clearPrompt();
+									Map<Long, GUIAttributeSet> setsMap = new HashMap<Long, GUIAttributeSet>();
+									for (GUIAttributeSet set : sets) 
+										setsMap.put(set.getId(), set);
+									
+									for (ListGridRecord record : selection) {
+										GUIAttribute setAttribute=null;
+										GUIAttributeSet set = setsMap.get(record.getAttributeAsLong("setId"));
+										if(set!=null)
+											setAttribute = set.getAttribute(record.getAttributeAsString("name"));
+											
+										if(setAttribute!=null) {
+											template.getAttribute(record.getAttributeAsString("name")).setInitialization(setAttribute.getInitialization());
+											record.setAttribute("initialization", setAttribute.getInitialization());
+										}else {
+											template.getAttribute(record.getAttributeAsString("name")).setInitialization(null);
+											record.setAttribute("initialization", (String)null);
+										}
+									}
+									
+
+									if(changedHandler!=null)
+										changedHandler.onChanged(null);
+								}
+							});
+						}
+					}
+				});
+			}
+		});
+
+		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeHidden, initialization, resetInitialization, validation, resetValidation, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -449,6 +529,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			record.setAttribute("hidden", att.isHidden());
 			record.setAttribute("multiple", att.isMultiple());
 			record.setAttribute("validation", att.getValidation());
+			record.setAttribute("initialization", att.getInitialization());
 			attributesList.getRecordList().add(record);
 		}
 	}
@@ -555,6 +636,7 @@ public class TemplatePropertiesPanel extends HLayout {
 					att.setHidden(rec.getAttributeAsBoolean("hidden"));
 					att.setMultiple(rec.getAttributeAsBoolean("multiple"));
 					att.setValidation(rec.getAttributeAsString("validation"));
+					att.setInitialization(rec.getAttributeAsString("initialization"));
 					template.appendAttribute(att);
 				}
 			}
