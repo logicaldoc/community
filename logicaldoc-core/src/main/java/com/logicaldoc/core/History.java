@@ -250,7 +250,8 @@ public abstract class History extends PersistentObject implements Comparable<His
 			this.setDocId(document.getId());
 			this.setFilename(document.getFileName());
 			this.setFileSize(document.getFileSize());
-			this.setFolderId(document.getFolder().getId());
+			if (document.getFolder() != null)
+				this.setFolderId(document.getFolder().getId());
 			this.setVersion(document.getVersion());
 			this.setColor(document.getColor());
 		}
