@@ -21,6 +21,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSUser;
+import com.logicaldoc.webservice.model.WSUtil;
 import com.logicaldoc.webservice.model.WSWorkingTime;
 import com.logicaldoc.webservice.soap.SecurityService;
 
@@ -139,7 +140,13 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setDateFormat(user.getDateFormat());
 				usr.setDateFormatShort(user.getDateFormatShort());
 				usr.setDateFormatLong(user.getDateFormatLong());
-
+				usr.setKey(user.getKey());
+				usr.setSecondFactor(user.getSecondFactor());
+				usr.setTimeZone(user.getTimeZone());
+				usr.setExpire(WSUtil.convertStringToDate(user.getExpire()));
+				usr.setEnforceWorkingTime(user.getEnforceWorkingTime());
+				usr.setMaxInactivity(user.getMaxInactivity());
+				
 				if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0)
 					for (WSWorkingTime wswt : user.getWorkingTimes()) {
 						WorkingTime wt = new WorkingTime();

@@ -16,8 +16,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	public static final int DOC_UNLOCKED = 0;
 
-	private long id;
-
 	private long tenantId;
 	
 	private Long docRef;
@@ -145,14 +143,6 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	 * metadata of a bulp update
 	 */
 	private boolean bulkUpdate = false;
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
 
 	public String getCustomId() {
 		return customId;
@@ -322,7 +312,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		return id == ((GUIDocument) obj).getId();
+		return getId() == ((GUIDocument) obj).getId();
 	}
 
 	@Override

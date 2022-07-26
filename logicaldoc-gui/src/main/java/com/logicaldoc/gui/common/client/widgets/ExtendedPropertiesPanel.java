@@ -258,6 +258,14 @@ public class ExtendedPropertiesPanel extends HLayout {
 							objAttr.setStringValues(templAttr.getStringValues());
 							objAttr.setPosition(templAttr.getPosition());
 							objAttr.setType(templAttr.getType());
+
+							if (object.getId() == 0L) {
+								objAttr.setStringValue(templAttr.getStringValue());
+								objAttr.setIntValue(templAttr.getIntValue());
+								objAttr.setDateValue(templAttr.getDateValue());
+								objAttr.setBooleanValue(templAttr.getBooleanValue());
+								objAttr.setDoubleValue(templAttr.getDoubleValue());
+							}
 						} else {
 							object.addAttribute(templAttr);
 						}
@@ -275,7 +283,6 @@ public class ExtendedPropertiesPanel extends HLayout {
 								}
 						}
 					}
-
 					object.sortAttributes();
 				}
 

@@ -1356,7 +1356,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			templateDao.initialize(template);
 
 			docVO.setTemplate(template);
-			if (guiDocument.getAttributes().length > 0) {
+			if (guiDocument.getAttributes()!=null && guiDocument.getAttributes().length > 0) {
 				for (GUIAttribute attr : guiDocument.getAttributes()) {
 					Attribute templateAttribute = template.getAttributes()
 							.get(attr.getParent() != null ? attr.getParent() : attr.getName());

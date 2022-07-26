@@ -17,12 +17,23 @@ import com.google.gwt.i18n.client.NumberFormat;
 public class GUIExtensibleObject implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	private long id = 0L;
+	
 	private String template;
 
 	private Long templateId;
 
 	private GUIAttribute[] attributes = new GUIAttribute[0];
 
+	public GUIExtensibleObject(long id) {
+		super();
+		this.id = id;
+	}
+
+	public GUIExtensibleObject() {
+		super();
+	}
+	
 	public String getTemplate() {
 		return template;
 	}
@@ -255,5 +266,13 @@ public class GUIExtensibleObject implements Serializable {
 			a.setDoubleValue(attr.getDoubleValue());
 			a.setStringValue(attr.getStringValue());
 		}
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 }

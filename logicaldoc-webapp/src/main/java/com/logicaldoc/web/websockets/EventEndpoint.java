@@ -162,7 +162,10 @@ public class EventEndpoint implements EventListener {
 
 				distributeMessage(message);
 			} catch (Throwable e) {
-				log.error(e.getMessage(), e);
+				if (e instanceof java.lang.IllegalStateException)
+					log.debug(e.getMessage(), e);
+				else
+					log.error(e.getMessage(), e);
 			}
 		}
 	}

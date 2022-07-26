@@ -51,6 +51,7 @@ public interface FormService extends RemoteService {
 	 * 
 	 * @param id identifier of the form to delete
 	 * 
+	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void delete(long id) throws ServerException;

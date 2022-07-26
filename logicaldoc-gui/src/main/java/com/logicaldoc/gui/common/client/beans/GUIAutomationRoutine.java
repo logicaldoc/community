@@ -6,8 +6,6 @@ public class GUIAutomationRoutine extends GUIExtensibleObject implements Seriali
 
 	private static final long serialVersionUID = 1L;
 
-	private long id;
-
 	private String name;
 
 	private String description;
@@ -15,20 +13,11 @@ public class GUIAutomationRoutine extends GUIExtensibleObject implements Seriali
 	private String automation;
 
 	public GUIAutomationRoutine(long id) {
-		super();
-		this.id = id;
+		super(id);
 	}
 
 	public GUIAutomationRoutine() {
 
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public String getName() {

@@ -20,7 +20,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.History;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
+import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeSet;
@@ -38,6 +40,7 @@ import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIExtensibleObject;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
+import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
@@ -317,7 +320,12 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 	@Override
 	public GUIAttribute[] getAttributes(long templateId, GUIExtensibleObject extensibleObject) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = null;
+		try {
+			session = ServiceUtil.validateSession(getThreadLocalRequest());
+		} catch (Throwable t) {
+
+		}
 
 		try {
 			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
@@ -326,14 +334,13 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 			GUIAttribute[] attributes = null;
 
-			System.out.println("A "+extensibleObject);
-			
 			if (extensibleObject == null) {
-				prepareGUIAttributes(template, null, session.getUser());
+				prepareGUIAttributes(template, null, session != null ? session.getUser() : null);
 			} else {
 				if (extensibleObject instanceof GUIDocument)
 					attributes = prepareGUIAttributes(template,
-							DocumentServiceImpl.toDocument((GUIDocument) extensibleObject), session.getUser());
+							DocumentServiceImpl.toDocument((GUIDocument) extensibleObject),
+							session != null ? session.getUser() : null);
 				else if (extensibleObject instanceof GUIFolder) {
 					GUIFolder guiFolder = (GUIFolder) extensibleObject;
 					Folder folder = new Folder();
@@ -342,9 +349,14 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 					folder.setType(guiFolder.getType());
 					folder.setTenantId(session.getTenantId());
 					folder.setTemplate(template);
-					attributes = prepareGUIAttributes(template, folder, session.getUser());
+					attributes = prepareGUIAttributes(template, folder, session != null ? session.getUser() : null);
+				} else if (extensibleObject instanceof GUIForm) {
+					Document dummyDoc = new Document();
+					dummyDoc.setFileName("webform");
+					dummyDoc.setTenantId(template.getTenantId());
+					attributes = prepareGUIAttributes(template, dummyDoc, session != null ? session.getUser() : null);
 				} else
-					attributes = prepareGUIAttributes(template, null, session.getUser());
+					attributes = prepareGUIAttributes(template, null, session != null ? session.getUser() : null);
 			}
 
 			if (attributes != null)
@@ -355,7 +367,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 						return Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition()));
 					}
 				});
-
+			
 			return attributes;
 		} catch (Throwable t) {
 			return (GUIAttribute[]) ServiceUtil.throwServerException(session, log, t);
@@ -374,7 +386,26 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			return new GUIAttribute[0];
 		try {
 			if (template != null) {
-				if (extensibleObject.getId() == 0L) {
+				Template currentTemplate = null;
+				if (extensibleObject instanceof Document) {
+					DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+					Document doc = docDao.findDocument(extensibleObject.getId());
+					if (doc != null)
+						currentTemplate = doc.getTemplate();
+				} else if (extensibleObject instanceof Folder) {
+					FolderDAO foldDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+					Folder folder = foldDao.findFolder(extensibleObject.getId());
+					if (folder != null)
+						currentTemplate = folder.getTemplate();
+				} else
+					currentTemplate = template;
+
+				if (extensibleObject.getId() == 0L || !template.equals(currentTemplate)) {
+					// Probably the GUI did not fill the attributes map at this
+					// point, so put the template's attributes
+					if (extensibleObject.getAttributes().isEmpty())
+						extensibleObject.setAttributes(template.getAttributes());
+
 					History transaction = null;
 					if (extensibleObject instanceof Document) {
 						transaction = new DocumentHistory();
@@ -383,16 +414,11 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 						transaction = new FolderHistory();
 						transaction.setFolder((Folder) extensibleObject);
 					}
+
 					transaction.setUser(sessionUser);
-					
-					System.out.println("A");
+
 					Initializer initializer = new Initializer();
 					initializer.initialize(extensibleObject, template, transaction);
-					System.out.println("B "+extensibleObject.getAttributeNames());
-					
-					for (String name : extensibleObject.getAttributeNames()) {
-						System.out.println(name+"= "+extensibleObject.getValue(name));
-					}
 				}
 
 				Map<Long, AttributeSet> sets = setDao.load(template.getTenantId());
@@ -498,6 +524,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			}
 
 			Collections.sort(attributes);
+
 			return attributes.toArray(new GUIAttribute[0]);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);

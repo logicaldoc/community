@@ -309,11 +309,11 @@
 
                                 <!-- Delete all .txt files -->
 								<delete>
-									<fileset dir="target/plugin" excludes="**/*.txt" />
+									<fileset dir="target/plugin" includes="**/*.txt" />
 								</delete>	
 
 								<!-- Delete all the sources from the smartgwt jar -->
-								<!-- delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false" />
+								<delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false" />
 								<unzip dest="target/plugin/WEB-INF/lib/smartgwt"
 									src="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar" />
 								<delete dir="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar" />
@@ -322,7 +322,7 @@
 								</delete>
 								<zip destfile="target/plugin/WEB-INF/lib/smartgwt-${smartgwt.version}.jar"
 									basedir="target/plugin/WEB-INF/lib/smartgwt" />
-								<delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false" / -->
+								<delete dir="target/plugin/WEB-INF/lib/smartgwt" failonerror="false" />
 
 								<copy file="target/${project.artifactId}-${project.version}.${project.packaging}"
 									tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />

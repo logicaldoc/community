@@ -42,8 +42,6 @@ public class GUIForm extends GUIExtensibleObject implements Serializable {
 			+ "  font-size: 12px;\n" + "}\n" + ".contactingserver{\n" + "  font-family: Roboto,Arial,sans-serif;\n"
 			+ "  font-size: 16pt;\n" + "  font-weight: bold;\n" + "  white-space: nowrap;\n" + "}";
 
-	private long id = 0L;
-
 	private String name;
 
 	private String title;
@@ -165,14 +163,6 @@ public class GUIForm extends GUIExtensibleObject implements Serializable {
 
 	public void setFormId(String formId) {
 		this.formId = formId;
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
 	}
 
 	public boolean isWebEnabled() {
