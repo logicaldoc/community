@@ -3,6 +3,7 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -53,13 +54,22 @@ public class AttributeOptionsDataServlet extends HttpServlet {
 			List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
 
 			if (withempty) {
-				writer.print("<option>");
-				writer.print("<id>-1</id>");
-				writer.print("<attribute></attribute>");
-				writer.print("<value></value>");
-				writer.print("<position></position>");
-				writer.print("<category></category>");
-				writer.print("</option>");
+				List<String> categories = options.stream().map(o -> o.getCategory()).distinct()
+						.collect(Collectors.toList());
+				if (!categories.contains(""))
+					categories.add("");
+
+				for (String cat : categories) {
+					if (cat == null)
+						continue;
+					writer.print("<option>");
+					writer.print("<id>-" + cat.hashCode() + "</id>");
+					writer.print("<attribute></attribute>");
+					writer.print("<value></value>");
+					writer.print("<position></position>");
+					writer.print("<category><![CDATA[" + (StringUtils.isEmpty(cat) ? "" : cat) + "]]></category>");
+					writer.print("</option>");
+				}
 			}
 
 			for (AttributeOption option : options) {
