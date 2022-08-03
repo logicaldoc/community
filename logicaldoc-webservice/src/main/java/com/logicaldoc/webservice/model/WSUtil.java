@@ -171,6 +171,7 @@ public class WSUtil {
 						att.setHidden(wsDoc.getAttributes()[i].getHidden());
 						att.setMultiple(wsDoc.getAttributes()[i].getMultiple());
 						att.setParent(wsDoc.getAttributes()[i].getParent());
+						att.setDependsOn(wsDoc.getAttributes()[i].getDependsOn());
 						att.setPosition(wsDoc.getAttributes()[i].getPosition());
 						att.setIntValue(wsDoc.getAttributes()[i].getIntValue());
 						att.setStringValue(wsDoc.getAttributes()[i].getStringValue());
@@ -357,6 +358,7 @@ public class WSUtil {
 					att.setHidden(wsSet.getAttributes()[i].getHidden());
 					att.setMultiple(wsSet.getAttributes()[i].getMultiple());
 					att.setParent(wsSet.getAttributes()[i].getParent());
+					att.setDependsOn(wsSet.getAttributes()[i].getDependsOn());
 					att.setPosition(wsSet.getAttributes()[i].getPosition());
 					att.setStringValue(wsSet.getAttributes()[i].getStringValue());
 					att.setIntValue(wsSet.getAttributes()[i].getIntValue());
@@ -395,6 +397,7 @@ public class WSUtil {
 					att.setHidden(wsTemplate.getAttributes()[i].getHidden());
 					att.setMultiple(wsTemplate.getAttributes()[i].getMultiple());
 					att.setParent(wsTemplate.getAttributes()[i].getParent());
+					att.setDependsOn(wsTemplate.getAttributes()[i].getDependsOn());
 					att.setPosition(wsTemplate.getAttributes()[i].getPosition());
 					att.setType(wsTemplate.getAttributes()[i].getType());
 					att.setStringValue(wsTemplate.getAttributes()[i].getStringValue());

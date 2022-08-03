@@ -71,9 +71,15 @@ public class Attribute implements Comparable<Attribute> {
 	private int multiple = 0;
 
 	/**
-	 * Name of a parent attribute
+	 * Name of a parent attribute, used for multiple values attributes
 	 */
 	private String parent;
+
+	/**
+	 * Name of another attribute on which the value of this attribute also
+	 * depends, used for managing linked presets
+	 */
+	private String dependsOn;
 
 	/**
 	 * Optional validation script
@@ -325,6 +331,14 @@ public class Attribute implements Comparable<Attribute> {
 		this.initialization = initialization;
 	}
 
+	public String getDependsOn() {
+		return dependsOn;
+	}
+
+	public void setDependsOn(String dependsOn) {
+		this.dependsOn = dependsOn;
+	}
+
 	@Override
 	public Attribute clone() {
 		Attribute clone = new Attribute();
@@ -345,6 +359,7 @@ public class Attribute implements Comparable<Attribute> {
 		clone.setName(name);
 		clone.setValidation(validation);
 		clone.setInitialization(initialization);
+		clone.setDependsOn(dependsOn);
 		return clone;
 	}
 }

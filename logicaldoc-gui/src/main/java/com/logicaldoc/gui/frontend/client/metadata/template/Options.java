@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.metadata.template;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Feature;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.common.client.data.AttributeOptionsDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
@@ -177,6 +178,11 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		value.setWidth("*");
 		value.setCanFilter(true);
 
+		ListGridField category = new ListGridField("category", I18N.message("category"));
+		category.setCanFilter(true);
+		category.setAutoFitWidth(true);
+		category.setMinWidth(80);
+
 		list = new ListGrid();
 		list.setWidth100();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
@@ -186,13 +192,13 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setFilterOnKeypress(true);
 		list.setShowFilterEditor(false);
-		list.setDataSource(new AttributeOptionsDS(setId, attribute, false));
+		list.setDataSource(new AttributeOptionsDS(setId, attribute, null, false));
 		list.setCanReorderRecords(!readOnly);
 		list.setCanDragRecordsOut(!readOnly);
 		list.setCanAcceptDroppedRecords(!readOnly);
 		list.setShowRowNumbers(true);
 		list.setDragDataAction(DragDataAction.MOVE);
-		list.setFields(id, value);
+		list.setFields(id, value, category);
 		list.sort("position", SortDirection.ASCENDING);
 
 		if (!readOnly)
@@ -218,10 +224,10 @@ public class Options extends com.smartgwt.client.widgets.Window {
 	 */
 	private void onSave() {
 		Record[] records = list.getRecords();
-		String[] values = new String[records.length];
+		GUIValue[] values = new GUIValue[records.length];
 		int i = 0;
 		for (Record record : records)
-			values[i++] = record.getAttributeAsString("value");
+			values[i++] = new GUIValue(record.getAttributeAsString("category"), record.getAttributeAsString("value"));
 
 		LD.contactingServer();
 		AttributeSetService.Instance.get().saveOptions(setId, attribute, values, new AsyncCallback<Void>() {
@@ -265,7 +271,7 @@ public class Options extends com.smartgwt.client.widgets.Window {
 	}
 
 	public void refresh() {
-		list.setDataSource(new AttributeOptionsDS(setId, attribute, false));
+		list.setDataSource(new AttributeOptionsDS(setId, attribute, null, false));
 		list.fetchData();
 	}
 

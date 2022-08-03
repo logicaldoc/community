@@ -25,7 +25,8 @@ create table ld_document_ext (ld_docid bigint not null, ld_mandatory int not nul
                               ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                               ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, 
                               ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint,
-                              ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), primary key (ld_docid, ld_name));
+                              ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255),
+                              ld_dependson varchar(255), primary key (ld_docid, ld_name));
 create table ld_generic (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null, 
                          ld_deleted int not null, ld_tenantid bigint not null, ld_type varchar(255) not null, 
                          ld_subtype varchar(255) not null, ld_qualifier bigint null, ld_string1 varchar(4000), 
@@ -38,7 +39,8 @@ create table ld_generic_ext (ld_genid bigint not null, ld_mandatory int not null
                              ld_editor bigint not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                              ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, 
                              ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
-                             ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), primary key (ld_genid, ld_name));
+                             ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                             ld_dependson varchar(255), primary key (ld_genid, ld_name));
 create table ld_group (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null, 
                        ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, 
                        ld_description varchar(255), ld_type int not null, ld_source varchar(255), primary key (ld_id));
@@ -76,7 +78,8 @@ create table ld_template_ext (ld_templateid bigint not null, ld_mandatory int no
                               ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                               ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, ld_validation varchar(4000),
                               ld_initialization varchar(4000), ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint,
-                              ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), primary key (ld_templateid, ld_name));
+                              ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                              ld_dependson varchar(255), primary key (ld_templateid, ld_name));
 create table ld_templategroup (ld_templateid bigint not null, ld_groupid bigint not null, ld_write int not null, 
                                primary key (ld_templateid, ld_groupid));                              
 create table ld_attributeset (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
@@ -87,7 +90,8 @@ create table ld_attributeset_ext (ld_attsetid bigint not null, ld_mandatory int 
                                   ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                                   ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, ld_validation varchar(4000),
                                   ld_initialization varchar(4000), ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
-                                  ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), primary key (ld_setid, ld_name));
+                                  ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                                  ld_dependson varchar(255), primary key (ld_setid, ld_name));
 create table ld_ticket (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_ticketid varchar(255) not null, 
                         ld_docid bigint not null, ld_userid bigint not null, ld_type int not null, 
@@ -139,7 +143,7 @@ create table ld_version_ext (ld_versionid bigint not null, ld_mandatory int not 
                              ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                              ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, ld_name varchar(255) not null, 
                              ld_label varchar(255), ld_setid bigint, ld_hidden int not null, ld_multiple int not null, 
-                             ld_parent varchar(255), primary key (ld_versionid, ld_name));
+                             ld_parent varchar(255), ld_dependson varchar(255), primary key (ld_versionid, ld_name));
 create table ld_folder (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255), 
                         ld_parentid bigint not null, ld_securityref bigint, ld_description varchar(4000), 
@@ -153,7 +157,8 @@ create table ld_folder_ext (ld_folderid bigint not null, ld_mandatory int not nu
                             ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                             ld_intvalue bigint, ld_doublevalue float, ld_datevalue timestamp null, 
                             ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
-                            ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), primary key (ld_folderid, ld_name));
+                            ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                            ld_dependson varchar(255), primary key (ld_folderid, ld_name));
 create table ld_folder_storage (ld_folderid bigint not null, ld_nodeid varchar(255) not null, ld_storageid int not null, primary key (ld_folderid, ld_nodeid));                          
 create table ld_folder_history (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                                 ld_deleted int not null, ld_tenantid bigint not null, ld_docid bigint, 
@@ -205,7 +210,7 @@ create table ld_sequence (ld_id bigint not null, ld_lastmodified timestamp not n
                           primary key (ld_id));
 create table ld_extoption (ld_id bigint not null, ld_lastmodified timestamp not null, ld_recordversion bigint not null,
                           ld_deleted int not null, ld_tenantid bigint not null, ld_setid bigint not null,
-                          ld_attribute varchar(255) not null, ld_value varchar(255) not null, 
+                          ld_attribute varchar(255) not null, ld_value varchar(255) not null, ld_category varchar(255), 
                           ld_label varchar(1000), ld_position int not null,
                           primary key (ld_id));
 create table ld_temp (ld_int bigint, ld_date timestamp, ld_string varchar(4000));

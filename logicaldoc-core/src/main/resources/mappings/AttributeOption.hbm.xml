@@ -17,6 +17,7 @@
         <property name="setId" type="long" column="ld_setid" not-null="true" />
         <property name="attribute" type="string" column="ld_attribute" not-null="true" />
 		<property name="value" type="string" column="ld_value" not-null="true" />
+		<property name="category" type="string" column="ld_category" not-null="false" />
         <property name="label" type="string" column="ld_label" not-null="false" />
         <property name="position" type="int" column="ld_position" not-null="true" />
 	</class>

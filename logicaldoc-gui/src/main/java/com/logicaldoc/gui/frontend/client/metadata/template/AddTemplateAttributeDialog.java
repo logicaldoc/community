@@ -71,20 +71,29 @@ public class AddTemplateAttributeDialog extends Window {
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setCanEdit(false);
 		name.setCanSort(false);
-		name.setWidth(100);
+		name.setAutoFitWidth(true);
+		name.setMinWidth(80);
 
 		ListGridField label = new ListGridField("label", I18N.message("label"));
 		label.setCanEdit(true);
 		label.setCanSort(false);
-		label.setWidth(150);
+		label.setAutoFitWidth(true);
+		label.setMinWidth(80);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setCanEdit(false);
 		type.setCanSort(false);
-		type.setWidth(100);
+		type.setAutoFitWidth(true);
+		type.setMinWidth(70);
 		type.setCellFormatter(new AttributeTypeFormatter());
 
-		setAttributesList.setFields(name, label, type);
+		ListGridField preset = new ListGridField("preset", I18N.message("preset"));
+		preset.setCanEdit(false);
+		preset.setCanSort(false);
+		preset.setAutoFitWidth(true);
+		preset.setMinWidth(70);
+
+		setAttributesList.setFields(name, label, type, preset);
 
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -167,6 +176,7 @@ public class AddTemplateAttributeDialog extends Window {
 					record.setAttribute("hidden", att.isHidden());
 					record.setAttribute("multiple", att.isMultiple());
 					record.setAttribute("validation", att.getValidation());
+					record.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
 					setAttributesList.getRecordList().add(record);
 				}
 			}

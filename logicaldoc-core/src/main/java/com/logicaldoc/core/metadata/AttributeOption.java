@@ -16,6 +16,14 @@ public class AttributeOption extends PersistentObject implements Comparable<Attr
 
 	private String attribute;
 
+	/**
+	 * An category, just to organize the values in groups
+	 */
+	private String category;
+
+	/**
+	 * The value of this option
+	 */
 	private String value;
 
 	private String label;
@@ -23,6 +31,11 @@ public class AttributeOption extends PersistentObject implements Comparable<Attr
 	private int position = 0;
 
 	public AttributeOption() {
+	}
+
+	public AttributeOption(long setId, String attribute, String value, String category) {
+		this(setId, attribute, value);
+		this.category = category;
 	}
 
 	public AttributeOption(long setId, String attribute, String value) {
@@ -70,6 +83,14 @@ public class AttributeOption extends PersistentObject implements Comparable<Attr
 
 	public void setPosition(int position) {
 		this.position = position;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	@Override

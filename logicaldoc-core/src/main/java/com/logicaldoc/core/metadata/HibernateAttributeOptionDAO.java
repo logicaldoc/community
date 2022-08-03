@@ -3,6 +3,8 @@ package com.logicaldoc.core.metadata;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 	public boolean deleteBySetIdAndAttribute(long setId, String attribute) {
 		boolean result = true;
 		try {
-			List<AttributeOption> options = findBySetIdAndAttribute(setId, attribute);
+			List<AttributeOption> options = findByAttribute(setId, attribute);
 			for (AttributeOption option : options)
 				del(option, PersistentObject.DELETED_CODE_DEFAULT);
 		} catch (Throwable e) {
@@ -42,21 +44,43 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 	}
 
 	@Override
-	public List<AttributeOption> findBySetIdAndAttribute(long setId, String attribute) {
+	public List<AttributeOption> findByAttribute(long setId, String attribute) {
+		return findByAttributeAndCategory(setId, attribute, null);
+	}
+
+	@Override
+	public List<AttributeOption> findByAttributeAndCategory(long setId, String attribute, String category) {
 		List<AttributeOption> coll = new ArrayList<AttributeOption>();
 		try {
-			if (StringUtils.isEmpty(attribute))
-				coll = (List<AttributeOption>) findByQuery(
-						"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 order by _opt.position asc",
-						new Object[] { Long.valueOf(setId) }, null);
-			else
-				coll = (List<AttributeOption>) findByQuery(
-						"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 and _opt.attribute = ?2 order by _opt.position asc",
-						new Object[] { Long.valueOf(setId), attribute }, null);
+			if (StringUtils.isEmpty(attribute)) {
+				if (StringUtils.isEmpty(category))
+					coll = (List<AttributeOption>) findByQuery(
+							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 order by _opt.position asc",
+							new Object[] { Long.valueOf(setId) }, null);
+				else
+					coll = (List<AttributeOption>) findByQuery(
+							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 and _opt.category = ?2 order by _opt.position asc",
+							new Object[] { Long.valueOf(setId), category }, null);
+			} else {
+				if (StringUtils.isEmpty(category))
+					coll = (List<AttributeOption>) findByQuery(
+							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 and _opt.attribute = ?2 order by _opt.position asc",
+							new Object[] { Long.valueOf(setId), attribute }, null);
+				else
+					coll = (List<AttributeOption>) findByQuery(
+							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 and _opt.attribute = ?2 and _opt.category = ?3 order by _opt.position asc",
+							new Object[] { Long.valueOf(setId), attribute, category }, null);
+			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 		}
 		return coll;
+	}
+
+	@Override
+	public Map<String, List<AttributeOption>> findByAttributeAsMap(long setId, String attribute) {
+		List<AttributeOption> coll = findByAttribute(setId, attribute);
+		return coll.stream().collect(Collectors.groupingBy(AttributeOption::getCategory));
 	}
 
 	@Override

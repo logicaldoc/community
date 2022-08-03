@@ -69,6 +69,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	private String parent;
 
+	private String dependsOn;
+
 	private int position = 0;
 
 	private String name;
@@ -85,7 +87,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	private String stringValues;
 
 	private String validation;
-	
+
 	private String initialization;
 
 	public static boolean isForbidden(String name) {
@@ -353,7 +355,15 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	public void setInitialization(String initialization) {
 		this.initialization = initialization;
 	}
-	
+
+	public String getDependsOn() {
+		return dependsOn;
+	}
+
+	public void setDependsOn(String dependsOn) {
+		this.dependsOn = dependsOn;
+	}
+
 	public GUIAttribute clone() {
 		GUIAttribute newAttr = new GUIAttribute();
 		newAttr.setBooleanValue(booleanValue);
@@ -378,6 +388,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		newAttr.setUsername(username);
 		newAttr.setValidation(validation);
 		newAttr.setInitialization(initialization);
+		newAttr.setDependsOn(dependsOn);
 
 		return newAttr;
 	}

@@ -1,10 +1,10 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -25,6 +25,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.model.WSAttribute;
+import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSTemplate;
@@ -121,6 +122,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						att.setHidden(attribute.getHidden());
 						att.setMultiple(attribute.getMultiple());
 						att.setParent(attribute.getParent());
+						att.setDependsOn(attribute.getDependsOn());
 						att.setLabel(attribute.getLabel());
 						if (StringUtils.isEmpty(attribute.getLabel()))
 							att.setLabel(attribute.getName());
@@ -167,39 +169,23 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 	}
 
 	@Override
-	public void setAttributeOptions(String sid, long setId, String attribute, String[] values) throws Exception {
+	public void setAttributeOptions(String sid, long setId, String attribute, WSAttributeOption[] wsOptions)
+			throws Exception {
 		checkAdministrator(sid);
 
 		try {
 			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
+			dao.deleteBySetIdAndAttribute(setId, attribute);
 
-			if (values == null || values.length == 0) {
-				dao.deleteBySetIdAndAttribute(setId, attribute);
+			if (wsOptions == null || wsOptions.length == 0) {
 				return;
 			}
-
-			List<String> valuesList = Arrays.asList(values);
-
-			List<AttributeOption> options = dao.findBySetIdAndAttribute(setId, attribute);
-			List<String> oldValues = new ArrayList<String>();
-			for (AttributeOption option : options) {
-				oldValues.add(option.getValue());
-				int index = valuesList.indexOf(option.getValue());
-				if (index == -1)
-					dao.delete(option.getId());
-				else if (options.indexOf(option) != index) {
-					option.setPosition(index);
-					dao.store(option);
-				}
+			for (int i = 0; i < wsOptions.length; i++) {
+				AttributeOption option = new AttributeOption(setId, attribute, wsOptions[i].getValue(),
+						wsOptions[i].getCategory());
+				option.setPosition(i);
+				dao.store(option);
 			}
-			for (int i = 0; i < values.length; i++) {
-				if (!oldValues.contains(values[i])) {
-					AttributeOption option = new AttributeOption(setId, attribute, values[i]);
-					option.setPosition(i);
-					dao.store(option);
-				}
-			}
-
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
@@ -212,12 +198,24 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 		try {
 			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 
-			List<AttributeOption> options = dao.findBySetIdAndAttribute(setId, attribute);
-			List<String> values = new ArrayList<String>();
-			for (AttributeOption option : options)
-				values.add(option.getValue());
+			List<AttributeOption> options = dao.findByAttribute(setId, attribute);
+			return options.stream().map(o -> o.getValue()).collect(Collectors.toList()).toArray(new String[0]);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+			throw new Exception(t.getMessage());
+		}
+	}
 
-			return values.toArray(new String[0]);
+	@Override
+	public WSAttributeOption[] getAttributeOptionsByCategory(String sid, long setId, String attribute, String category)
+			throws Exception {
+		validateSession(sid);
+		try {
+			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
+
+			List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
+			return options.stream().map(o -> new WSAttributeOption(o.getValue(), o.getCategory()))
+					.collect(Collectors.toList()).toArray(new WSAttributeOption[0]);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
@@ -302,6 +300,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						att.setHidden(attribute.getHidden());
 						att.setMultiple(attribute.getMultiple());
 						att.setParent(attribute.getParent());
+						att.setDependsOn(attribute.getDependsOn());
 						att.setLabel(attribute.getLabel());
 						if (StringUtils.isEmpty(attribute.getLabel()))
 							att.setLabel(attribute.getName());

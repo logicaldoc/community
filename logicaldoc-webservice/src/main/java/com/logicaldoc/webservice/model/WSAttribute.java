@@ -86,6 +86,9 @@ public class WSAttribute implements Serializable {
 	@WSDoc(required = false, description = "The reference attribute name, used for multi value attributes")
 	private String parent;
 
+	@WSDoc(required = false, description = "Name of another attribute on which the value of this attribute also depends, used for managing linked presets")
+	private String dependsOn;
+	
 	@WSDoc(required = false, description = "Read only. In case of multiple string values, contains the values separated by a comma")
 	private String stringValues;
 
@@ -299,5 +302,13 @@ public class WSAttribute implements Serializable {
 
 	public void setStringValues(String stringValues) {
 		this.stringValues = stringValues;
+	}
+
+	public String getDependsOn() {
+		return dependsOn;
+	}
+
+	public void setDependsOn(String dependsOn) {
+		this.dependsOn = dependsOn;
 	}
 }

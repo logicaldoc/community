@@ -7,6 +7,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 
 /**
  * The client side stub for the AttributeSet Service. This service gives all
@@ -53,17 +54,17 @@ public interface AttributeSetService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIAttributeSet[] getAttributeSets() throws ServerException;
-	
+
 	/**
 	 * Saves the list of all possible options
 	 * 
 	 * @param setId identifier of the set
 	 * @param attribute name of the attribute
-	 * @param values array of possible options
+	 * @param options array of possible options
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void saveOptions(long setId, String attribute, String[] values) throws ServerException;
+	public void saveOptions(long setId, String attribute, GUIValue[] options) throws ServerException;
 
 	/**
 	 * Delete a selection of options
@@ -86,7 +87,7 @@ public interface AttributeSetService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public String[] parseOptions(long setId, String attribute) throws ServerException;
+	public GUIValue[] parseOptions(long setId, String attribute) throws ServerException;
 
 	/**
 	 * Forces the validation of an attribute to all those templates that use it
@@ -99,7 +100,8 @@ public interface AttributeSetService extends RemoteService {
 	void applyValidationToTemplates(long setId, String attribute) throws ServerException;
 
 	/**
-	 * Forces the initialization of an attribute to all those templates that use it
+	 * Forces the initialization of an attribute to all those templates that use
+	 * it
 	 * 
 	 * @param setId identifier of the set
 	 * @param attribute name of the attribute
@@ -107,7 +109,7 @@ public interface AttributeSetService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	void applyInitializationToTemplates(long setId, String attribute) throws ServerException;
-	
+
 	public static class Instance {
 		private static AttributeSetServiceAsync instance;
 
@@ -120,5 +122,4 @@ public interface AttributeSetService extends RemoteService {
 		}
 	}
 
-	
 }

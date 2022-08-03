@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.rest.DocumentMetadataService;
@@ -36,9 +37,9 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@Path("/setAttributeOptions")
 	//@ApiOperation(value = "Save attribute options", notes = "Updates the options for the given attribute")
 	@Operation(summary = "Save attribute options", description = "Updates the options for the given attribute")
-	public void setAttributeOptions(@QueryParam("setId") long setId, @QueryParam("attribute") String attribute, @QueryParam("values") String[] values) throws Exception {
+	public void setAttributeOptions(@QueryParam("setId") long setId, @QueryParam("attribute") String attribute, @QueryParam("options") WSAttributeOption[] options) throws Exception {
 		String sid = validateSession();
-		super.setAttributeOptions(sid, setId, attribute, values);
+		super.setAttributeOptions(sid, setId, attribute, options);
 	}
 
 	@Override
@@ -157,8 +158,8 @@ public class RestDocumentMetadataService extends SoapDocumentMetadataService imp
 	@POST
 	@Path("/setAttributeOptionsPOST")
 	@Operation(summary = "Save attribute options with a POST method", description = "Saves the options for the given attribute with a POST method. This is useful for very large lists of values")
-	public void setAttributeOptionsPOST(@FormParam("setId") long setId, @FormParam("attribute") String attribute, @FormParam("values") String[] values) throws Exception {
+	public void setAttributeOptionsPOST(@FormParam("setId") long setId, @FormParam("attribute") String attribute, @FormParam("values") WSAttributeOption[] options) throws Exception {
 		String sid = validateSession();
-		super.setAttributeOptions(sid, setId, attribute, values);
+		super.setAttributeOptions(sid, setId, attribute, options);
 	}
 }

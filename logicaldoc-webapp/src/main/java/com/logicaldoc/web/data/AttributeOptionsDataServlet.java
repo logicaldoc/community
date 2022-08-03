@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,12 +44,13 @@ public class AttributeOptionsDataServlet extends HttpServlet {
 			long setId = Long.parseLong(request.getParameter("setId"));
 			String attribute = request.getParameter("attribute");
 			boolean withempty = "true".equals(request.getParameter("withempty"));
+			String category = request.getParameter("category");
 
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
 			AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
-			List<AttributeOption> options = dao.findBySetIdAndAttribute(setId, attribute);
+			List<AttributeOption> options = dao.findByAttributeAndCategory(setId, attribute, category);
 
 			if (withempty) {
 				writer.print("<option>");
@@ -56,6 +58,7 @@ public class AttributeOptionsDataServlet extends HttpServlet {
 				writer.print("<attribute></attribute>");
 				writer.print("<value></value>");
 				writer.print("<position></position>");
+				writer.print("<category></category>");
 				writer.print("</option>");
 			}
 
@@ -64,6 +67,8 @@ public class AttributeOptionsDataServlet extends HttpServlet {
 				writer.print("<id>" + option.getId() + "</id>");
 				writer.print("<attribute><![CDATA[" + option.getAttribute() + "]]></attribute>");
 				writer.print("<value><![CDATA[" + option.getValue() + "]]></value>");
+				if (StringUtils.isNotEmpty(option.getCategory()))
+					writer.print("<category><![CDATA[" + option.getCategory() + "]]></category>");
 				writer.print("<position><![CDATA[" + option.getPosition() + "]]></position>");
 				writer.print("</option>");
 			}

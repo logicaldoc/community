@@ -2,6 +2,7 @@ package com.logicaldoc.webservice.soap.client;
 
 import java.io.IOException;
 
+import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSTemplate;
@@ -49,8 +50,8 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 	}
 
 	@Override
-	public void setAttributeOptions(String sid, long setId, String attribute, String[] values) throws Exception {
-		client.setAttributeOptions(sid, setId, attribute, values);
+	public void setAttributeOptions(String sid, long setId, String attribute, WSAttributeOption[] options) throws Exception {
+		client.setAttributeOptions(sid, setId, attribute, options);
 	}
 
 	@Override
@@ -58,6 +59,12 @@ public class SoapDocumentMetadataClient extends SoapClient<DocumentMetadataServi
 		return client.getAttributeOptions(sid, setId, attribute);
 	}
 
+	@Override
+	public WSAttributeOption[] getAttributeOptionsByCategory(String sid, long setId, String attribute, String category)
+			throws Exception {
+		return client.getAttributeOptionsByCategory(sid, setId, attribute, category);
+	}
+	
 	@Override
 	public WSAttributeSet[] listAttributeSets(String sid) throws Exception {
 		return client.listAttributeSets(sid);

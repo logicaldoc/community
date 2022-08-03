@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.rest.DocumentMetadataService;
@@ -44,12 +45,12 @@ public class RestDocumentMetadataClient extends AbstractRestClient {
 		}
 	}
 
-	public void setAttributeOptions(long setId, String attribute, String[] values) throws Exception {
-		proxy.setAttributeOptions(setId, attribute, values);
+	public void setAttributeOptions(long setId, String attribute, WSAttributeOption[] options) throws Exception {
+		proxy.setAttributeOptions(setId, attribute, options);
 	}
 	
-	public void setAttributeOptionsPOST(long setId, String attribute, String[] values) throws Exception {
-		proxy.setAttributeOptionsPOST(setId, attribute, values);
+	public void setAttributeOptionsPOST(long setId, String attribute, WSAttributeOption[] options) throws Exception {
+		proxy.setAttributeOptionsPOST(setId, attribute, options);
 	}	
 
 	public long storeAttributeSet(WSAttributeSet attributeSet) throws Exception {

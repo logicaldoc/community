@@ -11,7 +11,7 @@ import com.smartgwt.client.data.fields.DataSourceTextField;
  * @since 7.1
  */
 public class AttributeOptionsDS extends DataSource {
-	public AttributeOptionsDS(long setId, String attribute, boolean withEmpty) {
+	public AttributeOptionsDS(long setId, String attribute, String category, boolean withEmpty) {
 		setRecordXPath("/list/option");
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
@@ -21,6 +21,8 @@ public class AttributeOptionsDS extends DataSource {
 		_attribute.setHidden(true);
 
 		DataSourceTextField value = new DataSourceTextField("value");
+		
+		DataSourceTextField cat = new DataSourceTextField("category");
 
 		DataSourceIntegerField position = new DataSourceIntegerField("position");
 		position.setHidden(true);
@@ -28,10 +30,10 @@ public class AttributeOptionsDS extends DataSource {
 		DataSourceTextField _templateId = new DataSourceTextField("templateId");
 		_templateId.setHidden(true);
 
-		setFields(id, _attribute, value, position, _templateId);
+		setFields(id, _attribute, value, cat, position, _templateId);
 		setClientOnly(true);
 
 		setDataURL("data/attributeoptions.xml?setId=" + setId + "&" + "attribute=" + attribute + "&withempty="
-				+ withEmpty);
+				+ withEmpty+(category!=null ? "&category="+category : ""));
 	}
 }

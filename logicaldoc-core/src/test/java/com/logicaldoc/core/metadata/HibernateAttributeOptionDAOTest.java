@@ -2,6 +2,7 @@ package com.logicaldoc.core.metadata;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -30,43 +31,81 @@ public class HibernateAttributeOptionDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testDeleteByTemplateIdAndAttribute() {
-		List<AttributeOption> options = dao.findBySetIdAndAttribute(1L, null);
-		Assert.assertEquals(3, options.size());
+		List<AttributeOption> options = dao.findByAttribute(1L, null);
+		Assert.assertEquals(5, options.size());
 
 		dao.deleteBySetIdAndAttribute(1L, "att1");
-		options = dao.findBySetIdAndAttribute(1L, null);
+		options = dao.findByAttribute(1L, null);
 		Assert.assertEquals(1, options.size());
 
 		dao.deleteBySetIdAndAttribute(1L, null);
-		options = dao.findBySetIdAndAttribute(1L, null);
+		options = dao.findByAttribute(1L, null);
 		Assert.assertEquals(0, options.size());
 	}
 
 	@Test
 	public void testDeleteOrphaned() {
-		List<AttributeOption> options = dao.findBySetIdAndAttribute(1L, "att1");
-		Assert.assertEquals(2, options.size());
+		List<AttributeOption> options = dao.findByAttribute(1L, "att1");
+		Assert.assertEquals(4, options.size());
 
 		dao.deleteOrphaned(1L, (List<String>)Arrays.asList(new String[]{"pippo","pluto"}));
-		options = dao.findBySetIdAndAttribute(1L, "att1");
+		options = dao.findByAttribute(1L, "att1");
 		Assert.assertEquals(0, options.size());
 	}
 	
 	@Test
 	public void testFindByTemplateAndAttribute() {
-		List<AttributeOption> options = dao.findBySetIdAndAttribute(1L, "att1");
-		Assert.assertEquals(2, options.size());
-		options = dao.findBySetIdAndAttribute(1L, null);
-		Assert.assertEquals(3, options.size());
+		List<AttributeOption> options = dao.findByAttribute(1L, "att1");
+		Assert.assertEquals(4, options.size());
+		options = dao.findByAttribute(1L, null);
+		Assert.assertEquals(5, options.size());
 
-		options = dao.findBySetIdAndAttribute(999L, null);
+		options = dao.findByAttribute(999L, null);
 		Assert.assertEquals(0, options.size());
 
-		options = dao.findBySetIdAndAttribute(1L, "att2");
+		options = dao.findByAttribute(1L, "att2");
 		Assert.assertEquals(1, options.size());
-		options = dao.findBySetIdAndAttribute(2L, "att1");
+		options = dao.findByAttribute(2L, "att1");
 		Assert.assertEquals(1, options.size());
-		options = dao.findBySetIdAndAttribute(2L, null);
+		options = dao.findByAttribute(2L, null);
 		Assert.assertEquals(1, options.size());
+	}
+	
+	@Test
+	public void testFindBySetIdAndAttributeCategory() {
+		List<AttributeOption> options = dao.findByAttributeAndCategory(1L, "att1", "cat1");
+		Assert.assertEquals(3, options.size());
+		Assert.assertEquals("value1", options.get(0).getValue());
+		Assert.assertEquals("value2", options.get(1).getValue());
+		Assert.assertEquals("value5", options.get(2).getValue());
+		
+		options = dao.findByAttributeAndCategory(1L, "att1", "cat2");
+		Assert.assertEquals(1, options.size());
+		Assert.assertEquals("value6", options.get(0).getValue());
+	
+		options = dao.findByAttributeAndCategory(1L, "att1", "catX");
+		Assert.assertEquals(0, options.size());
+	}
+	
+	
+	@Test
+	public void testFindByTemplateAndAttributeAsMap() {
+		Map<String, List<AttributeOption>> optionsMap = dao.findByAttributeAsMap(1L, "att1");
+		Assert.assertEquals(2, optionsMap.size());
+		Assert.assertTrue(optionsMap.containsKey("cat1"));
+		Assert.assertTrue(optionsMap.containsKey("cat2"));
+		
+		List<AttributeOption> options = optionsMap.get("cat1");
+		Assert.assertEquals(3, options.size());
+		Assert.assertEquals("value1", options.get(0).getValue());
+		Assert.assertEquals("value2", options.get(1).getValue());
+		Assert.assertEquals("value5", options.get(2).getValue());
+		
+		options = optionsMap.get("cat2");
+		Assert.assertEquals(1, options.size());
+		Assert.assertEquals("value6", options.get(0).getValue());
+		
+		optionsMap = dao.findByAttributeAsMap(1L, "pollo");
+		Assert.assertEquals(0, optionsMap.size());
 	}
 }

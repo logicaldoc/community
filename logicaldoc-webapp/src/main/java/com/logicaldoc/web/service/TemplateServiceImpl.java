@@ -138,6 +138,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 							att.setHidden(attribute.isHidden() ? 1 : 0);
 							att.setMultiple(attribute.isMultiple() ? 1 : 0);
 							att.setParent(attribute.getParent());
+							att.setDependsOn(attribute.getDependsOn());
 							att.setType(attribute.getType());
 							att.setLabel(attribute.getLabel());
 							att.setEditor(attribute.getEditor());
@@ -249,6 +250,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 				att.setHidden(templateExtAttr.getHidden() == 1 ? true : false);
 				att.setMultiple(templateExtAttr.getMultiple() == 1 ? true : false);
 				att.setParent(templateExtAttr.getParent());
+				att.setDependsOn(templateExtAttr.getDependsOn());
 				att.setStringValues(templateExtAttr.getStringValues());
 				att.setType(templateExtAttr.getType());
 				att.setValidation(templateExtAttr.getValidation());
@@ -367,7 +369,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 						return Integer.valueOf(o1.getPosition()).compareTo(Integer.valueOf(o2.getPosition()));
 					}
 				});
-			
+
 			return attributes;
 		} catch (Throwable t) {
 			return (GUIAttribute[]) ServiceUtil.throwServerException(session, log, t);
@@ -400,7 +402,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 				} else
 					currentTemplate = template;
 
-				if (extensibleObject.getId() == 0L || !template.equals(currentTemplate)) {
+				if ((extensibleObject!=null && extensibleObject.getId() == 0L) || !template.equals(currentTemplate)) {
 					// Probably the GUI did not fill the attributes map at this
 					// point, so put the template's attributes
 					if (extensibleObject.getAttributes().isEmpty())
@@ -436,6 +438,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 					guiAttribute.setHidden(templateExtAttr.getHidden() == 1);
 					guiAttribute.setMultiple(templateExtAttr.getMultiple() == 1);
 					guiAttribute.setParent(templateExtAttr.getParent());
+					guiAttribute.setDependsOn(templateExtAttr.getDependsOn());
 					guiAttribute.setStringValues(templateExtAttr.getStringValues());
 					guiAttribute.setEditor(templateExtAttr.getEditor());
 					guiAttribute.setStringValue(templateExtAttr.getStringValue());
@@ -478,6 +481,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 								GUIAttribute valAtt = (GUIAttribute) guiAttribute.clone();
 								valAtt.setName(valAttribute.getName());
 								valAtt.setParent(guiAttribute.getName());
+								valAtt.setDependsOn(guiAttribute.getDependsOn());
 								valAtt.setMultiple(false);
 								valAtt.setPosition(guiAttribute.getPosition());
 								valAtt.setBooleanValue(valAttribute.getBooleanValue());

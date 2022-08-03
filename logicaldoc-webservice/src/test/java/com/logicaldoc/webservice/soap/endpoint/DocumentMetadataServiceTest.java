@@ -3,14 +3,15 @@ package com.logicaldoc.webservice.soap.endpoint;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
+import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSTemplate;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>SoapDocumentMetadataService</code>
@@ -84,15 +85,21 @@ public class DocumentMetadataServiceTest extends AbstractWebserviceTestCase {
 		SoapDocumentMetadataService docMetadataServiceImpl = new SoapDocumentMetadataService();
 		docMetadataServiceImpl.setValidateSession(false);
 
-		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test", new String[] { "val1", "val2", "val3" });
+		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test",
+				new WSAttributeOption[] { new WSAttributeOption("val1", null), new WSAttributeOption("val2", null),
+						new WSAttributeOption("val3", null) });
 		String[] values = docMetadataServiceImpl.getAttributeOptions("xxx", 1L, "test");
 		Assert.assertEquals(3, values.length);
 
-		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test", new String[] { "val1", "val2", "val3", "val4" });
+		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test",
+				new WSAttributeOption[] { new WSAttributeOption("val1", null), new WSAttributeOption("val2", null),
+						new WSAttributeOption("val3", null), new WSAttributeOption("val4", null) });
 		values = docMetadataServiceImpl.getAttributeOptions("xxx", 1L, "test");
 		Assert.assertEquals(4, values.length);
 
-		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test", new String[] { "val1", "val2", "val4" });
+		docMetadataServiceImpl.setAttributeOptions("xxx", 1L, "test",
+				new WSAttributeOption[] { new WSAttributeOption("val1", null), new WSAttributeOption("val2", null),
+						new WSAttributeOption("val4", null) });
 		values = docMetadataServiceImpl.getAttributeOptions("xxx", 1L, "test");
 		Assert.assertEquals(3, values.length);
 		Assert.assertFalse(Arrays.asList(values).contains("val3"));

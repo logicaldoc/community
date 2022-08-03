@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSTemplate;
 
@@ -34,21 +35,20 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param setId The attribute set's id
 	 * @param attribute The attribute's name
-	 * @param values The attribute's options
+	 * @param options The attribute's options
 	 * 
 	 * @throws Exception error in the server application
 	 */
 	@PUT
 	@Path("/setAttributeOptions")
-	public void setAttributeOptions(
-			@QueryParam("setId") long setId, 
-			@QueryParam("attribute") String attribute, 
-			@QueryParam("values") String[] values) throws Exception;
-	
-	
+	public void setAttributeOptions(@QueryParam("setId")
+	long setId, @QueryParam("attribute")
+	String attribute, @QueryParam("options")
+	WSAttributeOption[] options) throws Exception;
+
 	/**
-	 * Saves the options for the given attribute with a POST method.
-	 * This is useful for very large lists of values 
+	 * Saves the options for the given attribute with a POST method. This is
+	 * useful for very large lists of values
 	 * 
 	 * @param setId The attribute set's id
 	 * @param attribute The attribute's name
@@ -58,10 +58,10 @@ public interface DocumentMetadataService {
 	 */
 	@POST
 	@Path("/setAttributeOptionsPOST")
-	public void setAttributeOptionsPOST(
-			@FormParam("setId") long setId, 
-			@FormParam("attribute") String attribute, 
-			@FormParam("values") String[] values) throws Exception;	
+	public void setAttributeOptionsPOST(@FormParam("setId")
+	long setId, @FormParam("attribute")
+	String attribute, @FormParam("options")
+	WSAttributeOption[] options) throws Exception;
 
 	/**
 	 * Create/Update an attribute set. You can completely customize the
@@ -104,7 +104,8 @@ public interface DocumentMetadataService {
 	 */
 	@GET
 	@Path("/getAttributeSetById")
-	public WSAttributeSet getAttributeSetById(@QueryParam("setId") long setId) throws Exception;
+	public WSAttributeSet getAttributeSetById(@QueryParam("setId")
+	long setId) throws Exception;
 
 	/**
 	 * Gets attribute set's metadata
@@ -117,7 +118,8 @@ public interface DocumentMetadataService {
 	 */
 	@GET
 	@Path("/getAttributeSet")
-	public WSAttributeSet getAttributeSet(@QueryParam("name") String name) throws Exception;
+	public WSAttributeSet getAttributeSet(@QueryParam("name")
+	String name) throws Exception;
 
 	/**
 	 * Gets template's metadata
@@ -130,7 +132,8 @@ public interface DocumentMetadataService {
 	 */
 	@GET
 	@Path("/getTemplate")
-	public WSTemplate getTemplate(@QueryParam("name") String name) throws Exception;
+	public WSTemplate getTemplate(@QueryParam("name")
+	String name) throws Exception;
 
 	/**
 	 * Gets template's metadata
@@ -143,7 +146,8 @@ public interface DocumentMetadataService {
 	 */
 	@GET
 	@Path("/getTemplateById")
-	public WSTemplate getTemplateById(@QueryParam("templateId") long templateId) throws Exception;
+	public WSTemplate getTemplateById(@QueryParam("templateId")
+	long templateId) throws Exception;
 
 	/**
 	 * Retrieves the options for the given attribute
@@ -157,8 +161,9 @@ public interface DocumentMetadataService {
 	 */
 	@GET
 	@Path("/getAttributeOptions")
-	public String[] getAttributeOptions(@QueryParam("setId") long setId, 
-			@QueryParam("attribute") String attribute) throws Exception;
+	public String[] getAttributeOptions(@QueryParam("setId")
+	long setId, @QueryParam("attribute")
+	String attribute) throws Exception;
 
 	/**
 	 * Gets metadata of all existing attribute sets.
@@ -180,7 +185,8 @@ public interface DocumentMetadataService {
 	 */
 	@DELETE
 	@Path("/deleteAttributeSet")
-	public void deleteAttributeSet(@QueryParam("setId") long setId) throws Exception;
+	public void deleteAttributeSet(@QueryParam("setId")
+	long setId) throws Exception;
 
 	/**
 	 * Deletes an existing template with the given identifier
@@ -191,7 +197,8 @@ public interface DocumentMetadataService {
 	 */
 	@DELETE
 	@Path("/deleteTemplate")
-	public void deleteTemplate(@QueryParam("templateId") long templateId) throws Exception;
+	public void deleteTemplate(@QueryParam("templateId")
+	long templateId) throws Exception;
 
 	/**
 	 * Gets metadata of all existing templates.

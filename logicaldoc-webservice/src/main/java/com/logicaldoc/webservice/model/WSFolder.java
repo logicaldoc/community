@@ -207,6 +207,7 @@ public class WSFolder implements Serializable {
 						extAttribute.setHidden(attributes[i].getHidden());
 						extAttribute.setMultiple(attributes[i].getMultiple());
 						extAttribute.setParent(attributes[i].getParent());
+						extAttribute.setDependsOn(attributes[i].getDependsOn());
 						extAttribute.setPosition(attributes[i].getPosition());
 						extAttribute.setIntValue(attributes[i].getIntValue());
 						extAttribute.setStringValue(attributes[i].getStringValue());

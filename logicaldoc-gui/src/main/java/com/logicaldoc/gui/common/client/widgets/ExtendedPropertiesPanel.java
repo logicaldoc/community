@@ -19,13 +19,19 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
+import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.data.Criteria;
+import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ResizedEvent;
 import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
+import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.FormItemCriteriaFunction;
+import com.smartgwt.client.widgets.form.fields.FormItemFunctionContext;
 import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -69,6 +75,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 	protected SelectItem templateItem = null;
 
 	protected List<FormItem> extendedItems = new ArrayList<FormItem>();
+
+	private ClearDependantAttributes dependeciesHandler = new ClearDependantAttributes();
 
 	public ExtendedPropertiesPanel(GUIExtensibleObject object, ChangedHandler changedHandler,
 			ChangedHandler templateChangedHandler, boolean updateEnabled, boolean checkMandatory,
@@ -218,6 +226,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		if (object.getAttributes() != null && object.getAttributes().length > 0 && extendedItems != null)
 			attributesForm.setItems(extendedItems.toArray(new FormItem[0]));
 
+		updateDependantAttributes();
 		addMember(attributesForm);
 	}
 
@@ -303,6 +312,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 				item.setDisabled(!updateEnabled);
 				if (changedHandler != null)
 					item.addChangedHandler(changedHandler);
+				item.addChangedHandler(dependeciesHandler);
 				extendedItems.add(item);
 			}
 		}
@@ -685,6 +695,72 @@ public class ExtendedPropertiesPanel extends HLayout {
 			if (error.getAttribute().isEmpty())
 				continue;
 			vm.setFieldErrors(ItemFactory.itemNameForAttribute(error.getAttribute()), error.getDescription(), true);
+		}
+	}
+
+	/**
+	 * Used when the form gets displayed the first time to update the options
+	 * lists according on the dependencies
+	 */
+	private void updateDependantAttributes() {
+		for (GUIAttribute att : object.getAttributes()) {
+			String dependsOn = att.getDependsOn();
+			if (dependsOn != null && !dependsOn.isEmpty()) {
+				FormItem item = vm.getItem(ItemFactory.itemNameForAttribute(att.getName()));
+				if (item instanceof SelectItem) {
+					SelectItem select = (SelectItem) item;
+					select.setPickListFilterCriteriaFunction(new FormItemCriteriaFunction() {
+						@Override
+						public Criteria getCriteria(FormItemFunctionContext itemContext) {
+							String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
+							Criteria criteria = new Criteria("category", category);
+							return criteria;
+						}
+					});
+				} else if (item instanceof ComboBoxItem) {
+					ComboBoxItem combo = (ComboBoxItem) item;
+					combo.setPickListFilterCriteriaFunction(new FormItemCriteriaFunction() {
+						@Override
+						public Criteria getCriteria(FormItemFunctionContext itemContext) {
+							String category = vm.getValueAsString(ItemFactory.itemNameForAttribute(dependsOn));
+							Criteria criteria = new Criteria("category", category);
+							return criteria;
+						}
+					});
+				}
+			}
+		}
+	}
+
+	/**
+	 * An handler to clear the options lists according to the dependencies
+	 * 
+	 * @author Marco Meschieri - LogicalDOC
+	 * @since 8.8.2
+	 */
+	class ClearDependantAttributes implements ChangedHandler {
+
+		@Override
+		public void onChanged(ChangedEvent event) {
+			for (GUIAttribute att : object.getAttributes()) {
+				String dependsOn = att.getDependsOn();
+				if (dependsOn != null && !dependsOn.isEmpty()) {
+					FormItem item = vm.getItem(ItemFactory.itemNameForAttribute(att.getName()));
+					FormItem editedItem = event.getItem();
+					String editedAttributeName = editedItem.getName().substring(1)
+							.replaceAll(Constants.BLANK_PLACEHOLDER, " ");
+
+					if (dependsOn.equals(editedAttributeName)) {
+						if (event.getItem() != null && !event.getItem().equals(item)) {
+							/*
+							 * Clear the currently selected item so the user can
+							 * choose an option from the new list
+							 */
+							item.clearValue();
+						}
+					}
+				}
+			}
 		}
 	}
 }

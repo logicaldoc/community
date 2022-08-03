@@ -78,8 +78,7 @@ public class Validator {
 		for (String attributeName : template.getAttributeNames()) {
 			Attribute attribute = object.getAttribute(attributeName);
 			Attribute templateAttribute = template.getAttribute(attributeName);
-			if (StringUtils.isNotEmpty(templateAttribute.getValidation())
-					&& (templateAttribute.getMandatory() != 1 && attribute.getValue() != null)) {
+			if (StringUtils.isNotEmpty(templateAttribute.getValidation())) {
 				Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
 				fieldValidationDictionary.put("object", object);
 				fieldValidationDictionary.put("event", transaction);

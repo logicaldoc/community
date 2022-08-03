@@ -103,6 +103,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
 			att.setValidation(rec.getAttributeAsString("validation"));
 			att.setInitialization(rec.getAttributeAsString("initialization"));
+			att.setDependsOn(rec.getAttributeAsString("dependsOn"));
 
 			template.appendAttribute(att);
 
@@ -151,38 +152,57 @@ public class TemplatePropertiesPanel extends HLayout {
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setCanEdit(false);
 		name.setCanSort(false);
-		name.setWidth(100);
+		name.setAutoFitWidth(true);
+		name.setMinWidth(80);
 
 		ListGridField label = new ListGridField("label", I18N.message("label"));
 		label.setCanEdit(false);
 		label.setCanSort(false);
-		label.setWidth(150);
+		label.setAutoFitWidth(true);
+		label.setMinWidth(80);
 
 		ListGridField set = new ListGridField("set", I18N.message("set"));
 		set.setCanEdit(false);
 		set.setCanSort(false);
+		set.setHidden(true);
 		set.setWidth("*");
 
 		ListGridField mandatory = new ListGridField("mandatory", I18N.message("mandatory"));
 		mandatory.setCanEdit(false);
 		mandatory.setCanSort(false);
-		mandatory.setWidth(90);
+		mandatory.setAutoFitWidth(true);
+		mandatory.setMinWidth(70);
 
 		ListGridField hidden = new ListGridField("hidden", I18N.message("hidden"));
 		hidden.setCanEdit(false);
 		hidden.setCanSort(false);
-		hidden.setWidth(80);
+		hidden.setAutoFitWidth(true);
+		hidden.setMinWidth(70);
 
 		ListGridField multiple = new ListGridField("multiple", I18N.message("multiple"));
 		multiple.setCanEdit(false);
 		multiple.setCanSort(false);
-		multiple.setWidth(80);
+		multiple.setAutoFitWidth(true);
+		multiple.setMinWidth(70);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setCanEdit(false);
 		type.setCanSort(false);
-		type.setWidth(60);
+		type.setAutoFitWidth(true);
+		type.setMinWidth(70);
 		type.setCellFormatter(new AttributeTypeFormatter());
+
+		ListGridField preset = new ListGridField("preset", I18N.message("preset"));
+		preset.setCanEdit(false);
+		preset.setCanSort(false);
+		preset.setAutoFitWidth(true);
+		preset.setMinWidth(70);
+
+		ListGridField dependsOn = new ListGridField("dependsOn", I18N.message("dependson"));
+		dependsOn.setCanEdit(false);
+		dependsOn.setCanSort(false);
+		dependsOn.setAutoFitWidth(true);
+		dependsOn.setMinWidth(70);
 
 		attributesList.addDropCompleteHandler(new DropCompleteHandler() {
 
@@ -199,7 +219,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 		});
 
-		attributesList.setFields(name, label, type, mandatory, hidden, multiple, set);
+		attributesList.setFields(name, label, type, mandatory, hidden, multiple, preset, dependsOn, set);
 
 		Button addAttributes = new Button(I18N.message("addattributes"));
 		addAttributes.setMargin(2);
@@ -373,7 +393,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		resetValidation.setTitle(I18N.message("resetvalidation"));
 		resetValidation.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] selection = attributesList.getSelectedRecords();		
+				ListGridRecord[] selection = attributesList.getSelectedRecords();
 
 				LD.ask(I18N.message("resetvalidation"), I18N.message("resetvalidationquestion"), new BooleanCallback() {
 
@@ -393,26 +413,27 @@ public class TemplatePropertiesPanel extends HLayout {
 								public void onSuccess(GUIAttributeSet[] sets) {
 									LD.clearPrompt();
 									Map<Long, GUIAttributeSet> setsMap = new HashMap<Long, GUIAttributeSet>();
-									for (GUIAttributeSet set : sets) 
+									for (GUIAttributeSet set : sets)
 										setsMap.put(set.getId(), set);
-									
+
 									for (ListGridRecord record : selection) {
-										GUIAttribute setAttribute=null;
+										GUIAttribute setAttribute = null;
 										GUIAttributeSet set = setsMap.get(record.getAttributeAsLong("setId"));
-										if(set!=null)
+										if (set != null)
 											setAttribute = set.getAttribute(record.getAttributeAsString("name"));
-											
-										if(setAttribute!=null) {
-											template.getAttribute(record.getAttributeAsString("name")).setValidation(setAttribute.getValidation());
+
+										if (setAttribute != null) {
+											template.getAttribute(record.getAttributeAsString("name"))
+													.setValidation(setAttribute.getValidation());
 											record.setAttribute("validation", setAttribute.getValidation());
-										}else {
-											template.getAttribute(record.getAttributeAsString("name")).setValidation(null);
-											record.setAttribute("validation", (String)null);
+										} else {
+											template.getAttribute(record.getAttributeAsString("name"))
+													.setValidation(null);
+											record.setAttribute("validation", (String) null);
 										}
 									}
-									
 
-									if(changedHandler!=null)
+									if (changedHandler != null)
 										changedHandler.onChanged(null);
 								}
 							});
@@ -421,21 +442,21 @@ public class TemplatePropertiesPanel extends HLayout {
 				});
 			}
 		});
-		
+
 		MenuItem initialization = new MenuItem();
 		initialization.setTitle(I18N.message("initialization"));
 		initialization.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				ListGridRecord selection = attributesList.getSelectedRecord();
-				TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation("initialization", "initialization", null,
-						null, false);
+				TextAreaItem initializationItem = ItemFactory.newTextAreaItemForAutomation("initialization",
+						"initialization", null, null, false);
 				initializationItem.setWidth(600);
 				initializationItem.setHeight(400);
 
 				GUIAttribute attribute = template.getAttribute(selection.getAttributeAsString("name"));
 
-				LD.askForValue(I18N.message("initialization"), I18N.message("initialization"), attribute.getInitialization(),
-						initializationItem, 600, new ValueCallback() {
+				LD.askForValue(I18N.message("initialization"), I18N.message("initialization"),
+						attribute.getInitialization(), initializationItem, 600, new ValueCallback() {
 
 							@Override
 							public void execute(String initializationScript) {
@@ -447,61 +468,89 @@ public class TemplatePropertiesPanel extends HLayout {
 						});
 			}
 		});
-		
+
 		MenuItem resetInitialization = new MenuItem();
 		resetInitialization.setTitle(I18N.message("resetinitialization"));
 		resetInitialization.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				ListGridRecord[] selection = attributesList.getSelectedRecords();		
+				ListGridRecord[] selection = attributesList.getSelectedRecords();
 
-				LD.ask(I18N.message("resetinitialization"), I18N.message("resetinitializationnquestion"), new BooleanCallback() {
+				LD.ask(I18N.message("resetinitialization"), I18N.message("resetinitializationnquestion"),
+						new BooleanCallback() {
 
-					@Override
-					public void execute(Boolean value) {
-						if (value) {
-							LD.contactingServer();
-							AttributeSetService.Instance.get().getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
+							@Override
+							public void execute(Boolean value) {
+								if (value) {
+									LD.contactingServer();
+									AttributeSetService.Instance.get()
+											.getAttributeSets(new AsyncCallback<GUIAttributeSet[]>() {
 
-								@Override
-								public void onFailure(Throwable caught) {
-									LD.clearPrompt();
-									GuiLog.serverError(caught);
+												@Override
+												public void onFailure(Throwable caught) {
+													LD.clearPrompt();
+													GuiLog.serverError(caught);
+												}
+
+												@Override
+												public void onSuccess(GUIAttributeSet[] sets) {
+													LD.clearPrompt();
+													Map<Long, GUIAttributeSet> setsMap = new HashMap<Long, GUIAttributeSet>();
+													for (GUIAttributeSet set : sets)
+														setsMap.put(set.getId(), set);
+
+													for (ListGridRecord record : selection) {
+														GUIAttribute setAttribute = null;
+														GUIAttributeSet set = setsMap
+																.get(record.getAttributeAsLong("setId"));
+														if (set != null)
+															setAttribute = set
+																	.getAttribute(record.getAttributeAsString("name"));
+
+														if (setAttribute != null) {
+															template.getAttribute(record.getAttributeAsString("name"))
+																	.setInitialization(
+																			setAttribute.getInitialization());
+															record.setAttribute("initialization",
+																	setAttribute.getInitialization());
+														} else {
+															template.getAttribute(record.getAttributeAsString("name"))
+																	.setInitialization(null);
+															record.setAttribute("initialization", (String) null);
+														}
+													}
+
+													if (changedHandler != null)
+														changedHandler.onChanged(null);
+												}
+											});
 								}
-
-								@Override
-								public void onSuccess(GUIAttributeSet[] sets) {
-									LD.clearPrompt();
-									Map<Long, GUIAttributeSet> setsMap = new HashMap<Long, GUIAttributeSet>();
-									for (GUIAttributeSet set : sets) 
-										setsMap.put(set.getId(), set);
-									
-									for (ListGridRecord record : selection) {
-										GUIAttribute setAttribute=null;
-										GUIAttributeSet set = setsMap.get(record.getAttributeAsLong("setId"));
-										if(set!=null)
-											setAttribute = set.getAttribute(record.getAttributeAsString("name"));
-											
-										if(setAttribute!=null) {
-											template.getAttribute(record.getAttributeAsString("name")).setInitialization(setAttribute.getInitialization());
-											record.setAttribute("initialization", setAttribute.getInitialization());
-										}else {
-											template.getAttribute(record.getAttributeAsString("name")).setInitialization(null);
-											record.setAttribute("initialization", (String)null);
-										}
-									}
-									
-
-									if(changedHandler!=null)
-										changedHandler.onChanged(null);
-								}
-							});
-						}
-					}
-				});
+							}
+						});
 			}
 		});
 
-		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeHidden, initialization, resetInitialization, validation, resetValidation, delete);
+		MenuItem dependsOn = new MenuItem();
+		dependsOn.setTitle(I18N.message("dependson"));
+		dependsOn.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				ListGridRecord selection = attributesList.getSelectedRecord();
+				LD.askForString("dependson", "attributename", selection.getAttributeAsString("dependsOn"),
+						new ValueCallback() {
+
+							@Override
+							public void execute(String value) {
+								ListGridRecord selection = attributesList.getSelectedRecord();
+								selection.setAttribute("dependsOn", value);
+								if (changedHandler != null)
+									changedHandler.onChanged(null);
+							}
+						});
+			}
+		});
+		dependsOn.setEnabled(attributesList.getSelectedRecord().getAttributeAsBoolean("preset"));
+
+		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeHidden, dependsOn, initialization,
+				resetInitialization, validation, resetValidation, delete);
 		contextMenu.showContextMenu();
 	}
 
@@ -530,6 +579,8 @@ public class TemplatePropertiesPanel extends HLayout {
 			record.setAttribute("multiple", att.isMultiple());
 			record.setAttribute("validation", att.getValidation());
 			record.setAttribute("initialization", att.getInitialization());
+			record.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
+			record.setAttribute("dependsOn", att.getDependsOn());
 			attributesList.getRecordList().add(record);
 		}
 	}
@@ -632,6 +683,7 @@ public class TemplatePropertiesPanel extends HLayout {
 					att.setSet(rec.getAttributeAsString("set"));
 					att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
 					att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
+					att.setDependsOn(rec.getAttributeAsString("dependsOn"));
 					att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
 					att.setHidden(rec.getAttributeAsBoolean("hidden"));
 					att.setMultiple(rec.getAttributeAsBoolean("multiple"));

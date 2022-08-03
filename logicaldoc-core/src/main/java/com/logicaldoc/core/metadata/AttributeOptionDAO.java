@@ -2,6 +2,7 @@ package com.logicaldoc.core.metadata;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.logicaldoc.core.PersistentObjectDAO;
 
@@ -40,5 +41,28 @@ public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption>
 	 * 
 	 * @return The ordered list of options
 	 */
-	public List<AttributeOption> findBySetIdAndAttribute(long setId, String attribute);
+	public List<AttributeOption> findByAttribute(long setId, String attribute);
+
+	/**
+	 * This finds all the options for a given attribute and groups them by category. The list is ordered by
+	 * position asc.
+	 * 
+	 * @param setId The attribute set id
+	 * @param attribute The attribute name
+	 * 
+	 * @return The map of opions, key is the category
+	 */
+	public Map<String, List<AttributeOption>> findByAttributeAsMap(long setId, String attribute);
+	
+	/**
+	 * This finds all the options for a given attribute. The list is ordered by
+	 * position asc.
+	 * 
+	 * @param setId The attribute set id
+	 * @param attribute The attribute name (Optional)
+	 * @param caegory The category (Optional)
+	 * 
+	 * @return The ordered list of options
+	 */
+	public List<AttributeOption> findByAttributeAndCategory(long setId, String attribute, String category);
 }

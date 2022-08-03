@@ -40,6 +40,7 @@
 				<property name="setId" type="long" column="ld_setid" />
 				<property name="label" type="string" column="ld_label" length="255" />
 				<property name="parent" type="string" column="ld_parent" length="255"/>
+				<property name="dependsOn" type="string" column="ld_dependson" length="255"/>
 				<property name="mandatory" type="int" column="ld_mandatory" not-null="true" />
 				<property name="hidden" type="int" column="ld_hidden" not-null="true"/>
 				<property name="multiple" type="int" column="ld_multiple" not-null="true"/>

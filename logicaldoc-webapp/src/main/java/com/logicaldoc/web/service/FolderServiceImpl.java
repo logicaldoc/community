@@ -1069,6 +1069,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					}
 
 					extAttr.setParent(attr.getParent());
+					extAttr.setDependsOn(attr.getDependsOn());
 					extAttr.setLabel(templateAttribute.getLabel());
 					extAttr.setType(templateType);
 					extAttr.setPosition(templateAttribute.getPosition());

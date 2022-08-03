@@ -25,6 +25,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
+import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.csv.CSVFileReader;
@@ -58,27 +59,15 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 	}
 
 	@Override
-	public void saveOptions(long setId, String attribute, String[] values) throws ServerException {
+	public void saveOptions(long setId, String attribute, GUIValue[] values) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 		try {
-			Map<String, AttributeOption> optionsMap = new HashMap<String, AttributeOption>();
-			List<AttributeOption> options = dao.findBySetIdAndAttribute(setId, attribute);
-			for (AttributeOption option : options)
-				optionsMap.put(option.getValue(), option);
-
+			dao.deleteBySetIdAndAttribute(setId, attribute);
 			for (int i = 0; i < values.length; i++) {
-				String value = values[i];
-				AttributeOption option = optionsMap.get(value);
-				if (option == null) {
-					option = new AttributeOption(setId, attribute, value);
-				} else {
-					if (value.equals(option.getValue()) && option.getPosition() == i)
-						continue;
-					option.setValue(value);
-				}
-
+				GUIValue value = values[i];
+				AttributeOption option = new AttributeOption(setId, attribute, value.getValue(), value.getCode());
 				option.setPosition(i);
 				boolean stored = dao.store(option);
 				if (!stored)
@@ -95,7 +84,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 
 		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 		try {
-			List<AttributeOption> options = dao.findBySetIdAndAttribute(setId, attribute);
+			List<AttributeOption> options = dao.findByAttribute(setId, attribute);
 			for (AttributeOption option : options)
 				for (String value : values)
 					if (value.equals(option.getValue())) {
@@ -141,6 +130,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 						att.setHidden(attribute.isHidden() ? 1 : 0);
 						att.setMultiple(attribute.isMultiple() ? 1 : 0);
 						att.setParent(attribute.getParent());
+						att.setDependsOn(attribute.getDependsOn());
 						att.setStringValues(attribute.getStringValues());
 						att.setType(attribute.getType());
 						att.setLabel(attribute.getLabel());
@@ -290,11 +280,11 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 	}
 
 	@Override
-	public String[] parseOptions(long setId, String attribute) throws ServerException {
+	public GUIValue[] parseOptions(long setId, String attribute) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
-		List<String> options = new ArrayList<String>();
+		List<GUIValue> options = new ArrayList<GUIValue>();
 
 		CSVFileReader reader = null;
 		try {
@@ -311,7 +301,11 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				if (row != null && "value".equals(row.get(0).toLowerCase()))
 					row = reader.readFields();
 				while (row != null && !row.isEmpty()) {
-					options.add(row.get(0).trim());
+					GUIValue option = new GUIValue();
+					option.setValue(row.get(0));
+					if (row.size() > 1)
+						option.setCode(row.get(1));
+					options.add(option);
 					row = reader.readFields();
 				}
 			}
@@ -325,10 +319,9 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				}
 		}
 
-		String[] values = options.toArray(new String[0]);
-		if (values.length > 0)
-			saveOptions(setId, attribute, values);
-		return values;
+		GUIValue[] optionsArray = options.toArray(new GUIValue[0]);
+		saveOptions(setId, attribute, optionsArray);
+		return optionsArray;
 	}
 
 	@Override
@@ -343,14 +336,15 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 			if (setAttribute == null)
 				return;
 
-			int count = dao.jdbcUpdate("update ld_template_ext set ld_validation = ? where ld_setid=" + setId + " and ld_name = ?",
+			int count = dao.jdbcUpdate(
+					"update ld_template_ext set ld_validation = ? where ld_setid=" + setId + " and ld_name = ?",
 					setAttribute.getValidation(), attribute);
 			log.info("Updated the validation of {} template attributes named {}", count, attribute);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
 	}
-	
+
 	@Override
 	public void applyInitializationToTemplates(long setId, String attribute) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
@@ -362,7 +356,8 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 			if (setAttribute == null)
 				return;
 
-			int count = dao.jdbcUpdate("update ld_template_ext set ld_initialization = ? where ld_setid=" + setId + " and ld_name = ?",
+			int count = dao.jdbcUpdate(
+					"update ld_template_ext set ld_initialization = ? where ld_setid=" + setId + " and ld_name = ?",
 					setAttribute.getInitialization(), attribute);
 			log.info("Updated the initialization of {} template attributes named {}", count, attribute);
 		} catch (Throwable t) {

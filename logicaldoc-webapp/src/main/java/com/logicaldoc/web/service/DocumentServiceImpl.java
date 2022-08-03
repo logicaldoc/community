@@ -1439,6 +1439,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					}
 
 					extAttr.setParent(attr.getParent());
+					extAttr.setDependsOn(attr.getDependsOn());
 					extAttr.setStringValues(attr.getStringValues());
 					extAttr.setLabel(templateAttribute.getLabel());
 					extAttr.setType(templateType);

@@ -1209,7 +1209,7 @@ public class ItemFactory {
 		if (handler != null)
 			cron.addChangedHandler(handler);
 		cron.setWidth(230);
-		
+
 		FormItemIcon composer = new FormItemIcon();
 		composer.setPrompt(I18N.message("opencronexpressioncomposer"));
 		composer.setSrc("[SKIN]/DynamicForm/date_control.png");
@@ -1342,17 +1342,13 @@ public class ItemFactory {
 
 			if (!InputValues.getInputs(itemName).isEmpty()) {
 				item = formItemWithSuggestions(item);
-//				item = new ComboBoxItem(itemName);
-//				item.setValueMap(InputValues.getInputsAsStrings(itemName).toArray(new String[0]));
-//				item.setShowPickerIcon(false);
-//				item.setTextBoxStyle("textItemLite");
-//				item.setValue(initialValue);
 			}
 
 			if (att.getEditor() == GUIAttribute.EDITOR_LISTBOX && att.getSetId() != null) {
 				item = new ComboBoxItem(itemName);
+
 				final AttributeOptionsDS options = new AttributeOptionsDS(att.getSetId(),
-						att.getParent() != null ? att.getParent() : att.getName(), !att.isMandatory());
+						att.getParent() != null ? att.getParent() : att.getName(), null, !att.isMandatory());
 				options.setCacheAllData(true);
 				item.setOptionDataSource(options);
 				item.setValueField("value");
@@ -1396,6 +1392,9 @@ public class ItemFactory {
 
 			item.setTooltip(item.getValue() != null ? item.getValue().toString() : "");
 			item.setWidth(Session.get().getConfigAsInt("gui.textbox.w"));
+
+			if (!att.isMandatory())
+				((ComboBoxItem) item).setAllowEmptyValue(true);
 		}
 
 		item.setName(itemName);
@@ -1908,11 +1907,11 @@ public class ItemFactory {
 		selectItem.setPickListWidth(150);
 		selectItem.setOptionDataSource(new AttributesDS(context));
 		selectItem.setWrapTitle(false);
-		
+
 		// Make the options ordered by label
-		SortSpecifier sp=new SortSpecifier("label", SortDirection.ASCENDING);
-		selectItem.setPickListSort(new SortSpecifier[] {sp});
-		
+		SortSpecifier sp = new SortSpecifier("label", SortDirection.ASCENDING);
+		selectItem.setPickListSort(new SortSpecifier[] { sp });
+
 		return selectItem;
 	}
 
@@ -2046,15 +2045,14 @@ public class ItemFactory {
 		item.setRequiredMessage(I18N.message("fieldrequired"));
 		ListGridField label = new ListGridField("label", I18N.message("workflow"));
 		label.setWidth(150);
-		
+
 		ListGridField name = new ListGridField("name", I18N.message("name"));
 		name.setWidth(150);
 		name.setHidden(true);
-		
+
 		ListGridField description = new ListGridField("description", I18N.message("description"));
 		description.setWidth(500);
-		
-		
+
 		item.setWidth(250);
 		item.setPickListWidth(500);
 		item.setPickListFields(label, description, name);
@@ -2178,7 +2176,7 @@ public class ItemFactory {
 		}
 		return item;
 	}
-	
+
 	private static FormItem formItemWithSuggestions(FormItem srcItem) {
 		FormItem item = null;
 		item = new ComboBoxItem(srcItem.getName(), srcItem.getTitle());
@@ -2591,7 +2589,7 @@ public class ItemFactory {
 	public static String originalItemName(String name) {
 		return name.toString().replaceAll("_", "\\.");
 	}
-	
+
 	public static String itemNameForAttribute(String name) {
 		return "_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER);
 	}

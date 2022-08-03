@@ -6,6 +6,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 
 import com.logicaldoc.webservice.doc.WSDoc;
+import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
 import com.logicaldoc.webservice.model.WSRight;
 import com.logicaldoc.webservice.model.WSTemplate;
@@ -183,7 +184,7 @@ public interface DocumentMetadataService {
 	 * @param sid Session identifier
 	 * @param setId The attribute set's id
 	 * @param attribute The attribute's name
-	 * @param values The attribute's options
+	 * @param options The attribute's options
 	 * 
 	 * @throws Exception error in the server application
 	 */
@@ -192,8 +193,8 @@ public interface DocumentMetadataService {
 	public void setAttributeOptions(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
 	long setId, @WebParam(name = "attribute")
-	String attribute, @WebParam(name = "values")
-	String[] values) throws Exception;
+	String attribute, @WebParam(name = "options")
+	WSAttributeOption[] options) throws Exception;
 
 	/**
 	 * Retrieves the options for the given attribute
@@ -212,6 +213,27 @@ public interface DocumentMetadataService {
 	String sid, @WebParam(name = "setId")
 	long setId, @WebParam(name = "attribute")
 	String attribute) throws Exception;
+	
+	/**
+	 * Retrieves the options for the given attribute inside a given category
+	 * 
+	 * @param sid Session identifier
+	 * @param setId The attribute set's id
+	 * @param attribute The attribute's name
+	 * @param categirt The options category (not mandatory)
+	 * 
+	 * @return the list of all the attribute's options
+	 * 
+	 * @throws Exception error in the server application
+	 */
+	@WebMethod
+	@WSDoc(description = "retrieves the options for the given attribute inside a given category")
+	public WSAttributeOption[] getAttributeOptionsByCategory(@WebParam(name = "sid")
+	String sid, @WebParam(name = "setId")
+	long setId, @WebParam(name = "attribute")
+	String attribute, @WebParam(name = "category")
+	String category) throws Exception;
+
 
 	/**
 	 * Tests if a template is readable.
@@ -244,7 +266,9 @@ public interface DocumentMetadataService {
 	@WebMethod
 	@WSDoc(description = "tests if a template is writable")
 	public boolean isTemplateWritable(@WSDoc(description = "identifier of the session", required = true)
-	@WebParam(name = "sid")	String sid, @WebParam(name = "templateId")	long templateId) throws Exception;
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "templateId")
+	long templateId) throws Exception;
 
 	/**
 	 * Grants user permission to the template.
@@ -259,12 +283,15 @@ public interface DocumentMetadataService {
 	 */
 	@WebMethod
 	@WSDoc(description = "grants user permission to the template")
-	public void grantUserToTemplate(
-			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "templateId") long templateId, @WebParam(name = "userId") long userId,
-			@WSDoc(description = "the permission integer representation; if '0', the user will be not granted to access the template") @WebParam(name = "permissions") int permissions)
-			throws Exception;
-	
+	public void grantUserToTemplate(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "templateId")
+	long templateId, @WebParam(name = "userId")
+	long userId,
+			@WSDoc(description = "the permission integer representation; if '0', the user will be not granted to access the template")
+			@WebParam(name = "permissions")
+			int permissions) throws Exception;
+
 	/**
 	 * Grants group permission to the template.
 	 * 
@@ -278,12 +305,15 @@ public interface DocumentMetadataService {
 	 */
 	@WebMethod
 	@WSDoc(description = "grants group permission to the template")
-	public void grantGroupToTemplate(
-			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "templateId") long templateId, @WebParam(name = "groupId") long groupId,
-			@WSDoc(description = "the permission integer representation; if '0', the group will be not granted to access the template") @WebParam(name = "permissions") int permissions)
-			throws Exception;
-	
+	public void grantGroupToTemplate(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "templateId")
+	long templateId, @WebParam(name = "groupId")
+	long groupId,
+			@WSDoc(description = "the permission integer representation; if '0', the group will be not granted to access the template")
+			@WebParam(name = "permissions")
+			int permissions) throws Exception;
+
 	/**
 	 * Retrieves the list of granted users for the given template.
 	 * 
@@ -296,22 +326,24 @@ public interface DocumentMetadataService {
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the list of granted users for the given folder")
-	public WSRight[] getGrantedUsers(
-			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "templateId") long templateId) throws Exception;
+	public WSRight[] getGrantedUsers(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "templateId")
+	long templateId) throws Exception;
 
 	/**
 	 * Retrieves the list of granted groups for the given template
 	 * 
 	 * @param sid Session identifier
-	 *@param templateId Template id
+	 * @param templateId Template id
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
 	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the list of granted groups for the given folder")
-	public WSRight[] getGrantedGroups(
-			@WSDoc(description = "identifier of the session", required = true) @WebParam(name = "sid") String sid,
-			@WebParam(name = "templateId") long templateId) throws Exception;
+	public WSRight[] getGrantedGroups(@WSDoc(description = "identifier of the session", required = true)
+	@WebParam(name = "sid")
+	String sid, @WebParam(name = "templateId")
+	long templateId) throws Exception;
 }

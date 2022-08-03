@@ -99,5 +99,4 @@ public class WSAttributeSet implements Serializable {
 		buf.add(att);
 		setAttributes(buf.toArray(new WSAttribute[0]));
 	}
-
 }
