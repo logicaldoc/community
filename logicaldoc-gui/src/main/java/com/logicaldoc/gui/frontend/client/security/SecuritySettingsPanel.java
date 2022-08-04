@@ -56,20 +56,20 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 	@Override
 	public void onDraw() {
-		DynamicForm securityForm = new DynamicForm();
-		securityForm.setValuesManager(vm);
-		securityForm.setTitleOrientation(TitleOrientation.TOP);
-		securityForm.setNumCols(1);
+		DynamicForm passwordForm = new DynamicForm();
+		passwordForm.setIsGroup(true);
+		passwordForm.setGroupTitle(I18N.message("password"));
+		passwordForm.setValuesManager(vm);
 
-		final SpinnerItem pwdSize = ItemFactory.newSpinnerItem("pwdSize", "passwdsize", settings.getPwdSize());
+		final SpinnerItem pwdSize = ItemFactory.newSpinnerItem("pwdSize", "size", settings.getPwdSize());
+		pwdSize.setWrapTitle(false);
 		pwdSize.setRequired(true);
 		pwdSize.setWidth(50);
 		pwdSize.setMin(4);
 		pwdSize.setStep(1);
 
-		final SpinnerItem pwdExp = ItemFactory.newSpinnerItem("pwdExp", "passwdexpiration",
-				settings.getPwdExpiration());
-		pwdExp.setHint(I18N.message("daysafteruserdisabled"));
+		final SpinnerItem pwdExp = ItemFactory.newSpinnerItem("pwdExp", "expiration", settings.getPwdExpiration());
+		pwdExp.setHint(I18N.message("days"));
 		pwdExp.setWrapTitle(false);
 		pwdExp.setRequired(true);
 		pwdExp.setWidth(50);
@@ -84,6 +84,44 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdEnforce.setWidth(50);
 		pwdEnforce.setMin(0);
 		pwdEnforce.setStep(1);
+
+		final SpinnerItem pwUpperCase = ItemFactory.newSpinnerItem("pwdUpperCase", "uppercasechars",
+				settings.getPwdUpperCase());
+		pwUpperCase.setRequired(true);
+		pwUpperCase.setWrapTitle(false);
+		pwUpperCase.setWidth(50);
+		pwUpperCase.setMin(1);
+		pwUpperCase.setStep(1);
+
+		final SpinnerItem pwLowerCase = ItemFactory.newSpinnerItem("pwdLowerCase", "lowercasechars",
+				settings.getPwdLowerCase());
+		pwLowerCase.setRequired(true);
+		pwLowerCase.setWrapTitle(false);
+		pwLowerCase.setWidth(50);
+		pwLowerCase.setMin(1);
+		pwLowerCase.setStep(1);
+
+		final SpinnerItem pwdDigit = ItemFactory.newSpinnerItem("pwdDigit", "digitchars", settings.getPwdDigit());
+		pwdDigit.setRequired(true);
+		pwdDigit.setWrapTitle(false);
+		pwdDigit.setWidth(50);
+		pwdDigit.setMin(1);
+		pwdDigit.setStep(1);
+
+		final SpinnerItem pwdSpecial = ItemFactory.newSpinnerItem("pwdSpecial", "specialchars",
+				settings.getPwdSpecial());
+		pwdSpecial.setRequired(true);
+		pwdSpecial.setWrapTitle(false);
+		pwdSpecial.setWidth(50);
+		pwdSpecial.setMin(1);
+		pwdSpecial.setStep(1);
+
+		passwordForm.setItems(pwdSize, pwUpperCase, pwLowerCase, pwdDigit, pwdSpecial, pwdExp, pwdEnforce);
+
+		DynamicForm securityForm = new DynamicForm();
+		securityForm.setValuesManager(vm);
+		securityForm.setTitleOrientation(TitleOrientation.TOP);
+		securityForm.setNumCols(1);
 
 		final SpinnerItem maxInactivity = ItemFactory.newSpinnerItem("maxinactivity", "maxinactivity",
 				settings.getMaxInactivity());
@@ -128,12 +166,12 @@ public class SecuritySettingsPanel extends AdminPanel {
 		contentSecurityPolicy.setWidth(400);
 
 		if (Session.get().isDefaultTenant())
-			securityForm.setFields(pwdSize, pwdExp, pwdEnforce, maxInactivity, savelogin, alertnewdevice,
-					ignorelogincase, allowSid, forceSsl, contentSecurityPolicy);
+			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, ignorelogincase, allowSid, forceSsl,
+					contentSecurityPolicy);
 		else
-			securityForm.setFields(pwdSize, pwdExp, pwdEnforce, maxInactivity, savelogin, alertnewdevice);
+			securityForm.setFields(maxInactivity, savelogin, alertnewdevice);
 
-		body.setMembers(securityForm);
+		body.setMembers(passwordForm, securityForm);
 
 		Tab menus = new Tab();
 		menus.setTitle(I18N.message("menus"));
@@ -157,6 +195,10 @@ public class SecuritySettingsPanel extends AdminPanel {
 					final Map<String, Object> values = (Map<String, Object>) vm.getValues();
 					SecuritySettingsPanel.this.settings.setPwdExpiration((Integer) values.get("pwdExp"));
 					SecuritySettingsPanel.this.settings.setPwdSize((Integer) values.get("pwdSize"));
+					SecuritySettingsPanel.this.settings.setPwdUpperCase((Integer) values.get("pwdUpperCase"));
+					SecuritySettingsPanel.this.settings.setPwdLowerCase((Integer) values.get("pwdLowerCase"));
+					SecuritySettingsPanel.this.settings.setPwdDigit((Integer) values.get("pwdDigit"));
+					SecuritySettingsPanel.this.settings.setPwdSpecial((Integer) values.get("pwdSpecial"));
 					SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) values.get("pwdEnforce"));
 					SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) values.get("maxinactivity"));
 					SecuritySettingsPanel.this.settings
@@ -207,8 +249,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 								@Override
 								public void onSuccess(Boolean restartRequired) {
-									GuiLog.info(I18N.message("settingssaved") + "  "
-											+ I18N.message("settingsaffectnewsessions"), null);
+									GuiLog.info(I18N.message("settingssaved"), null);
 
 									if (restartRequired.booleanValue())
 										SC.warn(I18N.message("needrestart"));

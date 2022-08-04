@@ -18,6 +18,14 @@ public class GUISecuritySettings implements Serializable {
 
 	private int pwdEnforceHistory;
 
+	private int pwdUpperCase=2;
+	
+	private int pwdLowerCase=2;
+	
+	private int pwdDigit=1;
+	
+	private int pwdSpecial=1;
+	
 	private Integer maxInactivity;
 
 	private boolean saveLogin = false;
@@ -48,6 +56,7 @@ public class GUISecuritySettings implements Serializable {
 	 * Value for the Content-Security-Policy HTTP header
 	 */
 	private String contentSecurityPolicy = null;
+	
 
 	public int getPwdSize() {
 		return pwdSize;
@@ -183,5 +192,37 @@ public class GUISecuritySettings implements Serializable {
 
 	public void setContentSecurityPolicy(String contentSecurityPolicy) {
 		this.contentSecurityPolicy = contentSecurityPolicy;
+	}
+
+	public int getPwdUpperCase() {
+		return pwdUpperCase;
+	}
+
+	public void setPwdUpperCase(int pwdUpperCase) {
+		this.pwdUpperCase = pwdUpperCase;
+	}
+
+	public int getPwdLowerCase() {
+		return pwdLowerCase;
+	}
+
+	public void setPwdLowerCase(int pwdLowerCase) {
+		this.pwdLowerCase = pwdLowerCase;
+	}
+
+	public int getPwdDigit() {
+		return pwdDigit;
+	}
+
+	public void setPwdDigit(int pwdDigit) {
+		this.pwdDigit = pwdDigit;
+	}
+
+	public int getPwdSpecial() {
+		return pwdSpecial;
+	}
+
+	public void setPwdSpecial(int pwdSpecial) {
+		this.pwdSpecial = pwdSpecial;
 	}
 }

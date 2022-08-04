@@ -933,6 +933,10 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 			securitySettings.setPwdExpiration(pbean.getInt(session.getTenantName() + ".password.ttl", 90));
 			securitySettings.setPwdSize(pbean.getInt(session.getTenantName() + ".password.size", 8));
+			securitySettings.setPwdLowerCase(pbean.getInt(session.getTenantName() + ".password.lowercase", 2));
+			securitySettings.setPwdUpperCase(pbean.getInt(session.getTenantName() + ".password.uppercase", 2));
+			securitySettings.setPwdDigit(pbean.getInt(session.getTenantName() + ".password.digit", 1));
+			securitySettings.setPwdSpecial(pbean.getInt(session.getTenantName() + ".password.special", 1));
 			securitySettings
 					.setPwdEnforceHistory(pbean.getInt(session.getTenantName() + ".password.enforcehistory", 3));
 			securitySettings.setMaxInactivity(pbean.getInt(session.getTenantName() + ".security.user.maxinactivity"));
@@ -996,7 +1000,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					WebConfigurator configurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
 					restartRequired = configurator.setTransportGuarantee(policy);
 				} catch (Throwable t) {
-					log.error(t.getMessage(), t);
+					log.error(t.getMessage(), t); 
 				}
 
 				// Update the context-security.xml
@@ -1019,6 +1023,10 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			conf.setProperty(session.getTenantName() + ".password.enforcehistory",
 					Integer.toString(settings.getPwdEnforceHistory()));
 			conf.setProperty(session.getTenantName() + ".password.size", Integer.toString(settings.getPwdSize()));
+			conf.setProperty(session.getTenantName() + ".password.lowercase", Integer.toString(settings.getPwdLowerCase()));
+			conf.setProperty(session.getTenantName() + ".password.uppercase", Integer.toString(settings.getPwdUpperCase()));
+			conf.setProperty(session.getTenantName() + ".password.digit", Integer.toString(settings.getPwdDigit()));
+			conf.setProperty(session.getTenantName() + ".password.special", Integer.toString(settings.getPwdSpecial()));
 			conf.setProperty(session.getTenantName() + ".gui.savelogin", Boolean.toString(settings.isSaveLogin()));
 			conf.setProperty(session.getTenantName() + ".alertnewdevice",
 					Boolean.toString(settings.isAlertNewDevice()));

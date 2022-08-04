@@ -1388,13 +1388,12 @@ public class ItemFactory {
 					}
 				});
 
+				if (!att.isMandatory())
+					((ComboBoxItem) item).setAllowEmptyValue(true);
 			}
 
 			item.setTooltip(item.getValue() != null ? item.getValue().toString() : "");
 			item.setWidth(Session.get().getConfigAsInt("gui.textbox.w"));
-
-			if (!att.isMandatory())
-				((ComboBoxItem) item).setAllowEmptyValue(true);
 		}
 
 		item.setName(itemName);
