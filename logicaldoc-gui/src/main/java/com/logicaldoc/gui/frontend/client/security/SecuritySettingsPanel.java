@@ -58,7 +58,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	public void onDraw() {
 		DynamicForm passwordForm = new DynamicForm();
 		passwordForm.setIsGroup(true);
-		passwordForm.setGroupTitle(I18N.message("password"));
+		passwordForm.setGroupTitle(I18N.message("passwordrules"));
 		passwordForm.setNumCols(4);
 		passwordForm.setWidth(1);
 		passwordForm.setValuesManager(vm);
@@ -125,7 +125,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdSequence.setWidth(50);
 		pwdSequence.setMin(3);
 		pwdSequence.setStep(1);
-		
+
 		final SpinnerItem pwdOccurrence = ItemFactory.newSpinnerItem("pwdOccurrence", "maxoccurrencies",
 				settings.getPwdOccurrence());
 		pwdOccurrence.setRequired(true);
@@ -133,8 +133,9 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdOccurrence.setWidth(50);
 		pwdOccurrence.setMin(1);
 		pwdOccurrence.setStep(1);
-		
-		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence, pwdExp, pwdEnforce);
+
+		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence,
+				pwdExp, pwdEnforce);
 
 		DynamicForm securityForm = new DynamicForm();
 		securityForm.setValuesManager(vm);
