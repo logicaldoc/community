@@ -106,12 +106,16 @@ public class SetPassword extends Window {
 											GuiLog.warn(I18N.message("wrongpassword"), null);
 										else if (ret == 2)
 											GuiLog.warn(I18N.message("passwdnotnotified"), null);
-										else if (ret == 3)
+										else if (ret == 3) {
 											GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
-										else
+											newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
+										} else if (ret == 4) {
+											GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
+											newPass.setErrors(val.getValue());
+										} else
 											GuiLog.warn(I18N.message("genericerror"), null);
-									}
-									SetPassword.this.destroy();
+									} else
+										destroy();
 								}
 							});
 				}

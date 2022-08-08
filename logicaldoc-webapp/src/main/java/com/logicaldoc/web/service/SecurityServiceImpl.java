@@ -20,6 +20,15 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.EnglishSequenceData;
+import org.passay.IllegalSequenceRule;
+import org.passay.LengthRule;
+import org.passay.PasswordData;
+import org.passay.PasswordValidator;
+import org.passay.RuleResult;
+import org.passay.WhitespaceRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -50,6 +59,7 @@ import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.WorkingTime;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
+import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.core.security.dao.DeviceDAO;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.MenuDAO;
@@ -255,7 +265,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			log.error(e.getMessage(), e);
 		}
 	}
-
+	
 	@Override
 	public GUIValue changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
 			boolean notify) {
@@ -283,7 +293,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 			if (oldPassword != null && !CryptUtil.cryptString(oldPassword).equals(user.getPassword()))
 				throw new Exception("Wrong old passord");
-
+			
 			UserHistory history = null;
 			// The password was changed
 			user.setDecodedPassword(newPassword);
@@ -316,6 +326,9 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					return new GUIValue("2", null);
 				}
 			return new GUIValue("0", null);
+		} catch (PasswordWeakException e) {
+			log.error(e.getMessage(), e);
+			return new GUIValue("4", e.getMessages().stream().collect(Collectors.joining("\n")));			
 		} catch (PasswordAlreadyUsedException e) {
 			log.error(e.getMessage(), e);
 			return new GUIValue("3", e.getFormattedDate());
@@ -937,6 +950,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			securitySettings.setPwdUpperCase(pbean.getInt(session.getTenantName() + ".password.uppercase", 2));
 			securitySettings.setPwdDigit(pbean.getInt(session.getTenantName() + ".password.digit", 1));
 			securitySettings.setPwdSpecial(pbean.getInt(session.getTenantName() + ".password.special", 1));
+			securitySettings.setPwdSequence(pbean.getInt(session.getTenantName() + ".password.sequence", 3));
+			securitySettings.setPwdOccurrence(pbean.getInt(session.getTenantName() + ".password.occurrence", 3));
 			securitySettings
 					.setPwdEnforceHistory(pbean.getInt(session.getTenantName() + ".password.enforcehistory", 3));
 			securitySettings.setMaxInactivity(pbean.getInt(session.getTenantName() + ".security.user.maxinactivity"));
@@ -1027,6 +1042,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			conf.setProperty(session.getTenantName() + ".password.uppercase", Integer.toString(settings.getPwdUpperCase()));
 			conf.setProperty(session.getTenantName() + ".password.digit", Integer.toString(settings.getPwdDigit()));
 			conf.setProperty(session.getTenantName() + ".password.special", Integer.toString(settings.getPwdSpecial()));
+			conf.setProperty(session.getTenantName() + ".password.sequence", Integer.toString(settings.getPwdSequence()));
+			conf.setProperty(session.getTenantName() + ".password.occurrence", Integer.toString(settings.getPwdOccurrence()));
 			conf.setProperty(session.getTenantName() + ".gui.savelogin", Boolean.toString(settings.isSaveLogin()));
 			conf.setProperty(session.getTenantName() + ".alertnewdevice",
 					Boolean.toString(settings.isAlertNewDevice()));

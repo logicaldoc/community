@@ -36,6 +36,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.web.firewall.HttpFirewall;
 import com.logicaldoc.web.util.ServiceUtil;
 import com.logicaldoc.web.util.ServletUtil;
 
@@ -245,6 +246,20 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 		}
 	}
 
+	@Override
+	public void saveFirewallSettings(GUIParameter[] settings) throws ServerException {
+		saveSettings(settings);
+		
+		HttpFirewall firewall = (HttpFirewall) Context.get().getBean(HttpFirewall.class);
+		ContextProperties config=Context.get().getProperties();
+		
+		firewall.setAllowBackSlash(config.getBoolean("firewall.allowBackSlash", false));
+		firewall.setAllowSemicolon(config.getBoolean("firewall.allowSemicolon", false));
+		firewall.setAllowUrlEncodedPercent(config.getBoolean("firewall.allowUrlEncodedPercent", false));
+		firewall.setAllowUrlEncodedSlash(config.getBoolean("firewall.allowUrlEncodedSlash", false));
+		firewall.setAllowUrlEncodedPeriod(config.getBoolean("firewall.allowUrlEncodedPeriod", false));
+	}
+	
 	@Override
 	public void saveStorageSettings(GUIParameter[] settings) throws ServerException {
 		saveSettings(settings);

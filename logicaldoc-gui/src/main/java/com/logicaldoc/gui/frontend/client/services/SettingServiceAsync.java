@@ -35,4 +35,6 @@ public interface SettingServiceAsync {
 	void removeStorage(int storageId, AsyncCallback<String[]> callback);
 
 	void loadWebserviceStats(Long tenantId, AsyncCallback<GUIParameter[]> callback);
+
+	void saveFirewallSettings(GUIParameter[] settings, AsyncCallback<Void> callback);
 }

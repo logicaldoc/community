@@ -110,7 +110,17 @@ public interface SettingService extends RemoteService {
 	public void saveStorageSettings(GUIParameter[] settings) throws ServerException;
 
 	/**
-	 * Tries to delete a storage and fails in case at least one folder is using it and also if the storage is marked as the default write one
+	 * Saves settings related to the firewall
+	 * 
+	 * @param settings the firewall settings
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void saveFirewallSettings(GUIParameter[] settings) throws ServerException;
+
+	/**
+	 * Tries to delete a storage and fails in case at least one folder is using
+	 * it and also if the storage is marked as the default write one
 	 * 
 	 * @param storageId identifier of the storage to remove
 	 * 
@@ -159,7 +169,7 @@ public interface SettingService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public GUIParameter[] loadWebserviceStats(Long tenantId) throws ServerException;
-	
+
 	/**
 	 * Persists new aliases for the given extension
 	 * 

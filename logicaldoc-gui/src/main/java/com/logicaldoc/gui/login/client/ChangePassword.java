@@ -42,10 +42,10 @@ public class ChangePassword extends Window {
 	private static final String NEWPASSWORD = "newpassword";
 
 	private LoginServiceAsync loginService = (LoginServiceAsync) GWT.create(LoginService.class);
-	
+
 	public ChangePassword(final GUIUser user, final LoginPanel loginPanel) {
 		super();
-		
+
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("changepassword"));
 		setWidth(300);
@@ -76,7 +76,8 @@ public class ChangePassword extends Window {
 		newPass.setRequired(true);
 		newPass.setValidators(equalsValidator, sizeValidator);
 
-		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN, null);
+		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN,
+				null);
 		newPassAgain.setWrapTitle(false);
 		newPassAgain.setRequired(true);
 
@@ -111,16 +112,20 @@ public class ChangePassword extends Window {
 											GuiLog.warn(I18N.message("wrongpassword"), null);
 										else if (ret == 2)
 											GuiLog.warn(I18N.message("passwdnotnotified"), null);
-										else if (ret == 3)
+										else if (ret == 3) {
 											GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
-										else
+											newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
+										} else if (ret == 4) {
+											GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
+											newPass.setErrors(val.getValue());
+										} else
 											GuiLog.warn(I18N.message("genericerror"), null);
 									} else {
 										// Close the popup
 										ChangePassword.this.destroy();
 										SC.say(I18N.message("yourpasswordhaschanged"));
 										GuiLog.info(I18N.message("event.user.passwordchanged"), null);
-										if(loginPanel!=null)
+										if (loginPanel != null)
 											loginPanel.onPasswordChanged();
 									}
 								}

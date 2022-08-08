@@ -59,6 +59,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 		DynamicForm passwordForm = new DynamicForm();
 		passwordForm.setIsGroup(true);
 		passwordForm.setGroupTitle(I18N.message("password"));
+		passwordForm.setNumCols(4);
+		passwordForm.setWidth(1);
 		passwordForm.setValuesManager(vm);
 
 		final SpinnerItem pwdSize = ItemFactory.newSpinnerItem("pwdSize", "size", settings.getPwdSize());
@@ -116,7 +118,23 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdSpecial.setMin(1);
 		pwdSpecial.setStep(1);
 
-		passwordForm.setItems(pwdSize, pwUpperCase, pwLowerCase, pwdDigit, pwdSpecial, pwdExp, pwdEnforce);
+		final SpinnerItem pwdSequence = ItemFactory.newSpinnerItem("pwdSequence", "maxcharsinsequence",
+				settings.getPwdSequence());
+		pwdSequence.setRequired(true);
+		pwdSequence.setWrapTitle(false);
+		pwdSequence.setWidth(50);
+		pwdSequence.setMin(3);
+		pwdSequence.setStep(1);
+		
+		final SpinnerItem pwdOccurrence = ItemFactory.newSpinnerItem("pwdOccurrence", "maxoccurrencies",
+				settings.getPwdOccurrence());
+		pwdOccurrence.setRequired(true);
+		pwdOccurrence.setWrapTitle(false);
+		pwdOccurrence.setWidth(50);
+		pwdOccurrence.setMin(1);
+		pwdOccurrence.setStep(1);
+		
+		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence, pwdExp, pwdEnforce);
 
 		DynamicForm securityForm = new DynamicForm();
 		securityForm.setValuesManager(vm);
@@ -199,6 +217,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 					SecuritySettingsPanel.this.settings.setPwdLowerCase((Integer) values.get("pwdLowerCase"));
 					SecuritySettingsPanel.this.settings.setPwdDigit((Integer) values.get("pwdDigit"));
 					SecuritySettingsPanel.this.settings.setPwdSpecial((Integer) values.get("pwdSpecial"));
+					SecuritySettingsPanel.this.settings.setPwdSequence((Integer) values.get("pwdSequence"));
+					SecuritySettingsPanel.this.settings.setPwdOccurrence((Integer) values.get("pwdOccurrence"));
 					SecuritySettingsPanel.this.settings.setPwdEnforceHistory((Integer) values.get("pwdEnforce"));
 					SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) values.get("maxinactivity"));
 					SecuritySettingsPanel.this.settings

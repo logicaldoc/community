@@ -18,6 +18,16 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
    
+	<bean id="HttpFirewall" class="com.logicaldoc.web.firewall.HttpFirewall">
+	    <property name="unsafeAllowAnyHttpMethod" value="true"/>
+    	<property name="allowSemicolon" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowSemicolon}')}"/>
+    	<property name="allowBackSlash" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowBackSlash}')}"/>
+    	<property name="allowUrlEncodedPercent" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowUrlEncodedPercent}')}"/>
+    	<property name="allowUrlEncodedSlash" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowUrlEncodedSlash}')}"/>
+    	<property name="allowUrlEncodedPeriod" value="#{T(java.lang.Boolean).parseBoolean('${firewall.allowUrlEncodedPeriod}')}"/>
+	</bean>
+	<security:http-firewall ref="HttpFirewall"/>   
+   
     <bean id="LDBasicAuthenticationEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
       <property name="realmName" value="Security Realm" />
     </bean>        

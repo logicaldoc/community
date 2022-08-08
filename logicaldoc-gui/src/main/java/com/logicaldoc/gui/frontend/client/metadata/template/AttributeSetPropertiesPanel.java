@@ -411,7 +411,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		initializationComposer.setWidth(16);
 		initializationComposer.setHeight(16);
 		initializationComposer.setSrc("[SKIN]/cog.png");
-		initializationComposer.setPrompt(I18N.message("openinitializercomposer"));
+		initializationComposer.setPrompt(I18N.message("openinitializatorcomposer"));
 		initializationComposer.addFormItemClickHandler(new FormItemClickHandler() {
 
 			@Override
