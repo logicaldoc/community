@@ -55,6 +55,17 @@ public interface LoginService extends RemoteService {
 
 	public GUIUser getUser(String username);
 
+	/**
+	 * Generates a password using the configured policies.
+	 * 
+	 * @param username the current user
+	 * 
+	 * @return the generated password
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public String generatePassword(String username);
+	
 	public static class Instance {
 		private static LoginServiceAsync instance;
 

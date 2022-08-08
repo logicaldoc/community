@@ -20,15 +20,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.passay.CharacterRule;
-import org.passay.EnglishCharacterData;
-import org.passay.EnglishSequenceData;
-import org.passay.IllegalSequenceRule;
-import org.passay.LengthRule;
-import org.passay.PasswordData;
-import org.passay.PasswordValidator;
-import org.passay.RuleResult;
-import org.passay.WhitespaceRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -68,6 +59,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.sequence.Sequence;
 import com.logicaldoc.core.sequence.SequenceDAO;
 import com.logicaldoc.core.util.UserUtil;
+import com.logicaldoc.gui.common.client.InvalidSessionException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.common.client.beans.GUIGroup;
@@ -265,7 +257,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			log.error(e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public GUIValue changePassword(Long requestorUserId, long userId, String oldPassword, String newPassword,
 			boolean notify) {
@@ -293,7 +285,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 			if (oldPassword != null && !CryptUtil.cryptString(oldPassword).equals(user.getPassword()))
 				throw new Exception("Wrong old passord");
-			
+
 			UserHistory history = null;
 			// The password was changed
 			user.setDecodedPassword(newPassword);
@@ -328,7 +320,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			return new GUIValue("0", null);
 		} catch (PasswordWeakException e) {
 			log.error(e.getMessage(), e);
-			return new GUIValue("4", e.getMessages().stream().collect(Collectors.joining("\n")));			
+			return new GUIValue("4", e.getMessages().stream().collect(Collectors.joining("\n")));
 		} catch (PasswordAlreadyUsedException e) {
 			log.error(e.getMessage(), e);
 			return new GUIValue("3", e.getFormattedDate());
@@ -681,11 +673,16 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					return guiUser;
 				}
 
+				String tenant = session.getTenantName();
+
 				// Generate an initial password(that must be changed)
-				ContextProperties pbean = Context.get().getProperties();
-				int minsize = pbean.getInt(session.getTenantName() + ".password.size", 8);
-				decodedPassword = PasswordGenerator.generate(minsize);
-				usr.setDecodedPassword(decodedPassword);
+				ContextProperties config = Context.get().getProperties();
+				String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
+						config.getInt(tenant + ".password.uppercase", 2),
+						config.getInt(tenant + ".password.lowercase", 2), config.getInt(tenant + ".password.digit", 1),
+						config.getInt(tenant + ".password.special", 1), config.getInt(tenant + ".password.sequence", 4),
+						config.getInt(tenant + ".password.occurrence", 3));
+				usr.setDecodedPassword(password);
 				usr.setPasswordExpired(1);
 				usr.setPasswordChanged(new Date());
 			}
@@ -1015,7 +1012,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					WebConfigurator configurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
 					restartRequired = configurator.setTransportGuarantee(policy);
 				} catch (Throwable t) {
-					log.error(t.getMessage(), t); 
+					log.error(t.getMessage(), t);
 				}
 
 				// Update the context-security.xml
@@ -1038,12 +1035,16 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			conf.setProperty(session.getTenantName() + ".password.enforcehistory",
 					Integer.toString(settings.getPwdEnforceHistory()));
 			conf.setProperty(session.getTenantName() + ".password.size", Integer.toString(settings.getPwdSize()));
-			conf.setProperty(session.getTenantName() + ".password.lowercase", Integer.toString(settings.getPwdLowerCase()));
-			conf.setProperty(session.getTenantName() + ".password.uppercase", Integer.toString(settings.getPwdUpperCase()));
+			conf.setProperty(session.getTenantName() + ".password.lowercase",
+					Integer.toString(settings.getPwdLowerCase()));
+			conf.setProperty(session.getTenantName() + ".password.uppercase",
+					Integer.toString(settings.getPwdUpperCase()));
 			conf.setProperty(session.getTenantName() + ".password.digit", Integer.toString(settings.getPwdDigit()));
 			conf.setProperty(session.getTenantName() + ".password.special", Integer.toString(settings.getPwdSpecial()));
-			conf.setProperty(session.getTenantName() + ".password.sequence", Integer.toString(settings.getPwdSequence()));
-			conf.setProperty(session.getTenantName() + ".password.occurrence", Integer.toString(settings.getPwdOccurrence()));
+			conf.setProperty(session.getTenantName() + ".password.sequence",
+					Integer.toString(settings.getPwdSequence()));
+			conf.setProperty(session.getTenantName() + ".password.occurrence",
+					Integer.toString(settings.getPwdOccurrence()));
 			conf.setProperty(session.getTenantName() + ".gui.savelogin", Boolean.toString(settings.isSaveLogin()));
 			conf.setProperty(session.getTenantName() + ".alertnewdevice",
 					Boolean.toString(settings.isAlertNewDevice()));
@@ -1633,5 +1634,27 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
+	}
+
+	@Override
+	public String generatePassword() throws InvalidSessionException {
+		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		String tenant = session.getTenantName();
+
+		// Generate an initial password(that must be changed)
+		ContextProperties config = Context.get().getProperties();
+		String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
+				config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
+				config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1),
+				config.getInt(tenant + ".password.sequence", 4), config.getInt(tenant + ".password.occurrence", 3));
+		return password;
+	}
+
+	@Override
+	public String generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
+			int maxSequenceSize, int maxOccurrences) {
+		String password = PasswordGenerator.generate(length, uppercaseChars, lowercaseChars, digits, specialChars,
+				maxSequenceSize, maxOccurrences);
+		return password;
 	}
 }

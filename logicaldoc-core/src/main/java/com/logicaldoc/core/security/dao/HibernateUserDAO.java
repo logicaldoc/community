@@ -13,18 +13,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.passay.CharacterOccurrencesRule;
-import org.passay.CharacterRule;
-import org.passay.EnglishCharacterData;
-import org.passay.EnglishSequenceData;
-import org.passay.IllegalSequenceRule;
-import org.passay.LengthRule;
-import org.passay.MessageResolver;
-import org.passay.PasswordData;
-import org.passay.PasswordValidator;
-import org.passay.PropertiesMessageResolver;
-import org.passay.RuleResult;
-import org.passay.WhitespaceRule;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
@@ -50,6 +38,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.StringUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.security.PasswordValidator;
 
 /**
  * Hibernate implementation of <code>UserDAO</code>
@@ -152,27 +141,24 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		Properties props = new Properties();
 		for (String key : errorKeys)
 			props.put(key.substring(key.indexOf('.') + 1), messages.get(key));
-		MessageResolver resolver = new PropertiesMessageResolver(props);
 
 		ContextProperties config = Context.get().getProperties();
-		PasswordValidator validator = new PasswordValidator(resolver,
+
+		PasswordValidator validator = new PasswordValidator(
 				// length between X and 30 characters
-				new LengthRule(config.getInt(tenant + ".password.size", 8), 255),
+				config.getInt(tenant + ".password.size", 8),
 
 				// at least X upper-case character
-				new CharacterRule(EnglishCharacterData.UpperCase, config.getInt(tenant + ".password.uppercase", 2)),
+				config.getInt(tenant + ".password.uppercase", 2),
 
 				// at least X lower-case characters
-				new CharacterRule(EnglishCharacterData.LowerCase, config.getInt(tenant + ".password.lowercase", 2)),
+				config.getInt(tenant + ".password.lowercase", 2),
 
 				// at least X digit characters
-				new CharacterRule(EnglishCharacterData.Digit, config.getInt(tenant + ".password.digit", 1)),
+				config.getInt(tenant + ".password.digit", 1),
 
 				// at least X symbols (special character)
-				new CharacterRule(EnglishCharacterData.Special, config.getInt(tenant + ".password.special", 1)),
-
-				// at least X times a character can be used
-				new CharacterOccurrencesRule(config.getInt(tenant + ".password.occurrence", 3)),
+				config.getInt(tenant + ".password.special", 1),
 
 				// define some illegal sequences that will fail when >= 4 chars
 				// long alphabetical is of the form 'abcd', numerical is '3456',
@@ -180,19 +166,16 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				// is 'asdf' the false parameter indicates that wrapped
 				// sequences are
 				// allowed; e.g. 'xyzab'
-				new IllegalSequenceRule(EnglishSequenceData.Alphabetical,
-						config.getInt(tenant + ".password.sequence", 3), false),
-				new IllegalSequenceRule(EnglishSequenceData.Numerical, config.getInt(tenant + ".password.sequence", 3),
-						false),
-				new IllegalSequenceRule(EnglishSequenceData.USQwerty, config.getInt(tenant + ".password.sequence", 3),
-						false),
+				config.getInt(tenant + ".password.sequence", 3),
 
-				// no whitespace
-				new WhitespaceRule());
+				// at least X times a character can be used
+				config.getInt(tenant + ".password.occurrence", 3),
 
-		RuleResult result = validator.validate(new PasswordData(password));
-		if (!result.isValid())
-			throw new PasswordWeakException(validator.getMessages(result));
+				props);
+
+		List<String> errors = validator.validate(password);
+		if (!errors.isEmpty())
+			throw new PasswordWeakException(errors);
 	}
 
 	private void checkAlreadyUsedPassword(User user) throws PersistenceException {

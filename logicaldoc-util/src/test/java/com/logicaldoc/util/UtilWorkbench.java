@@ -1,5 +1,7 @@
 package com.logicaldoc.util;
 
+import com.logicaldoc.util.security.PasswordGenerator;
+
 public class UtilWorkbench {
 
 	/**
@@ -7,6 +9,12 @@ public class UtilWorkbench {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+		
+		for (int i=0; i<100; i++) {
+			System.out.println(PasswordGenerator.generate(8, 2, 2, 1, 1, 3, 2));
+		}
+		
+		
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);
 //		context.setProperty("gui.welcome", "מגיע להופעה בישראל ואתם נהנים מהטבה ייחודית");

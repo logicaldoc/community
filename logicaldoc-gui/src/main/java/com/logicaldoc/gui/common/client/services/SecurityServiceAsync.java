@@ -83,4 +83,9 @@ public interface SecurityServiceAsync {
 	void changeStatus(long userId, boolean enabled, AsyncCallback<Void> callback);
 
 	void updateDeviceLabel(long deviceId, String label, AsyncCallback<Void> callback);
+
+	void generatePassword(AsyncCallback<String> callback);
+
+	void generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
+			int maxSequenceSize, int maxOccurrences, AsyncCallback<String> callback);
 }

@@ -15,7 +15,9 @@ import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.FeatureDisabled;
+import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
@@ -58,7 +60,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 	public void onDraw() {
 		DynamicForm passwordForm = new DynamicForm();
 		passwordForm.setIsGroup(true);
-		passwordForm.setGroupTitle(I18N.message("password"));
+		passwordForm.setGroupTitle(I18N.message("passwordrules"));
 		passwordForm.setNumCols(4);
 		passwordForm.setWidth(1);
 		passwordForm.setValuesManager(vm);
@@ -118,15 +120,15 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdSpecial.setMin(1);
 		pwdSpecial.setStep(1);
 
-		final SpinnerItem pwdSequence = ItemFactory.newSpinnerItem("pwdSequence", "maxcharsinsequence",
+		final SpinnerItem pwdSequence = ItemFactory.newSpinnerItem("pwdSequence", "maxsequencesize",
 				settings.getPwdSequence());
 		pwdSequence.setRequired(true);
 		pwdSequence.setWrapTitle(false);
 		pwdSequence.setWidth(50);
 		pwdSequence.setMin(3);
 		pwdSequence.setStep(1);
-		
-		final SpinnerItem pwdOccurrence = ItemFactory.newSpinnerItem("pwdOccurrence", "maxoccurrencies",
+
+		final SpinnerItem pwdOccurrence = ItemFactory.newSpinnerItem("pwdOccurrence", "maxoccurrences",
 				settings.getPwdOccurrence());
 		pwdOccurrence.setRequired(true);
 		pwdOccurrence.setWrapTitle(false);
@@ -134,7 +136,28 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdOccurrence.setMin(1);
 		pwdOccurrence.setStep(1);
 		
-		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence, pwdExp, pwdEnforce);
+		final ButtonItem generatePassword = new ButtonItem(I18N.message("generate"));
+		generatePassword.setStartRow(false);
+		generatePassword.setColSpan(2);
+		generatePassword.setAlign(Alignment.RIGHT);
+		generatePassword.addClickHandler(new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+
+			@Override
+			public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+				if (passwordForm.validate()) {
+					@SuppressWarnings("unchecked")
+					final Map<String, Object> values = (Map<String, Object>) vm.getValues();
+					PasswordGenerator generator = new PasswordGenerator((Integer) values.get("pwdSize"),
+							(Integer) values.get("pwdUpperCase"), (Integer) values.get("pwdLowerCase"),
+							(Integer) values.get("pwdDigit"), (Integer) values.get("pwdSpecial"),
+							(Integer) values.get("pwdSequence"), (Integer) values.get("pwdOccurrence"));
+					generator.show();
+				}
+			}
+		});
+
+		passwordForm.setItems(pwdSize, pwdDigit, pwUpperCase, pwdSpecial, pwLowerCase, pwdSequence, pwdOccurrence,
+				pwdExp, pwdEnforce, generatePassword);
 
 		DynamicForm securityForm = new DynamicForm();
 		securityForm.setValuesManager(vm);

@@ -73,6 +73,10 @@ public class TemplateServiceImplTest extends AbstractWebappTCase {
 		template.setValue("attr1", "v1");
 		template.setValue("a2", 23L);
 		Assert.assertTrue(templateDao.store(template));
+		
+		GUITemplate guiTemplate = service.getTemplate(template.getId());
+		Assert.assertNotNull(guiTemplate);
+		Assert.assertEquals("v1", guiTemplate.getAttribute("attr1").getValue());
 
 		GUIAttribute[] extAttr = service.getAttributes(template.getId(), null);
 		for (GUIAttribute at : extAttr) {

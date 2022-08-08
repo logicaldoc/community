@@ -53,6 +53,7 @@ import com.logicaldoc.gui.common.client.validators.EmailsValidator;
 import com.logicaldoc.gui.common.client.validators.SimpleTextValidator;
 import com.logicaldoc.gui.common.client.widgets.CronExpressionComposer;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
+import com.logicaldoc.gui.common.client.widgets.PasswordGenerator;
 import com.logicaldoc.gui.common.client.widgets.UserSelector;
 import com.logicaldoc.gui.common.client.widgets.automation.AutomationItemEditor;
 import com.logicaldoc.gui.common.client.widgets.automation.HtmlItemEditor;
@@ -1418,6 +1419,34 @@ public class ItemFactory {
 	public static PasswordItem newPasswordItemPreventAutocomplete(String name, String title, String value) {
 		PasswordItem password = newPasswordItem(name, title, value);
 		password.setAutoCompleteKeywords("new-password");
+		return password;
+	}
+
+	public static PasswordItem newPasswordItemPreventAutocomplete(String name, String title, String value,
+			boolean withGeneratorTool) {
+		PasswordItem password = newPasswordItemPreventAutocomplete(name, title, value);
+		FormItemIcon generator = new FormItemIcon();
+		generator.setName("generator");
+		generator.setWidth(16);
+		generator.setHeight(16);
+
+		if (withGeneratorTool) {
+			generator.setSrc("[SKIN]/key.png");
+			generator.setPrompt(I18N.message("passwordgenerator"));
+			generator.addFormItemClickHandler(new FormItemClickHandler() {
+
+				@Override
+				public void onFormItemClick(FormItemIconClickEvent event) {
+					PasswordGenerator generator = new PasswordGenerator();
+					generator.show();
+				}
+			});
+		} else {
+		}
+
+		password.setIcons(generator);
+		password.setIconVAlign(VerticalAlignment.CENTER);
+
 		return password;
 	}
 

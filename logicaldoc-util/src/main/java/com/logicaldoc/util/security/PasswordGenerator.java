@@ -6,6 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A password generator utility
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since 6.0
+ */
 public class PasswordGenerator {
 
 	private static final String CHAR_LOWER = "abcdefghijklmnopqrstuvwxyz";
@@ -14,7 +20,7 @@ public class PasswordGenerator {
 
 	private static final String NUMBER = "0123456789";
 
-	private static final String OTHER_CHAR = "!@#$%&*()_+-=[]?";
+	private static final String OTHER_CHAR = "!@#$%&*()_+-=[]?{}/;";
 
 	private static final String PASSWORD_ALLOW_BASE = CHAR_LOWER + CHAR_UPPER + NUMBER + OTHER_CHAR;
 
@@ -25,6 +31,9 @@ public class PasswordGenerator {
 
 	private static SecureRandom random = new SecureRandom();
 
+	private PasswordGenerator() {
+	}
+
 	public static void main(String[] args) {
 
 		System.out.format("String for password \t\t\t: %s%n", PASSWORD_ALLOW_BASE);
@@ -32,13 +41,13 @@ public class PasswordGenerator {
 
 		// generate 5 random password
 		for (int i = 0; i < 5; i++) {
-			System.out.println("password : " + generate(16));
+			System.out.println("password : " + generate(16, 2, 2, 1, 1, 4, 2));
 			System.out.println("\n");
 		}
 
 	}
 
-	public static String generate(int length) {
+	private static String generate(int length) {
 		if (length < 1)
 			throw new IllegalArgumentException();
 
@@ -59,4 +68,33 @@ public class PasswordGenerator {
 		return letters.stream().collect(Collectors.joining());
 	}
 
+	/**
+	 * Generates a new password
+	 * 
+	 * @param length dimension of the password
+	 * @param uppercaseChars minimum number of upper case chars
+	 * @param lowercaseChars minimum number of lower case chars
+	 * @param digits minimum number of digits
+	 * @param specialChars minimum number of special chars
+	 * @param maxSequenceSize maximum size of a sequence
+	 * @param maxOccurrences maximum number of occurrences of the same char
+	 * 
+	 * @return the generated password
+	 */
+	public static String generate(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
+			int maxSequenceSize, int maxOccurrences) {
+		if (length < 1)
+			throw new IllegalArgumentException();
+
+		PasswordValidator validator = new PasswordValidator(length, uppercaseChars, lowercaseChars, digits,
+				specialChars, maxSequenceSize, maxOccurrences, null);
+
+		String pswd = "";
+		boolean valid = false;
+		while (!valid) {
+			pswd = generate(length);
+			valid = validator.validate(pswd).isEmpty();
+		}
+		return pswd;
+	}
 }

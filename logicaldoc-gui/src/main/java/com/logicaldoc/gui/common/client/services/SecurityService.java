@@ -47,6 +47,31 @@ public interface SecurityService extends RemoteService {
 			boolean notify);
 
 	/**
+	 * Generates a password using the configured policies.
+	 * 
+	 * @return the generated password
+	 * 
+	 * @throws ServerException error generated in the server application
+	 */
+	public String generatePassword() throws ServerException;
+
+	/**
+	 * Generates a password
+	 * 
+	 * @param length dimension of the password
+	 * @param uppercaseChars minimum number of upper case chars
+	 * @param lowercaseChars minimum number of lower case chars
+	 * @param digits minimum number of digits
+	 * @param specialChars minimum number of special chars
+	 * @param maxSequenceSize maximum size of a sequence
+	 * @param maxOccurrences maximum number of occurrences of the same char
+	 * 
+	 * @return the generated password
+	 */
+	public String generatePassword2(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
+			int maxSequenceSize, int maxOccurrences);
+
+	/**
 	 * Changes the status of a user
 	 * 
 	 * @param userId The user Identifier

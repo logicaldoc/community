@@ -78,28 +78,28 @@ public class SecurityManagerImplTest extends AbstractCoreTCase {
 		// assign the newly created users to the editor group
 		User user = new User();
 		user.setUsername("test1");
-		user.setDecodedPassword("xxxpwd");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		userDAO.store(user);
 		user.addGroup(editorGroup);
 		userDAO.store(user);
 
 		user = new User();
 		user.setUsername("test2");
-		user.setDecodedPassword("xxxpwd");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		userDAO.store(user);
 		user.addGroup(editorGroup);
 		userDAO.store(user);
 
 		user = new User();
 		user.setUsername("test3");
-		user.setDecodedPassword("xxxpwd");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		userDAO.store(user);
 		user.addGroup(editorGroup);
 		userDAO.store(user);
 
 		user = new User();
 		user.setUsername("test4");
-		user.setDecodedPassword("xxxpwd");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		userDAO.store(user);
 		user.addGroup(editorGroup);
 		userDAO.store(user);
@@ -120,7 +120,7 @@ public class SecurityManagerImplTest extends AbstractCoreTCase {
 	public void testAssignUserToGroups() throws PersistenceException {
 		User user = new User();
 		user.setUsername("zzz");
-		user.setDecodedPassword("xxxpwd");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		userDAO.store(user);
 	}
 

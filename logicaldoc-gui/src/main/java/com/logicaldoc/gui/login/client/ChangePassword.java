@@ -21,9 +21,12 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
+import com.smartgwt.client.widgets.form.fields.FormItemIcon;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
+import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 
@@ -75,6 +78,24 @@ public class ChangePassword extends Window {
 		PasswordItem newPass = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORD, NEWPASSWORD, null);
 		newPass.setRequired(true);
 		newPass.setValidators(equalsValidator, sizeValidator);
+
+		FormItemIcon generator = new FormItemIcon();
+		generator.setName("generator");
+		generator.setWidth(16);
+		generator.setHeight(16);
+
+		generator.setSrc("[SKIN]/key.png");
+		generator.setPrompt(I18N.message("passwordgenerator"));
+		generator.addFormItemClickHandler(new FormItemClickHandler() {
+
+			@Override
+			public void onFormItemClick(FormItemIconClickEvent event) {
+				PasswordGenerator generator = new PasswordGenerator(user.getUsername());
+				generator.show();
+			}
+		});
+		newPass.setIcons(generator);
+		newPass.setIconVAlign(VerticalAlignment.CENTER);
 
 		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN,
 				null);

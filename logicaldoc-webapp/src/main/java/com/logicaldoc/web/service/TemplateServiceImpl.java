@@ -337,7 +337,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			GUIAttribute[] attributes = null;
 
 			if (extensibleObject == null) {
-				prepareGUIAttributes(template, null, session != null ? session.getUser() : null);
+				attributes = prepareGUIAttributes(template, null, session != null ? session.getUser() : null);
 			} else {
 				if (extensibleObject instanceof GUIDocument)
 					attributes = prepareGUIAttributes(template,
@@ -389,20 +389,20 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 		try {
 			if (template != null) {
 				Template currentTemplate = null;
-				if (extensibleObject instanceof Document) {
+				if (extensibleObject != null && extensibleObject instanceof Document) {
 					DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 					Document doc = docDao.findDocument(extensibleObject.getId());
 					if (doc != null)
 						currentTemplate = doc.getTemplate();
-				} else if (extensibleObject instanceof Folder) {
+				} else if (extensibleObject != null && extensibleObject instanceof Folder) {
 					FolderDAO foldDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 					Folder folder = foldDao.findFolder(extensibleObject.getId());
 					if (folder != null)
 						currentTemplate = folder.getTemplate();
 				} else
 					currentTemplate = template;
-
-				if ((extensibleObject!=null && extensibleObject.getId() == 0L) || !template.equals(currentTemplate)) {
+				
+				if (extensibleObject != null && (extensibleObject.getId() == 0L || !template.equals(currentTemplate))) {
 					// Probably the GUI did not fill the attributes map at this
 					// point, so put the template's attributes
 					if (extensibleObject.getAttributes().isEmpty())
@@ -446,7 +446,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 					guiAttribute.setBooleanValue(templateExtAttr.getBooleanValue());
 					guiAttribute.setDoubleValue(templateExtAttr.getDoubleValue());
 					guiAttribute.setDateValue(templateExtAttr.getDateValue());
-
+					
 					if (extensibleObject != null) {
 						Attribute attribute = extensibleObject.getAttribute(attrName);
 						if (attribute != null) {
@@ -528,7 +528,6 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			}
 
 			Collections.sort(attributes);
-
 			return attributes.toArray(new GUIAttribute[0]);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);

@@ -68,12 +68,13 @@ public class ChangePassword extends Window {
 				.setErrorMessage(I18N.message("errorfieldminlenght", Integer.toString(user.getPasswordMinLenght())));
 		sizeValidator.setMin(user.getPasswordMinLenght());
 
-		PasswordItem newPass = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORD, NEWPASSWORD, null);
+		PasswordItem newPass = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORD, NEWPASSWORD, null, true);
 		newPass.setWrapTitle(false);
 		newPass.setRequired(true);
 		newPass.setValidators(equalsValidator, sizeValidator);
 
-		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN, null);
+		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN,
+				null);
 		newPassAgain.setWrapTitle(false);
 		newPassAgain.setRequired(true);
 
@@ -116,8 +117,7 @@ public class ChangePassword extends Window {
 										else if (ret == 3) {
 											GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
 											newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
-										}
-										else if (ret == 4) {
+										} else if (ret == 4) {
 											GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
 											newPass.setErrors(val.getValue());
 										} else

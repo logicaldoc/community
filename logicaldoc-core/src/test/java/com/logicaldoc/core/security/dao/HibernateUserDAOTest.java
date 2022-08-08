@@ -16,7 +16,6 @@ import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.WorkingTime;
-import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 
@@ -197,7 +196,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 	public void testStore() throws PersistenceException {
 		User user = new User();
 		user.setUsername("xxx");
-		user.setDecodedPassword("xxxpwd");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		user.setName("claus");
 		user.setFirstName("valca");
 		user.setEmail("valca@acme.com");
@@ -220,14 +219,14 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(user, storedUser);
 		Assert.assertEquals(2, storedUser.getGroups().size());
 		Assert.assertNotNull(storedUser.getUserGroup());
-		Assert.assertEquals(CryptUtil.cryptString("xxxpwd"), storedUser.getPassword());
+		Assert.assertEquals(CryptUtil.cryptString("3$(a8BcX$7GAA%K)"), storedUser.getPassword());
 		Assert.assertEquals(1, storedUser.getWorkingTimes().size());
 		Assert.assertEquals(1, storedUser.getWorkingTimes().iterator().next().getDayOfWeek());
 		Assert.assertEquals(5, storedUser.getWorkingTimes().iterator().next().getHourStart());
 		Assert.assertEquals(30, storedUser.getWorkingTimes().iterator().next().getMinuteStart());
 
 		user = dao.findById(1);
-		user.setDecodedPassword("xxxpwd");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		transaction = new UserHistory();
 		transaction.setEvent(UserEvent.PASSWORDCHANGED.toString());
 		transaction.setUserId(user.getId());
@@ -248,26 +247,40 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		dao.initialize(user);
 		Assert.assertEquals(0, user.getPasswordExpired());
 		Assert.assertEquals(0, user.getPasswordExpires());
-		user.setPassword("psw1");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
+		dao.store(user);
 
+		user = dao.findById(1L);
+		dao.initialize(user);
+		Assert.assertEquals(0, user.getPasswordExpired());
+		Assert.assertEquals(0, user.getPasswordExpires());
+		user.setDecodedPassword("3$(a8BcX$7GAA%K-pippo");
+		dao.store(user);
+
+		// Give an already used password
+		user = dao.findById(1L);
+		dao.initialize(user);
+		Assert.assertEquals(0, user.getPasswordExpired());
+		Assert.assertEquals(0, user.getPasswordExpires());
+		user.setDecodedPassword("3$(a8BcX$7GAA%K");
 		try {
 			dao.store(user);
 			Assert.fail();
-		} catch (PasswordAlreadyUsedException e) {
+		} catch (Throwable t) {
 
 		}
 
 		user = dao.findById(1L);
 		dao.initialize(user);
 		Assert.assertEquals(0, user.getPasswordExpired());
-		user.setPassword("notexistingpasswd");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)-neverused");
 		user.setPasswordExpired(1);
 		dao.store(user);
 
 		user = dao.findById(1L);
-		
+
 		PasswordHistoryDAO pDao = (PasswordHistoryDAO) Context.get().getBean(PasswordHistoryDAO.class);
-		Assert.assertEquals(4, pDao.findByUserId(user.getId(), null).size());
+		Assert.assertEquals(7, pDao.findByUserId(user.getId(), null).size());
 	}
 
 	@Test

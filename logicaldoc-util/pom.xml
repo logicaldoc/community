@@ -146,7 +146,12 @@
 			<groupId>jaxen</groupId>
 			<artifactId>jaxen</artifactId>
 			<version>1.2.0</version>
-		</dependency>		
+		</dependency>
+  		<dependency>
+      		<groupId>org.passay</groupId>
+      		<artifactId>passay</artifactId>
+      		<version>1.6.2</version>
+  		</dependency>
 		<dependency>
 			<groupId>com.github.junrar</groupId>
 			<artifactId>junrar</artifactId>

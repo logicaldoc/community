@@ -61,19 +61,16 @@ public class SetPassword extends Window {
 				I18N.message("errorfieldminlenght", Integer.toString(Session.get().getUser().getPasswordMinLenght())));
 		sizeValidator.setMin(Session.get().getUser().getPasswordMinLenght());
 
-		PasswordItem newPass = new PasswordItem();
-		newPass.setName(NEWPASSWORD);
-		newPass.setTitle(I18N.message(NEWPASSWORD));
+		PasswordItem newPass = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORD, NEWPASSWORD, null, true);
 		newPass.setRequired(true);
 		newPass.setAutoComplete(AutoComplete.NONE);
+		newPass.setWrapTitle(false);
 		newPass.setValidators(equalsValidator, sizeValidator);
 
-		PasswordItem newPassAgain = new PasswordItem();
-		newPassAgain.setName(NEWPASSWORDAGAIN);
-		newPassAgain.setTitle(I18N.message(NEWPASSWORDAGAIN));
-		newPassAgain.setAutoComplete(AutoComplete.NONE);
-		newPassAgain.setWrapTitle(false);
+		PasswordItem newPassAgain = ItemFactory.newPasswordItemPreventAutocomplete(NEWPASSWORDAGAIN, NEWPASSWORDAGAIN, null);
 		newPassAgain.setRequired(true);
+		newPassAgain.setAutoComplete(AutoComplete.NONE);
+		newPassAgain.setWrapTitle(false);		
 
 		final CheckboxItem notify = ItemFactory.newCheckbox(NOTIFY, "notifycredentials");
 		notify.setValue(false);

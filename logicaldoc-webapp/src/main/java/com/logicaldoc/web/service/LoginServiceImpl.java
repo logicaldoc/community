@@ -36,6 +36,7 @@ import com.logicaldoc.gui.common.client.beans.GUIValue;
 import com.logicaldoc.gui.login.client.services.LoginService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.security.PasswordGenerator;
 
 /**
  * Implementation of the <code>LoginService</code>
@@ -191,5 +192,24 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			return !deviceDao.isTrustedDevice(username, request);
 		} else
 			return true;
+	}
+
+	@Override
+	public String generatePassword(String username) {
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		User user = userDao.findByUsername(username);
+		if (user == null)
+			return "";
+
+		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		String tenant = tDao.getTenantName(user.getTenantId());
+
+		// Generate an initial password(that must be changed)
+		ContextProperties config = Context.get().getProperties();
+		String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
+				config.getInt(tenant + ".password.uppercase", 2), config.getInt(tenant + ".password.lowercase", 2),
+				config.getInt(tenant + ".password.digit", 1), config.getInt(tenant + ".password.special", 1),
+				config.getInt(tenant + ".password.sequence", 4), config.getInt(tenant + ".password.occurrence", 3));
+		return password;
 	}
 }

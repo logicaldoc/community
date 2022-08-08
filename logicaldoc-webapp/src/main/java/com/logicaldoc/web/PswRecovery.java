@@ -103,10 +103,8 @@ public class PswRecovery extends HttpServlet {
 
 					// Generate a new password
 					ContextProperties config = Context.get().getProperties();
-
-					int pswdSize =  config.getInt(tenant + ".password.size", 8);
-
-					String password = PasswordGenerator.generate(pswdSize);
+					String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),config.getInt(tenant + ".password.uppercase", 2),config.getInt(tenant + ".password.lowercase", 2),config.getInt(tenant + ".password.digit", 1),
+							config.getInt(tenant + ".password.special", 1),config.getInt(tenant + ".password.sequence", 4), config.getInt(tenant + ".password.occurrence", 3));
 					user.setDecodedPassword(password);
 					user.setPasswordChanged(new Date());
 					user.setPasswordExpired(1);
