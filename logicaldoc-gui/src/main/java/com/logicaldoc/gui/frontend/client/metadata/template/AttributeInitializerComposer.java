@@ -16,6 +16,7 @@ import com.smartgwt.client.widgets.form.fields.FloatItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.IntegerItem;
 import com.smartgwt.client.widgets.form.fields.SpacerItem;
+import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -91,7 +92,7 @@ public class AttributeInitializerComposer extends Window {
 		else if (attributeType == GUIAttribute.TYPE_INT)
 			wizardForm = prepareIntegerForm();
 		else if (attributeType == GUIAttribute.TYPE_DATE)
-			wizardForm = prepareDatesForm();
+			wizardForm = prepareDateForm();
 		else if (attributeType == GUIAttribute.TYPE_STRING || attributeType == GUIAttribute.TYPE_STRING_PRESET
 				|| attributeType == GUIAttribute.TYPE_STRING_TEXTAREA)
 			wizardForm = prepareTextForm();
@@ -106,12 +107,17 @@ public class AttributeInitializerComposer extends Window {
 			Date date = (Date) vm.getValue("date");
 			boolean currentdate = vm.getValue("currentdate") != null ? (Boolean) vm.getValue("currentdate") : false;
 			if (currentdate) {
-				sb.append("$attribute.setDateValue($CURRENT_DATE);");
+				sb.append("#set($dt = $CURRENT_DATE)\n");
 			} else {
 				String dateStr = date != null ? DateUtil.format(date, "yyyy-MM-dd") : null;
 				sb.append("#set($dt = $DateTool.parse('" + dateStr + "', 'yyyy-MM-dd'))\n");
-				sb.append("$attribute.setDateValue($dt);");
 			}
+
+			int offset = vm.getValue("offset") != null ? (Integer) vm.getValue("offset") : 0;
+			if (offset != 0)
+				sb.append("#set($dt = $DateTool.addDays($dt, " + offset + "))\n");
+
+			sb.append("$attribute.setDateValue($dt);");
 		} else if (attributeType == GUIAttribute.TYPE_INT) {
 			Long number = Long.valueOf(vm.getValueAsString("number"));
 			sb.append("#set($number = " + number + ")\n");
@@ -156,7 +162,7 @@ public class AttributeInitializerComposer extends Window {
 		return form;
 	}
 
-	private DynamicForm prepareDatesForm() {
+	private DynamicForm prepareDateForm() {
 		DateItem date = ItemFactory.newDateItem("date", "date");
 		date.setWrapTitle(false);
 		date.setRequired(true);
@@ -174,10 +180,15 @@ public class AttributeInitializerComposer extends Window {
 			}
 		});
 
+		SpinnerItem offset = ItemFactory.newSpinnerItem("offset", "offset", 0);
+		offset.setWrapTitle(false);
+		offset.setMin(Integer.MIN_VALUE);
+		offset.setHint(I18N.message("days"));
+
 		DynamicForm form = new DynamicForm();
 		form.setWidth(1);
 		form.setValuesManager(vm);
-		form.setFields(new SpacerItem(), currentDate, date, new SpacerItem());
+		form.setFields(new SpacerItem(), currentDate, date, offset, new SpacerItem());
 
 		return form;
 	}
