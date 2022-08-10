@@ -122,7 +122,6 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						att.setHidden(attribute.getHidden());
 						att.setMultiple(attribute.getMultiple());
 						att.setParent(attribute.getParent());
-						att.setDependsOn(attribute.getDependsOn());
 						att.setLabel(attribute.getLabel());
 						if (StringUtils.isEmpty(attribute.getLabel()))
 							att.setLabel(attribute.getName());
@@ -133,6 +132,10 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						att.setType(attribute.getType());
 						att.setEditor(attribute.getEditor());
 						att.setSetId(attribute.getSetId());
+						att.setDependsOn(attribute.getDependsOn());
+						att.setValidation(attribute.getValidation());
+						att.setInitialization(attribute.getInitialization());						
+						
 						attrs.put(attribute.getName(), att);
 					}
 				}
@@ -300,7 +303,6 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						att.setHidden(attribute.getHidden());
 						att.setMultiple(attribute.getMultiple());
 						att.setParent(attribute.getParent());
-						att.setDependsOn(attribute.getDependsOn());
 						att.setLabel(attribute.getLabel());
 						if (StringUtils.isEmpty(attribute.getLabel()))
 							att.setLabel(attribute.getName());
@@ -311,6 +313,9 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						att.setType(attribute.getType());
 						att.setEditor(attribute.getEditor());
 						att.setSetId(attribute.getSetId());
+						att.setDependsOn(attribute.getDependsOn());
+						att.setValidation(attribute.getValidation());
+						att.setInitialization(attribute.getInitialization());			
 						attrs.put(attribute.getName(), att);
 					}
 				}

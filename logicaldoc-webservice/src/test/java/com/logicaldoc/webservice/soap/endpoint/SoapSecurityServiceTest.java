@@ -123,11 +123,12 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		newUser.setUsername("user");
 		newUser.setFirstName("test");
 		newUser.setEmail("user@acme.com");
+		newUser.setPassword("(-xi%HT3y?r3'ux");
 
 		Long userId = securityServiceImpl.storeUser("", newUser);
 		Assert.assertNotNull(userId);
 
-		int changeResult = securityServiceImpl.changePassword("", userId, null, "newpassword");
+		int changeResult = securityServiceImpl.changePassword("", userId, "(-xi%HT3y?r3'ux", "t<(`oN]I{*2d(0");
 		Assert.assertEquals(0, changeResult);
 	}
 }

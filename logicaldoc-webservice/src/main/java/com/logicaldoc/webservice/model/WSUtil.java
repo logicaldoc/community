@@ -118,6 +118,9 @@ public class WSUtil {
 						}
 
 						attribute.setType(attr.getType());
+						attribute.setDependsOn(attr.getDependsOn());
+						attribute.setValidation(attr.getValidation());
+						attribute.setInitialization(attr.getInitialization());
 						attributes[i++] = attribute;
 					}
 				}
@@ -179,7 +182,10 @@ public class WSUtil {
 						att.setDateValue(convertStringToDate(wsDoc.getAttributes()[i].getDateValue()));
 						att.setSetId(wsDoc.getAttributes()[i].getSetId());
 						att.setType(wsDoc.getAttributes()[i].getType());
-
+						att.setDependsOn(wsDoc.getAttributes()[i].getDependsOn());
+						att.setValidation(wsDoc.getAttributes()[i].getValidation());
+						att.setInitialization(wsDoc.getAttributes()[i].getInitialization());
+						
 						attrs.put(wsDoc.getAttributes()[i].getName(), att);
 					}
 				}
@@ -328,6 +334,9 @@ public class WSUtil {
 					attribute.setEditor(attr.getEditor());
 					attribute.setSetId(attr.getSetId());
 					attribute.setType(attr.getType());
+					attribute.setDependsOn(attr.getDependsOn());
+					attribute.setValidation(attr.getValidation());
+					attribute.setInitialization(attr.getInitialization());
 					attributes[i++] = attribute;
 				}
 				wsAttributeSet.setAttributes(attributes);
@@ -367,6 +376,9 @@ public class WSUtil {
 					att.setEditor(wsSet.getAttributes()[i].getEditor());
 					att.setSetId(wsSet.getAttributes()[i].getSetId());
 					att.setType(wsSet.getAttributes()[i].getType());
+					att.setDependsOn(wsSet.getAttributes()[i].getDependsOn());
+					att.setValidation(wsSet.getAttributes()[i].getValidation());
+					att.setInitialization(wsSet.getAttributes()[i].getInitialization());					
 					attributes.put(wsSet.getAttributes()[i].getName(), att);
 				}
 				set.setAttributes(attributes);
@@ -406,6 +418,9 @@ public class WSUtil {
 					att.setDateValue(convertStringToDate(wsTemplate.getAttributes()[i].getStringValue()));
 					att.setEditor(wsTemplate.getAttributes()[i].getEditor());
 					att.setSetId(wsTemplate.getAttributes()[i].getSetId());
+					att.setDependsOn(wsTemplate.getAttributes()[i].getDependsOn());
+					att.setValidation(wsTemplate.getAttributes()[i].getValidation());
+					att.setInitialization(wsTemplate.getAttributes()[i].getInitialization());
 					attributes.put(wsTemplate.getAttributes()[i].getName(), att);
 				}
 				template.setAttributes(attributes);
@@ -454,6 +469,9 @@ public class WSUtil {
 					attribute.setEditor(attr.getEditor());
 					attribute.setSetId(attr.getSetId());
 					attribute.setType(attr.getType());
+					attribute.setDependsOn(attr.getDependsOn());
+					attribute.setValidation(attr.getValidation());
+					attribute.setInitialization(attr.getInitialization());					
 					attributes[i++] = attribute;
 				}
 				wsTemplate.setAttributes(attributes);

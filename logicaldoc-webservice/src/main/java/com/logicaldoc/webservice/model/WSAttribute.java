@@ -88,9 +88,15 @@ public class WSAttribute implements Serializable {
 
 	@WSDoc(required = false, description = "Name of another attribute on which the value of this attribute also depends, used for managing linked presets")
 	private String dependsOn;
-	
+
 	@WSDoc(required = false, description = "Read only. In case of multiple string values, contains the values separated by a comma")
 	private String stringValues;
+
+	@WSDoc(required = false, description = "Optional validation script")
+	private String validation;
+
+	@WSDoc(required = false, description = "Optional initialization script")
+	private String initialization;
 
 	public WSAttribute() {
 	}
@@ -310,5 +316,21 @@ public class WSAttribute implements Serializable {
 
 	public void setDependsOn(String dependsOn) {
 		this.dependsOn = dependsOn;
+	}
+
+	public String getValidation() {
+		return validation;
+	}
+
+	public void setValidation(String validation) {
+		this.validation = validation;
+	}
+
+	public String getInitialization() {
+		return initialization;
+	}
+
+	public void setInitialization(String initialization) {
+		this.initialization = initialization;
 	}
 }

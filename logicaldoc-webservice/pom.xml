@@ -37,6 +37,12 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.logicaldoc</groupId>
+			<artifactId>logicaldoc-i18n</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>		
 
 		<dependency>
 			<groupId>io.swagger.core.v3</groupId>

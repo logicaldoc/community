@@ -58,6 +58,8 @@ public class WSUser {
 	private String username = "";
 
 	private String password = "";
+	
+	private String decodedPassword = "";
 
 	private String passwordmd4 = "";
 
@@ -241,11 +243,12 @@ public class WSUser {
 	/**
 	 * Sets the password and encode it
 	 * 
-	 * @param pwd The password in readable format
+	 * @param password The password in readable format
 	 */
-	public void setPassword(String pwd) {
-		if (org.apache.commons.lang.StringUtils.isNotEmpty(pwd)) {
-			password = CryptUtil.cryptString(pwd);
+	public void setPassword(String password) {
+		decodedPassword = password;
+		if (org.apache.commons.lang.StringUtils.isNotEmpty(password)) {
+			password = CryptUtil.cryptString(password);
 		}
 	}
 
@@ -648,5 +651,13 @@ public class WSUser {
 
 	public void setKey(String key) {
 		this.key = key;
+	}
+
+	public String getDecodedPassword() {
+		return decodedPassword;
+	}
+
+	public void setDecodedPassword(String decodedPassword) {
+		this.decodedPassword = decodedPassword;
 	}
 }

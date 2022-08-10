@@ -7,6 +7,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -131,11 +132,22 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	private static void checkPasswordStrength(User user) throws PersistenceException {
+
+		// Skip the tests in case of new tenant creation
+		if (user.getId() == 0L && user.getTenantId() != Tenant.DEFAULT_ID && "Administrator".equals(user.getFirstName())
+				&& user.getUsername().startsWith("admin") && "admin".equals(user.getDecodedPassword()))
+			return;
+		
+		// Without decoded password we cannot perform any test
+		String password = user.getDecodedPassword();
+		if(StringUtils.isEmpty(password))
+			return;
+
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenant = tenantDAO.getTenantName(user.getTenantId());
-		String password = user.getDecodedPassword();
+		
 
-		Map<String, String> messages = I18N.getMessages(user.getLocale());
+		Map<String, String> messages = I18N.getMessages(user.getLocale()!=null ? user.getLocale() : Locale.ENGLISH);
 		List<String> errorKeys = messages.keySet().stream().filter(key -> key.startsWith("passwderror."))
 				.collect(Collectors.toList());
 		Properties props = new Properties();
@@ -174,6 +186,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				props);
 
 		List<String> errors = validator.validate(password);
+		System.out.println("password: "+password);
 		if (!errors.isEmpty())
 			throw new PasswordWeakException(errors);
 	}

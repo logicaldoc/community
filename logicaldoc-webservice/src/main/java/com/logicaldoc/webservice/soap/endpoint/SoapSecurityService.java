@@ -146,13 +146,15 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				usr.setExpire(WSUtil.convertStringToDate(user.getExpire()));
 				usr.setEnforceWorkingTime(user.getEnforceWorkingTime());
 				usr.setMaxInactivity(user.getMaxInactivity());
-				
+
 				if (user.getWorkingTimes() != null && user.getWorkingTimes().length > 0)
 					for (WSWorkingTime wswt : user.getWorkingTimes()) {
 						WorkingTime wt = new WorkingTime();
 						BeanUtils.copyProperties(wt, wswt);
 						usr.getWorkingTimes().add(wt);
 					}
+			} else {
+				usr.setDecodedPassword(user.getDecodedPassword());
 			}
 
 			if (StringUtils.isEmpty(usr.getUsername()))
