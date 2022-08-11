@@ -338,9 +338,9 @@
 			<version>3.2.6</version>
 		</dependency>
 		<dependency>
-			<groupId>jmimemagic</groupId>
+			<groupId>net.sf.jmimemagic</groupId>
 			<artifactId>jmimemagic</artifactId>
-			<version>0.1.2</version>
+			<version>0.1.5</version>
 			<exclusions>
 				<exclusion>
 					<groupId>xml-apis</groupId>
@@ -350,6 +350,10 @@
 					<groupId>xml-apis</groupId>
 					<artifactId>xml-apis</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>				
 			</exclusions>
 		</dependency>
 		<dependency>
