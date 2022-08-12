@@ -25,9 +25,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -36,7 +34,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -177,7 +174,7 @@ public class FileUtil {
 //		} catch (IOException e) {
 //			return null;
 //		}
-		
+
 		String digest = "";
 		MessageDigest sha = null;
 
@@ -251,7 +248,7 @@ public class FileUtil {
 		try {
 			is = IOUtils.toInputStream(src, "UTF-8");
 			return computeDigest(is);
-		} catch (IOException e) {
+		} catch (Throwable e) {
 			log.error(e.getMessage());
 		}
 		return null;

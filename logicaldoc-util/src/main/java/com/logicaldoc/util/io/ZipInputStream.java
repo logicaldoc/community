@@ -4,17 +4,17 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Wrapper around a standard AutoDeleteZipInputStream that avoids the CRC
- * checks on stream closure.
+ * Wrapper around a standard AutoDeleteZipInputStream that avoids the CRC checks
+ * on stream closure.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.2
  */
 public class ZipInputStream extends InputStream {
 
-	protected net.lingala.zip4j.io.ZipInputStream wrapped;
+	protected net.lingala.zip4j.io.inputstream.ZipInputStream wrapped;
 
-	public ZipInputStream(net.lingala.zip4j.io.ZipInputStream wrapped) {
+	public ZipInputStream(net.lingala.zip4j.io.inputstream.ZipInputStream wrapped) {
 		this.wrapped = wrapped;
 	}
 
@@ -23,11 +23,7 @@ public class ZipInputStream extends InputStream {
 	}
 
 	public void close() throws IOException {
-		this.close(true);
-	}
-
-	public void close(boolean arg0) throws IOException {
-		wrapped.close(true);
+		wrapped.close();
 	}
 
 	public int hashCode() {

@@ -50,7 +50,7 @@ public class HTMLColor {
 	}
 
 	public static Integer integerValue(String color) {
-		return new Integer(decode(color).getRGB());
+		return decode(color).getRGB();
 	}
 
 	public static String encodeRGB(Color color) {

@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,11 +26,11 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
+import net.lingala.zip4j.model.enums.CompressionMethod;
 
 /**
  * This class is for handling with zip-files.
@@ -161,7 +162,7 @@ public class ZipUtil {
 
 	private void setCharset(ZipFile zipFile) throws ZipException {
 		if (fileNameCharset != null && !"auto".equals(fileNameCharset))
-			zipFile.setFileNameCharset(fileNameCharset);
+			zipFile.setCharset(Charset.forName(fileNameCharset));
 	}
 
 	/**
@@ -196,22 +197,16 @@ public class ZipUtil {
 	}
 
 	public static void addEntry(File zip, String entry, InputStream content) {
-		try {
+		try (ZipFile zipFile = new ZipFile(zip)) {
 			// read war.zip and write to
-			ZipFile zipFile = new ZipFile(zip);
+
 			ZipParameters parameters = new ZipParameters();
-			parameters.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
+			parameters.setCompressionMethod(CompressionMethod.DEFLATE);
 			// this would be the name of the file for this entry in the zip file
 			parameters.setFileNameInZip(entry);
 
-			// we set this flag to true. If this flag is true, Zip4j identifies
-			// that
-			// the data will not be from a file but directly from a stream
-			parameters.setSourceExternalStream(true);
-
 			// Creates a new entry in the zip file and adds the content to the
-			// zip
-			// file
+			// zip file
 			zipFile.addStream(content, parameters);
 		} catch (Exception e) {
 			logError(e.getMessage());
