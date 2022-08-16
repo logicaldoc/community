@@ -44,9 +44,12 @@ public class HistoryPanel extends FolderDetailTab {
 		ListGridField path = new ListGridField("path", I18N.message("path"));
 		ListGridField sid = new ListGridField("sid", I18N.message("sid"));
 		ListGridField ip = new ListGridField("ip", I18N.message("ip"));
-		ListGridField device = new ListGridField("device", I18N.message("device"), 200);
+		ip.setAutoFitWidth(true);
+		ListGridField device = new ListGridField("device", I18N.message("device"));
+		device.setAutoFitWidth(true);
 		device.setHidden(true);
-		ListGridField geolocation = new ListGridField("geolocation", I18N.message("geolocation"), 200);
+		ListGridField geolocation = new ListGridField("geolocation", I18N.message("geolocation"));
+		geolocation.setAutoFitWidth(true);
 		geolocation.setHidden(true);
 
 		final RefreshableListGrid list = new RefreshableListGrid();
