@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
+import org.apache.calcite.sql.fun.SqlJsonValueExpressionOperator;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -467,8 +468,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@Override
 	public SqlRowSet queryForRowSet(String sql, Object[] args, Integer maxRows) throws PersistenceException {
-		SqlRowSet rs = null;
 		try {
+			SqlRowSet rs = null;
 			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 			if (maxRows != null)
@@ -477,7 +478,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 				rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows), args);
 			else
 				rs = jdbcTemplate.queryForRowSet(insertTopClause(sql, maxRows));
-			return rs;
+			return new SqlRowSetWrapper(rs);
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
 		}
