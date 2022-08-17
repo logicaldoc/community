@@ -28,18 +28,28 @@ public class EMailSenderTestbench {
 //		sender.setAuthEncrypted(false);
 //		sender.setConnectionSecurity(EMailSender.SECURITY_TLS);
 //		sender.setPort(587);
+//		sender.send(mail);
+		
+//		EMailSender sender = new EMailSender();
+//		sender.setHost("smtp.office365.com");
+//		sender.setPassword("a@_^JqZX5bI]nA/");
+//		sender.setUsername("m.meschieri@logicaldoc.com");
+//		sender.setSender("m.meschieri@logicaldoc.com");
+//		sender.setAuthEncrypted(false);
+//		sender.setConnectionSecurity(EMailSender.SECURITY_TLS);
+//		sender.setPort(587);
+//		sender.send(mail);
 
 // ARUBA SMTP		
 //		EMailSender sender = new EMailSender();
 //		sender.setHost("smtp.logicaldoc.com");
-//		sender.setPassword("****");
+//		sender.setPassword("paf75peRQT");
 //		sender.setUsername("m.meschieri@logicaldoc.com");
 //		sender.setSender("m.meschieri@logicaldoc.com");
 //		sender.setAuthEncrypted(false);
 //		sender.setConnectionSecurity(EMailSender.SECURITY_NONE);
 //		sender.setPort(25);
 //		sender.send(mail);
-//		System.out.println("Sent 1");
 
 // GMAIL SSL  (requires to define an App password in Google security)
 //		EMailSender sender = new EMailSender();
@@ -51,7 +61,6 @@ public class EMailSenderTestbench {
 //		sender.setConnectionSecurity(EMailSender.SECURITY_SSL);
 //		sender.setPort(465);
 //		sender.send(mail);
-//		System.out.println("Sent 2");
 
 // GMAIL TLS (TLS v1.2)
 //		EMailSender sender = new EMailSender();
@@ -63,7 +72,9 @@ public class EMailSenderTestbench {
 //		sender.setConnectionSecurity(EMailSender.SECURITY_TLS);
 //		sender.setPort(587);
 //		sender.send(mail);
-//		System.out.println("Sent 3");		
+
+		
+		System.out.println("Sent " + mail.getSubject());
 	}
 
 }
