@@ -22,6 +22,9 @@ import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
  */
 public class SqlRowSetWrapper implements SqlRowSet {
 
+	private static final long serialVersionUID = 1L;
+
+	// The wrapped instance
 	private SqlRowSet rowSet;
 
 	public SqlRowSetWrapper(SqlRowSet rowSet) {
@@ -29,6 +32,7 @@ public class SqlRowSetWrapper implements SqlRowSet {
 		this.rowSet = rowSet;
 	}
 
+	@SuppressWarnings("unused")
 	private SqlRowSetWrapper() {
 	}
 

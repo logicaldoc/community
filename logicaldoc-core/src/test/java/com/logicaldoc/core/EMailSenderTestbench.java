@@ -20,26 +20,29 @@ public class EMailSenderTestbench {
 		mail.setMessageText("test");
 
 // OFFICE 365 (TLS v1.2)
-//		EMailSender sender = new EMailSender();
-//		sender.setHost("smtp.office365.com");
-//		sender.setPassword("");
-//		sender.setUsername("");
-//		sender.setSender("");
-//		sender.setAuthEncrypted(false);
-//		sender.setConnectionSecurity(EMailSender.SECURITY_TLS);
-//		sender.setPort(587);
-//		sender.send(mail);
-		
-//		EMailSender sender = new EMailSender();
-//		sender.setHost("smtp.office365.com");
+		EMailSender sender = new EMailSender();
+		sender.setHost("smtp.office365.com");
 //		sender.setPassword("a@_^JqZX5bI]nA/");
 //		sender.setUsername("m.meschieri@logicaldoc.com");
 //		sender.setSender("m.meschieri@logicaldoc.com");
-//		sender.setAuthEncrypted(false);
-//		sender.setConnectionSecurity(EMailSender.SECURITY_TLS);
-//		sender.setPort(587);
-//		sender.send(mail);
+		
+//		sender.setPassword("2010aivilo");
+//		sender.setUsername("shatzing5@outlook.com");
+//		sender.setSender("shatzing5@outlook.com");
+//		mail.setAuthorAddress("shatzing5@outlook.com");
+		
+		sender.setPassword("QHL@3}]j");
+		sender.setUsername("adminex@logicaldoc.eu");
+		sender.setSender("adminex@logicaldoc.eu");
+		mail.setAuthorAddress("adminex@logicaldoc.eu");
+		
+		sender.setAuthEncrypted(false);
+		sender.setConnectionSecurity(EMailSender.SECURITY_TLS);
+		sender.setPort(587);
+		sender.send(mail);
 
+		
+		
 // ARUBA SMTP		
 //		EMailSender sender = new EMailSender();
 //		sender.setHost("smtp.logicaldoc.com");

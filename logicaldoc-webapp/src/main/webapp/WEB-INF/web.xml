@@ -444,7 +444,15 @@
 	<servlet-name>TimeZonesData</servlet-name>
 	<servlet-class>com.logicaldoc.web.data.TimeZonesDataServlet</servlet-class>
   </servlet>
-    
+  <servlet>
+	<servlet-name>Echo</servlet-name>
+	<servlet-class>com.logicaldoc.web.EchoServlet</servlet-class>
+  </servlet>
+      
+  <servlet-mapping>
+    <servlet-name>Echo</servlet-name>
+    <url-pattern>/echo</url-pattern>
+  </servlet-mapping>    
   <servlet-mapping>
     <servlet-name>DashletsData</servlet-name>
     <url-pattern>/data/dashlets.xml</url-pattern>
