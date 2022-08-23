@@ -19,6 +19,9 @@ import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
+import com.logicaldoc.gui.frontend.client.document.note.AnnotationsWindow;
+import com.logicaldoc.gui.frontend.client.document.note.NoteUpdateDialog;
+import com.logicaldoc.gui.frontend.client.document.note.NotesPanel;
 import com.logicaldoc.gui.frontend.client.document.note.VersionNotesWindow;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
@@ -40,6 +43,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This panel shows a list of versions of a document in a tabular way.
@@ -140,31 +145,28 @@ public class VersionsPanel extends DocumentDetailTab {
 		container.setMembersMargin(3);
 		container.addMember(list);
 
-		HLayout buttons = new HLayout();
-		buttons.setMembersMargin(4);
+		ToolStrip buttons = new ToolStrip();
 		buttons.setWidth100();
-		buttons.setHeight(20);
 
-		Button exportButton = new Button(I18N.message("export"));
-		exportButton.setAutoFit(true);
-		buttons.addMember(exportButton);
-		exportButton.addClickHandler(new ClickHandler() {
+		ToolStripButton export = new ToolStripButton(I18N.message("export"));
+		export.addClickHandler(new ClickHandler() {
 
 			@Override
 			public void onClick(ClickEvent event) {
 				GridUtil.exportCSV(list, true);
 			}
 		});
-
-		Button print = new Button(I18N.message("print"));
-		print.setAutoFit(true);
-		buttons.addMember(print);
+		
+		ToolStripButton print = new ToolStripButton(I18N.message("print"));
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				GridUtil.print(list);
 			}
 		});
+
+		buttons.addButton(export);
+		buttons.addButton(print);
 
 		container.addMember(buttons);
 		addMember(container);

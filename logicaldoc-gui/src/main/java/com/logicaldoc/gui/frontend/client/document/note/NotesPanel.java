@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.data.NotesDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
@@ -16,7 +17,6 @@ import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLPane;
-import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -29,6 +29,8 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import com.smartgwt.client.widgets.toolbar.ToolStrip;
+import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
 /**
  * This panel shows the notes on a document
@@ -40,7 +42,7 @@ public class NotesPanel extends DocumentDetailTab {
 
 	private ListGrid notesGrid;
 
-	private IButton addNote;
+	private ToolStripButton addNote;
 
 	private HLayout buttons;
 
@@ -87,12 +89,11 @@ public class NotesPanel extends DocumentDetailTab {
 		notesGrid.setAutoFetchData(true);
 		notesGrid.setDataSource(new NotesDS(null, document.getId(), document.getFileVersion(), null));
 		notesGrid.setFields(id, userId, user, date, page, content);
-		container.setHeight100();
-		container.setWidth100();
-		container.addMember(notesGrid);
 
-		addNote = new IButton(I18N.message("addnote"));
-		addNote.setAutoFit(false);
+		ToolStrip buttons = new ToolStrip();
+		buttons.setWidth100();
+
+		addNote = new ToolStripButton(I18N.message("addnote"));
 		addNote.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -101,8 +102,7 @@ public class NotesPanel extends DocumentDetailTab {
 			}
 		});
 
-		IButton annotations = new IButton(I18N.message("annotations"));
-		annotations.setAutoFit(false);
+		ToolStripButton annotations = new ToolStripButton(I18N.message("annotations"));
 		annotations.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -112,20 +112,41 @@ public class NotesPanel extends DocumentDetailTab {
 			}
 		});
 
-		buttons = new HLayout();
-		buttons.setWidth100();
-		buttons.setHeight(30);
-		buttons.setMembersMargin(5);
-		container.addMember(buttons);
+		ToolStripButton export = new ToolStripButton(I18N.message("export"));
+		export.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				GridUtil.exportCSV(notesGrid, true);
+			}
+		});
+		
+		ToolStripButton print = new ToolStripButton(I18N.message("print"));
+		print.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				GridUtil.print(notesGrid);
+			}
+		});
 
 		if (document.getFolder().isWrite()) {
-			buttons.addMember(addNote);
+			buttons.addButton(addNote);
 		}
 
 		if (Feature.visible(Feature.ANNOTATIONS)) {
-			buttons.addMember(annotations);
+			buttons.addButton(annotations);
 			annotations.setDisabled(!Feature.enabled(Feature.ANNOTATIONS));
 		}
+
+		if (document.getFolder().isWrite())
+			buttons.addSeparator();
+		buttons.addButton(export);
+		buttons.addButton(print);
+
+		container.setHeight100();
+		container.setWidth100();
+		container.addMember(notesGrid);
+		container.addMember(buttons);
 
 		notesGrid.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override

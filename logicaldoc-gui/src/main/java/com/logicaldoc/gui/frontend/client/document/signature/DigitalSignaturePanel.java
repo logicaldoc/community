@@ -91,14 +91,16 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 				"<a href='" + url + "' target='_blank'>" + I18N.message("downloadrootcert") + "</a>");
 		rootCert.setRequired(true);
 		rootCert.setWrap(false);
-		rootCert.setColSpan(5);
+		rootCert.setColSpan(7);
+		rootCert.setStartRow(true);
 
 		final DynamicForm form = new DynamicForm();
 		form.setWrapItemTitles(false);
 		form.setTitleOrientation(TitleOrientation.LEFT);
-		form.setNumCols(5);
+		form.setNumCols(7);
 
 		ButtonItem sign = new ButtonItem(I18N.message("signnow"));
+		sign.setEndRow(false);
 		sign.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -132,9 +134,9 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		});
 
 		if (document.getFolder().hasPermission(Constants.PERMISSION_SIGN))
-			form.setItems(reason, visualPositioning, sign, rootCert);
+			form.setItems(sign, reason, visualPositioning, rootCert);
 		else {
-			formLayout.setHeight(50);
+			formLayout.setHeight(40);
 			form.setItems(rootCert);
 		}
 		formLayout.addMember(form);
