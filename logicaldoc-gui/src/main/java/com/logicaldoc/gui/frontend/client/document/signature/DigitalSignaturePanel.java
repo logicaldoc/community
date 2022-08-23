@@ -132,6 +132,10 @@ public class DigitalSignaturePanel extends DocumentDetailTab {
 		if (document.getFolder().hasPermission(Constants.PERMISSION_SIGN))
 			form.setItems(sign, reason, visualPositioning, rootCert);
 		else {
+<<<<<<< HEAD
+=======
+			formLayout.setHeight(40);
+>>>>>>> branch 'master' of https://github.com/logicaldoc/community.git
 			form.setItems(rootCert);
 		}
 
