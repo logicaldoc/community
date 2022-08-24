@@ -209,9 +209,10 @@ public class GridUtil {
 							continue;
 
 						stringBuilder.append("\"");
-						if (listGridField.getType().equals(ListGridFieldType.DATE)) {
+						if (listGridField.getType().equals(ListGridFieldType.DATE)
+								|| listGridField.getType().equals(ListGridFieldType.DATETIME)) {
 							Date val = record.getAttributeAsDate(listGridField.getName());
-							stringBuilder.append(val == null ? "" : I18N.formatDateShort(val));
+							stringBuilder.append(val == null ? "" : I18N.formatDateLong(val));
 						} else {
 							Object val = record.getAttribute(listGridField.getName());
 							stringBuilder.append(val == null || "null".equals(val.toString()) ? ""

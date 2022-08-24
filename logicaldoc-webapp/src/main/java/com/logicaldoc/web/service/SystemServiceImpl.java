@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -846,7 +847,8 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 					history.setTenantId(session.getTenantId());
 					history.setUsername(rs.getString(1));
 					history.setEvent(rs.getString(2));
-					if (rs.getObject(3) instanceof Timestamp)
+					
+					if (rs.getObject(3) instanceof Timestamp || rs.getObject(3) instanceof LocalDateTime)
 						history.setDate(rs.getTimestamp(3));
 					else
 						history.setDate(rs.getDate(3));

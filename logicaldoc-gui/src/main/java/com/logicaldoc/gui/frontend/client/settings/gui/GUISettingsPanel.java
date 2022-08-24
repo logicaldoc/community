@@ -307,10 +307,13 @@ public class GUISettingsPanel extends AdminPanel {
 		RadioGroupItem foldOpentree = ItemFactory.newBooleanSelector("foldopentree", I18N.message("openfolderstree"));
 		foldOpentree.setWrapTitle(false);
 
+		RadioGroupItem foldOpenSelect = ItemFactory.newBooleanSelector("foldopenselect", I18N.message("foldopenselect"));
+		foldOpenSelect.setWrapTitle(false);
+
 		SpinnerItem foldMaxChildren = ItemFactory.newSpinnerItem("foldmaxchildren", I18N.message("foldmaxchildren"),
 				(Integer) null);
 		foldMaxChildren.setWrapTitle(false);
-
+		
 		SpinnerItem maxHistories = ItemFactory.newSpinnerItem("maxhistories", I18N.message("maxhistories"),
 				(Integer) null);
 		maxHistories.setStep(10);
@@ -458,6 +461,8 @@ public class GUISettingsPanel extends AdminPanel {
 				maxHistories.setValue(Integer.parseInt(p.getValue().trim()));
 			if (p.getName().endsWith("gui.folder.autoclose"))
 				autocloseFolderNodes.setValue(p.getValue().equals("true") ? "yes" : "no");
+			if (p.getName().endsWith("gui.folder.openonselect"))
+				foldOpenSelect.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.folder.pagination"))
 				foldPagination.setValue(p.getValue().equals("true") ? "yes" : "no");
 			if (p.getName().endsWith("gui.folder.opentree"))
@@ -569,6 +574,8 @@ public class GUISettingsPanel extends AdminPanel {
 							values.get("foldsorting").toString()));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.opentree",
 							"yes".equals(values.get("foldopentree")) ? "true" : "false"));
+					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.openonselect",
+							"yes".equals(values.get("foldopenselect")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.pagination",
 							"yes".equals(values.get("foldpagination")) ? "true" : "false"));
 					params.add(new GUIParameter(Session.get().getTenantName() + ".gui.folder.maxchildren",
@@ -657,7 +664,8 @@ public class GUISettingsPanel extends AdminPanel {
 				thumbSize, thumbQuality, tileSize, tileQuality, mobileSize, mobileQuality, avatarSize, disallow,
 				showAvatarsInGrids, textExtensions, attrTextBoxW, attrTextAreaW, attrTextAreaH, noteMaxSize,
 				emailMaxSize, wfDashletRows, ondoubleclick, docTab, foldSorting, securityOption,
-				securitySecurityOptionDefault, foldOpentree, foldPagination, foldMaxChildren, openPreviewPanel,
+				securitySecurityOptionDefault, foldOpentree, foldOpenSelect, 
+				foldPagination, foldMaxChildren, openPreviewPanel,
 				maxHistories, autocloseFolderNodes, webstartMode, galleryEnabled, allowNotesEditing, webcontentFolders,
 				downloadTicketBehavior, saveLogin, sessionTimeout, rpcTimeout, sessionHeartbeat, popupTimeout, charset,
 				lockOnEditing, askVersionCommentOnSave, reactToRemoteEvents, saveInputs, showVersionAlertsInLogin,

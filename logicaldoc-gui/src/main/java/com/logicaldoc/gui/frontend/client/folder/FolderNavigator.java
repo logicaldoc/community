@@ -280,11 +280,14 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 				selectFolder(selectedFolderId);
 
-				// Expand the selected node if it is not already expanded
-				TreeNode selectedNode = (TreeNode) getSelectedRecord();
-				openFolder(selectedNode);
+				if(Session.get().getConfigAsBoolean("gui.folder.openonselect")) {
+					// Expand the selected node if it is not already expanded
+					TreeNode selectedNode = (TreeNode) getSelectedRecord();
+					openFolder(selectedNode);
+				}
 			}
 		});
+
 
 		/*
 		 * To refresh the folder's decoration and in case of need we add a

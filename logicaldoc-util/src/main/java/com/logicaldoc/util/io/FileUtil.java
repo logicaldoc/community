@@ -679,7 +679,7 @@ public class FileUtil {
 				((Buffer) buffer).clear();
 			}
 		} catch (IOException e) {
-			log.warn(e.getMessage());
+			log.warn(e.getMessage(), e);
 		} finally {
 			close(in);
 			close(out);
