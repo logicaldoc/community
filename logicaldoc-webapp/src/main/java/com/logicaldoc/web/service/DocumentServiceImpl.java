@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -35,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.google.common.io.Files;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
@@ -243,7 +243,15 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					 * Move the documents in a safe temporary folder
 					 */
 					Map<File, String> files = new HashMap<File, String>();
-					File tempDir = Files.createTempDir();
+
+					File tempDir = null;
+					try {
+						tempDir = Files.createTempDirectory("upload").toFile();
+					} catch (IOException e) {
+						log.error("Cannot create temporary folder", e);
+						throw new RuntimeException(e.getMessage(), e);
+					}
+
 					for (String fileId : uploadedFilesMap.keySet()) {
 						final File file = uploadedFilesMap.get(fileId);
 						final String filename = uploadedFileNames.get(fileId);
@@ -938,7 +946,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				document.setBookmarked(bDao.isDocBookmarkedByUser(document.getDocRef(), sessionUser.getId()));
 		}
 
-		GUIAttribute[] attributes = TemplateServiceImpl.prepareGUIAttributes(realDoc.getTemplate(), realDoc, sessionUser);
+		GUIAttribute[] attributes = TemplateServiceImpl.prepareGUIAttributes(realDoc.getTemplate(), realDoc,
+				sessionUser);
 		document.setAttributes(attributes);
 
 		if (folder != null) {
@@ -1356,7 +1365,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			templateDao.initialize(template);
 
 			docVO.setTemplate(template);
-			if (guiDocument.getAttributes()!=null && guiDocument.getAttributes().length > 0) {
+			if (guiDocument.getAttributes() != null && guiDocument.getAttributes().length > 0) {
 				for (GUIAttribute attr : guiDocument.getAttributes()) {
 					Attribute templateAttribute = template.getAttributes()
 							.get(attr.getParent() != null ? attr.getParent() : attr.getName());
