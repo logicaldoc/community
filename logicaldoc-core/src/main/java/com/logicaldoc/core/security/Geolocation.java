@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,7 +20,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ibm.icu.text.SimpleDateFormat;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;

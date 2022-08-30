@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
-import com.ibm.icu.util.StringTokenizer;
 
 /**
  * Comparators to sort documents with different options

@@ -1,12 +1,12 @@
 package com.logicaldoc.core.security;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.ibm.icu.util.Calendar;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.IPBlockedException;

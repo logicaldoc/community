@@ -3,11 +3,11 @@ package com.logicaldoc.core.document;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.ibm.icu.util.StringTokenizer;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.util.config.ContextProperties;
@@ -21,7 +21,7 @@ import com.logicaldoc.util.config.ContextProperties;
 public class Version extends AbstractDocument implements Comparable<Version> {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private String username;
 
 	private Date versionDate = new Date();
@@ -53,11 +53,9 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		this.userId = userId;
 	}
 
-	
 	public String getUsername() {
 		return username;
 	}
-
 
 	public void setUsername(String username) {
 		this.username = username;
@@ -67,8 +65,10 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	 * Calculate the new version name in the format <b>X</b>.<b>Y</b>.
 	 * 
 	 * <ul>
-	 * <li>if the new version is a release, then X will be raised by 1 and Y will be 0 (e.g.: 12.3 will become 13.0)</li>
-	 * <li>if the new version is not a release, then Y will be raised by 1 (e.g.: 12.3 will become 12.4)</li>
+	 * <li>if the new version is a release, then X will be raised by 1 and Y
+	 * will be 0 (e.g.: 12.3 will become 13.0)</li>
+	 * <li>if the new version is not a release, then Y will be raised by 1
+	 * (e.g.: 12.3 will become 12.4)</li>
 	 * </ul>
 	 * 
 	 * @param oldVersionName the old version in the format <b>X</b>.<b>Y</b>
@@ -216,7 +216,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		version.setWorkflowStatus(document.getWorkflowStatus());
 		version.setWorkflowStatusDisplay(document.getWorkflowStatusDisplay());
 		version.setColor(document.getColor());
-		
+
 		if (document.getTemplate() != null) {
 			version.setTemplateId(document.getTemplate().getId());
 			version.setTemplateName(document.getTemplate().getName());

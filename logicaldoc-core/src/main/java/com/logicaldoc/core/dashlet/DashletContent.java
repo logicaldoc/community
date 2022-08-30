@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.ibm.icu.util.StringTokenizer;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.document.Document;
