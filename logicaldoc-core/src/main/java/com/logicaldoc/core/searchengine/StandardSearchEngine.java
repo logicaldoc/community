@@ -396,7 +396,7 @@ public class StandardSearchEngine implements SearchEngine {
 		if (rows != null)
 			query = query.setRows(rows);
 		if (filters != null)
-			query = query.addFilterQuery(Joiner.on(" ").join(filters));
+			query = query.addFilterQuery(Joiner.on(" +").join(filters));
 		query = query.setSort(SortClause.desc("score"));
 		query.set("exprLang", expressionLanguage);
 		return query;
