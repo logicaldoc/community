@@ -305,7 +305,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					throw new Exception("Version not stored");
 
 				log.debug("Stored version {}", version.getVersion());
-				log.debug("Invoke listeners after store");
+				log.debug("Invoke listeners after checkin");
 				for (DocumentListener listener : listenerManager.getListeners())
 					listener.afterCheckin(document, transaction, dictionary);
 				stored = documentDAO.store(document);
