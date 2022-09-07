@@ -176,6 +176,7 @@ public class AddTemplateAttributeDialog extends Window {
 					record.setAttribute("hidden", att.isHidden());
 					record.setAttribute("multiple", att.isMultiple());
 					record.setAttribute("validation", att.getValidation());
+					record.setAttribute("initialization", att.getInitialization());
 					record.setAttribute("preset", att.getEditor() == GUIAttribute.EDITOR_LISTBOX);
 					setAttributesList.getRecordList().add(record);
 				}

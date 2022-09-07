@@ -188,9 +188,25 @@ public class DocTool {
 	 * Saves / updates a document into the database
 	 * 
 	 * @param doc the document to save
+	 * @param transaction entry to log the event
+	 * 
+	 */
+	public void store(Document doc, DocumentHistory transaction) {
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		try {
+			docDao.store(doc, transaction);
+		} catch (Throwable t) {
+			log.error(t.getMessage(), t);
+		}
+	}
+
+	/**
+	 * Saves / updates a document into the database
+	 * 
+	 * @param doc the document to save
 	 */
 	public void store(Document doc) {
-		store(doc, null);
+		store(doc, (String) null);
 	}
 
 	/**
@@ -201,18 +217,12 @@ public class DocTool {
 	 */
 	public void store(Document doc, String username) {
 		User user = new SecurityTool().getUser(username);
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setDocument(doc);
 		transaction.setDate(new Date());
 		transaction.setUser(user);
-
-		try {
-			docDao.store(doc, transaction);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-		}
+		store(doc, transaction);
 	}
 
 	/**

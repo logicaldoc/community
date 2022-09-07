@@ -17,7 +17,6 @@ import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
-import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.ResizedEvent;
@@ -87,19 +86,8 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		add.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				SC.askforValue(I18N.message("option"), new ValueCallback() {
-
-					@Override
-					public void execute(String value) {
-						if (value == null)
-							return;
-						Record rec = new ListGridRecord();
-						rec.setAttribute("value", value.trim());
-						rec.setAttribute("setId", Long.toString(setId));
-						rec.setAttribute("attribute", attribute);
-						list.addData(rec);
-					}
-				});
+				AddAttributeOptionDialog addAttribute = new AddAttributeOptionDialog(setId, attribute, list);
+				addAttribute.show();
 			}
 		});
 		add.setDisabled(readOnly);

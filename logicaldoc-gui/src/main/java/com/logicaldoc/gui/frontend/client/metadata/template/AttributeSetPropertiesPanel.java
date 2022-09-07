@@ -278,7 +278,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		} else
 			attributeName.setDisabled(true);
 
-		// Attribute Name
+		// Attribute Label
 		final TextItem label = ItemFactory.newTextItem("label", "label", null);
 		label.setWidth(400);
 
@@ -577,7 +577,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributeSettingsForm1.setValue("attributeName", "");
 		updatingAttributeName = "";
 
-		attributeSettingsForm1.setValue("label", (String) null);
+		attributeSettingsForm2.setValue("label", (String) null);
 		attributeSettingsForm1.setValue("mandatory", false);
 		attributeSettingsForm1.setValue("hidden", false);
 		attributeSettingsForm1.setValue("multiple", false);
@@ -694,10 +694,10 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			String selectedAttributeName = record.getAttributeAsString("name");
 			GUIAttribute extAttr = attributeSet.getAttribute(selectedAttributeName);
 			attributeSettingsForm1.setValue("attributeName", extAttr.getName());
-			attributeSettingsForm1.setValue("label", extAttr.getLabel());
 			attributeSettingsForm1.setValue("mandatory", extAttr.isMandatory());
 			attributeSettingsForm1.setValue("hidden", extAttr.isHidden());
 			attributeSettingsForm1.setValue("multiple", extAttr.isMultiple());
+			attributeSettingsForm2.setValue("label", extAttr.getLabel());
 			attributeSettingsForm2.setValue("type", extAttr.getType());
 			attributeSettingsForm2.setValue("editor", extAttr.getEditor());
 			attributeSettingsForm2.setValue("group", extAttr.getStringValue());
