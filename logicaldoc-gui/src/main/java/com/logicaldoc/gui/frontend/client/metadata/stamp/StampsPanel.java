@@ -114,7 +114,7 @@ public class StampsPanel extends AdminPanel {
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
 		list.setCanFreezeFields(true);
-		list.setCanSort(false);
+		list.setCanSort(true);
 		list.setFilterOnKeypress(true);
 		list.setDataSource(new StampsDS(null, false));
 
