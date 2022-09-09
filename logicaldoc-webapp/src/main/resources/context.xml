@@ -117,7 +117,7 @@
 		</property>
 	</bean>
 
-	<bean id="GarbageCollector"
+	<bean id="GarbageCollectorJob"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject">
 			<bean class="com.logicaldoc.web.GarbageCollector" />
@@ -125,26 +125,31 @@
 		<property name="targetMethod" value="gc" />
 		<property name="concurrent" value="false" />
 	</bean>
-	<bean id="GarbageCollectorTrigger"
+	<bean id="GarbageCollector"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="GarbageCollector" />
-		<property name="startDelay" value="1000" />
-		<property name="repeatInterval" value="2000" />
+		<property name="jobDetail" ref="GarbageCollectorJob" />
+		<property name="startDelay" value="2000" />
+		<property name="repeatInterval" value="4000" />
+	</bean>
+
+	<bean id="TempFolderCleanerJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<bean class="com.logicaldoc.web.TempFolderCleaner" />
+		</property>
+		<property name="targetMethod" value="clean" />
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="TempFolderCleaner"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="TempFolderCleanerJob" />
+		<property name="startDelay" value="10000" />
+		<property name="repeatInterval" value="3600000" />
 	</bean>
 
 	<!-- Scheduler -->
 	<bean id="Scheduler" class="com.logicaldoc.core.task.SchedulerFactoryBean"
 		destroy-method="destroy">
 		<property name="waitForJobsToCompleteOnShutdown" value="true" />
-		<property name="triggers">
-			<list>
-				<ref bean="GarbageCollectorTrigger" />
-				<ref bean="IndexOptimizerTrigger" />
-				<ref bean="TagsProcessorTrigger" />
-				<ref bean="IndexerTaskTrigger" />
-				<ref bean="StatsCollectorTrigger" />
-				<ref bean="PathCalculatorTrigger" />
-			</list>
-		</property>
 	</bean>
 </beans>
