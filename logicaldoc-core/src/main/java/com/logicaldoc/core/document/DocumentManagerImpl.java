@@ -638,6 +638,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					// create a new version
 					Version version = Version.create(doc, transaction.getUser(), transaction.getComment(),
 							DocumentEvent.CHANGED.toString(), false);
+					versionDAO.store(version);
 
 					boolean stored = false;
 
@@ -650,12 +651,13 @@ public class DocumentManagerImpl implements DocumentManager {
 						stored = documentDAO.store(doc, transaction);
 					}
 
-					if (!stored)
+					if (!stored) {
+						try {
+							versionDAO.delete(version.getId());
+						} catch (Throwable t) {
+						}
 						throw new Exception("Document not stored");
-
-					stored = versionDAO.store(version);
-					if (!stored)
-						throw new Exception("Version not stored");
+					}
 
 					markAliasesToIndex(doc.getId());
 				} else {
@@ -665,7 +667,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			if (e instanceof PersistenceException)
-				throw (PersistenceException)e;
+				throw (PersistenceException) e;
 			else
 				throw new PersistenceException(e);
 		}
