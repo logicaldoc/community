@@ -84,14 +84,20 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
 		}
 
 		// Some default triggers
-		Trigger trigger = (Trigger) applicationContext.getBean("TempFolderCleaner");
-		if (trigger != null)
-			triggers.add(trigger);
-		trigger = (Trigger) applicationContext.getBean("GarbageCollector");
-		if (trigger != null)
-			triggers.add(trigger);
-		
-		
+		try {
+			Trigger trigger = (Trigger) applicationContext.getBean("TempFolderCleaner");
+			if (trigger != null)
+				triggers.add(trigger);
+		} catch (Throwable t) {
+		}
+
+		try {
+			Trigger trigger = (Trigger) applicationContext.getBean("GarbageCollector");
+			if (trigger != null)
+				triggers.add(trigger);
+		} catch (Throwable t) {
+		}
+
 		if (!triggers.isEmpty())
 			setTriggers(triggers.toArray(new Trigger[0]));
 	}
