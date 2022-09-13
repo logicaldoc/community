@@ -11,7 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Anti XSS vulnerability, that is the presence of &lt;script&gt; element inside
+ * Anti XSS vulnerability, that is the presence of &lt;script&gt; element and other javascript code inside
  * the request URL.
  * 
  * <br>

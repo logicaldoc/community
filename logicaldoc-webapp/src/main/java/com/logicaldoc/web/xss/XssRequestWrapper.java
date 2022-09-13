@@ -76,7 +76,19 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 			// Avoid "; sequences
 			Pattern scriptPattern = Pattern.compile("\";", Pattern.CASE_INSENSITIVE);
 			value = scriptPattern.matcher(value).replaceAll("");
-			
+
+			// Avoid '; sequences
+			scriptPattern = Pattern.compile("';", Pattern.CASE_INSENSITIVE);
+			value = scriptPattern.matcher(value).replaceAll("");
+
+			// Avoid "); sequences
+			scriptPattern = Pattern.compile("\"\\);", Pattern.CASE_INSENSITIVE);
+			value = scriptPattern.matcher(value).replaceAll("");
+
+			// Avoid '); sequences
+			scriptPattern = Pattern.compile("'\\);", Pattern.CASE_INSENSITIVE);
+			value = scriptPattern.matcher(value).replaceAll("");
+
 			// Avoid anything between script tags
 			scriptPattern = Pattern.compile("<script>(.*?)</script>", Pattern.CASE_INSENSITIVE);
 			value = scriptPattern.matcher(value).replaceAll("");
