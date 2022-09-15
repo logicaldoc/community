@@ -44,7 +44,7 @@ public class TarParser extends AbstractParser {
 				 * If we have just one entry, parse it
 				 */
 				String entry = entries.get(0);
-				String entryExtension = FilenameUtils.getExtension(entry);
+				String entryExtension = FileUtil.getExtension(entry);
 				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
@@ -99,7 +99,7 @@ public class TarParser extends AbstractParser {
 				 * If we have just one entry, count it's pages
 				 */
 				String entry = entries.get(0);
-				String entryExtension = FilenameUtils.getExtension(entry);
+				String entryExtension = FileUtil.getExtension(entry);
 				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);

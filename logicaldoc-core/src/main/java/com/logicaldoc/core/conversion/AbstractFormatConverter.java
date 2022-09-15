@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Abstract format converter.
@@ -33,7 +33,8 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	}
 
 	/**
-	 * Template method that invokes {@link #convert(String, Document, File, File)}
+	 * Template method that invokes
+	 * {@link #convert(String, Document, File, File)}
 	 */
 	public final void convert(File src, File dest) throws IOException {
 		this.convert(null, null, src, dest);
@@ -68,7 +69,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 		}
 		return config;
 	}
-	
+
 	@Override
 	public void loadParameters() {
 		try {
@@ -119,12 +120,12 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	public int hashCode() {
 		return this.getClass().getSimpleName().hashCode();
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return hashCode() == obj.hashCode();
 	}
-	
+
 	/**
 	 * Gets the extension for the given filename, if an alias is found then the
 	 * value of the alias is returned as well. For instance if in the settings
@@ -138,7 +139,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 	public static String getExtension(String fileNameOrExtension) {
 		String ext = fileNameOrExtension;
 		if (fileNameOrExtension.contains("."))
-			ext = FilenameUtils.getExtension(fileNameOrExtension.toLowerCase());
+			ext = FileUtil.getExtension(fileNameOrExtension.toLowerCase());
 
 		String alias = Context.get().getProperties().getProperty("converter.alias." + ext);
 		if (StringUtils.isNotEmpty(alias))

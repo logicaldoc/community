@@ -46,6 +46,7 @@ import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for rendering dashlet's contents.
@@ -193,7 +194,7 @@ public class DashletContent extends HttpServlet {
 						+ "]]></filename>");
 				writer.write("<icon>"
 						+ FilenameUtils.getBaseName(
-								IconSelector.selectIcon(FilenameUtils.getExtension((String) history.getFilename())))
+								IconSelector.selectIcon(FileUtil.getExtension((String) history.getFilename())))
 						+ "</icon>");
 				writer.write("<new>" + (1 == history.getIsNew()) + "</new>");
 				writer.write("<folderId>" + history.getFolderId() + "</folderId>");
@@ -498,7 +499,7 @@ public class DashletContent extends HttpServlet {
 					writer.write("<lockUser><![CDATA[" + doc.getLockUser() + "]]></lockUser>");
 				writer.write("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
 				writer.write("<icon>" + FilenameUtils.getBaseName(
-						IconSelector.selectIcon(FilenameUtils.getExtension(doc.getFileName()))) + "</icon>");
+						IconSelector.selectIcon(FileUtil.getExtension(doc.getFileName()))) + "</icon>");
 				writer.write("<type><![CDATA[" + doc.getType() + "]]></type>");
 
 				writer.write("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
@@ -588,7 +589,7 @@ public class DashletContent extends HttpServlet {
 				writer.write("<docId>" + record.getDocId() + "</docId>");
 				writer.write("<filename><![CDATA[" + record.getFileName() + "]]></filename>");
 				writer.write("<icon>" + FilenameUtils.getBaseName(
-						IconSelector.selectIcon(FilenameUtils.getExtension(record.getFileName()))) + "</icon>");
+						IconSelector.selectIcon(FileUtil.getExtension(record.getFileName()))) + "</icon>");
 				writer.write("<userId><![CDATA[" + record.getUserId() + "]]></userId>");
 				writer.write("</post>");
 			}

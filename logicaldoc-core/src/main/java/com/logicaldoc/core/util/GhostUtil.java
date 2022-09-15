@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Utility method for using GhostScript
@@ -46,8 +47,7 @@ public class GhostUtil {
 		List<File> pages = new ArrayList<File>();
 		String[] cmd = null;
 		if (page != null) {
-			if ("png".equals(
-					org.apache.velocity.shaded.commons.io.FilenameUtils.getExtension(dst.getName().toLowerCase())))
+			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
 				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", "-dBATCH", "-dNOPAUSE",
 						"-dFirstPage=" + page, "-dLastPage=" + page, "-r" + dpi, "-sOutputFile=" + dst.getPath(),
 						srcPdf.getPath() };
@@ -57,17 +57,16 @@ public class GhostUtil {
 						"-sOutputFile=" + dst.getPath(), srcPdf.getPath() };
 			pages.add(dst);
 		} else {
-			if ("png".equals(
-					org.apache.velocity.shaded.commons.io.FilenameUtils.getExtension(dst.getName().toLowerCase())))
+			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
 				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", "-dBATCH", "-dNOPAUSE", "-r" + dpi,
 						"-sOutputFile=" + dst.getParent() + "/" + FilenameUtils.getBaseName(dst.getName()) + "-%04d."
-								+ FilenameUtils.getExtension(dst.getName()),
+								+ FileUtil.getExtension(dst.getName()),
 						srcPdf.getPath() };
 			else
 				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", "-dBATCH",
 						"-dNOPAUSE", "-r" + dpi,
 						"-sOutputFile=" + dst.getParent() + "/" + FilenameUtils.getBaseName(dst.getName()) + "-%04d."
-								+ FilenameUtils.getExtension(dst.getName()),
+								+ FileUtil.getExtension(dst.getName()),
 						srcPdf.getPath() };
 		}
 

@@ -339,6 +339,20 @@ public class FileUtil {
 	}
 
 	/**
+	 * Gets the file extension
+	 * 
+	 * @param fileName name of the file
+	 * 
+	 * @return the sum of the sizes of all contained files expressed in bytes
+	 */
+	public static String getExtension(String fileName) {
+		if (fileName != null && fileName.contains(".")) {
+			return fileName.substring(fileName.lastIndexOf('.') + 1);
+		} else
+			return "";
+	}
+
+	/**
 	 * Computes the folder size as the sum of all files directly and indirectly
 	 * contained.
 	 * 

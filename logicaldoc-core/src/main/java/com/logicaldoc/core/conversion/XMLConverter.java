@@ -50,7 +50,7 @@ public class XMLConverter extends AbstractFormatConverter {
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
-		String destExt = FilenameUtils.getExtension(dest.getName()).toLowerCase();
+		String destExt = FileUtil.getExtension(dest.getName()).toLowerCase();
 		File xslt = null;
 		File xml = null;
 		String xsltOutFormat = null;

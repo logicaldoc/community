@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.exec.Exec;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Converter to convert PDF into image
@@ -24,7 +24,7 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
-		String ext = FilenameUtils.getExtension(dest.getName()).toLowerCase();
+		String ext = FileUtil.getExtension(dest.getName()).toLowerCase();
 
 		try {
 			String pages = "";

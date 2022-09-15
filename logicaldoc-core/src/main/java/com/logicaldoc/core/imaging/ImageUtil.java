@@ -66,7 +66,7 @@ public class ImageUtil {
 
 		// write the image to a file
 		ImageIO.write(image,
-				file.getName().contains(".") ? FilenameUtils.getExtension(file.getName()).toLowerCase() : "jpg", file);
+				file.getName().contains(".") ? FileUtil.getExtension(file.getName()).toLowerCase() : "jpg", file);
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class ImageUtil {
 		/*
 		 * In case of an image, just use the original document's file
 		 */
-		String ext = FilenameUtils.getExtension(originalFileName).toLowerCase();
+		String ext = FileUtil.getExtension(originalFileName).toLowerCase();
 
 		if (ext.equals("jpg") || ext.equals("jpeg")) {
 			FileUtil.copyFile(originalFile, out);

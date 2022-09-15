@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +29,7 @@ import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServletUtil;
 
 public class TicketDownload extends HttpServlet {
@@ -93,7 +93,7 @@ public class TicketDownload extends HttpServlet {
 				suffix = "conversion.pdf";
 			if ("conversion.pdf".equals(suffix)) {
 				converter.convertToPdf(doc, null);
-				if ("pdf".equals(FilenameUtils.getExtension(doc.getFileName()).toLowerCase()))
+				if ("pdf".equals(FileUtil.getExtension(doc.getFileName()).toLowerCase()))
 					suffix = null;
 			}
 

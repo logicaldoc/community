@@ -212,8 +212,8 @@ public class FormatConverterManager {
 				docVO.setFileName(FilenameUtils.getBaseName(fileName) + "." + format);
 				docVO.setFolder(document.getFolder());
 				docVO.setLanguage(document.getLanguage());
-				
-				DocumentHistory createHistory=(DocumentHistory)transaction.clone();
+
+				DocumentHistory createHistory = (DocumentHistory) transaction.clone();
 				createHistory.setComment(null);
 				return documentManager.create(out, docVO, createHistory);
 			} else
@@ -259,7 +259,7 @@ public class FormatConverterManager {
 
 			if (transaction != null) {
 				transaction.setEvent(DocumentEvent.CONVERTED.toString());
-				transaction.setComment("format: " + FilenameUtils.getExtension(out.getName()));
+				transaction.setComment("format: " + FileUtil.getExtension(out.getName()));
 				DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				try {
 					dao.saveDocumentHistory(document, transaction);
@@ -368,7 +368,7 @@ public class FormatConverterManager {
 	public List<String> getAllOutputFormats(String inFileName) {
 		String inExt = inFileName;
 		if (inFileName.contains("."))
-			inExt = FilenameUtils.getExtension(inFileName);
+			inExt = FileUtil.getExtension(inFileName);
 		List<String> formats = new ArrayList<String>();
 		for (String key : getConverters().keySet()) {
 			String inOut[] = key.split("-");
@@ -439,7 +439,7 @@ public class FormatConverterManager {
 			log.warn("No format converter for file " + inFileName);
 
 		// Get the first available converter
-		FormatConverter converter = converters!=null ? converters.get(0) : null;
+		FormatConverter converter = converters != null ? converters.get(0) : null;
 
 		// Check if a special binding is configured
 		String currentConverter = config.getProperty("converter." + inOutkey);

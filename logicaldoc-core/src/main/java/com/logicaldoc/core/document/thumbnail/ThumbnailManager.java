@@ -189,7 +189,7 @@ public class ThumbnailManager {
 	 * @return the right thumbnail builder for the given file name
 	 */
 	public ThumbnailBuilder getBuilder(String filename) {
-		String ext = filename.contains(".") ? FilenameUtils.getExtension(filename.toLowerCase())
+		String ext = filename.contains(".") ? FileUtil.getExtension(filename.toLowerCase())
 				: filename.toLowerCase();
 		ThumbnailBuilder builder = getBuilders().get(ext);
 
@@ -233,7 +233,7 @@ public class ThumbnailManager {
 	 */
 	private File writeToTempFile(Document document, String fileVersion) throws IOException {
 		File target = File.createTempFile("scr",
-				"." + FilenameUtils.getExtension(DocUtil.getFileName(document, fileVersion)));
+				"." + FileUtil.getExtension(DocUtil.getFileName(document, fileVersion)));
 		String fver = getSuitableFileVersion(document, fileVersion);
 		String resource = storer.getResourceName(document, fver, null);
 		storer.writeToFile(document.getId(), resource, target);

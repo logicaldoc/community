@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
@@ -186,7 +186,7 @@ public class ParserFactory {
 		if (parsers.isEmpty())
 			init();
 
-		String ext = filename.contains(".") ? FilenameUtils.getExtension(filename.trim()) : filename.trim();
+		String ext = filename.contains(".") ? FileUtil.getExtension(filename.trim()) : filename.trim();
 		if (!StringUtils.isEmpty(ext))
 			ext = ext.toLowerCase();
 

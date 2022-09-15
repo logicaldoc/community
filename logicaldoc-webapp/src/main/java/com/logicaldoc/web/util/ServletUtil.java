@@ -189,7 +189,7 @@ public class ServletUtil {
 	 * @throws ServletException error in the servlet container
 	 * @throws FileNotFoundException resource's file not found
 	 * @throws IOException generic I/O error
-	 * @throws PersistenceException  error in the database
+	 * @throws PersistenceException error in the database
 	 */
 	public static void downloadDocument(HttpServletRequest request, HttpServletResponse response, String sid,
 			long docId, String fileVersion, String fileName, String suffix, User user)
@@ -241,7 +241,7 @@ public class ServletUtil {
 
 		if (StringUtils.isNotEmpty(suffix)) {
 			resource = storer.getResourceName(doc, fileVersion, suffix);
-			filename = filename + "." + FilenameUtils.getExtension(suffix);
+			filename = filename + "." + suffix.substring(suffix.lastIndexOf('.') + 1);
 		}
 
 		long length = storer.size(doc.getId(), resource);

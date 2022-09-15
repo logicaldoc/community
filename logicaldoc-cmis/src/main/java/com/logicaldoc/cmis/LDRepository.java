@@ -104,7 +104,6 @@ import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfoHandler;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,6 +142,7 @@ import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * LogicalDOC implementation of a CMIS Repository
@@ -1896,10 +1896,10 @@ public class LDRepository {
 					objectInfo.setFileName(null);
 				} else {
 					addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_MIME_TYPE,
-							MimeTypes.getMIMEType(FilenameUtils.getExtension(doc.getFileName())));
+							MimeTypes.getMIMEType(FileUtil.getExtension(doc.getFileName())));
 					addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_FILE_NAME, doc.getFileName());
 
-					objectInfo.setContentType(FilenameUtils.getExtension(doc.getFileName()));
+					objectInfo.setContentType(FileUtil.getExtension(doc.getFileName()));
 					objectInfo.setFileName(doc.getFileName());
 				}
 

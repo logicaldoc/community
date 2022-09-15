@@ -56,7 +56,7 @@ public class ZipConverter extends AbstractFormatConverter {
 				: fileName;
 		unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
 		File ungzippedFile = File.createTempFile("parsegzip",
-				"." + FilenameUtils.getExtension(unpackedFileName).toLowerCase());
+				"." + FileUtil.getExtension(unpackedFileName).toLowerCase());
 		ZipUtil zipUtil = new ZipUtil();
 		zipUtil.unGZip(input, ungzippedFile);
 		return ungzippedFile;
@@ -73,11 +73,11 @@ public class ZipConverter extends AbstractFormatConverter {
 	}
 
 	private void unzipSingleEntry(String sid, Document document, File src, File dest, String entry) throws IOException {
-		String entryExtension = FilenameUtils.getExtension(entry);
+		String entryExtension = FileUtil.getExtension(entry);
 		File uncompressedEntryFile = File.createTempFile("unzip", "." + entryExtension);
 
-		String targetExtension = FilenameUtils.getExtension(dest.getName()).toLowerCase();
-		
+		String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
+
 		try {
 			ZipUtil zipUtil = new ZipUtil();
 			zipUtil.unzipEntry(src, entry, uncompressedEntryFile);
@@ -88,7 +88,7 @@ public class ZipConverter extends AbstractFormatConverter {
 			if (converter == null)
 				throw new IOException(
 						String.format("Unable to find a converter from %s to %s", entryExtension, targetExtension));
-			Document clone=document.clone();
+			Document clone = document.clone();
 			clone.setFileName(uncompressedEntryFile.getName());
 			converter.convert(sid, document, uncompressedEntryFile, dest);
 		} finally {
@@ -107,7 +107,7 @@ public class ZipConverter extends AbstractFormatConverter {
 			}
 			writer.flush();
 
-			String targetExtension = FilenameUtils.getExtension(dest.getName()).toLowerCase();
+			String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 			if ("txt".equals(targetExtension)) {
 				FileUtil.copyFile(tempFile, dest);
 			} else if ("pdf".equals(targetExtension)) {

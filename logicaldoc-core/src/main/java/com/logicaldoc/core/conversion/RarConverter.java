@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,10 +34,10 @@ public class RarConverter extends AbstractFormatConverter {
 
 	private void convertSingleEntry(String sid, Document document, File src, File dest, String entry)
 			throws IOException {
-		String entryExtension = FilenameUtils.getExtension(entry);
+		String entryExtension = FileUtil.getExtension(entry);
 		File uncompressedEntryFile = File.createTempFile("unRar", "." + entryExtension);
 
-		String targetExtension = FilenameUtils.getExtension(dest.getName()).toLowerCase();
+		String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 		try {
 			RarUtil.extractEntry(src, entry, uncompressedEntryFile);
 			FormatConverterManager manager = (FormatConverterManager) Context.get()
@@ -67,7 +66,7 @@ public class RarConverter extends AbstractFormatConverter {
 			}
 			writer.flush();
 
-			String targetExtension = FilenameUtils.getExtension(dest.getName()).toLowerCase();
+			String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 			if ("txt".equals(targetExtension)) {
 				FileUtil.copyFile(tempFile, dest);
 			} else if ("pdf".equals(targetExtension)) {

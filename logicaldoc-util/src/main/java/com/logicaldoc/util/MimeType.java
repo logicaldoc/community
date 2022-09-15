@@ -3,7 +3,7 @@ package com.logicaldoc.util;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.commons.io.FilenameUtils;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Utility class for MIME Type detection using the classpath
@@ -39,6 +39,6 @@ public class MimeType {
 	}
 
 	public static String getByFilename(String filename) {
-		return get(FilenameUtils.getExtension(filename));
+		return get(FileUtil.getExtension(filename));
 	}
 }

@@ -9,7 +9,6 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.Util;
-import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
@@ -125,8 +124,9 @@ public class MailPreviewPanel extends VLayout {
 
 						@Override
 						public void onClick(ClickEvent event) {
-							WindowUtils.openUrl(Util.downloadAttachmentURL(document.getId(), document.getFileVersion(),
-									doc.getFileName()));
+							String url = Util.downloadAttachmentURL(document.getId(), document.getFileVersion(),
+									doc.getFileName());
+							Util.download(url);
 						}
 					});
 				button.setContextMenu(prepareButtonMenu(document, doc));
@@ -205,7 +205,8 @@ public class MailPreviewPanel extends VLayout {
 							public void onSuccess(GUIDocument doc) {
 								if (MainPanel.get().isOnDocumentsTab())
 									if (FolderController.get().getCurrentFolder() != null)
-										FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
+										FolderNavigator.get()
+												.selectFolder(FolderController.get().getCurrentFolder().getId());
 							}
 						});
 			}
@@ -216,8 +217,8 @@ public class MailPreviewPanel extends VLayout {
 		download.setTitle(I18N.message("download"));
 		download.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
-				WindowUtils.openUrl(
-						Util.downloadAttachmentURL(doc.getId(), doc.getFileVersion(), attachment.getFileName()));
+				String url = Util.downloadAttachmentURL(doc.getId(), doc.getFileVersion(), attachment.getFileName());
+				Util.download(url);
 			}
 		});
 		download.setEnabled(doc.getFolder().isDownload());

@@ -44,7 +44,7 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 				 */
 				tmp = File.createTempFile("ebookcover",
 						"." + reader.getCoverImageFileName() != null
-								? FilenameUtils.getExtension(reader.getCoverImageFileName())
+								? FileUtil.getExtension(reader.getCoverImageFileName())
 								: "png");
 				FileUtil.writeFile(reader.getCoverImage(), tmp.getAbsolutePath());
 				super.buildThumbnail(sid, document, fileVersion, tmp, dest, size, compression);

@@ -116,6 +116,15 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertTrue(mail.getMessageText().startsWith("<html"));
 			Assert.assertTrue(mail.getMessageText().contains("Saludos"));
 		}
+		
+		{
+			// An email with another email inside
+			EMail mail = MailUtil.messageToMail(new File("src/test/resources/email2022-00398.eml"), true);
+			Assert.assertNotNull(mail);
+			Assert.assertEquals(1, mail.getAttachmentsCount());
+			EMailAttachment attachment = mail.getAttachment(1);
+			assertEquals("I: test mail 2.eml", attachment.getFileName());
+		}
 	}
 
 }

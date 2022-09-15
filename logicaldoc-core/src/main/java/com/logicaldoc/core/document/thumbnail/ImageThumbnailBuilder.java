@@ -13,6 +13,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.exec.Exec;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Takes care of images thumbnail builder
@@ -27,7 +28,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,
 			int size, int quality) throws IOException {
 		try {
-			String outExt = FilenameUtils.getExtension(dest.getName().toLowerCase());
+			String outExt = FileUtil.getExtension(dest.getName().toLowerCase());
 			ContextProperties conf = Context.get().getProperties();
 			StringBuffer commandLine = new StringBuffer(conf.getProperty("converter.ImageConverter.path"));
 			if ("png".equals(outExt))

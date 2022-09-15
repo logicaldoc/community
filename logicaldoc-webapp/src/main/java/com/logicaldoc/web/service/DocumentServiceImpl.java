@@ -1266,7 +1266,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 					document.setFileName(guiDocument.getFileName());
 					document.setColor(guiDocument.getColor());
-					document.setType(FilenameUtils.getExtension(document.getFileName()).toLowerCase());
+					document.setType(FileUtil.getExtension(document.getFileName()).toLowerCase());
 					boolean stored = docDao.store(document);
 					if (!stored)
 						throw new Exception("Alias not stored");
@@ -1281,7 +1281,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					docVO.setDocRef(null);
 					docVO.setFileName(document.getFileName());
 					docVO.setColor(document.getColor());
-					docVO.setType(FilenameUtils.getExtension(document.getFileName()).toLowerCase());
+					docVO.setType(FileUtil.getExtension(document.getFileName()).toLowerCase());
 				}
 				docVO.setTenantId(session.getTenantId());
 
@@ -1733,7 +1733,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		att.setMimeType(MimeType.get(extension));
 
 		if (convertToPdf) {
-			if (!"pdf".equals(FilenameUtils.getExtension(doc.getFileName().toLowerCase()))) {
+			if (!"pdf".equals(FileUtil.getExtension(doc.getFileName().toLowerCase()))) {
 				FormatConverterManager manager = (FormatConverterManager) Context.get()
 						.getBean(FormatConverterManager.class);
 				manager.convertToPdf(doc, sid);
@@ -2711,7 +2711,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					GUIDocument d = new GUIDocument();
 					d.setFileName(att.getFileName());
 					d.setFileSize(Float.valueOf(att.getSize()));
-					d.setIcon(IconSelector.selectIcon(FilenameUtils.getExtension(att.getFileName())));
+					d.setIcon(IconSelector.selectIcon(att.getFileName()));
 					d.setFolder(doc.getFolder());
 					attachments.add(d);
 				}

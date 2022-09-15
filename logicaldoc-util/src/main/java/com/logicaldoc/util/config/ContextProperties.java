@@ -23,6 +23,8 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.util.io.FileUtil;
+
 /**
  * A configuration utility used to retrieve and alter context properties
  * 
@@ -84,7 +86,7 @@ public class ContextProperties extends OrderedProperties {
 		if (file == null || !file.exists())
 			return null;
 		File override = new File(file.getParentFile(),
-				FilenameUtils.getBaseName(file.getName()) + "-override." + FilenameUtils.getExtension(file.getName()));
+				FilenameUtils.getBaseName(file.getName()) + "-override." + FileUtil.getExtension(file.getName()));
 		return override.exists() ? override : null;
 	}
 

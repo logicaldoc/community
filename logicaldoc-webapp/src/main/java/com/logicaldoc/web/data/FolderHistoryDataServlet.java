@@ -26,6 +26,7 @@ import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServiceUtil;
 
 public class FolderHistoryDataServlet extends HttpServlet {
@@ -87,9 +88,9 @@ public class FolderHistoryDataServlet extends HttpServlet {
 				writer.print("<date>" + df.format((Date) cols[2]) + "</date>");
 				writer.print("<comment><![CDATA[" + (cols[3] == null ? "" : cols[3]) + "]]></comment>");
 				writer.print("<filename><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></filename>");
-				if (cols[4] != null && !FilenameUtils.getExtension(cols[4].toString()).isEmpty())
+				if (cols[4] != null && !FileUtil.getExtension(cols[4].toString()).isEmpty())
 					writer.print("<icon>" + FilenameUtils.getBaseName(
-							IconSelector.selectIcon(FilenameUtils.getExtension((String) cols[4]))) + "</icon>");
+							IconSelector.selectIcon(FileUtil.getExtension((String) cols[4]))) + "</icon>");
 				else
 					writer.print("<icon>folder</icon>");
 				writer.print("<path><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></path>");

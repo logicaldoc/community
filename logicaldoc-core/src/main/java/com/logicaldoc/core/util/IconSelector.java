@@ -2,6 +2,8 @@ package com.logicaldoc.core.util;
 
 import org.apache.commons.io.FilenameUtils;
 
+import com.logicaldoc.util.io.FileUtil;
+
 /**
  * utility class to select an icon based on a file extension
  * 
@@ -31,7 +33,7 @@ public class IconSelector {
 	public static String selectIcon(String ext, boolean shortcut) {
 		String icon = "";
 		if (ext != null)
-			ext = ext.contains(".") ? FilenameUtils.getExtension(ext).toLowerCase() : ext.toLowerCase();
+			ext = ext.contains(".") ? FileUtil.getExtension(ext).toLowerCase() : ext.toLowerCase();
 
 		if (ext == null || ext.equalsIgnoreCase(""))
 			icon = "generic.png";
@@ -86,7 +88,7 @@ public class IconSelector {
 			icon = "generic.png";
 
 		if (shortcut)
-			icon = FilenameUtils.getBaseName(icon) + "-sc." + FilenameUtils.getExtension(icon);
+			icon = FilenameUtils.getBaseName(icon) + "-sc." + FileUtil.getExtension(icon);
 
 		return icon;
 	}

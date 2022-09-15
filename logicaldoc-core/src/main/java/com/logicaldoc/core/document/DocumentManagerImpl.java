@@ -257,7 +257,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				// create some strings containing paths
 				document.setFileName(filename);
-				document.setType(FilenameUtils.getExtension(filename));
+				document.setType(FileUtil.getExtension(filename));
 
 				// set other properties of the document
 				document.setDate(new Date());
@@ -751,7 +751,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			String type = "unknown";
 			int lastDotIndex = docVO.getFileName().lastIndexOf(".");
 			if (lastDotIndex > 0) {
-				type = FilenameUtils.getExtension(docVO.getFileName()).toLowerCase();
+				type = FileUtil.getExtension(docVO.getFileName()).toLowerCase();
 			}
 
 			if (docVO.getDate() == null)
@@ -984,9 +984,9 @@ public class DocumentManagerImpl implements DocumentManager {
 					|| ((document.getImmutable() == 1 && transaction.getUser().isMemberOf("admin")))) {
 				documentDAO.initialize(document);
 				document.setFileName(newName.trim());
-				String extension = FilenameUtils.getExtension(newName.trim());
+				String extension = FileUtil.getExtension(newName.trim());
 				if (StringUtils.isNotEmpty(extension)) {
-					document.setType(FilenameUtils.getExtension(newName));
+					document.setType(FileUtil.getExtension(newName));
 				} else {
 					document.setType("unknown");
 				}
@@ -1061,12 +1061,12 @@ public class DocumentManagerImpl implements DocumentManager {
 			String type = "unknown";
 			int lastDotIndex = doc.getFileName().lastIndexOf(".");
 			if (lastDotIndex > 0)
-				type = FilenameUtils.getExtension(doc.getFileName());
+				type = FileUtil.getExtension(doc.getFileName());
 
 			if (StringUtils.isNotEmpty(aliasType)) {
 				alias.setFileName(FilenameUtils.getBaseName(doc.getFileName()) + "."
-						+ FilenameUtils.getExtension(aliasType).toLowerCase());
-				type = FilenameUtils.getExtension(aliasType).toLowerCase();
+						+ FileUtil.getExtension(aliasType).toLowerCase());
+				type = FileUtil.getExtension(aliasType).toLowerCase();
 			}
 
 			alias.setPublisher(transaction.getUsername());

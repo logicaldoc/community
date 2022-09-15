@@ -25,6 +25,7 @@ import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServiceUtil;
 
 /**
@@ -241,7 +242,7 @@ public class FoldersDataServlet extends HttpServlet {
 						writer.print("<type>file</type>");
 						writer.print("<customIcon>"
 								+ FilenameUtils.getBaseName(
-										IconSelector.selectIcon(FilenameUtils.getExtension(rs.getString(2))))
+										IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))
 								+ "</customIcon>");
 						writer.print("<size>" + rs.getInt(3) + "</size>");
 						writer.print("<status>" + rs.getInt(7) + "</status>");

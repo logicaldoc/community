@@ -22,6 +22,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.ticket.TicketDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServiceUtil;
 
 /**
@@ -96,7 +97,7 @@ public class TicketsDataServlet extends HttpServlet {
 						&& (expired == null || expired.after(new Date()))) + "</valid>");
 				writer.print("<filename><![CDATA[" + fileName + "]]></filename>");
 				writer.print("<icon>"
-						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils.getExtension(fileName)))
+						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(fileName)))
 						+ "</icon>");
 				writer.print("<folderId>" + set.getLong(11) + "</folderId>");
 				writer.print("</ticket>");

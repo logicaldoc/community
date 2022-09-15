@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.LazyInitializationException;
 
@@ -19,6 +18,7 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * The Document is the central entity of LogicalDOC. A Document is a persistent
@@ -510,7 +510,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	public String getFileExtension() {
-		return FilenameUtils.getExtension(getFileName());
+		return FileUtil.getExtension(getFileName());
 	}
 
 	public Template getTemplate() {

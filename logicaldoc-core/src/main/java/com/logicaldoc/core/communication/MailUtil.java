@@ -425,27 +425,40 @@ public class MailUtil {
 					addAttachments(bp, email, extractAttachmentContent);
 				}
 			}
-		} else if (extractAttachmentContent && StringUtils.isNotEmpty(p.getFileName())) {
+		} else if (extractAttachmentContent) {
 			addAttachment(p, email);
 		}
 	}
 
 	private static void addAttachment(BodyPart bp, EMail email)
 			throws UnsupportedEncodingException, MessagingException {
+
+		String fileName = bp.getFileName();
+		String disposition = "";
+		if (bp.getContentType().equalsIgnoreCase("message/rfc822")) {
+			// The part is another email (may happen in case of forwards).
+			try (InputStream is = bp.getInputStream()) {
+				EMail embeddedEmail = messageToMail(bp.getInputStream(), false);
+				fileName = embeddedEmail.getSubject() + ".eml";
+				disposition = "attachment";
+			} catch (Throwable t) {
+				log.warn(t.getMessage(), t);
+			}
+		}
+
 		// Skip part without a filename
-		if (StringUtils.isEmpty(bp.getFileName()))
+		if (StringUtils.isEmpty(fileName))
 			return;
 
 		// Skip part that is not an attachment
 		String[] values = bp.getHeader("Content-Disposition");
-		String disposition = "";
 		if (values != null && values.length > 0)
 			disposition = new ContentDisposition(values[0]).getDisposition();
 		if (!disposition.contains("attachment"))
 			return;
 
-		String name = MimeUtility.decodeText(bp.getFileName());
-		String fileName = FilenameUtils.getName(name);
+		fileName = MimeUtility.decodeText(fileName);
+		fileName = FilenameUtils.getName(fileName);
 
 		EMailAttachment attachment = new EMailAttachment();
 		attachment.setFileName(fileName);

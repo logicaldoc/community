@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ResourceUtil;
 
 /**
@@ -26,7 +26,7 @@ public class NotAvailableConverter implements FormatConverter {
 
 	@Override
 	public void convert(File src, File dest) throws IOException {
-		String ext = FilenameUtils.getExtension(dest.getName());
+		String ext = FileUtil.getExtension(dest.getName());
 
 		if (!"pdf".equalsIgnoreCase(ext))
 			throw new IOException("Format " + ext + " not supported");

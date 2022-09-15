@@ -31,6 +31,7 @@ import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Exports a folder hierarchy and all documents in it as a zip file. Can also be
@@ -252,7 +253,7 @@ public class ZipExport {
 	private String adjustFileNameForWindows(String src) {
 		String newName = src.replace("/", "").replace("\\", "");
 		if (newName.length() > 250) {
-			String ext = FilenameUtils.getExtension(newName);
+			String ext = FileUtil.getExtension(newName);
 			int maxSize = 250 - ext.length() - 1;
 			String name = FilenameUtils.getBaseName(newName).substring(0, maxSize);
 			newName = name + "." + ext;
@@ -272,7 +273,7 @@ public class ZipExport {
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(document, null, null);
 
-		if (pdfConversion && !"pdf".equals(FilenameUtils.getExtension(document.getFileName().toLowerCase()))) {
+		if (pdfConversion && !"pdf".equals(FileUtil.getExtension(document.getFileName().toLowerCase()))) {
 			FormatConverterManager manager = (FormatConverterManager) Context.get()
 					.getBean(FormatConverterManager.class);
 			try {

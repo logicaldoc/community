@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.exec.Exec;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Converter to convert image files in PDF
@@ -24,16 +24,17 @@ public class ImageConverter extends AbstractFormatConverter {
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
-		String ext = FilenameUtils.getExtension(dest.getName()).toLowerCase();
+		String ext = FileUtil.getExtension(dest.getName()).toLowerCase();
 		if (!"pdf".equals(ext))
 			throw new IOException("Unable to convert image to " + ext);
 
 		try {
 			int timeout = 10;
 			try {
-				timeout=Integer.parseInt(getParameter("timeout"));
-			}catch(Throwable t) {}
-			
+				timeout = Integer.parseInt(getParameter("timeout"));
+			} catch (Throwable t) {
+			}
+
 			String commandLine = getParameter("path") + " -compress JPEG " + src.getPath() + " " + dest.getPath();
 			Exec.exec(commandLine, null, null, timeout);
 
@@ -46,6 +47,6 @@ public class ImageConverter extends AbstractFormatConverter {
 
 	@Override
 	public List<String> getParameterNames() {
-		return Arrays.asList("path","timeout");
+		return Arrays.asList("path", "timeout");
 	}
 }

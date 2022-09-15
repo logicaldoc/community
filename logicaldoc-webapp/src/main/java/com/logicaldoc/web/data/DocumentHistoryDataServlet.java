@@ -29,6 +29,7 @@ import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServiceUtil;
 
 /**
@@ -124,7 +125,7 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 				writer.print("<comment><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></comment>");
 				writer.print("<filename><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></filename>");
 				writer.print("<icon>" + FilenameUtils.getBaseName(
-						IconSelector.selectIcon(FilenameUtils.getExtension((String) cols[5]))) + "</icon>");
+						IconSelector.selectIcon(FileUtil.getExtension((String) cols[5]))) + "</icon>");
 				writer.print("<new>" + (1 == (Integer) cols[6]) + "</new>");
 				writer.print("<folderId>" + cols[7] + "</folderId>");
 				writer.print("<docId>" + cols[8] + "</docId>");

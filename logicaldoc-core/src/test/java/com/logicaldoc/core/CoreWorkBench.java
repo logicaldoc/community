@@ -40,46 +40,50 @@ import com.talanlabs.avatargenerator.IdenticonAvatar;
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
-		String[] timezones = TimeZone.getAvailableIDs();
-		for (String timezone : timezones) {
-			System.out.println(timezone);
-		}
 		
-		System.out.println(ExceptionUtils.getStackTrace(new Exception()));
-
-		// Getting the current date from java.util.Date class
-		Date currentTime = new Date();
-		System.out.println("currentTime : " + currentTime);
-
-		// Date time to current timezone
-		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String ISTTime = dateFormatter.format(currentTime);
-		System.out.println("local time : " + ISTTime);
-
-		// Date time to PST
-		// Creating PST timezone
-		TimeZone pstTimezone = TimeZone.getTimeZone("America/Los_Angeles");
-
-		// setting pst timezone to formatter.
-		dateFormatter.setTimeZone(pstTimezone);
-
-		// converting IST to PST
-		String PSTTime = dateFormatter.format(currentTime);
-		System.out.println("PST time : " + PSTTime);
-
-		// Date time to GST - Dubai Gulf
-		// Creating GST timezone
-		TimeZone gstTimezone = TimeZone.getTimeZone("Asia/Dubai");
-
-		// setting pst timezone to formatter.
-		dateFormatter.setTimeZone(gstTimezone);
-
-		// converting IST to PST
-		String GSTTime = dateFormatter.format(currentTime);
-		System.out.println("GST time : " + GSTTime);
-
-		dateFormatter.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
-		System.out.println("Rome time : " + dateFormatter.format(currentTime));
+		EMail email = MailUtil.messageToMail(new File("src/test/resources/email2022-00398.eml"), true);
+		System.out.println(email.getAttachmentsCount());
+		
+//		String[] timezones = TimeZone.getAvailableIDs();
+//		for (String timezone : timezones) {
+//			System.out.println(timezone);
+//		}
+//		
+//		System.out.println(ExceptionUtils.getStackTrace(new Exception()));
+//
+//		// Getting the current date from java.util.Date class
+//		Date currentTime = new Date();
+//		System.out.println("currentTime : " + currentTime);
+//
+//		// Date time to current timezone
+//		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//		String ISTTime = dateFormatter.format(currentTime);
+//		System.out.println("local time : " + ISTTime);
+//
+//		// Date time to PST
+//		// Creating PST timezone
+//		TimeZone pstTimezone = TimeZone.getTimeZone("America/Los_Angeles");
+//
+//		// setting pst timezone to formatter.
+//		dateFormatter.setTimeZone(pstTimezone);
+//
+//		// converting IST to PST
+//		String PSTTime = dateFormatter.format(currentTime);
+//		System.out.println("PST time : " + PSTTime);
+//
+//		// Date time to GST - Dubai Gulf
+//		// Creating GST timezone
+//		TimeZone gstTimezone = TimeZone.getTimeZone("Asia/Dubai");
+//
+//		// setting pst timezone to formatter.
+//		dateFormatter.setTimeZone(gstTimezone);
+//
+//		// converting IST to PST
+//		String GSTTime = dateFormatter.format(currentTime);
+//		System.out.println("GST time : " + GSTTime);
+//
+//		dateFormatter.setTimeZone(TimeZone.getTimeZone("Europe/Rome"));
+//		System.out.println("Rome time : " + dateFormatter.format(currentTime));
 
 		// getting the diff b/w two los angeles and dubai times.
 
