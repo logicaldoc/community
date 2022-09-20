@@ -53,8 +53,13 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 	@Override
 	public String getParameter(String parameter) {
 		String value = super.getParameter(parameter);
-
-		return stripXSS(value);
+		if (value!=null && "tenant".equals(parameter)) {
+			// Check that the content of this special parameter is a tenant name
+			Pattern scriptPattern = Pattern.compile("[\\)\"'\\.,;*?!%/\\(\\\\]", Pattern.CASE_INSENSITIVE);
+			value = scriptPattern.matcher(value).replaceAll("");
+		} else
+			value = stripXSS(value);
+		return value;
 	}
 
 	@Override
