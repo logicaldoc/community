@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -36,9 +38,14 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 		try {
 			if (StringUtils.isEmpty(event))
 				return findByWhere("_entity.userId =" + userId, "order by _entity.date desc", null);
-			else
-				return findByWhere("_entity.userId = ?1 and _entity.event = ?2", new Object[] { userId, event },
+			else {
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put("userId", userId);
+				params.put("event", event);
+
+				return findByWhere("_entity.userId = :userId and _entity.event = :event", params,
 						"order by _entity.date desc", null);
+			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<UserHistory>();

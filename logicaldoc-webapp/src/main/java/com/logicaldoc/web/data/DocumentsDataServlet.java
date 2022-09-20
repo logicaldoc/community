@@ -248,17 +248,17 @@ public class DocumentsDataServlet extends HttpServlet {
 				if (StringUtils.isNotEmpty(request.getParameter("indexed")))
 					query.append(" and A.indexed=" + request.getParameter("indexed"));
 
-				Object[] values = null;
+				Map<String, Object> params=new HashMap<String, Object>();
 				if (filename != null) {
-					query.append(" and lower(A.fileName) like ?1 ");
-					values = new Object[] { "%" + filename.toLowerCase() + "%" };
+					query.append(" and lower(A.fileName) like :fileName ");
+					params.put("fileName", "%" + filename.toLowerCase() + "%");
 				}
 
 				List<Document> documents = new ArrayList<Document>();
 				List<Object> records = new ArrayList<Object>();
 				if (folderId != null || filename != null || formId != null
 						|| StringUtils.isNotEmpty(request.getParameter("indexed")))
-					records = (List<Object>) dao.findByQuery(query.toString(), values, null);
+					records = (List<Object>) dao.findByQuery(query.toString(), params, null);
 
 				/*
 				 * Iterate over records enriching the data

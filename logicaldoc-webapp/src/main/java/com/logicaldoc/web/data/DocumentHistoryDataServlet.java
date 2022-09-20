@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -72,7 +73,8 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 			// is related to a single user (for dashboard visualization)
 			Set<Long> docIds = new HashSet<Long>();
 
-			List<Object> parameters = new ArrayList<Object>();
+			Map<String, Object> params = new HashMap<String, Object>();
+
 			DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			StringBuffer query = new StringBuffer(
 					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color from DocumentHistory A where 1=1 and A.deleted = 0 ");
@@ -82,24 +84,23 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 				Document doc = ddao.findDocument(docId);
 				if (doc != null)
 					docId = doc.getId();
-				query.append(" and A.docId = ?" + (parameters.size() + 1));
-				parameters.add(docId);
+				query.append(" and A.docId = :docId");
+				params.put("docId", docId);
 			}
 			if (request.getParameter("userId") != null) {
-				query.append(" and A.userId = ?" + (parameters.size() + 1));
-				parameters.add(Long.parseLong(request.getParameter("userId")));
+				query.append(" and A.userId = :userId");
+
 			}
 			if (request.getParameter("event") != null) {
-				query.append(" and A.event = ?" + (parameters.size() + 1));
-				parameters.add(request.getParameter("event"));
+				query.append(" and A.event = :event");
+				params.put("event", request.getParameter("event"));
 			}
 			query.append(" order by A.date desc ");
 
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 			df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), parameters.toArray(new Object[0]),
-					max);
+			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max);
 
 			/*
 			 * Iterate over records composing the response XML document
@@ -124,8 +125,9 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 				writer.print("<date>" + df.format((Date) cols[3]) + "</date>");
 				writer.print("<comment><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></comment>");
 				writer.print("<filename><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></filename>");
-				writer.print("<icon>" + FilenameUtils.getBaseName(
-						IconSelector.selectIcon(FileUtil.getExtension((String) cols[5]))) + "</icon>");
+				writer.print("<icon>"
+						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[5])))
+						+ "</icon>");
 				writer.print("<new>" + (1 == (Integer) cols[6]) + "</new>");
 				writer.print("<folderId>" + cols[7] + "</folderId>");
 				writer.print("<docId>" + cols[8] + "</docId>");

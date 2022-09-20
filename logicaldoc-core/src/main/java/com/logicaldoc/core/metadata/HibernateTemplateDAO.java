@@ -4,9 +4,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,6 @@ import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.sql.SqlUtil;
 
-
 /**
  * Hibernate implementation of <code>TemplateDAO</code>
  * 
@@ -29,7 +30,7 @@ import com.logicaldoc.util.sql.SqlUtil;
 public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template> implements TemplateDAO {
 
 	private UserDAO userDAO;
-	
+
 	public HibernateTemplateDAO() {
 		super(Template.class);
 		super.log = LoggerFactory.getLogger(HibernateTemplateDAO.class);
@@ -38,7 +39,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	public void setUserDAO(UserDAO userDAO) {
 		this.userDAO = userDAO;
 	}
-	
+
 	@Override
 	public List<Template> findAll() {
 		try {
@@ -138,8 +139,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 			if (template.getAttributes() != null)
 				template.getAttributes().keySet().size();
-			
-			if(template.getTemplateGroups()!=null)
+
+			if (template.getTemplateGroups() != null)
 				template.getTemplateGroups().size();
 		} catch (Throwable t) {
 		}
@@ -174,11 +175,13 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				query.append(Long.toString(ug.getId()));
 				first = false;
 			}
-			query.append(") and _entity.id=?1");
+			query.append(") and _entity.id = :templateId");
+
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("templateId", Long.valueOf(templateId));
 
 			@SuppressWarnings("unchecked")
-			List<TemplateGroup> coll = (List<TemplateGroup>) findByQuery(query.toString(),
-					new Object[] { Long.valueOf(templateId) }, null);
+			List<TemplateGroup> coll = (List<TemplateGroup>) findByQuery(query.toString(), params, null);
 			result = coll.size() > 0;
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
@@ -218,11 +221,13 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				query.append(Long.toString(ug.getId()));
 				first = false;
 			}
-			query.append(") and _entity.id=?1");
+			query.append(") and _entity.id = :templateId");
+
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("templateId", Long.valueOf(templateId));
 
 			@SuppressWarnings("unchecked")
-			List<TemplateGroup> coll = (List<TemplateGroup>) findByQuery(query.toString(),
-					new Object[] { Long.valueOf(templateId) }, null);
+			List<TemplateGroup> coll = (List<TemplateGroup>) findByQuery(query.toString(), params, null);
 			result = coll.size() > 0;
 		} catch (Exception e) {
 			if (log.isErrorEnabled())

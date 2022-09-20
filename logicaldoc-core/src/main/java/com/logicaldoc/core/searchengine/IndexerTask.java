@@ -3,8 +3,10 @@ package com.logicaldoc.core.searchengine;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
@@ -138,9 +140,13 @@ public class IndexerTask extends Task {
 				// Mark all these documents as belonging to the current
 				// transaction. This may require time
 				String idsStr = ids.toString().replace('[', '(').replace(']', ')');
+
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put("transactionId", transactionId);
+
 				documentDao.bulkUpdate(
-						" set ld_transactionid = ?1 where ld_transactionid is null and ld_id in " + idsStr,
-						new Object[] { transactionId });
+						" set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in " + idsStr,
+						params);
 			}
 			log.info("Documents marked for indexing in transaction {}", transactionId);
 

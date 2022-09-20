@@ -2,7 +2,9 @@ package com.logicaldoc.core.sequence;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
@@ -11,8 +13,7 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.util.sql.SqlUtil;
 
 /**
- * Hibernate implementation of <code>SequenceDAO</code>.
- * <br>
+ * Hibernate implementation of <code>SequenceDAO</code>. <br>
  * Sequences are implemented ad Generics whose type is 'sequence' and subtype is
  * the sequence name.
  * 
@@ -100,12 +101,17 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 		try {
 			Sequence sequence = null;
 
-			String query = " _entity.tenantId = ?1 ";
-			query += " and _entity.objectId = ?2 ";
-			query += " and _entity.name = ?3 ";
+			String query = " _entity.tenantId = :tenantId ";
+			query += " and _entity.objectId = :objectId ";
+			query += " and _entity.name = :name ";
 			List<Sequence> sequences = new ArrayList<Sequence>();
 			try {
-				sequences = findByWhere(query, new Object[] { tenantId, objectId, name }, null, null);
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put("tenantId", tenantId);
+				params.put("objectId", objectId);
+				params.put("name", name);
+
+				sequences = findByWhere(query, params, null, null);
 			} catch (Throwable t) {
 			}
 

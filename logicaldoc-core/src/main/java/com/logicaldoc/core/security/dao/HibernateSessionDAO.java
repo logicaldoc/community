@@ -24,15 +24,20 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	@Override
 	public void deleteCurrentNodeSessions() {
 		try {
-			bulkUpdate(" set deleted=1 where node=?1 and deleted=0",
-					new Object[] { SystemInfo.get().getInstallationId() });
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("node", SystemInfo.get().getInstallationId());
+
+			bulkUpdate(" set deleted=1 where node = :node and deleted=0", params);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 		}
 
 		try {
-			bulkUpdate(" set status=" + Session.STATUS_EXPIRED + " where node=?1 and status=?2",
-					new Object[] { SystemInfo.get().getInstallationId(), Session.STATUS_OPEN });
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("node", SystemInfo.get().getInstallationId());
+			params.put("status", Session.STATUS_OPEN);
+
+			bulkUpdate(" set status=" + Session.STATUS_EXPIRED + " where node = :node and status = :status", params);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

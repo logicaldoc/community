@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -67,18 +68,18 @@ public class UserHistoryDataServlet extends HttpServlet {
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 			df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("userId", userId);
+
 			StringBuffer query = new StringBuffer(
-					"select A.id, A.username, A.event, A.date, A.comment, A.reason, A.sessionId, A.userId, A.ip, A.device, A.geolocation from UserHistory A where A.deleted = 0 and A.userId = ?1 ");
-			List<Object> parameters = new ArrayList<Object>();
-			parameters.add(userId);
+					"select A.id, A.username, A.event, A.date, A.comment, A.reason, A.sessionId, A.userId, A.ip, A.device, A.geolocation from UserHistory A where A.deleted = 0 and A.userId = :userId ");
 			if (StringUtils.isNotEmpty(event)) {
-				query.append(" and A.event = ?2 ");
-				parameters.add(event);
+				query.append(" and A.event = :event ");
+				params.put("event", event);
 			}
 			query.append(" order by A.date desc ");
 
-			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), parameters.toArray(new Object[0]),
-					max);
+			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), params, max);
 
 			/*
 			 * Iterate over the collection of user histories

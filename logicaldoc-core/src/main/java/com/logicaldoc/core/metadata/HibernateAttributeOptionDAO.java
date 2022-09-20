@@ -2,6 +2,7 @@ package com.logicaldoc.core.metadata;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,23 +54,41 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 		List<AttributeOption> coll = new ArrayList<AttributeOption>();
 		try {
 			if (StringUtils.isEmpty(attribute)) {
-				if (StringUtils.isEmpty(category))
+				if (StringUtils.isEmpty(category)) {
+					Map<String, Object> params = new HashMap<String, Object>();
+					params.put("setId", Long.valueOf(setId));
+
 					coll = (List<AttributeOption>) findByQuery(
-							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 order by _opt.position asc",
-							new Object[] { Long.valueOf(setId) }, null);
-				else
+							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId order by _opt.position asc",
+							params, null);
+				} else {
+					Map<String, Object> params = new HashMap<String, Object>();
+					params.put("setId", Long.valueOf(setId));
+					params.put("category", category);
+
 					coll = (List<AttributeOption>) findByQuery(
-							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 and _opt.category = ?2 order by _opt.position asc",
-							new Object[] { Long.valueOf(setId), category }, null);
+							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.category = :category order by _opt.position asc",
+							params, null);
+				}
 			} else {
-				if (StringUtils.isEmpty(category))
+				if (StringUtils.isEmpty(category)) {
+					Map<String, Object> params = new HashMap<String, Object>();
+					params.put("setId", Long.valueOf(setId));
+					params.put("attribute", attribute);
+
 					coll = (List<AttributeOption>) findByQuery(
-							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 and _opt.attribute = ?2 order by _opt.position asc",
-							new Object[] { Long.valueOf(setId), attribute }, null);
-				else
+							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.attribute = :attribute order by _opt.position asc",
+							params, null);
+				} else {
+					Map<String, Object> params = new HashMap<String, Object>();
+					params.put("setId", Long.valueOf(setId));
+					params.put("category", category);
+					params.put("attribute", attribute);
+
 					coll = (List<AttributeOption>) findByQuery(
-							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = ?1 and _opt.attribute = ?2 and _opt.category = ?3 order by _opt.position asc",
-							new Object[] { Long.valueOf(setId), attribute, category }, null);
+							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId and _opt.attribute = :attribute and _opt.category = :category order by _opt.position asc",
+							params, null);
+				}
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -121,9 +140,12 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 			}
 			buf.append(")");
 
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("setId", setId);
+
 			List<AttributeOption> options = findByQuery(
-					"from AttributeOption _opt where _opt.setId = ?1 and _opt.attribute not in " + buf.toString(),
-					new Object[] { setId }, null);
+					"from AttributeOption _opt where _opt.setId = :setId and _opt.attribute not in " + buf.toString(),
+					params, null);
 
 			for (AttributeOption option : options)
 				del(option, PersistentObject.DELETED_CODE_DEFAULT);

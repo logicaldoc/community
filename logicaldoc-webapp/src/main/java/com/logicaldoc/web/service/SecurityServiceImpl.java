@@ -1359,11 +1359,16 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			Calendar cal = Calendar.getInstance();
 			cal.add(Calendar.MINUTE, -config.getInt("throttle.username.wait", 0));
 			Date oldestDate = cal.getTime();
+
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("oldestDate", oldestDate);
+			params.put("max", max);
+
 			if (max > 0)
 				seqs.addAll(dao.findByWhere(
 						"_entity.name like '" + LoginThrottle.LOGINFAIL_USERNAME
-								+ "%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
-						new Object[] { max, oldestDate }, null, null));
+								+ "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate",
+						params, null, null));
 
 			max = config.getInt("throttle.ip.max", 0);
 			cal = Calendar.getInstance();
@@ -1372,8 +1377,8 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			if (max > 0)
 				seqs.addAll(dao.findByWhere(
 						"_entity.name like '" + LoginThrottle.LOGINFAIL_IP
-								+ "%' and _entity.value >= ?1 and _entity.lastModified >= ?2",
-						new Object[] { max, oldestDate }, null, null));
+								+ "%' and _entity.value >= :max and _entity.lastModified >= :oldestDate",
+						params, null, null));
 
 			GUISequence[] ret = new GUISequence[seqs.size()];
 			for (int i = 0; i < ret.length; i++) {

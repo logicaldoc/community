@@ -6,7 +6,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -82,7 +84,10 @@ public class UsersDataServlet extends HttpServlet {
 
 				users.addAll(group.getUsers());
 			} else {
-				users = userDao.findByWhere("_entity.tenantId=?1", new Long[] { session.getTenantId() }, null, null);
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put("tenantId", session.getTenantId());
+
+				users = userDao.findByWhere("_entity.tenantId = :tenantId", params, null, null);
 			}
 
 			/*
