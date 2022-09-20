@@ -133,7 +133,7 @@ public class RestDocumentClient extends AbstractRestClient {
 		WebClient.client(proxy).type(MediaType.MULTIPART_FORM_DATA);
 		WebClient.client(proxy).accept(MediaType.TEXT_PLAIN);
 		
-		proxy.checkin(Integer.valueOf(Long.toString(docId)), comment, release.toString(), packageFile.getName(), fileAttachment);
+		proxy.checkin(Long.toString(docId), comment, release.toString(), packageFile.getName(), fileAttachment);
 	}
 
 	public WSNote addNote(long docId, String note) throws Exception {

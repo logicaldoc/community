@@ -205,7 +205,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			encoding = @Encoding(name = "file", contentType = "application/octet-stream"))
 	)	    
     public void checkin(
-    		@Multipart(value = "docId", required = true) Integer docId, 
+    		@Multipart(value = "docId", required = true) String docId, 
     		@Multipart(value = "comment", required = false) String comment, 
     		@Multipart(value = "release", required = false) String releaseStr, 
     		@Multipart(value = "filename", required = true) String filename,  
@@ -221,7 +221,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 				
 			DataHandler datah = filedataDetail.getDataHandler();
 
-			super.checkin(sid, docId, comment, filename, release, datah);
+			super.checkin(sid, Long.parseLong(docId), comment, filename, release, datah);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new WebApplicationException(t.getMessage(), 500);
@@ -330,7 +330,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			boolean release_bool = false;
 			
 			if (docId != null) {
-				doc_id = Long.parseLong(docId.toString());
+				doc_id = Long.parseLong(docId);
 			}						
 			if (!Strings.isNullOrEmpty(folderId)) {
 				folder_id = Long.parseLong(folderId);

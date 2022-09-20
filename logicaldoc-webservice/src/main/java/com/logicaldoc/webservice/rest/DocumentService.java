@@ -103,7 +103,7 @@ public interface DocumentService {
 	@ApiResponses(value = { @ApiResponse(responseCode = "204", description = "Successful operation"),
 			@ApiResponse(responseCode = "401", description = "Authentication failed"),
 			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
-	public void checkin(@Multipart(value = "docId", required = true) Integer docId,
+	public void checkin(@Multipart(value = "docId", required = true) String docId,
 			@Multipart(value = "comment", required = false) String comment,
 			@Multipart(value = "release", required = false) String release,
 			@Multipart(value = "filename", required = true) String filename,
@@ -162,7 +162,7 @@ public interface DocumentService {
 			@ApiResponse(responseCode = "200", description = "successful operation", content = @Content(schema = @Schema(implementation = Long.class, description = "The ID of the document created or updated"))),
 			@ApiResponse(responseCode = "401", description = "Authentication failed"),
 			@ApiResponse(responseCode = "500", description = "Generic error, see the response message") })
-	public Long upload(@Multipart(value = "docId", required = false) Integer docId,
+	public Long upload(@Multipart(value = "docId", required = false) String docId,
 			@Multipart(value = "folderId", required = false) String folderId,
 			@Multipart(value = "release", required = false) String release,
 			@Multipart(value = "filename", required = true) String filename,
