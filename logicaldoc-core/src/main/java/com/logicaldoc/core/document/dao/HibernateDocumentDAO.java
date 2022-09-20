@@ -1307,6 +1307,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void updateCountUniqueTags() {
 		List<Long> tenantIds = tenantDAO.findAllIds();
@@ -1325,10 +1326,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			for (String tag : uniqueTags) {
 				try {
 					jdbcUpdate(
-							"update ld_uniquetag set ld_count = (select count(T.ld_tag) from ld_tag T, ld_document D where T.ld_tag='"
-									+ SqlUtil.doubleQuotes(tag) + "' and T.ld_tenantid=" + tenantId
-									+ " and T.ld_docid = D.ld_id and D.ld_deleted=0 ) where ld_tag='"
-									+ SqlUtil.doubleQuotes(tag) + "' and ld_tenantid=" + tenantId);
+							"update ld_uniquetag set ld_count = (select count(T.ld_tag) from ld_tag T, ld_document D where T.ld_tag = ? and T.ld_tenantid = ? "
+									+ " and T.ld_docid = D.ld_id and D.ld_deleted=0 ) where ld_tag = ? and ld_tenantid = ?",
+							tag, tenantId, tag, tenantId);
 				} catch (PersistenceException e) {
 					log.warn(e.getMessage(), e);
 				}
