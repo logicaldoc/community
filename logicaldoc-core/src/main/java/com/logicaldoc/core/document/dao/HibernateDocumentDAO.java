@@ -357,7 +357,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			if (doc.getDocRef() == null) {
 				/*
-				 * In case of a regular document, check for attributes defaults specified at folder's level
+				 * In case of a regular document, check for attributes defaults
+				 * specified at folder's level
 				 */
 				if (doc.getFolder().getTemplate() != null) {
 					folderDAO.initialize(doc.getFolder());
@@ -556,7 +557,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		List<Long> results = new ArrayList<Long>();
 		try {
-			results = (List<Long>) findByQuery(query.toString(), null, null);
+			results = (List<Long>) findByQuery(query.toString(), (Map<String, Object>) null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -641,7 +642,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(ids.stream().map(f -> f.toString()).collect(Collectors.joining(",")));
 			query.append(")");
 			try {
-				coll = (List<Document>) findByQuery(query.toString(), null, max);
+				coll = (List<Document>) findByQuery(query.toString(), (Map<String, Object>) null, max);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -698,7 +699,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(" and event = '" + DocumentEvent.DOWNLOADED + "' ");
 			query.append(" order by date desc");
 
-			List<Long> results = (List<Long>) findByQuery(query.toString(), null, null);
+			List<Long> results = (List<Long>) findByQuery(query.toString(), (Map<String, Object>) null, null);
 			ArrayList<Long> tmpal = new ArrayList<Long>(results);
 			List<Long> docIds = tmpal;
 
@@ -722,7 +723,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(")");
 
 			// execute the query
-			List<Document> unorderdColl = (List<Document>) findByQuery(query.toString(), null, null);
+			List<Document> unorderdColl = (List<Document>) findByQuery(query.toString(), (Map<String, Object>) null,
+					null);
 
 			// put all elements in a map
 			HashMap<Long, Document> hm = new HashMap<Long, Document>();
@@ -744,6 +746,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		return coll;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findDocIdByFolder(long folderId, Integer max) {
 		String sql = "select ld_id from ld_document where ld_deleted=0 and ld_folderid = " + folderId
@@ -759,7 +762,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findByFolder(long folderId, Integer max) {
 		try {
-			return findByWhere("_entity.folder.id = ?1 ", new Object[] { Long.valueOf(folderId) }, null, max);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("folderId", Long.valueOf(folderId));
+			return findByWhere("_entity.folder.id = :folderId ", params, null, max);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 			return new ArrayList<Document>();
@@ -945,10 +950,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void restore(long docId, long folderId, final DocumentHistory transaction) throws PersistenceException {
 		bulkUpdate("set ld_deleted=0, ld_folderid=" + folderId + ", ld_lastmodified=CURRENT_TIMESTAMP where ld_id="
-				+ docId, null);
+				+ docId, (Map<String, Object>) null);
 
 		versionDAO.bulkUpdate("set ld_deleted=0, ld_folderid=" + folderId
-				+ ", ld_lastmodified=CURRENT_TIMESTAMP where ld_documentid=" + docId, null);
+				+ ", ld_lastmodified=CURRENT_TIMESTAMP where ld_documentid=" + docId, (Map<String, Object>) null);
 
 		Document doc = findById(docId);
 		if (doc != null && transaction != null) {
@@ -1209,7 +1214,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		bulkUpdate(
 				"set transactionId=null where transactionId is not null and transactionId not in " + transactionIdsStr,
-				null);
+				(Map<String, Object>) null);
 	}
 
 	public void setTenantDAO(TenantDAO tenantDAO) {

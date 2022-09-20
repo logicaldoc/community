@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -65,7 +66,7 @@ public class DashletsDataServlet extends HttpServlet {
 			StringBuffer query = new StringBuffer("select A.id, A.name, A.title, A.type, A.query, A.content"
 					+ " from Dashlet A where A.deleted = 0 and A.tenantId = " + session.getTenantId()
 					+ " order by A.id asc");
-			records.addAll(dao.findByQuery(query.toString(), null, null));
+			records.addAll(dao.findByQuery(query.toString(), (Map<String, Object>) null, null));
 
 			/*
 			 * Iterate over records composing the response XML document

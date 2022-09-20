@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -64,7 +65,7 @@ public class BookmarksDataServlet extends HttpServlet {
 							+ " from Bookmark A, Document B where A.type=" + Bookmark.TYPE_DOCUMENT
 							+ " and A.deleted = 0 and B.deleted = 0 and A.targetId = B.id and A.userId = "
 							+ session.getUserId());
-			records.addAll(dao.findByQuery(query.toString(), null, null));
+			records.addAll(dao.findByQuery(query.toString(), (Map<String, Object>) null, null));
 
 			/*
 			 * Than for folders
@@ -73,7 +74,7 @@ public class BookmarksDataServlet extends HttpServlet {
 					"select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, A.targetId, B.color "
 							+ " from Bookmark A, Folder B where A.targetId = B.id and A.type=" + Bookmark.TYPE_FOLDER
 							+ " and A.deleted = 0 and A.userId = " + session.getUserId());
-			records.addAll(dao.findByQuery(query.toString(), null, null));
+			records.addAll(dao.findByQuery(query.toString(), (Map<String, Object>) null, null));
 
 			/*
 			 * Iterate over records composing the response XML document

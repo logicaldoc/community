@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -83,7 +84,7 @@ public class DocumentAliasesDataServlet extends HttpServlet {
 				}
 			}
 			
-			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, null);
+			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 			/*
 			 * Iterate over records composing the response XML document

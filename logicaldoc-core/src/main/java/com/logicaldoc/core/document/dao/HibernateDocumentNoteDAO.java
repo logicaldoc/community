@@ -3,7 +3,9 @@ package com.logicaldoc.core.document.dao;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -79,15 +81,28 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			if (StringUtils.isEmpty(fileVersion))
 				if (types == null || types.isEmpty())
 					return findByWhere("_entity.docId = " + docId, null, null);
-				else
-					return findByWhere("_entity.docId = ?1 and _entity.type in (?2)", new Object[] { docId, types },
+				else {
+					Map<String, Object> params=new HashMap<String, Object>();
+					params.put("docId", docId);
+					params.put("types", types);
+					
+					return findByWhere("_entity.docId = :docId and _entity.type in (:types)", params,
 							null, null);
-			else if (types == null || types.isEmpty())
-				return findByWhere("_entity.docId = ?1 and _entity.fileVersion = ?2",
-						new Object[] { docId, fileVersion }, null, null);
-			else
-				return findByWhere("_entity.docId = ?1 and _entity.fileVersion = ?2 and _entity.type in (?3)",
-						new Object[] { docId, fileVersion, types }, null, null);
+				}
+			else if (types == null || types.isEmpty()) {
+				Map<String, Object> params=new HashMap<String, Object>();
+				params.put("docId", docId);
+				params.put("fileVersion", fileVersion);
+				return findByWhere("_entity.docId = :docId and _entity.fileVersion = :fileVersion",
+						params, null, null);
+			} else {
+				Map<String, Object> params=new HashMap<String, Object>();
+				params.put("docId", docId);
+				params.put("fileVersion", fileVersion);
+				params.put("types", types);
+				return findByWhere("_entity.docId = :docId and _entity.fileVersion = :fileVersion and _entity.type in (:types)",
+						params, null, null);
+			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentNote>();

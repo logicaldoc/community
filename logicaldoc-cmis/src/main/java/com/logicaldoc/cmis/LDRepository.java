@@ -1544,7 +1544,8 @@ public class LDRepository {
 				// Iterate through the list of results
 				for (Hit hit : hits) {
 					try {
-						// filtro i risultati (lasciando solo le colonne richieste)
+						// filtro i risultati (lasciando solo le colonne
+						// richieste)
 						ObjectData result = compileObjectType(null, hit, filter, false, false, null);
 						list.add(result);
 					} catch (Throwable t) {
@@ -2784,7 +2785,7 @@ public class LDRepository {
 			throw new CmisInvalidArgumentException("Invalid change log token");
 		}
 
-		StringBuffer query = new StringBuffer(" _entity.tenantId=?1 and _entity.date >= ?2 ");
+		StringBuffer query = new StringBuffer(" _entity.tenantId = :tenantId and _entity.date >= :minDate ");
 		query.append(" and _entity.event in ('");
 		query.append(DocumentEvent.STORED);
 		query.append("','");
@@ -2800,8 +2801,11 @@ public class LDRepository {
 		List<DocumentHistory> entries = new ArrayList<DocumentHistory>();
 
 		try {
-			entries = historyDao.findByWhere(query.toString(),
-					new Object[] { getRoot().getTenantId(), new Date(minDate) }, "order by _entity.date", max);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("tenantId", getRoot().getTenantId());
+			params.put("minDate", new Date(minDate));
+
+			entries = historyDao.findByWhere(query.toString(), params, "order by _entity.date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -2931,7 +2935,7 @@ public class LDRepository {
 
 	public List<ObjectData> getDocumentLastChanges(long minDate, int max) {
 
-		StringBuffer query = new StringBuffer(" _entity.tenantId=?1 and _entity.date >= ?2 ");
+		StringBuffer query = new StringBuffer(" _entity.tenantId = :tenantId and _entity.date >= :minDate ");
 		query.append(" and _entity.event in ('");
 		query.append(DocumentEvent.STORED);
 		query.append("','");
@@ -2947,8 +2951,11 @@ public class LDRepository {
 		List<DocumentHistory> entries = new ArrayList<DocumentHistory>();
 
 		try {
-			entries = historyDao.findByWhere(query.toString(),
-					new Object[] { getRoot().getTenantId(), new Date(minDate) }, "order by _entity.date", max);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("tenantId", getRoot().getTenantId());
+			params.put("minDate", new Date(minDate));
+			
+			entries = historyDao.findByWhere(query.toString(), params, "order by _entity.date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -2994,7 +3001,7 @@ public class LDRepository {
 
 	public List<ObjectData> getFolderLastChanges(long minDate, int max) {
 
-		StringBuffer query = new StringBuffer(" _entity.tenantId=?1 and _entity.date >= ?2 ");
+		StringBuffer query = new StringBuffer(" _entity.tenantId = :tenantId and _entity.date >= :minDate ");
 		query.append(" and _entity.event in ('");
 		query.append(FolderEvent.CREATED);
 		query.append("','");
@@ -3008,8 +3015,10 @@ public class LDRepository {
 		List<FolderHistory> entries = new ArrayList<FolderHistory>();
 
 		try {
-			entries = folderHistoryDao.findByWhere(query.toString(),
-					new Object[] { getRoot().getTenantId(), new Date(minDate) }, "order by _entity.date", max);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("tenantId", getRoot().getTenantId());
+			params.put("minDate", new Date(minDate));
+			entries = folderHistoryDao.findByWhere(query.toString(),params, "order by _entity.date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

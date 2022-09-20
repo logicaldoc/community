@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +37,10 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	@Override
 	public Device findByDeviceId(String deviceId) {
 		try {
-			List<Device> devices = findByWhere("_entity.deviceId = ?1", new Object[] { deviceId }, null, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("deviceId", deviceId);
+
+			List<Device> devices = findByWhere("_entity.deviceId = :deviceId", params, null, null);
 			return devices.isEmpty() ? null : devices.get(0);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -46,8 +51,11 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	@Override
 	public List<Device> findTrustedDevices(long userId) {
 		try {
-			return findByWhere("_entity.trusted=1 and _entity.userId = ?1", new Object[] { userId },
-					"_entity.lastLogin desc", null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("userId", userId);
+
+			return findByWhere("_entity.trusted=1 and _entity.userId = :userId", params, "_entity.lastLogin desc",
+					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Device>();
@@ -57,7 +65,10 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	@Override
 	public List<Device> findByUserId(long userId) {
 		try {
-			return findByWhere("_entity.userId = ?1", new Object[] { userId }, "_entity.lastLogin desc", null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("userId", userId);
+
+			return findByWhere("_entity.userId = :userId", params, "_entity.lastLogin desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Device>();
@@ -133,42 +144,42 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			return findByDeviceId(device.getDeviceId());
 		else {
 			try {
-				List<Object> params = new ArrayList<Object>();
-				StringBuffer query = new StringBuffer();
-				int i = 1;
+				Map<String, Object> params = new HashMap<String, Object>();
 
-				query.append("_entity.userId = ?" + (i++));
-				params.add(device.getUserId());
+				StringBuffer query = new StringBuffer();
+
+				query.append("_entity.userId = :userId");
+				params.put("userId", device.getUserId());
 
 				query.append(" and ");
 				if (device.getBrowser() != null) {
-					query.append("_entity.browser = ?" + (i++));
-					params.add(device.getBrowser());
+					query.append("_entity.browser = :browser");
+					params.put("browser", device.getBrowser());
 				} else
 					query.append("_entity.browser is null");
 
 				query.append(" and ");
 				if (device.getBrowserVersion() != null) {
-					query.append("_entity.browserVersion = ?" + (i++));
-					params.add(device.getBrowserVersion());
+					query.append("_entity.browserVersion = :browserVersion");
+					params.put("browserVersion", device.getBrowserVersion());
 				} else
 					query.append("_entity.browserVersion is null");
 
 				query.append(" and ");
 				if (device.getOperativeSystem() != null) {
-					query.append("_entity.operativeSystem = ?" + (i++));
-					params.add(device.getOperativeSystem());
+					query.append("_entity.operativeSystem = :operativeSystem");
+					params.put("operativeSystem", device.getOperativeSystem());
 				} else
 					query.append("_entity.operativeSystem is null");
 
 				query.append(" and ");
 				if (device.getType() != null) {
-					query.append("_entity.type = ?" + (i++));
-					params.add(device.getType());
+					query.append("_entity.type = :type");
+					params.put("type", device.getType());
 				} else
 					query.append("_entity.type is null");
 
-				List<Device> devices = findByWhere(query.toString(), params.toArray(new Object[0]), null, null);
+				List<Device> devices = findByWhere(query.toString(), params, null, null);
 				if (devices.isEmpty())
 					return null;
 				else

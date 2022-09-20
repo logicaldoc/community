@@ -2270,7 +2270,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, null);
+			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, (Map<String, Object>) null);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -2282,10 +2282,12 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		try {
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			dao.bulkUpdate("set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId(), null);
+			dao.bulkUpdate("set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId(),
+					(Map<String, Object>) null);
 
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			fdao.bulkUpdate("set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId(), null);
+			fdao.bulkUpdate("set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId(),
+					(Map<String, Object>) null);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}

@@ -2,6 +2,7 @@ package com.logicaldoc.core;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -98,8 +99,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * Finds all entities by the given expression. Use _entity alias to
 	 * reference attributes in the where expression.
 	 * 
-	 * @param where The where clause expression (for positional parameters,
-	 *        please use JPA-style: ?1, ?2 ...)
+	 * @param where The where clause expression
 	 * @param values Parameters used in the where expression
 	 * @param order The order clause expression
 	 * @param max Maximum results number (optional)
@@ -108,7 +108,24 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
+	@Deprecated(since = "8.9")
 	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException;
+
+	/**
+	 * Finds all entities by the given expression. Use _entity alias to
+	 * reference attributes in the where expression.
+	 * 
+	 * @param where The where clause expression
+	 * @param parameters Parameters used in the where expression
+	 * @param order The order clause expression
+	 * @param max Maximum results number (optional)
+	 * 
+	 * @return The list of marching entities
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public List<T> findByWhere(String where, Map<String, Object> parameters, String order, Integer max)
+			throws PersistenceException;
 
 	/**
 	 * Finds all entities by the given object query.
@@ -125,6 +142,20 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<T> findByObjectQuery(String query, Object[] values, Integer max) throws PersistenceException;
 
 	/**
+	 * Finds all entities by the given object query.
+	 * 
+	 * @param query The query expression
+	 * @param parameters Parameters used in the where expression
+	 * @param max Maximum results number (optional)
+	 * 
+	 * @return The list of matching entities
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public List<T> findByObjectQuery(String query, Map<String, Object> parameters, Integer max)
+			throws PersistenceException;
+
+	/**
 	 * Find everything you want from the DB using the ORM query language
 	 * 
 	 * @param query The query to execute (for positional parameters, please use
@@ -136,7 +167,22 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
+	@Deprecated(since = "8.9")
 	public List<Object> findByQuery(String query, Object[] values, Integer max) throws PersistenceException;
+
+	/**
+	 * Find everything you want from the DB using the ORM query language
+	 * 
+	 * @param query The query to execute
+	 * @param parameters The map of the parameters
+	 * @param max Maximum results number (optional)
+	 * 
+	 * @return Query result
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public List<Object> findByQuery(String query, Map<String, Object> parameters, Integer max)
+			throws PersistenceException;
 
 	/**
 	 * Finds all entities ids by the given expression. Use _entity alias to
@@ -287,6 +333,26 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public long queryForLong(String sql) throws PersistenceException;
 
 	/**
+	 * Execute a query that results in an long value, given static SQL. Uses a
+	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
+	 * query with a PreparedStatement, use the overloaded queryForInt method
+	 * with null as argument array. This method is useful for running static SQL
+	 * with a known outcome. The query is expected to be a single row/single
+	 * column query that results in a long value.
+	 * 
+	 * @param sql SQL query to execute
+	 * @param args arguments to bind to the query (leaving it to the
+	 *        PreparedStatement to guess the corresponding SQL type); may also
+	 *        contain SqlParameterValue objects which indicate not only the
+	 *        argument value but also the SQL type and optionally the scale
+	 * 
+	 * @return the long value, or 0 in case of SQL NULL
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public long queryForLong(String statement, Object... args) throws PersistenceException;
+
+	/**
 	 * Execute a query that results in an string value, given static SQL. Uses a
 	 * JDBC Statement, not a PreparedStatement. If you want to execute a static
 	 * query with a PreparedStatement, use the overloaded queryForInt method
@@ -372,7 +438,20 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
+	@Deprecated(since = "8.9")
 	public int bulkUpdate(String expression, Object[] values) throws PersistenceException;
+
+	/**
+	 * Executes a bulk update as specified by the given expression
+	 * 
+	 * @param expression The update expression.
+	 * @param parameters Optional map of parameters
+	 * 
+	 * @return the number of modified records
+	 * 
+	 * @throws PersistenceException raised in case of errors in the database
+	 */
+	public int bulkUpdate(String expression, Map<String, Object> parameters) throws PersistenceException;
 
 	/**
 	 * Executes the given SQL update statement

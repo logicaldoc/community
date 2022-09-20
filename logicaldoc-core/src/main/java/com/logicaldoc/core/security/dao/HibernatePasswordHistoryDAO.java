@@ -1,6 +1,8 @@
 package com.logicaldoc.core.security.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +26,9 @@ public class HibernatePasswordHistoryDAO extends HibernatePersistentObjectDAO<Pa
 
 	@Override
 	public List<PasswordHistory> findByUserId(long userId, Integer max) throws PersistenceException {
-		return findByWhere("_entity.userId = ?1", new Object[] { userId }, "_entity.date desc", max);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		return findByWhere("_entity.userId = :userId", params, "_entity.date desc", max);
 	}
 
 	@Override
@@ -53,7 +57,7 @@ public class HibernatePasswordHistoryDAO extends HibernatePersistentObjectDAO<Pa
 				if (i >= max)
 					return null;
 				PasswordHistory history = histories.get(i);
-				if (history.getPassword()!=null && history.getPassword().equals(password))
+				if (history.getPassword() != null && history.getPassword().equals(password))
 					return history;
 			}
 		}

@@ -2,6 +2,8 @@ package com.logicaldoc.core.security.dao;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.LoggerFactory;
 
@@ -185,8 +187,10 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	@Override
 	public Collection<Group> findByLikeName(String name, long tenantId) {
 		try {
-			return findByWhere("lower(_entity.name) like ?1 and _entity.tenantId = ?2",
-					new Object[] { name.toLowerCase(), tenantId }, null, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("name", name.toLowerCase());
+			params.put("tenantId", tenantId);
+			return findByWhere("lower(_entity.name) like :name and _entity.tenantId = :tenantId", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Group>();

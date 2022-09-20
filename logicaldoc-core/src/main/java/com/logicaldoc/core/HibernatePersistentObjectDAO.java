@@ -5,11 +5,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
-import org.apache.calcite.sql.fun.SqlJsonValueExpressionOperator;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -135,10 +135,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@Override
 	public List<T> findByWhere(String where, String order, Integer max) throws PersistenceException {
-		return findByWhere(where, null, order, max);
+		return findByWhere(where, (Map<String, Object>) null, order, max);
 	}
 
 	@Override
+	@Deprecated(since = "8.9")
 	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException {
 		List<T> coll = new ArrayList<T>();
 		try {
@@ -156,6 +157,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
+	@Deprecated(since = "8.9")
 	public List<T> findByObjectQuery(String query, Object[] values, Integer max) throws PersistenceException {
 		List<T> coll = new ArrayList<T>();
 		try {
@@ -168,13 +170,60 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		}
 	}
 
+	@Override
+	public List<T> findByWhere(String where, Map<String, Object> parameters, String order, Integer max)
+			throws PersistenceException {
+		List<T> coll = new ArrayList<T>();
+		try {
+			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains("order by")
+					? "order by " + order
+					: order;
+			String query = "from " + entityClass.getCanonicalName() + " _entity where _entity.deleted=0 "
+					+ (StringUtils.isNotEmpty(where) ? " and (" + where + ") " : " ")
+					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
+			coll = findByObjectQuery(query, parameters, max);
+			return coll;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public List<T> findByObjectQuery(String query, Map<String, Object> parameters, Integer max)
+			throws PersistenceException {
+		List<T> coll = new ArrayList<T>();
+		try {
+			log.debug("Execute query: {}", query);
+			Query<T> queryObject = prepareQueryForObject(query, parameters, max);
+			coll = (List<T>) queryObject.list();
+			return coll;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
+	@Deprecated(since = "8.9")
 	public List findByQuery(String query, Object[] values, Integer max) throws PersistenceException {
 		List<Object> coll = new ArrayList<Object>();
 		try {
 			log.debug("Execute query: {}", query);
 			Query queryObject = prepareQuery(query, values, max);
+			coll = (List<Object>) queryObject.list();
+			return coll;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List findByQuery(String query, Map<String, Object> parameters, Integer max) throws PersistenceException {
+		List<Object> coll = new ArrayList<Object>();
+		try {
+			log.debug("Execute query: {}", query);
+			Query queryObject = prepareQuery(query, parameters, max);
 			coll = (List<Object>) queryObject.list();
 			return coll;
 		} catch (Throwable e) {
@@ -297,7 +346,11 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * @return The Hibernate query
 	 */
 	@SuppressWarnings("rawtypes")
+	@Deprecated(since = "8.9")
 	protected Query prepareQueryForUpdate(String expression, Object[] values, Integer max) {
+		if (values != null)
+			for (int i = 0; i < values.length; i++)
+				expression = expression.replace("?" + (i + 1), ":param" + (i + 1));
 		Query queryObject = sessionFactory.getCurrentSession().createQuery(expression);
 		applyParamsAndLimit(values, max, queryObject);
 		return queryObject;
@@ -315,6 +368,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * @return The Hibernate query
 	 */
 	protected Query<T> prepareQueryForObject(String expression, Object[] values, Integer max) {
+		if (values != null)
+			for (int i = 0; i < values.length; i++)
+				expression = expression.replace("?" + (i + 1), ":param" + (i + 1));
 		Query<T> queryObject = sessionFactory.getCurrentSession().createQuery(expression, entityClass);
 		applyParamsAndLimit(values, max, queryObject);
 		return queryObject;
@@ -331,6 +387,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * @return The Hibernate query
 	 */
 	protected Query<Object[]> prepareQuery(String expression, Object[] values, Integer max) {
+		if (values != null)
+			for (int i = 0; i < values.length; i++)
+				expression = expression.replace("?" + (i + 1), ":param" + (i + 1));
 		Query<Object[]> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Object[].class);
 		applyParamsAndLimit(values, max, queryObject);
 		return queryObject;
@@ -347,16 +406,80 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * @return The Hibernate query
 	 */
 	protected Query<Long> prepareQueryForLong(String expression, Object[] values, Integer max) {
+		if (values != null)
+			for (int i = 0; i < values.length; i++)
+				expression = expression.replace("?" + (i + 1), ":param" + (i + 1));
 		Query<Long> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Long.class);
 		applyParamsAndLimit(values, max, queryObject);
 		return queryObject;
 	}
 
+	@Deprecated(since = "8.9")
 	private void applyParamsAndLimit(Object[] values, Integer max, @SuppressWarnings("rawtypes")
 	Query queryObject) {
-		if (values != null)
+		if (values != null && values.length > 0)
 			for (int i = 0; i < values.length; i++)
-				queryObject.setParameter(Integer.toString(i + 1), values[i]);
+				queryObject.setParameter("param" + (i + 1), values[i]);
+
+		if (max != null && max > 0)
+			queryObject.setMaxResults(max);
+	}
+
+	/**
+	 * Utility method useful for preparing an Hibernate query for generic result
+	 * 
+	 * @param expression The expression for the query
+	 * @param values The parameters values to be used (optional, if the query is
+	 *        parametric)
+	 * @param max Optional maximum number of wanted results
+	 * 
+	 * @return The Hibernate query
+	 */
+	protected Query<Object[]> prepareQuery(String expression, Map<String, Object> values, Integer max) {
+		Query<Object[]> queryObject = sessionFactory.getCurrentSession().createQuery(expression, Object[].class);
+		applyParamsAndLimit(values, max, queryObject);
+		return queryObject;
+	}
+
+	/**
+	 * Utility method useful for preparing an Hibernate query for objects of
+	 * this type
+	 * 
+	 * @param expression The expression for the query
+	 * @param values The parameters values to be used (optional, if the query is
+	 *        parametric)
+	 * @param max Optional maximum number of wanted results
+	 * 
+	 * @return The Hibernate query
+	 */
+	protected Query<T> prepareQueryForObject(String expression, Map<String, Object> values, Integer max) {
+		Query<T> queryObject = sessionFactory.getCurrentSession().createQuery(expression, entityClass);
+		applyParamsAndLimit(values, max, queryObject);
+		return queryObject;
+	}
+
+	/**
+	 * Utility method useful for preparing an Hibernate query for updates
+	 * 
+	 * @param expression The expression for the query
+	 * @param values The parameters values to be used (optional, if the query is
+	 *        parametric)
+	 * @param max Optional maximum number of wanted results
+	 * 
+	 * @return The Hibernate query
+	 */
+	@SuppressWarnings("rawtypes")
+	protected Query prepareQueryForUpdate(String expression, Map<String, Object> values, Integer max) {
+		Query queryObject = sessionFactory.getCurrentSession().createQuery(expression);
+		applyParamsAndLimit(values, max, queryObject);
+		return queryObject;
+	}
+
+	private void applyParamsAndLimit(Map<String, Object> values, Integer max, @SuppressWarnings("rawtypes")
+	Query queryObject) {
+		if (values != null)
+			for (String name : values.keySet())
+				queryObject.setParameter(name, values.get(name));
 
 		if (max != null && max > 0)
 			queryObject.setMaxResults(max);
@@ -514,6 +637,23 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
+	public long queryForLong(String sql, Object... args) throws PersistenceException {
+		try {
+			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
+			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+			Long ret = jdbcTemplate.queryForObject(sql, Long.class, args);
+			if (ret != null)
+				return ret;
+			else
+				return 0L;
+		} catch (EmptyResultDataAccessException e) {
+			return 0L;
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
 	public String queryForString(String sql) throws PersistenceException {
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean("DataSource");
@@ -573,7 +713,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			}
 
 			Query<T> queryObject = prepareQueryForObject("update " + entityClass.getCanonicalName() + " set deleted="
-					+ code + " where id in(" + ids.toString() + ")", null, null);
+					+ code + " where id in(" + ids.toString() + ")", (Map<String, Object>) null, null);
 			queryObject.executeUpdate();
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
@@ -594,6 +734,20 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			Query queryObject = prepareQueryForUpdate("update " + entityClass.getCanonicalName() + " " + expression,
 					values, null);
+			return queryObject.executeUpdate();
+		} catch (Throwable e) {
+			throw new PersistenceException(e);
+		}
+	}
+
+	@Override
+	public int bulkUpdate(String expression, Map<String, Object> parameters) throws PersistenceException {
+		if (!checkStoringAspect())
+			return 0;
+
+		try {
+			Query queryObject = prepareQueryForUpdate("update " + entityClass.getCanonicalName() + " " + expression,
+					parameters, null);
 			return queryObject.executeUpdate();
 		} catch (Throwable e) {
 			throw new PersistenceException(e);

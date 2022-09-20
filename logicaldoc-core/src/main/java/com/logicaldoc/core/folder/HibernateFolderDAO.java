@@ -322,16 +322,18 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				query1.append(Long.toString(ug.getId()));
 				first = false;
 			}
-			query1.append(") and _entity.parentId = ?1 and _entity.id!=_entity.parentId");
+			query1.append(") and _entity.parentId = :parentId and _entity.id != _entity.parentId");
 
-			coll = (List<Folder>) findByQuery(query1.toString(), new Object[] { parentId }, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("parentId", parentId);
+			coll = (List<Folder>) findByQuery(query1.toString(), params, null);
 
 			/*
 			 * Now search for all other folders that references accessible
 			 * folders
 			 */
 			StringBuffer query2 = new StringBuffer(
-					"select _entity from Folder _entity where _entity.deleted=0 and _entity.parentId=?1 ");
+					"select _entity from Folder _entity where _entity.deleted=0 and _entity.parentId = :parentId ");
 			query2.append(" and _entity.securityRef in (");
 			query2.append("    select distinct(B.id) from Folder B ");
 			query2.append(" left join B.folderGroups as _group");
@@ -348,7 +350,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			}
 			query2.append("))");
 
-			List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), new Long[] { parentId }, null);
+			params.put("parentId", parentId);
+			List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), params, null);
 			for (Folder folder : coll2) {
 				if (!coll.contains(folder))
 					coll.add(folder);
@@ -370,8 +373,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public List<Folder> findChildren(long parentId, Integer max) {
 		try {
 			Folder parent = findFolder(parentId);
-			return findByWhere("_entity.parentId = ?1 and _entity.id!=_entity.parentId",
-					new Object[] { parent.getId() }, "order by _entity.name", max);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("parentId", parent.getId());
+			return findByWhere("_entity.parentId = :parentId and _entity.id!=_entity.parentId", params,
+					"order by _entity.name", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Folder>();
@@ -412,14 +417,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query1.append(") and _entity.parentId=" + parent.getId());
 			query1.append(" and not(_entity.id=" + parent.getId() + ")");
 
-			coll = (List<Folder>) findByQuery(query1.toString(), null, null);
+			coll = (List<Folder>) findByQuery(query1.toString(), (Map<String, Object>) null, null);
 
 			/*
 			 * Now search for all other folders that references accessible
 			 * folders
 			 */
 			StringBuffer query2 = new StringBuffer(
-					"select _entity from Folder _entity where _entity.deleted=0 and _entity.parentId=?1 ");
+					"select _entity from Folder _entity where _entity.deleted=0 and _entity.parentId = :parentId ");
 			query2.append(" and _entity.securityRef in (");
 			query2.append("    select distinct(B.id) from Folder B ");
 			query2.append(" left join B.folderGroups as _group");
@@ -437,7 +442,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query2.append("))");
 			query2.append(" and not(_entity.id=" + parent.getId() + ")");
 
-			List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), new Long[] { parent.getId() }, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("parentId", parent.getId());
+			List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), params, null);
 			for (Folder folder : coll2) {
 				if (!coll.contains(folder))
 					coll.add(folder);
@@ -542,10 +549,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				query.append(Long.toString(ug.getId()));
 				first = false;
 			}
-			query.append(") and _entity.id=?1");
+			query.append(") and _entity.id = :id");
 
-			List<FolderGroup> coll = (List<FolderGroup>) findByQuery(query.toString(),
-					new Object[] { Long.valueOf(id) }, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("id", Long.valueOf(id));
+			List<FolderGroup> coll = (List<FolderGroup>) findByQuery(query.toString(), params, null);
 			result = coll.size() > 0;
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -593,7 +601,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query.append(" left join _entity.folderGroups as _group ");
 			query.append(" where _entity.deleted=0 and _group.groupId =" + groupId);
 
-			coll = (List<Folder>) findByQuery(query.toString(), null, null);
+			coll = (List<Folder>) findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 			/*
 			 * Now search for all other folders that references the previous
@@ -610,7 +618,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 					first = false;
 				}
 				query2.append(")");
-				List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), null, null);
+				List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), (Map<String, Object>) null, null);
 				for (Folder folder : coll2) {
 					if (!coll.contains(folder))
 						coll.add(folder);
@@ -914,7 +922,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		int count = bulkUpdate("set ld_deleted=0, ld_parentid=" + parent.getId()
 				+ ", ld_lastmodified=CURRENT_TIMESTAMP where not ld_type=" + Folder.TYPE_WORKSPACE + " and ld_id="
-				+ folderId, null);
+				+ folderId, (Map<String, Object>) null);
 
 		if (count == 0) {
 			// The root of folders in the current tenant
@@ -923,7 +931,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			// Workspaces must always be restored under the root
 			bulkUpdate("set ld_deleted=0, ld_parentid=" + root.getId()
 					+ ", ld_lastmodified=CURRENT_TIMESTAMP where ld_type=" + Folder.TYPE_WORKSPACE + " and ld_id="
-					+ folderId, null);
+					+ folderId, (Map<String, Object>) null);
 		}
 
 		Folder fld = findFolder(folderId);
@@ -937,7 +945,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (!treeIds.isEmpty()) {
 			String idsStr = treeIds.toString().replace('[', '(').replace(']', ')');
 			bulkUpdate("set ld_deleted=0, ld_lastmodified=CURRENT_TIMESTAMP where ld_deleted=1 and ld_id in " + idsStr,
-					null);
+					(Map<String, Object>) null);
 			jdbcUpdate(
 					"update ld_document set ld_deleted=0, ld_lastmodified=CURRENT_TIMESTAMP where ld_deleted=1 and ld_folderid in "
 							+ idsStr);
@@ -1878,9 +1886,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@Override
 	public Set<Long> findFolderIdInTree(long rootId, boolean includeDeleted) {
-		
+
 		log.debug("findFolderIdInTree, rootID: {}, includeDeleted: {}", rootId, includeDeleted);
-		
+
 		Set<Long> ids = new HashSet<Long>();
 		ids.add(rootId);
 
@@ -1909,9 +1917,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			String query = "select ld_id from ld_folder where " + (includeDeleted ? "" : " ld_deleted=0 and ")
 					+ idsExpression;
-			
+
 			log.debug("Executing query{}", query);
-			
+
 			try {
 				lastIds = queryForList(query, Long.class);
 				if (!lastIds.isEmpty())
@@ -1921,7 +1929,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			}
 		}
 
-		if(log.isDebugEnabled())
+		if (log.isDebugEnabled())
 			log.debug("Got ids {}", ids.toString());
 		return ids;
 	}
@@ -2096,7 +2104,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				return false;
 
 			// Now all the folders that are referencing this one must be updated
-			bulkUpdate("set securityRef=" + securityRef + " where securityRef=" + folderId, null);
+			bulkUpdate("set securityRef=" + securityRef + " where securityRef=" + folderId, (Map<String, Object>) null);
 		} catch (Throwable e) {
 			result = false;
 			log.error(e.getMessage(), e);
@@ -2483,7 +2491,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query.append(")");
 
 			try {
-				coll = (List<Folder>) findByQuery(query.toString(), null, max);
+				coll = (List<Folder>) findByQuery(query.toString(), (Map<String, Object>) null, max);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}

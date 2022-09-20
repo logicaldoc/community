@@ -3,6 +3,7 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,7 +56,7 @@ public class GroupsDataServlet extends HttpServlet {
 					+ Group.TYPE_DEFAULT + " and A.tenantId=" + session.getTenantId());
 
 			GroupDAO dao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, null);
+			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 			/*
 			 * Iterate over records composing the response XML document

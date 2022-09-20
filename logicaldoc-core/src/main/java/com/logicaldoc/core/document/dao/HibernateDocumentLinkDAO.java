@@ -1,7 +1,9 @@
 package com.logicaldoc.core.document.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -36,18 +38,19 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 	 */
 	@Override
 	public List<DocumentLink> findByDocId(long docId, String type) {
-		StringBuffer query = new StringBuffer("(_entity.document1.id = ?1 ");
-		query.append(" or _entity.document2.id = ?2) ");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("docId", docId);
+
+		StringBuffer query = new StringBuffer("(_entity.document1.id = :docId ");
+		query.append(" or _entity.document2.id = :docId) ");
 		if (StringUtils.isNotEmpty(type)) {
-			query.append("and _entity.type = '");
-			query.append(type);
-			query.append("'");
+			query.append("and _entity.type = :type");
+			params.put("type", type);
 		}
 
 		try {
-			return findByWhere(query.toString(), new Object[] { docId, docId }, null, null);
+			return findByWhere(query.toString(), params, null, null);
 		} catch (PersistenceException e) {
-			e.printStackTrace();
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentLink>();
 		}
@@ -57,15 +60,19 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 	public DocumentLink findByDocIdsAndType(long docId1, long docId2, String type) {
 		if (type == null)
 			return null;
+
 		DocumentLink link = null;
-		StringBuffer query = new StringBuffer("_entity.document1.id = ?1 and _entity.document2.id = ?2 ");
-		query.append("and _entity.type = '");
-		query.append(type);
-		query.append("'");
+		StringBuffer query = new StringBuffer("_entity.document1.id = :docId1 and _entity.document2.id = :docId2 ");
+		query.append(" and _entity.type = :type");
 
 		List<DocumentLink> links = new ArrayList<DocumentLink>();
 		try {
-			links = findByWhere(query.toString(), new Object[] { docId1, docId2 }, null, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("docId1", docId1);
+			params.put("docId2", docId2);
+			params.put("type", type);
+
+			links = findByWhere(query.toString(), params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

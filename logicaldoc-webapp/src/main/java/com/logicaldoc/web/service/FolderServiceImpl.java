@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -1114,7 +1115,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		try {
 			String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');
 			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, null);
+			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, (Map<String, Object>) null);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}

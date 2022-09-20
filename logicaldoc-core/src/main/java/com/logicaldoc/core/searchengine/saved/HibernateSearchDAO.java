@@ -1,7 +1,9 @@
 package com.logicaldoc.core.searchengine.saved;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
@@ -26,13 +28,19 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 
 	@Override
 	public List<SavedSearch> findByUserId(long userId) throws PersistenceException {
-		return findByWhere("_entity.userId = ?1", new Object[] { userId }, "_entity.name asc", null);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		return findByWhere("_entity.userId = :userId", params, "_entity.name asc", null);
 	}
 
 	@Override
 	public SavedSearch findByUserIdAndName(long userId, String name) throws PersistenceException {
-		List<SavedSearch> searches = findByWhere("_entity.userId = ?1 and _entity.name = ?2", new Object[] { userId, name },
-				null, null);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("userId", userId);
+		params.put("name", name);
+
+		List<SavedSearch> searches = findByWhere("_entity.userId = :userId and _entity.name = :name", params, null,
+				null);
 		if (searches.isEmpty())
 			return null;
 		else

@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -73,7 +74,7 @@ public class FolderHistoryDataServlet extends HttpServlet {
 			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 			df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, max);
+			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, max);
 
 			/*
 			 * Iterate over records composing the response XML document

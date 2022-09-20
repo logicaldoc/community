@@ -126,18 +126,18 @@ public class DashletContent extends HttpServlet {
 				writer.write(content.trim());
 		} else {
 			writer.write("<list>");
-		
+
 			DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
 			List<DocumentHistory> records = new ArrayList<DocumentHistory>();
 
 			try {
-				records = hdao.findByObjectQuery(query.trim(), null,
+				records = hdao.findByObjectQuery(query.trim(), (Map<String, Object>) null,
 						dashlet.getUnique() == 0 ? dashlet.getMax() : null);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
-			
+
 			List<DocumentHistory> uniqueRecords = new ArrayList<DocumentHistory>();
 			if (dashlet.getUnique() == 1) {
 				log.debug("Ensure records uniqueness for query {}", query.trim());
@@ -154,7 +154,7 @@ public class DashletContent extends HttpServlet {
 					if (dashlet.getMax() != null && dashlet.getMax() > 0 && uniqueRecords.size() >= dashlet.getMax())
 						break;
 				}
-				
+
 				log.debug("retrieved {} unique records", uniqueRecords.size());
 			} else
 				uniqueRecords = records;
@@ -164,18 +164,19 @@ public class DashletContent extends HttpServlet {
 			 */
 			Map<Long, Document> docsMap = new HashMap<Long, Document>();
 			if (!uniqueRecords.isEmpty()) {
-				String docIds = uniqueRecords.stream().map(h -> Long.toString(h.getDocId())).collect(Collectors.joining(","));
+				String docIds = uniqueRecords.stream().map(h -> Long.toString(h.getDocId()))
+						.collect(Collectors.joining(","));
 				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				try {
-					List<Document> docs = ddao.findByObjectQuery("from Document where id in (" + docIds + ")", null,
-							null);
+					List<Document> docs = ddao.findByObjectQuery("from Document where id in (" + docIds + ")",
+							(Map<String, Object>) null, null);
 					for (Document document : docs)
 						docsMap.put(document.getId(), document);
 				} catch (PersistenceException e) {
 					log.error(e.getMessage(), e);
 				}
 			}
-			
+
 			/*
 			 * Iterate over records composing the response XML document
 			 */
@@ -237,12 +238,12 @@ public class DashletContent extends HttpServlet {
 						StringBuffer qry = new StringBuffer(
 								"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
 						qry.append(" from ld_document_ext where ld_docid in (");
-						qry.append(
-								uniqueRecords.stream().map(d -> Long.toString(d.getDocId())).collect(Collectors.joining(",")));
+						qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getDocId()))
+								.collect(Collectors.joining(",")));
 						qry.append(") and ld_name in ");
 						qry.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')")
 								.replaceAll(",", "','").replaceAll(" ", ""));
-						
+
 						dao.query(qry.toString(), null, new RowMapper<Long>() {
 							@Override
 							public Long mapRow(ResultSet rs, int row) throws SQLException {
@@ -372,7 +373,7 @@ public class DashletContent extends HttpServlet {
 			List<Document> records = new ArrayList<Document>();
 
 			try {
-				records = dao.findByObjectQuery(query.trim(), null, dashlet.getMax());
+				records = dao.findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -397,7 +398,7 @@ public class DashletContent extends HttpServlet {
 				log.debug("retrieved {} unique records", uniqueRecords.size());
 			} else
 				uniqueRecords = records;
-			
+
 			List<String> attrs = new ArrayList<String>();
 			if (StringUtils.isNotEmpty(dashlet.getColumns())) {
 				StringTokenizer st = new StringTokenizer(dashlet.getColumns().trim(), ",;");
@@ -498,8 +499,9 @@ public class DashletContent extends HttpServlet {
 				if (doc.getLockUser() != null)
 					writer.write("<lockUser><![CDATA[" + doc.getLockUser() + "]]></lockUser>");
 				writer.write("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-				writer.write("<icon>" + FilenameUtils.getBaseName(
-						IconSelector.selectIcon(FileUtil.getExtension(doc.getFileName()))) + "</icon>");
+				writer.write("<icon>"
+						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(doc.getFileName())))
+						+ "</icon>");
 				writer.write("<type><![CDATA[" + doc.getType() + "]]></type>");
 
 				writer.write("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
@@ -570,7 +572,7 @@ public class DashletContent extends HttpServlet {
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
 			List<DocumentNote> records = new ArrayList<DocumentNote>();
 			try {
-				records = dao.findByObjectQuery(query.trim(), null, dashlet.getMax());
+				records = dao.findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
@@ -588,8 +590,8 @@ public class DashletContent extends HttpServlet {
 				writer.write("<message><![CDATA[" + record.getMessage() + "]]></message>");
 				writer.write("<docId>" + record.getDocId() + "</docId>");
 				writer.write("<filename><![CDATA[" + record.getFileName() + "]]></filename>");
-				writer.write("<icon>" + FilenameUtils.getBaseName(
-						IconSelector.selectIcon(FileUtil.getExtension(record.getFileName()))) + "</icon>");
+				writer.write("<icon>" + FilenameUtils
+						.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(record.getFileName()))) + "</icon>");
 				writer.write("<userId><![CDATA[" + record.getUserId() + "]]></userId>");
 				writer.write("</post>");
 			}

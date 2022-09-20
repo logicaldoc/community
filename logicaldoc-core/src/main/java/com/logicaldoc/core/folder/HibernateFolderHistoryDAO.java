@@ -5,7 +5,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -103,14 +105,16 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	}
 
 	@Override
-	public List<FolderHistory> findByPath(String pathExpression, Date olderDate, Collection<String> events,
+	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) {
 		StringBuffer query = new StringBuffer(
-				"(_entity.path like '" + pathExpression + "' or _entity.pathOld like '" + pathExpression + "') ");
-		List<Object> params = new ArrayList<Object>();
-		if (olderDate != null) {
-			query.append(" and _entity.date >= ?1 ");
-			params.add(olderDate);
+				"(_entity.path like :pathExpression or _entity.pathOld like :pathExpression) ");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("pathExpression", pathExpression);
+
+		if (oldestDate != null) {
+			query.append(" and _entity.date >= :oldestDate ");
+			params.put("oldestDate", oldestDate);
 		}
 		if (events != null && !events.isEmpty()) {
 			StringBuffer eventsStr = new StringBuffer("(");
@@ -124,7 +128,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 		}
 
 		try {
-			return findByWhere(query.toString(), params.toArray(new Object[0]), "order by _entity.date asc", max);
+			return findByWhere(query.toString(), params, "order by _entity.date asc", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -133,18 +137,19 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 
 	@Override
 	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate) {
-		String query = "_entity.folderId = ?1 and _entity.event = ?2 ";
-		List<Object> values = new ArrayList<Object>();
-		values.add(folderId);
-		values.add(event);
+		String query = "_entity.folderId = :folderId and _entity.event = :event ";
+
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("folderId", folderId);
+		params.put("event", event);
 
 		if (oldestDate != null) {
-			query += " and _entity.date >= ?3 ";
-			values.add(oldestDate);
+			query += " and _entity.date >= :oldestDate ";
+			params.put("oldestDate", oldestDate);
 		}
 
 		try {
-			return findByWhere(query, values.toArray(new Object[0]), "order by _entity.date asc", null);
+			return findByWhere(query, params, "order by _entity.date asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();

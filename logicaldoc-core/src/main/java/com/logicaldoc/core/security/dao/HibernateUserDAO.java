@@ -72,7 +72,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Override
 	public List<User> findByName(String name) {
 		try {
-			return findByWhere("lower(_entity.name) like ?1", new Object[] { name.toLowerCase() }, null, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("name", name.toLowerCase());
+
+			return findByWhere("lower(_entity.name) like :name", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<User>();
@@ -83,7 +86,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	public User findByUsername(String username) {
 		User user = null;
 		try {
-			List<User> coll = findByWhere("_entity.username = ?1", new Object[] { username }, null, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("username", username);
+
+			List<User> coll = findByWhere("_entity.username = :username", params, null, null);
 			if (coll.size() > 0)
 				user = coll.iterator().next();
 			initialize(user);
@@ -97,8 +103,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	public User findByUsernameIgnoreCase(String username) {
 		User user = null;
 		try {
-			List<User> coll = findByWhere("lower(_entity.username) = ?1", new Object[] { username.toLowerCase() }, null,
-					null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("username", username.toLowerCase());
+
+			List<User> coll = findByWhere("lower(_entity.username) = :username", params, null, null);
 			if (coll.size() > 0)
 				user = coll.iterator().next();
 			initialize(user);
@@ -113,7 +121,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	 */
 	public List<User> findByLikeUsername(String username) {
 		try {
-			return findByWhere("_entity.username like ?1", new Object[] { username }, null, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("username", username);
+
+			return findByWhere("_entity.username like :username", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<User>();
@@ -123,8 +134,12 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	@Override
 	public List<User> findByUsernameAndName(String username, String name) {
 		try {
-			return findByWhere("lower(_entity.name) like ?1 and _entity.username like ?2",
-					new Object[] { name.toLowerCase(), username }, null, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("username", username);
+			params.put("name", name.toLowerCase());
+
+			return findByWhere("lower(_entity.name) like :name and _entity.username like :username", params, null,
+					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<User>();
@@ -137,17 +152,16 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.getId() == 0L && user.getTenantId() != Tenant.DEFAULT_ID && "Administrator".equals(user.getFirstName())
 				&& user.getUsername().startsWith("admin") && "admin".equals(user.getDecodedPassword()))
 			return;
-		
+
 		// Without decoded password we cannot perform any test
 		String password = user.getDecodedPassword();
-		if(StringUtils.isEmpty(password))
+		if (StringUtils.isEmpty(password))
 			return;
 
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenant = tenantDAO.getTenantName(user.getTenantId());
-		
 
-		Map<String, String> messages = I18N.getMessages(user.getLocale()!=null ? user.getLocale() : Locale.ENGLISH);
+		Map<String, String> messages = I18N.getMessages(user.getLocale() != null ? user.getLocale() : Locale.ENGLISH);
 		List<String> errorKeys = messages.keySet().stream().filter(key -> key.startsWith("passwderror."))
 				.collect(Collectors.toList());
 		Properties props = new Properties();
@@ -186,7 +200,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				props);
 
 		List<String> errors = validator.validate(password);
-		System.out.println("password: "+password);
+		System.out.println("password: " + password);
 		if (!errors.isEmpty())
 			throw new PasswordWeakException(errors);
 	}
@@ -747,7 +761,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			String query = "_entity.id in (" + StringUtil.arrayToString(docIds.toArray(new Long[0]), ",") + ")";
 
 			try {
-				List<User> users = findByWhere(query, null, null, null);
+				List<User> users = findByWhere(query, (Map<String, Object>) null, null, null);
 				for (User user : users) {
 					if (user.getDeleted() == 0 && !set.contains(user))
 						set.add(user);

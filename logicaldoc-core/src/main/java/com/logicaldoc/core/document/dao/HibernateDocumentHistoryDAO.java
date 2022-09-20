@@ -5,7 +5,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -80,7 +82,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 			return new ArrayList<DocumentHistory>();
 		}
 	}
-	
+
 	@Override
 	public void cleanOldHistories(int ttl) {
 		if (ttl > 0) {
@@ -147,15 +149,18 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	}
 
 	@Override
-	public List<DocumentHistory> findByPath(String pathExpression, Date olderDate, Collection<String> events,
+	public List<DocumentHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) {
 		StringBuffer query = new StringBuffer(
-				"(_entity.path like '" + pathExpression + "' or _entity.pathOld like '" + pathExpression + "') ");
-		List<Object> params = new ArrayList<Object>();
-		if (olderDate != null) {
-			query.append(" and _entity.date >= ?1 ");
-			params.add(olderDate);
+				"(_entity.path like :pathExpression or _entity.pathOld like :pathExpression) ");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("pathExpression", pathExpression);
+
+		if (oldestDate != null) {
+			query.append(" and _entity.date >= :oldestDate ");
+			params.put("oldestDate", oldestDate);
 		}
+
 		if (events != null && !events.isEmpty()) {
 			StringBuffer eventsStr = new StringBuffer("(");
 			for (String event : events) {
@@ -168,7 +173,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 		}
 
 		try {
-			return findByWhere(query.toString(), params.toArray(new Object[0]), "order by _entity.date asc", max);
+			return findByWhere(query.toString(), params, "order by _entity.date asc", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentHistory>();

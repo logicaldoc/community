@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.activation.DataHandler;
@@ -503,15 +504,15 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 			doc = docDao.findDocument(docId);
 			checkPublished(user, doc);
-			
+
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.COPYED.toString());
 			transaction.setComment("");
 			transaction.setUser(user);
-			
-			Folder folder=fdao.findFolder(folderId);
+
+			Folder folder = fdao.findFolder(folderId);
 
 			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			Document createdDoc = documentManager.copyToFolder(doc, folder, transaction);
@@ -521,7 +522,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			return null;
 		}
 	}
-	
+
 	@Override
 	public void rename(String sid, long docId, String name) throws Exception {
 		User user = validateSession(sid);
@@ -679,7 +680,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		StringBuffer query = new StringBuffer(
 				"select docId from DocumentHistory where deleted=0 and (docId is not NULL) and userId=" + user.getId());
 		query.append(" order by date desc");
-		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, max);
+		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, max);
 
 		Set<Long> docIds = new HashSet<Long>();
 

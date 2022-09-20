@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -78,7 +79,7 @@ public class IndexingQueueDataServlet extends HttpServlet {
 							+ "_entity.version, _entity.date, _entity.publisher, _entity.creation, _entity.creator, "
 							+ "_entity.fileSize, _entity.fileName, _entity.color from Document _entity  where "
 							+ query[0] + (StringUtils.isNotEmpty(query[1]) ? " order by " + query[1] : ""),
-					null, max);
+							(Map<String, Object>) null, max);
 
 			/*
 			 * Iterate over records composing the response XML document

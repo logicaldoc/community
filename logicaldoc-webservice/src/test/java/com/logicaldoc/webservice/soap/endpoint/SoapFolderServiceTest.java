@@ -70,6 +70,13 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		Assert.assertEquals("folder test", wsFolder.getName());
 		Assert.assertEquals(103, wsFolder.getParentId());
 
+		wsFolder = folderServiceImpl.getFolder("", wsFolder.getId());
+		Assert.assertNotNull(wsFolder);
+		System.out.println(">>>>>> "+wsFolder.getId() +"    "+wsFolder.getName()+"    "+wsFolder.getDescription());
+		
+		Assert.assertEquals("folder test", wsFolder.getName());
+		Assert.assertEquals(103, wsFolder.getParentId());
+		
 		Folder createdFolder = folderDao.findByNameAndParentId("folder test", 103).get(0);
 		Assert.assertNotNull(createdFolder);
 		Assert.assertEquals("folder test", createdFolder.getName());

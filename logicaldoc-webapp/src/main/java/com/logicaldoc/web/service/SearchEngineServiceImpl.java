@@ -111,8 +111,10 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 			public void run() {
 				try {
 					DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-					documentDao.bulkUpdate("set ld_indexed=0 where ld_indexed=1 "
-							+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""), null);
+					documentDao.bulkUpdate(
+							"set ld_indexed=0 where ld_indexed=1 "
+									+ (!dropIndex ? " and ld_tenantid=" + session.getTenantId() : ""),
+							(Map<String, Object>) null);
 				} catch (Exception t) {
 					log.error(t.getMessage(), t);
 					throw new RuntimeException(t.getMessage(), t);

@@ -3,6 +3,7 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -75,7 +76,7 @@ public class LinksDataServlet extends HttpServlet {
 				query.append(" and not A.document2.id = " + docId);
 			}
 
-			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), null, null);
+			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>)null, null);
 
 			/*
 			 * Iterate over records composing the response XML document

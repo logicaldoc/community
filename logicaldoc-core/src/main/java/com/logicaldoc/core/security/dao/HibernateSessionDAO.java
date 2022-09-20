@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -56,7 +58,9 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	@Override
 	public Session findBySid(String sid) {
 		try {
-			List<Session> sessions = findByWhere("_entity.sid = ?1", new Object[] { sid }, null, null);
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("sid", sid);
+			List<Session> sessions = findByWhere("_entity.sid = :sid", params, null, null);
 			for (Session session : sessions) {
 				if (session.getDeleted() == 0)
 					return session;
@@ -76,9 +80,12 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	public List<Session> findByNode(String node) {
 		try {
 			if (StringUtils.isEmpty(node))
-				return findByWhere(" 1=1 ", null, "order by _entity.creation desc", null);
-			else
-				return findByWhere("_entity.node = ?1", new Object[] { node }, "order by _entity.creation desc", null);
+				return findByWhere(" 1=1 ", (Map<String, Object>) null, "order by _entity.creation desc", null);
+			else {
+				Map<String, Object> params = new HashMap<String, Object>();
+				params.put("node", node);
+				return findByWhere("_entity.node = :node", params, "order by _entity.creation desc", null);
+			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Session>();
