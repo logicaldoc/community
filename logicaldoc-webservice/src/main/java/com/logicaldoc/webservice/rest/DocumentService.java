@@ -143,7 +143,7 @@ public interface DocumentService {
 	 * -F filename&#x3D;newDoc.txt -F filedata&#x3D;@newDoc.txt
 	 * http://localhost:8080/services/rest/document/upload
 	 * 
-	 * @param docId          identifier of the document 
+	 * @param docId          identifier of the document (string format)
 	 * @param folderId       identifier of the folder
 	 * @param release        if the upload must produce a major release or now
 	 * @param filename       name of the file

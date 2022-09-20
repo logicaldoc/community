@@ -206,7 +206,7 @@ public class RestDocumentClient extends AbstractRestClient {
 	 *
 	 * @return array of ratings
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws Exception error in the server application 
 	 */
 	public WSRating[] getRatings(long docId) throws Exception {
 		WebClient.client(proxy).type(MediaType.APPLICATION_JSON);

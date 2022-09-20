@@ -219,7 +219,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 				release = Boolean.parseBoolean(releaseStr);
 			}
 				
-			DataHandler datah = filedataDetail.getDataHandler();
+			DataHandler datah = filedataDetail.getDataHandler(); 
 
 			super.checkin(sid, Long.parseLong(docId), comment, filename, release, datah);
 		} catch (Throwable t) {
