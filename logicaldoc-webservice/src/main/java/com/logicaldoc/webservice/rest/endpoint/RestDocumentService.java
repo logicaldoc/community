@@ -319,7 +319,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 			encoding = @Encoding(name = "file", contentType = "application/octet-stream"))
 	)	       
     public Long upload(
-    		@Multipart(value = "docId", required = false) Integer docId, @Multipart(value = "folderId", required = false) String folderId, 
+    		@Multipart(value = "docId", required = false) String docId, @Multipart(value = "folderId", required = false) String folderId, 
     		@Multipart(value = "release", required = false)  String release, @Multipart(value = "filename", required = true)  String filename, 
     		@Multipart(value = "language", required = false)  String language,  @Multipart(value = "filedata" , required = true) Attachment filedataDetail) throws Exception {
     	
