@@ -46,6 +46,9 @@ public class XMLParser extends AbstractParser {
 			ExtractorHandler handler = new ExtractorHandler(writer);
 
 			SAXParserFactory factory = SAXParserFactory.newInstance();
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);			
+			
 			SAXParser parser = factory.newSAXParser();
 			XMLReader reader = parser.getXMLReader();
 			reader.setContentHandler(handler);
