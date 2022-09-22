@@ -55,9 +55,21 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 		String value = super.getParameter(parameter);
 		if (value!=null && "tenant".equals(parameter)) {
 			// Check that the content of this special parameter is a tenant name
-			Pattern scriptPattern = Pattern.compile("[\\)\"'\\.,;*?!%/\\(\\\\]", Pattern.CASE_INSENSITIVE);
+			Pattern scriptPattern = Pattern.compile("[^a-z^A-Z^0-9^-]", Pattern.CASE_INSENSITIVE);
 			value = scriptPattern.matcher(value).replaceAll("");
-		} else
+		} else if (value!=null && ("version".equals(parameter) || "fileVersion".equals(parameter))) {
+			// Check that the content of this special parameter is a tenant name
+			Pattern scriptPattern = Pattern.compile("[^0-9^.]", Pattern.CASE_INSENSITIVE);
+			value = scriptPattern.matcher(value).replaceAll("");			
+		} else if (value!=null && "locale".equals(parameter)) {
+			// Check that the content of this special parameter is a tenant name
+			Pattern scriptPattern = Pattern.compile("[^a-z^A-Z\\-]", Pattern.CASE_INSENSITIVE);
+			value = scriptPattern.matcher(value).replaceAll("");
+		} else if (value!=null && "control".equals(parameter)) {
+			// Check that the content of this special parameter is a tenant name
+			Pattern scriptPattern = Pattern.compile("[\\W]", Pattern.CASE_INSENSITIVE);
+			value = scriptPattern.matcher(value).replaceAll("");
+		}
 			value = stripXSS(value);
 		return value;
 	}
