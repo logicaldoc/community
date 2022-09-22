@@ -91,6 +91,7 @@ public class FeedParser {
 
 			// First create a new XMLInputFactory
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+			inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
 			// Setup a new eventReader
 			Reader in = read();
 			XMLEventReader eventReader = inputFactory.createXMLEventReader(in);

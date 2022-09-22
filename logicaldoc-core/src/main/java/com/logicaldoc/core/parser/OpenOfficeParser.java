@@ -174,9 +174,12 @@ public class OpenOfficeParser extends AbstractParser {
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuffer content) {
 		try {
-			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-			saxParserFactory.setValidating(false);
-			SAXParser saxParser = saxParserFactory.newSAXParser();
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			factory.setValidating(false);			
+		
+			SAXParser saxParser = factory.newSAXParser();
 			XMLReader xmlReader = saxParser.getXMLReader();
 			xmlReader.setFeature("http://xml.org/sax/features/validation", false);
 			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
@@ -213,9 +216,11 @@ public class OpenOfficeParser extends AbstractParser {
 	@Override
 	public int countPages(File input, String filename) {
 		try {
-			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-			saxParserFactory.setValidating(false);
-			SAXParser saxParser = saxParserFactory.newSAXParser();
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			factory.setValidating(false);
+			SAXParser saxParser = factory.newSAXParser();
 			XMLReader xmlReader = saxParser.getXMLReader();
 			xmlReader.setFeature("http://xml.org/sax/features/validation", false);
 			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
