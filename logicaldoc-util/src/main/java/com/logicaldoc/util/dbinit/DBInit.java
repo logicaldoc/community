@@ -34,7 +34,7 @@ public class DBInit {
 
 	private String username = "";
 
-	private String password = "";
+	private String password = System.getProperty("database.password");;
 
 	private Connection con;
 
@@ -110,8 +110,10 @@ public class DBInit {
 	 * @throws SQLException
 	 */
 	private void execute(String sqlFile) throws IOException, SQLException {
+		
 		log.debug("Execute {}", sqlFile);
 		System.out.println("Execute " + sqlFile);
+		
 		File file = new File(sqlFile);
 		if (!file.exists() || !file.canRead()) {
 			file = File.createTempFile(file.getName(), ".sql");
@@ -167,6 +169,7 @@ public class DBInit {
 	 * @return true if the database can be connected
 	 */
 	public boolean testConnection() {
+		
 		boolean result = false;
 
 		try {
