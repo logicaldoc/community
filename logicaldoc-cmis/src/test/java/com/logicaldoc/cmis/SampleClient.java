@@ -47,15 +47,6 @@ public class SampleClient {
 		Folder root = connect();
 		root.getName();
 
-		// cleanup(root, TEST_FOLDER_NAME);
-		// Folder newFolder = createFolder(root, TEST_FOLDER_NAME);
-		// createDocument(newFolder, TEST_DOCUMENT_NAME_1);
-		// createDocument(newFolder, TEST_DOCUMENT_NAME_2);
-		// System.out.println("+++ List Folder +++");
-		// listFolder(0, newFolder);
-		// DeleteDocument(newFolder, "/" + TEST_DOCUMENT_NAME_2);
-		// System.out.println("+++ List Folder +++");
-		// listFolder(0, newFolder);
 
 		CmisObject object = session.getObjectByPath(TEST_FOLDER_PATH);
 		System.out.println(object.getId() + " " + object.getName());

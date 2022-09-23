@@ -13,30 +13,6 @@ import java.util.stream.Collectors;
  * @since 8.2.1
  */
 public class CollectionUtil {
-
-	public static void main(String[] args) {
-		List<Long> in = new ArrayList<Long>();
-		in.add(1L);
-		// in.add(2L);
-		// in.add(3L);
-		// in.add(4L);
-		// in.add(5L);
-		// in.add(6L);
-		// in.add(7L);
-		// in.add(8L);
-		// in.add(9L);
-		// in.add(10L);
-		// in.add(11L);
-		// in.add(12L);
-		// in.add(13L);
-		// in.add(14L);
-
-		int size = (int) Math.ceil(in.size() / 2);
-		System.out.println(size);
-		System.out.println(partition(in, size));
-
-	}
-
 	/**
 	 * Divide a list to segments of n size
 	 * 

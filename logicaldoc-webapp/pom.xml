@@ -375,11 +375,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcmail-jdk16</artifactId>
+			<artifactId>bcmail-jdk15on</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk16</artifactId>
+			<artifactId>bcprov-jdk15on</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.tuckey</groupId>
@@ -433,7 +433,11 @@
         	<groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
         </dependency>		
-		
+		<dependency>
+			<groupId>org.apache.calcite</groupId>
+			<artifactId>calcite-core</artifactId>
+			<scope>test</scope>
+		</dependency>			
 <!-- dependency>
   <groupId>com.microsoft.graph</groupId>
   <artifactId>microsoft-graph</artifactId>
@@ -591,11 +595,11 @@
 
 								<!-- Remove the manifest file in the bcmail jar to avoid cyclic dependencies, 
 									but after dropping the support to SMBv1 this will be no more required -->
-								<unzip src="target/war/WEB-INF/lib/bcmail-jdk16-1.46.jar"
+								<unzip src="target/war/WEB-INF/lib/bcmail-jdk15on-1.70.jar"
 									dest="target/war/WEB-INF/lib/bcmail" />
 								<delete dir="target/war/WEB-INF/lib/bcmail/META-INF"
 									quiet="true" />
-								<zip destfile="target/war/WEB-INF/lib/bcmail-jdk16-1.46.jar"
+								<zip destfile="target/war/WEB-INF/lib/bcmail-jdk15on-1.70.jar"
 									basedir="target/war/WEB-INF/lib/bcmail" />
 								<delete dir="target/war/WEB-INF/lib/bcmail" quiet="true" />
 

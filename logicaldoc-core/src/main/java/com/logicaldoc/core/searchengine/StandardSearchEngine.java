@@ -53,7 +53,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class StandardSearchEngine implements SearchEngine {
 
-	public static Version VERSION = Version.LUCENE_8_11_1;
+	public static Version VERSION = Version.LUCENE_8_11_2;
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 

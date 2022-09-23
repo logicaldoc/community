@@ -53,7 +53,7 @@
 			<artifactId>logicaldoc-core</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>

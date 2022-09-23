@@ -52,15 +52,6 @@ public class FeedParser {
 
 	public final URL url;
 
-	public static void main(String[] args) {
-		FeedParser parser = new FeedParser(null);
-		Feed feed = parser.readFeed();
-		List<FeedMessage> messages = feed.getMessages();
-		for (FeedMessage message : messages) {
-			System.out.println(message.getTitle() + " " + message.getPubDate());
-		}
-	}
-
 	public FeedParser(String feedUrl) {
 		try {
 			if (feedUrl != null && StringUtils.isNotEmpty(feedUrl))

@@ -37,25 +37,6 @@ public class HttpUpload {
 	public void UploadFile() {
 	}
 
-	public static void main(String[] args) throws Exception {
-		File f = new File("D:/tmp/form.gif");
-		HttpUpload upload = new HttpUpload();
-		upload.setFile(f);
-		upload.setFileName("buf.txt");
-		//upload.setURL("https://localhost:9443/servlet.gupld?new_session=true&sid=f1c65c45-73d4-45e9-aabd-8ba9ee019103");
-		upload.setURL("https://demo.logicaldoc.com:443/servlet.gupld?new_session=true&sid=e6f7b4aa-d4e2-4429-b997-a77c64a67d25");
-		upload.setListener(new FileBodyCounter.ProgressListener() {
-			@Override
-			public void transferred(long total, long increment) {
-				if (total % (1024) == 0) {
-					System.out.println("Transfered " + increment);
-					System.out.println("Total " + total);
-				}
-			}
-		});
-		upload.upload();
-	}
-
 	public void upload() throws Exception {
 
 		CloseableHttpResponse response = null;

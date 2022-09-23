@@ -56,17 +56,4 @@ public class RarUtil {
 			throw new IOException(r.getMessage(), r);
 		}
 	}
-
-//	File f = new File(filename);
-//    Archive archive = new Archive(f);
-//    archive.getMainHeader().print();
-//    FileHeader fh = archive.nextFileHeader();
-//    while(fh!=null){        
-//            File fileEntry = new File(fh.getFileNameString().trim());
-//            System.out.println(fileEntry.getAbsolutePath());
-//            FileOutputStream os = new FileOutputStream(fileEntry);
-//            archive.extractFile(fh, os);
-//            os.close();
-//            fh=archive.nextFileHeader();
-//    }
 }

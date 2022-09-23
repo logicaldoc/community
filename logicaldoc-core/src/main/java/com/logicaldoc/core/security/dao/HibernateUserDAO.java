@@ -200,7 +200,6 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				props);
 
 		List<String> errors = validator.validate(password);
-		System.out.println("password: " + password);
 		if (!errors.isEmpty())
 			throw new PasswordWeakException(errors);
 	}

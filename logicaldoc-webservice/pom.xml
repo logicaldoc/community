@@ -271,6 +271,11 @@
 			<artifactId>jfreechart</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.calcite</groupId>
+			<artifactId>calcite-core</artifactId>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>

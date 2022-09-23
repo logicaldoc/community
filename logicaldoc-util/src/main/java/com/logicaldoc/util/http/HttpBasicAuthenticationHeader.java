@@ -7,21 +7,6 @@ import java.util.Base64;
 
 public class HttpBasicAuthenticationHeader {
 
-	public static void main(String[] args) {
-
-		final String username = "Aladdin";
-		final String password = "open sesame";
-
-		System.out.println("Input\t: username [" + username + "], password [" + password + "]");
-
-		final String encodedText = createEncodedText(username, password);
-		System.out.println("Encoded Text : " + encodedText);
-
-		final String[] userDetails = decode(encodedText);
-		System.out.println("Decoded\t: username [" + userDetails[0] + "], password [" + userDetails[1] + "]");
-
-	}
-
 	public static String[] decodeFromAuthorization(String authorization) { 		
 	    if (authorization != null && authorization.startsWith("Basic")) {
 	        // Authorization: Basic base64credentials
