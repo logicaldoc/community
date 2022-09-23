@@ -563,9 +563,16 @@ public class DavResourceImpl implements DavResource, Serializable {
 					log.debug("tempFile {}", tempFile);
 
 					// Write the content on the file
-					OutputStream myStream = new FileOutputStream(tempFile.toFile());
-					IOUtils.copy(ctx.getInputStream(), myStream);
-					IOUtils.closeQuietly(myStream);
+					OutputStream myStream = null;
+					try {
+						myStream = new FileOutputStream(tempFile.toFile());
+						IOUtils.copy(ctx.getInputStream(), myStream);
+					} finally {
+						try {
+							myStream.close();
+						} catch (Exception e) {
+						}
+					}
 				}
 
 				// Last part of the chunking received

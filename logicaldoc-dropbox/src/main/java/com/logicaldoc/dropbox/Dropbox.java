@@ -156,8 +156,9 @@ public class Dropbox {
 	}
 
 	public boolean downloadFile(String path, File out) throws IOException {
-		FileOutputStream outputStream = new FileOutputStream(out);
+		FileOutputStream outputStream = null;
 		try {
+			outputStream = new FileOutputStream(out);
 			client.files().download(path).download(outputStream);
 			return true;
 		} catch (DbxException e) {
@@ -170,8 +171,9 @@ public class Dropbox {
 	}
 
 	public boolean uploadFile(File inputFile, String path) throws IOException {
-		FileInputStream inputStream = new FileInputStream(inputFile);
+		FileInputStream inputStream = null;
 		try {
+			inputStream = new FileInputStream(inputFile);
 			if (!path.startsWith("/"))
 				path = "/" + path;
 			FileMetadata uploadedFile = client.files().upload(path).uploadAndFinish(inputStream);

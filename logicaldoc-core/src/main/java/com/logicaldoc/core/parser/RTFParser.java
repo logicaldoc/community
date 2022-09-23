@@ -38,58 +38,65 @@ public class RTFParser extends AbstractParser {
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuffer content) {
+		
+		BufferedInputStream bis0 = null;
 		try {
-			BufferedInputStream bis0 = new BufferedInputStream(input);
+			bis0 = new BufferedInputStream(input);
 			bis0.mark(Integer.MAX_VALUE);
 
 			String text = extractText(bis0);
 			content.append(StringUtil.writeToString(new StringReader(text)));
 
-			// Check if there are some variable code that must be added to the
-			// content
+			// Check if there are some variable code that must be added to the content
 			bis0.reset();
 			File tempFile = File.createTempFile("rtf", ".rtf");
-			OutputStream out = new FileOutputStream(tempFile);
-			byte buf[] = new byte[512];
-			int len;
-			while ((len = bis0.read(buf)) > 0)
-				out.write(buf, 0, len);
+			try (OutputStream out = new FileOutputStream(tempFile)) {
+				byte buf[] = new byte[512];
+				int len;
+				while ((len = bis0.read(buf)) > 0)
+					out.write(buf, 0, len);
+			}
+			
+			StringBuffer strBuf = null;
+			try (FileInputStream fis = new FileInputStream(tempFile);
+					BufferedReader d = new BufferedReader(new InputStreamReader(fis))) {
+				String thisLine = "";
 
-			FileInputStream fis = new FileInputStream(tempFile);
-			BufferedReader d = new BufferedReader(new InputStreamReader(fis));
-			String thisLine = "";
+				strBuf = new StringBuffer();
+				strBuf.append(content);
 
-			StringBuffer strBuf = new StringBuffer();
-			strBuf.append(content);
-
-			Pattern pattern = Pattern.compile("fldinst MERGEFIELD ");
-			StringTokenizer st = null;
-			while ((thisLine = d.readLine()) != null) {
-				for (String string : pattern.split(thisLine)) {
-					string = string.replaceAll("\\\\fldrslt", "");
-					string = string.replaceAll("\\{", "");
-					st = new StringTokenizer(string, "}");
-					while (st.hasMoreTokens()) {
-						String token = st.nextToken();
-						if (StringUtils.isNotEmpty(token) && !token.startsWith("\\")) {
-							strBuf.append(token);
+				Pattern pattern = Pattern.compile("fldinst MERGEFIELD ");
+				StringTokenizer st = null;
+				while ((thisLine = d.readLine()) != null) {
+					for (String string : pattern.split(thisLine)) {
+						string = string.replaceAll("\\\\fldrslt", "");
+						string = string.replaceAll("\\{", "");
+						st = new StringTokenizer(string, "}");
+						while (st.hasMoreTokens()) {
+							String token = st.nextToken();
+							if (StringUtils.isNotEmpty(token) && !token.startsWith("\\")) {
+								strBuf.append(token);
+							}
 						}
+						strBuf.append("\n");
 					}
-					strBuf.append("\n");
 				}
 			}
 
-			fis.close();
 			input.close();
-			out.close();
 
-			content.append(strBuf.toString());
-
+			content.append(strBuf.toString()); 
+			
 			// Delete temp file when program exits.
 			tempFile.deleteOnExit();
 
 		} catch (Throwable t) {
 			log.warn("Failed to extract RTF text content", t);
+		} finally {
+			try {
+				bis0.close();
+			} catch (IOException e) {
+			}
 		}
 	}
 

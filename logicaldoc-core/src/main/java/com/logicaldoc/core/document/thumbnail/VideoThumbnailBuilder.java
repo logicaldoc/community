@@ -25,6 +25,7 @@ import com.logicaldoc.core.document.Document;
  * @since 8.2
  */
 public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
+	
 	protected static Logger log = LoggerFactory.getLogger(VideoThumbnailBuilder.class);
 
 	@Override
@@ -51,16 +52,18 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 	}
 
 	private void writeMp4Frame(File videoFile, File frameFile) throws Exception {
-		FFmpegFrameGrabber g = new FFmpegFrameGrabber(videoFile);
-		g.start();
-
-		/*
-		 * Get a frame in the middle of the video
-		 */
-		int startFrame = g.getLengthInVideoFrames() / 2;
-		g.setVideoFrameNumber(startFrame);
-
+		
+		FFmpegFrameGrabber g = null;
 		try {
+			g = new FFmpegFrameGrabber(videoFile);
+			g.start();
+
+			/*
+			 * Get a frame in the middle of the video
+			 */
+			int startFrame = g.getLengthInVideoFrames() / 2;
+			g.setVideoFrameNumber(startFrame);
+			
 			for (int i = startFrame; i < g.getLengthInFrames() && frameFile.length() == 0; i++) {
 				try {
 					Frame frame = g.grab();
@@ -81,18 +84,19 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 	}
 
 	private void writeVideoFrame(File videoFile, File frameFile) throws Exception {
-		FrameGrabber g = new OpenCVFrameGrabber(videoFile);
-		g.start();
-
-		/*
-		 * Try to get a frame after 60 seconds
-		 */
-		double frameRate = g.getFrameRate();
-		int fiveSecondsFrame = (int) (60 * frameRate);
-		if (fiveSecondsFrame > g.getLengthInFrames())
-			fiveSecondsFrame = 1;
-
+		FrameGrabber g = null;
 		try {
+			g = new OpenCVFrameGrabber(videoFile);
+			g.start();
+
+			/*
+			 * Try to get a frame after 60 seconds
+			 */
+			double frameRate = g.getFrameRate();
+			int fiveSecondsFrame = (int) (60 * frameRate);
+			if (fiveSecondsFrame > g.getLengthInFrames())
+				fiveSecondsFrame = 1;			
+			
 			for (int i = 0; i < g.getLengthInFrames() && frameFile.length() == 0; i++) {
 				try {
 					if (i < fiveSecondsFrame) {

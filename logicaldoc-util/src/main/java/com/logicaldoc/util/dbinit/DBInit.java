@@ -85,9 +85,9 @@ public class DBInit {
 	public void executeSql(String sql) {
 		try {
 			doConnection();
-			PreparedStatement st = con.prepareStatement(sql);
-			st.execute();
-			st.close();
+			try (PreparedStatement st = con.prepareStatement(sql)) {
+				st.execute();
+			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			log.error("Failed to execute " + sql, e);

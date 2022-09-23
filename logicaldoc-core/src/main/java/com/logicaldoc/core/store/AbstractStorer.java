@@ -189,7 +189,7 @@ public abstract class AbstractStorer implements Storer {
 					is.close();
 				} catch (Throwable e) {
 				}
-		}
+		}		
 	}
 
 	@Override

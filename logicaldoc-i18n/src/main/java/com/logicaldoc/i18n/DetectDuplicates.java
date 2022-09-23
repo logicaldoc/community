@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,16 +18,19 @@ import java.util.Map;
 public class DetectDuplicates {
 
 	public static void main(String[] args) throws FileNotFoundException {
+
 		File file = new File("src/main/resources/i18n/messages.properties");
 		Map<String, Integer> map = new HashMap<String, Integer>();
 
-		try {
-			// Open the file that is the first
-			// command line parameter
-			FileInputStream fstream = new FileInputStream(file);
+		// Open the file that is the first command line parameter
+		FileInputStream fstream = new FileInputStream(file);
+
+		BufferedReader br = null;
+		try {	
 			// Get the object of DataInputStream
 			DataInputStream in = new DataInputStream(fstream);
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			br = new BufferedReader(new InputStreamReader(in));
+			
 			String strLine;
 			// Read File Line By Line
 			while ((strLine = br.readLine()) != null) {
@@ -40,10 +44,14 @@ public class DetectDuplicates {
 				} else
 					map.put(key, 1);
 			}
-			// Close the input stream
-			in.close();
-		} catch (Exception e) {// Catch exception if any
+		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				System.err.println("Error: " + e.getMessage());
+			}
 		}
 
 		System.out.println("Inspected a total of " + map.keySet().size() + " keys");
