@@ -17,7 +17,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
-import java.io.Writer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -627,7 +626,7 @@ public class FileUtil {
 	public static void replaceInFile(String sourcePath, String token, String newValue) throws Exception {
 		
 		BufferedReader reader = null;
-		Writer writer = null;
+		OutputStreamWriter writer = null;
 		String oldContent = "";
 
 		File tmp = new File(sourcePath + ".tmp");
