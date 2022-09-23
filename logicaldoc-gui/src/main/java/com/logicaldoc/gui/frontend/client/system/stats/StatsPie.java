@@ -159,21 +159,23 @@ public class StatsPie extends HLayout {
 				break;
 
 			StaticTextItem item = ItemFactory.newStaticTextItem(parameter.getName(), parameter.toString(), null);
-			if (type == STATS_REPOSITORY) {
-				item.setValue(Util.formatSize(fmt.parse(parameter.getValue())) + " ( "
-						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-			} else if (type == STATS_DOCUMENTS) {
-				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
-						+ I18N.message("documents").toLowerCase() + " " + "( "
-						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-			} else if (type == STATS_PAGES) {
-				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
-						+ I18N.message("pages").toLowerCase() + " " + "( "
-						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
-			} else if (type == STATS_FOLDERS) {
-				item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
-						+ I18N.message("folders").toLowerCase() + " " + " ( "
-						+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+			if (count > 0) {
+				if (type == STATS_REPOSITORY) {
+					item.setValue(Util.formatSize(fmt.parse(parameter.getValue())) + " ( "
+							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+				} else if (type == STATS_DOCUMENTS) {
+					item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+							+ I18N.message("documents").toLowerCase() + " " + "( "
+							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+				} else if (type == STATS_PAGES) {
+					item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+							+ I18N.message("pages").toLowerCase() + " " + "( "
+							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+				} else if (type == STATS_FOLDERS) {
+					item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "
+							+ I18N.message("folders").toLowerCase() + " " + " ( "
+							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
+				}
 			}
 
 			item.setRequired(true);

@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.text.BadLocationException;
@@ -24,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
-import com.logicaldoc.util.io.FileUtil;
 
 /**
  * @author Michael Scholz
@@ -111,8 +111,17 @@ public class RTFParser extends AbstractParser {
 	@Override
 	public int countPages(InputStream input, String filename) {
 		try {
-			String text = StringUtil.writeToString(input, "utf8");
-			return text != null ? text.split("\\page").length : 1;
+			String text = StringUtil.writeToString(input, "UTF-8");
+			if (text == null)
+				return 1;
+
+			Pattern pattern = Pattern.compile("\\\\nofpages\\d+");
+			Matcher matcher = pattern.matcher(text);
+			if (matcher.find()) {
+				String nofpages = matcher.group(0);
+				String npages = nofpages.substring(9);
+				return Integer.parseInt(npages);
+			}
 		} catch (Throwable e) {
 			log.error(e.getMessage());
 		}
@@ -121,11 +130,11 @@ public class RTFParser extends AbstractParser {
 
 	@Override
 	public int countPages(File input, String filename) {
-		try {
-			String text = FileUtil.readFile(input);
-			return text != null ? text.split("\\\\page").length : 1;
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
+
+		try (FileInputStream stream = new FileInputStream(input)) {
+			return this.countPages(stream, filename);
+		} catch (IOException e) {
+			log.error(e.getMessage());
 		}
 		return 1;
 	}

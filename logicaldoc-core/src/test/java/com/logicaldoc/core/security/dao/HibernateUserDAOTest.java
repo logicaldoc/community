@@ -268,7 +268,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		try {
 			dao.store(user);
 			Assert.fail("an exception should have been raised at this point");
-		} catch (Throwable t) {
+		} catch (PersistenceException e) {
 		}
 
 		user = dao.findById(1L);
