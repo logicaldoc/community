@@ -30,17 +30,24 @@ public class TarUtil {
 
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);
-					BufferedInputStream bis = new BufferedInputStream(fis);) {
-				ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);
+					BufferedInputStream bis = new BufferedInputStream(fis); 
+					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);) {
+				
 				if (input instanceof TarArchiveInputStream) {
-					TarArchiveInputStream tarInput = (TarArchiveInputStream) input;
-					TarArchiveEntry entry = tarInput.getNextTarEntry();
-					while (entry != null) {
-						String name = entry.getName();
-						if (name.endsWith("/"))
-							name = name.substring(0, name.lastIndexOf('/'));
-						entries.add(name);
-						entry = tarInput.getNextTarEntry();
+					TarArchiveInputStream tarInput = null;
+					try {
+						tarInput = (TarArchiveInputStream) input;
+						TarArchiveEntry entry = tarInput.getNextTarEntry();
+						while (entry != null) {
+							String name = entry.getName();
+							if (name.endsWith("/"))
+								name = name.substring(0, name.lastIndexOf('/'));
+							entries.add(name);
+							entry = tarInput.getNextTarEntry();
+						}
+					} finally {
+						if (tarInput != null)
+							tarInput.close();
 					}
 				}
 			}
@@ -54,24 +61,31 @@ public class TarUtil {
 	public static void extractEntry(File tarFile, String entryName, File dest) throws IOException {
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);
-					BufferedInputStream bis = new BufferedInputStream(fis);) {
-				ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);
+					BufferedInputStream bis = new BufferedInputStream(fis);
+					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);) {
+				
 				if (input instanceof TarArchiveInputStream) {
-					TarArchiveInputStream tarInput = (TarArchiveInputStream) input;
-					TarArchiveEntry entry = tarInput.getNextTarEntry();
-					while (entry != null) {
-						if (entry.getName().equals(entryName)) {
-							byte[] content = new byte[(int) entry.getSize()];
-							int offset = 0;
-							tarInput.read(content, offset, content.length - offset);
+					TarArchiveInputStream tarInput = null;
+					try {
+						tarInput = (TarArchiveInputStream) input;
+						TarArchiveEntry entry = tarInput.getNextTarEntry();
+						while (entry != null) {
+							if (entry.getName().equals(entryName)) {
+								byte[] content = new byte[(int) entry.getSize()];
+								int offset = 0;
+								tarInput.read(content, offset, content.length - offset);
 
-							try (FileOutputStream outputFile = new FileOutputStream(dest);) {
-								IOUtils.write(content, outputFile);
+								try (FileOutputStream outputFile = new FileOutputStream(dest);) {
+									IOUtils.write(content, outputFile);
+								}
+
+								break;
 							}
-
-							break;
+							entry = tarInput.getNextTarEntry();
 						}
-						entry = tarInput.getNextTarEntry();
+					} finally {
+						if (tarInput != null)
+							tarInput.close();
 					}
 				}
 			}

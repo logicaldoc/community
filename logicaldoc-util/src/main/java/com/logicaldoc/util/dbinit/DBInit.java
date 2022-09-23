@@ -34,7 +34,7 @@ public class DBInit {
 
 	private String username = "";
 
-	private String password = System.getProperty("database.password");;
+	private String password = System.getProperty("database.password");
 
 	private Connection con;
 

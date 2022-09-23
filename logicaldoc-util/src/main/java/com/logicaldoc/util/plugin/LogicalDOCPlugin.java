@@ -88,11 +88,15 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	}
 
 	protected void loadData() throws IOException {
-		data.load(new FileInputStream(resolveDataFile()));
+		try (FileInputStream fis = new FileInputStream(resolveDataFile())) {
+			data.load(fis);
+		}
 	}
 
 	protected void saveData() throws IOException {
-		data.store(new FileOutputStream(resolveDataFile()), "");
+		try (FileOutputStream fos = new FileOutputStream(resolveDataFile())) {
+			data.store(fos, "");
+		}
 	}
 
 	/**

@@ -468,8 +468,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				// checkin the document; throws an exception if
 				// something goes wrong
 				DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-				documentManager.checkin(doc.getId(), new FileInputStream(file), fileName, major, toDocument(document),
-						transaction);
+				try (FileInputStream fis = new FileInputStream(file)) {
+					documentManager.checkin(doc.getId(), fis, fileName, major, toDocument(document),
+							transaction);
+				}
 				UploadServlet.cleanReceivedFiles(getThreadLocalRequest().getSession());
 				GUIDocument checkedInDocument = getById(doc.getId());
 

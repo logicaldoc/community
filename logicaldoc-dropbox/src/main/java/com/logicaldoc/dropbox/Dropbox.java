@@ -156,32 +156,34 @@ public class Dropbox {
 	}
 
 	public boolean downloadFile(String path, File out) throws IOException {
-		FileOutputStream outputStream = null;
+		FileOutputStream stream = null;
 		try {
-			outputStream = new FileOutputStream(out);
-			client.files().download(path).download(outputStream);
+			stream = new FileOutputStream(out);
+			client.files().download(path).download(stream);
+			stream.flush();
 			return true;
 		} catch (DbxException e) {
 			log.error(e.getMessage(), e);
 		} finally {
-			outputStream.flush();
-			outputStream.close();
+			if (stream != null)
+				stream.close();
 		}
 		return false;
 	}
 
 	public boolean uploadFile(File inputFile, String path) throws IOException {
-		FileInputStream inputStream = null;
+		FileInputStream stream = null;
 		try {
-			inputStream = new FileInputStream(inputFile);
+			stream = new FileInputStream(inputFile);
 			if (!path.startsWith("/"))
 				path = "/" + path;
-			FileMetadata uploadedFile = client.files().upload(path).uploadAndFinish(inputStream);
+			FileMetadata uploadedFile = client.files().upload(path).uploadAndFinish(stream);
 			return uploadedFile != null;
 		} catch (DbxException e) {
 			log.error(e.getMessage(), e);
 		} finally {
-			inputStream.close();
+			if (stream != null)
+				stream.close();
 		}
 		return false;
 	}

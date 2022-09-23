@@ -213,22 +213,21 @@ public class LogDownload extends HttpServlet {
 	}
 
 	public void writeEntry(ZipOutputStream out, String entry, File file) throws FileNotFoundException, IOException {
-		FileInputStream in;
+
 		byte[] b;
 		int count;
-		in = new FileInputStream(file);
+		
+		try (FileInputStream in = new FileInputStream(file)) {
+			// name the file inside the zip file
+			out.putNextEntry(new ZipEntry(entry));
 
-		// name the file inside the zip file
-		out.putNextEntry(new ZipEntry(entry));
+			// buffer size
+			b = new byte[1024];
+			count = 0;
 
-		// buffer size
-		b = new byte[1024];
-		count = 0;
-
-		while ((count = in.read(b)) > 0)
-			out.write(b, 0, count);
-
-		in.close();
+			while ((count = in.read(b)) > 0)
+				out.write(b, 0, count);
+		}
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

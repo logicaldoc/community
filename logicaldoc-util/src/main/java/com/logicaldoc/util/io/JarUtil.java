@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -41,11 +42,12 @@ public class JarUtil {
 				FileUtils.forceMkdir(targetDir);
 			}
 
-			JarFile jar = new JarFile(jarsource);
-			JarEntry jare;
+			try (JarFile jar = new JarFile(jarsource)) {
+				JarEntry jare;
 
-			for (Enumeration enum1 = jar.entries(); enum1.hasMoreElements(); saveEntry(jar, jare, target)) {
-				jare = (JarEntry) enum1.nextElement();
+				for (Enumeration enum1 = jar.entries(); enum1.hasMoreElements(); saveEntry(jar, jare, target)) {
+					jare = (JarEntry) enum1.nextElement();
+				}
 			}
 		} catch (Exception e) {
 			result = false;
@@ -76,9 +78,10 @@ public class JarUtil {
 				FileUtils.forceMkdir(targetDir);
 			}
 
-			JarFile jar = new JarFile(jarsource);
-			JarEntry jare = new JarEntry(entry);
-			saveEntry(jar, jare, target);
+			try (JarFile jar = new JarFile(jarsource)) {
+				JarEntry jare = new JarEntry(entry);
+				saveEntry(jar, jare, target);
+			}
 		} catch (Exception e) {
 			result = false;
 			log.error(e.getMessage(), e);
@@ -93,7 +96,7 @@ public class JarUtil {
 		if (jare.isDirectory()) {
 			file.mkdirs();
 		} else {
-			try (java.io.InputStream is = jar.getInputStream(jare);
+			try (InputStream is = jar.getInputStream(jare);
 					BufferedInputStream bis = new BufferedInputStream(is);
 					FileOutputStream fos = new FileOutputStream(file);
 					BufferedOutputStream bos = new BufferedOutputStream(fos);) {

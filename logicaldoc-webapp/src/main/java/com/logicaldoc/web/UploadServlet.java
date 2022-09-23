@@ -272,8 +272,9 @@ public class UploadServlet extends UploadAction {
 
 					if (receivedContentTypes != null && receivedContentTypes.containsKey(fieldName))
 						response.setContentType(receivedContentTypes.get(fieldName));
-					FileInputStream is = new FileInputStream(f);
-					copyFromInputStreamToOutputStream(is, response.getOutputStream());
+					try (FileInputStream is = new FileInputStream(f)) {
+						copyFromInputStreamToOutputStream(is, response.getOutputStream());
+					}
 				} else {
 					renderXmlResponse(request, response, XML_ERROR_ITEM_NOT_FOUND);
 				}

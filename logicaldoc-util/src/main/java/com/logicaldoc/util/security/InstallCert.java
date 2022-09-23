@@ -39,10 +39,12 @@ public class InstallCert {
             }
         }
         System.out.println("Loading KeyStore " + file + "...");
-        InputStream in = new FileInputStream(file);
-        KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-        ks.load(in, passphrase);
-        in.close();
+        
+        KeyStore ks = null;
+        try (InputStream in = new FileInputStream(file)) {
+            ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(in, passphrase);
+        }
 
         SSLContext context = SSLContext.getInstance("TLS");
         TrustManagerFactory tmf =
@@ -54,17 +56,20 @@ public class InstallCert {
         SSLSocketFactory factory = context.getSocketFactory();
 
         System.out.println("Opening connection to " + host + ":" + port + "...");
-        SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
-        socket.setSoTimeout(10000);
+        SSLSocket socket = null;
         try {
+        	socket = (SSLSocket) factory.createSocket(host, port);
+            socket.setSoTimeout(10000);
             System.out.println("Starting SSL handshake...");
-            socket.startHandshake();
-            socket.close();
+            socket.startHandshake();            
             System.out.println();
             System.out.println("No errors, certificate is already trusted");
         } catch (SSLException e) {
             System.out.println();
             e.printStackTrace(System.out);
+        } finally {
+        	if (socket != null) 
+        		socket.close();
         }
 
         X509Certificate[] chain = tm.chain;

@@ -165,9 +165,12 @@ public class ServletUtil {
 				os.write(buffer, 0, letter);
 			}
 		} finally {
-			os.flush();
-			os.close();
-			is.close();
+			if (os != null) {
+				os.flush();
+				os.close();
+			}
+			if (is != null) 
+				is.close();
 		}
 	}
 

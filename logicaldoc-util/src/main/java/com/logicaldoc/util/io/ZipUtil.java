@@ -229,25 +229,29 @@ public class ZipUtil {
 					// loop again
 					continue;
 				}
-				// if we reached here, the File object f was not
-				// a directory
+				
+				// if we reached here, the File object f was not a directory
 				// create a FileInputStream on top of f
-				FileInputStream fis = new FileInputStream(f);
-				// create a new zip entry
-				String path = f.getPath();
-				if (!path.equals(startZipDir.getPath()))
-					path = path.substring(startZipDir.getPath().length());
-				if (path.startsWith(File.separator))
-					path = path.substring(1);
-				ZipEntry anEntry = new ZipEntry(path);
-				// place the zip entry in the ZipOutputStream object
-				zos.putNextEntry(anEntry);
-				// now write the content of the file to the ZipOutputStream
-				while ((bytesIn = fis.read(readBuffer)) != -1) {
-					zos.write(readBuffer, 0, bytesIn);
+				FileInputStream fis = null;
+				try {
+					fis = new FileInputStream(f);
+					// create a new zip entry
+					String path = f.getPath();
+					if (!path.equals(startZipDir.getPath()))
+						path = path.substring(startZipDir.getPath().length());
+					if (path.startsWith(File.separator))
+						path = path.substring(1);
+					ZipEntry anEntry = new ZipEntry(path);
+					// place the zip entry in the ZipOutputStream object
+					zos.putNextEntry(anEntry);
+					// now write the content of the file to the ZipOutputStream
+					while ((bytesIn = fis.read(readBuffer)) != -1) {
+						zos.write(readBuffer, 0, bytesIn);
+					}
+				} finally {
+					// close the Stream
+					fis.close();
 				}
-				// close the Stream
-				fis.close();
 			}
 		} catch (Exception e) {
 			logError(e.getMessage());
@@ -261,11 +265,13 @@ public class ZipUtil {
 	 * @param dest The destination archive file
 	 */
 	public void zipFile(File src, File dest) {
+		ZipOutputStream zos = null;
+		FileInputStream fis = null;
 		try {
 			// create a ZipOutputStream to zip the data to
-			ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(dest));
+			zos = new ZipOutputStream(new FileOutputStream(dest));
 
-			FileInputStream fis = new FileInputStream(src);
+			fis = new FileInputStream(src);
 			// create a new zip entry
 			ZipEntry anEntry = new ZipEntry(src.getName());
 			// place the zip entry in the ZipOutputStream object
@@ -277,15 +283,18 @@ public class ZipUtil {
 			// now write the content of the file to the ZipOutputStream
 			while ((bytesIn = fis.read(readBuffer)) != -1) {
 				zos.write(readBuffer, 0, bytesIn);
-			}
-			// close the Stream
-			fis.close();
+			}			
 			// close the stream
 			zos.flush();
-			zos.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			logError(e.getMessage());
+		} finally {
+			try {
+				fis.close();
+				zos.close();
+			} catch (Exception e) {
+			}
 		}
 	}
 
@@ -335,8 +344,8 @@ public class ZipUtil {
 			 */
 			tarFile = File.createTempFile("ungizp", ".tar");
 			try (GzipCompressorInputStream archive = new GzipCompressorInputStream(
-					new BufferedInputStream(new FileInputStream(tarGzFile)))) {
-				OutputStream out = Files.newOutputStream(tarFile.toPath());
+					new BufferedInputStream(new FileInputStream(tarGzFile)));
+					OutputStream out = Files.newOutputStream(tarFile.toPath())) {
 				IOUtils.copy(archive, out);
 			}
 
@@ -386,7 +395,7 @@ public class ZipUtil {
 	/**
 	 * UnGunzips a given .gz stream
 	 * 
-	 * @param gzStream the .gz stream
+	 * @param gzStream   the .gz stream
 	 * 
 	 * @param targetFile the target file to unpack to
 	 */
@@ -395,8 +404,9 @@ public class ZipUtil {
 			/*
 			 * Ungzip file to extract TAR file.
 			 */
-			try (GzipCompressorInputStream archive = new GzipCompressorInputStream(new BufferedInputStream(gzStream))) {
-				OutputStream out = Files.newOutputStream(targetFile.toPath());
+			try (GzipCompressorInputStream archive = new GzipCompressorInputStream(new BufferedInputStream(gzStream));
+					OutputStream out = Files.newOutputStream(targetFile.toPath());) {
+
 				IOUtils.copy(archive, out);
 			}
 		} catch (IOException e) {
