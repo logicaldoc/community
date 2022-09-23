@@ -93,10 +93,11 @@ public class ImageDeskew {
 				sum += hl[i].alpha;
 				count++;
 			}
-			return (sum / count);
-		} else {
-			return 0.0d;
+			if (count > 0) 
+				return (sum / count);						
 		}
+		
+		return 0.0d;
 	}
 
 	// calculate the count lines in the image with most points

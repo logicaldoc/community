@@ -430,7 +430,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		try {
 			storer.setRaiseError(true);
 			documentManager.create(new FileInputStream("pom.xml"), doc, history);
-			Assert.assertFalse("an exception should have been raised at this point", true);
+			Assert.fail("an exception should have been raised at this point");
 		} catch (Throwable e) {
 
 		} finally {
@@ -470,7 +470,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		try {
 			storer.setRaiseError(true);
 			documentManager.checkin(1L, file, "pippo", true, null, transaction);
-			Assert.assertFalse("an exception should have been raised at this point", true);
+			Assert.fail("an exception should have been raised at this point");
 		} catch (Throwable e) {
 
 		} finally {

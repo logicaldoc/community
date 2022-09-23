@@ -83,6 +83,8 @@ public abstract class Task implements Runnable {
 	protected LockManager lockManager;
 
 	protected SystemLoadMonitor systemLoadMonitor;
+	
+	private Random random = new Random();
 
 	public Task(String name) {
 		this.name = name;
@@ -119,8 +121,7 @@ public abstract class Task implements Runnable {
 
 		if (systemLoadMonitor != null) {
 			boolean overload = false;
-
-			Random random = new Random();
+			
 			while (systemLoadMonitor.isAverageCpuOverLoaded() && !interruptRequested) {
 				if (overload == false) {
 					overload = true;
@@ -129,7 +130,7 @@ public abstract class Task implements Runnable {
 				try {
 					lockManager.get(getName(), transactionId);
 				} catch (Throwable e) {
-				}
+				}				
 				try {
 					Thread.sleep((1 + random.nextInt(20)) * 1000);
 				} catch (Throwable e) {
@@ -175,7 +176,7 @@ public abstract class Task implements Runnable {
 	@Override
 	public void run() {
 		if (!RunLevel.current().aspectEnabled("scheduledTasks")) {
-			log.debug("Aspect Sceduled Tasks not enabled");
+			log.debug("Aspect Scheduled Tasks not enabled");
 			return;
 		}
 

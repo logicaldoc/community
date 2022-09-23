@@ -77,9 +77,11 @@ public class StatChartServlet extends HttpServlet {
 				GUIParameter param = parameters[index][i];
 				if (param != null) {
 					double val = param.getValue() != null ? Long.parseLong(param.getValue()) : 0L;
-					val = val * 100 / total;
-					if (val >= 1)
-						dataset.setValue(I18N.message(param.getName(), user.getLocale()), val);
+					if (total > 0) {
+						val = val * 100 / total;
+						if (val >= 1)
+							dataset.setValue(I18N.message(param.getName(), user.getLocale()), val);
+					}
 				}
 			}
 
