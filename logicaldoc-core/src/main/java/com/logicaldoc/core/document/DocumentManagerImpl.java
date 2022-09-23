@@ -3,6 +3,8 @@ package com.logicaldoc.core.document;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1527,9 +1529,13 @@ public class DocumentManagerImpl implements DocumentManager {
 	 * @throws IOException
 	 */
 	private File preparePdfs(User user, List<Long> docIds) throws IOException {
-		File temp = File.createTempFile("merge", "");
-		temp.delete();
-		temp.mkdir();
+		
+//		File temp = File.createTempFile("merge", "");
+//		temp.delete();
+//		temp.mkdir();
+		
+		Path tempPath = Files.createTempDirectory("merge");
+		File tempDir = tempPath.toFile();
 
 		DecimalFormat nf = new DecimalFormat("00000000");
 		int i = 0;
@@ -1547,14 +1553,14 @@ public class DocumentManagerImpl implements DocumentManager {
 						.getBean(FormatConverterManager.class);
 				manager.convertToPdf(document, null);
 
-				File pdf = new File(temp, nf.format(i) + ".pdf");
+				File pdf = new File(tempDir, nf.format(i) + ".pdf");
 
 				manager.writePdfToFile(document, null, pdf, null);
 			} catch (Throwable t) {
 				log.error(t.getMessage(), t);
 			}
 		}
-		return temp;
+		return tempDir;
 	}
 
 	/**
@@ -1568,14 +1574,17 @@ public class DocumentManagerImpl implements DocumentManager {
 	 */
 	private static File mergePdf(File[] pdfs) throws IOException {
 
-		File temp = null;
+		//File temp = null;
+		File tempDir = null;
 		try {
-			temp = File.createTempFile("merge", "");
-			temp.delete();
-			temp.mkdir();
+//			temp = File.createTempFile("merge", "");
+//			temp.delete();
+//			temp.mkdir();
+			
+			Path tempPath = Files.createTempDirectory("merge");
+			tempDir = tempPath.toFile();			
 
-			File dst = null;
-			dst = File.createTempFile("merge", ".pdf");
+			File dst = File.createTempFile("merge", ".pdf");
 
 			PDFMergerUtility merger = new PDFMergerUtility();
 			for (File file : pdfs) {
@@ -1584,13 +1593,13 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			merger.setDestinationFileName(dst.getAbsolutePath());
 			MemoryUsageSetting memoryUsage = MemoryUsageSetting.setupTempFileOnly();
-			memoryUsage.setTempDir(temp);
+			memoryUsage.setTempDir(tempDir);
 			merger.mergeDocuments(memoryUsage);
 
 			return dst;
 		} finally {
-			if (temp != null && temp.exists())
-				FileUtil.strongDelete(temp);
+			if (tempDir != null && tempDir.exists())
+				FileUtil.strongDelete(tempDir);
 		}
 	}
 }
