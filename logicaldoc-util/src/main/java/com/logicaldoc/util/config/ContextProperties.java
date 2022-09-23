@@ -2,6 +2,7 @@ package com.logicaldoc.util.config;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -63,17 +64,18 @@ public class ContextProperties extends OrderedProperties {
 
 	public ContextProperties(String filePath) throws IOException {
 		this.file = new File(filePath);
-		try {
-			load(new FileInputStream(this.file));
+		
+		try (FileInputStream fis = new FileInputStream(this.file)) {
+			load(fis);
 		} catch (Throwable e) {
 			log.error("Unable to read from {}", filePath, e);
 			throw e;
-		}
+		} 
 
 		overrideFile = detectOverrideFile();
 		if (overrideFile != null) {
-			try {
-				load(new FileInputStream(overrideFile));
+			try (FileInputStream fis = new FileInputStream(this.overrideFile)) {
+				load(fis);
 				log.info("Override settings defined in {}", overrideFile.getPath());
 			} catch (Throwable e) {
 				log.error("Unable to read from {}", overrideFile.getPath(), e);
@@ -104,8 +106,8 @@ public class ContextProperties extends OrderedProperties {
 			log.error("Unable to read from {}", file, e);
 			throw e;
 		}
-		try {
-			load(new FileInputStream(file));
+		try (FileInputStream fis = new FileInputStream(file)) {
+			load(fis);
 		} catch (IOException e) {
 			log.error("Unable to read from {}", file, e);
 			throw e;
@@ -113,8 +115,8 @@ public class ContextProperties extends OrderedProperties {
 
 		overrideFile = detectOverrideFile();
 		if (overrideFile != null) {
-			try {
-				load(new FileInputStream(overrideFile));
+			try (FileInputStream fis = new FileInputStream(overrideFile)) {
+				load(fis);
 				log.debug("Override settings defined in {}", overrideFile.getPath());
 			} catch (Throwable e) {
 				log.error("Unable to read from {}", overrideFile.getPath(), e);
@@ -127,7 +129,9 @@ public class ContextProperties extends OrderedProperties {
 		try {
 			if (file.exists()) {
 				this.file = file;
-				load(new FileInputStream(file));
+				try (FileInputStream fis = new FileInputStream(file)) {
+					load(fis);
+				}
 			}
 		} catch (IOException e) {
 			log.error("Unable to read from " + file.getPath(), e);
@@ -136,8 +140,8 @@ public class ContextProperties extends OrderedProperties {
 
 		overrideFile = detectOverrideFile();
 		if (overrideFile != null) {
-			try {
-				load(new FileInputStream(overrideFile));
+			try (FileInputStream fis = new FileInputStream(overrideFile)) {
+				load(fis);
 			} catch (Throwable e) {
 				log.error("Unable to read from {}", overrideFile.getPath(), e);
 				throw e;

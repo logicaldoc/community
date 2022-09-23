@@ -250,7 +250,7 @@ public class ZipUtil {
 					}
 				} finally {
 					// close the Stream
-					fis.close();
+					if (fis != null) fis.close();
 				}
 			}
 		} catch (Exception e) {
@@ -291,8 +291,8 @@ public class ZipUtil {
 			logError(e.getMessage());
 		} finally {
 			try {
-				fis.close();
-				zos.close();
+				if (fis != null) fis.close();
+				if (zos != null) zos.close();
 			} catch (Exception e) {
 			}
 		}

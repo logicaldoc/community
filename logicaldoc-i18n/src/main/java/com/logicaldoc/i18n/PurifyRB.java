@@ -116,8 +116,8 @@ public class PurifyRB {
 			e.printStackTrace();
 		} finally {
 			try {
-				ow.close();
-				out.close();
+				if (ow != null) ow.close();
+				if (out != null) out.close();
 			} catch (IOException e) {
 			}
 		}

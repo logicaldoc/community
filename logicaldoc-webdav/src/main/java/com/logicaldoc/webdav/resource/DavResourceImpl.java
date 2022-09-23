@@ -563,13 +563,13 @@ public class DavResourceImpl implements DavResource, Serializable {
 					log.debug("tempFile {}", tempFile);
 
 					// Write the content on the file
-					OutputStream myStream = null;
+					OutputStream stream = null;
 					try {
-						myStream = new FileOutputStream(tempFile.toFile());
-						IOUtils.copy(ctx.getInputStream(), myStream);
+						stream = new FileOutputStream(tempFile.toFile());
+						IOUtils.copy(ctx.getInputStream(), stream);
 					} finally {
 						try {
-							myStream.close();
+							if (stream != null) stream.close();
 						} catch (Exception e) {
 						}
 					}

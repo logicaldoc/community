@@ -554,36 +554,38 @@ public class FileUtil {
 	 * @throws IOException raised in case of error
 	 */
 	public static void copy(File input, File output, long offset) throws IOException {
-		RandomAccessFile inputRa = new RandomAccessFile(input, "r");
-		RandomAccessFile outputRa = new RandomAccessFile(output, "rw");
-		FileChannel sourceChannel = inputRa.getChannel();
-		FileChannel targetChannel = outputRa.getChannel();
+		
+		RandomAccessFile inputRa = null;
+		RandomAccessFile outputRa = null;
+		FileChannel sourceChannel = null;
+		FileChannel targetChannel = null;
+		
 		try {
+			inputRa = new RandomAccessFile(input, "r");
+			outputRa = new RandomAccessFile(output, "rw");
+			sourceChannel = inputRa.getChannel();
+			targetChannel = outputRa.getChannel();
 			targetChannel.transferFrom(sourceChannel, offset, input.length());
 		} finally {
 			try {
-				sourceChannel.close();
+				if (sourceChannel != null) sourceChannel.close();
 			} catch (Throwable e) {
-
 			}
 
 			try {
-				inputRa.close();
+				if (inputRa != null) inputRa.close();
 			} catch (Throwable e) {
-
+			}
+			
+			try {
+				if (targetChannel != null) targetChannel.close();
+			} catch (Throwable e) {
 			}
 
 			try {
-				targetChannel.close();
+				if (outputRa != null) outputRa.close();
 			} catch (Throwable e) {
-
-			}
-
-			try {
-				outputRa.close();
-			} catch (Throwable e) {
-
-			}
+			}			
 		}
 	}
 
@@ -623,6 +625,7 @@ public class FileUtil {
 	}
 
 	public static void replaceInFile(String sourcePath, String token, String newValue) throws Exception {
+		
 		BufferedReader reader = null;
 		Writer writer = null;
 		String oldContent = "";
@@ -653,8 +656,8 @@ public class FileUtil {
 		} finally {
 			try {
 				// Closing the resources
-				reader.close();
-				writer.close();
+				if (reader != null) reader.close();
+				if (writer != null) writer.close();
 			} catch (IOException e) {
 				log.error(e.getMessage(), e);
 			}
