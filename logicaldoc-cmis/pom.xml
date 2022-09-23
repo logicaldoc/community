@@ -14,32 +14,32 @@
 	<artifactId>logicaldoc-cmis</artifactId>
 	<name>logicaldoc-cmis</name>
 	<packaging>jar</packaging>
-		
+
 	<properties>
-	    <opencmis.version>0.14.0</opencmis.version>
+		<opencmis.version>0.14.0</opencmis.version>
 	</properties>
 
 	<dependencies>
-	    <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-        </dependency>
-	
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+		</dependency>
+
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
 			<artifactId>logicaldoc-core</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
-            <exclusions>
+			<exclusions>
 				<exclusion>
-				    <groupId>jmimemagic</groupId>
+					<groupId>jmimemagic</groupId>
 					<artifactId>jmimemagic</artifactId>
 				</exclusion>
 				<exclusion>
-				    <groupId>net.sourceforge.nekohtml</groupId>
+					<groupId>net.sourceforge.nekohtml</groupId>
 					<artifactId>nekohtml</artifactId>
 				</exclusion>
-			</exclusions>			
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.logicaldoc</groupId>
@@ -104,6 +104,12 @@
 			<groupId>org.apache.chemistry.opencmis</groupId>
 			<artifactId>chemistry-opencmis-client-impl</artifactId>
 			<version>${opencmis.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.cxf</groupId>
+					<artifactId>cxf-rt-ws-policy</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -118,7 +124,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
+			<artifactId>log4j-slf4j-impl</artifactId>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -160,20 +166,25 @@
 						<configuration>
 							<tasks>
 								<delete dir="target/plugin" quiet="true" />
-								<unzip src="target/${project.artifactId}-${project.version}-plugin.zip"
+								<unzip
+									src="target/${project.artifactId}-${project.version}-plugin.zip"
 									dest="target/plugin" />
-								<delete dir="target/${project.artifactId}-${project.version}-plugin.zip" />
+								<delete
+									dir="target/${project.artifactId}-${project.version}-plugin.zip" />
 								<delete>
 									<fileset dir="target/plugin/WEB-INF/lib"
 										includes="junit*,jax*,wood*,stax*,activation*,*logicaldoc*,*spring*,commons*,*velocity*,*geronimo*,*aopalliance*,*saaj*,ant*,hibernate*,ehcache*,slf4j*,cxf*,asm*,neethi*,xml*,wsdl*" />
 								</delete>
 
-								<copy file="target/${project.artifactId}-${project.version}.${project.packaging}"
+								<copy
+									file="target/${project.artifactId}-${project.version}.${project.packaging}"
 									tofile="target/plugin/WEB-INF/lib/${project.artifactId}-${project.version}-plugin.${project.packaging}" />
 
-								<zip destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
+								<zip
+									destfile="target/${project.artifactId}-${project.version}-plugin2.zip"
 									basedir="target/plugin" />
-								<move file="target/${project.artifactId}-${project.version}-plugin2.zip"
+								<move
+									file="target/${project.artifactId}-${project.version}-plugin2.zip"
 									tofile="target/${project.artifactId}-${project.version}-plugin.zip" />
 							</tasks>
 						</configuration>
