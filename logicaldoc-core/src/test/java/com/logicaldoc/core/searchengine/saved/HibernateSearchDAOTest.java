@@ -99,13 +99,8 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 				saved.saveOptions(opt);
 				String xml = saved.getOptions();
 
-				System.out.println("xml:\n" + xml);
-
 				saved = new SavedSearch();
 				saved.setOptions(xml);
-				SearchOptions options = saved.readOptions();
-
-				System.out.println(name + " > " + options.getExpression());
 			} catch (Throwable t) {
 			}
 		}
@@ -131,10 +126,6 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 		SavedSearch saved = new SavedSearch();
 		saved.setName("ואתם נהנים מהטבה ייחודית");
 		saved.saveOptions(opt);
-		String xml = saved.getOptions();
-
-		System.out.println("xml:\n" + xml);
-
-	
+		String xml = saved.getOptions();	
 	}
 }

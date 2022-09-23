@@ -30,8 +30,6 @@ public class OpenOfficeParserTest extends AbstractCoreTCase {
 		super.setUp();
 		this.startTime = System.currentTimeMillis();
 		this.mem1 = Runtime.getRuntime().totalMemory();
-		System.out.println("freeMemory: " + Runtime.getRuntime().freeMemory());
-		System.out.println("totalMemory: " + Runtime.getRuntime().totalMemory());
 	}
 
 	/**

@@ -175,7 +175,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Collection<Long> ids = dao.findByUserId(3);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(3, ids.size());
-		Assert.assertTrue(ids.contains(new Long(2)));
+		Assert.assertTrue(ids.contains(2L));
 
 		// Try with a user without documents
 		ids = dao.findByUserId(2);

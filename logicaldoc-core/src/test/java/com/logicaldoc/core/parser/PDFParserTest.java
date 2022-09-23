@@ -13,7 +13,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,37 +22,12 @@ import com.logicaldoc.core.security.Tenant;
 
 public class PDFParserTest extends AbstractCoreTCase {
 
-	private long startTime;
-
-	private long mem1;
-
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
-		this.startTime = System.currentTimeMillis();
-		this.mem1 = Runtime.getRuntime().totalMemory();
-		System.out.println("freeMemory: " + Runtime.getRuntime().freeMemory());
-		System.out.println("totalMemory: " + Runtime.getRuntime().totalMemory());
-	}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-		long elapsedMillis = System.currentTimeMillis() - this.startTime;
-		System.err.println("elapsedMillis: " + elapsedMillis);
-		long mem2 = Runtime.getRuntime().totalMemory();
-
-		System.err.println("freeMemory AFTER: " + Runtime.getRuntime().freeMemory());
-		System.err.println("totalMemory AFTER: " + Runtime.getRuntime().totalMemory());
-
-		System.err.println("Difference in memory allocation: " + ((mem2 - mem1) / 1024) + " KB");
-		Runtime.getRuntime().gc(); // request garbage collection
-		super.tearDown();
 	}
 
 	@Test
@@ -69,24 +43,7 @@ public class PDFParserTest extends AbstractCoreTCase {
 
 		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-		// pdfp.parse(file);
-		//
-		// String title = pdfp.getTitle();
-		// System.out.println("title: " + title);
-		// assertTrue(StringUtils.isNotEmpty(title));
-		// assertEquals("Folie 1", title);
-		//
-		// String author = pdfp.getAuthor();
-		// System.out.println("author: " + author);
-		// assertTrue(StringUtils.isNotEmpty(author));
-		// assertEquals("Marcus Joost", author);
-		//
-		// String content = pdfp.getContent();
-		// assertNotNull(content);
-		// assertTrue(StringUtils.isNotEmpty(content));
-		//
-		// System.out.println("content.length(): " + content.length());
-		// assertEquals(27179, content.length());
+
 
 		inputFile = "src/test/resources/probiotic-1.4.pdf";
 		file = new File(inputFile);

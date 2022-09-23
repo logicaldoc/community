@@ -132,12 +132,10 @@ public class HibernateGroupDAOTest extends AbstractCoreTCase {
 		Assert.assertFalse(manager.getAllowedGroups(5).contains(group));
 
 		dao.inheritACLs(group, 2);
-		System.out.println(manager.getAllowedGroups(5));
 		Assert.assertTrue(manager.getAllowedGroups(5).contains(group));
 		Assert.assertFalse(manager.getAllowedGroups(9).contains(group));
 
 		dao.inheritACLs(group, 1);
-		System.out.println(manager.getAllowedGroups(9));
 		Assert.assertTrue(manager.getAllowedGroups(9).contains(group));
 	}
 }

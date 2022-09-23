@@ -51,7 +51,8 @@ public abstract class AbstractCoreTCase {
 	public void setUp() throws Exception {
 		userHome = System.getProperty("user.home");
 		System.setProperty("user.home", tempDir.getPath());
-
+		System.setProperty("solr.http1", "true");
+		
 		createTestDirs();
 		context = new ClassPathXmlApplicationContext(new String[] { "/context.xml" });
 		createTestDatabase();

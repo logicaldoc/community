@@ -253,8 +253,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 		Folder B = dao.findByPathExtended("/Default/A/B", 1L);
 		Assert.assertNull(B.getSecurityRef());
-		System.out.println("B folder is " + B.getId());
-
+	
 		Folder C = dao.findByPathExtended("/Default/A/B/C", 1L);
 		dao.initialize(C);
 		Assert.assertNull(C.getSecurityRef());
@@ -602,7 +601,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		try {
 			dao.delete(Folder.DEFAULTWORKSPACEID);
 		} catch (Throwable t) {
-			System.out.println(t.getMessage());
+			t.printStackTrace();
 		}
 		folder = dao.findById(Folder.DEFAULTWORKSPACEID);
 		Assert.assertNotNull(Folder.DEFAULTWORKSPACEID);

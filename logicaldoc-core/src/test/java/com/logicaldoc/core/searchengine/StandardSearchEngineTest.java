@@ -140,12 +140,7 @@ public class StandardSearchEngineTest extends AbstractCoreTCase {
 		engine.addHit(document, "This test 201");
 		
 		Hits hits = engine.query("*:*", 2, 3);
-		System.out.println("estimated count: " + hits.getEstimatedCount());
 		Assert.assertEquals(1, hits.getCount());
-		while(hits.hasNext()) {
-			Hit hit=hits.next();
-			System.out.println(hit.getId()+ " - "+hit.getTenantId()+" - "+hit.getFolder().getId()+" - "+hit.getFolder().getName());
-		}
 	}
 
 	@Test
@@ -200,6 +195,5 @@ public class StandardSearchEngineTest extends AbstractCoreTCase {
 	@Test
 	public void testPurge() throws Exception {
 		testAddHit();
-		System.out.println("purged: " + engine.purge());
 	}
 }

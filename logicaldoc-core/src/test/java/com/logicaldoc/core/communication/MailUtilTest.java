@@ -91,8 +91,6 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getName());
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getAddress());
 			
-			//Assert.assertEquals("vendor_info@kajima.co.uk", mail.getReplyTo().toString());
-			System.out.println(mail.getReplyTo().toString());
 			Assert.assertTrue(mail.getReplyTo().toString().contains("vendor_info@kajima.co.uk"));
 		}
 
@@ -106,8 +104,6 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertEquals("'Marco Meschieri'", to.iterator().next().getName());
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getAddress());
 			
-			//Assert.assertEquals("xcumplido@ingenium-ax.com.mx", mail.getReplyTo().toString());
-			System.out.println(mail.getReplyTo().toString());
 			Assert.assertTrue(mail.getReplyTo().toString().contains("xcumplido@ingenium-ax.com.mx"));
 			
 			Assert.assertTrue(mail.getRecipientsCC().isEmpty());

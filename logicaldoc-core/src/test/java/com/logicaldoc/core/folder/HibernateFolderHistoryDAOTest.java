@@ -87,9 +87,6 @@ public class HibernateFolderHistoryDAOTest extends AbstractCoreTCase {
 		cal.setTime(date);
 		cal.add(Calendar.HOUR_OF_DAY, -48);
 
-		System.out.println(date);
-		System.out.println(cal.getTime());
-
 		histories = dao.findByFolderIdAndEvent(5, "data test 03", cal.getTime());
 		Assert.assertEquals(1, histories.size());
 

@@ -29,7 +29,7 @@
 		</Logger>	
 		<Root level="info">
 			<AppenderRef ref="file" />
-			<AppenderRef ref="console" />
+			<!-- AppenderRef ref="console" /-->
 		</Root>
 	</Loggers>
 </Configuration>

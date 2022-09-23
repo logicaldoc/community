@@ -42,7 +42,6 @@ public class CoreWorkBench {
 	public static void main(String[] args) throws Exception {
 		
 		EMail email = MailUtil.messageToMail(new File("src/test/resources/email2022-00398.eml"), true);
-		System.out.println(email.getAttachmentsCount());
 		
 //		String[] timezones = TimeZone.getAvailableIDs();
 //		for (String timezone : timezones) {
