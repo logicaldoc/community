@@ -60,7 +60,7 @@ public class LockManager {
 		Date ldDate = cal.getTime();
 		while (new Date().before(ldDate)) {
 			if (getInternal(lockName, transactionId)) {
-				log.debug("Acquired lock " + lockName);
+				log.debug("Acquired lock {}", lockName);
 				return true;
 			} else
 				try {
@@ -69,7 +69,7 @@ public class LockManager {
 				}
 		}
 
-		log.warn("Unable to get lock " + lockName);
+		log.warn("Unable to get lock  {}", lockName);
 		return false;
 	}
 

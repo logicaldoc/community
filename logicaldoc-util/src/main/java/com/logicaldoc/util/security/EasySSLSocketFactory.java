@@ -5,44 +5,44 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.X509Certificate;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * An SSL socket factory that will let any certifacte past, even if it's expired
- * or not singed by a root CA.
+ * An SSL socket factory that will let any certifacte pass, even if it's expired
+ * or not singed by a root CA, unless the environment variable
+ * <code>ldoc.ssl.validate = true</code>
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1
  */
-public class DummySSLSocketFactory extends SSLSocketFactory {
+public class EasySSLSocketFactory extends SSLSocketFactory {
+	private static Logger log = LoggerFactory.getLogger(EasySSLSocketFactory.class);
 
 	private SSLSocketFactory factory;
 
-	public DummySSLSocketFactory() {
+	public EasySSLSocketFactory() {
 
 		try {
 			SSLContext sslcontent = SSLContext.getInstance("TLS");
 			sslcontent.init(null, // KeyManager not required
-					new TrustManager[] { new DummyTrustManager() }, new java.security.SecureRandom());
+					new TrustManager[] { new EasyX509TrustManager() }, new java.security.SecureRandom());
 			factory = sslcontent.getSocketFactory();
 		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+			log.debug(e.getMessage());
 		} catch (KeyManagementException e) {
-			e.printStackTrace();
+			log.debug(e.getMessage());
 		}
 	}
 
 	public static SocketFactory getDefault() {
-		return new DummySSLSocketFactory();
+		return new EasySSLSocketFactory();
 	}
 
 	public Socket createSocket(Socket socket, String s, int i, boolean flag) throws IOException {
@@ -71,39 +71,5 @@ public class DummySSLSocketFactory extends SSLSocketFactory {
 
 	public String[] getSupportedCipherSuites() {
 		return factory.getSupportedCipherSuites();
-	}
-}
-
-/**
- * Trust manager which accepts certificates without any validation except date
- * validation.
- */
-class DummyTrustManager implements X509TrustManager {
-
-	public boolean isClientTrusted(X509Certificate[] cert) {
-		return true;
-	}
-
-	public boolean isServerTrusted(X509Certificate[] cert) {
-		try {
-			cert[0].checkValidity();
-			return true;
-		} catch (CertificateExpiredException e) {
-			return false;
-		} catch (CertificateNotYetValidException e) {
-			return false;
-		}
-	}
-
-	public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-		// Do nothing for now.
-	}
-
-	public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-		// Do nothing for now.
-	}
-
-	public X509Certificate[] getAcceptedIssuers() {
-		return new X509Certificate[0];
 	}
 }

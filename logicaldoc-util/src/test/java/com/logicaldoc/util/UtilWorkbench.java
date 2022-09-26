@@ -1,6 +1,10 @@
 package com.logicaldoc.util;
 
-import com.logicaldoc.util.security.PasswordGenerator;
+import java.security.KeyStore;
+
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
 
 public class UtilWorkbench {
 
@@ -9,12 +13,21 @@ public class UtilWorkbench {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		
-		for (int i=0; i<100; i++) {
-			System.out.println(PasswordGenerator.generate(8, 2, 2, 1, 1, 3, 2));
+
+		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		tmf.init((KeyStore) null);
+
+		X509TrustManager trm = null;
+
+		for (TrustManager tm : tmf.getTrustManagers()) {
+			if (tm instanceof X509TrustManager) {
+				trm = (X509TrustManager) tm;
+				break;
+			}
 		}
-		
-		
+
+		System.out.println("trm: "+trm);
+
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);
 //		context.setProperty("gui.welcome", "מגיע להופעה בישראל ואתם נהנים מהטבה ייחודית");

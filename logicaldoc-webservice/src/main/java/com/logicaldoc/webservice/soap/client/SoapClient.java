@@ -11,7 +11,7 @@ import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
-import com.logicaldoc.util.http.EasyX509TrustManager;
+import com.logicaldoc.util.security.EasyX509TrustManager;
 
 /**
  * Parent for all SOAP clients
