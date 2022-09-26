@@ -28,7 +28,7 @@
 			<AppenderRef ref="file" />
 		</Logger>
 		<Root level="info">
-			<AppenderRef ref="file" />
+			<!-- AppenderRef ref="file" / -->
 			<AppenderRef ref="console" />
 		</Root>
 	</Loggers>
