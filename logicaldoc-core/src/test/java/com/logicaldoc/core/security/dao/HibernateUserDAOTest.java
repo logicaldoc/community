@@ -16,6 +16,7 @@ import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.UserEvent;
 import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.WorkingTime;
+import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 
@@ -263,12 +264,12 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		dao.initialize(user);
 		Assert.assertEquals(0, user.getPasswordExpired());
 		Assert.assertEquals(0, user.getPasswordExpires());
-		user.setDecodedPassword("3$(a8BcX$7GAA%K");
+		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
 		
 		try {
 			dao.store(user);
 			Assert.fail("an exception should have been raised at this point");
-		} catch (PersistenceException e) {
+		} catch (PasswordAlreadyUsedException e) {
 		}
 
 		user = dao.findById(1L);
@@ -281,7 +282,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		user = dao.findById(1L);
 
 		PasswordHistoryDAO pDao = (PasswordHistoryDAO) Context.get().getBean(PasswordHistoryDAO.class);
-		Assert.assertEquals(7, pDao.findByUserId(user.getId(), null).size());
+		Assert.assertEquals(6, pDao.findByUserId(user.getId(), null).size());
 	}
 
 	@Test
