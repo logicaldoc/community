@@ -262,7 +262,8 @@ public class FormatConverterManager {
 				transaction.setComment("format: " + FileUtil.getExtension(out.getName()));
 				DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				try {
-					dao.saveDocumentHistory(document, transaction);
+					dao.initialize(document);
+					dao.store(document, transaction);
 				} catch (PersistenceException e) {
 					log.warn(e.getMessage(), e);
 				}
