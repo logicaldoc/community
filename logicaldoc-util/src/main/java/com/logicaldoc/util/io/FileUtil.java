@@ -342,11 +342,25 @@ public class FileUtil {
 	 * 
 	 * @param fileName name of the file
 	 * 
-	 * @return the sum of the sizes of all contained files expressed in bytes
+	 * @return the extension
 	 */
 	public static String getExtension(String fileName) {
 		if (fileName != null && fileName.contains(".")) {
 			return fileName.substring(fileName.lastIndexOf('.') + 1);
+		} else
+			return "";
+	}
+
+	/**
+	 * Gets the file base name
+	 * 
+	 * @param fileName name of the file
+	 * 
+	 * @return the base name
+	 */
+	public static String getBaseName(String fileName) {
+		if (fileName != null && fileName.contains(".")) {
+			return fileName.substring(0, fileName.indexOf('.'));
 		} else
 			return "";
 	}
@@ -553,12 +567,12 @@ public class FileUtil {
 	 * @throws IOException raised in case of error
 	 */
 	public static void copy(File input, File output, long offset) throws IOException {
-		
+
 		RandomAccessFile inputRa = null;
 		RandomAccessFile outputRa = null;
 		FileChannel sourceChannel = null;
 		FileChannel targetChannel = null;
-		
+
 		try {
 			inputRa = new RandomAccessFile(input, "r");
 			outputRa = new RandomAccessFile(output, "rw");
@@ -567,24 +581,28 @@ public class FileUtil {
 			targetChannel.transferFrom(sourceChannel, offset, input.length());
 		} finally {
 			try {
-				if (sourceChannel != null) sourceChannel.close();
+				if (sourceChannel != null)
+					sourceChannel.close();
 			} catch (Throwable e) {
 			}
 
 			try {
-				if (inputRa != null) inputRa.close();
-			} catch (Throwable e) {
-			}
-			
-			try {
-				if (targetChannel != null) targetChannel.close();
+				if (inputRa != null)
+					inputRa.close();
 			} catch (Throwable e) {
 			}
 
 			try {
-				if (outputRa != null) outputRa.close();
+				if (targetChannel != null)
+					targetChannel.close();
 			} catch (Throwable e) {
-			}			
+			}
+
+			try {
+				if (outputRa != null)
+					outputRa.close();
+			} catch (Throwable e) {
+			}
 		}
 	}
 
@@ -624,7 +642,7 @@ public class FileUtil {
 	}
 
 	public static void replaceInFile(String sourcePath, String token, String newValue) throws Exception {
-		
+
 		BufferedReader reader = null;
 		OutputStreamWriter writer = null;
 		String oldContent = "";
@@ -655,8 +673,10 @@ public class FileUtil {
 		} finally {
 			try {
 				// Closing the resources
-				if (reader != null) reader.close();
-				if (writer != null) writer.close();
+				if (reader != null)
+					reader.close();
+				if (writer != null)
+					writer.close();
 			} catch (IOException e) {
 				log.error(e.getMessage(), e);
 			}

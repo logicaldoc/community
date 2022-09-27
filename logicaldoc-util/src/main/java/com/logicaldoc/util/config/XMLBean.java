@@ -9,16 +9,20 @@ import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.jdom.xpath.XPath;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPathExpression;
+import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,10 +130,28 @@ public class XMLBean {
 	 * @return the found element
 	 */
 	public Element findElement(String xpathExpression) {
+		return findElement(xpathExpression, null);
+	}
+
+	/**
+	 * Finds an element using an XPATH expression
+	 * 
+	 * @param xpathExpression the expression to evaluate
+	 * @param namespaces map of namespaces as declared into the XML document
+	 * 
+	 * @return the found element
+	 */
+	public Element findElement(String xpathExpression, Map<String, String> namespaces) {
 		try {
-			XPath xpath = XPath.newInstance(xpathExpression);
-			return (Element) xpath.selectSingleNode(doc);
-		} catch (JDOMException e) {
+			XPathFactory xpath = XPathFactory.instance();
+			XPathExpression<Element> expr = null;
+			if (namespaces == null || namespaces.isEmpty())
+				expr = xpath.compile(xpathExpression, Filters.element());
+			else
+				expr = xpath.compile(xpathExpression, Filters.element(), null, namespaces.keySet().stream()
+						.map(key -> Namespace.getNamespace(key, namespaces.get(key))).collect(Collectors.toList()));
+			return expr.evaluateFirst(doc);
+		} catch (Throwable e) {
 			log.error(e.getMessage());
 		}
 		return null;
@@ -160,7 +182,6 @@ public class XMLBean {
 	}
 
 	private List<Element> getChildren(Element elem, String name) {
-		@SuppressWarnings("unchecked")
 		List<Element> list = (List<Element>) elem.getChildren(name, elem.getNamespace());
 		if (list == null || list.isEmpty())
 			list = elem.getChildren(name);

@@ -109,8 +109,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>jdom</groupId>
-			<artifactId>jdom</artifactId>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

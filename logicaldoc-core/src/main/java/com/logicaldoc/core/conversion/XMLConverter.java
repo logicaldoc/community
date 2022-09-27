@@ -22,17 +22,16 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jdom.Element;
-import org.jdom.ProcessingInstruction;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Content;
+import org.jdom2.Element;
+import org.jdom2.ProcessingInstruction;
+import org.jdom2.input.SAXBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -49,7 +48,7 @@ public class XMLConverter extends AbstractFormatConverter {
 	protected static Logger log = LoggerFactory.getLogger(XMLConverter.class);
 
 	@Override
-	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
+	public void internalConvert(String sid, com.logicaldoc.core.document.Document document, File src, File dest) throws IOException {
 		String destExt = FileUtil.getExtension(dest.getName()).toLowerCase();
 		File xslt = null;
 		File xml = null;
@@ -61,8 +60,8 @@ public class XMLConverter extends AbstractFormatConverter {
 
 			// Parse the XML searching for a stylesheet
 			SAXBuilder saxBuilder = new SAXBuilder();
-			org.jdom.Document doc = saxBuilder.build(xml);
-			List<Object> contents = doc.getContent();
+			org.jdom2.Document doc = saxBuilder.build(xml);
+			List<Content> contents = doc.getContent();
 
 			boolean containsStyleReference = false;
 			for (Object content : contents) {
@@ -75,7 +74,7 @@ public class XMLConverter extends AbstractFormatConverter {
 						// format
 						try {
 							FileUtils.copyURLToFile(new URL(pi.getPseudoAttributeValue("href")), xslt);
-							org.jdom.Document xsltDoc = saxBuilder.build(xslt);
+							org.jdom2.Document xsltDoc = saxBuilder.build(xslt);
 							Element root = xsltDoc.getRootElement();
 							Element outputElem = root.getChild("output", root.getNamespace());
 							if (outputElem != null)

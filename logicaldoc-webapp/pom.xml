@@ -86,14 +86,14 @@
 			<groupId>commons-el</groupId>
 			<artifactId>commons-el</artifactId>
 		</dependency>
-		<dependency>
+		<!-- dependency>
 			<groupId>commons-discovery</groupId>
 			<artifactId>commons-discovery</artifactId>
-		</dependency>
-		<dependency>
+		</dependency -->
+		<!-- dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
-		</dependency>
+		</dependency -->
 		<!--  >dependency>
 			<groupId>taglibs</groupId>
 			<artifactId>standard</artifactId>
@@ -159,8 +159,8 @@
 			<artifactId>xercesImpl</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>jdom</groupId>
-			<artifactId>jdom</artifactId>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>torque</groupId>
@@ -437,7 +437,17 @@
 			<groupId>org.apache.calcite</groupId>
 			<artifactId>calcite-core</artifactId>
 			<scope>test</scope>
-		</dependency>			
+		</dependency>		
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-css</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-util</artifactId>
+            <scope>provided</scope>
+        </dependency>			
 <!-- dependency>
   <groupId>com.microsoft.graph</groupId>
   <artifactId>microsoft-graph</artifactId>

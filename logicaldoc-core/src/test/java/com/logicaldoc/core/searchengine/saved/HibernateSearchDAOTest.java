@@ -126,6 +126,6 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 		SavedSearch saved = new SavedSearch();
 		saved.setName("ואתם נהנים מהטבה ייחודית");
 		saved.saveOptions(opt);
-		String xml = saved.getOptions();	
+		saved.getOptions();	
 	}
 }

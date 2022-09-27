@@ -1,6 +1,9 @@
 package com.logicaldoc.util.config;
 
-import org.jdom.Element;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.jdom2.Element;
 
 /**
  * Configurator class for spring's context-security setup.
@@ -47,6 +50,8 @@ public class SecurityConfigurator {
 	}
 
 	private Element getContentSecurityPolicyElement() {
-		return xml.findElement("//security:header[@name='Content-Security-Policy']");
+		Map<String, String> namespaces=new HashMap<String, String>();
+		namespaces.put("security", "http://www.springframework.org/schema/security");
+		return xml.findElement("//security:header[@name='Content-Security-Policy']", namespaces);
 	}
 }

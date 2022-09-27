@@ -7,8 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.jdom.CDATA;
-import org.jdom.Element;
+import org.jdom2.CDATA;
+import org.jdom2.Element;
 
 /**
  * Utility class for manipulating log4j.xml file

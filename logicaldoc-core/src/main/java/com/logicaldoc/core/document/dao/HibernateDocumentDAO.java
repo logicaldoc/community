@@ -485,7 +485,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		String baseName = doc.getFileName();
 		String ext = "";
 		if (doc.getFileName().indexOf(".") != -1) {
-			baseName = FilenameUtils.getBaseName(doc.getFileName());
+			baseName = FileUtil.getBaseName(doc.getFileName());
 			ext = "." + FileUtil.getExtension(doc.getFileName());
 		}
 

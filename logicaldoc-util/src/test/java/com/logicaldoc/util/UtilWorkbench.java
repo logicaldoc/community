@@ -1,11 +1,5 @@
 package com.logicaldoc.util;
 
-import java.security.KeyStore;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-
 public class UtilWorkbench {
 
 	/**
@@ -14,19 +8,7 @@ public class UtilWorkbench {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		tmf.init((KeyStore) null);
 
-		X509TrustManager trm = null;
-
-		for (TrustManager tm : tmf.getTrustManagers()) {
-			if (tm instanceof X509TrustManager) {
-				trm = (X509TrustManager) tm;
-				break;
-			}
-		}
-
-		System.out.println("trm: "+trm);
 
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);

@@ -3,7 +3,7 @@ package com.logicaldoc.util.cache;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jdom.Element;
+import org.jdom2.Element;
 
 import com.logicaldoc.util.config.XMLBean;
 
