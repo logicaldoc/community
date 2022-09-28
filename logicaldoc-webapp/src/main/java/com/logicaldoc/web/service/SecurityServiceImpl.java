@@ -81,7 +81,6 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.SecurityConfigurator;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.crypt.CryptUtil;
-import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.security.PasswordGenerator;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.web.UploadServlet;
@@ -1537,26 +1536,17 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 	public void saveAvatar(long userId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
-
-		File file = null;
+		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		File file = uploadedFilesMap.values().iterator().next();
 		try {
-			for (String fileId : uploadedFilesMap.keySet())
-				if (fileId.startsWith("LDOC_AVATAR")) {
-					file = uploadedFilesMap.get(fileId);
-					break;
-				}
-
-			if (file != null) {
-				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-				User user = userDao.findById(userId);
-				if (user != null)
-					UserUtil.saveAvatar(user, file);
-			}
+			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			User user = userDao.findById(userId);
+			if (user != null)
+				UserUtil.saveAvatar(user, file);
 		} catch (Throwable e) {
 			log.error("Unable to store the avatar", e);
 		} finally {
-			FileUtil.strongDelete(file);
+			UploadServlet.cleanReceivedFiles(session.getSid());
 		}
 	}
 

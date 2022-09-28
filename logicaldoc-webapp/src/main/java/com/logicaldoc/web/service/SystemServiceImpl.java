@@ -1067,7 +1067,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			if (!session.getUser().isMemberOf("admin") || session.getTenantId() != Tenant.DEFAULT_ID)
 				throw new AccessDeniedException();
 
-			Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), null);
+			Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 
 			if (uploadedFilesMap != null && uploadedFilesMap.size() > 0) {
 				File pluginPackage = uploadedFilesMap.values().iterator().next();
@@ -1147,6 +1147,8 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 				throw new Exception("File not found");
 		} catch (Throwable e) {
 			ServiceUtil.throwServerException(session, log, e);
+		} finally {
+			UploadServlet.cleanReceivedFiles(session.getSid());
 		}
 	}
 

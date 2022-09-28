@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
 import com.smartgwt.client.types.Alignment;
@@ -23,9 +24,9 @@ import com.smartgwt.client.widgets.form.fields.TextAreaItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
+//import gwtupload.client.IUploadStatus.Status;
+//import gwtupload.client.IUploader;
+//import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload / edit an OCR template
@@ -35,7 +36,7 @@ import gwtupload.client.MultiUploader;
  */
 public class ZonalOCRTemplateSettings extends Window {
 
-	private MultiUploader uploader;
+	private Upload uploader;
 
 	private ValuesManager vm;
 
@@ -65,17 +66,6 @@ public class ZonalOCRTemplateSettings extends Window {
 			}
 		});
 
-		uploader = new MultiUploader();
-		uploader.setMaximumFiles(1);
-		uploader.setStyleName("upload");
-		uploader.setFileInputPrefix("ZONALOCR");
-		uploader.setWidth("400px");
-		uploader.reset();
-		uploader.setHeight("40px");
-		uploader.setTitle(I18N.message("sample"));
-		uploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-		uploader.addOnStartUploadHandler(onStartUploaderHandler);
-
 		prepareForm();
 
 		VLayout layout = new VLayout();
@@ -83,6 +73,8 @@ public class ZonalOCRTemplateSettings extends Window {
 		layout.setWidth100();
 
 		layout.addMember(form);
+
+		uploader = new Upload(save);
 		layout.addMember(uploader);
 		layout.addMember(save);
 
@@ -156,7 +148,7 @@ public class ZonalOCRTemplateSettings extends Window {
 	}
 
 	public void onSave() {
-		if (ocrPanel.getSelectedOcrTemplate().getId() == 0L && uploader.getSuccessUploads() <= 0) {
+		if (ocrPanel.getSelectedOcrTemplate().getId() == 0L && uploader.getUploadedFiles().isEmpty()) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}
@@ -186,17 +178,17 @@ public class ZonalOCRTemplateSettings extends Window {
 		});
 	}
 
-	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-		public void onFinish(IUploader uploader) {
-			if (uploader.getStatus() == Status.SUCCESS) {
-				save.setDisabled(false);
-			}
-		}
-	};
-
-	private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-		public void onStart(IUploader uploader) {
-			save.setDisabled(true);
-		}
-	};
+//	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
+//		public void onFinish(IUploader uploader) {
+//			if (uploader.getStatus() == Status.SUCCESS) {
+//				save.setDisabled(false);
+//			}
+//		}
+//	};
+//
+//	private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
+//		public void onStart(IUploader uploader) {
+//			save.setDisabled(true);
+//		}
+//	};
 }

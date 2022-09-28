@@ -24,10 +24,6 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 /**
  * Displays an Avatar
  * 
@@ -109,7 +105,7 @@ public class Avatar extends HLayout {
 
 		private IButton saveButton;
 
-		private MultiUploader multiUploader;
+		private Upload uploader;
 
 		private long userId;
 
@@ -118,24 +114,12 @@ public class Avatar extends HLayout {
 
 			setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 			setTitle(I18N.message("uploadavatar"));
-			setWidth(460);
-			setHeight(170);
 			setCanDragResize(true);
 			setIsModal(true);
 			setShowModalMask(true);
 			centerInPage();
-
-			// Create a new uploader panel and attach it to the window
-			multiUploader = new MultiUploader();
-			multiUploader.addOnStartUploadHandler(onStartUploaderHandler);
-			multiUploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-			multiUploader.setStyleName("upload");
-			multiUploader.setWidth("400px");
-			multiUploader.setHeight("50px");
-			multiUploader.setFileInputPrefix("LDOC_AVATAR");
-			multiUploader.reset();
-			multiUploader.setMaximumFiles(1);
-			multiUploader.setValidExtensions("png", "jpg", "jpeg", "gif");
+			setMinWidth(300);
+			setAutoSize(true);
 
 			saveButton = new IButton(I18N.message("save"));
 			saveButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
@@ -149,13 +133,17 @@ public class Avatar extends HLayout {
 			Label hint = new Label(I18N.message("avatarhint", Session.get().getConfig("gui.avatar.size"),
 					Session.get().getConfig("gui.avatar.size")));
 			hint.setHeight(20);
+			hint.setWrap(false);
 
 			VLayout layout = new VLayout();
 			layout.setMembersMargin(5);
 			layout.setMargin(2);
 
 			layout.addMember(hint);
-			layout.addMember(multiUploader);
+
+			uploader = new Upload(saveButton);
+			uploader.setFileTypes("*.png,*.jpg,*.jpeg,*.gif");
+			layout.addMember(uploader);
 			layout.addMember(saveButton);
 
 			addCloseClickHandler(new CloseClickHandler() {
@@ -179,21 +167,8 @@ public class Avatar extends HLayout {
 			addItem(layout);
 		}
 
-		private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-			public void onFinish(IUploader uploader) {
-				if (uploader.getStatus() == Status.SUCCESS && multiUploader.getSuccessUploads() > 0)
-					saveButton.setDisabled(false);
-			}
-		};
-
-		private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-			public void onStart(IUploader uploader) {
-				saveButton.setDisabled(true);
-			}
-		};
-
 		public void onSave() {
-			if (multiUploader.getSuccessUploads() <= 0) {
+			if (uploader.getUploadedFiles().isEmpty()) {
 				SC.warn(I18N.message("filerequired"));
 				return;
 			}

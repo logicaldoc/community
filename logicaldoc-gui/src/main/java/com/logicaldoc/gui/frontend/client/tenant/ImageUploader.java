@@ -3,24 +3,19 @@ package com.logicaldoc.gui.frontend.client.tenant;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.TenantService;
 import com.smartgwt.client.types.HeaderControls;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
-
-import gwtupload.client.IFileInput.FileInputType;
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload new branding images
@@ -32,7 +27,7 @@ public class ImageUploader extends Window {
 
 	private IButton uploadButton;
 
-	private MultiUploader multiUploader;
+	private Upload uploader;
 
 	private Label customExternalDropZone;
 
@@ -43,8 +38,7 @@ public class ImageUploader extends Window {
 	public ImageUploader(String imageName, TenantBrandingPanel panel) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("uploadnewimage"));
-		setWidth(460);
-		setHeight(200);
+		setMinWidth(460);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -61,14 +55,6 @@ public class ImageUploader extends Window {
 		customExternalDropZone.getElement().getStyle().setBorderStyle(BorderStyle.DASHED);
 		customExternalDropZone.getElement().getStyle().setBorderWidth(1, Unit.PX);
 		customExternalDropZone.getElement().getStyle().setPadding(10, Unit.PX);
-		multiUploader = new MultiUploader(FileInputType.CUSTOM.with(
-				(Widget) new Button(I18N.message("clickmeordropfiles"))).withZone(customExternalDropZone));
-		multiUploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-		multiUploader.addOnStartUploadHandler(onStartUploaderHandler);
-		multiUploader.setFileInputPrefix("BIMG");
-		multiUploader.setMaximumFiles(1);
-		multiUploader.setValidExtensions(".png", ".PNG");
-		multiUploader.reset();
 
 		uploadButton = new IButton(I18N.message("upload"));
 		uploadButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
@@ -85,7 +71,10 @@ public class ImageUploader extends Window {
 		layout.setWidth100();
 
 		layout.addMember(customExternalDropZone);
-		layout.addMember(multiUploader);
+
+		uploader = new Upload(uploadButton);
+		uploader.setFileTypes("*.png");
+		layout.addMember(uploader);
 		layout.addMember(uploadButton);
 
 		// Clean the upload folder if the window is closed
@@ -121,21 +110,12 @@ public class ImageUploader extends Window {
 		});
 	}
 
-	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-		public void onFinish(IUploader uploader) {
-			if (uploader.getStatus() == Status.SUCCESS || multiUploader.getSuccessUploads() > 0) {
-				uploadButton.setDisabled(false);
-			}
-		}
-	};
-
-	private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-		public void onStart(IUploader uploader) {
-			uploadButton.setDisabled(true);
-		}
-	};
-
 	public void onUpload() {
+		if (uploader.getUploadedFiles().isEmpty()) {
+			SC.warn(I18N.message("filerequired"));
+			return;
+		}
+
 		TenantService.Instance.get().encodeBrandingImage(new AsyncCallback<String>() {
 
 			@Override

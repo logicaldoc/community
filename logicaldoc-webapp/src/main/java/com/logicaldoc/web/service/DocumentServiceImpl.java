@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.file.Files;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -205,7 +204,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		try {
 			List<GUIDocument> createdDocs = new ArrayList<GUIDocument>();
-			HttpServletRequest servletRequest = getThreadLocalRequest();
+//			HttpServletRequest servletRequest = getThreadLocalRequest();
 
 			Runnable runnable = new Runnable() {
 
@@ -213,12 +212,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				public void run() {
 					List<Document> docs = new ArrayList<Document>();
 
-					Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(servletRequest,
-							session.getSid());
+//					Map<String, File> uploadedFilesMap = GWTUploadServlet.getReceivedFiles(servletRequest,
+//							session.getSid());
+					Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 					log.debug("Uploading {} files", uploadedFilesMap.size());
 
-					Map<String, String> uploadedFileNames = UploadServlet.getReceivedFileNames(servletRequest,
-							session.getSid());
+//					Map<String, String> uploadedFileNames = GWTUploadServlet.getReceivedFileNames(servletRequest,
+//							session.getSid());
 
 					DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
@@ -238,110 +238,78 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 						throw new RuntimeException("The user doesn't have the write permission on the current folder");
 
 					List<Long> docsToIndex = new ArrayList<Long>();
-
-					/*
-					 * Move the documents in a safe temporary folder
-					 */
-					Map<File, String> files = new HashMap<File, String>();
-
-					File tempDir = null;
-					try {
-						tempDir = Files.createTempDirectory("upload").toFile();
-					} catch (IOException e) {
-						log.error("Cannot create temporary folder", e);
-						throw new RuntimeException(e.getMessage(), e);
-					}
-
-					for (String fileId : uploadedFilesMap.keySet()) {
-						final File file = uploadedFilesMap.get(fileId);
-						final String filename = uploadedFileNames.get(fileId);
-
-						File safeFile = new File(tempDir, file.getName());
+					for (String filename : uploadedFilesMap.keySet()) {
+						final File file = uploadedFilesMap.get(filename);
 						try {
-							FileUtils.moveFile(file, safeFile);
-							files.put(safeFile, filename);
-						} catch (IOException e) {
-							log.error("Cannot move file {} to {}", file.getAbsolutePath(), tempDir.getAbsolutePath());
-						}
-					}
+							if (filename.toLowerCase().endsWith(".zip") && importZip) {
+								log.debug("zip file = {}", file);
 
-					try {
-						for (File file : files.keySet()) {
-							try {
-								final String filename = files.get(file);
+								// copy the zip into a temporary file
+								final File tempZip = File.createTempFile("upload-", ".zip");
+								FileUtils.copyFile(file, tempZip);
 
-								if (filename.endsWith(".zip") && importZip) {
-									log.debug("zip file = {}", file);
+								final long userId = session.getUserId();
+								final String sessionId = session.getSid();
+								// Prepare the import thread
+								Thread zipImporter = new Thread(new Runnable() {
+									public void run() {
+										/*
+										 * Prepare the Master document used to
+										 * create the new one
+										 */
+										try {
+											Document doc = toDocument(metadata);
+											doc.setTenantId(session.getTenantId());
+											doc.setCreation(new Date());
 
-									// copy the zip into a temporary file
-									final File tempZip = File.createTempFile("upload-", ".zip");
-									FileUtils.copyFile(file, tempZip);
-
-									final long userId = session.getUserId();
-									final String sessionId = session.getSid();
-									// Prepare the import thread
-									Thread zipImporter = new Thread(new Runnable() {
-										public void run() {
-											/*
-											 * Prepare the Master document used
-											 * to create the new one
-											 */
-											try {
-												Document doc = toDocument(metadata);
-												doc.setTenantId(session.getTenantId());
-												doc.setCreation(new Date());
-
-												InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
-												importer.process(tempZip, parent, userId, sessionId);
-											} catch (Throwable e) {
-												log.error("Unable to delete temporary file {}",
-														tempZip.getAbsolutePath(), e);
-											} finally {
-												FileUtil.strongDelete(tempZip);
-											}
+											InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
+											importer.process(tempZip, parent, userId, sessionId);
+										} catch (Throwable e) {
+											log.error("Unable to delete temporary file {}", tempZip.getAbsolutePath(),
+													e);
+										} finally {
+											FileUtil.strongDelete(tempZip);
 										}
-									});
+									}
+								});
 
-									// And launch it
-									zipImporter.start();
-								} else {
-									// Create the document history event
-									DocumentHistory transaction = new DocumentHistory();
-									transaction.setSession(session);
-									transaction.setEvent(DocumentEvent.STORED.toString());
-									transaction.setComment(metadata.getComment());
+								// And launch it
+								zipImporter.start();
+							} else {
+								// Create the document history event
+								DocumentHistory transaction = new DocumentHistory();
+								transaction.setSession(session);
+								transaction.setEvent(DocumentEvent.STORED.toString());
+								transaction.setComment(metadata.getComment());
 
-									/*
-									 * Prepare the Master document used to
-									 * create the new one
-									 */
-									Document doc = toDocument(metadata);
-									doc.setTenantId(session.getTenantId());
-									doc.setCreation(new Date());
-									doc.setFileName(filename);
+								/*
+								 * Prepare the Master document used to create
+								 * the new one
+								 */
+								Document doc = toDocument(metadata);
+								doc.setTenantId(session.getTenantId());
+								doc.setCreation(new Date());
+								doc.setFileName(filename);
 
-									// Create the new document
-									doc = documentManager.create(file, doc, transaction);
+								// Create the new document
+								doc = documentManager.create(file, doc, transaction);
 
-									if (immediateIndexing && doc.getIndexed() == Document.INDEX_TO_INDEX)
-										docsToIndex.add(doc.getId());
+								if (immediateIndexing && doc.getIndexed() == Document.INDEX_TO_INDEX)
+									docsToIndex.add(doc.getId());
 
-									createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
-									docs.add(doc);
-								}
-							} catch (Throwable t) {
-								throw new RuntimeException(t.getMessage(), t);
-							} finally {
-								FileUtil.strongDelete(file);
+								createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
+								docs.add(doc);
 							}
+						} catch (Throwable t) {
+							throw new RuntimeException(t.getMessage(), t);
+						} finally {
+							FileUtil.strongDelete(file);
 						}
-					} finally {
-						FileUtil.strongDelete(tempDir);
 					}
 
 					try {
 						for (String uploadedEntry : uploadedFilesMap.keySet())
-							UploadServlet.cleanReceivedFile(servletRequest.getSession(), uploadedEntry);
+							FileUtil.strongDelete(uploadedFilesMap.get(uploadedEntry));
 					} catch (Throwable t) {
 
 					}
@@ -443,14 +411,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	public GUIDocument checkin(GUIDocument document, boolean major) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
+		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
-		if (file != null) {
-			// check that we have a valid file for storing as new version
-			Map<String, String> uploadedFileNames = UploadServlet.getReceivedFileNames(getThreadLocalRequest(),
-					session.getSid());
-			String fileName = uploadedFileNames.values().iterator().next();
+		String fileName = uploadedFilesMap.keySet().iterator().next();
 
+		if (file != null) {
 			log.debug("Checking in file {}", fileName);
 
 			try {
@@ -469,10 +434,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				// something goes wrong
 				DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 				try (FileInputStream fis = new FileInputStream(file)) {
-					documentManager.checkin(doc.getId(), fis, fileName, major, toDocument(document),
-							transaction);
+					documentManager.checkin(doc.getId(), fis, fileName, major, toDocument(document), transaction);
 				}
-				UploadServlet.cleanReceivedFiles(getThreadLocalRequest().getSession());
+				UploadServlet.cleanReceivedFiles(session.getSid());
 				GUIDocument checkedInDocument = getById(doc.getId());
 
 				/*
@@ -2523,7 +2487,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	public void replaceFile(long docId, String fileVersion, String comment) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
+		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
 		if (file != null) {
 			try {
@@ -2548,7 +2512,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 				manager.replaceFile(doc.getId(), fileVersion, file, transaction);
 
-				UploadServlet.cleanReceivedFiles(getThreadLocalRequest().getSession());
+				UploadServlet.cleanReceivedFiles(session.getSid());
 			} catch (Throwable t) {
 				ServiceUtil.throwServerException(session, log, t);
 			}

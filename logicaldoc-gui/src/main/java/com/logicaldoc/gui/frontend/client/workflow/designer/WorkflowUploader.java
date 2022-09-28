@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.workflow.designer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
 import com.smartgwt.client.types.HeaderControls;
@@ -10,10 +11,6 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.layout.VLayout;
-
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload a new workflow schema to the server.
@@ -23,7 +20,7 @@ import gwtupload.client.MultiUploader;
  */
 public class WorkflowUploader extends Window {
 
-	private MultiUploader uploader;
+	private Upload uploader;
 
 	private IButton sendButton;
 
@@ -44,19 +41,6 @@ public class WorkflowUploader extends Window {
 		layout.setMembersMargin(2);
 		layout.setMargin(2);
 
-		// Create a new uploader panel and attach it to the window
-		uploader = new MultiUploader();
-		uploader.setMaximumFiles(1);
-		uploader.setStyleName("upload");
-		uploader.setFileInputPrefix("LDOC");
-		uploader.setWidth("400px");
-		uploader.reset();
-		uploader.setHeight("40px");
-
-		// Add a finish handler which will load the image once the upload
-		// finishes
-		uploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-
 		sendButton = new IButton(I18N.message("send"));
 		sendButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
@@ -66,23 +50,14 @@ public class WorkflowUploader extends Window {
 			}
 		});
 
+		uploader = new Upload(sendButton);
 		layout.addMember(uploader);
 		layout.addMember(sendButton);
 		addItem(layout);
 	}
 
-	// Load the image in the document and in the case of success attach it to
-	// the viewer
-	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-		public void onFinish(IUploader uploader) {
-			if (uploader.getStatus() == Status.SUCCESS) {
-				sendButton.setDisabled(false);
-			}
-		}
-	};
-
 	public void onSend() {
-		if (uploader.getSuccessUploads() <= 0) {
+		if (uploader.getUploadedFiles().isEmpty()) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

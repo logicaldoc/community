@@ -14,21 +14,7 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>/WEB-INF/classes/context.xml</param-value>
   </context-param>
-  <context-param>
-    <!-- Useful in development mode to slow down the uploads in fast networks. Put the number of milliseconds to sleep in each block received in the server. false or 0, means don't use slow uploads -->
-    <param-name>slowUploads</param-name>
-    <param-value>0</param-value>
-  </context-param>
-  <context-param>
-    <!-- Timeout used when uploading files (milliseconds) -->
-    <param-name>noDataTimeout</param-name>
-    <param-value>60000</param-value>
-  </context-param>
-  <context-param>
-    <!-- This is for the CORS checks of the GWT upload servlet -->
-    <param-name>corsDomainsRegex</param-name>
-    <param-value>.*</param-value>
-  </context-param>  
+  
   <session-config>
     <session-timeout>30</session-timeout>
     <tracking-mode>COOKIE</tracking-mode>
@@ -92,8 +78,7 @@
     <listener-class>org.apache.chemistry.opencmis.server.impl.CmisRepositoryContextListener</listener-class>
   </listener>
   <servlet>
-    <servlet-name>UploadServlet</servlet-name>
-    <!-- This is the default servlet, it puts files in session -->
+    <servlet-name>upload</servlet-name>
     <servlet-class>com.logicaldoc.web.UploadServlet</servlet-class>
   </servlet>
   <servlet>
@@ -474,8 +459,8 @@
     <url-pattern>/data/extensionaliases.xml</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>UploadServlet</servlet-name>
-    <url-pattern>*.gupld</url-pattern>
+    <servlet-name>upload</servlet-name>
+    <url-pattern>/upload</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>uploadresource</servlet-name>

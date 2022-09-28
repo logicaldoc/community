@@ -111,98 +111,92 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 			throws ServerException {
 		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
+		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		File file = uploadedFilesMap.values().iterator().next();
 
 		ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 
 		List<GUIContact> contacts = new ArrayList<GUIContact>();
 
 		try {
-			File file = null;
-			for (String fileId : uploadedFilesMap.keySet())
-				if (fileId.startsWith("LDOC_CNT")) {
-					file = uploadedFilesMap.get(fileId);
-					break;
-				}
+			CSVFileReader reader = null;
+			try {
+				reader = new CSVFileReader(file.getAbsolutePath(), separator.charAt(0), delimiter.charAt(0));
+				if (skipFirstRow)
+					reader.readFields();
 
-			if (file != null) {
-				CSVFileReader reader = null;
-				try {
-					reader = new CSVFileReader(file.getAbsolutePath(), separator.charAt(0), delimiter.charAt(0));
-					if (skipFirstRow)
-						reader.readFields();
+				Vector<String> fields = reader.readFields();
+				long i = 1;
+				while (fields != null) {
+					String emailStr = fields.get(email - 1);
 
-					Vector<String> fields = reader.readFields();
-					long i = 1;
-					while (fields != null) {
-						String emailStr = fields.get(email - 1);
-
-						// Skip rows without an email
-						if (StringUtils.isEmpty(emailStr)) {
-							fields = reader.readFields();
-							continue;
-						}
-
-						Contact contact = null;
-						List<Contact> cont = dao.findByUser(session.getUserId(), emailStr);
-						if (!cont.isEmpty())
-							contact = cont.get(0);
-						if (contact == null) {
-							contact = new Contact();
-							contact.setUserId(session.getUserId());
-							contact.setTenantId(session.getUser().getTenantId());
-						}
-
-						contact.setEmail(emailStr);
-
-						try {
-							contact.setFirstName(fields.get(firstName - 1));
-						} catch (Throwable e) {
-						}
-						try {
-							contact.setLastName(fields.get(lastName - 1));
-						} catch (Throwable e) {
-						}
-						try {
-							contact.setEmail(fields.get(email - 1));
-						} catch (Throwable e) {
-						}
-						try {
-							contact.setAddress(fields.get(address - 1));
-						} catch (Throwable e) {
-						}
-						try {
-							contact.setCompany(fields.get(company - 1));
-						} catch (Throwable e) {
-						}
-						try {
-							contact.setMobile(fields.get(mobile - 1));
-						} catch (Throwable e) {
-						}
-						try {
-							contact.setPhone(fields.get(phone - 1));
-						} catch (Throwable e) {
-						}
-
-						if (StringUtils.isEmpty(contact.getEmail()))
-							continue;
-
-						GUIContact guiContact = fromContact(contact);
-						guiContact.setId(i++);
-						contacts.add(guiContact);
-
-						if (!preview)
-							dao.store(contact);
-
+					// Skip rows without an email
+					if (StringUtils.isEmpty(emailStr)) {
 						fields = reader.readFields();
+						continue;
 					}
-					
-				} finally {
-					reader.close();
+
+					Contact contact = null;
+					List<Contact> cont = dao.findByUser(session.getUserId(), emailStr);
+					if (!cont.isEmpty())
+						contact = cont.get(0);
+					if (contact == null) {
+						contact = new Contact();
+						contact.setUserId(session.getUserId());
+						contact.setTenantId(session.getUser().getTenantId());
+					}
+
+					contact.setEmail(emailStr);
+
+					try {
+						contact.setFirstName(fields.get(firstName - 1));
+					} catch (Throwable e) {
+					}
+					try {
+						contact.setLastName(fields.get(lastName - 1));
+					} catch (Throwable e) {
+					}
+					try {
+						contact.setEmail(fields.get(email - 1));
+					} catch (Throwable e) {
+					}
+					try {
+						contact.setAddress(fields.get(address - 1));
+					} catch (Throwable e) {
+					}
+					try {
+						contact.setCompany(fields.get(company - 1));
+					} catch (Throwable e) {
+					}
+					try {
+						contact.setMobile(fields.get(mobile - 1));
+					} catch (Throwable e) {
+					}
+					try {
+						contact.setPhone(fields.get(phone - 1));
+					} catch (Throwable e) {
+					}
+
+					if (StringUtils.isEmpty(contact.getEmail()))
+						continue;
+
+					GUIContact guiContact = fromContact(contact);
+					guiContact.setId(i++);
+					contacts.add(guiContact);
+
+					if (!preview)
+						dao.store(contact);
+
+					fields = reader.readFields();
 				}
+
+			} finally {
+				reader.close();
 			}
 		} catch (Throwable e) {
 			log.error("Unable to parse contacs in CSV file", e);
+		} finally {
+			UploadServlet.cleanReceivedFiles(session.getSid());
 		}
 
 		return contacts.toArray(new GUIContact[0]);

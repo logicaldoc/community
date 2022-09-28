@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.metadata.stamp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.StampService;
 import com.smartgwt.client.types.HeaderControls;
@@ -13,9 +14,6 @@ import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
 
 /**
  * This popup window is used to upload a new stamp
@@ -27,7 +25,7 @@ public class StampUploader extends Window {
 
 	private IButton saveButton;
 
-	private MultiUploader multiUploader;
+	private Upload uploader;
 
 	private long stampId;
 
@@ -39,24 +37,12 @@ public class StampUploader extends Window {
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("uploadstamp"));
-		setWidth(460);
-		setHeight(150);
+		setMinWidth(460);
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
+		setAutoSize(true);
 		centerInPage();
-
-		// Create a new uploader panel and attach it to the window
-		multiUploader = new MultiUploader();
-		multiUploader.addOnStartUploadHandler(onStartUploaderHandler);
-		multiUploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-		multiUploader.setStyleName("upload");
-		multiUploader.setWidth("400px");
-		multiUploader.setHeight("50px");
-		multiUploader.setFileInputPrefix("LDOC");
-		multiUploader.reset();
-		multiUploader.setMaximumFiles(1);
-		multiUploader.setValidExtensions("png", "PNG");
 
 		saveButton = new IButton(I18N.message("save"));
 		saveButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
@@ -71,7 +57,9 @@ public class StampUploader extends Window {
 		layout.setMembersMargin(5);
 		layout.setMargin(2);
 
-		layout.addMember(multiUploader);
+		uploader=new Upload(saveButton);
+		uploader.setFileTypes("*.png");
+		layout.addMember(uploader);
 		layout.addMember(saveButton);
 
 		addCloseClickHandler(new CloseClickHandler() {
@@ -95,21 +83,8 @@ public class StampUploader extends Window {
 		addItem(layout);
 	}
 
-	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-		public void onFinish(IUploader uploader) {
-			if (uploader.getStatus() == Status.SUCCESS && multiUploader.getSuccessUploads() > 0)
-				saveButton.setDisabled(false);
-		}
-	};
-
-	private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-		public void onStart(IUploader uploader) {
-			saveButton.setDisabled(true);
-		}
-	};
-
 	public void onSave() {
-		if (multiUploader.getSuccessUploads() <= 0) {
+		if (uploader.getUploadedFiles().isEmpty()) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

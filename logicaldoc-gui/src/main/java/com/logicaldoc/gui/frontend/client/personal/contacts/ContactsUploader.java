@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.personal.contacts;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
+import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.HeaderControls;
 import com.smartgwt.client.util.SC;
@@ -11,10 +12,6 @@ import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 /**
  * This popup window is used to upload a new contacts file to the server.
  * 
@@ -24,7 +21,7 @@ import gwtupload.client.MultiUploader;
 public class ContactsUploader extends Window {
 	private SubmitItem sendButton;
 
-	private MultiUploader uploader;
+	private Upload uploader;
 
 	private ValuesManager vm;
 
@@ -57,34 +54,13 @@ public class ContactsUploader extends Window {
 
 		form.setItems(sendButton);
 
-		// Create a new uploader panel and attach it to the window
-		uploader = new MultiUploader();
-		uploader.setMaximumFiles(1);
-		uploader.setStyleName("upload");
-		uploader.setFileInputPrefix("LDOC_CNT");
-		uploader.setHeight("30px");
-		uploader.reset();
-
-		// Add a finish handler which will load the image once the upload
-		// finishes
-		uploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-
+		uploader = new Upload(sendButton);
 		addItem(uploader);
 		addItem(form);
 	}
 
-	// Load the image in the document and in the case of success attach it to
-	// the viewer
-	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-		public void onFinish(IUploader uploader) {
-			if (uploader.getStatus() == Status.SUCCESS) {
-				sendButton.setDisabled(false);
-			}
-		}
-	};
-
 	public void onSend() {
-		if (uploader.getSuccessUploads() <= 0) {
+		if (uploader.getUploadedFiles().isEmpty()) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

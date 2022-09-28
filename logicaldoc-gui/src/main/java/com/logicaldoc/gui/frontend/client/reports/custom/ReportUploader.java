@@ -6,6 +6,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
+import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.ReportService;
 import com.smartgwt.client.types.HeaderControls;
@@ -19,10 +20,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 /**
  * Uploads and creates a new Report
  * 
@@ -33,7 +30,7 @@ public class ReportUploader extends Window {
 
 	private IButton save;
 
-	private MultiUploader multiUploader;
+	private Upload uploader;
 
 	private ValuesManager vm;
 
@@ -49,7 +46,7 @@ public class ReportUploader extends Window {
 			setTitle(I18N.message("uploadnewdesign") + " - " + report.getName());
 		else
 			setTitle(I18N.message("newreport"));
-		setWidth(460);
+		setMinWidth(460);
 
 		setAutoSize(true);
 		setCanDragResize(true);
@@ -58,17 +55,6 @@ public class ReportUploader extends Window {
 		centerInPage();
 
 		this.reportsPanel = reportsPanel;
-
-		// Create a new uploader panel and attach it to the window
-		multiUploader = new MultiUploader();
-		multiUploader.addOnStartUploadHandler(onStartUploaderHandler);
-		multiUploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-		multiUploader.setStyleName("upload");
-		multiUploader.setWidth("400px");
-		multiUploader.setHeight("40px");
-		multiUploader.setFileInputPrefix("LDOC");
-		multiUploader.reset();
-		multiUploader.setMaximumFiles(1);
 
 		save = new IButton(I18N.message("save"));
 		save.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
@@ -88,7 +74,8 @@ public class ReportUploader extends Window {
 			layout.addMember(form);
 		}
 
-		layout.addMember(multiUploader);
+		uploader = new Upload(save);
+		layout.addMember(uploader);
 		layout.addMember(save);
 
 		addCloseClickHandler(new CloseClickHandler() {
@@ -142,22 +129,8 @@ public class ReportUploader extends Window {
 		form.setItems(name, outputFolderSelector);
 	}
 
-	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-		public void onFinish(IUploader uploader) {
-			if (uploader.getStatus() == Status.SUCCESS || multiUploader.getSuccessUploads() > 0) {
-				save.setDisabled(false);
-			}
-		}
-	};
-
-	private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-		public void onStart(IUploader uploader) {
-			save.setDisabled(true);
-		}
-	};
-
 	public void onSave(GUIReport report) {
-		if (multiUploader.getSuccessUploads() <= 0) {
+		if (uploader.getUploadedFiles().isEmpty()) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

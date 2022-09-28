@@ -283,31 +283,23 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 	public GUIValue[] parseOptions(long setId, String attribute) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(getThreadLocalRequest(), session.getSid());
+		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		File file = uploadedFilesMap.values().iterator().next();
 		List<GUIValue> options = new ArrayList<GUIValue>();
 
 		CSVFileReader reader = null;
 		try {
-			File file = null;
-			for (String fileId : uploadedFilesMap.keySet())
-				if (fileId.startsWith("LDOC_OPT")) {
-					file = uploadedFilesMap.get(fileId);
-					break;
-				}
-
-			if (file != null) {
-				reader = new CSVFileReader(file.getPath());
-				Vector<String> row = reader.readFields();
-				if (row != null && "value".equals(row.get(0).toLowerCase()))
-					row = reader.readFields();
-				while (row != null && !row.isEmpty()) {
-					GUIValue option = new GUIValue();
-					option.setValue(row.get(0));
-					if (row.size() > 1)
-						option.setCode(row.get(1));
-					options.add(option);
-					row = reader.readFields();
-				}
+			reader = new CSVFileReader(file.getPath());
+			Vector<String> row = reader.readFields();
+			if (row != null && "value".equals(row.get(0).toLowerCase()))
+				row = reader.readFields();
+			while (row != null && !row.isEmpty()) {
+				GUIValue option = new GUIValue();
+				option.setValue(row.get(0));
+				if (row.size() > 1)
+					option.setCode(row.get(1));
+				options.add(option);
+				row = reader.readFields();
 			}
 		} catch (Throwable e) {
 			log.error("Unable to parse options in CSV file", e);
@@ -317,6 +309,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 					reader.close();
 				} catch (IOException e) {
 				}
+			UploadServlet.cleanReceivedFiles(session.getSid());
 		}
 
 		GUIValue[] optionsArray = options.toArray(new GUIValue[0]);

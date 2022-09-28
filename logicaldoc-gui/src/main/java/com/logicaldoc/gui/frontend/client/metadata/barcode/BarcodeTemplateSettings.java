@@ -9,6 +9,7 @@ import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
@@ -29,10 +30,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
-
 /**
  * This popup window is used to upload / edit a barcode template
  * 
@@ -51,7 +48,7 @@ public class BarcodeTemplateSettings extends Window {
 
 	private GUIBarcodeTemplate template;
 
-	private MultiUploader uploader;
+	private Upload uploader;
 
 	public BarcodeTemplateSettings(BarcodeTemplatesPanel panel, GUIBarcodeTemplate template) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
@@ -74,18 +71,6 @@ public class BarcodeTemplateSettings extends Window {
 			}
 		});
 
-		uploader = new MultiUploader();
-		uploader.setMaximumFiles(1);
-		uploader.setStyleName("upload");
-		uploader.setFileInputPrefix("ZONALBARCODE");
-		uploader.setWidth("400px");
-		uploader.reset();
-		uploader.setHeight("40px");
-		uploader.setTitle(I18N.message("sample"));
-		uploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-		uploader.addOnStartUploadHandler(onStartUploaderHandler);
-		uploader.setVisible(template.isZonal());
-
 		prepareForm();
 
 		VLayout layout = new VLayout();
@@ -93,7 +78,7 @@ public class BarcodeTemplateSettings extends Window {
 		layout.setWidth100();
 
 		layout.addMember(form);
-		layout.addMember(uploader);
+		uploader = new Upload(save);
 		layout.addMember(save);
 
 		addItem(layout);
@@ -154,9 +139,9 @@ public class BarcodeTemplateSettings extends Window {
 		type.setDisabled(template.getId() != 0L || !Feature.enabled(Feature.ZONAL_BARCODE));
 		if (template.getId() != 0L)
 			type.setValue(template.isZonal() ? "zonal" : "positonal");
-		if(!Feature.enabled(Feature.ZONAL_BARCODE))
+		if (!Feature.enabled(Feature.ZONAL_BARCODE))
 			type.setValue("positonal");
-		
+
 		type.addChangedHandler(new ChangedHandler() {
 
 			@Override
@@ -200,7 +185,7 @@ public class BarcodeTemplateSettings extends Window {
 
 	public void onSave() {
 		if ("zonal".equals(vm.getValueAsString("type")) && template.getId() == 0L
-				&& uploader.getSuccessUploads() <= 0) {
+				&& uploader.getUploadedFiles().isEmpty()) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}
@@ -236,18 +221,4 @@ public class BarcodeTemplateSettings extends Window {
 			}
 		});
 	}
-
-	private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-		public void onFinish(IUploader uploader) {
-			if (uploader.getStatus() == Status.SUCCESS) {
-				save.setDisabled(false);
-			}
-		}
-	};
-
-	private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-		public void onStart(IUploader uploader) {
-			save.setDisabled(true);
-		}
-	};
 }

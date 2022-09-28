@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIForm;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.common.client.widgets.Upload;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.services.FormService;
 import com.smartgwt.client.types.Alignment;
@@ -22,10 +23,6 @@ import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-
-import gwtupload.client.IUploadStatus.Status;
-import gwtupload.client.IUploader;
-import gwtupload.client.MultiUploader;
 
 /**
  * Displays the header image
@@ -101,7 +98,7 @@ public class FormImageTile extends HLayout {
 
 		private IButton saveButton;
 
-		private MultiUploader multiUploader;
+		private Upload uploader;
 
 		private GUIForm form;
 
@@ -117,18 +114,6 @@ public class FormImageTile extends HLayout {
 			setShowModalMask(true);
 			centerInPage();
 
-			// Create a new uploader panel and attach it to the window
-			multiUploader = new MultiUploader();
-			multiUploader.addOnStartUploadHandler(onStartUploaderHandler);
-			multiUploader.addOnFinishUploadHandler(onFinishUploaderHandler);
-			multiUploader.setStyleName("upload");
-			multiUploader.setWidth("400px");
-			multiUploader.setHeight("50px");
-			multiUploader.setFileInputPrefix("LDOC_FORM");
-			multiUploader.reset();
-			multiUploader.setMaximumFiles(1);
-			multiUploader.setValidExtensions("png", "jpg", "jpeg", "gif");
-
 			saveButton = new IButton(I18N.message("save"));
 			saveButton.addClickHandler(new com.smartgwt.client.widgets.events.ClickHandler() {
 
@@ -142,7 +127,9 @@ public class FormImageTile extends HLayout {
 			layout.setMembersMargin(5);
 			layout.setMargin(2);
 
-			layout.addMember(multiUploader);
+			uploader = new Upload(saveButton);
+			uploader.setFileTypes("*.png,*.jpg,*.jpeg,*.gif");
+			layout.addMember(uploader);
 			layout.addMember(saveButton);
 
 			addCloseClickHandler(new CloseClickHandler() {
@@ -166,21 +153,8 @@ public class FormImageTile extends HLayout {
 			addItem(layout);
 		}
 
-		private IUploader.OnFinishUploaderHandler onFinishUploaderHandler = new IUploader.OnFinishUploaderHandler() {
-			public void onFinish(IUploader uploader) {
-				if (uploader.getStatus() == Status.SUCCESS && multiUploader.getSuccessUploads() > 0)
-					saveButton.setDisabled(false);
-			}
-		};
-
-		private IUploader.OnStartUploaderHandler onStartUploaderHandler = new IUploader.OnStartUploaderHandler() {
-			public void onStart(IUploader uploader) {
-				saveButton.setDisabled(true);
-			}
-		};
-
 		public void onSave() {
-			if (multiUploader.getSuccessUploads() <= 0) {
+			if (uploader.getUploadedFiles().isEmpty()) {
 				SC.warn(I18N.message("filerequired"));
 				return;
 			}
