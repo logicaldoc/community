@@ -33,6 +33,7 @@ public class UserHistory extends History {
 		history.setComment(getComment());
 		history.setReason(getReason());
 		history.setVersion(getVersion());
+		history.setFileVersion(getFileVersion());
 		history.setPath(getPath());
 		history.setPathOld(getPathOld());
 		history.setNotified(getNotified());

@@ -206,6 +206,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 			DocumentHistory history = new DocumentHistory();
 			history.setDocId(doc.getId());
 			history.setVersion(doc.getVersion());
+			history.setFileVersion(doc.getFileVersion());
 			history.setFilename(doc.getFileName());
 			history.setFolderId(doc.getFolder().getId());
 			history.setComment("Exported into Dropbox");

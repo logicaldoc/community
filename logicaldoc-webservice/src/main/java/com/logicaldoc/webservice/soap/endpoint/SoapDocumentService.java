@@ -763,6 +763,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 				history.setComment(StringUtils.abbreviate(recipients, 4000));
 				history.setFilename(doc.getFileName());
 				history.setVersion(doc.getVersion());
+				history.setFileVersion(doc.getFileVersion());
 				history.setPath(folderDao.computePathExtended(doc.getFolder().getId()));
 				docDao.saveDocumentHistory(doc, history);
 			}

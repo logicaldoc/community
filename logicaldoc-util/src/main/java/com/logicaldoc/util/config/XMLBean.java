@@ -96,17 +96,6 @@ public class XMLBean {
 			SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
 			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-			
-			String ayktrick = XMLConstants.ACCESS_EXTERNAL_DTD;
-			builder.setProperty(ayktrick, "http,https");
-			
-			/*
-SAXBuilder builder = new SAXBuilder();
-builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
-builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
-builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-builder.setExpandEntities(false);
-			 */
 
 			if (docPath != null) {
 				try {

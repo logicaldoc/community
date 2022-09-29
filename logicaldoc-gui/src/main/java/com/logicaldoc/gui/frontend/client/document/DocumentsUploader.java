@@ -55,6 +55,7 @@ public class DocumentsUploader extends Window {
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();
+		setMinWidth(400);
 		setAutoSize(true);
 
 		sendButton = new IButton(I18N.message("send"));

@@ -1039,6 +1039,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			transaction.setDocId(doc.getId());
 			transaction.setFolderId(doc.getFolder().getId());
 			transaction.setVersion(doc.getVersion());
+			transaction.setFileVersion(doc.getFileVersion());
 			transaction.setFilename(doc.getFileName());
 			transaction.setFileSize(doc.getFileSize());
 			transaction.setNotified(0);

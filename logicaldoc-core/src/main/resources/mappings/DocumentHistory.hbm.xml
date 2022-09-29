@@ -24,6 +24,7 @@
 		<property name="comment" type="string" column="ld_comment" length="4000" />
 		<property name="reason" type="string" column="ld_reason" length="4000" />
 		<property name="version" type="string" column="ld_version" length="10" />
+		<property name="fileVersion" type="string" column="ld_fileversion" length="10" />
 		<property name="path" type="string" column="ld_path" length="4000" />
         <property name="pathOld" type="string" column="ld_pathold" length="4000" />
         <property name="notified" type="int" column="ld_notified" not-null="true" />

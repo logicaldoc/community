@@ -45,6 +45,16 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	private String version = null;
 
+	private String fileVersion = null;
+
+	public String getFileVersion() {
+		return fileVersion;
+	}
+
+	public void setFileVersion(String fileVersion) {
+		this.fileVersion = fileVersion;
+	}
+
 	private String path = null;
 
 	private String pathOld = null;
@@ -253,6 +263,7 @@ public abstract class History extends PersistentObject implements Comparable<His
 			if (document.getFolder() != null)
 				this.setFolderId(document.getFolder().getId());
 			this.setVersion(document.getVersion());
+			this.setFileVersion(document.getFileVersion());
 			this.setColor(document.getColor());
 		}
 	}
@@ -399,12 +410,6 @@ public abstract class History extends PersistentObject implements Comparable<His
 		this.device = device;
 	}
 
-	@Override
-	public int compareTo(History o) {
-		History other = (History) o;
-		return getDate().compareTo(other.getDate());
-	}
-
 	public Long getFileSize() {
 		return fileSize;
 	}
@@ -419,5 +424,11 @@ public abstract class History extends PersistentObject implements Comparable<His
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+	
+	@Override
+	public int compareTo(History o) {
+		History other = (History) o;
+		return getDate().compareTo(other.getDate());
 	}
 }

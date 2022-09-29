@@ -1613,6 +1613,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 							StringUtils.abbreviate(StringUtil.collectionToString(mail.getRecipients(), ", "), 4000));
 					history.setFilename(doc.getFileName());
 					history.setVersion(doc.getVersion());
+					history.setFileVersion(doc.getFileVersion());
 					history.setPath(fDao.computePathExtended(doc.getFolder().getId()));
 					documentDao.saveDocumentHistory(doc, history);
 				}
@@ -2872,6 +2873,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			transaction.setEvent(DocumentEvent.DELETED.toString());
 			transaction.setFilename(doc.getFileName());
 			transaction.setVersion(doc.getVersion());
+			transaction.setFileVersion(doc.getFileVersion());
 			transaction.setPath(doc.getFolder().getPathExtended());
 			docDao.saveDocumentHistory(doc, transaction);
 		}

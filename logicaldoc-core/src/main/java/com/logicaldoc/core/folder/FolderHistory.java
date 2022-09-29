@@ -22,6 +22,7 @@ public class FolderHistory extends History {
 		history.setEvent(getEvent());
 		history.setComment(getComment());
 		history.setReason(getReason());
+		history.setFileVersion(getFileVersion());
 		history.setVersion(getVersion());
 		history.setPath(getPath());
 		history.setPathOld(getPathOld());

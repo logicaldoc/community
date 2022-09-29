@@ -1168,6 +1168,7 @@ public class LDRepository {
 			transaction.setUser(getSessionUser());
 			transaction.setDocId(doc.getId());
 			transaction.setVersion(doc.getVersion());
+			transaction.setFileVersion(doc.getFileVersion());
 			transaction.setFilename(doc.getFileName());
 			transaction.setFileSize(doc.getFileSize());
 			transaction.setNotified(0);

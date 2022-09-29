@@ -1,5 +1,93 @@
 <?xml version="1.0" ?>
-<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 1.0" "http://jpf.sourceforge.net/plugin_1_0.dtd">
+<!DOCTYPE plugin [
+<!ELEMENT plugin (doc?, attributes?, requires?, runtime?,
+                  (extension-point|extension)*)>
+<!ATTLIST plugin id         CDATA #REQUIRED>
+<!ATTLIST plugin version    CDATA #REQUIRED>
+<!ATTLIST plugin vendor     CDATA #IMPLIED>
+<!ATTLIST plugin class      CDATA #IMPLIED>
+<!ATTLIST plugin docs-path  CDATA #IMPLIED>
+
+<!ELEMENT plugin-fragment (doc?, attributes?, requires?, runtime?,
+                           (extension-point|extension)*)>
+<!ATTLIST plugin-fragment id              CDATA #REQUIRED>
+<!ATTLIST plugin-fragment version         CDATA #REQUIRED>
+<!ATTLIST plugin-fragment vendor          CDATA #IMPLIED>
+<!ATTLIST plugin-fragment plugin-id       CDATA #REQUIRED>
+<!ATTLIST plugin-fragment plugin-version  CDATA #IMPLIED>
+<!ATTLIST plugin-fragment match           (equal | equivalent | compatible
+                                          | greater-or-equal) "compatible">
+<!ATTLIST plugin-fragment docs-path       CDATA #IMPLIED>
+
+<!ELEMENT attributes (attribute+)>
+
+<!ELEMENT attribute (doc?, attribute*)>
+<!ATTLIST attribute id     CDATA #REQUIRED>
+<!ATTLIST attribute value  CDATA #IMPLIED>
+
+<!ELEMENT doc (doc-ref*, doc-text?)>
+<!ATTLIST doc caption  CDATA #IMPLIED>
+
+<!ELEMENT doc-ref EMPTY>
+<!ATTLIST doc-ref path     CDATA #REQUIRED>
+<!ATTLIST doc-ref caption  CDATA #REQUIRED>
+
+<!ELEMENT doc-text (#PCDATA)>
+
+<!ELEMENT requires (import+)>
+
+<!ELEMENT import (doc?)>
+<!ATTLIST import id              CDATA #IMPLIED>
+<!ATTLIST import plugin-id       CDATA #REQUIRED>
+<!ATTLIST import plugin-version  CDATA #IMPLIED>
+<!ATTLIST import match           (equal | equivalent | compatible
+                                 | greater-or-equal) "compatible">
+<!ATTLIST import exported        (true | false) "false">
+<!ATTLIST import optional        (true | false) "false">
+<!ATTLIST import reverse-lookup  (true | false) "false">
+
+<!ELEMENT runtime (library+)>
+
+<!ELEMENT library (doc?, export*)>
+<!ATTLIST library id       CDATA #REQUIRED>
+<!ATTLIST library path     CDATA #REQUIRED>
+<!ATTLIST library type     (code | resources) #REQUIRED>
+<!ATTLIST library version  CDATA #IMPLIED>
+
+<!ELEMENT export EMPTY>
+<!ATTLIST export prefix  CDATA #REQUIRED>
+
+<!ELEMENT extension-point (doc?, parameter-def*)>
+<!ATTLIST extension-point id                CDATA #REQUIRED>
+<!ATTLIST extension-point parent-plugin-id  CDATA #IMPLIED>
+<!ATTLIST extension-point parent-point-id   CDATA #IMPLIED>
+<!ATTLIST extension-point extension-multiplicity  (any | one | one-per-plugin
+                                                  | none) "any">
+
+<!ELEMENT parameter-def (doc?, parameter-def*)>
+<!ATTLIST parameter-def id             CDATA #REQUIRED>
+<!ATTLIST parameter-def multiplicity   (one | any | none-or-one | one-or-more)
+                                       "one">
+<!ATTLIST parameter-def type           (string | boolean | number | date | time
+                                       | date-time | null | any | plugin-id
+									   | extension-point-id | extension-id
+									   | fixed | resource) "string">
+<!ATTLIST parameter-def custom-data    CDATA #IMPLIED>
+<!ATTLIST parameter-def default-value  CDATA #IMPLIED>
+
+
+<!ELEMENT extension (doc?, parameter*)>
+<!ATTLIST extension plugin-id  CDATA #REQUIRED>
+<!ATTLIST extension point-id   CDATA #REQUIRED>
+<!ATTLIST extension id         CDATA #REQUIRED>
+
+<!ELEMENT parameter (doc?, value?, parameter*)>
+<!ATTLIST parameter id     CDATA #REQUIRED>
+<!ATTLIST parameter value  CDATA #IMPLIED>
+
+<!ELEMENT value (#PCDATA)>
+]>
+
 <plugin id="logicaldoc-webservice" version="8.8.3" class="com.logicaldoc.webservice.WebservicePlugin">
 	<requires>
 		<import plugin-id="logicaldoc-core" />
