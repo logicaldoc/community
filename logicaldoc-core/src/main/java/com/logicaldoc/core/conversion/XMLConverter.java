@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -32,6 +33,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -48,7 +50,7 @@ public class XMLConverter extends AbstractFormatConverter {
 	protected static Logger log = LoggerFactory.getLogger(XMLConverter.class);
 
 	@Override
-	public void internalConvert(String sid, com.logicaldoc.core.document.Document document, File src, File dest) throws IOException {
+	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
 		String destExt = FileUtil.getExtension(dest.getName()).toLowerCase();
 		File xslt = null;
 		File xml = null;
@@ -59,8 +61,20 @@ public class XMLConverter extends AbstractFormatConverter {
 			FileUtil.copyFile(src, xml);
 
 			// Parse the XML searching for a stylesheet
-			SAXBuilder saxBuilder = new SAXBuilder();
-			org.jdom2.Document doc = saxBuilder.build(xml);
+			SAXBuilder builder = new SAXBuilder();			
+			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+			builder.setExpandEntities(false);
+			
+			/*
+			SAXBuilder builder = new SAXBuilder();
+			builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+			builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			builder.setExpandEntities(false);
+			*/
+			
+			org.jdom2.Document doc = builder.build(xml);
 			List<Content> contents = doc.getContent();
 
 			boolean containsStyleReference = false;
@@ -74,7 +88,7 @@ public class XMLConverter extends AbstractFormatConverter {
 						// format
 						try {
 							FileUtils.copyURLToFile(new URL(pi.getPseudoAttributeValue("href")), xslt);
-							org.jdom2.Document xsltDoc = saxBuilder.build(xslt);
+							org.jdom2.Document xsltDoc = builder.build(xslt);
 							Element root = xsltDoc.getRootElement();
 							Element outputElem = root.getChild("output", root.getNamespace());
 							if (outputElem != null)

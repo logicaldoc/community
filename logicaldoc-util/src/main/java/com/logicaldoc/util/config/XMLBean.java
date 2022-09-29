@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.xml.XMLConstants;
+
 import org.apache.commons.io.FileUtils;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -19,6 +21,7 @@ import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.sax.XMLReaders;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
@@ -90,16 +93,29 @@ public class XMLBean {
 	 */
 	private void initDocument() {
 		try {
-			SAXBuilder builder = new SAXBuilder(false);
+			SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
+			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+			
+			String ayktrick = XMLConstants.ACCESS_EXTERNAL_DTD;
+			builder.setProperty(ayktrick, "http,https");
+			
+			/*
+SAXBuilder builder = new SAXBuilder();
+builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+builder.setExpandEntities(false);
+			 */
+
 			if (docPath != null) {
 				try {
 					doc = builder.build(docPath);
 				} catch (Throwable t) {
 					t.printStackTrace();
 
-					// In some environments, during maven test phase a well
-					// formed
-					// URL must be used insead of ordinary path
+					// In some environments, during maven test phase a well formed URL must be used
+					// insead of ordinary path
 					log.error(t.getMessage());
 
 					try {
