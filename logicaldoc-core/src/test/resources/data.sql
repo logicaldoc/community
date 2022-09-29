@@ -212,6 +212,10 @@ insert into ld_document
            (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages)
 values     (6,8,'2010-04-01 00:00:00',1,0,'g','testDoc6','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'TIFF',3,'en','topolino',122345,1,0,'',1,0,2,0,1,1,1,5,0,0,0,0,1);
 
+insert into ld_document
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_deleteuserid,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages)
+values     (7,6,'2010-04-01 00:00:00',0,0,'h','testDoc7','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,1,'XML',3,'en','context.xml',122345,1,0,'',1,0,2,0,1,1,1,5,0,0,0,0,1);
+
 
 insert into ld_ticket
            (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion, ld_enabled)

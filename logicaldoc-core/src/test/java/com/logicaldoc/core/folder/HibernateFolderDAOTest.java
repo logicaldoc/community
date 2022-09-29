@@ -8,10 +8,13 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.conversion.XMLConverterTest;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -46,6 +49,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	private FolderHistoryDAO historyDao;
 
 	private TemplateDAO templateDao;
+	
+	protected static Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
 
 	@Before
 	public void setUp() throws Exception {
@@ -133,7 +138,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		}
 
 		long count = dao.countDocsInTree(5L);
-		Assert.assertEquals(3, count);
+		Assert.assertEquals(4, count);
 
 		count = dao.countDocsInTree(4L);
 		Assert.assertEquals(0, count);
@@ -154,7 +159,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		}
 		
 		long size = dao.computeTreeSize(5L);
-		Assert.assertEquals(268704L, size);
+		Assert.assertEquals(391049L, size);
 
 		size = dao.computeTreeSize(4L);
 		Assert.assertEquals(0, size);
@@ -563,8 +568,9 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	public void testCreateAlias() throws PersistenceException {
 		Folder alias = dao.createAlias(4L, 3000L, null);
 		Assert.assertNotNull(alias);
-		Assert.assertEquals(new Long(3000L), alias.getFoldRef());
-		Assert.assertEquals(new Long(3000L), alias.getSecurityRef());
+		
+		Assert.assertEquals(Long.valueOf(3000L), alias.getFoldRef());
+		Assert.assertEquals(Long.valueOf(3000L), alias.getSecurityRef());
 		Assert.assertEquals(new Integer(Folder.TYPE_ALIAS), new Integer(alias.getType()));
 		Folder orig = dao.findById(3000L);
 		Assert.assertEquals("Workspace X", orig.getName());
@@ -597,14 +603,16 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertTrue(dao.delete(1201));
 		folder = dao.findById(1201);
 		Assert.assertNull(folder);
-
+		
 		try {
 			dao.delete(Folder.DEFAULTWORKSPACEID);
-		} catch (Throwable t) {
-			t.printStackTrace();
+			Assert.fail("No exception was thrown");
+		} catch (PersistenceException e) {
+			log.debug("Delete error on DEFAULTWORKSPACEID", e);
 		}
+		
 		folder = dao.findById(Folder.DEFAULTWORKSPACEID);
-		Assert.assertNotNull(Folder.DEFAULTWORKSPACEID);
+		Assert.assertNotNull(folder);
 	}
 
 	@Test

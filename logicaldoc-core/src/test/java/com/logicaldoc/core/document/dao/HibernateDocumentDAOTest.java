@@ -130,9 +130,9 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	public void testFindAll() throws PersistenceException {
 		Collection<Document> documents = dao.findAll();
 		Assert.assertNotNull(documents);
-		Assert.assertEquals(3, documents.size());
+		Assert.assertEquals(4, documents.size());
 
-		Assert.assertEquals(3, dao.findByWhere("1=1", null, null).size());
+		Assert.assertEquals(4, dao.findByWhere("1=1", null, null).size());
 		Assert.assertEquals(1, dao.findByWhere("1=1", null, 1).size());
 	}
 
@@ -174,7 +174,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	public void testFindByUserId() {
 		Collection<Long> ids = dao.findByUserId(3);
 		Assert.assertNotNull(ids);
-		Assert.assertEquals(3, ids.size());
+		Assert.assertEquals(4, ids.size());
 		Assert.assertTrue(ids.contains(2L));
 
 		// Try with a user without documents
@@ -187,7 +187,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	public void testFindDocIdByFolder() {
 		Collection<Long> ids = dao.findDocIdByFolder(6, null);
 		Assert.assertNotNull(ids);
-		Assert.assertEquals(3, ids.size());
+		Assert.assertEquals(4, ids.size());
 		Assert.assertTrue(ids.contains(2L));
 
 		ids = dao.findDocIdByFolder(1111, null);
@@ -199,7 +199,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	public void testFindByFolder() throws PersistenceException {
 		Collection<Document> docs = dao.findByFolder(6, null);
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(3, docs.size());
+		Assert.assertEquals(4, docs.size());
 		Assert.assertTrue(docs.contains(dao.findById(2)));
 
 		docs = dao.findByFolder(1111, null);
@@ -211,7 +211,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	public void testFindIndexed() {
 		List<Document> docs = dao.findByIndexed(1);
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(1, docs.size());
+		Assert.assertEquals(2, docs.size());
 		Assert.assertEquals(1, docs.get(0).getId());
 
 		docs = dao.findByIndexed(0);
@@ -235,8 +235,8 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Collection<Long> ids = dao.findDocIdByTag("abc");
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(1, ids.size());
-		Assert.assertEquals(new Long("1"), ids.iterator().next());
-
+		Assert.assertEquals(Long.valueOf(1L), ids.iterator().next());		
+		
 		ids = dao.findDocIdByTag("xxx");
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(0, ids.size());
@@ -409,7 +409,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(ids);
 		// There is also the shortcut
 		Assert.assertEquals(1, ids.size());
-		Assert.assertEquals(new Long(1), ids.iterator().next());
+		Assert.assertEquals(Long.valueOf(1L), ids.iterator().next());
 
 		ids = dao.findDocIdByUserIdAndTag(1, "xxx");
 		Assert.assertNotNull(ids);
@@ -528,14 +528,14 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testCount() {
-		Assert.assertEquals(6L, dao.count(null, true, false));
-		Assert.assertEquals(3L, dao.count(Tenant.DEFAULT_ID, false, false));
+		Assert.assertEquals(7L, dao.count(null, true, false));
+		Assert.assertEquals(4L, dao.count(Tenant.DEFAULT_ID, false, false));
 	}
 
 	@Test
 	public void testCountByIndexed() {
 		Assert.assertEquals(2L, dao.countByIndexed(0));
-		Assert.assertEquals(1L, dao.countByIndexed(1));
+		Assert.assertEquals(2L, dao.countByIndexed(1));
 	}
 
 	@Test
@@ -559,9 +559,9 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testFindByLockUserAndStatus() {
-		Assert.assertEquals(3, dao.findByLockUserAndStatus(3L, null).size());
-		Assert.assertEquals(1, dao.findByLockUserAndStatus(3L, Document.DOC_CHECKED_OUT).size());
-		Assert.assertEquals(1, dao.findByLockUserAndStatus(null, Document.DOC_CHECKED_OUT).size());
+		Assert.assertEquals(4, dao.findByLockUserAndStatus(3L, null).size());
+		Assert.assertEquals(2, dao.findByLockUserAndStatus(3L, Document.DOC_CHECKED_OUT).size());
+		Assert.assertEquals(2, dao.findByLockUserAndStatus(null, Document.DOC_CHECKED_OUT).size());
 		Assert.assertEquals(0, dao.findByLockUserAndStatus(1L, null).size());
 		Assert.assertEquals(0, dao.findByLockUserAndStatus(1L, Document.DOC_CHECKED_OUT).size());
 		Assert.assertEquals(0, dao.findByLockUserAndStatus(987541L, null).size());
@@ -572,7 +572,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Collection<Long> ids = dao.findAliasIds(1);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(1, ids.size());
-		Assert.assertTrue(ids.contains(new Long(2)));
+		Assert.assertTrue(ids.contains(Long.valueOf(2L)));
 
 		ids = dao.findAliasIds(3);
 		Assert.assertNotNull(ids);
@@ -628,7 +628,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 
 		docs = dao.findByIds(new Long[] { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L }, null);
 		Assert.assertNotNull(docs);
-		Assert.assertEquals(3, docs.size());
+		Assert.assertEquals(4, docs.size());
 	}
 
 	@Test

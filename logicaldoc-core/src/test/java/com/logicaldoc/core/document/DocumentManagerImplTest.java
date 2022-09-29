@@ -203,6 +203,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 	@Test
 	public void testCreate() throws Exception {
+		
 		User user = userDao.findByUsername("admin");
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
