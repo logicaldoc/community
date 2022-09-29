@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -28,6 +27,7 @@ import org.jdom2.Content;
 import org.jdom2.Element;
 import org.jdom2.ProcessingInstruction;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.input.sax.XMLReaders;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
@@ -61,19 +61,30 @@ public class XMLConverter extends AbstractFormatConverter {
 			FileUtil.copyFile(src, xml);
 
 			// Parse the XML searching for a stylesheet
-			SAXBuilder builder = new SAXBuilder();			
-			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-			builder.setExpandEntities(false);
-			
-			/*
-			SAXBuilder builder = new SAXBuilder();
-			builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+			SAXBuilder builder = new SAXBuilder(XMLReaders.NONVALIDATING);
+
+			builder.setFeature("http://xml.org/sax/features/validation", false);
+			builder.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+			builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			builder.setExpandEntities(false);
-			*/
 			
+//			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+//			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+
+			// builder.setExpandEntities(false);
+
+			/*
+			 * SAXBuilder builder = new SAXBuilder(); builder.setFeature(
+			 * "http://apache.org/xml/features/disallow-doctype-decl",true);
+			 * builder.setFeature(
+			 * "http://xml.org/sax/features/external-general-entities", false);
+			 * builder.setFeature(
+			 * "http://xml.org/sax/features/external-parameter-entities",
+			 * false); builder.setExpandEntities(false);
+			 */
+
 			org.jdom2.Document doc = builder.build(xml);
 			List<Content> contents = doc.getContent();
 
