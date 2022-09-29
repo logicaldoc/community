@@ -720,8 +720,7 @@ public class ContextMenu extends Menu {
 				GUIDocument selection = grid.getSelectedDocument();
 				if (selection == null)
 					return;
-				WindowUtils.openUrl("ldedit:" + GWT.getHostPageBaseURL() + "ldedit?action=edit&sid="
-						+ Session.get().getSid() + "&docId=" + selection.getId());
+				Util.openEditWithOffice(selection.getId());
 			}
 		});
 
