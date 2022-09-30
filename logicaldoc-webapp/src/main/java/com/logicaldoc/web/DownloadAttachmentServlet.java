@@ -52,19 +52,21 @@ public class DownloadAttachmentServlet extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Session session = ServletUtil.validateSession(request);
-
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
-		long docId = Long.parseLong(request.getParameter("docId"));
-		String fileVersion = request.getParameter("fileVersion");
-		String filename = request.getParameter("attachmentFileName");
-
-		Version version = null;
-		File tmp = File.createTempFile("attdown", null);
+		File tmp = null;
 		try {
+			Session session = ServletUtil.validateSession(request);
+
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
+			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+			long docId = Long.parseLong(request.getParameter("docId"));
+			String fileVersion = request.getParameter("fileVersion");
+			String filename = request.getParameter("attachmentFileName");
+
+			Version version = null;
+			tmp = File.createTempFile("attdown", null);
+			
 			Document doc = docDao.findById(docId);
 			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
 					doc.getFolder().getId(), session.getUserId()))
@@ -106,12 +108,9 @@ public class DownloadAttachmentServlet extends HttpServlet {
 				FileUtils.writeByteArrayToFile(tmp, attachment.getData());
 				ServletUtil.downloadFile(request, response, tmp, filename);
 			}
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			if (t instanceof IOException)
-				throw (IOException) t;
-			else
-				throw new IOException(t.getMessage());
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		} finally {
 			FileUtil.strongDelete(tmp);
 		}

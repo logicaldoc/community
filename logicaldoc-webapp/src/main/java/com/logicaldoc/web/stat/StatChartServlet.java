@@ -40,19 +40,21 @@ public class StatChartServlet extends HttpServlet {
 	protected static Logger log = LoggerFactory.getLogger(StatChartServlet.class);
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Session session = ServletUtil.validateSession(request);
-
-		// Avoid resource caching
-		response.setHeader("Pragma", "no-cache");
-		response.setHeader("Cache-Control", "no-store");
-		response.setDateHeader("Expires", 0);
-
-		User user = session.getUser();
-
-		// Create the folder for the chart
-		File chartFile = File.createTempFile("chart", ".png");
+		File chartFile = null;
 
 		try {
+			Session session = ServletUtil.validateSession(request);
+
+			// Avoid resource caching
+			response.setHeader("Pragma", "no-cache");
+			response.setHeader("Cache-Control", "no-store");
+			response.setDateHeader("Expires", 0);
+
+			User user = session.getUser();
+
+			// Create the folder for the chart
+			chartFile = File.createTempFile("chart", ".png");
+
 			String chart = request.getParameter("chart");
 			SystemServiceImpl service = new SystemServiceImpl();
 			GUIParameter[][] parameters = service.getStatistics(user.getLanguage());

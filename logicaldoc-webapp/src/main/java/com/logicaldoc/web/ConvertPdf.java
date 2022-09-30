@@ -56,12 +56,12 @@ public class ConvertPdf extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Session session = ServletUtil.validateSession(request);
-
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		VersionDAO versionDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
-
 		try {
+			Session session = ServletUtil.validateSession(request);
+
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			VersionDAO versionDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
+
 			long docId = Long.parseLong(request.getParameter(DOCUMENT_ID));
 			Document document = docDao.findById(docId);
 			if (document.getDocRef() != null)
@@ -83,25 +83,23 @@ public class ConvertPdf extends HttpServlet {
 		} catch (Throwable r) {
 			log.error(r.getMessage(), r);
 
-			ServletUtil.setContentDisposition(request, response, "notavailable.pdf");
-
-			InputStream is = ConvertPdf.class.getResourceAsStream("/pdf/notavailable.pdf");
-			OutputStream os;
-			os = response.getOutputStream();
 			int letter = 0;
-
-			try {
+			try (InputStream is = ConvertPdf.class.getResourceAsStream("/pdf/notavailable.pdf");
+					OutputStream os = response.getOutputStream();) {
+				ServletUtil.setContentDisposition(request, response, "notavailable.pdf");
 				while ((letter = is.read()) != -1)
 					os.write(letter);
-			} finally {
-				os.flush();
-				os.close();
-				is.close();
+			} catch (Throwable e) {
+				log.warn(e.getMessage());
 			}
 		}
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
+		try {
+			doGet(request, response);
+		} catch (Throwable r) {
+
+		}
 	}
 }

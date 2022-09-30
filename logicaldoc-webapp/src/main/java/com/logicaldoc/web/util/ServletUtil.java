@@ -169,7 +169,7 @@ public class ServletUtil {
 				os.flush();
 				os.close();
 			}
-			if (is != null) 
+			if (is != null)
 				is.close();
 		}
 	}
@@ -731,6 +731,13 @@ public class ServletUtil {
 	private static long sublong(String value, int beginIndex, int endIndex) {
 		String substring = value.substring(beginIndex, endIndex);
 		return (substring.length() > 0) ? Long.parseLong(substring) : -1;
+	}
+
+	public static void sendError(HttpServletResponse response, String message) {
+		try {
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
+		} catch (Throwable e) {
+		}
 	}
 
 	/**

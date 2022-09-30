@@ -60,24 +60,24 @@ public class PswRecovery extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session = request.getSession();
-		String ticketId = request.getParameter("ticketId");
-		String userId = request.getParameter("userId");
-		String tenant = request.getParameter("tenant");
-		if (tenant == null)
-			tenant = Tenant.DEFAULT_NAME;
-
-		if (StringUtils.isEmpty(ticketId)) {
-			ticketId = (String) request.getAttribute("ticketId");
-		}
-
-		if (StringUtils.isEmpty(ticketId)) {
-			ticketId = (String) session.getAttribute("ticketId");
-		}
-
-		log.debug("Recover password for ticket with ticketId={}", ticketId);
-
 		try {
+			HttpSession session = request.getSession();
+			String ticketId = request.getParameter("ticketId");
+			String userId = request.getParameter("userId");
+			String tenant = request.getParameter("tenant");
+			if (tenant == null)
+				tenant = Tenant.DEFAULT_NAME;
+
+			if (StringUtils.isEmpty(ticketId)) {
+				ticketId = (String) request.getAttribute("ticketId");
+			}
+
+			if (StringUtils.isEmpty(ticketId)) {
+				ticketId = (String) session.getAttribute("ticketId");
+			}
+
+			log.debug("Recover password for ticket with ticketId={}", ticketId);
+
 			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 			Ticket ticket = ticketDao.findByTicketId(ticketId);
 
@@ -103,8 +103,13 @@ public class PswRecovery extends HttpServlet {
 
 					// Generate a new password
 					ContextProperties config = Context.get().getProperties();
-					String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),config.getInt(tenant + ".password.uppercase", 2),config.getInt(tenant + ".password.lowercase", 2),config.getInt(tenant + ".password.digit", 1),
-							config.getInt(tenant + ".password.special", 1),config.getInt(tenant + ".password.sequence", 4), config.getInt(tenant + ".password.occurrence", 3));
+					String password = PasswordGenerator.generate(config.getInt(tenant + ".password.size", 8),
+							config.getInt(tenant + ".password.uppercase", 2),
+							config.getInt(tenant + ".password.lowercase", 2),
+							config.getInt(tenant + ".password.digit", 1),
+							config.getInt(tenant + ".password.special", 1),
+							config.getInt(tenant + ".password.sequence", 4),
+							config.getInt(tenant + ".password.occurrence", 3));
 					user.setDecodedPassword(password);
 					user.setPasswordChanged(new Date());
 					user.setPasswordExpired(1);
@@ -161,19 +166,23 @@ public class PswRecovery extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html");
+		try {
+			response.setContentType("text/html");
 
-		PrintWriter out = response.getWriter();
-		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
-		out.println("<HTML>");
-		out.println("  <HEAD><TITLE>Download Ticket Action</TITLE></HEAD>");
-		out.println("  <BODY>");
-		out.print("    This is ");
-		out.print(this.getClass());
-		out.println(", using the POST method");
-		out.println("  </BODY>");
-		out.println("</HTML>");
-		out.flush();
-		out.close();
+			PrintWriter out = response.getWriter();
+			out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
+			out.println("<HTML>");
+			out.println("  <HEAD><TITLE>Download Ticket Action</TITLE></HEAD>");
+			out.println("  <BODY>");
+			out.print("    This is ");
+			out.print(this.getClass());
+			out.println(", using the POST method");
+			out.println("  </BODY>");
+			out.println("</HTML>");
+			out.flush();
+			out.close();
+		} catch (Throwable e) {
+
+		}
 	}
 }
