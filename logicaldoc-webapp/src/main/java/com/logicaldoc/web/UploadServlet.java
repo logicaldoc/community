@@ -48,7 +48,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 * Sets the size threshold (in bytes) beyond which files are written
 	 * directly to disk.
 	 */
-	private int maxMemSize = 1 * 1024 * 1024;
+	private static int maxMemSize = 1 * 1024 * 1024;
 
 	/**
 	 * Constructor of the object.
@@ -142,8 +142,9 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 */
 	public static void cleanReceivedFiles(String sid) {
 		FileUtil.strongDelete(getUploadDir(sid));
-		if (getReceivedFiles(sid) != null)
-			getReceivedFiles(sid).clear();
+		Map<String, File> uploadedFiles = getReceivedFiles(sid);
+		if (uploadedFiles != null)
+			uploadedFiles.clear();
 	}
 	
 	/**
@@ -246,7 +247,8 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 					File file = new File(uploadDir.getAbsolutePath() + "/" + UUID.randomUUID().toString() + "."
 							+ FileUtil.getExtension(fileName));
 					fi.write(file);
-					uploadedFiles.put(fileName, file);
+					if (uploadedFiles != null)
+						uploadedFiles.put(fileName, file);
 					out.println("Uploaded Filename: " + fileName + "<br>");
 				}
 			}
