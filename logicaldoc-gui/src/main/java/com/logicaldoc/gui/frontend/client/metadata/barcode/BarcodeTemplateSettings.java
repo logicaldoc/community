@@ -185,7 +185,7 @@ public class BarcodeTemplateSettings extends Window {
 
 	public void onSave() {
 		if ("zonal".equals(vm.getValueAsString("type")) && template.getId() == 0L
-				&& uploader.getUploadedFiles().isEmpty()) {
+				&& uploader.getUploadedFile()==null) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}

@@ -83,7 +83,7 @@ public class ReplaceVersionFile extends Window {
 		if (!vm.validate())
 			return;
 
-		if (uploader.getUploadedFiles().isEmpty()) {
+		if (uploader.getUploadedFile()==null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

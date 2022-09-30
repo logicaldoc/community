@@ -17,10 +17,6 @@ import com.smartgwt.client.widgets.form.fields.SubmitItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 
-//import gwtupload.client.IUploadStatus.Status;
-//import gwtupload.client.IUploader;
-//import gwtupload.client.MultiUploader;
-
 /**
  * This popup window is used to upload a new options file to the server.
  * 
@@ -73,7 +69,7 @@ public class OptionsUploader extends Window {
 	}
 
 	public void onSend() {
-		if (uploader.getUploadedFiles().isEmpty()) {
+		if (uploader.getUploadedFile()==null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

@@ -110,7 +110,7 @@ public class DocumentCheckin extends Window {
 	}
 
 	public void onSend() {
-		if (uploader.getUploadedFiles().isEmpty()) {
+		if (uploader.getUploadedFile()==null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}
@@ -119,7 +119,7 @@ public class DocumentCheckin extends Window {
 			return;
 
 		if ("true".equals(vm.getValueAsString("checkfilename"))
-				&& !uploader.getUploadedFiles().get(0).equals(fileName)) {
+				&& !uploader.getUploadedFile().equals(fileName)) {
 			sendButton.setDisabled(true);
 			SC.warn(I18N.message("nosamefilename"));
 			return;

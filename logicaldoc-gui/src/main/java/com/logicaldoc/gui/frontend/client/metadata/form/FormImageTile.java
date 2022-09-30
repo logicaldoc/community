@@ -154,7 +154,7 @@ public class FormImageTile extends HLayout {
 		}
 
 		public void onSave() {
-			if (uploader.getUploadedFiles().isEmpty()) {
+			if (uploader.getUploadedFile()==null) {
 				SC.warn(I18N.message("filerequired"));
 				return;
 			}

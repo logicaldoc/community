@@ -146,9 +146,9 @@ public class ZonalOCRTemplateSettings extends Window {
 		else
 			form.setItems(id, name, description);
 	}
-
+	
 	public void onSave() {
-		if (ocrPanel.getSelectedOcrTemplate().getId() == 0L && uploader.getUploadedFiles().isEmpty()) {
+		if (ocrPanel.getSelectedOcrTemplate().getId() == 0L && uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("samplerequired"));
 			return;
 		}
