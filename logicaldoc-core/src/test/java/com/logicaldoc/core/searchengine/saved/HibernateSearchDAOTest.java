@@ -1,11 +1,15 @@
 package com.logicaldoc.core.searchengine.saved;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.annotations.common.AssertionFailure;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,6 +20,7 @@ import com.logicaldoc.core.searchengine.SearchOptions;
 import com.logicaldoc.core.searchengine.folder.FolderCriterion;
 import com.logicaldoc.core.searchengine.folder.FolderSearchOptions;
 import com.logicaldoc.util.Context;
+import com.mchange.util.AssertException;
 
 import junit.framework.Assert;
 
@@ -76,34 +81,77 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testCharsets() {
+		
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 
 		opt.setLanguage("it");
-		opt.setExpression("ואתם נהנים");
+		opt.setExpression("Cerco operai a 2000 euro al mese, nessuno risponde: manca l'umiltà");
 		opt.setExpressionLanguage("it");
 		opt.setTemplate(1L);
 		opt.setSizeMax(3000L);
 		opt.setSizeMin(2L);
 		opt.setType(SearchOptions.TYPE_FULLTEXT);
 		opt.setUserId(1);
-
 		opt.setCreationFrom(new Date());
+		
+//		Map<String, Charset> charsets = Charset.availableCharsets();
+//		for (String name : charsets.keySet()) {
+//			System.err.println(name);
+//		}
+		
+		try {
+			Charset ch = Charset.forName("windows-1252");			
+			Context.get().getProperties().setProperty("default.charset", ch.name());
+			SavedSearch saved = new SavedSearch();
+			saved.setName("manca l'umiltà");
+			saved.saveOptions(opt);
+			String xml = saved.getOptions();
+			assertNotNull(xml);
+		    assertTrue(xml.length() > 700);
 
-		Map<String, Charset> charsets = Charset.availableCharsets();
-		for (String name : charsets.keySet()) {
-			try {
-
-				Context.get().getProperties().setProperty("default.charset", name);
-				SavedSearch saved = new SavedSearch();
-				saved.setName("ואתם נהנים מהטבה ייחודית");
-				saved.saveOptions(opt);
-				String xml = saved.getOptions();
-
-				saved = new SavedSearch();
-				saved.setOptions(xml);
-			} catch (Throwable t) {
-			}
+			saved = new SavedSearch();
+			saved.setOptions(xml);
+		} catch (Throwable t) {
+			t.printStackTrace();
+			Assert.fail("error saving the option");
 		}
+		
+		try {
+			Charset ch = Charset.forName("UTF-8");			
+			Context.get().getProperties().setProperty("default.charset", ch.name());
+			SavedSearch saved = new SavedSearch();
+			saved.setName("manca l'umiltà");
+			saved.saveOptions(opt);
+			String xml = saved.getOptions();
+			assertNotNull(xml);
+			assertTrue(xml.length() > 700);
+
+			saved = new SavedSearch();
+			saved.setOptions(xml);
+		} catch (Throwable t) {
+			t.printStackTrace();
+			Assert.fail("error saving the option");
+		}
+		
+		opt.setExpression("我正在寻找每月200欧元的工人，没有人回答：缺乏谦虚");
+		try {
+			Charset ch = Charset.forName("UTF-8");			
+			Context.get().getProperties().setProperty("default.charset", ch.name());
+			SavedSearch saved = new SavedSearch();
+			saved.setName("缺乏谦卑");
+			saved.saveOptions(opt);
+			String xml = saved.getOptions();
+			assertNotNull(xml);
+			//System.err.println(xml.length());
+			assertTrue(xml.length() > 800);
+
+			saved = new SavedSearch();
+			saved.setOptions(xml);
+		} catch (Throwable t) {
+			t.printStackTrace();
+			Assert.fail("error saving the option");
+		}		
+
 	}
 
 	@Test
@@ -111,7 +159,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 		FolderSearchOptions opt = new FolderSearchOptions();
 
 	
-		opt.setExpression("ואתם נהנים");
+		opt.setExpression("×•×�×ª×� × ×”× ×™×�");
 		opt.setTemplate(1L);
 		opt.setType(SearchOptions.TYPE_FULLTEXT);
 		opt.setUserId(1);
@@ -124,7 +172,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 		
 		
 		SavedSearch saved = new SavedSearch();
-		saved.setName("ואתם נהנים מהטבה ייחודית");
+		saved.setName("×•×�×ª×� × ×”× ×™×� ×ž×”×˜×‘×” ×™×™×—×•×“×™×ª");
 		saved.saveOptions(opt);
 		saved.getOptions();	
 	}

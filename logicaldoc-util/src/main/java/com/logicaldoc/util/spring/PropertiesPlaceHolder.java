@@ -3,6 +3,7 @@ package com.logicaldoc.util.spring;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Properties;
@@ -47,8 +48,10 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 	 * @return The found value, may be null
 	 */
 	private String getDbProperty(String property) {
+		
 		Connection conn = null;
 		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
 			ContextProperties conf = new ContextProperties();
@@ -57,16 +60,16 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 			Class.forName(conf.getProperty("jdbc.driver"));
 
 			// Get a connection to the database
-			conn = DriverManager.getConnection(conf.getProperty("jdbc.url"), conf.getProperty("jdbc.username"),
-					conf.getProperty("jdbc.password"));
+			conn = DriverManager.getConnection(conf.getProperty("jdbc.url"), conf.getProperty("jdbc.username"),conf.getProperty("jdbc.password"));
 
 			// Get a statement from the connection
 			stmt = conn.createStatement();
 
 			// Execute the query
-			rs = stmt
-					.executeQuery("select ld_string1 from ld_generic where ld_deleted=0 and ld_type='conf' and ld_subtype='"
-							+ property + "'");
+			String query = "select ld_string1 from ld_generic where ld_deleted=0 and ld_type='conf' and ld_subtype=?";
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, property);
+			rs = pstmt.executeQuery();
 
 			// Loop through the result set
 			while (rs.next())
@@ -84,8 +87,11 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 			try {
 				stmt.close();
 			} catch (Throwable se) {
+			}			
+			try {
+				pstmt.close();
+			} catch (Throwable se) {
 			}
-
 			try {
 				conn.close();
 			} catch (Throwable se) {

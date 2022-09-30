@@ -16,12 +16,16 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.security.Tenant;
 
 public class PDFParserTest extends AbstractCoreTCase {
 
+	protected static Logger log = LoggerFactory.getLogger(PDFParserTest.class);
+	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -33,8 +37,7 @@ public class PDFParserTest extends AbstractCoreTCase {
 	@Test
 	public void testParse() throws UnsupportedEncodingException, ParseException {
 
-		// This is a pdf German document that PDFBox version 0.7.3 in not able
-		// to read
+		// This is a pdf German document that PDFBox version 0.7.3 in not able to read
 		// The new version of PDFBox 1.3.1 is able to open such document
 		// This pdf has been created with Adobe PDF Library 9.0
 		String inputFile = "src/test/resources/Digital_Day.pdf";
@@ -43,8 +46,7 @@ public class PDFParserTest extends AbstractCoreTCase {
 
 		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-
-
+		
 		inputFile = "src/test/resources/probiotic-1.4.pdf";
 		file = new File(inputFile);
 		filename = file.getPath();
@@ -151,20 +153,28 @@ public class PDFParserTest extends AbstractCoreTCase {
 
 	@Test
 	public void testForm() throws UnsupportedEncodingException, ParseException {
-		String inputFile = "src/test/reaources/pdf_form_fields.pdf";
+		
+		String inputFile = "src/test/resources/pdf_form_fields.pdf";
 		File file = new File(inputFile);
 		String filename = file.getPath();
 
 		Parser parser = ParserFactory.getParser(filename);
 		PDFParser pdfp = (PDFParser) parser;
-		pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
-
+		String x = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+		assertNotNull(x);
+		log.debug("Extracted text size: " + x.length());
+		assertTrue(x.length() > 2000);
+		
 		inputFile = "src/test/resources/fillablePDF1.pdf";
 		file = new File(inputFile);
 		filename = file.getPath();
 
 		parser = ParserFactory.getParser(filename);
 		pdfp = (PDFParser) parser;
-		pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+		x = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
+		assertNotNull(x);
+		log.debug("Extracted text size: " + x.length());
+		assertTrue(x.length() > 2500);
+		
 	}
 }
