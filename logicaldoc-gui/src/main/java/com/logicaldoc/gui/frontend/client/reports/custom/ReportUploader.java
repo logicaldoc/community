@@ -46,7 +46,7 @@ public class ReportUploader extends Window {
 			setTitle(I18N.message("uploadnewdesign") + " - " + report.getName());
 		else
 			setTitle(I18N.message("newreport"));
-		setMinWidth(460);
+		setWidth(460);
 
 		setAutoSize(true);
 		setCanDragResize(true);
@@ -130,7 +130,7 @@ public class ReportUploader extends Window {
 	}
 
 	public void onSave(GUIReport report) {
-		if (uploader.getUploadedFiles().isEmpty()) {
+		if (uploader.getUploadedFile() == null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

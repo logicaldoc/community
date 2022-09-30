@@ -106,7 +106,7 @@ public class KeystoreUploader extends Window {
 	}
 
 	public void onSend() {
-		if (uploader.getUploadedFiles().isEmpty()) {
+		if (uploader.getUploadedFile()==null) {
 			SC.warn(I18N.message("filerequired"));
 			return;
 		}

@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.common.client.widgets;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.wisepersist.gwt.uploader.client.Uploader;
 import org.wisepersist.gwt.uploader.client.events.FileDialogCompleteEvent;
 import org.wisepersist.gwt.uploader.client.events.FileDialogCompleteHandler;
@@ -38,7 +35,7 @@ public class Upload extends VerticalPanel {
 
 	private final Label progressLabel = new Label();
 
-	private List<String> uploadedFiles = new ArrayList<String>();
+	private String uploadedFile;
 
 	public Upload(SubmitItem submitButton) {
 		this(null, submitButton);
@@ -62,13 +59,24 @@ public class Upload extends VerticalPanel {
 				}).setUploadSuccessHandler(new UploadSuccessHandler() {
 					public boolean onUploadSuccess(UploadSuccessEvent uploadSuccessEvent) {
 						resetText();
-						progressLabel.setText(uploadSuccessEvent.getFile().getName());
+						String fileName = uploadSuccessEvent.getFile().getName();
+						String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+
+						if (!Util.isAllowedForUpload(fileName)) {
+							uploader.cancelUpload(uploadSuccessEvent.getFile().getId(), false);
+							fileName = null;
+							SC.warn(I18N.message("disallowedext", fileExtension));
+							return false;
+						}
+
+						progressLabel.setText(fileName);
+						uploadedFile = fileName;
 
 						if (confirmButton != null)
 							confirmButton.setDisabled(false);
 						if (submitButton != null)
 							submitButton.setDisabled(false);
-						
+
 						return true;
 					}
 				}).setFileDialogCompleteHandler(new FileDialogCompleteHandler() {
@@ -86,6 +94,7 @@ public class Upload extends VerticalPanel {
 						SC.warn(I18N.message("uploadoffile") + " " + fileQueueErrorEvent.getFile().getName() + " "
 								+ I18N.message("failedueto") + " [" + fileQueueErrorEvent.getErrorCode().toString()
 								+ "]: " + fileQueueErrorEvent.getMessage());
+						uploadedFile = null;
 						return true;
 					}
 				}).setUploadErrorHandler(new UploadErrorHandler() {
@@ -94,6 +103,7 @@ public class Upload extends VerticalPanel {
 						SC.warn(I18N.message("uploadoffile") + " " + uploadErrorEvent.getFile().getName() + " "
 								+ I18N.message("failedueto") + " [" + uploadErrorEvent.getErrorCode().toString() + "]: "
 								+ uploadErrorEvent.getMessage());
+						uploadedFile = null;
 						return true;
 					}
 				});
@@ -112,7 +122,7 @@ public class Upload extends VerticalPanel {
 		uploader.setFileTypes(fileTypes);
 	}
 
-	public List<String> getUploadedFiles() {
-		return uploadedFiles;
+	public String getUploadedFile() {
+		return uploadedFile;
 	}
 }
