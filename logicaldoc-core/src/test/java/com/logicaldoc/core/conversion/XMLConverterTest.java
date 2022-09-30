@@ -2,9 +2,8 @@ package com.logicaldoc.core.conversion;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
-import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -14,57 +13,57 @@ import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.core.security.dao.SessionDAO;
 
 public class XMLConverterTest extends AbstractCoreTCase {
-	
-	// Instance under test
-	private SessionDAO sdao;	
-	
+
 	private DocumentDAO ddao;
-	
+
 	protected static Logger log = LoggerFactory.getLogger(XMLConverterTest.class);
 
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 
-		// Retrieve the instance under test from spring context. Make sure that
-		// it is an HibernateSessionDAO
-		sdao = (SessionDAO) context.getBean("SessionDAO");
-		ddao = (DocumentDAO) context.getBean("DocumentDAO");		
-	}
-
-	@After
-	public void tearDown() throws Exception {
+		// Retrieve the instance under test from spring context.
+		ddao = (DocumentDAO) context.getBean("DocumentDAO");
 	}
 
 	@Test
 	public void testInternalConvert() throws PersistenceException, IOException {
 
-		List<Document> xxx = ddao.findAll();
-		for (Document document : xxx) {
-			System.out.println("id: " + document.getId());
-		}
-		
-		Document doc = ddao.findById(3);
+		Document doc = ddao.findById(7);
+
+		System.err.println(doc.getFileName());
+		System.err.println(doc.getFileExtension());
 		log.error(doc.getFileName());
 		log.error(doc.getFileExtension());
-		
+
 		XMLConverter convert = new XMLConverter();
-		
+
 		String inputFile = "src/test/resources/context.xml";
 		File srcXMLFile = new File(inputFile);
 
-	    try {
-			//Creating a temp file
-			File targetFile = File.createTempFile("converted", ".html");
+		File targetFile = null;
+		try {
+			// Creating a temp file
+			targetFile = File.createTempFile("converted", ".txt");
+			System.err.println(targetFile);
+
 			convert.internalConvert("sid1", doc, srcXMLFile, targetFile);
+			
+			// read file and print length the outputstream
+			System.err.println("targetFile.length(): " +targetFile.length());
+
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			log.error("Exception during conversion", e);
 			e.printStackTrace();
-			log.error("ghghgj", e);
+			Assert.fail();
+		} finally {
+			if (targetFile != null && targetFile.exists())
+				targetFile.delete();
 		}
+		
+		
 	}
 
 }
