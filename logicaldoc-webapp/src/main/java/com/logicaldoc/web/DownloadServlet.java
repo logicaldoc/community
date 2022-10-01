@@ -53,9 +53,9 @@ public class DownloadServlet extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Session session = ServletUtil.validateSession(request);
-
 		try {
+			Session session = ServletUtil.validateSession(request);
+
 			if (request.getParameter("pluginId") != null)
 				ServletUtil.downloadPluginResource(request, response, session.getSid(),
 						request.getParameter("pluginId"), request.getParameter("resourcePath"),
@@ -91,7 +91,11 @@ public class DownloadServlet extends HttpServlet {
 
 		try {
 			if (StringUtils.isNotEmpty(docId)) {
-				doc = docDao.findById(Long.parseLong(docId));
+				try {
+					doc = docDao.findById(Long.parseLong(docId));
+				} catch (NumberFormatException e) {
+					log.error("Invalid document ID {}", docId);
+				}
 
 				if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
 						doc.getFolder().getId(), session.getUserId()))
@@ -106,7 +110,11 @@ public class DownloadServlet extends HttpServlet {
 					// Generate the PDF conversion
 					FormatConverterManager manager = (FormatConverterManager) Context.get()
 							.getBean(FormatConverterManager.class);
-					manager.convertToPdf(doc, fileVersion, session.getSid());
+					try {
+						manager.convertToPdf(doc, fileVersion, session.getSid());
+					} catch (Exception e) {
+						log.error("Cannot convert to PDF the document {}", doc);
+					}
 
 					suffix = FormatConverterManager.PDF_CONVERSION_SUFFIX;
 				}
@@ -119,7 +127,12 @@ public class DownloadServlet extends HttpServlet {
 			}
 
 			if (StringUtils.isNotEmpty(versionId)) {
-				version = versDao.findById(Long.parseLong(versionId));
+				try {
+					version = versDao.findById(Long.parseLong(versionId));
+				} catch (NumberFormatException e) {
+					log.error("Invalid version ID {}", versionId);
+				}
+
 				if (doc == null) {
 					doc = docDao.findDocument(version.getDocId());
 
@@ -130,6 +143,8 @@ public class DownloadServlet extends HttpServlet {
 			}
 		} catch (PersistenceException e) {
 			throw new ServletException("An error happened in the database", e);
+		} catch (Throwable t) {
+			throw new ServletException(t.getMessage(), t);
 		}
 
 		if (version == null && doc != null && StringUtils.isNotEmpty(ver))

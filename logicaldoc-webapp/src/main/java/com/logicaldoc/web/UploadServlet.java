@@ -26,6 +26,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionListener;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -61,17 +62,21 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
-		out.println("<HTML>");
-		out.println("  <HEAD><TITLE>Upload Document Resource Servlet</TITLE></HEAD>");
-		out.println("  <BODY>");
-		out.print(" This servlet doesn't support GET method. Use POST instead. ");
-		out.println("  </BODY>");
-		out.println("</HTML>");
-		out.flush();
-		out.close();
+
+		try {
+			response.setContentType("text/html");
+			PrintWriter out = response.getWriter();
+			out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
+			out.println("<HTML>");
+			out.println("  <HEAD><TITLE>Upload Document Resource Servlet</TITLE></HEAD>");
+			out.println("  <BODY>");
+			out.print(" This servlet doesn't support GET method. Use POST instead. ");
+			out.println("  </BODY>");
+			out.println("</HTML>");
+			out.flush();
+			out.close();
+		} catch (Throwable t) {
+		}
 	}
 
 	/**
@@ -87,7 +92,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 		dir.mkdir();
 		return dir;
 	}
-	
+
 	/**
 	 * Retrieves the root of the upload folder
 	 * 
@@ -146,7 +151,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 		if (uploadedFiles != null)
 			uploadedFiles.clear();
 	}
-	
+
 	/**
 	 * Removes all the uploaded files from session and file system.
 	 * 
@@ -186,44 +191,44 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String sid = getSid(request);
-		String tenant = SessionManager.get().get(sid).getTenantName();
-		File uploadDir = getUploadDir(sid);
-
-		// Check that we have a file upload request
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		response.setContentType("text/html");
-		java.io.PrintWriter out = response.getWriter();
-
-		if (!isMultipart) {
-			out.println("<html>");
-			out.println("<head>");
-			out.println("<title>Upload</title>");
-			out.println("</head>");
-			out.println("<body>");
-			out.println("<p>No file uploaded</p>");
-			out.println("</body>");
-			out.println("</html>");
-			return;
-		}
-
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-
-		// maximum size that will be stored in memory (in bytes)
-		factory.setSizeThreshold(maxMemSize);
-
-		// Location to save data that is larger than maxMemSize.
-		factory.setRepository(uploadDir);
-
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
-
-		// maximum file size to be uploaded (in bytes)
-		upload.setFileSizeMax(Context.get().getProperties().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
-
-		Map<String, File> uploadedFiles = getReceivedFiles(sid);
-
 		try {
+			String sid = getSid(request);
+			String tenant = SessionManager.get().get(sid).getTenantName();
+			File uploadDir = getUploadDir(sid);
+
+			// Check that we have a file upload request
+			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+			response.setContentType("text/html");
+			java.io.PrintWriter out = response.getWriter();
+
+			if (!isMultipart) {
+				out.println("<html>");
+				out.println("<head>");
+				out.println("<title>Upload</title>");
+				out.println("</head>");
+				out.println("<body>");
+				out.println("<p>No file uploaded</p>");
+				out.println("</body>");
+				out.println("</html>");
+				return;
+			}
+
+			DiskFileItemFactory factory = new DiskFileItemFactory();
+
+			// maximum size that will be stored in memory (in bytes)
+			factory.setSizeThreshold(maxMemSize);
+
+			// Location to save data that is larger than maxMemSize.
+			factory.setRepository(uploadDir);
+
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+
+			// maximum file size to be uploaded (in bytes)
+			upload.setFileSizeMax(Context.get().getProperties().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
+
+			Map<String, File> uploadedFiles = getReceivedFiles(sid);
+
 			// Parse the request to get uploaded file items.
 			List<FileItem> fileItems = upload.parseRequest(request);
 
@@ -235,12 +240,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
 			for (FileItem fi : fileItems) {
 				if (!fi.isFormField()) {
-					// Get the uploaded file parameters
-//	                String fieldName = fi.getFieldName();
 					String fileName = fi.getName();
-//	                String contentType = fi.getContentType();
-//					boolean isInMemory = fi.isInMemory();
-//					long sizeInBytes = fi.getSize();
 
 					checkIfAllowedForUpload(tenant, fileName);
 
@@ -254,12 +254,9 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			}
 			out.println("</body>");
 			out.println("</html>");
-		} catch (ServletException se) {
-			log.error(se.getMessage(), se);
-			throw se;
-		} catch (Throwable ex) {
-			log.error(ex.getMessage(), ex);
-			throw new ServletException(ex.getMessage());
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 

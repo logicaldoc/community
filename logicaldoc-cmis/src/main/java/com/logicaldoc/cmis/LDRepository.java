@@ -458,12 +458,8 @@ public class LDRepository {
 
 		try {
 			Folder target = getFolder(folderId);
-			if (target == null)
-				throw new CmisObjectNotFoundException("Folder '" + folderId + "' is unknown!");
 
 			Document doc = (Document) getDocument(sourceId);
-			if (doc == null)
-				throw new CmisObjectNotFoundException("Document '" + sourceId + "' is unknown!");
 
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setSessionId(sid);
@@ -551,6 +547,7 @@ public class LDRepository {
 				throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
 
 			User user = getSessionUser();
+			assert(user!=null);
 
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
@@ -567,11 +564,6 @@ public class LDRepository {
 			}
 			if (!isValidName(fileName))
 				throw new CmisNameConstraintViolationException("File name is not valid!");
-
-			// get parent Folder
-			Folder parent = getFolder(folderId);
-			if (parent == null)
-				throw new CmisObjectNotFoundException("Parent is not a folder!");
 
 			Document document = new Document();
 			updateDocumentMetadata(document, properties, true);

@@ -43,6 +43,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.util.IconSelector;
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
@@ -108,12 +109,7 @@ public class DashletContent extends HttpServlet {
 				handleContent(dashlet, dashletDictionary, automation, writer);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			if (e instanceof ServletException)
-				throw (ServletException) e;
-			else if (e instanceof IOException)
-				throw (IOException) e;
-			else
-				throw new ServletException(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 

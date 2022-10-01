@@ -56,20 +56,21 @@ public class TicketDownload extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		HttpSession session = request.getSession();
 		String ticketId = request.getParameter("ticketId");
 
-		if (StringUtils.isEmpty(ticketId)) {
-			ticketId = (String) request.getAttribute("ticketId");
-		}
-
-		if (StringUtils.isEmpty(ticketId)) {
-			ticketId = (String) session.getAttribute("ticketId");
-		}
-
-		logger.debug("Download ticket ticketId={}", ticketId);
-
 		try {
+			HttpSession session = request.getSession();
+
+			if (StringUtils.isEmpty(ticketId)) {
+				ticketId = (String) request.getAttribute("ticketId");
+			}
+
+			if (StringUtils.isEmpty(ticketId)) {
+				ticketId = (String) session.getAttribute("ticketId");
+			}
+
+			logger.debug("Download ticket ticketId={}", ticketId);
+
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 			FormatConverterManager converter = (FormatConverterManager) Context.get()
@@ -108,11 +109,12 @@ public class TicketDownload extends HttpServlet {
 			ticketDao.store(ticket);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
-			PrintWriter out = response.getWriter();
-			out.println("Ticket " + ticketId + " is no more active"
-					+ (e.getMessage() != null ? ": " + e.getMessage() : ""));
-			out.flush();
-			out.close();
+
+			try (PrintWriter out = response.getWriter();) {
+				out.println("Ticket " + ticketId + " is no more active"
+						+ (e.getMessage() != null ? ": " + e.getMessage() : ""));
+			} catch (Throwable t) {
+			}
 		}
 	}
 
@@ -128,20 +130,22 @@ public class TicketDownload extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html");
+		try {
+			response.setContentType("text/html");
 
-		PrintWriter out = response.getWriter();
-		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
-		out.println("<HTML>");
-		out.println("  <HEAD><TITLE>Download Ticket Action</TITLE></HEAD>");
-		out.println("  <BODY>");
-		out.print("    This is ");
-		out.print(this.getClass());
-		out.println(", using the POST method");
-		out.println("  </BODY>");
-		out.println("</HTML>");
-		out.flush();
-		out.close();
+			try (PrintWriter out = response.getWriter()) {
+				out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
+				out.println("<HTML>");
+				out.println("  <HEAD><TITLE>Download Ticket Action</TITLE></HEAD>");
+				out.println("  <BODY>");
+				out.print("    This is ");
+				out.print(this.getClass());
+				out.println(", using the POST method");
+				out.println("  </BODY>");
+				out.println("</HTML>");
+			}
+		} catch (Throwable t) {
+		}
 	}
 
 	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Document doc,
@@ -150,12 +154,12 @@ public class TicketDownload extends HttpServlet {
 
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(doc, fileVersion, suffix);
-		String filename = doc.getFileName();
-		if (suffix != null && suffix.contains("pdf"))
-			filename = doc.getFileName() + ".pdf";
-
 		OutputStream os = null;
-		try(InputStream is = storer.getStream(doc.getId(), resource)) {
+		try (InputStream is = storer.getStream(doc.getId(), resource)) {
+			String filename = doc.getFileName();
+			if (suffix != null && suffix.contains("pdf"))
+				filename = doc.getFileName() + ".pdf";
+
 			long size = storer.size(doc.getId(), resource);
 
 			// get the mimetype
@@ -178,9 +182,12 @@ public class TicketDownload extends HttpServlet {
 				os.write(letter);
 			}
 		} finally {
-			if (os != null)
-				os.flush();
-			os.close();
+			try {
+				if (os != null)
+					os.flush();
+				os.close();
+			} catch (Throwable t) {
+			}
 		}
 
 		// Add an history entry to track the download of the document

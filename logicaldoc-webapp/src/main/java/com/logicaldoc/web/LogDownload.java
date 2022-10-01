@@ -48,7 +48,7 @@ public class LogDownload extends HttpServlet {
 		try {
 			ServletUtil.checkMenu(request, Menu.LOGS);
 		} catch (Throwable t) {
-			throw new ServletException(t.getMessage());
+			ServletUtil.sendError(response, t.getMessage());
 		}
 
 		String appender = request.getParameter("appender");
@@ -206,7 +206,7 @@ public class LogDownload extends HttpServlet {
 				out.close();
 			}
 		} catch (Throwable ex) {
-			ex.printStackTrace();
+			log.error(ex.getMessage(), ex);
 		}
 
 		return tmp;
@@ -216,7 +216,7 @@ public class LogDownload extends HttpServlet {
 
 		byte[] b;
 		int count;
-		
+
 		try (FileInputStream in = new FileInputStream(file)) {
 			// name the file inside the zip file
 			out.putNextEntry(new ZipEntry(entry));
@@ -231,6 +231,9 @@ public class LogDownload extends HttpServlet {
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		doGet(request, response);
+		try {
+			doGet(request, response);
+		} catch (Throwable t) {
+		}
 	}
 }

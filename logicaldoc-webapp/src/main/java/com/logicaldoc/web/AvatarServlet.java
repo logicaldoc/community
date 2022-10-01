@@ -53,18 +53,18 @@ public class AvatarServlet extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String id = request.getParameter(USER_ID);
-
-		String fileName = "avatar-" + id + ".png";
-		response.setContentType(MimeType.getByFilename(fileName));
-		ServletUtil.setContentDisposition(request, response, fileName);
-
 		try {
+			String id = request.getParameter(USER_ID);
+
+			String fileName = "avatar-" + id + ".png";
+			response.setContentType(MimeType.getByFilename(fileName));
+			ServletUtil.setContentDisposition(request, response, fileName);
+
 			String content = UserUtil.getAvatarImage(id);
 			saveImage(content, response.getOutputStream());
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			new IOException(t.getMessage());
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 

@@ -56,47 +56,53 @@ public class DocumentResourceUpload extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html");
-		PrintWriter out = response.getWriter();
-		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
-		out.println("<HTML>");
-		out.println("  <HEAD><TITLE>Upload Document Resource Servlet</TITLE></HEAD>");
-		out.println("  <BODY>");
-		out.print(" This servlet doesn't support GET method. Use POST instead. ");
-		out.println("  </BODY>");
-		out.println("</HTML>");
-		out.flush();
-		out.close();
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		try {
+			response.setContentType("text/html");
+			PrintWriter out = response.getWriter();
+			out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
+			out.println("<HTML>");
+			out.println("  <HEAD><TITLE>Upload Document Resource Servlet</TITLE></HEAD>");
+			out.println("  <BODY>");
+			out.print(" This servlet doesn't support GET method. Use POST instead. ");
+			out.println("  </BODY>");
+			out.println("</HTML>");
+			out.flush();
+			out.close();
+		} catch (Exception ex) {
+			log.error(ex.getMessage(), ex);
+		}
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
-		Session session = ServletUtil.validateSession(request);
-
-		UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
-
-		// Load the user associated to the session
-		User user = udao.findByUsername(session.getUsername());
-		if (user == null)
-			return;
-
-		String docId = request.getParameter(DOC_ID);
-
-		String suffix = request.getParameter(SUFFIX);
-
-		String fileVersion = request.getParameter(VERSION_ID);
-
-		String docVersion = request.getParameter(VERSION_DOC);
-
-		log.debug("Start Upload resource for document " + docId);
-
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		try {
+			Session session = ServletUtil.validateSession(request);
+
+			UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
+
+			// Load the user associated to the session
+			User user = udao.findByUsername(session.getUsername());
+			if (user == null)
+				return;
+
+			String docId = request.getParameter(DOC_ID);
+
+			String suffix = request.getParameter(SUFFIX);
+
+			String fileVersion = request.getParameter(VERSION_ID);
+
+			String docVersion = request.getParameter(VERSION_DOC);
+
+			log.debug("Start Upload resource for document " + docId);
+
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+
 			Document doc = docDao.findById(Long.parseLong(docId));
 			Folder folder = doc.getFolder();
 			if (fdao.isPermissionEnabled(Permission.SIGN, folder.getId(), user.getId())) {

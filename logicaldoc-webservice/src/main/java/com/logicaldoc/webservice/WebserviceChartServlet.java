@@ -65,26 +65,28 @@ public class WebserviceChartServlet extends HttpServlet {
 	 * @throws IOException if an error occurred
 	 */
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		WebserviceServletUtil.validateSession(request);
-
-		int width = 1200;
-		if (request.getParameter("width") != null)
-			width = Integer.parseInt(request.getParameter("width"));
-
-		int height = 450;
-		if (request.getParameter("height") != null)
-			height = Integer.parseInt(request.getParameter("height"));
-
-		Locale locale = Locale.ENGLISH;
-		if (request.getParameter("locale") != null)
-			locale = LocaleUtil.toLocale(request.getParameter("locale"));
-
-		long tenantId = Tenant.SYSTEM_ID;
-		if (request.getParameter("tenantId") != null)
-			tenantId = Long.parseLong(request.getParameter("tenantId"));
-
-		File chartFile = File.createTempFile("chart", ".png");
+		File chartFile = null;
 		try {
+			WebserviceServletUtil.validateSession(request);
+
+			int width = 1200;
+			if (request.getParameter("width") != null)
+				width = Integer.parseInt(request.getParameter("width"));
+
+			int height = 450;
+			if (request.getParameter("height") != null)
+				height = Integer.parseInt(request.getParameter("height"));
+
+			Locale locale = Locale.ENGLISH;
+			if (request.getParameter("locale") != null)
+				locale = LocaleUtil.toLocale(request.getParameter("locale"));
+
+			long tenantId = Tenant.SYSTEM_ID;
+			if (request.getParameter("tenantId") != null)
+				tenantId = Long.parseLong(request.getParameter("tenantId"));
+
+			chartFile = File.createTempFile("chart", ".png");
+			
 			/**
 			 * Retrieve the sequences and order them by date
 			 */

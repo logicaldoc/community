@@ -154,7 +154,7 @@ public class LDCmisService extends AbstractCmisService {
 			}
 
 			LDRepository repo = repositories.get(repositoryId);
-			
+
 			String tenantIdStr = Long.toString(repo.getRoot().getTenantId());
 
 			StringBuffer query = new StringBuffer(
@@ -163,20 +163,19 @@ public class LDCmisService extends AbstractCmisService {
 			query.append(" AND ld_event IN ('");
 			query.append(DocumentEvent.STORED);
 			query.append("','");
-			query.append(DocumentEvent.CHECKEDIN); 
+			query.append(DocumentEvent.CHECKEDIN);
 			query.append("','");
 //			query.append(DocumentEvent.CHANGED);// this happens when metadata are changed, it is not so relevant for LDSynch so to improve performance we commented it
 //			query.append("','");
 			query.append(DocumentEvent.MOVED);
-			query.append("','");			
+			query.append("','");
 			query.append(DocumentEvent.RENAMED);
 			query.append("','");
 			query.append(DocumentEvent.DELETED);
 			query.append("')");
-			//log.debug("Query: {}", query.toString());
+			// log.debug("Query: {}", query.toString());
 
 			Timestamp latestDate = (Timestamp) historyDao.queryForObject(query.toString(), Timestamp.class);
-			
 
 			StringBuffer query2 = new StringBuffer(
 					"SELECT MAX(ld_date) FROM ld_folder_history WHERE ld_deleted=0 AND ld_tenantid=");
@@ -187,25 +186,21 @@ public class LDCmisService extends AbstractCmisService {
 			query2.append(FolderEvent.RENAMED);
 			query2.append("','");
 			query2.append(FolderEvent.MOVED);
-			query2.append("','");			
+			query2.append("','");
 			query2.append(FolderEvent.DELETED);
 			query2.append("')");
-			//log.debug("Query: {}", query2.toString());
+			// log.debug("Query: {}", query2.toString());
 
 			Timestamp latestFolderDate = (Timestamp) historyDao.queryForObject(query2.toString(), Timestamp.class);
-			
+
 			if (latestDate == null && latestFolderDate == null) {
-				//log.debug("latestDate == null, return 0");
 				return "0";
 			} else {
-//				log.debug("latestDate.getTime(): {}" ,latestDate.getTime());
-//				return Long.toString(latestDate.getTime());
-				
-				log.debug("latestDate.getTime(): {}", latestDate.getTime());
-				log.debug("latestFolderDate.getTime(): {}", latestFolderDate.getTime());
+				log.debug("latestDate.getTime(): {}", latestDate != null ? latestDate.getTime() : "");
+				log.debug("latestFolderDate.getTime(): {}", latestDate != null ? latestFolderDate.getTime() : "");
 				Timestamp myDate = getLatestTimestamp(latestDate, latestFolderDate);
-				
-				log.debug("myDate.getTime(): {}" ,myDate.getTime());
+
+				log.debug("myDate.getTime(): {}", myDate.getTime());
 				return Long.toString(myDate.getTime());
 			}
 		} catch (Throwable e) {
@@ -215,17 +210,14 @@ public class LDCmisService extends AbstractCmisService {
 	}
 
 	private Timestamp getLatestTimestamp(Timestamp date1, Timestamp date2) {
-		
-		if (date1 != null && date2 == null) 
+		if (date1 != null && date2 == null)
 			return date1;
-		if (date1 == null && date2 != null) 
+		if (date1 == null && date2 != null)
 			return date2;
-		if (date1.after(date2))
+		if (date1 != null && date1.after(date2))
 			return date1;
-		
 		return date2;
 	}
-	
 
 	@Override
 	public TypeDefinitionList getTypeChildren(String repositoryId, String typeId, Boolean includePropertyDefinitions,
@@ -449,6 +441,9 @@ public class LDCmisService extends AbstractCmisService {
 	public LDRepository getRepository() {
 		LDRepository repo = null;
 		Session session = validateSession();
+
+		if (session == null)
+			throw new CmisPermissionDeniedException("No session");
 
 		if (StringUtils.isEmpty(getCallContext().getRepositoryId())) {
 			/*
