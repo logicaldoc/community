@@ -211,6 +211,7 @@ public class LDRepository {
 	 * @param root root folder
 	 */
 	public LDRepository(Folder root, String sid) {
+		
 		// check root folder
 		if (root == null)
 			throw new IllegalArgumentException("Invalid root folder!");
