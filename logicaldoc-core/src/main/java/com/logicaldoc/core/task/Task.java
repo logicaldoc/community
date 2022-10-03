@@ -131,11 +131,15 @@ public abstract class Task implements Runnable {
 					lockManager.get(getName(), transactionId);
 				} catch (Throwable e) {
 				}				
-				try {
-					Thread.sleep((1 + random.nextInt(20)) * 1000);
-				} catch (Throwable e) {
+				
+				synchronized (this) {
+					try {
+						wait((1 + random.nextInt(20)) * 1000);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
 				}
-
+				
 				checkExpiration();
 			}
 

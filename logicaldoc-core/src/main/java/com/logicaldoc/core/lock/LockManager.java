@@ -63,9 +63,12 @@ public class LockManager {
 				log.debug("Acquired lock {}", lockName);
 				return true;
 			} else
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
+				synchronized (this) {
+					try {
+						wait(1000);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
 				}
 		}
 

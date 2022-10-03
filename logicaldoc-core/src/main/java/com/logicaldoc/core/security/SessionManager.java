@@ -516,11 +516,14 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		@Override
 		public void run() {
 			while (active) {
-				try {
-					Thread.sleep(1000 * 60L);
-				} catch (InterruptedException e) {
-
+				synchronized (this) {
+					try {
+						wait(1000 * 60L);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
 				}
+
 				for (Session session : SessionManager.this.getSessions()) {
 					if (session.isOpen() && session.isTimedOut()) {
 						session.setExpired();

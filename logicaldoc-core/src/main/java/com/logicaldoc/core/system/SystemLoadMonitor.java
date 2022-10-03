@@ -164,9 +164,12 @@ public class SystemLoadMonitor {
 							}
 						}
 
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
+					synchronized (this) {
+						try {
+							wait(2000);
+						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
+						}
 					}
 				}
 			}
