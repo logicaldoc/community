@@ -1428,6 +1428,8 @@ public class LDRepository {
 		if (where.toLowerCase().contains("where"))
 			where = where.substring(where.toLowerCase().indexOf("where") + 6).trim();
 
+		log.debug("where: {}", where);
+		
 		/**
 		 * Try to detect if the request comes from LogicalDOC Mobile
 		 */
@@ -1450,6 +1452,7 @@ public class LDRepository {
 		// FROM cmis:document WHERE ldoc:sourceId = '12345'
 
 		boolean fileNameSearch = where.toLowerCase().contains("cmis:name");
+		log.debug("fileNameSearch: {}", fileNameSearch);
 
 		Long parentFolderID = null;
 
@@ -1487,11 +1490,14 @@ public class LDRepository {
 
 		// Performs Full-text search
 		if (!fileNameSearch) {
+			log.debug("Performs Full-text search");
 			expr = StringUtils.substringBetween(statement, "'%", "%'");
 			if (StringUtils.isEmpty(expr))
 				expr = StringUtils.substringBetween(statement, "('", "')");
 			if (StringUtils.isEmpty(expr))
 				expr = StringUtils.substringBetween(statement, "'", "'");
+			
+			log.debug("expr: {}", expr);
 
 			// Prepare the search options
 			FulltextSearchOptions opt = new FulltextSearchOptions();
@@ -1499,10 +1505,12 @@ public class LDRepository {
 
 			User user = getSessionUser();
 			opt.setUserId(user.getId());
+			log.debug("user.getLanguage(): {}", user.getLanguage());
 			opt.setExpressionLanguage(user.getLanguage());
 
 			// Check to search in Tree
 			if (parentFolderID != null) {
+				System.err.println("parentFolderID != null");
 				opt.setFolderId(parentFolderID);
 				opt.setSearchInSubPath(true);
 			}
@@ -1518,6 +1526,8 @@ public class LDRepository {
 					String field = m.group();
 					if (field.startsWith("ldoc:"))
 						field = field.substring("ldoc:".length());
+					
+					log.debug("field: {}", field);
 					fields.add(field);
 				}
 
@@ -1525,21 +1535,23 @@ public class LDRepository {
 			}
 
 			// Execute the search
+			log.debug("opt: {}",opt);
 			Search search = Search.get(opt);
+			log.debug("search: {}", search);
 			List<Hit> hits = new ArrayList<Hit>();
 			try {
 				hits = search.search();
 			} catch (SearchException e1) {
 				log.error(e1.getMessage(), e1);
 			}
+			log.debug("hits.size(): {}", hits.size());
 
 			// Populate CMIS data structure
 			try {
 				// Iterate through the list of results
 				for (Hit hit : hits) {
 					try {
-						// filtro i risultati (lasciando solo le colonne
-						// richieste)
+						// filtro i risultati (lasciando solo le colonne richieste)
 						ObjectData result = compileObjectType(null, hit, filter, false, false, null);
 						list.add(result);
 					} catch (Throwable t) {
@@ -1549,18 +1561,13 @@ public class LDRepository {
 			} catch (Throwable e) {
 				log.error("CMIS Exception populating data structure", e);
 			}
-			// hasMoreItems = search.getEstimatedHitsNumber() > list.size();
-			hasMoreItems = search.getEstimatedHitsNumber() > max; // THIS Seems
-																	// more
-																	// correct
+			hasMoreItems = search.getEstimatedHitsNumber() > max; 
 		} else {
 			User user = getSessionUser();
-
-			expr = StringUtils.substringBetween(statement, "'%", "%'");
-			// Remove all the '*' from start and end
-			expr = StringUtils.strip(expr, "*");
-
-			String filename = "%" + expr + "%";
+			
+			expr = StringUtils.substringBetween(statement, "'", "'");
+			String filename = expr;
+			log.debug("filename: {}", filename);
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, getSessionUser().getId(),
@@ -2603,7 +2610,7 @@ public class LDRepository {
 	/**
 	 * Returns the first value of an string property.
 	 */
-	private static String getStringProperty(Properties properties, String name) {
+	static String getStringProperty(Properties properties, String name) {
 
 		PropertyData<?> property = properties.getProperties().get(name);
 
@@ -2698,7 +2705,6 @@ public class LDRepository {
 	}
 
 	private void debug(String msg) {
-		// debug(msg, null);
 		log.debug("<{}> {}", id, msg);
 	}
 
@@ -2763,97 +2769,6 @@ public class LDRepository {
 
 	public void setTemplateDao(TemplateDAO templateDao) {
 		this.templateDao = templateDao;
-	}
-
-	public ObjectList getContentChangesXXXX(Holder<String> changeLogToken, int max)
-			throws CmisPermissionDeniedException {
-
-		if (changeLogToken == null)
-			throw new CmisInvalidArgumentException("Missing change log token holder");
-
-		long minDate;
-
-		try {
-			minDate = Long.parseLong(changeLogToken.getValue());
-		} catch (NumberFormatException e) {
-			throw new CmisInvalidArgumentException("Invalid change log token");
-		}
-
-		StringBuffer query = new StringBuffer(" _entity.tenantId = :tenantId and _entity.date >= :minDate ");
-		query.append(" and _entity.event in ('");
-		query.append(DocumentEvent.STORED);
-		query.append("','");
-		query.append(DocumentEvent.CHECKEDIN);
-		query.append("','");
-//		query.append(DocumentEvent.CHANGED);
-//		query.append("','");
-		query.append(DocumentEvent.RENAMED);
-		query.append("','");
-		query.append(DocumentEvent.DELETED);
-		query.append("')");
-
-		List<DocumentHistory> entries = new ArrayList<DocumentHistory>();
-
-		try {
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("tenantId", getRoot().getTenantId());
-			params.put("minDate", new Date(minDate));
-
-			entries = historyDao.findByWhere(query.toString(), params, "order by _entity.date", max);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-
-		ObjectListImpl ol = new ObjectListImpl();
-		boolean hasMoreItems = entries.size() > max;
-		ol.setHasMoreItems(Boolean.valueOf(hasMoreItems));
-		if (hasMoreItems)
-			entries = entries.subList(0, max);
-
-		List<ObjectData> ods = new ArrayList<ObjectData>(entries.size());
-		Date date = null;
-		for (DocumentHistory logEntry : entries) {
-			ObjectDataImpl od = new ObjectDataImpl();
-			ChangeEventInfoDataImpl cei = new ChangeEventInfoDataImpl();
-
-			// change type
-			String eventId = logEntry.getEvent();
-			ChangeType changeType;
-			if (DocumentEvent.STORED.toString().equals(eventId)) {
-				changeType = ChangeType.CREATED;
-			} else if (DocumentEvent.CHANGED.toString().equals(eventId)
-					|| DocumentEvent.CHECKEDIN.toString().equals(eventId)
-					|| DocumentEvent.RENAMED.toString().equals(eventId)) {
-				changeType = ChangeType.UPDATED;
-			} else if (DocumentEvent.DELETED.toString().equals(eventId)) {
-				changeType = ChangeType.DELETED;
-			} else {
-				continue;
-			}
-			cei.setChangeType(changeType);
-
-			// change time
-			GregorianCalendar changeTime = (GregorianCalendar) Calendar.getInstance();
-			date = logEntry.getDate();
-			changeTime.setTime(date);
-			cei.setChangeTime(changeTime);
-			od.setChangeEventInfo(cei);
-
-			// properties: id, doc type
-			PropertiesImpl properties = new PropertiesImpl();
-			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_ID, ID_PREFIX_DOC + logEntry.getDocId()));
-			properties.addProperty(new PropertyIdImpl(PropertyIds.OBJECT_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value()));
-			od.setProperties(properties);
-			ods.add(od);
-		}
-
-		ol.setObjects(ods);
-		ol.setNumItems(BigInteger.valueOf(-1));
-
-		String latestChangeLogToken = date == null ? null : String.valueOf(date.getTime());
-		changeLogToken.setValue(latestChangeLogToken);
-
-		return ol;
 	}
 
 	public ObjectList getContentChanges(Holder<String> changeLogToken, int max) throws CmisPermissionDeniedException {

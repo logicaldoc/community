@@ -84,11 +84,12 @@ public class SampleClient {
 	private static void checkoutCheckin() throws IOException {
 
 		// Folder root = connect("admin", "admin");
-		// Folder root = connect("manager", "12345678"); // user solely in group
-		// author
-		Folder root = connect("admin", "12345678"); // user in groups
-													// author and
-													// admin
+		
+		// user solely in group author
+		// Folder root = connect("manager", "12345678"); 
+		
+		// user in groups author and admin
+		Folder root = connect("admin", "12345678"); 
 		root.getName();
 
 		CmisObject object = session.getObjectByPath(TEST_FOLDER_PATH);
