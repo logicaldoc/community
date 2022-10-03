@@ -178,10 +178,12 @@ public class IndexerTask extends Task {
 				log.info("Waiting for completion");
 				boolean threadsCompleted = false;
 				while (!threadsCompleted) {
-					try {
-						Thread.sleep(2);
-					} catch (Throwable t) {
-
+					synchronized (this) {
+						try {
+							wait(2);
+						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
+						}
 					}
 
 					threadsCompleted = true;

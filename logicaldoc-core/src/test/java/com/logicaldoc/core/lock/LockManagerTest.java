@@ -38,9 +38,13 @@ public class LockManagerTest extends AbstractCoreTCase {
 		Assert.assertTrue(manager.get("test", "t1"));
 		Assert.assertTrue(manager.get("test", "t1"));
 		Assert.assertFalse(manager.get("test", "t2"));
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
+		
+		synchronized (this) {
+			try {
+				wait(3000);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
 
 		Assert.assertTrue(manager.get("test", "t2"));

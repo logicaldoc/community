@@ -96,9 +96,12 @@ public class TaskManager {
 					running = true;
 					break;
 				}
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
+			synchronized (this) {
+				try {
+					wait(500);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
 		}
 		log.info("All tasks are idle");

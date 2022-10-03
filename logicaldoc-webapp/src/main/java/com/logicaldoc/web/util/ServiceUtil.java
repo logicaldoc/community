@@ -242,10 +242,12 @@ public class ServiceUtil {
 
 		// Wait up to 20 seconds for completion
 		while (task.getElapsedTime() < 20000 && !task.isOver()) {
-			try {
-				Thread.sleep(2000);
-			} catch (Throwable t) {
-
+			synchronized (pools) {
+				try {
+					pools.wait(1000);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
 		}
 

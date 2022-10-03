@@ -12,9 +12,12 @@ public class TimeDiff {
 
 	public static void main(String[] args) {
 		Date d1 = new Date();
-		try {
-			Thread.sleep(750);
-		} catch (InterruptedException e) { /* ignore */
+		synchronized (d1) {
+			try {
+				d1.wait(1000);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
 		Date d0 = new Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24 * 3)); // About
 																					// 3

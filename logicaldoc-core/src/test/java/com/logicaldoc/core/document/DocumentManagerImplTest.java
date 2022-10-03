@@ -99,9 +99,12 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Ticket t = documentManager.createDownloadTicket(1L, null, null, null, null, null, transaction);
 		Assert.assertNotNull(t.getUrl());
 
-		try {
-			Thread.sleep(1000);
-		} catch (Throwable e) {
+		synchronized (this) {
+			try {
+				wait(1000);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
 
 		t = documentManager.createDownloadTicket(1L, null, 2, null, null, null, transaction);
