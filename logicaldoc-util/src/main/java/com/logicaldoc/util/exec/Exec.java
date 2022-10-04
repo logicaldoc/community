@@ -362,7 +362,7 @@ public class Exec {
 	 */
 	private static Set<String> getAllowedCommands() {
 		Set<String> allowedCommands = new HashSet<String>();
-		URL resource = UtilWorkbench.class.getResource(ALLOWED_COMMANDS);
+		URL resource = Exec.class.getResource(ALLOWED_COMMANDS);
 		if (resource != null) {
 			InputStream is = null;
 			try {
