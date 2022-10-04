@@ -11,6 +11,7 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField.DateCellFormatter;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileVersionListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
@@ -47,6 +48,7 @@ public class HistoryPanel extends DocumentDetailTab {
 		ListGridField user = new UserListGridField("user", "userId", "user");
 		ListGridField event = new ListGridField("event", I18N.message("event"), 200);
 		ListGridField version = new VersionListGridField();
+		ListGridField fileVersion = new FileVersionListGridField();
 		ListGridField date = new DateListGridField("date", "date", DateCellFormatter.FORMAT_LONG);
 
 		ListGridField comment = new ListGridField("comment", I18N.message("comment"));
@@ -68,9 +70,10 @@ public class HistoryPanel extends DocumentDetailTab {
 		list.setAutoFetchData(true);
 		list.setDataSource(new DocumentHistoryDS(document.getId(), null));
 		if (Menu.enabled(Menu.SESSIONS))
-			list.setFields(user, event, date, comment, version, fileName, path, sid, ip, device, geolocation);
+			list.setFields(user, event, date, comment, version, fileVersion, fileName, path, sid, ip, device,
+					geolocation);
 		else
-			list.setFields(user, event, date, comment, version, fileName, path);
+			list.setFields(user, event, date, comment, version, fileVersion, fileName, path);
 
 		list.addDoubleClickHandler(new DoubleClickHandler() {
 			@Override
@@ -103,7 +106,7 @@ public class HistoryPanel extends DocumentDetailTab {
 				list.refresh(new DocumentHistoryDS(document.getId(), Integer.parseInt(maxItem.getValueAsString())));
 			}
 		});
-
+		
 		buttons.addSeparator();
 
 		ToolStripButton export = new ToolStripButton(I18N.message("export"));
