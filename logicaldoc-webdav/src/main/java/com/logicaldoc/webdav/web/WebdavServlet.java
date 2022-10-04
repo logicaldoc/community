@@ -3,7 +3,6 @@ package com.logicaldoc.webdav.web;
 import java.io.IOException;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -168,14 +167,18 @@ public class WebdavServlet extends AbstractWebdavServlet {
 		this.config = config;
 	}
 
-	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void service(HttpServletRequest request, HttpServletResponse response) {
 		ContextProperties settings = getSettings();
 
 		// Check if the service is enabled
 		if ("true".equals(settings.get("webdav.enabled")))
 			super.service(request, response);
 		else
-			response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
+			try {
+				response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
+			} catch (Throwable e) {
+			}
+
 	}
 
 	public ContextProperties getSettings() {

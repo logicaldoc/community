@@ -49,10 +49,8 @@ public class DownloadServlet extends HttpServlet {
 	 * 
 	 * @param request the request send by the client to the server
 	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
 	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Session session = ServletUtil.validateSession(request);
 
@@ -71,7 +69,7 @@ public class DownloadServlet extends HttpServlet {
 		}
 	}
 
-	protected void downloadDocument(HttpServletRequest request, HttpServletResponse response, Session session)
+	private void downloadDocument(HttpServletRequest request, HttpServletResponse response, Session session)
 			throws FileNotFoundException, IOException, ServletException, PersistenceException {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
@@ -89,62 +87,55 @@ public class DownloadServlet extends HttpServlet {
 		Version version = null;
 		Document doc = null;
 
-		try {
-			if (StringUtils.isNotEmpty(docId)) {
+		if (StringUtils.isNotEmpty(docId)) {
+			try {
+				doc = docDao.findById(Long.parseLong(docId));
+			} catch (NumberFormatException e) {
+				log.error("Invalid document ID {}", docId);
+			}
+
+			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
+					doc.getFolder().getId(), session.getUserId()))
+				throw new IOException("You don't have the DOWNLOAD permission");
+
+			/*
+			 * In case of alias to PDF, we have to serve the PDF conversion
+			 */
+			if (doc.getDocRef() != null && StringUtil.isEmpty(downloadText)
+					&& (doc.getDocRefType() != null && doc.getDocRefType().contains("pdf"))) {
+
+				// Generate the PDF conversion
+				FormatConverterManager manager = (FormatConverterManager) Context.get()
+						.getBean(FormatConverterManager.class);
 				try {
-					doc = docDao.findById(Long.parseLong(docId));
-				} catch (NumberFormatException e) {
-					log.error("Invalid document ID {}", docId);
+					manager.convertToPdf(doc, fileVersion, session.getSid());
+				} catch (Exception e) {
+					log.error("Cannot convert to PDF the document {}", doc);
 				}
 
-				if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
-						doc.getFolder().getId(), session.getUserId()))
+				suffix = FormatConverterManager.PDF_CONVERSION_SUFFIX;
+			}
+
+			/*
+			 * In case of alias we have to work on the real document
+			 */
+			if (doc.getDocRef() != null)
+				doc = docDao.findById(doc.getDocRef());
+		}
+
+		if (StringUtils.isNotEmpty(versionId)) {
+			try {
+				version = versDao.findById(Long.parseLong(versionId));
+			} catch (NumberFormatException e) {
+				log.error("Invalid version ID {}", versionId);
+			}
+
+			if (doc == null) {
+				doc = docDao.findDocument(version.getDocId());
+
+				if (!folderDao.isPermissionEnabled(Permission.DOWNLOAD, doc.getFolder().getId(), session.getUserId()))
 					throw new IOException("You don't have the DOWNLOAD permission");
-
-				/*
-				 * In case of alias to PDF, we have to serve the PDF conversion
-				 */
-				if (doc.getDocRef() != null && StringUtil.isEmpty(downloadText)
-						&& (doc.getDocRefType() != null && doc.getDocRefType().contains("pdf"))) {
-
-					// Generate the PDF conversion
-					FormatConverterManager manager = (FormatConverterManager) Context.get()
-							.getBean(FormatConverterManager.class);
-					try {
-						manager.convertToPdf(doc, fileVersion, session.getSid());
-					} catch (Exception e) {
-						log.error("Cannot convert to PDF the document {}", doc);
-					}
-
-					suffix = FormatConverterManager.PDF_CONVERSION_SUFFIX;
-				}
-
-				/*
-				 * In case of alias we have to work on the real document
-				 */
-				if (doc.getDocRef() != null)
-					doc = docDao.findById(doc.getDocRef());
 			}
-
-			if (StringUtils.isNotEmpty(versionId)) {
-				try {
-					version = versDao.findById(Long.parseLong(versionId));
-				} catch (NumberFormatException e) {
-					log.error("Invalid version ID {}", versionId);
-				}
-
-				if (doc == null) {
-					doc = docDao.findDocument(version.getDocId());
-
-					if (!folderDao.isPermissionEnabled(Permission.DOWNLOAD, doc.getFolder().getId(),
-							session.getUserId()))
-						throw new IOException("You don't have the DOWNLOAD permission");
-				}
-			}
-		} catch (PersistenceException e) {
-			throw new ServletException("An error happened in the database", e);
-		} catch (Throwable t) {
-			throw new ServletException(t.getMessage(), t);
 		}
 
 		if (version == null && doc != null && StringUtils.isNotEmpty(ver))

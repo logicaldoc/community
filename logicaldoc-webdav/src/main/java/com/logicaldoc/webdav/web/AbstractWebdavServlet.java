@@ -132,7 +132,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * @throws ServletException error inside the servlet container
 	 * @throws IOException generic I/O error
 	 */
-	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@Override
+	public void service(HttpServletRequest request, HttpServletResponse response) {
 		log.debug("Received WebDAV request");
 
 		try {
