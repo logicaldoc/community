@@ -2,10 +2,17 @@ package com.logicaldoc.util.exec;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,8 +20,11 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.logicaldoc.util.UtilWorkbench;
 
 /**
  * Utility class used to execute system commands
@@ -23,6 +33,8 @@ import org.slf4j.LoggerFactory;
  * @since 6.3
  */
 public class Exec {
+
+	private static final String ALLOWED_COMMANDS = "/allowed-commands.txt";
 
 	protected static Logger log = LoggerFactory.getLogger(Exec.class);
 
@@ -46,6 +58,8 @@ public class Exec {
 	 * @throws IOException raised in case of errors during execution
 	 */
 	public static int exec2(List<String> commandLine, File directory, int timeout) throws IOException {
+		checkAllowed(commandLine.get(0));
+
 		log.debug("Executing command: {}", commandLine);
 		ProcessBuilder pb = new ProcessBuilder();
 		pb.redirectErrorStream(true);
@@ -67,7 +81,7 @@ public class Exec {
 				worker.join();
 			if (worker.getExit() == null)
 				throw new TimeoutException();
-			else 
+			else
 				return worker.getExit();
 		} catch (TimeoutException e) {
 			log.error("Command timed out {}", commandLine);
@@ -81,7 +95,7 @@ public class Exec {
 
 			}
 		}
-		
+
 		return 1;
 	}
 
@@ -111,6 +125,8 @@ public class Exec {
 	 * @return the return code of the command
 	 */
 	public static int exec(final List<String> commandLine, String[] env, File dir, int timeout) throws IOException {
+		checkAllowed(commandLine.get(0));
+
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine.toArray(new String[0]), env, dir);
@@ -169,6 +185,8 @@ public class Exec {
 	 * @throws IOException If the execution caused an error
 	 */
 	public static String exec(String commandLine, String[] env, File dir) throws IOException {
+		checkAllowed(commandLine);
+
 		Process process = Runtime.getRuntime().exec(commandLine, env, dir != null ? dir : null);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		StringBuffer out = new StringBuffer();
@@ -180,6 +198,8 @@ public class Exec {
 
 	public static int exec(final String commandLine, String[] env, File dir, StringBuffer buffer, int timeout)
 			throws IOException {
+		checkAllowed(commandLine);
+
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine, env, dir);
@@ -228,6 +248,8 @@ public class Exec {
 
 	public static int exec(final String commandLine, String[] env, File dir, Writer outputWriter, int timeout)
 			throws IOException {
+		checkAllowed(commandLine);
+
 		int exit = 0;
 
 		final Process process = Runtime.getRuntime().exec(commandLine, env, dir);
@@ -291,7 +313,7 @@ public class Exec {
 	 * @throws IOException raised if the command produced an error
 	 */
 	public static int exec(final String commandLine, String[] env, File dir, int timeout) throws IOException {
-		return exec(commandLine, env, dir, (Writer)null, timeout);
+		return exec(commandLine, env, dir, (Writer) null, timeout);
 	}
 
 	static class CallableProcess implements Callable<Integer> {
@@ -304,5 +326,73 @@ public class Exec {
 		public Integer call() throws Exception {
 			return p.waitFor();
 		}
+	}
+
+	/**
+	 * Checks if a given command is allowed
+	 * 
+	 * @param commandLine the command line to test
+	 * 
+	 * @throws IOException if the command is not allowed
+	 */
+	private static void checkAllowed(String commandLine) throws IOException {
+		Set<String> allowedCommands = getAllowedCommands();
+		if (allowedCommands.isEmpty())
+			return;
+
+		boolean allowed = allowedCommands.contains(commandLine);
+		if (!allowed) {
+			for (String row : allowedCommands) {
+				if (commandLine.startsWith(commandLine) && commandLine.length() > row.length()
+						&& commandLine.substring(row.length()).startsWith(" ")) {
+					allowed = true;
+					break;
+				}
+			}
+		}
+
+		if (!allowed)
+			throw new IOException("Command " + commandLine + " is not allowed");
+	}
+
+	/**
+	 * Retrieves the full list of the OS commands allowed to execute
+	 * 
+	 * @return the set of allowed commands
+	 */
+	private static Set<String> getAllowedCommands() {
+		Set<String> allowedCommands = new HashSet<String>();
+		URL resource = UtilWorkbench.class.getResource(ALLOWED_COMMANDS);
+		if (resource != null) {
+			InputStream is = null;
+			try {
+				try {
+					is = new FileInputStream(resource.getFile());
+				} catch (FileNotFoundException e) {
+					log.error(e.getMessage(), e);
+				}
+
+				if (is == null)
+					is = UtilWorkbench.class.getResourceAsStream(ALLOWED_COMMANDS);
+
+				if (is != null) {
+					try (Scanner sc = new Scanner(is);) {
+						while (sc.hasNext()) {
+							String line = sc.nextLine().trim();
+							if (StringUtils.isNotEmpty(line) && !line.startsWith("#")
+									&& !allowedCommands.contains(line))
+								allowedCommands.add(line);
+						}
+					}
+				}
+			} finally {
+				if (is != null)
+					try {
+						is.close();
+					} catch (IOException e) {
+					}
+			}
+		}
+		return allowedCommands;
 	}
 }

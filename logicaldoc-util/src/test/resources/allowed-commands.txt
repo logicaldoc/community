@@ -1,0 +1,2 @@
+C:\tmp\sync.bat
+/usr/bin/convert
