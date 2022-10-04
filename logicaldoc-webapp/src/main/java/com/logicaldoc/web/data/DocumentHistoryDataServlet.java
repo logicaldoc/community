@@ -77,7 +77,7 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 
 			DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			StringBuffer query = new StringBuffer(
-					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color from DocumentHistory A where 1=1 and A.deleted = 0 ");
+					"select A.username, A.event, A.version, A.date, A.comment, A.filename, A.isNew, A.folderId, A.docId, A.path, A.sessionId, A.userId, A.reason, A.ip, A.device, A.geolocation, A.color, A.fileVersion from DocumentHistory A where 1=1 and A.deleted = 0 ");
 			if (request.getParameter("docId") != null) {
 				Long docId = Long.parseLong(request.getParameter("docId"));
 				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -139,9 +139,9 @@ public class DocumentHistoryDataServlet extends HttpServlet {
 				writer.print("<ip><![CDATA[" + (cols[13] == null ? "" : cols[13]) + "]]></ip>");
 				writer.print("<device><![CDATA[" + (cols[14] == null ? "" : cols[14]) + "]]></device>");
 				writer.print("<geolocation><![CDATA[" + (cols[15] == null ? "" : cols[15]) + "]]></geolocation>");
-
 				if (cols[16] != null)
 					writer.write("<color><![CDATA[" + cols[16] + "]]></color>");
+				writer.print("<fileVersion>" + (cols[17] == null ? "" : cols[17]) + "</fileVersion>");
 				writer.print("</history>");
 			}
 			writer.write("</list>");
