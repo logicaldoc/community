@@ -881,7 +881,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		long rootId = findRoot(folder.getTenantId()).getId();
 		List<Folder> coll = new ArrayList<Folder>();
 		try {
-			while (folder.getId() != rootId && folder.getId() != folder.getParentId()) {
+			while (folder != null && folder.getId() != rootId && folder.getId() != folder.getParentId()) {
 				folder = findById(folder.getParentId());
 				if (folder != null)
 					coll.add(0, folder);
@@ -1936,17 +1936,24 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@Override
 	public Set<Long> findFolderIdInPath(long rootId, boolean includeDeleted) {
+		Set<Long> ids = new HashSet<Long>();
+
 		Folder rootFolder = null;
 		try {
 			rootFolder = findById(rootId);
 		} catch (PersistenceException e1) {
 			log.error(e1.getMessage(), e1);
 		}
+
+		if (rootFolder == null) {
+			log.warn("No root folder {}", rootId);
+			return ids;
+		}
+
 		String query = "select ld_id from ld_folder where ld_tenantid=" + rootFolder.getTenantId()
 				+ (includeDeleted ? "" : " and ld_deleted=0 ");
 		query += " and ld_path like '" + SqlUtil.doubleQuotes(rootFolder.getPath()) + "/%'";
 
-		Set<Long> ids = new HashSet<Long>();
 		try {
 			ids = new HashSet<Long>(queryForList(query, Long.class));
 		} catch (PersistenceException e) {
@@ -2006,18 +2013,16 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			refresh(folder);
 
 			if (folder.getFolderGroups() != null)
-				folder.getFolderGroups().size();
+				log.trace("Initialized {} folder groups", folder.getFolderGroups().size());
 
 			if (folder.getTags() != null)
-				folder.getTags().size();
+				log.trace("Initialized {} tags", folder.getTags().size());
 
 			if (folder.getAttributes() != null)
-				for (String attribute : folder.getAttributes().keySet())
-					folder.getAttributes().get(attribute).getValue();
+				log.trace("Initialized {} attributes", folder.getAttributes().keySet().size());
 
 			if (folder.getStorages() != null)
-				for (String nodeId : folder.getStorages().keySet())
-					folder.getStorages().get(nodeId);
+				log.trace("Initialized {} storages", folder.getStorages().keySet().size());
 		} catch (Throwable t) {
 		}
 	}

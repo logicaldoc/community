@@ -112,30 +112,33 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 				log.error("{} not found", filterClass);
 			}
 
-			try {
-				@SuppressWarnings({ "rawtypes", "unchecked" })
-				Constructor constructor = aClass.getConstructor(new Class[] { java.util.Map.class });
+			if (aClass != null) {
+				try {
+					@SuppressWarnings({ "rawtypes", "unchecked" })
+					Constructor constructor = aClass.getConstructor(new Class[] { java.util.Map.class });
 
-				TokenFilterFactory factory = (TokenFilterFactory) constructor.newInstance(configs);
+					TokenFilterFactory factory = (TokenFilterFactory) constructor.newInstance(configs);
 
-				if (factory instanceof WordDelimiterGraphFilterFactory) {
-					/**
-					 * This class may need initialization from files
-					 */
-					ResourceLoader loader = new FilesystemResourceLoader(
-							new File(Context.get().getProperties().getProperty("index.dir") + "/logicaldoc/conf")
-									.toPath(),
-							this.getClass().getClassLoader());
-					((WordDelimiterGraphFilterFactory) factory).inform(loader);
+					if (factory instanceof WordDelimiterGraphFilterFactory) {
+						/**
+						 * This class may need initialization from files
+						 */
+						ResourceLoader loader = new FilesystemResourceLoader(
+								new File(Context.get().getProperties().getProperty("index.dir") + "/logicaldoc/conf")
+										.toPath(),
+								this.getClass().getClassLoader());
+						((WordDelimiterGraphFilterFactory) factory).inform(loader);
+					}
+
+					ts = factory.create(ts);
+
+					log.debug("Appended token stream filter {}", filterClass);
+				} catch (NoSuchMethodException nse) {
+					log.warn("constructor (Map<String, String>) not found for {}", filterClass);
+				} catch (Throwable e) {
+					log.warn("constructor (Map<String, String>) of {} raised an error: {}", filterClass, e.getMessage(),
+							e);
 				}
-
-				ts = factory.create(ts);
-
-				log.debug("Appended token stream filter {}", filterClass);
-			} catch (NoSuchMethodException nse) {
-				log.warn("constructor (Map<String, String>) not found for {}", filterClass);
-			} catch (Throwable e) {
-				log.warn("constructor (Map<String, String>) of {} raised an error: {}", filterClass, e.getMessage(), e);
 			}
 		}
 

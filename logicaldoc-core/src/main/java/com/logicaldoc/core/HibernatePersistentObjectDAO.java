@@ -615,8 +615,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@Override
 	public int queryForInt(String sql) throws PersistenceException {
-		long mytmplong = queryForLong(sql);
-		return Long.valueOf(mytmplong).intValue();
+		return (int) queryForLong(sql);
 	}
 
 	@Override

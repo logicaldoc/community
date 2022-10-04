@@ -211,7 +211,7 @@ public class LDRepository {
 	 * @param root root folder
 	 */
 	public LDRepository(Folder root, String sid) {
-		
+
 		// check root folder
 		if (root == null)
 			throw new IllegalArgumentException("Invalid root folder!");
@@ -547,7 +547,7 @@ public class LDRepository {
 				throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
 
 			User user = getSessionUser();
-			assert(user!=null);
+			assert (user != null);
 
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
@@ -618,8 +618,6 @@ public class LDRepository {
 
 			// get parent File
 			Folder parent = getFolder(folderId);
-			if (parent == null)
-				throw new CmisObjectNotFoundException("Parent is not a folder!");
 
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(getSessionUser());
@@ -627,6 +625,7 @@ public class LDRepository {
 
 			Folder folder = null;
 			Folder newFolder = new Folder(name);
+
 			newFolder.setTenantId(getSessionUser().getTenantId());
 			folder = folderDao.create(parent, newFolder, true, transaction);
 
@@ -658,13 +657,8 @@ public class LDRepository {
 			validatePermission(objectId.getValue(), context, Permission.DOWNLOAD);
 
 			Folder target = getFolder(targetFolderId);
-			if (target == null)
-				throw new CmisInvalidArgumentException(String.format("Target folder %s not found!", targetFolderId));
 
 			Object object = getObject(objectId.getValue());
-			if (object == null)
-				throw new CmisInvalidArgumentException(
-						String.format("Source object %s not found!", objectId.getValue()));
 
 			if (object instanceof Document) {
 				DocumentHistory transaction = new DocumentHistory();
@@ -731,8 +725,6 @@ public class LDRepository {
 	public void deleteObjectOrCancelCheckOut(CallContext context, String objectId) {
 		// get the file or folder
 		PersistentObject object = getObject(objectId);
-		if (object == null)
-			throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId));
 
 		if (object instanceof Document) {
 			Document doc = (Document) object;
@@ -757,8 +749,6 @@ public class LDRepository {
 		try {
 			// get the file or folder
 			PersistentObject object = getObject(objectId);
-			if (object == null)
-				throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId));
 
 			if (object instanceof Folder) {
 				Folder folder = (Folder) object;
@@ -795,8 +785,6 @@ public class LDRepository {
 
 		// get the document or folder
 		PersistentObject object = getObject(folderId);
-		if (object == null)
-			throw new CmisObjectNotFoundException(String.format("Object %s not found!", folderId));
 
 		FailedToDeleteDataImpl result = new FailedToDeleteDataImpl();
 		result.setIds(new ArrayList<String>());
@@ -880,8 +868,6 @@ public class LDRepository {
 		try {
 			// get the document
 			PersistentObject object = getObject(objectId.getValue());
-			if (object == null)
-				throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId.getValue()));
 
 			if (!(object instanceof Document))
 				throw new CmisObjectNotFoundException(
@@ -910,8 +896,6 @@ public class LDRepository {
 		try {
 			// get the document
 			PersistentObject object = getObject(objectId);
-			if (object == null)
-				throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId));
 
 			if (!(object instanceof Document))
 				throw new CmisObjectNotFoundException(String.format("Object %s is not a Document!", objectId));
@@ -945,9 +929,6 @@ public class LDRepository {
 
 		try {
 			PersistentObject object = getObject(objectId.getValue());
-
-			if (object == null)
-				throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId.getValue()));
 
 			if (!(object instanceof Document))
 				throw new CmisObjectNotFoundException(
@@ -1006,8 +987,6 @@ public class LDRepository {
 			}
 
 			PersistentObject obj = getObject(objectId);
-			if (obj == null)
-				throw new CmisObjectNotFoundException(String.format("Object ID %s not found", objectId));
 
 			// set defaults if values not set
 			boolean iaa = (includeAllowableActions == null ? false : includeAllowableActions.booleanValue());
@@ -1429,7 +1408,7 @@ public class LDRepository {
 			where = where.substring(where.toLowerCase().indexOf("where") + 6).trim();
 
 		log.debug("where: {}", where);
-		
+
 		/**
 		 * Try to detect if the request comes from LogicalDOC Mobile
 		 */
@@ -1496,7 +1475,7 @@ public class LDRepository {
 				expr = StringUtils.substringBetween(statement, "('", "')");
 			if (StringUtils.isEmpty(expr))
 				expr = StringUtils.substringBetween(statement, "'", "'");
-			
+
 			log.debug("expr: {}", expr);
 
 			// Prepare the search options
@@ -1526,7 +1505,7 @@ public class LDRepository {
 					String field = m.group();
 					if (field.startsWith("ldoc:"))
 						field = field.substring("ldoc:".length());
-					
+
 					log.debug("field: {}", field);
 					fields.add(field);
 				}
@@ -1535,7 +1514,7 @@ public class LDRepository {
 			}
 
 			// Execute the search
-			log.debug("opt: {}",opt);
+			log.debug("opt: {}", opt);
 			Search search = Search.get(opt);
 			log.debug("search: {}", search);
 			List<Hit> hits = new ArrayList<Hit>();
@@ -1551,7 +1530,8 @@ public class LDRepository {
 				// Iterate through the list of results
 				for (Hit hit : hits) {
 					try {
-						// filtro i risultati (lasciando solo le colonne richieste)
+						// filtro i risultati (lasciando solo le colonne
+						// richieste)
 						ObjectData result = compileObjectType(null, hit, filter, false, false, null);
 						list.add(result);
 					} catch (Throwable t) {
@@ -1561,10 +1541,10 @@ public class LDRepository {
 			} catch (Throwable e) {
 				log.error("CMIS Exception populating data structure", e);
 			}
-			hasMoreItems = search.getEstimatedHitsNumber() > max; 
+			hasMoreItems = search.getEstimatedHitsNumber() > max;
 		} else {
 			User user = getSessionUser();
-			
+
 			expr = StringUtils.substringBetween(statement, "'", "'");
 			String filename = expr;
 			log.debug("filename: {}", filename);
@@ -2552,7 +2532,7 @@ public class LDRepository {
 	private static GregorianCalendar millisToCalendar(long millis) {
 		GregorianCalendar result = new GregorianCalendar();
 		result.setTimeZone(TimeZone.getTimeZone("GMT"));
-		result.setTimeInMillis((long) (Math.ceil(millis / 1000) * 1000));
+		result.setTimeInMillis((long) (Math.ceil(millis / 1000D) * 1000D));
 
 		return result;
 	}
@@ -2633,15 +2613,15 @@ public class LDRepository {
 	private User getSessionUser() {
 		if (sid != null) {
 			if (SessionManager.get().getStatus(sid) != Session.STATUS_OPEN)
-				return null;
+				throw new CmisPermissionDeniedException("Invalid session");
 			try {
 				return userDao.findById(SessionManager.get().get(sid).getUserId());
 			} catch (PersistenceException e) {
 				log.warn(e.getMessage(), e);
-				return null;
+				throw new CmisPermissionDeniedException("User not found");
 			}
 		} else {
-			return null;
+			throw new CmisPermissionDeniedException("No session");
 		}
 	}
 
@@ -2686,7 +2666,7 @@ public class LDRepository {
 			else
 				SessionManager.get().renew(sid);
 			userId = SessionManager.get().get(sid).getUserId();
-		} else {
+		} else if (context != null) {
 			User user = userDao.findByUsername(context.getUsername());
 			userId = user.getId();
 		}
@@ -2764,6 +2744,8 @@ public class LDRepository {
 			log.warn(t.getMessage(), t);
 		}
 
+		if (out == null)
+			throw new CmisObjectNotFoundException(String.format("Object %s not found!", objectId));
 		return out;
 	}
 
@@ -2863,7 +2845,7 @@ public class LDRepository {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
-			
+
 			entries = historyDao.findByWhere(query.toString(), params, "order by _entity.date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -2927,7 +2909,7 @@ public class LDRepository {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
-			entries = folderHistoryDao.findByWhere(query.toString(),params, "order by _entity.date", max);
+			entries = folderHistoryDao.findByWhere(query.toString(), params, "order by _entity.date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

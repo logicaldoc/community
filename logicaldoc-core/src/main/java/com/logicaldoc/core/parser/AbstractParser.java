@@ -95,6 +95,9 @@ public abstract class AbstractParser implements Parser {
 					ret = executor.invokeAll(Arrays.asList(
 							new InternalParseTask(input, filename, encoding, lcl, tnt, document, fileVersion, content)),
 							timeout, TimeUnit.SECONDS).get(0).get();
+				} catch (InterruptedException ie) {
+					log.warn("Interrupted parse");
+					Thread.currentThread().interrupt();
 				} catch (Throwable e) {
 					log.warn(e.getMessage(), e);
 					if (e instanceof ParseException)
@@ -151,7 +154,13 @@ public abstract class AbstractParser implements Parser {
 				internalParse(is, filename, encoding, locale, tenant, document, fileVersion, content);
 				return "completed";
 			} catch (InterruptedException e) {
-				throw new ParseException("Timeout while parsing document " + document);
+				try {
+					String message = "Timeout while parsing document " + document;
+					log.warn(message);
+					throw new ParseException(message);
+				} finally {
+					Thread.currentThread().interrupt();
+				}
 			} catch (ParseException pe) {
 				throw pe;
 			} catch (Exception ee) {

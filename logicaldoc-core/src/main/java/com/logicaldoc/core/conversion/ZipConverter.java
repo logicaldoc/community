@@ -35,6 +35,9 @@ public class ZipConverter extends AbstractFormatConverter {
 	}
 
 	private void convertGZip(String sid, Document document, File src, File dest) throws IOException {
+		if (src == null)
+			throw new IOException("No source");
+
 		File ungzippedFile = null;
 		try {
 			ungzippedFile = gunzip(src,

@@ -82,11 +82,19 @@ public class Client {
 		if (obj == null)
 			return false;
 
+		if (this.getClass() != obj.getClass())
+			return false;
+
 		Client other = (Client) obj;
 		if ((id == null && other.id != null) || (id != null && other.id == null))
 			return false;
 
-		return id.equals(other.id);
+		return id != null ? id.equals(other.id) : false;
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
 	}
 
 	@Override

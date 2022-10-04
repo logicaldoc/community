@@ -839,10 +839,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			refresh(doc);
 
 			if (doc.getAttributes() != null)
-				doc.getAttributes().keySet().size();
+				log.trace("Initialized {} attributes", doc.getAttributes().keySet().size());
 
 			if (doc.getTags() != null)
-				doc.getTags().size();
+				log.trace("Initialized {} tags", doc.getTags().size());
 		} catch (Throwable t) {
 		}
 	}

@@ -122,7 +122,7 @@ public class Language implements Comparable<Language> {
 			}
 
 			// Try to use constructor (Set<?> stopwords)
-			if (stopWords != null && (!stopWords.isEmpty())) {
+			if (aClass != null && stopWords != null && (!stopWords.isEmpty())) {
 				try {
 					Constructor<?> constructor = aClass.getConstructor(new Class[] { java.util.Set.class });
 					if (constructor != null)
@@ -133,7 +133,7 @@ public class Language implements Comparable<Language> {
 			}
 
 			// Try with default constructor
-			if (analyzer == null) {
+			if (aClass != null && analyzer == null) {
 				try {
 					analyzer = (Analyzer) aClass.newInstance();
 				} catch (Throwable e) {
@@ -164,6 +164,17 @@ public class Language implements Comparable<Language> {
 	@Override
 	public int hashCode() {
 		return toString().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+
+		if (getClass() != obj.getClass())
+			return false;
+
+		return toString().equals(obj.toString());
 	}
 
 	@Override

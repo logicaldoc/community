@@ -358,7 +358,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		synchronized (this) {
 			Document document = documentDAO.findDocument(docId);
 
-			if (document.getStatus() == status && document.getLockUserId() == transaction.getUserId()) {
+			if (document.getStatus() == status && document.getLockUserId().equals(transaction.getUserId())) {
 				log.debug("Document {} is already locked by user {}", document, transaction.getUser().getFullName());
 				return;
 			}
@@ -1192,10 +1192,10 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		/*
 		 * Downgrade the document version in case the deleted version is the
-		 * actual one
+		 * current one
 		 */
 		String currentVersion = document.getVersion();
-		if (currentVersion.equals(versionToDeleteSpec)) {
+		if (currentVersion.equals(versionToDeleteSpec) && lastVersion != null) {
 			documentDAO.initialize(document);
 			document.setVersion(lastVersion.getVersion());
 			document.setFileVersion(lastVersion.getFileVersion());
@@ -1492,11 +1492,12 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			// Add an history entry to track the export of the document
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			for (Long id : docIds) {
-				DocumentHistory trans = transaction.clone();
-				trans.setEvent(DocumentEvent.EXPORTPDF.toString());
-				docDao.saveDocumentHistory(docDao.findById(id), trans);
-			}
+			if (transaction != null)
+				for (Long id : docIds) {
+					DocumentHistory trans = transaction.clone();
+					trans.setEvent(DocumentEvent.EXPORTPDF.toString());
+					docDao.saveDocumentHistory(docDao.findById(id), trans);
+				}
 
 			Document docVO = new Document();
 			docVO.setFileName(fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf");
@@ -1529,11 +1530,11 @@ public class DocumentManagerImpl implements DocumentManager {
 	 * @throws IOException
 	 */
 	private File preparePdfs(User user, List<Long> docIds) throws IOException {
-		
+
 //		File temp = File.createTempFile("merge", "");
 //		temp.delete();
 //		temp.mkdir();
-		
+
 		Path tempPath = Files.createTempDirectory("merge");
 		File tempDir = tempPath.toFile();
 
@@ -1574,15 +1575,15 @@ public class DocumentManagerImpl implements DocumentManager {
 	 */
 	private static File mergePdf(File[] pdfs) throws IOException {
 
-		//File temp = null;
+		// File temp = null;
 		File tempDir = null;
 		try {
 //			temp = File.createTempFile("merge", "");
 //			temp.delete();
 //			temp.mkdir();
-			
+
 			Path tempPath = Files.createTempDirectory("merge");
-			tempDir = tempPath.toFile();			
+			tempDir = tempPath.toFile();
 
 			File dst = File.createTempFile("merge", ".pdf");
 

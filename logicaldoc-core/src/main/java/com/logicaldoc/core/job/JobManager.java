@@ -95,7 +95,7 @@ public class JobManager {
 				.withDescription(job.getDescription() != null ? job.getDescription() : "")
 				.usingJobData(new JobDataMap(dictionary)).build();
 
-		SimpleDateFormat df = new SimpleDateFormat("YYYMMdd_HHmmss");
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		Set<Trigger> trgs = new HashSet<Trigger>();
 		for (Object triggerSpec : triggers.keySet()) {
 			Trigger trig = null;

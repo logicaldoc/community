@@ -253,4 +253,9 @@ public class Device extends PersistentObject implements Serializable {
 		else
 			return super.equals(obj);
 	}
+
+	@Override
+	public int hashCode() {
+		return deviceId.hashCode();
+	}
 }

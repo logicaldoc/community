@@ -166,13 +166,10 @@ public class ParserFactory {
 	public static String parse(InputStream input, String filename, String encoding, Locale locale, long tenantId,
 			Document document, String fileVersion) throws ParseException {
 		Parser parser = getParser(filename);
-		if (parser != null) {
-			TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-			String tenantName = dao.getTenantName(tenantId);
-			return parser.parse(input, filename, encoding, locale,
-					tenantName != null ? tenantName : Tenant.DEFAULT_NAME, document, fileVersion);
-		} else
-			return "";
+		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		String tenantName = dao.getTenantName(tenantId);
+		return parser.parse(input, filename, encoding, locale, tenantName != null ? tenantName : Tenant.DEFAULT_NAME,
+				document, fileVersion);
 	}
 
 	/**

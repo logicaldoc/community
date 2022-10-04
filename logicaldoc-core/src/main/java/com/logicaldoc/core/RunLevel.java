@@ -33,7 +33,9 @@ public enum RunLevel {
 	}
 
 	public static RunLevel current() {
-		String runLevel = getConfig().getProperty("runlevel", DEFAULT.toString());
+		ContextProperties config = getConfig();
+		String runLevel = config != null ? config.getProperty("runlevel", DEFAULT.toString())
+				: DEFAULT.toString();
 		return RunLevel.fromString(runLevel);
 	}
 
@@ -51,11 +53,14 @@ public enum RunLevel {
 	}
 
 	public boolean aspectEnabled(String aspect) {
-		return getConfig().getBoolean(getAspectProperty(aspect), false);
+		ContextProperties config = getConfig();
+		return config != null ? config.getBoolean(getAspectProperty(aspect), false) : false;
 	}
 
 	public void setAspect(String aspect, boolean enabled) {
-		getConfig().setProperty(getAspectProperty(aspect), "" + enabled);
+		ContextProperties config = getConfig();
+		if (config != null)
+			config.setProperty(getAspectProperty(aspect), "" + enabled);
 	}
 
 	private static ContextProperties getConfig() {

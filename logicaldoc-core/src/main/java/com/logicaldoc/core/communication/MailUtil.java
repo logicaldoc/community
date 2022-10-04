@@ -58,7 +58,7 @@ public class MailUtil {
 	public static boolean emlContainsAttachments(InputStream is) {
 		try {
 			MimeMessage msg = readMime(is);
-			if (msg.isMimeType("multipart/*")) {
+			if (msg!=null && msg.isMimeType("multipart/*")) {
 				Multipart mp = (Multipart) msg.getContent();
 				int count = mp.getCount();
 				return count > 1;
@@ -240,7 +240,6 @@ public class MailUtil {
 		props.put("mail.smtp.provider.vendor", "foo");
 		props.put("mail.smtp.provider.version", "0.0.0");
 		// props.put("mail.host", "smtp.unexisting.com");
-		props.put("mail.transport.protocol", "smtp");
 
 		try {
 			Session mailSession = Session.getInstance(props, null);
@@ -691,7 +690,7 @@ public class MailUtil {
 		}
 
 		@Override
-		public void connect(String host, int port, String username, String password) throws MessagingException {
+		public synchronized void connect(String host, int port, String username, String password) throws MessagingException {
 		}
 
 		@Override
@@ -699,7 +698,7 @@ public class MailUtil {
 		}
 
 		@Override
-		public void close() {
+		public synchronized void close() {
 		}
 	}
 }

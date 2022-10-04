@@ -85,7 +85,7 @@ public class Contact extends PersistentObject implements Cloneable {
 	}
 
 	public String getFullName() {
-		return firstName != null ? firstName : "" + " " + lastName != null ? lastName : "";
+		return firstName != null ? firstName :  (lastName != null ? " " +lastName : "");
 	}
 
 	public String toString() {

@@ -54,7 +54,7 @@ public class Tag implements Comparable<Tag>, Serializable {
 	@Override
 	public String toString() {
 		if (tag == null)
-			return null;
+			return "";
 		else
 			return tag.toString();
 	}
@@ -69,6 +69,12 @@ public class Tag implements Comparable<Tag>, Serializable {
 
 	@Override
 	public boolean equals(Object o) {
+		if (o == null)
+			return false;
+
+		if (this.getClass() != o.getClass())
+			return false;
+
 		Tag other = (Tag) o;
 		return other.tenantId == this.tenantId && this.tag != null && this.tag.equals(other.tag);
 	}

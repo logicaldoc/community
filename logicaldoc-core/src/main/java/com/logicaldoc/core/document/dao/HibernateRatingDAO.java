@@ -40,8 +40,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 		if (!result)
 			return false;
 		flush();
-		
-		
+
 		try {
 			if (transaction != null) {
 				transaction.setEvent(DocumentEvent.RATING_NEW.toString());
@@ -96,7 +95,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 					if (rs.getInt(1) > 0) {
 						float div = (float) rs.getInt(2) / (float) rs.getInt(1);
 						double avg = Math.round(div * 100.0) / 100.0;
-						rating.setAverage(Double.valueOf(avg).floatValue());
+						rating.setAverage((float)avg);
 					} else
 						rating.setAverage(0F);
 
