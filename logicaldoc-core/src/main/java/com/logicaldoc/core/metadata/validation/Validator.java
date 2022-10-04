@@ -77,6 +77,9 @@ public class Validator {
 		tDao.initialize(template);
 		for (String attributeName : template.getAttributeNames()) {
 			Attribute attribute = object.getAttribute(attributeName);
+			if(attribute==null)
+				continue;
+			
 			Attribute templateAttribute = template.getAttribute(attributeName);
 			if (StringUtils.isNotEmpty(templateAttribute.getValidation())) {
 				Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
