@@ -4,9 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -53,39 +51,18 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		fdao = (FolderDAO) context.getBean("FolderDAO");		
 	}
 	
-	private void activateCorePlugin() throws JpfException, MalformedURLException {
+	private void activateCorePlugin() throws JpfException, IOException {
 
-		String pluginsDir = "target/tests-plugins";
-
-		// creating new folder
-		File myfolder = new File(pluginsDir);
-
-		File[] file_array = myfolder.listFiles();
-		for (int i = 0; i < file_array.length; i++) {
-			if (file_array[i].isFile() && !file_array[i].getName().contains("plugin")) {
-				File myfile = new File(pluginsDir + "\\" + file_array[i].getName());
-				String long_file_name = file_array[i].getName();				
-				String new_file_name = long_file_name.replace(".jar", "-plugin.jar");
-				myfile.renameTo(new File(pluginsDir + "\\" + new_file_name));
-			}
-		}
+		File pluginsDir = new File("target/tests-plugins");
+		pluginsDir.mkdir();
+		 		
+		File corePluginFile = new File(pluginsDir, "logicaldoc-core-plugin.jar");
+		
+		// copy plugin file to target resources
+		copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile.getAbsolutePath());
 		
 		PluginRegistry registry = PluginRegistry.getInstance();		
-		registry.init(pluginsDir);
-			
-		/*
-		Collection<Extension> extensions = new ArrayList<Extension>();
-		try {
-			extensions = registry.getExtensions("logicaldoc-core", "Search");			
-		} catch (Throwable e) {
-			log.error(e.getMessage());
-		}	
-		for (Extension extension : extensions) {
-			log.debug(extension.toString());
-			log.debug(extension.getId());
-			log.debug(extension.getExtendedPointId());
-			log.debug(extension.getExtendedPluginId());
-		}*/
+		registry.init(pluginsDir.getAbsolutePath());
 	}
 
 
@@ -218,11 +195,13 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		log.info("found results: {}", ol.getObjects().size());	
 		assertEquals(1, ol.getObjects().size());
 		
+		// Search by tag
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE ldoc:tags = 'document'";
 		ol = ldrep.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());	
 		assertEquals(1, ol.getObjects().size());
 		
+		// Search by language
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE ldoc:language = 'en'";
 		ol = ldrep.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());	
