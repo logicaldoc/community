@@ -15,6 +15,7 @@ import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.FileVersionListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
@@ -126,7 +127,7 @@ public class LockedDocsReport extends AdminPanel {
 		version.setCanFilter(false);
 		version.setCanGroupBy(false);
 
-		ListGridField fileVersion = new VersionListGridField("fileVersion", "fileversion");
+		FileVersionListGridField fileVersion = new FileVersionListGridField();
 		fileVersion.setCanFilter(false);
 		fileVersion.setCanGroupBy(false);
 		fileVersion.setHidden(true);

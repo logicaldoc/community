@@ -69,7 +69,7 @@ public class LockedDocsDataServlet extends HttpServlet {
 					"select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 			query.append(
 					" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_immutable, A.ld_folderid, A.ld_status, A.ld_lockuserid, ");
-			query.append(" B.ld_firstname, B.ld_name, A.ld_fileversion, A.ld_color ");
+			query.append(" B.ld_firstname, B.ld_name, A.ld_fileversion, A.ld_color, A.ld_fileversion ");
 			query.append(" from ld_document A ");
 			query.append(" left outer join ld_user B on A.ld_lockuserid=B.ld_id ");
 			query.append(" where A.ld_deleted = 0 and not A.ld_status=" + AbstractDocument.DOC_ARCHIVED);
@@ -109,7 +109,9 @@ public class LockedDocsDataServlet extends HttpServlet {
 
 					doc.setFileVersion(rs.getString(15));
 					doc.setColor(rs.getString(16));
-
+					doc.setFileVersion(rs.getString(17));
+					
+					
 					return doc;
 				}
 			}, null);
@@ -128,6 +130,7 @@ public class LockedDocsDataServlet extends HttpServlet {
 						+ FilenameUtils.getBaseName(IconSelector.selectIcon(doc.getType(), doc.getDocRef() != null))
 						+ "</icon>");
 				writer.print("<version>" + doc.getVersion() + "</version>");
+				writer.print("<fileVersion>" + doc.getFileVersion() + "</fileVersion>");
 				writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");
 				writer.print("<size>" + doc.getFileSize() + "</size>");
 				writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
