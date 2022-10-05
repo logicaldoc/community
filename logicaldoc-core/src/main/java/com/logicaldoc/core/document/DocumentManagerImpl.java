@@ -482,7 +482,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				if (realDoc != null) {
 					if (realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
 							|| realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA)
-						parsingTime = reindex(realDoc.getId(), content, transaction.clone());
+						parsingTime = reindex(realDoc.getId(), content, new DocumentHistory(transaction));
 
 					// Take the content from the real document to avoid double
 					// parsing
@@ -556,7 +556,7 @@ public class DocumentManagerImpl implements DocumentManager {
 						|| ((doc.getImmutable() == 1 && transaction.getUser().isMemberOf("admin")))) {
 					DocumentHistory renameTransaction = null;
 					if (!doc.getFileName().equals(docVO.getFileName()) && docVO.getFileName() != null) {
-						renameTransaction = (DocumentHistory) transaction.clone();
+						renameTransaction = new DocumentHistory(transaction);
 						renameTransaction.setFilenameOld(doc.getFileName());
 						renameTransaction.setEvent(DocumentEvent.RENAMED.toString());
 					}
@@ -894,7 +894,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Document createdDocument = create(is, cloned, transaction);
 
 			// Save the event of the copy
-			DocumentHistory copyEvent = (DocumentHistory) transaction.clone();
+			DocumentHistory copyEvent = new DocumentHistory(transaction);
 			copyEvent.setDocument(doc);
 			copyEvent.setFolder(doc.getFolder());
 			copyEvent.setEvent(DocumentEvent.COPYED.toString());
@@ -1033,7 +1033,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			documentDAO.initialize(originalDoc);
 			documentDAO.delete(aliasId, transaction);
 
-			return copyToFolder(originalDoc, folder, (DocumentHistory) transaction.clone());
+			return copyToFolder(originalDoc, folder, new DocumentHistory(transaction));
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			throw new PersistenceException(e);
@@ -1174,7 +1174,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		// Save the version deletion history
 		DocumentHistory delHistory = null;
 		if (transaction != null) {
-			delHistory = (DocumentHistory) transaction.clone();
+			delHistory = new DocumentHistory(transaction);
 			delHistory.setEvent(DocumentEvent.VERSION_DELETED.toString());
 			delHistory.setComment(versionToDeleteSpec + " - " + versionToDelete.getFileVersion());
 		}
@@ -1260,7 +1260,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				continue;
 
 			// Create the document history event
-			DocumentHistory t = (DocumentHistory) transaction.clone();
+			DocumentHistory t = new DocumentHistory(transaction);
 			if (dao.archive(id, t))
 				idsList.add(id);
 		}
@@ -1383,7 +1383,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			File tmp = File.createTempFile("promotion", "");
 			try {
 				Folder originalFolder = document.getFolder();
-				Version docVO = (Version) ver.clone();
+				Version docVO = new Version(ver);
 				docVO.setFolder(originalFolder);
 				docVO.setCustomId(ver.getCustomId());
 				docVO.setId(0L);
@@ -1397,7 +1397,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				}
 
 				storer.writeToFile(document.getId(), storer.getResourceName(document, ver.getFileVersion(), null), tmp);
-				DocumentHistory checkinTransaction = (DocumentHistory) transaction.clone();
+				DocumentHistory checkinTransaction = new DocumentHistory(transaction);
 				checkinTransaction.setDate(new Date());
 				checkin(document.getId(), tmp, ver.getFileName(), false, docVO, checkinTransaction);
 
@@ -1454,7 +1454,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				if (movedFiles > 0) {
 					totalMovedFiles += movedFiles;
 					try {
-						DocumentHistory storedTransaction = transaction.clone();
+						DocumentHistory storedTransaction = new DocumentHistory(transaction);
 						storedTransaction
 								.setComment(String.format("%d files moved to storage %d", movedFiles, targetStorage));
 						documentDAO.saveDocumentHistory(document, transaction);
@@ -1494,7 +1494,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			if (transaction != null)
 				for (Long id : docIds) {
-					DocumentHistory trans = transaction.clone();
+					DocumentHistory trans = new DocumentHistory(transaction);
 					trans.setEvent(DocumentEvent.EXPORTPDF.toString());
 					docDao.saveDocumentHistory(docDao.findById(id), trans);
 				}

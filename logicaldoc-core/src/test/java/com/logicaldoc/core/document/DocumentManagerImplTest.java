@@ -2,7 +2,6 @@ package com.logicaldoc.core.document;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 import org.junit.Test;
 
@@ -206,7 +205,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 	@Test
 	public void testCreate() throws Exception {
-		
+
 		User user = userDao.findByUsername("admin");
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
@@ -224,12 +223,12 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		Document newDoc = documentManager.create(new FileInputStream("pom.xml"), doc, transaction);
 
-		Assert.assertEquals("1.0",newDoc.getVersion());
-		Assert.assertEquals("1.0",newDoc.getFileVersion());
-		
-		Version ver=verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
+		Assert.assertEquals("1.0", newDoc.getVersion());
+		Assert.assertEquals("1.0", newDoc.getFileVersion());
+
+		Version ver = verDao.findByVersion(newDoc.getId(), newDoc.getVersion());
 		Assert.assertNotNull(ver);
-		
+
 		newDoc = docDao.findById(newDoc.getId());
 		Assert.assertEquals(newDoc.getFileName(), doc.getFileName());
 	}
@@ -279,7 +278,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		DummyStorer storer = (DummyStorer) Context.get().getBean(Storer.class);
 		try {
 			storer.setUseDummyFile(true);
-			Document newDoc = documentManager.replaceAlias(alias.getId(), (DocumentHistory) transaction.clone());
+			Document newDoc = documentManager.replaceAlias(alias.getId(), new DocumentHistory(transaction));
 
 			Assert.assertNotNull(newDoc);
 			Assert.assertEquals(originalDoc.getFileName(), newDoc.getFileName());
@@ -432,19 +431,17 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		history.setSession(SessionManager.get().newSession("admin", "admin", null));
 
 		DummyStorer storer = (DummyStorer) Context.get().getBean(Storer.class);
-		/*try {
-			storer.setRaiseError(true);
-			documentManager.create(new FileInputStream("pom.xml"), doc, history);
-			Assert.fail("an exception should have been raised at this point");
-		} catch (Throwable e) {
-
-		} finally {
-			storer.setRaiseError(false);
-		}*/
-		
+		/*
+		 * try { storer.setRaiseError(true); documentManager.create(new
+		 * FileInputStream("pom.xml"), doc, history);
+		 * Assert.fail("an exception should have been raised at this point"); }
+		 * catch (Throwable e) {
+		 * 
+		 * } finally { storer.setRaiseError(false); }
+		 */
 
 		FileInputStream fis = new FileInputStream("pom.xml");
-		
+
 		try {
 			storer.setRaiseError(true);
 			documentManager.create(fis, doc, history);
@@ -453,7 +450,6 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		} finally {
 			storer.setRaiseError(false);
 		}
-		
 
 		// Now check that the document was deleted
 		Assert.assertTrue(doc.getId() != 0L);
@@ -486,23 +482,22 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		DummyStorer storer = (DummyStorer) Context.get().getBean(Storer.class);
 		/*
-		 * try { storer.setRaiseError(true); documentManager.checkin(1L, file, "pippo",
-		 * true, null, transaction);
-		 * Assert.fail("an exception should have been raised at this point"); } catch
-		 * (Throwable e) {
+		 * try { storer.setRaiseError(true); documentManager.checkin(1L, file,
+		 * "pippo", true, null, transaction);
+		 * Assert.fail("an exception should have been raised at this point"); }
+		 * catch (Throwable e) {
 		 * 
 		 * } finally { storer.setRaiseError(false); }
 		 */
 		try {
-			storer.setRaiseError(true); 
+			storer.setRaiseError(true);
 			documentManager.checkin(1L, file, "pippo", true, null, transaction);
 			Assert.fail("an exception should have been raised at this point");
 		} catch (Exception e) {
-		} finally { 
-			storer.setRaiseError(false); 
+		} finally {
+			storer.setRaiseError(false);
 		}
 
-		 
 		doc = docDao.findById(1L);
 
 		Assert.assertEquals(Document.DOC_CHECKED_OUT, doc.getStatus());

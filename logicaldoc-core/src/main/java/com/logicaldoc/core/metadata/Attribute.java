@@ -91,6 +91,30 @@ public class Attribute implements Comparable<Attribute> {
 	 */
 	private String initialization;
 
+	public Attribute() {
+	}
+
+	public Attribute(Attribute source) {
+		this.name = source.name;
+		this.label = source.label;
+		this.stringValue = source.stringValue;
+		this.stringValues = source.stringValues;
+		this.intValue = source.intValue;
+		this.doubleValue = source.doubleValue;
+		this.dateValue = source.dateValue;
+		this.type = source.type;
+		this.hidden = source.hidden;
+		this.mandatory = source.mandatory;
+		this.position = source.position;
+		this.editor = source.editor;
+		this.setId = source.setId;
+		this.multiple = source.multiple;
+		this.parent = source.parent;
+		this.dependsOn = source.dependsOn;
+		this.validation = source.validation;
+		this.initialization = source.initialization;
+	}
+
 	public String getStringValue() {
 		return stringValue;
 	}
@@ -337,29 +361,5 @@ public class Attribute implements Comparable<Attribute> {
 
 	public void setDependsOn(String dependsOn) {
 		this.dependsOn = dependsOn;
-	}
-
-	@Override
-	public Attribute clone() {
-		Attribute clone = new Attribute();
-		clone.setStringValue(stringValue);
-		clone.setStringValues(stringValues);
-		clone.setDateValue(dateValue);
-		clone.setDoubleValue(doubleValue);
-		clone.setIntValue(intValue);
-		clone.setLabel(label);
-		clone.setMandatory(mandatory);
-		clone.setHidden(hidden);
-		clone.setMultiple(multiple);
-		clone.setPosition(position);
-		clone.setEditor(editor);
-		clone.setType(type);
-		clone.setSetId(setId);
-		clone.setParent(parent);
-		clone.setName(name);
-		clone.setValidation(validation);
-		clone.setInitialization(initialization);
-		clone.setDependsOn(dependsOn);
-		return clone;
 	}
 }

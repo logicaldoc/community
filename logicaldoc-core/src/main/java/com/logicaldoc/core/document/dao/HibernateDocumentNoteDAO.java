@@ -82,25 +82,24 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				if (types == null || types.isEmpty())
 					return findByWhere("_entity.docId = " + docId, null, null);
 				else {
-					Map<String, Object> params=new HashMap<String, Object>();
+					Map<String, Object> params = new HashMap<String, Object>();
 					params.put("docId", docId);
 					params.put("types", types);
-					
-					return findByWhere("_entity.docId = :docId and _entity.type in (:types)", params,
-							null, null);
+
+					return findByWhere("_entity.docId = :docId and _entity.type in (:types)", params, null, null);
 				}
 			else if (types == null || types.isEmpty()) {
-				Map<String, Object> params=new HashMap<String, Object>();
+				Map<String, Object> params = new HashMap<String, Object>();
 				params.put("docId", docId);
 				params.put("fileVersion", fileVersion);
-				return findByWhere("_entity.docId = :docId and _entity.fileVersion = :fileVersion",
-						params, null, null);
+				return findByWhere("_entity.docId = :docId and _entity.fileVersion = :fileVersion", params, null, null);
 			} else {
-				Map<String, Object> params=new HashMap<String, Object>();
+				Map<String, Object> params = new HashMap<String, Object>();
 				params.put("docId", docId);
 				params.put("fileVersion", fileVersion);
 				params.put("types", types);
-				return findByWhere("_entity.docId = :docId and _entity.fileVersion = :fileVersion and _entity.type in (:types)",
+				return findByWhere(
+						"_entity.docId = :docId and _entity.fileVersion = :fileVersion and _entity.type in (:types)",
 						params, null, null);
 			}
 		} catch (PersistenceException e) {
@@ -145,15 +144,11 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 			if (oldNote.getPage() > 0)
 				continue;
 
-			try {
-				DocumentNote newNote = (DocumentNote) oldNote.clone();
-				newNote.setId(0L);
-				newNote.setFileVersion(newFileVersion);
-				store(newNote);
-				count++;
-			} catch (CloneNotSupportedException e) {
-				log.error(e.getMessage(), e);
-			}
+			DocumentNote newNote = new DocumentNote(oldNote);
+			newNote.setId(0L);
+			newNote.setFileVersion(newFileVersion);
+			store(newNote);
+			count++;
 		}
 		return count;
 	}

@@ -361,7 +361,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				 */
 				UserHistory createdHistory = new UserHistory();
 				if (transaction != null)
-					createdHistory = (UserHistory) transaction.clone();
+					createdHistory = new UserHistory(transaction);
 				createdHistory.setEvent(UserEvent.CREATED.toString());
 				createdHistory.setComment(user.getUsername());
 				saveUserHistory(user, createdHistory);
@@ -387,7 +387,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 					&& !transaction.getEvent().equals(UserEvent.ENABLED.toString())))) {
 				UserHistory enabledOrDisabledHistory = new UserHistory();
 				if (transaction != null)
-					enabledOrDisabledHistory = transaction.clone();
+					enabledOrDisabledHistory = new UserHistory(transaction);
 				else {
 					enabledOrDisabledHistory.setUser(user);
 				}

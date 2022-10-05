@@ -22,7 +22,7 @@ public class Document extends AbstractDocument {
 		setOcrTemplateId(source.getOcrTemplateId());
 		setBarcoded(source.getBarcoded());
 		setBarcodeTemplateId(source.getBarcodeTemplateId());
-		if (getIndexed() != INDEX_INDEXED)
+		if (source.getIndexed() != INDEX_INDEXED)
 			setIndexed(source.getIndexed());
 		setCustomId(null);
 	}

@@ -1008,7 +1008,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void deleteAll(Collection<Document> documents, int delCode, DocumentHistory transaction) {
 		for (Document document : documents) {
-			DocumentHistory deleteHistory = (DocumentHistory) transaction.clone();
+			DocumentHistory deleteHistory = new DocumentHistory(transaction);
 			deleteHistory.setEvent(DocumentEvent.DELETED.toString());
 			delete(document.getId(), delCode, deleteHistory);
 		}

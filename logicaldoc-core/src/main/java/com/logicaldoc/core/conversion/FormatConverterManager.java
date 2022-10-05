@@ -213,7 +213,7 @@ public class FormatConverterManager {
 				docVO.setFolder(document.getFolder());
 				docVO.setLanguage(document.getLanguage());
 
-				DocumentHistory createHistory = (DocumentHistory) transaction.clone();
+				DocumentHistory createHistory = new DocumentHistory(transaction);
 				createHistory.setComment(null);
 				return documentManager.create(out, docVO, createHistory);
 			} else

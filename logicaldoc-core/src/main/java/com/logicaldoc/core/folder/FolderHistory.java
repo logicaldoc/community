@@ -11,35 +11,35 @@ import com.logicaldoc.core.History;
 public class FolderHistory extends History {
 
 	private static final long serialVersionUID = 1L;
-	
-	@Override
-	public FolderHistory clone() {
-		FolderHistory history = new FolderHistory();
-		history.setDate(getDate());
-		history.setDocId(getDocId());
-		history.setFolderId(getFolderId());
-		history.setUser(getUser());
-		history.setEvent(getEvent());
-		history.setComment(getComment());
-		history.setReason(getReason());
-		history.setFileVersion(getFileVersion());
-		history.setVersion(getVersion());
-		history.setPath(getPath());
-		history.setPathOld(getPathOld());
-		history.setNotified(getNotified());
-		history.setSessionId(getSessionId());
-		history.setIsNew(getIsNew());
-		history.setFilename(getFilename());
-		history.setFilenameOld(getFilenameOld());
-		history.setUserId(getUserId());
-		history.setUsername(getUsername());
-		history.setUserLogin(getUserLogin());
-		history.setNotifyEvent(isNotifyEvent());
-		history.setIp(getIp());
-		history.setDevice(getDevice());
-		history.setGeolocation(getGeolocation());
-		history.setFileSize(getFileSize());
-		
-		return history;
+
+	public FolderHistory() {
+
+	}
+
+	public FolderHistory( FolderHistory source) {
+		setDate(source.getDate());
+		setDocId(source.getDocId());
+		setFolderId(source.getFolderId());
+		setUser(source.getUser());
+		setEvent(source.getEvent());
+		setComment(source.getComment());
+		setReason(source.getReason());
+		setFileVersion(source.getFileVersion());
+		setVersion(source.getVersion());
+		setPath(source.getPath());
+		setPathOld(source.getPathOld());
+		setNotified(source.getNotified());
+		setSessionId(source.getSessionId());
+		setIsNew(source.getIsNew());
+		setFilename(source.getFilename());
+		setFilenameOld(source.getFilenameOld());
+		setUserId(source.getUserId());
+		setUsername(source.getUsername());
+		setUserLogin(source.getUserLogin());
+		setNotifyEvent(isNotifyEvent());
+		setIp(source.getIp());
+		setDevice(source.getDevice());
+		setGeolocation(source.getGeolocation());
+		setFileSize(source.getFileSize());
 	}
 }

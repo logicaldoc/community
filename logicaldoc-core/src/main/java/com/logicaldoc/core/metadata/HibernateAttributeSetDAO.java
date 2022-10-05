@@ -141,13 +141,12 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 					int currentPosition = templateAttribute.getPosition();
 					String currentValidation = templateAttribute.getValidation();
 					String currentInitialization = templateAttribute.getInitialization();
-					
 
-					Attribute clonedAttribute = (Attribute) setAttribute.clone();
+					Attribute clonedAttribute = new Attribute(setAttribute);
 					clonedAttribute.setPosition(currentPosition);
-					if(StringUtils.isNotEmpty(currentValidation))
+					if (StringUtils.isNotEmpty(currentValidation))
 						clonedAttribute.setValidation(currentValidation);
-					if(StringUtils.isNotEmpty(currentInitialization))
+					if (StringUtils.isNotEmpty(currentInitialization))
 						clonedAttribute.setInitialization(currentInitialization);
 					template.getAttributes().put(name, clonedAttribute);
 				} else {

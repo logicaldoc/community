@@ -166,7 +166,7 @@ public abstract class ExtensibleObject extends PersistentObject {
 	 * @param attribute the attribute instance
 	 */
 	public void setAttribute(String name, Attribute attribute) {
-		Attribute newAttribute = (Attribute) attribute.clone();
+		Attribute newAttribute = new Attribute(attribute);
 		Attribute oldAttribute = attributes.get(name);
 		if (oldAttribute != null) {
 			newAttribute.setPosition(oldAttribute.getPosition());

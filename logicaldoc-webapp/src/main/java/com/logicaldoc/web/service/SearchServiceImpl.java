@@ -183,7 +183,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 			search.setTenantId(session.getTenantId());
 			search.setDescription(options.getDescription());
 			search.saveOptions(opt);
-			
+
 			SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 			dao.store(search);
 
@@ -361,7 +361,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 			op.setLanguage(((FulltextSearchOptions) searchOptions).getLanguage());
 			op.setSizeMax(((FulltextSearchOptions) searchOptions).getSizeMax());
 			op.setSizeMin(((FulltextSearchOptions) searchOptions).getSizeMin());
-		}	else if (searchOptions.getType() == SearchOptions.TYPE_FOLDERS) {
+		} else if (searchOptions.getType() == SearchOptions.TYPE_FOLDERS) {
 			List<GUICriterion> criteria = new ArrayList<GUICriterion>();
 			for (FolderCriterion crit : ((FolderSearchOptions) searchOptions).getCriteria()) {
 				GUICriterion criterion = new GUICriterion();
@@ -426,7 +426,8 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 				for (Long userId : users) {
 					try {
-						com.logicaldoc.core.searchengine.saved.SavedSearch clone = search.clone();
+						com.logicaldoc.core.searchengine.saved.SavedSearch clone = new com.logicaldoc.core.searchengine.saved.SavedSearch(
+								search);
 						clone.setUserId(userId);
 						dao.store(clone);
 					} catch (Throwable t) {
@@ -439,15 +440,15 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		}
 	}
 
-	protected java.util.Date convertToJavaDate(Date source){
-		if(source==null)
+	protected java.util.Date convertToJavaDate(Date source) {
+		if (source == null)
 			return source;
-		
+
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(source);
 		return cal.getTime();
 	}
-	
+
 	protected SearchOptions toSearchOptions(GUISearchOptions options) {
 		SearchOptions searchOptions = Search.newOptions(options.getType());
 		searchOptions.setTopOperator(options.getTopOperator());

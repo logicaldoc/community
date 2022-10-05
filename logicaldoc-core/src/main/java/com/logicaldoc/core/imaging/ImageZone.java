@@ -6,7 +6,7 @@ package com.logicaldoc.core.imaging;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
  */
-public class ImageZone implements Cloneable {
+public class ImageZone {
 
 	/**
 	 * Upper-left corner of the zone (percentage of the width 0..1)
@@ -27,6 +27,17 @@ public class ImageZone implements Cloneable {
 	 * Height of the zone (percentage of the height 0..1)
 	 */
 	private Double height = 0.10;
+
+	public ImageZone() {
+		super();
+	}
+
+	public ImageZone(ImageZone source) {
+		this.left = source.left;
+		this.top = source.top;
+		this.width = source.width;
+		this.height = source.height;
+	}
 
 	public Double getLeft() {
 		return left;
@@ -65,15 +76,5 @@ public class ImageZone implements Cloneable {
 		this.top = top;
 		this.width = width;
 		this.height = height;
-	}
-
-	@Override
-	protected Object clone() {
-		ImageZone z = new ImageZone();
-		z.setHeight(getHeight());
-		z.setLeft(getLeft());
-		z.setTop(getTop());
-		z.setWidth(getWidth());
-		return z;
 	}
 }

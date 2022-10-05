@@ -635,7 +635,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			for (long id : docIds) {
 				Document doc = dao.findDocument(id);
 				if (doc != null)
-					documentManager.checkout(doc.getId(), transaction.clone());
+					documentManager.checkout(doc.getId(), new DocumentHistory(transaction));
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -659,7 +659,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			for (long id : docIds) {
 				Document doc = dao.findDocument(id);
 				if (doc != null)
-					documentManager.lock(doc.getId(), Document.DOC_LOCKED, transaction.clone());
+					documentManager.lock(doc.getId(), Document.DOC_LOCKED, new DocumentHistory(transaction));
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);

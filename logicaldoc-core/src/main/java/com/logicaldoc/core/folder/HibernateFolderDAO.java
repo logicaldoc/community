@@ -207,7 +207,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			for (FolderListener listener : listenerManager.getListeners())
 				listener.afterStore(folder, transaction, dictionary);
 
-			saveFolderHistory((Folder) folder.clone(), transaction);
+			saveFolderHistory(new Folder(folder), transaction);
 		} catch (Throwable e) {
 			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());
@@ -1259,7 +1259,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public void deleteAll(Collection<Folder> folders, int code, FolderHistory transaction) throws PersistenceException {
 		for (Folder folder : folders) {
-			FolderHistory deleteHistory = (FolderHistory) transaction.clone();
+			FolderHistory deleteHistory = new FolderHistory(transaction);
 			deleteHistory.setEvent(FolderEvent.DELETED.toString());
 			deleteHistory.setFolderId(folder.getId());
 			deleteHistory.setPath(computePathExtended(folder.getId()));
@@ -1435,7 +1435,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * Create the alias event in the original folder
 		 */
 		if (aliasFolder != null && transaction != null) {
-			FolderHistory aliasHistory = (FolderHistory) transaction.clone();
+			FolderHistory aliasHistory = new FolderHistory(transaction);
 			aliasHistory.setFolder(targetFolder);
 			aliasHistory.setEvent(FolderEvent.ALIAS_CREATED.toString());
 			saveFolderHistory(targetFolder, aliasHistory);
@@ -1514,7 +1514,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			folder.setTemplate(parent.getTemplate());
 			try {
 				for (String att : parent.getAttributeNames()) {
-					Attribute ext = parent.getAttributes().get(att).clone();
+					Attribute ext = new Attribute(parent.getAttributes().get(att));
 					folder.getAttributes().put(att, ext);
 				}
 			} catch (Throwable t) {
@@ -1555,7 +1555,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				folderVO.setName(name);
 				folderVO.setType(root.equals(folder) ? Folder.TYPE_WORKSPACE : Folder.TYPE_DEFAULT);
 				dir = create(folder, folderVO, inheritSecurity,
-						transaction != null ? (FolderHistory) transaction.clone() : null);
+						transaction != null ? new FolderHistory(transaction) : null);
 				flush();
 			} else {
 				dir = childs.iterator().next();
@@ -1662,7 +1662,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		// Create the same folder in the target
 		Folder newFolder = null;
 		newFolder = createPath(target, StringUtils.isNotEmpty(newName) ? newName : source.getName(),
-				"inherit".equals(securityOption), (FolderHistory) transaction.clone());
+				"inherit".equals(securityOption), new FolderHistory(transaction));
 		newFolder.setFoldRef(source.getFoldRef());
 
 		if ("replicate".equals(securityOption) && newFolder.getFoldRef() == null) {
@@ -1674,7 +1674,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			} else {
 				newFolder.getFolderGroups().clear();
 				for (FolderGroup fg : source.getFolderGroups()) {
-					newFolder.addFolderGroup(fg.clone());
+					newFolder.addFolderGroup(new FolderGroup(fg));
 				}
 			}
 			store(newFolder);
@@ -2230,13 +2230,13 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			for (Folder folder : children) {
 				initialize(folder);
 
-				FolderHistory tr = (FolderHistory) transaction.clone();
+				FolderHistory tr = new FolderHistory(transaction);
 				tr.setFolderId(folder.getId());
 
 				folder.setTemplate(parent.getTemplate());
 				folder.setTemplateLocked(parent.getTemplateLocked());
 				for (String name : parent.getAttributeNames()) {
-					Attribute ext = (Attribute) parent.getAttributes().get(name).clone();
+					Attribute ext = new Attribute(parent.getAttributes().get(name));
 					folder.getAttributes().put(name, ext);
 				}
 
@@ -2278,7 +2278,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			for (Folder folder : children) {
 				initialize(folder);
 
-				FolderHistory tr = (FolderHistory) transaction.clone();
+				FolderHistory tr = new FolderHistory(transaction);
 				tr.setFolderId(folder.getId());
 
 				if (folder.getTags() != null)
@@ -2325,7 +2325,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				initialize(folder);
 				folder.setGrid(parent.getGrid());
 
-				FolderHistory tr = (FolderHistory) transaction.clone();
+				FolderHistory tr = new FolderHistory(transaction);
 				tr.setFolderId(folder.getId());
 
 				store(folder, tr);
@@ -2362,7 +2362,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				initialize(folder);
 				folder.setStorage(parent.getStorage());
 
-				FolderHistory tr = (FolderHistory) transaction.clone();
+				FolderHistory tr = new FolderHistory(transaction);
 				tr.setFolderId(folder.getId());
 
 				store(folder, tr);
@@ -2399,7 +2399,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				folder.setOcrTemplateId(parent.getOcrTemplateId());
 				folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
 
-				FolderHistory tr = (FolderHistory) transaction.clone();
+				FolderHistory tr = new FolderHistory(transaction);
 				tr.setFolderId(folder.getId());
 
 				store(folder, tr);
@@ -2556,7 +2556,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		for (Folder folder : foldersInSource) {
 			// Move only non-clashing folders
 			if (findByNameAndParentId(folder.getName(), target.getId()).isEmpty())
-				move(folder, target, transaction != null ? transaction.clone() : null);
+				move(folder, target, transaction != null ? new FolderHistory(transaction) : null);
 		}
 
 		/*
@@ -2567,12 +2567,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			List<Folder> foldersInTarget = findByNameAndParentId(fldSource.getName(), target.getId());
 			if (foldersInTarget.isEmpty())
 				continue;
-			merge(fldSource, foldersInTarget.get(0), transaction != null ? transaction.clone() : null);
+			merge(fldSource, foldersInTarget.get(0), transaction != null ? new FolderHistory(transaction) : null);
 		}
 
 		log.debug("delete the empty source folder {}", source);
 		if (docDao.findByFolder(source.getId(), null).isEmpty() && findByParentId(source.getId()).isEmpty()) {
-			delete(source.getId(), transaction != null ? transaction.clone() : null);
+			delete(source.getId(), transaction != null ? new FolderHistory(transaction) : null);
 		}
 	}
 

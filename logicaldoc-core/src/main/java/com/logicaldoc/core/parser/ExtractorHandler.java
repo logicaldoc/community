@@ -31,7 +31,7 @@ class ExtractorHandler extends DefaultHandler implements ErrorHandler {
     /**
      * Separator that is written between consecutive text and attribute values.
      */
-    private static final char SPACE = ' ';
+    private static final char SPACE_CHAR = ' ';
 
     /**
      * The writer to which the selected text content is written.
@@ -92,7 +92,7 @@ class ExtractorHandler extends DefaultHandler implements ErrorHandler {
                     space = true;
                 } else {
                     if (space) {
-                        writer.write(SPACE);
+                        writer.write(SPACE_CHAR);
                         space = false;
                     }
                     writer.write(ch[start + i]);

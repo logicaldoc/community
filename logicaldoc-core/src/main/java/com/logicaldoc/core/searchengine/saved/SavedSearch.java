@@ -20,7 +20,7 @@ import com.logicaldoc.util.io.StringOutputStream;
  * @since 8.6.1
  *
  */
-public class SavedSearch extends PersistentObject implements Serializable, Comparable<SavedSearch>, Cloneable {
+public class SavedSearch extends PersistentObject implements Serializable, Comparable<SavedSearch> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -36,14 +36,26 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 
 	private String options = "";
 
+	public SavedSearch() {
+	}
+
+	public SavedSearch(SavedSearch source) {
+		this.userId = source.userId;
+		this.name = source.name;
+		this.description = source.description;
+		this.type = source.type;
+		this.date = source.date;
+		this.options = source.options;
+	}
+
 	public void saveOptions(SearchOptions opt) throws IOException {
 		this.setType(opt.getType());
 		StringBuffer sb = new StringBuffer();
 
 		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		String tenantName = tenantDao.getTenantName(getTenantId());		
-		String charset = Context.get().getProperties().getProperty(tenantName+".charset", "UTF-8");
-		
+		String tenantName = tenantDao.getTenantName(getTenantId());
+		String charset = Context.get().getProperties().getProperty(tenantName + ".charset", "UTF-8");
+
 		try (StringOutputStream out = new StringOutputStream(sb);
 				XMLEncoder encoder = new XMLEncoder(out, charset, true, 0)) {
 			encoder.writeObject(opt);
@@ -111,18 +123,5 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 
 	public void setType(int type) {
 		this.type = type;
-	}
-
-	@Override
-	public SavedSearch clone() {
-		SavedSearch newSearch = new SavedSearch();
-		newSearch.setDate(date);
-		newSearch.setDescription(description);
-		newSearch.setName(name);
-		newSearch.setOptions(options);
-		newSearch.setTenantId(getTenantId());
-		newSearch.setUserId(userId);
-		newSearch.setType(type);
-		return newSearch;
 	}
 }

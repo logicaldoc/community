@@ -10,10 +10,10 @@ import com.logicaldoc.core.PersistentObject;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.2
  */
-public class DocumentNote extends PersistentObject implements Cloneable {
+public class DocumentNote extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String SHAPE_SQUARE = "square";
 
 	public static final String SHAPE_CIRCLE = "circle";
@@ -89,6 +89,33 @@ public class DocumentNote extends PersistentObject implements Cloneable {
 	private String recipientEmail;
 
 	public DocumentNote() {
+	}
+
+	public DocumentNote(DocumentNote source) {
+		this.docId = source.docId;
+		this.fileVersion = source.fileVersion;
+		this.fileName = source.fileName;
+		this.userId = source.userId;
+		this.username = source.username;
+		this.date = source.date;
+		this.message = source.message;
+		this.page = source.page;
+		this.opacity = source.opacity;
+		this.color = source.color;
+		this.left = source.left;
+		this.top = source.top;
+		this.width = source.width;
+		this.height = source.height;
+		this.lineOpacity = source.lineOpacity;
+		this.lineColor = source.lineColor;
+		this.lineWidth = source.lineWidth;
+		this.shape = source.shape;
+		this.rotation = source.rotation;
+		this.type = source.type;
+		this.recipient = source.recipient;
+		this.recipientEmail = source.recipientEmail;
+
+		setFileVersion(source.getFileVersion());
 	}
 
 	public long getDocId() {
@@ -225,34 +252,6 @@ public class DocumentNote extends PersistentObject implements Cloneable {
 
 	public void setRecipientEmail(String recipientEmail) {
 		this.recipientEmail = recipientEmail;
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		DocumentNote note = new DocumentNote();
-		note.setId(getId());
-		note.setDate(getDate());
-		note.setDocId(getDocId());
-		note.setMessage(getMessage());
-		note.setUserId(getUserId());
-		note.setUsername(getUsername());
-		note.setPage(getPage());
-		note.setOpacity(getOpacity());
-		note.setColor(getColor());
-		note.setTop(getTop());
-		note.setLeft(getLeft());
-		note.setWidth(getWidth());
-		note.setHeight(getHeight());
-		note.setFileVersion(getFileVersion());
-		note.setFileName(getFileName());
-		note.setType(getType());
-		note.setRecipient(getRecipient());
-		note.setRecipientEmail(getRecipientEmail());
-		note.setShape(getShape());
-		note.setLineColor(getLineColor());
-		note.setLineOpacity(getLineOpacity());
-		note.setLineWidth(getLineWidth());
-		return note;
 	}
 
 	public int getLineOpacity() {

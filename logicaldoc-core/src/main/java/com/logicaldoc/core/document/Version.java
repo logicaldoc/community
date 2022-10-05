@@ -45,6 +45,14 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 	public Version() {
 	}
 
+	public Version(Version source) {
+		copyAttributes(source);
+		setId(source.getId());
+		if (source.getIndexed() != INDEX_INDEXED)
+			setIndexed(source.getIndexed());
+		setCustomId(null);
+	}
+
 	public long getUserId() {
 		return userId;
 	}
@@ -291,19 +299,5 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 
 	public void setDocId(long docId) {
 		this.docId = docId;
-	}
-
-	/**
-	 * Clones the document but does not replicate the CustomID
-	 */
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		Version cloned = new Version();
-		cloned.copyAttributes((Version) this);
-		cloned.setId(getId());
-		if (getIndexed() != INDEX_INDEXED)
-			cloned.setIndexed(getIndexed());
-		cloned.setCustomId(null);
-		return cloned;
 	}
 }

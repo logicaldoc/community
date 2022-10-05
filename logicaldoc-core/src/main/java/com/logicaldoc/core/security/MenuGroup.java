@@ -21,6 +21,14 @@ public class MenuGroup {
 	public MenuGroup() {
 	}
 
+	public MenuGroup(MenuGroup source) {
+		this.write = source.write;
+		this.manageSecurity = source.manageSecurity;
+		this.delete = source.delete;
+		this.rename = source.rename;
+		this.groupId = source.groupId;
+	}
+
 	public int getManageSecurity() {
 		return manageSecurity;
 	}
@@ -66,16 +74,6 @@ public class MenuGroup {
 	}
 
 	@Override
-	public MenuGroup clone() {
-		MenuGroup mg = new MenuGroup(groupId);
-		mg.setDelete(delete);
-		mg.setManageSecurity(manageSecurity);
-		mg.setRename(rename);
-		mg.setWrite(write);
-		return mg;
-	}
-
-	@Override
 	public boolean equals(Object obj) {
 		if (!(obj instanceof MenuGroup))
 			return false;
@@ -106,8 +104,8 @@ public class MenuGroup {
 	/**
 	 * Set each permission evaluating the given integer representation.
 	 * 
-	 * @param permissions mask(the last slot is for the 'read'
-	 *        permission and it is not evaluated)
+	 * @param permissions mask(the last slot is for the 'read' permission and it
+	 *        is not evaluated)
 	 */
 	public void setPermissions(int permissions) {
 		setWrite(Permission.WRITE.match(permissions) ? 1 : 0);
