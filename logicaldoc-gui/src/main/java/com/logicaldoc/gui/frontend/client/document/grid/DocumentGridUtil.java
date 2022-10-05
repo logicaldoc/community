@@ -67,7 +67,7 @@ public class DocumentGridUtil {
 				document.setPublisher(record.getAttributeAsString("publisher"));
 
 				if (record.getAttributeAsFloat("size") != null)
-					document.setFileSize(record.getAttributeAsFloat("size"));
+					document.setFileSize(record.getAttributeAsLong("size"));
 
 				if (record.getAttributeAsFloat("pages") != null)
 					document.setPages(record.getAttributeAsInt("pages"));

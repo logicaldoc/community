@@ -14,23 +14,17 @@ public class Document extends AbstractDocument {
 
 	public Document() {
 	}
-
-	/**
-	 * Clones the document but does not replicate the CustomID
-	 */
-	@Override
-	public Document clone() {
-		Document cloned = new Document();
-		cloned.copyAttributes((Document) this);
-		cloned.setId(getId());
-		cloned.setOcrd(getOcrd());
-		cloned.setOcrTemplateId(getOcrTemplateId());
-		cloned.setBarcoded(getBarcoded());
-		cloned.setBarcodeTemplateId(getBarcodeTemplateId());
+	
+	public Document(Document source) {
+		copyAttributes(source);
+		setId(source.getId());
+		setOcrd(source.getOcrd());
+		setOcrTemplateId(source.getOcrTemplateId());
+		setBarcoded(source.getBarcoded());
+		setBarcodeTemplateId(source.getBarcodeTemplateId());
 		if (getIndexed() != INDEX_INDEXED)
-			cloned.setIndexed(getIndexed());
-		cloned.setCustomId(null);
-		return cloned;
+			setIndexed(source.getIndexed());
+		setCustomId(null);
 	}
 
 	public Long getTemplateId() {

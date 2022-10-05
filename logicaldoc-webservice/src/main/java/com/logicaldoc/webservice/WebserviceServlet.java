@@ -1,15 +1,12 @@
 package com.logicaldoc.webservice;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.servlet.CXFServlet;
 
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.util.config.ContextProperties;
 
 /**
  * Extension of the standard CXF servlet that checks the enabled flag
@@ -20,21 +17,15 @@ import com.logicaldoc.util.config.ContextProperties;
 public class WebserviceServlet extends CXFServlet {
 	private static final long serialVersionUID = 1L;
 
-	private ContextProperties settings;
-
-	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ContextProperties settings = getSettings();
-
-		// Check if the service is enabled
-		if (settings.getBoolean("webservice.enabled", false))
-			super.service(request, response);
-		else
-			response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
-	}
-
-	public ContextProperties getSettings() {
-		if (settings == null)
-			settings = Context.get().getProperties();
-		return settings;
+	public void service(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			// Check if the service is enabled
+			if (Context.get().getProperties().getBoolean("webservice.enabled", false))
+				super.service(request, response);
+			else
+				response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
+		} catch (Throwable t) {
+			ServletUtil.sendError(response, t.getMessage());
+		}
 	}
 }

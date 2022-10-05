@@ -53,7 +53,7 @@ public class SevenZipParser extends AbstractParser {
 
 					SevenZipUtil.extractEntry(sevenFile, entry, uncompressedEntryFile);
 
-					Document clone = document.clone();
+					Document clone = new Document(document);
 					clone.setFileName(uncompressedEntryFile.getName());
 					String text = entryParser.parse(uncompressedEntryFile, uncompressedEntryFile.getName(), encoding,
 							locale, tenant, document, fileVersion);

@@ -86,7 +86,6 @@ public class StatsPie extends HLayout {
 
 		}
 
-		
 		VLayout pages = new VLayout();
 		pieImage = new Image(Util.contextPath() + "stat?chart=pages&random=" + new Date().getTime());
 		pieImage.setWidth("250px");
@@ -103,7 +102,7 @@ public class StatsPie extends HLayout {
 		} catch (Throwable t) {
 
 		}
-		
+
 		VLayout folders = new VLayout();
 		pieImage = new Image(Util.contextPath() + "stat?sid=" + Session.get().getSid() + "&chart=folders&random="
 				+ new Date().getTime());
@@ -127,7 +126,7 @@ public class StatsPie extends HLayout {
 		NumberFormat fmt = NumberFormat.getFormat("#############");
 
 		// Calculate the total value
-		double count = 0;
+		long count = 0;
 		for (GUIParameter parameter : parameters) {
 			if (parameter == null)
 				break;
@@ -161,7 +160,7 @@ public class StatsPie extends HLayout {
 			StaticTextItem item = ItemFactory.newStaticTextItem(parameter.getName(), parameter.toString(), null);
 			if (count > 0) {
 				if (type == STATS_REPOSITORY) {
-					item.setValue(Util.formatSize(fmt.parse(parameter.getValue())) + " ( "
+					item.setValue(Util.formatSize((long) fmt.parse(parameter.getValue())) + " ( "
 							+ Util.formatPercentage((fmt.parse(parameter.getValue()) * 100 / count), 2) + " )");
 				} else if (type == STATS_DOCUMENTS) {
 					item.setValue(Util.formatLong((long) fmt.parse(parameter.getValue())) + " "

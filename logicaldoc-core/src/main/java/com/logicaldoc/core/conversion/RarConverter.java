@@ -47,7 +47,7 @@ public class RarConverter extends AbstractFormatConverter {
 			if (converter == null)
 				throw new IOException(
 						String.format("Unable to find a converter from %s to %s", entryExtension, targetExtension));
-			Document clone = document.clone();
+			Document clone = new Document(document);
 			clone.setFileName(uncompressedEntryFile.getName());
 			converter.convert(sid, document, uncompressedEntryFile, dest);
 		} finally {

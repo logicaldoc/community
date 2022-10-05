@@ -100,7 +100,7 @@ public class ExportZip extends HttpServlet {
 				bos = exporter.process(docIds.toArray(new Long[0]), false, transaction);
 			} else {
 				FolderHistory transaction = new FolderHistory();
-				transaction.setUserId(userId.longValue());
+				transaction.setUserId(userId);
 				transaction.setFolderId(Long.parseLong(folderId));
 				transaction.setSessionId(session.getSid());
 

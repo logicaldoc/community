@@ -177,14 +177,14 @@ public class ReportParametersForm extends Window {
 			if (name.startsWith("_")) {
 				Object val = values.get(name);
 				String nm = name.substring(1).replaceAll(Constants.BLANK_PLACEHOLDER, " ");
-				GUIAttribute att = getParameter(nm);
-				if (att == null)
+				GUIAttribute attribute = getParameter(nm);
+				if (attribute == null)
 					continue;
 
 				if (val != null) {
-					if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
+					if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
 						if (!(val == null || "".equals(val.toString().trim())))
-							att.setValue("1".equals(val.toString().trim()) ? true : false);
+							attribute.setValue("1".equals(val.toString().trim()) ? true : false);
 						else if (getParameter(nm) != null) {
 							GUIAttribute at = getParameter(nm);
 							if (at != null) {
@@ -193,28 +193,28 @@ public class ReportParametersForm extends Window {
 							}
 						}
 					} else
-						att.setValue(val);
+						attribute.setValue(val);
 				} else {
-					if (att != null) {
-						if (att.getType() == GUIAttribute.TYPE_INT) {
-							getParameter(nm).setIntValue(null);
+					if (attribute != null) {
+						if (attribute.getType() == GUIAttribute.TYPE_INT) {
+							attribute.setIntValue(null);
 							break;
-						} else if (att.getType() == GUIAttribute.TYPE_BOOLEAN) {
-							getParameter(nm).setBooleanValue(null);
+						} else if (attribute.getType() == GUIAttribute.TYPE_BOOLEAN) {
+							attribute.setBooleanValue(null);
 							break;
-						} else if (att.getType() == GUIAttribute.TYPE_DOUBLE) {
-							getParameter(nm).setDoubleValue(null);
+						} else if (attribute.getType() == GUIAttribute.TYPE_DOUBLE) {
+							attribute.setDoubleValue(null);
 							break;
-						} else if (att.getType() == GUIAttribute.TYPE_DATE) {
-							getParameter(nm).setDateValue(null);
+						} else if (attribute.getType() == GUIAttribute.TYPE_DATE) {
+							attribute.setDateValue(null);
 							break;
 						} else {
-							att.setValue("");
+							attribute.setValue("");
 							break;
 						}
 					}
 				}
-				parameters.add(att);
+				parameters.add(attribute);
 			}
 		}
 

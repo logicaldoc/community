@@ -105,6 +105,9 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 				}
 			}
 
+			if (task == null)
+				throw new Exception("Cannot find task named " + taskName);
+
 			task.getScheduling().setEnabled(false);
 			task.getScheduling().save();
 
@@ -126,8 +129,8 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 					break;
 				}
 			}
-			if (task != null)
-				log.warn("Task {} not found", taskName);
+			if (task == null)
+				throw new Exception("Cannot find task named " + taskName);
 
 			TaskScheduling scheduling = task.getScheduling();
 			if (scheduling != null) {
@@ -847,7 +850,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 					history.setTenantId(session.getTenantId());
 					history.setUsername(rs.getString(1));
 					history.setEvent(rs.getString(2));
-					
+
 					if (rs.getObject(3) instanceof Timestamp || rs.getObject(3) instanceof LocalDateTime)
 						history.setDate(rs.getTimestamp(3));
 					else

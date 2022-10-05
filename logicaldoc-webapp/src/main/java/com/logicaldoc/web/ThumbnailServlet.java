@@ -1,9 +1,7 @@
 package com.logicaldoc.web;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,10 +59,8 @@ public class ThumbnailServlet extends HttpServlet {
 	 * 
 	 * @param request the request send by the client to the server
 	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
 	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		String id = request.getParameter(DOC_ID);
 		String fileVersion = request.getParameter(FILE_VERSION);
 		String version = request.getParameter(VERSION);
@@ -110,7 +106,7 @@ public class ThumbnailServlet extends HttpServlet {
 					storer.getResourceName(doc, fileVersion, suffix), suffix, user);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
-			new IOException(t.getMessage());
+			ServletUtil.sendError(response, t.getMessage());
 		}
 	}
 

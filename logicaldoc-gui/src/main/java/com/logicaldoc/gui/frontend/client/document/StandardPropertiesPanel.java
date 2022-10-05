@@ -128,7 +128,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 				I18N.formatDate((Date) document.getDate()) + " " + I18N.message("by") + " " + document.getPublisher());
 
 		StaticTextItem size = ItemFactory.newStaticTextItem("size", "size",
-				Util.formatSizeW7(document.getFileSize().doubleValue()) + " ("
+				Util.formatSizeW7(document.getFileSize()) + " ("
 						+ Util.formatSizeBytes(document.getFileSize()) + ")");
 
 		StaticTextItem pages = ItemFactory.newStaticTextItem("pages", "pages", Util.formatInt(document.getPages()));

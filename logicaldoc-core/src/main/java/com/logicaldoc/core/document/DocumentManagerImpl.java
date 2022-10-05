@@ -208,7 +208,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			if (document.getImmutable() == 0) {
 				documentDAO.initialize(document);
 
-				oldDocument = (Document) document.clone();
+				oldDocument = new Document(document);
 
 				// Check CustomId uniqueness
 				if (docVO != null && docVO.getCustomId() != null) {
@@ -878,7 +878,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		String resource = storer.getResourceName(doc, null, null);
 		InputStream is = storer.getStream(doc.getId(), resource);
 		try {
-			Document cloned = (Document) doc.clone();
+			Document cloned = new Document(doc);
 			cloned.setId(0);
 			if (doc.getFolder().getId() != folder.getId())
 				cloned.setFolder(folder);

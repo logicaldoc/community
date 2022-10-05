@@ -34,6 +34,7 @@ import com.logicaldoc.core.metadata.TemplateGroup;
 import com.logicaldoc.core.metadata.initialization.Initializer;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
@@ -181,8 +182,11 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 						wg = new TemplateGroup();
 						wg.setGroupId(right.getEntityId());
 					}
-					grps.add(wg);
 
+					if (wg == null)
+						continue;
+
+					grps.add(wg);
 					if (isAdmin || right.isWrite())
 						wg.setWrite(1);
 					else
@@ -349,7 +353,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 					folder.setId(guiFolder.getId());
 					folder.setName(guiFolder.getName());
 					folder.setType(guiFolder.getType());
-					folder.setTenantId(session.getTenantId());
+					folder.setTenantId(session != null ? session.getTenantId() : Tenant.DEFAULT_ID);
 					folder.setTemplate(template);
 					attributes = prepareGUIAttributes(template, folder, session != null ? session.getUser() : null);
 				} else if (extensibleObject instanceof GUIForm) {
@@ -401,7 +405,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 						currentTemplate = folder.getTemplate();
 				} else
 					currentTemplate = template;
-				
+
 				if (extensibleObject != null && (extensibleObject.getId() == 0L || !template.equals(currentTemplate))) {
 					// Probably the GUI did not fill the attributes map at this
 					// point, so put the template's attributes
@@ -446,7 +450,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 					guiAttribute.setBooleanValue(templateExtAttr.getBooleanValue());
 					guiAttribute.setDoubleValue(templateExtAttr.getDoubleValue());
 					guiAttribute.setDateValue(templateExtAttr.getDateValue());
-					
+
 					if (extensibleObject != null) {
 						Attribute attribute = extensibleObject.getAttribute(attrName);
 						if (attribute != null) {

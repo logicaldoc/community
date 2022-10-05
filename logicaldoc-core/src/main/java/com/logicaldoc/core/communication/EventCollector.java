@@ -108,7 +108,7 @@ public class EventCollector {
 			 * Do not use the original document because to avoid interactions
 			 * with Hibernate session.
 			 */
-			Document clone = (Document) history.getDocument().clone();
+			Document clone = new Document(history.getDocument());
 			// Restore some attributes skipped by the clone method
 			clone.setCustomId(history.getDocument().getCustomId());
 			clone.setStatus(history.getDocument().getStatus());

@@ -146,8 +146,8 @@ public abstract class AbstractConnection implements Connection {
 			Point decorationCenter = decoratedSegment.middle();
 			int width = decoration.getWidth();
 			int height = decoration.getHeight();
-			decoration.asWidget().getElement().getStyle().setTop(decorationCenter.getTop() - height / 2, Unit.PX);
-			decoration.asWidget().getElement().getStyle().setLeft(decorationCenter.getLeft() - width / 2, Unit.PX);
+			decoration.asWidget().getElement().getStyle().setTop(decorationCenter.getTop() - height / 2D, Unit.PX);
+			decoration.asWidget().getElement().getStyle().setLeft(decorationCenter.getLeft() - width / 2D, Unit.PX);
 		}
 	}
 

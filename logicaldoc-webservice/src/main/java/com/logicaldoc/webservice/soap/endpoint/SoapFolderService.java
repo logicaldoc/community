@@ -135,7 +135,7 @@ public class SoapFolderService extends AbstractService implements FolderService 
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		long rootId = folderDao.findRoot(user.getTenantId()).getTenantId();
-		if (folderId == rootId || folderId == rootId)
+		if (folderId == rootId)
 			throw new Exception("Cannot delete root folder or Default workspace");
 
 		checkPermission(Permission.DELETE, user, folderId);
@@ -293,16 +293,12 @@ public class SoapFolderService extends AbstractService implements FolderService 
 	public void rename(String sid, long folderId, String name) throws Exception {
 		User user = validateSession(sid);
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!folderDao.isPermissionEnabled(Permission.RENAME, folderId, user.getId())) {
+		if (!folderDao.isPermissionEnabled(Permission.RENAME, folderId, user.getId()))
 			throw new Exception("user does't have rename permission");
-		}
 
 		long rootId = folderDao.findRoot(user.getTenantId()).getId();
 		if (folderId == rootId)
 			throw new Exception("cannot rename the root folder");
-
-		if (folderId == rootId)
-			throw new Exception("cannot rename the Default workspace");
 
 		Folder folder = folderDao.findById(folderId);
 		if (folder == null)

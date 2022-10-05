@@ -184,9 +184,10 @@ public class TicketDownload extends HttpServlet {
 			throw ioe;
 		} finally {
 			try {
-				if (os != null)
+				if (os != null) {
 					os.flush();
-				os.close();
+					os.close();
+				}
 			} catch (Throwable t) {
 			}
 		}

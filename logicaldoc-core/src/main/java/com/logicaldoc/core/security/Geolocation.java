@@ -292,7 +292,7 @@ public class Geolocation {
 		dispose();
 	}
 
-	private void dispose() {
+	public void dispose() {
 		if (dbReader != null) {
 			try {
 				dbReader.close();

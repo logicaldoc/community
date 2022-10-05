@@ -122,8 +122,7 @@ public class ZipUtil {
 			entry = entry.substring(1);
 
 		InputStream entryStream = null;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try {
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
 			ZipFile zFile = new ZipFile(zipFile);
 			setCharset(zFile);
 			FileHeader header = zFile.getFileHeader(entry);
@@ -131,16 +130,17 @@ public class ZipUtil {
 			entryStream = zFile.getInputStream(header);
 			IOUtils.copy(entryStream, baos);
 			baos.flush();
+			return baos.toByteArray();
 		} catch (Throwable e) {
 			logError(e.getMessage());
+			return null;
 		} finally {
 			try {
-				baos.close();
-				entryStream.close();
+				if (entryStream != null)
+					entryStream.close();
 			} catch (Throwable e) {
 			}
 		}
-		return baos.toByteArray();
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class ZipUtil {
 					// loop again
 					continue;
 				}
-				
+
 				// if we reached here, the File object f was not a directory
 				// create a FileInputStream on top of f
 				FileInputStream fis = null;
@@ -250,7 +250,8 @@ public class ZipUtil {
 					}
 				} finally {
 					// close the Stream
-					if (fis != null) fis.close();
+					if (fis != null)
+						fis.close();
 				}
 			}
 		} catch (Exception e) {
@@ -283,7 +284,7 @@ public class ZipUtil {
 			// now write the content of the file to the ZipOutputStream
 			while ((bytesIn = fis.read(readBuffer)) != -1) {
 				zos.write(readBuffer, 0, bytesIn);
-			}			
+			}
 			// close the stream
 			zos.flush();
 		} catch (Exception e) {
@@ -291,8 +292,10 @@ public class ZipUtil {
 			logError(e.getMessage());
 		} finally {
 			try {
-				if (fis != null) fis.close();
-				if (zos != null) zos.close();
+				if (fis != null)
+					fis.close();
+				if (zos != null)
+					zos.close();
 			} catch (Exception e) {
 			}
 		}
@@ -395,7 +398,7 @@ public class ZipUtil {
 	/**
 	 * UnGunzips a given .gz stream
 	 * 
-	 * @param gzStream   the .gz stream
+	 * @param gzStream the .gz stream
 	 * 
 	 * @param targetFile the target file to unpack to
 	 */

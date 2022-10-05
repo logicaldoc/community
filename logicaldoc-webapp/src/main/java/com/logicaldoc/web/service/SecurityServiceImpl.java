@@ -1024,7 +1024,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				}
 
 				// Invalidate then Geolocation
-				Geolocation.get().finalize();
+				Geolocation.get().dispose();
 			}
 
 			conf.setProperty(session.getTenantName() + ".password.ttl", Integer.toString(settings.getPwdExpiration()));

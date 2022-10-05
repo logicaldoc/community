@@ -17,8 +17,14 @@ public class SoftwareVersion implements Comparable<SoftwareVersion> {
 	public SoftwareVersion(String version) {
 		if (version == null)
 			throw new IllegalArgumentException("Version can not be null");
+		
+		// Put a limit in the size in order to avoid stack overflows in the regular expression
+		if (version.length() > 20)
+			throw new IllegalArgumentException("Version can not be more than 20 characters");
+		
 		if (!version.matches("[0-9]+(\\.[0-9]+)*"))
 			throw new IllegalArgumentException("Invalid version format");
+		
 		this.version = version;
 	}
 
@@ -49,5 +55,10 @@ public class SoftwareVersion implements Comparable<SoftwareVersion> {
 		if (this.getClass() != that.getClass())
 			return false;
 		return this.compareTo((SoftwareVersion) that) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return version.hashCode();
 	}
 }

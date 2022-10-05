@@ -92,7 +92,7 @@ public class StandardSearchEngine implements SearchEngine {
 			// This is an alias
 			Document referencedDoc = documentDao.findById(document.getDocRef());
 			documentDao.initialize(referencedDoc);
-			doc = (Document) referencedDoc.clone();
+			doc = new Document(referencedDoc);
 			doc.setId(document.getId());
 			doc.setTenantId(document.getTenantId());
 			doc.setDocRef(document.getDocRef());

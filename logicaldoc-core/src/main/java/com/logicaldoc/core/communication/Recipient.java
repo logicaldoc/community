@@ -13,7 +13,7 @@ public class Recipient {
 	public final static String MODE_EMAIL_CC = "CC";
 
 	public final static String MODE_EMAIL_BCC = "BCC";
-	
+
 	public final static String MODE_EMAIL_REPLYTO = "REPLYTO";
 
 	// The login
@@ -38,6 +38,15 @@ public class Recipient {
 	}
 
 	public Recipient() {
+	}
+
+	public Recipient(Recipient source) {
+		super();
+		this.name = source.name;
+		this.address = source.address;
+		this.mode = source.mode;
+		this.type = source.type;
+		this.read = source.read;
 	}
 
 	public String getName() {
@@ -91,17 +100,6 @@ public class Recipient {
 
 	public void setRead(int read) {
 		this.read = read;
-	}
-
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		Recipient cloned = new Recipient();
-		cloned.setAddress(getAddress());
-		cloned.setMode(getMode());
-		cloned.setName(getName());
-		cloned.setRead(getRead());
-		cloned.setType(getType());
-		return cloned;
 	}
 
 	@Override

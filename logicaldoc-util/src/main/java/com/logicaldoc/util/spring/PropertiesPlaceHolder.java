@@ -41,14 +41,13 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 	}
 
 	/**
-	 * Tries to retrieve a property by using a direct JDBC query against the
-	 * DB
+	 * Tries to retrieve a property by using a direct JDBC query against the DB
 	 * 
 	 * @param property The property name
 	 * @return The found value, may be null
 	 */
 	private String getDbProperty(String property) {
-		
+
 		Connection conn = null;
 		Statement stmt = null;
 		PreparedStatement pstmt = null;
@@ -60,7 +59,8 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 			Class.forName(conf.getProperty("jdbc.driver"));
 
 			// Get a connection to the database
-			conn = DriverManager.getConnection(conf.getProperty("jdbc.url"), conf.getProperty("jdbc.username"),conf.getProperty("jdbc.password"));
+			conn = DriverManager.getConnection(conf.getProperty("jdbc.url"), conf.getProperty("jdbc.username"),
+					conf.getProperty("jdbc.password"));
 
 			// Get a statement from the connection
 			stmt = conn.createStatement();
@@ -81,19 +81,23 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 			return null;
 		} finally {
 			try {
-				rs.close();
+				if (rs != null)
+					rs.close();
 			} catch (Throwable se) {
 			}
 			try {
-				stmt.close();
-			} catch (Throwable se) {
-			}			
-			try {
-				pstmt.close();
+				if (stmt != null)
+					stmt.close();
 			} catch (Throwable se) {
 			}
 			try {
-				conn.close();
+				if (pstmt != null)
+					pstmt.close();
+			} catch (Throwable se) {
+			}
+			try {
+				if (conn != null)
+					conn.close();
 			} catch (Throwable se) {
 			}
 		}

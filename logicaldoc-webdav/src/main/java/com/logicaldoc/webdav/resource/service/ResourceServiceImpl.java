@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.slf4j.Logger;
@@ -187,8 +188,10 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public Resource getResource(String requestPath, DavSession session) throws DavException {
-
 		log.trace("Find DAV resource: {}", requestPath);
+
+		if (session == null)
+			throw new DavException(DavServletResponse.SC_FORBIDDEN, "No WebDAV session");
 
 		long userId = 0;
 		String currentStablePath = "";
@@ -214,7 +217,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 			Folder folder = null;
 
-			if (path.equals("/") && name.equals("")) {
+			if (path.equals("/") && StringUtils.isEmpty(name)) {
 				folder = folderDAO.findRoot(session.getTenantId());
 			} else
 				folder = folderDAO.findByPathExtended(path + "/" + name, session.getTenantId());
@@ -306,6 +309,9 @@ public class ResourceServiceImpl implements ResourceService {
 	public Resource createResource(Resource parentResource, String name, boolean isCollection, ImportContext context,
 			DavSession session) throws DavException {
 
+		if(session==null)
+			throw new DavException(DavServletResponse.SC_FORBIDDEN, "No WebDAV session");
+		
 		Folder parentFolder;
 		try {
 			parentFolder = folderDAO.findById(Long.parseLong(parentResource.getID()));

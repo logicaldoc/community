@@ -15,7 +15,7 @@ import com.logicaldoc.util.LocaleUtil;
 public class MessageTemplate extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public static String TYPE_SYSTEM = "system";
 
 	public static String TYPE_USER = "user";
@@ -33,6 +33,15 @@ public class MessageTemplate extends PersistentObject {
 	private String type = TYPE_SYSTEM;
 
 	public MessageTemplate() {
+	}
+
+	public MessageTemplate(MessageTemplate source) {
+		body = source.getBody();
+		description = source.getDescription();
+		language = source.getLanguage();
+		name = source.getName();
+		subject = source.getSubject();
+		setTenantId(source.getTenantId());
 	}
 
 	private String getFormattedContent(Map<String, Object> dictionary, String text) {
@@ -89,18 +98,6 @@ public class MessageTemplate extends PersistentObject {
 
 	public void setSubject(String subject) {
 		this.subject = subject;
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		MessageTemplate newTemplate = new MessageTemplate();
-		newTemplate.setBody(getBody());
-		newTemplate.setDescription(getDescription());
-		newTemplate.setLanguage(getLanguage());
-		newTemplate.setName(getName());
-		newTemplate.setSubject(getSubject());
-		newTemplate.setTenantId(getTenantId());
-		return newTemplate;
 	}
 
 	public String getType() {

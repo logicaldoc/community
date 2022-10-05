@@ -17,7 +17,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	public static final int DOC_UNLOCKED = 0;
 
 	private long tenantId;
-	
+
 	private Long docRef;
 
 	private String docRefType;
@@ -50,7 +50,7 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	private String language;
 
-	private Float fileSize;
+	private long fileSize = 0;
 
 	private Date lastModified;
 
@@ -294,11 +294,11 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 		this.language = language;
 	}
 
-	public Float getFileSize() {
+	public long getFileSize() {
 		return fileSize;
 	}
 
-	public void setFileSize(Float fileSize) {
+	public void setFileSize(long fileSize) {
 		this.fileSize = fileSize;
 	}
 
@@ -313,10 +313,10 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
-		    return false;
+			return false;
 
-		  if (this.getClass() != obj.getClass())
-		    return false;
+		if (this.getClass() != obj.getClass())
+			return false;
 
 		return getId() == ((GUIDocument) obj).getId();
 	}

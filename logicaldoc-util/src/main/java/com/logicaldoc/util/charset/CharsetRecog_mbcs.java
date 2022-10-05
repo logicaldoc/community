@@ -111,7 +111,7 @@ abstract class CharsetRecog_mbcs extends CharsetRecognizer {
                 //
                 double maxVal = Math.log((float)doubleByteCharCount / 4);
                 double scaleFactor = 90.0 / maxVal;
-                confidence = (int)(Math.log(commonCharCount+1) * scaleFactor + 10);
+                confidence = (int)(Math.log(commonCharCount+1D) * scaleFactor + 10);
                 confidence = Math.min(confidence, 100);
             }
         }   // end of detectBlock:

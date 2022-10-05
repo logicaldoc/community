@@ -15,9 +15,9 @@ import org.apache.http.entity.mime.content.FileBody;
  * @since 7.5
  */
 public class FileBodyCounter extends FileBody {
-	private volatile long byteCount;
+	private long byteCount;
 
-	private volatile ProgressListener listener;
+	private ProgressListener listener;
 
 	public FileBodyCounter(File file, ContentType contentType, String filename, ProgressListener listener) {
 		super(file, contentType, filename);

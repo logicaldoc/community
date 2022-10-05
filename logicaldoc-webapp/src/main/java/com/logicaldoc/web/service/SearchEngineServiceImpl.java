@@ -449,7 +449,7 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 					document.setWorkflowStatus(hit.getWorkflowStatus());
 					document.setWorkflowStatusDisplay(hit.getWorkflowStatusDisplay());
 					document.setImmutable(hit.getImmutable());
-					document.setFileSize(Long.valueOf(hit.getFileSize()).floatValue());
+					document.setFileSize(hit.getFileSize());
 					document.setStartPublishing(hit.getStartPublishing());
 					document.setStopPublishing(hit.getStopPublishing());
 					document.setPublished(hit.getPublished());

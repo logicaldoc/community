@@ -62,10 +62,12 @@ public class DownloadServlet extends HttpServlet {
 				downloadDocument(request, response, session);
 		} catch (Throwable ex) {
 			if (ex.getClass().getName().contains("ClientAbortException")) {
-				if (log.isDebugEnabled())
-					log.info(ex.getMessage(), ex);
-			} else
+				log.debug(ex.getMessage(), ex);
+			} else {
 				log.error(ex.getMessage(), ex);
+				ServletUtil.sendError(response, ex.getMessage());
+			}
+			
 		}
 	}
 
@@ -130,9 +132,8 @@ public class DownloadServlet extends HttpServlet {
 				log.error("Invalid version ID {}", versionId);
 			}
 
-			if (doc == null) {
+			if (doc == null && version != null) {
 				doc = docDao.findDocument(version.getDocId());
-
 				if (!folderDao.isPermissionEnabled(Permission.DOWNLOAD, doc.getFolder().getId(), session.getUserId()))
 					throw new IOException("You don't have the DOWNLOAD permission");
 			}
@@ -144,12 +145,12 @@ public class DownloadServlet extends HttpServlet {
 		if (version == null && doc != null && StringUtils.isNotEmpty(fileVersion))
 			version = versDao.findByFileVersion(doc.getId(), fileVersion);
 
-		if (doc.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(doc.getId()))
+		if (doc != null && doc.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(doc.getId()))
 			throw new IOException("The document is protected by a password");
 
 		if (version != null)
 			filename = version.getFileName();
-		else
+		else if (doc != null)
 			filename = doc.getFileName();
 
 		/*
@@ -157,15 +158,17 @@ public class DownloadServlet extends HttpServlet {
 		 */
 		if ("safe.html".equals(suffix)) {
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
-			String safeResource = storer.getResourceName(doc,
-					version == null ? doc.getFileVersion() : version.getFileVersion(), suffix);
-			if (!storer.exists(doc.getId(), safeResource)) {
-				String unsafeResource = storer.getResourceName(doc,
-						version == null ? doc.getFileVersion() : version.getFileVersion(), null);
-				String unsafe = storer.getString(doc.getId(), unsafeResource);
-				String safe = HTMLSanitizer.sanitize(unsafe);
-				storer.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), doc.getId(),
-						safeResource);
+			if (doc != null) {
+				String safeResource = storer.getResourceName(doc,
+						version == null ? doc.getFileVersion() : version.getFileVersion(), suffix);
+				if (!storer.exists(doc.getId(), safeResource)) {
+					String unsafeResource = storer.getResourceName(doc,
+							version == null ? doc.getFileVersion() : version.getFileVersion(), null);
+					String unsafe = storer.getString(doc.getId(), unsafeResource);
+					String safe = HTMLSanitizer.sanitize(unsafe);
+					storer.store(new ByteArrayInputStream(safe.getBytes(StandardCharsets.UTF_8)), doc.getId(),
+							safeResource);
+				}
 			}
 		}
 
@@ -174,7 +177,7 @@ public class DownloadServlet extends HttpServlet {
 		if (StringUtils.isEmpty(fileVersion)) {
 			if (version != null)
 				fileVersion = version.getFileVersion();
-			else
+			else if (doc != null)
 				fileVersion = doc.getFileVersion();
 		}
 
@@ -187,11 +190,14 @@ public class DownloadServlet extends HttpServlet {
 		else
 			log.debug("Download document id={}", docId);
 
-		if ("true".equals(downloadText)) {
-			ServletUtil.downloadDocumentText(request, response, doc.getId(), session.getUser());
-		} else {
-			ServletUtil.downloadDocument(request, response, session.getSid(), doc.getId(), fileVersion, filename,
-					suffix, session.getUser());
-		}
+		if (doc != null)
+			if ("true".equals(downloadText)) {
+				ServletUtil.downloadDocumentText(request, response, doc.getId(), session.getUser());
+			} else {
+				ServletUtil.downloadDocument(request, response, session.getSid(), doc.getId(), fileVersion, filename,
+						suffix, session.getUser());
+			}
+		else
+			throw new FileNotFoundException("Cannot find document " + docId);
 	}
 }

@@ -8,10 +8,10 @@ import com.logicaldoc.core.PersistentObject;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
-public class Contact extends PersistentObject implements Cloneable {
+public class Contact extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private Long userId;
 
 	private String firstName;
@@ -27,6 +27,22 @@ public class Contact extends PersistentObject implements Cloneable {
 	private String mobile;
 
 	private String address;
+
+	public Contact() {
+	}
+
+	public Contact(Contact source) {
+		this.userId = source.userId;
+		this.firstName = source.firstName;
+		this.lastName = source.lastName;
+		this.company = source.company;
+		this.email = source.email;
+		this.phone = source.phone;
+		this.mobile = source.mobile;
+		this.address = source.address;
+
+		setTenantId(source.getTenantId());
+	}
 
 	public Long getUserId() {
 		return userId;
@@ -85,7 +101,7 @@ public class Contact extends PersistentObject implements Cloneable {
 	}
 
 	public String getFullName() {
-		return firstName != null ? firstName :  (lastName != null ? " " +lastName : "");
+		return firstName != null ? firstName : (lastName != null ? " " + lastName : "");
 	}
 
 	public String toString() {
@@ -98,20 +114,5 @@ public class Contact extends PersistentObject implements Cloneable {
 
 	public void setAddress(String address) {
 		this.address = address;
-	}
-
-	@Override
-	public Contact clone() {
-		Contact clone = new Contact();
-		clone.setAddress(address);
-		clone.setCompany(company);
-		clone.setEmail(email);
-		clone.setLastName(lastName);
-		clone.setFirstName(firstName);
-		clone.setMobile(mobile);
-		clone.setTenantId(getTenantId());
-		clone.setId(getId());
-		clone.setUserId(userId);
-		return clone;
 	}
 }

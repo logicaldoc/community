@@ -33,8 +33,8 @@ import com.logicaldoc.webdav.session.DavSession;
 import com.logicaldoc.webdav.version.VersionHistoryResourceImpl;
 import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
-public class VersionControlledResourceImpl extends DeltaVResourceImpl implements VersionControlledResource,
-		Serializable {
+public class VersionControlledResourceImpl extends DeltaVResourceImpl
+		implements VersionControlledResource, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,7 +54,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * @param session the DAV session
 	 * @param config configurations
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 */
 	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
 			ResourceConfig config) throws DavException {
@@ -71,7 +72,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * @param config configurations
 	 * @param isCollection is this a folder?
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 */
 	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
 			ResourceConfig config, boolean isCollection) throws DavException {
@@ -92,12 +94,10 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 		StringBuffer sb = new StringBuffer(super.getSupportedMethods());
 		// Versioning support
 		sb.append(", ").append(VersionableResource.METHODS);
-		if (isVersionControlled()) {
-			sb.append(", ").append(DavMethods.METHOD_CHECKOUT);
-			sb.append(", ").append(DavMethods.METHOD_UNCHECKOUT);
-			sb.append(", ").append(DavMethods.METHOD_LABEL);
-			sb.append(", ").append(DavMethods.METHOD_CHECKIN);
-		}
+		sb.append(", ").append(DavMethods.METHOD_CHECKOUT);
+		sb.append(", ").append(DavMethods.METHOD_UNCHECKOUT);
+		sb.append(", ").append(DavMethods.METHOD_LABEL);
+		sb.append(", ").append(DavMethods.METHOD_CHECKIN);
 		return sb.toString();
 	}
 
@@ -121,7 +121,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	/**
 	 * Calls {@link javax.jcr.Node#checkin()} on the underlying repository node.
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#checkin()
 	 */
 	public String checkin() throws DavException {
@@ -129,10 +130,10 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	}
 
 	/**
-	 * Calls {@link javax.jcr.Node#checkout()} on the underlying repository
-	 * node
+	 * Calls {@link javax.jcr.Node#checkout()} on the underlying repository node
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 * 
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#checkout()
 	 */
@@ -141,7 +142,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	}
 
 	/**
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 * 
 	 * @see org.apache.jackrabbit.webdav.version.VersionControlledResource#uncheckout()
 	 */
@@ -154,10 +156,11 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * {@link DavServletResponse#SC_NOT_IMPLEMENTED}.
 	 * 
 	 * @param updateInfo update datails
-	 *  
+	 * 
 	 * @return the status
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 * @see VersionControlledResource#update(UpdateInfo)
 	 */
 	public MultiStatus update(UpdateInfo updateInfo) throws DavException {
@@ -172,7 +175,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * 
 	 * @return the status
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 * @see VersionControlledResource#merge(MergeInfo)
 	 */
 	public MultiStatus merge(MergeInfo mergeInfo) throws DavException {
@@ -184,7 +188,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * 
 	 * @param labelInfo details of the label
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 * @see VersionControlledResource#label(LabelInfo)
 	 * @see javax.jcr.version.VersionHistory#addVersionLabel(String, String,
 	 *      boolean)
@@ -199,16 +204,12 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 		}
 
 		try {
-			if (!isVersionControlled()) {
-				throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED,
-						"A LABEL request may only be applied to a version-controlled, checked-in resource.");
-			}
 			DavResource[] resArr = this.getReferenceResources(CHECKED_IN);
 			if (resArr.length == 1 && resArr[0] instanceof VersionResource) {
 				((VersionResource) resArr[0]).label(labelInfo);
 			} else {
-				throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "DAV:checked-in property on '"
-						+ getHref() + "' did not point to a single VersionResource.");
+				throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
+						"DAV:checked-in property on '" + getHref() + "' did not point to a single VersionResource.");
 			}
 		} catch (Exception e) {
 
@@ -258,7 +259,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * @see DavResourceImpl#initProperties()
 	 */
 	protected void initProperties() {
-		
+
 		if (!propsInitialized) {
 			super.initProperties();
 
@@ -267,13 +268,14 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 			// DAV:auto-version property: there is no auto version, explicit
 			// EVENT_CHECKEDOUT is required.
 			properties.add(new DefaultDavProperty<Object>(AUTO_VERSION, null, false));
-		  
-			if(resource==null)
+
+			if (resource == null)
 				return;
-			
+
 			properties.add(new DefaultDavProperty<String>(DavPropertyName.DISPLAYNAME, resource.getName(), false));
-			properties.add(new DefaultDavProperty<String>(DavPropertyName.GETCONTENTTYPE, AbstractWebdavServlet.getContext().getMimeType(resource.getName()), false));
-			
+			properties.add(new DefaultDavProperty<String>(DavPropertyName.GETCONTENTTYPE,
+					AbstractWebdavServlet.getContext().getMimeType(resource.getName()), false));
+
 			if (resource.isFolder())
 				return;
 
@@ -296,15 +298,6 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 				properties.add(new HrefProperty(CHECKED_IN, locator.getResourcePath(), true));
 			}
 		}
-	}
-
-	/**
-	 * @return true, if this resource is a non-collection resource and
-	 *         represents an existing repository node that has the mixin
-	 *         nodetype 'mix:versionable' set.
-	 */
-	private boolean isVersionControlled() {
-		return true;
 	}
 
 	/**
@@ -331,7 +324,8 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl implements
 	 * 
 	 * @return new <code>DavResource</code>
 	 * 
-	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV communication
+	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
+	 *         communication
 	 */
 	protected DavResource createResourceFromLocator(DavResourceLocator loc) throws DavException {
 		DavResource res = getFactory().createResource(loc, getSession());

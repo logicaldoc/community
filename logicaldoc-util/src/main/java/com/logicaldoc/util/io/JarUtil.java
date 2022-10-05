@@ -35,12 +35,12 @@ public class JarUtil {
 
 		try {
 			File targetDir = new File(target);
-			if (targetDir.exists() && targetDir.isFile()) {
-				targetDir.delete();
-			}
-			if (!targetDir.exists()) {
+			
+			if (targetDir.exists() && targetDir.isFile())
+				FileUtil.strongDelete(targetDir);
+
+			if (!targetDir.exists())
 				FileUtils.forceMkdir(targetDir);
-			}
 
 			try (JarFile jar = new JarFile(jarsource)) {
 				JarEntry jare;
@@ -71,12 +71,11 @@ public class JarUtil {
 
 		try {
 			File targetDir = new File(target);
-			if (targetDir.exists() && targetDir.isFile()) {
-				targetDir.delete();
-			}
-			if (!targetDir.exists()) {
+			if (targetDir.exists() && targetDir.isFile()) 
+				FileUtil.strongDelete(targetDir);
+			
+			if (!targetDir.exists())
 				FileUtils.forceMkdir(targetDir);
-			}
 
 			try (JarFile jar = new JarFile(jarsource)) {
 				JarEntry jare = new JarEntry(entry);

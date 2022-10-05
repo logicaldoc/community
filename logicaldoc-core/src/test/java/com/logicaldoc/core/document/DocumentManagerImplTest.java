@@ -211,7 +211,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
 		docDao.initialize(doc);
-		doc = (Document) doc.clone();
+		doc = new Document(doc);
 		doc.setId(0);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setFolderId(103L);

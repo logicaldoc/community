@@ -67,11 +67,11 @@ public class AutoDeleteInputStream extends InputStream {
 			FileUtil.strongDelete(file);
 	}
 
-	public void mark(int readlimit) {
+	public synchronized void mark(int readlimit) {
 		wrappedStream.mark(readlimit);
 	}
 
-	public void reset() throws IOException {
+	public synchronized void reset() throws IOException {
 		wrappedStream.reset();
 	}
 

@@ -129,7 +129,7 @@ public class EventEndpoint implements EventListener {
 
 				GUIDocument document = null;
 				if (event.getDocument() != null) {
-					Document clone = (Document) event.getDocument().clone();
+					Document clone = new Document(event.getDocument());
 					// Report some attributes skipped by the clone method
 					clone.setCustomId(event.getDocument().getCustomId());
 					clone.setStatus(event.getDocument().getStatus());
@@ -152,8 +152,8 @@ public class EventEndpoint implements EventListener {
 					}
 				}
 
-				if (event.getEvent().equals(DocumentEvent.CHECKEDOUT.toString())
-						|| event.getEvent().equals(DocumentEvent.LOCKED.toString())) {
+				if (document != null && (event.getEvent().equals(DocumentEvent.CHECKEDOUT.toString())
+						|| event.getEvent().equals(DocumentEvent.LOCKED.toString()))) {
 					document.setLockUser(event.getUsername());
 					document.setLockUserId(event.getUserId());
 				}

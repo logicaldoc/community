@@ -1,8 +1,5 @@
 package com.logicaldoc.web;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +12,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 
 /**
@@ -45,7 +43,7 @@ public class DisplayServlet extends HttpServlet {
 	/**
 	 * Redirects the request to the proper frontend URL
 	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		String docId = request.getParameter(DOC_ID);
 		String folderId = request.getParameter(FOLDER_ID);
 		String folderPath = request.getParameter(FOLDER_PATH);
@@ -69,7 +67,7 @@ public class DisplayServlet extends HttpServlet {
 			response.sendRedirect(redirectUrl);
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
-			new IOException(t.getMessage());
+			ServletUtil.sendError(response, t.getMessage());
 		}
 	}
 }

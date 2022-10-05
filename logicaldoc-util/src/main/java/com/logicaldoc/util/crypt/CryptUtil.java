@@ -1,6 +1,7 @@
 package com.logicaldoc.util.crypt;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -66,7 +67,7 @@ public class CryptUtil {
 
 	public void encrypt(File inputFile, File outputFile) throws EncryptionException {
 		if (inputFile == null || !inputFile.exists())
-			throw new IllegalArgumentException("Unencrypted file not found in " + inputFile.getPath());
+			throw new IllegalArgumentException("Unencrypted file not found in inpout file");
 		try {
 			SecretKey key = keyFactory.generateSecret(keySpec);
 			cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -74,7 +75,9 @@ public class CryptUtil {
 			byte[] encryptedContent = cipher.doFinal(clearContent);
 			outputFile.mkdirs();
 			FileUtil.strongDelete(outputFile);
-			outputFile.createNewFile();
+			boolean created = outputFile.createNewFile();
+			if (!created)
+				throw new IOException("Cannot create file " + outputFile.getAbsolutePath());
 			FileUtils.writeByteArrayToFile(outputFile, encryptedContent);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -85,14 +88,16 @@ public class CryptUtil {
 	public void decrypt(File inputFile, File outputFile) throws EncryptionException {
 		try {
 			if (inputFile == null || !inputFile.exists())
-				throw new IllegalArgumentException("Encrypted file not found in " + inputFile.getPath());
+				throw new IllegalArgumentException("Encrypted file not found in input file");
 			SecretKey key = keyFactory.generateSecret(keySpec);
 			cipher.init(Cipher.DECRYPT_MODE, key);
 			byte[] encryptedContent = FileUtils.readFileToByteArray(inputFile);
 			byte[] clearContent = cipher.doFinal(encryptedContent);
 			outputFile.mkdirs();
 			FileUtil.strongDelete(outputFile);
-			outputFile.createNewFile();
+			boolean created = outputFile.createNewFile();
+			if (!created)
+				throw new IOException("Cannot create file " + outputFile.getAbsolutePath());
 			FileUtils.writeByteArrayToFile(outputFile, clearContent);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
@@ -168,12 +173,10 @@ public class CryptUtil {
 	 * @return the returned hash as bytes.
 	 */
 	public static String hashMD4(String original) {
-		String copy = "";
-		String pwd = original;
-		if (pwd == null) {
-			pwd = "";
-		}
+		if (original == null)
+			original = "";
 
+		String copy = "";
 		try {
 			MD4Digest md4 = new MD4Digest();
 			byte[] pwdBytes = original.getBytes();

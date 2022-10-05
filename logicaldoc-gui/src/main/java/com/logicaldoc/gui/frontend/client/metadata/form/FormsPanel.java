@@ -243,8 +243,9 @@ public class FormsPanel extends AdminPanel {
 		invite.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				if (getSelectedForm() != null) {
-					FormInvitationDialog invitation = new FormInvitationDialog(getSelectedForm().getId());
+				GUIForm selectedForm = getSelectedForm();
+				if (selectedForm != null) {
+					FormInvitationDialog invitation = new FormInvitationDialog(selectedForm.getId());
 					invitation.show();
 				}
 			}
@@ -317,8 +318,9 @@ public class FormsPanel extends AdminPanel {
 	}
 
 	private void onEdit() {
-		if (getSelectedForm() != null && details instanceof FormDetailsPanel) {
-			if (((FormDetailsPanel) details).getForm().getId() == getSelectedForm().getId())
+		GUIForm selectedForm = getSelectedForm();
+		if (selectedForm != null && details instanceof FormDetailsPanel) {
+			if (((FormDetailsPanel) details).getForm().getId() == selectedForm.getId())
 				((FormDetailsPanel) details).openContentEditor();
 		}
 	}

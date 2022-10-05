@@ -15,7 +15,7 @@ import java.util.Set;
 public class SystemMessage extends Message {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public final static int STATUS_NEW = 0;
 
 	public final static int STATUS_DELIVERED = 1;
@@ -44,6 +44,31 @@ public class SystemMessage extends Message {
 	private int trials = 0;
 
 	public SystemMessage() {
+	}
+
+	public SystemMessage(SystemMessage source) {
+		this.dateScope = source.dateScope;
+		this.prio = source.prio;
+		this.confirmation = source.confirmation;
+		this.lastNotified = source.lastNotified;
+		this.status = source.status;
+		this.trials = source.trials;
+
+		setAuthor(source.getAuthor());
+		setHtml(source.getHtml());
+		setLastNotified(source.getLastNotified());
+		setLocale(source.getLocale());
+		setMessageText(source.getMessageText());
+		Set<Recipient> recs = new HashSet<Recipient>();
+		for (Recipient rec : source.getRecipients())
+			recs.add(new Recipient(rec));
+
+		setRecipients(recs);
+		setSentDate(source.getSentDate());
+		setSubject(source.getSubject());
+		setTenantId(source.getTenantId());
+		setType(source.getType());
+		setNotify(source.isNotify());
 	}
 
 	public int getDateScope() {
@@ -92,33 +117,5 @@ public class SystemMessage extends Message {
 
 	public void setTrials(int trials) {
 		this.trials = trials;
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		SystemMessage cloned = new SystemMessage();
-		cloned.setAuthor(getAuthor());
-		cloned.setConfirmation(getConfirmation());
-		cloned.setDateScope(getDateScope());
-		cloned.setHtml(getHtml());
-		cloned.setLastNotified(getLastNotified());
-		cloned.setLocale(getLocale());
-		cloned.setMessageText(getMessageText());
-		cloned.setPrio(getPrio());
-		Set<Recipient> recs = new HashSet<Recipient>();
-		for (Recipient rec : getRecipients()) {
-			Recipient newRec = (Recipient) rec.clone();
-			recs.add(newRec);
-		}
-		cloned.setRecipients(recs);
-		cloned.setSentDate(getSentDate());
-		cloned.setStatus(getStatus());
-		cloned.setSubject(getSubject());
-		cloned.setTenantId(getTenantId());
-		cloned.setTrials(getTrials());
-		cloned.setType(getType());
-		cloned.setNotify(isNotify());
-
-		return cloned;
 	}
 }

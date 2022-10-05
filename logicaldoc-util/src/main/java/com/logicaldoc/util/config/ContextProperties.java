@@ -242,7 +242,7 @@ public class ContextProperties extends OrderedProperties {
 
 		if (oldBackups.length > maxBackups)
 			for (int i = maxBackups - 1; i < oldBackups.length; i++)
-				oldBackups[i].delete();
+				FileUtil.strongDelete(oldBackups[i]);
 	}
 
 	public String getString(String property) {

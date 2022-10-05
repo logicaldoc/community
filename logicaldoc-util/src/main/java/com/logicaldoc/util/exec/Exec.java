@@ -24,8 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.util.UtilWorkbench;
-
 /**
  * Utility class used to execute system commands
  * 
@@ -76,7 +74,7 @@ public class Exec {
 
 		try {
 			if (timeout > 0)
-				worker.join(timeout * 1000);
+				worker.join(timeout * 1000L);
 			else
 				worker.join();
 			if (worker.getExit() == null)
@@ -137,6 +135,9 @@ public class Exec {
 				Callable<Integer> call = new CallableProcess(process);
 				Future<Integer> future = service.submit(call);
 				exit = future.get(timeout, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				process.destroy();
+				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
 				log.warn("Timeout command {}", commandLine);
@@ -161,7 +162,7 @@ public class Exec {
 		try {
 			exit = process.waitFor();
 		} catch (InterruptedException e) {
-
+			Thread.currentThread().interrupt();
 		}
 
 		try {
@@ -210,6 +211,9 @@ public class Exec {
 				Callable<Integer> call = new CallableProcess(process);
 				Future<Integer> future = service.submit(call);
 				exit = future.get(timeout, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				process.destroy();
+				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
 				log.warn("Timeout command {}", commandLine);
@@ -234,7 +238,7 @@ public class Exec {
 		try {
 			exit = process.waitFor();
 		} catch (InterruptedException e) {
-
+			Thread.currentThread().interrupt();
 		}
 
 		try {
@@ -260,6 +264,9 @@ public class Exec {
 				Callable<Integer> call = new CallableProcess(process);
 				Future<Integer> future = service.submit(call);
 				exit = future.get(timeout, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				process.destroy();
+				Thread.currentThread().interrupt();
 			} catch (TimeoutException e) {
 				process.destroy();
 				log.warn("Timeout command {}", commandLine);
@@ -284,7 +291,7 @@ public class Exec {
 		try {
 			exit = process.waitFor();
 		} catch (InterruptedException e) {
-
+			Thread.currentThread().interrupt();
 		}
 
 		try {
@@ -343,7 +350,7 @@ public class Exec {
 		boolean allowed = allowedCommands.contains(commandLine);
 		if (!allowed) {
 			for (String row : allowedCommands) {
-				if (commandLine.startsWith(commandLine) && commandLine.length() > row.length()
+				if (commandLine.startsWith(row) && commandLine.length() > row.length()
 						&& commandLine.substring(row.length()).startsWith(" ")) {
 					allowed = true;
 					break;
@@ -352,7 +359,7 @@ public class Exec {
 		}
 
 		if (!allowed)
-			throw new IOException("Command " + commandLine + " is not allowed");
+			throw new IOException("Command " + commandLine + " is not allowed. Add it to allowed-commands.txt.");
 	}
 
 	/**
@@ -373,7 +380,7 @@ public class Exec {
 				}
 
 				if (is == null)
-					is = UtilWorkbench.class.getResourceAsStream(ALLOWED_COMMANDS);
+					is = Exec.class.getResourceAsStream(ALLOWED_COMMANDS);
 
 				if (is != null) {
 					try (Scanner sc = new Scanner(is);) {

@@ -158,7 +158,8 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 				file.mkdirs();
 				file.mkdir();
 				file = new File(file, "plugin.properties");
-				file.createNewFile();
+				if (!file.createNewFile())
+					throw new IOException("Cannot create file " + file.getAbsolutePath());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -1698,7 +1698,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			List<Document> srcDocs = docDao.findByFolder(source.getId(), null);
 			for (Document srcDoc : srcDocs) {
 				docDao.initialize(srcDoc);
-				Document newDoc = srcDoc.clone();
+				Document newDoc = new Document(srcDoc);
 				newDoc.setId(0L);
 				newDoc.setCustomId(null);
 				newDoc.setVersion(null);

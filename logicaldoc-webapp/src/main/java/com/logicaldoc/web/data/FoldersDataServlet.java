@@ -118,7 +118,7 @@ public class FoldersDataServlet extends HttpServlet {
 					.getBoolean(session.getTenantName() + ".gui.folder.pagination", false)) {
 				// Check if the folder itself specifies a max number of records
 				// per page
-				if (StringUtils.isNotEmpty(parentFolder.getGrid()))
+				if (parentFolder != null && StringUtils.isNotEmpty(parentFolder.getGrid()))
 					endRecord = getFolderPageSizeFromSpec(parentFolder.getGrid());
 
 				// Go with the default page size
@@ -144,7 +144,7 @@ public class FoldersDataServlet extends HttpServlet {
 
 			StringBuffer query = new StringBuffer(
 					"select ld_id, ld_parentid, ld_name, ld_type, ld_foldref, ld_color, ld_position from ld_folder where ld_deleted=0 and ld_hidden=0 and not ld_id=ld_parentid and ld_parentid = ? and ld_tenantid = ? ");
-			if (!user.isMemberOf("admin")) {
+			if (!user.isMemberOf("admin") && parentFolder != null) {
 				Collection<Long> accessibleIds = folderDao.findFolderIdByUserId(session.getUserId(),
 						parentFolder.getId(), false);
 				if (!accessibleIds.isEmpty()) {
@@ -183,39 +183,41 @@ public class FoldersDataServlet extends HttpServlet {
 			else
 				query.append(" ld_creation desc ");
 
-			SqlRowSet rs = folderDao.queryForRowSet(query.toString(), new Long[] { parentFolder.getId(), tenantId },
-					null);
+			if (parentFolder != null) {
+				SqlRowSet rs = folderDao.queryForRowSet(query.toString(), new Long[] { parentFolder.getId(), tenantId },
+						null);
 
-			if (rs != null) {
-				long i = 0;
-				while (rs.next()) {
-					if (startRecord != null && i < startRecord) {
+				if (rs != null) {
+					long i = 0;
+					while (rs.next()) {
+						if (startRecord != null && i < startRecord) {
+							i++;
+							continue;
+						}
+						if (endRecord != null && i > endRecord) {
+							i++;
+							continue;
+						}
+
+						writer.print("<folder>");
+						writer.print("<id>" + parent + "-" + rs.getLong(1) + "</id>");
+						writer.print("<folderId>" + rs.getLong(1) + "</folderId>");
+						writer.print("<parent>" + parent + "</parent>");
+						writer.print("<name><![CDATA[" + rs.getString(3) + "]]></name>");
+						writer.print("<type>" + rs.getInt(4) + "</type>");
+						if (rs.getObject(5) != null)
+							writer.print("<foldRef>" + rs.getLong(5) + "</foldRef>");
+						writer.print("<customIcon>" + (rs.getInt(4) == Folder.TYPE_ALIAS ? "folder_alias" : "folder")
+								+ "</customIcon>");
+						writer.print("<status>0</status>");
+						writer.print("<publishedStatus>yes</publishedStatus>");
+						if (StringUtils.isNotEmpty(rs.getString(6)))
+							writer.print("<color><![CDATA[" + rs.getString(6) + "]]></color>");
+						writer.print("<position>" + rs.getInt(7) + "</position>");
+						writer.print("</folder>");
+
 						i++;
-						continue;
 					}
-					if (endRecord != null && i > endRecord) {
-						i++;
-						continue;
-					}
-
-					writer.print("<folder>");
-					writer.print("<id>" + parent + "-" + rs.getLong(1) + "</id>");
-					writer.print("<folderId>" + rs.getLong(1) + "</folderId>");
-					writer.print("<parent>" + parent + "</parent>");
-					writer.print("<name><![CDATA[" + rs.getString(3) + "]]></name>");
-					writer.print("<type>" + rs.getInt(4) + "</type>");
-					if (rs.getObject(5) != null)
-						writer.print("<foldRef>" + rs.getLong(5) + "</foldRef>");
-					writer.print("<customIcon>" + (rs.getInt(4) == Folder.TYPE_ALIAS ? "folder_alias" : "folder")
-							+ "</customIcon>");
-					writer.print("<status>0</status>");
-					writer.print("<publishedStatus>yes</publishedStatus>");
-					if (StringUtils.isNotEmpty(rs.getString(6)))
-						writer.print("<color><![CDATA[" + rs.getString(6) + "]]></color>");
-					writer.print("<position>" + rs.getInt(7) + "</position>");
-					writer.print("</folder>");
-
-					i++;
 				}
 			}
 
@@ -229,30 +231,34 @@ public class FoldersDataServlet extends HttpServlet {
 				}
 				query.append(" order by ld_filename");
 
-				rs = folderDao.queryForRowSet(query.toString(), new Long[] { parentFolder.getId() }, null);
-				if (rs != null)
-					while (rs.next()) {
-						Date now = new Date();
-						boolean published = (rs.getInt(4) == 1) && (rs.getDate(5) == null || now.after(rs.getDate(5)))
-								&& (rs.getDate(6) == null || now.before(rs.getDate(6)));
-						writer.print("<folder>");
-						writer.print("<id>d-" + rs.getLong(1) + "</id>");
-						writer.print("<folderId>d-" + rs.getLong(1) + "</folderId>");
-						writer.print("<parent>" + parent + "</parent>");
-						writer.print("<name><![CDATA[" + rs.getString(2) + "]]></name>");
-						writer.print("<type>file</type>");
-						writer.print("<customIcon>"
-								+ FilenameUtils
-										.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))
-								+ "</customIcon>");
-						writer.print("<size>" + rs.getInt(3) + "</size>");
-						writer.print("<status>" + rs.getInt(7) + "</status>");
-						writer.print("<publishedStatus>" + (published ? "yes" : "no") + "</publishedStatus>");
-						if (StringUtils.isNotEmpty(rs.getString(8)))
-							writer.print("<color><![CDATA[" + rs.getString(8) + "]]></color>");
-						writer.print("<position>0</position>");
-						writer.print("</folder>");
-					}
+				if (parentFolder != null) {
+					SqlRowSet rs = folderDao.queryForRowSet(query.toString(), new Long[] { parentFolder.getId() },
+							null);
+					if (rs != null)
+						while (rs.next()) {
+							Date now = new Date();
+							boolean published = (rs.getInt(4) == 1)
+									&& (rs.getDate(5) == null || now.after(rs.getDate(5)))
+									&& (rs.getDate(6) == null || now.before(rs.getDate(6)));
+							writer.print("<folder>");
+							writer.print("<id>d-" + rs.getLong(1) + "</id>");
+							writer.print("<folderId>d-" + rs.getLong(1) + "</folderId>");
+							writer.print("<parent>" + parent + "</parent>");
+							writer.print("<name><![CDATA[" + rs.getString(2) + "]]></name>");
+							writer.print("<type>file</type>");
+							writer.print("<customIcon>"
+									+ FilenameUtils.getBaseName(
+											IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))
+									+ "</customIcon>");
+							writer.print("<size>" + rs.getInt(3) + "</size>");
+							writer.print("<status>" + rs.getInt(7) + "</status>");
+							writer.print("<publishedStatus>" + (published ? "yes" : "no") + "</publishedStatus>");
+							if (StringUtils.isNotEmpty(rs.getString(8)))
+								writer.print("<color><![CDATA[" + rs.getString(8) + "]]></color>");
+							writer.print("<position>0</position>");
+							writer.print("</folder>");
+						}
+				}
 			}
 
 			writer.write("</list>");

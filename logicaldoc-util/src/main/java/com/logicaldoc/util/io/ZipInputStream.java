@@ -34,7 +34,8 @@ public class ZipInputStream extends InputStream {
 		return wrapped.equals(obj);
 	}
 
-	public void mark(int readlimit) {
+	@Override
+	public synchronized void mark(int readlimit) {
 		wrapped.mark(readlimit);
 	}
 
@@ -54,7 +55,8 @@ public class ZipInputStream extends InputStream {
 		return wrapped.read(b);
 	}
 
-	public void reset() throws IOException {
+	@Override
+	public synchronized void reset() throws IOException {
 		wrapped.reset();
 	}
 

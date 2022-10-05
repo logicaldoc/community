@@ -163,7 +163,8 @@ public class FeedParser {
 							} catch (ParseException e) {
 								System.err.println(e.getMessage());
 							}
-						feed.getMessages().add(message);
+						if (feed != null)
+							feed.getMessages().add(message);
 						event = eventReader.nextEvent();
 						continue;
 					}

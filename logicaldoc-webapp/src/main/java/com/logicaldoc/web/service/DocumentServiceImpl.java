@@ -796,7 +796,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 //			}
 
 			if (session != null)
-				checkPublished(session != null ? session.getUser() : null, doc);
+				checkPublished(session.getUser(), doc);
 
 			docDao.initialize(doc);
 
@@ -872,7 +872,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		document.setWorkflowStatus(realDoc.getWorkflowStatus());
 		document.setWorkflowStatusDisplay(realDoc.getWorkflowStatusDisplay());
 		document.setImmutable(realDoc.getImmutable());
-		document.setFileSize(Long.valueOf(realDoc.getFileSize()).floatValue());
+		document.setFileSize(realDoc.getFileSize());
 		document.setStartPublishing(realDoc.getStartPublishing());
 		document.setStopPublishing(realDoc.getStopPublishing());
 		document.setPublished(realDoc.getPublished());
@@ -958,7 +958,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				version1.setFileVersion(docVersion.getFileVersion());
 				version1.setLanguage(docVersion.getLanguage());
 				version1.setTemplateId(docVersion.getTemplateId());
-				version1.setFileSize(Float.valueOf(docVersion.getFileSize()));
+				version1.setFileSize(docVersion.getFileSize());
 				version1.setWorkflowStatus(docVersion.getWorkflowStatus());
 				version1.setWorkflowStatusDisplay(docVersion.getWorkflowStatusDisplay());
 				version1.setColor(docVersion.getColor());
@@ -1020,7 +1020,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				version2.setVersion(docVersion.getVersion());
 				version2.setFileVersion(docVersion.getFileVersion());
 				version2.setLanguage(docVersion.getLanguage());
-				version2.setFileSize(Float.valueOf(docVersion.getFileSize()));
+				version2.setFileSize(docVersion.getFileSize());
 				if (docVersion.getRating() != null)
 					version2.setRating(docVersion.getRating());
 				version2.setWorkflowStatus(docVersion.getWorkflowStatus());
@@ -1304,8 +1304,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		docVO.setPublisher(guiDocument.getPublisher());
 		docVO.setFileVersion(guiDocument.getFileVersion());
 		docVO.setLanguage(guiDocument.getLanguage());
-		if (guiDocument.getFileSize() != null)
-			docVO.setFileSize(guiDocument.getFileSize().longValue());
+		docVO.setFileSize(guiDocument.getFileSize());
 
 		docVO.setRating(guiDocument.getRating());
 		docVO.setComment(guiDocument.getComment());
@@ -2176,18 +2175,20 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	public GUIDocument deleteVersions(long[] ids) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
+		long docId = 0;
 		try {
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			for (long id : ids) {
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setSession(session);
 				Version version = manager.deleteVersion(id, transaction);
-				return getById(version.getDocId());
+				docId = version.getDocId();
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
-		return null;
+
+		return getById(docId);
 	}
 
 	@Override
@@ -2574,8 +2575,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			RatingDAO rDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
 			Rating rat = rDao.findById(id);
+			if (rat == null)
+				return 0;
+
 			if (rat != null && rat.getUserId() != session.getUserId())
-				throw new Exception("Cannot delete the vote of another user");
+				throw new Exception("Cannot delete the rating left by another user");
 			rDao.delete(id);
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2679,7 +2683,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					EMailAttachment att = email.getAttachment(i);
 					GUIDocument d = new GUIDocument();
 					d.setFileName(att.getFileName());
-					d.setFileSize(Float.valueOf(att.getSize()));
+					d.setFileSize(att.getSize());
 					d.setIcon(IconSelector.selectIcon(att.getFileName()));
 					d.setFolder(doc.getFolder());
 					attachments.add(d);

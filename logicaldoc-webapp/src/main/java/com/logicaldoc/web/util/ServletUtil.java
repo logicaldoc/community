@@ -443,7 +443,7 @@ public class ServletUtil {
 			 */
 			DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			List<DocumentHistory> oldHistories = hdao.findByUserIdAndEvent(user.getId(), history.getEvent(),
-					session.getSid());
+					session != null ? session.getSid() : sid);
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(history.getDate());
 			cal.add(Calendar.SECOND, -30);

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,7 @@ public class TarParser extends AbstractParser {
 
 					TarUtil.extractEntry(tarFile, entry, uncompressedEntryFile);
 
-					Document clone = document.clone();
+					Document clone = new Document(document);
 					clone.setFileName(uncompressedEntryFile.getName());
 					String text = entryParser.parse(uncompressedEntryFile, uncompressedEntryFile.getName(), encoding,
 							locale, tenant, document, fileVersion);

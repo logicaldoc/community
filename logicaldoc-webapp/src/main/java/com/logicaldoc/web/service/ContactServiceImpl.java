@@ -229,7 +229,7 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 				for (Long userId : users) {
 					List<Contact> userContacts = dao.findByUser(userId, originalContact.getEmail());
 					if (userContacts.isEmpty()) {
-						Contact cloned = originalContact.clone();
+						Contact cloned = new Contact(originalContact);
 						cloned.setId(0L);
 						cloned.setUserId(userId);
 						try {

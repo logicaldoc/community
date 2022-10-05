@@ -30,38 +30,41 @@ public class TagUtil {
 	 * @return the collection of tags
 	 */
 	public static Set<String> extractTags(String tenantName, String words) {
-		if (words != null && !words.contains(","))
-			words = "," + words + ",";
-
-		// Replace the escapes \, in _comma_ in order to include those tags with
-		// commas inside so the tokenization will work property
-		words = words.replace("\\,", "__comma__");
-
 		Set<String> coll = new HashSet<String>();
-		try {
-			ContextProperties conf = new ContextProperties();
-			int minSize = conf.getInt(tenantName + ".tag.minsize");
-			int maxSize = conf.getInt(tenantName + ".tag.maxsize");
 
-			StringTokenizer st = new StringTokenizer(words, ",", false);
-			while (st.hasMoreTokens()) {
-				String word = st.nextToken();
+		if (words != null)
+			try {
+				if (!words.contains(","))
+					words = "," + words + ",";
 
-				// Get back comma escapes into the , char
-				word = word.replace("__comma__", ",");
-				if (StringUtils.isNotEmpty(word)) {
-					word = word.trim();
-					if (word.length() >= minSize) {
-						if (word.length() > maxSize)
-							coll.add(word.substring(0, maxSize));
-						else
-							coll.add(word);
+				// Replace the escapes \, in _comma_ in order to include those
+				// tags with
+				// commas inside so the tokenization will work property
+				words = words.replace("\\,", "__comma__");
+
+				ContextProperties conf = new ContextProperties();
+				int minSize = conf.getInt(tenantName + ".tag.minsize");
+				int maxSize = conf.getInt(tenantName + ".tag.maxsize");
+
+				StringTokenizer st = new StringTokenizer(words, ",", false);
+				while (st.hasMoreTokens()) {
+					String word = st.nextToken();
+
+					// Get back comma escapes into the , char
+					word = word.replace("__comma__", ",");
+					if (StringUtils.isNotEmpty(word)) {
+						word = word.trim();
+						if (word.length() >= minSize) {
+							if (word.length() > maxSize)
+								coll.add(word.substring(0, maxSize));
+							else
+								coll.add(word);
+						}
 					}
 				}
+			} catch (IOException e) {
 			}
 
-		} catch (IOException e) {
-		}
 		return coll;
 	}
 

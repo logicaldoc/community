@@ -162,7 +162,7 @@ public class ZipImport {
 				if (session != null)
 					history.setSession(session);
 
-				Document doc = (Document) docVo.clone();
+				Document doc = new Document(docVo);
 				doc.setId(0L);
 				doc.setFolder(parent);
 

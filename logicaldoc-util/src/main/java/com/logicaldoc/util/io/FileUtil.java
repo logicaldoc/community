@@ -6,10 +6,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -127,15 +125,8 @@ public class FileUtil {
 	}
 
 	public static String readFile(File file) throws IOException {
-		FileInputStream fisTargetFile = null;
-		try {
-			fisTargetFile = new FileInputStream(file);
+		try (FileInputStream fisTargetFile = new FileInputStream(file);) {
 			return IOUtils.toString(fisTargetFile, "UTF-8");
-		} finally {
-			try {
-				fisTargetFile.close();
-			} catch (Throwable ioe) {
-			}
 		}
 	}
 
@@ -144,21 +135,11 @@ public class FileUtil {
 	}
 
 	public static void appendFile(String text, String filepath) {
-		OutputStream bos = null;
 
-		try {
-			bos = new FileOutputStream(filepath, true);
+		try (OutputStream bos = new FileOutputStream(filepath, true);) {
 			bos.write(text.getBytes());
 		} catch (Exception e) {
 			logError(e.getLocalizedMessage());
-		} finally {
-			if (bos != null) {
-				try {
-					bos.close();
-				} catch (IOException ioe) {
-					;
-				}
-			}
 		}
 	}
 
@@ -174,37 +155,38 @@ public class FileUtil {
 //			return null;
 //		}
 
+		if (is == null)
+			return null;
+
 		String digest = "";
 		MessageDigest sha = null;
 
 		try {
-			if (is != null) {
-				sha = MessageDigest.getInstance("SHA-1");
-				byte[] message = new byte[BUFF_SIZE];
-				int len = 0;
-				while ((len = is.read(message)) != -1) {
-					sha.update(message, 0, len);
-				}
-				byte[] messageDigest = sha.digest();
-				// convert the array to String
-				int size = messageDigest.length;
-				StringBuffer buf = new StringBuffer();
-				int unsignedValue = 0;
-				String strUnsignedValue = null;
-				for (int i = 0; i < size; i++) {
-					// convert each messageDigest byte to unsigned
-					unsignedValue = ((int) messageDigest[i]) & 0xff;
-					strUnsignedValue = Integer.toHexString(unsignedValue);
-					// at least two letters
-					if (strUnsignedValue.length() == 1)
-						buf.append("0");
-					buf.append(strUnsignedValue);
-				}
-				digest = buf.toString();
-				log.debug("Computed Digest: {}", digest);
-
-				return digest;
+			sha = MessageDigest.getInstance("SHA-1");
+			byte[] message = new byte[BUFF_SIZE];
+			int len = 0;
+			while ((len = is.read(message)) != -1) {
+				sha.update(message, 0, len);
 			}
+			byte[] messageDigest = sha.digest();
+			// convert the array to String
+			int size = messageDigest.length;
+			StringBuffer buf = new StringBuffer();
+			int unsignedValue = 0;
+			String strUnsignedValue = null;
+			for (int i = 0; i < size; i++) {
+				// convert each messageDigest byte to unsigned
+				unsignedValue = ((int) messageDigest[i]) & 0xff;
+				strUnsignedValue = Integer.toHexString(unsignedValue);
+				// at least two letters
+				if (strUnsignedValue.length() == 1)
+					buf.append("0");
+				buf.append(strUnsignedValue);
+			}
+			digest = buf.toString();
+			log.debug("Computed Digest: {}", digest);
+
+			return digest;
 		} catch (IOException io) {
 			log.error("Error generating digest: ", io);
 		} catch (Throwable t) {
@@ -225,11 +207,9 @@ public class FileUtil {
 	 * @return digest
 	 */
 	public static String computeDigest(File file) {
-		InputStream is;
-		try {
-			is = new BufferedInputStream(new FileInputStream(file), BUFF_SIZE);
+		try (InputStream is = new BufferedInputStream(new FileInputStream(file), BUFF_SIZE);) {
 			return computeDigest(is);
-		} catch (FileNotFoundException e) {
+		} catch (Throwable e) {
 			log.error(e.getMessage());
 		}
 		return null;
@@ -260,17 +240,10 @@ public class FileUtil {
 	 * @return digest
 	 */
 	public static byte[] computeSha1Hash(File file) {
-		InputStream is = null;
-		try {
-			is = new BufferedInputStream(new FileInputStream(file), BUFF_SIZE);
+		try (InputStream is = new BufferedInputStream(new FileInputStream(file), BUFF_SIZE);) {
 			return computeSha1Hash(is);
 		} catch (IOException io) {
 			log.error(io.getMessage(), io);
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-			}
 		}
 		return null;
 	}
@@ -642,17 +615,14 @@ public class FileUtil {
 	}
 
 	public static void replaceInFile(String sourcePath, String token, String newValue) throws Exception {
-
-		BufferedReader reader = null;
-		OutputStreamWriter writer = null;
 		String oldContent = "";
 
 		File tmp = new File(sourcePath + ".tmp");
 		File file = new File(sourcePath);
 
-		try {
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(sourcePath), "UTF-8"));
-
+		try (BufferedReader reader = new BufferedReader(
+				new InputStreamReader(new FileInputStream(sourcePath), "UTF-8"));
+				OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(tmp), "UTF-8");) {
 			// Reading all the lines of input text file into oldContent
 			String line = reader.readLine();
 
@@ -665,25 +635,15 @@ public class FileUtil {
 			String newContent = oldContent.replaceAll(token, newValue);
 
 			// Rewriting the input text file with newContent
-			writer = new OutputStreamWriter(new FileOutputStream(tmp), "UTF-8");
-
 			writer.write(newContent);
 		} catch (IOException ioe) {
 			log.error(ioe.getMessage(), ioe);
 		} finally {
-			try {
-				// Closing the resources
-				if (reader != null)
-					reader.close();
-				if (writer != null)
-					writer.close();
-			} catch (IOException e) {
-				log.error(e.getMessage(), e);
-			}
+			FileUtil.strongDelete(file);
+			boolean renamed = tmp.renameTo(file);
+			if (!renamed)
+				log.warn("Cannot rename to " + file.getAbsolutePath());
 		}
-
-		file.delete();
-		tmp.renameTo(file);
 	}
 
 	/**
@@ -694,14 +654,9 @@ public class FileUtil {
 	 * 
 	 * @throws IOException if the copy resulted in an error
 	 */
-	@SuppressWarnings("resource")
 	public static void copyFile(File source, File target) throws IOException {
-		FileChannel in = null;
-		FileChannel out = null;
-
-		try {
-			in = new FileInputStream(source).getChannel();
-			out = new FileOutputStream(target).getChannel();
+		try (FileChannel in = new FileInputStream(source).getChannel();
+				FileChannel out = new FileOutputStream(target).getChannel();) {
 
 			ByteBuffer buffer = ByteBuffer.allocateDirect(BUFF_SIZE);
 			while (in.read(buffer) != -1) {
@@ -716,19 +671,6 @@ public class FileUtil {
 			}
 		} catch (IOException e) {
 			log.warn(e.getMessage(), e);
-		} finally {
-			close(in);
-			close(out);
-		}
-	}
-
-	private static void close(Closeable closable) {
-		if (closable != null) {
-			try {
-				closable.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -767,17 +709,28 @@ public class FileUtil {
 	}
 
 	public static void merge(List<File> files, File merged) throws IOException {
-		merged.createNewFile();
+		boolean created = merged.createNewFile();
+		if (!created)
+			throw new IOException("Cannot create file " + merged.getAbsolutePath());
+
 		File tmp = new File(merged.getParent(), "tmp");
-		tmp.createNewFile();
 
 		try {
+			created = tmp.createNewFile();
+			if (!created)
+				throw new IOException("Cannot create file " + tmp.getAbsolutePath());
+
 			for (File chunk : files) {
 				FileUtil.merge(merged, chunk, tmp);
 				FileUtils.forceDelete(merged);
-				tmp.renameTo(merged);
+				boolean renamed = tmp.renameTo(merged);
+				if (!renamed)
+					throw new IOException("Cannot rename file to " + merged.getAbsolutePath());
+
 				tmp = new File(merged.getParent(), "tmp");
-				tmp.createNewFile();
+				created = tmp.createNewFile();
+				if (!created)
+					throw new IOException("Cannot create file " + tmp.getAbsolutePath());
 			}
 		} finally {
 			if (tmp != null && tmp.exists())
@@ -787,10 +740,8 @@ public class FileUtil {
 	}
 
 	public static List<File> split(File file, long chunkSize, File destDir) throws IOException {
-		RandomAccessFile raf = null;
 		List<File> chunks = new ArrayList<File>();
-		try {
-			raf = new RandomAccessFile(file, "r");
+		try (RandomAccessFile raf = new RandomAccessFile(file, "r");) {
 			long numSplits = file.length() / chunkSize;
 			long sourceSize = raf.length();
 			long remainingBytes = sourceSize - (numSplits * chunkSize);
@@ -826,12 +777,6 @@ public class FileUtil {
 				bw.close();
 				chunks.add(chunkFile);
 			}
-		} finally {
-			if (raf != null)
-				try {
-					raf.close();
-				} catch (Throwable t) {
-				}
 		}
 		return chunks;
 	}
@@ -845,8 +790,7 @@ public class FileUtil {
 	}
 
 	public static long countLines(File file) throws IOException {
-		InputStream is = new BufferedInputStream(new FileInputStream(file));
-		try {
+		try (InputStream is = new BufferedInputStream(new FileInputStream(file));) {
 			byte[] c = new byte[1024];
 			long count = 0;
 			int readChars = 0;
@@ -860,8 +804,6 @@ public class FileUtil {
 				}
 			}
 			return (count == 0 && !empty) ? 1 : count;
-		} finally {
-			is.close();
 		}
 	}
 

@@ -168,8 +168,14 @@ public class WSGroup implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		return id == ((WSGroup) other).getId();
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+
+		if (this.getClass() != obj.getClass())
+			return false;
+
+		return id == ((WSGroup) obj).getId();
 	}
 
 	@Override
