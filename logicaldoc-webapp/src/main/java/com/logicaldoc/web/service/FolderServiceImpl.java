@@ -462,9 +462,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		FolderHistory transaction = new FolderHistory();
 		transaction.setSession(session);
 
-        String modelName = (model == null ? null : model.getName());
-		Folder createdFolder = folderDao.copy(folderToCopy, destParentFolder, modelName, foldersOnly,
-				securityOption, transaction);
+		String modelName = (model == null ? null : model.getName());
+		Folder createdFolder = folderDao.copy(folderToCopy, destParentFolder, modelName, foldersOnly, securityOption,
+				transaction);
 		if (model != null) {
 			model.setId(createdFolder.getId());
 			folderDao.initialize(createdFolder);
@@ -707,6 +707,10 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					fg = new FolderGroup();
 					fg.setGroupId(right.getEntityId());
 				}
+				
+				if (fg == null)
+					continue;
+
 				grps.add(fg);
 
 				if (isAdmin || right.isPrint())
@@ -935,7 +939,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
 			Folder selectedFolderFolder = folderDao.findFolder(folderId);
-			
+
 			for (long id : docIds) {
 				Document doc = docDao.findById(id);
 				// Create the document history event
@@ -978,7 +982,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	 * @param folder The folder to update
 	 * @param f The model to use
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error in the database
 	 */
 	private void updateExtendedAttributes(Folder folder, GUIFolder f) throws PersistenceException {
 		if (f.getTemplateId() != null) {

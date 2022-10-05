@@ -312,6 +312,12 @@ public class GUIDocument extends GUIExtensibleObject implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null)
+		    return false;
+
+		  if (this.getClass() != obj.getClass())
+		    return false;
+
 		return getId() == ((GUIDocument) obj).getId();
 	}
 

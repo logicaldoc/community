@@ -255,6 +255,12 @@ public class GUIDocumentNote implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null)
+		    return false;
+
+		  if (this.getClass() != obj.getClass())
+		    return false;
+		  
 		GUIDocumentNote other = (GUIDocumentNote) obj;
 		return id == other.id;
 	}

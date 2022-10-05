@@ -132,7 +132,7 @@ public class ParameterConditionRow extends HLayout {
 		}
 
 		operator.setValueMap(operatorsMap);
-		if (!operatorsMap.isEmpty())
+		if (operatorsMap != null && !operatorsMap.isEmpty())
 			operator.setValue(operatorsMap.keySet().iterator().next());
 
 		attribute.addChangedHandler(new ChangedHandler() {

@@ -128,7 +128,7 @@ public class Dropbox {
 	public List<FileMetadata> listFilesInTree(String basePath) throws DbxException {
 		List<FileMetadata> files = new ArrayList<FileMetadata>();
 		if (basePath.endsWith("/"))
-			basePath.substring(0, basePath.length() - 1);
+			basePath = basePath.substring(0, basePath.length() - 1);
 		if (!basePath.startsWith("/"))
 			basePath = "/" + basePath;
 		if (basePath.equals("/"))

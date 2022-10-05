@@ -33,10 +33,10 @@ public class PreviewTile extends HLayout {
 		setAlign(Alignment.RIGHT);
 		setOverflow(Overflow.HIDDEN);
 
-		init();
+		initGUI();
 	}
 
-	private void init() {
+	private void initGUI() {
 		Canvas[] members = getMembers();
 		if (members != null && members.length > 0)
 			for (Canvas canvas : members)
@@ -64,7 +64,7 @@ public class PreviewTile extends HLayout {
 				@Override
 				public void onClick(ClickEvent event) {
 					Session.get().setShowThumbnail(false);
-					init();
+					initGUI();
 					event.cancel();
 				}
 			});
@@ -77,7 +77,7 @@ public class PreviewTile extends HLayout {
 				@Override
 				public void onClick(ClickEvent event) {
 					Session.get().setShowThumbnail(true);
-					init();
+					initGUI();
 					event.cancel();
 				}
 			});

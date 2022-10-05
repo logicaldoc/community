@@ -243,7 +243,8 @@ public class CustomActionsPanel extends VLayout {
 		if (records != null)
 			for (ListGridRecord record : records) {
 				GUIMenu action = getAction(record.getAttributeAsLong("id"));
-				action.setPosition(i++);
+				if (action != null)
+					action.setPosition(i++);
 			}
 
 		SecurityService.Instance.get().saveMenus(actions.toArray(new GUIMenu[0]), I18N.getLocale(),

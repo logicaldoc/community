@@ -56,7 +56,7 @@ public class DocumentDashlet extends Dashlet {
 
 		setTitle(AwesomeFactory.getIconHtml(icn, title));
 
-		init();
+		initGUI();
 	}
 
 	private List<String> getColumnsList() {
@@ -70,7 +70,7 @@ public class DocumentDashlet extends Dashlet {
 		return set;
 	}
 
-	private void init() {
+	private void initGUI() {
 		list = new DocumentsListGrid(guiDashlet.getExtendedAttributes());
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setCanFreezeFields(true);
@@ -185,8 +185,7 @@ public class DocumentDashlet extends Dashlet {
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				if (event != null)
-					event.cancel();
+				event.cancel();
 				Record record = event.getRecord();
 				DocumentService.Instance.get().getById(Long.parseLong(record.getAttributeAsString("id")),
 						new AsyncCallback<GUIDocument>() {

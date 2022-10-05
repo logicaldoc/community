@@ -69,12 +69,12 @@ public class ReportParametersForm extends Window {
 			@Override
 			public void onSuccess(GUIAttribute[] parameters) {
 				ReportParametersForm.this.parameters = parameters;
-				init();
+				initGUI();
 			}
 		});
 	}
 
-	private void init() {
+	private void initGUI() {
 		VLayout layout = new VLayout();
 		layout.setMargin(5);
 		layout.setMembersMargin(3);
@@ -187,8 +187,10 @@ public class ReportParametersForm extends Window {
 							att.setValue("1".equals(val.toString().trim()) ? true : false);
 						else if (getParameter(nm) != null) {
 							GUIAttribute at = getParameter(nm);
-							at.setBooleanValue(null);
-							at.setType(GUIAttribute.TYPE_BOOLEAN);
+							if (at != null) {
+								at.setBooleanValue(null);
+								at.setType(GUIAttribute.TYPE_BOOLEAN);
+							}
 						}
 					} else
 						att.setValue(val);

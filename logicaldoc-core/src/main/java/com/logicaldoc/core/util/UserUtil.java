@@ -73,7 +73,7 @@ public class UserUtil {
 	 */
 	public static File getUserResource(long id, String path) {
 		File root = getUserHome(id);
-		File resource = new File(root.getPath() + "/" + path);
+		File resource = new File((root != null ? root.getPath() : "") + "/" + path);
 
 		if (!resource.exists() && !path.contains("."))
 			try {

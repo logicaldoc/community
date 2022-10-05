@@ -81,6 +81,12 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+
+		if (this.getClass() != obj.getClass())
+			return false;
+
 		return id == ((Storer) obj).getId();
 	}
 
@@ -189,7 +195,7 @@ public abstract class AbstractStorer implements Storer {
 					is.close();
 				} catch (Throwable e) {
 				}
-		}		
+		}
 	}
 
 	@Override
@@ -279,8 +285,7 @@ public abstract class AbstractStorer implements Storer {
 			log.error(e.getMessage(), e);
 			return false;
 		} finally {
-			if (tmpFile.exists())
-				FileUtil.strongDelete(tmpFile);
+			FileUtil.strongDelete(tmpFile);
 			try {
 				if (exists(0L, resource))
 					delete(0L);

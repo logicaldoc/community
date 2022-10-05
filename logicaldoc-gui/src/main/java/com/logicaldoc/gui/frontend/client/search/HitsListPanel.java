@@ -76,10 +76,10 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 		ListGridField id = new ColoredListGridField("id", "id", 60);
 		id.setHidden(true);
 
-		if (visualizationMode == DocumentsGrid.MODE_LIST)
-			grid = new SearchHitsGrid();
-		else if (visualizationMode == DocumentsGrid.MODE_GALLERY)
+		if (visualizationMode == DocumentsGrid.MODE_GALLERY)
 			grid = new DocumentsTileGrid(null);
+		else
+			grid = new SearchHitsGrid();
 
 		grid.registerSelectionChangedHandler(new SelectionChangedHandler() {
 			@Override

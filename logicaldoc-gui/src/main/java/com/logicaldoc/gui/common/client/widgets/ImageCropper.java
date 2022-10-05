@@ -132,11 +132,11 @@ public class ImageCropper extends Canvas {
 		int newHeight = img.getHeight() + zoom;
 		int newWidth = (int) ((double) newHeight * getImageAspectRatio());
 
-		double proportionW = img.getWidth() / selection.getWidth();
-		double proportionH = img.getHeight() / selection.getHeight();
-		double proportionX = img.getWidth() / selection.getLeft();
-		double proportionY = img.getHeight() / selection.getTop();
-		
+		double proportionW = img.getWidth() / (double) selection.getWidth();
+		double proportionH = img.getHeight() / (double) selection.getHeight();
+		double proportionX = img.getWidth() / (double) selection.getLeft();
+		double proportionY = img.getHeight() / (double) selection.getTop();
+
 		int newSelectionHeight = (int) ((double) newHeight / proportionH);
 		int newSelectionWidth = (int) ((double) newWidth / proportionW);
 		int newSelectionTop = (int) ((double) newHeight / proportionY);

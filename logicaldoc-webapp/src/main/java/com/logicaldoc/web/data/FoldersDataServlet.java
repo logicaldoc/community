@@ -1,13 +1,11 @@
 package com.logicaldoc.web.data;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +22,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.util.IconSelector;
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.util.ServiceUtil;
@@ -45,8 +44,7 @@ public class FoldersDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(FoldersDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			response.setContentType("text/xml");
 			response.setCharacterEncoding("UTF-8");
@@ -98,8 +96,11 @@ public class FoldersDataServlet extends HttpServlet {
 				parentFolderId = Long.parseLong(parent);
 
 			Folder parentFolder = folderDao.findFolder(parentFolderId);
-			if (parentFolder == null)
-				log.error("No folder found with ID={} parent {}", parentFolderId, parent);
+			if (parentFolder == null) {
+				String message = String.format("No folder found with ID=%d parent %s", parentFolderId, parent);
+				log.error(message);
+				ServletUtil.sendError(response, message);
+			}
 
 			Context context = Context.get();
 			UserDAO udao = (UserDAO) context.getBean(UserDAO.class);
@@ -241,8 +242,8 @@ public class FoldersDataServlet extends HttpServlet {
 						writer.print("<name><![CDATA[" + rs.getString(2) + "]]></name>");
 						writer.print("<type>file</type>");
 						writer.print("<customIcon>"
-								+ FilenameUtils.getBaseName(
-										IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))
+								+ FilenameUtils
+										.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))
 								+ "</customIcon>");
 						writer.print("<size>" + rs.getInt(3) + "</size>");
 						writer.print("<status>" + rs.getInt(7) + "</status>");
@@ -257,12 +258,7 @@ public class FoldersDataServlet extends HttpServlet {
 			writer.write("</list>");
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			if (e instanceof ServletException)
-				throw (ServletException) e;
-			else if (e instanceof IOException)
-				throw (IOException) e;
-			else
-				throw new ServletException(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 

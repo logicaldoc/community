@@ -46,13 +46,13 @@ public class NotesDashlet extends Dashlet {
 		setTitle(AwesomeFactory.getIconHtml("sticky-note", I18N.message(guiDashlet.getTitle())));
 
 		if (Feature.enabled(Feature.NOTES)) {
-			init();
+			initGUI();
 		} else {
 			addItem(new FeatureDisabled());
 		}
 	}
 
-	private void init() {
+	private void initGUI() {
 		ListGridField date = new DateListGridField("date", "date");
 
 		ListGridField title = new ColoredListGridField("title", I18N.message("note"));
@@ -77,8 +77,7 @@ public class NotesDashlet extends Dashlet {
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				if (event != null)
-					event.cancel();
+				event.cancel();
 				Record record = event.getRecord();
 				DocumentService.Instance.get().getById(Long.parseLong(record.getAttributeAsString("docId")),
 						new AsyncCallback<GUIDocument>() {

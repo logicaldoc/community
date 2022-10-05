@@ -4,6 +4,8 @@ import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,6 +21,8 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 4.5
  */
 public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, InitializingBean {
+
+	protected Logger log = LoggerFactory.getLogger(TaskTrigger.class);
 
 	private SimpleTriggerFactoryBean simpleTrigger = null;
 
@@ -91,16 +95,17 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 			cronTrigger = null;
 			return simpleTrigger.getObject();
 		} else {
-			if (cronTrigger == null)
+			if (cronTrigger == null) {
+				cronTrigger = new CronTriggerFactoryBean();
+				cronTrigger.setName(getName());
+				cronTrigger.setCronExpression(config.getProperty("schedule.cron." + getName()));
+				cronTrigger.setJobDetail(jobDetail);
 				try {
-					cronTrigger = new CronTriggerFactoryBean();
-					cronTrigger.setName(getName());
-					cronTrigger.setCronExpression(config.getProperty("schedule.cron." + getName()));
-					cronTrigger.setJobDetail(jobDetail);
 					cronTrigger.afterPropertiesSet();
 				} catch (Throwable e) {
-
+					log.warn(e.getMessage(), e);
 				}
+			}
 			simpleTrigger = null;
 			return cronTrigger.getObject();
 		}
@@ -134,8 +139,9 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 	}
 
 	public long getRepeatInterval() {
-		if (simpleTrigger != null)
-			return simpleTrigger.getObject().getRepeatInterval();
+		SimpleTrigger triggerObject = simpleTrigger.getObject();
+		if (simpleTrigger != null && triggerObject != null)
+			return triggerObject.getRepeatInterval();
 		else
 			return -1;
 	}

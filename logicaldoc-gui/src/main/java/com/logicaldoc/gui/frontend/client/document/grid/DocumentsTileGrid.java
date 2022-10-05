@@ -176,16 +176,14 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 	@Override
 	public void setDocuments(GUIDocument[] documents) {
 		Record[] records = new Record[0];
-		if (documents == null || documents.length == 0)
-			setData(records);
-
-		records = new Record[documents.length];
-		for (int i = 0; i < documents.length; i++) {
-			GUIDocument doc = documents[i];
-			Record record = DocumentGridUtil.fromDocument(doc);
-			records[i] = record;
+		if (documents != null && documents.length > 0) {
+			records = new Record[documents.length];
+			for (int i = 0; i < documents.length; i++) {
+				GUIDocument doc = documents[i];
+				Record record = DocumentGridUtil.fromDocument(doc);
+				records[i] = record;
+			}
 		}
-
 		setData(records);
 	}
 

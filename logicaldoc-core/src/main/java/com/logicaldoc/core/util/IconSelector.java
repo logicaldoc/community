@@ -115,6 +115,8 @@ public class IconSelector {
 	 * @return if ext is an image
 	 */
 	public static boolean isPicture(String ext) {
+		if (ext == null)
+			return false;
 
 		if (ext != null)
 			ext = ext.toLowerCase();

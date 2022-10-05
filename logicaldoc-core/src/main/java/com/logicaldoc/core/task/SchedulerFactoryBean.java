@@ -76,10 +76,10 @@ public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.
 		Collection<Task> tasks = manager.getTasks(applicationContext);
 		for (Task task : tasks) {
 			String name = task.getName();
-			Trigger trigger = (Trigger) applicationContext.getBean(name + "Trigger");
-			if (trigger != null)
-				triggers.add(trigger);
-			else
+			Object trigger = applicationContext.getBean(name + "Trigger");
+			if (trigger != null && trigger instanceof Trigger) {
+				triggers.add((Trigger) trigger);
+			} else
 				log.warn("Cannot schedule task {}", name);
 		}
 

@@ -44,10 +44,10 @@ public class FormImageTile extends HLayout {
 		setAlign(Alignment.LEFT);
 		setOverflow(Overflow.HIDDEN);
 
-		init();
+		initGUI();
 	}
 
-	private void init() {
+	private void initGUI() {
 		Canvas[] members = getMembers();
 		if (members != null && members.length > 0)
 			for (Canvas canvas : members)
@@ -69,7 +69,7 @@ public class FormImageTile extends HLayout {
 			public void onClick(ClickEvent event) {
 				form.setHeaderImage(null);
 				changedHandler.onChanged(null);
-				init();
+				initGUI();
 			}
 		});
 
@@ -170,7 +170,7 @@ public class FormImageTile extends HLayout {
 				@Override
 				public void onSuccess(String imageSrc) {
 					form.setHeaderImage(imageSrc);
-					FormImageTile.this.init();
+					FormImageTile.this.initGUI();
 					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
 						@Override

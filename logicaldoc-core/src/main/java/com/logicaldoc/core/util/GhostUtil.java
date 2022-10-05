@@ -86,7 +86,7 @@ public class GhostUtil {
 			worker = new Worker(process);
 			worker.start();
 
-			worker.join(config.getInt("converter.GhostscriptConverter.timeout", 30) * 1000);
+			worker.join(config.getInt("converter.GhostscriptConverter.timeout", 30) * 1000L);
 			if (worker.getExit() == null)
 				throw new TimeoutException();
 
@@ -173,7 +173,7 @@ public class GhostUtil {
 			try {
 				exit = process.waitFor();
 			} catch (InterruptedException ignore) {
-				return;
+				Thread.currentThread().interrupt();
 			}
 		}
 

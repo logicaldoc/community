@@ -75,7 +75,8 @@ public class PrintUtil {
 			}
 		}
 
-		printPreview(title, element.getInnerHTML());
+		if (element != null)
+			printPreview(title, element.getInnerHTML());
 	}
 
 	public static void printScreenShot(String id) {

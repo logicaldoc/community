@@ -108,11 +108,11 @@ public class FormsPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setDataSource(new FormsDS());
 
-		if(Feature.enabled(Feature.WEB_FORM))
+		if (Feature.enabled(Feature.WEB_FORM))
 			list.setFields(id, formId, name, webEnabled, permaLink);
 		else
 			list.setFields(id, formId, name);
-		
+
 		listing.addMember(infoPanel);
 		listing.addMember(list);
 
@@ -243,13 +243,15 @@ public class FormsPanel extends AdminPanel {
 		invite.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			@Override
 			public void onClick(MenuItemClickEvent event) {
-				FormInvitationDialog invitation = new FormInvitationDialog(getSelectedForm().getId());
-				invitation.show();
+				if (getSelectedForm() != null) {
+					FormInvitationDialog invitation = new FormInvitationDialog(getSelectedForm().getId());
+					invitation.show();
+				}
 			}
 		});
 		invite.setEnabled(record.getAttributeAsBoolean("webEnabled"));
 
-		if(Feature.enabled(Feature.WEB_FORM))
+		if (Feature.enabled(Feature.WEB_FORM))
 			contextMenu.setItems(edit, preview, invite, delete);
 		else
 			contextMenu.setItems(edit, delete);
@@ -315,7 +317,7 @@ public class FormsPanel extends AdminPanel {
 	}
 
 	private void onEdit() {
-		if (details instanceof FormDetailsPanel) {
+		if (getSelectedForm() != null && details instanceof FormDetailsPanel) {
 			if (((FormDetailsPanel) details).getForm().getId() == getSelectedForm().getId())
 				((FormDetailsPanel) details).openContentEditor();
 		}
