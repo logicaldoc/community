@@ -75,7 +75,7 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testCharsets() {
+	public void testCharsets() throws IOException {
 		FulltextSearchOptions opt = new FulltextSearchOptions();
 
 		opt.setLanguage("it");
@@ -88,59 +88,40 @@ public class HibernateSearchDAOTest extends AbstractCoreTCase {
 		opt.setUserId(1);
 		opt.setCreationFrom(new Date());
 
-//		Map<String, Charset> charsets = Charset.availableCharsets();
-//		for (String name : charsets.keySet()) {
-//			System.err.println(name);
-//		}
+		Charset ch = Charset.forName("windows-1252");
+		Context.get().getProperties().setProperty("default.charset", ch.name());
+		SavedSearch saved = new SavedSearch();
+		saved.setName("manca l'umiltà");
+		saved.saveOptions(opt);
+		String xml = saved.getOptions();
+		assertNotNull(xml);
+		assertTrue(xml.length() > 700);
+		saved = new SavedSearch();
+		saved.setOptions(xml);
 
-		try {
-			Charset ch = Charset.forName("windows-1252");
-			Context.get().getProperties().setProperty("default.charset", ch.name());
-			SavedSearch saved = new SavedSearch();
-			saved.setName("manca l'umiltà");
-			saved.saveOptions(opt);
-			String xml = saved.getOptions();
-			assertNotNull(xml);
-			assertTrue(xml.length() > 700);
-
-			saved = new SavedSearch();
-			saved.setOptions(xml);
-		} catch (Throwable t) {
-			Assert.fail("error saving the option");
-		}
-
-		try {
-			Charset ch = Charset.forName("UTF-8");
-			Context.get().getProperties().setProperty("default.charset", ch.name());
-			SavedSearch saved = new SavedSearch();
-			saved.setName("manca l'umiltà");
-			saved.saveOptions(opt);
-			String xml = saved.getOptions();
-			assertNotNull(xml);
-			assertTrue(xml.length() > 700);
-
-			saved = new SavedSearch();
-			saved.setOptions(xml);
-		} catch (Throwable t) {
-			Assert.fail("error saving the option");
-		}
+		ch = Charset.forName("UTF-8");
+		Context.get().getProperties().setProperty("default.charset", ch.name());
+		saved = new SavedSearch();
+		saved.setName("manca l'umiltà");
+		saved.saveOptions(opt);
+		xml = saved.getOptions();
+		assertNotNull(xml);
+		assertTrue(xml.length() > 700);
+		saved = new SavedSearch();
+		saved.setOptions(xml);
 
 		opt.setExpression("我正在寻找每月200欧元的工人，没有人回答：缺乏谦虚");
-		try {
-			Charset ch = Charset.forName("UTF-8");
-			Context.get().getProperties().setProperty("default.charset", ch.name());
-			SavedSearch saved = new SavedSearch();
-			saved.setName("缺乏谦卑");
-			saved.saveOptions(opt);
-			String xml = saved.getOptions();
-			assertNotNull(xml);
-			// System.err.println(xml.length());
-			assertTrue(xml.length() > 800);
+		ch = Charset.forName("UTF-8");
+		Context.get().getProperties().setProperty("default.charset", ch.name());
+		saved = new SavedSearch();
+		saved.setName("缺乏谦卑");
+		saved.saveOptions(opt);
+		xml = saved.getOptions();
+		assertNotNull(xml);
+		// System.err.println(xml.length());
+		assertTrue(xml.length() > 800);
 
-			saved = new SavedSearch();
-			saved.setOptions(xml);
-		} catch (Throwable t) {
-			Assert.fail("error saving the option");
-		}
+		saved = new SavedSearch();
+		saved.setOptions(xml);
 	}
 }
