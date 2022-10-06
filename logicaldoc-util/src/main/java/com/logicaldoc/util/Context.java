@@ -136,7 +136,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 				((AbstractApplicationContext) applicationContext).start();
 				((AbstractApplicationContext) applicationContext).refresh();
 			} catch (Throwable e) {
-				e.printStackTrace();
+				
 			}
 		}
 	}
@@ -194,7 +194,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 		try {
 			return Context.applicationContext.getResources(resourcePattern);
 		} catch (IOException e) {
-			e.printStackTrace();
+			
 		}
 
 		return null;

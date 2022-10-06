@@ -88,9 +88,7 @@ public class ZipExport {
 				zos.flush();
 				zos.close();
 			} catch (Throwable e) {
-				e.printStackTrace();
 			}
-
 		}
 
 		/*
@@ -177,7 +175,7 @@ public class ZipExport {
 				zos.flush();
 				zos.close();
 			} catch (Throwable e) {
-				e.printStackTrace();
+				log.warn(e.getMessage());
 			}
 
 		}

@@ -106,7 +106,7 @@ public class I18N {
 			while (st.hasMoreTokens())
 				locales.add(st.nextToken());
 		} catch (IOException e) {
-			e.printStackTrace();
+			
 		}
 		return locales;
 	}

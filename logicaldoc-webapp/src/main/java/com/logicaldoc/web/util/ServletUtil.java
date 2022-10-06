@@ -708,7 +708,8 @@ public class ServletUtil {
 	 * @return True if the given accept header accepts the given value
 	 */
 	private static boolean accepts(String acceptHeader, String toAccept) {
-		String[] acceptValues = acceptHeader.split("\\s*(,|;)\\s*");
+		// Limit the size of the interpreted string in order to avoid DoS attacks
+		String[] acceptValues = StringUtils.left(acceptHeader, 100).split("\\s*(,|;)\\s*");
 		Arrays.sort(acceptValues);
 		return Arrays.binarySearch(acceptValues, toAccept) > -1
 				|| Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1

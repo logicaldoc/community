@@ -246,7 +246,7 @@ public class MailUtil {
 			MimeMessage msg = new MimeMessage(mailSession, is);
 			return msg;
 		} catch (Throwable t) {
-			t.printStackTrace();
+			log.warn(t.getMessage());
 		}
 		return null;
 	}

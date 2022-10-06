@@ -249,7 +249,6 @@ public class OpenOfficeParser extends AbstractParser {
 
 			return pages;
 		} catch (Throwable e) {
-			e.printStackTrace();
 			log.warn("Failed to extract OpenOffice metadata", e);
 			return 1;
 		}

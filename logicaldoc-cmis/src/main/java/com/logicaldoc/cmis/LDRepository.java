@@ -997,7 +997,6 @@ public class LDRepository {
 			// gather properties
 			return compileObjectType(context, obj, filterCollection, iaa, iacl, objectInfos);
 		} catch (Throwable t) {
-			t.printStackTrace();
 			return (ObjectData) catchError(t);
 		}
 	}

@@ -50,7 +50,7 @@ public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 		LDAuthenticationToken token = (LDAuthenticationToken) authentication;
 		
 		Cookie sidCookie = new Cookie(LDAuthenticationToken.COOKIE_SID, token.getSid());
-		sidCookie.setHttpOnly(true);
+		sidCookie.setSecure(true);
 		response.addCookie(sidCookie);
 
 		if (requestedUrl != null) {

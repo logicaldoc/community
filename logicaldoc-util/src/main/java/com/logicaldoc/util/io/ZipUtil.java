@@ -288,7 +288,6 @@ public class ZipUtil {
 			// close the stream
 			zos.flush();
 		} catch (Exception e) {
-			e.printStackTrace();
 			logError(e.getMessage());
 		} finally {
 			try {
@@ -320,7 +319,6 @@ public class ZipUtil {
 			zos.flush();
 			zos.close();
 		} catch (Exception e) {
-			e.printStackTrace();
 			logError(e.getMessage());
 		}
 	}

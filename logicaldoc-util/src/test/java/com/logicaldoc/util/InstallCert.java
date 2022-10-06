@@ -1,4 +1,4 @@
-package com.logicaldoc.util.security;
+package com.logicaldoc.util;
 
 import javax.net.ssl.*;
 import java.io.*;

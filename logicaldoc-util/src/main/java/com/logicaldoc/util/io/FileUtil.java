@@ -477,7 +477,7 @@ public class FileUtil {
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, append), "UTF8"));
 			out.write(content);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		} finally {
 			if (out != null)
 				try {

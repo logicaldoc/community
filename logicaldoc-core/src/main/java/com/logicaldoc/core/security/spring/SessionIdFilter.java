@@ -72,6 +72,7 @@ public class SessionIdFilter extends GenericFilterBean {
 
 				// Put the cookie
 				Cookie sidCookie = new Cookie(LDAuthenticationToken.COOKIE_SID, session.getSid());
+				sidCookie.setSecure(true);
 				response.addCookie(sidCookie);
 
 				// Preferably clear the password in the user object before

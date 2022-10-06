@@ -38,13 +38,13 @@ public class DefaultPluginRegistry extends PluginRegistry {
 				manager.activatePlugin(plugin.getDescriptor().getId());
 				System.out.println("Activated plugin " + plugin.getDescriptor().getId());
 			} catch (SecurityException e) {
-				e.printStackTrace();
+				System.err.println("PluginRegistry -> SecurityException: " + e.getMessage());
 			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
+				System.err.println("PluginRegistry -> IllegalArgumentException: " + e.getMessage());
 			} catch (PluginLifecycleException e) {
-				e.printStackTrace();
-			} catch (Throwable ex) {
-				ex.printStackTrace();
+				System.err.println("PluginRegistry -> IllegalArgumentException: " + e.getMessage());
+			} catch (Throwable e) {
+				System.err.println("PluginRegistry -> Error: " + e.getMessage());
 			}
 		}
 	}

@@ -96,7 +96,7 @@ public class Dropbox {
 			DbxAuthFinish authFinish = webAuth.finishFromCode(authorizationCode);
 			return authFinish.getAccessToken();
 		} catch (DbxException e) {
-			e.printStackTrace();
+			log.debug(e.getMessage());
 		}
 		return null;
 	}
