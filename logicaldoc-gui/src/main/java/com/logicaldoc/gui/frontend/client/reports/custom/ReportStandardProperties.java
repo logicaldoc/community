@@ -35,8 +35,6 @@ public class ReportStandardProperties extends ReportDetailsTab {
 
 	private Layout tile = new HLayout();
 
-	private GUIReport report;
-
 	public ReportStandardProperties(GUIReport report, final ChangedHandler changedHandler) {
 		super(report, changedHandler);
 		setWidth100();

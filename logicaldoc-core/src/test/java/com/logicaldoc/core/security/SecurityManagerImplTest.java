@@ -117,11 +117,18 @@ public class SecurityManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testAssignUserToGroups() throws PersistenceException {
+	public void testAssignUserToGroups() {
 		User user = new User();
 		user.setUsername("zzz");
 		user.setDecodedPassword("3$(a8BcX$7GAA%K)");
-		userDAO.store(user);
+
+		String notThrownTest = null;
+		try {
+			userDAO.store(user);
+			notThrownTest = "ok";
+		} catch (Throwable t) {
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 
 	@Test

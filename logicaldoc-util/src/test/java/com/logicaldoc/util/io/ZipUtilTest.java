@@ -9,10 +9,13 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import junit.framework.Assert;
 
 public class ZipUtilTest {
+	private static Logger log = LoggerFactory.getLogger(ZipUtilTest.class);
 
 	@Before
 	public void setUp() throws Exception {
@@ -40,25 +43,25 @@ public class ZipUtilTest {
 		List<ZipEntry> entries = zipUtil.listZipEntries(file);
 
 		for (ZipEntry zipEntry : entries) {
-			System.out.println(zipEntry.getName()+" "+zipEntry.getSize()+" "+zipEntry.getLastModifiedTime());
+			System.out.println(zipEntry.getName() + " " + zipEntry.getSize() + " " + zipEntry.getLastModifiedTime());
 		}
-		
+
 		Assert.assertEquals(3, entries.size());
 	}
-	
+
 	@Test
 	public void testUnzip() throws IOException {
 		File file = new File("target/test.zip");
 		FileUtil.copyResource("/test.zip", file);
 
 		Assert.assertFalse(new File("target/test/index.xml").exists());
-		
+
 		ZipUtil zipUtil = new ZipUtil();
 		zipUtil.unzip(file.getPath(), "target/test");
-		
+
 		Assert.assertTrue(new File("target/test/index.xml").exists());
 	}
-	
+
 	@Test
 	public void testListEntries() throws IOException {
 		File file = new File("target/test.zip");
@@ -82,14 +85,20 @@ public class ZipUtilTest {
 	}
 
 	@Test
-	public void testUmlauts() throws IOException {
-		File file = new File("target/NeuesZip.zip");
-		FileUtil.copyResource("/NeuesZip.zip", file);
-		ZipUtil zipUtil = new ZipUtil();
-		zipUtil.setFileNameCharset("utf-8");
-		List<String> entries = zipUtil.listEntries(file);
-		
-		System.out.println(entries);
-		
+	public void testUmlauts() {
+		String notThrownTest = null;
+		try {
+			File file = new File("target/NeuesZip.zip");
+			FileUtil.copyResource("/NeuesZip.zip", file);
+			ZipUtil zipUtil = new ZipUtil();
+			zipUtil.setFileNameCharset("utf-8");
+			List<String> entries = zipUtil.listEntries(file);
+			log.debug("Found {} entries", entries.size());
+			notThrownTest="ok";
+		} catch (Throwable t) {
+
+		}
+		Assert.assertNotNull(notThrownTest);
+
 	}
 }

@@ -482,7 +482,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 							// Create the GUI attributes for the values
 							for (Attribute valAttribute : values) {
-								GUIAttribute valAtt = (GUIAttribute) guiAttribute.clone();
+								GUIAttribute valAtt = new GUIAttribute(guiAttribute);
 								valAtt.setName(valAttribute.getName());
 								valAtt.setParent(guiAttribute.getName());
 								valAtt.setDependsOn(guiAttribute.getDependsOn());

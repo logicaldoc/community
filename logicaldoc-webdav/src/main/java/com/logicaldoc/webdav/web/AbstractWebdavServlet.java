@@ -392,8 +392,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 						parsedRange = parseRangeRequestHeader(rangeHeader);
 						log.debug("parsedRange {}", parsedRange);
 					} catch (DavException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						log.error(e.getMessage());
 					}
 
 //					resource = new RangeResourceImpl(dri.getLocator(), dri.getFactoryLD(), dri.getSessionLD(),

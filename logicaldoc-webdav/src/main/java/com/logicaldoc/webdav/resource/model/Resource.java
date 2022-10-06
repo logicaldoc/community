@@ -11,7 +11,7 @@ import com.logicaldoc.webdav.session.DavSession;
  * identifies a resource against logicalDOC.<br>
  * <b>Name</b> Is the Title of a given resource that appears on the client site
  * as "file name"<br>
- * <b>RequestedPerson</b> shows the user that wants todo something with this
+ * <b>RequestedPerson</b> shows the user that wants to do something with this
  * resource. Therefore the passed ID corresponds with the userid within
  * logicalDOC. Secure handlings will be managed through this.
  * 

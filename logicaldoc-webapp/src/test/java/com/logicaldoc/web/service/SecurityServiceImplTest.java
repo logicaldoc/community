@@ -49,8 +49,11 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 	@Test
 	public void testChangePassword() {
 		Assert.assertEquals("0", service.changePassword(1L, 1L, "admin", "TBDcy@u<QOR;6}l", false).getCode());
-		Assert.assertEquals("0", service.changePassword(1L, 1L, "TBDcy@u<QOR;6}l", "TBDcy@u<QOR;6}l;", false).getCode());
-		Assert.assertEquals("0", service.changePassword(1L, 1L, "TBDcy@u<QOR;6}l;", "TBDcy@u<QOR;6}l-", false).getCode());;
+		Assert.assertEquals("0",
+				service.changePassword(1L, 1L, "TBDcy@u<QOR;6}l", "TBDcy@u<QOR;6}l;", false).getCode());
+		Assert.assertEquals("0",
+				service.changePassword(1L, 1L, "TBDcy@u<QOR;6}l;", "TBDcy@u<QOR;6}l-", false).getCode());
+		;
 	}
 
 	@Test
@@ -178,11 +181,19 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 	}
 
 	@Test
-	public void testSaveSettings() throws ServerException {
+	public void testSaveSettings() {
 		GUISecuritySettings securitySettings = new GUISecuritySettings();
 		securitySettings.setPwdExpiration(30);
 		securitySettings.setPwdSize(6);
 		securitySettings.setAnonymousKey("xxx");
-		service.saveSettings(securitySettings);
+
+		String notThrownTest = null;
+		try {
+			service.saveSettings(securitySettings);
+			notThrownTest = "ok";
+		} catch (Throwable t) {
+
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 }

@@ -82,20 +82,23 @@ public class TaskNotificationPanel extends VLayout {
 	}
 
 	boolean validate() {
-		if (recipients == null)
-			return true;
+		try {
+			if (recipients != null) {
+				String[] ids = recipients.getValues();
+				GUIUser[] recipients = new GUIUser[ids != null ? ids.length : 0];
 
-		String[] ids = recipients.getValues();
-		GUIUser[] recipients = new GUIUser[ids != null ? ids.length : 0];
+				if (ids != null && ids.length > 0)
+					for (int i = 0; i < ids.length; i++) {
+						GUIUser user = new GUIUser();
+						user.setId(Long.parseLong(ids[i]));
+						recipients[i] = user;
+					}
 
-		if (ids != null && ids.length > 0)
-			for (int i = 0; i < ids.length; i++) {
-				GUIUser user = new GUIUser();
-				user.setId(Long.parseLong(ids[i]));
-				recipients[i] = user;
+				task.setReportRecipients(recipients);
 			}
-
-		task.setReportRecipients(recipients);
-		return true;
+			return true;
+		} catch (Throwable t) {
+			return false;
+		}
 	}
 }

@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.chemistry.opencmis.commons.impl.server.AbstractServiceFactory;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.CmisService;
-import org.apache.chemistry.opencmis.server.support.CmisServiceWrapper;
+import org.apache.chemistry.opencmis.server.support.wrapper.ConformanceCmisServiceWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,17 +40,18 @@ public class ServiceFactory extends AbstractServiceFactory {
 
 	@Override
 	public CmisService getService(CallContext context) {
-		Session session = SessionManager.get().getSession(
-				(HttpServletRequest) context.get(CallContext.HTTP_SERVLET_REQUEST));
+		Session session = SessionManager.get()
+				.getSession((HttpServletRequest) context.get(CallContext.HTTP_SERVLET_REQUEST));
 
 		CmisService wrapperService = null;
 		if (session != null) {
 			if (context.getRepositoryId() != null)
 				session.getDictionary().put(KEY_REPO_ID, context.getRepositoryId());
 			log.debug("Using session " + session.getSid() + " for user " + session.getUsername());
-			wrapperService = new CmisServiceWrapper<LDCmisService>(new LDCmisService(context, session.getSid()),
-					DEFAULT_MAX_ITEMS_TYPES, BigInteger.valueOf(Context.get().getProperties()
-							.getInt("cmis.maxitems", 200)), DEFAULT_MAX_ITEMS_OBJECTS, DEFAULT_DEPTH_OBJECTS);
+			wrapperService = new ConformanceCmisServiceWrapper(new LDCmisService(context, session.getSid()),
+					DEFAULT_MAX_ITEMS_TYPES,
+					BigInteger.valueOf(Context.get().getProperties().getInt("cmis.maxitems", 200)),
+					DEFAULT_MAX_ITEMS_OBJECTS, DEFAULT_DEPTH_OBJECTS);
 
 		} else {
 			log.warn("No session was found for this request");

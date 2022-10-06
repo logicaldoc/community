@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.chemistry.opencmis.commons.PropertyIds;
-import org.apache.chemistry.opencmis.commons.data.Ace;
 import org.apache.chemistry.opencmis.commons.data.Acl;
 import org.apache.chemistry.opencmis.commons.data.AllowableActions;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
@@ -337,7 +336,7 @@ public class LDRepository {
 		String ns = "http://www.logicaldoc.com";
 
 		// create a list for the first level of our extension
-		List<CmisExtensionElement> extElements = new ArrayList<CmisExtensionElement>();
+		List<CmisExtensionElement> extElements = new ArrayList<>();
 
 		// add two leafs to the extension
 		extElements.add(new CmisExtensionElementImpl(ns, "sid", null, this.sid));
@@ -496,7 +495,7 @@ public class LDRepository {
 
 		TypeDefinition type = types.getType(typeId);
 		if (type == null)
-			throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
+			throw new CmisObjectNotFoundException(String.format("Type '%s' is unknown!", typeId));
 
 		String objectId = null;
 		if (type.getBaseTypeId() == BaseTypeId.CMIS_DOCUMENT) {
@@ -544,7 +543,7 @@ public class LDRepository {
 			String typeId = getTypeId(properties);
 			TypeDefinition type = types.getType(typeId);
 			if (type == null)
-				throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
+				throw new CmisObjectNotFoundException(String.format("Type '%s' is unknown!", typeId));
 
 			User user = getSessionUser();
 			assert (user != null);
@@ -609,7 +608,7 @@ public class LDRepository {
 			String typeId = getTypeId(properties);
 			TypeDefinition type = types.getType(typeId);
 			if (type == null)
-				throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
+				throw new CmisObjectNotFoundException(String.format("Type '%s' is unknown!", typeId));
 
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
@@ -1498,7 +1497,7 @@ public class LDRepository {
 
 			// Now detect if the search must be applied to specific fields
 			if (where.contains("cmis:") || where.contains("ldoc:")) {
-				List<String> fields = new ArrayList<String>();
+				List<String> fields = new ArrayList<>();
 				Pattern p = Pattern.compile("[(cmis),(ldoc)]+:\\w+");
 				Matcher m = p.matcher(where);
 				while (m.find()) {
@@ -1517,7 +1516,7 @@ public class LDRepository {
 			log.debug("opt: {}", opt);
 			Search search = Search.get(opt);
 			log.debug("search: {}", search);
-			List<Hit> hits = new ArrayList<Hit>();
+			List<Hit> hits = new ArrayList<>();
 			try {
 				hits = search.search();
 			} catch (SearchException e1) {
@@ -1700,7 +1699,7 @@ public class LDRepository {
 			throw new IllegalArgumentException("Object must not be null!");
 
 		// copy filter
-		Set<String> filter = (orgfilter == null ? null : new HashSet<String>(orgfilter));
+		Set<String> filter = (orgfilter == null ? null : new HashSet<>(orgfilter));
 
 		// find base type
 		String typeId = null;
@@ -2434,7 +2433,7 @@ public class LDRepository {
 		boolean isWorkspace = isFolder && ((Folder) object).getType() == Folder.TYPE_WORKSPACE;
 		boolean isRoot = root.equals(object);
 
-		Set<Action> aas = new HashSet<Action>();
+		Set<Action> aas = new HashSet<>();
 
 		addAction(aas, Action.CAN_GET_OBJECT_PARENTS, !isRoot);
 		addAction(aas, Action.CAN_GET_PROPERTIES, true);
@@ -2494,7 +2493,7 @@ public class LDRepository {
 	 */
 	private Acl compileAcl(PersistentObject object) {
 		AccessControlListImpl result = new AccessControlListImpl();
-		result.setAces(new ArrayList<Ace>());
+		result.setAces(new ArrayList<>());
 
 		for (Map.Entry<String, Boolean> ue : userMap.entrySet()) {
 			// create principal
@@ -2551,7 +2550,7 @@ public class LDRepository {
 			return null;
 		}
 
-		Set<String> result = new HashSet<String>();
+		Set<String> result = new HashSet<>();
 		for (String s : filter.split(",")) {
 			s = s.trim();
 			if (s.equals("*")) {
@@ -2778,11 +2777,6 @@ public class LDRepository {
 		complex.addAll(odsDocs);
 		complex.addAll(odsFolders);
 
-//	    log.debug("Before sort");
-//	    for (ObjectData objectData : complex) {
-//	    	log.debug("ChangeTime {}", objectData.getChangeEventInfo().getChangeTime().getTime());
-//		}		
-
 		// sort the content of list complex by date
 		Collections.sort(complex, new Comparator<ObjectData>() {
 			public int compare(ObjectData o1, ObjectData o2) {
@@ -2790,11 +2784,6 @@ public class LDRepository {
 						.compareTo(o2.getChangeEventInfo().getChangeTime().getTime());
 			}
 		});
-
-//	    log.debug("After sort");
-//	    for (ObjectData objectData : complex) {
-//	    	log.debug("ChangeTime {} {} {} {}", objectData.getChangeEventInfo().getChangeType(), objectData.getId() ,objectData.getChangeEventInfo().getChangeTime().getTime(), objectData.getChangeEventInfo().getChangeTime().getTime().getTime());
-//		}
 
 		boolean hasMoreItems = complex.size() > max;
 		if (hasMoreItems) {
@@ -2805,13 +2794,9 @@ public class LDRepository {
 
 		Date date = null;
 		if (complex.size() > 0) {
-			// ol.setNumItems(BigInteger.valueOf(complex.size()));
 			ol.setNumItems(BigInteger.valueOf(-1));
-			// ol.setHasMoreItems(true);
 			ol.setHasMoreItems(Boolean.valueOf(hasMoreItems));
 			date = ((ObjectData) complex.get(complex.size() - 1)).getChangeEventInfo().getChangeTime().getTime();
-// 			log.debug("date {}", date);
-// 			log.debug("date.getTime {}", date.getTime());
 		} else {
 			ol.setHasMoreItems(Boolean.valueOf(false));
 			ol.setNumItems(BigInteger.ZERO);
@@ -2842,7 +2827,7 @@ public class LDRepository {
 		List<DocumentHistory> entries = new ArrayList<DocumentHistory>();
 
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
 
@@ -2906,7 +2891,7 @@ public class LDRepository {
 		List<FolderHistory> entries = new ArrayList<FolderHistory>();
 
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
+			Map<String, Object> params = new HashMap<>();
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
 			entries = folderHistoryDao.findByWhere(query.toString(), params, "order by _entity.date", max);

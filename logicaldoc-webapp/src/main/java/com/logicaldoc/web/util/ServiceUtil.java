@@ -333,7 +333,7 @@ public class ServiceUtil {
 
 							// Create the GUI attributes for the values
 							for (Attribute valAttribute : values) {
-								GUIAttribute valAtt = (GUIAttribute) att.clone();
+								GUIAttribute valAtt = new GUIAttribute(att);
 								valAtt.setName(valAttribute.getName());
 								valAtt.setParent(att.getName());
 								valAtt.setMultiple(false);

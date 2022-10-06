@@ -61,8 +61,7 @@ public class VirtualHostHelper {
 		return getServerURL(request, false);
 	}
 
-	private static String getServerUrl(String scheme, String serverName, int serverPort) {
-
+	private static String getServerURL(String scheme, String serverName, int serverPort) {
 		StringBuilder sbaseURL = new StringBuilder();
 		sbaseURL.append(scheme);
 		sbaseURL.append("://");
@@ -141,7 +140,7 @@ public class VirtualHostHelper {
 					}
 				}
 
-				baseURL = getServerUrl(scheme, serverName, serverPort);
+				baseURL = getServerURL(scheme, serverName, serverPort);
 			}
 		}
 		if (baseURL == null) {

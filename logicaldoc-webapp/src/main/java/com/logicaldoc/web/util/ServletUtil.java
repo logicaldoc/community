@@ -662,7 +662,6 @@ public class ServletUtil {
 	 * 
 	 * @throws Exception a generic error
 	 */
-	@SuppressWarnings("unchecked")
 	public static void uploadDocumentResource(HttpServletRequest request, String docId, String suffix,
 			String fileVersion, String docVersion) throws Exception {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);

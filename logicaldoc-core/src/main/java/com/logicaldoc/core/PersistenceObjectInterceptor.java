@@ -20,6 +20,7 @@ public class PersistenceObjectInterceptor extends EmptyInterceptor {
 	private static final long serialVersionUID = 1L;
 
 	public PersistenceObjectInterceptor() {
+		super();
 	}
 
 	@Override
@@ -30,10 +31,8 @@ public class PersistenceObjectInterceptor extends EmptyInterceptor {
 
 	@Override
 	public boolean onSave(Object entity, Serializable id, Object[] currentState, String[] propertyNames, Type[] types) {
-		if (entity instanceof PersistentObject) {
-			boolean changed = setValue(currentState, propertyNames, LAST_MODIFIED, new Date());
-			return changed;
-		}
+		if (entity instanceof PersistentObject)
+			return setValue(currentState, propertyNames, LAST_MODIFIED, new Date());
 		return false;
 	}
 

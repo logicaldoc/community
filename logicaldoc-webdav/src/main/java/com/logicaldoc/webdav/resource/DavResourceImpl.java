@@ -601,11 +601,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 						// Check that the number of files is correct
 						log.debug("chunkfiles.length {}, chunkTotal {}", chunkfiles.length, chunkTotal);
 
-						if (chunkfiles.length < chunkTotal) {
-							// @TODO evaulate if it's appropriate to throw an
-							// exception
+						if (chunkfiles.length < chunkTotal)
 							return;
-						}
 
 						// Sort files by extension in ascending order.
 						Arrays.sort(chunkfiles, EXTENSION_COMPARATOR);

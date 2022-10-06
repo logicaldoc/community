@@ -223,32 +223,35 @@ public class EmailAccountFiltersPanel extends EmailAccountDetailsTab {
 	}
 
 	boolean validate() {
-		if (list == null)
+		try {
+			if (list != null) {
+				ListGridRecord[] records = list.getRecords();
+				List<GUIEmailRule> rules = new ArrayList<GUIEmailRule>();
+				for (ListGridRecord record : records) {
+					if (record.getAttribute("expression") == null)
+						continue;
+					GUIEmailRule rule = new GUIEmailRule();
+					GUIFolder target = new GUIFolder();
+
+					if (record.getAttributeAsLong("targetId") != null)
+						target.setId(record.getAttributeAsLong("targetId"));
+					else
+						target.setId(0L);
+
+					target.setName(record.getAttribute("targetName"));
+					rule.setTarget(target);
+					rule.setField(Integer.parseInt(record.getAttribute("field")));
+					rule.setPolicy(Integer.parseInt(record.getAttribute("condition")));
+					rule.setExpression(record.getAttribute("expression"));
+					rules.add(rule);
+				}
+
+				account.setRules(rules.toArray(new GUIEmailRule[0]));
+			}
 			return true;
-
-		ListGridRecord[] records = list.getRecords();
-		List<GUIEmailRule> rules = new ArrayList<GUIEmailRule>();
-		for (ListGridRecord record : records) {
-			if (record.getAttribute("expression") == null)
-				continue;
-			GUIEmailRule rule = new GUIEmailRule();
-			GUIFolder target = new GUIFolder();
-
-			if (record.getAttributeAsLong("targetId") != null)
-				target.setId(record.getAttributeAsLong("targetId"));
-			else
-				target.setId(0L);
-
-			target.setName(record.getAttribute("targetName"));
-			rule.setTarget(target);
-			rule.setField(Integer.parseInt(record.getAttribute("field")));
-			rule.setPolicy(Integer.parseInt(record.getAttribute("condition")));
-			rule.setExpression(record.getAttribute("expression"));
-			rules.add(rule);
+		} catch (Throwable t) {
+			return false;
 		}
-
-		account.setRules(rules.toArray(new GUIEmailRule[0]));
-		return true;
 	}
 
 	private void showContextMenu() {

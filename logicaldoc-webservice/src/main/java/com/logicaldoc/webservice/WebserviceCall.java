@@ -17,15 +17,50 @@ public class WebserviceCall extends History {
 	public static String REST = "rest";
 
 	public static String ASPECT = "saveApiCall";
-	
+
 	/**
-	 * The protocol used for the communication, can be
-	 * WebserviceCall.SOAP or WebserviceCall.REST
+	 * The protocol used for the communication, can be WebserviceCall.SOAP or
+	 * WebserviceCall.REST
 	 */
 	private String protocol = SOAP;
 
 	public WebserviceCall() {
 		setEvent("event.webservice.call");
+	}
+
+	public WebserviceCall(WebserviceCall source) {
+		this();
+
+		this.protocol = source.protocol;
+
+		setTenantId(source.getTenantId());
+		setDate(source.getDate());
+		setDocId(source.getDocId());
+		setFolderId(source.getFolderId());
+		setUser(source.getUser());
+		setEvent(source.getEvent());
+		setComment(source.getComment());
+		setReason(source.getReason());
+		setVersion(source.getVersion());
+		setFileVersion(source.getFileVersion());
+		setPath(source.getPath());
+		setPathOld(source.getPathOld());
+		setNotified(source.getNotified());
+		setSessionId(source.getSessionId());
+		setIsNew(source.getIsNew());
+		setFilename(source.getFilename());
+		setFilenameOld(source.getFilenameOld());
+		setUserId(source.getUserId());
+		setUsername(source.getUsername());
+		setUserLogin(source.getUserLogin());
+		setFile(source.getFile());
+		setTenant(source.getTenant());
+		setNotifyEvent(isNotifyEvent());
+		setIp(source.getIp());
+		setDevice(source.getDevice());
+		setGeolocation(source.getGeolocation());
+		setFileSize(source.getFileSize());
+		setProtocol(source.getProtocol());
 	}
 
 	public String getPayload() {
@@ -35,7 +70,7 @@ public class WebserviceCall extends History {
 	public void setPayload(String payload) {
 		setComment(payload);
 	}
-	
+
 	public String getUri() {
 		return getPath();
 	}
@@ -50,40 +85,6 @@ public class WebserviceCall extends History {
 
 	public void setProtocol(String protocol) {
 		this.protocol = protocol;
-	}
-
-	@Override
-	public Object clone() {
-		WebserviceCall history = new WebserviceCall();
-		history.setTenantId(getTenantId());
-		history.setDate(getDate());
-		history.setDocId(getDocId());
-		history.setFolderId(getFolderId());
-		history.setUser(getUser());
-		history.setEvent(getEvent());
-		history.setComment(getComment());
-		history.setReason(getReason());
-		history.setVersion(getVersion());
-		history.setFileVersion(getFileVersion());
-		history.setPath(getPath());
-		history.setPathOld(getPathOld());
-		history.setNotified(getNotified());
-		history.setSessionId(getSessionId());
-		history.setIsNew(getIsNew());
-		history.setFilename(getFilename());
-		history.setFilenameOld(getFilenameOld());
-		history.setUserId(getUserId());
-		history.setUsername(getUsername());
-		history.setUserLogin(getUserLogin());
-		history.setFile(getFile());
-		history.setTenant(getTenant());
-		history.setNotifyEvent(isNotifyEvent());
-		history.setIp(getIp());
-		history.setDevice(getDevice());
-		history.setGeolocation(getGeolocation());
-		history.setFileSize(getFileSize());
-		history.setProtocol(getProtocol());
-		return history;
 	}
 
 	@Override
