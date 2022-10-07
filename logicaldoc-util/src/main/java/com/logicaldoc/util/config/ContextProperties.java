@@ -2,7 +2,6 @@ package com.logicaldoc.util.config;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -64,13 +63,13 @@ public class ContextProperties extends OrderedProperties {
 
 	public ContextProperties(String filePath) throws IOException {
 		this.file = new File(filePath);
-		
+
 		try (FileInputStream fis = new FileInputStream(this.file)) {
 			load(fis);
 		} catch (Throwable e) {
 			log.error("Unable to read from {}", filePath, e);
 			throw e;
-		} 
+		}
 
 		overrideFile = detectOverrideFile();
 		if (overrideFile != null) {
@@ -284,6 +283,18 @@ public class ContextProperties extends OrderedProperties {
 	public boolean getBoolean(String property, boolean defaultValue) {
 		String v = getProperty(property, "" + defaultValue).trim();
 		return "true".equals(v) || "yes".equals(v) || "1".equals(v);
+	}
+
+	public double getDouble(String property) {
+		return getDouble(property, 0D);
+	}
+
+	public double getDouble(String property, double defaultValue) {
+		String v = getProperty(property);
+		if (v == null || v.trim().isEmpty())
+			return defaultValue;
+		else
+			return Double.parseDouble(v.trim());
 	}
 
 	/**

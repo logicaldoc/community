@@ -59,9 +59,9 @@ public abstract class PluginRegistry {
 			}
 			try {
 				System.out.println("Instantiate concrete PluginRegistry: " + pluginregistry);
-				instance = (PluginRegistry) Class.forName(pluginregistry).newInstance();
+				instance = (PluginRegistry) Class.forName(pluginregistry).getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		}
 		return instance;
@@ -158,7 +158,7 @@ public abstract class PluginRegistry {
 							}
 						});
 					} catch (MalformedURLException e) {
-						e.printStackTrace();
+						System.err.println(e.getMessage());
 					}
 				}
 			} else {

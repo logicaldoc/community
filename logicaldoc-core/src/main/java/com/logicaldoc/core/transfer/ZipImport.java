@@ -89,18 +89,22 @@ public class ZipImport {
 		} catch (IOException e) {
 		}
 
-		ZipUtil zipUtil = new ZipUtil();
-		zipUtil.unzip(zipFile.getPath(), dir.getPath());
-		File[] files = dir.listFiles();
+		try {
+			ZipUtil zipUtil = new ZipUtil();
+			zipUtil.unzip(zipFile.getPath(), dir.getPath());
+			File[] files = dir.listFiles();
 
-		for (int i = 0; i < files.length; i++) {
-			if (StringUtils.isNotEmpty(files[i].getName())
-					|| StringUtils.isNotEmpty(FilenameUtils.getBaseName(files[i].getName())))
-				try {
-					addEntry(files[i], parent);
-				} catch (PersistenceException e) {
-					log.error("Error adding entry " + files[i].getName(), e);
-				}
+			for (int i = 0; i < files.length; i++) {
+				if (StringUtils.isNotEmpty(files[i].getName())
+						|| StringUtils.isNotEmpty(FilenameUtils.getBaseName(files[i].getName())))
+					try {
+						addEntry(files[i], parent);
+					} catch (PersistenceException e) {
+						log.error("Error adding entry " + files[i].getName(), e);
+					}
+			}
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
 		}
 
 		try {
@@ -112,8 +116,8 @@ public class ZipImport {
 			sendNotificationMessage();
 	}
 
-	public void process(String zipsource, Locale locale, Folder parent, long userId, Long templateId,
-			String sessionId) throws PersistenceException {
+	public void process(String zipsource, Locale locale, Folder parent, long userId, Long templateId, String sessionId)
+			throws PersistenceException {
 		File srcfile = new File(zipsource);
 		process(srcfile, parent, userId, sessionId);
 	}

@@ -156,7 +156,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				System.out.println("Taking log configuration from " + log4jPath);
 				Configurator.initialize(null, log4jPath);
 			} catch (Throwable e) {
-				System.err.println("Cannot initialize the log: "+e.getMessage());
+				System.err.println("Cannot initialize the log: " + e.getMessage());
 			}
 
 			// Update the web descriptor with the correct transport guarantee
@@ -309,7 +309,6 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				FileUtils.forceDelete(uploadDir);
 		} catch (IOException e) {
 			log.warn(e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
@@ -324,7 +323,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 			pidCreated = true;
 		} catch (IOException e) {
 			log.warn(e.getMessage());
-			e.printStackTrace();
+			System.err.println("Cannot create pid file " + pidFile.getAbsolutePath());
 		}
 	}
 

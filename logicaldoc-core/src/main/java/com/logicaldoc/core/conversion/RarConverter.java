@@ -25,7 +25,7 @@ public class RarConverter extends AbstractFormatConverter {
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
-		List<String> entries = RarUtil.listEntries(src);
+		List<String> entries = new RarUtil().listEntries(src);
 		if (entries.size() > 1)
 			convertMultipleEntries(sid, document, src, dest, entries);
 		else
@@ -39,7 +39,7 @@ public class RarConverter extends AbstractFormatConverter {
 
 		String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 		try {
-			RarUtil.extractEntry(src, entry, uncompressedEntryFile);
+			new RarUtil().extractEntry(src, entry, uncompressedEntryFile);
 			FormatConverterManager manager = (FormatConverterManager) Context.get()
 					.getBean(FormatConverterManager.class);
 			FormatConverter converter = manager.getConverter(entryExtension, targetExtension);

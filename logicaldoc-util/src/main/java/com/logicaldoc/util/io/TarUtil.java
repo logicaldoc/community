@@ -1,6 +1,7 @@
 package com.logicaldoc.util.io;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,11 +9,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.io.IOUtils;
+
+import com.logicaldoc.util.Context;
 
 /**
  * This class is for reading tar files
@@ -22,17 +25,28 @@ import org.apache.commons.io.IOUtils;
  */
 public class TarUtil {
 
-	private TarUtil() {
+	/**
+	 * Maximum size of the uncompressed contents of the compressed archive,
+	 * config parameter zip.maxsize
+	 */
+	private int maxSize = 1024 * 1024 * 1024; // 1 GB
+
+	public TarUtil() {
+		try {
+			maxSize = Context.get().getProperties().getInt("zip.maxsize", 1024) * 1024 * 1024;
+		} catch (Throwable t) {
+
+		}
 	}
 
-	public static List<String> listEntries(File tarFile) throws IOException {
+	public List<String> listEntries(File tarFile) throws IOException {
 		List<String> entries = new ArrayList<String>();
 
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);
-					BufferedInputStream bis = new BufferedInputStream(fis); 
+					BufferedInputStream bis = new BufferedInputStream(fis);
 					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);) {
-				
+
 				if (input instanceof TarArchiveInputStream) {
 					TarArchiveInputStream tarInput = null;
 					try {
@@ -51,46 +65,42 @@ public class TarUtil {
 					}
 				}
 			}
-		} catch (Throwable r) {
-			throw new IOException(r.getMessage(), r);
+		} catch (ArchiveException e) {
+			throw new IOException(e.getMessage());
 		}
 
 		return entries;
 	}
 
-	public static void extractEntry(File tarFile, String entryName, File dest) throws IOException {
+	public void extractEntry(File tarFile, String entryName, File dest) throws IOException {
 		try {
 			try (FileInputStream fis = new FileInputStream(tarFile);
 					BufferedInputStream bis = new BufferedInputStream(fis);
-					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);) {
-				
+					ArchiveInputStream input = new ArchiveStreamFactory().createArchiveInputStream(bis);
+					BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(dest));) {
+
 				if (input instanceof TarArchiveInputStream) {
-					TarArchiveInputStream tarInput = null;
-					try {
-						tarInput = (TarArchiveInputStream) input;
-						TarArchiveEntry entry = tarInput.getNextTarEntry();
-						while (entry != null) {
-							if (entry.getName().equals(entryName)) {
-								byte[] content = new byte[(int) entry.getSize()];
-								int offset = 0;
-								tarInput.read(content, offset, content.length - offset);
+					try (TarArchiveInputStream tarInput = (TarArchiveInputStream) input;) {
+						int nBytes = -1;
+						byte[] buffer = new byte[4096];
+						int totalSizeEntry = 0;
 
-								try (FileOutputStream outputFile = new FileOutputStream(dest);) {
-									IOUtils.write(content, outputFile);
-								}
+						while ((nBytes = tarInput.read(buffer)) > 0) {
+							bos.write(buffer, 0, nBytes);
+							totalSizeEntry += nBytes;
 
-								break;
-							}
-							entry = tarInput.getNextTarEntry();
+							if (totalSizeEntry > maxSize)
+								throw new IOException(String.format(
+										"Tar file looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s",
+										FileUtil.getDisplaySize(maxSize, "en")));
 						}
-					} finally {
-						if (tarInput != null)
-							tarInput.close();
+
+						bos.flush();
 					}
 				}
 			}
-		} catch (Throwable r) {
-			throw new IOException(r.getMessage(), r);
+		} catch (ArchiveException e) {
+			throw new IOException(e.getMessage());
 		}
 	}
 }

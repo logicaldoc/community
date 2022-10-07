@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class RarParser extends AbstractParser {
 		File rarFile = File.createTempFile("parserar", ".rar");
 		try {
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());
-			List<String> entries = RarUtil.listEntries(rarFile);
+			List<String> entries = new RarUtil().listEntries(rarFile);
 			if (entries.size() > 1) {
 				/*
 				 * If we have more entries just print the entries list
@@ -51,7 +50,7 @@ public class RarParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					RarUtil.extractEntry(rarFile, entry, uncompressedEntryFile);
+					new RarUtil().extractEntry(rarFile, entry, uncompressedEntryFile);
 
 					Document clone = new Document(document);
 					clone.setFileName(uncompressedEntryFile.getName());
@@ -94,7 +93,7 @@ public class RarParser extends AbstractParser {
 	@Override
 	public int countPages(File input, String filename) {
 		try {
-			List<String> entries = RarUtil.listEntries(input);
+			List<String> entries = new RarUtil().listEntries(input);
 			if (entries.size() > 1) {
 				return entries.size();
 			} else {
@@ -109,7 +108,7 @@ public class RarParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					RarUtil.extractEntry(input, entry, uncompressedEntryFile);
+					new RarUtil().extractEntry(input, entry, uncompressedEntryFile);
 					return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
 				} finally {
 					if (uncompressedEntryFile != null)

@@ -1,11 +1,10 @@
 package com.logicaldoc.core.parser;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -20,6 +19,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.IOUtil;
 import com.logicaldoc.util.io.ZipUtil;
 
@@ -177,23 +177,25 @@ public class OpenOfficeParser extends AbstractParser {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
 			factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			factory.setValidating(false);			
-		
+			factory.setValidating(false);
+
 			SAXParser saxParser = factory.newSAXParser();
 			XMLReader xmlReader = saxParser.getXMLReader();
 			xmlReader.setFeature("http://xml.org/sax/features/validation", false);
 			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
-			try (ZipInputStream zis = new ZipInputStream(input)) {
-				ZipEntry ze = zis.getNextEntry();
-				while (ze != null && !ze.getName().equals("content.xml")) {
-					ze = zis.getNextEntry();
+			File contentXml = File.createTempFile("openoffice-content", ".xml");
+			try {
+				if (new ZipUtil().unzip(input, fileVersion, contentXml) > 0) {
+					try (InputStream contentStream = new FileInputStream(contentXml)) {
+						OpenOfficeContentHandler contentHandler = new OpenOfficeContentHandler();
+						xmlReader.setContentHandler(contentHandler);
+						xmlReader.parse(new InputSource(contentStream));
+						content.append(StringUtil.writeToString(new StringReader(contentHandler.getContent())));
+					}
 				}
-
-				OpenOfficeContentHandler contentHandler = new OpenOfficeContentHandler();
-				xmlReader.setContentHandler(contentHandler);
-				xmlReader.parse(new InputSource(zis));
-				content.append(StringUtil.writeToString(new StringReader(contentHandler.getContent())));
+			} finally {
+				FileUtil.strongDelete(contentXml);
 			}
 		} catch (Throwable e) {
 			log.warn("Failed to extract OpenOffice text content", e);

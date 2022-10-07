@@ -394,6 +394,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			request.getSession(false).setAttribute(PARAM_SID, sid);
 
 		Cookie sidCookie = new Cookie(COOKIE_SID, sid);
+		sidCookie.setHttpOnly(true);
 		sidCookie.setSecure(true);
 		response.addCookie(sidCookie);
 	}

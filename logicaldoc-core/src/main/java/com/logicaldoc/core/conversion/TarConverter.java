@@ -25,7 +25,7 @@ public class TarConverter extends AbstractFormatConverter {
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
-		List<String> entries = TarUtil.listEntries(src);
+		List<String> entries = new TarUtil().listEntries(src);
 		if (entries.size() > 1)
 			convertMultipleEntries(sid, document, src, dest, entries);
 		else
@@ -39,7 +39,7 @@ public class TarConverter extends AbstractFormatConverter {
 
 		String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 		try {
-			TarUtil.extractEntry(src, entry, uncompressedEntryFile);
+			new TarUtil().extractEntry(src, entry, uncompressedEntryFile);
 			FormatConverterManager manager = (FormatConverterManager) Context.get()
 					.getBean(FormatConverterManager.class);
 			FormatConverter converter = manager.getConverter(entryExtension, targetExtension);

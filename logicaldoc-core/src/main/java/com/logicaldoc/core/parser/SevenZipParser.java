@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class SevenZipParser extends AbstractParser {
 		File sevenFile = File.createTempFile("parse7z", ".7z");
 		try {
 			FileUtil.writeFile(input, sevenFile.getAbsolutePath());
-			List<String> entries = SevenZipUtil.listEntries(sevenFile);
+			List<String> entries = new SevenZipUtil().listEntries(sevenFile);
 			if (entries.size() > 1) {
 				/*
 				 * If we have more entries just print the entries list
@@ -51,7 +50,7 @@ public class SevenZipParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					SevenZipUtil.extractEntry(sevenFile, entry, uncompressedEntryFile);
+					new SevenZipUtil().extractEntry(sevenFile, entry, uncompressedEntryFile);
 
 					Document clone = new Document(document);
 					clone.setFileName(uncompressedEntryFile.getName());
@@ -94,7 +93,7 @@ public class SevenZipParser extends AbstractParser {
 	@Override
 	public int countPages(File input, String filename) {
 		try {
-			List<String> entries = SevenZipUtil.listEntries(input);
+			List<String> entries = new SevenZipUtil().listEntries(input);
 			if (entries.size() > 1) {
 				return entries.size();
 			} else {
@@ -109,7 +108,7 @@ public class SevenZipParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					SevenZipUtil.extractEntry(input, entry, uncompressedEntryFile);
+					new SevenZipUtil().extractEntry(input, entry, uncompressedEntryFile);
 					return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
 				} finally {
 					if (uncompressedEntryFile != null)

@@ -231,7 +231,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 		try {
 			return new VersionHistoryResourceImpl(loc, factory, session, config, resource);
 		} catch (DavException e) {
-			e.printStackTrace();
+			log.warn(e.getMessage(), e);
 		}
 
 		throw new RuntimeException("");

@@ -28,7 +28,7 @@ public class WebserviceDocGen {
 					name = "com.logicaldoc." + args[i];
 				services.add(WebserviceDocGen.class.forName(name));
 			} catch (Throwable t) {
-				t.printStackTrace();
+				System.err.println(t.getMessage());
 			}
 		}
 

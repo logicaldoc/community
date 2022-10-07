@@ -46,7 +46,7 @@ public class ZipUtilTest {
 			System.out.println(zipEntry.getName() + " " + zipEntry.getSize() + " " + zipEntry.getLastModifiedTime());
 		}
 
-		Assert.assertEquals(3, entries.size());
+		Assert.assertEquals(5, entries.size());
 	}
 
 	@Test
@@ -60,6 +60,7 @@ public class ZipUtilTest {
 		zipUtil.unzip(file.getPath(), "target/test");
 
 		Assert.assertTrue(new File("target/test/index.xml").exists());
+		Assert.assertTrue(new File("target/test/abc/test.txt").exists());
 	}
 
 	@Test
@@ -70,7 +71,7 @@ public class ZipUtilTest {
 		ZipUtil zipUtil = new ZipUtil();
 		List<String> entries = zipUtil.listEntries(file);
 
-		Assert.assertEquals(3, entries.size());
+		Assert.assertEquals(5, entries.size());
 		Assert.assertTrue(entries.contains("impex.xsd"));
 	}
 
