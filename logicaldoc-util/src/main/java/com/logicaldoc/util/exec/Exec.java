@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -401,5 +402,19 @@ public class Exec {
 			}
 		}
 		return allowedCommands;
+	}
+	
+	/**
+	 * Utility method for normalizing a path to be used to invoke a command
+	 * 
+	 * @param srcPath the source path to parse
+	 * 
+	 * @return the normalized path
+	 */
+	public static String normalizePathForCommand(String srcPath) {
+		String normalizedPath = FilenameUtils.normalize(srcPath);
+		if (System.getProperty("os.name").toLowerCase().indexOf("win") > 0)
+			normalizedPath = "\"" + normalizedPath + "\"";
+		return normalizedPath;
 	}
 }

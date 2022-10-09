@@ -400,13 +400,13 @@ public class FormatConverterManager {
 	 * Returns the list of possible converters for a given in and out format
 	 * 
 	 * @param inFileName input file name
-	 * @param outFileName convertion file name
+	 * @param outFileName conversion file name
 	 * 
 	 * @return the collection of all installed format converters
 	 */
 	public List<FormatConverter> getAvailableConverters(String inFileName, String outFileName) {
 		String key = composeKey(inFileName, outFileName);
-		return getConverters().get(key);
+		return getConverters().get(key) != null ? getConverters().get(key) : new ArrayList<FormatConverter>();
 	}
 
 	/**

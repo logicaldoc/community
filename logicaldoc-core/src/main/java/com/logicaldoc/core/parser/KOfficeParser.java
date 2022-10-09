@@ -86,7 +86,7 @@ public class KOfficeParser extends AbstractParser {
 
 			File mainDocXml = File.createTempFile("koffice-maindoc", ".xml");
 			try {
-				if (new ZipUtil().unzip(input, fileVersion, mainDocXml) > 0) {
+				if (new ZipUtil().unzip(input, "maindoc.xml", mainDocXml) > 0) {
 					try (InputStream mainDocStream = new FileInputStream(mainDocXml)) {
 						KOfficeContentHandler contentHandler = new KOfficeContentHandler();
 						xmlReader.setContentHandler(contentHandler);

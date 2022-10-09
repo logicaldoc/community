@@ -186,7 +186,7 @@ public class OpenOfficeParser extends AbstractParser {
 
 			File contentXml = File.createTempFile("openoffice-content", ".xml");
 			try {
-				if (new ZipUtil().unzip(input, fileVersion, contentXml) > 0) {
+				if (new ZipUtil().unzip(input, "content.xml", contentXml) > 0) {
 					try (InputStream contentStream = new FileInputStream(contentXml)) {
 						OpenOfficeContentHandler contentHandler = new OpenOfficeContentHandler();
 						xmlReader.setContentHandler(contentHandler);
