@@ -28,7 +28,6 @@ import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,8 +137,8 @@ public class ImageUtil {
 		int width = originalImage.getWidth();
 		int height = originalImage.getHeight();
 
-		int x = width < squareSize ? 0 : (int) ((double) (width / 2)) - (int) ((double) (squareSize / 2));
-		int y = height < squareSize ? 0 : (int) ((double) (height / 2)) - (int) ((double) (squareSize / 2));
+		int x = width < squareSize ? 0 : (int) ((double) (width / 2D)) - (int) ((double) (squareSize / 2D));
+		int y = height < squareSize ? 0 : (int) ((double) (height / 2D)) - (int) ((double) (squareSize / 2D));
 		int w = width < squareSize ? width : squareSize;
 		int h = height < squareSize ? height : squareSize;
 
@@ -543,8 +542,8 @@ public class ImageUtil {
 		BufferedImage tmp = new BufferedImage(newW, newH, image.getType());
 		Graphics2D g2d = tmp.createGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-		g2d.translate((newW - w) / 2, (newH - h) / 2);
-		g2d.rotate(theta, w / 2, h / 2);
+		g2d.translate((newW - w) / 2D, (newH - h) / 2D);
+		g2d.rotate(theta, w / 2D, h / 2D);
 		g2d.drawImage(image, 0, 0, null);
 		g2d.dispose();
 		return tmp;

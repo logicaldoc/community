@@ -878,7 +878,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		List<Document> docs = new ArrayList<Document>();
 		if (user.isMemberOf("admin"))
 			docs = docDao.findByWhere("_entity.docRef=" + docId, null, null);
-		else {
+		else if (folderIds != null) {
 			String idsStr = folderIds.toString().replace('[', '(').replace(']', ')');
 			docs = docDao.findByWhere("_entity.docRef=" + docId + " and _entity.id in " + idsStr, null, null);
 		}
@@ -886,7 +886,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		List<WSDocument> wsDocs = new ArrayList<WSDocument>();
 		for (int i = 0; i < docs.size(); i++) {
 			docDao.initialize(docs.get(i));
-			if (user.isMemberOf("admin") || folderIds.contains(docs.get(i).getFolder().getId()))
+			if (user.isMemberOf("admin") || (folderIds != null && folderIds.contains(docs.get(i).getFolder().getId())))
 				wsDocs.add(WSUtil.toWSDocument(docs.get(i)));
 		}
 

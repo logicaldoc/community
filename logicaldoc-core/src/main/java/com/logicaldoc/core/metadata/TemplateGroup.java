@@ -22,6 +22,11 @@ public class TemplateGroup {
 		this.groupId = groupId;
 	}
 
+	public TemplateGroup(TemplateGroup source) {
+		this.write = source.write;
+		this.groupId = source.groupId;
+	}
+
 	public long getGroupId() {
 		return groupId;
 	}
@@ -36,13 +41,6 @@ public class TemplateGroup {
 
 	public void setWrite(int write) {
 		this.write = write;
-	}
-
-	@Override
-	public TemplateGroup clone() {
-		TemplateGroup mg = new TemplateGroup(groupId);
-		mg.setWrite(write);
-		return mg;
 	}
 
 	@Override

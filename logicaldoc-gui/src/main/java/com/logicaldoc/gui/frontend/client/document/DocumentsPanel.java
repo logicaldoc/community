@@ -273,9 +273,10 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	 * Shows folders data in the details area.
 	 */
 	public void showFolderDetails() {
-		if (detailPanel != null)
+		if (detailPanel != null) {
 			details.removeMember(detailPanel);
-		detailPanel.destroy();
+			detailPanel.destroy();
+		}
 		detailPanel = new FolderDetailsPanel(folder);
 		details.addMember(detailPanel);
 		details.redraw();

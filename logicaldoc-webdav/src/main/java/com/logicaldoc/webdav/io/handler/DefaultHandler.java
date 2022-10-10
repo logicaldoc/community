@@ -108,7 +108,6 @@ public class DefaultHandler implements IOHandler {
 		} catch (DavException e) {
 			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.warn(e.getMessage(), e);
 		}
 

@@ -153,6 +153,7 @@ public class JavaLauncher {
 
 		} catch (InterruptedException e) {
 			log.error(e.getMessage());
+			Thread.currentThread().interrupt();
 		}
 	}
 

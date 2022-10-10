@@ -19,7 +19,7 @@ public class Worker extends Thread {
 		try {
 			exit = process.waitFor();
 		} catch (InterruptedException ignore) {
-			return;
+			Thread.currentThread().interrupt();
 		}
 	}
 

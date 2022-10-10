@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -49,7 +48,7 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
 		String username = String.valueOf(auth.getPrincipal());
 		String password = String.valueOf(auth.getCredentials());
-		
+
 		HttpServletRequest httpReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 		String jPassword = httpReq.getParameter("j_password");
@@ -105,7 +104,9 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 			// Register a new login failure
 			LoginThrottle.recordFailure(username, client, nf);
 
-			throw new UsernameNotFoundException(nf.getMessage());
+			// Hide the real exception reason to not disclose that the username
+			// doesn't exist
+			throw new CredentialsExpiredException("Bad credentials");
 		} catch (AccountDisabledException ad) {
 			String message = String.format("User %s is disabled", username);
 			log.warn(message);

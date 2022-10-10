@@ -48,10 +48,10 @@ public class Avatar extends HLayout {
 		setAlign(Alignment.LEFT);
 		setOverflow(Overflow.HIDDEN);
 
-		init();
+		initGUI();
 	}
 
-	private void init() {
+	private void initGUI() {
 		Canvas[] members = getMembers();
 		if (members != null && members.length > 0)
 			for (Canvas canvas : members)
@@ -79,7 +79,7 @@ public class Avatar extends HLayout {
 
 					@Override
 					public void onSuccess(Void arg) {
-						Avatar.this.init();
+						Avatar.this.initGUI();
 						if (callback != null)
 							callback.onSuccess(null);
 					}
@@ -183,7 +183,7 @@ public class Avatar extends HLayout {
 
 				@Override
 				public void onSuccess(Void arg) {
-					Avatar.this.init();
+					Avatar.this.initGUI();
 					DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {
 
 						@Override

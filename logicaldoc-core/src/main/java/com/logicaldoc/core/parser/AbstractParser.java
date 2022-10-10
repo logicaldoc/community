@@ -2,8 +2,6 @@ package com.logicaldoc.core.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Locale;
@@ -38,19 +36,11 @@ public abstract class AbstractParser implements Parser {
 	@Override
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
 			String fileVersion) throws ParseException {
-		InputStream is = null;
-		try {
-			is = new FileInputStream(file);
+		try (InputStream is = new FileInputStream(file);) {
 			return parse(is, filename, encoding, locale, tenant, document, fileVersion);
-		} catch (FileNotFoundException e) {
+		} catch (Throwable e) {
 			log.error(e.getMessage());
 			return "";
-		} finally {
-			if (is != null)
-				try {
-					is.close();
-				} catch (IOException e) {
-				}
 		}
 	}
 
@@ -95,6 +85,9 @@ public abstract class AbstractParser implements Parser {
 					ret = executor.invokeAll(Arrays.asList(
 							new InternalParseTask(input, filename, encoding, lcl, tnt, document, fileVersion, content)),
 							timeout, TimeUnit.SECONDS).get(0).get();
+				} catch (InterruptedException ie) {
+					log.warn("Interrupted parse");
+					Thread.currentThread().interrupt();
 				} catch (Throwable e) {
 					log.warn(e.getMessage(), e);
 					if (e instanceof ParseException)
@@ -151,7 +144,13 @@ public abstract class AbstractParser implements Parser {
 				internalParse(is, filename, encoding, locale, tenant, document, fileVersion, content);
 				return "completed";
 			} catch (InterruptedException e) {
-				throw new ParseException("Timeout while parsing document " + document);
+				try {
+					String message = "Timeout while parsing document " + document;
+					log.warn(message);
+					throw new ParseException(message);
+				} finally {
+					Thread.currentThread().interrupt();
+				}
 			} catch (ParseException pe) {
 				throw pe;
 			} catch (Exception ee) {
@@ -173,19 +172,11 @@ public abstract class AbstractParser implements Parser {
 
 	@Override
 	public int countPages(File file, String filename) {
-		InputStream is = null;
-		try {
-			is = new FileInputStream(file);
+		try (InputStream is = new FileInputStream(file);) {
 			return countPages(is, filename);
-		} catch (FileNotFoundException e) {
+		} catch (Throwable e) {
 			log.error(e.getMessage());
 			return 1;
-		} finally {
-			if (is != null)
-				try {
-					is.close();
-				} catch (IOException e) {
-				}
 		}
 	}
 }

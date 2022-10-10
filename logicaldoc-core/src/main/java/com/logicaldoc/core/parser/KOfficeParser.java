@@ -1,10 +1,10 @@
 package com.logicaldoc.core.parser;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -19,6 +19,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
+import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.io.ZipUtil;
 
 /**
  * Text extractor for KOffice 1.6 documents.
@@ -82,21 +84,19 @@ public class KOfficeParser extends AbstractParser {
 			xmlReader.setFeature("http://xml.org/sax/features/validation", false);
 			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
-			ZipInputStream zis = new ZipInputStream(input);
-			ZipEntry ze = zis.getNextEntry();
-			while (ze != null && !ze.getName().equals("maindoc.xml")) {
-				ze = zis.getNextEntry();
-			}
-
-			KOfficeContentHandler contentHandler = new KOfficeContentHandler();
-			xmlReader.setContentHandler(contentHandler);
+			File mainDocXml = File.createTempFile("koffice-maindoc", ".xml");
 			try {
-				xmlReader.parse(new InputSource(zis));
+				if (new ZipUtil().unzip(input, "maindoc.xml", mainDocXml) > 0) {
+					try (InputStream mainDocStream = new FileInputStream(mainDocXml)) {
+						KOfficeContentHandler contentHandler = new KOfficeContentHandler();
+						xmlReader.setContentHandler(contentHandler);
+						xmlReader.parse(new InputSource(mainDocStream));
+						content.append(StringUtil.writeToString(new StringReader(contentHandler.getContent())));
+					}
+				}
 			} finally {
-				zis.close();
+				FileUtil.strongDelete(mainDocXml);
 			}
-
-			content.append(StringUtil.writeToString(new StringReader(contentHandler.getContent())));
 		} catch (Exception e) {
 			log.warn("Failed to extract KOffice text content", e);
 		}

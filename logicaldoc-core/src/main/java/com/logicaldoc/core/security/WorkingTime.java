@@ -9,7 +9,7 @@ import java.util.Date;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7.2
  */
-public class WorkingTime implements Cloneable {
+public class WorkingTime {
 	/**
 	 * The day of week ranges from 1 (Sunday) to 7 (Saturday)
 	 */
@@ -41,6 +41,16 @@ public class WorkingTime implements Cloneable {
 			this.hourEnd = hourStart;
 		this.minuteStart = minuteStart;
 		this.minuteEnd = minuteStart;
+	}
+
+	public WorkingTime(WorkingTime source) {
+		this.dayOfWeek = source.dayOfWeek;
+		this.hourStart = source.hourStart;
+		this.minuteStart = source.minuteStart;
+		this.hourEnd = source.hourEnd;
+		this.minuteEnd = source.minuteEnd;
+		this.label = source.label;
+		this.description = source.description;
 	}
 
 	public int getDayOfWeek() {
@@ -155,18 +165,5 @@ public class WorkingTime implements Cloneable {
 		if (hourStart != other.hourStart)
 			return false;
 		return true;
-	}
-
-	@Override
-	public WorkingTime clone() {
-		WorkingTime nwt=new WorkingTime();
-		nwt.setLabel(label);
-		nwt.setDescription(description);
-		nwt.setDayOfWeek(dayOfWeek);
-		nwt.setHourEnd(hourEnd);
-		nwt.setHourStart(hourStart);
-		nwt.setMinuteEnd(minuteEnd);
-		nwt.setMinuteStart(minuteStart);
-		return nwt;
 	}
 }

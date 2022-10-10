@@ -52,7 +52,7 @@ public class ColoredListGridField extends ListGridField {
 			if (colorSpec != null && !colorSpec.isEmpty())
 				return "<span style='color: " + colorSpec + ";'>" + value + "</span>";
 			else
-				return value != null ? value.toString() : "";
+				return value.toString();
 		}
 	}
 

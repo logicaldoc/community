@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +22,7 @@ import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServiceUtil;
 
@@ -39,8 +39,7 @@ public class RightsDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(RightsDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -70,12 +69,7 @@ public class RightsDataServlet extends HttpServlet {
 				menuRights(response, menuId, locale, session.getTenantId());
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			if (e instanceof ServletException)
-				throw (ServletException) e;
-			else if (e instanceof IOException)
-				throw (IOException) e;
-			else
-				throw new ServletException(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 
@@ -131,7 +125,7 @@ public class RightsDataServlet extends HttpServlet {
 			String groupName = set.getString(2);
 			int groupType = set.getInt(3);
 			long userId = 0L;
-			if (groupType == Group.TYPE_USER)
+			if (groupType == Group.TYPE_USER && groupName != null)
 				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
 			writer.print("<right>");
@@ -202,7 +196,7 @@ public class RightsDataServlet extends HttpServlet {
 			String groupName = set.getString(2);
 			int groupType = set.getInt(3);
 			long userId = 0L;
-			if (groupType == Group.TYPE_USER)
+			if (groupType == Group.TYPE_USER && groupName != null)
 				userId = Long.parseLong(groupName.substring(groupName.lastIndexOf('_') + 1));
 
 			writer.print("<right>");

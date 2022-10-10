@@ -46,7 +46,7 @@ public class FirewallPanel extends VLayout {
 		setHeight100();
 		setMembersMargin(20);
 
-		init();
+		initGUI();
 		setMembers(form);
 	}
 
@@ -55,7 +55,7 @@ public class FirewallPanel extends VLayout {
 		setMembersMargin(5);
 		setMargin(5);
 
-		init();
+		initGUI();
 
 		Tab tab = new Tab();
 		tab.setTitle(I18N.message("firewall"));
@@ -80,7 +80,7 @@ public class FirewallPanel extends VLayout {
 		setMembers(tabs, save);
 	}
 
-	private void init() {
+	private void initGUI() {
 		form = new DynamicForm();
 		form.setWidth(1);
 		form.setValuesManager(vm);

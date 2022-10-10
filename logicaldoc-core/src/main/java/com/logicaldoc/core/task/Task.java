@@ -83,7 +83,7 @@ public abstract class Task implements Runnable {
 	protected LockManager lockManager;
 
 	protected SystemLoadMonitor systemLoadMonitor;
-	
+
 	private Random random = new Random();
 
 	public Task(String name) {
@@ -121,25 +121,26 @@ public abstract class Task implements Runnable {
 
 		if (systemLoadMonitor != null) {
 			boolean overload = false;
-			
+
 			while (systemLoadMonitor.isAverageCpuOverLoaded() && !interruptRequested) {
 				if (overload == false) {
 					overload = true;
 					log.info("Execution paused because of system overload");
 				}
 				try {
-					lockManager.get(getName(), transactionId);
+					if (lockManager != null)
+						lockManager.get(getName(), transactionId);
 				} catch (Throwable e) {
-				}				
-				
+				}
+
 				synchronized (this) {
 					try {
-						wait((1 + random.nextInt(20)) * 1000);
+						wait((1 + random.nextInt(20)) * 1000L);
 					} catch (InterruptedException e) {
 						Thread.currentThread().interrupt();
 					}
 				}
-				
+
 				checkExpiration();
 			}
 
@@ -216,7 +217,8 @@ public abstract class Task implements Runnable {
 		} finally {
 			// In any case release the lock
 			try {
-				lockManager.release(getName(), transactionId);
+				if (lockManager != null)
+					lockManager.release(getName(), transactionId);
 			} catch (Throwable t) {
 
 			}
@@ -262,7 +264,7 @@ public abstract class Task implements Runnable {
 	 * 
 	 * @return the status
 	 */
-	public int getStatus() {
+	public synchronized int getStatus() {
 		return status;
 	}
 
@@ -271,7 +273,7 @@ public abstract class Task implements Runnable {
 	 * 
 	 * @return the current step
 	 */
-	public long getProgress() {
+	public synchronized long getProgress() {
 		return progress;
 	}
 

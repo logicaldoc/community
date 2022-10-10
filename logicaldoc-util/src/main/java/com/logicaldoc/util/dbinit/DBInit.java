@@ -72,7 +72,7 @@ public class DBInit {
 				if (con != null)
 					con.close();
 			} catch (SQLException e1) {
-				e1.printStackTrace();
+				log.error(e1.getMessage(), e1);
 			}
 		}
 	}
@@ -95,7 +95,7 @@ public class DBInit {
 				if (con != null)
 					con.close();
 			} catch (SQLException e1) {
-				e1.printStackTrace();
+				log.error(e1.getMessage(), e1);
 			}
 		}
 	}
@@ -110,10 +110,10 @@ public class DBInit {
 	 * @throws SQLException
 	 */
 	private void execute(String sqlFile) throws IOException, SQLException {
-		
+
 		log.debug("Execute {}", sqlFile);
 		System.out.println("Execute " + sqlFile);
-		
+
 		File file = new File(sqlFile);
 		if (!file.exists() || !file.canRead()) {
 			file = File.createTempFile(file.getName(), ".sql");
@@ -169,7 +169,7 @@ public class DBInit {
 	 * @return true if the database can be connected
 	 */
 	public boolean testConnection() {
-		
+
 		boolean result = false;
 
 		try {
@@ -178,7 +178,6 @@ public class DBInit {
 			result = true;
 			con.close();
 		} catch (Exception ex) {
-			ex.printStackTrace();
 			log.error(ex.getMessage(), ex);
 		}
 

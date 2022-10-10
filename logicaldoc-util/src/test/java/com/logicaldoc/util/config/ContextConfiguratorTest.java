@@ -8,6 +8,8 @@ import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
 
+import junit.framework.Assert;
+
 /**
  * Test case for <code>WebConfigurator</code>
  * 
@@ -30,7 +32,14 @@ public class ContextConfiguratorTest {
 
 	@Test
 	public void testAddTrigger() {
-		ContextConfigurator config = new ContextConfigurator(contextXml.getPath());
-		config.addTrigger("TestTrigger");
+		String notThrownTest = null;
+		try {
+			ContextConfigurator config = new ContextConfigurator(contextXml.getPath());
+			config.addTrigger("TestTrigger");
+			notThrownTest = "ok";
+		} catch (Throwable t) {
+
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 }

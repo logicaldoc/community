@@ -59,9 +59,9 @@ public abstract class PluginRegistry {
 			}
 			try {
 				System.out.println("Instantiate concrete PluginRegistry: " + pluginregistry);
-				instance = (PluginRegistry) Class.forName(pluginregistry).newInstance();
+				instance = (PluginRegistry) Class.forName(pluginregistry).getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		}
 		return instance;
@@ -100,8 +100,6 @@ public abstract class PluginRegistry {
 		}
 	}
 
-	
-	
 	/**
 	 * Initializes found plugins
 	 * 
@@ -160,7 +158,7 @@ public abstract class PluginRegistry {
 							}
 						});
 					} catch (MalformedURLException e) {
-						e.printStackTrace();
+						System.err.println(e.getMessage());
 					}
 				}
 			} else {
@@ -188,10 +186,12 @@ public abstract class PluginRegistry {
 		Collection<Extension> exts = new ArrayList<Extension>();
 		try {
 			PluginRegistry registry = PluginRegistry.getInstance();
-			PluginDescriptor descriptor = registry.getManager().getRegistry().getPluginDescriptor(pluginId);
-			ExtensionPoint dbinitExtPoint = registry.getManager().getRegistry().getExtensionPoint(descriptor.getId(),
-					extensionPoint);
-			exts = dbinitExtPoint.getConnectedExtensions();
+			if (registry != null) {
+				PluginDescriptor descriptor = registry.getManager().getRegistry().getPluginDescriptor(pluginId);
+				ExtensionPoint dbinitExtPoint = registry.getManager().getRegistry()
+						.getExtensionPoint(descriptor.getId(), extensionPoint);
+				exts = dbinitExtPoint.getConnectedExtensions();
+			}
 		} catch (Exception e) {
 
 		}
@@ -241,7 +241,10 @@ public abstract class PluginRegistry {
 	 */
 	public Collection<PluginDescriptor> getPlugins() {
 		PluginRegistry registry = PluginRegistry.getInstance();
-		return registry.getManager().getRegistry().getPluginDescriptors();
+		if (registry != null)
+			return registry.getManager().getRegistry().getPluginDescriptors();
+		else
+			return new ArrayList<PluginDescriptor>();
 	}
 
 	/**
@@ -253,7 +256,10 @@ public abstract class PluginRegistry {
 	 */
 	public PluginDescriptor getPlugin(String pluginId) {
 		PluginRegistry registry = PluginRegistry.getInstance();
-		return registry.getManager().getRegistry().getPluginDescriptor(pluginId);
+		if (registry != null)
+			return registry.getManager().getRegistry().getPluginDescriptor(pluginId);
+		else
+			return null;
 	}
 
 	public boolean isRestartRequired() {
@@ -266,7 +272,8 @@ public abstract class PluginRegistry {
 
 	/**
 	 * This method retrieves the folder of the given plugin. If not exists, it
-	 * creates the folder. The folder is: <b>conf.plugindir</b>/<b>pluginName</b>
+	 * creates the folder. The folder is:
+	 * <b>conf.plugindir</b>/<b>pluginName</b>
 	 * 
 	 * @param pluginName The plugin name
 	 * 
@@ -274,11 +281,11 @@ public abstract class PluginRegistry {
 	 */
 	public static File getPluginHome(String pluginName) {
 		File root = getPluginsDir();
-		File userDir = new File(root, pluginName);
+		File userDir = new File(root != null ? root : new File(""), pluginName);
 
 		if (!FileUtil.isInsideFolder(root, userDir))
-			throw new SecurityException(
-					String.format("Plugin %s non inside plugin home %s", pluginName, root.getPath()));
+			throw new SecurityException(String.format("Plugin %s non inside plugin home %s", pluginName,
+					root != null ? root.getPath() : ""));
 
 		if (!userDir.exists()) {
 			try {
@@ -294,7 +301,7 @@ public abstract class PluginRegistry {
 	 * This method retrieves the plugins root folder. If not exists, it creates
 	 * the folder. The folder is: <b>conf.plugindir</b>
 	 * 
-	 * @return root of the plugins data folders 
+	 * @return root of the plugins data folders
 	 */
 	public static File getPluginsDir() {
 		File pluginsPath = null;
@@ -307,7 +314,7 @@ public abstract class PluginRegistry {
 		try {
 			FileUtils.forceMkdir(pluginsPath);
 		} catch (IOException e) {
-			return null;
+			return new File(".");
 		}
 		return pluginsPath;
 	}
@@ -324,11 +331,11 @@ public abstract class PluginRegistry {
 	 */
 	public static File getPluginResource(String pluginName, String path) {
 		File root = getPluginHome(pluginName);
-		File resource = new File(root.getPath() + "/" + path);
+		File resource = new File((root != null ? root.getPath() : "") + "/" + path);
 
 		if (!FileUtil.isInsideFolder(root, resource))
-			throw new SecurityException(
-					String.format("Resource %s non inside plugin home %s", resource.getPath(), root.getPath()));
+			throw new SecurityException(String.format("Resource %s non inside plugin home %s", resource.getPath(),
+					root != null ? root.getPath() : ""));
 
 		if (!resource.exists() && !path.contains("."))
 			try {

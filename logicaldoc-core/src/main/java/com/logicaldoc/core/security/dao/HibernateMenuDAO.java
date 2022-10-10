@@ -619,7 +619,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		List<Menu> coll = new ArrayList<Menu>();
 		try {
 			Menu menu = findById(menuId);
-			while (menu.getId() != 1 && menu.getId() != menu.getParentId()) {
+			while (menu!=null && menu.getId() != 1 && menu.getId() != menu.getParentId()) {
 				menu = findById(menu.getParentId());
 				if (menu != null)
 					coll.add(0, menu);

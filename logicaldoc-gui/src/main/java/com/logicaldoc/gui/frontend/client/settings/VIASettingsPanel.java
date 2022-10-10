@@ -53,10 +53,10 @@ public class VIASettingsPanel extends AdminPanel {
 
 	@Override
 	protected void onDraw() {
-		init();
+		initGUI();
 	}
 
-	void init() {
+	void initGUI() {
 		setWidth100();
 		setHeight100();
 		setMembersMargin(20);
@@ -268,7 +268,7 @@ public class VIASettingsPanel extends AdminPanel {
 				public void onSuccess(GUIVIASettings settings) {
 					GuiLog.info(I18N.message("settingssaved"), null);
 					VIASettingsPanel.this.settings = settings;
-					init();
+					initGUI();
 				}
 			});
 		}

@@ -164,7 +164,7 @@ public class SystemUtil {
 						System.out.println(message);
 						Runtime.getRuntime().exec(cmd.toString());
 					} catch (IOException e) {
-						e.printStackTrace();
+						log.error(e.getMessage(), e);
 					}
 				}
 			});

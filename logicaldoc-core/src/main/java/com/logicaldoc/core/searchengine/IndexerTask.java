@@ -363,7 +363,7 @@ public class IndexerTask extends Task {
 									doc.getFileName());
 						} else {
 							Date beforeIndexing = new Date();
-							parsingTime += documentManager.reindex(id, null, transaction.clone());
+							parsingTime += documentManager.reindex(id, null, new DocumentHistory(transaction));
 							long indexingDiff = TimeDiff.getTimeDifference(beforeIndexing, new Date(),
 									TimeField.MILLISECOND);
 							indexingTime += indexingDiff;

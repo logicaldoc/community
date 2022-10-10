@@ -131,7 +131,7 @@ public class KeystoreUploader extends Window {
 
 			@Override
 			public void onSuccess(Void arg) {
-				keystorePanel.init();
+				keystorePanel.initGUI();
 
 				// Cleanup the upload folder
 				DocumentService.Instance.get().cleanUploadedFileFolder(new AsyncCallback<Void>() {

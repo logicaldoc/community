@@ -3,7 +3,8 @@ package com.logicaldoc.util.dbinit;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.logicaldoc.util.dbinit.DBInit;
+import org.junit.Assert;
+import org.junit.Test;
 
 import junit.framework.TestCase;
 
@@ -22,7 +23,7 @@ public class DBInitTest extends TestCase {
 		sqlList.add("sql1.sql");
 		sqlList.add("sql2.sql");
 		dbinit = new DBInit(sqlList);
-		//dbinit.setDriver("org.hsqldb.jdbcDriver"); // version 1.8
+		// dbinit.setDriver("org.hsqldb.jdbcDriver"); // version 1.8
 		dbinit.setDriver("org.hsqldb.jdbc.JDBCDriver");
 		dbinit.setUrl("jdbc:hsqldb:mem:logicaldoc");
 		dbinit.setUsername("sa");
@@ -30,11 +31,18 @@ public class DBInitTest extends TestCase {
 	}
 
 	public void tearDown() throws Exception {
-		
 
 	}
 
-	public void testExecute() throws Exception {
-		dbinit.execute();
+	@Test
+	public void testExecute() {
+		String notThrownTest=null;
+		try {
+			dbinit.execute();
+			notThrownTest="ok";
+		}catch(Throwable t) {
+			
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 }

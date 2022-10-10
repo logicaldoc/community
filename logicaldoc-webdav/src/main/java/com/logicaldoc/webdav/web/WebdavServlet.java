@@ -1,9 +1,6 @@
 package com.logicaldoc.webdav.web;
 
-import java.io.IOException;
-
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,21 +45,21 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	public static final String CTX_ATTR_RESOURCE_PATH_PREFIX = "jackrabbit.webdav.simple.resourcepath";
 
-	private String resourcePathPrefix;
+	private static String resourcePathPrefix;
 
-	private String authenticate_header;
+	private static String authenticate_header;
 
-	private LockManager lockManager;
+	private static LockManager lockManager;
 
-	private DavResourceFactory resourceFactory;
+	private static DavResourceFactory resourceFactory;
 
-	private DavLocatorFactory locatorFactory;
+	private static DavLocatorFactory locatorFactory;
 
-	private SessionProvider sessionProvider;
+	private static SessionProvider sessionProvider;
 
-	private ResourceConfig config;
+	private static ResourceConfig config;
 
-	private ContextProperties settings;
+	private static ContextProperties settings;
 
 	public void init() {
 		resourcePathPrefix = getInitParameter(INIT_PARAM_RESOURCE_PATH_PREFIX);
@@ -111,10 +108,6 @@ public class WebdavServlet extends AbstractWebdavServlet {
 		return locatorFactory;
 	}
 
-	public void setLocatorFactory(DavLocatorFactory locatorFactory) {
-		this.locatorFactory = locatorFactory;
-	}
-
 	public LockManager getLockManager() {
 		if (lockManager == null) {
 			lockManager = new SimpleLockManager();
@@ -122,19 +115,11 @@ public class WebdavServlet extends AbstractWebdavServlet {
 		return lockManager;
 	}
 
-	public void setLockManager(LockManager lockManager) {
-		this.lockManager = lockManager;
-	}
-
 	public DavResourceFactory getResourceFactory() {
 		if (resourceFactory == null) {
 			resourceFactory = new DavResourceFactoryImpl(getLockManager(), getResourceConfig());
 		}
 		return resourceFactory;
-	}
-
-	public void setResourceFactory(DavResourceFactory resourceFactory) {
-		this.resourceFactory = resourceFactory;
 	}
 
 	public synchronized SessionProvider getSessionProvider() {
@@ -146,10 +131,6 @@ public class WebdavServlet extends AbstractWebdavServlet {
 
 	protected CredentialsProvider getCredentialsProvider() {
 		return new BasicCredentialsProvider(getInitParameter(INIT_PARAM_MISSING_AUTH_MAPPING));
-	}
-
-	public synchronized void setSessionProvider(SessionProvider sessionProvider) {
-		this.sessionProvider = sessionProvider;
 	}
 
 	public String getAuthenticateHeaderValue() {
@@ -164,23 +145,33 @@ public class WebdavServlet extends AbstractWebdavServlet {
 			return (ResourceConfig) Context.get().getBean(ResourceConfig.class);
 	}
 
-	public void setResourceConfig(ResourceConfig config) {
-		this.config = config;
-	}
-
-	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void service(HttpServletRequest request, HttpServletResponse response) {
 		ContextProperties settings = getSettings();
 
 		// Check if the service is enabled
 		if ("true".equals(settings.get("webdav.enabled")))
 			super.service(request, response);
 		else
-			response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
+			try {
+				response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
+			} catch (Throwable e) {
+			}
+
 	}
 
 	public ContextProperties getSettings() {
 		if (settings == null)
 			settings = Context.get().getProperties();
 		return settings;
+	}
+
+	@Override
+	public void setResourceFactory(DavResourceFactory resourceFactory) {
+		WebdavServlet.resourceFactory = resourceFactory;
+	}
+
+	@Override
+	public void setLocatorFactory(DavLocatorFactory locatorFactory) {
+		WebdavServlet.locatorFactory = locatorFactory;
 	}
 }

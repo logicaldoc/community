@@ -45,11 +45,7 @@ public class HttpUtil {
 
 			// fallback to the classpath resource
 			if (config == null)
-				try {
-					config = new ContextProperties();
-				} catch (Throwable t) {
-
-				}
+				config = new ContextProperties();
 
 			proxy[0] = config.getProperty("proxy.host");
 			proxy[1] = config.getProperty("proxy.port");

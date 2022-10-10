@@ -73,7 +73,7 @@ public class InMemoryZipImport extends ZipImport {
 					continue;
 
 				try {
-					Document doc = (Document) docVo.clone();
+					Document doc = new Document(docVo);
 					doc.setId(0L);
 					doc.setFileName(fileName);
 					doc.setFolder(folder);

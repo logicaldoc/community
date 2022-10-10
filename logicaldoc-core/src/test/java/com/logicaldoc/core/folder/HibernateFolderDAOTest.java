@@ -1134,31 +1134,31 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(doc);
 
 		docDao.initialize(doc);
-		doc = doc.clone();
+		doc = new Document(doc);
 		doc.setId(0);
 		doc.setFolder(dao.findByPathExtended("/Default/Target/Pippo", 1L));
 		doc.setFileName("doc1.txt");
 		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
 
-		doc = doc.clone();
+		doc = new Document(doc);
 		doc.setId(0);
 		doc.setFolder(dao.findByPathExtended("/Default/Source/Pippo", 1L));
 		doc.setFileName("doc1.txt");
 		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
 
-		doc = doc.clone();
+		doc = new Document(doc);
 		doc.setId(0);
 		doc.setFolder(dao.findByPathExtended("/Default/Source/Pippo", 1L));
 		doc.setFileName("doc2.txt");
 		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
 
-		doc = doc.clone();
+		doc = new Document(doc);
 		doc.setId(0);
 		doc.setFolder(dao.findByPathExtended("/Default/Source/Pluto/Paperina", 1L));
 		doc.setFileName("doc3.txt");
 		docManager.create(new FileInputStream("pom.xml"), doc, transaction);
 
-		doc = doc.clone();
+		doc = new Document(doc);
 		doc.setId(0);
 		doc.setFolder(dao.findByPathExtended("/Default/Source/Pollo/DEF", 1L));
 		doc.setFileName("doc4.txt");

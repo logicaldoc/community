@@ -1,13 +1,11 @@
 package com.logicaldoc.web.data;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,6 +20,7 @@ import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.util.IconSelector;
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServiceUtil;
 
@@ -38,8 +37,7 @@ public class NotesDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(NotesDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			ServiceUtil.validateSession(request);
 
@@ -49,11 +47,11 @@ public class NotesDataServlet extends HttpServlet {
 
 			Long docId = null;
 			if (request.getParameter("docId") != null) {
-				docId=Long.parseLong(request.getParameter("docId"));				
+				docId = Long.parseLong(request.getParameter("docId"));
 				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-				Document doc=ddao.findDocument(docId);
-				if(doc!=null)
-					docId=doc.getId();
+				Document doc = ddao.findDocument(docId);
+				if (doc != null)
+					docId = doc.getId();
 			}
 
 			String fileVersion = null;
@@ -113,8 +111,9 @@ public class NotesDataServlet extends HttpServlet {
 				writer.print("<user><![CDATA[" + set.getString(3) + "]]></user>");
 
 				Date date = null;
-				if (set.getObject(4) != null && set.getObject(4).getClass().getName().equals("oracle.sql.TIMESTAMP")) {
-					oracle.sql.TIMESTAMP ts = (oracle.sql.TIMESTAMP) set.getObject(4);
+				Object obj = set.getObject(4);
+				if (obj != null && obj instanceof oracle.sql.TIMESTAMP) {
+					oracle.sql.TIMESTAMP ts = (oracle.sql.TIMESTAMP) obj;
 					date = new Date(ts.dateValue().getTime());
 				} else {
 					date = set.getDate(4);
@@ -123,9 +122,8 @@ public class NotesDataServlet extends HttpServlet {
 				writer.print("<message><![CDATA[" + set.getString(2) + "]]></message>");
 				writer.print("<docId>" + set.getLong(5) + "</docId>");
 				writer.print("<filename><![CDATA[" + set.getString(6) + "]]></filename>");
-				writer.print("<icon>"
-						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils
-								.getExtension(set.getString(6)))) + "</icon>");
+				writer.print("<icon>" + FilenameUtils.getBaseName(
+						IconSelector.selectIcon(FilenameUtils.getExtension(set.getString(6)))) + "</icon>");
 				writer.print("<userId>" + set.getString(7) + "</userId>");
 				writer.print("<fileVersion><![CDATA[" + set.getString(10) + "]]></fileVersion>");
 				writer.print("</post>");
@@ -134,12 +132,7 @@ public class NotesDataServlet extends HttpServlet {
 			writer.write("</list>");
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			if (e instanceof ServletException)
-				throw (ServletException) e;
-			else if (e instanceof IOException)
-				throw (IOException) e;
-			else
-				throw new ServletException(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 }

@@ -38,12 +38,12 @@ public class MostUsedTagsPortlet extends Portlet {
 
 	public MostUsedTagsPortlet() {
 		if (Feature.enabled(Feature.TAGS)) {
-			init();
+			initGUI();
 		} else
 			addItem(new FeatureDisabled());
 	}
 
-	private void init() {
+	private void initGUI() {
 		setTitle(AwesomeFactory.getIconHtml("tag", I18N.message("mostusedtags")));
 
 		HeaderControl refresh = new HeaderControl(HeaderControl.REFRESH, new ClickHandler() {

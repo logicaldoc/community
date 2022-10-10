@@ -60,7 +60,7 @@ public class Automation {
 
 	private String logTag = "AutomationEngine";
 
-	private Locale locale = Locale.ENGLISH;
+	private Locale automationLocale = Locale.ENGLISH;
 
 	private long tenantId = Tenant.DEFAULT_ID;
 
@@ -88,7 +88,7 @@ public class Automation {
 	public Automation(String logTag, Locale locale, long tenantId) {
 		super();
 		this.logTag = logTag;
-		this.locale = locale;
+		this.automationLocale = locale;
 		this.tenantId = tenantId;
 	}
 
@@ -165,7 +165,7 @@ public class Automation {
 
 		// This is the locale
 		if (!clientDictionary.containsKey(LOCALE))
-			clientDictionary.put(LOCALE, this.locale != null ? this.locale : Locale.ENGLISH);
+			clientDictionary.put(LOCALE, this.automationLocale != null ? this.automationLocale : Locale.ENGLISH);
 
 		// This is needed to format dates
 		DateTool dateTool = new DateTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),

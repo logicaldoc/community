@@ -140,6 +140,77 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	public Folder() {
 	}
 
+	public Folder(Folder source) {
+		this.id = source.id;
+		this.name = source.name;
+		this.parentId = source.parentId;
+		this.securityRef = source.securityRef;
+		this.description = source.description;
+		this.type = source.type;
+		this.creation = source.creation;
+		this.creator = source.creator;
+		this.creatorId = source.creatorId;
+		this.position = source.position;
+		this.hidden = source.hidden;
+		this.folderGroups = source.folderGroups;
+		this.template = source.template;
+		this.templateLocked = source.templateLocked;
+		this.deleteUserId = source.deleteUserId;
+		this.deleteUser = source.deleteUser;
+		this.quotaDocs = source.quotaDocs;
+		this.quotaSize = source.quotaSize;
+		this.quotaThreshold = source.quotaThreshold;
+		this.quotaAlertRecipients = source.quotaAlertRecipients;
+		this.foldRef = source.foldRef;
+		this.storages = source.storages;
+		this.maxVersions = source.maxVersions;
+		this.color = source.color;
+		this.tags = source.tags;
+		this.tgs = source.tgs;
+		this.path = source.path;
+		this.pathExtended = source.pathExtended;
+		this.grid = source.grid;
+		this.ocrTemplateId = source.ocrTemplateId;
+		this.barcodeTemplateId = source.barcodeTemplateId;
+
+		setTenantId(source.getTenantId());
+
+		setAttributes(new HashMap<String, Attribute>());
+		try {
+			for (String name : source.getAttributes().keySet()) {
+				getAttributes().put(name, source.getAttributes().get(name));
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+
+		try {
+			setTags(new HashSet<Tag>());
+			for (Tag tag : source.getTags()) {
+				getTags().add(tag);
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+		try {
+			setFolderGroups(new HashSet<FolderGroup>());
+			for (FolderGroup fg : source.getFolderGroups()) {
+				getFolderGroups().add(new FolderGroup(fg));
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+
+		setStorages(new HashMap<String, Integer>());
+		try {
+			for (String nodeId : source.getStorages().keySet()) {
+				getStorages().put(nodeId, source.getStorages().get(nodeId));
+			}
+		} catch (LazyInitializationException x) {
+			// may happen do nothing
+		}
+	}
+
 	public boolean isWorkspace() {
 		return type == TYPE_WORKSPACE;
 	}
@@ -540,73 +611,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	public void setDeleteUser(String deleteUser) {
 		this.deleteUser = deleteUser;
-	}
-
-	/**
-	 * Clones the folder
-	 * 
-	 * @return a cloned instance
-	 */
-	@Override
-	public Object clone() {
-		Folder cloned = new Folder();
-		cloned.setId(getId());
-
-		cloned.setParentId(getParentId());
-		cloned.setTenantId(getTenantId());
-		cloned.setFoldRef(getFoldRef());
-		cloned.setName(getName());
-		cloned.setDescription(getDescription());
-		cloned.setStorage(getStorage());
-		cloned.setMaxVersions(getMaxVersions());
-		cloned.setColor(getColor());
-		cloned.setHidden(getHidden());
-		cloned.setPosition(getPosition());
-		cloned.setCreator(getCreator());
-		cloned.setCreatorId(getCreatorId());
-		cloned.setType(getType());
-		cloned.setTemplate(getTemplate());
-		cloned.setPath(getPath());
-		cloned.setPathExtended(getPathExtended());
-		cloned.setOcrTemplateId(getOcrTemplateId());
-		cloned.setBarcodeTemplateId(getBarcodeTemplateId());
-
-		cloned.setAttributes(new HashMap<String, Attribute>());
-		try {
-			for (String name : getAttributes().keySet()) {
-				cloned.getAttributes().put(name, getAttributes().get(name));
-			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
-		}
-
-		try {
-			cloned.setTags(new HashSet<Tag>());
-			for (Tag tag : getTags()) {
-				cloned.getTags().add(tag);
-			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
-		}
-		try {
-			cloned.setFolderGroups(new HashSet<FolderGroup>());
-			for (FolderGroup fg : getFolderGroups()) {
-				cloned.getFolderGroups().add(fg.clone());
-			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
-		}
-
-		cloned.setStorages(new HashMap<String, Integer>());
-		try {
-			for (String nodeId : getStorages().keySet()) {
-				cloned.getStorages().put(nodeId, getStorages().get(nodeId));
-			}
-		} catch (LazyInitializationException x) {
-			// may happen do nothing
-		}
-
-		return cloned;
 	}
 
 	public String getPathExtended() {

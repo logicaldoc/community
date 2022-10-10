@@ -1,5 +1,6 @@
 package com.logicaldoc.web.service;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +30,14 @@ public class SettingServiceImplTest extends AbstractWebappTCase {
 		emailSettings.setSecureAuth(true);
 		emailSettings.setSenderEmail("mario@acme.com");
 
-		service.saveEmailSettings(emailSettings);
+		String notThrownTest = null;
+		try {
+			service.saveEmailSettings(emailSettings);
+			notThrownTest = "ok";
+		} catch (Throwable t) {
+
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 
 	@Test
@@ -40,7 +48,14 @@ public class SettingServiceImplTest extends AbstractWebappTCase {
 			params[i] = p;
 		}
 
-		service.saveSettings(params);
+		String notThrownTest = null;
+		try {
+			service.saveSettings(params);
+			notThrownTest = "ok";
+		} catch (Throwable t) {
+
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 
 	@Test
@@ -58,6 +73,13 @@ public class SettingServiceImplTest extends AbstractWebappTCase {
 		settings[0] = wsSettings;
 		settings[1] = wdSettings;
 
-		service.saveSettings(settings);
+		String notThrownTest = null;
+		try {
+			service.saveSettings(settings);
+			notThrownTest = "ok";
+		} catch (Throwable t) {
+
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 }

@@ -65,8 +65,7 @@ public class ExtensionAliasesDialog extends Window {
 
 				String extension = record.getAttributeAsString("extension");
 				String aliases = (String) event.getNewValues().get("aliases");
-				aliases = aliases.trim().toLowerCase();
-				aliases.replace(" ", "");
+				aliases = aliases.trim().toLowerCase().replace(" ", "");
 
 				SettingService.Instance.get().saveExtensionAliases(extension, aliases, new AsyncCallback<Void>() {
 

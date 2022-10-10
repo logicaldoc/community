@@ -191,7 +191,6 @@ public interface DocumentService {
 	 * @throws Exception error in the server application
 	 */
 	@WebMethod
-	// @TODO correct this to "document"
 	@WebResult(name = "documents")
 	@WSDoc(description = "gets document metadata of a collection of existing documents with the given identifiers; returns an array of WSDocument")
 	public WSDocument[] getDocuments(

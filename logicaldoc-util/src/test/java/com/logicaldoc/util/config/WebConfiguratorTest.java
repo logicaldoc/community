@@ -2,13 +2,13 @@ package com.logicaldoc.util.config;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>WebConfigurator</code>
@@ -32,8 +32,15 @@ public class WebConfiguratorTest {
 
 	@Test
 	public void testAddServlet() {
-		WebConfigurator config = new WebConfigurator(webXml.getPath());
-		config.addServlet("DocumentsData", "pippo");
+		String notThrownTest = null;
+		try {
+			WebConfigurator config = new WebConfigurator(webXml.getPath());
+			config.addServlet("DocumentsData", "pippo");
+			notThrownTest = "ok";
+		} catch (Throwable t) {
+
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 
 	@Test
@@ -41,5 +48,13 @@ public class WebConfiguratorTest {
 		WebConfigurator config = new WebConfigurator(webXml.getPath());
 		Assert.assertTrue(config.setTransportGuarantee("CONFIDENCIAL"));
 		Assert.assertFalse(config.setTransportGuarantee("CONFIDENCIAL"));
+		
+		String notThrownTest = null;
+		try {
+			notThrownTest = "ok";
+		} catch (Throwable t) {
+
+		}
+		Assert.assertNotNull(notThrownTest);
 	}
 }

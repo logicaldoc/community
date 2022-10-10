@@ -155,18 +155,18 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 					|| name.startsWith("ocr.") || name.contains(".ocr.") || name.contains("barcode")
 					|| name.startsWith("task.") || name.startsWith("store") || name.startsWith("advancedocr.")
 					|| name.startsWith("command.") || name.contains(".gui.") || name.contains(".upload.")
-					|| name.equals("userno") || name.contains(".search.") || name.contains("password")
-					|| name.contains("tag.") || name.startsWith("cluster") || name.startsWith("ip.")
-					|| name.contains(".extcall.") || name.contains("anonymous") || name.startsWith("hibernate.")
-					|| name.contains(".session.") || name.contains("antivirus.") || name.startsWith("login.")
-					|| name.equals("upload.maxsize") || name.startsWith("news.") || name.equals("registry")
-					|| name.equals("searchengine") || name.equals("load") || name.startsWith("ssl.")
-					|| name.contains(".tagcloud.") || name.startsWith("throttle.") || name.contains("security.")
-					|| name.contains("parser.") || name.startsWith("quota.") || name.equals("initialized")
-					|| name.startsWith("converter.") || name.startsWith("firewall.") || name.contains(".2fa.")
-					|| name.startsWith("ftp.") || name.startsWith("cas.") || name.startsWith("cache.")
-					|| name.startsWith("jdbc.") || name.startsWith("comparator.") || name.contains(".via.")
-					|| name.contains(".downloadticket.") || name.startsWith("zonalocr.") || name.endsWith(".charset"))
+					|| name.equals("userno") || name.contains(".search.") || name.contains("tag.")
+					|| name.startsWith("cluster") || name.startsWith("ip.") || name.contains(".extcall.")
+					|| name.contains("anonymous") || name.startsWith("hibernate.") || name.contains(".session.")
+					|| name.contains("antivirus.") || name.startsWith("login.") || name.equals("upload.maxsize")
+					|| name.startsWith("news.") || name.equals("registry") || name.equals("searchengine")
+					|| name.equals("load") || name.startsWith("ssl.") || name.contains(".tagcloud.")
+					|| name.startsWith("throttle.") || name.contains("security.") || name.contains("parser.")
+					|| name.startsWith("quota.") || name.equals("initialized") || name.startsWith("converter.")
+					|| name.startsWith("firewall.") || name.contains(".2fa.") || name.startsWith("ftp.")
+					|| name.startsWith("cas.") || name.startsWith("cache.") || name.startsWith("jdbc.")
+					|| name.startsWith("comparator.") || name.contains(".via.") || name.contains(".downloadticket.")
+					|| name.startsWith("zonalocr.") || name.endsWith(".charset"))
 				continue;
 
 			sortedSet.add(key.toString());
@@ -249,17 +249,17 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 	@Override
 	public void saveFirewallSettings(GUIParameter[] settings) throws ServerException {
 		saveSettings(settings);
-		
+
 		HttpFirewall firewall = (HttpFirewall) Context.get().getBean(HttpFirewall.class);
-		ContextProperties config=Context.get().getProperties();
-		
+		ContextProperties config = Context.get().getProperties();
+
 		firewall.setAllowBackSlash(config.getBoolean("firewall.allowBackSlash", false));
 		firewall.setAllowSemicolon(config.getBoolean("firewall.allowSemicolon", false));
 		firewall.setAllowUrlEncodedPercent(config.getBoolean("firewall.allowUrlEncodedPercent", false));
 		firewall.setAllowUrlEncodedSlash(config.getBoolean("firewall.allowUrlEncodedSlash", false));
 		firewall.setAllowUrlEncodedPeriod(config.getBoolean("firewall.allowUrlEncodedPeriod", false));
 	}
-	
+
 	@Override
 	public void saveStorageSettings(GUIParameter[] settings) throws ServerException {
 		saveSettings(settings);

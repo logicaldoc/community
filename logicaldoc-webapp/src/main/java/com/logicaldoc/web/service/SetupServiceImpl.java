@@ -80,7 +80,7 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 			Context.refresh();
 
 		} catch (Throwable caught) {
-			caught.printStackTrace();
+			System.err.println(caught.getMessage());
 			log.error(caught.getMessage(), caught);
 			throw new RuntimeException(caught.getMessage(), caught);
 		}
@@ -110,7 +110,7 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 			pbean.write();
 			log.info("configuration data written successfully.");
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 			log.error("Exception writing db config on context file: " + e.getMessage(), e);
 			throw e;
 		}
@@ -126,7 +126,7 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 			pbean.write();
 			log.info("configuration data written successfully.");
 		} catch (Exception e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 			log.error("Exception writing registration config on context file: " + e.getMessage(), e);
 			throw e;
 		}
@@ -158,9 +158,10 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 				file.mkdirs();
 				file.mkdir();
 				file = new File(file, "plugin.properties");
-				file.createNewFile();
+				if (!file.createNewFile())
+					throw new IOException("Cannot create file " + file.getAbsolutePath());
 			} catch (Exception e) {
-				e.printStackTrace();
+				System.err.println(e.getMessage());
 			}
 		}
 	}
@@ -203,16 +204,16 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 		pbean.write();
 
 		// Refresh the current logging location
+		String log4jPath = URLDecoder.decode(this.getClass().getResource("/log.xml").getPath(), "UTF-8");
 		try {
-			// Init the logs
-			String log4jPath = URLDecoder.decode(this.getClass().getResource("/log.xml").getPath(), "UTF-8");
+			// Init the logs			
 			System.out.println("Taking log configuration from " + log4jPath);
 			try (InputStream inputStream = new FileInputStream(log4jPath)) {
 				ConfigurationSource source = new ConfigurationSource(inputStream);
 				Configurator.initialize(null, source);
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			System.err.println("Cannot access log file " + log4jPath);
 		}
 
 		reloadContext();

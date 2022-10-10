@@ -210,6 +210,9 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 
 	@Override
 	public void initialize(Group group) {
+		if (group == null)
+			return;
+
 		if (group != null && group.getDeleted() == 0)
 			refresh(group);
 

@@ -839,10 +839,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			refresh(doc);
 
 			if (doc.getAttributes() != null)
-				doc.getAttributes().keySet().size();
+				log.trace("Initialized {} attributes", doc.getAttributes().keySet().size());
 
 			if (doc.getTags() != null)
-				doc.getTags().size();
+				log.trace("Initialized {} tags", doc.getTags().size());
 		} catch (Throwable t) {
 		}
 	}
@@ -1008,7 +1008,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public void deleteAll(Collection<Document> documents, int delCode, DocumentHistory transaction) {
 		for (Document document : documents) {
-			DocumentHistory deleteHistory = (DocumentHistory) transaction.clone();
+			DocumentHistory deleteHistory = new DocumentHistory(transaction);
 			deleteHistory.setEvent(DocumentEvent.DELETED.toString());
 			delete(document.getId(), delCode, deleteHistory);
 		}

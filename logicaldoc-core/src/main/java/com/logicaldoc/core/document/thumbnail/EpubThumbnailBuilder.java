@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +42,9 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 				 * The eBook defines a cover image, so extract and use it
 				 */
 				tmp = File.createTempFile("ebookcover",
-						"." + reader.getCoverImageFileName() != null
+						"." + (reader.getCoverImageFileName() != null
 								? FileUtil.getExtension(reader.getCoverImageFileName())
-								: "png");
+								: "png"));
 				FileUtil.writeFile(reader.getCoverImage(), tmp.getAbsolutePath());
 				super.buildThumbnail(sid, document, fileVersion, tmp, dest, size, compression);
 			} else {
@@ -56,6 +55,7 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 				 */
 				ThumbnailBuilder pdfBuilder = ((ThumbnailManager) Context.get().getBean(ThumbnailManager.class))
 						.getBuilder("pdf");
+
 				FormatConverter pdfConverter = ((FormatConverterManager) Context.get()
 						.getBean(FormatConverterManager.class)).getConverter("epub", "pdf");
 
@@ -83,7 +83,9 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 						pdfConverter = ((FormatConverterManager) Context.get().getBean(FormatConverterManager.class))
 								.getConverter("txt", "pdf");
 						pdfConverter.convert(tmp, pdf);
-						pdfBuilder.buildThumbnail(sid, document, fileVersion, pdf, dest, size, compression);
+
+						if (pdfBuilder != null)
+							pdfBuilder.buildThumbnail(sid, document, fileVersion, pdf, dest, size, compression);
 					} finally {
 						FileUtil.strongDelete(pdf);
 					}

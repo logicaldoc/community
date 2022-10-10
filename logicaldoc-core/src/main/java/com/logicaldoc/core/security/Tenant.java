@@ -18,14 +18,14 @@ import com.logicaldoc.core.PersistentObject;
  * 
  * @version 6.9
  */
-public class Tenant extends PersistentObject implements Serializable, Cloneable {
+public class Tenant extends PersistentObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	public static final long SYSTEM_ID = -1L;
 
 	public static final String SYSTEM_NAME = "system";
-	
+
 	public static final long DEFAULT_ID = 1L;
 
 	public static final String DEFAULT_NAME = "default";
@@ -72,6 +72,34 @@ public class Tenant extends PersistentObject implements Serializable, Cloneable 
 	private Integer quotaThreshold = null;
 
 	private String quotaAlertRecipients = null;
+
+	public Tenant() {
+	}
+
+	public Tenant(Tenant source) {
+		this.name = source.name;
+		this.displayName = source.displayName;
+		this.street = source.street;
+		this.postalCode = source.postalCode;
+		this.city = source.city;
+		this.state = source.state;
+		this.country = source.country;
+		this.email = source.email;
+		this.telephone = source.telephone;
+		this.type = source.type;
+		this.maxUsers = source.maxUsers;
+		this.maxGuests = source.maxGuests;
+		this.maxSessions = source.maxSessions;
+		this.maxRepoDocs = source.maxRepoDocs;
+		this.enabled = source.enabled;
+		this.expire = source.expire;
+		this.maxRepoSize = source.maxRepoSize;
+		this.quotaThreshold = source.quotaThreshold;
+		this.quotaAlertRecipients = source.quotaAlertRecipients;
+
+		setId(source.getId());
+		setTenantId(source.getTenantId());
+	}
 
 	public String getName() {
 		return name;
@@ -263,32 +291,4 @@ public class Tenant extends PersistentObject implements Serializable, Cloneable 
 	public void setMaxGuests(Integer maxGuests) {
 		this.maxGuests = maxGuests;
 	}
-
-	@Override
-	public Tenant clone() throws CloneNotSupportedException {
-		Tenant tenant = new Tenant();
-		tenant.setId(getId());
-		tenant.setCity(getCity());
-		tenant.setCountry(getCountry());
-		tenant.setDisplayName(getDisplayName());
-		tenant.setEmail(getEmail());
-		tenant.setEnabled(getEnabled());
-		tenant.setExpire(getExpire());
-		tenant.setMaxGuests(getMaxGuests());
-		tenant.setMaxRepoDocs(getMaxRepoDocs());
-		tenant.setMaxRepoSize(getMaxRepoSize());
-		tenant.setMaxSessions(getMaxSessions());
-		tenant.setMaxUsers(getMaxUsers());
-		tenant.setName(getName());
-		tenant.setPostalCode(getPostalCode());
-		tenant.setQuotaAlertRecipients(getQuotaAlertRecipients());
-		tenant.setQuotaThreshold(getQuotaThreshold());
-		tenant.setState(getState());
-		tenant.setStreet(getStreet());
-		tenant.setTelephone(getTelephone());
-		tenant.setTenantId(getTenantId());
-		tenant.setType(getType());
-		return tenant;
-	}
-
 }

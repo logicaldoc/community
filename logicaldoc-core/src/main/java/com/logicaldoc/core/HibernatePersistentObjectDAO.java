@@ -33,6 +33,7 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 4.0
  */
 public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> implements PersistentObjectDAO<T> {
+
 	protected Logger log = LoggerFactory.getLogger(HibernatePersistentObjectDAO.class);
 
 	protected Class<T> entityClass;
@@ -615,8 +616,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@Override
 	public int queryForInt(String sql) throws PersistenceException {
-		long mytmplong = queryForLong(sql);
-		return Long.valueOf(mytmplong).intValue();
+		return (int) queryForLong(sql);
 	}
 
 	@Override

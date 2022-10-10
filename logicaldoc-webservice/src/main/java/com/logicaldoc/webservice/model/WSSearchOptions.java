@@ -266,7 +266,7 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 		wopt.setRetrieveAliases(opt.isRetrieveAliases() ? 1 : 0);
 		wopt.setTemplate(opt.getTemplate());
 		wopt.setCaseSensitive(opt.isCaseSensitive() ? 1 : 0);
-		if (opt.getFilterIds() != null && opt.getFilterIds() != null)
+		if (opt.getFilterIds() != null)
 			wopt.setFilterIds(opt.getFilterIds().toArray(new Long[0]));
 
 		switch (opt.getType()) {

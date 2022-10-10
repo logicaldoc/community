@@ -50,7 +50,7 @@ public class FolderGroup {
 	private int email = 1;
 
 	private int automation = 0;
-	
+
 	private int storage = 0;
 
 	private long groupId;
@@ -62,30 +62,30 @@ public class FolderGroup {
 	public FolderGroup() {
 	}
 
-	@Override
-	public FolderGroup clone() {
-		FolderGroup mg = new FolderGroup(groupId);
-		mg.setAdd(add);
-		mg.setDelete(delete);
-		mg.setSecurity(security);
-		mg.setImmutable(immutable);
-		mg.setRename(rename);
-		mg.setWrite(write);
-		mg.setRead(read);
-		mg.setImport(_import);
-		mg.setExport(export);
-		mg.setSign(sign);
-		mg.setArchive(archive);
-		mg.setWorkflow(workflow);
-		mg.setDownload(download);
-		mg.setCalendar(calendar);
-		mg.setSubscription(subscription);
-		mg.setPassword(password);
-		mg.setMove(move);
-		mg.setEmail(email);
-		mg.setAutomation(automation);
-		mg.setStorage(storage);
-		return mg;
+	public FolderGroup(FolderGroup source) {
+		super();
+		this.read = source.read;
+		this.write = source.write;
+		this.download = source.download;
+		this.add = source.add;
+		this.security = source.security;
+		this.delete = source.delete;
+		this.rename = source.rename;
+		this.immutable = source.immutable;
+		this._import = source._import;
+		this.export = source.export;
+		this.sign = source.sign;
+		this.archive = source.archive;
+		this.workflow = source.workflow;
+		this.calendar = source.calendar;
+		this.subscription = source.subscription;
+		this.password = source.password;
+		this.print = source.print;
+		this.move = source.move;
+		this.email = source.email;
+		this.automation = source.automation;
+		this.storage = source.storage;
+		this.groupId = source.groupId;
 	}
 
 	@Override

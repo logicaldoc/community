@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Some network utility methods.
  * 
@@ -11,7 +14,8 @@ import java.net.Socket;
  * @since 4.5
  */
 public class NetUtil {
-
+	protected static Logger log = LoggerFactory.getLogger(JarUtil.class);
+	
 	/**
 	 * Checks if a port is available
 	 * 
@@ -32,7 +36,7 @@ public class NetUtil {
 				return true;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 			return false;
 		} finally {
 			// Clean up

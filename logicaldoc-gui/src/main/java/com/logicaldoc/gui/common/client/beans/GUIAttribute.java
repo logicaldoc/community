@@ -90,6 +90,37 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	private String initialization;
 
+	
+	public GUIAttribute() {
+	}
+
+	
+	
+	public GUIAttribute(GUIAttribute source) {
+		this.editor = source.editor;
+		this.stringValue = source.stringValue;
+		this.username = source.username;
+		this.intValue = source.intValue;
+		this.doubleValue = source.doubleValue;
+		this.dateValue = source.dateValue;
+		this.booleanValue = source.booleanValue;
+		this.type = source.type;
+		this.mandatory = source.mandatory;
+		this.hidden = source.hidden;
+		this.multiple = source.multiple;
+		this.parent = source.parent;
+		this.dependsOn = source.dependsOn;
+		this.position = source.position;
+		this.name = source.name;
+		this.label = source.label;
+		this.set = source.set;
+		this.setId = source.setId;
+		this.options = source.options;
+		this.stringValues = source.stringValues;
+		this.validation = source.validation;
+		this.initialization = source.initialization;
+	}
+	
 	public static boolean isForbidden(String name) {
 		for (String forbidden : FORBIDDEN_NAMES) {
 			if (forbidden.equals(name))
@@ -362,35 +393,6 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	public void setDependsOn(String dependsOn) {
 		this.dependsOn = dependsOn;
-	}
-
-	public GUIAttribute clone() {
-		GUIAttribute newAttr = new GUIAttribute();
-		newAttr.setBooleanValue(booleanValue);
-		newAttr.setDateValue(dateValue);
-		newAttr.setEditor(editor);
-		newAttr.setDoubleValue(doubleValue);
-		newAttr.setHidden(hidden);
-		newAttr.setIntValue(intValue);
-		newAttr.setLabel(label);
-		newAttr.setMandatory(mandatory);
-		newAttr.setMultiple(multiple);
-		newAttr.setName(name);
-		newAttr.setOptions(options);
-		newAttr.setPosition(position);
-		newAttr.setSet(set);
-		newAttr.setSetId(setId);
-		newAttr.setStringValue(stringValue);
-		newAttr.setParent(parent);
-		newAttr.setOptions(options);
-		newAttr.setStringValues(stringValues);
-		newAttr.setType(type);
-		newAttr.setUsername(username);
-		newAttr.setValidation(validation);
-		newAttr.setInitialization(initialization);
-		newAttr.setDependsOn(dependsOn);
-
-		return newAttr;
 	}
 
 	@Override

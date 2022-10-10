@@ -145,7 +145,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	private void storeSession(Session session) {
 		try {
 			if (session.getId() == 0L) {
-				Session dbSession = (Session) session.clone();
+				Session dbSession = session.getClone();
 				sessionDao.store(dbSession);
 				session.setId(dbSession.getId());
 			} else {
@@ -395,6 +395,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 		Cookie sidCookie = new Cookie(COOKIE_SID, sid);
 		sidCookie.setHttpOnly(true);
+		sidCookie.setSecure(true);
 		response.addCookie(sidCookie);
 	}
 

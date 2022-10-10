@@ -53,7 +53,7 @@ public class Upload extends VerticalPanel {
 				.setUploadProgressHandler(new UploadProgressHandler() {
 					public boolean onUploadProgress(UploadProgressEvent uploadProgressEvent) {
 						progressLabel.setText(NumberFormat.getPercentFormat()
-								.format(uploadProgressEvent.getBytesComplete() / uploadProgressEvent.getBytesTotal()));
+								.format(uploadProgressEvent.getBytesComplete() / (double) uploadProgressEvent.getBytesTotal()));
 						return true;
 					}
 				}).setUploadSuccessHandler(new UploadSuccessHandler() {

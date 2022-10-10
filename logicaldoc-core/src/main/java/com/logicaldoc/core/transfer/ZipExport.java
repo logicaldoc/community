@@ -67,7 +67,7 @@ public class ZipExport {
 	 *        the original files
 	 * 
 	 * @return The Stream of the zip archive
-	 * @throws PersistenceException error at database level 
+	 * @throws PersistenceException error at database level
 	 */
 	public ByteArrayOutputStream process(FolderHistory transaction, boolean pdfConversion) throws PersistenceException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -88,9 +88,7 @@ public class ZipExport {
 				zos.flush();
 				zos.close();
 			} catch (Throwable e) {
-				e.printStackTrace();
 			}
-
 		}
 
 		/*
@@ -112,9 +110,10 @@ public class ZipExport {
 	 * 
 	 * @return The Stream of the zip archive
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error in the database
 	 */
-	public ByteArrayOutputStream process(Long[] docIds, boolean pdfConversion, DocumentHistory transaction) throws PersistenceException {
+	public ByteArrayOutputStream process(Long[] docIds, boolean pdfConversion, DocumentHistory transaction)
+			throws PersistenceException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		process(docIds, bos, pdfConversion, transaction);
 		return bos;
@@ -130,7 +129,8 @@ public class ZipExport {
 	 * @param transaction session informations
 	 * @throws PersistenceException error at database level
 	 */
-	public void process(Long[] docIds, OutputStream out, boolean pdfConversion, DocumentHistory transaction) throws PersistenceException {
+	public void process(Long[] docIds, OutputStream out, boolean pdfConversion, DocumentHistory transaction)
+			throws PersistenceException {
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -161,7 +161,7 @@ public class ZipExport {
 				addDocument("", doc, convertToPdf, transaction.getSessionId());
 
 				if (transaction != null) {
-					DocumentHistory t = (DocumentHistory) transaction.clone();
+					DocumentHistory t = new DocumentHistory(transaction);
 					transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
 					try {
 						ddao.saveDocumentHistory(doc, t);
@@ -175,7 +175,7 @@ public class ZipExport {
 				zos.flush();
 				zos.close();
 			} catch (Throwable e) {
-				e.printStackTrace();
+				log.warn(e.getMessage());
 			}
 
 		}
@@ -199,9 +199,10 @@ public class ZipExport {
 	 * @param pdfConversion if the PDF conversions have to be used instead
 	 * @param sid identifier of the session
 	 * 
-	 * @throws PersistenceException  error in the database 
+	 * @throws PersistenceException error in the database
 	 */
-	protected void appendChildren(Folder folder, int depth, boolean pdfConversion, String sid) throws PersistenceException {
+	protected void appendChildren(Folder folder, int depth, boolean pdfConversion, String sid)
+			throws PersistenceException {
 		if (!allLevel && (depth > 1)) {
 			return;
 		} else {
@@ -223,7 +224,7 @@ public class ZipExport {
 	 * @param pdfConversion if the PDF conversions have to be used instead
 	 * @param sid identifier of the session
 	 * 
-	 * @throws PersistenceException error in the databaes 
+	 * @throws PersistenceException error in the databaes
 	 */
 	protected void addFolderDocuments(Folder folder, boolean pdfConversion, String sid) throws PersistenceException {
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);

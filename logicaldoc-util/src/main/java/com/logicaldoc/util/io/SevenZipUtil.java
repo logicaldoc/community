@@ -9,6 +9,8 @@ import java.util.List;
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
 import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 
+import com.logicaldoc.util.Context;
+
 /**
  * This class is for handling with 7z files
  * 
@@ -17,10 +19,21 @@ import org.apache.commons.compress.archivers.sevenz.SevenZFile;
  */
 public class SevenZipUtil {
 
-	private SevenZipUtil() {
+	/**
+	 * Maximum size of the uncompressed contents of the compressed archive,
+	 * config parameter zip.maxsize
+	 */
+	private int maxSize = 1024 * 1024 * 1024; // 1 GB
+
+	public SevenZipUtil() {
+		try {
+			maxSize = Context.get().getProperties().getInt("zip.maxsize", 1024) * 1024 * 1024;
+		} catch (Throwable t) {
+
+		}
 	}
 
-	public static List<String> listEntries(File sevenZipFile) throws IOException {
+	public List<String> listEntries(File sevenZipFile) throws IOException {
 		List<String> entries = new ArrayList<String>();
 
 		try (SevenZFile archiveFile = new SevenZFile(sevenZipFile);) {
@@ -34,7 +47,7 @@ public class SevenZipUtil {
 		return entries;
 	}
 
-	public static void extractEntry(File sevenZipFile, String entryName, File dest) throws IOException {
+	public void extractEntry(File sevenZipFile, String entryName, File dest) throws IOException {
 		try (SevenZFile archiveFile = new SevenZFile(sevenZipFile);) {
 			SevenZArchiveEntry entry;
 			while ((entry = archiveFile.getNextEntry()) != null) {
@@ -42,8 +55,16 @@ public class SevenZipUtil {
 					try (FileOutputStream fileOutputStream = new FileOutputStream(dest)) {
 						int length = -1;
 						byte[] buffer = new byte[2048];
+						int totalSizeEntry = 0;
+
 						while ((length = archiveFile.read(buffer)) != -1) {
 							fileOutputStream.write(buffer, 0, length);
+							totalSizeEntry += length;
+
+							if (totalSizeEntry > maxSize)
+								throw new IOException(String.format(
+										"7Zip file looks like a Zip Bomb Attack: the uncompressed data size is over the maximum allowed of %s",
+										FileUtil.getDisplaySize(maxSize, "en")));
 						}
 					}
 					break;

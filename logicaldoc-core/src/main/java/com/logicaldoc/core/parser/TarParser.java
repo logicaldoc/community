@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class TarParser extends AbstractParser {
 		File tarFile = File.createTempFile("parsetar", ".tar");
 		try {
 			FileUtil.writeFile(input, tarFile.getAbsolutePath());
-			List<String> entries = TarUtil.listEntries(tarFile);
+			List<String> entries = new TarUtil().listEntries(tarFile);
 			if (entries.size() > 1) {
 				/*
 				 * If we have more entries just print the entries list
@@ -51,9 +50,9 @@ public class TarParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					TarUtil.extractEntry(tarFile, entry, uncompressedEntryFile);
+					new TarUtil().extractEntry(tarFile, entry, uncompressedEntryFile);
 
-					Document clone = document.clone();
+					Document clone = new Document(document);
 					clone.setFileName(uncompressedEntryFile.getName());
 					String text = entryParser.parse(uncompressedEntryFile, uncompressedEntryFile.getName(), encoding,
 							locale, tenant, document, fileVersion);
@@ -91,7 +90,7 @@ public class TarParser extends AbstractParser {
 	@Override
 	public int countPages(File input, String filename) {
 		try {
-			List<String> entries = TarUtil.listEntries(input);
+			List<String> entries = new TarUtil().listEntries(input);
 			if (entries.size() > 1) {
 				return entries.size();
 			} else {
@@ -106,7 +105,7 @@ public class TarParser extends AbstractParser {
 					if (entryParser == null)
 						throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
 
-					TarUtil.extractEntry(input, entry, uncompressedEntryFile);
+					new TarUtil().extractEntry(input, entry, uncompressedEntryFile);
 					return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
 				} finally {
 					if (uncompressedEntryFile != null)

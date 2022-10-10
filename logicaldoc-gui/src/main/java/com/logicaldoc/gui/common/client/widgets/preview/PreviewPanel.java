@@ -49,7 +49,7 @@ public class PreviewPanel extends VLayout {
 	private MailPreviewPanel mail = null;
 
 	private Canvas reload = null;
-	
+
 	private Label disabled = null;
 
 	private long docId;
@@ -258,7 +258,7 @@ public class PreviewPanel extends VLayout {
 		String contents = "";
 
 		long maxFileSize = Session.get().getConfigAsLong("gui.preview.maxfilesize") * 1024 * 1024;
-		if (maxFileSize > 0 && document.getFileSize() != null && maxFileSize < document.getFileSize()) {
+		if (maxFileSize > 0 && maxFileSize < document.getFileSize()) {
 			contents = "<div><br><center><b>" + I18N.message("doctoobigtoberendered") + "</b></center></br></div>";
 		} else {
 			try {
@@ -320,7 +320,7 @@ public class PreviewPanel extends VLayout {
 
 		addMember(reload);
 	}
-	
+
 	/**
 	 * Displays the label when the preview menu is not enabled
 	 */

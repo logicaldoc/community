@@ -1,11 +1,9 @@
 package com.logicaldoc.web.data;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.util.IconSelector;
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.util.ServiceUtil;
 
@@ -28,19 +27,21 @@ public class LinksDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(LinksDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			ServiceUtil.validateSession(request);
 
 			Long docId = null;
 			if (StringUtils.isNotEmpty(request.getParameter("docId"))) {
-				docId=Long.parseLong(request.getParameter("docId"));				
+				docId = Long.parseLong(request.getParameter("docId"));
 				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-				Document doc=ddao.findDocument(docId);
-				if(doc!=null)
-					docId=doc.getId();
+				Document doc = ddao.findDocument(docId);
+				if (doc != null)
+					docId = doc.getId();
 			}
+
+			if (docId == null)
+				throw new Exception("No document ID");
 
 			String parent = request.getParameter("parent");
 			if (StringUtils.isEmpty(parent))
@@ -76,7 +77,7 @@ public class LinksDataServlet extends HttpServlet {
 				query.append(" and not A.document2.id = " + docId);
 			}
 
-			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>)null, null);
+			List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, null);
 
 			/*
 			 * Iterate over records composing the response XML document
@@ -105,7 +106,7 @@ public class LinksDataServlet extends HttpServlet {
 					writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[5]))
 							+ "</icon>");
 					if (cols[11] != null)
-						writer.print("<color><![CDATA[" + cols[11] + "]]></color>");					
+						writer.print("<color><![CDATA[" + cols[11] + "]]></color>");
 					writer.print("<direction>in</direction>");
 				}
 
@@ -115,12 +116,7 @@ public class LinksDataServlet extends HttpServlet {
 			writer.write("</list>");
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			if (e instanceof ServletException)
-				throw (ServletException) e;
-			else if (e instanceof IOException)
-				throw (IOException) e;
-			else
-				throw new ServletException(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 }

@@ -75,15 +75,12 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 		try {
 			return super.createPath(sid, root.getId(), folderPath);
 		} catch (RuntimeException re) {
-			re.printStackTrace();
 			log.error("createSimpleForm RuntimeException", re);
 			throw re;
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error("createSimpleForm Exception", e);
 			throw e;
 		} catch (Throwable tw) {
-			tw.printStackTrace();
 			log.error("createSimpleForm Throwable", tw);
 			throw tw;
 		}

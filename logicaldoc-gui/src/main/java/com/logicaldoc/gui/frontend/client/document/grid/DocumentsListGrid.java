@@ -146,8 +146,9 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 						SortSpecifier[] sortSpecs = getSort();
 						SortSpecifier[] newSpecs = new SortSpecifier[sortSpecs != null ? sortSpecs.length + 1 : 1];
 						newSpecs[0] = new SortSpecifier("order", SortDirection.DESCENDING);
-						for (int i = 1; i < newSpecs.length; i++)
-							newSpecs[i] = sortSpecs[i - 1];
+						if (sortSpecs != null)
+							for (int i = 1; i < newSpecs.length; i++)
+								newSpecs[i] = sortSpecs[i - 1];
 						setSort(newSpecs);
 					}
 					selectDocument(Session.get().getHiliteDocId());
@@ -732,14 +733,14 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	@Override
 	public void setDocuments(GUIDocument[] documents) {
 		ListGridRecord[] records = new ListGridRecord[0];
-		if (documents == null || documents.length == 0)
-			setRecords(records);
 
-		records = new ListGridRecord[documents.length];
-		for (int i = 0; i < documents.length; i++) {
-			GUIDocument doc = documents[i];
-			ListGridRecord record = DocumentGridUtil.fromDocument(doc);
-			records[i] = record;
+		if (documents != null && documents.length > 0) {
+			records = new ListGridRecord[documents.length];
+			for (int i = 0; i < documents.length; i++) {
+				GUIDocument doc = documents[i];
+				ListGridRecord record = DocumentGridUtil.fromDocument(doc);
+				records[i] = record;
+			}
 		}
 
 		setRecords(records);

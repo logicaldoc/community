@@ -16,6 +16,7 @@ import org.apache.jackrabbit.webdav.io.OutputContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.webdav.resource.model.Resource;
 
 /**
@@ -147,8 +148,7 @@ public class ExportContextImpl extends AbstractExportContext {
 				}
 			}
 		}
-		if (outFile != null) {
-			outFile.delete();
-		}
+		
+		FileUtil.strongDelete(outFile);
 	}
 }

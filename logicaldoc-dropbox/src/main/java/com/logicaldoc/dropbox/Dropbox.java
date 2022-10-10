@@ -96,7 +96,7 @@ public class Dropbox {
 			DbxAuthFinish authFinish = webAuth.finishFromCode(authorizationCode);
 			return authFinish.getAccessToken();
 		} catch (DbxException e) {
-			e.printStackTrace();
+			log.debug(e.getMessage());
 		}
 		return null;
 	}
@@ -128,7 +128,7 @@ public class Dropbox {
 	public List<FileMetadata> listFilesInTree(String basePath) throws DbxException {
 		List<FileMetadata> files = new ArrayList<FileMetadata>();
 		if (basePath.endsWith("/"))
-			basePath.substring(0, basePath.length() - 1);
+			basePath = basePath.substring(0, basePath.length() - 1);
 		if (!basePath.startsWith("/"))
 			basePath = "/" + basePath;
 		if (basePath.equals("/"))

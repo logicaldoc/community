@@ -404,7 +404,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 		while (iter.hasNext()) {
 			String words = iter.next().toString();
-			words.replace(",", "\\,");
+			words = words.replace(",", "\\,");
 
 			if (!start) {
 				sb.append(",");

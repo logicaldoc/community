@@ -4,12 +4,10 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -17,26 +15,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.chemistry.opencmis.commons.data.Ace;
-import org.apache.chemistry.opencmis.commons.data.Acl;
-import org.apache.chemistry.opencmis.commons.data.AllowableActions;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
 import org.apache.chemistry.opencmis.commons.data.ExtensionsData;
-import org.apache.chemistry.opencmis.commons.data.ObjectData;
-import org.apache.chemistry.opencmis.commons.data.ObjectInFolderContainer;
-import org.apache.chemistry.opencmis.commons.data.ObjectInFolderData;
-import org.apache.chemistry.opencmis.commons.data.PolicyIdList;
-import org.apache.chemistry.opencmis.commons.data.Properties;
-import org.apache.chemistry.opencmis.commons.data.PropertyBoolean;
-import org.apache.chemistry.opencmis.commons.data.PropertyData;
-import org.apache.chemistry.opencmis.commons.data.PropertyDateTime;
-import org.apache.chemistry.opencmis.commons.data.PropertyDecimal;
-import org.apache.chemistry.opencmis.commons.data.PropertyHtml;
-import org.apache.chemistry.opencmis.commons.data.PropertyId;
-import org.apache.chemistry.opencmis.commons.data.PropertyInteger;
-import org.apache.chemistry.opencmis.commons.data.PropertyString;
-import org.apache.chemistry.opencmis.commons.data.PropertyUri;
-import org.apache.chemistry.opencmis.commons.data.RenditionData;
 import org.apache.chemistry.opencmis.commons.definitions.Choice;
 import org.apache.chemistry.opencmis.commons.definitions.DocumentTypeDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.FolderTypeDefinition;
@@ -52,60 +32,29 @@ import org.apache.chemistry.opencmis.commons.definitions.PropertyStringDefinitio
 import org.apache.chemistry.opencmis.commons.definitions.PropertyUriDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.RelationshipTypeDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
-import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionContainer;
-import org.apache.chemistry.opencmis.commons.definitions.TypeDefinitionList;
-import org.apache.chemistry.opencmis.commons.enums.Action;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.Cardinality;
-import org.apache.chemistry.opencmis.commons.enums.ChangeType;
 import org.apache.chemistry.opencmis.commons.enums.ContentStreamAllowed;
 import org.apache.chemistry.opencmis.commons.enums.DateTimeResolution;
 import org.apache.chemistry.opencmis.commons.enums.PropertyType;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyData;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyDefinition;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractTypeDefinition;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlEntryImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlListImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.AccessControlPrincipalDataImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.AllowableActionsImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ChangeEventInfoDataImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.ChoiceImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.CmisExtensionElementImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.DocumentTypeDefinitionImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.FolderTypeDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectDataImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectInFolderContainerImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectInFolderDataImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PolicyIdListImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PolicyTypeDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyBooleanDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyBooleanImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyDateTimeDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyDateTimeImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyDecimalDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyDecimalImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyHtmlDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyHtmlImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIntegerDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIntegerImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyUriDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyUriImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.RelationshipTypeDefinitionImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.RenditionDataImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.TypeDefinitionContainerImpl;
-import org.apache.chemistry.opencmis.commons.impl.dataobjects.TypeDefinitionListImpl;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisAccessControlEntryType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisAccessControlListType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisAccessControlPrincipalType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisAllowableActionsType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisChangeEventType;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisChoiceBoolean;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisChoiceDateTime;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisChoiceDecimal;
@@ -114,12 +63,6 @@ import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisChoiceId;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisChoiceInteger;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisChoiceString;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisChoiceUri;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisListOfIdsType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisObjectInFolderContainerType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisObjectInFolderType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisObjectType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisPropertiesType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisProperty;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisPropertyBoolean;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisPropertyBooleanDefinitionType;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisPropertyDateTime;
@@ -137,9 +80,6 @@ import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisPropertyString;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisPropertyStringDefinitionType;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisPropertyUri;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisPropertyUriDefinitionType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisRenditionType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisTypeContainer;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisTypeDefinitionListType;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisTypeDefinitionType;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisTypeDocumentDefinitionType;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.CmisTypeFolderDefinitionType;
@@ -150,7 +90,6 @@ import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumCardinality;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumContentStreamAllowed;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumDateTimeResolution;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumPropertyType;
-import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumTypeOfChanges;
 import org.apache.chemistry.opencmis.commons.impl.jaxb.EnumUpdatability;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -182,9 +121,8 @@ public final class Converter {
 	 * @return the type definition obect
 	 */
 	public static TypeDefinition convert(CmisTypeDefinitionType typeDefinition) {
-		if (typeDefinition == null) {
+		if (typeDefinition == null)
 			return null;
-		}
 
 		AbstractTypeDefinition result = null;
 
@@ -226,9 +164,8 @@ public final class Converter {
 		result.setParentTypeId(typeDefinition.getParentId());
 		result.setQueryName(typeDefinition.getQueryName());
 
-		for (CmisPropertyDefinitionType propertyDefinition : typeDefinition.getPropertyDefinition()) {
+		for (CmisPropertyDefinitionType propertyDefinition : typeDefinition.getPropertyDefinition())
 			result.addPropertyDefinition(convert(propertyDefinition));
-		}
 
 		// handle extensions
 		convertExtension(typeDefinition, result);
@@ -243,10 +180,9 @@ public final class Converter {
 	 * 
 	 * @return definition object
 	 */
-	public static PropertyDefinition<?> convert(CmisPropertyDefinitionType propertyDefinition) {
-		if (propertyDefinition == null) {
+	private static PropertyDefinition<?> convert(CmisPropertyDefinitionType propertyDefinition) {
+		if (propertyDefinition == null)
 			return null;
-		}
 
 		AbstractPropertyDefinition<?> result = null;
 
@@ -351,9 +287,8 @@ public final class Converter {
 			if (prop != null) {
 				((PropertyUriDefinitionImpl) result).setDefaultValue(prop.getValue());
 			}
-		} else {
+		} else
 			return null;
-		}
 
 		result.setCardinality(convert(Cardinality.class, propertyDefinition.getCardinality()));
 		result.setDescription(propertyDefinition.getDescription());
@@ -384,9 +319,8 @@ public final class Converter {
 	 * @return CMIS type definition object
 	 */
 	public static CmisTypeDefinitionType convert(TypeDefinition typeDefinition) {
-		if (typeDefinition == null) {
+		if (typeDefinition == null)
 			return null;
-		}
 
 		CmisTypeDefinitionType result = null;
 
@@ -418,9 +352,8 @@ public final class Converter {
 			}
 		} else if (typeDefinition instanceof PolicyTypeDefinition) {
 			result = new CmisTypePolicyDefinitionType();
-		} else {
+		} else
 			return null;
-		}
 
 		result.setBaseId(convert(EnumBaseObjectTypeIds.class, typeDefinition.getBaseTypeId()));
 		result.setControllableACL(convertBoolean(typeDefinition.isControllableAcl(), false));
@@ -457,10 +390,9 @@ public final class Converter {
 	 * 
 	 * @return CMS property definition
 	 */
-	public static CmisPropertyDefinitionType convert(PropertyDefinition<?> propertyDefinition) {
-		if (propertyDefinition == null) {
+	private static CmisPropertyDefinitionType convert(PropertyDefinition<?> propertyDefinition) {
+		if (propertyDefinition == null)
 			return null;
-		}
 
 		CmisPropertyDefinitionType result = null;
 
@@ -609,9 +541,8 @@ public final class Converter {
 				}
 				target.setDefaultValue(defaultValue);
 			}
-		} else {
+		} else
 			return null;
-		}
 
 		result.setCardinality(convert(EnumCardinality.class, propertyDefinition.getCardinality()));
 		result.setDescription(propertyDefinition.getDescription());
@@ -646,11 +577,10 @@ public final class Converter {
 	 * @return list of choices
 	 */
 	private static List<Choice<String>> convertChoiceStringList(List<CmisChoiceString> choices) {
-		if (choices == null) {
-			return null;
-		}
+		if (choices == null)
+			return new ArrayList<>();
 
-		List<Choice<String>> result = new ArrayList<Choice<String>>();
+		List<Choice<String>> result = new ArrayList<>();
 
 		for (CmisChoiceString choice : choices) {
 			ChoiceImpl<String> newChoice = new ChoiceImpl<String>();
@@ -700,11 +630,10 @@ public final class Converter {
 	 * @return list of choices
 	 */
 	private static List<Choice<String>> convertChoiceIdList(List<CmisChoiceId> choices) {
-		if (choices == null) {
-			return null;
-		}
+		if (choices == null)
+			return new ArrayList<>();
 
-		List<Choice<String>> result = new ArrayList<Choice<String>>();
+		List<Choice<String>> result = new ArrayList<>();
 
 		for (CmisChoiceId choice : choices) {
 			ChoiceImpl<String> newChoice = new ChoiceImpl<String>();
@@ -726,9 +655,8 @@ public final class Converter {
 	 * @param target listr that will receive the conversion
 	 */
 	private static void convertChoiceIdList(List<Choice<String>> choices, List<CmisChoiceId> target) {
-		if (choices == null) {
+		if (choices == null)
 			return;
-		}
 
 		for (Choice<String> choice : choices) {
 			CmisChoiceId newChoice = new CmisChoiceId();
@@ -754,14 +682,13 @@ public final class Converter {
 	 * @return the list of conversions
 	 */
 	private static List<Choice<BigInteger>> convertChoiceIntegerList(List<CmisChoiceInteger> choices) {
-		if (choices == null) {
-			return null;
-		}
+		if (choices == null)
+			return new ArrayList<>();
 
-		List<Choice<BigInteger>> result = new ArrayList<Choice<BigInteger>>();
+		List<Choice<BigInteger>> result = new ArrayList<>();
 
 		for (CmisChoiceInteger choice : choices) {
-			ChoiceImpl<BigInteger> newChoice = new ChoiceImpl<BigInteger>();
+			ChoiceImpl<BigInteger> newChoice = new ChoiceImpl<>();
 
 			newChoice.setChoice(convertChoiceIntegerList(choice.getChoice()));
 			newChoice.setDisplayName(choice.getDisplayName());
@@ -780,9 +707,8 @@ public final class Converter {
 	 * @param target list that will receive the conversions
 	 */
 	private static void convertChoiceIntegerList(List<Choice<BigInteger>> choices, List<CmisChoiceInteger> target) {
-		if (choices == null) {
+		if (choices == null)
 			return;
-		}
 
 		for (Choice<BigInteger> choice : choices) {
 			CmisChoiceInteger newChoice = new CmisChoiceInteger();
@@ -805,17 +731,16 @@ public final class Converter {
 	 * 
 	 * @param choices the choices
 	 * 
-	 * @return the lsit of conversions
+	 * @return the list of conversions
 	 */
 	private static List<Choice<BigDecimal>> convertChoiceDecimalList(List<CmisChoiceDecimal> choices) {
-		if (choices == null) {
-			return null;
-		}
+		if (choices == null)
+			return new ArrayList<>();
 
-		List<Choice<BigDecimal>> result = new ArrayList<Choice<BigDecimal>>();
+		List<Choice<BigDecimal>> result = new ArrayList<>();
 
 		for (CmisChoiceDecimal choice : choices) {
-			ChoiceImpl<BigDecimal> newChoice = new ChoiceImpl<BigDecimal>();
+			ChoiceImpl<BigDecimal> newChoice = new ChoiceImpl<>();
 
 			newChoice.setChoice(convertChoiceDecimalList(choice.getChoice()));
 			newChoice.setDisplayName(choice.getDisplayName());
@@ -834,9 +759,8 @@ public final class Converter {
 	 * @param target list that will receive the conversions
 	 */
 	private static void convertChoiceDecimalList(List<Choice<BigDecimal>> choices, List<CmisChoiceDecimal> target) {
-		if (choices == null) {
+		if (choices == null)
 			return;
-		}
 
 		for (Choice<BigDecimal> choice : choices) {
 			CmisChoiceDecimal newChoice = new CmisChoiceDecimal();
@@ -861,11 +785,10 @@ public final class Converter {
 	 * @return list of conversions
 	 */
 	private static List<Choice<Boolean>> convertChoiceBooleanList(List<CmisChoiceBoolean> choices) {
-		if (choices == null) {
-			return null;
-		}
+		if (choices == null)
+			return new ArrayList<>();
 
-		List<Choice<Boolean>> result = new ArrayList<Choice<Boolean>>();
+		List<Choice<Boolean>> result = new ArrayList<>();
 
 		for (CmisChoiceBoolean choice : choices) {
 			ChoiceImpl<Boolean> newChoice = new ChoiceImpl<Boolean>();
@@ -887,9 +810,8 @@ public final class Converter {
 	 * @param target list that will receive the conversions
 	 */
 	private static void convertChoiceBooleanList(List<Choice<Boolean>> choices, List<CmisChoiceBoolean> target) {
-		if (choices == null) {
+		if (choices == null)
 			return;
-		}
 
 		for (Choice<Boolean> choice : choices) {
 			CmisChoiceBoolean newChoice = new CmisChoiceBoolean();
@@ -915,9 +837,8 @@ public final class Converter {
 	 * @return the list of conversions
 	 */
 	private static List<Choice<GregorianCalendar>> convertChoiceDateTimeList(List<CmisChoiceDateTime> choices) {
-		if (choices == null) {
-			return null;
-		}
+		if (choices == null)
+			return new ArrayList<>();
 
 		List<Choice<GregorianCalendar>> result = new ArrayList<Choice<GregorianCalendar>>();
 
@@ -939,9 +860,8 @@ public final class Converter {
 	 */
 	private static void convertChoiceDateTimeList(List<Choice<GregorianCalendar>> choices,
 			List<CmisChoiceDateTime> target) {
-		if (choices == null) {
+		if (choices == null)
 			return;
-		}
 
 		for (Choice<GregorianCalendar> choice : choices) {
 			CmisChoiceDateTime newChoice = new CmisChoiceDateTime();
@@ -963,9 +883,8 @@ public final class Converter {
 	 * Converts a choices list.
 	 */
 	private static List<Choice<String>> convertChoiceHtmlList(List<CmisChoiceHtml> choices) {
-		if (choices == null) {
-			return null;
-		}
+		if (choices == null)
+			return new ArrayList<>();
 
 		List<Choice<String>> result = new ArrayList<Choice<String>>();
 
@@ -986,9 +905,8 @@ public final class Converter {
 	 * Converts a choices list.
 	 */
 	private static void convertChoiceHtmlList(List<Choice<String>> choices, List<CmisChoiceHtml> target) {
-		if (choices == null) {
+		if (choices == null)
 			return;
-		}
 
 		for (Choice<String> choice : choices) {
 			CmisChoiceHtml newChoice = new CmisChoiceHtml();
@@ -1010,14 +928,13 @@ public final class Converter {
 	 * Converts a choices list.
 	 */
 	private static List<Choice<String>> convertChoiceUriList(List<CmisChoiceUri> choices) {
-		if (choices == null) {
-			return null;
-		}
+		if (choices == null)
+			return new ArrayList<>();
 
-		List<Choice<String>> result = new ArrayList<Choice<String>>();
+		List<Choice<String>> result = new ArrayList<>();
 
 		for (CmisChoiceUri choice : choices) {
-			ChoiceImpl<String> newChoice = new ChoiceImpl<String>();
+			ChoiceImpl<String> newChoice = new ChoiceImpl<>();
 
 			newChoice.setChoice(convertChoiceUriList(choice.getChoice()));
 			newChoice.setDisplayName(choice.getDisplayName());
@@ -1033,9 +950,8 @@ public final class Converter {
 	 * Converts a choices list.
 	 */
 	private static void convertChoiceUriList(List<Choice<String>> choices, List<CmisChoiceUri> target) {
-		if (choices == null) {
+		if (choices == null)
 			return;
-		}
 
 		for (Choice<String> choice : choices) {
 			CmisChoiceUri newChoice = new CmisChoiceUri();
@@ -1064,44 +980,43 @@ public final class Converter {
 	 * 
 	 * @return the converted object
 	 */
-	public static ObjectData convert(CmisObjectType object) {
-		if (object == null) {
-			return null;
-		}
-
-		ObjectDataImpl result = new ObjectDataImpl();
-
-		result.setAcl(convert(object.getAcl(), object.isExactACL()));
-		result.setAllowableActions(convert(object.getAllowableActions()));
-		if (object.getChangeEventInfo() != null) {
-			ChangeEventInfoDataImpl changeEventInfo = new ChangeEventInfoDataImpl();
-			if (object.getChangeEventInfo().getChangeTime() != null) {
-				changeEventInfo.setChangeTime(object.getChangeEventInfo().getChangeTime().toGregorianCalendar());
-			}
-			changeEventInfo.setChangeType(convert(ChangeType.class, object.getChangeEventInfo().getChangeType()));
-			convertExtension(object.getChangeEventInfo(), changeEventInfo);
-
-			result.setChangeEventInfo(changeEventInfo);
-		}
-		result.setIsExactAcl(object.isExactACL());
-		result.setPolicyIds(convert(object.getPolicyIds()));
-		result.setProperties(convert(object.getProperties()));
-		List<ObjectData> relationships = new ArrayList<ObjectData>();
-		for (CmisObjectType cmisObject : object.getRelationship()) {
-			relationships.add(convert(cmisObject));
-		}
-		result.setRelationships(relationships);
-		List<RenditionData> renditions = new ArrayList<RenditionData>();
-		for (CmisRenditionType rendition : object.getRendition()) {
-			renditions.add(convert(rendition));
-		}
-		result.setRenditions(renditions);
-
-		// handle extensions
-		convertExtension(object, result);
-
-		return result;
-	}
+//	private static ObjectData convert(CmisObjectType object) {
+//		if (object == null)
+//			return null;
+//
+//		ObjectDataImpl result = new ObjectDataImpl();
+//
+//		result.setAcl(convert(object.getAcl(), object.isExactACL()));
+//		result.setAllowableActions(convert(object.getAllowableActions()));
+//		if (object.getChangeEventInfo() != null) {
+//			ChangeEventInfoDataImpl changeEventInfo = new ChangeEventInfoDataImpl();
+//			if (object.getChangeEventInfo().getChangeTime() != null) {
+//				changeEventInfo.setChangeTime(object.getChangeEventInfo().getChangeTime().toGregorianCalendar());
+//			}
+//			changeEventInfo.setChangeType(convert(ChangeType.class, object.getChangeEventInfo().getChangeType()));
+//			convertExtension(object.getChangeEventInfo(), changeEventInfo);
+//
+//			result.setChangeEventInfo(changeEventInfo);
+//		}
+//		result.setIsExactAcl(object.isExactACL());
+//		result.setPolicyIds(convert(object.getPolicyIds()));
+//		result.setProperties(convert(object.getProperties()));
+//		List<ObjectData> relationships = new ArrayList<ObjectData>();
+//		for (CmisObjectType cmisObject : object.getRelationship()) {
+//			relationships.add(convert(cmisObject));
+//		}
+//		result.setRelationships(relationships);
+//		List<RenditionData> renditions = new ArrayList<RenditionData>();
+//		for (CmisRenditionType rendition : object.getRendition()) {
+//			renditions.add(convert(rendition));
+//		}
+//		result.setRenditions(renditions);
+//
+//		// handle extensions
+//		convertExtension(object, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a properties object
@@ -1110,22 +1025,21 @@ public final class Converter {
 	 * 
 	 * @return the converted properties object
 	 */
-	public static Properties convert(CmisPropertiesType properties) {
-		if (properties == null) {
-			return null;
-		}
-
-		PropertiesImpl result = new PropertiesImpl();
-
-		for (CmisProperty property : properties.getProperty()) {
-			result.addProperty(convert(property));
-		}
-
-		// handle extensions
-		convertExtension(properties, result);
-
-		return result;
-	}
+//	private static Properties convert(CmisPropertiesType properties) {
+//		if (properties == null)
+//			return null;
+//
+//		PropertiesImpl result = new PropertiesImpl();
+//
+//		for (CmisProperty property : properties.getProperty()) {
+//			result.addProperty(convert(property));
+//		}
+//
+//		// handle extensions
+//		convertExtension(properties, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a property object
@@ -1134,47 +1048,46 @@ public final class Converter {
 	 * 
 	 * @return the conversion
 	 */
-	public static PropertyData<?> convert(CmisProperty property) {
-		if (property == null) {
-			return null;
-		}
-
-		PropertyData<?> result = null;
-
-		if (property instanceof CmisPropertyString) {
-			result = new PropertyStringImpl(property.getPropertyDefinitionId(),
-					((CmisPropertyString) property).getValue());
-		} else if (property instanceof CmisPropertyId) {
-			result = new PropertyIdImpl(property.getPropertyDefinitionId(), ((CmisPropertyId) property).getValue());
-		} else if (property instanceof CmisPropertyInteger) {
-			result = new PropertyIntegerImpl(property.getPropertyDefinitionId(),
-					((CmisPropertyInteger) property).getValue());
-		} else if (property instanceof CmisPropertyDecimal) {
-			result = new PropertyDecimalImpl(property.getPropertyDefinitionId(),
-					((CmisPropertyDecimal) property).getValue());
-		} else if (property instanceof CmisPropertyBoolean) {
-			result = new PropertyBooleanImpl(property.getPropertyDefinitionId(),
-					((CmisPropertyBoolean) property).getValue());
-		} else if (property instanceof CmisPropertyDateTime) {
-			result = new PropertyDateTimeImpl(property.getPropertyDefinitionId(),
-					convertXMLCalendar(((CmisPropertyDateTime) property).getValue()));
-		} else if (property instanceof CmisPropertyHtml) {
-			result = new PropertyHtmlImpl(property.getPropertyDefinitionId(), ((CmisPropertyHtml) property).getValue());
-		} else if (property instanceof CmisPropertyUri) {
-			result = new PropertyUriImpl(property.getPropertyDefinitionId(), ((CmisPropertyUri) property).getValue());
-		} else {
-			return null;
-		}
-
-		((AbstractPropertyData<?>) result).setLocalName(property.getLocalName());
-		((AbstractPropertyData<?>) result).setQueryName(property.getQueryName());
-		((AbstractPropertyData<?>) result).setDisplayName(property.getDisplayName());
-
-		// handle extensions
-		convertExtension(property, result);
-
-		return result;
-	}
+//	private static PropertyData<?> convert(CmisProperty property) {
+//		if (property == null)
+//			return null;
+//
+//		PropertyData<?> result = null;
+//
+//		if (property instanceof CmisPropertyString) {
+//			result = new PropertyStringImpl(property.getPropertyDefinitionId(),
+//					((CmisPropertyString) property).getValue());
+//		} else if (property instanceof CmisPropertyId) {
+//			result = new PropertyIdImpl(property.getPropertyDefinitionId(), ((CmisPropertyId) property).getValue());
+//		} else if (property instanceof CmisPropertyInteger) {
+//			result = new PropertyIntegerImpl(property.getPropertyDefinitionId(),
+//					((CmisPropertyInteger) property).getValue());
+//		} else if (property instanceof CmisPropertyDecimal) {
+//			result = new PropertyDecimalImpl(property.getPropertyDefinitionId(),
+//					((CmisPropertyDecimal) property).getValue());
+//		} else if (property instanceof CmisPropertyBoolean) {
+//			result = new PropertyBooleanImpl(property.getPropertyDefinitionId(),
+//					((CmisPropertyBoolean) property).getValue());
+//		} else if (property instanceof CmisPropertyDateTime) {
+//			result = new PropertyDateTimeImpl(property.getPropertyDefinitionId(),
+//					convertXMLCalendar(((CmisPropertyDateTime) property).getValue()));
+//		} else if (property instanceof CmisPropertyHtml) {
+//			result = new PropertyHtmlImpl(property.getPropertyDefinitionId(), ((CmisPropertyHtml) property).getValue());
+//		} else if (property instanceof CmisPropertyUri) {
+//			result = new PropertyUriImpl(property.getPropertyDefinitionId(), ((CmisPropertyUri) property).getValue());
+//		} else {
+//			return null;
+//		}
+//
+//		((AbstractPropertyData<?>) result).setLocalName(property.getLocalName());
+//		((AbstractPropertyData<?>) result).setQueryName(property.getQueryName());
+//		((AbstractPropertyData<?>) result).setDisplayName(property.getDisplayName());
+//
+//		// handle extensions
+//		convertExtension(property, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a properties object
@@ -1183,24 +1096,23 @@ public final class Converter {
 	 * 
 	 * @return the conversion
 	 */
-	public static CmisPropertiesType convert(Properties properties) {
-		if (properties == null) {
-			return null;
-		}
-
-		CmisPropertiesType result = new CmisPropertiesType();
-
-		if (properties.getProperties() != null) {
-			for (PropertyData<?> property : properties.getProperties().values()) {
-				result.getProperty().add(convert(property));
-			}
-		}
-
-		// handle extensions
-		convertExtension(properties, result);
-
-		return result;
-	}
+//	private static CmisPropertiesType convert(Properties properties) {
+//		if (properties == null)
+//			return null;
+//
+//		CmisPropertiesType result = new CmisPropertiesType();
+//
+//		if (properties.getProperties() != null) {
+//			for (PropertyData<?> property : properties.getProperties().values()) {
+//				result.getProperty().add(convert(property));
+//			}
+//		}
+//
+//		// handle extensions
+//		convertExtension(properties, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a property object
@@ -1209,49 +1121,47 @@ public final class Converter {
 	 * 
 	 * @return the conversion
 	 */
-	public static CmisProperty convert(PropertyData<?> property) {
-		if (property == null) {
-			return null;
-		}
-
-		CmisProperty result = null;
-
-		if (property instanceof PropertyString) {
-			result = new CmisPropertyString();
-			((CmisPropertyString) result).getValue().addAll(((PropertyString) property).getValues());
-		} else if (property instanceof PropertyId) {
-			result = new CmisPropertyId();
-			((CmisPropertyId) result).getValue().addAll(((PropertyId) property).getValues());
-		} else if (property instanceof PropertyInteger) {
-			result = new CmisPropertyInteger();
-			((CmisPropertyInteger) result).getValue().addAll(((PropertyInteger) property).getValues());
-		} else if (property instanceof PropertyDecimal) {
-			result = new CmisPropertyDecimal();
-			((CmisPropertyDecimal) result).getValue().addAll(((PropertyDecimal) property).getValues());
-		} else if (property instanceof PropertyBoolean) {
-			result = new CmisPropertyBoolean();
-			((CmisPropertyBoolean) result).getValue().addAll(((PropertyBoolean) property).getValues());
-		} else if (property instanceof PropertyDateTime) {
-			result = new CmisPropertyDateTime();
-			((CmisPropertyDateTime) result).getValue()
-					.addAll(convertCalendar(((PropertyDateTime) property).getValues()));
-		} else if (property instanceof PropertyHtml) {
-			result = new CmisPropertyHtml();
-			((CmisPropertyHtml) result).getValue().addAll(((PropertyHtml) property).getValues());
-		} else if (property instanceof PropertyUri) {
-			result = new CmisPropertyUri();
-			((CmisPropertyUri) result).getValue().addAll(((PropertyUri) property).getValues());
-		} else {
-			return null;
-		}
-
-		result.setPropertyDefinitionId(property.getId());
-		result.setLocalName(property.getLocalName());
-		result.setQueryName(property.getQueryName());
-		result.setDisplayName(property.getDisplayName());
-
-		return result;
-	}
+//	private static CmisProperty convert(PropertyData<?> property) {
+//		if (property == null)
+//			return null;
+//
+//		CmisProperty result = null;
+//
+//		if (property instanceof PropertyString) {
+//			result = new CmisPropertyString();
+//			((CmisPropertyString) result).getValue().addAll(((PropertyString) property).getValues());
+//		} else if (property instanceof PropertyId) {
+//			result = new CmisPropertyId();
+//			((CmisPropertyId) result).getValue().addAll(((PropertyId) property).getValues());
+//		} else if (property instanceof PropertyInteger) {
+//			result = new CmisPropertyInteger();
+//			((CmisPropertyInteger) result).getValue().addAll(((PropertyInteger) property).getValues());
+//		} else if (property instanceof PropertyDecimal) {
+//			result = new CmisPropertyDecimal();
+//			((CmisPropertyDecimal) result).getValue().addAll(((PropertyDecimal) property).getValues());
+//		} else if (property instanceof PropertyBoolean) {
+//			result = new CmisPropertyBoolean();
+//			((CmisPropertyBoolean) result).getValue().addAll(((PropertyBoolean) property).getValues());
+//		} else if (property instanceof PropertyDateTime) {
+//			result = new CmisPropertyDateTime();
+//			((CmisPropertyDateTime) result).getValue()
+//					.addAll(convertCalendar(((PropertyDateTime) property).getValues()));
+//		} else if (property instanceof PropertyHtml) {
+//			result = new CmisPropertyHtml();
+//			((CmisPropertyHtml) result).getValue().addAll(((PropertyHtml) property).getValues());
+//		} else if (property instanceof PropertyUri) {
+//			result = new CmisPropertyUri();
+//			((CmisPropertyUri) result).getValue().addAll(((PropertyUri) property).getValues());
+//		} else
+//			return null;
+//
+//		result.setPropertyDefinitionId(property.getId());
+//		result.setLocalName(property.getLocalName());
+//		result.setQueryName(property.getQueryName());
+//		result.setDisplayName(property.getDisplayName());
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a rendition object
@@ -1260,27 +1170,26 @@ public final class Converter {
 	 * 
 	 * @return the conversion
 	 */
-	public static RenditionData convert(CmisRenditionType rendition) {
-		if (rendition == null) {
-			return null;
-		}
-
-		RenditionDataImpl result = new RenditionDataImpl();
-
-		result.setBigHeight(rendition.getHeight());
-		result.setKind(rendition.getKind());
-		result.setBigLength(rendition.getLength());
-		result.setMimeType(rendition.getMimetype());
-		result.setRenditionDocumentId(rendition.getRenditionDocumentId());
-		result.setStreamId(rendition.getStreamId());
-		result.setTitle(rendition.getTitle());
-		result.setBigWidth(rendition.getWidth());
-
-		// handle extensions
-		convertExtension(rendition, result);
-
-		return result;
-	}
+//	private static RenditionData convert(CmisRenditionType rendition) {
+//		if (rendition == null)
+//			return null;
+//
+//		RenditionDataImpl result = new RenditionDataImpl();
+//
+//		result.setBigHeight(rendition.getHeight());
+//		result.setKind(rendition.getKind());
+//		result.setBigLength(rendition.getLength());
+//		result.setMimeType(rendition.getMimetype());
+//		result.setRenditionDocumentId(rendition.getRenditionDocumentId());
+//		result.setStreamId(rendition.getStreamId());
+//		result.setTitle(rendition.getTitle());
+//		result.setBigWidth(rendition.getWidth());
+//
+//		// handle extensions
+//		convertExtension(rendition, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a rendition object
@@ -1289,27 +1198,26 @@ public final class Converter {
 	 * 
 	 * @return the conversion
 	 */
-	public static CmisRenditionType convert(RenditionData rendition) {
-		if (rendition == null) {
-			return null;
-		}
-
-		CmisRenditionType result = new CmisRenditionType();
-
-		result.setHeight(rendition.getBigHeight());
-		result.setKind(rendition.getKind());
-		result.setLength(rendition.getBigLength());
-		result.setMimetype(rendition.getMimeType());
-		result.setRenditionDocumentId(rendition.getRenditionDocumentId());
-		result.setStreamId(rendition.getStreamId());
-		result.setTitle(rendition.getTitle());
-		result.setWidth(rendition.getBigWidth());
-
-		// handle extensions
-		convertExtension(rendition, result);
-
-		return result;
-	}
+//	private static CmisRenditionType convert(RenditionData rendition) {
+//		if (rendition == null)
+//			return null;
+//
+//		CmisRenditionType result = new CmisRenditionType();
+//
+//		result.setHeight(rendition.getBigHeight());
+//		result.setKind(rendition.getKind());
+//		result.setLength(rendition.getBigLength());
+//		result.setMimetype(rendition.getMimeType());
+//		result.setRenditionDocumentId(rendition.getRenditionDocumentId());
+//		result.setStreamId(rendition.getStreamId());
+//		result.setTitle(rendition.getTitle());
+//		result.setWidth(rendition.getBigWidth());
+//
+//		// handle extensions
+//		convertExtension(rendition, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a CMIS object
@@ -1318,45 +1226,44 @@ public final class Converter {
 	 * 
 	 * @return the CMIS conversion
 	 */
-	public static CmisObjectType convert(ObjectData object) {
-		if (object == null) {
-			return null;
-		}
-
-		CmisObjectType result = new CmisObjectType();
-
-		result.setAcl(convert(object.getAcl()));
-		result.setAllowableActions(convert(object.getAllowableActions()));
-		if (object.getChangeEventInfo() != null) {
-			CmisChangeEventType changeEventInfo = new CmisChangeEventType();
-
-			changeEventInfo
-					.setChangeType(convert(EnumTypeOfChanges.class, object.getChangeEventInfo().getChangeType()));
-			changeEventInfo.setChangeTime(convertCalendar(object.getChangeEventInfo().getChangeTime()));
-
-			convertExtension(object.getChangeEventInfo(), changeEventInfo);
-
-			result.setChangeEventInfo(changeEventInfo);
-		}
-		result.setExactACL(object.getAcl() == null ? null : object.getAcl().isExact());
-		result.setPolicyIds(convert(object.getPolicyIds()));
-		result.setProperties(convert(object.getProperties()));
-		if (object.getRelationships() != null) {
-			for (ObjectData relationship : object.getRelationships()) {
-				result.getRelationship().add(convert(relationship));
-			}
-		}
-		if (object.getRenditions() != null) {
-			for (RenditionData rendition : object.getRenditions()) {
-				result.getRendition().add(convert(rendition));
-			}
-		}
-
-		// handle extensions
-		convertExtension(object, result);
-
-		return result;
-	}
+//	private static CmisObjectType convert(ObjectData object) {
+//		if (object == null)
+//			return null;
+//
+//		CmisObjectType result = new CmisObjectType();
+//
+//		result.setAcl(convert(object.getAcl()));
+//		result.setAllowableActions(convert(object.getAllowableActions()));
+//		if (object.getChangeEventInfo() != null) {
+//			CmisChangeEventType changeEventInfo = new CmisChangeEventType();
+//
+//			changeEventInfo
+//					.setChangeType(convert(EnumTypeOfChanges.class, object.getChangeEventInfo().getChangeType()));
+//			changeEventInfo.setChangeTime(convertCalendar(object.getChangeEventInfo().getChangeTime()));
+//
+//			convertExtension(object.getChangeEventInfo(), changeEventInfo);
+//
+//			result.setChangeEventInfo(changeEventInfo);
+//		}
+//		result.setExactACL(object.getAcl() == null ? null : object.getAcl().isExact());
+//		result.setPolicyIds(convert(object.getPolicyIds()));
+//		result.setProperties(convert(object.getProperties()));
+//		if (object.getRelationships() != null) {
+//			for (ObjectData relationship : object.getRelationships()) {
+//				result.getRelationship().add(convert(relationship));
+//			}
+//		}
+//		if (object.getRenditions() != null) {
+//			for (RenditionData rendition : object.getRenditions()) {
+//				result.getRendition().add(convert(rendition));
+//			}
+//		}
+//
+//		// handle extensions
+//		convertExtension(object, result);
+//
+//		return result;
+//	}
 
 	// -------------------------------------------------------------------------
 	// --- ACLs and Policies ---
@@ -1370,42 +1277,41 @@ public final class Converter {
 	 * 
 	 * @return the converted ACL
 	 */
-	public static Acl convert(CmisAccessControlListType acl, Boolean isExact) {
-		if (acl == null) {
-			return null;
-		}
-
-		AccessControlListImpl result = new AccessControlListImpl();
-
-		List<Ace> aces = new ArrayList<Ace>();
-		for (CmisAccessControlEntryType entry : acl.getPermission()) {
-			if (entry == null) {
-				continue;
-			}
-
-			AccessControlEntryImpl ace = new AccessControlEntryImpl();
-			ace.setDirect(entry.isDirect());
-			ace.setPermissions(entry.getPermission());
-			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl(
-					entry.getPrincipal() == null ? null : entry.getPrincipal().getPrincipalId());
-			convertExtension(entry.getPrincipal(), principal);
-			ace.setPrincipal(principal);
-
-			// handle extensions
-			convertExtension(entry, ace);
-
-			aces.add(ace);
-		}
-
-		result.setAces(aces);
-
-		result.setExact(isExact);
-
-		// handle extensions
-		convertExtension(acl, result);
-
-		return result;
-	}
+//	private static Acl convert(CmisAccessControlListType acl, Boolean isExact) {
+//		if (acl == null)
+//			return null;
+//
+//		AccessControlListImpl result = new AccessControlListImpl();
+//
+//		List<Ace> aces = new ArrayList<Ace>();
+//		for (CmisAccessControlEntryType entry : acl.getPermission()) {
+//			if (entry == null) {
+//				continue;
+//			}
+//
+//			AccessControlEntryImpl ace = new AccessControlEntryImpl();
+//			ace.setDirect(entry.isDirect());
+//			ace.setPermissions(entry.getPermission());
+//			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl(
+//					entry.getPrincipal() == null ? null : entry.getPrincipal().getPrincipalId());
+//			convertExtension(entry.getPrincipal(), principal);
+//			ace.setPrincipal(principal);
+//
+//			// handle extensions
+//			convertExtension(entry, ace);
+//
+//			aces.add(ace);
+//		}
+//
+//		result.setAces(aces);
+//
+//		result.setExact(isExact);
+//
+//		// handle extensions
+//		convertExtension(acl, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts an ACL object with its ACEs
@@ -1414,44 +1320,44 @@ public final class Converter {
 	 * 
 	 * @return the CMIS ACL
 	 */
-	public static CmisAccessControlListType convert(Acl acl) {
-		if (acl == null) {
-			return null;
-		}
-
-		CmisAccessControlListType result = new CmisAccessControlListType();
-
-		if (acl.getAces() != null) {
-			for (Ace ace : acl.getAces()) {
-				if (ace == null) {
-					continue;
-				}
-
-				CmisAccessControlEntryType entry = new CmisAccessControlEntryType();
-
-				if (ace.getPrincipal() != null) {
-					CmisAccessControlPrincipalType pincipal = new CmisAccessControlPrincipalType();
-
-					pincipal.setPrincipalId(ace.getPrincipal().getId());
-					convertExtension(pincipal, ace.getPrincipal());
-
-					entry.setPrincipal(pincipal);
-				}
-
-				entry.setDirect(ace.isDirect());
-				entry.getPermission().addAll(ace.getPermissions());
-
-				convertExtension(ace, entry);
-
-				result.getPermission().add(entry);
-			}
-		}
-
-		// handle extensions
-		convertExtension(acl, result);
-
-		return result;
-	}
+//	private static CmisAccessControlListType convert(Acl acl) {
+//		if (acl == null) {
+//			return null;
+//		}
+//
+//		CmisAccessControlListType result = new CmisAccessControlListType();
+//
+//		if (acl.getAces() != null) {
+//			for (Ace ace : acl.getAces()) {
+//				if (ace == null) {
+//					continue;
+//				}
+//
+//				CmisAccessControlEntryType entry = new CmisAccessControlEntryType();
+//
+//				if (ace.getPrincipal() != null) {
+//					CmisAccessControlPrincipalType pincipal = new CmisAccessControlPrincipalType();
+//
+//					pincipal.setPrincipalId(ace.getPrincipal().getId());
+//					convertExtension(pincipal, ace.getPrincipal());
+//
+//					entry.setPrincipal(pincipal);
+//				}
+//
+//				entry.setDirect(ace.isDirect());
+//				entry.getPermission().addAll(ace.getPermissions());
+//
+//				convertExtension(ace, entry);
+//
+//				result.getPermission().add(entry);
+//			}
+//		}
+//
+//		// handle extensions
+//		convertExtension(acl, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts an AllowableActions object
@@ -1460,113 +1366,112 @@ public final class Converter {
 	 * 
 	 * @return the actions
 	 */
-	public static AllowableActions convert(CmisAllowableActionsType allowableActions) {
-		if (allowableActions == null) {
-			return null;
-		}
-
-		AllowableActionsImpl result = new AllowableActionsImpl();
-
-		Set<Action> set = EnumSet.noneOf(Action.class);
-
-		if (Boolean.TRUE.equals(allowableActions.isCanSetContentStream())) {
-			set.add(Action.CAN_SET_CONTENT_STREAM);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanAddObjectToFolder())) {
-			set.add(Action.CAN_ADD_OBJECT_TO_FOLDER);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanApplyACL())) {
-			set.add(Action.CAN_APPLY_ACL);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanApplyPolicy())) {
-			set.add(Action.CAN_APPLY_POLICY);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanCancelCheckOut())) {
-			set.add(Action.CAN_CANCEL_CHECK_OUT);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanCheckIn())) {
-			set.add(Action.CAN_CHECK_IN);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanCheckOut())) {
-			set.add(Action.CAN_CHECK_OUT);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanCreateDocument())) {
-			set.add(Action.CAN_CREATE_DOCUMENT);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanCreateFolder())) {
-			set.add(Action.CAN_CREATE_FOLDER);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanCreateRelationship())) {
-			set.add(Action.CAN_CREATE_RELATIONSHIP);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanDeleteContentStream())) {
-			set.add(Action.CAN_DELETE_CONTENT_STREAM);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanDeleteObject())) {
-			set.add(Action.CAN_DELETE_OBJECT);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanDeleteTree())) {
-			set.add(Action.CAN_DELETE_TREE);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetACL())) {
-			set.add(Action.CAN_GET_ACL);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetAllVersions())) {
-			set.add(Action.CAN_GET_ALL_VERSIONS);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetAppliedPolicies())) {
-			set.add(Action.CAN_GET_APPLIED_POLICIES);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetChildren())) {
-			set.add(Action.CAN_GET_CHILDREN);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetContentStream())) {
-			set.add(Action.CAN_GET_CONTENT_STREAM);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetDescendants())) {
-			set.add(Action.CAN_GET_DESCENDANTS);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetFolderParent())) {
-			set.add(Action.CAN_GET_FOLDER_PARENT);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetFolderTree())) {
-			set.add(Action.CAN_GET_FOLDER_TREE);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetObjectParents())) {
-			set.add(Action.CAN_GET_OBJECT_PARENTS);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetObjectRelationships())) {
-			set.add(Action.CAN_GET_OBJECT_RELATIONSHIPS);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetProperties())) {
-			set.add(Action.CAN_GET_PROPERTIES);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanGetRenditions())) {
-			set.add(Action.CAN_GET_RENDITIONS);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanMoveObject())) {
-			set.add(Action.CAN_MOVE_OBJECT);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanRemoveObjectFromFolder())) {
-			set.add(Action.CAN_REMOVE_OBJECT_FROM_FOLDER);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanRemovePolicy())) {
-			set.add(Action.CAN_REMOVE_POLICY);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanSetContentStream())) {
-			set.add(Action.CAN_SET_CONTENT_STREAM);
-		}
-		if (Boolean.TRUE.equals(allowableActions.isCanUpdateProperties())) {
-			set.add(Action.CAN_UPDATE_PROPERTIES);
-		}
-
-		result.setAllowableActions(set);
-
-		// handle extensions
-		convertExtension(allowableActions, result);
-
-		return result;
-	}
+//	private static AllowableActions convert(CmisAllowableActionsType allowableActions) {
+//		if (allowableActions == null)
+//			return null;
+//
+//		AllowableActionsImpl result = new AllowableActionsImpl();
+//
+//		Set<Action> set = EnumSet.noneOf(Action.class);
+//
+//		if (Boolean.TRUE.equals(allowableActions.isCanSetContentStream())) {
+//			set.add(Action.CAN_SET_CONTENT_STREAM);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanAddObjectToFolder())) {
+//			set.add(Action.CAN_ADD_OBJECT_TO_FOLDER);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanApplyACL())) {
+//			set.add(Action.CAN_APPLY_ACL);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanApplyPolicy())) {
+//			set.add(Action.CAN_APPLY_POLICY);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanCancelCheckOut())) {
+//			set.add(Action.CAN_CANCEL_CHECK_OUT);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanCheckIn())) {
+//			set.add(Action.CAN_CHECK_IN);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanCheckOut())) {
+//			set.add(Action.CAN_CHECK_OUT);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanCreateDocument())) {
+//			set.add(Action.CAN_CREATE_DOCUMENT);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanCreateFolder())) {
+//			set.add(Action.CAN_CREATE_FOLDER);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanCreateRelationship())) {
+//			set.add(Action.CAN_CREATE_RELATIONSHIP);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanDeleteContentStream())) {
+//			set.add(Action.CAN_DELETE_CONTENT_STREAM);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanDeleteObject())) {
+//			set.add(Action.CAN_DELETE_OBJECT);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanDeleteTree())) {
+//			set.add(Action.CAN_DELETE_TREE);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetACL())) {
+//			set.add(Action.CAN_GET_ACL);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetAllVersions())) {
+//			set.add(Action.CAN_GET_ALL_VERSIONS);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetAppliedPolicies())) {
+//			set.add(Action.CAN_GET_APPLIED_POLICIES);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetChildren())) {
+//			set.add(Action.CAN_GET_CHILDREN);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetContentStream())) {
+//			set.add(Action.CAN_GET_CONTENT_STREAM);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetDescendants())) {
+//			set.add(Action.CAN_GET_DESCENDANTS);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetFolderParent())) {
+//			set.add(Action.CAN_GET_FOLDER_PARENT);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetFolderTree())) {
+//			set.add(Action.CAN_GET_FOLDER_TREE);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetObjectParents())) {
+//			set.add(Action.CAN_GET_OBJECT_PARENTS);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetObjectRelationships())) {
+//			set.add(Action.CAN_GET_OBJECT_RELATIONSHIPS);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetProperties())) {
+//			set.add(Action.CAN_GET_PROPERTIES);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanGetRenditions())) {
+//			set.add(Action.CAN_GET_RENDITIONS);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanMoveObject())) {
+//			set.add(Action.CAN_MOVE_OBJECT);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanRemoveObjectFromFolder())) {
+//			set.add(Action.CAN_REMOVE_OBJECT_FROM_FOLDER);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanRemovePolicy())) {
+//			set.add(Action.CAN_REMOVE_POLICY);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanSetContentStream())) {
+//			set.add(Action.CAN_SET_CONTENT_STREAM);
+//		}
+//		if (Boolean.TRUE.equals(allowableActions.isCanUpdateProperties())) {
+//			set.add(Action.CAN_UPDATE_PROPERTIES);
+//		}
+//
+//		result.setAllowableActions(set);
+//
+//		// handle extensions
+//		convertExtension(allowableActions, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts an AllowableActions object
@@ -1575,53 +1480,52 @@ public final class Converter {
 	 * 
 	 * @return the conversion
 	 */
-	public static CmisAllowableActionsType convert(AllowableActions allowableActions) {
-		if (allowableActions == null) {
-			return null;
-		}
-
-		CmisAllowableActionsType result = new CmisAllowableActionsType();
-
-		if (allowableActions.getAllowableActions() != null) {
-			Set<Action> set = allowableActions.getAllowableActions();
-
-			result.setCanAddObjectToFolder(set.contains(Action.CAN_ADD_OBJECT_TO_FOLDER));
-			result.setCanApplyACL(set.contains(Action.CAN_APPLY_ACL));
-			result.setCanApplyPolicy(set.contains(Action.CAN_APPLY_POLICY));
-			result.setCanCancelCheckOut(set.contains(Action.CAN_CANCEL_CHECK_OUT));
-			result.setCanCheckIn(set.contains(Action.CAN_CHECK_IN));
-			result.setCanCheckOut(set.contains(Action.CAN_CHECK_OUT));
-			result.setCanCreateDocument(set.contains(Action.CAN_CREATE_DOCUMENT));
-			result.setCanCreateFolder(set.contains(Action.CAN_CREATE_FOLDER));
-			result.setCanCreateRelationship(set.contains(Action.CAN_CREATE_RELATIONSHIP));
-			result.setCanDeleteContentStream(set.contains(Action.CAN_DELETE_CONTENT_STREAM));
-			result.setCanDeleteObject(set.contains(Action.CAN_DELETE_OBJECT));
-			result.setCanDeleteTree(set.contains(Action.CAN_DELETE_TREE));
-			result.setCanGetACL(set.contains(Action.CAN_GET_ACL));
-			result.setCanGetAllVersions(set.contains(Action.CAN_GET_ALL_VERSIONS));
-			result.setCanGetAppliedPolicies(set.contains(Action.CAN_GET_APPLIED_POLICIES));
-			result.setCanGetChildren(set.contains(Action.CAN_GET_CHILDREN));
-			result.setCanGetContentStream(set.contains(Action.CAN_GET_CONTENT_STREAM));
-			result.setCanGetDescendants(set.contains(Action.CAN_GET_DESCENDANTS));
-			result.setCanGetFolderParent(set.contains(Action.CAN_GET_FOLDER_PARENT));
-			result.setCanGetFolderTree(set.contains(Action.CAN_GET_FOLDER_TREE));
-			result.setCanGetObjectParents(set.contains(Action.CAN_GET_OBJECT_PARENTS));
-			result.setCanGetObjectRelationships(set.contains(Action.CAN_GET_OBJECT_RELATIONSHIPS));
-			result.setCanGetProperties(set.contains(Action.CAN_GET_PROPERTIES));
-			result.setCanGetRenditions(set.contains(Action.CAN_GET_RENDITIONS));
-			result.setCanMoveObject(set.contains(Action.CAN_MOVE_OBJECT));
-			result.setCanRemoveObjectFromFolder(set.contains(Action.CAN_REMOVE_OBJECT_FROM_FOLDER));
-			result.setCanRemovePolicy(set.contains(Action.CAN_REMOVE_POLICY));
-			result.setCanSetContentStream(set.contains(Action.CAN_SET_CONTENT_STREAM));
-			result.setCanUpdateProperties(set.contains(Action.CAN_UPDATE_PROPERTIES));
-
-		}
-
-		// handle extensions
-		convertExtension(allowableActions, result);
-
-		return result;
-	}
+//	private static CmisAllowableActionsType convert(AllowableActions allowableActions) {
+//		if (allowableActions == null)
+//			return null;
+//
+//		CmisAllowableActionsType result = new CmisAllowableActionsType();
+//
+//		if (allowableActions.getAllowableActions() != null) {
+//			Set<Action> set = allowableActions.getAllowableActions();
+//
+//			result.setCanAddObjectToFolder(set.contains(Action.CAN_ADD_OBJECT_TO_FOLDER));
+//			result.setCanApplyACL(set.contains(Action.CAN_APPLY_ACL));
+//			result.setCanApplyPolicy(set.contains(Action.CAN_APPLY_POLICY));
+//			result.setCanCancelCheckOut(set.contains(Action.CAN_CANCEL_CHECK_OUT));
+//			result.setCanCheckIn(set.contains(Action.CAN_CHECK_IN));
+//			result.setCanCheckOut(set.contains(Action.CAN_CHECK_OUT));
+//			result.setCanCreateDocument(set.contains(Action.CAN_CREATE_DOCUMENT));
+//			result.setCanCreateFolder(set.contains(Action.CAN_CREATE_FOLDER));
+//			result.setCanCreateRelationship(set.contains(Action.CAN_CREATE_RELATIONSHIP));
+//			result.setCanDeleteContentStream(set.contains(Action.CAN_DELETE_CONTENT_STREAM));
+//			result.setCanDeleteObject(set.contains(Action.CAN_DELETE_OBJECT));
+//			result.setCanDeleteTree(set.contains(Action.CAN_DELETE_TREE));
+//			result.setCanGetACL(set.contains(Action.CAN_GET_ACL));
+//			result.setCanGetAllVersions(set.contains(Action.CAN_GET_ALL_VERSIONS));
+//			result.setCanGetAppliedPolicies(set.contains(Action.CAN_GET_APPLIED_POLICIES));
+//			result.setCanGetChildren(set.contains(Action.CAN_GET_CHILDREN));
+//			result.setCanGetContentStream(set.contains(Action.CAN_GET_CONTENT_STREAM));
+//			result.setCanGetDescendants(set.contains(Action.CAN_GET_DESCENDANTS));
+//			result.setCanGetFolderParent(set.contains(Action.CAN_GET_FOLDER_PARENT));
+//			result.setCanGetFolderTree(set.contains(Action.CAN_GET_FOLDER_TREE));
+//			result.setCanGetObjectParents(set.contains(Action.CAN_GET_OBJECT_PARENTS));
+//			result.setCanGetObjectRelationships(set.contains(Action.CAN_GET_OBJECT_RELATIONSHIPS));
+//			result.setCanGetProperties(set.contains(Action.CAN_GET_PROPERTIES));
+//			result.setCanGetRenditions(set.contains(Action.CAN_GET_RENDITIONS));
+//			result.setCanMoveObject(set.contains(Action.CAN_MOVE_OBJECT));
+//			result.setCanRemoveObjectFromFolder(set.contains(Action.CAN_REMOVE_OBJECT_FROM_FOLDER));
+//			result.setCanRemovePolicy(set.contains(Action.CAN_REMOVE_POLICY));
+//			result.setCanSetContentStream(set.contains(Action.CAN_SET_CONTENT_STREAM));
+//			result.setCanUpdateProperties(set.contains(Action.CAN_UPDATE_PROPERTIES));
+//
+//		}
+//
+//		// handle extensions
+//		convertExtension(allowableActions, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a list of policy ids
@@ -1630,44 +1534,18 @@ public final class Converter {
 	 * 
 	 * @return list of policy identifiers
 	 */
-	public static PolicyIdList convert(CmisListOfIdsType policyIds) {
-		if (policyIds == null) {
-			return null;
-		}
-
-		PolicyIdListImpl result = new PolicyIdListImpl();
-		result.setPolicyIds(policyIds.getId());
-
-		// handle extensions
-		convertExtension(policyIds, result);
-
-		return result;
-	}
-
-	/**
-	 * Converts a list of policy ids
-	 * 
-	 * @param policyIds list of policy identifiers
-	 * 
-	 * @return list of policy identifiers
-	 */
-	public static CmisListOfIdsType convert(PolicyIdList policyIds) {
-		if (policyIds == null) {
-			return null;
-		}
-
-		CmisListOfIdsType result = new CmisListOfIdsType();
-		if (policyIds.getPolicyIds() != null) {
-			for (String id : policyIds.getPolicyIds()) {
-				result.getId().add(id);
-			}
-		}
-
-		// handle extensions
-		convertExtension(policyIds, result);
-
-		return result;
-	}
+//	private static PolicyIdList convert(CmisListOfIdsType policyIds) {
+//		if (policyIds == null)
+//			return null;
+//
+//		PolicyIdListImpl result = new PolicyIdListImpl();
+//		result.setPolicyIds(policyIds.getId());
+//
+//		// handle extensions
+//		convertExtension(policyIds, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a list of policy ids
@@ -1676,16 +1554,40 @@ public final class Converter {
 	 * 
 	 * @return list of policy identifiers
 	 */
-	public static CmisListOfIdsType convertPolicyIds(List<String> policyIds) {
-		if (policyIds == null) {
-			return null;
-		}
+//	private static CmisListOfIdsType convert(PolicyIdList policyIds) {
+//		if (policyIds == null)
+//			return null;
+//
+//		CmisListOfIdsType result = new CmisListOfIdsType();
+//		if (policyIds.getPolicyIds() != null) {
+//			for (String id : policyIds.getPolicyIds()) {
+//				result.getId().add(id);
+//			}
+//		}
+//
+//		// handle extensions
+//		convertExtension(policyIds, result);
+//
+//		return result;
+//	}
 
-		CmisListOfIdsType result = new CmisListOfIdsType();
-		result.getId().addAll(policyIds);
-
-		return result;
-	}
+//	/**
+//	 * Converts a list of policy ids
+//	 * 
+//	 * @param policyIds list of policy identifiers
+//	 * 
+//	 * @return list of policy identifiers
+//	 */
+//	private static CmisListOfIdsType convertPolicyIds(List<String> policyIds) {
+//		if (policyIds == null) {
+//			return null;
+//		}
+//
+//		CmisListOfIdsType result = new CmisListOfIdsType();
+//		result.getId().addAll(policyIds);
+//
+//		return result;
+//	}
 
 	// -------------------------------------------------------------------------
 	// --- Lists, containers and similar ---
@@ -1698,10 +1600,9 @@ public final class Converter {
 	 * 
 	 * @return list of gregorian calendars
 	 */
-	public static List<GregorianCalendar> convertXMLCalendar(List<XMLGregorianCalendar> calendar) {
-		if (calendar == null) {
-			return null;
-		}
+	private static List<GregorianCalendar> convertXMLCalendar(List<XMLGregorianCalendar> calendar) {
+		if (calendar == null)
+			return new ArrayList<>();
 
 		List<GregorianCalendar> result = new ArrayList<GregorianCalendar>();
 		for (XMLGregorianCalendar cal : calendar) {
@@ -1720,10 +1621,9 @@ public final class Converter {
 	 * 
 	 * @return list of XML gregorian calendars
 	 */
-	public static List<XMLGregorianCalendar> convertCalendar(List<GregorianCalendar> calendar) {
-		if (calendar == null) {
-			return null;
-		}
+	private static List<XMLGregorianCalendar> convertCalendar(List<GregorianCalendar> calendar) {
+		if (calendar == null)
+			return new ArrayList<>();
 
 		DatatypeFactory df;
 		try {
@@ -1747,20 +1647,19 @@ public final class Converter {
 	 * 
 	 * @return an XML gregorian calendar
 	 */
-	public static XMLGregorianCalendar convertCalendar(GregorianCalendar calendar) {
-		if (calendar == null) {
-			return null;
-		}
-
-		DatatypeFactory df;
-		try {
-			df = DatatypeFactory.newInstance();
-		} catch (DatatypeConfigurationException e) {
-			throw new CmisRuntimeException("Convert exception: " + e.getMessage(), e);
-		}
-
-		return df.newXMLGregorianCalendar(calendar);
-	}
+//	private static XMLGregorianCalendar convertCalendar(GregorianCalendar calendar) {
+//		if (calendar == null)
+//			return null;
+//
+//		DatatypeFactory df;
+//		try {
+//			df = DatatypeFactory.newInstance();
+//		} catch (DatatypeConfigurationException e) {
+//			throw new CmisRuntimeException("Convert exception: " + e.getMessage(), e);
+//		}
+//
+//		return df.newXMLGregorianCalendar(calendar);
+//	}
 
 	/**
 	 * Converts a type list
@@ -1769,26 +1668,25 @@ public final class Converter {
 	 * 
 	 * @return the converted definition list
 	 */
-	public static TypeDefinitionList convert(CmisTypeDefinitionListType typeList) {
-		if (typeList == null) {
-			return null;
-		}
-
-		TypeDefinitionListImpl result = new TypeDefinitionListImpl();
-		List<TypeDefinition> types = new ArrayList<TypeDefinition>();
-		for (CmisTypeDefinitionType typeDefinition : typeList.getTypes()) {
-			types.add(convert(typeDefinition));
-		}
-
-		result.setList(types);
-		result.setHasMoreItems(typeList.isHasMoreItems());
-		result.setNumItems(typeList.getNumItems());
-
-		// handle extensions
-		convertExtension(typeList, result);
-
-		return result;
-	}
+//	private static TypeDefinitionList convert(CmisTypeDefinitionListType typeList) {
+//		if (typeList == null)
+//			return null;
+//
+//		TypeDefinitionListImpl result = new TypeDefinitionListImpl();
+//		List<TypeDefinition> types = new ArrayList<TypeDefinition>();
+//		for (CmisTypeDefinitionType typeDefinition : typeList.getTypes()) {
+//			types.add(convert(typeDefinition));
+//		}
+//
+//		result.setList(types);
+//		result.setHasMoreItems(typeList.isHasMoreItems());
+//		result.setNumItems(typeList.getNumItems());
+//
+//		// handle extensions
+//		convertExtension(typeList, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a type list
@@ -1797,27 +1695,27 @@ public final class Converter {
 	 * 
 	 * @return the CMIS definitions
 	 */
-	public static CmisTypeDefinitionListType convert(TypeDefinitionList typeList) {
-		if (typeList == null) {
-			return null;
-		}
-
-		CmisTypeDefinitionListType result = new CmisTypeDefinitionListType();
-
-		if (typeList.getList() != null) {
-			for (TypeDefinition tdd : typeList.getList()) {
-				result.getTypes().add(convert(tdd));
-			}
-		}
-
-		result.setHasMoreItems(convertBoolean(typeList.hasMoreItems(), false));
-		result.setNumItems(typeList.getNumItems());
-
-		// handle extensions
-		convertExtension(typeList, result);
-
-		return result;
-	}
+//	private static CmisTypeDefinitionListType convert(TypeDefinitionList typeList) {
+//		if (typeList == null) {
+//			return null;
+//		}
+//
+//		CmisTypeDefinitionListType result = new CmisTypeDefinitionListType();
+//
+//		if (typeList.getList() != null) {
+//			for (TypeDefinition tdd : typeList.getList()) {
+//				result.getTypes().add(convert(tdd));
+//			}
+//		}
+//
+//		result.setHasMoreItems(convertBoolean(typeList.hasMoreItems(), false));
+//		result.setNumItems(typeList.getNumItems());
+//
+//		// handle extensions
+//		convertExtension(typeList, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a type container list
@@ -1826,23 +1724,22 @@ public final class Converter {
 	 * 
 	 * @return the list of type definitions
 	 */
-	public static List<TypeDefinitionContainer> convertTypeContainerList(List<CmisTypeContainer> typeContainers) {
-		if (typeContainers == null) {
-			return null;
-		}
-
-		List<TypeDefinitionContainer> result = new ArrayList<TypeDefinitionContainer>();
-		for (CmisTypeContainer container : typeContainers) {
-			TypeDefinitionContainerImpl newConatiner = new TypeDefinitionContainerImpl();
-			newConatiner.setTypeDefinition(convert(container.getType()));
-			newConatiner.setChildren(convertTypeContainerList(container.getChildren()));
-			convertExtension(container, newConatiner);
-
-			result.add(newConatiner);
-		}
-
-		return result;
-	}
+//	private static List<TypeDefinitionContainer> convertTypeContainerList(List<CmisTypeContainer> typeContainers) {
+//		if (typeContainers == null)
+//			return new ArrayList<>();
+//
+//		List<TypeDefinitionContainer> result = new ArrayList<TypeDefinitionContainer>();
+//		for (CmisTypeContainer container : typeContainers) {
+//			TypeDefinitionContainerImpl newConatiner = new TypeDefinitionContainerImpl();
+//			newConatiner.setTypeDefinition(convert(container.getType()));
+//			newConatiner.setChildren(convertTypeContainerList(container.getChildren()));
+//			convertExtension(container, newConatiner);
+//
+//			result.add(newConatiner);
+//		}
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts a type container list
@@ -1850,21 +1747,20 @@ public final class Converter {
 	 * @param typeContainers the container of types
 	 * @param target the target list
 	 */
-	public static void convertTypeContainerList(List<TypeDefinitionContainer> typeContainers,
-			List<CmisTypeContainer> target) {
-		if (typeContainers == null) {
-			return;
-		}
-
-		for (TypeDefinitionContainer container : typeContainers) {
-			CmisTypeContainer newConatiner = new CmisTypeContainer();
-			newConatiner.setType(convert(container.getTypeDefinition()));
-			convertTypeContainerList(container.getChildren(), newConatiner.getChildren());
-			convertExtension(container, newConatiner);
-
-			target.add(newConatiner);
-		}
-	}
+//	private static void convertTypeContainerList(List<TypeDefinitionContainer> typeContainers,
+//			List<CmisTypeContainer> target) {
+//		if (typeContainers == null)
+//			return;
+//
+//		for (TypeDefinitionContainer container : typeContainers) {
+//			CmisTypeContainer newConatiner = new CmisTypeContainer();
+//			newConatiner.setType(convert(container.getTypeDefinition()));
+//			convertTypeContainerList(container.getChildren(), newConatiner.getChildren());
+//			convertExtension(container, newConatiner);
+//
+//			target.add(newConatiner);
+//		}
+//	}
 
 	/**
 	 * Converts an ObjectInFolder object
@@ -1873,21 +1769,20 @@ public final class Converter {
 	 * 
 	 * @return the converted object
 	 */
-	public static ObjectInFolderData convert(CmisObjectInFolderType objectInFolder) {
-		if (objectInFolder == null) {
-			return null;
-		}
-
-		ObjectInFolderDataImpl result = new ObjectInFolderDataImpl();
-
-		result.setObject(convert(objectInFolder.getObject()));
-		result.setPathSegment(objectInFolder.getPathSegment());
-
-		// handle extensions
-		convertExtension(objectInFolder, result);
-
-		return result;
-	}
+//	private static ObjectInFolderData convert(CmisObjectInFolderType objectInFolder) {
+//		if (objectInFolder == null)
+//			return null;
+//
+//		ObjectInFolderDataImpl result = new ObjectInFolderDataImpl();
+//
+//		result.setObject(convert(objectInFolder.getObject()));
+//		result.setPathSegment(objectInFolder.getPathSegment());
+//
+//		// handle extensions
+//		convertExtension(objectInFolder, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts an ObjectInFolder object
@@ -1896,50 +1791,20 @@ public final class Converter {
 	 * 
 	 * @return the CMIS object
 	 */
-	public static CmisObjectInFolderType convert(ObjectInFolderData objectInFolder) {
-		if (objectInFolder == null) {
-			return null;
-		}
-
-		CmisObjectInFolderType result = new CmisObjectInFolderType();
-
-		result.setObject(convert(objectInFolder.getObject()));
-		result.setPathSegment(objectInFolder.getPathSegment());
-
-		// handle extensions
-		convertExtension(objectInFolder, result);
-
-		return result;
-	}
-
-	/**
-	 * Converts an ObjectInFolder container object
-	 * 
-	 * @param container the container
-	 * 
-	 * @return the CMIS object
-	 */
-	public static ObjectInFolderContainer convert(CmisObjectInFolderContainerType container) {
-		if (container == null) {
-			return null;
-		}
-
-		ObjectInFolderContainerImpl result = new ObjectInFolderContainerImpl();
-
-		result.setObject(convert(container.getObjectInFolder()));
-
-		List<ObjectInFolderContainer> containerList = new ArrayList<ObjectInFolderContainer>();
-		for (CmisObjectInFolderContainerType containerChild : container.getChildren()) {
-			containerList.add(convert(containerChild));
-		}
-
-		result.setChildren(containerList);
-
-		// handle extensions
-		convertExtension(container, result);
-
-		return result;
-	}
+//	private static CmisObjectInFolderType convert(ObjectInFolderData objectInFolder) {
+//		if (objectInFolder == null)
+//			return null;
+//
+//		CmisObjectInFolderType result = new CmisObjectInFolderType();
+//
+//		result.setObject(convert(objectInFolder.getObject()));
+//		result.setPathSegment(objectInFolder.getPathSegment());
+//
+//		// handle extensions
+//		convertExtension(objectInFolder, result);
+//
+//		return result;
+//	}
 
 	/**
 	 * Converts an ObjectInFolder container object
@@ -1948,36 +1813,62 @@ public final class Converter {
 	 * 
 	 * @return the CMIS object
 	 */
-	public static CmisObjectInFolderContainerType convert(ObjectInFolderContainer container) {
-		if (container == null) {
-			return null;
-		}
+//	private static ObjectInFolderContainer convert(CmisObjectInFolderContainerType container) {
+//		if (container == null)
+//			return null;
+//
+//		ObjectInFolderContainerImpl result = new ObjectInFolderContainerImpl();
+//
+//		result.setObject(convert(container.getObjectInFolder()));
+//
+//		List<ObjectInFolderContainer> containerList = new ArrayList<ObjectInFolderContainer>();
+//		for (CmisObjectInFolderContainerType containerChild : container.getChildren()) {
+//			containerList.add(convert(containerChild));
+//		}
+//
+//		result.setChildren(containerList);
+//
+//		// handle extensions
+//		convertExtension(container, result);
+//
+//		return result;
+//	}
 
-		CmisObjectInFolderContainerType result = new CmisObjectInFolderContainerType();
-
-		result.setObjectInFolder(convert(container.getObject()));
-
-		if (container.getChildren() != null) {
-			for (ObjectInFolderContainer child : container.getChildren()) {
-				result.getChildren().add(convert(child));
-			}
-		}
-
-		// handle extensions
-		convertExtension(container, result);
-
-		return result;
-	}
+	/**
+	 * Converts an ObjectInFolder container object
+	 * 
+	 * @param container the container
+	 * 
+	 * @return the CMIS object
+	 */
+//	private static CmisObjectInFolderContainerType convert(ObjectInFolderContainer container) {
+//		if (container == null)
+//			return null;
+//
+//		CmisObjectInFolderContainerType result = new CmisObjectInFolderContainerType();
+//
+//		result.setObjectInFolder(convert(container.getObject()));
+//
+//		if (container.getChildren() != null) {
+//			for (ObjectInFolderContainer child : container.getChildren()) {
+//				result.getChildren().add(convert(child));
+//			}
+//		}
+//
+//		// handle extensions
+//		convertExtension(container, result);
+//
+//		return result;
+//	}
 
 	// -------------------------------------------------------------------------
 	// --- Extensions and holders ---
 	// -------------------------------------------------------------------------
 
 	@SuppressWarnings("unchecked")
-	public static void convertExtension(Object source, ExtensionsData target) {
-		if (source == null) {
+	private static void convertExtension(Object source, ExtensionsData target) {
+		if (source == null)
 			return;
-		}
 
 		try {
 			Method m = source.getClass().getMethod("getAny", new Class<?>[0]);
@@ -2000,10 +1891,9 @@ public final class Converter {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void convertExtension(ExtensionsData source, Object target) {
-		if (source == null) {
+	private static void convertExtension(ExtensionsData source, Object target) {
+		if (source == null)
 			return;
-		}
 
 		try {
 			Method m = target.getClass().getMethod("getAny", new Class<?>[0]);
@@ -2030,14 +1920,12 @@ public final class Converter {
 	 */
 	private static CmisExtensionElement convertDomToCmisExtensionElement(Object source) {
 		// if it's not a Node, skip it
-		if (!(source instanceof Node)) {
+		if (!(source instanceof Node))
 			return null;
-		}
 
 		Node node = (Node) source;
-		if (node.getNodeType() != Node.ELEMENT_NODE) {
+		if (node.getNodeType() != Node.ELEMENT_NODE)
 			return null;
-		}
 
 		String name = node.getLocalName();
 		String namespace = node.getNamespaceURI();
@@ -2087,9 +1975,8 @@ public final class Converter {
 	 * @return the DOM node
 	 */
 	private static Node convertCmisExtensionElementToNode(CmisExtensionElement source) {
-		if (source == null) {
+		if (source == null)
 			return null;
-		}
 
 		Document doc = null;
 
@@ -2134,9 +2021,8 @@ public final class Converter {
 	 * @return the DOM node
 	 */
 	private static Node convertCmisExtensionElementToNode(CmisExtensionElement source, Element parent, Document doc) {
-		if (source == null) {
+		if (source == null)
 			return null;
-		}
 
 		Element element = doc.createElementNS(
 				(source.getNamespace() == null ? DEFAULT_EXTENSION_NS : source.getNamespace()), source.getName());
@@ -2177,11 +2063,10 @@ public final class Converter {
 	 * 
 	 * @return the converted enumeration
 	 */
-	public static <T extends Enum<T>> T convert(Class<T> destClass, Enum<?> source) {
+	private static <T extends Enum<T>> T convert(Class<T> destClass, Enum<?> source) {
 		if (source == null) {
 			return null;
 		}
-
 		return Enum.valueOf(destClass, source.name());
 	}
 }

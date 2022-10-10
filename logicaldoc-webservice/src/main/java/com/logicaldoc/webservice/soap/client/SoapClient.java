@@ -95,8 +95,8 @@ public abstract class SoapClient<T> {
 			return;
 
 		HTTPClientPolicy policy = new HTTPClientPolicy();
-		policy.setConnectionTimeout(timeout * 1000);
-		policy.setReceiveTimeout(timeout * 1000);
+		policy.setConnectionTimeout(timeout * 1000L);
+		policy.setReceiveTimeout(timeout * 1000L);
 
 		org.apache.cxf.endpoint.Client cl = ClientProxy.getClient(client);
 		HTTPConduit httpConduit = (HTTPConduit) cl.getConduit();

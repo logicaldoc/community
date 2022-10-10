@@ -132,7 +132,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * @throws ServletException error inside the servlet container
 	 * @throws IOException generic I/O error
 	 */
-	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@Override
+	public void service(HttpServletRequest request, HttpServletResponse response) {
 		log.debug("Received WebDAV request");
 
 		try {
@@ -391,8 +392,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 						parsedRange = parseRangeRequestHeader(rangeHeader);
 						log.debug("parsedRange {}", parsedRange);
 					} catch (DavException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						log.error(e.getMessage());
 					}
 
 //					resource = new RangeResourceImpl(dri.getLocator(), dri.getFactoryLD(), dri.getSessionLD(),

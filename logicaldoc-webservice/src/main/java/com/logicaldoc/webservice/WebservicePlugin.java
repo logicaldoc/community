@@ -2,9 +2,6 @@ package com.logicaldoc.webservice;
 
 import java.io.File;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
@@ -17,7 +14,6 @@ import com.logicaldoc.util.plugin.LogicalDOCPlugin;
  * 
  */
 public class WebservicePlugin extends LogicalDOCPlugin {
-	protected static Logger log = LoggerFactory.getLogger(WebservicePlugin.class);
 
 	@Override
 	public void install() throws Exception {
@@ -32,7 +28,7 @@ public class WebservicePlugin extends LogicalDOCPlugin {
 		pbean.setProperty("threadpool." + WebserviceInterceptor.THREADPOOL_CALL_STORE + ".type", "default");
 		pbean.setProperty("threadpool." + WebserviceInterceptor.THREADPOOL_CALL_COUNTER + ".max", "20");
 		pbean.setProperty("threadpool." + WebserviceInterceptor.THREADPOOL_CALL_COUNTER + ".type", "default");
-		
+
 		pbean.write();
 
 		File dest = new File(getPluginPath());

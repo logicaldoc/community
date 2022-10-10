@@ -108,8 +108,6 @@ public class XMLBean {
 				try {
 					doc = builder.build(docPath);
 				} catch (Throwable t) {
-					t.printStackTrace();
-
 					// In some environments, during maven test phase a well formed URL must be used
 					// insead of ordinary path
 					log.error(t.getMessage());
@@ -129,7 +127,6 @@ public class XMLBean {
 
 			root = doc.getRootElement();
 		} catch (Exception jdome) {
-			jdome.printStackTrace();
 			log.error(jdome.getMessage());
 		}
 	}
@@ -298,7 +295,6 @@ public class XMLBean {
 			}
 		} catch (Exception ex) {
 			log.error(ex.getMessage(), ex);
-			ex.printStackTrace();
 		}
 
 		return result;

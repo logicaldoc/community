@@ -350,7 +350,7 @@ public class TypeManager {
 	 * @param description property's description
 	 * @param datatype type or data
 	 * @param cardinality the cardinality
-	 * @param updateability  if the property can be updated
+	 * @param updateability if the property can be updated
 	 * @param inherited if the property has been inherited
 	 * @param required if the property is mandatory
 	 * 
@@ -560,13 +560,14 @@ public class TypeManager {
 	 * @param context call context
 	 * @param typeId id of the type
 	 * @param depth depth specification
-	 * @param includePropertyDefinitions if the properties definition must be included
-	 *  
+	 * @param includePropertyDefinitions if the properties definition must be
+	 *        included
+	 * 
 	 * @return list of definitions
 	 */
 	public List<TypeDefinitionContainer> getTypesDescendants(CallContext context, String typeId, BigInteger depth,
 			Boolean includePropertyDefinitions) {
-		List<TypeDefinitionContainer> result = new ArrayList<TypeDefinitionContainer>();
+		List<TypeDefinitionContainer> result = new ArrayList<>();
 
 		// check depth
 		int d = (depth == null ? -1 : depth.intValue());
@@ -599,7 +600,8 @@ public class TypeManager {
 	 * 
 	 * @param depth depth specifications
 	 * @param tc the container
-	 * @param includePropertyDefinitions if the property definitions must be included
+	 * @param includePropertyDefinitions if the property definitions must be
+	 *        included
 	 * 
 	 * @return the definition container
 	 */

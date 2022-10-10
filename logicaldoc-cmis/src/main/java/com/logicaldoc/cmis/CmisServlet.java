@@ -21,7 +21,7 @@ public class CmisServlet extends CmisAtomPubServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	public static ThreadLocal<String[]> remoteAddress = new ThreadLocal<String[]>();
+	public static final ThreadLocal<String[]> remoteAddress = new ThreadLocal<>();
 
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

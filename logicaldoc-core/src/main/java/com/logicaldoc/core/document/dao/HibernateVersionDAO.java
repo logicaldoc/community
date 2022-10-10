@@ -84,9 +84,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	public void initialize(Version version) {
 		refresh(version);
 
-		for (String attribute : version.getAttributes().keySet()) {
-			attribute.getBytes();
-		}
+		if (version.getAttributes() != null)
+			log.trace("Initialized {} attributes", version.getAttributes().keySet().size());
 	}
 
 	@Override

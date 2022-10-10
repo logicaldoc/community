@@ -1024,7 +1024,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				}
 
 				// Invalidate then Geolocation
-				Geolocation.get().finalize();
+				Geolocation.get().dispose();
 			}
 
 			conf.setProperty(session.getTenantName() + ".password.ttl", Integer.toString(settings.getPwdExpiration()));
@@ -1595,7 +1595,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 				userDao.initialize(user);
 				if (srcUser.getWorkingTimes() != null)
 					for (WorkingTime wt : srcUser.getWorkingTimes())
-						user.getWorkingTimes().add(wt.clone());
+						user.getWorkingTimes().add(new WorkingTime(wt));
 				UserHistory transaction = new UserHistory();
 				transaction.setSession(session);
 				transaction.setEvent(UserEvent.UPDATED.toString());

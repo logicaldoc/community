@@ -399,7 +399,7 @@ public class DocumentsDataServlet extends HttpServlet {
 				// Always add the hilight doc as first element of the collection
 				if (hiliteDocId != null) {
 					hiliteDoc = dao.findById(hiliteDocId);
-					if (hiliteDoc != null && folderId != null && hiliteDoc != null && hiliteDoc.getFolder() != null
+					if (hiliteDoc != null && folderId != null && hiliteDoc.getFolder() != null
 							&& hiliteDoc.getFolder().getId() == folderId) {
 						dao.initialize(hiliteDoc);
 					} else

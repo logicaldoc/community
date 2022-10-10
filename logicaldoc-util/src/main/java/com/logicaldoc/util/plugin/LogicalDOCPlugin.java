@@ -30,7 +30,7 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public abstract class LogicalDOCPlugin extends Plugin {
 
-	protected static Logger log = LoggerFactory.getLogger(LogicalDOCPlugin.class);
+	private static Logger logger = LoggerFactory.getLogger(LogicalDOCPlugin.class);
 
 	private static final String PLUGIN_PROPERTIES = "plugin.properties";
 
@@ -51,14 +51,17 @@ public abstract class LogicalDOCPlugin extends Plugin {
 		try {
 			if (isInstallNeeded()) {
 				install();
-				getInstallMark().createNewFile();
-				log.info("Plugin " + getDescriptor().getId() + " installed");
+				boolean created = getInstallMark().createNewFile();
+				if (created)
+					logger.info("Plugin " + getDescriptor().getId() + " installed");
+				else
+					logger.error("Cannot install plugin " + getDescriptor().getId());
 			}
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw e;
 		}
-		start();
+		onStart();
 		saveData();
 	}
 
@@ -131,9 +134,11 @@ public abstract class LogicalDOCPlugin extends Plugin {
 		File file = new File(getDataDirectory(), PLUGIN_PROPERTIES);
 		if (!file.exists())
 			try {
-				file.createNewFile();
+				boolean created = file.createNewFile();
+				if (!created)
+					throw new IOException("Cannot create new file " + file.getAbsolutePath());
 			} catch (IOException e) {
-				log.error(e.getMessage());
+				logger.error(e.getMessage());
 			}
 		return file;
 	}
@@ -168,7 +173,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * 
 	 * @throws Exception raised if some errors happened during the startup
 	 */
-	protected void start() throws Exception {
+	protected void onStart() throws Exception {
 	}
 
 	protected void setRestartRequired() {

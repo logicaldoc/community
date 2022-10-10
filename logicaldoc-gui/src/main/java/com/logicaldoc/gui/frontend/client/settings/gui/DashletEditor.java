@@ -149,7 +149,7 @@ public class DashletEditor extends Window {
 		controls.setWidth100();
 		controls.setHeight(24);
 		final SelectItem selector = ItemFactory
-				.newAttributesSelector(dashlet.getType() == GUIDashlet.TYPE_DOCEVENT ? "docevent" : null);
+				.newAttributesSelector(dashlet.getType().equals(GUIDashlet.TYPE_DOCEVENT) ? "docevent" : null);
 		selector.setWidth(100);
 		selector.addChangedHandler(new ChangedHandler() {
 

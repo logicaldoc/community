@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ public class SevenZipConverter extends AbstractFormatConverter {
 
 	@Override
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
-		List<String> entries = SevenZipUtil.listEntries(src);
+		List<String> entries = new SevenZipUtil().listEntries(src);
 		if (entries.size() > 1)
 			convertMultipleEntries(sid, document, src, dest, entries);
 		else
@@ -40,7 +39,7 @@ public class SevenZipConverter extends AbstractFormatConverter {
 
 		String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 		try {
-			SevenZipUtil.extractEntry(src, entry, uncompressedEntryFile);
+			new SevenZipUtil().extractEntry(src, entry, uncompressedEntryFile);
 			FormatConverterManager manager = (FormatConverterManager) Context.get()
 					.getBean(FormatConverterManager.class);
 			FormatConverter converter = manager.getConverter(entryExtension, targetExtension);
@@ -48,7 +47,7 @@ public class SevenZipConverter extends AbstractFormatConverter {
 			if (converter == null)
 				throw new IOException(
 						String.format("Unable to find a converter from %s to %s", entryExtension, targetExtension));
-			Document clone = document.clone();
+			Document clone = new Document(document);
 			clone.setFileName(uncompressedEntryFile.getName());
 			converter.convert(sid, document, uncompressedEntryFile, dest);
 		} finally {

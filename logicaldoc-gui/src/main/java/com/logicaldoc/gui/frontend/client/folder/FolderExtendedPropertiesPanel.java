@@ -81,7 +81,7 @@ public class FolderExtendedPropertiesPanel extends FolderDetailTab {
 			folder.setTemplateLocked("yes".equals(form1.getValueAsString("locked")) ? 1 : 0);
 			return true;
 		}
-		return true;
+		return false;
 	}
 
 	@Override

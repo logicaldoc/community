@@ -18,7 +18,7 @@ public class GUIExtensibleObject implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private long id = 0L;
-	
+
 	private String template;
 
 	private Long templateId;
@@ -33,7 +33,7 @@ public class GUIExtensibleObject implements Serializable {
 	public GUIExtensibleObject() {
 		super();
 	}
-	
+
 	public String getTemplate() {
 		return template;
 	}
@@ -138,7 +138,7 @@ public class GUIExtensibleObject implements Serializable {
 		List<GUIAttribute> actualValues = getValues(name);
 
 		GUIAttribute lastValue = actualValues.get(actualValues.size() - 1);
-		GUIAttribute newAtt = (GUIAttribute) lastValue.clone();
+		GUIAttribute newAtt = new GUIAttribute(lastValue);
 		newAtt.setValue(null);
 		newAtt.setMultiple(false);
 		newAtt.setParent(name);
@@ -242,7 +242,7 @@ public class GUIExtensibleObject implements Serializable {
 		if ((!up && index > values.size() - 1) || (up && index < 1))
 			return;
 
-		GUIAttribute actual = attribute.clone();
+		GUIAttribute actual = new GUIAttribute(attribute);
 		GUIAttribute next = values.get(index + (up ? -1 : 1));
 		attribute.setIntValue(next.getIntValue());
 		attribute.setDateValue(next.getDateValue());

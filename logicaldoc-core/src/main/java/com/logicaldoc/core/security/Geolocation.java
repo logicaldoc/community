@@ -131,18 +131,11 @@ public class Geolocation {
 		if (!database.exists())
 			return null;
 
-		DatabaseReader reader = null;
-		try {
-			reader = new DatabaseReader.Builder(database).build();
+		try (DatabaseReader reader = new DatabaseReader.Builder(database).build();) {
 			return df.format(reader.getMetadata().getBuildDate()) + " - " + reader.getMetadata().getDatabaseType();
 		} catch (IOException e) {
 			log.warn("Cannot read the version of database {}", database.getPath());
 			return null;
-		} finally {
-			try {
-				reader.close();
-			} catch (Throwable e) {
-			}
 		}
 	}
 
@@ -207,18 +200,18 @@ public class Geolocation {
 
 			FileUtil.strongDelete(mmdbFile);
 
-			finalize();
+			dispose();
 		} finally {
 			try {
 				FileUtils.forceDelete(gzFile);
 			} catch (Throwable t) {
-				t.printStackTrace();
+				log.warn(t.getMessage());
 			}
 
 			try {
 				FileUtils.forceDelete(tmpDir);
 			} catch (Throwable t) {
-				t.printStackTrace();
+				log.warn(t.getMessage());
 			}
 		}
 	}
@@ -296,6 +289,10 @@ public class Geolocation {
 
 	@Override
 	public void finalize() {
+		dispose();
+	}
+
+	public void dispose() {
 		if (dbReader != null) {
 			try {
 				dbReader.close();

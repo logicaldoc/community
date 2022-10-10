@@ -8,10 +8,10 @@ import com.logicaldoc.core.PersistentObject;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.2.3
  */
-public class Dashlet extends PersistentObject implements Cloneable {
+public class Dashlet extends PersistentObject {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public final static String TYPE_DOCEVENT = "docevent";
 
 	public final static String TYPE_DOCUMENT = "document";
@@ -38,6 +38,23 @@ public class Dashlet extends PersistentObject implements Cloneable {
 	private int unique = 0;
 
 	private String columns;
+
+	public Dashlet() {
+	}
+
+	public Dashlet(Dashlet source) {
+		super();
+		this.type = source.type;
+		this.query = source.query;
+		this.content = source.content;
+		this.name = source.name;
+		this.title = source.title;
+		this.max = source.max;
+		this.unique = source.unique;
+		this.columns = source.columns;
+
+		setTenantId(source.getTenantId());
+	}
 
 	public String getType() {
 		return type;
@@ -90,22 +107,6 @@ public class Dashlet extends PersistentObject implements Cloneable {
 
 	public void setMax(Integer max) {
 		this.max = max;
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		Dashlet dashlet = new Dashlet();
-		dashlet.setId(getId());
-		dashlet.setContent(content);
-		dashlet.setMax(max);
-		dashlet.setName(name);
-		dashlet.setQuery(query);
-		dashlet.setTenantId(getTenantId());
-		dashlet.setTitle(title);
-		dashlet.setType(type);
-		dashlet.setColumns(columns);
-		dashlet.setUnique(unique);
-		return super.clone();
 	}
 
 	public String getColumns() {

@@ -112,7 +112,6 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 					return ticket;
 			}
 		} catch (Throwable e) {
-			e.printStackTrace();
 			log.error(e.getMessage(), e);
 		}
 		return null;

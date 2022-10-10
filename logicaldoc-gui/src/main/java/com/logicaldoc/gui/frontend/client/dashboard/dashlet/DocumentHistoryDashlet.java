@@ -66,10 +66,10 @@ public class DocumentHistoryDashlet extends Dashlet {
 			event = Constants.EVENT_CHANGED;
 		else if ("lastaccessed".equals(guiDashlet.getName()))
 			setTitle(AwesomeFactory.getIconHtml("eye", I18N.message(guiDashlet.getTitle())));
-		init();
+		initGUI();
 	}
 
-	private void init() {
+	private void initGUI() {
 		list = new DocumentsListGrid(guiDashlet.getExtendedAttributes()) {
 
 			@Override
@@ -136,8 +136,7 @@ public class DocumentHistoryDashlet extends Dashlet {
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {
-				if (event != null)
-					event.cancel();
+				event.cancel();
 				Record record = event.getRecord();
 				DocumentService.Instance.get().getById(Long.parseLong(record.getAttributeAsString("docId")),
 						new AsyncCallback<GUIDocument>() {

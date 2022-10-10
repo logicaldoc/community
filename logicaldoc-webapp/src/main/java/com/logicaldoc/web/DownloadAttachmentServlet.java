@@ -66,7 +66,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 
 			Version version = null;
 			tmp = File.createTempFile("attdown", null);
-			
+
 			Document doc = docDao.findById(docId);
 			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,
 					doc.getFolder().getId(), session.getUserId()))
@@ -81,7 +81,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			if (version == null && doc != null && StringUtils.isNotEmpty(fileVersion))
 				version = versDao.findByFileVersion(doc.getId(), fileVersion);
 
-			if (doc.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(doc.getId()))
+			if (doc != null && doc.isPasswordProtected() && !session.getUnprotectedDocs().containsKey(doc.getId()))
 				throw new IOException("The document is protected by a password");
 
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
@@ -89,7 +89,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			try (InputStream is = storer.getStream(docId, resource);) {
 				EMail email = null;
 
-				if (doc.getFileName().toLowerCase().endsWith(".eml"))
+				if (doc != null && doc.getFileName().toLowerCase().endsWith(".eml"))
 					email = MailUtil.messageToMail(is, true);
 				else
 					email = MailUtil.msgToMail(is, true);

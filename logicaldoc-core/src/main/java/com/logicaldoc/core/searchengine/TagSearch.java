@@ -40,7 +40,7 @@ public class TagSearch extends Search {
 
 		moreHitsPresent = (hits.size() >= options.getMaxHits());
 		if (moreHitsPresent)
-			estimatedHitsNumber = hits.size() + 1;
+			estimatedHitsNumber = hits.size() + 1L;
 		else
 			estimatedHitsNumber = hits.size();
 	}

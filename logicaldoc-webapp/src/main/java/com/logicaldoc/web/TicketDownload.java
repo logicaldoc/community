@@ -36,7 +36,7 @@ public class TicketDownload extends HttpServlet {
 
 	private static final long serialVersionUID = 9088160958327454062L;
 
-	protected static Logger logger = LoggerFactory.getLogger(TicketDownload.class);
+	protected static Logger log = LoggerFactory.getLogger(TicketDownload.class);
 
 	/**
 	 * Constructor of the object.
@@ -52,10 +52,9 @@ public class TicketDownload extends HttpServlet {
 	 * 
 	 * @param request the request send by the client to the server
 	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
 	 */
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@Override
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 		String ticketId = request.getParameter("ticketId");
 
 		try {
@@ -69,7 +68,7 @@ public class TicketDownload extends HttpServlet {
 				ticketId = (String) session.getAttribute("ticketId");
 			}
 
-			logger.debug("Download ticket ticketId={}", ticketId);
+			log.debug("Download ticket ticketId={}", ticketId);
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			TicketDAO ticketDao = (TicketDAO) Context.get().getBean(TicketDAO.class);
@@ -108,7 +107,7 @@ public class TicketDownload extends HttpServlet {
 			ticket.setCount(ticket.getCount() + 1);
 			ticketDao.store(ticket);
 		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 
 			try (PrintWriter out = response.getWriter();) {
 				out.println("Ticket " + ticketId + " is no more active"
@@ -126,10 +125,9 @@ public class TicketDownload extends HttpServlet {
 	 * 
 	 * @param request the request send by the client to the server
 	 * @param response the response send by the server to the client
-	 * @throws ServletException if an error occurred
-	 * @throws IOException if an error occurred
 	 */
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	@Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			response.setContentType("text/html");
 
@@ -181,11 +179,15 @@ public class TicketDownload extends HttpServlet {
 			while ((letter = is.read()) != -1) {
 				os.write(letter);
 			}
+		} catch (IOException ioe) {
+			log.error("Cannot open the stream {} {} {} of for ticket {}", doc, fileVersion, suffix, ticket);
+			throw ioe;
 		} finally {
 			try {
-				if (os != null)
+				if (os != null) {
 					os.flush();
-				os.close();
+					os.close();
+				}
 			} catch (Throwable t) {
 			}
 		}
@@ -205,7 +207,7 @@ public class TicketDownload extends HttpServlet {
 		try {
 			ddao.saveDocumentHistory(doc, history);
 		} catch (PersistenceException e) {
-			logger.warn(e.getMessage(), e);
+			log.warn(e.getMessage(), e);
 		}
 	}
 }

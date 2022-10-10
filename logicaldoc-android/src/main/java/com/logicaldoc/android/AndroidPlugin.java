@@ -14,9 +14,4 @@ import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 public class AndroidPlugin extends LogicalDOCPlugin {
 
 	protected static Logger log = LoggerFactory.getLogger(AndroidPlugin.class);
-
-	@Override
-	public void install() throws Exception {
-		super.install();
-	}
 }

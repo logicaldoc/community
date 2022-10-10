@@ -456,8 +456,7 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.password = password;
 	}
 
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
+	Session getClone() {
 		Session clone = new Session();
 		clone.setId(getId());
 		clone.setTenantId(getTenantId());

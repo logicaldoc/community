@@ -129,7 +129,7 @@ public class ThreadPools {
 			try {
 				pool.awaitTermination(3, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
-
+				Thread.currentThread().interrupt();
 			}
 		}
 	}

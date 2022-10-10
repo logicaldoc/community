@@ -451,7 +451,7 @@ public class WSUser {
 					user.getWorkingTimes().add(wt);
 				}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			
 		}
 
 		return user;

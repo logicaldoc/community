@@ -21,6 +21,12 @@ import com.logicaldoc.i18n.I18N;
 @AutomationDictionary
 public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 
+	private static final String FORMAT_DATESHORT = "format_dateshort";
+
+	private static final String FORMAT_DATELONG = "format_datelong";
+
+	private static final String FORMAT_DATE = "format_date";
+
 	private static final long serialVersionUID = 1L;
 
 	private String dateFormatLong;
@@ -32,22 +38,22 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 	private TimeZone timeZone;
 
 	public DateTool(Locale locale) {
-		this(I18N.message("format_date", locale), I18N.message("format_datelong", locale),
-				I18N.message("format_dateshort", locale));
+		this(I18N.message(FORMAT_DATE, locale), I18N.message(FORMAT_DATELONG, locale),
+				I18N.message(FORMAT_DATESHORT, locale));
 	}
 
 	public DateTool(String dateFormat, String dateFormatLong, String dateFormatShort) {
 		super();
-		this.dateFormat = dateFormat != null ? dateFormat : I18N.message("format_date");
-		this.dateFormatLong = dateFormatLong != null ? dateFormatLong : I18N.message("format_datelong");
-		this.dateFormatShort = dateFormatShort != null ? dateFormatShort : I18N.message("format_dateshort");
+		this.dateFormat = dateFormat != null ? dateFormat : I18N.message(FORMAT_DATE);
+		this.dateFormatLong = dateFormatLong != null ? dateFormatLong : I18N.message(FORMAT_DATELONG);
+		this.dateFormatShort = dateFormatShort != null ? dateFormatShort : I18N.message(FORMAT_DATESHORT);
 	}
 
 	public DateTool() {
 		super();
-		this.dateFormat = I18N.message("format_date");
-		this.dateFormatLong = I18N.message("format_datelong");
-		this.dateFormatShort = I18N.message("format_dateshort");
+		this.dateFormat = I18N.message(FORMAT_DATE);
+		this.dateFormatLong = I18N.message(FORMAT_DATELONG);
+		this.dateFormatShort = I18N.message(FORMAT_DATESHORT);
 	}
 
 	/**

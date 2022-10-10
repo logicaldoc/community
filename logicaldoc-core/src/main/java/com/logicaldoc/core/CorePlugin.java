@@ -23,7 +23,7 @@ public class CorePlugin extends LogicalDOCPlugin {
 	protected static Logger log = LoggerFactory.getLogger(CorePlugin.class);
 
 	@Override
-	protected void start() throws Exception {
+	protected void onStart() throws Exception {
 		ContextProperties pbean = new ContextProperties();
 		if (StringUtils.isEmpty(pbean.getProperty("id"))) {
 			pbean.setProperty("id", UUID.randomUUID().toString());

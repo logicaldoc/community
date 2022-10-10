@@ -54,10 +54,10 @@ public class TenantKeystorePanel extends VLayout {
 
 	public TenantKeystorePanel(final long tenantId) {
 		this.tenantId = tenantId;
-		init();
+		initGUI();
 	}
 
-	void init() {
+	void initGUI() {
 		if (tenantId <= 0) {
 			setMembers(TenantsPanel.SELECT_TENANT);
 		} else {
@@ -160,12 +160,14 @@ public class TenantKeystorePanel extends VLayout {
 		organizationalUnit.setRequired(true);
 		organizationalUnit.setWrapTitle(false);
 
-		TextItem keytoolCommand = ItemFactory.newTextItem("keytoolCommand", "Keytool", keystore.getKeytoolPath());
+		TextItem keytoolCommand = ItemFactory.newTextItem("keytoolCommand", "Keytool",
+				keystore != null ? keystore.getKeytoolPath() : "");
 		keytoolCommand.setWidth(400);
 		keytoolCommand.setRequired(true);
 		keytoolCommand.setColSpan(2);
 
-		TextItem opensslCommand = ItemFactory.newTextItem("opensslCommand", "OpenSSL", keystore.getOpenSSLPath());
+		TextItem opensslCommand = ItemFactory.newTextItem("opensslCommand", "OpenSSL",
+				keystore != null ? keystore.getOpenSSLPath() : "");
 		opensslCommand.setWidth(400);
 		opensslCommand.setRequired(true);
 		opensslCommand.setColSpan(2);
@@ -178,21 +180,23 @@ public class TenantKeystorePanel extends VLayout {
 		signatureForm.setAlign(Alignment.LEFT);
 		signatureForm.setGroupTitle(I18N.message("signature"));
 
-		TextItem exprx = ItemFactory.newTextItem("exprx", "exprx", keystore.getSignX());
+		TextItem exprx = ItemFactory.newTextItem("exprx", "exprx", keystore != null ? keystore.getSignX() : "");
 		exprx.setWidth(300);
 
-		TextItem expry = ItemFactory.newTextItem("expry", "expry", keystore.getSignY());
+		TextItem expry = ItemFactory.newTextItem("expry", "expry", keystore != null ? keystore.getSignY() : "");
 		expry.setWidth(300);
 
-		TextItem width = ItemFactory.newTextItem("width", "width", keystore.getSignWidth());
+		TextItem width = ItemFactory.newTextItem("width", "width", keystore != null ? keystore.getSignWidth() : "");
 		width.setWidth(300);
 
 		final RadioGroupItem visual = ItemFactory.newBooleanSelector("visual", "visual");
-		visual.setValue(keystore.isSignVisual() ? "yes" : "no");
+		visual.setValue(keystore != null && keystore.isSignVisual() ? "yes" : "no");
 
-		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", "opacity", keystore.getSignOpacity(), 1, 100);
+		SpinnerItem opacity = ItemFactory.newSpinnerItem("opacity", "opacity",
+				keystore != null ? keystore.getSignOpacity() : 100, 1, 100);
 
-		RichTextItem text = ItemFactory.newRichTextItemForAutomation("text", "text", keystore.getSignText(), null);
+		RichTextItem text = ItemFactory.newRichTextItemForAutomation("text", "text",
+				keystore != null ? keystore.getSignText() : "", null);
 
 		signatureForm.setItems(visual, exprx, expry, width, opacity, text);
 
@@ -217,7 +221,7 @@ public class TenantKeystorePanel extends VLayout {
 						@Override
 						public void onSuccess(Void arg) {
 							LD.clearPrompt();
-							init();
+							initGUI();
 						}
 					});
 				}
@@ -276,7 +280,7 @@ public class TenantKeystorePanel extends VLayout {
 
 								@Override
 								public void onSuccess(Void arg) {
-									init();
+									initGUI();
 								}
 							});
 					}
@@ -366,7 +370,7 @@ public class TenantKeystorePanel extends VLayout {
 			keystore.setSignText((String) values.get("text"));
 			keystore.setPassword((String) values.get("password"));
 			keystore.setKeytoolPath((String) values.get("keytoolCommand"));
-			keystore.setOpenSSLPath((String) values.get("opensslCommand")); 
+			keystore.setOpenSSLPath((String) values.get("opensslCommand"));
 			try {
 				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU=" + values.get("organizationalUnit")
 						+ ",C=" + values.get("countryCode").toString().toUpperCase());

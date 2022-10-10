@@ -48,8 +48,8 @@ public class MetadataDiff extends Window {
 				version2.getFileVersion(), 0));
 		records.add(new DiffRecord(I18N.message("filename"), I18N.message("filename"), version1.getFileName(),
 				version2.getFileName(), 0));
-		records.add(new DiffRecord(I18N.message("size"), I18N.message("size"), Util.formatSizeW7((double)version1.getFileSize()),
-				Util.formatSizeW7((double)version2.getFileSize()), 0));
+		records.add(new DiffRecord(I18N.message("size"), I18N.message("size"),
+				Util.formatSizeW7(version1.getFileSize()), Util.formatSizeW7(version2.getFileSize()), 0));
 		records.add(new DiffRecord(I18N.message("pages"), I18N.message("pages"), Util.formatInt(version1.getPages()),
 				Util.formatInt(version2.getPages()), 0));
 		records.add(new DiffRecord(I18N.message("username"), I18N.message("username"), version1.getUsername(),
@@ -69,8 +69,7 @@ public class MetadataDiff extends Window {
 		records.add(new DiffRecord(I18N.message("publisher"), I18N.message("publisher"), version1.getPublisher(),
 				version2.getPublisher(), 0));
 		records.add(new DiffRecord(I18N.message("size"), I18N.message("size"),
-				Util.formatSizeBytes((double) version1.getFileSize()),
-				Util.formatSizeBytes((double) version2.getFileSize()), 0));
+				Util.formatSizeBytes(version1.getFileSize()), Util.formatSizeBytes(version2.getFileSize()), 0));
 		records.add(new DiffRecord(I18N.message("folder"), I18N.message("folder"),
 				version1.getFolder().getId() == Constants.DOCUMENTS_FOLDERID ? "/" : version1.getFolder().getName(),
 				version2.getFolder().getId() == Constants.DOCUMENTS_FOLDERID ? "/" : version2.getFolder().getName(),
@@ -78,7 +77,7 @@ public class MetadataDiff extends Window {
 
 		records.add(new DiffRecord(I18N.message("color"), I18N.message("color"), version1.getColor(),
 				version2.getColor(), 0));
-		
+
 		records.add(new DiffRecord(I18N.message("tags"), I18N.message("tags"), version1.getTagsString(),
 				version2.getTagsString(), 0));
 

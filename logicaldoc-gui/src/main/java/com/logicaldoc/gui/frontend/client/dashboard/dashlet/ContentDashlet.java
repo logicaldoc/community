@@ -20,9 +20,22 @@ public class ContentDashlet extends Dashlet {
 	public ContentDashlet(GUIDashlet guiDashlet) {
 		super(guiDashlet);
 		setMembersMargin(0);
-		init();
+		initGUI();
 	}
 
+	private void initGUI() {
+		if (content != null)
+			removeChild(content);
+
+		content = new HTMLFlow();
+		content.setWidth100();
+		content.setHeight100();
+		content.setOverflow(Overflow.SCROLL);
+		content.setContentsURL(Util.contextPath() + getDataSourceUrl());
+
+		addMember(content);
+	}
+	
 	@Override
 	protected void refresh() {
 		DashletService.Instance.get().get(guiDashlet.getId(), new AsyncCallback<GUIDashlet>() {
@@ -35,22 +48,8 @@ public class ContentDashlet extends Dashlet {
 			@Override
 			public void onSuccess(GUIDashlet dashlet) {
 				guiDashlet = dashlet;
-				init();
+				initGUI();
 			}
 		});
 	}
-
-	private void init() {
-		if (content != null)
-			removeChild(content);
-
-		content = new HTMLFlow();
-		content.setWidth100();
-		content.setHeight100();
-		content.setOverflow(Overflow.SCROLL);
-		content.setContentsURL(Util.contextPath() + getDataSourceUrl());
-
-		addMember(content);
-	}
-
 }

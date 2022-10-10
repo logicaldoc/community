@@ -17,19 +17,14 @@ import com.logicaldoc.util.plugin.LogicalDOCPlugin;
  * 
  */
 public class WebserviceDocPlugin extends LogicalDOCPlugin {
-	protected static Logger log = LoggerFactory.getLogger(WebserviceDocPlugin.class);
 
 	@Override
 	public void install() throws Exception {
-
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();
 		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
-//		config.addServlet("CXFServlet", WebserviceServlet.class.getName());
-//		config.writeXMLDoc();
 		config.addServletMapping("CXFServlet", "/app/*");
 		config.writeXMLDoc();
-	
 		setRestartRequired();
 	}
 }

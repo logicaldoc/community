@@ -1,12 +1,10 @@
 package com.logicaldoc.web.data;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +19,7 @@ import com.logicaldoc.core.conversion.NotAvailableConverter;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.MenuDAO;
+import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.web.util.ServiceUtil;
@@ -38,8 +37,7 @@ public class FormatConvertersDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(FormatConvertersDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Session session = ServiceUtil.validateSession(request);
 
@@ -59,10 +57,10 @@ public class FormatConvertersDataServlet extends HttpServlet {
 			boolean parameters = session.getTenantId() == Tenant.DEFAULT_ID
 					&& mDao.isReadEnable(1750, session.getUserId());
 
-			FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(
-					FormatConverterManager.class);
+			FormatConverterManager manager = (FormatConverterManager) Context.get()
+					.getBean(FormatConverterManager.class);
 			manager.getConverters();
-			
+
 			PrintWriter writer = response.getWriter();
 			writer.write("<list>");
 
@@ -81,7 +79,8 @@ public class FormatConvertersDataServlet extends HttpServlet {
 								writer.print("<out><![CDATA[" + outExt + "]]></out>");
 								writer.print("<converter><![CDATA[" + associatedConverter.getClass().getName()
 										+ "]]></converter>");
-								writer.print("<selected>" + converterSpecification.equals(associatedConverter)
+								writer.print("<selected>"
+										+ converterSpecification.equals(associatedConverter.getClass().getName())
 										+ "</selected>");
 								writer.print("<eenabled>" + associatedConverter.isEnabled() + "</eenabled>");
 								writer.print("</association>");
@@ -114,12 +113,7 @@ public class FormatConvertersDataServlet extends HttpServlet {
 			writer.write("</list>");
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			if (e instanceof ServletException)
-				throw (ServletException) e;
-			else if (e instanceof IOException)
-				throw (IOException) e;
-			else
-				throw new ServletException(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 
@@ -143,8 +137,8 @@ public class FormatConvertersDataServlet extends HttpServlet {
 
 		if (parameters) {
 			for (String name : converter.getParameterNames()) {
-				String value = conf.getPropertyWithSubstitutions("converter." + converter.getClass().getSimpleName()
-						+ "." + name, "");
+				String value = conf.getPropertyWithSubstitutions(
+						"converter." + converter.getClass().getSimpleName() + "." + name, "");
 				writer.print("<" + name + "><![CDATA[" + value + "]]></" + name + ">");
 			}
 		}

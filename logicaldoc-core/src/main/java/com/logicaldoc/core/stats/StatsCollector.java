@@ -57,10 +57,8 @@ public class StatsCollector extends Task {
 
 	protected TenantDAO tenantDAO;
 
-	protected ContextProperties config;
-
 	private SequenceDAO sequenceDAO;
-	
+
 	private static String userno = "community";
 
 	private static String sid;
@@ -206,12 +204,12 @@ public class StatsCollector extends Task {
 		long totaldocs = docStats[3];
 		long archiveddocs = docStats[4];
 		long docdir = docStats[5];
-		
+
 		List<Tenant> tenants = tenantDAO.findAll();
 		for (Tenant tenant : tenants)
 			extractDocStats(tenant.getId());
 
-		log.info("Saved documents statistics");		
+		log.info("Saved documents statistics");
 		next();
 		if (interruptRequested)
 			return;
@@ -226,11 +224,11 @@ public class StatsCollector extends Task {
 		for (Tenant tenant : tenants)
 			extractPageStats(tenant.getId());
 
-		log.info("Saved pages statistics");		
+		log.info("Saved pages statistics");
 		next();
 		if (interruptRequested)
 			return;
-		
+
 		/*
 		 * Collect folders statistics
 		 */
@@ -246,7 +244,7 @@ public class StatsCollector extends Task {
 		next();
 		if (interruptRequested)
 			return;
-		
+
 		/*
 		 * Collect sizing statistics
 		 */
@@ -617,7 +615,7 @@ public class StatsCollector extends Task {
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
-		
+
 		stats[2] = 0;
 		try {
 			stats[2] = documentDAO.queryForLong("SELECT SUM(A.ld_pages) FROM ld_document A where A.ld_deleted  > 0 "
