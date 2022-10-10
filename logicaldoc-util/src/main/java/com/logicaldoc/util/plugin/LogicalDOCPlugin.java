@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Properties;
 
-import org.hsqldb.server.Servlet;
 import org.java.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
