@@ -151,6 +151,12 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class LDRepository {
 
+	private static final String IS_UNKNOWN = "is unknown!";
+
+	private static final String PROPERTY_S_S = "Property '%s' %s";
+
+	private static final String TYPE_S_IS_UNKNOWN = "Type '%s' is unknown!";
+
 	private static final String ID_PREFIX_DOC = "doc.";
 
 	private static final String ID_PREFIX_FLD = "fld.";
@@ -495,7 +501,7 @@ public class LDRepository {
 
 		TypeDefinition type = types.getType(typeId);
 		if (type == null)
-			throw new CmisObjectNotFoundException(String.format("Type '%s' is unknown!", typeId));
+			throw new CmisObjectNotFoundException(String.format(TYPE_S_IS_UNKNOWN, typeId));
 
 		String objectId = null;
 		if (type.getBaseTypeId() == BaseTypeId.CMIS_DOCUMENT) {
@@ -533,17 +539,11 @@ public class LDRepository {
 			if ((properties == null) || (properties.getProperties() == null))
 				throw new CmisInvalidArgumentException("Properties must be set!");
 
-			// // check versioning state
-			// if (versioningState != null && VersioningState.NONE !=
-			// versioningState) {
-			// throw new CmisConstraintException("Versioning not supported!");
-			// }
-
 			// check type
 			String typeId = getTypeId(properties);
 			TypeDefinition type = types.getType(typeId);
 			if (type == null)
-				throw new CmisObjectNotFoundException(String.format("Type '%s' is unknown!", typeId));
+				throw new CmisObjectNotFoundException(String.format(TYPE_S_IS_UNKNOWN, typeId));
 
 			User user = getSessionUser();
 			assert (user != null);
@@ -608,7 +608,7 @@ public class LDRepository {
 			String typeId = getTypeId(properties);
 			TypeDefinition type = types.getType(typeId);
 			if (type == null)
-				throw new CmisObjectNotFoundException(String.format("Type '%s' is unknown!", typeId));
+				throw new CmisObjectNotFoundException(String.format(TYPE_S_IS_UNKNOWN, typeId));
 
 			// check the name
 			String name = getStringProperty(properties, PropertyIds.NAME);
@@ -727,7 +727,7 @@ public class LDRepository {
 
 		if (object instanceof Document) {
 			Document doc = (Document) object;
-			if (doc.getStatus() != Document.DOC_UNLOCKED)
+			if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
 				cancelCheckOut(objectId);
 			else
 				deleteObject(context, objectId);
@@ -827,6 +827,7 @@ public class LDRepository {
 		try {
 			// get the document or folder
 			PersistentObject object = getObject(objectId.getValue());
+			log.debug("object.getId() {}", object.getId());
 
 			// get old properties
 			Properties oldProperties = compileProperties(object, null, new ObjectInfoImpl());
@@ -901,7 +902,7 @@ public class LDRepository {
 
 			Document doc = (Document) object;
 
-			if (doc.getStatus() == Document.DOC_CHECKED_OUT
+			if (doc.getStatus() == AbstractDocument.DOC_CHECKED_OUT
 					&& ((getSessionUser().getId() != doc.getLockUserId()) && (!getSessionUser().isMemberOf("admin"))))
 				throw new CmisPermissionDeniedException("You can't change the checkout status on this object!");
 
@@ -913,7 +914,7 @@ public class LDRepository {
 			transaction.setUser(getSessionUser());
 
 			documentDao.initialize(doc);
-			doc.setStatus(Document.DOC_UNLOCKED);
+			doc.setStatus(AbstractDocument.DOC_UNLOCKED);
 			documentDao.store(doc, transaction);
 		} catch (Throwable t) {
 			catchError(t);
@@ -935,7 +936,7 @@ public class LDRepository {
 
 			Document doc = (Document) object;
 
-			if (doc.getStatus() == Document.DOC_CHECKED_OUT
+			if (doc.getStatus() == AbstractDocument.DOC_CHECKED_OUT
 					&& ((getSessionUser().getId() != doc.getLockUserId()) && (!getSessionUser().isMemberOf("admin")))) {
 				throw new CmisPermissionDeniedException(
 						String.format("You can't do a checkin on object %s!", objectId.getValue()));
@@ -1400,35 +1401,18 @@ public class LDRepository {
 			max = maxItems;
 
 		// As expression we will use the WHERE clause as is
-		String expr = StringUtils.removeStartIgnoreCase(statement, "where");
-		String where = expr;
-		if (where.toLowerCase().contains("where"))
-			where = where.substring(where.toLowerCase().indexOf("where") + 6).trim();
+		final String where = "where";
+		String expr = StringUtils.removeStartIgnoreCase(statement, where);
+		String whereExp = expr;
+		if (whereExp.toLowerCase().contains(where))
+			whereExp = whereExp.substring(whereExp.toLowerCase().indexOf(where) + 6).trim();
 
-		log.debug("where: {}", where);
+		log.debug("where: {}", whereExp);
 
 		/**
 		 * Try to detect if the request comes from LogicalDOC Mobile
 		 */
-		// Pattern 1) [search by filename]
-		// statement.toString() ->
-		// SELECT
-		// cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType
-		// FROM cmis:document WHERE cmis:name LIKE '%flexspaces%'
-		//
-		// Pattern 2) [full-text search standard]
-		// statement.toString() ->
-		// SELECT
-		// cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType
-		// FROM cmis:document WHERE CONTAINS('flexspaces')
-		//
-		// Pattern 3) [full-text search on a specific attribute]
-		// statement.toString() ->
-		// SELECT
-		// cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType
-		// FROM cmis:document WHERE ldoc:sourceId = '12345'
-
-		boolean fileNameSearch = where.toLowerCase().contains("cmis:name");
+		boolean fileNameSearch = whereExp.toLowerCase().contains("cmis:name");
 		log.debug("fileNameSearch: {}", fileNameSearch);
 
 		Long parentFolderID = null;
@@ -1495,14 +1479,15 @@ public class LDRepository {
 			opt.setExpression(expr);
 
 			// Now detect if the search must be applied to specific fields
-			if (where.contains("cmis:") || where.contains("ldoc:")) {
+			final String ldocPrefix = "ldoc:";
+			if (whereExp.contains("cmis:") || whereExp.contains(ldocPrefix)) {
 				List<String> fields = new ArrayList<>();
 				Pattern p = Pattern.compile("[(cmis),(ldoc)]+:\\w+");
-				Matcher m = p.matcher(where);
+				Matcher m = p.matcher(whereExp);
 				while (m.find()) {
 					String field = m.group();
-					if (field.startsWith("ldoc:"))
-						field = field.substring("ldoc:".length());
+					if (field.startsWith(ldocPrefix))
+						field = field.substring(ldocPrefix.length());
 
 					log.debug("field: {}", field);
 					fields.add(field);
@@ -1677,7 +1662,6 @@ public class LDRepository {
 
 		if ((context != null) && context.isObjectInfoRequired() && (objectInfos != null)) {
 			objectInfo.setObject(result);
-			// objectInfo.setVersionSeriesId(getId(object));
 			objectInfos.addObjectInfo(objectInfo);
 		}
 
@@ -1834,8 +1818,6 @@ public class LDRepository {
 				addPropertyId(result, typeId, filter, PropertyIds.OBJECT_TYPE_ID, TypeManager.DOCUMENT_TYPE_ID);
 
 				// file properties
-				// addPropertyBoolean(result, typeId, filter,
-				// PropertyIds.IS_IMMUTABLE, false);
 				if (doc instanceof Document) {
 					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_LATEST_VERSION, true);
 					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION,
@@ -1851,7 +1833,7 @@ public class LDRepository {
 				}
 				addPropertyString(result, typeId, filter, PropertyIds.VERSION_LABEL, doc.getVersion());
 				addPropertyId(result, typeId, filter, PropertyIds.VERSION_SERIES_ID, getId(doc));
-				if (doc.getStatus() != Document.DOC_CHECKED_OUT) {
+				if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT) {
 					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, false);
 					addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_BY, null);
 					addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, null);
@@ -1917,7 +1899,6 @@ public class LDRepository {
 						versionDao.initialize((Version) doc);
 
 					// Now load the extended properties
-					// dao.initialize(template);
 					Map<String, Attribute> attributes = doc.getAttributes();
 					for (String attrName : attributes.keySet()) {
 						Attribute attribute = attributes.get(attrName);
@@ -2004,17 +1985,17 @@ public class LDRepository {
 		// update properties
 		for (PropertyData<?> p : properties.getProperties().values()) {
 			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
-
+			
 			// do we know that property?
 			if (propType == null)
-				throw new CmisConstraintException("Property '" + p.getId() + "' is unknown!");
+				throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), IS_UNKNOWN));
 
 			// can it be set?
 			if ((propType.getUpdatability() == Updatability.READONLY))
-				throw new CmisConstraintException("Property '" + p.getId() + "' is readonly!");
+				throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), "is readonly!"));
 
 			if (propType.getUpdatability() == Updatability.ONCREATE && !create)
-				throw new CmisConstraintException("Property '" + p.getId() + "' can only be set on create!");
+				throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), "can only be set on create!"));
 
 			if ((p.getId().equals(PropertyIds.CONTENT_STREAM_FILE_NAME) || p.getId().equals(PropertyIds.NAME))
 					&& StringUtils.isNotEmpty((String) p.getFirstValue())) {
@@ -2122,6 +2103,9 @@ public class LDRepository {
 					case Attribute.TYPE_STRING:
 						doc.setValue(attributeName, stringValue);
 						break;
+					default:
+					    // nothing to do here
+					    break;						
 					}
 				}
 			}
@@ -2148,7 +2132,7 @@ public class LDRepository {
 
 			// do we know that property?
 			if (propType == null) {
-				throw new CmisConstraintException("Property '" + prop.getId() + "' is unknown!");
+				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), IS_UNKNOWN));
 			}
 
 			// only add read/write properties
@@ -2166,16 +2150,16 @@ public class LDRepository {
 
 			// do we know that property?
 			if (propType == null) {
-				throw new CmisConstraintException("Property '" + prop.getId() + "' is unknown!");
+				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), IS_UNKNOWN));
 			}
 
 			// can it be set?
 			if ((propType.getUpdatability() == Updatability.READONLY)) {
-				throw new CmisConstraintException("Property '" + prop.getId() + "' is readonly!");
+				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), "is readonly!"));
 			}
 
 			if ((propType.getUpdatability() == Updatability.ONCREATE)) {
-				throw new CmisConstraintException("Property '" + prop.getId() + "' can only be set on create!");
+				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), "can only be set on create!"));
 			}
 
 			// default or value
@@ -2216,6 +2200,7 @@ public class LDRepository {
 			transaction.setEvent(DocumentEvent.CHANGED.toString());
 			try {
 				Document actualDoc = documentDao.findById(doc.getId());
+				log.debug("actualDoc: {}",actualDoc);
 				documentDao.initialize(actualDoc);
 				doc.setId(0);
 				documentManager.update(actualDoc, doc, transaction);
@@ -2460,11 +2445,11 @@ public class LDRepository {
 			addAction(aas, Action.CAN_GET_CONTENT_STREAM, true);
 			addAction(aas, Action.CAN_GET_ALL_VERSIONS, true);
 			addAction(aas, Action.CAN_SET_CONTENT_STREAM, write);
-			addAction(aas, Action.CAN_CHECK_OUT, doc.getStatus() == Document.DOC_UNLOCKED && write);
-			addAction(aas, Action.CAN_CHECK_IN, doc.getStatus() == Document.DOC_CHECKED_OUT
+			addAction(aas, Action.CAN_CHECK_OUT, doc.getStatus() == AbstractDocument.DOC_UNLOCKED && write);
+			addAction(aas, Action.CAN_CHECK_IN, doc.getStatus() == AbstractDocument.DOC_CHECKED_OUT
 					&& doc.getLockUserId().longValue() == getSessionUser().getId() && write);
 			addAction(aas, Action.CAN_CANCEL_CHECK_OUT,
-					doc.getStatus() != Document.DOC_UNLOCKED
+					doc.getStatus() != AbstractDocument.DOC_UNLOCKED
 							&& (doc.getLockUserId().longValue() == getSessionUser().getId()
 									|| getSessionUser().isMemberOf("admin")));
 		} else {
@@ -2495,9 +2480,6 @@ public class LDRepository {
 		result.setAces(new ArrayList<>());
 
 		for (Map.Entry<String, Boolean> ue : userMap.entrySet()) {
-			// create principal
-//			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl();
-//			principal.setPrincipalId(ue.getKey());
 
 			// create principal
 			AccessControlPrincipalDataImpl principal = new AccessControlPrincipalDataImpl(ue.getKey());
@@ -2560,7 +2542,6 @@ public class LDRepository {
 		}
 
 		// set a few base properties
-		// query name == id (for base type properties)
 		result.add(PropertyIds.OBJECT_ID);
 		result.add(PropertyIds.OBJECT_TYPE_ID);
 		result.add(PropertyIds.BASE_TYPE_ID);

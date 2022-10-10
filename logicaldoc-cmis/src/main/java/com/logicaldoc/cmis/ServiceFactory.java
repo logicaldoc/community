@@ -61,10 +61,11 @@ public class ServiceFactory extends AbstractServiceFactory {
 
 	@Override
 	public void init(Map<String, String> parameters) {
+		// Do nothing
 	}
 
 	@Override
 	public void destroy() {
-		// threadLocalService = null;
+		// Do nothing
 	}
 }

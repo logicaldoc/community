@@ -18,6 +18,7 @@ import org.apache.chemistry.opencmis.commons.enums.PropertyType;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisInvalidArgumentException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.impl.WSConverter;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractPropertyDefinition;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.AbstractTypeDefinition;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.DocumentTypeDefinitionImpl;
@@ -104,12 +105,13 @@ public class TypeManager {
 		folderType.setIsControllableAcl(false);
 		folderType.setIsControllablePolicy(false);
 		folderType.setIsCreatable(true);
-		folderType.setDescription("Folder");
-		folderType.setDisplayName("Folder");
+		final String folder = "Folder";
+		folderType.setDescription(folder);
+		folderType.setDisplayName(folder);
 		folderType.setIsFileable(true);
 		folderType.setIsFulltextIndexed(false);
 		folderType.setIsIncludedInSupertypeQuery(true);
-		folderType.setLocalName("Folder");
+		folderType.setLocalName(folder);
 		folderType.setLocalNamespace(NAMESPACE);
 		folderType.setIsQueryable(true);
 		folderType.setQueryName("cmis:folder");
@@ -126,15 +128,15 @@ public class TypeManager {
 		workspaceType.setIsControllableAcl(false);
 		workspaceType.setIsControllablePolicy(false);
 		workspaceType.setIsCreatable(false);
-		workspaceType.setDescription("Workspace");
-		workspaceType.setDisplayName("Workspace");
+		workspaceType.setDescription(WORKSPACE_TYPE_ID);
+		workspaceType.setDisplayName(WORKSPACE_TYPE_ID);
 		workspaceType.setIsFileable(true);
 		workspaceType.setIsFulltextIndexed(false);
 		workspaceType.setIsIncludedInSupertypeQuery(true);
-		workspaceType.setLocalName("Workspace");
+		workspaceType.setLocalName(WORKSPACE_TYPE_ID);
 		workspaceType.setLocalNamespace(NAMESPACE);
 		workspaceType.setIsQueryable(true);
-		workspaceType.setQueryName("Workspace");
+		workspaceType.setQueryName(WORKSPACE_TYPE_ID);
 		workspaceType.setId(WORKSPACE_TYPE_ID);
 
 		addBasePropertyDefinitions(workspaceType);
@@ -148,12 +150,13 @@ public class TypeManager {
 		documentType.setIsControllableAcl(false);
 		documentType.setIsControllablePolicy(false);
 		documentType.setIsCreatable(true);
-		documentType.setDescription("Document");
-		documentType.setDisplayName("Document");
+		final String document = "Document";
+		documentType.setDescription(document);
+		documentType.setDisplayName(document);
 		documentType.setIsFileable(true);
 		documentType.setIsFulltextIndexed(false);
 		documentType.setIsIncludedInSupertypeQuery(true);
-		documentType.setLocalName("Document");
+		documentType.setLocalName(document);
 		documentType.setLocalNamespace(NAMESPACE);
 		documentType.setIsQueryable(true);
 		documentType.setQueryName("cmis:document");
@@ -172,11 +175,12 @@ public class TypeManager {
 		relationshipType.setIsControllableAcl(false);
 		relationshipType.setIsControllablePolicy(false);
 		relationshipType.setIsCreatable(false);
-		relationshipType.setDescription("Relationship");
-		relationshipType.setDisplayName("Relationship");
+		final String relationship = "Relationship";
+		relationshipType.setDescription(relationship);
+		relationshipType.setDisplayName(relationship);
 		relationshipType.setIsFileable(false);
 		relationshipType.setIsIncludedInSupertypeQuery(true);
-		relationshipType.setLocalName("Relationship");
+		relationshipType.setLocalName(relationship);
 		relationshipType.setLocalNamespace(NAMESPACE);
 		relationshipType.setIsQueryable(false);
 		relationshipType.setQueryName("cmis:relationship");
@@ -191,20 +195,18 @@ public class TypeManager {
 		policyType.setIsControllableAcl(false);
 		policyType.setIsControllablePolicy(false);
 		policyType.setIsCreatable(false);
-		policyType.setDescription("Policy");
-		policyType.setDisplayName("Policy");
+		final String policy = "Policy";
+		policyType.setDescription(policy);
+		policyType.setDisplayName(policy);
 		policyType.setIsFileable(false);
 		policyType.setIsIncludedInSupertypeQuery(true);
-		policyType.setLocalName("Policy");
+		policyType.setLocalName(policy);
 		policyType.setLocalNamespace(NAMESPACE);
 		policyType.setIsQueryable(false);
 		policyType.setQueryName("cmis:policy");
 		policyType.setId(POLICY_TYPE_ID);
 
 		addBasePropertyDefinitions(policyType);
-
-		// not supported - don't expose it
-		// addTypeInteral(policyType);
 	}
 
 	private static void addBasePropertyDefinitions(AbstractTypeDefinition type) {
@@ -581,10 +583,6 @@ public class TypeManager {
 		if (typeId == null) {
 			result.add(getTypesDescendants(d, types.get(FOLDER_TYPE_ID), ipd));
 			result.add(getTypesDescendants(d, types.get(DOCUMENT_TYPE_ID), ipd));
-			// result.add(getTypesDescendants(depth,
-			// fTypes.get(RELATIONSHIP_TYPE_ID), includePropertyDefinitions));
-			// result.add(getTypesDescendants(depth, fTypes.get(POLICY_TYPE_ID),
-			// includePropertyDefinitions));
 		} else {
 			TypeDefinitionContainer tc = types.get(typeId);
 			if (tc != null) {
@@ -641,7 +639,7 @@ public class TypeManager {
 		if (tc == null) {
 			return null;
 		}
-
+		
 		return tc.getTypeDefinition();
 	}
 
@@ -658,11 +656,11 @@ public class TypeManager {
 		if (tc == null) {
 			throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
 		}
-
+		
 		return copyTypeDefintion(tc.getTypeDefinition());
 	}
 
 	private static TypeDefinition copyTypeDefintion(TypeDefinition type) {
-		return Converter.convert(Converter.convert(type));
+		return WSConverter.convert(WSConverter.convert(type));
 	}
 }

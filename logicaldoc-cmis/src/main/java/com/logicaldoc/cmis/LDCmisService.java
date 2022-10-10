@@ -165,15 +165,12 @@ public class LDCmisService extends AbstractCmisService {
 			query.append("','");
 			query.append(DocumentEvent.CHECKEDIN);
 			query.append("','");
-//			query.append(DocumentEvent.CHANGED);// this happens when metadata are changed, it is not so relevant for LDSynch so to improve performance we commented it
-//			query.append("','");
 			query.append(DocumentEvent.MOVED);
 			query.append("','");
 			query.append(DocumentEvent.RENAMED);
 			query.append("','");
 			query.append(DocumentEvent.DELETED);
 			query.append("')");
-			// log.debug("Query: {}", query.toString());
 
 			Timestamp latestDate = (Timestamp) historyDao.queryForObject(query.toString(), Timestamp.class);
 
@@ -189,7 +186,6 @@ public class LDCmisService extends AbstractCmisService {
 			query2.append("','");
 			query2.append(FolderEvent.DELETED);
 			query2.append("')");
-			// log.debug("Query: {}", query2.toString());
 
 			Timestamp latestFolderDate = (Timestamp) historyDao.queryForObject(query2.toString(), Timestamp.class);
 

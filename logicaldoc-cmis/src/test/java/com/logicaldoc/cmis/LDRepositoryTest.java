@@ -11,7 +11,12 @@ import java.util.List;
 
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.ObjectList;
+import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.data.PropertyData;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyStringImpl;
+import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
+import org.apache.chemistry.opencmis.commons.spi.Holder;
 import org.java.plugin.JpfException;
 import org.java.plugin.PluginLifecycleException;
 import org.junit.Before;
@@ -132,10 +137,6 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		log.info(folder.getName());
 		
 		Session session = SessionManager.get().newSession("admin", "admin", null);
-		
-//      String sid = session.getSid();		
-//		long rootId = fdao.findRoot(SessionManager.get().get(sid).getTenantId()).getId();
-//		log.info("rootId: " +rootId);
 
 		LDRepository ldrep = new LDRepository(folder, session.getSid());
 
@@ -170,9 +171,6 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		List<ObjectData> results = ol.getObjects();
 		for (Iterator<ObjectData> iterator = results.iterator(); iterator.hasNext();) {
 			ObjectData objectData = (ObjectData) iterator.next();			
-//			log.info("objectData.getClass(): {}", objectData.getClass());
-//			log.info("objectData.getBaseTypeId(): {}", objectData.getBaseTypeId());
-//			log.info("objectData: {}", objectData);
 
 			PropertyData<?> oid = objectData.getProperties().getProperties().get("cmis:objectId");
 			PropertyData<?> cmisname = objectData.getProperties().getProperties().get("cmis:name");
@@ -219,5 +217,62 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		log.info("found results: {}", ol.getObjects().size());	
 		assertEquals(3, ol.getObjects().size());		
 	}
+		
+	@Test
+    public void testGetObjectInfo() {
+    	
+		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
+		log.info(folder.getName());
+		
+		Session session = SessionManager.get().newSession("admin", "admin", null);
 
+		LDRepository ldrep = new LDRepository(folder, session.getSid());
+
+		ObjectInfo oi = ldrep.getObjectInfo("doc.5", null);	
+		assertNotNull(oi);
+		assertEquals("doc.5", oi.getId());
+		assertEquals("flexspaces.xlsx", oi.getFileName());
+		
+		oi = ldrep.getObjectInfo("fld.4", null);
+		assertNotNull(oi);
+		assertEquals("fld.4", oi.getId());
+		assertEquals("Default", oi.getName());		
+    }	
+	
+	
+	@Test
+    public void testUpdateProperties() {
+    	
+		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
+		log.info(folder.getName());
+		
+		Session session = SessionManager.get().newSession("admin", "admin", null);
+
+		LDRepository ldrep = new LDRepository(folder, session.getSid());
+
+		ObjectInfo oi = ldrep.getObjectInfo("doc.5", null);	
+		assertNotNull(oi);
+		assertEquals("doc.5", oi.getId());
+		assertEquals("flexspaces.xlsx", oi.getFileName());
+		
+		Holder<String> objectId = new Holder<String>("doc.5");
+
+		Properties props = oi.getObject().getProperties();
+		log.debug((String) props.getProperties().get("cmis:name").getFirstValue());
+		
+		// Update the name of the file
+		PropertiesImpl pimp = new PropertiesImpl();
+		
+		String pid = "cmis:name";		
+		PropertyStringImpl p = new PropertyStringImpl(pid, "snow angels.txt");		
+		p.setQueryName(pid);		
+		pimp.addProperty(p);
+		
+		ldrep.updateProperties(null, objectId, pimp, null);
+		
+		oi = ldrep.getObjectInfo("doc.5", null);	
+		assertNotNull(oi);
+		assertEquals("doc.5", oi.getId());
+		assertEquals("snow angels.txt", oi.getFileName());				
+    }	
 }
