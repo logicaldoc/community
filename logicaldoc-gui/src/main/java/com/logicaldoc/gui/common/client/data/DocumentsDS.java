@@ -59,9 +59,9 @@ public class DocumentsDS extends DataSource {
 					+ (sortSpec != null && !sortSpec.isEmpty() ? "&sort=" + sortSpec : "")
 					+ (Session.get().getHiliteDocId() != null ? "&hiliteDocId=" + Session.get().getHiliteDocId() : ""));
 		} else if (barcoded)
-			setDataURL("data/tobarcode.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
+			setDataURL("data/barcodequeue.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
 		else
-			setDataURL("data/toocr.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
+			setDataURL("data/zonalocrqueue.xml?max=" + (max != null ? max : DEFAULT_MAX) + "&page=" + page);
 	}
 
 	public DocumentsDS(String docIds) {
