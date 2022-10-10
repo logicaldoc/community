@@ -217,7 +217,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE ldoc:content CONTAINS('document') in_tree ('fld.5')";
 		ol = ldrep.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());	
-		assertEquals(3, ol.getObjects().size());			
+		assertEquals(3, ol.getObjects().size());		
 	}
 
 }

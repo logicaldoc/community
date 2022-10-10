@@ -1510,7 +1510,7 @@ public class LDRepository {
 
 			// Check to search in Tree
 			if (parentFolderID != null) {
-				System.err.println("parentFolderID != null");
+				log.debug("parentFolderID != null");
 				opt.setFolderId(parentFolderID);
 				opt.setSearchInSubPath(true);
 			}
