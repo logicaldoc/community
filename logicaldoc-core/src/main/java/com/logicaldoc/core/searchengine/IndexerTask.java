@@ -224,8 +224,10 @@ public class IndexerTask extends Task {
 			lockManager.release(getName(), transactionId);
 
 			// Remove the transaction reference
-			documentDao.bulkUpdate("set ld_transactionid = null where ld_transactionId = ?1",
-					new Object[] { transactionId });
+
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("transactionId", transactionId);
+			documentDao.bulkUpdate("set ld_transactionid = null where ld_transactionId = :transactionId", params);
 
 			// Last step done
 			next();
