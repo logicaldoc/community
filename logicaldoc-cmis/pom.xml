@@ -158,6 +158,12 @@
 			<artifactId>spring-orm</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+		    <groupId>commons-beanutils</groupId>
+		    <artifactId>commons-beanutils</artifactId>
+		    <version>1.9.4</version>
+			<scope>provided</scope>
+		</dependency>
 
 	</dependencies>
 
