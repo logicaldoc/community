@@ -26,20 +26,14 @@ public class CmisPlugin extends LogicalDOCPlugin {
 	public void install() throws Exception {
 		super.install();
 
+		addServlet(SERVLET_NAME, CmisServlet.class.getName(), "/service/cmis/*", 4);
+
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();
 
 		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
-
-		config.addServlet(SERVLET_NAME, CmisServlet.class.getName(), 4);
-		config.writeXMLDoc();
-
 		config.addInitParam(SERVLET_NAME, "callContextHandler", BasicAuthCallContextHandler.class.getName(), null);
 		config.addInitParam(SERVLET_NAME, "cmisVersion", "1.0", null);
-
-		config.addServletMapping(SERVLET_NAME, "/service/cmis/*");
-		config.writeXMLDoc();
-
 		config.addListener(CmisRepositoryContextListener.class.getName());
 		config.writeXMLDoc();
 

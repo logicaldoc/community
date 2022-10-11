@@ -1,6 +1,5 @@
 package com.logicaldoc.core;
 
-import java.io.File;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.dashlet.DashletContent;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 
 /**
@@ -46,12 +44,7 @@ public class CorePlugin extends LogicalDOCPlugin {
 
 		pbean.write();
 
-		// Register the needed servlets
-		File dest = new File(getPluginPath());
-		dest = dest.getParentFile().getParentFile();
-		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
-		config.addServlet("DashletContent", DashletContent.class.getName());
-		config.addServletMapping("DashletContent", "/data/dashletcontent");
+		addServlet("DashletContent", DashletContent.class.getName(), "/data/dashletcontent");
 
 		setRestartRequired();
 	}

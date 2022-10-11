@@ -255,13 +255,31 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * @param mapping The mapping specification
 	 */
 	protected void addServlet(String name, String servletClass, String mapping) {
+		addServlet(name, servletClass, mapping, null);
+	}
+
+	/**
+	 * Utility method to add a servlet in the web descriptor
+	 * 
+	 * @param name Name of the servlet
+	 * @param clazz The qualified name of the servlet class
+	 * @param mapping The mapping specification
+	 * @param optional index when loading the servlet on startup
+	 */
+	protected void addServlet(String name, String servletClass, String mapping, Integer loadOnStartup) {
 		File dest = new File(getPluginPath());
 		dest = dest.getParentFile().getParentFile();
 
 		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
-		config.addServlet(name, servletClass);
+		if (loadOnStartup != null)
+			config.addServlet(name, servletClass, loadOnStartup);
+		else
+			config.addServlet(name, servletClass);
 		config.writeXMLDoc();
-		config.addServletMapping(name, mapping);
-		config.writeXMLDoc();
+
+		if (mapping != null) {
+			config.addServletMapping(name, mapping);
+			config.writeXMLDoc();
+		}
 	}
 }
