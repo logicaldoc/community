@@ -3,15 +3,13 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
@@ -22,9 +20,7 @@ import com.logicaldoc.core.security.Menu;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * This servlet is responsible for rights data.
@@ -32,45 +28,26 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
-public class RightsDataServlet extends HttpServlet {
+public class RightsDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(RightsDataServlet.class);
-
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			Session session = ServiceUtil.validateSession(request);
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+			Locale locale) throws PersistenceException, IOException {
 
-			Long folderId = null;
-			if (StringUtils.isNotEmpty(request.getParameter("folderId")))
-				folderId = Long.parseLong(request.getParameter("folderId"));
+		Long folderId = null;
+		if (StringUtils.isNotEmpty(request.getParameter("folderId")))
+			folderId = Long.parseLong(request.getParameter("folderId"));
 
-			Long menuId = null;
-			if (StringUtils.isNotEmpty(request.getParameter("menuId")))
-				menuId = Long.parseLong(request.getParameter("menuId"));
+		Long menuId = null;
+		if (StringUtils.isNotEmpty(request.getParameter("menuId")))
+			menuId = Long.parseLong(request.getParameter("menuId"));
 
-			String locale = request.getParameter("locale");
-			if (StringUtils.isEmpty(locale))
-				locale = "en";
-
-			response.setContentType("text/xml");
-			response.setCharacterEncoding("UTF-8");
-
-			// Avoid resource caching
-			response.setHeader("Pragma", "no-cache");
-			response.setHeader("Cache-Control", "no-store");
-			response.setDateHeader("Expires", 0);
-
-			if (folderId != null)
-				folderRights(response, folderId, locale);
-			else
-				menuRights(response, menuId, locale, session.getTenantId());
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			ServletUtil.sendError(response, e.getMessage());
-		}
+		if (folderId != null)
+			folderRights(response, folderId);
+		else
+			menuRights(response, menuId, session.getTenantId());
 	}
 
 	/**
@@ -88,8 +65,7 @@ public class RightsDataServlet extends HttpServlet {
 		return users;
 	}
 
-	private void folderRights(HttpServletResponse response, Long folderId, String locale)
-			throws IOException, PersistenceException {
+	private void folderRights(HttpServletResponse response, Long folderId) throws IOException, PersistenceException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Folder folder = folderDao.findById(folderId);
 		folderDao.initialize(folder);
@@ -167,7 +143,7 @@ public class RightsDataServlet extends HttpServlet {
 		writer.write("</list>");
 	}
 
-	private void menuRights(HttpServletResponse response, Long menuId, String locale, long tenantId)
+	private void menuRights(HttpServletResponse response, Long menuId, long tenantId)
 			throws IOException, PersistenceException {
 		MenuDAO menuDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		Menu menu = menuDao.findById(menuId);

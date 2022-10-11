@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +39,8 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max)
-			throws PersistenceException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+			Locale locale) throws PersistenceException, IOException {
 
 		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 		User user = dao.findById(session.getUserId());
