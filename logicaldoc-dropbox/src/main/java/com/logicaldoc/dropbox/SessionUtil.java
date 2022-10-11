@@ -1,13 +1,10 @@
 package com.logicaldoc.dropbox;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.gui.common.client.InvalidSessionException;
-import com.logicaldoc.gui.common.client.ServerException;
 
 /**
  * Various methods related to the user session
@@ -28,7 +25,8 @@ public class SessionUtil {
 	 * 
 	 * @param sid identifier of the session
 	 * 
-	 * @throws InvalidSessionException if the session does not exist or it is expired
+	 * @throws InvalidSessionException if the session does not exist or it is
+	 *         expired
 	 * 
 	 * @return the session
 	 */
@@ -40,14 +38,5 @@ public class SessionUtil {
 			throw new InvalidSessionException("Invalid or Expired Session");
 		SessionManager.get().renew(sid);
 		return session;
-	}
-
-	public static Locale currentLocale(Session session) throws ServerException {
-		return (Locale) session.getDictionary().get(LOCALE);
-	}
-
-	public static Locale currentLocale(String sid) throws ServerException {
-		Session session = validateSession(sid);
-		return currentLocale(session);
 	}
 }
