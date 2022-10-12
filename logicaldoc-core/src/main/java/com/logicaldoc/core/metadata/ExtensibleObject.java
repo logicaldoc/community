@@ -25,6 +25,50 @@ public abstract class ExtensibleObject extends PersistentObject {
 
 	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
 
+	/**
+	 * Implementations may persist or not this attribute
+	 */
+	private Template template;
+
+	/**
+	 * Not persistent. Used sometimes to carry the name of the template
+	 */
+	private String templateName;
+
+	/**
+	 * Not persistent. Used sometimes to carry the name of the template
+	 */
+	private Long templateId;
+
+	public Long getTemplateId() {
+		if (templateId != null)
+			return templateId;
+		else if (getTemplate() != null)
+			return getTemplate().getId();
+		else
+			return null;
+	}
+
+	public void setTemplateId(Long templateId) {
+		this.templateId = templateId;
+	}
+
+	public String getTemplateName() {
+		return templateName;
+	}
+
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+
+	public Template getTemplate() {
+		return template;
+	}
+
+	public void setTemplate(Template template) {
+		this.template = template;
+	}
+
 	public Map<String, Attribute> getAttributes() {
 		return attributes;
 	}

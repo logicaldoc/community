@@ -173,6 +173,7 @@
         <module>logicaldoc-util</module>
         <module>logicaldoc-core</module>
         <module>logicaldoc-webservice</module>
+        <module>logicaldoc-webserviceclient</module>
         <module>logicaldoc-webservicedoc</module>
         <module>logicaldoc-webdav</module>
         <module>logicaldoc-cmis</module>

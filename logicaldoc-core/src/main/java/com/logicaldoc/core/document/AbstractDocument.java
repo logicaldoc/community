@@ -14,7 +14,6 @@ import com.logicaldoc.core.TransactionalObject;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
-import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -129,8 +128,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	private Folder folder;
 
-	private Template template;
-
 	private String customId;
 
 	private int immutable = 0;
@@ -164,11 +161,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	private Date stopPublishing;
 
 	private String transactionId;
-
-	/**
-	 * Not persistent. Used sometimes to carry the name of the template
-	 */
-	private String templateName;
 
 	private int pages = 1;
 
@@ -513,14 +505,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 		return FileUtil.getExtension(getFileName());
 	}
 
-	public Template getTemplate() {
-		return template;
-	}
-
-	public void setTemplate(Template template) {
-		this.template = template;
-	}
-
 	/**
 	 * The document's creation date
 	 * 
@@ -797,14 +781,6 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 
 	public void setExtResId(String extResId) {
 		this.extResId = extResId;
-	}
-
-	public String getTemplateName() {
-		return templateName;
-	}
-
-	public void setTemplateName(String templateName) {
-		this.templateName = templateName;
 	}
 
 	public String getDocRefType() {

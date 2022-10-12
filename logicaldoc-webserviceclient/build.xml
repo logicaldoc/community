@@ -1,0 +1,6 @@
+<project name="logicaldoc-webserviceclient" default="deploy" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+	<property file="${user.home}/logicaldoc-dev.properties" />
+	<import file="${logicaldoc.devroot}/build/ant/build.xml" />
+
+
+</project>

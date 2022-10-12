@@ -16,7 +16,6 @@ import org.hibernate.LazyInitializationException;
 import com.logicaldoc.core.document.Tag;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
-import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.util.Context;
 
 /**
@@ -70,11 +69,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	private int hidden = 0;
 
 	protected Set<FolderGroup> folderGroups = new HashSet<FolderGroup>();
-
-	/**
-	 * Optional default template for this folder
-	 */
-	private Template template;
 
 	/**
 	 * If 1, the users cannot change the template of the contained documents
@@ -153,7 +147,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		this.position = source.position;
 		this.hidden = source.hidden;
 		this.folderGroups = source.folderGroups;
-		this.template = source.template;
 		this.templateLocked = source.templateLocked;
 		this.deleteUserId = source.deleteUserId;
 		this.deleteUser = source.deleteUser;
@@ -172,6 +165,10 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 		this.grid = source.grid;
 		this.ocrTemplateId = source.ocrTemplateId;
 		this.barcodeTemplateId = source.barcodeTemplateId;
+
+		setTemplate(source.getTemplate());
+		setTemplateId(source.getTemplateId());
+		setTemplateName(source.getTemplateName());
 
 		setTenantId(source.getTenantId());
 
@@ -360,14 +357,6 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	public void setCreatorId(Long creatorId) {
 		this.creatorId = creatorId;
-	}
-
-	public Template getTemplate() {
-		return template;
-	}
-
-	public void setTemplate(Template template) {
-		this.template = template;
 	}
 
 	public int getTemplateLocked() {
