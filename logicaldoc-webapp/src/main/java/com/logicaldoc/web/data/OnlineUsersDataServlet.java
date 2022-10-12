@@ -51,7 +51,6 @@ public class OnlineUsersDataServlet extends HttpServlet {
 			List<Session> sessions = sessionDao.findByNode(null);
 			Set<User> users = new HashSet<User>();
 			for (Session session : sessions) {
-				System.out.println("session: "+session);
 				if (session.getStatus() != Session.STATUS_OPEN)
 					continue;
 				if (!tenant.equals(session.getTenantName()))

@@ -3,25 +3,21 @@ package com.logicaldoc.web.data;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.security.Group;
+import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * This servlet is responsible for templte rights data.
@@ -29,36 +25,25 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7.2
  */
-public class TemplateRightsDataServlet extends HttpServlet {
+public class TemplateRightsDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(TemplateRightsDataServlet.class);
-
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			ServiceUtil.validateSession(request);
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+			Locale locale) throws PersistenceException, IOException {
 
-			long workflowId = Long.parseLong(request.getParameter("templateId"));
+		long workflowId = Long.parseLong(request.getParameter("templateId"));
 
-			String locale = request.getParameter("locale");
-			if (StringUtils.isEmpty(locale))
-				locale = "en";
+		response.setContentType("text/xml");
+		response.setCharacterEncoding("UTF-8");
 
-			response.setContentType("text/xml");
-			response.setCharacterEncoding("UTF-8");
+		// Avoid resource caching
+		response.setHeader("Pragma", "no-cache");
+		response.setHeader("Cache-Control", "no-store");
+		response.setDateHeader("Expires", 0);
 
-			// Avoid resource caching
-			response.setHeader("Pragma", "no-cache");
-			response.setHeader("Cache-Control", "no-store");
-			response.setDateHeader("Expires", 0);
-
-			templateRights(response, workflowId, locale);
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			ServletUtil.sendError(response, e.getMessage());
-		}
+		templateRights(response, workflowId);
 	}
 
 	/**
@@ -76,7 +61,7 @@ public class TemplateRightsDataServlet extends HttpServlet {
 		return users;
 	}
 
-	private void templateRights(HttpServletResponse response, Long workflowId, String locale)
+	private void templateRights(HttpServletResponse response, Long workflowId)
 			throws IOException, PersistenceException {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		Template template = tDao.findById(workflowId);

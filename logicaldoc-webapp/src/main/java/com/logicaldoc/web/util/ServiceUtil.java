@@ -55,7 +55,6 @@ public class ServiceUtil {
 
 	public static Session validateSession(HttpServletRequest request) throws InvalidSessionException {
 		String sid = SessionManager.get().getSessionId(request);
-
 		return validateSession(sid);
 	}
 

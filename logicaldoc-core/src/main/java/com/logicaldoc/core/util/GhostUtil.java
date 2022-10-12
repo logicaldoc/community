@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.exec.Worker;
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -157,28 +158,6 @@ public class GhostUtil {
 			} catch (IOException ioe) {
 				log.error(ioe.getMessage());
 			}
-		}
-	}
-
-	protected static class Worker extends Thread {
-		private final Process process;
-
-		private Integer exit;
-
-		public Worker(Process process) {
-			this.process = process;
-		}
-
-		public void run() {
-			try {
-				exit = process.waitFor();
-			} catch (InterruptedException ignore) {
-				Thread.currentThread().interrupt();
-			}
-		}
-
-		public Integer getExit() {
-			return exit;
 		}
 	}
 }

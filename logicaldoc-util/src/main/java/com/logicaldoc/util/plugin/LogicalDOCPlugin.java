@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.config.LoggingConfigurator;
+import com.logicaldoc.util.config.WebConfigurator;
 
 /**
  * This is the base class for LogicalDOC plugins.
@@ -53,9 +55,9 @@ public abstract class LogicalDOCPlugin extends Plugin {
 				install();
 				boolean created = getInstallMark().createNewFile();
 				if (created)
-					logger.info("Plugin " + getDescriptor().getId() + " installed");
+					logger.info("Plugin {} installed", getDescriptor().getId());
 				else
-					logger.error("Cannot install plugin " + getDescriptor().getId());
+					logger.error("Cannot install plugin {}", getDescriptor().getId());
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -201,5 +203,83 @@ public abstract class LogicalDOCPlugin extends Plugin {
 
 	public String getProperty(String name) {
 		return data.getProperty(name);
+	}
+
+	/**
+	 * Utility method to add a new task scheduling into the configuration
+	 * 
+	 * @param taskName the name of the task
+	 */
+	protected void addScheduling(String taskName) {
+		try {
+			// Add the scheduling defaults
+			ContextProperties pbean = new ContextProperties();
+			pbean.setProperty("schedule.cron." + taskName, "00 00 00 1 * ?");
+			pbean.setProperty("schedule.length." + taskName, "-1");
+			pbean.setProperty("schedule.enabled." + taskName, "true");
+			pbean.setProperty("schedule.mode." + taskName, "simple");
+			pbean.setProperty("schedule.interval." + taskName, "1800000");
+			pbean.setProperty("schedule.delay." + taskName, "1800000");
+			pbean.write();
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+			logger.warn("Cannot add task {} to the configuration", taskName);
+		}
+	}
+
+	/**
+	 * Utility method to add a new appender into the log configuration
+	 * 
+	 * @param logger name of the logger
+	 * @param appender name of the appender
+	 */
+	protected void addLogger(String logger, String appender) {
+		// Add notifier log issues
+		LoggingConfigurator logging = new LoggingConfigurator();
+		logging.addTextAppender(appender);
+		logging.write();
+
+		String appenderWeb = appender + "_WEB";
+		logging.addHtmlAppender(appenderWeb);
+		logging.write();
+
+		logging.addLogger(logger, new String[] { appender, appenderWeb });
+		logging.write();
+	}
+
+	/**
+	 * Utility method to add a servlet in the web descriptor
+	 * 
+	 * @param name Name of the servlet
+	 * @param clazz The qualified name of the servlet class
+	 * @param mapping The mapping specification
+	 */
+	protected void addServlet(String name, String servletClass, String mapping) {
+		addServlet(name, servletClass, mapping, null);
+	}
+
+	/**
+	 * Utility method to add a servlet in the web descriptor
+	 * 
+	 * @param name Name of the servlet
+	 * @param clazz The qualified name of the servlet class
+	 * @param mapping The mapping specification
+	 * @param optional index when loading the servlet on startup
+	 */
+	protected void addServlet(String name, String servletClass, String mapping, Integer loadOnStartup) {
+		File dest = new File(getPluginPath());
+		dest = dest.getParentFile().getParentFile();
+
+		WebConfigurator config = new WebConfigurator(dest.getPath() + "/web.xml");
+		if (loadOnStartup != null)
+			config.addServlet(name, servletClass, loadOnStartup);
+		else
+			config.addServlet(name, servletClass);
+		config.writeXMLDoc();
+
+		if (mapping != null) {
+			config.addServletMapping(name, mapping);
+			config.writeXMLDoc();
+		}
 	}
 }

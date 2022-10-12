@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
@@ -493,59 +494,28 @@ public class TypeManager {
 	 * @param includePropertyDefinitions if the property definition must be
 	 *        included
 	 * @param maxItems maximum number of items
-	 * @param skipCount if the counting of children must be avoided
+	 * @param skipCount optional number of potential results that the repository
+	 *        MUST skip/page over before returning any results (default is 0)
 	 * 
 	 * @return list of definitions
 	 */
 	public TypeDefinitionList getTypesChildren(CallContext context, String typeId, boolean includePropertyDefinitions,
 			BigInteger maxItems, BigInteger skipCount) {
+		TypeDefinitionContainer tc = types.get(typeId);
 		TypeDefinitionListImpl result = new TypeDefinitionListImpl(new ArrayList<TypeDefinition>());
-
-		int skip = (skipCount == null ? 0 : skipCount.intValue());
-		if (skip < 0) {
-			skip = 0;
-		}
-
-		int max = (maxItems == null ? Integer.MAX_VALUE : maxItems.intValue());
-		if (max < 1) {
-			return result;
-		}
-
 		if (typeId == null) {
-			if (skip < 1) {
-				result.getList().add(copyTypeDefintion(types.get(FOLDER_TYPE_ID).getTypeDefinition()));
-				max--;
-			}
-			if ((skip < 2) && (max > 0)) {
-				result.getList().add(copyTypeDefintion(types.get(DOCUMENT_TYPE_ID).getTypeDefinition()));
-				max--;
-			}
-
-			result.setHasMoreItems((result.getList().size() + skip) < 2);
-			result.setNumItems(BigInteger.valueOf(2));
-		} else {
-			TypeDefinitionContainer tc = types.get(typeId);
-			if ((tc == null) || (tc.getChildren() == null)) {
-				return result;
-			}
-
-			for (TypeDefinitionContainer child : tc.getChildren()) {
-				if (skip > 0) {
-					skip--;
-					continue;
-				}
-
-				result.getList().add(copyTypeDefintion(child.getTypeDefinition()));
-
-				max--;
-				if (max == 0) {
-					break;
-				}
-			}
-
-			result.setHasMoreItems((result.getList().size() + skip) < tc.getChildren().size());
-			result.setNumItems(BigInteger.valueOf(tc.getChildren().size()));
+			result.getList().add(copyTypeDefintion(types.get(FOLDER_TYPE_ID).getTypeDefinition()));
+			result.getList().add(copyTypeDefintion(types.get(DOCUMENT_TYPE_ID).getTypeDefinition()));
+		} else if (tc != null) {
+			List<TypeDefinitionContainer> typeContainers = tc.getChildren().stream()
+					.skip(skipCount != null ? skipCount.intValue() : 0)
+					.limit(maxItems == null ? Integer.MAX_VALUE : maxItems.intValue()).collect(Collectors.toList());
+			result = new TypeDefinitionListImpl(typeContainers.stream()
+					.map(c -> copyTypeDefintion(c.getTypeDefinition())).collect(Collectors.toList()));
 		}
+
+		result.setHasMoreItems(tc != null ? result.getList().size() < tc.getChildren().size() : false);
+		result.setNumItems(BigInteger.valueOf(tc != null ? tc.getChildren().size() : result.getList().size()));
 
 		if (!includePropertyDefinitions) {
 			for (TypeDefinition type : result.getList()) {
@@ -639,7 +609,7 @@ public class TypeManager {
 		if (tc == null) {
 			return null;
 		}
-		
+
 		return tc.getTypeDefinition();
 	}
 
@@ -656,7 +626,7 @@ public class TypeManager {
 		if (tc == null) {
 			throw new CmisObjectNotFoundException("Type '" + typeId + "' is unknown!");
 		}
-		
+
 		return copyTypeDefintion(tc.getTypeDefinition());
 	}
 

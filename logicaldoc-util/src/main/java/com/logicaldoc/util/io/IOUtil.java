@@ -1,6 +1,9 @@
 package com.logicaldoc.util.io;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -67,6 +70,22 @@ public class IOUtil {
 			}
 		}
 		return sb.toString();
+	}
+	
+	public static byte[] printIS(InputStream stream) throws IOException {
 
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		BufferedOutputStream bos = new BufferedOutputStream(baos);
+
+		BufferedInputStream bis = new BufferedInputStream(stream);
+		int aByte;
+		while ((aByte = bis.read()) != -1) {
+			bos.write(aByte);
+		}
+		bos.flush();
+		bos.close();
+		bis.close();
+
+		return baos.toByteArray();
 	}
 }
