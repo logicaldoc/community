@@ -288,8 +288,12 @@ public class Geolocation {
 	}
 
 	@Override
-	public void finalize() {
-		dispose();
+	protected void finalize() throws Throwable {
+		try {
+			dispose();
+		} finally {
+			super.finalize();
+		}
 	}
 
 	public void dispose() {

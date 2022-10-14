@@ -11,7 +11,7 @@ package com.logicaldoc.util;
 public class Base64Coder {
 
 	// The line separator string of the operating system.
-	private static final String systemLineSeparator = System.getProperty("line.separator");
+	private static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
 
 	// Mapping table from 6-bit nibbles to Base64 characters.
 	private static final char[] map1 = new char[64];
@@ -56,7 +56,7 @@ public class Base64Coder {
 	 * @return A String containing the Base64 encoded data, broken into lines.
 	 */
 	public static String encodeLines(byte[] in) {
-		return encodeLines(in, 0, in.length, 76, systemLineSeparator);
+		return encodeLines(in, 0, in.length, 76, SYSTEM_LINE_SEPARATOR);
 	}
 
 	/**

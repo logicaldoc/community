@@ -100,7 +100,7 @@ public class WebserviceChartServlet extends HttpServlet {
 				cal.add(Calendar.MONTH, -i);
 				String month = dfNumber.format(cal.getTime());
 				String monthName = dfName.format(cal.getTime());
-				dataset.addValue(dao.getCurrentValue(WebserviceInterceptor.WSCALL_ + month, 0L, tenantId), "calls",
+				dataset.addValue(dao.getCurrentValue(WebserviceInterceptor.WSCALL_HYPHEN + month, 0L, tenantId), "calls",
 						monthName);
 			}
 

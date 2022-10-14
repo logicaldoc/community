@@ -50,9 +50,9 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	public static final String THREADPOOL_CALL_STORE = "WebserviceCallStore";
 
-	public static final String WSCALL = "wscall";
+	private static final String WSCALL = "wscall";
 
-	public static final String WSCALL_ = WSCALL + "-";
+	public static final String WSCALL_HYPHEN = WSCALL + "-";
 
 	protected static Logger log = LoggerFactory.getLogger(WebserviceInterceptor.class);
 
@@ -218,10 +218,10 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	protected void increaseCounters(Session session) {
 		String currentMonth = getCurrentMonth();
 		increaseCounter(WSCALL, Tenant.SYSTEM_ID);
-		increaseCounter(WSCALL_ + currentMonth, Tenant.SYSTEM_ID);
+		increaseCounter(WSCALL_HYPHEN + currentMonth, Tenant.SYSTEM_ID);
 		if (session != null) {
 			increaseCounter(WSCALL, session.getTenantId());
-			increaseCounter(WSCALL_ + currentMonth, session.getTenantId());
+			increaseCounter(WSCALL_HYPHEN + currentMonth, session.getTenantId());
 		}
 
 		Date now = new Date();
