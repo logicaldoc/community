@@ -515,7 +515,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
 	public boolean isReadEnabled(long folderId, long userId) {
 		boolean result = true;
 		try {
@@ -532,23 +531,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (folder.getSecurityRef() != null)
 				id = folder.getSecurityRef().longValue();
 
-			Set<Group> Groups = user.getGroups();
-			if (Groups.isEmpty())
+			Set<Group> userGroups = user.getGroups();
+			if (userGroups.isEmpty())
 				return false;
 
 			StringBuffer query = new StringBuffer("select distinct(_entity) from Folder _entity  ");
 			query.append(" left join _entity.folderGroups as _group ");
 			query.append(" where _group.groupId in (");
-
-			boolean first = true;
-			Iterator iter = Groups.iterator();
-			while (iter.hasNext()) {
-				if (!first)
-					query.append(",");
-				Group ug = (Group) iter.next();
-				query.append(Long.toString(ug.getId()));
-				first = false;
-			}
+			query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(") and _entity.id = :id");
 
 			Map<String, Object> params = new HashMap<String, Object>();

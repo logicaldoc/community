@@ -8,9 +8,6 @@ package com.logicaldoc.core.document;
  */
 public class Document extends AbstractDocument {
 	private static final long serialVersionUID = 1L;
-	
-	// Useful but not persisted
-	private Long templateId;
 
 	public Document() {
 	}
@@ -22,21 +19,12 @@ public class Document extends AbstractDocument {
 		setOcrTemplateId(source.getOcrTemplateId());
 		setBarcoded(source.getBarcoded());
 		setBarcodeTemplateId(source.getBarcodeTemplateId());
+		setTemplate(source.getTemplate());
+		setTemplateId(source.getTemplateId());
+		setTemplateName(source.getTemplateName());
+		
 		if (source.getIndexed() != INDEX_INDEXED)
 			setIndexed(source.getIndexed());
 		setCustomId(null);
-	}
-
-	public Long getTemplateId() {
-		if (templateId != null)
-			return templateId;
-		else if (getTemplate() != null)
-			return getTemplate().getId();
-		else
-			return null;
-	}
-
-	public void setTemplateId(Long templateId) {
-		this.templateId = templateId;
 	}
 }
