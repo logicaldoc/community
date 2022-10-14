@@ -15,6 +15,7 @@ import com.google.gwt.http.client.Response;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.CookiesManager;
@@ -150,7 +151,7 @@ public class Util {
 		url.append("webstart/");
 		url.append(appName);
 		url.append(".jsp?random=");
-		url.append(new Date().getTime());
+		url.append(Random.nextInt());
 		url.append("&language=");
 		url.append(I18N.getLocale());
 		url.append("&docLanguage=");

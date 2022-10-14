@@ -210,7 +210,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 
 		final Throwable throwable = event.getThrown();
 		if (throwable != null) {
-			
+
 			sbuf.append("<tr><td style=\"color:White; font-size : xx-small;\" colspan=\"5\" bgcolor=\"#993300\">");
 			appendThrowableAsHtml(throwable, sbuf);
 			sbuf.append("</td></tr>").append(Strings.LINE_SEPARATOR);
@@ -416,7 +416,7 @@ public class LDHtmlLayout extends AbstractStringLayout {
 
 		@Override
 		public LDHtmlLayout build() {
-			// TODO: extract charset from content-type
+			// Extract charset from content-type
 			if (contentType == null) {
 				contentType = DEFAULT_CONTENT_TYPE + "; charset=" + charset;
 			}

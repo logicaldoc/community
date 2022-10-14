@@ -3,7 +3,10 @@ package com.logicaldoc.core;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -806,5 +809,48 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	public SessionFactory getSessionFactory() {
 		return sessionFactory;
+	}
+
+	/**
+	 * A generic method to logically delete old records of a table, useful for
+	 * some DAO implementations. This method uses JDBC directly. The processed
+	 * table must provide the ld_deleted and ld_lastmodified columns. The
+	 * dateColumn is the column used to validate the ttl
+	 * 
+	 * 
+	 * @param ttl number of retention days
+	 * @param tableName name of the table to process
+	 * @param dateColumn
+	 * 
+	 * @throws PersistenceException error at database level
+	 */
+	protected int cleanOldRecords(int ttl, String tableName, String dateColumn) throws PersistenceException {
+		int updates = 0;
+		if (ttl > 0) {
+			Date today = new Date();
+			GregorianCalendar cal = new GregorianCalendar();
+			cal.add(Calendar.DAY_OF_MONTH, -ttl);
+			Date ldDate = cal.getTime();
+
+			updates = jdbcUpdate("UPDATE " + tableName + " SET ld_deleted = 1, ld_lastmodified = ?"
+					+ " WHERE ld_deleted = 0 AND " + dateColumn + " < ?", today, ldDate);
+
+			log.info("Removed {} old rows from table {}: ", updates, tableName);
+		}
+		return updates;
+	}
+
+	/**
+	 * A short cut for {@link #cleanOldRecords(int, String, String)} that passes
+	 * the dateColumn="ld_date"
+	 * 
+	 * 
+	 * @param ttl number of retention days
+	 * @param tableName name of the table to process
+	 * 
+	 * @throws PersistenceException error at database level
+	 */
+	protected int cleanOldRecords(int ttl, String tableName) throws PersistenceException {
+		return cleanOldRecords(ttl, tableName, "ld_date");
 	}
 }

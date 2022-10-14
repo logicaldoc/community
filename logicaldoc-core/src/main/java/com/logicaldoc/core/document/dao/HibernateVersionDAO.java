@@ -196,8 +196,6 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 			assert (ver != null);
 			if (ver != null) {
 				ver.setDeleted(delCode);
-				// TODO At the moment the version ld_version column is just 10
-				// chars, we have to change it to varchar(255)
 				ver.setVersion(StringUtils.right(versionId + "." + ver.getVersion(), 10));
 				store(ver);
 			}

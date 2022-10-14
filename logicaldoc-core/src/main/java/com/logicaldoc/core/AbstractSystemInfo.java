@@ -1,15 +1,15 @@
-package com.logicaldoc.webservice.model;
-
-import javax.xml.bind.annotation.XmlType;
+package com.logicaldoc.core;
 
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.webservice.doc.WSDoc;
 
-@XmlType(name = "WSSystemInfo")
-public class WSSystemInfo {
-
-	@WSDoc(documented=false)
-	protected static final long serialVersionUID = 1L;
+/**
+ * The root for any SystemInfo implementation
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * @since <product_release>
+ *
+ */
+public class AbstractSystemInfo {
 
 	protected String productName = "LogicalDOC Community";
 
@@ -54,8 +54,6 @@ public class WSSystemInfo {
 
 	protected String[] features;
 
-	protected String date = null;
-
 	public String getProductName() {
 		return productName;
 	}
@@ -70,7 +68,7 @@ public class WSSystemInfo {
 
 	public void setProduct(String product) {
 		this.product = product;
-	} 
+	}
 
 	public String getRelease() {
 		return release;
@@ -192,20 +190,12 @@ public class WSSystemInfo {
 		this.runLevel = runLevel;
 	}
 
-	public String[] getFeatures() {
-		return features;
+	public long getTenantId() {
+		return tenantId;
 	}
 
-	public void setFeatures(String[] features) {
-		this.features = features;
-	}
-
-	public String getDate() {
-		return date;
-	}
-
-	public void setDate(String date) {
-		this.date = date;
+	public void setTenantId(long tenantId) {
+		this.tenantId = tenantId;
 	}
 
 	public String getHostName() {
@@ -214,5 +204,13 @@ public class WSSystemInfo {
 
 	public void setHostName(String hostName) {
 		this.hostName = hostName;
+	}
+
+	public String[] getFeatures() {
+		return features;
+	}
+
+	public void setFeatures(String[] features) {
+		this.features = features;
 	}
 }

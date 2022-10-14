@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.settings.automation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -15,6 +12,7 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.data.AdvancedCriteria;
@@ -29,7 +27,6 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -83,41 +80,8 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 		ListGridField id = new ListGridField("id", 50);
 		id.setHidden(true);
 
-		ListGridField triggeron = new ListGridField("events", I18N.message("triggeron"), 300);
+		ListGridField triggeron = new EventsListGridField("events", "triggeron");
 		triggeron.setCanFilter(true);
-		triggeron.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					if (value != null && !value.toString().isEmpty()) {
-						// Translate the set of events
-						String[] key = null;
-
-						if (!value.toString().contains(","))
-							key = new String[] { value.toString().trim() };
-						else
-							key = value.toString().split(",");
-						List<String> labels = new ArrayList<String>();
-						for (String string : key) {
-							if (string.trim().isEmpty())
-								continue;
-							labels.add(I18N.message(string.trim() + ".short"));
-						}
-
-						String str = labels.toString().substring(1);
-						return str.substring(0, str.length() - 1);
-					} else if (record.getAttributeAsDate("date") != null) {
-						return I18N.formatDate(record.getAttributeAsDate("date"));
-					} else if (record.getAttributeAsString("cron") != null) {
-						return record.getAttributeAsString("cron");
-					} else
-						return "";
-				} catch (Throwable e) {
-					return "";
-				}
-			}
-		});
 
 		ListGridField routine = new ListGridField("routine", I18N.message("routine"), 150);
 		routine.setCanFilter(true);

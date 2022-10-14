@@ -99,22 +99,10 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 
 	@Override
 	public void cleanOldSessions(int ttl) {
-		if (ttl > 0) {
-			Date today = new Date();
-			GregorianCalendar cal = new GregorianCalendar();
-			cal.add(Calendar.DAY_OF_MONTH, -ttl);
-			Date ldDate = cal.getTime();
-
-			try {
-				int rowsUpdated = jdbcUpdate("UPDATE ld_session SET ld_deleted = 1, ld_lastmodified = ?"
-						+ " WHERE ld_deleted = 0 AND ld_creation < ?", today, ldDate);
-
-				log.info("cleanOldSessions rows updated: {}", rowsUpdated);
-			} catch (Exception e) {
-				if (log.isErrorEnabled())
-					log.error(e.getMessage(), e);
-			}
-
+		try {
+			log.info("cleanOldSessions rows updated: {}", cleanOldRecords(ttl, "ld_session"));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 }

@@ -858,7 +858,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	/**
 	 * @see org.apache.jackrabbit.webdav.DavResource#getFactory()
-	 * @deprecated JackRabbit usage
 	 */
 	public org.apache.jackrabbit.webdav.DavResourceFactory getFactory() {
 		throw new UnsupportedOperationException();

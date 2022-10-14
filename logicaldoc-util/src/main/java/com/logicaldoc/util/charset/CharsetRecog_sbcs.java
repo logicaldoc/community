@@ -119,7 +119,6 @@ abstract class CharsetRecog_sbcs extends CharsetRecognizer {
             while ((b = nextByte(det)) >= 0) {
                 byte mb = byteMap[b];
                 
-                // TODO: 0x20 might not be a space in all character sets...
                 if (mb != 0) {
                     if (!(mb == spaceChar && ignoreSpace)) {
                         addByte(mb);                    
@@ -129,15 +128,10 @@ abstract class CharsetRecog_sbcs extends CharsetRecognizer {
                 }
             }
             
-            // TODO: Is this OK? The buffer could have ended in the middle of a word...
             addByte(spaceChar);
 
             double rawPercent = (double) hitCount / (double) ngramCount;
-            
-//                if (rawPercent <= 2.0) {
-//                    return 0;
-//                }
-            
+                        
             // This is a bit of a hack to take care of a case
             // were we were getting a confidence of 135...
             if (rawPercent > 0.33) {

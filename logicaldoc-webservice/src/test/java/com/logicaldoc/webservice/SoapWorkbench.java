@@ -32,7 +32,7 @@ import com.logicaldoc.webservice.soap.client.SoapTagClient;
 
 public class SoapWorkbench {
 
-	final static String BASE = "https://demo.logicaldoc.com/services";
+	final static String BASE = "http://localhost:9080/services";
 
 	public static void main(String[] args) throws Exception {
 
@@ -45,12 +45,16 @@ public class SoapWorkbench {
 		SoapDocumentMetadataClient metadataClient = new SoapDocumentMetadataClient(BASE + "/DocumentMetadata");
 
 		// Open a session
-		String sid = auth.login("admin", "admin");
+		String sid = auth.login("admin", "12345678");
 		System.out.println("Server date: " + systemClient.getInfo().getDate());
 		System.out.println("Sid: " + sid);
 
 		try {
-
+			System.out.println(info.getInfo().getProductName()+"  "+info.getInfo().getDate());
+			
+			String html = org.jaxws.wsdl2html.service.Wsdl2Html.generateHtml("http://localhost:9080/services/System");
+			System.out.println(html);
+			
 //			String[] features = systemClient.getInfo().getFeatures();
 //			System.out.println("Features:");
 //			for (String feature : features) {
@@ -64,7 +68,7 @@ public class SoapWorkbench {
 			// This will search by filename using LIKE %filename%
 			// searchByFilename(sid, "simply");
 
-			 folderStuff(sid);
+//			 folderStuff(sid);
 
 			// searchStuff(sid);
 
