@@ -1020,7 +1020,10 @@ public class LDRepository {
 	public ObjectData getObjectByPath(CallContext context, String path, String filter, Boolean includeAllowableActions,
 			IncludeRelationships includeRelationships, String renditionFilter, Boolean includePolicyIds,
 			Boolean includeAcl, ExtensionsData extension) {
+		
 		debug("getObjectByPath " + path);
+		
+		ObjectData out = null;
 
 		try {
 			String fullPath = path;
@@ -1032,9 +1035,7 @@ public class LDRepository {
 			debug("using normalized path " + fullPath);
 
 			// Try to check if the path is a folder
-			Folder folder = folderDao.findByPathExtended(fullPath, getSessionUser().getTenantId());
-
-			ObjectData out = null;
+			Folder folder = folderDao.findByPathExtended(fullPath, getSessionUser().getTenantId());			
 
 			if (folder != null) {
 				out = getObject(context, ID_PREFIX_FLD + Long.toString(folder.getId()), null, filter,
@@ -1043,9 +1044,6 @@ public class LDRepository {
 				// Not a folder, probably a file
 				String parentPath = fullPath.substring(0, fullPath.lastIndexOf('/'));
 				folder = folderDao.findByPathExtended(parentPath, getSessionUser().getTenantId());
-				if (folder == null) {
-					out = null;
-				}
 
 				if (folder != null) {
 					String fileName = fullPath.substring(fullPath.lastIndexOf('/') + 1);
@@ -1053,22 +1051,21 @@ public class LDRepository {
 					List<Document> docs = documentDao.findByFileNameAndParentFolderId(folder.getId(), fileName, null,
 							getSessionUser().getTenantId(), null);
 
-					if (docs == null || docs.isEmpty()) {
-						out = null;
-					} else {
+					if (docs != null && (!docs.isEmpty())) {
 						out = getObject(context, ID_PREFIX_DOC + Long.toString(docs.get(0).getId()), null, filter,
 								includeAllowableActions, includeAcl, null);
-					}
+					} 
 				}
 			}
 
 			if (out == null)
 				throw new CmisObjectNotFoundException("Object not found!");
-			else
-				return out;
+
 		} catch (Throwable t) {
 			return (ObjectData) catchError(t);
 		}
+		
+		return out;
 	}
 
 	/**
@@ -2605,32 +2602,35 @@ public class LDRepository {
 	}
 
 	private boolean checkPermission(PersistentObject object, long userId, Permission permission) {
+
+		assert object != null : "Argument object is null";
+		assert permission != null : "Argument permission is null";
+
 		long id = root.getId();
 
-		if (object != null)
-			if (object instanceof Folder) {
-				id = object.getId();
-			} else if (object instanceof Version) {
-				id = ((Version) object).getDocId();
-				try {
-					Document doc = documentDao.findById(id);
-					id = doc.getFolder().getId();
-				} catch (PersistenceException e) {
-					log.error(e.getMessage(), e);
-					return false;
-				}
-			} else {
-				id = ((Document) object).getFolder().getId();
+		if (object instanceof Folder) {
+			id = object.getId();
+		} else if (object instanceof Version) {
+			id = ((Version) object).getDocId();
+			try {
+				Document doc = documentDao.findById(id);
+				id = doc.getFolder().getId();
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+				return false;
 			}
+		} else {
+			id = ((Document) object).getFolder().getId();
+		}
 
 		boolean enabled = folderDao.isReadEnabled(id, userId);
 
-		if (enabled && permission != null) {
+		if (enabled) {
 			if (object instanceof Folder && id == Folder.ROOTID) {
 				// The root is just readable
-				enabled = enabled && permission.equals(Permission.READ);
+				enabled = permission.equals(Permission.READ);
 			} else {
-				enabled = enabled && folderDao.isPermissionEnabled(permission, id, userId);
+				enabled = folderDao.isPermissionEnabled(permission, id, userId);
 			}
 		}
 
