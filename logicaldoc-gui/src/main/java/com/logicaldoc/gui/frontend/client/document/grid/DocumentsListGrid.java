@@ -523,6 +523,100 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			}
 		}
 	}
+	
+	
+	/**
+	 * Merges the given list of fields with the legacy ones.
+	 * 
+	 * @param fields The fields as you already filled
+	 */
+	public void mergeFields(List<ListGridField> fields) {
+		if(!fields.contains(fieldsMap.get("icon")))
+			fields.add(0, fieldsMap.get("icon"));
+		
+		if(!fields.contains(fieldsMap.get("statusIcons")))
+			fields.add(0, fieldsMap.get("statusIcons"));
+		
+		if(!fields.contains(fieldsMap.get("thumbnail")))
+			fields.add(0, fieldsMap.get("thumbnail"));
+		
+		if (!fields.contains(fieldsMap.get("filename"))) {
+			fieldsMap.get("filename").setHidden(true);
+			fields.add(fieldsMap.get("filename"));
+		}
+		if (!fields.contains(fieldsMap.get("lastModified"))) {
+			fieldsMap.get("lastModified").setHidden(true);
+			fields.add(fieldsMap.get("lastModified"));
+		}
+		if (!fields.contains(fieldsMap.get("type"))) {
+			fieldsMap.get("type").setHidden(true);
+			fields.add(fieldsMap.get("type"));
+		}
+		if (!fields.contains(fieldsMap.get("size"))) {
+			fieldsMap.get("size").setHidden(true);
+			fields.add(fieldsMap.get("size"));
+		}
+		if (!fields.contains(fieldsMap.get("pages"))) {
+			fieldsMap.get("pages").setHidden(true);
+			fields.add(fieldsMap.get("pages"));
+		}
+		if (!fields.contains(fieldsMap.get("fileVersion"))) {
+			fieldsMap.get("fileVersion").setHidden(true);
+			fields.add(fieldsMap.get("fileVersion"));
+		}
+		if (!fields.contains(fieldsMap.get("version"))) {
+			fieldsMap.get("version").setHidden(true);
+			fields.add(fieldsMap.get("version"));
+		}
+		if (!fields.contains(fieldsMap.get("publisher"))) {
+			fieldsMap.get("publisher").setHidden(true);
+			fields.add(fieldsMap.get("publisher"));
+		}
+		if (!fields.contains(fieldsMap.get("published"))) {
+			fieldsMap.get("published").setHidden(true);
+			fields.add(fieldsMap.get("published"));
+		}
+		if (!fields.contains(fieldsMap.get("creator"))) {
+			fieldsMap.get("creator").setHidden(true);
+			fields.add(fieldsMap.get("creator"));
+		}
+		if (!fields.contains(fieldsMap.get("created"))) {
+			fieldsMap.get("created").setHidden(true);
+			fields.add(fieldsMap.get("created"));
+		}
+		if (!fields.contains(fieldsMap.get("customId"))) {
+			fieldsMap.get("customId").setHidden(true);
+			fields.add(fieldsMap.get("customId"));
+		}
+		if (!fields.contains(fieldsMap.get("rating"))) {
+			fieldsMap.get("rating").setHidden(true);
+			fields.add(fieldsMap.get("rating"));
+		}
+		if (!fields.contains(fieldsMap.get("comment"))) {
+			fieldsMap.get("comment").setHidden(true);
+			fields.add(fieldsMap.get("comment"));
+		}
+		if (!fields.contains(fieldsMap.get("workflowStatus"))) {
+			fieldsMap.get("workflowStatus").setHidden(true);
+			fields.add(fieldsMap.get("workflowStatus"));
+		}
+		if (!fields.contains(fieldsMap.get("template"))) {
+			fieldsMap.get("template").setHidden(true);
+			fields.add(fieldsMap.get("template"));
+		}
+		if (!fields.contains(fieldsMap.get("startPublishing"))) {
+			fieldsMap.get("startPublishing").setHidden(true);
+			fields.add(fieldsMap.get("startPublishing"));
+		}
+		if (!fields.contains(fieldsMap.get("stopPublishing"))) {
+			fieldsMap.get("stopPublishing").setHidden(true);
+			fields.add(fieldsMap.get("stopPublishing"));
+		}
+		if (!fields.contains(fieldsMap.get("language"))) {
+			fieldsMap.get("language").setHidden(true);
+			fields.add(fieldsMap.get("language"));
+		}
+	}
 
 	@Override
 	public void deselectAll() {

@@ -45,6 +45,7 @@ public class DeletedDocsReport extends ReportPanel implements FolderChangeListen
 
 	@Override
 	protected void prepareListGrid() {
+		
 		ListGridField id = new ListGridField("id");
 		id.setHidden(true);
 		id.setCanGroupBy(false);

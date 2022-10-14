@@ -1,11 +1,9 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
 import com.logicaldoc.gui.common.client.Feature;
-import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
-import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
@@ -35,7 +33,7 @@ abstract class ReportPanel extends AdminPanel {
 	public ReportPanel(String title, String infoLabel) {
 		super(title);
 		this.infoLabel = infoLabel;
-		this.list=createListGrid();
+		this.list = createListGrid();
 	}
 
 	@Override
@@ -50,7 +48,7 @@ abstract class ReportPanel extends AdminPanel {
 		list.setFilterOnKeypress(true);
 		list.setSelectionType(SelectionStyle.MULTIPLE);
 		list.setShowFilterEditor(true);
-		
+
 		list.addCellContextClickHandler(new CellContextClickHandler() {
 			@Override
 			public void onCellContextClick(CellContextClickEvent event) {

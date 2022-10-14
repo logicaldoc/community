@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.folder;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIAutomationTrigger;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -10,6 +7,7 @@ import com.logicaldoc.gui.common.client.data.AutomationTriggersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.frontend.client.services.AutomationService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
@@ -21,7 +19,6 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -71,37 +68,8 @@ public class FolderAutomationPanel extends FolderDetailTab {
 		ListGridField routine = new ListGridField("routine", I18N.message("routine"), 150);
 		routine.setCanFilter(true);
 
-		ListGridField events = new ListGridField("events", I18N.message("triggeron"));
+		ListGridField events = new EventsListGridField("events", "triggeron");
 		events.setWidth(300);
-		events.setCanEdit(false);
-		events.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					if (value != null && !value.toString().trim().isEmpty()) {
-						// Translate the set of events
-						String[] key = null;
-
-						if (!value.toString().contains(","))
-							key = new String[] { value.toString().trim() };
-						else
-							key = value.toString().split(",");
-						List<String> labels = new ArrayList<String>();
-						for (String string : key) {
-							if (string.trim().isEmpty())
-								continue;
-							labels.add(I18N.message(string + ".short"));
-						}
-						String str = labels.toString().substring(1);
-						return str.substring(0, str.length() - 1);
-					} else
-						return "";
-				} catch (Throwable e) {
-					return "";
-				}
-			}
-		});
 
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));

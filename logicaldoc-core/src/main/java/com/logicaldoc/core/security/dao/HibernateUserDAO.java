@@ -47,7 +47,6 @@ import com.logicaldoc.util.security.PasswordValidator;
  * @author Marco Meschieri - LogicalDOC
  * @since 3.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> implements UserDAO {
 
 	private GenericDAO genericDAO;
@@ -333,28 +332,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 				listener.afterStore(user, transaction, dictionary);
 
 			if (newUser) {
-				// Save default dashlets
-				Generic dash = new Generic("usersetting", "dashlet-checkout", user.getId());
-				dash.setInteger1(1L);
-				dash.setInteger2(0L);
-				dash.setInteger3(0L);
-				dash.setString1("0");
-				dash.setTenantId(user.getTenantId());
-				genericDAO.store(dash);
-				dash = new Generic("usersetting", "dashlet-locked", user.getId());
-				dash.setInteger1(3L);
-				dash.setInteger2(0L);
-				dash.setInteger3(1L);
-				dash.setString1("0");
-				dash.setTenantId(user.getTenantId());
-				genericDAO.store(dash);
-				dash = new Generic("usersetting", "dashlet-notes", user.getId());
-				dash.setInteger1(6L);
-				dash.setInteger2(1L);
-				dash.setInteger3(0L);
-				dash.setString1("0");
-				dash.setTenantId(user.getTenantId());
-				genericDAO.store(dash);
+				saveDefaultDashlets(user);
 
 				/*
 				 * Save an history to record the user creation
@@ -407,6 +385,36 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 
 		return result;
+	}
+
+	private void saveDefaultDashlets(User user) throws PersistenceException {
+		String type = "usersetting";
+		String dashletSubtype = "dashlet-";
+		String[] dashletSubtypes = new String[] { dashletSubtype + "checkout", dashletSubtype + "locked",
+				dashletSubtype + "notes" };
+		for (int i = 0; i < dashletSubtypes.length; i++) {
+			Generic dash = new Generic(type, dashletSubtypes[i], user.getId());
+			dash.setString1("0");
+			dash.setTenantId(user.getTenantId());
+			switch (i) {
+			case 0:
+				dash.setInteger1(1L);
+				dash.setInteger2(0L);
+				dash.setInteger3(0L);
+				break;
+			case 1:
+				dash.setInteger1(3L);
+				dash.setInteger2(0L);
+				dash.setInteger3(1L);
+				break;
+			case 3:
+				dash.setInteger1(6L);
+				dash.setInteger2(1L);
+				dash.setInteger3(0L);
+				break;
+			}
+			genericDAO.store(dash);
+		}
 	}
 
 	/**

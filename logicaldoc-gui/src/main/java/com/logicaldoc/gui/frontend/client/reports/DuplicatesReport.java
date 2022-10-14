@@ -3,7 +3,6 @@ package com.logicaldoc.gui.frontend.client.reports;
 import java.util.LinkedHashMap;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DuplicatesDS;
@@ -11,29 +10,24 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.DocUtil;
-import com.logicaldoc.gui.common.client.util.GridUtil;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
 import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
-import com.logicaldoc.gui.common.client.widgets.InfoPanel;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileNameListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FileSizeListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.FolderListGridField;
-import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.common.client.widgets.grid.VersionListGridField;
 import com.logicaldoc.gui.common.client.widgets.preview.PreviewPopup;
-import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.GroupStartOpen;
 import com.smartgwt.client.types.ListGridFieldType;
-import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.ValueCallback;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -50,10 +44,6 @@ import com.smartgwt.client.widgets.grid.GroupTitleRenderer;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
-import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
-import com.smartgwt.client.widgets.grid.events.DataArrivedEvent;
-import com.smartgwt.client.widgets.grid.events.DataArrivedHandler;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
@@ -66,27 +56,18 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
-public class DuplicatesReport extends AdminPanel implements FolderChangeListener {
-
-	private RefreshableListGrid list;
-
-	private boolean filters;
+public class DuplicatesReport extends ReportPanel implements FolderChangeListener {
 
 	private SpinnerItem max;
 
 	private FolderSelector folderSelector;
 
 	public DuplicatesReport() {
-		super("duplicates");
+		super("duplicates", "showndocuments");
 	}
 
 	@Override
-	public void onDraw() {
-		ToolStrip toolStrip = new ToolStrip();
-		toolStrip.setHeight(20);
-		toolStrip.setWidth100();
-		toolStrip.addSpacer(2);
-
+	protected void fillToolBar(ToolStrip toolStrip) {
 		max = ItemFactory.newSpinnerItem("max", "", 500, 5, null);
 		max.setHint(I18N.message("elements"));
 		max.setShowTitle(false);
@@ -182,41 +163,10 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 		});
 		toolStrip.addSeparator();
 		toolStrip.addButton(deDuplicate);
+	}
 
-		ToolStripButton print = new ToolStripButton();
-		print.setIcon(ItemFactory.newImgIcon("printer.png").getSrc());
-		print.setTooltip(I18N.message("print"));
-		print.setAutoFit(true);
-		print.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				GridUtil.print(list);
-			}
-		});
-		toolStrip.addSeparator();
-		toolStrip.addButton(print);
-
-		if (Feature.visible(Feature.EXPORT_CSV)) {
-			toolStrip.addSeparator();
-			ToolStripButton export = new ToolStripButton();
-			export.setIcon(ItemFactory.newImgIcon("table_row_insert.png").getSrc());
-			export.setTooltip(I18N.message("export"));
-			export.setAutoFit(true);
-			toolStrip.addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					GridUtil.exportCSV(list, false);
-				}
-			});
-			if (!Feature.enabled(Feature.EXPORT_CSV)) {
-				export.setDisabled(true);
-				export.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		toolStrip.addFill();
-
-		final InfoPanel infoPanel = new InfoPanel("");
+	@Override
+	protected void prepareListGrid() {
 
 		ListGridField id = new ColoredListGridField("id");
 		id.setHidden(true);
@@ -262,29 +212,6 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 		type.setHidden(true);
 		type.setCanGroupBy(false);
 
-		list = new RefreshableListGrid() {
-			@Override
-			protected String getCellCSSText(ListGridRecord record, int rowNum, int colNum) {
-				if (getFieldName(colNum).equals("filename")) {
-					if ("stop".equals(record.getAttribute("immutable"))
-							|| !"blank".equals(record.getAttribute("locked"))) {
-						return "color: #888888; font-style: italic;";
-					} else {
-						return super.getCellCSSText(record, rowNum, colNum);
-					}
-				} else {
-					return super.getCellCSSText(record, rowNum, colNum);
-				}
-			}
-		};
-		list.setEmptyMessage(I18N.message("notitemstoshow"));
-		list.setShowRecordComponents(true);
-		list.setShowRecordComponentsByCell(true);
-		list.setCanFreezeFields(false);
-		list.setAutoFetchData(true);
-		list.setFilterOnKeypress(true);
-		list.setSelectionType(SelectionStyle.MULTIPLE);
-
 		// Initial group by
 		list.setGroupStartOpen(GroupStartOpen.ALL);
 		list.setGroupByField("digest");
@@ -309,14 +236,6 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 		list.setCanDragRecordsOut(true);
 		list.setFields(filename, folderName, lastModified, size, version, publisher, customId, digest, type);
 
-		list.addCellContextClickHandler(new CellContextClickHandler() {
-			@Override
-			public void onCellContextClick(CellContextClickEvent event) {
-				showContextMenu();
-				event.cancel();
-			}
-		});
-
 		list.addDoubleClickHandler(new DoubleClickHandler() {
 			@Override
 			public void onDoubleClick(DoubleClickEvent event) {
@@ -325,31 +244,17 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 					DocUtil.download(Long.parseLong(id), null);
 			}
 		});
-
-		list.addDataArrivedHandler(new DataArrivedHandler() {
-			@Override
-			public void onDataArrived(DataArrivedEvent event) {
-				infoPanel.setMessage(I18N.message("showndocuments", Integer.toString(list.getTotalRows())));
-			}
-		});
-
-		body.setMembers(toolStrip, infoPanel, list);
-
-		refresh();
 	}
 
-	private void refresh() {
+	@Override
+	protected void refresh() {
 		Long folderId = folderSelector.getFolderId();
 		int maxElements = max.getValueAsInteger();
 		list.refresh(new DuplicatesDS(folderId, maxElements));
 	}
 
-	public void toggleFilters() {
-		list.setShowFilterEditor(!filters);
-		filters = !filters;
-	}
-
-	private void showContextMenu() {
+	@Override
+	protected void showContextMenu() {
 		Menu contextMenu = new Menu();
 		final ListGridRecord[] selection = list.getSelectedRecords();
 
@@ -389,7 +294,8 @@ public class DuplicatesReport extends AdminPanel implements FolderChangeListener
 
 		MenuItem preview = new MenuItem();
 		preview.setTitle(I18N.message("preview"));
-		preview.setEnabled(com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
+		preview.setEnabled(
+				com.logicaldoc.gui.common.client.Menu.enabled(com.logicaldoc.gui.common.client.Menu.PREVIEW));
 		preview.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 			public void onClick(MenuItemClickEvent event) {
 				long id = Long.parseLong(list.getSelectedRecord().getAttribute("id"));

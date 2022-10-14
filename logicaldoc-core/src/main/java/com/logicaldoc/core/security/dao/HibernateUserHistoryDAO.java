@@ -1,9 +1,6 @@
 package com.logicaldoc.core.security.dao;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,24 +86,10 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 	 */
 	@Override
 	public void cleanOldHistories(int ttl) {
-		if (ttl > 0) {
-			Date today = new Date();
-			GregorianCalendar cal = new GregorianCalendar();
-			cal.add(Calendar.DAY_OF_MONTH, -ttl);
-			Date ldDate = cal.getTime();
-
-			log.debug("today: {}", today);
-			log.debug("ldDate: {}", ldDate);
-
-			try {
-				int rowsUpdated = jdbcUpdate("UPDATE ld_user_history SET ld_deleted = 1, ld_lastmodified = ?"
-						+ " WHERE ld_deleted = 0 AND ld_date < ?", today, ldDate);
-				log.info("cleanOldHistories rows updated: {}", rowsUpdated);
-			} catch (Exception e) {
-				if (log.isErrorEnabled())
-					log.error(e.getMessage(), e);
-			}
-
+		try {
+			log.info("cleanOldHistories rows updated: {}", cleanOldRecords(ttl, "ld_user_history"));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 

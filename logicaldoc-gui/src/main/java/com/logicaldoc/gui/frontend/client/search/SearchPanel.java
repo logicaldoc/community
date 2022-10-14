@@ -363,8 +363,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	@Override
 	public void onFolderMoved(GUIFolder folder) {
-		// TODO Auto-generated method stub
-
+		// Noting to do
 	}
 
 	@Override

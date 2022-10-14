@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.reports;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
@@ -16,8 +13,10 @@ import com.logicaldoc.gui.common.client.widgets.FolderChangeListener;
 import com.logicaldoc.gui.common.client.widgets.FolderSelector;
 import com.logicaldoc.gui.common.client.widgets.grid.ColoredListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
+import com.logicaldoc.gui.frontend.client.folder.FolderSubscriptionOptionListGridField;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
@@ -30,7 +29,6 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.menu.Menu;
@@ -138,72 +136,10 @@ public class SubscriptionsReport extends ReportPanel implements FolderChangeList
 
 		ListGridField created = new DateListGridField("created", "subscription");
 
-		ColoredListGridField option = new ColoredListGridField("folderOption", "option");
-		option.setWidth(60);
-		option.setCanEdit(false);
-		option.setHidden(true);
-		option.setCellFormatter(new CellFormatter() {
+		ColoredListGridField option = new FolderSubscriptionOptionListGridField();
 
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					String decoded = I18N.message("document");
-					if ("folder".equals(record.getAttributeAsString("type")))
-						if ("1".equals(value.toString()))
-							decoded = I18N.message("tree");
-						else
-							decoded = I18N.message("folder");
-
-					String colorSpec = record.getAttributeAsString("color");
-					if (colorSpec != null && !colorSpec.isEmpty())
-						return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
-					else
-						return decoded != null ? decoded : "";
-				} catch (Throwable e) {
-					return "";
-				}
-			}
-		});
-
-		ListGridField events = new ColoredListGridField("events", "notifyon");
+		ListGridField events = new EventsListGridField();
 		events.setWidth(200);
-		events.setCanEdit(false);
-		events.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					String decoded = "document";
-					if (value != null && !value.toString().isEmpty()) {
-						// Translate the set of events
-						String[] key = null;
-
-						if (!value.toString().contains(","))
-							key = new String[] { value.toString().trim() };
-						else
-							key = value.toString().split(",");
-						List<String> labels = new ArrayList<String>();
-						for (String string : key) {
-							if (string.trim().isEmpty())
-								continue;
-							labels.add(I18N.message(string.trim() + ".short"));
-						}
-
-						String str = labels.toString().substring(1);
-						decoded = str.substring(0, str.length() - 1);
-
-						String colorSpec = record.getAttributeAsString("color");
-						if (colorSpec != null && !colorSpec.isEmpty())
-							return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
-						else
-							return decoded != null ? decoded : "";
-					} else
-						return "";
-				} catch (Throwable e) {
-					return "";
-				}
-			}
-		});
 
 		ListGridField path = new ColoredListGridField("path", I18N.message("path"));
 		path.setWidth("*");

@@ -23,7 +23,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.6
  */
-public class Dashlet extends Portlet {
+public abstract class Dashlet extends Portlet {
 
 	protected GUIDashlet guiDashlet;
 

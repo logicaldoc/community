@@ -6,10 +6,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.LoggerFactory;
 
@@ -147,9 +147,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		}
 	}
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public boolean isWriteEnable(long templateId, long userId) {
+	private boolean isWriteOrReadEnable(long templateId, long userId, boolean write) {
 		boolean result = true;
 		try {
 			User user = userDAO.findById(userId);
@@ -162,20 +160,13 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			if (groups.isEmpty())
 				return false;
 
-			Iterator iter = groups.iterator();
-
 			StringBuffer query = new StringBuffer("select distinct(_entity) from Template _entity  ");
 			query.append(" left join _entity.templateGroups as _group ");
-			query.append(" where _group.write=1 and _group.groupId in (");
-
-			boolean first = true;
-			while (iter.hasNext()) {
-				if (!first)
-					query.append(",");
-				Group ug = (Group) iter.next();
-				query.append(Long.toString(ug.getId()));
-				first = false;
-			}
+			query.append(" where ");
+			if (write)
+				query.append(" _group.write=1 and ");
+			query.append(" _group.groupId in (");
+			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(") and _entity.id = :templateId");
 
 			Map<String, Object> params = new HashMap<String, Object>();
@@ -194,49 +185,13 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
+	public boolean isWriteEnable(long templateId, long userId) {
+		return isWriteOrReadEnable(templateId, userId, true);
+	}
+
+	@Override
 	public boolean isReadEnable(long templateId, long userId) {
-		boolean result = true;
-		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return false;
-			if (user.isMemberOf("admin"))
-				return true;
-
-			Set<Group> Groups = user.getGroups();
-			if (Groups.isEmpty())
-				return false;
-
-			Iterator iter = Groups.iterator();
-
-			StringBuffer query = new StringBuffer("select distinct(_entity) from Template _entity  ");
-			query.append(" left join _entity.templateGroups as _group ");
-			query.append(" where _group.groupId in (");
-
-			boolean first = true;
-			while (iter.hasNext()) {
-				if (!first)
-					query.append(",");
-				Group ug = (Group) iter.next();
-				query.append(Long.toString(ug.getId()));
-				first = false;
-			}
-			query.append(") and _entity.id = :templateId");
-
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("templateId", Long.valueOf(templateId));
-
-			@SuppressWarnings("unchecked")
-			List<TemplateGroup> coll = (List<TemplateGroup>) findByQuery(query.toString(), params, null);
-			result = coll.size() > 0;
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
-		}
-
-		return result;
+		return isWriteOrReadEnable(templateId, userId, false);
 	}
 
 	@Override
@@ -262,16 +217,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			query.append(" where ");
 			query.append(" ld_templateid=" + templateId);
 			query.append(" and ld_groupid in (");
-
-			boolean first = true;
-			Iterator<Group> iter = groups.iterator();
-			while (iter.hasNext()) {
-				if (!first)
-					query.append(",");
-				Group ug = (Group) iter.next();
-				query.append(Long.toString(ug.getId()));
-				first = false;
-			}
+			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(")");
 
 			/**
