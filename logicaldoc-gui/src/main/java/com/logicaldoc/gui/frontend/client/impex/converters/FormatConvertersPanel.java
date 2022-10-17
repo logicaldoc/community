@@ -4,19 +4,17 @@ import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.data.FormatConvertersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.frontend.client.settings.comparators.ComparatorAssociationsDialog;
 import com.logicaldoc.gui.frontend.client.settings.comparators.ComparatorsPanel;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.OperatorId;
-import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.grid.CellFormatter;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridEditorContext;
 import com.smartgwt.client.widgets.grid.ListGridEditorCustomizer;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -67,21 +65,10 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 
 	@Override
 	protected void prepareAssociationsGrid() {
-		associationsGrid = new ListGrid();
-		associationsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		associationsGrid.setShowFilterEditor(true);
-		associationsGrid.setFilterOnKeypress(true);
-		associationsGrid.setAutoFetchData(true);
-		associationsGrid.setEditByCell(true);
-		associationsGrid.setSelectionType(SelectionStyle.SINGLE);
-		associationsGrid.setEditEvent(ListGridEditEvent.CLICK);
-		associationsGrid.setDataSource(new FormatConvertersDS(null, null));
-		associationsGrid.setAllowFilterOperators(true);
-		associationsGrid.setShowRecordComponents(true);
-		associationsGrid.setShowRecordComponentsByCell(true);
+		buildAssociationsGrid();
 
 		ListGridField in = new ListGridField("in", I18N.message("in"), 50);
-		ListGridField converter = new ListGridField("converter", listGridAttributeLabel);
+		ListGridField converter = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		converter.setWidth("*");
 		converter.setCanEdit(!Session.get().isDemo());
 		converter.setCellFormatter(new CellFormatter() {
@@ -129,12 +116,16 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 		});
 	}
 
+	@Override
+	protected ComparatorAssociationsDialog getAssociationsDialog() {
+		return new ConverterAssociationsDialog(associationsGrid);
+	}
 
 	@Override
 	protected DataSource getSettingsDataSource() {
 		return new FormatConvertersDS("-", "-");
 	}
-	
+
 	private String getConverterShortName(String value) {
 		if (value == null)
 			return null;

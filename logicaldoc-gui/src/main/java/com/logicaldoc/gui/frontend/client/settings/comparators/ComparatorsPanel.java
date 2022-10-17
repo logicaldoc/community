@@ -105,7 +105,7 @@ public class ComparatorsPanel extends AdminPanel {
 		configButton.setShowDown(false);
 		configButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				ComparatorAssociationsDialog dialog = new ComparatorAssociationsDialog(associationsGrid);
+				ComparatorAssociationsDialog dialog = getAssociationsDialog();
 				dialog.show();
 			}
 		});
@@ -136,6 +136,10 @@ public class ComparatorsPanel extends AdminPanel {
 		body.addMember(layout);
 	}
 
+	protected ComparatorAssociationsDialog getAssociationsDialog() {
+		return new ComparatorAssociationsDialog(associationsGrid);
+	}
+	
 	protected ToolStrip prepareToolStrip() {
 		ToolStrip toolStrip = new ToolStrip();
 		toolStrip.setHeight(20);
@@ -157,18 +161,7 @@ public class ComparatorsPanel extends AdminPanel {
 	}
 
 	protected void prepareAssociationsGrid() {
-		associationsGrid = new ListGrid();
-		associationsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
-		associationsGrid.setShowFilterEditor(true);
-		associationsGrid.setFilterOnKeypress(true);
-		associationsGrid.setAutoFetchData(true);
-		associationsGrid.setEditByCell(true);
-		associationsGrid.setSelectionType(SelectionStyle.SINGLE);
-		associationsGrid.setEditEvent(ListGridEditEvent.CLICK);
-		associationsGrid.setDataSource(new ComparatorsDS(null));
-		associationsGrid.setAllowFilterOperators(true);
-		associationsGrid.setShowRecordComponents(true);
-		associationsGrid.setShowRecordComponentsByCell(true);
+		buildAssociationsGrid();
 
 		ListGridField in = new ListGridField("in", I18N.message("ext"), 40);
 		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
@@ -216,6 +209,21 @@ public class ComparatorsPanel extends AdminPanel {
 							converterRecord.getAttributeAsBoolean("eenabled"));
 			}
 		});
+	}
+
+	protected void buildAssociationsGrid() {
+		associationsGrid = new ListGrid();
+		associationsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
+		associationsGrid.setShowFilterEditor(true);
+		associationsGrid.setFilterOnKeypress(true);
+		associationsGrid.setAutoFetchData(true);
+		associationsGrid.setEditByCell(true);
+		associationsGrid.setSelectionType(SelectionStyle.SINGLE);
+		associationsGrid.setEditEvent(ListGridEditEvent.CLICK);
+		associationsGrid.setDataSource(new ComparatorsDS(null));
+		associationsGrid.setAllowFilterOperators(true);
+		associationsGrid.setShowRecordComponents(true);
+		associationsGrid.setShowRecordComponentsByCell(true);
 	}
 
 	protected void prepareSettingsGrid() {

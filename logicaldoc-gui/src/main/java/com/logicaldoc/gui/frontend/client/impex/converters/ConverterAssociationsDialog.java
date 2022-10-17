@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.impex.converters;
 import com.logicaldoc.gui.common.client.data.FormatConvertersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.frontend.client.settings.comparators.ComparatorAssociationsDialog;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.HeaderControls;
@@ -11,7 +12,6 @@ import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
@@ -25,7 +25,7 @@ import com.smartgwt.client.widgets.grid.ListGridField;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7
  */
-public class ConverterAssociationsDialog extends Window {
+public class ConverterAssociationsDialog extends ComparatorAssociationsDialog {
 
 	private static final String DEFAULT_CONVERTER = "com.logicaldoc.conversion.LibreOfficeConverter";
 
@@ -39,13 +39,13 @@ public class ConverterAssociationsDialog extends Window {
 	private ListGrid srcGrid;
 
 	public ConverterAssociationsDialog(final ListGrid srcGrid) {
-		this.srcGrid = srcGrid;
+		super(srcGrid);
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("associations"));
 		setWidth(320);
 		setHeight(360);
-		
+
 		setCanDragResize(true);
 		setIsModal(true);
 		setShowModalMask(true);
@@ -93,13 +93,13 @@ public class ConverterAssociationsDialog extends Window {
 //		associationsGrid.setEditEvent(ListGridEditEvent.CLICK);
 		associationsGrid.setWidth100();
 		associationsGrid.setHeight("*");
-		associationsGrid.setSelectionAppearance(SelectionAppearance.CHECKBOX);  
+		associationsGrid.setSelectionAppearance(SelectionAppearance.CHECKBOX);
 		associationsGrid.setSelectionProperty("selected");
 		ListGridField in = new ListGridField("in", I18N.message("in"), 40);
 		in.setCanEdit(false);
 		ListGridField out = new ListGridField("out", I18N.message("out"), 40);
 		out.setCanEdit(false);
-		
+
 		associationsGrid.setFields(in, out);
 
 		if (converter.getValueAsString() != null)
