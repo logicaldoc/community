@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,10 +32,9 @@ public class DropboxDataServlet extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(DropboxDataServlet.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-			IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			Session session = SessionUtil.validateSession(request);
+			Session session = DropboxServiceImpl.validateSession(request);
 			User user = session.getUser();
 
 			Dropbox dbox = new Dropbox();
@@ -83,8 +81,9 @@ public class DropboxDataServlet extends HttpServlet {
 						writer.print("<type>" + ((entry instanceof FileMetadata) ? "file" : "folder") + "</type>");
 						if (entry instanceof FileMetadata)
 							writer.print("<iicon>"
-									+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils
-											.getExtension(entry.getName()).toLowerCase().trim())) + "</iicon>");
+									+ FilenameUtils.getBaseName(IconSelector.selectIcon(
+											FilenameUtils.getExtension(entry.getName()).toLowerCase().trim()))
+									+ "</iicon>");
 						else
 							writer.print("<iicon>folder</iicon>");
 						writer.print("</entry>");
@@ -93,13 +92,12 @@ public class DropboxDataServlet extends HttpServlet {
 			}
 			writer.write("</list>");
 		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			if (e instanceof ServletException)
-				throw (ServletException) e;
-			else if (e instanceof IOException)
-				throw (IOException) e;
-			else
-				throw new ServletException(e.getMessage(), e);
+			String message = e.getMessage();
+			log.error(message, e);
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
+			} catch (Throwable t) {
+			}
 		}
 	}
 }

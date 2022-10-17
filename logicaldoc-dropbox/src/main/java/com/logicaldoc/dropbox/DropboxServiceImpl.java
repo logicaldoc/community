@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -30,8 +32,10 @@ import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.gui.common.client.InvalidSessionException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
 import com.logicaldoc.util.Context;
@@ -47,9 +51,20 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private static Logger log = LoggerFactory.getLogger(DropboxServiceImpl.class);
 
+	public static Session validateSession(HttpServletRequest request) throws InvalidSessionException {
+		String sid = SessionManager.get().getSessionId(request);
+		Session session = SessionManager.get().get(sid);
+		if (session == null)
+			throw new InvalidSessionException("Invalid Session");
+		if (!SessionManager.get().isOpen(sid))
+			throw new InvalidSessionException("Invalid or Expired Session");
+		SessionManager.get().renew(sid);
+		return session;
+	}
+	
 	@Override
 	public boolean isConnected() throws ServerException {
-		Session session = SessionUtil.validateSession(getThreadLocalRequest());
+		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 
 		try {
 			Dropbox dbox = new Dropbox();
@@ -65,7 +80,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	@Override
 	public String startAuthorization() throws ServerException {
-		Session session = SessionUtil.validateSession(getThreadLocalRequest());
+		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 
 		try {
 			Dropbox dbox = new Dropbox();
@@ -78,7 +93,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	@Override
 	public String finishAuthorization(String authorizationCode) throws ServerException {
-		Session session = SessionUtil.validateSession(getThreadLocalRequest());
+		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 
 		try {
 			User user = session.getUser();
@@ -129,7 +144,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	@Override
 	public boolean exportDocuments(String targetPath, long[] folderIds, long[] docIds) throws ServerException {
-		Session session = SessionUtil.validateSession(getThreadLocalRequest());
+		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 
 		try {
 			User user = session.getUser();
@@ -240,7 +255,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	@Override
 	public int importDocuments(long targetFolder, String[] paths) throws ServerException {
-		Session session = SessionUtil.validateSession(getThreadLocalRequest());
+		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		if (!fdao.isPermissionEnabled(Permission.IMPORT, targetFolder, session.getUserId()))

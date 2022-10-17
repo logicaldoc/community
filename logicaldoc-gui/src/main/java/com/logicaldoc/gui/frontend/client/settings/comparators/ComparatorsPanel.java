@@ -16,6 +16,7 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.smartgwt.client.data.AdvancedCriteria;
+import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.OperatorId;
@@ -58,37 +59,34 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  */
 public class ComparatorsPanel extends AdminPanel {
 
-	private static final String SETTING_PREFIX = "comparator.";
+	protected String gridAttributeName = "comparator";
 
+
+	protected String settingsPrefix = gridAttributeName + ".";
+
+	protected String listGridAttributeLabel = I18N.message(gridAttributeName);
+	
+	
 	// Associations between file formats and a comparator
-	private ListGrid associationsGrid;
-
+	protected ListGrid associationsGrid;
+	
 	// Settings for the different comparators
-	private ListGrid settingsGrid;
+	protected ListGrid settingsGrid;
 
+	protected String settingsGridTitle = I18N.message("comparators");
+	
+	public ComparatorsPanel(String title) {
+		super(title);
+	}
+	
 	public ComparatorsPanel() {
 		super("comparators");
-		initGUI();
-	}
-
-	private void initGUI() {
-		ToolStrip toolStrip = new ToolStrip();
-		toolStrip.setHeight(20);
-		toolStrip.setWidth100();
-		toolStrip.addSpacer(2);
-
-		ToolStripButton save = new ToolStripButton();
-		save.setTitle(I18N.message("save"));
-		save.setDisabled(Session.get().isDemo());
-		save.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				onSave();
-			}
-		});
-		save.setDisabled(Session.get().isDemo() && Session.get().getUser().getId() == 1);
-
-		toolStrip.addButton(save);
+	}	
+	
+	@Override
+	protected void onDraw() {
+		ToolStrip toolStrip = prepareToolStrip();
+		
 		toolStrip.addFill();
 
 		body.addMember(toolStrip);
@@ -120,7 +118,7 @@ public class ComparatorsPanel extends AdminPanel {
 		associationsStack.setSections(associationsSection);
 
 		prepareSettingsGrid();
-		SectionStackSection settingsSection = new SectionStackSection(I18N.message("comparators"));
+		SectionStackSection settingsSection = new SectionStackSection(settingsGridTitle);
 		settingsSection.setCanCollapse(false);
 		settingsSection.setExpanded(true);
 		settingsSection.setItems(settingsGrid);
@@ -138,7 +136,27 @@ public class ComparatorsPanel extends AdminPanel {
 		body.addMember(layout);
 	}
 
-	private void prepareAssociationsGrid() {
+	protected ToolStrip prepareToolStrip() {
+		ToolStrip toolStrip = new ToolStrip();
+		toolStrip.setHeight(20);
+		toolStrip.setWidth100();
+		toolStrip.addSpacer(2);
+
+		ToolStripButton save = new ToolStripButton();
+		save.setTitle(I18N.message("save"));
+		save.setDisabled(Session.get().isDemo());
+		save.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				onSave();
+			}
+		});
+		save.setDisabled(Session.get().isDemo());
+		toolStrip.addButton(save);
+		return toolStrip;
+	}
+
+	protected void prepareAssociationsGrid() {
 		associationsGrid = new ListGrid();
 		associationsGrid.setEmptyMessage(I18N.message("notitemstoshow"));
 		associationsGrid.setShowFilterEditor(true);
@@ -153,7 +171,7 @@ public class ComparatorsPanel extends AdminPanel {
 		associationsGrid.setShowRecordComponentsByCell(true);
 
 		ListGridField in = new ListGridField("in", I18N.message("ext"), 40);
-		ListGridField comparator = new ListGridField("comparator", I18N.message("comparator"));
+		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
 		comparator.setCanEdit(!Session.get().isDemo());
 		comparator.setCellFormatter(new CellFormatter() {
@@ -176,7 +194,7 @@ public class ComparatorsPanel extends AdminPanel {
 			public FormItem getEditor(ListGridEditorContext context) {
 				ListGridField field = context.getEditField();
 
-				if (field.getName().equals("comparator")) {
+				if (field.getName().equals(gridAttributeName)) {
 					final ListGridRecord selectedRecord = associationsGrid.getSelectedRecord();
 					final SelectItem editorItem = ItemFactory
 							.newComparatorSelector(selectedRecord.getAttributeAsString("in"));
@@ -192,7 +210,7 @@ public class ComparatorsPanel extends AdminPanel {
 			@Override
 			public void onEditComplete(EditCompleteEvent event) {
 				Record converterRecord = settingsGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS,
-						associationsGrid.getSelectedRecord().getAttributeAsString("comparator")));
+						associationsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 				if (converterRecord != null)
 					associationsGrid.getSelectedRecord().setAttribute("eenabled",
 							converterRecord.getAttributeAsBoolean("eenabled"));
@@ -200,7 +218,7 @@ public class ComparatorsPanel extends AdminPanel {
 		});
 	}
 
-	private void prepareSettingsGrid() {
+	protected void prepareSettingsGrid() {
 		settingsGrid = new ListGrid() {
 
 			@Override
@@ -268,7 +286,7 @@ public class ComparatorsPanel extends AdminPanel {
 		settingsGrid.setFilterOnKeypress(true);
 		settingsGrid.setAutoFetchData(true);
 		settingsGrid.setCanEdit(false);
-		settingsGrid.setDataSource(new ComparatorsDS("-"));
+		settingsGrid.setDataSource(getSettingsDataSource());
 
 		ListGridField enabled = new ListGridField("eenabled", " ", 20);
 		enabled.setCanSort(false);
@@ -286,7 +304,7 @@ public class ComparatorsPanel extends AdminPanel {
 			}
 		});
 
-		ListGridField comparator = new ListGridField("comparator", I18N.message("comparator"));
+		ListGridField comparator = new ListGridField(gridAttributeName, listGridAttributeLabel);
 		comparator.setWidth("*");
 		comparator.setCellFormatter(new CellFormatter() {
 
@@ -307,8 +325,12 @@ public class ComparatorsPanel extends AdminPanel {
 		});
 	}
 
-	private static boolean isParameterAttribute(String name) {
-		if ("id".equals(name) || "comparator".equals(name) || "in".equals(name) || "label".equals(name)
+	protected DataSource getSettingsDataSource() {
+		return new ComparatorsDS("-");
+	}
+
+	protected boolean isParameterAttribute(String name) {
+		if ("id".equals(name) || gridAttributeName.equals(name) || "in".equals(name) || "label".equals(name)
 				|| "eenabled".equals(name) || name.startsWith("_"))
 			return false;
 		else
@@ -322,12 +344,12 @@ public class ComparatorsPanel extends AdminPanel {
 
 		for (Record rec : associationsGrid.getRecordList().toArray()) {
 			String in = rec.getAttributeAsString("in").trim();
-			String comparator = rec.getAttributeAsString("comparator").trim();
-			settings.add(new GUIParameter(SETTING_PREFIX + in, comparator));
+			String comparator = rec.getAttributeAsString(gridAttributeName).trim();
+			settings.add(new GUIParameter(settingsPrefix + in, comparator));
 		}
 
 		for (Record rec : settingsGrid.getRecordList().toArray()) {
-			String comparator = rec.getAttributeAsString("comparator").trim();
+			String comparator = rec.getAttributeAsString(gridAttributeName).trim();
 			String comparatorShort = getComparatorShortName(comparator);
 
 			String[] attrs = rec.getAttributes();
@@ -336,7 +358,7 @@ public class ComparatorsPanel extends AdminPanel {
 					String attributeValue = rec.getAttributeAsString(attr);
 					if (!isParameterAttribute(attr))
 						continue;
-					String settingName = SETTING_PREFIX + comparatorShort + "." + attr;
+					String settingName = settingsPrefix + comparatorShort + "." + attr;
 					if (settingNames.contains(settingName))
 						continue;
 					settingNames.add(settingName);
@@ -372,7 +394,7 @@ public class ComparatorsPanel extends AdminPanel {
 		return str;
 	}
 
-	private void showContextMenu() {
+	protected void showContextMenu() {
 		Menu contextMenu = new Menu();
 
 		MenuItem enable = new MenuItem();
@@ -381,7 +403,7 @@ public class ComparatorsPanel extends AdminPanel {
 			public void onClick(MenuItemClickEvent event) {
 				SettingService.Instance.get()
 						.saveSettings(new GUIParameter[] { new GUIParameter(
-								SETTING_PREFIX + settingsGrid.getSelectedRecord().getAttribute("label") + ".enabled",
+								settingsPrefix + settingsGrid.getSelectedRecord().getAttribute("label") + ".enabled",
 								"true") }, new AsyncCallback<Void>() {
 
 									@Override
@@ -397,8 +419,8 @@ public class ComparatorsPanel extends AdminPanel {
 
 										// Update the associations table
 										Record[] associations = associationsGrid.findAll(new AdvancedCriteria(
-												"comparator", OperatorId.EQUALS,
-												settingsGrid.getSelectedRecord().getAttributeAsString("comparator")));
+												gridAttributeName, OperatorId.EQUALS,
+												settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 										if (associations != null)
 											for (Record record : associations)
 												record.setAttribute("eenabled", true);
@@ -425,7 +447,7 @@ public class ComparatorsPanel extends AdminPanel {
 			public void onClick(MenuItemClickEvent event) {
 				SettingService.Instance.get()
 						.saveSettings(new GUIParameter[] { new GUIParameter(
-								SETTING_PREFIX + settingsGrid.getSelectedRecord().getAttribute("label") + ".enabled",
+								settingsPrefix + settingsGrid.getSelectedRecord().getAttribute("label") + ".enabled",
 								"false") }, new AsyncCallback<Void>() {
 
 									@Override
@@ -441,8 +463,8 @@ public class ComparatorsPanel extends AdminPanel {
 
 										// Update the associations table
 										Record[] associations = associationsGrid.findAll(new AdvancedCriteria(
-												"comparator", OperatorId.EQUALS,
-												settingsGrid.getSelectedRecord().getAttributeAsString("comparator")));
+												gridAttributeName, OperatorId.EQUALS,
+												settingsGrid.getSelectedRecord().getAttributeAsString(gridAttributeName)));
 										if (associations != null)
 											for (Record record : associations)
 												record.setAttribute("eenabled", false);
