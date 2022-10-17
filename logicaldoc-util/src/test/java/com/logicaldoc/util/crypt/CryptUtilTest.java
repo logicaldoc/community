@@ -3,26 +3,14 @@ package com.logicaldoc.util.crypt;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.crypt.CryptUtil.EncryptionException;
 import com.logicaldoc.util.io.FileUtil;
 
+import junit.framework.Assert;
+
 public class CryptUtilTest {
-
-	@Before
-	public void setUp() throws Exception {
-
-	}
-
-	@After
-	public void tearDown() throws Exception {
-
-	}
 
 	@Test
 	public void testCrypt() throws IOException, EncryptionException {

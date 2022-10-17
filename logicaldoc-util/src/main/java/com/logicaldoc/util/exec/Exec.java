@@ -348,29 +348,11 @@ public class Exec {
 		if (allowedCommands.isEmpty())
 			return;
 
-		System.err.println(commandLine);
-		System.err.println(allowedCommands);
 		boolean allowed = allowedCommands.contains(commandLine);
 		if (!allowed) {
 			for (String row : allowedCommands) {
-				System.out.println(row);
-				/*
-				 * if (commandLine.startsWith(row) && commandLine.length() > row.length() &&
-				 * commandLine.substring(row.length()).startsWith(" ")) { allowed = true; break;
-				 * }
-				 */
-				boolean xxx = commandLine.startsWith(row);
-				boolean xxx02 = commandLine.length() > row.length();
-				// boolean xxx03 = commandLine.substring(row.length()).startsWith(" ");
-				boolean xxx03 = commandLine.substring(row.length()).startsWith(" ", 0);
-
-				System.out.println("xxx: " + xxx);
-				System.out.println("xxx02: " + xxx02);
-				System.out.println("xxx03: " + xxx03);
-
 				if (commandLine.startsWith(row) && commandLine.length() > row.length()
 						&& commandLine.substring(row.length()).startsWith(" ", 0)) {
-					System.out.println("Allowed!!");
 					allowed = true;
 					break;
 				}

@@ -1,7 +1,5 @@
 package com.logicaldoc.util.config;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import junit.framework.Assert;
@@ -13,16 +11,6 @@ import junit.framework.Assert;
  * @since 4.5
  */
 public class LoggingConfiguratorTest {
-
-	@Before
-	public void setUp() throws Exception {
-		
-	}
-
-	@After
-	public void tearDown() throws Exception {
-
-	}
 	
 	@Test
 	public void testGetProperty() {

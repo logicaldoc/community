@@ -1,8 +1,6 @@
 package com.logicaldoc.util.config;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -13,15 +11,6 @@ import org.junit.Test;
  * @since 8.7.4
  */
 public class PluginDescriptorConfiguratorTest {
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-
-	}
 
 	@Test
 	public void testGetId() {
