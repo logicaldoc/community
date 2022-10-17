@@ -237,7 +237,7 @@ public class LDRepository {
 		this.id = Long.toString(root.getId());
 
 		// set up user table
-		userMap = new HashMap<String, Boolean>();
+		userMap = new HashMap<>();
 
 		// compile repository info
 		repositoryInfo = new RepositoryInfoImpl();
@@ -1020,9 +1020,9 @@ public class LDRepository {
 	public ObjectData getObjectByPath(CallContext context, String path, String filter, Boolean includeAllowableActions,
 			IncludeRelationships includeRelationships, String renditionFilter, Boolean includePolicyIds,
 			Boolean includeAcl, ExtensionsData extension) {
-		
+
 		debug("getObjectByPath " + path);
-		
+
 		ObjectData out = null;
 
 		try {
@@ -1035,7 +1035,7 @@ public class LDRepository {
 			debug("using normalized path " + fullPath);
 
 			// Try to check if the path is a folder
-			Folder folder = folderDao.findByPathExtended(fullPath, getSessionUser().getTenantId());			
+			Folder folder = folderDao.findByPathExtended(fullPath, getSessionUser().getTenantId());
 
 			if (folder != null) {
 				out = getObject(context, ID_PREFIX_FLD + Long.toString(folder.getId()), null, filter,
@@ -1054,7 +1054,7 @@ public class LDRepository {
 					if (docs != null && (!docs.isEmpty())) {
 						out = getObject(context, ID_PREFIX_DOC + Long.toString(docs.get(0).getId()), null, filter,
 								includeAllowableActions, includeAcl, null);
-					} 
+					}
 				}
 			}
 
@@ -1064,7 +1064,7 @@ public class LDRepository {
 		} catch (Throwable t) {
 			return (ObjectData) catchError(t);
 		}
-		
+
 		return out;
 	}
 
@@ -1982,7 +1982,7 @@ public class LDRepository {
 		// update properties
 		for (PropertyData<?> p : properties.getProperties().values()) {
 			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
-			
+
 			// do we know that property?
 			if (propType == null)
 				throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), IS_UNKNOWN));
@@ -2101,8 +2101,8 @@ public class LDRepository {
 						doc.setValue(attributeName, stringValue);
 						break;
 					default:
-					    // nothing to do here
-					    break;						
+						// nothing to do here
+						break;
 					}
 				}
 			}
@@ -2156,7 +2156,8 @@ public class LDRepository {
 			}
 
 			if ((propType.getUpdatability() == Updatability.ONCREATE)) {
-				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), "can only be set on create!"));
+				throw new CmisConstraintException(
+						String.format(PROPERTY_S_S, prop.getId(), "can only be set on create!"));
 			}
 
 			// default or value
@@ -2197,7 +2198,7 @@ public class LDRepository {
 			transaction.setEvent(DocumentEvent.CHANGED.toString());
 			try {
 				Document actualDoc = documentDao.findById(doc.getId());
-				log.debug("actualDoc: {}",actualDoc);
+				log.debug("actualDoc: {}", actualDoc);
 				documentDao.initialize(actualDoc);
 				doc.setId(0);
 				documentManager.update(actualDoc, doc, transaction);
@@ -2601,30 +2602,26 @@ public class LDRepository {
 		}
 	}
 
-	private boolean checkPermission(PersistentObject object, long userId, Permission permission) {
-
-		assert object != null : "Argument object is null";
-		
+	private boolean checkPermission(PersistentObject object, long userId, Permission permission)
+			throws PersistenceException {
 		long id = root.getId();
 
-		if (object instanceof Folder) {
-			id = object.getId();
-		} else if (object instanceof Version) {
-			id = ((Version) object).getDocId();
-			try {
+		boolean enabled = false;
+		if (object != null) {
+			if (object instanceof Folder) {
+				id = object.getId();
+			} else if (object instanceof Version) {
+				id = ((Version) object).getDocId();
 				Document doc = documentDao.findById(id);
 				id = doc.getFolder().getId();
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-				return false;
+			} else {
+				id = ((Document) object).getFolder().getId();
 			}
-		} else {
-			id = ((Document) object).getFolder().getId();
 		}
 
-		boolean enabled = folderDao.isReadEnabled(id, userId);
+		enabled = folderDao.isReadEnabled(id, userId);
 
-		if (enabled && permission!=null) {
+		if (enabled && permission != null) {
 			if (object instanceof Folder && id == Folder.ROOTID) {
 				// The root is just readable
 				enabled = permission.equals(Permission.READ);
@@ -2648,7 +2645,14 @@ public class LDRepository {
 			User user = userDao.findByUsername(context.getUsername());
 			userId = user.getId();
 		}
-		return checkPermission(object, userId, permission);
+
+		try {
+			return checkPermission(object, userId, permission);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return false;
+		}
+
 	}
 
 	private void validatePermission(String objectId, CallContext context, Permission permission)

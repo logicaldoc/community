@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronScheduleBuilder;
@@ -142,8 +143,7 @@ public class JobManager {
 	 * 
 	 * @param group the group name
 	 * 
-	 * @return JobManager.MISSFIRE_RUNNOW or
-	 *         JobManager.MISSFIRE_IGNORE
+	 * @return JobManager.MISSFIRE_RUNNOW or JobManager.MISSFIRE_IGNORE
 	 */
 	public String getMissfireInstruction(String group) {
 		return config.getProperty("job.calendar.missfire", MISSFIRE_RUNNOW);
@@ -209,8 +209,10 @@ public class JobManager {
 		return scheduler.getJobDetail(JobKey.jobKey(name, group));
 	}
 
-	public List<? extends Trigger> getTriggersOfJob(String name, String group) throws SchedulerException {
-		return scheduler.getTriggersOfJob(JobKey.jobKey(name, group));
+	public List<Trigger> getTriggersOfJob(String name, String group) throws SchedulerException {
+		List<Trigger> triggers = scheduler.getTriggersOfJob(JobKey.jobKey(name, group)).stream()
+				.collect(Collectors.toList());
+		return triggers;
 	}
 
 	public void unscheduleJob(String name, String group) throws SchedulerException {

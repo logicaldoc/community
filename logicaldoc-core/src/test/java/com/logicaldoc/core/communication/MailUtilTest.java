@@ -8,9 +8,6 @@ import java.util.Set;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
-import com.logicaldoc.core.communication.EMail;
-import com.logicaldoc.core.communication.MailUtil;
-import com.logicaldoc.core.communication.Recipient;
 
 import junit.framework.Assert;
 
@@ -26,19 +23,19 @@ public class MailUtilTest extends AbstractCoreTCase {
 	public void testMsgToMail() throws Exception {
 		{
 			EMail mail = MailUtil.msgToMail(new File("src/test/resources/test.msg"), true);
-			
+
 			Assert.assertNotNull(mail);
 			Assert.assertEquals("Re: Fwd: Offer for Customizations on LogicalDOC", mail.getSubject());
 			Assert.assertTrue(mail.getMessageText().contains("Stefan"));
 			Assert.assertEquals(1, mail.getAttachmentsCount());
 			Assert.assertEquals("erich.widmer@olig.ch", mail.getFrom().getAddress());
-			
+
 			Assert.assertNotNull(mail.getSentDate());
 			Assert.assertNotNull(mail.getReceivedDate());
 			assertEquals(mail.getSentDate(), mail.getReceivedDate());
 		}
 	}
-	
+
 	@Test
 	public void testSignedMsg() throws Exception {
 		EMail mail = MailUtil.msgToMail(new File("src/test/resources/signed.msg"), true);
@@ -65,15 +62,15 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertNotNull(mail);
 			Assert.assertEquals(1, mail.getAttachmentsCount());
 		}
-		
+
 		{
 			EMail mail = MailUtil.messageToMail(new File("src/test/resources/amazon.eml"), true);
 			Assert.assertNotNull(mail);
 			Assert.assertEquals("Il tuo ordine Amazon.it (#403-7782228-1569116) )", mail.getSubject());
 			Assert.assertTrue(mail.getMessageText().startsWith("<html"));
-			
+
 			Assert.assertEquals(0, mail.getAttachmentsCount());
-			
+
 			Assert.assertEquals("delivery-notification@amazon.it", mail.getFrom().getAddress());
 		}
 
@@ -90,10 +87,13 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertEquals(1, to.size());
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getName());
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getAddress());
-			
+
 			Assert.assertTrue(mail.getReplyTo().toString().contains("vendor_info@kajima.co.uk"));
 		}
+	}
 
+	@Test
+	public void testMessageToMailB() throws Exception {
 		{
 			EMail mail = MailUtil.messageToMail(new File("src/test/resources/parche 2.eml"), true);
 			Assert.assertNotNull(mail);
@@ -103,16 +103,16 @@ public class MailUtilTest extends AbstractCoreTCase {
 			Assert.assertEquals(1, to.size());
 			Assert.assertEquals("'Marco Meschieri'", to.iterator().next().getName());
 			Assert.assertEquals("m.meschieri@logicaldoc.com", to.iterator().next().getAddress());
-			
+
 			Assert.assertTrue(mail.getReplyTo().toString().contains("xcumplido@ingenium-ax.com.mx"));
-			
+
 			Assert.assertTrue(mail.getRecipientsCC().isEmpty());
 			Assert.assertEquals("Xavier Cumplido Morales", mail.getAuthor());
 			Assert.assertEquals("xcumplido@ingenium-ax.com.mx", mail.getAuthorAddress());
 			Assert.assertTrue(mail.getMessageText().startsWith("<html"));
 			Assert.assertTrue(mail.getMessageText().contains("Saludos"));
 		}
-		
+
 		{
 			// An email with another email inside
 			EMail mail = MailUtil.messageToMail(new File("src/test/resources/email2022-00398.eml"), true);
