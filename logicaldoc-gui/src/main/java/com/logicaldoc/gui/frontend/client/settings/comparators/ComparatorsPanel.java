@@ -220,7 +220,7 @@ public class ComparatorsPanel extends AdminPanel {
 		associationsGrid.setEditByCell(true);
 		associationsGrid.setSelectionType(SelectionStyle.SINGLE);
 		associationsGrid.setEditEvent(ListGridEditEvent.CLICK);
-		associationsGrid.setDataSource(new ComparatorsDS(null));
+		associationsGrid.setDataSource(getAssociationsDataSource());
 		associationsGrid.setAllowFilterOperators(true);
 		associationsGrid.setShowRecordComponents(true);
 		associationsGrid.setShowRecordComponentsByCell(true);
@@ -337,6 +337,10 @@ public class ComparatorsPanel extends AdminPanel {
 		return new ComparatorsDS("-");
 	}
 
+	protected DataSource getAssociationsDataSource() {
+		return new ComparatorsDS(null);
+	}
+	
 	protected boolean isParameterAttribute(String name) {
 		if ("id".equals(name) || gridAttributeName.equals(name) || "in".equals(name) || "label".equals(name)
 				|| "eenabled".equals(name) || name.startsWith("_"))

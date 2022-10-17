@@ -125,6 +125,11 @@ public class FormatConvertersPanel extends ComparatorsPanel {
 	protected DataSource getSettingsDataSource() {
 		return new FormatConvertersDS("-", "-");
 	}
+	
+	@Override
+	protected DataSource getAssociationsDataSource() {
+		return new FormatConvertersDS(null, null);
+	}
 
 	private String getConverterShortName(String value) {
 		if (value == null)
