@@ -845,7 +845,7 @@ public class LDRepository {
 
 		try {
 			// check id
-			if ((objectId == null))
+			if (objectId == null)
 				throw new CmisInvalidArgumentException("Object Id must be set.");
 
 			ObjectInfoImpl info = new ObjectInfoImpl();
