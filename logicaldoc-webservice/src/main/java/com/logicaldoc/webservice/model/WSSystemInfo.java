@@ -2,59 +2,76 @@ package com.logicaldoc.webservice.model;
 
 import javax.xml.bind.annotation.XmlType;
 
-import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.webservice.doc.WSDoc;
 
 @XmlType(name = "WSSystemInfo")
 public class WSSystemInfo {
 
-	@WSDoc(documented=false)
+	@WSDoc(documented = false)
 	protected static final long serialVersionUID = 1L;
 
-	protected String productName = "LogicalDOC Community";
+	@WSDoc(required = true)
+	private String productName = "LogicalDOC Community";
 
-	protected String product = "LogicalDOC";
+	@WSDoc(required = true)
+	private String product = "LogicalDOC";
 
-	protected String release = "8.8.3";
+	@WSDoc(required = true)
+	private String release = "8.8.3";
 
-	protected String year = "2006-2022";
+	@WSDoc(required = true)
+	private String year = "2006-2022";
 
-	protected String help = "https://docs.logicaldoc.com";
+	@WSDoc(required = true)
+	private String help = "https://docs.logicaldoc.com";
 
-	protected String bugs = "https://bugs.logicaldoc.com";
+	@WSDoc(required = true)
+	private String bugs = "https://bugs.logicaldoc.com";
 
-	protected String url = "https://www.logicaldoc.com";
+	@WSDoc(required = true)
+	private String url = "https://www.logicaldoc.com";
 
-	protected String forum = "https://forums.logicaldoc.com";
+	@WSDoc(required = true)
+	private String forum = "https://forums.logicaldoc.com";
 
-	protected String vendor = "LogicalDOC";
+	@WSDoc(required = true)
+	private String vendor = "LogicalDOC";
 
-	protected String vendorAddress = "via Aldo Moro interna, 3";
+	@WSDoc(required = true)
+	private String vendorAddress = "via Aldo Moro interna, 3";
 
-	protected String vendorCap = "41012";
+	@WSDoc(required = true)
+	private String vendorCap = "41012";
 
-	protected String vendorCountry = "Italy";
+	@WSDoc(required = true)
+	private String vendorCountry = "Italy";
 
-	protected String vendorCity = "Carpi";
+	@WSDoc(required = true)
+	private String vendorCity = "Carpi";
 
-	protected String support = "support@logicaldoc.com";
+	@WSDoc(required = true)
+	private String support = "support@logicaldoc.com";
 
-	protected String installationId;
+	@WSDoc(required = true)
+	private String installationId;
 
-	protected String licensee;
+	@WSDoc(required = true)
+	private String licensee;
 
-	protected String runLevel;
+	@WSDoc(required = true)
+	private String runLevel;
 
-	protected long tenantId = Tenant.DEFAULT_ID;
-	
 	/**
 	 * Deducted server's host name
 	 */
-	protected String hostName;
+	@WSDoc(required = true)
+	private String hostName;
 
-	protected String[] features;
+	@WSDoc(required = true)
+	private String[] features;
 
-	protected String date = null;
+	@WSDoc(required = true)
+	private String date = null;
 
 	public String getProductName() {
 		return productName;
@@ -70,7 +87,7 @@ public class WSSystemInfo {
 
 	public void setProduct(String product) {
 		this.product = product;
-	} 
+	}
 
 	public String getRelease() {
 		return release;

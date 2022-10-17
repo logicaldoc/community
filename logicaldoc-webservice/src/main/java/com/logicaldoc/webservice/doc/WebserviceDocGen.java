@@ -33,7 +33,7 @@ public class WebserviceDocGen {
 		}
 
 		WebserviceDocGen doc = new WebserviceDocGen();
-		doc.indexPage(args[0], outputDir, services);
+		doc.indexPage(release, outputDir, services);
 
 		for (Class<?> clazz : services) {
 			doc.singleReport(outputDir, clazz);

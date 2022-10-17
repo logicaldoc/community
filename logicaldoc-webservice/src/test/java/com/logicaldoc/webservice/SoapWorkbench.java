@@ -52,14 +52,11 @@ public class SoapWorkbench {
 		try {
 			System.out.println(info.getInfo().getProductName()+"  "+info.getInfo().getDate());
 			
-			String html = org.jaxws.wsdl2html.service.Wsdl2Html.generateHtml("http://localhost:9080/services/System");
-			System.out.println(html);
-			
-//			String[] features = systemClient.getInfo().getFeatures();
-//			System.out.println("Features:");
-//			for (String feature : features) {
-//				System.out.println(Arrays.asList(feature).stream().sorted().collect(Collectors.toList()));
-//			}
+			String[] features = systemClient.getInfo().getFeatures();
+			System.out.println("Features:");
+			for (String feature : features) {
+				System.out.println(Arrays.asList(feature).stream().sorted().collect(Collectors.toList()));
+			}
 
 //		    securityStuff(sid);
 
