@@ -17,6 +17,9 @@ import java.util.Vector;
  * @version 1.0
  */
 public class OrderedProperties extends Properties {
+
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * Overrides the original store() method and sorts the output
 	 *

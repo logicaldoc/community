@@ -2604,8 +2604,7 @@ public class LDRepository {
 	private boolean checkPermission(PersistentObject object, long userId, Permission permission) {
 
 		assert object != null : "Argument object is null";
-		assert permission != null : "Argument permission is null";
-
+		
 		long id = root.getId();
 
 		if (object instanceof Folder) {
@@ -2625,7 +2624,7 @@ public class LDRepository {
 
 		boolean enabled = folderDao.isReadEnabled(id, userId);
 
-		if (enabled) {
+		if (enabled && permission!=null) {
 			if (object instanceof Folder && id == Folder.ROOTID) {
 				// The root is just readable
 				enabled = permission.equals(Permission.READ);

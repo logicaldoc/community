@@ -27,16 +27,18 @@ import com.smartgwt.client.widgets.grid.ListGridField;
  */
 public class ComparatorAssociationsDialog extends Window {
 
-	private static final String DEFAULT_COMPARATOR = "com.logicaldoc.comparison.basic.BasicComparator";
+	protected String defaultComparator = "com.logicaldoc.comparison.basic.BasicComparator";
 
-	private ListGrid associationsGrid;
+	protected String comparatorAttributeName = "comparator";
 
-	private SelectItem comparator;
+	protected ListGrid associationsGrid;
 
-	private IButton apply;
+	protected SelectItem selectItem;
+
+	protected IButton apply;
 
 	// The grid that maintains the associations
-	private ListGrid srcGrid;
+	protected ListGrid srcGrid;
 
 	public ComparatorAssociationsDialog(final ListGrid srcGrid) {
 		this.srcGrid = srcGrid;
@@ -51,11 +53,11 @@ public class ComparatorAssociationsDialog extends Window {
 		setShowModalMask(true);
 		centerInPage();
 
-		comparator = ItemFactory.newComparatorSelector();
-		comparator.setWidth(290);
-		comparator.setRequired(true);
-		comparator.setValue(DEFAULT_COMPARATOR);
-		comparator.addChangedHandler(new ChangedHandler() {
+		prepareSelectItem();
+		selectItem.setValue(defaultComparator);
+		selectItem.setWidth(290);
+		selectItem.setRequired(true);
+		selectItem.addChangedHandler(new ChangedHandler() {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
@@ -66,14 +68,20 @@ public class ComparatorAssociationsDialog extends Window {
 		DynamicForm form = new DynamicForm();
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
-		form.setItems(comparator);
+		form.setItems(selectItem);
 
 		addItem(form);
+	}
 
+	protected void prepareSelectItem() {
+		selectItem = ItemFactory.newComparatorSelector();
+	}
+
+	public void onDraw() {
 		refresh();
 	}
 
-	private void refresh() {
+	protected void refresh() {
 		if (associationsGrid != null) {
 			removeItem(associationsGrid);
 		}
@@ -99,7 +107,7 @@ public class ComparatorAssociationsDialog extends Window {
 		associationsGrid.setFields(in);
 
 		ComparatorsDS ds = new ComparatorsDS(null);
-		ds.setComparator(comparator.getValueAsString() != null ? comparator.getValueAsString() : DEFAULT_COMPARATOR);
+		ds.setComparator(selectItem.getValueAsString() != null ? selectItem.getValueAsString() : defaultComparator);
 		associationsGrid.setDataSource(ds);
 		apply = new IButton(I18N.message("apply"));
 		apply.setAutoFit(true);
@@ -119,11 +127,11 @@ public class ComparatorAssociationsDialog extends Window {
 		for (Record rec : associationsGrid.getRecordList().toArray()) {
 			if (rec.getAttributeAsBoolean("selected")) {
 				String id = rec.getAttributeAsString("id").trim();
-				String selectedComparator = comparator.getValueAsString();
+				String selectedComparator = selectItem.getValueAsString();
 
 				Record record = srcGrid.find(new AdvancedCriteria("id", OperatorId.EQUALS, id));
 				if (record != null) {
-					record.setAttribute("comparator", selectedComparator);
+					record.setAttribute(comparatorAttributeName, selectedComparator);
 					srcGrid.updateData(record);
 				}
 			}

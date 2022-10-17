@@ -1,9 +1,6 @@
 package com.logicaldoc.core.security.dao;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +97,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	@Override
 	public void cleanOldSessions(int ttl) {
 		try {
-			log.info("cleanOldSessions rows updated: {}", cleanOldRecords(ttl, "ld_session"));
+			log.info("cleanOldSessions rows updated: {}", cleanOldRecords(ttl, "ld_session", "ld_creation"));
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
