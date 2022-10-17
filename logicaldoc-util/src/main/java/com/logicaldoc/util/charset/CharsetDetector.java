@@ -105,7 +105,7 @@ public class CharsetDetector {
 		return this;
 	}
 
-	private static final int kBufSize = 8000;
+	private static final int KBUF_SIZE = 8000;
 
 	/**
 	 * Set the input text (byte) data whose charset is to be detected.
@@ -124,13 +124,13 @@ public class CharsetDetector {
 	 */
 	public CharsetDetector setText(InputStream in) throws IOException {
 		fInputStream = in;
-		fInputStream.mark(kBufSize);
-		fRawInput = new byte[kBufSize]; // Always make a new buffer because the
+		fInputStream.mark(KBUF_SIZE);
+		fRawInput = new byte[KBUF_SIZE]; // Always make a new buffer because the
 										// previous one may have come from the
 										// caller,
 										// in which case we can't touch it.
 		fRawLength = 0;
-		int remainingLength = kBufSize;
+		int remainingLength = KBUF_SIZE;
 		while (remainingLength > 0) {
 			// read() may give data in smallish chunks, esp. for remote sources.
 			// Hence, this loop.
@@ -381,8 +381,8 @@ public class CharsetDetector {
 		if (openTags < 5 || openTags / 5 < badTags || (fInputLen < 100 && fRawLength > 600)) {
 			int limit = fRawLength;
 
-			if (limit > kBufSize) {
-				limit = kBufSize;
+			if (limit > KBUF_SIZE) {
+				limit = KBUF_SIZE;
 			}
 
 			for (srci = 0; srci < limit; srci++) {
@@ -416,7 +416,7 @@ public class CharsetDetector {
 	 * 
 	 */
 	byte[] fInputBytes = // The text to be checked. Markup will have been
-			new byte[kBufSize]; // removed if appropriate.
+			new byte[KBUF_SIZE]; // removed if appropriate.
 
 	int fInputLen; // Length of the byte data in fInputText.
 

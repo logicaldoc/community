@@ -413,7 +413,7 @@ public class Exec {
 	 */
 	public static String normalizePathForCommand(String srcPath) {
 		String normalizedPath = FilenameUtils.normalize(srcPath);
-		if (System.getProperty("os.name").toLowerCase().indexOf("win") > 0)
+		if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)
 			normalizedPath = "\"" + normalizedPath + "\"";
 		return normalizedPath;
 	}

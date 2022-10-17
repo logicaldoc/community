@@ -656,7 +656,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				 */
 				StringBuffer query2 = new StringBuffer("select B.ld_id from ld_folder B where B.ld_deleted=0 ");
 				query2.append(" and B.ld_parentid=" + parentId);
-				query2.append("	and B.ld_securityref in (");
+				query2.append(" and B.ld_securityref in (");
 				query2.append(query1.toString());
 				query2.append(")");
 

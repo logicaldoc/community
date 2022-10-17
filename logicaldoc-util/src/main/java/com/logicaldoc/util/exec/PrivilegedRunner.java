@@ -114,6 +114,6 @@ public class PrivilegedRunner {
 	public static boolean isUnix() {
 		return (System.getProperty("os.name").toLowerCase().indexOf("nix") >= 0
 				|| System.getProperty("os.name").toLowerCase().indexOf("nux") >= 0 || System.getProperty("os.name")
-				.toLowerCase().indexOf("aix") > 0);
+				.toLowerCase().indexOf("aix") >= 0);
 	}
 }

@@ -29,9 +29,9 @@ import com.logicaldoc.core.document.Document;
  */
 public class PDFParser extends AbstractParser {
 
-	protected static Logger log = LoggerFactory.getLogger(PDFParser.class);
+	private static final String CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING = "Can not get pdf document for parsing";
 
-	private static int count = Integer.MAX_VALUE;
+	protected static Logger log = LoggerFactory.getLogger(PDFParser.class);
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
@@ -41,7 +41,7 @@ public class PDFParser extends AbstractParser {
 			pdfDocument = PDDocument.load(input);
 
 			if (pdfDocument == null) {
-				throw new Exception("Can not get pdf document for parsing");
+				throw new Exception(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
 			} else {
 				if (pdfDocument.isEncrypted()) {
 					try {
@@ -55,7 +55,7 @@ public class PDFParser extends AbstractParser {
 				}
 
 				if (pdfDocument == null)
-					throw new Exception("Can not get pdf document for parsing");
+					throw new Exception(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
 
 				// Strip text from the entire document
 				parseDocument(pdfDocument, content);
@@ -73,11 +73,6 @@ public class PDFParser extends AbstractParser {
 				log.error(e.getMessage(), e);
 			}
 		}
-
-		// PDF Box is memory intensive so execute a gc every 100 parses
-		if (count % 100 == 0)
-			System.gc();
-		count++;
 	}
 
 	/**
@@ -96,9 +91,7 @@ public class PDFParser extends AbstractParser {
 		PDFTextStripper stripper = new PDFTextStripper();
 		int pages = pdfDocument.getNumberOfPages();
 		for (int i = 1; i <= pages; i++) {
-			Writer writer = new CharArrayWriter();
-
-			try {
+			try (Writer writer = new CharArrayWriter()) {
 				stripper.setStartPage(i);
 				stripper.setEndPage(i);
 				stripper.setPageEnd("\n");
@@ -108,13 +101,7 @@ public class PDFParser extends AbstractParser {
 				writer.flush();
 				content.append(writer.toString());
 			} catch (Throwable tw) {
-				log.error("Exception reading pdf document: " + tw.getMessage());
-			} finally {
-				try {
-					writer.close();
-				} catch (Throwable e) {
-					log.warn(e.getMessage(), e);
-				}
+				log.error("Exception reading pdf document: {}", tw.getMessage());
 			}
 		}
 	}
@@ -165,7 +152,7 @@ public class PDFParser extends AbstractParser {
 	private int internalCountPages(PDDocument pdfDocument) {
 		try {
 			if (pdfDocument == null) {
-				throw new Exception("Can not get pdf document for parsing");
+				throw new Exception(CAN_NOT_GET_PDF_DOCUMENT_FOR_PARSING);
 			} else {
 				return pdfDocument.getNumberOfPages();
 			}

@@ -474,7 +474,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				StringBuffer query2 = new StringBuffer(
 						"select B.ld_id from ld_menu B where B.ld_deleted=0 and B.ld_enabled=1 ");
 				query2.append(" and B.ld_parentid=" + parentId);
-				query2.append("	and B.ld_securityref in (");
+				query2.append(" and B.ld_securityref in (");
 				query2.append(query1.toString());
 				query2.append(")");
 
@@ -732,7 +732,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				 */
 				StringBuffer query2 = new StringBuffer("select B.ld_id from ld_menu B where B.ld_deleted=0 ");
 				query2.append(" and B.ld_parentid=" + parentId);
-				query2.append("	and B.ld_securityref in (");
+				query2.append(" and B.ld_securityref in (");
 				query2.append(query1.toString());
 				query2.append(")");
 
