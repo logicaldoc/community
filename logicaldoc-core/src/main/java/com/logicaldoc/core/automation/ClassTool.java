@@ -37,7 +37,7 @@ public class ClassTool {
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException,
 			InvocationTargetException, NoSuchMethodException, SecurityException {
 		if (className.equals("java.lang.Runtime"))
-			new SecurityException("Class java.lang.Runtime is forbidden and cannot be instanciated");
+			throw new SecurityException("Class java.lang.Runtime is forbidden and cannot be instanciated");
 
 		try {
 			return Class.forName(className).getDeclaredConstructor().newInstance();
