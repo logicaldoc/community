@@ -18,8 +18,8 @@ import com.logicaldoc.i18n.I18N;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-@AutomationDictionary
-public class DateTool extends org.apache.velocity.tools.generic.DateTool {
+@AutomationDictionary(key = "DateTool")
+public class AutomationDateTool extends org.apache.velocity.tools.generic.DateTool {
 
 	private static final String FORMAT_DATESHORT = "format_dateshort";
 
@@ -37,19 +37,19 @@ public class DateTool extends org.apache.velocity.tools.generic.DateTool {
 
 	private TimeZone timeZone;
 
-	public DateTool(Locale locale) {
+	public AutomationDateTool(Locale locale) {
 		this(I18N.message(FORMAT_DATE, locale), I18N.message(FORMAT_DATELONG, locale),
 				I18N.message(FORMAT_DATESHORT, locale));
 	}
 
-	public DateTool(String dateFormat, String dateFormatLong, String dateFormatShort) {
+	public AutomationDateTool(String dateFormat, String dateFormatLong, String dateFormatShort) {
 		super();
 		this.dateFormat = dateFormat != null ? dateFormat : I18N.message(FORMAT_DATE);
 		this.dateFormatLong = dateFormatLong != null ? dateFormatLong : I18N.message(FORMAT_DATELONG);
 		this.dateFormatShort = dateFormatShort != null ? dateFormatShort : I18N.message(FORMAT_DATESHORT);
 	}
 
-	public DateTool() {
+	public AutomationDateTool() {
 		super();
 		this.dateFormat = I18N.message(FORMAT_DATE);
 		this.dateFormatLong = I18N.message(FORMAT_DATELONG);

@@ -45,9 +45,9 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected SessionFactory sessionFactory;
 
-	protected final static String ASPECT_STORING = "storing";
+	protected static final String ASPECT_STORING = "storing";
 
-	protected final static String ALIAS_ENTITY = "_entity";
+	public static final String ALIAS_ENTITY = "_entity";
 
 	private static final String DEFAULT_WHERE_PREAMBLE = " " + ALIAS_ENTITY + " where " + ALIAS_ENTITY + ".deleted=0 ";
 

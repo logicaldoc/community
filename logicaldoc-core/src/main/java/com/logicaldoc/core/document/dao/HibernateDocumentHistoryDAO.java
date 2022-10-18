@@ -42,12 +42,12 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 
 	@Override
 	public List<DocumentHistory> findByDocIdAndEvent(long docId, String event) {
-		StringBuffer query = new StringBuffer(" _entity.docId = " + docId);
+		StringBuffer query = new StringBuffer(" "+ALIAS_ENTITY+".docId = " + docId);
 		if (StringUtils.isNotEmpty(event))
-			query.append(" and _entity.event='" + SqlUtil.doubleQuotes(event) + "'");
+			query.append(" and "+ALIAS_ENTITY+".event='" + SqlUtil.doubleQuotes(event) + "'");
 
 		try {
-			return findByWhere(query.toString(), "order by _entity.date desc", null);
+			return findByWhere(query.toString(), "order by "+ALIAS_ENTITY+".date desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentHistory>();
@@ -66,7 +66,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	 */
 	public List<DocumentHistory> findByFolderId(long folderId) {
 		try {
-			return findByWhere("_entity.folderId =" + folderId, "order by _entity.date asc", null);
+			return findByWhere(ALIAS_ENTITY+".folderId =" + folderId, "order by "+ALIAS_ENTITY+".date asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentHistory>();
@@ -76,7 +76,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	@Override
 	public List<DocumentHistory> findNotNotified(Integer max) {
 		try {
-			return findByWhere("_entity.notified = 0", "order by _entity.date asc", max);
+			return findByWhere(ALIAS_ENTITY+".notified = 0", "order by "+ALIAS_ENTITY+".date asc", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentHistory>();
@@ -94,14 +94,14 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 
 	@Override
 	public List<DocumentHistory> findByUserIdAndEvent(long userId, String event, String sessionId) {
-		String query = "_entity.userId =" + userId;
+		String query = ALIAS_ENTITY+".userId =" + userId;
 		if (event != null && StringUtils.isNotEmpty(event))
-			query += " and _entity.event = '" + SqlUtil.doubleQuotes(event) + "'";
+			query += " and "+ALIAS_ENTITY+".event = '" + SqlUtil.doubleQuotes(event) + "'";
 		if (sessionId != null && StringUtils.isNotEmpty(sessionId))
-			query += " and _entity.sessionId = '" + sessionId + "'";
+			query += " and "+ALIAS_ENTITY+".sessionId = '" + sessionId + "'";
 
 		try {
-			return findByWhere(query, "order by _entity.date asc", null);
+			return findByWhere(query, "order by "+ALIAS_ENTITY+".date asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentHistory>();
@@ -137,12 +137,12 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	public List<DocumentHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) {
 		StringBuffer query = new StringBuffer(
-				"(_entity.path like :pathExpression or _entity.pathOld like :pathExpression) ");
+				"("+ALIAS_ENTITY+".path like :pathExpression or "+ALIAS_ENTITY+".pathOld like :pathExpression) ");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("pathExpression", pathExpression);
 
 		if (oldestDate != null) {
-			query.append(" and _entity.date >= :oldestDate ");
+			query.append(" and "+ALIAS_ENTITY+".date >= :oldestDate ");
 			params.put("oldestDate", oldestDate);
 		}
 
@@ -154,11 +154,11 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 				eventsStr.append("'" + event + "'");
 			}
 			eventsStr.append(")");
-			query.append(" and _entity.event in " + eventsStr);
+			query.append(" and "+ALIAS_ENTITY+".event in " + eventsStr);
 		}
 
 		try {
-			return findByWhere(query.toString(), params, "order by _entity.date asc", max);
+			return findByWhere(query.toString(), params, "order by "+ALIAS_ENTITY+".date asc", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentHistory>();

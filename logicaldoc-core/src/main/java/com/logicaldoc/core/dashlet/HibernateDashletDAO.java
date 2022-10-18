@@ -30,7 +30,8 @@ public class HibernateDashletDAO extends HibernatePersistentObjectDAO<Dashlet> i
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("tenantId", tenantId);
 			params.put("name", name);
-			dashlets = findByWhere("_entity.tenantId = :tenantId and _entity.name = :name", params, null, null);
+			dashlets = findByWhere(ALIAS_ENTITY + ".tenantId = :tenantId and " + ALIAS_ENTITY + ".name = :name", params,
+					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

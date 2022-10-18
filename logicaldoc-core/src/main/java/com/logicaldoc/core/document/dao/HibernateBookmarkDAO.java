@@ -26,7 +26,7 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 	@Override
 	public List<Bookmark> findByUserId(long userId) {
 		try {
-			return findByWhere("_entity.userId =" + userId, "order by _entity.position asc", null);
+			return findByWhere(ALIAS_ENTITY + ".userId =" + userId, "order by " + ALIAS_ENTITY + ".position asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Bookmark>();
@@ -38,8 +38,8 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 		List<Bookmark> list = new ArrayList<Bookmark>();
 
 		try {
-			list = findByWhere("_entity.userId =" + userId + " and _entity.targetId =" + docId + " and _entity.type="
-					+ Bookmark.TYPE_DOCUMENT, null, null);
+			list = findByWhere(ALIAS_ENTITY + ".userId =" + userId + " and " + ALIAS_ENTITY + ".targetId =" + docId
+					+ " and " + ALIAS_ENTITY + ".type=" + Bookmark.TYPE_DOCUMENT, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -54,8 +54,8 @@ public class HibernateBookmarkDAO extends HibernatePersistentObjectDAO<Bookmark>
 	public Bookmark findByUserIdAndFolderId(long userId, long folderId) {
 		List<Bookmark> list = new ArrayList<Bookmark>();
 		try {
-			list = findByWhere("_entity.userId =" + userId + " and _entity.targetId =" + folderId + " and _entity.type="
-					+ Bookmark.TYPE_FOLDER, null, null);
+			list = findByWhere(ALIAS_ENTITY + ".userId =" + userId + " and " + ALIAS_ENTITY + ".targetId =" + folderId
+					+ " and " + ALIAS_ENTITY + ".type=" + Bookmark.TYPE_FOLDER, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

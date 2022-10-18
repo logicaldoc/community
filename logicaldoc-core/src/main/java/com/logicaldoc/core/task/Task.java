@@ -185,7 +185,6 @@ public abstract class Task implements Runnable {
 			return;
 		}
 
-		System.gc();
 		if (!getScheduling().isEnabled()) {
 			log.debug("Task {} is disabled", getName());
 			return;

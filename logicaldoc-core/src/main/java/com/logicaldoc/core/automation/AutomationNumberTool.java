@@ -9,8 +9,8 @@ import com.logicaldoc.util.LocaleUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.3
  */
-@AutomationDictionary
-public class NumberTool extends org.apache.velocity.tools.generic.NumberTool {
+@AutomationDictionary(key="NumberTool")
+public class AutomationNumberTool extends org.apache.velocity.tools.generic.NumberTool {
 
 	private static final long serialVersionUID = 1L;
 

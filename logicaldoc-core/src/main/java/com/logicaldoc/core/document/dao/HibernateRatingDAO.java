@@ -118,7 +118,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 	public Rating findByDocIdAndUserId(long docId, long userId) {
 		List<Rating> results = new ArrayList<Rating>();
 		try {
-			results = findByWhere("_entity.docId =" + docId + " and _entity.userId =" + userId, null, null);
+			results = findByWhere(ALIAS_ENTITY+".docId =" + docId + " and "+ALIAS_ENTITY+".userId =" + userId, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -131,7 +131,7 @@ public class HibernateRatingDAO extends HibernatePersistentObjectDAO<Rating> imp
 	@Override
 	public List<Rating> findByDocId(long docId) {
 		try {
-			return findByWhere("_entity.docId = " + docId, " order by _entity.lastModified desc", null);
+			return findByWhere(ALIAS_ENTITY+".docId = " + docId, " order by "+ALIAS_ENTITY+".lastModified desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Rating>();

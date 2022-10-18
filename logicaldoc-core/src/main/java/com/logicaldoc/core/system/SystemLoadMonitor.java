@@ -147,8 +147,8 @@ public class SystemLoadMonitor {
 					}
 
 					int[] averageOld = new int[] { averageCpuLoad[0], averageCpuLoad[1] };
-					averageCpuLoad[0] = (int) Math.round(totals[0] / (float)samples.length);
-					averageCpuLoad[1] = (int) Math.round(totals[1] / (float)samples.length);
+					averageCpuLoad[0] = (int) Math.round(totals[0] / (float) samples.length);
+					averageCpuLoad[1] = (int) Math.round(totals[1] / (float) samples.length);
 
 					int cpuLoadMax = config.getInt("system.cpuload.max", 50);
 					if (cpuLoadMax > 0)
@@ -164,13 +164,12 @@ public class SystemLoadMonitor {
 							}
 						}
 
-					synchronized (this) {
-						try {
-							wait(2000);
-						} catch (InterruptedException e) {
-							Thread.currentThread().interrupt();
-						}
+					try {
+						wait(2000);
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
 					}
+
 				}
 			}
 		}

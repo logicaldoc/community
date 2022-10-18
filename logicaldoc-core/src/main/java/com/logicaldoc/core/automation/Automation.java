@@ -169,10 +169,10 @@ public class Automation {
 			clientDictionary.put(LOCALE, this.automationLocale != null ? this.automationLocale : Locale.ENGLISH);
 
 		// This is needed to format dates
-		DateTool dateTool = new DateTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
+		AutomationDateTool dateTool = new AutomationDateTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_datelong"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_dateshort"));
-		dictionary.put(DateTool.class.getSimpleName(), dateTool);
+		dictionary.put(AutomationDateTool.class.getSimpleName(), dateTool);
 
 		// Put the current date
 		dictionary.put(CURRENT_DATE, new Date());
