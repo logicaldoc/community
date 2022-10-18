@@ -32,7 +32,7 @@
     <Logger name="com.logicaldoc.export" level="info" additivity="true">
       <Appender-Ref ref="FILE" />
     </Logger>
-	<Root level="info">
+	<Root level="error">
 		<AppenderRef ref="CONSOLE"/>
     </Root>
   </Loggers>

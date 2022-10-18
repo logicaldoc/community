@@ -74,6 +74,7 @@ public class SystemInfo {
 	}
 
 	public static SystemInfo get(long tenantId) {
+
 		SystemInfo info = new SystemInfo(tenantId);
 
 		/*
@@ -86,21 +87,18 @@ public class SystemInfo {
 
 			if (!exts.isEmpty()) {
 				String className = exts.iterator().next().getParameter("class").valueAsString();
-				try {
-					@SuppressWarnings("rawtypes")
-					Class clazz = Class.forName(className);
-					// Try to instantiate the info
-					@SuppressWarnings("unchecked")
-					Object tmp = clazz.getDeclaredConstructor().newInstance();
-					if (!(tmp instanceof SystemInfo))
-						throw new Exception(
-								"The specified info " + className + " doesn't implement SystemInfo interface");
 
-					info = (SystemInfo) tmp;
-					info.setTenantId(tenantId);
-				} catch (Throwable e) {
-					log.error(e.getMessage(), e);
-				}
+				@SuppressWarnings("rawtypes")
+				Class clazz = Class.forName(className);
+
+				// Try to instantiate the info
+				@SuppressWarnings("unchecked")
+				Object tmp = clazz.getDeclaredConstructor().newInstance();
+				if (!(tmp instanceof SystemInfo))
+					throw new Exception("The specified info " + className + " doesn't implement SystemInfo interface");
+
+				info = (SystemInfo) tmp;
+				info.setTenantId(tenantId);
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
