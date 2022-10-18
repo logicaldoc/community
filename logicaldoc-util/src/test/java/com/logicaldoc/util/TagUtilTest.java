@@ -8,8 +8,6 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import com.logicaldoc.util.TagUtil;
-
 /**
  * Test case for TagUtil class
  * 
