@@ -2,3 +2,4 @@ C:\\tmp\\sync.bat
 /usr/bin/convert
 C:\LogicalDOC-Devel\imagemagick\convert.exe
 target\test-classes\nothing.bat
+target\test-classes\loop.bat
