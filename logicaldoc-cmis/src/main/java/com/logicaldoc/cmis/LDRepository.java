@@ -107,6 +107,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
@@ -2793,9 +2794,9 @@ public class LDRepository {
 	}
 
 	public List<ObjectData> getDocumentLastChanges(long minDate, int max) {
-
-		StringBuffer query = new StringBuffer(" _entity.tenantId = :tenantId and _entity.date >= :minDate ");
-		query.append(" and _entity.event in ('");
+		StringBuilder query = new StringBuilder(" " + HibernatePersistentObjectDAO.ALIAS_ENTITY
+				+ ".tenantId = :tenantId and " + HibernatePersistentObjectDAO.ALIAS_ENTITY + ".date >= :minDate ");
+		query.append(" and " + HibernatePersistentObjectDAO.ALIAS_ENTITY + ".event in ('");
 		query.append(DocumentEvent.STORED);
 		query.append("','");
 		query.append(DocumentEvent.CHECKEDIN);
@@ -2814,7 +2815,8 @@ public class LDRepository {
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
 
-			entries = historyDao.findByWhere(query.toString(), params, "order by _entity.date", max);
+			entries = historyDao.findByWhere(query.toString(), params,
+					"order by " + HibernatePersistentObjectDAO.ALIAS_ENTITY + ".date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -2860,8 +2862,8 @@ public class LDRepository {
 
 	public List<ObjectData> getFolderLastChanges(long minDate, int max) {
 
-		StringBuffer query = new StringBuffer(" _entity.tenantId = :tenantId and _entity.date >= :minDate ");
-		query.append(" and _entity.event in ('");
+		StringBuilder query = new StringBuilder(" "+HibernatePersistentObjectDAO.ALIAS_ENTITY+".tenantId = :tenantId and "+HibernatePersistentObjectDAO.ALIAS_ENTITY+".date >= :minDate ");
+		query.append(" and "+HibernatePersistentObjectDAO.ALIAS_ENTITY+".event in ('");
 		query.append(FolderEvent.CREATED);
 		query.append("','");
 		query.append(FolderEvent.RENAMED);
@@ -2877,7 +2879,7 @@ public class LDRepository {
 			Map<String, Object> params = new HashMap<>();
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
-			entries = folderHistoryDao.findByWhere(query.toString(), params, "order by _entity.date", max);
+			entries = folderHistoryDao.findByWhere(query.toString(), params, "order by "+HibernatePersistentObjectDAO.ALIAS_ENTITY+".date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
