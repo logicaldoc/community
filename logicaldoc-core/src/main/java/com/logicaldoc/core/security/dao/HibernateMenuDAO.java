@@ -436,61 +436,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		return coll;
 	}
 
-	@SuppressWarnings("rawtypes")
-	public List<Long> findIdByUserId(long userId, long parentId, Integer type) {
-		List<Long> ids = new ArrayList<Long>();
-		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return ids;
-			if (user.isMemberOf("admin"))
-				return findIdsByWhere("_entity.enabled=1 and _entity.parentId=" + parentId
-						+ (type == null ? "" : " and _entity.type=" + type), null, null);
-
-			StringBuffer query1 = new StringBuffer();
-			Set<Group> precoll = user.getGroups();
-			Iterator iter = precoll.iterator();
-			if (!precoll.isEmpty()) {
-				query1 = new StringBuffer("select distinct(A.ld_menuid) from ld_menugroup A, ld_menu B "
-						+ " where B.ld_enabled=1 and B.ld_deleted=0 and A.ld_menuid=B.ld_id AND B.ld_parentid="
-						+ parentId + " AND A.ld_groupid in (");
-				boolean first = true;
-				while (iter.hasNext()) {
-					if (!first)
-						query1.append(",");
-					Group ug = (Group) iter.next();
-					query1.append(Long.toString(ug.getId()));
-					first = false;
-				}
-				query1.append(")");
-				if (type != null)
-					query1.append(" AND B.ld_type=" + type.toString());
-
-				ids = (List<Long>) queryForList(query1.toString(), Long.class);
-
-				/*
-				 * Now find all menus referencing the previously found ones
-				 */
-				StringBuffer query2 = new StringBuffer(
-						"select B.ld_id from ld_menu B where B.ld_deleted=0 and B.ld_enabled=1 ");
-				query2.append(" and B.ld_parentid=" + parentId);
-				query2.append(" and B.ld_securityref in (");
-				query2.append(query1.toString());
-				query2.append(")");
-
-				List<Long> menuids2 = (List<Long>) queryForList(query2.toString(), Long.class);
-				for (Long menuid : menuids2) {
-					if (!ids.contains(menuid))
-						ids.add(menuid);
-				}
-
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-		return ids;
-	}
-
 	@Override
 	public List<Menu> findByName(String name) {
 		return findByName(null, name, true);
