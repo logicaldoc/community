@@ -258,9 +258,4 @@ public class MessagesPanel extends VLayout implements UserObserver {
 	public void destroy() {
 		UserController.get().removeObserver(this);
 	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		UserController.get().removeObserver(this);
-	}
 }

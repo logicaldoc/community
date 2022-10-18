@@ -703,11 +703,6 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	public void destroy() {
 		DocumentController.get().removeObserver(this);
 	}

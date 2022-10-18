@@ -85,8 +85,8 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 
 	@Override
 	public List<Sequence> findByName(String name, long tenantId) {
-		String query = " _entity.tenantId=" + tenantId;
-		query += " and _entity.name like '" + SqlUtil.doubleQuotes(name) + "%' ";
+		String query = " " + ALIAS_ENTITY + ".tenantId=" + tenantId;
+		query += " and " + ALIAS_ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "%' ";
 
 		try {
 			return findByWhere(query, null, null);
@@ -101,9 +101,9 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 		try {
 			Sequence sequence = null;
 
-			String query = " _entity.tenantId = :tenantId ";
-			query += " and _entity.objectId = :objectId ";
-			query += " and _entity.name = :name ";
+			String query = " " + ALIAS_ENTITY + ".tenantId = :tenantId ";
+			query += " and " + ALIAS_ENTITY + ".objectId = :objectId ";
+			query += " and " + ALIAS_ENTITY + ".name = :name ";
 			List<Sequence> sequences = new ArrayList<Sequence>();
 			try {
 				Map<String, Object> params = new HashMap<String, Object>();

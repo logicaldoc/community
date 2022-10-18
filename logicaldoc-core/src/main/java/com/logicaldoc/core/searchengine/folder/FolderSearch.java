@@ -235,9 +235,6 @@ public class FolderSearch extends Search {
 					query.append("-%') and ");
 					columnName = "C" + counter + ".";
 					switch (criterion.getType()) {
-					case Attribute.TYPE_STRING:
-						columnName += "ld_stringvalue";
-						break;
 					case Attribute.TYPE_INT:
 					case Attribute.TYPE_USER:
 					case Attribute.TYPE_FOLDER:
@@ -250,6 +247,9 @@ public class FolderSearch extends Search {
 					case Attribute.TYPE_DATE:
 						columnName += "ld_datevalue";
 						break;
+					default:
+						columnName += "ld_stringvalue";
+						break;
 					}
 				} else {
 					columnName = criterion.getColumnName();
@@ -261,48 +261,6 @@ public class FolderSearch extends Search {
 				}
 
 				switch (criterion.getType()) {
-				case Attribute.TYPE_STRING:
-					if (options.isCaseSensitive()) {
-						String val = SqlUtil.doubleQuotes(criterion.getStringValue());
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append(columnName + " = '" + val + "'");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not " + columnName + " = '" + val + "')");
-						else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
-							query.append(columnName + " like '%" + val + "%'");
-						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
-							query.append(
-									" (" + columnName + " is null or not (" + columnName + " like '%" + val + "%'))");
-						else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
-							query.append(columnName + " like '" + val + "%'");
-						else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
-							query.append(columnName + " like '%" + val + "'");
-						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
-							query.append(columnName + " is null ");
-						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
-							query.append(columnName + " is not null ");
-					} else {
-						String val = SqlUtil.doubleQuotes(criterion.getStringValue().toLowerCase());
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append("lower(" + columnName + ") = '" + val + "'");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not lower(" + columnName + ") = '" + val + "')");
-						else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
-							query.append("lower(" + columnName + ") like '%" + val + "%'");
-						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
-							query.append(" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val
-									+ "%')");
-						else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
-							query.append("lower(" + columnName + ") like '" + val + "%'");
-						else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
-							query.append("lower(" + columnName + ") like  '%" + val + "'");
-						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
-							query.append(columnName + " is null ");
-						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
-							query.append(columnName + " is not null ");
-						break;
-					}
-					break;
 				case Attribute.TYPE_INT:
 					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
 						query.append(columnName + " is null ");
@@ -406,6 +364,48 @@ public class FolderSearch extends Search {
 						query.append(tableAlias + ".ld_path like '" + path + "/%'");
 					} else
 						query.append(columnName + " = " + criterion.getLongValue());
+					break;
+				default:
+					if (options.isCaseSensitive()) {
+						String val = SqlUtil.doubleQuotes(criterion.getStringValue());
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+							query.append(columnName + " = '" + val + "'");
+						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+							query.append("(not " + columnName + " = '" + val + "')");
+						else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
+							query.append(columnName + " like '%" + val + "%'");
+						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
+							query.append(
+									" (" + columnName + " is null or not (" + columnName + " like '%" + val + "%'))");
+						else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
+							query.append(columnName + " like '" + val + "%'");
+						else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
+							query.append(columnName + " like '%" + val + "'");
+						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
+							query.append(columnName + " is null ");
+						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
+							query.append(columnName + " is not null ");
+					} else {
+						String val = SqlUtil.doubleQuotes(criterion.getStringValue().toLowerCase());
+						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+							query.append("lower(" + columnName + ") = '" + val + "'");
+						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+							query.append("(not lower(" + columnName + ") = '" + val + "')");
+						else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
+							query.append("lower(" + columnName + ") like '%" + val + "%'");
+						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
+							query.append(" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val
+									+ "%')");
+						else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
+							query.append("lower(" + columnName + ") like '" + val + "%'");
+						else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
+							query.append("lower(" + columnName + ") like  '%" + val + "'");
+						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
+							query.append(columnName + " is null ");
+						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
+							query.append(columnName + " is not null ");
+						break;
+					}
 					break;
 				}
 

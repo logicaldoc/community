@@ -28,7 +28,7 @@ public class HibernatePasswordHistoryDAO extends HibernatePersistentObjectDAO<Pa
 	public List<PasswordHistory> findByUserId(long userId, Integer max) throws PersistenceException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", userId);
-		return findByWhere("_entity.userId = :userId", params, "_entity.date desc", max);
+		return findByWhere(ALIAS_ENTITY + ".userId = :userId", params, ALIAS_ENTITY + ".date desc", max);
 	}
 
 	@Override

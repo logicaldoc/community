@@ -29,7 +29,7 @@ import com.smartgwt.client.widgets.notify.NotifySettings;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1.1
  */
-public class WebsocketListener implements com.sksamuel.gwt.websockets.WebsocketListener {
+public class WebSocketListener implements com.sksamuel.gwt.websockets.WebsocketListener {
 
 	private static final String COMMAND = "command";
 

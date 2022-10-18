@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**
@@ -39,8 +40,6 @@ public class ThreadPools {
 
 	private static Logger log = LoggerFactory.getLogger(ThreadPools.class);
 
-	private static ThreadPools instance;
-
 	private Map<String, ExecutorService> pools = new HashMap<String, ExecutorService>();
 
 	private ContextProperties config;
@@ -50,11 +49,7 @@ public class ThreadPools {
 	}
 
 	public static ThreadPools get() {
-		return instance;
-	}
-
-	public void start() {
-		ThreadPools.instance = this;
+		return (ThreadPools) Context.get().getBean(ThreadPools.class);
 	}
 
 	/**

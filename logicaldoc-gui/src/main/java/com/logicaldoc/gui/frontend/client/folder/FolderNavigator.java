@@ -1588,11 +1588,6 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	protected void onUnload() {
 		destroy();
 		super.onUnload();

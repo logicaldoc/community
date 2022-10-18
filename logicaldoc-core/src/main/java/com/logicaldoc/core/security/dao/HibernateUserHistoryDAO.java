@@ -34,14 +34,14 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 	public List<UserHistory> findByUserIdAndEvent(long userId, String event) {
 		try {
 			if (StringUtils.isEmpty(event))
-				return findByWhere("_entity.userId =" + userId, "order by _entity.date desc", null);
+				return findByWhere(ALIAS_ENTITY+".userId =" + userId, "order by "+ALIAS_ENTITY+".date desc", null);
 			else {
 				Map<String, Object> params = new HashMap<String, Object>();
 				params.put("userId", userId);
 				params.put("event", event);
 
-				return findByWhere("_entity.userId = :userId and _entity.event = :event", params,
-						"order by _entity.date desc", null);
+				return findByWhere(ALIAS_ENTITY+".userId = :userId and "+ALIAS_ENTITY+".event = :event", params,
+						"order by "+ALIAS_ENTITY+".date desc", null);
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

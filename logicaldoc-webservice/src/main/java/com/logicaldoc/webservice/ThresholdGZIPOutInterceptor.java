@@ -1,6 +1,6 @@
 package com.logicaldoc.webservice;
 
-public class GZIPOutInterceptor extends org.apache.cxf.transport.common.gzip.GZIPOutInterceptor {
+public class ThresholdGZIPOutInterceptor extends org.apache.cxf.transport.common.gzip.GZIPOutInterceptor {
 
 	@Override
 	public void setThreshold(int threshold) {

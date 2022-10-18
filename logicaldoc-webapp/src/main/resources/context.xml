@@ -118,21 +118,6 @@
 		</property>
 	</bean>
 
-	<bean id="GarbageCollectorJob"
-		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-		<property name="targetObject">
-			<bean class="com.logicaldoc.web.GarbageCollector" />
-		</property>
-		<property name="targetMethod" value="gc" />
-		<property name="concurrent" value="false" />
-	</bean>
-	<bean id="GarbageCollector"
-		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="GarbageCollectorJob" />
-		<property name="startDelay" value="2000" />
-		<property name="repeatInterval" value="4000" />
-	</bean>
-
 	<bean id="TempFolderCleanerJob"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
 		<property name="targetObject">
@@ -149,7 +134,7 @@
 	</bean>
 
 	<!-- Scheduler -->
-	<bean id="Scheduler" class="com.logicaldoc.core.task.SchedulerFactoryBean"
+	<bean id="Scheduler" class="com.logicaldoc.core.task.DefaultSchedulerFactory"
 		destroy-method="destroy">
 		<property name="waitForJobsToCompleteOnShutdown" value="true" />
 	</bean>

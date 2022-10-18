@@ -982,11 +982,6 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	protected void onUnload() {
 		destroy();
 		super.onUnload();

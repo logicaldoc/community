@@ -33,16 +33,18 @@ public class AttributeTypeFormatter implements CellFormatter {
 			return I18N.message("user");
 		case GUIAttribute.TYPE_FOLDER:
 			return I18N.message("folder");
+		default:
+			return value.toString();
 		}
-		return value.toString();
+
 	}
 
 	/**
-	 * Converts an attribute's type into the human readable label 
+	 * Converts an attribute's type into the human readable label
 	 * 
 	 * @param type the attribute's type
 	 * 
-	 * @return the table indicating the type using the current locale 
+	 * @return the table indicating the type using the current locale
 	 */
 	public static String format(int type) {
 		String value = "";
@@ -61,7 +63,8 @@ public class AttributeTypeFormatter implements CellFormatter {
 			return I18N.message("user");
 		case GUIAttribute.TYPE_FOLDER:
 			return I18N.message("folder");
+		default:
+			return value.toString();
 		}
-		return value.toString();
 	}
 }

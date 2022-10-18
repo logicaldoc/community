@@ -206,6 +206,8 @@ public class FolderCriterion implements Serializable {
 		case TYPE_LANGUAGE:
 			setStringValue((String) value);
 			break;
+		default:
+			// do noting			
 		}
 	}
 

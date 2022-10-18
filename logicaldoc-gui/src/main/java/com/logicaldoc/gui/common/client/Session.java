@@ -42,7 +42,7 @@ public class Session implements DocumentObserver {
 
 	private boolean showThumbnail = true;
 
-	private static int missedPingCount = 0;
+	private int missedPingCount = 0;
 
 	public static Session get() {
 		if (instance == null)

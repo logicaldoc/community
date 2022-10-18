@@ -30,7 +30,7 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 	public List<SavedSearch> findByUserId(long userId) throws PersistenceException {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", userId);
-		return findByWhere("_entity.userId = :userId", params, "_entity.name asc", null);
+		return findByWhere(ALIAS_ENTITY + ".userId = :userId", params, ALIAS_ENTITY + ".name asc", null);
 	}
 
 	@Override
@@ -39,8 +39,8 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 		params.put("userId", userId);
 		params.put("name", name);
 
-		List<SavedSearch> searches = findByWhere("_entity.userId = :userId and _entity.name = :name", params, null,
-				null);
+		List<SavedSearch> searches = findByWhere(
+				ALIAS_ENTITY + ".userId = :userId and " + ALIAS_ENTITY + ".name = :name", params, null, null);
 		if (searches.isEmpty())
 			return null;
 		else

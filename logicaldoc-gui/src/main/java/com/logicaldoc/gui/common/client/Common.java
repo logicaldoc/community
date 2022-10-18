@@ -10,17 +10,8 @@ import com.google.gwt.core.client.EntryPoint;
  */
 public class Common implements EntryPoint {
 
-	private static Common instance;
-
-	/**
-	 * @return singleton Main instance
-	 */
-	public static Common get() {
-		return instance; 
-	}
-
 	@Override
 	public void onModuleLoad() {
-		instance = this;
+		// Nothing to do
 	}
 }

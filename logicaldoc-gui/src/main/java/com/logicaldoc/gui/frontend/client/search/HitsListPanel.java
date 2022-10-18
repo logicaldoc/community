@@ -367,11 +367,6 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	protected void onUnload() {
 		destroy();
 		super.onUnload();

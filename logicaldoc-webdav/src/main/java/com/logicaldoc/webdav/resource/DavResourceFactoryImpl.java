@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * For more informations, please visit
@@ -47,10 +47,10 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	}
 
 	public DavResource createResource(DavResourceLocator locator, DavServletRequest request) throws DavException {
-		return createResource(locator, request, (DavSession) request.getDavSession());
+		return createResource(locator, request, (WebdavSession) request.getDavSession());
 	}
 
-	public DavResource createResource(DavResourceLocator locator, DavServletRequest request, DavSession session) throws DavException {
+	public DavResource createResource(DavResourceLocator locator, DavServletRequest request, WebdavSession session) throws DavException {
 
 		try {
 			String resourcePath = locator.getResourcePath();
@@ -82,7 +82,7 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 		}
 	}
 
-	public DavResource createResource(DavResourceLocator locator, DavSession session) throws DavException {
+	public DavResource createResource(DavResourceLocator locator, WebdavSession session) throws DavException {
 		try {
 			Resource res = resourceService.getResource(locator.getResourcePath(), session);
 			DavResource resource = createResource(locator, session, res);
@@ -94,16 +94,16 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 		}
 	}
 
-	private DavResource createNullResource(DavResourceLocator locator, DavSession session, boolean isCollection) throws DavException {
+	private DavResource createNullResource(DavResourceLocator locator, WebdavSession session, boolean isCollection) throws DavException {
 		return new VersionControlledResourceImpl(locator, this, session, resourceConfig, isCollection);
 	}
 
-	public DavResource createResource(DavResourceLocator locator, DavSession session, Resource resource) throws DavException {
+	public DavResource createResource(DavResourceLocator locator, WebdavSession session, Resource resource) throws DavException {
 		return new VersionControlledResourceImpl(locator, this, session, resourceConfig, resource);
 	}
 
 	@Override
-	public DavResource createRangeResource(DavResourceLocator locator, DavSession session, Pair<String, String> parsedRange) throws DavException {
+	public DavResource createRangeResource(DavResourceLocator locator, WebdavSession session, Pair<String, String> parsedRange) throws DavException {
 		
 		Resource res = resourceService.getResource(locator.getResourcePath(), session);
 		//DavResource resource = createResource(locator, session, res);

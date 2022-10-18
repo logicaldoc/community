@@ -57,7 +57,7 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DavResourceImpl;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 import com.logicaldoc.webdav.session.DavSessionImpl;
 
 /**
@@ -398,7 +398,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 //					resource = new RangeResourceImpl(dri.getLocator(), dri.getFactoryLD(), dri.getSessionLD(),
 //							dri.getConfig(), dri.getResource(), parsedRange);
 
-					DavSession session = (com.logicaldoc.webdav.session.DavSession) request.getDavSession();
+					WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
 					resource = getResourceFactory().createRangeResource(dri.getLocator(), session, parsedRange);
 
 					log.debug("Create RangeResourceImpl {}", resource);
@@ -751,7 +751,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		log.debug("doMove");
 
-		DavSession session = (com.logicaldoc.webdav.session.DavSession) request.getDavSession();
+		WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
 		try {
 			DavResource destResource = null;
 			try {

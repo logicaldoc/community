@@ -14,6 +14,13 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
  * @since 4.0
  */
 public interface PersistentObjectDAO<T extends PersistentObject> {
+	
+	/**
+	 * The alias to use to reference the object in the queries
+	 */
+	public static final String ALIAS_ENTITY = "_entity";
+	
+	
 	/**
 	 * This method persists the entity object
 	 * 
@@ -82,7 +89,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<Long> findAllIds(long tenantId);
 
 	/**
-	 * Finds all entities by the given expression. Use _entity alias to
+	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY} alias to
 	 * reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
@@ -96,7 +103,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<T> findByWhere(String where, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities by the given expression. Use _entity alias to
+	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY} alias to
 	 * reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
@@ -112,7 +119,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities by the given expression. Use _entity alias to
+	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY} alias to
 	 * reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
@@ -185,7 +192,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 			throws PersistenceException;
 
 	/**
-	 * Finds all entities ids by the given expression. Use _entity alias to
+	 * Finds all entities ids by the given expression. Use {@value #ALIAS_ENTITY} alias to
 	 * reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
@@ -199,7 +206,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities ids by the given expression. Use _entity alias to
+	 * Finds all entities ids by the given expression. Use {@value #ALIAS_ENTITY} alias to
 	 * reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression (for positional parameters,

@@ -27,7 +27,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.task.SchedulerFactoryBean;
+import com.logicaldoc.core.task.DefaultSchedulerFactory;
 import com.logicaldoc.util.config.ContextProperties;
 
 /**
@@ -45,7 +45,7 @@ public class JobManager {
 
 	public static final String MISSFIRE_IGNORE = "ignore";
 
-	protected static Logger log = LoggerFactory.getLogger(SchedulerFactoryBean.class);
+	protected static Logger log = LoggerFactory.getLogger(DefaultSchedulerFactory.class);
 
 	private Scheduler scheduler;
 
@@ -61,7 +61,7 @@ public class JobManager {
 	 * 
 	 * @throws SchedulerException error in the scheduler
 	 */
-	public void schedule(Job job, Map<String, Object> dictionary, Object... triggers) throws SchedulerException {
+	public void schedule(AbstractJob job, Map<String, Object> dictionary, Object... triggers) throws SchedulerException {
 		Map<Object, Map<String, Object>> trgs = new HashMap<Object, Map<String, Object>>();
 		for (Object trigger : triggers) {
 			trgs.put(trigger, new HashMap<String, Object>());
@@ -80,7 +80,7 @@ public class JobManager {
 	 * 
 	 * @throws SchedulerException error in the scheduler
 	 */
-	public void schedule(Job job, Map<String, Object> dictionary, Map<Object, Map<String, Object>> triggers)
+	public void schedule(AbstractJob job, Map<String, Object> dictionary, Map<Object, Map<String, Object>> triggers)
 			throws SchedulerException {
 		if (job.getTenantId() != null && !dictionary.containsKey(TENANT_ID))
 			dictionary.put(TENANT_ID, job.getTenantId());

@@ -42,7 +42,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	private static Context instance;
 
 	// The Spring's application context
-	private static ApplicationContext applicationContext;
+	private ApplicationContext applicationContext;
 
 	private Context() {
 		Context.instance = this;
@@ -63,7 +63,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	}
 
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		Context.applicationContext = applicationContext;
+		this.applicationContext = applicationContext;
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * NOTE: use carefully, invoke only during setup when the config.xml is
 	 * changed
 	 */
-	public static void refresh() {
+	public void refresh() {
 		if (applicationContext != null) {
 			try {
 				closeCaches();
@@ -136,7 +136,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 				((AbstractApplicationContext) applicationContext).start();
 				((AbstractApplicationContext) applicationContext).refresh();
 			} catch (Throwable e) {
-				
+
 			}
 		}
 	}
@@ -192,9 +192,9 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 
 	public Resource[] getResources(String resourcePattern) {
 		try {
-			return Context.applicationContext.getResources(resourcePattern);
+			return applicationContext.getResources(resourcePattern);
 		} catch (IOException e) {
-			
+
 		}
 
 		return null;
@@ -208,7 +208,7 @@ public class Context implements ApplicationContextAware, ApplicationListener<App
 	 * @return the resource instance
 	 */
 	public Resource getResource(String resourceLocation) {
-		return Context.applicationContext.getResource(resourceLocation);
+		return applicationContext.getResource(resourceLocation);
 	}
 
 	/**

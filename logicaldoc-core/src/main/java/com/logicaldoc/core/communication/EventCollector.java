@@ -33,8 +33,6 @@ public class EventCollector {
 
 	private static Logger log = LoggerFactory.getLogger(EventCollector.class);
 
-	private static EventCollector instance;
-
 	private Set<EventListener> listeners = new HashSet<EventListener>();
 
 	private ContextProperties config;
@@ -44,11 +42,7 @@ public class EventCollector {
 	private Map<String, Queue<Long>> fifos = new HashMap<String, Queue<Long>>();
 
 	public static EventCollector get() {
-		return instance;
-	}
-
-	public void start() {
-		EventCollector.instance = this;
+		return (EventCollector) Context.get().getBean(EventCollector.class);
 	}
 
 	public void addListener(EventListener listener) {

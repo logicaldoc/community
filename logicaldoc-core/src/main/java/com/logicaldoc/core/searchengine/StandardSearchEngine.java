@@ -57,7 +57,7 @@ public class StandardSearchEngine implements SearchEngine {
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
 
-	private static ContextProperties config;
+	private ContextProperties config;
 
 	protected DocumentDAO documentDao;
 
@@ -69,7 +69,7 @@ public class StandardSearchEngine implements SearchEngine {
 	}
 
 	public void setConfig(ContextProperties config) {
-		StandardSearchEngine.config = config;
+		this.config = config;
 	}
 
 	public void setDocumentDao(DocumentDAO documentDao) {
@@ -549,11 +549,11 @@ public class StandardSearchEngine implements SearchEngine {
 		}
 	}
 
-	static Directory getIndexDataDirectory() throws IOException {
+	Directory getIndexDataDirectory() throws IOException {
 		return new NIOFSDirectory(getIndexDataFolder().toPath());
 	}
 
-	static File getIndexDataFolder() throws IOException {
+	File getIndexDataFolder() throws IOException {
 		File indexdir = new File(config.getPropertyWithSubstitutions("index.dir"));
 		indexdir = new File(indexdir, "logicaldoc");
 		indexdir = new File(indexdir, "data");

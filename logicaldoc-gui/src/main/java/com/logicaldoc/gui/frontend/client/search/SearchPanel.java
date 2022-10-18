@@ -309,12 +309,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 	public void destroy() {
 		DocumentController.get().removeObserver(this);
 	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
+	
 	@Override
 	protected void onUnload() {
 		destroy();

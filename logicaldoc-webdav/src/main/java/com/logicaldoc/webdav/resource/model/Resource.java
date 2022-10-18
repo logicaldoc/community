@@ -3,7 +3,7 @@ package com.logicaldoc.webdav.resource.model;
 import java.io.InputStream;
 import java.util.Date;
 
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * Main-Class that contains all information about one particular resource within
@@ -101,9 +101,9 @@ public interface Resource {
 
 	public Date getCreationDate();
 
-	public DavSession getSession();
+	public WebdavSession getSession();
 
-	public void setSession(DavSession session);
+	public void setSession(WebdavSession session);
 
 	public Long getDocRef();
 

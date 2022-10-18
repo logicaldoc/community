@@ -7,7 +7,7 @@ package com.logicaldoc.webdav.session;
  * @author Sebastian Wenzky
  * 
  */
-public interface DavSession extends org.apache.jackrabbit.webdav.DavSession {
+public interface WebdavSession extends org.apache.jackrabbit.webdav.DavSession {
 
 	/**
 	 * Puts an object to the session map

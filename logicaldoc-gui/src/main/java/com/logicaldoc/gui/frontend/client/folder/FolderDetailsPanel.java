@@ -517,11 +517,6 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	protected void onUnload() {
 		destroy();
 		super.onUnload();

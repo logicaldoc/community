@@ -33,7 +33,7 @@ import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DeltaVResourceImpl;
 import com.logicaldoc.webdav.resource.ResourceConfig;
 import com.logicaldoc.webdav.resource.model.Resource;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * For more informations, please visit
@@ -49,7 +49,7 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 
 
 	public VersionResourceImpl(DavResourceLocator locator,
-			DavResourceFactory factory, DavSession session,
+			DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, Resource item) throws DavException {
 		super(locator, factory, session, config, item);
 

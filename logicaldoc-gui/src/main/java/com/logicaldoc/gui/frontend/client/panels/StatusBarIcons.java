@@ -142,11 +142,6 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	protected void onUnload() {
 		destroy();
 		super.onUnload();

@@ -16,7 +16,7 @@
             http://www.springframework.org/schema/security
             http://www.springframework.org/schema/security/spring-security.xsd">
    
-   <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector" init-method="start">
+   <bean id="EventCollector" class="com.logicaldoc.core.communication.EventCollector">
       <property name="config" ref="ContextProperties" />
    </bean>
     
@@ -25,7 +25,7 @@
       <property name="config" ref="ContextProperties" />
    </bean>
    
-   <bean id="ThreadPools" abstract="false" autowire="default" class="com.logicaldoc.core.threading.ThreadPools" lazy-init="default" init-method="start" destroy-method="shutdown">
+   <bean id="ThreadPools" abstract="false" autowire="default" class="com.logicaldoc.core.threading.ThreadPools" lazy-init="default" destroy-method="shutdown">
       <property name="config" ref="ContextProperties" />
    </bean>
    

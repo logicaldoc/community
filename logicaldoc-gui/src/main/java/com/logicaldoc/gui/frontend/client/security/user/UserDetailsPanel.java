@@ -393,10 +393,4 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 	public void destroy() {
 		UserController.get().removeObserver(this);
 	}
-
-	@Override
-	protected void finalize() {
-		destroy();
-	}
-	
 }

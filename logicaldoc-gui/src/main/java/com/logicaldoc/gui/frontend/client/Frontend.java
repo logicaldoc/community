@@ -18,7 +18,7 @@ import com.logicaldoc.gui.common.client.services.InfoService;
 import com.logicaldoc.gui.common.client.services.SecurityService;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.util.WindowUtils;
-import com.logicaldoc.gui.common.client.websockets.WebsocketListener;
+import com.logicaldoc.gui.common.client.websockets.WebSocketListener;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.TagsForm;
@@ -39,15 +39,6 @@ import com.smartgwt.client.widgets.notify.NotifySettings;
 public class Frontend implements EntryPoint {
 
 	private Websocket websocket = null;
-
-	private static Frontend instance;
-
-	/**
-	 * @return singleton Main instance
-	 */
-	public static Frontend get() {
-		return instance;
-	}
 
 	/**
 	 * Configure some interface defaults
@@ -81,8 +72,6 @@ public class Frontend implements EntryPoint {
 			}
 
 		});
-
-		instance = this;
 
 		// Tries to capture locale parameter
 		final String locale = Util.detectLocale();
@@ -185,15 +174,9 @@ public class Frontend implements EntryPoint {
 	public void connectWebsockets() {
 		if (Session.get().isServerPushEnabled()) {
 			websocket = new Websocket(Util.websocketUrl());
-			websocket.addListener(new WebsocketListener());
+			websocket.addListener(new WebSocketListener());
 			websocket.open();
 		}
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		if (websocket != null)
-			websocket.close();
 	}
 
 	/**
@@ -242,7 +225,7 @@ public class Frontend implements EntryPoint {
 			frontend.@com.logicaldoc.gui.frontend.client.Frontend::searchTag(Ljava/lang/String;)(tag);
 		};
 	}-*/;
-	
+
 	/**
 	 * Declares the javascript function used to download something
 	 */

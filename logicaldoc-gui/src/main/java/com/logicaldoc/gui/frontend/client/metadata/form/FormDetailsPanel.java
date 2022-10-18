@@ -67,7 +67,7 @@ public class FormDetailsPanel extends VLayout {
 
 	private DynamicForm notificationForm = null;
 
-	private static int selectedTabIndex = 0;
+	private int selectedTabIndex = 0;
 
 	private FolderSelector targetFolder;
 

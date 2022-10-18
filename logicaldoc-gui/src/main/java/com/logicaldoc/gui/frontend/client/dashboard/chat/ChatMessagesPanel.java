@@ -136,11 +136,6 @@ public class ChatMessagesPanel extends VLayout implements ChatObserver {
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	protected void onUnload() {
 		destroy();
 		super.onUnload();

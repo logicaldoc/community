@@ -618,6 +618,8 @@ public class CronExpressionComposer extends Window {
 								+ vm.getValueAsString("yearly-day-position") + " *");
 			break;
 		}
+		default:
+			// do nothing
 		}
 
 		InfoService.Instance.get().getCronDescription("" + vm.getItem("expression").getValue(), I18N.getLocale(),

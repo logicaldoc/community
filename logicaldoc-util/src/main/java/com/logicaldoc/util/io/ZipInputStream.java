@@ -67,9 +67,4 @@ public class ZipInputStream extends InputStream {
 	public String toString() {
 		return wrapped.toString();
 	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		close();
-	}
 }

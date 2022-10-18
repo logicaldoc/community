@@ -160,11 +160,6 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	protected void onUnload() {
 		destroy();
 		super.onUnload();

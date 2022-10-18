@@ -195,6 +195,8 @@ public class WPFilterInputStream extends FilterInputStream {
 							return 0xDE; // THORN
 						case (byte) 0x59:
 							return 0xFE; // thorn
+						default:
+							// do nothing
 						}
 					}
 					else if (buf[1] == (byte) 0x04) {
@@ -203,6 +205,8 @@ public class WPFilterInputStream extends FilterInputStream {
 							return 0x92; // quote
 						case (byte) 0x1D:
 							return 0x91; // backquote
+						default:
+							// do nothing
 						}
 					}
 				}

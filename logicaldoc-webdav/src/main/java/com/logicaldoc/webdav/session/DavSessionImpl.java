@@ -8,14 +8,14 @@ import java.util.HashMap;
  * 
  * @author Sebastian Wenzky
  */
-public class DavSessionImpl implements DavSession {
+public class DavSessionImpl implements WebdavSession {
 
 	private HashMap<String, Object> map = new HashMap<String, Object>();
 
 	private long tenantId;
 
 	/**
-	 * @see DavSession#getObject(String)
+	 * @see WebdavSession#getObject(String)
 	 */
 	@Override
 	public Object getObject(String key) {
@@ -23,7 +23,7 @@ public class DavSessionImpl implements DavSession {
 	}
 
 	/**
-	 * @see DavSession#putObject(String, Object)
+	 * @see WebdavSession#putObject(String, Object)
 	 */
 	@Override
 	public void putObject(String key, Object value) {

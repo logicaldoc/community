@@ -199,8 +199,9 @@ public class WSAttribute implements Serializable {
 			return getIntValue();
 		case TYPE_FOLDER:
 			return getIntValue();
+		default:
+			return getStringValue();
 		}
-		return null;
 	}
 
 	/**

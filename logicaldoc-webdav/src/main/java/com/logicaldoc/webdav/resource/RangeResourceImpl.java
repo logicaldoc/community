@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.exception.UncheckedDavException;
 import com.logicaldoc.webdav.resource.model.Resource;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
 public class RangeResourceImpl extends DavResourceImpl {
@@ -31,7 +31,7 @@ public class RangeResourceImpl extends DavResourceImpl {
 	
 	private final Pair<String, String> requestRange;
 	
-	public RangeResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public RangeResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, Resource resource, Pair<String, String> requestRange) {
 		super(locator, factory, session, config, resource);
 		this.requestRange = requestRange; 

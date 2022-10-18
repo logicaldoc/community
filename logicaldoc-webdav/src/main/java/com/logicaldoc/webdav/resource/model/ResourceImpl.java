@@ -12,7 +12,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * @see Resource
@@ -71,7 +71,7 @@ public class ResourceImpl implements Resource {
 
 	private Boolean moveEnabled;
 
-	DavSession session;
+	WebdavSession session;
 
 	private String eTag;
 
@@ -253,11 +253,11 @@ public class ResourceImpl implements Resource {
 		this.addChildEnabled = addChildEnabled;
 	}
 
-	public DavSession getSession() {
+	public WebdavSession getSession() {
 		return session;
 	}
 
-	public void setSession(DavSession session) {
+	public void setSession(WebdavSession session) {
 		this.session = session;
 	}
 

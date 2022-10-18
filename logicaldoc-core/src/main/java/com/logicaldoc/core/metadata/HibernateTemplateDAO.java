@@ -43,7 +43,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll() {
 		try {
-			return findByWhere(" 1=1", "order by _entity.name", null);
+			return findByWhere(" 1=1", "order by " + ALIAS_ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Template>();
@@ -53,7 +53,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll(long tenantId) {
 		try {
-			return findByWhere(" _entity.tenantId=" + tenantId, "order by _entity.name", null);
+			return findByWhere(" " + ALIAS_ENTITY + ".tenantId=" + tenantId, "order by " + ALIAS_ENTITY + ".name",
+					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Template>();
@@ -65,8 +66,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		Template template = null;
 
 		try {
-			List<Template> coll = findByWhere(
-					"_entity.name = '" + SqlUtil.doubleQuotes(name) + "' and _entity.tenantId=" + tenantId, null, null);
+			List<Template> coll = findByWhere(ALIAS_ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and "
+					+ ALIAS_ENTITY + ".tenantId=" + tenantId, null, null);
 			if (coll.size() > 0)
 				template = coll.iterator().next();
 			if (template != null && template.getDeleted() == 1)
@@ -124,8 +125,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findByType(int type, long tenantId) {
 		try {
-			return findByWhere("_entity.type =" + type + " and _entity.tenantId=" + tenantId,
-					"order by _entity.name asc", null);
+			return findByWhere(ALIAS_ENTITY + ".type =" + type + " and " + ALIAS_ENTITY + ".tenantId=" + tenantId,
+					"order by " + ALIAS_ENTITY + ".name asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Template>();
@@ -160,14 +161,15 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			if (groups.isEmpty())
 				return false;
 
-			StringBuffer query = new StringBuffer("select distinct(_entity) from Template _entity  ");
-			query.append(" left join _entity.templateGroups as _group ");
+			StringBuffer query = new StringBuffer(
+					"select distinct(" + ALIAS_ENTITY + ") from Template " + ALIAS_ENTITY + "  ");
+			query.append(" left join " + ALIAS_ENTITY + ".templateGroups as _group ");
 			query.append(" where ");
 			if (write)
 				query.append(" _group.write=1 and ");
 			query.append(" _group.groupId in (");
 			query.append(groups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
-			query.append(") and _entity.id = :templateId");
+			query.append(") and " + ALIAS_ENTITY + ".id = :templateId");
 
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("templateId", Long.valueOf(templateId));

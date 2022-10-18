@@ -86,29 +86,12 @@
             </props>
         </property>
     </bean>
-    <bean id="GarbageCollector"
-        class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject">
-            <bean class="com.logicaldoc.web.GarbageCollector" />
-        </property>
-        <property name="targetMethod">
-            <value>gc</value>
-        </property>
-        <property name="concurrent">
-            <value>false</value>
-        </property>
-    </bean>
-    <bean id="GarbageCollectorTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerBean">
-        <property name="jobDetail" ref="GarbageCollector" />
-        <property name="startDelay" value="5000" />
-        <property name="repeatInterval" value="60000" />
-    </bean>
+   
     <!-- Scheduler -->
     <bean id="Scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
         <property name="waitForJobsToCompleteOnShutdown" value="true" />
         <property name="triggers">
             <list>
-                <ref bean="GarbageCollectorTrigger" />
                 <ref bean="IndexOptimizerTrigger" />
                 <ref bean="TagsProcessorTrigger" />
                 <ref bean="IndexerTaskTrigger" />

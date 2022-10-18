@@ -24,16 +24,7 @@ import com.smartgwt.client.util.SC;
  */
 public class Login implements EntryPoint {
 
-	private static Login instance;
-
 	private LoginPanel loginPanel;
-
-	/**
-	 * @return singleton Main instance
-	 */
-	public static Login get() {
-		return instance;
-	}
 
 	@Override
 	public void onModuleLoad() {
@@ -47,8 +38,6 @@ public class Login implements EntryPoint {
 			}
 
 		});
-
-		instance = this;
 
 		declareShowLostDialog(this);
 

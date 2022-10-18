@@ -287,15 +287,6 @@ public class Geolocation {
 		return new File(folder, "geolocation.db");
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-		try {
-			dispose();
-		} finally {
-			super.finalize();
-		}
-	}
-
 	public void dispose() {
 		if (dbReader != null) {
 			try {

@@ -177,8 +177,6 @@ public class Attribute implements Comparable<Attribute> {
 	 */
 	public Object getValue() {
 		switch (type) {
-		case TYPE_STRING:
-			return getStringValue();
 		case TYPE_INT:
 			return getIntValue();
 		case TYPE_DOUBLE:
@@ -194,8 +192,9 @@ public class Attribute implements Comparable<Attribute> {
 				return null;
 			else
 				return getIntValue().intValue() == 1;
+		default:
+			return getStringValue();
 		}
-		return null;
 	}
 
 	/**

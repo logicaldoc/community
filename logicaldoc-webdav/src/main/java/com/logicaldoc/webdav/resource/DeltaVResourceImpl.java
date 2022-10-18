@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webdav.resource.model.Resource;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * For more informations, please visit
@@ -43,19 +43,19 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 
 	protected SupportedReportSetProperty supportedReports = new SupportedReportSetProperty();
 
-	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, Resource resource) throws DavException {
 		super(locator, factory, session, config, resource);
 		initSupportedReports();
 	}
 
-	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config) throws DavException {
 		super(locator, factory, session, config);
 		initSupportedReports();
 	}
 
-	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, boolean isCollection) throws DavException {
 		super(locator, factory, session, config, isCollection);
 		initSupportedReports();

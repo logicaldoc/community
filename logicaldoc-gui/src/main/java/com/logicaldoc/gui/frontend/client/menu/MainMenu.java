@@ -1219,11 +1219,6 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 	}
 
 	@Override
-	protected void finalize() throws Throwable {
-		destroy();
-	}
-
-	@Override
 	protected void onUnload() {
 		destroy();
 		super.onUnload();

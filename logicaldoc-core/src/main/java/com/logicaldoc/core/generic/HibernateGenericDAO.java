@@ -46,13 +46,13 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	@Override
 	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId) {
 		Generic generic = null;
-		StringBuffer sb = new StringBuffer(" _entity.type = '" + SqlUtil.doubleQuotes(type) + "' and _entity.subtype='"
-				+ SqlUtil.doubleQuotes(subtype) + "' ");
-		sb.append(" and _entity.tenantId=" + tenantId);
+		StringBuffer sb = new StringBuffer(" " + ALIAS_ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and "
+				+ ALIAS_ENTITY + ".subtype='" + SqlUtil.doubleQuotes(subtype) + "' ");
+		sb.append(" and " + ALIAS_ENTITY + ".tenantId=" + tenantId);
 		if (qualifier != null)
-			sb.append(" and _entity.qualifier=" + qualifier);
+			sb.append(" and " + ALIAS_ENTITY + ".qualifier=" + qualifier);
 		else
-			sb.append(" and _entity.qualifier is null");
+			sb.append(" and " + ALIAS_ENTITY + ".qualifier is null");
 		try {
 			Collection<Generic> coll = findByWhere(sb.toString(), null, null);
 			if (coll.size() > 0)
@@ -67,13 +67,13 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) {
 		String query = " 1=1 ";
 		if (StringUtils.isNotEmpty(type))
-			query += " and _entity.type like '" + SqlUtil.doubleQuotes(type) + "' ";
+			query += " and "+ALIAS_ENTITY+".type like '" + SqlUtil.doubleQuotes(type) + "' ";
 		if (StringUtils.isNotEmpty(subtype))
-			query += " and _entity.subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
+			query += " and "+ALIAS_ENTITY+".subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
 		if (qualifier != null)
-			query += " and _entity.qualifier = " + qualifier;
+			query += " and "+ALIAS_ENTITY+".qualifier = " + qualifier;
 		if (tenantId != null)
-			query += " and _entity.tenantId = " + tenantId;
+			query += " and "+ALIAS_ENTITY+".tenantId = " + tenantId;
 
 		try {
 			return findByWhere(query, null, null);

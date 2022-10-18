@@ -90,6 +90,7 @@ public class SplitDialog extends Window {
 					expression.setHint(I18N.message("regularexpression"));
 					break;
 				case SplitService.POLICY_TEXT:
+				default:
 					separator.setDisabled(false);
 					expression.setDisabled(false);
 					expression.setHint(I18N.message("regularexpression"));

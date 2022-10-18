@@ -53,7 +53,7 @@ import com.logicaldoc.webdav.context.ImportContextImpl;
 import com.logicaldoc.webdav.io.manager.IOManager;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.service.ResourceService;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
 /**
@@ -71,7 +71,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	protected DavResourceFactory factory;
 
-	protected DavSession session;
+	protected WebdavSession session;
 
 	protected DavResourceLocator locator;
 
@@ -91,7 +91,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	private List<DavResource> list = null;
 
-	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, Resource resource) {
 
 		this.locator = locator;
@@ -117,7 +117,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config) throws DavException {
 
 		this.factory = factory;
@@ -138,7 +138,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, boolean isCollection) throws DavException {
 		this(locator, factory, session, config);
 		this.isCollection = isCollection;

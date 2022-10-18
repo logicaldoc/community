@@ -17,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -127,9 +129,9 @@ public class IndexerTask extends Task {
 			// First of all find documents to be indexed and not already
 			// involved into a transaction
 			String[] query = IndexerTask.prepareQuery();
-			List<Long> ids = documentDao.findIdsByWhere(query[0]
-					+ " and (_entity.transactionId is null or _entity.transactionId not in " + transactionIdsStr + ") ",
-					query[1], max);
+			List<Long> ids = documentDao.findIdsByWhere(query[0] + " and (" + HibernatePersistentObjectDAO.ALIAS_ENTITY
+					+ ".transactionId is null or " + HibernatePersistentObjectDAO.ALIAS_ENTITY
+					+ ".transactionId not in " + transactionIdsStr + ") ", query[1], max);
 			size = ids.size();
 			log.info("Found a total of {} documents to be processed", size);
 
@@ -247,13 +249,13 @@ public class IndexerTask extends Task {
 		String sorting = config.getProperty("index.sorting");
 		if (StringUtils.isNotEmpty(sorting))
 			if ("oldestfirst".equals(sorting))
-				sorting = "_entity.date asc";
+				sorting = PersistentObjectDAO.ALIAS_ENTITY + ".date asc";
 			else if ("mostrecentfirst".equals(sorting))
-				sorting = "_entity.date desc";
+				sorting = PersistentObjectDAO.ALIAS_ENTITY + ".date desc";
 			else if ("smallestfirst".equals(sorting))
-				sorting = "_entity.fileSize asc";
+				sorting = PersistentObjectDAO.ALIAS_ENTITY + ".fileSize asc";
 			else
-				sorting = "_entity.fileSize desc";
+				sorting = PersistentObjectDAO.ALIAS_ENTITY + ".fileSize desc";
 
 		// This hidden setting overrides the default sorting policy(some really
 		// demanding users may need this optimization).
@@ -261,9 +263,9 @@ public class IndexerTask extends Task {
 		if (StringUtils.isNotEmpty(sortingCustom))
 			sorting = sortingCustom;
 
-		String where = " (_entity.indexed = " + AbstractDocument.INDEX_TO_INDEX + " or _entity.indexed = "
-				+ AbstractDocument.INDEX_TO_INDEX_METADATA + ") and not _entity.status = "
-				+ AbstractDocument.DOC_ARCHIVED;
+		String where = " (" + PersistentObjectDAO.ALIAS_ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX
+				+ " or " + PersistentObjectDAO.ALIAS_ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX_METADATA
+				+ ") and not " + PersistentObjectDAO.ALIAS_ENTITY + ".status = " + AbstractDocument.DOC_ARCHIVED;
 
 		return new String[] { where, sorting };
 	}

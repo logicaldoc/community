@@ -37,7 +37,7 @@ import com.logicaldoc.webdav.context.ImportContext;
 import com.logicaldoc.webdav.exception.DavResourceIOException;
 import com.logicaldoc.webdav.resource.model.Resource;
 import com.logicaldoc.webdav.resource.model.ResourceImpl;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * Base implementation of a ResourceService
@@ -77,7 +77,7 @@ public class ResourceServiceImpl implements ResourceService {
 	public ResourceServiceImpl() {
 	}
 
-	private Resource marshallFolder(Folder folder, long userId, DavSession session) throws PersistenceException {
+	private Resource marshallFolder(Folder folder, long userId, WebdavSession session) throws PersistenceException {
 		Resource resource = new ResourceImpl();
 		resource.setID(String.valueOf(folder.getId()));
 		resource.setContentLength(0L);
@@ -98,7 +98,7 @@ public class ResourceServiceImpl implements ResourceService {
 		return resource;
 	}
 
-	private Resource marshallDocument(Document document, DavSession session) {
+	private Resource marshallDocument(Document document, WebdavSession session) {
 
 		Resource resource = new ResourceImpl();
 		resource.setID(String.valueOf(document.getId()));
@@ -187,7 +187,7 @@ public class ResourceServiceImpl implements ResourceService {
 		return resourceList;
 	}
 
-	public Resource getResource(String requestPath, DavSession session) throws DavException {
+	public Resource getResource(String requestPath, WebdavSession session) throws DavException {
 		log.trace("Find DAV resource: {}", requestPath);
 
 		if (session == null)
@@ -258,7 +258,7 @@ public class ResourceServiceImpl implements ResourceService {
 	/**
 	 * @see ResourceService#getChildByName(Resource, String)
 	 */
-	public Resource getParentResource(String resourcePath, long userId, DavSession session) {
+	public Resource getParentResource(String resourcePath, long userId, WebdavSession session) {
 
 		log.debug("Find parent DAV resource: {}", resourcePath);
 
@@ -307,7 +307,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	public Resource createResource(Resource parentResource, String name, boolean isCollection, ImportContext context,
-			DavSession session) throws DavException {
+			WebdavSession session) throws DavException {
 
 		if(session==null)
 			throw new DavException(DavServletResponse.SC_FORBIDDEN, "No WebDAV session");
@@ -399,7 +399,7 @@ public class ResourceServiceImpl implements ResourceService {
 		return null;
 	}
 
-	public void updateResource(Resource resource, ImportContext context, DavSession session) throws DavException {
+	public void updateResource(Resource resource, ImportContext context, WebdavSession session) throws DavException {
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());
 			Document document = documentDAO.findById(Long.parseLong(resource.getID()));
@@ -462,7 +462,7 @@ public class ResourceServiceImpl implements ResourceService {
 		return null;
 	}
 
-	public Resource move(Resource source, Resource destination, DavSession session) throws DavException {
+	public Resource move(Resource source, Resource destination, WebdavSession session) throws DavException {
 		String sid = (String) session.getObject("sid");
 		if (source.isWorkspace()) {
 			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot move a workspace");
@@ -473,7 +473,7 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 	}
 
-	private Resource fileRenameOrMove(Resource source, Resource destination, DavSession session, String sid)
+	private Resource fileRenameOrMove(Resource source, Resource destination, WebdavSession session, String sid)
 			throws DavException {
 		// The source is a file so the requested operation can be: file
 		// rename/file move
@@ -540,7 +540,7 @@ public class ResourceServiceImpl implements ResourceService {
 		return this.marshallDocument(document, session);
 	}
 
-	private Resource folderRenameOrMove(Resource source, Resource destination, DavSession session, String sid)
+	private Resource folderRenameOrMove(Resource source, Resource destination, WebdavSession session, String sid)
 			throws DavException {
 
 //		log.info("Rename or Move folder {} to {}", source.getPath(), destination.getPath());
@@ -626,7 +626,7 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 	}
 
-	public void deleteResource(Resource resource, DavSession session) throws DavException {
+	public void deleteResource(Resource resource, WebdavSession session) throws DavException {
 		String sid = (String) session.getObject("sid");
 		Folder folder = null;
 		User user = null;
@@ -683,7 +683,7 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 	}
 
-	public void copyResource(Resource destinationResource, Resource resource, DavSession session) throws DavException {
+	public void copyResource(Resource destinationResource, Resource resource, WebdavSession session) throws DavException {
 		String sid = (String) session.getObject("sid");
 		User user = null;
 		try {
@@ -792,7 +792,7 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	@Override
-	public void checkout(Resource resource, DavSession session) throws DavException {
+	public void checkout(Resource resource, WebdavSession session) throws DavException {
 		String sid = (String) session.getObject("sid");
 
 		User user = null;
@@ -874,7 +874,7 @@ public class ResourceServiceImpl implements ResourceService {
 		return resourceHistory;
 	}
 
-	public void uncheckout(Resource resource, DavSession session) {
+	public void uncheckout(Resource resource, WebdavSession session) {
 		String sid = (String) session.getObject("sid");
 		try {
 			User user = userDAO.findById(resource.getRequestedPerson());

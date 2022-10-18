@@ -101,7 +101,7 @@
 	</bean>
 	
 	<bean id="Scheduler"
-		class="com.logicaldoc.core.task.SchedulerFactoryBean"
+		class="com.logicaldoc.core.task.DefaultSchedulerFactory"
 		destroy-method="destroy">
 		<property name="waitForJobsToCompleteOnShutdown" value="true" />
 	</bean>	

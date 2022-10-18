@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.webdav.resource.model.Resource;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 import com.logicaldoc.webdav.version.VersionHistoryResourceImpl;
 import com.logicaldoc.webdav.web.AbstractWebdavServlet;
 
@@ -40,7 +40,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 
 	protected static Logger log = LoggerFactory.getLogger(VersionControlledResourceImpl.class);
 
-	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, Resource resource) throws DavException {
 		super(locator, factory, session, config, resource);
 		initSupportedReports();
@@ -57,7 +57,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
 	 *         communication
 	 */
-	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config) throws DavException {
 		super(locator, factory, session, config);
 		initSupportedReports();
@@ -75,7 +75,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @throws org.apache.jackrabbit.webdav.DavException error in the DAV
 	 *         communication
 	 */
-	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session,
+	public VersionControlledResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, boolean isCollection) throws DavException {
 		super(locator, factory, session, config, isCollection);
 		initSupportedReports();

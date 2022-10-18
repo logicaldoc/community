@@ -25,7 +25,7 @@ public class SystemLoadMonitor {
 
 	private LoadTracker tracker = new LoadTracker();
 
-	private List<SystemLoadListener> listeners = new ArrayList<SystemLoadListener>();
+	private List<SystemLoadListener> listeners = new ArrayList<>();
 
 	public void setConfig(ContextProperties config) {
 		this.config = config;
@@ -101,12 +101,11 @@ public class SystemLoadMonitor {
 	}
 
 	public void stop() {
-		try {
-			if (tracker != null)
+		if (tracker != null)
+			try {
 				tracker.end();
-		} catch (Throwable t) {
-
-		}
+			} catch (Exception e) {
+			}
 	}
 
 	public void start() {
@@ -133,43 +132,46 @@ public class SystemLoadMonitor {
 		@Override
 		public void run() {
 			while (running) {
-				for (int i = 0; i < samples.length && running; i++) {
-					// Get an actual sample and store it
-					int[] sample = getCpuLoad();
-					samples[i] = sample;
-
-					long totals[] = new long[2];
-
-					// Compute the average
-					for (int j = 0; j < samples.length; j++) {
-						totals[0] = totals[0] + samples[j][0];
-						totals[1] = totals[1] + samples[j][1];
-					}
-
-					int[] averageOld = new int[] { averageCpuLoad[0], averageCpuLoad[1] };
-					averageCpuLoad[0] = (int) Math.round(totals[0] / (float) samples.length);
-					averageCpuLoad[1] = (int) Math.round(totals[1] / (float) samples.length);
-
-					int cpuLoadMax = config.getInt("system.cpuload.max", 50);
-					if (cpuLoadMax > 0)
-						if (averageOld[0] <= cpuLoadMax && averageCpuLoad[0] > cpuLoadMax) {
-							log.warn("The system is overloaded (" + averageCpuLoad[0] + "%)");
-							for (SystemLoadListener listener : listeners) {
-								listener.onOverload(averageCpuLoad[0], averageCpuLoad[1]);
-							}
-						} else if (averageOld[0] > cpuLoadMax && averageCpuLoad[0] <= cpuLoadMax) {
-							log.warn("The system is underloaded (" + averageCpuLoad[0] + "%)");
-							for (SystemLoadListener listener : listeners) {
-								listener.onUnderload(averageCpuLoad[0], averageCpuLoad[1]);
-							}
+				synchronized (SystemLoadMonitor.this) {
+					int i = 0;
+					while (i < samples.length && running) {
+						try {
+							SystemLoadMonitor.this.wait(2000);
+						} catch (InterruptedException e) {
+							Thread.currentThread().interrupt();
 						}
 
-					try {
-						wait(2000);
-					} catch (InterruptedException e) {
-						Thread.currentThread().interrupt();
-					}
+						// Get an actual sample and store it
+						int[] sample = getCpuLoad();
+						samples[i] = sample;
 
+						long totals[] = new long[2];
+
+						// Compute the average
+						for (int j = 0; j < samples.length; j++) {
+							totals[0] = totals[0] + samples[j][0];
+							totals[1] = totals[1] + samples[j][1];
+						}
+
+						int[] averageOld = new int[] { averageCpuLoad[0], averageCpuLoad[1] };
+						averageCpuLoad[0] = (int) Math.round(totals[0] / (float) samples.length);
+						averageCpuLoad[1] = (int) Math.round(totals[1] / (float) samples.length);
+
+						int cpuLoadMax = config.getInt("system.cpuload.max", 50);
+						if (cpuLoadMax > 0)
+							if (averageOld[0] <= cpuLoadMax && averageCpuLoad[0] > cpuLoadMax) {
+								log.warn("The system is overloaded (" + averageCpuLoad[0] + "%)");
+								for (SystemLoadListener listener : listeners) {
+									listener.onOverload(averageCpuLoad[0], averageCpuLoad[1]);
+								}
+							} else if (averageOld[0] > cpuLoadMax && averageCpuLoad[0] <= cpuLoadMax) {
+								log.warn("The system is underloaded (" + averageCpuLoad[0] + "%)");
+								for (SystemLoadListener listener : listeners) {
+									listener.onUnderload(averageCpuLoad[0], averageCpuLoad[1]);
+								}
+							}
+						i++;
+					}
 				}
 			}
 		}

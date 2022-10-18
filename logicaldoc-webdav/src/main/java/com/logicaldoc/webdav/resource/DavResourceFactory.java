@@ -5,7 +5,7 @@ import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletRequest;
 
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -17,12 +17,12 @@ import org.apache.commons.lang3.tuple.Pair;
  */
 public interface DavResourceFactory {
 
-	public DavResource createResource(DavResourceLocator locator, DavServletRequest request, DavSession session) throws DavException;
+	public DavResource createResource(DavResourceLocator locator, DavServletRequest request, WebdavSession session) throws DavException;
 
 	public DavResource createResource(DavResourceLocator locator, DavServletRequest request) throws DavException;
 
-	public DavResource createResource(DavResourceLocator locator, DavSession session) throws DavException;
+	public DavResource createResource(DavResourceLocator locator, WebdavSession session) throws DavException;
 	
-	public DavResource createRangeResource(DavResourceLocator locator, DavSession session, Pair<String, String> parsedRange) throws DavException;
+	public DavResource createRangeResource(DavResourceLocator locator, WebdavSession session, Pair<String, String> parsedRange) throws DavException;
 
 }

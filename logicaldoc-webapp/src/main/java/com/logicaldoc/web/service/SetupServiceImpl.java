@@ -77,7 +77,7 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 
 			// Reload the application context in order to reconnect DAOs to the
 			// database
-			Context.refresh();
+			Context.get().refresh();
 
 		} catch (Throwable caught) {
 			System.err.println(caught.getMessage());
@@ -137,7 +137,7 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 	 */
 	private void reloadContext() {
 		// Reload the application context in order to obtain the new value
-		Context.refresh();
+		Context.get().refresh();
 
 		ContextProperties conf = Context.get().getProperties();
 		String path = conf.getPropertyWithSubstitutions("index.dir");
@@ -206,7 +206,7 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 		// Refresh the current logging location
 		String log4jPath = URLDecoder.decode(this.getClass().getResource("/log.xml").getPath(), "UTF-8");
 		try {
-			// Init the logs			
+			// Init the logs
 			System.out.println("Taking log configuration from " + log4jPath);
 			try (InputStream inputStream = new FileInputStream(log4jPath)) {
 				ConfigurationSource source = new ConfigurationSource(inputStream);

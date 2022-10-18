@@ -36,7 +36,7 @@
     
     
     <bean id="GZIPInInterceptor" class="org.apache.cxf.transport.common.gzip.GZIPInInterceptor" />
-    <bean id="GZIPOutInterceptor" class="com.logicaldoc.webservice.GZIPOutInterceptor">
+    <bean id="GZIPOutInterceptor" class="com.logicaldoc.webservice.ThresholdGZIPOutInterceptor">
         <property name="threshold" value="${webservice.gzip}" />
     </bean>
     <bean id="WebserviceInterceptor" class="${webservice.interceptor}" destroy-method="shutdown">

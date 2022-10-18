@@ -94,9 +94,8 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	public Group findByName(String name, long tenantId) {
 		Group group = null;
 		try {
-			Collection<Group> coll = findByWhere(
-					"_entity.tenantId=" + tenantId + " and _entity.name = '" + SqlUtil.doubleQuotes(name) + "'", null,
-					null);
+			Collection<Group> coll = findByWhere(ALIAS_ENTITY + ".tenantId=" + tenantId + " and " + ALIAS_ENTITY
+					+ ".name = '" + SqlUtil.doubleQuotes(name) + "'", null, null);
 			if (coll.size() > 0) {
 				group = coll.iterator().next();
 				if (group.getDeleted() == 1)
@@ -190,7 +189,9 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("name", name.toLowerCase());
 			params.put("tenantId", tenantId);
-			return findByWhere("lower(_entity.name) like :name and _entity.tenantId = :tenantId", params, null, null);
+			return findByWhere(
+					"lower(" + ALIAS_ENTITY + ".name) like :name and " + ALIAS_ENTITY + ".tenantId = :tenantId", params,
+					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Group>();

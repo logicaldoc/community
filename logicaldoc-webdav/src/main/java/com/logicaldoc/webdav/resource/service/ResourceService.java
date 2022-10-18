@@ -9,7 +9,7 @@ import org.apache.jackrabbit.webdav.DavResourceLocator;
 
 import com.logicaldoc.webdav.context.ImportContext;
 import com.logicaldoc.webdav.resource.model.Resource;
-import com.logicaldoc.webdav.session.DavSession;
+import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * All CRUD as well as versioning functionalities against logicalDOC will be
@@ -35,7 +35,7 @@ public interface ResourceService extends Serializable {
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public Resource getResource(String location, DavSession session) throws DavException;
+	public Resource getResource(String location, WebdavSession session) throws DavException;
 
 	/**
 	 * On passing a valid
@@ -65,7 +65,7 @@ public interface ResourceService extends Serializable {
 	 * @throws DavException error in the DAV communication
 	 */
 	public Resource createResource(Resource parentResource, String name, boolean isCollection, ImportContext context,
-			DavSession session) throws DavException;
+			WebdavSession session) throws DavException;
 
 	/**
 	 * Updating a resource on passing all new properties though a valid resource
@@ -89,7 +89,7 @@ public interface ResourceService extends Serializable {
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public void updateResource(Resource resource, ImportContext context, DavSession session) throws DavException;
+	public void updateResource(Resource resource, ImportContext context, WebdavSession session) throws DavException;
 
 	/**
 	 * Check for existing resource(logically)
@@ -133,7 +133,7 @@ public interface ResourceService extends Serializable {
 	 * 
 	 * @return the parent resource
 	 */
-	public Resource getParentResource(String location, long userId, DavSession session);
+	public Resource getParentResource(String location, long userId, WebdavSession session);
 
 	/**
 	 * Moves a resource named target to the folder dictionary destination
@@ -145,7 +145,7 @@ public interface ResourceService extends Serializable {
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public Resource move(Resource target, Resource destination, DavSession session) throws DavException;
+	public Resource move(Resource target, Resource destination, WebdavSession session) throws DavException;
 
 	/**
 	 * Sets the stream for a resource
@@ -172,7 +172,7 @@ public interface ResourceService extends Serializable {
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public void deleteResource(Resource resource, DavSession session) throws DavException;
+	public void deleteResource(Resource resource, WebdavSession session) throws DavException;
 
 	/**
 	 * Copying of a resource within logicalDOC. Not supported those days.
@@ -183,7 +183,7 @@ public interface ResourceService extends Serializable {
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public void copyResource(Resource destinResource, Resource resource, DavSession session) throws DavException;
+	public void copyResource(Resource destinResource, Resource resource, WebdavSession session) throws DavException;
 
 	/**
 	 * Versioning-part. Checkout causes the system to make a version
@@ -194,7 +194,7 @@ public interface ResourceService extends Serializable {
 	 * 
 	 * @throws DavException error in the DAV communication
 	 */
-	public void checkout(Resource resource, DavSession session) throws DavException;
+	public void checkout(Resource resource, WebdavSession session) throws DavException;
 
 	/**
 	 * Versioning-part. Based upon the current resource, the versionhistory is
@@ -212,5 +212,5 @@ public interface ResourceService extends Serializable {
 	 * @param resource the DAV resource
 	 * @param session the current session
 	 */
-	public void uncheckout(Resource resource, DavSession session);
+	public void uncheckout(Resource resource, WebdavSession session);
 }

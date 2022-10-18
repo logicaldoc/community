@@ -7,7 +7,7 @@ package com.logicaldoc.core.job;
  * 
  * @since 8.7.4
  */
-public abstract class Job implements org.quartz.Job {
+public abstract class AbstractJob implements org.quartz.Job {
 
 	private String name;
 
@@ -17,19 +17,19 @@ public abstract class Job implements org.quartz.Job {
 
 	private Long tenantId;
 
-	public Job(String name, String group) {
+	public AbstractJob(String name, String group) {
 		this(name, group, null, null);
 	}
 
-	public Job(String name, String group, Long tenantId) {
+	public AbstractJob(String name, String group, Long tenantId) {
 		this(name, group, null, tenantId);
 	}
 
-	public Job(String name, String group, String description) {
+	public AbstractJob(String name, String group, String description) {
 		this(name, group, description, null);
 	}
 
-	public Job(String name, String group, String description, Long tenantId) {
+	public AbstractJob(String name, String group, String description, Long tenantId) {
 		super();
 		this.name = name;
 		this.group = group;

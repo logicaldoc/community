@@ -176,8 +176,6 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 	 */
 	public Object getValue() {
 		switch (type) {
-		case TYPE_STRING:
-			return getStringValue();
 		case TYPE_INT:
 			return getIntValue();
 		case TYPE_DOUBLE:
@@ -190,8 +188,9 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 			return getIntValue();
 		case TYPE_FOLDER:
 			return getIntValue();
+		default:
+			return getStringValue();
 		}
-		return null;
 	}
 
 	/**

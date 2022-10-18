@@ -22,10 +22,10 @@ import com.logicaldoc.core.RunLevel;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.6.4
  */
-public class SchedulerFactoryBean extends org.springframework.scheduling.quartz.SchedulerFactoryBean
+public class DefaultSchedulerFactory extends org.springframework.scheduling.quartz.SchedulerFactoryBean
 		implements ApplicationContextAware {
 
-	protected static Logger log = LoggerFactory.getLogger(SchedulerFactoryBean.class);
+	protected static Logger log = LoggerFactory.getLogger(DefaultSchedulerFactory.class);
 
 	@Override
 	public void start() throws SchedulingException {
