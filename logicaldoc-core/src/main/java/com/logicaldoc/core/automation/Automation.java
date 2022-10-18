@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -177,8 +178,7 @@ public class Automation {
 		dictionary.put(CURRENT_DATE, new Date());
 
 		// Localized messages map
-		dictionary.put("I18N",
-				new I18NTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE))));
+		dictionary.put("I18N", new I18NTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE))));
 
 		if (Context.get() != null)
 			clientDictionary.put(SERVER_URL, Context.get().getProperties().get("server.url"));
@@ -237,18 +237,8 @@ public class Automation {
 	 */
 	public String evaluate(String expression, Map<String, Object> clientDictionary) {
 		StringWriter writer = new StringWriter();
-		try {
-			if (StringUtils.isNotEmpty(expression)) {
-				VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
-
-				Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine",
-						expression);
-			}
-			return writer.toString();
-		} catch (Throwable e) {
-			log.error("Error in this script: {}", expression, e);
-			return expression;
-		}
+		evaluate(expression, clientDictionary, writer);
+		return writer.toString();
 	}
 
 	/**
@@ -261,10 +251,21 @@ public class Automation {
 	 */
 	public void evaluate(Map<String, Object> clientDictionary, Reader reader, Writer writer) {
 		try {
-			if (reader != null) {
-				VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
-				Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", reader);
-			}
+			String expression = IOUtils.toString(reader);
+			evaluate(expression, clientDictionary, writer);
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
+
+	}
+
+	private void evaluate(String expression, Map<String, Object> clientDictionary, Writer writer) {
+		try {
+			if (expression.contains("java.lang.Runtime"))
+				throw new SecurityException(
+						"The script makes use of the forbidden class java.lang.Runtime and cannot be executed");
+			VelocityContext context = prepareContext(prepareDictionary(clientDictionary));
+			Velocity.evaluate(context, writer, StringUtils.isNotEmpty(logTag) ? logTag : "ScriptEngine", expression);
 		} catch (Throwable e) {
 			log.error("Error in the script", e);
 		}
