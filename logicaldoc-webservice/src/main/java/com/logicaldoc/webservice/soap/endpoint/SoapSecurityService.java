@@ -192,6 +192,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			Group grp = group.toGroup();
 			if (group.getId() != 0) {
 				grp = dao.findById(group.getId());
+				dao.initialize(grp);
 				if (grp.getType() != Group.TYPE_DEFAULT) {
 					throw new Exception(String.format("You cannot edit group with id %s because it is a system group",
 							grp.getId()));
@@ -217,7 +218,6 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				System.err.println("group.getUserIds() > 0 ");
 				
 				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-				dao.initialize(grp);
 				for (User usr : grp.getUsers()) {
 					System.err.println("removing group from user: " + usr.getName());
 					usr.removeGroup(grp.getId());
