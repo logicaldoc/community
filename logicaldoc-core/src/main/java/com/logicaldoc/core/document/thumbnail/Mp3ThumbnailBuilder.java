@@ -38,21 +38,12 @@ public class Mp3ThumbnailBuilder extends AbstractThumbnailBuilder {
 					mimeType = extension = "." + mimeType.toLowerCase();
 
 				File albumImage = File.createTempFile("album-", extension);
-				RandomAccessFile file = null;
-				try {
-					file = new RandomAccessFile(albumImage, "rw");
+				try (RandomAccessFile file = new RandomAccessFile(albumImage, "rw");) {
 					file.write(albumData);
-
 					ImageThumbnailBuilder imageTBuilder = new ImageThumbnailBuilder();
 					imageTBuilder.buildThumbnail(sid, document, fileVersion, albumImage, dest, size, quality);
 				} finally {
-					try {
-						FileUtils.deleteQuietly(albumImage);
-						if (file != null)
-							file.close();
-					} catch (IOException e) {
-						// do nothing
-					}
+					FileUtils.deleteQuietly(albumImage);
 				}
 			}
 		} catch (Throwable e) {

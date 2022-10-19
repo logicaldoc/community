@@ -30,41 +30,41 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 
 	public static final int TYPE_FOLDERS = 3;
 
-	protected int page = 1;
+	private int page = 1;
 	
-	protected int maxHits = 40;
+	private int maxHits = 40;
 
 	private int type = TYPE_FULLTEXT;
 
-	protected String expression = "";
+	private String expression = "";
 
-	protected String name = "";
+	private String name = "";
 
-	protected String description = "";
+	private String description = "";
 
-	protected Object[] parameters = null;
+	private Serializable[] parameters = null;
 
-	protected long userId = -1;
+	private long userId = -1;
 
-	protected String topOperator;
+	private String topOperator;
 
-	protected boolean caseSensitive = true;
+	private boolean caseSensitive = true;
 
-	protected boolean retrieveAliases = true;
+	private boolean retrieveAliases = true;
 
 	/**
 	 * Optional set of document ids. If specified only documents inside this set
 	 * will be returned.
 	 */
-	protected Set<Long> filterIds = new HashSet<Long>();
+	private Set<Long> filterIds = new HashSet<Long>();
 
-	protected Long folderId = null;
+	private Long folderId = null;
 
-	protected boolean searchInSubPath = false;
+	private boolean searchInSubPath = false;
 
-	protected Long template = null;
+	private Long template = null;
 
-	protected Long tenantId = null;
+	private Long tenantId = null;
 
 	public Long getTemplate() {
 		return template;
@@ -74,11 +74,11 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		this.template = template;
 	}
 
-	public Object[] getParameters() {
+	public Serializable[] getParameters() {
 		return parameters;
 	}
 
-	public void setParameters(Object[] parameters) {
+	public void setParameters(Serializable[] parameters) {
 		this.parameters = parameters;
 	}
 

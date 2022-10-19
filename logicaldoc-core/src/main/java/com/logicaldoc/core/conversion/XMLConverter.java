@@ -69,7 +69,7 @@ public class XMLConverter extends AbstractFormatConverter {
 			builder.setFeature("http://xml.org/sax/features/external-general-entities", false);
 			builder.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			builder.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-			
+
 //			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 //			builder.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
@@ -171,33 +171,37 @@ public class XMLConverter extends AbstractFormatConverter {
 						File transformedFile = null;
 						try {
 							transformedFile = File.createTempFile("trs", "." + xsltOutFormat);
-							Result result = new StreamResult(new FileOutputStream(transformedFile));
+							try (FileOutputStream fos = new FileOutputStream(transformedFile)) {
+								Result result = new StreamResult(fos);
 
-							// Apply the xsl file to the source file and write
-							// the result to the output file
-							xformer.transform(source, result);
+								// Apply the xsl file to the source file and
+								// write
+								// the result to the output file
+								xformer.transform(source, result);
 
-							if ("html".equals(xsltOutFormat.toLowerCase())) {
-								// Sometimes the converter adds a not closed
-								// element <META http-equiv="Content-Type"
-								// content="text/html; charset=UTF-8">, so we
-								// must strip not closed <meta> tags
-								String htmlContent = FileUtil.readFile(transformedFile);
-								org.jsoup.nodes.Document htmlDoc = Jsoup.parse(htmlContent);
-								Elements elements = htmlDoc.select("meta");
-								for (org.jsoup.nodes.Element element : elements) {
-									if (!element.toString().endsWith("/>"))
-										element.remove();
+								if ("html".equals(xsltOutFormat.toLowerCase())) {
+									// Sometimes the converter adds a not closed
+									// element <META http-equiv="Content-Type"
+									// content="text/html; charset=UTF-8">, so
+									// we
+									// must strip not closed <meta> tags
+									String htmlContent = FileUtil.readFile(transformedFile);
+									org.jsoup.nodes.Document htmlDoc = Jsoup.parse(htmlContent);
+									Elements elements = htmlDoc.select("meta");
+									for (org.jsoup.nodes.Element element : elements) {
+										if (!element.toString().endsWith("/>"))
+											element.remove();
+									}
+									htmlContent = htmlDoc.html();
+									FileUtil.writeFile(htmlContent, transformedFile.getAbsolutePath());
 								}
-								htmlContent = htmlDoc.html();
-								FileUtil.writeFile(htmlContent, transformedFile.getAbsolutePath());
-							}
 
-							FormatConverter converter = manager.getConverter(xsltOutFormat, destExt);
-							if (converter == null)
-								throw new IOException(String.format("Unable to find a converter from %s to %s",
-										xsltOutFormat, destExt));
-							converter.convert(sid, document, transformedFile, dest);
+								FormatConverter converter = manager.getConverter(xsltOutFormat, destExt);
+								if (converter == null)
+									throw new IOException(String.format("Unable to find a converter from %s to %s",
+											xsltOutFormat, destExt));
+								converter.convert(sid, document, transformedFile, dest);
+							}
 						} finally {
 							if (transformedFile != null)
 								FileUtil.strongDelete(transformedFile);

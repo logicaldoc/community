@@ -57,8 +57,8 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.webdav.context.ExportContext;
 import com.logicaldoc.webdav.resource.DavResourceFactory;
 import com.logicaldoc.webdav.resource.DavResourceImpl;
-import com.logicaldoc.webdav.session.WebdavSession;
 import com.logicaldoc.webdav.session.DavSessionImpl;
+import com.logicaldoc.webdav.session.WebdavSession;
 
 /**
  * A base for building a WebDAV servlet
@@ -95,33 +95,11 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	abstract public DavLocatorFactory getLocatorFactory();
 
 	/**
-	 * Sets the <code>DavLocatorFactory</code>
-	 * 
-	 * @param locatorFactory local factory
-	 */
-	abstract public void setLocatorFactory(DavLocatorFactory locatorFactory);
-
-	/**
 	 * Returns the <code>DavResourceFactory</code>
 	 * 
 	 * @return the resource factory
 	 */
 	abstract public DavResourceFactory getResourceFactory();
-
-	/**
-	 * Sets the <code>DavResourceFactory</code>
-	 * 
-	 * @param resourceFactory resource factory
-	 */
-	abstract public void setResourceFactory(DavResourceFactory resourceFactory);
-
-	/**
-	 * Returns the value of the 'WWW-Authenticate' header, that is returned in
-	 * case of 401 error.
-	 * 
-	 * @return value of the 'WWW-Authenticate' header
-	 */
-	abstract public String getAuthenticateHeaderValue();
 
 	/**
 	 * Service the given request
@@ -395,9 +373,6 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 						log.error(e.getMessage());
 					}
 
-//					resource = new RangeResourceImpl(dri.getLocator(), dri.getFactoryLD(), dri.getSessionLD(),
-//							dri.getConfig(), dri.getResource(), parsedRange);
-
 					WebdavSession session = (com.logicaldoc.webdav.session.WebdavSession) request.getDavSession();
 					resource = getResourceFactory().createRangeResource(dri.getLocator(), session, parsedRange);
 
@@ -409,10 +384,6 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			}
 
 		}
-
-		// spool resource properties and ev. resource content.
-		// OutputStream out = (sendContent) ? response.getOutputStream() : null;
-		// resource.spool(getOutputContext(response, out));
 
 		resource.spool(oc);
 	}
@@ -577,18 +548,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				status = DavServletResponse.SC_CREATED;
 			}
 
-//			boolean isChunkedUpload = false;
-//			if (request.getHeader("LD-Chunked") != null) {
-//				isChunkedUpload = true;
-//			}
-
 			parentResource.addMember(resource, getInputContext(request, request.getInputStream()));
-
-//			if (!isChunkedUpload) {
-//				WebdavRequest webdavRequest = new WebdavRequestImpl(request, getLocatorFactory());
-//				webdavRequest.setDavSession(request.getDavSession());
-//				DavSession session = (com.logicaldoc.webdav.session.DavSession) webdavRequest.getDavSession();
-//			} 
 
 			response.setStatus(status);
 		} catch (DavException dave) {
@@ -1022,7 +982,11 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
-		context = config.getServletContext();
+		setContext(config.getServletContext());
+	}
+
+	private static void setContext(ServletContext context) {
+		AbstractWebdavServlet.context = context;
 	}
 
 	public static ServletContext getContext() {

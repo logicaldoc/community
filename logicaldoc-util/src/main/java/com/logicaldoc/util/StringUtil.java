@@ -95,11 +95,8 @@ public class StringUtil {
 		if (StringUtils.isNotEmpty(targetEncoding))
 			enc = targetEncoding;
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		OutputStreamWriter osw = null;
-		try {
-			baos = new ByteArrayOutputStream();
-			osw = new OutputStreamWriter(baos, enc);
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				OutputStreamWriter osw = new OutputStreamWriter(baos, enc);) {
 			BufferedWriter bw = new BufferedWriter(osw);
 			BufferedReader br = new BufferedReader(reader);
 			String inputLine;
@@ -110,14 +107,6 @@ public class StringUtil {
 			bw.flush();
 			osw.flush();
 			return new String(baos.toByteArray(), enc);
-		} finally {
-			try {
-				if (reader != null)
-					reader.close();
-				if (osw != null)
-					osw.close();
-			} catch (IOException e) {
-			}
 		}
 	}
 
@@ -128,8 +117,7 @@ public class StringUtil {
 
 		Writer writer = new StringWriter();
 		char[] buffer = new char[1024];
-		try {
-			Reader reader = new BufferedReader(new InputStreamReader(is, enc));
+		try (InputStreamReader isr = new InputStreamReader(is, enc); Reader reader = new BufferedReader(isr);) {
 			int n;
 			while ((n = reader.read(buffer)) != -1) {
 				writer.write(buffer, 0, n);

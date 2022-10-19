@@ -69,27 +69,27 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(DavResourceImpl.class);
 
-	protected DavResourceFactory factory;
+	protected transient DavResourceFactory factory;
 
-	protected WebdavSession session;
+	protected transient WebdavSession session;
 
-	protected DavResourceLocator locator;
+	protected transient DavResourceLocator locator;
 
-	protected Resource resource;
+	protected transient Resource resource;
 
-	protected DavPropertySet properties = new DavPropertySet();
+	protected transient DavPropertySet properties = new DavPropertySet();
 
 	protected boolean propsInitialized = false;
 
 	private boolean isCollection = true;
 
-	protected ResourceConfig config;
+	protected transient ResourceConfig config;
 
 	private long modificationTime = System.currentTimeMillis();
 
 	protected ResourceService resourceService;
 
-	private List<DavResource> list = null;
+	private transient List<DavResource> list = null;
 
 	public DavResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, Resource resource) {
@@ -563,15 +563,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 					log.debug("tempFile {}", tempFile);
 
 					// Write the content on the file
-					OutputStream stream = null;
-					try {
-						stream = new FileOutputStream(tempFile.toFile());
+					try(OutputStream stream = new FileOutputStream(tempFile.toFile());) {
 						IOUtils.copy(ctx.getInputStream(), stream);
-					} finally {
-						try {
-							if (stream != null) stream.close();
-						} catch (Exception e) {
-						}
 					}
 				}
 

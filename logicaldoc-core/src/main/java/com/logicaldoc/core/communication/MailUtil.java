@@ -58,7 +58,7 @@ public class MailUtil {
 	public static boolean emlContainsAttachments(InputStream is) {
 		try {
 			MimeMessage msg = readMime(is);
-			if (msg!=null && msg.isMimeType("multipart/*")) {
+			if (msg != null && msg.isMimeType("multipart/*")) {
 				Multipart mp = (Multipart) msg.getContent();
 				int count = mp.getCount();
 				return count > 1;
@@ -206,12 +206,8 @@ public class MailUtil {
 	 * @throws Exception raised if the message cannot be read
 	 */
 	public static EMail msgToMail(File msgFile, boolean extractAttachmentContent) throws Exception {
-		InputStream is = null;
-		try {
-			is = new FileInputStream(msgFile);
+		try (InputStream is = new FileInputStream(msgFile)) {
 			return msgToMail(is, extractAttachmentContent);
-		} finally {
-			IOUtils.closeQuietly(is);
 		}
 	}
 
@@ -265,13 +261,8 @@ public class MailUtil {
 	 */
 	public static EMail messageToMail(File emlFile, boolean extractAttachmentContent)
 			throws MessagingException, IOException {
-
-		InputStream is = null;
-		try {
-			is = new FileInputStream(emlFile);
+		try (InputStream is = new FileInputStream(emlFile);) {
 			return messageToMail(is, extractAttachmentContent);
-		} finally {
-			IOUtils.closeQuietly(is);
 		}
 	}
 
@@ -577,28 +568,20 @@ public class MailUtil {
 	}
 
 	public static int countMsgAttachments(File msgFile) {
-		InputStream is = null;
-		try {
-			is = new FileInputStream(msgFile);
+		try (InputStream is = new FileInputStream(msgFile);) {
 			return countMsgAttachments(is);
 		} catch (Throwable t) {
 			log.warn(t.getMessage(), t);
 			return 0;
-		} finally {
-			IOUtils.closeQuietly(is);
 		}
 	}
 
 	public static boolean msgContainsAttachments(File msgFile) {
-		InputStream is = null;
-		try {
-			is = new FileInputStream(msgFile);
+		try (InputStream is = new FileInputStream(msgFile);) {
 			return msgContainsAttachments(is);
 		} catch (Throwable t) {
 			log.warn(t.getMessage(), t);
 			return false;
-		} finally {
-			IOUtils.closeQuietly(is);
 		}
 	}
 
@@ -612,10 +595,10 @@ public class MailUtil {
 				FileAttachment p7mAttachment = (FileAttachment) msg.getAttachments().get(0);
 				byte[] p7mBytes = p7mAttachment.getData();
 				File tmp = File.createTempFile("msg", null);
-				try {
+				try (FileInputStream fis = new FileInputStream(tmp);) {
 					P7M p7m = new P7M(p7mBytes);
 					p7m.extractOriginalFile(tmp);
-					return countEmlAttachments(new FileInputStream(tmp));
+					return countEmlAttachments(fis);
 				} finally {
 					FileUtils.deleteQuietly(tmp);
 				}
@@ -639,10 +622,10 @@ public class MailUtil {
 				FileAttachment p7mAttachment = (FileAttachment) msg.getAttachments().get(0);
 				byte[] p7mBytes = p7mAttachment.getData();
 				File tmp = File.createTempFile("msg", null);
-				try {
+				try (FileInputStream fis = new FileInputStream(tmp);) {
 					P7M p7m = new P7M(p7mBytes);
 					p7m.extractOriginalFile(tmp);
-					return emlContainsAttachments(new FileInputStream(tmp));
+					return emlContainsAttachments(fis);
 				} finally {
 					FileUtils.deleteQuietly(tmp);
 				}
@@ -690,7 +673,8 @@ public class MailUtil {
 		}
 
 		@Override
-		public synchronized void connect(String host, int port, String username, String password) throws MessagingException {
+		public synchronized void connect(String host, int port, String username, String password)
+				throws MessagingException {
 		}
 
 		@Override

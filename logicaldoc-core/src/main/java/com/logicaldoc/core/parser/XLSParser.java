@@ -28,10 +28,8 @@ public class XLSParser extends AbstractParser {
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuffer content) {
-		ExcelExtractor extractor = null;
-		try {
-			POIFSFileSystem fs = new POIFSFileSystem(input);
-			extractor = new ExcelExtractor(fs);
+
+		try (POIFSFileSystem fs = new POIFSFileSystem(input); ExcelExtractor extractor = new ExcelExtractor(fs);) {
 			String tmp = extractor.getText();
 
 			// Replace Control characters
@@ -41,15 +39,9 @@ public class XLSParser extends AbstractParser {
 			content.append(StringUtil.writeToString(new StringReader(tmp)));
 		} catch (Exception e) {
 			log.warn("Failed to extract Excel text content", e);
-		} finally {
-			if (extractor != null)
-				try {
-					extractor.close();
-				} catch (IOException e) {
-				}
 		}
 	}
-	
+
 	@Override
 	public int countPages(InputStream input, String filename) {
 		try (HSSFWorkbook excelDoc = new HSSFWorkbook(input)) {

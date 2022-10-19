@@ -1,5 +1,7 @@
 package com.logicaldoc.core.metadata;
 
+import java.io.Serializable;
+
 import com.logicaldoc.core.security.Permission;
 
 /**
@@ -9,7 +11,9 @@ import com.logicaldoc.core.security.Permission;
  * @author Marco Meschieri - LogicalDOC
  * @version 8.7.2
  */
-public class TemplateGroup {
+public class TemplateGroup implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private int write = 0;
 

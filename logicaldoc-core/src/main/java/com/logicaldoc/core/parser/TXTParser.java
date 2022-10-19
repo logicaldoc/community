@@ -34,12 +34,7 @@ public class TXTParser extends AbstractParser {
 	@Override
 	public String parse(File file, String filename, String encoding, Locale locale, String tenant, Document document,
 			String fileVersion) {
-		FileInputStream fis = null;
-		BufferedInputStream bis = null;
-		try {
-			fis = new FileInputStream(file);
-			bis = new BufferedInputStream(fis);
-
+		try (FileInputStream fis = new FileInputStream(file); BufferedInputStream bis = new BufferedInputStream(fis);) {
 			String enc = encoding;
 			if (StringUtils.isEmpty(enc)) {
 				// Determine the most probable encoding
@@ -58,15 +53,6 @@ public class TXTParser extends AbstractParser {
 			return parse(bis, filename, enc, locale, tenant, document, fileVersion);
 		} catch (Throwable ex) {
 			log.warn("Failed to extract TXT text content", ex);
-		} finally {
-			try {
-				if (bis != null)
-					bis.close();
-				if (fis != null)
-					fis.close();
-			} catch (IOException e) {
-				log.warn(e.getMessage(), e);
-			}
 		}
 		return "";
 	}

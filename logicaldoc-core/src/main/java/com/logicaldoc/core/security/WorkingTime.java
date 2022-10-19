@@ -1,5 +1,6 @@
 package com.logicaldoc.core.security;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -9,7 +10,10 @@ import java.util.Date;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7.2
  */
-public class WorkingTime {
+public class WorkingTime implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The day of week ranges from 1 (Sunday) to 7 (Saturday)
 	 */

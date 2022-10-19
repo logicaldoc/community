@@ -1,6 +1,7 @@
 package com.logicaldoc.core.security;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,7 +14,9 @@ import org.slf4j.LoggerFactory;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
  */
-public class Client {
+public class Client implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(Client.class);
 
@@ -31,7 +34,7 @@ public class Client {
 
 	private Device device;
 
-	private Geolocation geolocation;
+	private transient Geolocation geolocation;
 
 	public Client() {
 	}

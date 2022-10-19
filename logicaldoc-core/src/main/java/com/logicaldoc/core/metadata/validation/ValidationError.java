@@ -1,5 +1,7 @@
 package com.logicaldoc.core.metadata.validation;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -8,7 +10,9 @@ import org.apache.commons.lang.StringUtils;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.8.1
  */
-public class ValidationError {
+public class ValidationError implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private String attribute;
 	

@@ -87,8 +87,6 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	private static final long serialVersionUID = 1L;
 
-	private static int progress = 0;
-
 	private static Logger log = LoggerFactory.getLogger(SystemServiceImpl.class);
 
 	@Override
@@ -420,10 +418,6 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	@Override
 	public GUITask[] loadTasks(String locale) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-
-		if (progress >= 100)
-			progress = -1;
-		progress++;
 
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
 		GUITask[] tasks;
@@ -1145,7 +1139,8 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 				log.info("Copying plugin package {} into {}", pluginPackage.getName(), targetFile.getAbsolutePath());
 				FileUtil.copyFile(pluginPackage, targetFile);
 
-				ApplicationListener.needRestart = pluginRegistry.isRestartRequired();
+				if (pluginRegistry.isRestartRequired())
+					ApplicationListener.restartRequired();
 			} else
 				throw new Exception("File not found");
 		} catch (Throwable e) {

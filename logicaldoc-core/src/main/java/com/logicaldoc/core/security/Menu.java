@@ -100,7 +100,7 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 	 */
 	private String automation;
 
-	protected Set<MenuGroup> menuGroups = new HashSet<MenuGroup>();
+	private Set<MenuGroup> menuGroups = new HashSet<MenuGroup>();
 
 	public Menu() {
 	}

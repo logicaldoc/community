@@ -24,11 +24,11 @@ public class ResourceConfig implements Serializable {
 
 	protected static Logger log = LoggerFactory.getLogger(ResourceConfig.class);
 
-	private ItemFilter itemFilter;
+	private transient ItemFilter itemFilter;
 
-	private IOManager ioManager;
+	private transient IOManager ioManager;
 
-	private PropertyManager propManager;
+	private transient PropertyManager propManager;
 
 	public void setIOManager(IOManager ioManager) {
 		this.ioManager = ioManager;

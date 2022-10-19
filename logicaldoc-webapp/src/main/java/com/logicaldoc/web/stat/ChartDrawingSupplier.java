@@ -16,7 +16,7 @@ public class ChartDrawingSupplier extends DefaultDrawingSupplier {
 
 	private static final long serialVersionUID = 1L;
 
-	public Paint[] paintSequence;
+	public transient Paint[] paintSequence;
 
 	public int paintIndex;
 

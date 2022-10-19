@@ -1,7 +1,6 @@
 package com.logicaldoc.web.service;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -287,9 +286,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 		File file = uploadedFilesMap.values().iterator().next();
 		List<GUIValue> options = new ArrayList<GUIValue>();
 
-		CSVFileReader reader = null;
-		try {
-			reader = new CSVFileReader(file.getPath());
+		try (CSVFileReader reader = new CSVFileReader(file.getPath());) {
 			Vector<String> row = reader.readFields();
 			if (row != null && "value".equals(row.get(0).toLowerCase()))
 				row = reader.readFields();
@@ -304,11 +301,6 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 		} catch (Throwable e) {
 			log.error("Unable to parse options in CSV file", e);
 		} finally {
-			if (reader != null)
-				try {
-					reader.close();
-				} catch (IOException e) {
-				}
 			UploadServlet.cleanReceivedFiles(session.getSid());
 		}
 

@@ -68,7 +68,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 
 	private int hidden = 0;
 
-	protected Set<FolderGroup> folderGroups = new HashSet<FolderGroup>();
+	private Set<FolderGroup> folderGroups = new HashSet<FolderGroup>();
 
 	/**
 	 * If 1, the users cannot change the template of the contained documents

@@ -170,11 +170,9 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public void writeToFile(long docId, String resource, File out) throws IOException {
-		OutputStream os = null;
-		InputStream is = null;
-		try {
-			os = new BufferedOutputStream(new FileOutputStream(out, false), DEFAULT_BUFFER_SIZE);
-			is = getStream(docId, resource);
+
+		try (OutputStream os = new BufferedOutputStream(new FileOutputStream(out, false), DEFAULT_BUFFER_SIZE);
+				InputStream is = getStream(docId, resource);) {
 			FileUtil.writeFile(is, out.getPath());
 		} catch (IOException ioe) {
 			log.error(ioe.getMessage(), ioe);
@@ -182,19 +180,6 @@ public abstract class AbstractStorer implements Storer {
 		} catch (Throwable e) {
 			log.error("Error writing document {} into {}", docId, out.getPath());
 			log.error(e.getMessage(), e);
-		} finally {
-			if (os != null) {
-				try {
-					os.flush();
-					os.close();
-				} catch (Throwable e) {
-				}
-			}
-			if (is != null)
-				try {
-					is.close();
-				} catch (Throwable e) {
-				}
 		}
 	}
 

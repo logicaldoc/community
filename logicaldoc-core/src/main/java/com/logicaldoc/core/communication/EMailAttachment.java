@@ -2,6 +2,7 @@ package com.logicaldoc.core.communication;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +19,10 @@ import com.logicaldoc.util.Context;
  * @author Michael Scholz
  * @author Alessandro Gasparini - LogicalDOC
  */
-public class EMailAttachment {
+public class EMailAttachment implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+
 	protected static Logger log = LoggerFactory.getLogger(EMailAttachment.class);
 
 	private String icon = "";

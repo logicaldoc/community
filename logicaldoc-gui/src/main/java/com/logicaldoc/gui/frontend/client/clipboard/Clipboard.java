@@ -22,7 +22,7 @@ public class Clipboard extends HashSet<GUIDocument> {
 
 	private static Clipboard instance = new Clipboard();
 
-	private Set<ClipboardObserver> observers = new HashSet<ClipboardObserver>();
+	private transient Set<ClipboardObserver> observers = new HashSet<ClipboardObserver>();
 
 	private String lastAction = COPY;
 	

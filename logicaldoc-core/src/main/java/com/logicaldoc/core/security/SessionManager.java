@@ -45,13 +45,13 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	// The maximum number of closed session maintained in memory
 	private static int MAX_CLOSED_SESSIONS = 50;
 
-	private AuthenticationChain authenticationChain;
+	private transient AuthenticationChain authenticationChain;
 
-	private SessionDAO sessionDao;
+	private transient SessionDAO sessionDao;
 
-	private SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();
+	private transient SessionTimeoutWatchDog timeoutWatchDog = new SessionTimeoutWatchDog();
 
-	private List<SessionListener> listeners = new ArrayList<SessionListener>();
+	private transient List<SessionListener> listeners = new ArrayList<SessionListener>();
 
 	private SessionManager() {
 		timeoutWatchDog.start();

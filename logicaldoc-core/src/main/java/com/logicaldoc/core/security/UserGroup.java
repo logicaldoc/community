@@ -1,12 +1,16 @@
 package com.logicaldoc.core.security;
 
+import java.io.Serializable;
+
 /**
  * Simple bean to map a relationship between a user and it's groups
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 7.7.1
  */
-public class UserGroup {
+public class UserGroup implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private long groupId;
 

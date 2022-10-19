@@ -228,14 +228,10 @@ public class StandardSearchEngine implements SearchEngine {
 	public String check() {
 		log.warn("Checking index");
 
-		ByteArrayOutputStream baos = null;
+		
 		String statMsg = "";
-		CheckIndex ci = null;
-		try {
-			ci = new CheckIndex(getIndexDataDirectory());
-
-			// Prepare the output buffer
-			baos = new ByteArrayOutputStream();
+		
+		try(CheckIndex ci = new CheckIndex(getIndexDataDirectory()); ByteArrayOutputStream baos =new ByteArrayOutputStream();) {
 			PrintStream ps = new PrintStream(baos);
 
 			// Retrieve the status collecting all informations in a string
@@ -277,19 +273,8 @@ public class StandardSearchEngine implements SearchEngine {
 			}
 		} catch (Throwable t) {
 			log.error(t.getMessage());
-		} finally {
-			if (baos != null)
-				try {
-					baos.close();
-				} catch (IOException e) {
-
-				}
-			if (ci != null)
-				try {
-					ci.close();
-				} catch (IOException e) {
-				}
 		}
+		
 		log.warn("Finished checking index");
 		return statMsg;
 	}

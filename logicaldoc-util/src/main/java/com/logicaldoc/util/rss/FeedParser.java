@@ -178,34 +178,20 @@ public class FeedParser {
 	}
 
 	private Reader read() {
-		CloseableHttpClient httpclient = null;
-		try {
-			httpclient = HttpUtil.getNotValidatingClient(40);
-
+		try (CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(40);) {
 			HttpGet get = new HttpGet(url.toString());
 			get.setHeader("User-Agent",
 					"Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 
-			CloseableHttpResponse response = null;
-			try {
-				response = httpclient.execute(get);
+			try (CloseableHttpResponse response = httpclient.execute(get);) {
 				int result = response.getStatusLine().getStatusCode();
 				if (result != HttpStatus.SC_OK)
 					throw new IOException("HTTP error " + result);
 
 				return new StringReader(HttpUtil.getBodyString(response));
-			} finally {
-				if (response != null)
-					response.close();
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (httpclient != null)
-				try {
-					httpclient.close();
-				} catch (IOException e) {
-				}
 		}
 	}
 }

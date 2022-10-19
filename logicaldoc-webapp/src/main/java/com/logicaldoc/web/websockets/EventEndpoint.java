@@ -46,8 +46,6 @@ public class EventEndpoint implements EventListener {
 
 	private static Logger log = LoggerFactory.getLogger(EventEndpoint.class);
 
-	private static boolean registered = false;
-
 	private static Set<String> MONITORED_EVENTS = new HashSet<String>(Arrays.asList(new String[] {
 			DocumentEvent.STORED.toString(), DocumentEvent.CHANGED.toString(), DocumentEvent.CHECKEDIN.toString(),
 			DocumentEvent.CHECKEDOUT.toString(), DocumentEvent.IMMUTABLE.toString(), DocumentEvent.LOCKED.toString(),
@@ -63,6 +61,8 @@ public class EventEndpoint implements EventListener {
 
 	private static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
 
+	private boolean registered = false;
+	
 	@OnOpen
 	public void onOpen(final Session session) {
 		if (!registered) {

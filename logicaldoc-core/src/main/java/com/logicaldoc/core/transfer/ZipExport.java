@@ -286,11 +286,8 @@ public class ZipExport {
 			resource = storer.getResourceName(document, null, FormatConverterManager.PDF_CONVERSION_SUFFIX);
 		}
 
-		InputStream is = null;
-		BufferedInputStream bis = null;
-		try {
-			is = storer.getStream(document.getId(), resource);
-			bis = new BufferedInputStream(is);
+		try (InputStream is = storer.getStream(document.getId(), resource);
+				BufferedInputStream bis = new BufferedInputStream(is);) {
 
 			String fileName = document.getFileName();
 			if (pdfConversion)
@@ -307,15 +304,6 @@ public class ZipExport {
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
-		} finally {
-			try {
-				zos.closeArchiveEntry();
-				if (bis != null)
-					bis.close();
-				if (is != null)
-					is.close();
-			} catch (IOException e) {
-			}
 		}
 	}
 

@@ -67,17 +67,19 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 	/**
 	 * Last time a database synchronization of the coutners has done
 	 */
-	private static Date lastSync;
+	private Date lastSync;
 
 	/**
 	 * Last time the oldest calls were cleaned
 	 */
-	private static Date lastClean;
+	private Date lastClean;
 
 	private ContextProperties settings;
 
 	public WebserviceInterceptor() {
 		super(Phase.RECEIVE);
+		
+		System.out.println(new Date()+" - Constructor  WebserviceInterceptor");
 	}
 
 	@Override

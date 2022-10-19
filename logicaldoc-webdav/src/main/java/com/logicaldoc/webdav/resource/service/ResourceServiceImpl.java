@@ -50,17 +50,17 @@ public class ResourceServiceImpl implements ResourceService {
 
 	protected static Logger log = LoggerFactory.getLogger(ResourceServiceImpl.class);
 
-	private DocumentDAO documentDAO;
+	private transient DocumentDAO documentDAO;
 
-	private VersionDAO versionDAO;
+	private transient VersionDAO versionDAO;
 
-	private FolderDAO folderDAO;
+	private transient FolderDAO folderDAO;
 
-	private DocumentManager documentManager;
+	private transient DocumentManager documentManager;
 
-	private Storer storer;
+	private transient Storer storer;
 
-	private UserDAO userDAO;
+	private transient UserDAO userDAO;
 
 	public void setUserDAO(UserDAO userDAO) {
 		this.userDAO = userDAO;

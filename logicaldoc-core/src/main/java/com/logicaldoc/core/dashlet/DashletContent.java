@@ -189,10 +189,7 @@ public class DashletContent extends HttpServlet {
 						+ "]]></comment>");
 				writer.write("<filename><![CDATA[" + (history.getFilename() == null ? "" : history.getFilename())
 						+ "]]></filename>");
-				writer.write("<icon>"
-						+ FilenameUtils.getBaseName(
-								IconSelector.selectIcon(FileUtil.getExtension((String) history.getFilename())))
-						+ "</icon>");
+				printIcon(writer, history.getFilename());
 				writer.write("<new>" + (1 == history.getIsNew()) + "</new>");
 				writer.write("<folderId>" + history.getFolderId() + "</folderId>");
 				writer.write("<docId>" + history.getDocId() + "</docId>");
@@ -237,8 +234,8 @@ public class DashletContent extends HttpServlet {
 						qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getDocId()))
 								.collect(Collectors.joining(",")));
 						qry.append(") and ld_name in ");
-						qry.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')")
-								.replaceAll(",", "','").replaceAll(" ", ""));
+						qry.append(attrs.toString().replace("\\[", "('").replace("\\]", "')").replaceAll(",", "','")
+								.replaceAll(" ", ""));
 
 						dao.query(qry.toString(), null, new RowMapper<Long>() {
 							@Override
@@ -420,8 +417,8 @@ public class DashletContent extends HttpServlet {
 				qry.append(" from ld_document_ext where ld_docid in (");
 				qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getId())).collect(Collectors.joining(",")));
 				qry.append(") and ld_name in ");
-				qry.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')").replaceAll(",", "','")
-						.replaceAll(" ", ""));
+				qry.append(attrs.toString().replace("\\[", "('").replace("\\]", "')").replace(",", "','")
+						.replace(" ", ""));
 
 				dao.query(qry.toString(), null, new RowMapper<Long>() {
 					@Override
@@ -495,9 +492,7 @@ public class DashletContent extends HttpServlet {
 				if (doc.getLockUser() != null)
 					writer.write("<lockUser><![CDATA[" + doc.getLockUser() + "]]></lockUser>");
 				writer.write("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-				writer.write("<icon>"
-						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(doc.getFileName())))
-						+ "</icon>");
+				printIcon(writer, doc.getFileName());
 				writer.write("<type><![CDATA[" + doc.getType() + "]]></type>");
 
 				writer.write("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
@@ -586,14 +581,18 @@ public class DashletContent extends HttpServlet {
 				writer.write("<message><![CDATA[" + record.getMessage() + "]]></message>");
 				writer.write("<docId>" + record.getDocId() + "</docId>");
 				writer.write("<filename><![CDATA[" + record.getFileName() + "]]></filename>");
-				writer.write("<icon>" + FilenameUtils
-						.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(record.getFileName()))) + "</icon>");
+				printIcon(writer, record.getFileName());
 				writer.write("<userId><![CDATA[" + record.getUserId() + "]]></userId>");
 				writer.write("</post>");
 			}
 
 			writer.write("</list>");
 		}
+	}
+
+	private void printIcon(PrintWriter writer, String filename) {
+		writer.write("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(filename)))
+				+ "</icon>");
 	}
 
 	private void handleContent(Dashlet dashlet, Map<String, Object> dashletDictionary, Automation automation,

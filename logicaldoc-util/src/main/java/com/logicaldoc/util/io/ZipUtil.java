@@ -385,9 +385,8 @@ public class ZipUtil {
 
 				// if we reached here, the File object f was not a directory
 				// create a FileInputStream on top of f
-				FileInputStream fis = null;
-				try {
-					fis = new FileInputStream(f);
+
+				try (FileInputStream fis = new FileInputStream(f);) {
 					// create a new zip entry
 					String path = f.getPath();
 					if (!path.equals(startZipDir.getPath()))
@@ -401,10 +400,6 @@ public class ZipUtil {
 					while ((bytesIn = fis.read(readBuffer)) != -1) {
 						zos.write(readBuffer, 0, bytesIn);
 					}
-				} finally {
-					// close the Stream
-					if (fis != null)
-						fis.close();
 				}
 			}
 		} catch (Exception e) {
@@ -419,13 +414,9 @@ public class ZipUtil {
 	 * @param dest The destination archive file
 	 */
 	public void zipFile(File src, File dest) {
-		ZipOutputStream zos = null;
-		FileInputStream fis = null;
-		try {
-			// create a ZipOutputStream to zip the data to
-			zos = new ZipOutputStream(new FileOutputStream(dest));
 
-			fis = new FileInputStream(src);
+		try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(dest));
+				FileInputStream fis = new FileInputStream(src);) {
 			// create a new zip entry
 			ZipEntry anEntry = new ZipEntry(src.getName());
 			// place the zip entry in the ZipOutputStream object
@@ -442,14 +433,6 @@ public class ZipUtil {
 			zos.flush();
 		} catch (Exception e) {
 			logError(e.getMessage());
-		} finally {
-			try {
-				if (fis != null)
-					fis.close();
-				if (zos != null)
-					zos.close();
-			} catch (Exception e) {
-			}
 		}
 	}
 

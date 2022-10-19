@@ -61,6 +61,7 @@ import net.sf.jmimemagic.MagicMatch;
  * @author Matteo Caruso - LogicalDOC
  */
 public class EMailSender {
+
 	private static final String THREAD_POOL = "Email";
 
 	private static Logger log = LoggerFactory.getLogger(EMailSender.class);
@@ -439,7 +440,10 @@ public class EMailSender {
 		File emlFile = null;
 		try {
 			emlFile = File.createTempFile("emailsender", ".eml");
-			message.writeTo(new FileOutputStream(emlFile));
+			
+			try(FileOutputStream fos = new FileOutputStream(emlFile);){
+				message.writeTo(new FileOutputStream(emlFile));
+			}
 
 			Folder folder = saveFolder;
 			if (foldering == FOLDERING_YEAR) {

@@ -40,7 +40,7 @@ public abstract class Message extends PersistentObject {
 
 	private int type = TYPE_SYSTEM;
 
-	protected Set<Recipient> recipients = new HashSet<Recipient>();
+	private Set<Recipient> recipients = new HashSet<Recipient>();
 
 	/**
 	 * The locale in which the message is written

@@ -25,7 +25,7 @@ import com.logicaldoc.core.document.Document;
  * @since 8.2
  */
 public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
-	
+
 	protected static Logger log = LoggerFactory.getLogger(VideoThumbnailBuilder.class);
 
 	@Override
@@ -52,21 +52,18 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 	}
 
 	private void writeMp4Frame(File videoFile, File frameFile) throws Exception {
-		
-		FFmpegFrameGrabber g = null;
-		try {
-			g = new FFmpegFrameGrabber(videoFile);
-			g.start();
+		try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoFile);) {
+			grabber.start();
 
 			/*
 			 * Get a frame in the middle of the video
 			 */
-			int startFrame = g.getLengthInVideoFrames() / 2;
-			g.setVideoFrameNumber(startFrame);
-			
-			for (int i = startFrame; i < g.getLengthInFrames() && frameFile.length() == 0; i++) {
+			int startFrame = grabber.getLengthInVideoFrames() / 2;
+			grabber.setVideoFrameNumber(startFrame);
+
+			for (int i = startFrame; i < grabber.getLengthInFrames() && frameFile.length() == 0; i++) {
 				try {
-					Frame frame = g.grab();
+					Frame frame = grabber.grab();
 					if (frame == null)
 						continue;
 					BufferedImage img = Java2DFrameUtils.toBufferedImage(frame);
@@ -77,34 +74,29 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 				} catch (Throwable t) {
 				}
 			}
-		} finally {
-			g.stop();
-			g.close();
 		}
 	}
 
 	private void writeVideoFrame(File videoFile, File frameFile) throws Exception {
-		FrameGrabber g = null;
-		try {
-			g = new OpenCVFrameGrabber(videoFile);
-			g.start();
+		try(FrameGrabber grabber = new OpenCVFrameGrabber(videoFile);) {
+			grabber.start();
 
 			/*
 			 * Try to get a frame after 60 seconds
 			 */
-			double frameRate = g.getFrameRate();
+			double frameRate = grabber.getFrameRate();
 			int fiveSecondsFrame = (int) (60 * frameRate);
-			if (fiveSecondsFrame > g.getLengthInFrames())
-				fiveSecondsFrame = 1;			
-			
-			for (int i = 0; i < g.getLengthInFrames() && frameFile.length() == 0; i++) {
+			if (fiveSecondsFrame > grabber.getLengthInFrames())
+				fiveSecondsFrame = 1;
+
+			for (int i = 0; i < grabber.getLengthInFrames() && frameFile.length() == 0; i++) {
 				try {
 					if (i < fiveSecondsFrame) {
-						g.grab();
+						grabber.grab();
 						continue;
 					}
 
-					Frame frame = g.grab();
+					Frame frame = grabber.grab();
 					if (frame == null)
 						continue;
 					BufferedImage img = Java2DFrameUtils.toBufferedImage(frame);
@@ -115,9 +107,6 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 				} catch (Throwable t) {
 				}
 			}
-		} finally {
-			g.stop();
-			g.close();
 		}
 	}
 

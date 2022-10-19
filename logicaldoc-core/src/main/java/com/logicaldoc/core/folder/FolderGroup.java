@@ -1,5 +1,7 @@
 package com.logicaldoc.core.folder;
 
+import java.io.Serializable;
+
 import com.logicaldoc.core.security.Permission;
 
 /**
@@ -9,7 +11,9 @@ import com.logicaldoc.core.security.Permission;
  * @author Marco Meschieri - LogicalDOC
  * @version 6.0
  */
-public class FolderGroup {
+public class FolderGroup implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private int read = 1;
 

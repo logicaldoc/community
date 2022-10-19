@@ -78,11 +78,9 @@ public class LogDownload extends HttpServlet {
 			if (file == null)
 				return;
 
-			InputStream is = null;
-			try {
+			try (InputStream is = new BufferedInputStream(new FileInputStream(file));) {
 				if (file.length() > 1) {
 					response.setHeader("Content-Length", Long.toString(file.length()));
-					is = new BufferedInputStream(new FileInputStream(file));
 					byte[] buf = new byte[1024];
 					int read = 1;
 
@@ -98,15 +96,8 @@ public class LogDownload extends HttpServlet {
 					response.getWriter().println("");
 				}
 			} catch (Throwable ex) {
-
+				// Nothing to do
 			} finally {
-				try {
-					if (is != null)
-						is.close();
-				} catch (Throwable ex) {
-
-				}
-
 				if ("all".equals(appender) && file != null)
 					FileUtils.deleteQuietly(file);
 			}
@@ -122,89 +113,84 @@ public class LogDownload extends HttpServlet {
 	private File prepareAllSupportResources(HttpServletRequest request, HttpServletResponse response) {
 		File tmp = null;
 
-		try {
+		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));) {
 			tmp = File.createTempFile("logs", ".zip");
-			ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));
 
-			try {
-				LoggingConfigurator conf = new LoggingConfigurator();
-				Collection<String> appenders = conf.getLoggingFiles();
+			LoggingConfigurator conf = new LoggingConfigurator();
+			Collection<String> appenders = conf.getLoggingFiles();
 
-				/*
-				 * Store the log files in the zip file
-				 */
-				for (String appender : appenders) {
-					if (appender.endsWith("_WEB"))
-						continue;
+			/*
+			 * Store the log files in the zip file
+			 */
+			for (String appender : appenders) {
+				if (appender.endsWith("_WEB"))
+					continue;
 
-					File logFile = new File(conf.getFile(appender, true));
-					writeEntry(out, logFile.getName(), logFile);
-				}
-
-				/*
-				 * Now create a copy of the configuration and store it in the
-				 * zip file
-				 */
-				File buf = File.createTempFile("context", ".properties");
-				ContextProperties cp = Context.get().getProperties();
-				OrderedProperties prop = new OrderedProperties();
-				for (String key : cp.getKeys()) {
-					if (key.contains("password"))
-						continue;
-					else
-						prop.put(key, cp.get(key));
-				}
-				prop.store(new FileOutputStream(buf), "Support Request");
-
-				writeEntry(out, "context.properties", buf);
-				FileUtil.strongDelete(buf);
-
-				/*
-				 * Now create a file with the environment
-				 */
-				String env = SystemUtil.printEnvironment();
-				buf = File.createTempFile("environment", ".txt");
-				FileUtil.writeFile(env, buf.getPath());
-				writeEntry(out, "environment.txt", buf);
-				FileUtil.strongDelete(buf);
-
-				/*
-				 * Discover the tomcat's folder
-				 */
-				ServletContext context = getServletContext();
-				File tomcatFile = new File(context.getRealPath("/WEB-INF/web.xml"));
-				tomcatFile = tomcatFile.getParentFile().getParentFile().getParentFile().getParentFile();
-
-				/*
-				 * Now put the server.xml file
-				 */
-				File serverFile = new File(tomcatFile.getPath() + "/conf/server.xml");
-				writeEntry(out, "tomcat/server.xml", serverFile);
-
-				/*
-				 * Now put the most recent tomcat's logs
-				 */
-				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-				String today = df.format(new Date());
-				File logsDir = new File(tomcatFile.getPath() + "/logs");
-				File[] files = logsDir.listFiles();
-				for (File file : files) {
-					if (file.isDirectory() || (!file.getName().toLowerCase().endsWith(".log")
-							&& !file.getName().toLowerCase().endsWith(".out")
-							&& !file.getName().toLowerCase().endsWith(".txt")))
-						continue;
-
-					// store just the logs of today
-					if (file.getName().toLowerCase().endsWith(".out")
-							|| file.getName().toLowerCase().endsWith(today + ".log")
-							|| file.getName().toLowerCase().endsWith(today + ".txt"))
-						writeEntry(out, "tomcat/" + file.getName(), file);
-				}
-
-				prop.store(new FileOutputStream(buf), "Support Request");
-			} finally {
-				out.close();
+				File logFile = new File(conf.getFile(appender, true));
+				writeEntry(out, logFile.getName(), logFile);
 			}
+
+			/*
+			 * Now create a copy of the configuration and store it in the zip
+			 * file
+			 */
+			File buf = File.createTempFile("context", ".properties");
+			ContextProperties cp = Context.get().getProperties();
+			OrderedProperties prop = new OrderedProperties();
+			for (String key : cp.getKeys()) {
+				if (key.contains("password"))
+					continue;
+				else
+					prop.put(key, cp.get(key));
+			}
+			prop.store(new FileOutputStream(buf), "Support Request");
+
+			writeEntry(out, "context.properties", buf);
+			FileUtil.strongDelete(buf);
+
+			/*
+			 * Now create a file with the environment
+			 */
+			String env = SystemUtil.printEnvironment();
+			buf = File.createTempFile("environment", ".txt");
+			FileUtil.writeFile(env, buf.getPath());
+			writeEntry(out, "environment.txt", buf);
+			FileUtil.strongDelete(buf);
+
+			/*
+			 * Discover the tomcat's folder
+			 */
+			ServletContext context = getServletContext();
+			File tomcatFile = new File(context.getRealPath("/WEB-INF/web.xml"));
+			tomcatFile = tomcatFile.getParentFile().getParentFile().getParentFile().getParentFile();
+
+			/*
+			 * Now put the server.xml file
+			 */
+			File serverFile = new File(tomcatFile.getPath() + "/conf/server.xml");
+			writeEntry(out, "tomcat/server.xml", serverFile);
+
+			/*
+			 * Now put the most recent tomcat's logs
+			 */
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			String today = df.format(new Date());
+			File logsDir = new File(tomcatFile.getPath() + "/logs");
+			File[] files = logsDir.listFiles();
+			for (File file : files) {
+				if (file.isDirectory() || (!file.getName().toLowerCase().endsWith(".log")
+						&& !file.getName().toLowerCase().endsWith(".out")
+						&& !file.getName().toLowerCase().endsWith(".txt")))
+					continue;
+
+				// store just the logs of today
+				if (file.getName().toLowerCase().endsWith(".out")
+						|| file.getName().toLowerCase().endsWith(today + ".log")
+						|| file.getName().toLowerCase().endsWith(today + ".txt"))
+					writeEntry(out, "tomcat/" + file.getName(), file);
+			}
+
+			prop.store(new FileOutputStream(buf), "Support Request");
 		} catch (Throwable ex) {
 			log.error(ex.getMessage(), ex);
 		}

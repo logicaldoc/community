@@ -27,9 +27,8 @@ public class PPTParser extends AbstractParser {
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuffer content) {
-		PowerPointExtractor extractor = null;
-		try {
-			extractor = new PowerPointExtractor(input);
+
+		try (PowerPointExtractor extractor = new PowerPointExtractor(input);) {
 			String tmp = extractor.getText(true, true);
 
 			// Replace Control characters
@@ -39,12 +38,6 @@ public class PPTParser extends AbstractParser {
 			content.append(StringUtil.writeToString(new StringReader(tmp)));
 		} catch (Exception e) {
 			log.warn("Failed to extract PowerPoint text content", e);
-		} finally {
-			if (extractor != null)
-				try {
-					extractor.close();
-				} catch (IOException e) {
-				}
 		}
 	}
 

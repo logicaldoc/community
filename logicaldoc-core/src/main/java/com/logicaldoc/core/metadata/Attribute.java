@@ -1,5 +1,6 @@
 package com.logicaldoc.core.metadata;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.logicaldoc.core.folder.Folder;
@@ -13,7 +14,9 @@ import com.logicaldoc.core.security.User;
  * @author Matteo Caruso - LogicalDOC
  * @since 4.5.1
  */
-public class Attribute implements Comparable<Attribute> {
+public class Attribute implements Comparable<Attribute>, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public static final int TYPE_STRING = 0;
 

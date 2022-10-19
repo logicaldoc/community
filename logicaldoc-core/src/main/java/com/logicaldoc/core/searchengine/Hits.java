@@ -21,7 +21,7 @@ public class Hits implements Iterator<Hit>, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	private Iterator<SolrDocument> internal;
+	private transient Iterator<SolrDocument> internal;
 
 	private QueryResponse rsp;
 

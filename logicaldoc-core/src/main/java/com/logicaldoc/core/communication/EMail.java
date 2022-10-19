@@ -114,7 +114,7 @@ public class EMail extends Message {
 	}
 
 	public void addRecipient(Recipient rec) {
-		recipients.add(rec);
+		getRecipients().add(rec);
 	}
 
 	public String getFolder() {
@@ -145,7 +145,7 @@ public class EMail extends Message {
 	}
 
 	public InternetAddress[] getAddresses() throws Exception {
-		return getAddresses(recipients);
+		return getAddresses(getRecipients());
 	}
 
 	public InternetAddress[] getAddressesCC() throws Exception {
@@ -182,7 +182,7 @@ public class EMail extends Message {
 	}
 
 	public void parseRecipients(String str) {
-		parseRecipients(str, recipients);
+		parseRecipients(str, getRecipients());
 	}
 
 	public void parseRecipientsCC(String str) {
@@ -295,8 +295,8 @@ public class EMail extends Message {
 	public Set<String> getAllRecipientsEmails() {
 		Set<String> emails = new HashSet<String>();
 
-		if (recipients != null && !recipients.isEmpty()) {
-			for (Recipient recipient : recipients)
+		if (getRecipients() != null && !getRecipients().isEmpty()) {
+			for (Recipient recipient : getRecipients())
 				if (StringUtils.isNotEmpty(recipient.getAddress())
 						&& !emails.contains(recipient.getAddress().toLowerCase()))
 					emails.add(recipient.getAddress().toLowerCase());

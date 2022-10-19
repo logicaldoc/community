@@ -13,9 +13,8 @@ public class StreamEater implements Runnable {
 	private String prefix;
 
 	private Writer output;
-	
+
 	private StringBuffer buffer;
-	
 
 	public StreamEater(String prefix, InputStream stream, StringBuffer buffer) {
 		super();
@@ -23,7 +22,7 @@ public class StreamEater implements Runnable {
 		this.stream = stream;
 		this.buffer = buffer;
 	}
-	
+
 	public StreamEater(String prefix, InputStream stream, Writer output) {
 		super();
 		this.prefix = prefix;
@@ -32,47 +31,31 @@ public class StreamEater implements Runnable {
 	}
 
 	public StreamEater(String prefix, InputStream stream) {
-		this(prefix, stream, (Writer)null);
+		this(prefix, stream, (Writer) null);
 	}
 
 	public void run() {
-
-		try {
-			InputStreamReader isr = new InputStreamReader(stream);
-
-			BufferedReader br = new BufferedReader(isr);
-
+		try (InputStreamReader isr = new InputStreamReader(stream); BufferedReader br = new BufferedReader(isr);) {
 			String line = br.readLine();
-
-			boolean firstLine=true;
+			boolean firstLine = true;
 			while (line != null) {
 				System.out.println((prefix != null ? (prefix + ":") : "") + line);
 				if (output != null && line != null) {
-					if(!firstLine)
+					if (!firstLine)
 						output.write("\n");
 					output.write(line);
 					output.flush();
-					
+
 				} else if (buffer != null && line != null) {
-					if(!firstLine)
+					if (!firstLine)
 						buffer.append("\n");
 					buffer.append(line);
 				}
-				firstLine=false;
+				firstLine = false;
 				line = br.readLine();
 			}
-
-			br.close();
 		} catch (IOException e) {
-
-		} finally {
-			if (output != null)
-				try {
-					output.flush();
-					output.close();
-				} catch (IOException e) {
-					
-				}
+			// nothing to do
 		}
 	}
 }

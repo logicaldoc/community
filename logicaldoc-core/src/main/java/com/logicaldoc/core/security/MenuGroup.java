@@ -1,12 +1,16 @@
 package com.logicaldoc.core.security;
 
+import java.io.Serializable;
+
 /**
  * This class represents security permissions for a group in relation to a menu
  * 
  * @author Marco Meschieri - LogicalDOC
  * @version 1.0
  */
-public class MenuGroup {
+public class MenuGroup implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private int write = 0;
 

@@ -41,7 +41,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 
 	protected static Logger log = LoggerFactory.getLogger(DeltaVResourceImpl.class);
 
-	protected SupportedReportSetProperty supportedReports = new SupportedReportSetProperty();
+	protected transient SupportedReportSetProperty supportedReports = new SupportedReportSetProperty();
 
 	public DeltaVResourceImpl(DavResourceLocator locator, DavResourceFactory factory, WebdavSession session,
 			ResourceConfig config, Resource resource) throws DavException {

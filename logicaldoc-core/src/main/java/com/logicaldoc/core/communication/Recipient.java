@@ -1,9 +1,14 @@
 package com.logicaldoc.core.communication;
 
+import java.io.Serializable;
+
 /**
  * @author Michael Scholz
  */
-public class Recipient {
+public class Recipient implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	public final static int TYPE_SYSTEM = 0;
 
 	public final static int TYPE_EMAIL = 1;

@@ -1,5 +1,6 @@
 package com.logicaldoc.core.searchengine.folder;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class FolderSearch extends Search {
 			throw new SearchException(e1);
 		}
 
-		Object[] params = null;
+		Serializable[] params = null;
 		try {
 			params = prepareExpression();
 		} catch (PersistenceException e1) {
@@ -84,11 +85,11 @@ public class FolderSearch extends Search {
 	 * 
 	 * @throws PersistenceException database error
 	 */
-	private Object[] prepareExpression() throws PersistenceException {
+	private Serializable[] prepareExpression() throws PersistenceException {
 		if (StringUtils.isNotEmpty(options.getExpression()))
 			return options.getParameters();
 
-		ArrayList<Object> params = new ArrayList<Object>();
+		ArrayList<Serializable> params = new ArrayList<Serializable>();
 
 		StringBuffer query = new StringBuffer();
 
@@ -119,7 +120,7 @@ public class FolderSearch extends Search {
 		log.info("executing query {}", query.toString());
 		log.info("with parameters {}", params);
 
-		return params.toArray();
+		return params.toArray(new Serializable[0]);
 	}
 
 	/**
@@ -133,7 +134,7 @@ public class FolderSearch extends Search {
 	 * 
 	 * @throws PersistenceException database error
 	 */
-	private void appendWhereClause(boolean searchAliases, ArrayList<Object> params, StringBuffer query)
+	private void appendWhereClause(boolean searchAliases, ArrayList<Serializable> params, StringBuffer query)
 			throws PersistenceException {
 		String tableAlias = "A";
 		if (searchAliases)

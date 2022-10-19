@@ -39,9 +39,8 @@ public class RTFParser extends AbstractParser {
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuffer content) {
 		
-		BufferedInputStream bis0 = null;
-		try {
-			bis0 = new BufferedInputStream(input);
+		
+		try(BufferedInputStream bis0 = new BufferedInputStream(input); ) {
 			bis0.mark(Integer.MAX_VALUE);
 
 			String text = extractText(bis0);
@@ -92,11 +91,6 @@ public class RTFParser extends AbstractParser {
 
 		} catch (Throwable t) {
 			log.warn("Failed to extract RTF text content", t);
-		} finally {
-			try {
-				bis0.close();
-			} catch (IOException e) {
-			}
 		}
 	}
 

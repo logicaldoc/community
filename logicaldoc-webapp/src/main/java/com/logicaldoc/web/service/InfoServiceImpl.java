@@ -117,7 +117,7 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 				alerts.add(setupReminder);
 			} else {
 				// Check if the application needs to be restarted
-				if (ApplicationListener.needRestart) {
+				if (ApplicationListener.isRestartRequired()) {
 					GUIMessage restartReminder = new GUIMessage();
 					restartReminder.setMessage(getValue(info, "needrestart"));
 					alerts.add(restartReminder);

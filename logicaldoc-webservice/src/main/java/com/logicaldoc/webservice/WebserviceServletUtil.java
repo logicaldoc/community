@@ -109,18 +109,9 @@ public class WebserviceServletUtil {
 		// Add this header for compatibility with internal .NET browsers
 		response.setHeader("Content-Length", Long.toString(file.length()));
 
-		InputStream is = null;
-		OutputStream os = null;
-
-		try {
-			is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
-			os = response.getOutputStream();
-
+		try (InputStream is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+				OutputStream os = response.getOutputStream();) {
 			IOUtils.copy(is, os);
-		} finally {
-			// Gently close streams.
-			IOUtils.closeQuietly(is);
-			IOUtils.closeQuietly(os);
 		}
 	}
 

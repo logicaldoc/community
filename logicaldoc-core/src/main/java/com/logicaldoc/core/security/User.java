@@ -27,7 +27,7 @@ import com.logicaldoc.util.crypt.CryptUtil;
  */
 public class User extends PersistentObject implements Serializable {
 
-	protected Logger log = LoggerFactory.getLogger(User.class);
+	private final static Logger log = LoggerFactory.getLogger(User.class);
 
 	public static int TYPE_DEFAULT = 0;
 
@@ -148,7 +148,7 @@ public class User extends PersistentObject implements Serializable {
 	 */
 	private String key;
 
-	protected Set<UserGroup> userGroups = new HashSet<UserGroup>();
+	private Set<UserGroup> userGroups = new HashSet<UserGroup>();
 
 	private Date creation;
 

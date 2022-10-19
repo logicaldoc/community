@@ -47,13 +47,19 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 	private static Logger log = LoggerFactory.getLogger(ApplicationListener.class);
 
-	public static boolean needRestart = false;
+	private boolean pidCreated = false;
+	
+	private static boolean restartRequired = false;
 
-	public static boolean pidCreated = false;
+	public static boolean isRestartRequired() {
+		return restartRequired;
+	}
 
-	/**
-	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-	 */
+	public static void restartRequired() {
+		ApplicationListener.restartRequired = true;
+	}
+
+	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		try {
 			onShutdown();
@@ -125,9 +131,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 		log.warn("Application stopped");
 	}
 
-	/**
-	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-	 */
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
 			ServletContext context = sce.getServletContext();
@@ -153,10 +157,10 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				lconf.write();
 
 				// Init the logs
-				System.out.println("Taking log configuration from " + log4jPath);
+				System.out.println(String.format("Taking log configuration from %s", log4jPath));
 				Configurator.initialize(null, log4jPath);
 			} catch (Throwable e) {
-				System.err.println("Cannot initialize the log: " + e.getMessage());
+				System.err.println(String.format("Cannot initialize the log: %s", e.getMessage()));
 			}
 
 			// Update the web descriptor with the correct transport guarantee
@@ -225,9 +229,8 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				log.warn(e.getMessage());
 			}
 
-			needRestart = PluginRegistry.getInstance().isRestartRequired();
-
-			if (needRestart) {
+			if (PluginRegistry.getInstance().isRestartRequired()) {
+				restartRequired();
 				log.warn("The application has to be restarted");
 				System.out.println("The application has to be restarted");
 			}
@@ -275,7 +278,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				for (File file : installationMarkers)
 					FileUtils.deleteQuietly(file);
 
-				needRestart = true;
+				restartRequired();
 			}
 	}
 

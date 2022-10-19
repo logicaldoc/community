@@ -151,26 +151,12 @@ public class ServletUtil {
 		// Add this header for compatibility with internal .NET browsers
 		response.setHeader("Content-Length", Long.toString(file.length()));
 
-		InputStream is = null;
-		OutputStream os = null;
-
-		try {
-			is = new FileInputStream(file);
-			os = response.getOutputStream();
-
+		try (InputStream is = new FileInputStream(file); OutputStream os = response.getOutputStream();) {
 			int letter = 0;
-
 			byte[] buffer = new byte[128 * 1024];
 			while ((letter = is.read(buffer)) != -1) {
 				os.write(buffer, 0, letter);
 			}
-		} finally {
-			if (os != null) {
-				os.flush();
-				os.close();
-			}
-			if (is != null)
-				is.close();
 		}
 	}
 
@@ -349,20 +335,16 @@ public class ServletUtil {
 		// ------------------------------------------------
 
 		// Prepare streams.
-		OutputStream output = null;
+		boolean gstreamRequired = (ranges.isEmpty() || ranges.get(0) == full || ranges.get(0).length == length)
+				&& acceptsGzip;
 
-		try {
-			// Open streams.
-			output = response.getOutputStream();
+		try (OutputStream output = gstreamRequired
+				? new GZIPOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE)
+				: response.getOutputStream();) {
 
-			if (ranges.isEmpty() || ranges.get(0) == full || ranges.get(0).length == length) {
-				// Return full file.
-				if (acceptsGzip) {
-					// The browser accepts GZIP, so GZIP the content.
-					response.setHeader("Content-Encoding", "gzip");
-					output = new GZIPOutputStream(output, DEFAULT_BUFFER_SIZE);
-				}
-
+			if (gstreamRequired) {
+				// The browser accepts GZIP, so GZIP the content.
+				response.setHeader("Content-Encoding", "gzip");
 				storer.writeToStream(docId, resource, output);
 			} else if (ranges.size() == 1) {
 				// Return single part of file.
@@ -398,9 +380,6 @@ public class ServletUtil {
 					sos.println("--" + MULTIPART_BOUNDARY + "--");
 				}
 			}
-		} finally {
-			// Gently close streams.
-			IOUtils.closeQuietly(output);
 		}
 
 		/*
@@ -500,19 +479,9 @@ public class ServletUtil {
 
 		// Add this header for compatibility with internal .NET browsers
 		response.setHeader("Content-Length", Long.toString(file.length()));
-
-		InputStream is = null;
-		OutputStream os = null;
-
-		try {
-			is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
-			os = response.getOutputStream();
-
+		try (InputStream is = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+				OutputStream os = response.getOutputStream();) {
 			IOUtils.copy(is, os);
-		} finally {
-			// Gently close streams.
-			IOUtils.closeQuietly(is);
-			IOUtils.closeQuietly(os);
 		}
 	}
 
@@ -708,7 +677,8 @@ public class ServletUtil {
 	 * @return True if the given accept header accepts the given value
 	 */
 	private static boolean accepts(String acceptHeader, String toAccept) {
-		// Limit the size of the interpreted string in order to avoid DoS attacks
+		// Limit the size of the interpreted string in order to avoid DoS
+		// attacks
 		String[] acceptValues = StringUtils.left(acceptHeader, 100).split("\\s*(,|;)\\s*");
 		Arrays.sort(acceptValues);
 		return Arrays.binarySearch(acceptValues, toAccept) > -1

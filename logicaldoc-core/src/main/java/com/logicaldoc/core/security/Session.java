@@ -92,9 +92,9 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 * Represents a dictionary of custom informations a client may save in the
 	 * session
 	 */
-	private Map<String, Object> dictionary = new ConcurrentHashMap<String, Object>();
+	private transient Map<String, Object> dictionary = new ConcurrentHashMap<String, Object>();
 
-	private List<Log> logs = new ArrayList<Log>();
+	private transient List<Log> logs = new ArrayList<Log>();
 
 	public Map<String, Object> getDictionary() {
 		return dictionary;

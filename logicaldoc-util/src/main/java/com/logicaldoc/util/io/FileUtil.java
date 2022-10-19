@@ -64,10 +64,7 @@ public class FileUtil {
 	 * @throws Exception raised in case of I/O error
 	 */
 	public static void writeFile(InputStream in, String filepath) throws Exception {
-		OutputStream os = null;
-		try {
-			os = new FileOutputStream(filepath);
-
+		try (OutputStream os = new FileOutputStream(filepath);) {
 			while (true) {
 				synchronized (buffer) {
 					int amountRead = in.read(buffer);
@@ -76,14 +73,11 @@ public class FileUtil {
 					os.write(buffer, 0, amountRead);
 				}
 			}
+			os.flush();
 		} finally {
-			if (os != null)
-				os.flush();
 			try {
 				if (in != null)
 					in.close();
-				if (os != null)
-					os.close();
 			} catch (IOException e) {
 				logError(e.getMessage());
 			}
@@ -91,36 +85,17 @@ public class FileUtil {
 	}
 
 	public static void writeFile(byte[] in, String filepath) throws Exception {
-		InputStream inStream = null;
-		try {
-			inStream = new ByteArrayInputStream(in);
+		try (InputStream inStream = new ByteArrayInputStream(in);) {
 			writeFile(inStream, filepath);
-		} finally {
-			try {
-				if (inStream != null)
-					inStream.close();
-			} catch (IOException e) {
-				logError(e.getMessage());
-			}
 		}
 	}
 
 	public static void writeFile(String text, String filepath) {
-		BufferedOutputStream bos = null;
-
-		try {
-			bos = new BufferedOutputStream(new FileOutputStream(filepath));
+		try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filepath));) {
 			bos.write(text.getBytes("UTF-8"));
+			bos.flush();
 		} catch (Throwable e) {
 			logError(e.getLocalizedMessage());
-		} finally {
-			if (bos != null) {
-				try {
-					bos.flush();
-					bos.close();
-				} catch (Throwable ioe) {
-				}
-			}
 		}
 	}
 
@@ -135,7 +110,6 @@ public class FileUtil {
 	}
 
 	public static void appendFile(String text, String filepath) {
-
 		try (OutputStream bos = new FileOutputStream(filepath, true);) {
 			bos.write(text.getBytes());
 		} catch (Exception e) {
@@ -149,12 +123,6 @@ public class FileUtil {
 	}
 
 	public static String computeDigest(InputStream is) {
-//		try {
-//			return  DigestUtils.sha1Hex(is);
-//		} catch (IOException e) {
-//			return null;
-//		}
-
 		if (is == null)
 			return null;
 
@@ -223,11 +191,9 @@ public class FileUtil {
 	 * @return digest
 	 */
 	public static String computeDigest(String src) {
-		InputStream is;
-		try {
-			is = IOUtils.toInputStream(src, "UTF-8");
+		try (InputStream is = IOUtils.toInputStream(src, "UTF-8");) {
 			return computeDigest(is);
-		} catch (Throwable e) {
+		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
 		return null;
@@ -286,7 +252,6 @@ public class FileUtil {
 	 */
 	public static void copyResource(String resourceName, File out) throws IOException {
 		InputStream is = null;
-		OutputStream os = null;
 		try {
 			try {
 				is = new BufferedInputStream(FileUtil.class.getResource(resourceName).openStream());
@@ -294,19 +259,19 @@ public class FileUtil {
 				is = new BufferedInputStream(
 						Thread.currentThread().getContextClassLoader().getResource(resourceName).openStream());
 			}
-			os = new BufferedOutputStream(new FileOutputStream(out));
 
-			for (;;) {
-				int b = is.read();
-				if (b == -1)
-					break;
-				os.write(b);
+			try (OutputStream os = new BufferedOutputStream(new FileOutputStream(out));) {
+
+				for (;;) {
+					int b = is.read();
+					if (b == -1)
+						break;
+					os.write(b);
+				}
 			}
 		} finally {
 			if (is != null)
 				is.close();
-			if (os != null)
-				os.close();
 		}
 	}
 
@@ -472,54 +437,31 @@ public class FileUtil {
 	}
 
 	public static void writeUTF8(String content, File file, boolean append) {
-		BufferedWriter out = null;
-		try {
-			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, append), "UTF8"));
+		try (BufferedWriter out = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(file, append), "UTF8"));) {
 			out.write(content);
 		} catch (Exception e) {
 			log.error(e.getMessage());
-		} finally {
-			if (out != null)
-				try {
-					out.close();
-				} catch (IOException e) {
-
-				}
 		}
 	}
 
 	public static byte[] toByteArray(File file) {
-		InputStream is = null;
-		try {
-			is = new BufferedInputStream(new FileInputStream(file), 2048);
+		try (InputStream is = new BufferedInputStream(new FileInputStream(file), 2048);) {
 			return IOUtils.toByteArray(is);
 		} catch (IOException e) {
 			log.error(e.getMessage());
-		} finally {
-			if (is != null)
-				try {
-					is.close();
-				} catch (IOException e) {
-				}
 		}
 		return null;
 	}
 
 	public static byte[] toByteArray(RandomAccessFile input, long start, long length) throws IOException {
-		ByteArrayOutputStream output = null;
-		try {
-			// Open streams.
-			output = new ByteArrayOutputStream();
+		try (ByteArrayOutputStream output = new ByteArrayOutputStream();) {
 			copy(input, output, start, length);
 			output.flush();
 			return output.toByteArray();
 		} finally {
 			try {
 				input.close();
-			} catch (Throwable e) {
-			}
-			try {
-				output.close();
 			} catch (Throwable e) {
 			}
 		}
@@ -541,41 +483,11 @@ public class FileUtil {
 	 */
 	public static void copy(File input, File output, long offset) throws IOException {
 
-		RandomAccessFile inputRa = null;
-		RandomAccessFile outputRa = null;
-		FileChannel sourceChannel = null;
-		FileChannel targetChannel = null;
-
-		try {
-			inputRa = new RandomAccessFile(input, "r");
-			outputRa = new RandomAccessFile(output, "rw");
-			sourceChannel = inputRa.getChannel();
-			targetChannel = outputRa.getChannel();
+		try (RandomAccessFile inputRa = new RandomAccessFile(input, "r");
+				RandomAccessFile outputRa = new RandomAccessFile(output, "rw");
+				FileChannel sourceChannel = inputRa.getChannel();
+				FileChannel targetChannel = outputRa.getChannel();) {
 			targetChannel.transferFrom(sourceChannel, offset, input.length());
-		} finally {
-			try {
-				if (sourceChannel != null)
-					sourceChannel.close();
-			} catch (Throwable e) {
-			}
-
-			try {
-				if (inputRa != null)
-					inputRa.close();
-			} catch (Throwable e) {
-			}
-
-			try {
-				if (targetChannel != null)
-					targetChannel.close();
-			} catch (Throwable e) {
-			}
-
-			try {
-				if (outputRa != null)
-					outputRa.close();
-			} catch (Throwable e) {
-			}
 		}
 	}
 
@@ -750,8 +662,7 @@ public class FileUtil {
 			int maxReadBufferSize = 8 * 1024; // 8KB
 			for (int destIx = 1; destIx <= numSplits; destIx++) {
 				File chunkFile = new File(destDir, nf.format(destIx));
-				BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(chunkFile));
-				try {
+				try (BufferedOutputStream bw = new BufferedOutputStream(new FileOutputStream(chunkFile));) {
 					if (chunkSize > maxReadBufferSize) {
 						long numReads = chunkSize / maxReadBufferSize;
 						long numRemainingRead = chunkSize % maxReadBufferSize;
@@ -765,8 +676,6 @@ public class FileUtil {
 						readWrite(raf, bw, chunkSize);
 					}
 					chunks.add(chunkFile);
-				} finally {
-					bw.close();
 				}
 			}
 
