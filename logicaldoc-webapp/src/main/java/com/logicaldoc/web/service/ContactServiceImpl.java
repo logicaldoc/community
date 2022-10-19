@@ -118,7 +118,8 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 
 		List<GUIContact> contacts = new ArrayList<GUIContact>();
 
-		try (CSVFileReader reader = new CSVFileReader(file.getAbsolutePath(), separator.charAt(0),	delimiter.charAt(0));) {
+		try (CSVFileReader reader = new CSVFileReader(file.getAbsolutePath(), separator.charAt(0),
+				delimiter.charAt(0));) {
 			if (skipFirstRow)
 				reader.readFields();
 

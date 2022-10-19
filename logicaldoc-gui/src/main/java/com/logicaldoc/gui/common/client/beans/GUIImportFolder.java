@@ -288,7 +288,7 @@ public class GUIImportFolder implements Serializable {
 			if (getPath() != null && !getPath().isEmpty())
 				url += getPath();
 		} else if (getProvider().startsWith(PROVIDER_SMB)) {
-			String path = getPath().replaceAll("/", "\\\\");
+			String path = getPath().replace("/", "\\\\");
 			if (!path.startsWith("\\"))
 				path = "\\" + path;
 			url += path;

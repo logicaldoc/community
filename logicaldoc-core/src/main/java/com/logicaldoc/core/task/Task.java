@@ -374,7 +374,7 @@ public abstract class Task implements Runnable {
 			dictionary.put("started", scheduling.getPreviousFireTime());
 			dictionary.put("ended", new Date());
 			dictionary.put("error", (lastRunError != null ? lastRunError.getMessage() : null));
-			dictionary.put("report", prepareReport(recipient.getLocale()).replaceAll("\\n", "<br />"));
+			dictionary.put("report", prepareReport(recipient.getLocale()).replace("\\n", "<br />"));
 
 			// Send the email
 			try {

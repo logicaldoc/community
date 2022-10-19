@@ -234,8 +234,8 @@ public class DashletContent extends HttpServlet {
 						qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getDocId()))
 								.collect(Collectors.joining(",")));
 						qry.append(") and ld_name in ");
-						qry.append(attrs.toString().replace("\\[", "('").replace("\\]", "')").replaceAll(",", "','")
-								.replaceAll(" ", ""));
+						qry.append(attrs.toString().replace("\\[", "('").replace("\\]", "')").replace(",", "','")
+								.replace(" ", ""));
 
 						dao.query(qry.toString(), null, new RowMapper<Long>() {
 							@Override

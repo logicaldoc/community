@@ -178,8 +178,8 @@ public abstract class Search {
 
 			query.append(idsString);
 			query.append(" and ld_name in ");
-			query.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')").replaceAll(",", "','")
-					.replaceAll(" ", ""));
+			query.append(attrs.toString().replace("\\[", "('").replace("\\]", "')").replace(",", "','")
+					.replace(" ", ""));
 
 			try {
 				ddao.query(query.toString(), null, new RowMapper<Long>() {

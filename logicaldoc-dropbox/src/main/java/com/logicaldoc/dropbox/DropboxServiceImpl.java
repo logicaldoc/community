@@ -296,7 +296,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 						String folderPath = file.getPathDisplay().substring(rootPath.length());
 						folderPath = FilenameUtils.getPath(file.getPathDisplay());
-						folderPath = folderPath.replaceAll("\\\\", "/");
+						folderPath = folderPath.replace("\\\\", "/");
 
 						Folder folder = fdao.createPath(root, folderPath, true, transaction);
 
