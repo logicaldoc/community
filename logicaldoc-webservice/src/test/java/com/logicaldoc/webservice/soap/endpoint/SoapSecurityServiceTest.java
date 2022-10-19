@@ -1,5 +1,7 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
+import static org.junit.Assert.fail;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,6 +87,28 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		Assert.assertNotNull(createdUser);
 		Assert.assertEquals("user test", createdUser.getName());
 		Assert.assertEquals("user@acme.com", createdUser.getEmail());
+		
+		// test store user with id != 0 (existing user)
+		WSUser tuser = securityServiceImpl.getUser("", 5);
+		Assert.assertNotNull(tuser);
+		
+		tuser.setFirstName("Taylor");
+		tuser.setName("Taylor Swift");
+		tuser.setStreet("Cornelia Street");
+		tuser.setCountry("United States");
+		tuser.setCity("New York");				
+		tuser.setLanguage("en");
+		
+		userId = securityServiceImpl.storeUser("", tuser);
+		Assert.assertNotNull(userId);
+		Assert.assertEquals(5L, userId.longValue());
+		
+		tuser = securityServiceImpl.getUser("", 5);
+		Assert.assertEquals("Taylor", tuser.getFirstName());
+		Assert.assertEquals("Taylor Swift", tuser.getName());
+		Assert.assertEquals("Cornelia Street", tuser.getStreet());
+		Assert.assertEquals("United States", tuser.getCountry());
+		Assert.assertEquals("New York", tuser.getCity());
 	}
 
 	@Test
@@ -95,11 +119,65 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 
 		Long groupId = securityServiceImpl.storeGroup("", wsGroupTest);
 		Assert.assertNotNull(groupId);
-		
+
 		Group createdGroup = groupDao.findById(groupId);
 		Assert.assertNotNull(createdGroup);
 		Assert.assertEquals("group test", createdGroup.getName());
 		Assert.assertEquals("group test descr", createdGroup.getDescription());
+
+		// test store user with id != 0 (existing user)
+		WSGroup sgroup = securityServiceImpl.getGroup("", groupId);
+		
+		// you can't store group with name null or empty 
+		try {
+			sgroup.setName(null);
+			securityServiceImpl.storeGroup("", sgroup);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+			// nothing to do here
+		}
+
+		sgroup = securityServiceImpl.getGroup("", -2);
+		Assert.assertNotNull(sgroup);
+		
+		// you can't store group whose type is not default
+		try {
+			sgroup.setName("Midnights");
+			securityServiceImpl.storeGroup("", sgroup);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+			// nothing to do here
+		}
+		
+		// Test updating an existing group 
+		sgroup = securityServiceImpl.getGroup("", 10);
+		Assert.assertNotNull(sgroup);
+		Assert.assertEquals("testGroup", sgroup.getName());
+		System.out.println(sgroup.getName());
+		System.out.println(sgroup.getDescription());
+		System.out.println(sgroup.getType());
+		System.out.println(sgroup.getUserIds());
+		
+		if (sgroup.getUserIds() != null) {
+			System.out.println("group size: " + sgroup.getUserIds().length);
+			for (long element : sgroup.getUserIds()) {
+				System.out.println(element);
+			}
+		}
+		
+		sgroup.setName("Midnights");
+		long groupIdSt = securityServiceImpl.storeGroup("", sgroup);
+		Assert.assertEquals(10, groupIdSt);
+		
+//		Group updatedGroup = groupDao.findById(groupIdSt);
+//		Assert.assertEquals(10, updatedGroup.getId());
+//		Assert.assertNotNull(updatedGroup);				
+//		Assert.assertEquals("Midnights", updatedGroup.getName());
+		
+		WSGroup updatedGroup = securityServiceImpl.getGroup("", groupIdSt);
+		Assert.assertNotNull(updatedGroup);	
+		Assert.assertEquals(10, updatedGroup.getId());
+		Assert.assertEquals("Midnights", updatedGroup.getName());
 	}
 
 	@Test
@@ -164,6 +242,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 	public void testGetGroup() throws Exception {
 		WSGroup group = securityServiceImpl.getGroup("", 2);
 		Assert.assertNotNull(group);
+		Assert.assertEquals("author", group.getName());
 		
 		// test for non-existent group
 		group = securityServiceImpl.getGroup("", 200);
