@@ -8,6 +8,8 @@ import java.util.List;
 import org.junit.Test;
 
 import com.logicaldoc.core.security.Group;
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -24,6 +26,7 @@ import junit.framework.Assert;
  * @since 6.1
  */
 public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
+	
 	private UserDAO userDao;
 
 	private GroupDAO groupDao;
@@ -44,17 +47,43 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testListUsers() throws Exception {
-		WSUser[] users = securityServiceImpl.listUsers("",null);
+		WSUser[] users = securityServiceImpl.listUsers("", null);
 		Assert.assertNotNull(users);
 		Assert.assertEquals(5, users.length);
 		List<WSUser> usersList = Arrays.asList(users);
 		Assert.assertEquals(1, usersList.get(0).getId());
 		Assert.assertEquals(2, usersList.get(1).getId());
 		Assert.assertEquals("boss", usersList.get(1).getUsername());
-		
+
 		users = securityServiceImpl.listUsers("", "testGroup");
 		Assert.assertNotNull(users);
 		Assert.assertEquals(3, users.length);
+
+		securityServiceImpl.setValidateSession(true);
+		SessionManager sm = SessionManager.get();
+		Session session1 = sm.newSession("author", "admin", null);
+
+		users = securityServiceImpl.listUsers(session1.getSid(), "admin");
+
+		Assert.assertNotNull(users);
+		Assert.assertEquals(2, users.length);
+
+		for (WSUser wsUser : users) {
+//			System.err.println("Name: " + wsUser.getName());
+//			System.err.println("Username: " + wsUser.getUsername());
+//			System.err.println("Password: " + wsUser.getPassword());
+//			System.err.println("Email: " + wsUser.getEmail());
+//			System.err.println("Email2: " + wsUser.getEmail2());
+//			System.err.println("Passwordmd4: " + wsUser.getPasswordmd4());
+
+			Assert.assertNull(wsUser.getUsername());
+			Assert.assertNull(wsUser.getEmail());
+			Assert.assertNull(wsUser.getEmail2());
+			Assert.assertTrue(wsUser.getPassword() == null || wsUser.getPassword().isEmpty());
+			Assert.assertNull(wsUser.getPasswordmd4());
+		}
+		
+		securityServiceImpl.setValidateSession(false);
 	}
 
 	@Test
@@ -109,6 +138,22 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		Assert.assertEquals("Cornelia Street", tuser.getStreet());
 		Assert.assertEquals("United States", tuser.getCountry());
 		Assert.assertEquals("New York", tuser.getCity());
+		
+		// try to store system user
+		wsUserTest = new WSUser();
+		wsUserTest.setId(-1010);
+		wsUserTest.setName("Lavender Haze");
+		wsUserTest.setEmail("l.haze@midnights.com");
+		wsUserTest.setUsername("lavhaze");
+		wsUserTest.setFirstName("Lavender");
+		wsUserTest.setType(User.TYPE_SYSTEM);
+
+		try {
+			userId = securityServiceImpl.storeUser("", wsUserTest);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+			// nothing to do here
+		}		
 	}
 
 	@Test
@@ -153,26 +198,12 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		sgroup = securityServiceImpl.getGroup("", 10);
 		Assert.assertNotNull(sgroup);
 		Assert.assertEquals("testGroup", sgroup.getName());
-		System.out.println(sgroup.getName());
-		System.out.println(sgroup.getDescription());
-		System.out.println(sgroup.getType());
-		System.out.println(sgroup.getUserIds());
-		
-		if (sgroup.getUserIds() != null) {
-			System.out.println("group size: " + sgroup.getUserIds().length);
-			for (long element : sgroup.getUserIds()) {
-				System.out.println(element);
-			}
-		}
+		Assert.assertNotNull(sgroup.getUserIds());
+		Assert.assertTrue(sgroup.getUserIds().length > 0);
 		
 		sgroup.setName("Midnights");
 		long groupIdSt = securityServiceImpl.storeGroup("", sgroup);
 		Assert.assertEquals(10, groupIdSt);
-		
-//		Group updatedGroup = groupDao.findById(groupIdSt);
-//		Assert.assertEquals(10, updatedGroup.getId());
-//		Assert.assertNotNull(updatedGroup);				
-//		Assert.assertEquals("Midnights", updatedGroup.getName());
 		
 		WSGroup updatedGroup = securityServiceImpl.getGroup("", groupIdSt);
 		Assert.assertNotNull(updatedGroup);	
@@ -182,11 +213,28 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 
 	@Test
 	public void testDeleteUser() throws Exception {
+		
 		User user = userDao.findById(2);
 		Assert.assertNotNull(user);
 		securityServiceImpl.deleteUser("", user.getId());
 		user = userDao.findById(2);
 		Assert.assertNull(user);
+		
+		// Try to delete a user that cannot be deleted
+		try {
+			securityServiceImpl.deleteUser("", 1);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+			// nothing to do here
+		}
+
+		// Attempt to delete a system user
+		try {
+			securityServiceImpl.deleteUser("", -1010);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+			// nothing to do here
+		}		
 	}
 
 	@Test
@@ -196,6 +244,20 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		securityServiceImpl.deleteGroup("", group.getId());
 		group = groupDao.findById(2);
 		Assert.assertNull(group);
+		
+		// Try to delete a group that cannot be deleted
+		try {
+			securityServiceImpl.deleteGroup("", 1);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+		}
+		
+		// Attempt to delete a user' group (not deletable)
+		try {
+			securityServiceImpl.deleteGroup("", -2);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+		}		
 	}
 
 	@Test
@@ -212,6 +274,14 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 
 		int changeResult = securityServiceImpl.changePassword("", userId, "(-xi%HT3y?r3'ux", "t<(`oN]I{*2d(0");
 		Assert.assertEquals(0, changeResult);
+		
+		// attempt to change the passwd using the previously used passwd (same passwd)
+		changeResult = securityServiceImpl.changePassword("", userId, "(-xi%HT3y?r3'ux", "t<(`oN]I{*2d(0");
+		Assert.assertEquals(1, changeResult);
+		
+		// attempt to change password of a non existent user
+		changeResult = securityServiceImpl.changePassword("", 2110, "(-xi%HT3y?r3'ux", "t<(`oN]I{*2d(0");
+		Assert.assertEquals(1, changeResult);
 	}
 	
 	@Test
