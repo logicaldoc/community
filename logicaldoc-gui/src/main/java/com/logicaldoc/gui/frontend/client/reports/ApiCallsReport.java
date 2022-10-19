@@ -249,6 +249,7 @@ public class ApiCallsReport extends AdminPanel {
 
 					@Override
 					public void execute(String value) {
+						// Nothing to do
 					}
 				});
 			}
@@ -309,7 +310,7 @@ public class ApiCallsReport extends AdminPanel {
 						displayMaxValue = Integer.parseInt((String) values.get("displayMax"));
 				}
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 			LD.contactingServer();

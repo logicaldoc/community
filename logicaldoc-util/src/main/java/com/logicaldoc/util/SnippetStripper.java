@@ -26,18 +26,18 @@ public class SnippetStripper {
 	public static String strip(String snippet) {
 		String summary = snippet;
 		// Escape all tag delimiters to avoid bad markup in the results page
-		summary = summary.replaceAll("<", "&lt;");
-		summary = summary.replaceAll(">", "&gt;");
+		summary = summary.replace("<", "&lt;");
+		summary = summary.replace(">", "&gt;");
 
 		// But preserve Lucene hilights
-		summary = summary.replaceAll(LUCENE_HILIGHT_START, "<font style='background-color:#FFFF00'>");
-		summary = summary.replaceAll(LUCENE_HILIGHT_STOP, "</font>");
+		summary = summary.replace(LUCENE_HILIGHT_START, "<font style='background-color:#FFFF00'>");
+		summary = summary.replace(LUCENE_HILIGHT_STOP, "</font>");
 		String outString = summary;
 
 		// Remove all control characters
-		outString = outString.replaceAll("[\\u0000-\\u0020]", " ");
-		outString = outString.replaceAll("\\u007F", " ");
-		outString = outString.replaceAll("[\\u0080-\\u009F]", " ");
+		outString = outString.replace("[\\u0000-\\u0020]", " ");
+		outString = outString.replace("\\u007F", " ");
+		outString = outString.replace("[\\u0080-\\u009F]", " ");
 
 		return outString;
 	}

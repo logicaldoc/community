@@ -375,7 +375,7 @@ public class TenantKeystorePanel extends VLayout {
 				keystore.setOrganizationDN("O=" + values.get("organization") + ",OU=" + values.get("organizationalUnit")
 						+ ",C=" + values.get("countryCode").toString().toUpperCase());
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 		}

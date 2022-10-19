@@ -48,6 +48,7 @@ public class DOCParser extends RTFParser {
 			try {
 				bis.reset();
 			} catch (Exception e) {
+				// Noting to do
 			}
 
 			if (tmp.length() == 0) {

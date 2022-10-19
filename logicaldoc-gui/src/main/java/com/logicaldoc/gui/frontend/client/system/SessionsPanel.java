@@ -134,6 +134,7 @@ public class SessionsPanel extends VLayout {
 						list.getSelectedRecord().getAttributeAsString("sid"), new ValueCallback() {
 							@Override
 							public void execute(final String value) {
+								// Nothing to do
 							}
 						});
 				event.cancel();

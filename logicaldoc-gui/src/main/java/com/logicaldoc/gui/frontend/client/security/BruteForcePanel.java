@@ -101,6 +101,7 @@ public class BruteForcePanel extends AdminPanel {
 		try {
 			usernameMax.setValue(Integer.parseInt(params.get("throttle.username.max")));
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		SpinnerItem usernameWait = ItemFactory.newSpinnerItem("usernamewait", "sameusernamewait", (Integer) null);
@@ -110,6 +111,7 @@ public class BruteForcePanel extends AdminPanel {
 		try {
 			usernameWait.setValue(Integer.parseInt(params.get("throttle.username.wait")));
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		SpinnerItem ipMax = ItemFactory.newSpinnerItem("ipmax", "maxsameipfailedattempts", (Integer) null);
@@ -118,6 +120,7 @@ public class BruteForcePanel extends AdminPanel {
 		try {
 			ipMax.setValue(Integer.parseInt(params.get("throttle.ip.max")));
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		SpinnerItem ipWait = ItemFactory.newSpinnerItem("ipwait", "sameipwait", (Integer) null);
@@ -127,6 +130,7 @@ public class BruteForcePanel extends AdminPanel {
 		try {
 			ipWait.setValue(Integer.parseInt(params.get("throttle.ip.wait")));
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		form.setItems(enabled, usernameMax, usernameWait, ipMax, ipWait);

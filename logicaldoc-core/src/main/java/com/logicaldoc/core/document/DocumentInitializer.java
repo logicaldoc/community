@@ -26,7 +26,7 @@ public class DocumentInitializer extends Initializer implements DocumentListener
 			if ("true".equals(dictionary.get(INITIALIZED_FLAG))
 					|| "true".equals(System.getProperty("ld.bulkloadextreme")))
 				return;
-			
+
 			initialize(document, document.getTemplate(), transaction);
 		} finally {
 			dictionary.put(INITIALIZED_FLAG, "true");
@@ -36,20 +36,24 @@ public class DocumentInitializer extends Initializer implements DocumentListener
 	@Override
 	public void beforeCheckin(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws Exception {
+		// Nothing to do
 	}
 
 	@Override
 	public void afterStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws Exception {
+		// Nothing to do
 	}
 
 	@Override
 	public void afterCheckin(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
 			throws Exception {
+		// Nothing to do
 	}
 
 	@Override
 	public void afterSaveHistory(Document document, DocumentHistory event, Map<String, Object> dictionary)
 			throws Exception {
+		// Nothing to do
 	}
 }

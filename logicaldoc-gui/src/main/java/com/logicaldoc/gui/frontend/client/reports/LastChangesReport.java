@@ -346,7 +346,7 @@ public class LastChangesReport extends AdminPanel {
 						displayMaxValue = Integer.parseInt((String) values.get("displayMax"));
 				}
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 			LD.contactingServer();

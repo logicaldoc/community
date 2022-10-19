@@ -212,9 +212,9 @@ public class FirewallPanel extends VLayout {
 
 		params[0] = new GUIParameter("firewall.enabled", enabled);
 		params[1] = new GUIParameter("firewall.whitelist",
-				whitelist != null ? whitelist.replace('\n', ',').replaceAll(" ", "") : null);
+				whitelist != null ? whitelist.replace('\n', ',').replace(" ", "") : null);
 		params[2] = new GUIParameter("firewall.blacklist",
-				blacklist != null ? blacklist.replace('\n', ',').replaceAll(" ", "") : null);
+				blacklist != null ? blacklist.replace('\n', ',').replace(" ", "") : null);
 		params[3] = new GUIParameter("firewall.allowSemicolon",
 				"yes".equals(vm.getValueAsString("allowSemicolon")) ? "true" : "false");
 		params[4] = new GUIParameter("firewall.allowBackSlash",
@@ -246,8 +246,8 @@ public class FirewallPanel extends VLayout {
 	public boolean validate() {
 		String whitelist = vm.getValueAsString("whitelist");
 		String blacklist = vm.getValueAsString("blacklist");
-		user.setIpWhitelist(whitelist != null ? whitelist.replace('\n', ',').replaceAll(" ", "") : null);
-		user.setIpBlacklist(blacklist != null ? blacklist.replace('\n', ',').replaceAll(" ", "") : null);
+		user.setIpWhitelist(whitelist != null ? whitelist.replace('\n', ',').replace(" ", "") : null);
+		user.setIpBlacklist(blacklist != null ? blacklist.replace('\n', ',').replace(" ", "") : null);
 		return true;
 	}
 }

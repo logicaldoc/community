@@ -137,6 +137,7 @@ public class NotifyingThread extends Thread {
 	 * @throws Throwable whatever error that happens during the elaboration
 	 */
 	public void doRun() throws Throwable {
+		// Nothing to do
 	}
 
 	public Throwable getError() {

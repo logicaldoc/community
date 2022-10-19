@@ -441,7 +441,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 			else
 				storages.put(nodeId, storage);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 

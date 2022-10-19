@@ -46,7 +46,7 @@ public class BrandingPanel extends AdminPanel {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
-
+				// Nothing to do
 			}
 		});
 

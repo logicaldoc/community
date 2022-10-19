@@ -191,6 +191,7 @@ public class StandardPropertiesPanel extends DocumentDetailTab {
 				LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
 					@Override
 					public void execute(final String value) {
+						// Nothing to do
 					}
 				});
 				event.cancel();

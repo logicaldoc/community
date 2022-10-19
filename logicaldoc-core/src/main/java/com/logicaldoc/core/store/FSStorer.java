@@ -96,6 +96,7 @@ public class FSStorer extends AbstractStorer {
 			try {
 				stream.close();
 			} catch (IOException e) {
+				// Nothing to do
 			}
 		}
 	}

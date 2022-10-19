@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -66,6 +67,7 @@ public abstract class AbstractDropBoxTCase {
 			if (tempDir.exists() && tempDir.isDirectory())
 				FileUtils.deleteDirectory(tempDir);
 		} catch (Exception e) {
+			// Nothing to do
 		}
 		tempDir.mkdirs();
 
@@ -119,18 +121,17 @@ public abstract class AbstractDropBoxTCase {
 
 	/**
 	 * Destroys the in-memory database
+	 * 
+	 * @throws SQLException error at database level 
 	 */
-	private void destroyDatabase() {
+	private void destroyDatabase() throws SQLException {
 		Connection con = null;
 		try {
 			con = ds.getConnection();
 			con.createStatement().execute("shutdown");
 		} catch (Exception e) {
-			try {
-				if (con != null)
-					con.close();
-			} catch (Exception ex) {
-			}
+			if (con != null)
+				con.close();
 			e.printStackTrace();
 		}
 	}

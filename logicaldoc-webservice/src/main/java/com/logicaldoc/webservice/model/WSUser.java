@@ -451,7 +451,7 @@ public class WSUser {
 					user.getWorkingTimes().add(wt);
 				}
 		} catch (Throwable e) {
-			
+			// Nothing to do
 		}
 
 		return user;
@@ -519,7 +519,7 @@ public class WSUser {
 								try {
 									BeanUtils.copyProperties(wswt, wt);
 								} catch (Throwable t) {
-
+									// Nothing to do
 								}
 								return wswt;
 							}

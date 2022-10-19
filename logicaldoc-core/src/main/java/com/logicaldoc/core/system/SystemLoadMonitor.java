@@ -105,6 +105,7 @@ public class SystemLoadMonitor {
 			try {
 				tracker.end();
 			} catch (Exception e) {
+				// Nothing to do
 			}
 	}
 

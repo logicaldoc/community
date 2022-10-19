@@ -58,6 +58,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentSelected(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -68,6 +69,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentsDeleted(documents);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -78,6 +80,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentMoved(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -88,6 +91,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentModified(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -98,6 +102,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentStored(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -108,6 +113,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentCheckedIn(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -118,6 +124,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentCheckedOut(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -128,6 +135,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentLocked(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -138,6 +146,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentUnlocked(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -171,6 +180,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentBeginEditing(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -203,6 +213,7 @@ public class DocumentController {
 				try {
 					observer.onDocumentCancelEditing(document);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 			editing = false;
 		}

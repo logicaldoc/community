@@ -158,7 +158,7 @@ public class UpdatePanel extends VLayout {
 		ChangedHandler nothingToDo = new ChangedHandler() {
 			@Override
 			public void onChanged(ChangedEvent event) {
-
+				// Nothing to do
 			}
 		};
 

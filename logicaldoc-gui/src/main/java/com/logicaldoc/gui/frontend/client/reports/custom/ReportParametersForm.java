@@ -176,7 +176,7 @@ public class ReportParametersForm extends Window {
 		for (String name : values.keySet()) {
 			if (name.startsWith("_")) {
 				Object val = values.get(name);
-				String nm = name.substring(1).replaceAll(Constants.BLANK_PLACEHOLDER, " ");
+				String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
 				GUIAttribute attribute = getParameter(nm);
 				if (attribute == null)
 					continue;

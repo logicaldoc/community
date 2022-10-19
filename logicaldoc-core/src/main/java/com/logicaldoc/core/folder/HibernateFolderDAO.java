@@ -1,6 +1,5 @@
 package com.logicaldoc.core.folder;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -199,6 +198,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			try {
 				flush();
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 			if (folder.getDeleted() == 0 && folder.getId() != 0L)
 				refresh(folder);
@@ -855,9 +855,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public List<Folder> findByNameAndParentId(String name, long parentId) {
 		try {
-			return findByWhere(
-					ALIAS_ENTITY+".parentId = " + parentId + " and "+ALIAS_ENTITY+".name like '" + SqlUtil.doubleQuotes(name) + "'",
-					null, null);
+			return findByWhere(ALIAS_ENTITY + ".parentId = " + parentId + " and " + ALIAS_ENTITY + ".name like '"
+					+ SqlUtil.doubleQuotes(name) + "'", null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Folder>();
@@ -1717,17 +1716,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				documentTransaction.setEvent(DocumentEvent.STORED.toString());
 
 				String oldDocResource = storer.getResourceName(srcDoc, null, null);
-				InputStream is = null;
-				try {
-					is = storer.getStream(srcDoc.getId(), oldDocResource);
+				try (InputStream is = storer.getStream(srcDoc.getId(), oldDocResource);) {
 					docMan.create(is, newDoc, documentTransaction);
 				} catch (Throwable t) {
 					log.error(t.getMessage(), t);
-					if (is != null)
-						try {
-							is.close();
-						} catch (IOException e) {
-						}
 				}
 			}
 		}
@@ -1994,10 +1986,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		long rootId = root.getId();
 
 		try {
-			return findByWhere(
-					" (not "+ALIAS_ENTITY+".id=" + rootId + ") and "+ALIAS_ENTITY+".parentId=" + rootId + " and "+ALIAS_ENTITY+".type="
-							+ Folder.TYPE_WORKSPACE + " and "+ALIAS_ENTITY+".tenantId=" + tenantId,
-					"order by lower("+ALIAS_ENTITY+".name)", null);
+			return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + ") and " + ALIAS_ENTITY + ".parentId="
+					+ rootId + " and " + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE + " and " + ALIAS_ENTITY
+					+ ".tenantId=" + tenantId, "order by lower(" + ALIAS_ENTITY + ".name)", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Folder>();
@@ -2021,6 +2012,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (folder.getStorages() != null)
 				log.trace("Initialized {} storages", folder.getStorages().keySet().size());
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 
@@ -2069,9 +2061,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		List<Folder> workspaces = new ArrayList<Folder>();
 
 		try {
-			workspaces = findByWhere(ALIAS_ENTITY+".parentId = " + root.getId() + " and "+ALIAS_ENTITY+".name = '"
-					+ SqlUtil.doubleQuotes(Folder.DEFAULTWORKSPACENAME) + "' and "+ALIAS_ENTITY+".tenantId=" + tenantId
-					+ " and "+ALIAS_ENTITY+".type=" + Folder.TYPE_WORKSPACE, null, null);
+			workspaces = findByWhere(ALIAS_ENTITY + ".parentId = " + root.getId() + " and " + ALIAS_ENTITY + ".name = '"
+					+ SqlUtil.doubleQuotes(Folder.DEFAULTWORKSPACENAME) + "' and " + ALIAS_ENTITY + ".tenantId="
+					+ tenantId + " and " + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -2165,9 +2157,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@Override
 	public List<Folder> findAliases(Long foldRef, long tenantId) {
-		String query = " "+ALIAS_ENTITY+".tenantId=" + tenantId;
+		String query = " " + ALIAS_ENTITY + ".tenantId=" + tenantId;
 		if (foldRef != null)
-			query += " and "+ALIAS_ENTITY+".foldRef=" + foldRef;
+			query += " and " + ALIAS_ENTITY + ".foldRef=" + foldRef;
 
 		try {
 			return findByWhere(query, null, null);

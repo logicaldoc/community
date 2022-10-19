@@ -356,7 +356,7 @@ public class Profile extends Window {
 			List<String> searches = new ArrayList<String>();
 			for (ListGridRecord record : records)
 				searches.add(record.getAttributeAsString("search"));
-			u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replaceAll(" ", ""));
+			u.setSearchPref(searches.toString().replace("[", "").replace("]", "").replace(" ", ""));
 
 			SecurityService.Instance.get().saveProfile(u, new AsyncCallback<GUIUser>() {
 				@Override

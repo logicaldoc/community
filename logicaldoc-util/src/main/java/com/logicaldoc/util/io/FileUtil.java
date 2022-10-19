@@ -191,12 +191,14 @@ public class FileUtil {
 	 * @return digest
 	 */
 	public static String computeDigest(String src) {
+		String digest = null;
 		try (InputStream is = IOUtils.toInputStream(src, "UTF-8");) {
-			return computeDigest(is);
+			digest = computeDigest(is);
 		} catch (IOException e) {
 			log.error(e.getMessage());
+			digest = null;
 		}
-		return null;
+		return digest;
 	}
 
 	/**
@@ -544,7 +546,7 @@ public class FileUtil {
 			}
 
 			// Replacing oldString with newString in the oldContent
-			String newContent = oldContent.replaceAll(token, newValue);
+			String newContent = oldContent.replace(token, newValue);
 
 			// Rewriting the input text file with newContent
 			writer.write(newContent);

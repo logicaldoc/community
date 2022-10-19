@@ -120,6 +120,7 @@ public class StandardSearchEngine implements SearchEngine {
 			try {
 				maxText = config.getInt("index.maxtext");
 			} catch (Exception e) {
+				// Nothing to do
 			}
 		}
 
@@ -267,6 +268,7 @@ public class StandardSearchEngine implements SearchEngine {
 				try {
 					content = baos.toString("UTF-8");
 				} catch (UnsupportedEncodingException e) {
+					// Nothing to do
 				}
 
 				statMsg += "\n" + content;

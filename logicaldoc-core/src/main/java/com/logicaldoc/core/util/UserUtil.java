@@ -102,7 +102,7 @@ public class UserUtil {
 				return null;
 			}
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 		return userpath;
 	}

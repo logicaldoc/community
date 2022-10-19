@@ -1186,7 +1186,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 	@Override
 	public void onDocumentStored(GUIDocument document) {
-
+		// Nothing to do
 	}
 
 	@Override

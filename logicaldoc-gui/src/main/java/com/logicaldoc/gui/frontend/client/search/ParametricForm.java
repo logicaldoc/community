@@ -279,7 +279,7 @@ public class ParametricForm extends VLayout {
 				if (fieldName == null || fieldName.isEmpty())
 					continue;
 
-				fieldName = fieldName.replaceAll(Constants.BLANK_PLACEHOLDER, " ");
+				fieldName = fieldName.replace(Constants.BLANK_PLACEHOLDER, " ");
 				if (fieldName.startsWith("_"))
 					fieldName = fieldName.substring(1);
 				String fieldOperator = condition.getOperatorsFieldItem().getValueAsString();
@@ -309,10 +309,10 @@ public class ParametricForm extends VLayout {
 					else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_DATE))
 						fieldValue = (Date) fieldValue;
 					else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
-						fieldName = fieldName.replaceAll("type:" + GUIAttribute.TYPE_STRING_PRESET,
+						fieldName = fieldName.replace("type:" + GUIAttribute.TYPE_STRING_PRESET,
 								"type:" + GUIAttribute.TYPE_STRING);
 					} else if (fieldName.endsWith("type:" + GUIAttribute.TYPE_STRING_TEXTAREA)) {
-						fieldName = fieldName.replaceAll("type:" + GUIAttribute.TYPE_STRING_TEXTAREA,
+						fieldName = fieldName.replace("type:" + GUIAttribute.TYPE_STRING_TEXTAREA,
 								"type:" + GUIAttribute.TYPE_STRING);
 					}
 					if (fieldValue instanceof Date)

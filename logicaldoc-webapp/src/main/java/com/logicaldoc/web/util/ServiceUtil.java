@@ -173,7 +173,7 @@ public class ServiceUtil {
 		}
 
 		if (message != null)
-			message = message.replaceAll("com.logicaldoc.", "").replaceAll("java.lang.", "");
+			message = message.replace("com.logicaldoc.", "").replace("java.lang.", "");
 
 		if (session != null && t != null
 				&& (t instanceof org.hibernate.TransactionException || t instanceof org.hibernate.HibernateException

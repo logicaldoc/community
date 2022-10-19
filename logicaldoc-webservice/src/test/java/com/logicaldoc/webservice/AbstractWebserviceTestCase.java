@@ -9,10 +9,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
-
-import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.hsqldb.cmdline.SqlFile;
@@ -22,6 +21,8 @@ import org.junit.Before;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import junit.framework.Assert;
 
 /**
  * Abstract test case for the Web Service module. This class initialises a test
@@ -40,7 +41,7 @@ public abstract class AbstractWebserviceTestCase {
 	protected File tempDir = new File("target/tmp");
 
 	protected File coreSchemaFile;
-	
+
 	protected File wsSchemaFile;
 
 	protected File dataFile;
@@ -58,11 +59,8 @@ public abstract class AbstractWebserviceTestCase {
 
 	protected void createTestDirs() throws IOException {
 		// Create test dirs
-		try {
-			if (tempDir.exists() && tempDir.isDirectory())
-				FileUtils.deleteDirectory(tempDir);
-		} catch (Exception e) {
-		}
+		if (tempDir.exists() && tempDir.isDirectory())
+			FileUtils.deleteDirectory(tempDir);
 		tempDir.mkdirs();
 
 		Assert.assertTrue(tempDir.exists() && tempDir.isDirectory());
@@ -110,7 +108,7 @@ public abstract class AbstractWebserviceTestCase {
 		try {
 			((AbstractApplicationContext) context).close();
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 		// Restore user home system property
 		System.setProperty("user.home", userHome);
@@ -118,18 +116,18 @@ public abstract class AbstractWebserviceTestCase {
 
 	/**
 	 * Destroys the in-memory database
+	 * 
+	 * @throws SQLException error at database level
 	 */
-	private void destroyDatabase() {
+	private void destroyDatabase() throws SQLException {
 		Connection con = null;
 		try {
 			con = ds.getConnection();
 			con.createStatement().execute("shutdown");
 		} catch (Exception e) {
-			try {
-				if (con != null)
-					con.close();
-			} catch (Exception ex) {
-			}
+			if (con != null)
+				con.close();
+			e.printStackTrace();
 		}
 	}
 
@@ -155,7 +153,7 @@ public abstract class AbstractWebserviceTestCase {
 			sqlFile = new SqlFile(wsSchemaFile, "Cp1252", false);
 			sqlFile.setConnection(con);
 			sqlFile.execute();
-			
+
 			// Load data
 			sqlFile = new SqlFile(dataFile, "Cp1252", false);
 			sqlFile.setConnection(con);

@@ -440,7 +440,7 @@ public class User extends PersistentObject implements Serializable {
 				i++;
 			}
 		} catch (Throwable e) {
-
+			// Nothing to do
 		}
 	}
 

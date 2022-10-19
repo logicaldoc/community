@@ -66,7 +66,7 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 						SessionManager.get().saveSid(request, response, sid);
 					}
 				} catch (AuthenticationException ae) {
-
+					// Noting to do
 				} catch (Throwable t) {
 					log.error(t.getMessage(), t);
 				}

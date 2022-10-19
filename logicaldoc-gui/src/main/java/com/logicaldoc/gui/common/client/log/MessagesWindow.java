@@ -89,6 +89,7 @@ public class MessagesWindow extends Window {
 						grid.getSelectedRecord().getAttributeAsString("detail"), new ValueCallback() {
 							@Override
 							public void execute(final String value) {
+								// Nothing to do
 							}
 						});	
 			}

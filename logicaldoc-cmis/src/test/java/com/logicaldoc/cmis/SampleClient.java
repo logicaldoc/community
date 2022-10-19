@@ -99,8 +99,7 @@ public class SampleClient {
 		System.out.println(object.getId() + " " + object.getProperty(PropertyIds.NAME).getValues().get(0));
 
 		Document pwc = (Document) object;
-		ObjectId oid = pwc.checkOut();
-
+		
 		// default values if the document has no content
 		String filename = "test.txt";
 		String mimetype = "text/plain; fileNameCharset=UTF-8";

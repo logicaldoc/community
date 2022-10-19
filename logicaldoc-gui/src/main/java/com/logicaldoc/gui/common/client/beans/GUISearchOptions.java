@@ -80,15 +80,11 @@ public class GUISearchOptions implements Serializable {
 
 	/** Creates a new instance of SearchOptions */
 	public GUISearchOptions() {
-		try {
-			if (Session.get() != null) {
-				Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
-				if (pageSize == null)
-					pageSize = Session.get().getConfigAsInt("search.hits");
-				maxHits = pageSize;
-			}
-		} catch (Throwable t) {
-
+		if (Session.get() != null) {
+			Integer pageSize = DocumentGridUtil.getPageSizeFromSpec(Session.get().getUser().getHitsGrid());
+			if (pageSize == null)
+				pageSize = Session.get().getConfigAsInt("search.hits");
+			maxHits = pageSize;
 		}
 	}
 

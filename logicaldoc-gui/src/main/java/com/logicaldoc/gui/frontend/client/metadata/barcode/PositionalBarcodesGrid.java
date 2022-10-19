@@ -86,7 +86,7 @@ public class PositionalBarcodesGrid extends ListGrid {
 					else if (!frmts.trim().contains(","))
 						record.setAttribute("formats", frmts.trim());
 					else
-						record.setAttribute("formats", pat.getFormats().replaceAll(" ", "").split(","));
+						record.setAttribute("formats", pat.getFormats().replace(" ", "").split(","));
 					records.add(record);
 				}
 			setRecords(records.toArray(new ListGridRecord[0]));

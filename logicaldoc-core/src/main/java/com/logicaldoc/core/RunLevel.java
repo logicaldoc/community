@@ -70,6 +70,7 @@ public enum RunLevel {
 			if (context != null)
 				conf = context.getProperties();
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		if (conf == null)

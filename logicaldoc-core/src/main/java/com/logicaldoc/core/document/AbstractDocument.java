@@ -456,6 +456,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 			if (docRef != null && docRef.longValue() != 0L && "pdf".equals(getDocRefType()))
 				icon = IconSelector.selectIcon("pdf", true);
 		} catch (Exception e) {
+			// Nothing to do
 		}
 		return icon;
 	}

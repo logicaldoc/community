@@ -305,6 +305,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 						att.setStringValues(null);
 				}
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 
@@ -315,6 +316,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			sessionFactory.getCurrentSession().flush();
 		} catch (Throwable t) {
+			// Nothing to do
 
 		}
 	}
@@ -325,6 +327,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 				sessionFactory.getCurrentSession().refresh(entity);
 			}
 		} catch (Throwable t) {
+			// Nothing to do
 
 		}
 	}

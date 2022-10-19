@@ -65,6 +65,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 			try {
 				config = new ContextProperties();
 			} catch (Throwable e) {
+				// Noting to do
 			}
 		}
 		return config;
@@ -79,6 +80,7 @@ public abstract class AbstractFormatConverter implements FormatConverter {
 				parameters.put(param, config().getProperty(key));
 			}
 		} catch (Throwable t) {
+			// Noting to do
 		}
 	}
 

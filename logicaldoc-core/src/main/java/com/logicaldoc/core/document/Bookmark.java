@@ -102,6 +102,7 @@ public class Bookmark extends PersistentObject {
 		try {
 			icon = IconSelector.selectIcon(getFileType());
 		} catch (Exception e) {
+			// Nothing to do
 		}
 		return icon;
 	}

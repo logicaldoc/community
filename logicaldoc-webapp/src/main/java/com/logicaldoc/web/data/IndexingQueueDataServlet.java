@@ -178,10 +178,10 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		 */
 		String[] queryFragments = IndexerTask.prepareQuery();
 
-		StringBuffer where = new StringBuffer(queryFragments[0].replaceAll("_entity.", "ld_"));
+		StringBuffer where = new StringBuffer(queryFragments[0].replace("_entity.", "ld_"));
 
 		where.append((StringUtils.isNotEmpty(queryFragments[1])
-				? " order by " + queryFragments[1].replaceAll("_entity.", "ld_")
+				? " order by " + queryFragments[1].replace("_entity.", "ld_")
 				: ""));
 
 		return where.toString();

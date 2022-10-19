@@ -56,12 +56,14 @@ public class I18N {
 			try {
 				tmp = tmp.replace("{0}", val1);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 
 		if (val2 != null)
 			try {
 				tmp = tmp.replace("{1}", val2);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		return tmp;
 	}
@@ -73,6 +75,7 @@ public class I18N {
 				tmp = tmp.replace("{" + i + "}", vals[i]);
 			}
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 		return tmp;
 

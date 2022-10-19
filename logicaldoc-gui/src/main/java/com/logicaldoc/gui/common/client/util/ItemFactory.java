@@ -331,7 +331,7 @@ public class ItemFactory {
 	 */
 	public static DateItem newDateItemForAttribute(String name, String title) {
 		// We cannot use spaces in items name
-		String itemName = "_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER);
+		String itemName = "_" + name.replace(" ", Constants.BLANK_PLACEHOLDER);
 		final DateItem date = new DateItem(itemName);
 		date.setTitle(title);
 		return date;
@@ -370,7 +370,7 @@ public class ItemFactory {
 
 	public static TextItem newFolderSelectorForAttribute(String name, String title, boolean allowsNull,
 			List<FormItemIcon> additionalIcons) {
-		final TextItem item = new FolderSelector("_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER), !allowsNull,
+		final TextItem item = new FolderSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), !allowsNull,
 				additionalIcons);
 		if (title != null)
 			item.setTitle(I18N.message(title));
@@ -379,7 +379,7 @@ public class ItemFactory {
 
 	public static SelectItem newUserSelectorForAttribute(String name, String title, String groupIdOrName,
 			List<FormItemIcon> additionalIcons) {
-		final SelectItem item = new UserSelector("_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER), title,
+		final SelectItem item = new UserSelector("_" + name.replace(" ", Constants.BLANK_PLACEHOLDER), title,
 				groupIdOrName, false, true, additionalIcons);
 		return item;
 	}
@@ -1330,7 +1330,7 @@ public class ItemFactory {
 	 */
 	public static FormItem newStringItemForAttribute(GUIAttribute att) {
 		// We cannot use spaces in items name
-		String itemName = "_" + att.getName().replaceAll(" ", Constants.BLANK_PLACEHOLDER);
+		String itemName = "_" + att.getName().replace(" ", Constants.BLANK_PLACEHOLDER);
 		final String initialValue = att.getStringValue();
 
 		FormItem item = null;
@@ -1608,7 +1608,7 @@ public class ItemFactory {
 	 */
 	public static FormItem newIntegerItemForAttribute(String name, String label, Integer value) {
 		// We cannot use spaces in items name
-		String itemName = "_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER);
+		String itemName = "_" + name.replace(" ", Constants.BLANK_PLACEHOLDER);
 		FormItem item = newIntegerItem(itemName, label, value);
 		if (!InputValues.getInputs(item.getName()).isEmpty()) {
 			item = formItemWithSuggestions(item);
@@ -1629,7 +1629,7 @@ public class ItemFactory {
 	 * @return the new item
 	 */
 	public static SelectItem newBooleanSelectorForAttribute(String name, String title, boolean allowEmpty) {
-		String itemName = "_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER);
+		String itemName = "_" + name.replace(" ", Constants.BLANK_PLACEHOLDER);
 		SelectItem select = new SelectItem();
 		select.setName(itemName);
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
@@ -2604,7 +2604,7 @@ public class ItemFactory {
 	 * @return sanitized name
 	 */
 	public static String filterItemName(String name) {
-		return name.toString().replaceAll("\\.", "_");
+		return name.toString().replace("\\.", "_");
 	}
 
 	/**
@@ -2615,10 +2615,10 @@ public class ItemFactory {
 	 * @return original name
 	 */
 	public static String originalItemName(String name) {
-		return name.toString().replaceAll("_", "\\.");
+		return name.toString().replace("_", "\\.");
 	}
 
 	public static String itemNameForAttribute(String name) {
-		return "_" + name.replaceAll(" ", Constants.BLANK_PLACEHOLDER);
+		return "_" + name.replace(" ", Constants.BLANK_PLACEHOLDER);
 	}
 }

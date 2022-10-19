@@ -234,7 +234,7 @@ public class DashletContent extends HttpServlet {
 						qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getDocId()))
 								.collect(Collectors.joining(",")));
 						qry.append(") and ld_name in ");
-						qry.append(attrs.toString().replace("\\[", "('").replace("\\]", "')").replace(",", "','")
+						qry.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','")
 								.replace(" ", ""));
 
 						dao.query(qry.toString(), null, new RowMapper<Long>() {
@@ -417,7 +417,7 @@ public class DashletContent extends HttpServlet {
 				qry.append(" from ld_document_ext where ld_docid in (");
 				qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getId())).collect(Collectors.joining(",")));
 				qry.append(") and ld_name in ");
-				qry.append(attrs.toString().replace("\\[", "('").replace("\\]", "')").replace(",", "','")
+				qry.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','")
 						.replace(" ", ""));
 
 				dao.query(qry.toString(), null, new RowMapper<Long>() {

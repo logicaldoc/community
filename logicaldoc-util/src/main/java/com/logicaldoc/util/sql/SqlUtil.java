@@ -16,7 +16,7 @@ public class SqlUtil {
 	 * @return A string with doubled quotes
 	 */
 	public static String doubleQuotes(String input){
-		return input.replaceAll("'", "''");
+		return input.replace("'", "''");
 	}
 	
 	public void initialize(int[] vector, int index){

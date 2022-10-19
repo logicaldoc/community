@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -61,11 +62,9 @@ public abstract class AbstractCmisTCase {
 
 	protected void createTestDirs() throws IOException {
 		// Create test dirs
-		try {
-			if (tempDir.exists() && tempDir.isDirectory())
-				FileUtils.deleteDirectory(tempDir);
-		} catch (Exception e) {
-		}
+		if (tempDir.exists() && tempDir.isDirectory())
+			FileUtils.deleteDirectory(tempDir);
+
 		tempDir.mkdirs();
 
 		dbSchemaFile = new File(tempDir, "logicaldoc-core.sql");
@@ -91,24 +90,18 @@ public abstract class AbstractCmisTCase {
 
 	/**
 	 * Destroys the in-memory database
+	 * 
+	 * @throws SQLException error at database level
 	 */
-	private void destroyDatabase() {
-		
-		Assert.assertNotNull(ds);
-		
+	private void destroyDatabase() throws SQLException {
 		Connection con = null;
 		try {
 			con = ds.getConnection();
-			con.createStatement().execute("SHUTDOWN IMMEDIATELY");
+			con.createStatement().execute("shutdown");
 		} catch (Exception e) {
-			//e.printStackTrace();
-		} finally {
-			try {
-				if (con != null)
-					con.close();
-			} catch (Exception ex) {
-				//ex.printStackTrace();
-			}
+			if (con != null)
+				con.close();
+			e.printStackTrace();
 		}
 	}
 
@@ -119,7 +112,7 @@ public abstract class AbstractCmisTCase {
 	 * 
 	 */
 	private void createTestDatabase() throws Exception {
-		
+
 		ds = (DataSource) context.getBean("DataSource");
 		Assert.assertNotNull(ds);
 

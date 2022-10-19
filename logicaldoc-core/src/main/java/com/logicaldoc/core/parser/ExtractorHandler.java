@@ -112,6 +112,7 @@ class ExtractorHandler extends DefaultHandler implements ErrorHandler {
      * @param exception ignored
      */
     public void warning(SAXParseException exception) {
+    	// Noting to do
     }
 
     /**
@@ -120,6 +121,7 @@ class ExtractorHandler extends DefaultHandler implements ErrorHandler {
      * @param exception ignored
      */
     public void error(SAXParseException exception) {
+    	// Noting to do
     }
 
     /**
@@ -128,6 +130,7 @@ class ExtractorHandler extends DefaultHandler implements ErrorHandler {
      * @param exception ignored
      */
     public void fatalError(SAXParseException exception) {
+    	// Noting to do
     }
 
 }

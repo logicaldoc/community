@@ -54,6 +54,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 			long userId = uDao.queryForLong("select ld_id from ld_user where ld_username='admin' and ld_deleted=0");
 			dbAvailable = userId == 1L;
 		} catch (Throwable t) {
+			// Noting to do
 		}
 
 		String adminPasswd = null;
@@ -64,6 +65,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 				adminPasswd = uDao
 						.queryForString("select ld_password from ld_user where ld_username='admin' and ld_deleted=0");
 			} catch (Throwable t) {
+				// Noting to do
 			}
 		} else {
 			// If the database is not available, get the password from the
@@ -72,6 +74,7 @@ public class AdminAuthenticationProvider implements AuthenticationProvider {
 				ContextProperties config = Context.get().getProperties();
 				adminPasswd = config.getProperty("adminpasswd");
 			} catch (Throwable t) {
+				// Noting to do
 			}
 		}
 

@@ -5,7 +5,7 @@ import java.util.Locale;
 
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.task.Task;
 import com.logicaldoc.i18n.I18N;
@@ -66,8 +66,8 @@ public class DigestProcessor extends Task {
 
 			log.info("Found a total of {} documents to be processed", size);
 
-			List<Long> ids = documentDao
-					.findIdsByWhere(HibernatePersistentObjectDAO.ALIAS_ENTITY+".docRef is null and "+HibernatePersistentObjectDAO.ALIAS_ENTITY+".digest is null and deleted = 0", null, max);
+			List<Long> ids = documentDao.findIdsByWhere(PersistentObjectDAO.ALIAS_ENTITY + ".docRef is null and "
+					+ PersistentObjectDAO.ALIAS_ENTITY + ".digest is null and deleted = 0", null, max);
 			for (Long id : ids) {
 				try {
 					log.debug("Processing document {}", id);

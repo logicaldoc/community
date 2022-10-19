@@ -141,7 +141,7 @@ public class SystemInfo {
 		try {
 			info.setHostName(InetAddress.getLocalHost().getHostName());
 		} catch (UnknownHostException e) {
-
+			// Nothing to do
 		}
 
 		return info;

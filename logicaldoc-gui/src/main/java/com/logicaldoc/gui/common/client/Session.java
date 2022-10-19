@@ -284,7 +284,7 @@ public class Session implements DocumentObserver {
 					Session.get().close();
 					Util.redirectToLoginUrl(tenant);
 				} catch (Throwable t) {
-
+					// Nothing to do
 				}
 			}
 		});
@@ -292,15 +292,17 @@ public class Session implements DocumentObserver {
 
 	@Override
 	public void onDocumentSelected(GUIDocument document) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void onDocumentModified(GUIDocument document) {
+		// Nothing to do
 	}
 
 	@Override
 	public void onDocumentStored(GUIDocument document) {
+		// Nothing to do
 	}
 
 	@Override
@@ -315,12 +317,12 @@ public class Session implements DocumentObserver {
 
 	@Override
 	public void onDocumentsDeleted(GUIDocument[] documents) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void onDocumentMoved(GUIDocument document) {
-
+		// Nothing to do
 	}
 
 	@Override

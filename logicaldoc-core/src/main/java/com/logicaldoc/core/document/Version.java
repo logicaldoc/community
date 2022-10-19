@@ -206,7 +206,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 		try {
 			BeanUtils.copyProperties(version, document);
 		} catch (Exception e) {
-
+			// Nothing to do
 		}
 
 		version.setVersion(document.getVersion());
@@ -237,6 +237,7 @@ public class Version extends AbstractDocument implements Comparable<Version> {
 					version.getAttributes().put(name, document.getAttributes().get(name));
 				}
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 

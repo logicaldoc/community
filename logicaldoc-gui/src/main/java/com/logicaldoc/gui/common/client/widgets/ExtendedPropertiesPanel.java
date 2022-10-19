@@ -501,7 +501,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 					try {
 						if (name.startsWith("_")) {
 							Object val = values.get(name);
-							String nm = name.substring(1).replaceAll(Constants.BLANK_PLACEHOLDER, " ");
+							String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
 
 							GUIAttribute att = object.getAttribute(nm);
 							if (att == null || att.isHidden())
@@ -597,7 +597,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 						for (String name : values.keySet()) {
 							// Get back the name of the attribute from the form
 							// item's name
-							String nm = name.substring(1).replaceAll(Constants.BLANK_PLACEHOLDER, " ");
+							String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
 							if (nm.equals(att.getName())) {
 								found = true;
 								break;
@@ -642,7 +642,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 		Map<String, Object> valuesMap = (Map<String, Object>) attributesForm.getValues();
 		for (String name : valuesMap.keySet()) {
 			if (name.startsWith("_")) {
-				String nm = name.substring(1).replaceAll(Constants.BLANK_PLACEHOLDER, " ");
+				String nm = name.substring(1).replace(Constants.BLANK_PLACEHOLDER, " ");
 				Object val = valuesMap.get(name);
 				FormItem item = attributesForm.getItem(name);
 
@@ -746,7 +746,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 					FormItem item = vm.getItem(ItemFactory.itemNameForAttribute(att.getName()));
 					FormItem editedItem = event.getItem();
 					String editedAttributeName = editedItem.getName().substring(1)
-							.replaceAll(Constants.BLANK_PLACEHOLDER, " ");
+							.replace(Constants.BLANK_PLACEHOLDER, " ");
 
 					if (dependsOn.equals(editedAttributeName)) {
 						if (event.getItem() != null && !event.getItem().equals(item)) {

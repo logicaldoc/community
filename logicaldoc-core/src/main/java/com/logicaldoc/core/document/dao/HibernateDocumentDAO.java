@@ -432,6 +432,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			try {
 				flush();
 			} catch (Throwable t) {
+				// Noting to do
 			}
 			if (doc.getDeleted() == 0 && doc.getId() != 0L)
 				refresh(doc);
@@ -524,20 +525,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public void updateDigest(Document doc) throws PersistenceException {
 		String resource = storer.getResourceName(doc, doc.getFileVersion(), null);
 		if (storer.exists(doc.getId(), resource)) {
-			InputStream in = null;
-			try {
-				in = storer.getStream(doc.getId(), resource);
+			
+			try(InputStream in = storer.getStream(doc.getId(), resource);) {
 				doc.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
 				log.error("Cannot retrieve the conten of document {}", doc, e);
-			} finally {
-				if (in != null)
-					try {
-						in.close();
-					} catch (Throwable t) {
-					}
 			}
-
+			
 			jdbcUpdate("update ld_document set ld_lastmodified=?, ld_digest=?  where ld_id=?", new Date(),
 					doc.getDigest(), doc.getId());
 
@@ -844,9 +838,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			if (doc.getTags() != null)
 				log.trace("Initialized {} tags", doc.getTags().size());
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findDeletedDocIds() {
 		String query = "select ld_id from ld_document where ld_deleted=1 order by ld_lastmodified desc";

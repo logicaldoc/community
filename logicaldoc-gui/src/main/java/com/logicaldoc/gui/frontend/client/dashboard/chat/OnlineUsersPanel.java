@@ -150,7 +150,7 @@ public class OnlineUsersPanel extends VLayout implements UserObserver {
 
 	@Override
 	public void onUserChanged(GUIUser user) {
-
+		// Nothing to do
 	}
 
 	@Override

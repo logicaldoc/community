@@ -270,6 +270,7 @@ public class PreviewPanel extends VLayout {
 						+ "px; height:" + (getHeight() - 1)
 						+ "px; overflow:hidden;'  scrolling='no' seamless='seamless'></iframe>";
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 		preview.setContents(contents);

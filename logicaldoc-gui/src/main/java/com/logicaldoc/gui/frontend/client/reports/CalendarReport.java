@@ -308,7 +308,7 @@ public class CalendarReport extends AdminPanel {
 						maxRecords = Integer.parseInt((String) values.get("displayMax"));
 				}
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 			CalendarService.Instance.get().find(fromValue, toValue, endDateFrom, endDateTo, frequencyValue, titleValue,

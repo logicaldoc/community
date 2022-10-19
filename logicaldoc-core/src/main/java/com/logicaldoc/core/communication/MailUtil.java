@@ -289,6 +289,7 @@ public class MailUtil {
 				try {
 					receivedDate = new MailDateFormat().parse(date[0]);
 				} catch (ParseException e) {
+					// Nothing to do
 				}
 		}
 		if (receivedDate == null) {
@@ -297,6 +298,7 @@ public class MailUtil {
 				try {
 					receivedDate = new MailDateFormat().parse(date[0]);
 				} catch (ParseException e) {
+					// Nothing to do
 				}
 		}
 
@@ -670,19 +672,23 @@ public class MailUtil {
 
 		@Override
 		public void connect() throws MessagingException {
+			// Nothing to do
 		}
 
 		@Override
 		public synchronized void connect(String host, int port, String username, String password)
 				throws MessagingException {
+			// Nothing to do
 		}
 
 		@Override
 		public void connect(String host, String username, String password) throws MessagingException {
+			// Nothing to do
 		}
 
 		@Override
 		public synchronized void close() {
+			// Nothing to do
 		}
 	}
 }

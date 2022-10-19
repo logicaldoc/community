@@ -61,7 +61,7 @@ public class FolderFieldsDS extends DataSource {
 					continue;
 
 				DataSourceField field = null;
-				String name = "_" + att.getName().replaceAll(" ", Constants.BLANK_PLACEHOLDER);
+				String name = "_" + att.getName().replace(" ", Constants.BLANK_PLACEHOLDER);
 				String titl = att.getLabel() + " (" + template.getName() + ")";
 				if (att.getType() == GUIAttribute.TYPE_DATE) {
 					field = new DataSourceDateTimeField();

@@ -302,7 +302,7 @@ public class Util {
 		if (src == null)
 			return null;
 		else
-			return src.replaceAll("\\<.*?\\>", "").replaceAll("&nbsp;", " ");
+			return src.replaceAll("\\<.*?\\>", "").replace("&nbsp;", " ");
 	}
 
 	public static String toString(Object[] elements) {

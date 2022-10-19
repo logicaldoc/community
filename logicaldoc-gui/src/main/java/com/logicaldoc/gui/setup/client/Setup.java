@@ -414,7 +414,7 @@ public class Setup implements EntryPoint {
 					if (I18N.message(EMBEDDED).equals(data.getDbType())) {
 						data.setDbEngine("hsqldb");
 						data.setDbDriver("org.hsqldb.jdbcDriver");
-						data.setDbUrl(("jdbc:hsqldb:" + data.getRepositoryFolder() + "/db/db").replaceAll("//", "/"));
+						data.setDbUrl(("jdbc:hsqldb:" + data.getRepositoryFolder() + "/db/db").replace("//", "/"));
 						data.setDbUsername("sa");
 						data.setDbPassword("");
 						data.setDbDialect("org.hibernate.dialect.HSQLDialect");

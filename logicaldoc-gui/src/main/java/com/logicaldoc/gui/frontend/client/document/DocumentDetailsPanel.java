@@ -368,7 +368,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			retentionPoliciesPanel = new PublishingPanel(document, changeHandler);
 			retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -383,7 +383,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			capturePanel = new DocumentCapturePanel(document, changeHandler, true);
 			captureTabPanel.addMember(capturePanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -398,7 +398,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			versionsPanel = new VersionsPanel(document);
 			versionsTabPanel.addMember(versionsPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -413,7 +413,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			historyPanel = new HistoryPanel(document);
 			historyTabPanel.addMember(historyPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -495,7 +495,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			previewPanel = new DetailsPreviewPanel(document);
 			previewTabPanel.addMember(previewPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -510,7 +510,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			calendarPanel = new DocumentCalendarPanel(document);
 			calendarTabPanel.addMember(calendarPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -530,7 +530,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 					if (tabSet.getTab(ID_TAB_SUBSCRIPTIONS) == null)
 						tabSet.addTab(subscriptionsTab);
 				} catch (Throwable t) {
-
+					// Nothing to do
 				}
 			} else
 				tabSet.removeTab(subscriptionsTab);
@@ -640,7 +640,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	@Override
 	public void onDocumentSelected(GUIDocument document) {
-
+		// Nothing to do
 	}
 
 	@Override
@@ -653,7 +653,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	@Override
 	public void onDocumentStored(GUIDocument document) {
-
+		// Nothing to do
 	}
 
 	@Override
@@ -689,17 +689,17 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 
 	@Override
 	public void onDocumentMoved(GUIDocument document) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void onDocumentBeginEditing(GUIDocument document) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void onDocumentCancelEditing(GUIDocument document) {
-
+		// Nothing to do
 	}
 
 	@Override

@@ -88,7 +88,7 @@ public class XssRequestWrapper extends HttpServletRequestWrapper {
 			value = ESAPI.encoder().canonicalize(value);
 
 			// Avoid null characters
-			value = value.replaceAll("", "");
+			value = value.replace("", "");
 
 			// Avoid "; sequences
 			Pattern scriptPattern = Pattern.compile("\";", Pattern.CASE_INSENSITIVE);

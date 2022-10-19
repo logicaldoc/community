@@ -84,6 +84,7 @@ public class SaveDialog extends Window {
 														? I18N.message("fulltext")
 														: I18N.message("parametric"));
 								} catch (Throwable t) {
+									// Nothing to do
 								}
 								destroy();
 							}

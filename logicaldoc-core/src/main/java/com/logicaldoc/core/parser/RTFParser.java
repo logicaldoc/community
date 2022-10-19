@@ -68,7 +68,7 @@ public class RTFParser extends AbstractParser {
 				StringTokenizer st = null;
 				while ((thisLine = d.readLine()) != null) {
 					for (String string : pattern.split(thisLine)) {
-						string = string.replace("\\\\fldrslt", "");
+						string = string.replace("\\fldrslt", "");
 						string = string.replace("\\{", "");
 						st = new StringTokenizer(string, "}");
 						while (st.hasMoreTokens()) {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
@@ -84,23 +85,18 @@ public abstract class AbstractCoreTCase {
 
 	/**
 	 * Destroys the in-memory database
+	 * 
+	 * @throws SQLException error at database level 
 	 */
-	private void destroyDatabase() {
+	private void destroyDatabase() throws SQLException {
 		Connection con = null;
-		if (ds == null)
-			return;
 		try {
 			con = ds.getConnection();
-			con.createStatement().execute("SHUTDOWN IMMEDIATELY");
+			con.createStatement().execute("shutdown");
 		} catch (Exception e) {
+			if (con != null)
+				con.close();
 			e.printStackTrace();
-		} finally {
-			try {
-				if (con != null)
-					con.close();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
 		}
 	}
 

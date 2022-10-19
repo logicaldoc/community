@@ -31,54 +31,45 @@ public class GuiLog {
 	 * @param caught The caught exception (if any)
 	 */
 	public static void serverError(String message, Throwable caught) {
-		try {
-			LD.clearPrompt();
+		LD.clearPrompt();
 
-			if (message == null || message.isEmpty())
-				message = "error";
+		if (message == null || message.isEmpty())
+			message = "error";
 
-			// Hide download exceptions that normally are raised on double
-			// click.
-			if ("0".equals(message.trim()))
-				return;
-			GWT.log("Server error: " + message, caught);
+		// Hide download exceptions that normally are raised on double
+		// click.
+		if ("0".equals(message.trim()))
+			return;
+		GWT.log("Server error: " + message, caught);
 
-			if (caught instanceof RequestTimeoutException) {
-				SC.warn(I18N.message("timeout"));
-			} else if (caught instanceof InvalidSessionException) {
-				// Redirect to the module's login page
-				Session.get().close();
-				String base = GWT.getHostPageBaseURL();
-				Util.redirect(base
-						+ (base.endsWith("/") ? GWT.getModuleName() + ".jsp" : "/" + GWT.getModuleName() + ".jsp"));
-			} else {
-				GuiLog.error(caught.getMessage(), null, caught);
-			}
-		} catch (Throwable t) {
+		if (caught instanceof RequestTimeoutException) {
+			SC.warn(I18N.message("timeout"));
+		} else if (caught instanceof InvalidSessionException) {
+			// Redirect to the module's login page
+			Session.get().close();
+			String base = GWT.getHostPageBaseURL();
+			Util.redirect(
+					base + (base.endsWith("/") ? GWT.getModuleName() + ".jsp" : "/" + GWT.getModuleName() + ".jsp"));
+		} else {
+			GuiLog.error(caught.getMessage(), null, caught);
 		}
 	}
 
 	public static void warn(String message, String detail) {
-		try {
-			GWT.log("warn: " + message, null);
-			EventPanel.get().warn(message, detail);
-		} catch (Throwable t) {
-		}
+		GWT.log("warn: " + message, null);
+		EventPanel.get().warn(message, detail);
 	}
 
 	public static void error(String message, String detail, Throwable caught) {
-		try {
-			// Hide download exceptions that normally are raised on double
-			// click.
-			if ("0".equals(message))
-				return;
+		// Hide download exceptions that normally are raised on double
+		// click.
+		if ("0".equals(message))
+			return;
 
-			GWT.log("error: " + message, caught);
-			EventPanel.get().error(message, detail);
-		} catch (Throwable t) {
-		}
+		GWT.log("error: " + message, caught);
+		EventPanel.get().error(message, detail);
 	}
-	
+
 	public static void error(String message) {
 		error(message, null, null);
 	}
@@ -88,17 +79,11 @@ public class GuiLog {
 	}
 
 	public static void info(String message, String detail) {
-		try {
-			GWT.log("info: " + message, null);
-			EventPanel.get().info(message, detail);
-		} catch (Throwable t) {
-		}
+		GWT.log("info: " + message, null);
+		EventPanel.get().info(message, detail);
 	}
 
 	public static void debug(String message) {
-		try {
-			GWT.log("debug: " + message, null);
-		} catch (Throwable t) {
-		}
+		GWT.log("debug: " + message, null);
 	}
 }

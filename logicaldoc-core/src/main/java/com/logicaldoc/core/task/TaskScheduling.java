@@ -115,6 +115,7 @@ public class TaskScheduling {
 			interval = Long.parseLong(config.getProperty("schedule.interval." + taskName));
 			delay = Long.parseLong(config.getProperty("schedule.delay." + taskName));
 		} catch (Exception e) {
+			// Nothing to do
 		}
 	}
 

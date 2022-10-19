@@ -189,7 +189,7 @@ public class UpdatePanel extends VLayout {
 								@Override
 								public void onSuccess(String path) {
 									ApplicationRestarting
-											.get(I18N.message("updaterunning", path.replaceAll("\\\\", "/"))).show();
+											.get(I18N.message("updaterunning", path.replace("\\\\", "/"))).show();
 
 									final String tenant = Session.get().getUser().getTenant().getName();
 									Session.get().close();

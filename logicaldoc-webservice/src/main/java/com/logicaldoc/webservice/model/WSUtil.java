@@ -125,6 +125,7 @@ public class WSUtil {
 					}
 				}
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 			wsDoc.setAttributes(attributes);
 
@@ -264,6 +265,7 @@ public class WSUtil {
 			try {
 				return df.format(date);
 			} catch (Exception e1) {
+				// Nothing to do
 			}
 		}
 		
@@ -282,6 +284,7 @@ public class WSUtil {
 			try {
 				return df.format(date);
 			} catch (Exception e1) {
+				// Nothing to do
 			}
 		}
 		
