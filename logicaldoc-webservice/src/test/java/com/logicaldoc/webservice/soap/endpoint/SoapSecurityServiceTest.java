@@ -3,8 +3,6 @@ package com.logicaldoc.webservice.soap.endpoint;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.logicaldoc.core.security.Group;
@@ -14,6 +12,8 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSGroup;
 import com.logicaldoc.webservice.model.WSUser;
+
+import junit.framework.Assert;
 
 /**
  * Test case for <code>SoapSecurityService</code>
@@ -49,6 +49,10 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		Assert.assertEquals(1, usersList.get(0).getId());
 		Assert.assertEquals(2, usersList.get(1).getId());
 		Assert.assertEquals("boss", usersList.get(1).getUsername());
+		
+		users = securityServiceImpl.listUsers("", "testGroup");
+		Assert.assertNotNull(users);
+		Assert.assertEquals(3, users.length);
 	}
 
 	@Test
@@ -131,4 +135,38 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 		int changeResult = securityServiceImpl.changePassword("", userId, "(-xi%HT3y?r3'ux", "t<(`oN]I{*2d(0");
 		Assert.assertEquals(0, changeResult);
 	}
+	
+	@Test
+	public void testGetUser() throws Exception {
+		WSUser user = securityServiceImpl.getUser("", 4);
+		Assert.assertNotNull(user);
+		Assert.assertEquals("Author", user.getName());
+		Assert.assertEquals("author@acme.com", user.getEmail());
+		
+		// test for non-existent user
+		user = securityServiceImpl.getUser("", 400);
+		Assert.assertNull(user);
+	}
+
+	@Test
+	public void testGetUserByUsername() throws Exception {
+		WSUser user = securityServiceImpl.getUserByUsername("", "author");
+		Assert.assertNotNull(user);
+		Assert.assertEquals("Author", user.getName());
+		Assert.assertEquals("author@acme.com", user.getEmail());
+		
+		// test for non-existent user
+		user = securityServiceImpl.getUserByUsername("", "Midnights");
+		Assert.assertNull(user);		
+	}
+
+	@Test
+	public void testGetGroup() throws Exception {
+		WSGroup group = securityServiceImpl.getGroup("", 2);
+		Assert.assertNotNull(group);
+		
+		// test for non-existent group
+		group = securityServiceImpl.getGroup("", 200);
+		Assert.assertNull(group);
+	}	
 }
