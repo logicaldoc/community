@@ -191,7 +191,7 @@ public class FileUtil {
 	 * @return digest
 	 */
 	public static String computeDigest(String src) {
-		String digest=null;
+		String digest = null;
 		try (InputStream is = IOUtils.toInputStream(src, "UTF-8");) {
 			digest = computeDigest(is);
 		} catch (IOException e) {

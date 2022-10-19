@@ -129,8 +129,8 @@ public class IndexerTask extends Task {
 			// First of all find documents to be indexed and not already
 			// involved into a transaction
 			String[] query = IndexerTask.prepareQuery();
-			List<Long> ids = documentDao.findIdsByWhere(query[0] + " and (" + HibernatePersistentObjectDAO.ALIAS_ENTITY
-					+ ".transactionId is null or " + HibernatePersistentObjectDAO.ALIAS_ENTITY
+			List<Long> ids = documentDao.findIdsByWhere(query[0] + " and (" + PersistentObjectDAO.ALIAS_ENTITY
+					+ ".transactionId is null or " + PersistentObjectDAO.ALIAS_ENTITY
 					+ ".transactionId not in " + transactionIdsStr + ") ", query[1], max);
 			size = ids.size();
 			log.info("Found a total of {} documents to be processed", size);
