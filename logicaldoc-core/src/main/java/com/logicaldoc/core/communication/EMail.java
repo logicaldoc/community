@@ -78,9 +78,6 @@ public class EMail extends Message {
 	 */
 	private Folder targetFolder;
 
-	public EMail() {
-	}
-
 	public String getEmailId() {
 		return emailId;
 	}

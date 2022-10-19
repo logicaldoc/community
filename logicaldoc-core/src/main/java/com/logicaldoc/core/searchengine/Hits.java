@@ -79,7 +79,7 @@ public class Hits implements Iterator<Hit>, Serializable {
 
 	@Override
 	public void remove() {
-
+		// Nothing to do
 	}
 
 	public static Hit toHit(SolrDocument sdoc) {

@@ -215,7 +215,7 @@ public class FolderCopyStandardPropertiesPanel extends FolderDetailTab {
 			folder.setTags(tagItem.getValues());
 			folder.setDescription(vm.getValueAsString("description"));
 			if (vm.getValueAsString("name") != null)
-				folder.setName(vm.getValueAsString("name").replaceAll("/", ""));
+				folder.setName(vm.getValueAsString("name").replace("/", ""));
 		}
 		return !vm.hasErrors();
 	}

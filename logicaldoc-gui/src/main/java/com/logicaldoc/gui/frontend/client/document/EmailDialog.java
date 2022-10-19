@@ -218,7 +218,7 @@ public class EmailDialog extends AbstractEmailDialog {
 
 	private void removeDownloadTicketPlaceholder() {
 		String messageBody = getMessageWithoutSignature().replaceAll("(<br />)?\\$downloadTicket(<br />)?", "")
-				.replaceAll("\\$downloadTicket", "");
+				.replace("\\$downloadTicket", "");
 		message.setValue(messageBody);
 		updateSignature();
 	}

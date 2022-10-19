@@ -199,7 +199,7 @@ public class Language implements Comparable<Language> {
 						stemmer = (SnowballProgram) constructor.newInstance();
 				}
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 		}
 		return stemmer;

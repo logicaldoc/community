@@ -33,6 +33,7 @@ public class ServletUtil {
 		try {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
 		} catch (Throwable e) {
+			// Nothing to do
 		}
 	}
 }

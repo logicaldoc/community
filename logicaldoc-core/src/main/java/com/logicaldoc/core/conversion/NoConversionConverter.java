@@ -50,6 +50,7 @@ public class NoConversionConverter implements FormatConverter {
 
 	@Override
 	public void loadParameters() {
+		// Nothing to do
 	}
 
 	@Override
@@ -59,6 +60,6 @@ public class NoConversionConverter implements FormatConverter {
 
 	@Override
 	public void setEnabled(boolean enabled) {
-
+		// Nothing to do
 	}
 }

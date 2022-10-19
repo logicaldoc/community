@@ -447,6 +447,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 			documentManager.create(fis, doc, history);
 			Assert.fail("Expected an IOException to be thrown");
 		} catch (Exception e) {
+			// Noting to do
 		} finally {
 			storer.setRaiseError(false);
 		}
@@ -494,6 +495,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 			documentManager.checkin(1L, file, "pippo", true, null, transaction);
 			Assert.fail("an exception should have been raised at this point");
 		} catch (Exception e) {
+			// Noting to do
 		} finally {
 			storer.setRaiseError(false);
 		}

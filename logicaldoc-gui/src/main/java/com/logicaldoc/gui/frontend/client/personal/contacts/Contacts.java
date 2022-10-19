@@ -314,6 +314,7 @@ public class Contacts extends com.smartgwt.client.widgets.Window {
 				new ValuesCallback() {
 					@Override
 					public void execute(String value) {
+						// Nothing to do
 					}
 
 					@Override

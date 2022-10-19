@@ -178,7 +178,7 @@ public abstract class Search {
 
 			query.append(idsString);
 			query.append(" and ld_name in ");
-			query.append(attrs.toString().replace("\\[", "('").replace("\\]", "')").replace(",", "','")
+			query.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','")
 					.replace(" ", ""));
 
 			try {

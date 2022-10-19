@@ -67,6 +67,7 @@ public class StatsPie extends HLayout {
 			repository.addMember(prepareLegend(parameters[STATS_REPOSITORY], STATS_REPOSITORY));
 			addMember(repository);
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		VLayout documents = new VLayout();
@@ -83,7 +84,7 @@ public class StatsPie extends HLayout {
 			documents.addMember(prepareLegend(parameters[STATS_DOCUMENTS], STATS_DOCUMENTS));
 			addMember(documents);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		VLayout pages = new VLayout();
@@ -118,7 +119,7 @@ public class StatsPie extends HLayout {
 			folders.addMember(prepareLegend(parameters[STATS_FOLDERS], STATS_FOLDERS));
 			addMember(folders);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 

@@ -57,7 +57,7 @@ public class EventPanel extends HLayout {
 		if (statusLabel != null && contains(statusLabel))
 			removeMember(statusLabel);
 
-		String oneRow = text.replace('\n', ' ').replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+		String oneRow = text.replace('\n', ' ').replace("<", "&lt;").replace(">", "&gt;");
 		if (text.length() > 80)
 			oneRow = oneRow.substring(0, 80) + "...";
 

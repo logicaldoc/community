@@ -176,6 +176,7 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 			Assert.assertEquals(2, rights.length);
 			Assert.assertEquals(3, rights[0].getId());
 		} catch (Exception e) {
+			// Nothing to do
 		}
 	}
 

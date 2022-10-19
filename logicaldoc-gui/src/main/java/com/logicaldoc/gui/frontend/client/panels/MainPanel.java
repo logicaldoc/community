@@ -170,7 +170,7 @@ public class MainPanel extends VLayout implements SessionObserver {
 					new AsyncCallback<GUIInfo>() {
 						@Override
 						public void onFailure(Throwable caught) {
-
+							// Nothing to do
 						}
 
 						@Override

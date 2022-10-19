@@ -35,5 +35,6 @@ public class FolderInitializer extends Initializer implements FolderListener {
 	@Override
 	public void afterStore(Folder document, FolderHistory transaction, Map<String, Object> dictionary)
 			throws Exception {
+		// Nothing to do
 	}
 }

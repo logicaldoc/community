@@ -127,6 +127,7 @@ public class SecurityManagerImplTest extends AbstractCoreTCase {
 			userDAO.store(user);
 			notThrownTest = "ok";
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
 	}

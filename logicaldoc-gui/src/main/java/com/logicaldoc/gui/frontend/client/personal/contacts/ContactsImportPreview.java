@@ -75,6 +75,7 @@ public class ContactsImportPreview extends com.smartgwt.client.widgets.Window {
 									try {
 										Contacts.get().refresh();
 									} catch (Throwable t) {
+										// Nothing to do
 									}
 								}
 							});

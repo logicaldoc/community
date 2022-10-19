@@ -89,6 +89,7 @@ public class DefaultSchedulerFactory extends org.springframework.scheduling.quar
 			if (trigger != null)
 				triggers.add(trigger);
 		} catch (Throwable t) {
+			// Noting to do
 		}
 
 		if (!triggers.isEmpty())

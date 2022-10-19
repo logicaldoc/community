@@ -142,6 +142,7 @@ abstract class ReportPanel extends AdminPanel {
 	}
 
 	protected void fillToolBar(ToolStrip toolStrip) {
+		// Nothing to do
 	}
 
 	protected abstract void showContextMenu();

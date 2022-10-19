@@ -81,12 +81,14 @@ public class ZipImport {
 			try {
 				FileUtils.deleteDirectory(dir);
 			} catch (IOException e) {
+				// Nothing to do
 			}
 		}
 
 		try {
 			FileUtils.forceMkdir(dir);
 		} catch (IOException e) {
+			// Nothing to do
 		}
 
 		try {
@@ -110,6 +112,7 @@ public class ZipImport {
 		try {
 			FileUtils.deleteDirectory(dir);
 		} catch (IOException e) {
+			// Nothing to do
 		}
 
 		if (notifyUser)

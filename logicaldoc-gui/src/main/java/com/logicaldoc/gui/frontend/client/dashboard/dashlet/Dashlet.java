@@ -138,6 +138,6 @@ public abstract class Dashlet extends Portlet {
 	}
 
 	protected void refresh() {
-
+		// Nothing to do
 	}
 }

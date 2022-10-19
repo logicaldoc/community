@@ -127,6 +127,7 @@ public class SearchOptions implements Serializable, Comparable<SearchOptions> {
 		try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(file)))) {
 			encoder.writeObject(this);
 		} catch (FileNotFoundException fileNotFound) {
+			// Nothing to do
 		}
 	}
 

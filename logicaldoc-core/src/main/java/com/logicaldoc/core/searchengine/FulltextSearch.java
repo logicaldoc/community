@@ -308,7 +308,7 @@ public class FulltextSearch extends Search {
 			}
 			richQuery.append("  and A.ld_docref is not null and REF.ld_deleted=0 and not A.ld_status="
 					+ AbstractDocument.DOC_ARCHIVED + " and A.ld_docref = REF.ld_id ");
-			richQuery.append(hitsIdsCondition.toString().replaceAll("A.ld_id", "A.ld_docref"));
+			richQuery.append(hitsIdsCondition.toString().replace("A.ld_id", "A.ld_docref"));
 		}
 
 		log.debug("Execute query {}", richQuery.toString());

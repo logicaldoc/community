@@ -73,7 +73,7 @@ public class TaskTrigger implements FactoryBean<Trigger>, BeanNameAware, Initial
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-
+		// Nothing to do
 	}
 
 	@Override

@@ -165,18 +165,11 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		initialize(version);
 		String resource = storer.getResourceName(version.getDocId(), version.getFileVersion(), null);
 		if (storer.exists(version.getDocId(), resource)) {
-			InputStream in = null;
-			try {
-				in = storer.getStream(version.getDocId(), resource);
+
+			try (InputStream in = storer.getStream(version.getDocId(), resource);) {
 				version.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
 				log.error("Cannot retrieve the content of version {}", version, e);
-			} finally {
-				if (in != null)
-					try {
-						in.close();
-					} catch (Throwable t) {
-					}
 			}
 			saveOrUpdate(version);
 		}

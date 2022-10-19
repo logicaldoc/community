@@ -186,7 +186,7 @@ public class Automation {
 			try {
 				clientDictionary.put(SERVER_URL, new ContextProperties().getProperty("server.url"));
 			} catch (IOException e1) {
-
+				// Noting to do
 			}
 
 		/*

@@ -131,6 +131,7 @@ public abstract class Task implements Runnable {
 					if (lockManager != null)
 						lockManager.get(getName(), transactionId);
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 
 				synchronized (this) {
@@ -219,7 +220,7 @@ public abstract class Task implements Runnable {
 				if (lockManager != null)
 					lockManager.release(getName(), transactionId);
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 			setStatus(STATUS_IDLE);
@@ -348,6 +349,7 @@ public abstract class Task implements Runnable {
 			try {
 				recipient = userDao.findById(Long.parseLong(userId));
 			} catch (NumberFormatException e1) {
+				// Nothing to do
 			} catch (PersistenceException e1) {
 				log.error(e1.getMessage(), e1);
 			}

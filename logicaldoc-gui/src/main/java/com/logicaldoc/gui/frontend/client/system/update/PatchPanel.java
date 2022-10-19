@@ -306,10 +306,10 @@ public class PatchPanel extends VLayout {
 
 									if (!patch.isRestart()) {
 										ApplicationRestarting
-												.get(I18N.message("patchrunning", path.replaceAll("\\\\", "/"))).show();
+												.get(I18N.message("patchrunning", path.replace("\\\\", "/"))).show();
 									} else {
 										ApplicationRestarting
-												.get(I18N.message("patchrunning1", path.replaceAll("\\\\", "/")))
+												.get(I18N.message("patchrunning1", path.replace("\\\\", "/")))
 												.show();
 
 										final String tenant = Session.get().getUser().getTenant().getName();

@@ -113,6 +113,7 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 
 				sequences = findByWhere(query, params, null, null);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 
 			// It's incredible but the findByWhere sometimes doesn't find the

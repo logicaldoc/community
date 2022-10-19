@@ -108,7 +108,7 @@ public class ReportUploader extends Window {
 
 			@Override
 			public void onSuccess(Void result) {
-
+				// Nothing to do
 			}
 		});
 	}

@@ -117,7 +117,7 @@ public class ContextMenu extends Menu {
 							public void execute(final String value) {
 								if (value == null || "".equals(value.trim()))
 									return;
-								final String newFilename = value.trim().replaceAll("/", "").replaceAll("\\\\", "");
+								final String newFilename = value.trim().replace("/", "").replace("\\\\", "");
 
 								// Check if the user has changed the extension
 								// and warn him
@@ -1196,6 +1196,7 @@ public class ContextMenu extends Menu {
 
 			@Override
 			public void onSuccess(Void arg0) {
+				// Nothing to do
 			}
 		});
 	}

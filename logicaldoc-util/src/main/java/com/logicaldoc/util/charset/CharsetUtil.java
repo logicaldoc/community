@@ -14,7 +14,7 @@ public abstract class CharsetUtil {
 	}
 
 	public static String getCharset(String contentType) {
-		String mycc = contentType.replaceAll("\"", "");
+		String mycc = contentType.replace("\"", "");
 
 		if (mycc.indexOf(" format=flowed") != -1) {
 			mycc = mycc.replace(" format=flowed", "");

@@ -97,6 +97,7 @@ public class DropboxDataServlet extends HttpServlet {
 			try {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 	}

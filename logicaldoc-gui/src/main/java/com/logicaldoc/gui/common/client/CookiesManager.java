@@ -47,7 +47,7 @@ public class CookiesManager {
 			Cookies.removeCookie(COOKIE_SID);
 			Cookies.removeCookie(COOKIE_JSESSIONID);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 
@@ -58,7 +58,7 @@ public class CookiesManager {
 		try {
 			removeSid();
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 
@@ -69,13 +69,13 @@ public class CookiesManager {
 		try {
 			Offline.remove(COOKIE_DENSITY);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		try {
 			Offline.remove(COOKIE_HITSLIST_PREV_W);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		try {
@@ -87,36 +87,38 @@ public class CookiesManager {
 		try {
 			Offline.remove(COOKIE_DOCSMENU_W);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		try {
 			Offline.remove(COOKIE_PASSWORD);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
+		
 		try {
 			Offline.remove(COOKIE_SAVELOGIN);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
+		
 		try {
 			Offline.remove(COOKIE_USER);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		try {
 			Offline.remove(COOKIE_DEVICE);
 			Cookies.removeCookie(COOKIE_DEVICE);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		try {
 			removeLogin();
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 

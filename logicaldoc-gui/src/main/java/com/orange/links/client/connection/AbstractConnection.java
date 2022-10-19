@@ -241,6 +241,7 @@ public abstract class AbstractConnection implements Connection {
 
 	@Override
 	public void drawHighlight() {
+		// Nothing to do
 	}
 
 	@Override

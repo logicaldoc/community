@@ -262,7 +262,7 @@ public class SearchToolbar extends ToolStrip {
 
 			@Override
 			public void onFailure(Throwable e) {
-
+				// Nothing to do
 			}
 
 			@Override

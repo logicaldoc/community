@@ -133,5 +133,6 @@ public class FreemarkerWebServiceDisplayer {
 	}
 
 	private static final class UnkownType {
+		// Nothing to do
 	}
 }

@@ -143,8 +143,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 
 			if (template.getTemplateGroups() != null)
 				log.trace("Initialized {} template groups", template.getTemplateGroups().size());
-			;
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 

@@ -95,7 +95,7 @@ public abstract class AbstractEmailDialog extends Window {
 	}
 
 	protected void prepareEmail(GUIEmail mail) {
-
+		// Nothing to do
 	}
 
 	public void onDraw() {

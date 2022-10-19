@@ -44,9 +44,11 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 
 			int timeout = 30;
 			try {
-				timeout=Integer.parseInt(getParameter("timeout"));
-			}catch(Throwable t) {}
-			
+				timeout = Integer.parseInt(getParameter("timeout"));
+			} catch (Throwable t) {
+				// Nothing to do
+			}
+
 			String commandLine = getParameter("path") + " "
 					+ (getParameter("arguments") != null ? getParameter("arguments") : "") + " -sDEVICE=" + device + " "
 					+ pages + " -sOutputFile=" + dest.getPath() + " " + src.getPath();
@@ -54,9 +56,7 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 
 			if (!dest.exists() || dest.length() < 1)
 				throw new Exception("Empty conversion");
-		} catch (
-
-		Throwable e) {
+		} catch (Throwable e) {
 			throw new IOException("Error in PDF to image conversion", e);
 		}
 	}

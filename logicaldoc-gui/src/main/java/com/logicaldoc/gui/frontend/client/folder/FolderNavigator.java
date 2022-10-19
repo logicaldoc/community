@@ -1183,7 +1183,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 					public void execute(final String value) {
 						if (value == null || "".equals(value.trim()))
 							return;
-						final String val = value.trim().replaceAll("/", "").replaceAll("\\\\", "");
+						final String val = value.trim().replace("/", "").replace("\\\\", "");
 						final long folderId = Long.parseLong(selectedNode.getAttributeAsString("folderId"));
 						FolderService.Instance.get().rename(folderId, val, new AsyncCallback<Void>() {
 

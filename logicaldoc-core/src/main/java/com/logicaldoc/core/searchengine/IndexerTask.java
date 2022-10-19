@@ -307,7 +307,7 @@ public class IndexerTask extends Task {
 			try {
 				executor.awaitTermination(3, TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
-
+				// Nothing to do
 			}
 		}
 	}

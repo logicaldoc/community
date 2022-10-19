@@ -88,6 +88,7 @@ public class ZipExport {
 				zos.flush();
 				zos.close();
 			} catch (Throwable e) {
+				// Nothing to do
 			}
 		}
 

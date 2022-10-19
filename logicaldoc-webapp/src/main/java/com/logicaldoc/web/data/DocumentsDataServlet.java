@@ -177,8 +177,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 				if (formId != null)
 					query.append(" and D.ld_formid=" + Long.toString(formId));
 				query.append(") and ld_name in ");
-				query.append(attrs.toString().replaceAll("\\[", "('").replaceAll("\\]", "')").replaceAll(",", "','")
-						.replaceAll(" ", ""));
+				query.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','")
+						.replace(" ", ""));
 
 				dao.query(query.toString(), null, new RowMapper<Long>() {
 					@Override

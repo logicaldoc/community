@@ -321,6 +321,7 @@ public class EMailSender {
 			try {
 				from = new InternetAddress(email.getAuthorAddress());
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		InternetAddress[] to = email.getAddresses();
 		InternetAddress[] cc = email.getAddressesCC();
@@ -365,7 +366,7 @@ public class EMailSender {
 					MagicMatch match = Magic.getMagicMatch(att.getData(), true);
 					mime = match.getMimeType();
 				} catch (Throwable t) {
-
+					// Nothing to do
 				}
 				DataSource fdSource = new ByteArrayDataSource(att.getData(), mime);
 				DataHandler fdHandler = new DataHandler(fdSource);

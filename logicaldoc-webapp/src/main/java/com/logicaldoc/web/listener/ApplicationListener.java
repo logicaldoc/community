@@ -143,6 +143,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 				try {
 					configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 
 				if (configFile == null)
@@ -284,7 +285,7 @@ public class ApplicationListener implements ServletContextListener, HttpSessionL
 
 	@Override
 	public void sessionCreated(HttpSessionEvent event) {
-
+		// Nothing to do
 	}
 
 	/**

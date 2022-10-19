@@ -35,7 +35,7 @@ public class TagCloud extends VLayout {
 		TagService.Instance.get().getTagCloud(new AsyncCallback<GUITag[]>() {
 			@Override
 			public void onFailure(Throwable arg0) {
-
+				// Nothing to do
 			}
 
 			@Override

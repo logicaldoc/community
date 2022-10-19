@@ -69,6 +69,7 @@ public class XMLParser extends AbstractParser {
 			// call and explicitly close the stream in a finally block.
 			InputSource source = new InputSource(new FilterInputStream(input) {
 				public void close() {
+					// Nothing to do
 				}
 			});
 			if (encoding != null) {

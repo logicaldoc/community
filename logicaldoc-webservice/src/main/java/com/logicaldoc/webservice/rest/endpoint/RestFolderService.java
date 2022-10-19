@@ -103,6 +103,7 @@ public class RestFolderService extends SoapFolderService implements FolderServic
 
 		ObjectMapper mapper = new ObjectMapper();
 		TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+			// Nothing to do
 		};
 		HashMap<String, String> hm = mapper.readValue(jsonstr, typeRef);
 

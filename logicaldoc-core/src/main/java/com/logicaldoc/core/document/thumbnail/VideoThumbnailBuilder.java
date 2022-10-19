@@ -72,13 +72,14 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 
 					ImageIO.write(img, "png", frameFile);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 			}
 		}
 	}
 
 	private void writeVideoFrame(File videoFile, File frameFile) throws Exception {
-		try(FrameGrabber grabber = new OpenCVFrameGrabber(videoFile);) {
+		try (FrameGrabber grabber = new OpenCVFrameGrabber(videoFile);) {
 			grabber.start();
 
 			/*
@@ -105,6 +106,7 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 
 					ImageIO.write(img, "png", frameFile);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 			}
 		}

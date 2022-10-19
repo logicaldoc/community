@@ -41,6 +41,6 @@ public class FolderValidator extends Validator implements FolderListener {
 
 	@Override
 	public void afterStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary) throws Exception {
-
+		// Nothing to do
 	}
 }

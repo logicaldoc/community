@@ -33,6 +33,7 @@ public class ImageConverter extends AbstractFormatConverter {
 			try {
 				timeout = Integer.parseInt(getParameter("timeout"));
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 
 			String commandLine = getParameter("path") + " -compress JPEG " + src.getPath() + " " + dest.getPath();

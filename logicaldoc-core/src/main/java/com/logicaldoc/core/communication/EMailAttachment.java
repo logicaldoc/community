@@ -35,9 +35,6 @@ public class EMailAttachment implements Serializable {
 
 	private String fileName = "";
 
-	public EMailAttachment() {
-	}
-
 	public String getIcon() {
 		return icon;
 	}

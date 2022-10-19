@@ -657,6 +657,7 @@ public class DocumentManagerImpl implements DocumentManager {
 						try {
 							versionDAO.delete(version.getId());
 						} catch (Throwable t) {
+							// Nothing to do
 						}
 						throw new Exception("Document not stored");
 					}
@@ -1507,14 +1508,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			return manager.create(bigPdf, docVO, transaction);
 		} finally {
-			try {
-				FileUtil.strongDelete(bigPdf);
-			} catch (Throwable r) {
-			}
-			try {
-				FileUtil.strongDelete(tempDir);
-			} catch (Throwable r) {
-			}
+			FileUtil.strongDelete(bigPdf);
+			FileUtil.strongDelete(tempDir);
 		}
 	}
 

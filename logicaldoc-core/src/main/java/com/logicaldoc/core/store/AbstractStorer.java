@@ -142,7 +142,7 @@ public abstract class AbstractStorer implements Storer {
 				try {
 					is.close();
 				} catch (IOException e) {
-
+					// Noting to do
 				}
 		}
 	}
@@ -275,7 +275,7 @@ public abstract class AbstractStorer implements Storer {
 				if (exists(0L, resource))
 					delete(0L);
 			} catch (Throwable t) {
-
+				// Noting to do
 			}
 		}
 	}
@@ -292,11 +292,11 @@ public abstract class AbstractStorer implements Storer {
 
 	@Override
 	public void init() {
-
+		// Noting to do
 	}
 
 	@Override
 	public void destroy() {
-
+		// Noting to do
 	}
 }

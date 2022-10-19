@@ -48,7 +48,7 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 	public void setup(SetupInfo data) throws ServerException {
 		securityCheck();
 
-		data.setRepositoryFolder(data.getRepositoryFolder().replaceAll("\\\\", "/"));
+		data.setRepositoryFolder(data.getRepositoryFolder().replace("\\", "/"));
 		File repoFolder = new File(data.getRepositoryFolder());
 		log.warn("Initialize system using repository " + repoFolder);
 		try {

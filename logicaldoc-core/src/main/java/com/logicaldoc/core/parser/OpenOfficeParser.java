@@ -130,10 +130,12 @@ public class OpenOfficeParser extends AbstractParser {
 
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
+			// Nothing to do
 		}
 
 		public void endElement(java.lang.String namespaceURI, java.lang.String localName, java.lang.String qName)
 				throws SAXException {
+			// Nothing to do
 		}
 	}
 
@@ -163,10 +165,12 @@ public class OpenOfficeParser extends AbstractParser {
 
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
+			// Nothing to do
 		}
 
 		public void endElement(java.lang.String namespaceURI, java.lang.String localName, java.lang.String qName)
 				throws SAXException {
+			// Nothing to do
 		}
 	}
 

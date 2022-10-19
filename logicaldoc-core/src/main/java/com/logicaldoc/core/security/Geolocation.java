@@ -292,6 +292,7 @@ public class Geolocation {
 			try {
 				dbReader.close();
 			} catch (Throwable e) {
+				// Nothing to do
 			}
 			dbReader = null;
 		}

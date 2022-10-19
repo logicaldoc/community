@@ -32,6 +32,7 @@ public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 			bookmarkService.bookmarkDocument("", 3L);
 			Assert.fail("the document doesn't exist, why exception was not raised.");
 		} catch (Exception e) {
+			// Nothing to do
 		}
 
 	}
@@ -48,6 +49,7 @@ public class SoapBookmarkServiceTest extends AbstractWebserviceTestCase {
 			bookmarkService.bookmarkDocument("", 99L);
 			Assert.fail("the folder doesn't exist, why exception was not raised.");
 		} catch (Exception e) {
+			// Nothing to do
 		}
 
 	}

@@ -270,6 +270,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 			dao.store(user);
 			Assert.fail("an exception should have been raised at this point");
 		} catch (PasswordAlreadyUsedException e) {
+			// Nothing to do
 		}
 
 		user = dao.findById(1L);

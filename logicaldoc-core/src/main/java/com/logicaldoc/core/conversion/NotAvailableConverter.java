@@ -56,6 +56,7 @@ public class NotAvailableConverter implements FormatConverter {
 
 	@Override
 	public void loadParameters() {
+		// Nothing to do
 	}
 
 	@Override
@@ -65,6 +66,6 @@ public class NotAvailableConverter implements FormatConverter {
 
 	@Override
 	public void setEnabled(boolean enabled) {
-
+		// Nothing to do
 	}
 }

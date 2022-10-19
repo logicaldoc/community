@@ -62,6 +62,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 
 		ObjectMapper mapper = new ObjectMapper();
 		TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+			// Nothing to do
 		};
 		HashMap<String, String> hm = mapper.readValue(jsonstr, typeRef);
 

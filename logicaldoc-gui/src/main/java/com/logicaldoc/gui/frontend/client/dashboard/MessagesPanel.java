@@ -246,12 +246,12 @@ public class MessagesPanel extends VLayout implements UserObserver {
 
 	@Override
 	public void onUserLogin(String username) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void onUserLogout(String username) {
-
+		// Nothing to do
 	}
 
 	@Override

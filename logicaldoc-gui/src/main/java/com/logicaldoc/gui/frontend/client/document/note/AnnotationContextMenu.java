@@ -106,7 +106,7 @@ public class AnnotationContextMenu extends Menu {
 	}
 
 	protected void appendAdditionalItems(List<MenuItem> items) {
-
+		// Nothing to do
 	}
 
 	private MenuItem prepareFillMenuItem() {

@@ -43,9 +43,9 @@ public class StateWidget extends Label {
 
 		String name = trans.getText();
 		if (name != null) {
-			name = name.replaceAll("<b>", "");
-			name = name.replaceAll("</b>", "");
-			name = name.replaceAll("&nbsp;", "");
+			name = name.replace("<b>", "");
+			name = name.replace("</b>", "");
+			name = name.replace("&nbsp;", "");
 		}
 
 		this.connection = connection;
@@ -207,6 +207,7 @@ public class StateWidget extends Label {
 		try {
 			workflowDesigner.saveModel();
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		workflowDesigner.getWorkflow().setStartStateId(wfState.getId());

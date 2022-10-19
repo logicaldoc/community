@@ -268,19 +268,19 @@ public class ParameterConditionRow extends HLayout {
 			item.setValue("yes");
 			return item;
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_STRING_PRESET)) {
-			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replaceAll("_", "");
+			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			FormItem item = ItemFactory.newStringItemForAttribute(template.getAttribute(attributeName));
 			item.setName("value");
 			return item;
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_USER)) {
-			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replaceAll("_", "");
+			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
 			FormItem item = ItemFactory.newUserSelectorForAttribute("value", att.getLabel(),
 					(att.getOptions() != null && att.getOptions().length > 0) ? att.getOptions()[0] : null, null);
 			item.setName("value");
 			return item;
 		} else if (criteriaField.endsWith("type:" + GUIAttribute.TYPE_FOLDER)) {
-			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replaceAll("_", "");
+			String attributeName = criteriaField.substring(0, criteriaField.lastIndexOf(':') - 4).replace("_", "");
 			GUIAttribute att = template.getAttribute(attributeName);
 			FormItem item = ItemFactory.newFolderSelectorForAttribute("value", att.getLabel(), false, null);
 			item.setName("value");

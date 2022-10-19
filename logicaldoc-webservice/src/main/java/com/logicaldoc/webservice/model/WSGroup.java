@@ -134,7 +134,7 @@ public class WSGroup implements Serializable {
 					group.setUsers(users);
 			}
 		} catch (Throwable e) {
-			
+			// Nothing to do
 		}
 
 		return group;
@@ -161,7 +161,7 @@ public class WSGroup implements Serializable {
 				wsGroup.setUserIds(userIds);
 			}
 		} catch (Throwable e) {
-			
+			// Nothing to do
 		}
 
 		return wsGroup;

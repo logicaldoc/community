@@ -47,7 +47,7 @@ public class GUIOCRTemplate implements Serializable {
 		try {
 			batch = Session.get().getConfigAsInt("zonalocr.batch");
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 

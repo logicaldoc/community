@@ -344,7 +344,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 									@Override
 									public void onSuccess(Void arg) {
-
+										// Nothing to do
 									}
 								});
 					}
@@ -403,7 +403,7 @@ public class SearchIndexingPanel extends AdminPanel {
 
 							@Override
 							public void onSuccess(Void arg) {
-
+								// Nothing to do
 							}
 						});
 			}

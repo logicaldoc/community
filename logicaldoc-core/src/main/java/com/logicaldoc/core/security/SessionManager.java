@@ -486,6 +486,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			try {
 				SessionManager.get().kill(session.getSid());
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 		clear();
@@ -494,7 +495,7 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 			try {
 				timeoutWatchDog.interrupt();
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 			log.info("Session timeout watch dog killed");
 		}

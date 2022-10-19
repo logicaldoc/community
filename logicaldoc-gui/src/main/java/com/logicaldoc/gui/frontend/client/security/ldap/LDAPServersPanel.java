@@ -203,7 +203,7 @@ public class LDAPServersPanel extends AdminPanel {
 
 						@Override
 						public void onSuccess(Void arg) {
-							
+							// Nothing to do
 						}
 					});
 				}
