@@ -44,7 +44,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			if (StringUtils.isEmpty(group)) {
 				for (User usr : dao.findAll(user.getTenantId())) {
 					dao.initialize(user);
-					if (usr.getType() == User.TYPE_DEFAULT)
+					if (usr.getType() != User.TYPE_SYSTEM)
 						users.add(WSUser.fromUser(usr));
 				}
 			} else {
@@ -53,7 +53,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				gDao.initialize(grp);
 				for (User usr : grp.getUsers()) {
 					dao.initialize(user);
-					if (usr.getType() == User.TYPE_DEFAULT)
+					if (usr.getType() != User.TYPE_SYSTEM)
 						users.add(WSUser.fromUser(usr));
 				}
 			}
@@ -113,7 +113,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			if (user.getId() != 0) {
 				usr = dao.findById(user.getId());
-				if (usr.getType() != User.TYPE_DEFAULT)
+				if (usr.getType() == User.TYPE_SYSTEM)
 					throw new Exception("You cannot edit user with id " + usr.getId() + " because it is a system user");
 				dao.initialize(usr);
 
@@ -197,26 +197,26 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 					throw new Exception(String.format("You cannot edit group with id %s because it is a system group",
 							grp.getId()));
 				}
-				System.err.println("setting new name: " +group.getName());
-				System.err.println("setting new desc: " +group.getDescription());
-				System.err.println("setting new Type: " +group.getType());
-				
+				System.err.println("setting new name: " + group.getName());
+				System.err.println("setting new desc: " + group.getDescription());
+				System.err.println("setting new Type: " + group.getType());
+
 				grp.setName(group.getName());
 				grp.setDescription(group.getDescription());
 				grp.setType(group.getType());
-				
-				System.err.println("grp name: " +grp.getName());
-				System.err.println("grp desc: " +grp.getDescription());
-				System.err.println("grp Type: " +grp.getType());				
+
+				System.err.println("grp name: " + grp.getName());
+				System.err.println("grp desc: " + grp.getDescription());
+				System.err.println("grp Type: " + grp.getType());
 			}
 
 			if (StringUtils.isEmpty(grp.getName()))
 				throw new Exception("Missing mandatory value 'Name'");
 
 			if (group.getUserIds() != null && group.getUserIds().length > 0) {
-				
+
 				System.err.println("group.getUserIds() > 0 ");
-				
+
 				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 				for (User usr : grp.getUsers()) {
 					System.err.println("removing group from user: " + usr.getName());
@@ -224,7 +224,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 					userDao.store(usr);
 				}
 
-				for (long userId : group.getUserIds()) {					
+				for (long userId : group.getUserIds()) {
 					User user = userDao.findById(userId);
 					System.err.println("Adding group to user: " + user.getName());
 					grp.getUsers().add(user);
@@ -239,7 +239,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 					System.err.println("inherit from group");
 					dao.inheritACLs(grp, group.getInheritGroupId().longValue());
 				}
-				
+
 				return grp.getId();
 			} else
 				throw new Exception("Unable to store the group");
@@ -260,7 +260,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 		try {
 			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 			User usr = dao.findById(userId);
-			if (usr.getType() != User.TYPE_DEFAULT) {
+			if (usr.getType() == User.TYPE_SYSTEM) {
 				throw new Exception("You cannot delete user with id " + usr.getId() + " because it is a system user");
 			}
 			dao.delete(userId);
