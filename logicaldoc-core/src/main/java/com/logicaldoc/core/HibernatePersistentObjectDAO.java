@@ -433,7 +433,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	/**
-	 * Applies the params 
+	 * Applies the params
 	 * 
 	 * @param values the values
 	 * @param max max number of results

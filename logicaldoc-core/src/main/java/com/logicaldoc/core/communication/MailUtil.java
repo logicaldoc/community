@@ -339,7 +339,7 @@ public class MailUtil {
 	}
 
 	private static void setBCC(javax.mail.Message msg, EMail email) throws MessagingException {
-		Address[] addresses  = msg.getRecipients(Message.RecipientType.BCC);
+		Address[] addresses = msg.getRecipients(Message.RecipientType.BCC);
 		if (addresses != null) {
 			try {
 				email.setRecipientsBCC(Stream.of(addresses).map(address -> {
@@ -504,41 +504,11 @@ public class MailUtil {
 	 */
 	private static String getText(Part p) throws MessagingException, IOException {
 		if (p.isMimeType("text/*")) {
-			Object obj = p.getContent();
-			String str = NO_BODY;
-
-			if (obj instanceof InputStream) {
-				InputStream is = (InputStream) obj;
-				StringWriter writer = new StringWriter();
-				IOUtils.copy(is, writer, "UTF-8");
-				str = writer.toString();
-			} else {
-				str = (String) obj;
-			}
-
-			if (p.isMimeType("text/html")) {
-				return "H" + str;
-			} else {
-				// Let's set as text/plain
-				return "T" + str;
-			}
+			return extractTextFromTextStar(p);
 		} else if (p.isMimeType("multipart/alternative")) {
-			// prefer html over plain text
-			Multipart mp = (Multipart) p.getContent();
-			String text = "T" + NO_BODY;
-			// log.info("Mime Parts: {}", mp.getCount());
-
-			for (int i = 0; i < mp.getCount(); i++) {
-				Part bp = mp.getBodyPart(i);
-				text = getText(bp);
-				if (bp.isMimeType("text/html"))
-					break;
-			}
-
-			return text;
+			return extractTextFromMultipartAlernative(p);
 		} else if (p.isMimeType("multipart/*")) {
 			Multipart mp = (Multipart) p.getContent();
-
 			for (int i = 0; i < mp.getCount(); i++) {
 				String s = getText(mp.getBodyPart(i));
 				if (s != null)
@@ -547,6 +517,60 @@ public class MailUtil {
 		}
 
 		return "T" + NO_BODY;
+	}
+
+	/**
+	 * Extracts the text from a part of type text/*
+	 * 
+	 * @param p The part
+	 * @return The extracted text
+	 * 
+	 * @throws IOException error
+	 * @throws MessagingException error
+	 */
+	private static String extractTextFromTextStar(Part p) throws IOException, MessagingException {
+		Object obj = p.getContent();
+		String str = NO_BODY;
+
+		if (obj instanceof InputStream) {
+			InputStream is = (InputStream) obj;
+			StringWriter writer = new StringWriter();
+			IOUtils.copy(is, writer, "UTF-8");
+			str = writer.toString();
+		} else {
+			str = (String) obj;
+		}
+
+		if (p.isMimeType("text/html")) {
+			return "H" + str;
+		} else {
+			// Let's set as text/plain
+			return "T" + str;
+		}
+	}
+
+	/**
+	 * Extracts the text from a part of type multipart/alternative
+	 * 
+	 * @param p The part
+	 * @return The extracted text
+	 * 
+	 * @throws IOException error
+	 * @throws MessagingException error
+	 */
+	private static String extractTextFromMultipartAlernative(Part p) throws IOException, MessagingException {
+		// prefer html over plain text
+		Multipart mp = (Multipart) p.getContent();
+		String text = "T" + NO_BODY;
+		// log.info("Mime Parts: {}", mp.getCount());
+
+		for (int i = 0; i < mp.getCount(); i++) {
+			Part bp = mp.getBodyPart(i);
+			text = getText(bp);
+			if (bp.isMimeType("text/html"))
+				break;
+		}
+		return text;
 	}
 
 	/**

@@ -2141,20 +2141,21 @@ public class LDRepository {
 		// now put the new properties, update properties
 		copyProperties(type, properties, result);
 
-		addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
-		addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
-
 		if (object instanceof Document) {
 			Document doc = (Document) object;
 			documentDao.initialize(doc);
 			updateDocumentMetadata(doc, result, false);
-
+			
+			{
+				addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
+				addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
+			}
+			
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);
 			transaction.setEvent(DocumentEvent.CHANGED.toString());
 			Document actualDoc = documentDao.findById(doc.getId());
-			log.debug("actualDoc: {}", actualDoc);
 			documentDao.initialize(actualDoc);
 			doc.setId(0);
 			documentManager.update(actualDoc, doc, transaction);
@@ -2162,6 +2163,11 @@ public class LDRepository {
 			Folder folder = (Folder) object;
 			updateFolderMetadata(folder, result, properties);
 
+			{
+				addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
+				addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
+			}
+			
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);
