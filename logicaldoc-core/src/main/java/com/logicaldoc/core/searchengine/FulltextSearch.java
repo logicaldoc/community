@@ -23,6 +23,7 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.util.Context;
@@ -270,7 +271,7 @@ public class FulltextSearch extends Search {
 				+ " and A.ld_nature=" + AbstractDocument.NATURE_DOC + " and A.ld_folderid=FOLD.ld_id  ");
 		richQuery.append(" and A.ld_tenantid = " + tenantId);
 		// For normal users we have to exclude not published documents
-		if (searchUser != null && !searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
+		if (searchUser != null && !searchUser.isMemberOf(Group.GROUP_ADMIN) && !searchUser.isMemberOf("publisher")) {
 			richQuery.append(" and A.ld_published = 1 ");
 			richQuery.append(" and A.ld_startpublishing <= CURRENT_TIMESTAMP ");
 			richQuery.append(" and ( A.ld_stoppublishing is null or A.ld_stoppublishing > CURRENT_TIMESTAMP )");
@@ -301,7 +302,7 @@ public class FulltextSearch extends Search {
 					+ " and A.ld_nature=" + AbstractDocument.NATURE_DOC + " and A.ld_folderid=FOLD.ld_id ");
 			richQuery.append(" and A.ld_tenantid = " + tenantId);
 			// For normal users we have to exclude not published documents
-			if (searchUser != null && !searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
+			if (searchUser != null && !searchUser.isMemberOf(Group.GROUP_ADMIN) && !searchUser.isMemberOf("publisher")) {
 				richQuery.append(" and REF.ld_published = 1 ");
 				richQuery.append(" and REF.ld_startpublishing <= CURRENT_TIMESTAMP ");
 				richQuery.append(" and ( REF.ld_stoppublishing is null or REF.ld_stoppublishing > CURRENT_TIMESTAMP )");
@@ -341,7 +342,7 @@ public class FulltextSearch extends Search {
 			if (StringUtils.isEmpty(hit.getFileName()))
 				continue;
 
-			if ((searchUser.isMemberOf("admin") && opt.getFolderId() == null)
+			if ((searchUser.isMemberOf(Group.GROUP_ADMIN) && opt.getFolderId() == null)
 					|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId())))
 				hits.add(hit);
 		}

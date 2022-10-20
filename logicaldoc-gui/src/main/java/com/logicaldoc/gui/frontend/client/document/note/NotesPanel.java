@@ -1,6 +1,7 @@
 package com.logicaldoc.gui.frontend.client.document.note;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -185,7 +186,7 @@ public class NotesPanel extends DocumentDetailTab {
 
 				ListGridRecord[] selection = notesGrid.getSelectedRecords();
 
-				if (Session.get().getUser().isMemberOf("admin")) {
+				if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 					delete.setEnabled(selection.length > 0);
 					edit.setEnabled(selection.length == 1);
 				} else if (Session.get().getConfigAsBoolean("gui.notes.allowedit")) {

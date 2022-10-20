@@ -59,7 +59,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			}
 
 			// Remove sensible informations in case of non admin user
-			if (!user.isMemberOf("admin")) {
+			if (!user.isMemberOf(Group.GROUP_ADMIN)) {
 				for (WSUser usr : users) {
 					usr.setUsername(null);
 					usr.setEmail(null);

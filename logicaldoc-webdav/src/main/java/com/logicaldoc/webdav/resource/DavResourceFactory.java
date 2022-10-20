@@ -1,12 +1,12 @@
 package com.logicaldoc.webdav.resource;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletRequest;
 
 import com.logicaldoc.webdav.session.WebdavSession;
-import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * For more informations, please visit

@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
@@ -80,7 +81,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	@Override
 	public boolean store(FolderHistory history) throws PersistenceException {
 		// Write only if the history is enabled
-		if (RunLevel.current().aspectEnabled(FolderHistory.ASPECT)) {
+		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
 			if (history.getComment() != null && history.getComment().length() > 4000)
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 			boolean ret = super.store(history);

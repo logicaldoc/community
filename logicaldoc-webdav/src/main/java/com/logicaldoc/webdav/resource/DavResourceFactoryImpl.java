@@ -3,13 +3,14 @@ package com.logicaldoc.webdav.resource;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletRequest;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.lock.LockManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,8 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 	}
 
 	public DavResourceFactoryImpl(LockManager lockMgr, ResourceConfig resourceConfig) {
-		this.resourceConfig = (resourceConfig != null) ? resourceConfig: (ResourceConfig) Context.get().getBean("ResourceConfig");
+		this.resourceConfig = (resourceConfig != null) ? resourceConfig
+				: (ResourceConfig) Context.get().getBean("ResourceConfig");
 		this.resourceService = (ResourceService) Context.get().getBean("ResourceService");
 	}
 
@@ -50,7 +52,8 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 		return createResource(locator, request, (WebdavSession) request.getDavSession());
 	}
 
-	public DavResource createResource(DavResourceLocator locator, DavServletRequest request, WebdavSession session) throws DavException {
+	public DavResource createResource(DavResourceLocator locator, DavServletRequest request, WebdavSession session)
+			throws DavException {
 
 		try {
 			String resourcePath = locator.getResourcePath();
@@ -72,13 +75,14 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 			} else {
 				repositoryResource.setVersionLabel(version);
 				repositoryResource.setRequestedPerson(Long.parseLong(session.getObject("id").toString()));
-				resource = new VersionControlledResourceImpl(locator, this, session, resourceConfig, repositoryResource);
+				resource = new VersionControlledResourceImpl(locator, this, session, resourceConfig,
+						repositoryResource);
 			}
 
 			return resource;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
@@ -90,29 +94,33 @@ public class DavResourceFactoryImpl implements DavResourceFactory {
 			return resource;
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e);
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
 		}
 	}
 
-	private DavResource createNullResource(DavResourceLocator locator, WebdavSession session, boolean isCollection) throws DavException {
+	private DavResource createNullResource(DavResourceLocator locator, WebdavSession session, boolean isCollection)
+			throws DavException {
 		return new VersionControlledResourceImpl(locator, this, session, resourceConfig, isCollection);
 	}
 
-	public DavResource createResource(DavResourceLocator locator, WebdavSession session, Resource resource) throws DavException {
+	public DavResource createResource(DavResourceLocator locator, WebdavSession session, Resource resource)
+			throws DavException {
 		return new VersionControlledResourceImpl(locator, this, session, resourceConfig, resource);
 	}
 
 	@Override
-	public DavResource createRangeResource(DavResourceLocator locator, WebdavSession session, Pair<String, String> parsedRange) throws DavException {
-		
+	public DavResource createRangeResource(DavResourceLocator locator, WebdavSession session,
+			Pair<String, String> parsedRange) throws DavException {
+
 		Resource res = resourceService.getResource(locator.getResourcePath(), session);
-		//DavResource resource = createResource(locator, session, res);
-		
-		
+		// DavResource resource = createResource(locator, session, res);
+
 		/*
-public RangeResourceImpl(DavResourceLocator locator, DavResourceFactory factory, DavSession session, ResourceConfig config, Resource resource, Pair<String, String> requestRange) {
-		 */		
-		
+		 * public RangeResourceImpl(DavResourceLocator locator,
+		 * DavResourceFactory factory, DavSession session, ResourceConfig
+		 * config, Resource resource, Pair<String, String> requestRange) {
+		 */
+
 		RangeResourceImpl rangeRes = new RangeResourceImpl(locator, this, session, resourceConfig, res, parsedRange);
 		return rangeRes;
 	}

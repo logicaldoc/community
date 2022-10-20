@@ -663,7 +663,7 @@ public class TaskDetailsDialog extends Window {
 
 				ListGridRecord[] selection = notesGrid.getSelectedRecords();
 
-				if (Session.get().getUser().isMemberOf("admin")) {
+				if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 					delete.setEnabled(selection.length > 0);
 				} else {
 					long userId = Long.parseLong(selection[0].getAttribute("userId"));

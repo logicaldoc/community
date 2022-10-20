@@ -130,7 +130,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				Session session = SessionManager.get().getSession(request);
 				if (session == null)
-					throw new DavException(DavServletResponse.SC_FORBIDDEN);
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 
 				SessionManager.get().renew(session.getSid());
 
@@ -147,7 +147,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 				String path = webdavRequest.getRequestLocator().getResourcePath();
 				if (path.startsWith("/store") == false && path.startsWith("/vstore") == false)
-					throw new DavException(DavServletResponse.SC_NOT_FOUND);
+					throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 
 				// check matching if=header for lock-token relevant operations
 				DavResource resource = getResourceFactory().createResource(webdavRequest.getRequestLocator(),
@@ -155,7 +155,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 				if (!isPreconditionValid(webdavRequest, resource)) {
 					try {
-						webdavResponse.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
+						webdavResponse.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
 					} catch (Throwable t) {
 						// Nothing to do
 					}
@@ -307,7 +307,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			try {
-				response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			} catch (Throwable t) {
 				// Nothing to do
 			}
@@ -358,7 +358,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				// Enforce download permission
 				ExportContext exportCtx = dri.getExportContext(oc);
 				if (!exportCtx.getResource().isDownloadEnabled()) {
-					throw new DavException(DavServletResponse.SC_FORBIDDEN,
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN,
 							"Download permission not granted to this user");
 				}
 
@@ -405,17 +405,17 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	private Pair<String, String> parseRangeRequestHeader(String rangeHeader) throws DavException {
 		assert rangeHeader != null;
 		if (!rangeHeader.startsWith(RANGE_BYTE_PREFIX)) {
-			throw new DavException(DavServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+			throw new DavException(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
 		}
 		final String byteRangeSet = StringUtils.removeStartIgnoreCase(rangeHeader, RANGE_BYTE_PREFIX);
 		final String[] byteRanges = StringUtils.split(byteRangeSet, RANGE_SET_SEP);
 		if (byteRanges.length != 1) {
-			throw new DavException(DavServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+			throw new DavException(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
 		}
 		final String byteRange = byteRanges[0];
 		final String[] bytePos = StringUtils.splitPreserveAllTokens(byteRange, RANGE_SEP);
 		if (bytePos.length != 2 || bytePos[0].isEmpty() && bytePos[1].isEmpty()) {
-			throw new DavException(DavServletResponse.SC_BAD_REQUEST, "malformed range header: " + rangeHeader);
+			throw new DavException(HttpServletResponse.SC_BAD_REQUEST, "malformed range header: " + rangeHeader);
 		}
 		return new ImmutablePair<>(bytePos[0], bytePos[1]);
 	}
@@ -440,7 +440,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		if (!resource.exists()) {
 			log.warn("Resource not found: {}", resource.getResourcePath());
-			response.sendError(DavServletResponse.SC_NOT_FOUND);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
@@ -489,7 +489,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		List<? extends PropEntry> changeList = request.getPropPatchChangeList();
 		if (changeList.isEmpty()) {
-			response.sendError(DavServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 
@@ -537,16 +537,16 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 			if (parentResource == null || !parentResource.exists()) {
 				// parent does not exist
-				response.sendError(DavServletResponse.SC_CONFLICT);
+				response.sendError(HttpServletResponse.SC_CONFLICT);
 				return;
 			}
 
 			int status;
 			// test if resource already exists
 			if (resource.exists()) {
-				status = DavServletResponse.SC_NO_CONTENT;
+				status = HttpServletResponse.SC_NO_CONTENT;
 			} else {
-				status = DavServletResponse.SC_CREATED;
+				status = HttpServletResponse.SC_CREATED;
 			}
 
 			parentResource.addMember(resource, getInputContext(request, request.getInputStream()));
@@ -563,7 +563,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			log.error("An Exception occurred!", e);
 
 			try {
-				response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (Throwable t) {
 				// Nothing to do
 			}
@@ -590,12 +590,12 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			DavResource parentResource = resource.getCollection();
 			if (parentResource == null || !parentResource.exists() || !parentResource.isCollection()) {
 				// parent does not exist or is not a collection
-				response.sendError(DavServletResponse.SC_CONFLICT);
+				response.sendError(HttpServletResponse.SC_CONFLICT);
 				return;
 			}
 			// shortcut: mkcol is only allowed on deleted/non-existing resources
 			if (resource.exists()) {
-				response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			}
 
 			if (request.getContentLength() > 0 || request.getHeader("Transfer-Encoding") != null) {
@@ -603,7 +603,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			} else {
 				parentResource.addMember(resource, getInputContext(request, null));
 			}
-			response.setStatus(DavServletResponse.SC_CREATED);
+			response.setStatus(HttpServletResponse.SC_CREATED);
 		} catch (DavException dave) {
 			log.debug("Error during folder creation", dave);
 			response.setStatus(dave.getErrorCode());
@@ -611,7 +611,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			log.error("Error during folder creation", e);
 
 			try {
-				response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (Throwable t) {
 				// Nothing to do
 			}
@@ -638,9 +638,9 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			DavResource parent = resource.getCollection();
 			if (parent != null) {
 				parent.removeMember(resource);
-				response.setStatus(DavServletResponse.SC_NO_CONTENT);
+				response.setStatus(HttpServletResponse.SC_NO_CONTENT);
 			} else {
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot remove the root resource.");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot remove the root resource.");
 			}
 		} catch (DavException dave) {
 			log.debug(dave.getMessage(), dave);
@@ -649,7 +649,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			log.error(e.getMessage(), e);
 
 			try {
-				response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (Throwable t) {
 				// Nothing to do
 			}
@@ -674,7 +674,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		int depth = request.getDepth(DEPTH_INFINITY);
 		if (!(depth == DEPTH_0 || depth == DEPTH_INFINITY)) {
 			try {
-				response.sendError(DavServletResponse.SC_BAD_REQUEST);
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			} catch (Throwable t) {
 				// Nothing to do
 			}
@@ -689,7 +689,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		}
 
 		int status = validateDestination(destResource, request);
-		if (status > DavServletResponse.SC_NO_CONTENT) {
+		if (status > HttpServletResponse.SC_NO_CONTENT) {
 			try {
 				response.sendError(status);
 			} catch (Throwable t) {
@@ -729,8 +729,8 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			int status = validateDestination(destResource, request);
 			log.debug("status = " + status);
 
-			if (status > DavServletResponse.SC_NO_CONTENT) {
-				log.debug("status > DavServletResponse.SC_NO_CONTENT");
+			if (status > HttpServletResponse.SC_NO_CONTENT) {
+				log.debug("status > HttpServletResponse.SC_NO_CONTENT");
 				try {
 					response.sendError(status);
 				} catch (Throwable t) {
@@ -747,7 +747,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		} catch (Exception e) {
 			log.error("Error during move", e);
 			try {
-				response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (Throwable t) {
 				// Nothing to do
 			}
@@ -768,10 +768,10 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		String destHeader = request.getHeader(HEADER_DESTINATION);
 		if (destHeader == null || "".equals(destHeader)) {
-			return DavServletResponse.SC_BAD_REQUEST;
+			return HttpServletResponse.SC_BAD_REQUEST;
 		}
 		if (destResource.getLocator().equals(request.getRequestLocator())) {
-			return DavServletResponse.SC_FORBIDDEN;
+			return HttpServletResponse.SC_FORBIDDEN;
 		}
 
 		int status;
@@ -779,20 +779,20 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			if (request.isOverwrite()) {
 				// matching if-header required for existing resources
 				if (!request.matchesIfHeader(destResource)) {
-					return DavServletResponse.SC_PRECONDITION_FAILED;
+					return HttpServletResponse.SC_PRECONDITION_FAILED;
 				} else {
 					// overwrite existing resource
 					destResource.getCollection().removeMember(destResource);
-					status = DavServletResponse.SC_NO_CONTENT;
+					status = HttpServletResponse.SC_NO_CONTENT;
 				}
 			} else {
 				// cannot copy/move to an existing item, if overwrite is not
 				// forced
-				return DavServletResponse.SC_PRECONDITION_FAILED;
+				return HttpServletResponse.SC_PRECONDITION_FAILED;
 			}
 		} else {
 			// destination does not exist >> copy/move can be performed
-			status = DavServletResponse.SC_CREATED;
+			status = HttpServletResponse.SC_CREATED;
 		}
 		return status;
 	}
@@ -824,9 +824,9 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			oR = ((DeltaVResource) resource).getOptionResponse(oInfo);
 		}
 		if (oR == null) {
-			response.setStatus(DavServletResponse.SC_OK);
+			response.setStatus(HttpServletResponse.SC_OK);
 		} else {
-			response.sendXmlResponse(oR, DavServletResponse.SC_OK);
+			response.sendXmlResponse(oR, HttpServletResponse.SC_OK);
 		}
 	}
 
@@ -835,7 +835,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		log.debug("doVersionControl");
 		if (!(resource instanceof VersionableResource)) {
 			try {
-				response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			} catch (Throwable t) {
 				// Nothing to do
 			}
@@ -879,7 +879,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws DavException, IOException {
 		log.debug("doCheckout");
 		if (!(resource instanceof VersionControlledResource)) {
-			response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+			response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			return;
 		}
 		((VersionControlledResource) resource).checkout();
@@ -900,7 +900,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		log.debug("doCheckin");
 
 		try {
-			response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+			response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 		} catch (Throwable t) {
 			// Nothing to do
 		}
@@ -928,14 +928,15 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			report = ((AclResource) resource).getReport(info);
 		} else {
 			try {
-				response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			} catch (Throwable t) {
 				// Nothing to do
 			}
 			return;
 		}
 
-		int statusCode = (report.isMultiStatusReport()) ? DavServletResponse.SC_MULTI_STATUS : DavServletResponse.SC_OK;
+		int statusCode = (report.isMultiStatusReport()) ? DavServletResponse.SC_MULTI_STATUS
+				: HttpServletResponse.SC_OK;
 		response.sendXmlResponse(report, statusCode);
 	}
 
@@ -953,11 +954,15 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			throws DavException, IOException {
 		log.debug("doUncheckout(" + resource.getDisplayName() + ")");
 		if (!(resource instanceof VersionControlledResource)) {
-			response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+			try {
+				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+			} catch (IOException e) {
+				// Nothing to do
+			}
 			return;
 		}
 		((VersionControlledResource) resource).uncheckout();
-		response.setStatus(DavServletResponse.SC_OK);
+		response.setStatus(HttpServletResponse.SC_OK);
 	}
 
 	/**

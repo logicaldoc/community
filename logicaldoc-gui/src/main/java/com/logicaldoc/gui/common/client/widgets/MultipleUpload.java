@@ -32,6 +32,8 @@ import com.google.gwt.event.dom.client.DragOverEvent;
 import com.google.gwt.event.dom.client.DragOverHandler;
 import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -202,9 +204,9 @@ public class MultipleUpload extends HorizontalPanel {
 
 		add(verticalPanel);
 		add(progressBarPanel);
-		setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
-		setCellHorizontalAlignment(uploader, HorizontalPanel.ALIGN_LEFT);
-		setCellHorizontalAlignment(progressBarPanel, HorizontalPanel.ALIGN_RIGHT);
+		setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		setCellHorizontalAlignment(uploader, HasHorizontalAlignment.ALIGN_LEFT);
+		setCellHorizontalAlignment(progressBarPanel, HasHorizontalAlignment.ALIGN_RIGHT);
 	}
 
 	public void setFileTypes(String fileTypes) {

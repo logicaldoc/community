@@ -133,6 +133,7 @@ import com.logicaldoc.core.searchengine.FulltextSearchOptions;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.searchengine.SearchException;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -832,7 +833,12 @@ public class LDRepository {
 
 			// get old properties
 			Properties oldProperties = compileProperties(object, null, new ObjectInfoImpl());
-			update(object, oldProperties, properties);
+
+			try {
+				update(object, oldProperties, properties);
+			} catch (PersistenceException e) {
+				throw new CmisStorageException("Storage error during folder update", e);
+			}
 
 			return compileObjectType(context, object, null, false, false, objectInfos);
 		} catch (Throwable t) {
@@ -904,7 +910,8 @@ public class LDRepository {
 			Document doc = (Document) object;
 
 			if (doc.getStatus() == AbstractDocument.DOC_CHECKED_OUT
-					&& ((getSessionUser().getId() != doc.getLockUserId()) && (!getSessionUser().isMemberOf("admin"))))
+					&& ((getSessionUser().getId() != doc.getLockUserId())
+							&& (!getSessionUser().isMemberOf(Group.GROUP_ADMIN))))
 				throw new CmisPermissionDeniedException("You can't change the checkout status on this object!");
 
 			// Create the document history event
@@ -938,7 +945,8 @@ public class LDRepository {
 			Document doc = (Document) object;
 
 			if (doc.getStatus() == AbstractDocument.DOC_CHECKED_OUT
-					&& ((getSessionUser().getId() != doc.getLockUserId()) && (!getSessionUser().isMemberOf("admin")))) {
+					&& ((getSessionUser().getId() != doc.getLockUserId())
+							&& (!getSessionUser().isMemberOf(Group.GROUP_ADMIN)))) {
 				throw new CmisPermissionDeniedException(
 						String.format("You can't do a checkin on object %s!", objectId.getValue()));
 			}
@@ -1562,7 +1570,7 @@ public class LDRepository {
 	// --- helper methods ---
 
 	private void checkPublished(User user, Document doc) throws Exception {
-		if (!user.isMemberOf("admin") && !user.isMemberOf("publisher") && !doc.isPublishing())
+		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new Exception("Document not published");
 	}
 
@@ -2112,8 +2120,11 @@ public class LDRepository {
 
 	/**
 	 * Checks and updates a property set and write to database.
+	 * 
+	 * @throws PersistenceException Storage error during update
 	 */
-	private Properties update(PersistentObject object, Properties oldProperties, Properties properties) {
+	private Properties update(PersistentObject object, Properties oldProperties, Properties properties)
+			throws PersistenceException {
 		PropertiesImpl result = new PropertiesImpl();
 
 		if (properties == null)
@@ -2125,41 +2136,57 @@ public class LDRepository {
 		TypeDefinition type = types.getType(typeId);
 
 		// copy old properties
-		for (PropertyData<?> prop : oldProperties.getProperties().values()) {
-			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(prop.getId());
+		copyOldProperties(type, oldProperties, result);
 
-			// do we know that property?
-			if (propType == null) {
-				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), IS_UNKNOWN));
-			}
+		// now put the new properties, update properties
+		copyProperties(type, properties, result);
 
-			// only add read/write properties
-			if ((propType.getUpdatability() != Updatability.READWRITE)) {
-				continue;
-			}
+		addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
+		addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
 
-			result.addProperty(prop);
+		if (object instanceof Document) {
+			Document doc = (Document) object;
+			documentDao.initialize(doc);
+			updateDocumentMetadata(doc, result, false);
+
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setUser(getSessionUser());
+			transaction.setSessionId(sid);
+			transaction.setEvent(DocumentEvent.CHANGED.toString());
+			Document actualDoc = documentDao.findById(doc.getId());
+			log.debug("actualDoc: {}", actualDoc);
+			documentDao.initialize(actualDoc);
+			doc.setId(0);
+			documentManager.update(actualDoc, doc, transaction);
+		} else {
+			Folder folder = (Folder) object;
+			updateFolderMetadata(folder, result, properties);
+
+			FolderHistory transaction = new FolderHistory();
+			transaction.setUser(getSessionUser());
+			transaction.setSessionId(sid);
+			transaction.setEvent(FolderEvent.CHANGED.toString());
+			folderDao.store(folder, transaction);
 		}
 
-		// now put the new properties
-		// update properties
+		return result;
+	}
+
+	private void copyProperties(TypeDefinition type, Properties properties, PropertiesImpl result) {
 		for (PropertyData<?> prop : properties.getProperties().values()) {
 			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(prop.getId());
 
 			// do we know that property?
-			if (propType == null) {
+			if (propType == null)
 				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), IS_UNKNOWN));
-			}
 
 			// can it be set?
-			if ((propType.getUpdatability() == Updatability.READONLY)) {
+			if ((propType.getUpdatability() == Updatability.READONLY))
 				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), "is readonly!"));
-			}
 
-			if ((propType.getUpdatability() == Updatability.ONCREATE)) {
+			if ((propType.getUpdatability() == Updatability.ONCREATE))
 				throw new CmisConstraintException(
 						String.format(PROPERTY_S_S, prop.getId(), "can only be set on create!"));
-			}
 
 			// default or value
 			if (isEmptyProperty(prop)) {
@@ -2168,58 +2195,36 @@ public class LDRepository {
 				result.addProperty(prop);
 			}
 		}
+	}
 
-		Document doc = object instanceof Document ? (Document) object : null;
-		Folder folder = object instanceof Folder ? (Folder) object : null;
+	private void copyOldProperties(TypeDefinition type, Properties oldProperties, PropertiesImpl newProperties) {
+		for (PropertyData<?> prop : oldProperties.getProperties().values()) {
+			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(prop.getId());
 
-		if (object instanceof Document) {
-			documentDao.initialize(doc);
-			updateDocumentMetadata(doc, result, false);
-		} else {
-			// update properties
-			for (PropertyData<?> prop : properties.getProperties().values()) {
-				PropertyData<?> p = result.getProperties().get(prop.getId());
+			// do we know that property?
+			if (propType == null)
+				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), IS_UNKNOWN));
 
-				if ((p.getId().equals(PropertyIds.CONTENT_STREAM_FILE_NAME) || p.getId().equals(PropertyIds.NAME))
-						&& StringUtils.isNotEmpty((String) p.getFirstValue()))
-					folder.setName((String) p.getFirstValue());
-				else if (p.getId().equals(TypeManager.PROP_DESCRIPTION)) {
-					folder.setDescription((String) p.getFirstValue());
-				}
+			// only add read/write properties
+			if ((propType.getUpdatability() != Updatability.READWRITE))
+				continue;
+
+			newProperties.addProperty(prop);
+		}
+	}
+
+	private void updateFolderMetadata(Folder folder, PropertiesImpl result, Properties properties) {
+		// update properties
+		for (PropertyData<?> prop : properties.getProperties().values()) {
+			PropertyData<?> p = result.getProperties().get(prop.getId());
+
+			if ((p.getId().equals(PropertyIds.CONTENT_STREAM_FILE_NAME) || p.getId().equals(PropertyIds.NAME))
+					&& StringUtils.isNotEmpty((String) p.getFirstValue()))
+				folder.setName((String) p.getFirstValue());
+			else if (p.getId().equals(TypeManager.PROP_DESCRIPTION)) {
+				folder.setDescription((String) p.getFirstValue());
 			}
 		}
-
-		addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
-		addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
-
-		if (object instanceof Document) {
-			DocumentHistory transaction = new DocumentHistory();
-			transaction.setUser(getSessionUser());
-			transaction.setSessionId(sid);
-			transaction.setEvent(DocumentEvent.CHANGED.toString());
-			try {
-				Document actualDoc = documentDao.findById(doc.getId());
-				log.debug("actualDoc: {}", actualDoc);
-				documentDao.initialize(actualDoc);
-				doc.setId(0);
-				documentManager.update(actualDoc, doc, transaction);
-			} catch (Throwable e) {
-				throw new CmisStorageException("Storage error during document update", e);
-			}
-		} else {
-			FolderHistory transaction = new FolderHistory();
-			transaction.setUser(getSessionUser());
-			transaction.setSessionId(sid);
-			transaction.setEvent(FolderEvent.CHANGED.toString());
-
-			try {
-				folderDao.store(folder, transaction);
-			} catch (Throwable e) {
-				throw new CmisStorageException("Storage error during folder update", e);
-			}
-		}
-
-		return result;
 	}
 
 	private static boolean isEmptyProperty(PropertyData<?> prop) {
@@ -2450,7 +2455,7 @@ public class LDRepository {
 			addAction(aas, Action.CAN_CANCEL_CHECK_OUT,
 					doc.getStatus() != AbstractDocument.DOC_UNLOCKED
 							&& (doc.getLockUserId().longValue() == getSessionUser().getId()
-									|| getSessionUser().isMemberOf("admin")));
+									|| getSessionUser().isMemberOf(Group.GROUP_ADMIN)));
 		} else {
 			addAction(aas, Action.CAN_GET_CONTENT_STREAM, true);
 		}

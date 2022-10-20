@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.docusign;
 import java.util.Arrays;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIDocumentNote;
@@ -39,7 +40,7 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 	@Override
 	protected DrawItem prepareAnnotationItem(GUIDocumentNote note) {
 		DrawItem drawItem = newAnnotationItem(note);
-		if (Session.get().getUser().isMemberOf("admin") || note.getUserId() == Session.get().getUser().getId()) {
+		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN) || note.getUserId() == Session.get().getUser().getId()) {
 			DocuSignTabContextMenu contextMenu = new DocuSignTabContextMenu(drawItem, note);
 			contextMenu.addDeleteClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
 

@@ -8,11 +8,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.logicaldoc.core.folder.Folder;
 
@@ -21,9 +20,9 @@ import com.logicaldoc.core.folder.Folder;
  * @author Marco Meschieri - LogicalDOC
  */
 public class EMail extends Message {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private String authorAddress = "";
 
 	private String username = "";
@@ -291,28 +290,10 @@ public class EMail extends Message {
 	 */
 	public Set<String> getAllRecipientsEmails() {
 		Set<String> emails = new HashSet<String>();
-
-		if (getRecipients() != null && !getRecipients().isEmpty()) {
-			for (Recipient recipient : getRecipients())
-				if (StringUtils.isNotEmpty(recipient.getAddress())
-						&& !emails.contains(recipient.getAddress().toLowerCase()))
-					emails.add(recipient.getAddress().toLowerCase());
-		}
-
-		if (recipientsCC != null && !recipientsCC.isEmpty()) {
-			for (Recipient recipient : recipientsCC)
-				if (StringUtils.isNotEmpty(recipient.getAddress())
-						&& !emails.contains(recipient.getAddress().toLowerCase()))
-					emails.add(recipient.getAddress().toLowerCase());
-		}
-
-		if (recipientsBCC != null && !recipientsBCC.isEmpty()) {
-			for (Recipient recipient : recipientsBCC)
-				if (StringUtils.isNotEmpty(recipient.getAddress())
-						&& !emails.contains(recipient.getAddress().toLowerCase()))
-					emails.add(recipient.getAddress().toLowerCase());
-		}
-
+		emails.addAll(
+				getRecipients().stream().map(r -> r.getAddress().trim().toLowerCase()).collect(Collectors.toSet()));
+		emails.addAll(recipientsCC.stream().map(r -> r.getAddress().trim().toLowerCase()).collect(Collectors.toSet()));
+		emails.addAll(recipientsBCC.stream().map(r -> r.getAddress().trim().toLowerCase()).collect(Collectors.toSet()));
 		return emails;
 	}
 

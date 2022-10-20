@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.mail.Address;
 import javax.mail.BodyPart;
@@ -281,8 +283,123 @@ public class MailUtil {
 			throws MessagingException, IOException {
 		EMail email = new EMail();
 
-		Date receivedDate = msg.getReceivedDate();
+		setReceivedDate(msg, email);
 
+		email.setSubject(msg.getSubject() == null || msg.getSubject().isEmpty() ? NO_SUBJECT : msg.getSubject());
+
+		setMessageText(msg, email);
+
+		if (msg.getFrom() != null && msg.getFrom().length > 0) {
+			Recipient rec = new Recipient();
+			rec.setName(getAddressName(msg.getFrom()[0]));
+			rec.setAddress(getAddressEmail(msg.getFrom()[0]));
+			rec.setType(Recipient.TYPE_EMAIL);
+			rec.setMode(Recipient.MODE_EMAIL_TO);
+			email.setFrom(rec);
+			email.setAuthor(rec.getName());
+			email.setAuthorAddress(rec.getAddress());
+		}
+
+		setTO(msg, email);
+
+		setCC(msg, email);
+
+		setBCC(msg, email);
+
+		setReplyTo(msg, email);
+
+		if (msg.isMimeType("multipart/*") && (msg.getContent() instanceof Multipart)) {
+			Multipart mp = (Multipart) msg.getContent();
+			int count = mp.getCount();
+			for (int i = 1; i < count; i++) {
+				BodyPart bp = mp.getBodyPart(i);
+				addAttachments(bp, email, extractAttachmentContent);
+			}
+		}
+
+		return email;
+	}
+
+	private static void setReplyTo(javax.mail.Message msg, EMail email) throws MessagingException {
+		Address[] addresses = msg.getReplyTo();
+		if (addresses != null) {
+			try {
+				email.setReplyTo(Stream.of(addresses).map(address -> {
+					Recipient rec = new Recipient();
+					rec.setName(getAddressName(address));
+					rec.setAddress(getAddressEmail(address));
+					rec.setType(Recipient.TYPE_EMAIL);
+					rec.setMode(Recipient.MODE_EMAIL_REPLYTO);
+					return rec;
+				}).collect(Collectors.toSet()));
+			} catch (Throwable t) {
+				log.warn("Unable to extract BCC addresses - %s", t.getMessage());
+			}
+		}
+	}
+
+	private static void setBCC(javax.mail.Message msg, EMail email) throws MessagingException {
+		Address[] addresses  = msg.getRecipients(Message.RecipientType.BCC);
+		if (addresses != null) {
+			try {
+				email.setRecipientsBCC(Stream.of(addresses).map(address -> {
+					Recipient rec = new Recipient();
+					rec.setName(getAddressName(address));
+					rec.setAddress(getAddressEmail(address));
+					rec.setType(Recipient.TYPE_EMAIL);
+					rec.setMode(Recipient.MODE_EMAIL_BCC);
+					return rec;
+				}).collect(Collectors.toSet()));
+			} catch (Throwable t) {
+				log.warn("Unable to extract BCC addresses - %s", t.getMessage());
+			}
+		}
+	}
+
+	private static void setCC(javax.mail.Message msg, EMail email) throws MessagingException {
+		Address[] addresses = msg.getRecipients(Message.RecipientType.CC);
+		if (addresses != null) {
+			try {
+				email.setRecipientsCC(Stream.of(addresses).map(address -> {
+					Recipient rec = new Recipient();
+					rec.setName(getAddressName(address));
+					rec.setAddress(getAddressEmail(address));
+					rec.setType(Recipient.TYPE_EMAIL);
+					rec.setMode(Recipient.MODE_EMAIL_CC);
+					return rec;
+				}).collect(Collectors.toSet()));
+			} catch (Throwable t) {
+				log.warn("Unable to extract CC addresses - %s", t.getMessage());
+			}
+		}
+	}
+
+	private static void setTO(javax.mail.Message msg, EMail email) throws MessagingException {
+		Address[] addresses = msg.getRecipients(Message.RecipientType.TO);
+		if (addresses != null) {
+			try {
+				email.setRecipients(Stream.of(addresses).map(address -> {
+					Recipient rec = new Recipient();
+					rec.setName(getAddressName(address));
+					rec.setAddress(getAddressEmail(address));
+					rec.setType(Recipient.TYPE_EMAIL);
+					rec.setMode(Recipient.MODE_EMAIL_TO);
+					return rec;
+				}).collect(Collectors.toSet()));
+			} catch (Throwable t) {
+				log.warn("Unable to extract TO addresses - %s", t.getMessage());
+			}
+		}
+	}
+
+	private static void setMessageText(javax.mail.Message msg, EMail email) throws MessagingException, IOException {
+		String body = getText(msg);
+		email.setHtml(body.charAt(0) == 'H' ? 1 : 0);
+		email.setMessageText(body.substring(1));
+	}
+
+	private static void setReceivedDate(javax.mail.Message msg, EMail email) throws MessagingException {
+		Date receivedDate = msg.getReceivedDate();
 		if (receivedDate == null) {
 			String[] date = msg.getHeader("Delivery-Date");
 			if (date != null && StringUtils.isNotEmpty(date[0]))
@@ -311,97 +428,6 @@ public class MailUtil {
 			sentDate.setTime(msg.getSentDate());
 		}
 		email.setSentDate(sentDate.getTime());
-
-		email.setSubject(msg.getSubject() == null || msg.getSubject().isEmpty() ? NO_SUBJECT : msg.getSubject());
-
-		String body = getText(msg);
-		if (body.charAt(0) == 'H')
-			email.setHtml(1);
-		else
-			email.setHtml(0);
-		email.setMessageText(body.substring(1));
-
-		if (msg.getFrom() != null && msg.getFrom().length > 0) {
-			Recipient rec = new Recipient();
-			rec.setName(getAddressName(msg.getFrom()[0]));
-			rec.setAddress(getAddressEmail(msg.getFrom()[0]));
-			rec.setType(Recipient.TYPE_EMAIL);
-			rec.setMode(Recipient.MODE_EMAIL_TO);
-			email.setFrom(rec);
-			email.setAuthor(rec.getName());
-			email.setAuthorAddress(rec.getAddress());
-		}
-
-		try {
-			Address[] addresses = msg.getRecipients(Message.RecipientType.TO);
-			if (addresses != null)
-				for (Address address : addresses) {
-					Recipient rec = new Recipient();
-					rec.setName(getAddressName(address));
-					rec.setAddress(getAddressEmail(address));
-					rec.setType(Recipient.TYPE_EMAIL);
-					rec.setMode(Recipient.MODE_EMAIL_TO);
-					email.getRecipients().add(rec);
-				}
-		} catch (Throwable t) {
-			log.warn("Unable to extract TO addresses - %s", t.getMessage());
-		}
-
-		try {
-			Address[] addresses = msg.getRecipients(Message.RecipientType.CC);
-			if (addresses != null)
-				for (Address address : addresses) {
-					Recipient rec = new Recipient();
-					rec.setName(getAddressName(address));
-					rec.setAddress(getAddressEmail(address));
-					rec.setType(Recipient.TYPE_EMAIL);
-					rec.setMode(Recipient.MODE_EMAIL_CC);
-					email.getRecipientsCC().add(rec);
-				}
-		} catch (Throwable t) {
-			log.warn("Unable to extract CC addresses - %s", t.getMessage());
-		}
-
-		try {
-			Address[] addresses = msg.getRecipients(Message.RecipientType.BCC);
-			if (addresses != null)
-				for (Address address : addresses) {
-					Recipient rec = new Recipient();
-					rec.setName(getAddressName(address));
-					rec.setAddress(getAddressEmail(address));
-					rec.setType(Recipient.TYPE_EMAIL);
-					rec.setMode(Recipient.MODE_EMAIL_BCC);
-					email.getRecipientsBCC().add(rec);
-				}
-		} catch (Throwable t) {
-			log.warn("Unable to extract BCC addresses - {}", t.getMessage());
-		}
-
-		try {
-			Address[] addresses = msg.getReplyTo();
-			if (addresses != null)
-				for (Address address : addresses) {
-					Recipient rec = new Recipient();
-					rec.setName(getAddressName(address));
-					rec.setAddress(getAddressEmail(address));
-					rec.setType(Recipient.TYPE_EMAIL);
-					rec.setMode(Recipient.MODE_EMAIL_REPLYTO);
-					email.getReplyTo().add(rec);
-				}
-		} catch (Throwable t) {
-			log.warn("Unable to extract ReplyTo addresses - {}", t.getMessage());
-		}
-
-		if (msg.isMimeType("multipart/*") && (msg.getContent() instanceof Multipart)) {
-			Multipart mp = (Multipart) msg.getContent();
-			int count = mp.getCount();
-			for (int i = 1; i < count; i++) {
-				BodyPart bp = mp.getBodyPart(i);
-				addAttachments(bp, email, extractAttachmentContent);
-			}
-		}
-
-		return email;
 	}
 
 	private static void addAttachments(BodyPart p, EMail email, boolean extractAttachmentContent)
@@ -424,7 +450,6 @@ public class MailUtil {
 
 	private static void addAttachment(BodyPart bp, EMail email)
 			throws UnsupportedEncodingException, MessagingException {
-
 		String fileName = bp.getFileName();
 		String disposition = "";
 		if (bp.getContentType().equalsIgnoreCase("message/rfc822")) {
@@ -493,10 +518,8 @@ public class MailUtil {
 
 			if (p.isMimeType("text/html")) {
 				return "H" + str;
-			} else if (p.isMimeType("text/plain")) {
-				return "T" + str;
 			} else {
-				// Otherwise let's set as text/plain
+				// Let's set as text/plain
 				return "T" + str;
 			}
 		} else if (p.isMimeType("multipart/alternative")) {
@@ -507,15 +530,9 @@ public class MailUtil {
 
 			for (int i = 0; i < mp.getCount(); i++) {
 				Part bp = mp.getBodyPart(i);
-
-				if (bp.isMimeType("text/plain")) {
-					text = getText(bp);
-				} else if (bp.isMimeType("text/html")) {
-					text = getText(bp);
+				text = getText(bp);
+				if (bp.isMimeType("text/html"))
 					break;
-				} else {
-					text = getText(bp);
-				}
 			}
 
 			return text;
@@ -524,7 +541,6 @@ public class MailUtil {
 
 			for (int i = 0; i < mp.getCount(); i++) {
 				String s = getText(mp.getBodyPart(i));
-
 				if (s != null)
 					return s;
 			}

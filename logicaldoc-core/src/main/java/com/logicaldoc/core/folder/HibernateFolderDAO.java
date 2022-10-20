@@ -235,7 +235,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				return coll;
 
 			// The administrators can see all folders
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findAll();
 
 			Set<Group> precoll = user.getGroups();
@@ -298,7 +298,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return coll;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findByWhere(ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY
 						+ ".parentId=" + parentId, " order by " + ALIAS_ENTITY + ".name ", null);
 			/*
@@ -394,7 +394,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			Folder parent = findFolder(parentId);
 
 			User user = userDAO.findById(userId);
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findChildren(parent.getId(), null);
 
 			Set<Group> groups = user.getGroups();
@@ -525,7 +525,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return false;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return true;
 
 			long id = folderId;
@@ -636,7 +636,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return ids;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findIdsByWhere(ALIAS_ENTITY + ".parentId=" + parentId, null, null);
 
 			StringBuffer query1 = new StringBuffer();
@@ -960,7 +960,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				return permissions;
 
 			// If the user is an administrator bypass all controls
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				return Permission.all();
 			}
 
@@ -1069,7 +1069,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				return ids;
 
 			// The administrators have all permissions on all folders
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				if (parentId != null)
 					return findFolderIdInPath(parentId, false);
 			}
@@ -1166,7 +1166,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				return ids;
 
 			// The administrators have all permissions on all folders
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				if (parentId != null) {
 					if (tree) {
 						return findFolderIdInTree(parentId, false);
@@ -1484,7 +1484,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			// folder
 			User user = userDAO.findById(transaction.getUserId());
 			userDAO.initialize(user);
-			if (!user.isMemberOf("admin")) {
+			if (!user.isMemberOf(Group.GROUP_ADMIN)) {
 				Group userGroup = user.getUserGroup();
 				FolderGroup fg = new FolderGroup(userGroup.getId());
 				fg.setAdd(1);
@@ -2428,7 +2428,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			StringBuffer query = new StringBuffer();
 
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				ids = findFolderIdByTag(tag);
 			} else {
 

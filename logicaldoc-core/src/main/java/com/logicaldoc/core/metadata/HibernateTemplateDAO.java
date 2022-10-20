@@ -154,7 +154,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return false;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return true;
 
 			Set<Group> groups = user.getGroups();
@@ -206,7 +206,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				return permissions;
 
 			// If the user is an administrator bypass all controls
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				return Permission.all();
 			}
 

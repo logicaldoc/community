@@ -218,7 +218,7 @@ public class ItemFactory {
 		PasswordItem passwordItem = new PasswordItem();
 		passwordItem.setHintStyle("hint");
 		passwordItem.setRequiredMessage(I18N.message("fieldrequired"));
-		SpinnerItem.setDefaultProperties(passwordItem);
+		TextItem.setDefaultProperties(passwordItem);
 
 		StaticTextItem staticTextItem = new StaticTextItem();
 		staticTextItem.setWidth(150);

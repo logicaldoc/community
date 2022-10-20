@@ -2,6 +2,7 @@ package com.logicaldoc.core.communication;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,10 +20,13 @@ import javax.activation.DataSource;
 import javax.activation.URLDataSource;
 import javax.mail.Address;
 import javax.mail.Authenticator;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.NoSuchProviderException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MailDateFormat;
 import javax.mail.internet.MimeBodyPart;
@@ -61,6 +65,8 @@ import net.sf.jmimemagic.MagicMatch;
  * @author Matteo Caruso - LogicalDOC
  */
 public class EMailSender {
+
+	private static final String UTF_8 = "UTF-8";
 
 	private static final String THREAD_POOL = "Email";
 
@@ -243,15 +249,118 @@ public class EMailSender {
 	 * @throws Exception raised if the email cannot be sent
 	 */
 	public void send(EMail email) throws Exception {
-		try {
-			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-			String tenantName = tDao.getTenantName(email.getTenantId());
-			if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
-				email.setAuthorAddress(null);
-		} catch (Throwable t) {
-			log.warn(t.getMessage(), t);
+		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		String tenantName = tDao.getTenantName(email.getTenantId());
+		if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
+			email.setAuthorAddress(null);
+
+		Session sess = newMailSession();
+
+		MimeMessage message = new MimeMessage(sess);
+
+		// The FROM field must to be the one configured for the SMTP connection.
+		// because of errors will be returned in the case the sender is not in
+		// the SMTP domain.
+		InternetAddress from = new InternetAddress(sender);
+		if (StringUtils.isNotEmpty(email.getAuthorAddress()))
+			try {
+				from = new InternetAddress(email.getAuthorAddress());
+			} catch (AddressException t) {
+				// Nothing to do
+			}
+		InternetAddress[] to = email.getAddresses();
+		InternetAddress[] cc = email.getAddressesCC();
+		InternetAddress[] bcc = email.getAddressesBCC();
+		message.setFrom(from);
+		message.setRecipients(javax.mail.Message.RecipientType.TO, to);
+		if (cc.length > 0)
+			message.setRecipients(javax.mail.Message.RecipientType.CC, cc);
+		if (bcc.length > 0)
+			message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc);
+		message.setSubject(email.getSubject(), UTF_8);
+
+		MimeBodyPart body = buildBodyPart(email);
+
+		/*
+		 * If we have to images, the parts must be 'related' otherwise 'mixed'
+		 */
+		Multipart mpMessage = new MimeMultipart(email.getImages().isEmpty() ? "mixed" : "related");
+		mpMessage.addBodyPart(body);
+
+		int i = 1;
+		for (String image : email.getImages()) {
+			MimeBodyPart imageBodyPart = new MimeBodyPart();
+			DataSource ds = new URLDataSource(new URL(image));
+			imageBodyPart.setDataHandler(new DataHandler(ds));
+			imageBodyPart.setHeader("Content-ID", "<image_" + (i++) + ">");
+			imageBodyPart.setDisposition("inline");
+			mpMessage.addBodyPart(imageBodyPart);
 		}
 
+		for (Integer partId : email.getAttachments().keySet()) {
+			EMailAttachment att = email.getAttachment(partId);
+			String mime = detectMimeType(att);
+			DataSource fdSource = new ByteArrayDataSource(att.getData(), mime);
+			DataHandler fdHandler = new DataHandler(fdSource);
+			MimeBodyPart part = new MimeBodyPart();
+			part.setDataHandler(fdHandler);
+			String fileName = MimeUtility.encodeText(att.getFileName(), UTF_8, null);
+			part.setFileName(fileName);
+			mpMessage.addBodyPart(part);
+		}
+
+		message.setContent(mpMessage);
+
+		Transport trans = buildTransport(sess);
+
+		Address[] adr = message.getAllRecipients();
+		// message.setSentDate(new Date());
+
+		MailDateFormat formatter = new MailDateFormat();
+		formatter.setTimeZone(TimeZone.getTimeZone("GMT")); // always use UTC
+															// for outgoing mail
+		Date now = new Date();
+		message.setHeader("Date", formatter.format(now));
+
+		trans.sendMessage(message, adr);
+		trans.close();
+
+		log.info("Sent email with subject '{}' to recipients {}", email.getSubject(), email.getAllRecipientsEmails());
+
+		/*
+		 * If the case, we save the email as document in LogicalDOC's repository
+		 */
+		email.setSentDate(now);
+		historycizeOutgoingEmail(email, message, from);
+	}
+
+	private Session newMailSession() {
+		Properties props = prepareMailSessionProperties();
+
+		Session sess = null;
+		try {
+			if (!StringUtils.isEmpty(username))
+				sess = Session.getInstance(props, new Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(username, password);
+					}
+				});
+			else
+				sess = Session.getInstance(props);
+		} catch (SecurityException e) {
+			if (!StringUtils.isEmpty(username))
+				sess = Session.getInstance(props, new Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(username, password);
+					}
+				});
+			else
+				sess = Session.getInstance(props);
+		}
+		return sess;
+	}
+
+	private Properties prepareMailSessionProperties() {
 		Properties props = new Properties();
 		if (!StringUtils.isEmpty(username))
 			props.put("mail.smtp.auth", "true");
@@ -288,98 +397,32 @@ public class EMailSender {
 		props.put("mail.smtp.ssl.checkserveridentity", "false");
 		props.put("mail.smtp.ssl.trust", "*");
 		// props.put("mail.debug", "true");
+		return props;
+	}
 
-		Session sess = null;
-
-		try {
-			if (!StringUtils.isEmpty(username))
-				sess = Session.getInstance(props, new Authenticator() {
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username, password);
-					}
-				});
-			else
-				sess = Session.getInstance(props);
-		} catch (SecurityException e) {
-			if (!StringUtils.isEmpty(username))
-				sess = Session.getInstance(props, new Authenticator() {
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username, password);
-					}
-				});
-			else
-				sess = Session.getInstance(props);
-		}
-
-		MimeMessage message = new MimeMessage(sess);
-
-		// The FROM field must to be the one configured for the SMTP connection.
-		// because of errors will be returned in the case the sender is not in
-		// the SMTP domain.
-		InternetAddress from = new InternetAddress(sender);
-		if (StringUtils.isNotEmpty(email.getAuthorAddress()))
-			try {
-				from = new InternetAddress(email.getAuthorAddress());
-			} catch (Throwable t) {
-				// Nothing to do
-			}
-		InternetAddress[] to = email.getAddresses();
-		InternetAddress[] cc = email.getAddressesCC();
-		InternetAddress[] bcc = email.getAddressesBCC();
-		message.setFrom(from);
-		message.setRecipients(javax.mail.Message.RecipientType.TO, to);
-		if (cc.length > 0)
-			message.setRecipients(javax.mail.Message.RecipientType.CC, cc);
-		if (bcc.length > 0)
-			message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc);
-		message.setSubject(email.getSubject(), "UTF-8");
-
+	private MimeBodyPart buildBodyPart(EMail email) throws MessagingException, UnsupportedEncodingException {
 		MimeBodyPart body = new MimeBodyPart();
 		if (email.isHtml()) {
-			body.setContent(new String(email.getMessageText().getBytes("UTF-8"), "UTF-8"),
+			body.setContent(new String(email.getMessageText().getBytes(UTF_8), UTF_8),
 					"text/html; charset=UTF-8; fileNameCharset=UTF-8");
 		} else {
-			body.setText(email.getMessageText(), "UTF-8");
+			body.setText(email.getMessageText(), UTF_8);
 		}
+		return body;
+	}
 
-		/*
-		 * If we have to images, the parts must be 'related' otherwise 'mixed'
-		 */
-		Multipart mpMessage = new MimeMultipart(email.getImages().isEmpty() ? "mixed" : "related");
-		mpMessage.addBodyPart(body);
-
-		int i = 1;
-		for (String image : email.getImages()) {
-			MimeBodyPart imageBodyPart = new MimeBodyPart();
-			DataSource ds = new URLDataSource(new URL(image));
-			imageBodyPart.setDataHandler(new DataHandler(ds));
-			imageBodyPart.setHeader("Content-ID", "<image_" + (i++) + ">");
-			imageBodyPart.setDisposition("inline");
-			mpMessage.addBodyPart(imageBodyPart);
+	private String detectMimeType(EMailAttachment att) {
+		String mime = "text/plain";
+		try {
+			MagicMatch match = Magic.getMagicMatch(att.getData(), true);
+			mime = match.getMimeType();
+		} catch (Exception e) {
+			// Nothing to do
 		}
+		return mime;
+	}
 
-		for (Integer partId : email.getAttachments().keySet()) {
-			EMailAttachment att = email.getAttachment(partId);
-			if (att != null) {
-				String mime = "text/plain";
-				try {
-					MagicMatch match = Magic.getMagicMatch(att.getData(), true);
-					mime = match.getMimeType();
-				} catch (Throwable t) {
-					// Nothing to do
-				}
-				DataSource fdSource = new ByteArrayDataSource(att.getData(), mime);
-				DataHandler fdHandler = new DataHandler(fdSource);
-				MimeBodyPart part = new MimeBodyPart();
-				part.setDataHandler(fdHandler);
-				String fileName = MimeUtility.encodeText(att.getFileName(), "UTF-8", null);
-				part.setFileName(fileName);
-				mpMessage.addBodyPart(part);
-			}
-		}
-
-		message.setContent(mpMessage);
-
+	private Transport buildTransport(Session sess) throws NoSuchProviderException, MessagingException {
 		Transport trans = null;
 		if (authEncrypted)
 			trans = sess.getTransport("smtps");
@@ -391,26 +434,7 @@ public class EMailSender {
 		} else {
 			trans.connect(host, port, username, password);
 		}
-
-		Address[] adr = message.getAllRecipients();
-		// message.setSentDate(new Date());
-
-		MailDateFormat formatter = new MailDateFormat();
-		formatter.setTimeZone(TimeZone.getTimeZone("GMT")); // always use UTC
-															// for outgoing mail
-		Date now = new Date();
-		message.setHeader("Date", formatter.format(now));
-
-		trans.sendMessage(message, adr);
-		trans.close();
-
-		log.info("Sent email with subject '{}' to recipients {}", email.getSubject(), email.getAllRecipientsEmails());
-
-		/*
-		 * If the case, we save the email as document in LogicalDOC's repository
-		 */
-		email.setSentDate(now);
-		historycizeOutgoingEmail(email, message, from);
+		return trans;
 	}
 
 	/**
@@ -427,8 +451,9 @@ public class EMailSender {
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		Folder saveFolder=null;
+		Folder saveFolder = null;
 		try {
 			saveFolder = folderId != null && folderId != 0 ? folderDao.findFolder(folderId) : null;
 		} catch (PersistenceException e) {
@@ -441,12 +466,13 @@ public class EMailSender {
 		File emlFile = null;
 		try {
 			emlFile = File.createTempFile("emailsender", ".eml");
-			
-			try(FileOutputStream fos = new FileOutputStream(emlFile);){
+
+			try (FileOutputStream fos = new FileOutputStream(emlFile);) {
 				message.writeTo(new FileOutputStream(emlFile));
 			}
 
 			Folder folder = saveFolder;
+
 			if (foldering == FOLDERING_YEAR) {
 				DateFormat df = new SimpleDateFormat("yyyy");
 				folder = folderDao.createPath(saveFolder, df.format(email.getSentDate()), true, null);
@@ -471,14 +497,14 @@ public class EMailSender {
 				ext.setStringValue(StringUtils.substring(from.getAddress(), 0, 3999));
 				attributes.put("from", ext);
 
-				if (email.getAddresses() != null) {
+				{
 					ext = new Attribute();
 					ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddresses()).stream()
 							.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
 					attributes.put("to", ext);
 				}
 
-				if (email.getAddressesCC() != null) {
+				{
 					ext = new Attribute();
 					ext.setStringValue(StringUtils.substring(Arrays.asList(email.getAddressesCC()).stream()
 							.map(a -> a.getAddress()).collect(Collectors.joining(", ")), 0, 3999));
@@ -516,8 +542,7 @@ public class EMailSender {
 			log.warn("Cannot historycize the email with subject '{}' sent to {}", email.getSubject(),
 					email.getAllRecipientsEmails(), t);
 		} finally {
-			if (emlFile != null && emlFile.exists())
-				FileUtil.strongDelete(emlFile);
+			FileUtil.strongDelete(emlFile);
 		}
 	}
 

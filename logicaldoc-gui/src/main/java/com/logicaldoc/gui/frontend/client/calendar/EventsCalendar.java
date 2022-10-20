@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.calendar;
 import java.util.Date;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
 import com.logicaldoc.gui.common.client.beans.GUIUser;
@@ -73,7 +74,7 @@ public class EventsCalendar extends Calendar {
 								GUIUser currentUser = Session.get().getUser();
 
 								if (ev.getParentId() != null
-										&& (currentUser.getId() == creatorId || currentUser.isMemberOf("admin"))) {
+										&& (currentUser.getId() == creatorId || currentUser.isMemberOf(Constants.GROUP_ADMIN))) {
 									LD.ask(I18N.message("editevent"), I18N.message("douwantmodifyalloccurrences"),
 											new BooleanCallback() {
 												@Override

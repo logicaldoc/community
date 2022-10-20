@@ -78,8 +78,6 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	public WebserviceInterceptor() {
 		super(Phase.RECEIVE);
-		
-		System.out.println(new Date()+" - Constructor  WebserviceInterceptor");
 	}
 
 	@Override

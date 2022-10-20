@@ -32,6 +32,7 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.TemplateGroup;
 import com.logicaldoc.core.metadata.initialization.Initializer;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Tenant;
@@ -100,12 +101,12 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			if (template.getId() != 0) {
 				templ = dao.findById(template.getId());
 				dao.initialize(templ);
-				if (!sessionUser.isMemberOf("admin")
+				if (!sessionUser.isMemberOf(Group.GROUP_ADMIN)
 						&& (templ.getReadonly() == 1 || !dao.isWriteEnable(templ.getId(), session.getUserId())))
 					throw new Exception("You do not have the permission");
 			} else {
 				templ = new Template();
-				if (!sessionUser.isMemberOf("admin")
+				if (!sessionUser.isMemberOf(Group.GROUP_ADMIN)
 						&& (template.getRights() == null || template.getRights().length == 0)) {
 					// At least the current user must have write permission to
 					// this
@@ -173,7 +174,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			 * Save the security settings
 			 */
 			if ((templ.getReadonly() == 0 && dao.isWriteEnable(templ.getId(), session.getUserId()))
-					|| sessionUser.isMemberOf("admin")) {
+					|| sessionUser.isMemberOf(Group.GROUP_ADMIN)) {
 				Set<TemplateGroup> grps = new HashSet<TemplateGroup>();
 				for (GUIRight right : template.getRights()) {
 					boolean isAdmin = right.getEntityId() == 1;

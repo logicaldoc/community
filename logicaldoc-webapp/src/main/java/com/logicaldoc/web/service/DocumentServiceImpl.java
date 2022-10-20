@@ -76,6 +76,7 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
@@ -659,7 +660,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			for (long id : docIds) {
 				Document doc = dao.findDocument(id);
 				if (doc != null)
-					documentManager.lock(doc.getId(), Document.DOC_LOCKED, new DocumentHistory(transaction));
+					documentManager.lock(doc.getId(), AbstractDocument.DOC_LOCKED, new DocumentHistory(transaction));
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -695,13 +696,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 					// The document of the selected documentRecord must be
 					// not immutable
-					if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf("admin")) {
+					if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
 						log.debug("Document {} was not deleted because immutable", id);
 						continue;
 					}
 
 					// The document must be not locked
-					if (doc.getStatus() == Document.DOC_LOCKED) {
+					if (doc.getStatus() == AbstractDocument.DOC_LOCKED) {
 						log.debug("Document {} was not deleted because locked", id);
 						continue;
 					}
@@ -2119,7 +2120,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	protected static void checkPublished(User user, Document doc) throws Exception {
-		if (!user.isMemberOf("admin") && !user.isMemberOf("publisher") && !doc.isPublishing())
+		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new FileNotFoundException("Document not published");
 	}
 
@@ -2208,7 +2209,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				document = documentManager.create(IOUtils.toInputStream(content, "UTF-8"), doc, transaction);
 
 			// If that VO is in checkout, perform a checkout also
-			if (vo.getStatus() == Document.DOC_CHECKED_OUT) {
+			if (vo.getStatus() == AbstractDocument.DOC_CHECKED_OUT) {
 				transaction = new DocumentHistory();
 				transaction.setSession(session);
 				documentManager.checkout(document.getId(), transaction);
@@ -2396,7 +2397,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
 			Document doc = dao.findDocument(docId);
-			if (session.getUser().isMemberOf("admin") || doc.isGranted(currentPassword))
+			if (session.getUser().isMemberOf(Group.GROUP_ADMIN) || doc.isGranted(currentPassword))
 				dao.unsetPassword(docId, transaction);
 			else
 				throw new Exception("You cannot access the document");

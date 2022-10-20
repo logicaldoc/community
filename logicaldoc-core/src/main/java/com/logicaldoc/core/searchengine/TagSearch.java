@@ -12,6 +12,7 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.Context;
 
@@ -136,7 +137,7 @@ public class TagSearch extends Search {
 		query.append(!"()".equals(buf) ? buf : "(0)");
 
 		// For normal users we have to exclude not published documents
-		if (!searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
+		if (!searchUser.isMemberOf(Group.GROUP_ADMIN) && !searchUser.isMemberOf("publisher")) {
 			query.append(" and A.ld_published = 1 ");
 			query.append(" and A.ld_startpublishing <= CURRENT_TIMESTAMP ");
 			query.append(" and ( A.ld_stoppublishing is null or A.ld_stoppublishing > CURRENT_TIMESTAMP )");

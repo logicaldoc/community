@@ -46,6 +46,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -161,7 +162,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		try {
 			Document doc = (Document) findById(docId);
 			if (doc != null && doc.getImmutable() == 0
-					|| (doc != null && doc.getImmutable() == 1 && transaction.getUser().isMemberOf("admin"))) {
+					|| (doc != null && doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 
 				// Remove versions
 				try {
@@ -655,7 +656,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			StringBuffer query = new StringBuffer();
 
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				ids = findDocIdByTag(tag);
 			} else {
 

@@ -1,10 +1,8 @@
 package com.logicaldoc.core.document.dao;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
@@ -122,7 +121,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	@Override
 	public boolean store(DocumentHistory history) throws PersistenceException {
 		// Write only if the history is enabled
-		if (RunLevel.current().aspectEnabled(DocumentHistory.ASPECT)) {
+		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
 			if (history.getComment() != null && history.getComment().length() > 4000)
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 			boolean ret = super.store(history);

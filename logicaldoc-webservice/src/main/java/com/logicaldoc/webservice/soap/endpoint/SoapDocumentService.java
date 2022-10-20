@@ -45,6 +45,7 @@ import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -147,8 +148,8 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 		document = ddao.findDocument(docId);
 
-		if (document.getStatus() == Document.DOC_CHECKED_OUT
-				&& (user.getId() == document.getLockUserId() || user.isMemberOf("admin"))) {
+		if (document.getStatus() == AbstractDocument.DOC_CHECKED_OUT
+				&& (user.getId() == document.getLockUserId() || user.isMemberOf(Group.GROUP_ADMIN))) {
 			try {
 				ddao.initialize(document);
 
@@ -232,7 +233,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	}
 
 	private void checkLocked(User user, Document doc) throws Exception {
-		if (user.isMemberOf("admin"))
+		if (user.isMemberOf(Group.GROUP_ADMIN))
 			return;
 
 		if (doc.getImmutable() == 1)
@@ -446,7 +447,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		transaction.setUser(user);
 
 		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-		documentManager.lock(doc.getId(), Document.DOC_LOCKED, transaction);
+		documentManager.lock(doc.getId(), AbstractDocument.DOC_LOCKED, transaction);
 	}
 
 	@Override
@@ -666,7 +667,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 			} catch (Throwable t) {
 				continue;
 			}
-			if (user.isMemberOf("admin") || folderIds.contains(docs.get(i).getFolder().getId()))
+			if (user.isMemberOf(Group.GROUP_ADMIN) || folderIds.contains(docs.get(i).getFolder().getId()))
 				wsDocs.add(getDoc(docs.get(i).getId()));
 		}
 
@@ -870,14 +871,14 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	public WSDocument[] getAliases(String sid, long docId) throws Exception {
 		User user = validateSession(sid);
 		Collection<Long> folderIds = null;
-		if (!user.isMemberOf("admin")) {
+		if (!user.isMemberOf(Group.GROUP_ADMIN)) {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			folderIds = fdao.findFolderIdByUserId(user.getId(), null, true);
 		}
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		List<Document> docs = new ArrayList<Document>();
-		if (user.isMemberOf("admin"))
+		if (user.isMemberOf(Group.GROUP_ADMIN))
 			docs = docDao.findByWhere("_entity.docRef=" + docId, null, null);
 		else if (folderIds != null) {
 			String idsStr = folderIds.toString().replace('[', '(').replace(']', ')');
@@ -887,7 +888,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		List<WSDocument> wsDocs = new ArrayList<WSDocument>();
 		for (int i = 0; i < docs.size(); i++) {
 			docDao.initialize(docs.get(i));
-			if (user.isMemberOf("admin") || (folderIds != null && folderIds.contains(docs.get(i).getFolder().getId())))
+			if (user.isMemberOf(Group.GROUP_ADMIN) || (folderIds != null && folderIds.contains(docs.get(i).getFolder().getId())))
 				wsDocs.add(WSUtil.toWSDocument(docs.get(i)));
 		}
 
@@ -1138,7 +1139,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (note == null)
 			return;
 
-		if (user.isMemberOf("admin") || user.getId() == note.getUserId())
+		if (user.isMemberOf(Group.GROUP_ADMIN) || user.getId() == note.getUserId())
 			dao.delete(note.getId());
 	}
 

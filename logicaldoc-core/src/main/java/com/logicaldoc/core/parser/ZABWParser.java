@@ -2,7 +2,6 @@ package com.logicaldoc.core.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;

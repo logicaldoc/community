@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUICalendarEvent;
@@ -94,7 +95,7 @@ public class CalendarEventDialog extends Window {
 		this.onChangedCallback = onChangedCallback;
 
 		readOnly = Session.get().getUser().getId() != calEvent.getCreatorId()
-				&& !Session.get().getUser().isMemberOf("admin");
+				&& !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
 
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		if (calEvent.getId() != 0)
@@ -808,7 +809,7 @@ public class CalendarEventDialog extends Window {
 	 */
 	private void onDelete() {
 		GUIUser currentUser = Session.get().getUser();
-		if (currentUser.getId() != calendarEvent.getCreatorId() && !currentUser.isMemberOf("admin")) {
+		if (currentUser.getId() != calendarEvent.getCreatorId() && !currentUser.isMemberOf(Constants.GROUP_ADMIN)) {
 			return;
 		}
 

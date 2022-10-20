@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.data.RecordList;
 import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 
@@ -70,7 +71,7 @@ public class GridUtil {
 
 			@Override
 			public void endScroll(ListGrid listGrid) {
-				ListGrid.showPrintPreview(listGrid);
+				Canvas.showPrintPreview(listGrid);
 
 //              Uncomment to realize the preview page by our own
 //

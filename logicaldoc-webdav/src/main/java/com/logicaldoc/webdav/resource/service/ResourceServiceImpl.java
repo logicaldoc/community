@@ -9,14 +9,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.webdav.DavException;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -28,6 +30,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderEvent;
 import com.logicaldoc.core.folder.FolderHistory;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -104,8 +107,8 @@ public class ResourceServiceImpl implements ResourceService {
 		resource.setCreationDate(document.getCreation());
 		resource.setLastModified(document.getDate());
 		resource.isFolder(false);
-		resource.setCheckedOut(
-				document.getStatus() == Document.DOC_CHECKED_OUT || document.getStatus() == Document.DOC_LOCKED);
+		resource.setCheckedOut(document.getStatus() == AbstractDocument.DOC_CHECKED_OUT
+				|| document.getStatus() == AbstractDocument.DOC_LOCKED);
 		resource.setVersionLabel(document.getVersion());
 		resource.setAuthor(document.getPublisher());
 		resource.setDocRef(document.getDocRef());
@@ -115,8 +118,8 @@ public class ResourceServiceImpl implements ResourceService {
 		resource.setETag(String.format("d-%d_%s", document.getId(), document.getVersion()));
 
 		resource.setSession(session);
-		resource.setLocked(
-				document.getStatus() == Document.DOC_LOCKED || document.getStatus() == Document.DOC_CHECKED_OUT);
+		resource.setLocked(document.getStatus() == AbstractDocument.DOC_LOCKED
+				|| document.getStatus() == AbstractDocument.DOC_CHECKED_OUT);
 		resource.setLockUser(document.getLockUser());
 
 		if (session != null && (Long) session.getObject("id") != null) {
@@ -188,7 +191,7 @@ public class ResourceServiceImpl implements ResourceService {
 		log.trace("Find DAV resource: {}", requestPath);
 
 		if (session == null)
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "No WebDAV session");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No WebDAV session");
 
 		long userId = 0;
 		String currentStablePath = "";
@@ -238,14 +241,14 @@ public class ResourceServiceImpl implements ResourceService {
 		boolean hasAccess = folderDAO.isReadEnabled(document.getFolder().getId(), userId);
 
 		if (hasAccess == false)
-			throw new DavException(DavServletResponse.SC_FORBIDDEN,
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN,
 					"You have no appropriated rights to read this document");
 
 		User user;
 		try {
 			user = userDAO.findById(userId);
 		} catch (PersistenceException e) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e.getMessage());
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
 		}
 		userDAO.initialize(user);
 		checkPublished(user, document);
@@ -307,14 +310,14 @@ public class ResourceServiceImpl implements ResourceService {
 	public Resource createResource(Resource parentResource, String name, boolean isCollection, ImportContext context,
 			WebdavSession session) throws DavException {
 
-		if(session==null)
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "No WebDAV session");
-		
+		if (session == null)
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No WebDAV session");
+
 		Folder parentFolder;
 		try {
 			parentFolder = folderDAO.findById(Long.parseLong(parentResource.getID()));
 		} catch (PersistenceException e1) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e1);
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
 		}
 		String sid = null;
 		if (session != null)
@@ -323,13 +326,13 @@ public class ResourceServiceImpl implements ResourceService {
 		long rootId = folderDAO.findRoot(parentFolder.getTenantId()).getId();
 
 		if (parentFolder.getId() == rootId)
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot write in the root.");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot write in the root.");
 
 		if (isCollection) {
 			// check permission to add folder
 			boolean addChildEnabled = parentResource.isAddChildEnabled();
 			if (!addChildEnabled) {
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Add Folder not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Add Folder not granted to this user");
 			}
 
 			User user = (User) session.getObject("user");
@@ -345,27 +348,27 @@ public class ResourceServiceImpl implements ResourceService {
 				createdFolder = folderDAO.create(parentFolder, newFolder, true, transaction);
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
-				throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+				throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 			}
 
 			try {
 				return this.marshallFolder(createdFolder, parentResource.getRequestedPerson(), session);
 			} catch (PersistenceException e1) {
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, e1);
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
 			}
 		}
 
 		// check permission to add document
 		boolean writeEnabled = parentResource.isWriteEnabled();
 		if (!writeEnabled) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Write Access not granted to this user");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Write Access not granted to this user");
 		}
 
 		User user = null;
 		try {
 			user = userDAO.findById(parentResource.getRequestedPerson());
 		} catch (PersistenceException e1) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e1);
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
 		}
 
 		InputStream is = context.getInputStream();
@@ -405,15 +408,16 @@ public class ResourceServiceImpl implements ResourceService {
 			// verify the write permission on the parent folder
 			Resource parent = getParentResource(resource);
 			if (!parent.isWriteEnabled())
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "No rights to write resource.");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to write resource.");
 
-			if ((document.getStatus() == Document.DOC_CHECKED_OUT || document.getStatus() == Document.DOC_LOCKED)
+			if ((document.getStatus() == AbstractDocument.DOC_CHECKED_OUT
+					|| document.getStatus() == AbstractDocument.DOC_LOCKED)
 					&& (user.getId() != document.getLockUserId() && !"admin".equals(user.getUsername()))) {
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Current user didn't locked the document");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Current user didn't locked the document");
 			}
 
-			if (document.getImmutable() == 1 && !user.isMemberOf("admin"))
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "The document is immutable");
+			if (document.getImmutable() == 1 && !user.isMemberOf(Group.GROUP_ADMIN))
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
 
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
@@ -463,7 +467,7 @@ public class ResourceServiceImpl implements ResourceService {
 	public Resource move(Resource source, Resource destination, WebdavSession session) throws DavException {
 		String sid = (String) session.getObject("sid");
 		if (source.isWorkspace()) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot move a workspace");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot move a workspace");
 		} else if (source.isFolder()) {
 			return folderRenameOrMove(source, destination, session, sid);
 		} else {
@@ -489,11 +493,11 @@ public class ResourceServiceImpl implements ResourceService {
 			user = userDAO.findById(source.getRequestedPerson());
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e);
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
 
-		if (document.getImmutable() == 1 && !user.isMemberOf("admin"))
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "The document is immutable");
+		if (document.getImmutable() == 1 && !user.isMemberOf(Group.GROUP_ADMIN))
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
 
 		documentDAO.initialize(document);
 
@@ -505,7 +509,7 @@ public class ResourceServiceImpl implements ResourceService {
 		if (!source.getName().equals(document.getFileName())) {
 			boolean renameEnabled = parentFolder.isRenameEnabled();
 			if (!renameEnabled)
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
 
 			// we are doing a file rename
 			try {
@@ -518,12 +522,12 @@ public class ResourceServiceImpl implements ResourceService {
 			// verify the addchild permission on destination folder
 			boolean addchildEnabled = destination.isAddChildEnabled();
 			if (!addchildEnabled)
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "AddChild Rights not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "AddChild Rights not granted to this user");
 
 			// verify the MOVE permission on parent folder
 			boolean moveEnabled = parentFolder.isMoveEnabled();
 			if (!moveEnabled)
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Delete Rights not granted to this user");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Delete Rights not granted to this user");
 
 			try {
 				Folder folder = folderDAO.findById(Long.parseLong(destination.getID()));
@@ -531,7 +535,7 @@ public class ResourceServiceImpl implements ResourceService {
 					transaction.setEvent(DocumentEvent.SHORTCUT_MOVED.toString());
 				documentManager.moveToFolder(document, folder, transaction);
 			} catch (Throwable e) {
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, e);
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 			}
 		}
 
@@ -547,11 +551,11 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			currentFolder = folderDAO.findById(Long.parseLong(source.getID()));
 		} catch (PersistenceException e) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e);
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
 
 		if (currentFolder.getType() == Folder.TYPE_WORKSPACE)
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot move nor rename a workspace");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot move nor rename a workspace");
 
 		folderDAO.initialize(currentFolder);
 
@@ -565,12 +569,13 @@ public class ResourceServiceImpl implements ResourceService {
 				// folders
 				boolean addchildEnabled = destination.isAddChildEnabled();
 				if (!addchildEnabled)
-					throw new DavException(DavServletResponse.SC_FORBIDDEN, "AddChild Rights not granted to this user");
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN,
+							"AddChild Rights not granted to this user");
 
 				// check the delete permission on the parent of the source to
 				// move
 				if (!source.isDeleteEnabled())
-					throw new DavException(DavServletResponse.SC_FORBIDDEN, "No rights to delete resource.");
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to delete resource.");
 
 				User user = (User) session.getObject("user");
 				// Add a folder history entry
@@ -585,13 +590,13 @@ public class ResourceServiceImpl implements ResourceService {
 					folderDAO.move(currentFolder, destParentFolder, transaction);
 				} catch (Throwable e) {
 					log.warn(e.getMessage(), e);
-					throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, "Error during Folder Move");
+					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error during Folder Move");
 				}
 
 				return this.marshallFolder(currentFolder, source.getRequestedPerson(), session);
 			} else {
 				if (!source.isRenameEnabled())
-					throw new DavException(DavServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Rename Rights not granted to this user");
 
 				// Folder Rename
 				currentFolder.setName(source.getName());
@@ -615,12 +620,12 @@ public class ResourceServiceImpl implements ResourceService {
 					folderDAO.store(currentFolder);
 				} catch (PersistenceException e) {
 					log.error(e.getMessage(), e);
-					throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+					throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 				}
 				return this.marshallFolder(currentFolder, source.getRequestedPerson(), session);
 			}
 		} catch (PersistenceException e) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e);
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
 	}
 
@@ -634,10 +639,10 @@ public class ResourceServiceImpl implements ResourceService {
 			user = userDAO.findById(resource.getRequestedPerson());
 
 			if (resource.isFolder() && folder != null && (folder.getType() == Folder.TYPE_WORKSPACE)) {
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot delete a workspace.");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot delete a workspace.");
 			} else if (resource.isFolder()) {
 				if (!resource.isDeleteEnabled())
-					throw new DavException(DavServletResponse.SC_FORBIDDEN, "No rights to delete resource.");
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to delete resource.");
 
 				FolderHistory transaction = new FolderHistory();
 				transaction.setUser(user);
@@ -654,7 +659,7 @@ public class ResourceServiceImpl implements ResourceService {
 				// verify the write permission on the parent folder
 				Resource parent = getParentResource(resource);
 				if (!parent.isDeleteEnabled())
-					throw new DavException(DavServletResponse.SC_FORBIDDEN, "No rights to delete on parent resource.");
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to delete on parent resource.");
 
 				DocumentHistory transaction = new DocumentHistory();
 				transaction.setUser(user);
@@ -663,8 +668,8 @@ public class ResourceServiceImpl implements ResourceService {
 				transaction.setEvent(DocumentEvent.DELETED.toString());
 
 				if (documentDAO.findById(Long.parseLong(resource.getID())).getImmutable() == 1
-						&& !user.isMemberOf("admin"))
-					throw new DavException(DavServletResponse.SC_FORBIDDEN, "The document is immutable");
+						&& !user.isMemberOf(Group.GROUP_ADMIN))
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
 
 				// Check if there are some shortcuts associated to the
 				// deleting document. All the shortcuts must be deleted.
@@ -681,13 +686,14 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 	}
 
-	public void copyResource(Resource destinationResource, Resource resource, WebdavSession session) throws DavException {
+	public void copyResource(Resource destinationResource, Resource resource, WebdavSession session)
+			throws DavException {
 		String sid = (String) session.getObject("sid");
 		User user = null;
 		try {
 			user = userDAO.findById(resource.getRequestedPerson());
 		} catch (PersistenceException e) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e);
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
 
 		long rootId = folderDAO.findRoot(user.getTenantId()).getId();
@@ -696,7 +702,7 @@ public class ResourceServiceImpl implements ResourceService {
 		 * Cannot write in the root
 		 */
 		if (destinationResource.isFolder() && Long.parseLong(destinationResource.getID()) == rootId)
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Cannot write in the root");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot write in the root");
 
 		if (resource.isFolder() == true) {
 			throw new RuntimeException("FolderCopy not supported");
@@ -704,13 +710,13 @@ public class ResourceServiceImpl implements ResourceService {
 			try {
 				boolean writeEnabled = destinationResource.isWriteEnabled();
 				if (!writeEnabled)
-					throw new DavException(DavServletResponse.SC_FORBIDDEN, "No rights to write resource.");
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to write resource.");
 
 				Document document = documentDAO.findById(Long.parseLong(resource.getID()));
 				Folder folder = folderDAO.findById(Long.parseLong(destinationResource.getID()));
 
-				if (document.getImmutable() == 1 && !user.isMemberOf("admin"))
-					throw new DavException(DavServletResponse.SC_FORBIDDEN, "The document is immutable");
+				if (document.getImmutable() == 1 && !user.isMemberOf(Group.GROUP_ADMIN))
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN, "The document is immutable");
 
 				// Create the document history event
 				DocumentHistory transaction = new DocumentHistory();
@@ -797,20 +803,20 @@ public class ResourceServiceImpl implements ResourceService {
 		try {
 			user = userDAO.findById(resource.getRequestedPerson());
 		} catch (PersistenceException e1) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e1);
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
 		}
 		userDAO.initialize(user);
 
 		try {
 			checkPublished(user, Long.parseLong(resource.getID()));
 		} catch (PersistenceException e1) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, e1);
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
 		}
 
 		// verify the write permission on the parent folder
 		Resource parent = getParentResource(resource);
 		if (!parent.isWriteEnabled())
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "No rights to checkout resource.");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "No rights to checkout resource.");
 
 		try {
 			// Create the document history event
@@ -830,11 +836,11 @@ public class ResourceServiceImpl implements ResourceService {
 
 	public boolean isCheckedOut(Resource resource) throws NumberFormatException, PersistenceException {
 		Document document = documentDAO.findById(Long.parseLong(resource.getID()));
-		return document.getStatus() == Document.DOC_CHECKED_OUT;
+		return document.getStatus() == AbstractDocument.DOC_CHECKED_OUT;
 	}
 
 	protected void checkPublished(User user, Document doc) throws DavException {
-		if (!user.isMemberOf("admin") && !user.isMemberOf("publisher") && !doc.isPublishing())
+		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new DavException(1, "Document not published");
 	}
 

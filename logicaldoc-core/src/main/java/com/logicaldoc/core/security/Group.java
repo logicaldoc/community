@@ -26,11 +26,13 @@ import com.logicaldoc.util.Context;
  * @version 1.0
  */
 public class Group extends PersistentObject implements Serializable {
-	
+
 	private static final long serialVersionUID = 2L;
-	
+
 	protected static Logger log = LoggerFactory.getLogger(Group.class);
-	
+
+	public static final String GROUP_ADMIN = "admin";
+
 	public static final long GROUPID_ADMIN = 1;
 
 	public static final long GROUPID_PUBLISHER = -10000;

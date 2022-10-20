@@ -41,6 +41,7 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.searchengine.SearchEngine;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
@@ -210,7 +211,7 @@ public class ServletUtil {
 
 		Document doc = dao.findById(docId);
 
-		if (doc != null && user != null && !user.isMemberOf("admin") && !user.isMemberOf("publisher")
+		if (doc != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
 				&& !doc.isPublishing())
 			throw new FileNotFoundException("Document not published");
 
@@ -571,7 +572,7 @@ public class ServletUtil {
 
 		UserDAO udao = (UserDAO) Context.get().getBean(UserDAO.class);
 		udao.initialize(user);
-		if (doc != null && !user.isMemberOf("admin") && !user.isMemberOf("publisher") && !doc.isPublishing())
+		if (doc != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new FileNotFoundException("Document not published");
 
 		SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);

@@ -71,7 +71,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				return coll;
 
 			// The administrators can see all menus
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findAll();
 
 			Set<Group> precoll = user.getGroups();
@@ -119,7 +119,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return coll;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findByWhere(
 						ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY
 								+".parentId and " + ALIAS_ENTITY + ".parentId=" + parentId
@@ -212,7 +212,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		List<Menu> coll = new ArrayList<Menu>();
 		try {
 			User user = userDAO.findById(userId);
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findChildren(parentId, null);
 
 			Set<Group> groups = user.getGroups();
@@ -304,7 +304,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return false;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return true;
 
 			long id = menuId;
@@ -451,7 +451,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return ids;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findIdsByWhere(ALIAS_ENTITY + ".enabled=1 and " + ALIAS_ENTITY + ".parentId=" + parentId
 						+ (type == null ? "" : " and " + ALIAS_ENTITY + ".type=" + type), null, null);
 
@@ -606,7 +606,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				return ids;
 
 			// The administrators have all permissions on all menus
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				return findAllIds();
 			}
 
@@ -713,7 +713,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return ids;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findIdsByWhere(ALIAS_ENTITY + ".parentId=" + parentId, null, null);
 
 			StringBuffer query1 = new StringBuffer();

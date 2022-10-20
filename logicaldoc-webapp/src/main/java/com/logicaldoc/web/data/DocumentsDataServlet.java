@@ -31,6 +31,7 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -307,7 +308,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 					doc.setStopPublishing((Date) cols[23]);
 					doc.setPublished((Integer) cols[24]);
 
-					if (doc.isPublishing() || user.isMemberOf("admin") || user.isMemberOf("publisher")) {
+					if (doc.isPublishing() || user.isMemberOf(Group.GROUP_ADMIN) || user.isMemberOf("publisher")) {
 						doc.setCustomId((String) cols[1]);
 						doc.setVersion((String) cols[4]);
 						doc.setLastModified((Date) cols[5]);
@@ -348,7 +349,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 					}
 				}
 
-				if (doc.isPublishing() || user.isMemberOf("admin") || user.isMemberOf("publisher"))
+				if (doc.isPublishing() || user.isMemberOf(Group.GROUP_ADMIN) || user.isMemberOf("publisher"))
 					documents.add(doc);
 			}
 

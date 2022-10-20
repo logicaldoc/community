@@ -20,6 +20,7 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.searchengine.Hit;
 import com.logicaldoc.core.searchengine.Search;
 import com.logicaldoc.core.searchengine.SearchException;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -67,7 +68,7 @@ public class FolderSearch extends Search {
 		// Traverse the results checking visibility and count
 		Collection<Long> accessibleFolderIds = findAccessibleFolderIds(user);
 		for (Hit folder : folders) {
-			if (accessibleFolderIds.contains(folder.getId()) || user.isMemberOf("admin"))
+			if (accessibleFolderIds.contains(folder.getId()) || user.isMemberOf(Group.GROUP_ADMIN))
 				hits.add(folder);
 			if (hits.size() >= options.getMaxHits())
 				break;
@@ -449,7 +450,7 @@ public class FolderSearch extends Search {
 		 * In case of normal user and without a folder criterion, we have to
 		 * collect all accessible folders.
 		 */
-		if (!user.isMemberOf("admin"))
+		if (!user.isMemberOf(Group.GROUP_ADMIN))
 			ids = folderDAO.findFolderIdByUserIdInPath(options.getUserId(), null);
 
 		return ids;

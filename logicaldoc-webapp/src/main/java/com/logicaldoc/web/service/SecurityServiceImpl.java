@@ -710,7 +710,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			groupDao.initialize(adminGroup);
 
 			// The admin user must be always member of admin group
-			if ("admin".equals(guiUser.getUsername()) && !guiUser.isMemberOf("admin")) {
+			if ("admin".equals(guiUser.getUsername()) && !guiUser.isMemberOf(Group.GROUP_ADMIN)) {
 				usr.addGroup(adminGroup);
 				userDao.store(usr);
 			}

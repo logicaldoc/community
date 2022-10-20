@@ -40,6 +40,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.job.JobManager;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -964,7 +965,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	public void uninstallPlugin(String pluginId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
-			if (!session.getUser().isMemberOf("admin") || session.getTenantId() != Tenant.DEFAULT_ID)
+			if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 				throw new AccessDeniedException();
 
 			PluginRegistry pluginRegistry = PluginRegistry.getInstance();
@@ -1014,7 +1015,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	public void initializePlugin(String pluginId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
-			if (!session.getUser().isMemberOf("admin") || session.getTenantId() != Tenant.DEFAULT_ID)
+			if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 				throw new AccessDeniedException();
 
 			/*
@@ -1061,7 +1062,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	public void installPlugin() throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
-			if (!session.getUser().isMemberOf("admin") || session.getTenantId() != Tenant.DEFAULT_ID)
+			if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 				throw new AccessDeniedException();
 
 			Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
