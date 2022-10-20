@@ -123,6 +123,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	private static Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
 
+	private EMailSender emailSender;
+
 	@Override
 	public void addBookmarks(long[] ids, int type) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
@@ -1584,7 +1586,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				mail.setMessageText(message);
 
 				// Send the message
-				EMailSender sender = new EMailSender(session.getTenantName());
+				EMailSender sender = getEmailSender(session);
 				sender.send(mail);
 
 				FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -1643,6 +1645,15 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					// Nothing to do
 				}
 		}
+	}
+
+	private EMailSender getEmailSender(Session session) {
+		if (this.emailSender != null) 
+			this.emailSender.setTenant(session.getTenantId());
+		else
+			this.setEmailSender(new EMailSender(session.getTenantName()));
+			
+		return this.emailSender;
 	}
 
 	private File createTile(Document doc, String sid) throws IOException {
@@ -3094,5 +3105,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			FileUtil.strongDelete(tileFile);
 		}
 		return tile;
+	}
+
+	void setEmailSender(EMailSender emailSender) {
+		this.emailSender = emailSender;
 	}
 }

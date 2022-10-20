@@ -1,11 +1,23 @@
 package com.logicaldoc.web.service;
 
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.communication.EMail;
+import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.Document;
@@ -19,14 +31,20 @@ import com.logicaldoc.core.document.dao.DocumentLinkDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
+import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
+import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.web.AbstractWebappTCase;
 
 import junit.framework.Assert;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DocumentServiceImplTest extends AbstractWebappTCase {
 
+	@Mock 
+	private EMailSender emailSender;
+	
 	// Instance under test
 	private DocumentServiceImpl service = new DocumentServiceImpl();
 
@@ -49,6 +67,12 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		noteDao = (DocumentNoteDAO) context.getBean("DocumentNoteDAO");
 		documentHistoryDao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
 		bookDao = (BookmarkDAO) context.getBean("BookmarkDAO");
+		
+		File emailFile = new File("target/tmp/logicaldoc/docs/5/doc/1.0");
+		emailFile.getParentFile().mkdirs();
+
+		// Copy sql files
+		copyResource("/Joyce Jinks shared the Bruce Duo post.eml", emailFile.getCanonicalPath());		
 	}
 
 	@Test
@@ -305,7 +329,79 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testCountDocuments() throws ServerException {
-		Assert.assertEquals(4, service.countDocuments(new long[] { 5 }, 0));
+		Assert.assertEquals(5, service.countDocuments(new long[] { 5 }, 0));
 		Assert.assertEquals(0, service.countDocuments(new long[] { 5 }, 3));
 	}
+//	
+//	@Test
+//	public void testValidate() {
+//		fail("Not yet implemented");
+//	}
+
+	@Test
+	public void testSendAsEmail() throws Exception {
+						
+		emailSender = mock(EMailSender.class);
+		
+		service.setEmailSender(emailSender);
+		
+		doNothing().when(emailSender).send(any(EMail.class));
+		
+		try {						
+			GUIEmail gmail = service.extractEmail(5, "1.0");
+			System.err.println(gmail.getFrom().getEmail());
+			gmail.setDocIds(new long[]{5});
+			
+			List<GUIContact> tos = new ArrayList<GUIContact>(); 
+			GUIContact gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
+			tos.add(gc);
+			
+			GUIContact[] carr = new GUIContact[]{};
+			gmail.setTos(tos.toArray(carr));			
+			gmail.setBccs(null);
+			gmail.setCcs(null);
+			
+			long tid = this.session.getUser().getTenant().getTenantId();
+			long tid02 = this.session.getUser().getTenant().getId();
+			
+			System.err.println("tid:" + tid);
+			System.err.println("tid02:" + tid02);
+			
+			String retmess = service.sendAsEmail(gmail, "en-US");
+			System.err.println("returned message: " + retmess);
+		} catch (ServerException e) {
+			e.printStackTrace();
+			
+		}
+	}
+//
+//	@Test
+//	public void testGetNotes() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	public void testSaveNotes() {
+//		fail("Not yet implemented");
+//	}
+//
+//	@Test
+//	public void testBulkUpdate() {
+//		fail("Not yet implemented");
+//	}
+
+	@Test
+	public void testExtractEmail() {
+		try {
+			service.extractEmail(4, null);
+			fail("Expected exception was not thrown");
+		} catch (ServerException e) {
+			// nothing to do
+		}
+	}
+
+//	@Test
+//	public void testSaveEmailAttachment() {
+//		//fail("Not yet implemented");
+//	}	
 }
