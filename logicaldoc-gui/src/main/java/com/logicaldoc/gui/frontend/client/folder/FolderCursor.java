@@ -186,7 +186,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 						@Override
 						public void onSuccess(Void arg) {
-
+							// Nothing to do
 						}
 					});
 		else
@@ -200,7 +200,7 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 						@Override
 						public void onSuccess(Void arg) {
-
+							// Nothing to do
 						}
 					});
 	}
@@ -212,17 +212,17 @@ public class FolderCursor extends DynamicForm implements FolderObserver {
 
 	@Override
 	public void onFolderDeleted(GUIFolder folder) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void onFolderCreated(GUIFolder folder) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void onFolderMoved(GUIFolder folder) {
-
+		// Nothing to do
 	}
 
 	@Override

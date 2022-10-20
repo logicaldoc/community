@@ -34,9 +34,6 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class FolderSearch extends Search {
 
-	public FolderSearch() {
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {

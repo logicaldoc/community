@@ -52,6 +52,7 @@ public class StatsPie extends HLayout {
 				params[i].setValue(Long.toString(val));
 			}
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		Image pieImage = new Image(Util.contextPath() + "stat?chart=repository&random=" + new Date().getTime());
@@ -101,7 +102,7 @@ public class StatsPie extends HLayout {
 			pages.addMember(prepareLegend(parameters[STATS_PAGES], STATS_PAGES));
 			addMember(pages);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		VLayout folders = new VLayout();

@@ -415,7 +415,7 @@ public class WorkflowToolStrip extends ToolStrip {
 					AdminScreen.get().setContent(new WorkflowDesigner(currentWorkflow));
 					update();
 				} catch (Throwable t) {
-
+					// Nothing to do
 				}
 			}
 		});
@@ -469,6 +469,7 @@ public class WorkflowToolStrip extends ToolStrip {
 			if (!designer.saveModel())
 				return;
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		currentWorkflow = designer.getWorkflow();

@@ -76,6 +76,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			out.flush();
 			out.close();
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 
@@ -262,7 +263,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 
 	@Override
 	public void onSessionCreated(Session session) {
-
+		// Nothing to do
 	}
 
 	@Override

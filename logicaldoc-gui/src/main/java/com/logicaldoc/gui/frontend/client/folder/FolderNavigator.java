@@ -237,6 +237,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 								});
 					}
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 			}
 		});
@@ -863,6 +864,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			@Override
 			public void onSuccess(Void v) {
+				// Nothing to do
 			}
 		});
 	}
@@ -1455,10 +1457,12 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 	@Override
 	public void onFolderBeginEditing(GUIFolder folder) {
+		// Nothing to do
 	}
 
 	@Override
 	public void onFolderCancelEditing(GUIFolder folder) {
+		// Nothing to do
 	}
 
 	@Override
@@ -1578,6 +1582,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 					getTree().reloadChildren(getRootNode());
 				}
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 	}
@@ -1698,6 +1703,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 			@Override
 			public void onSuccess(Void arg0) {
+				// Nothing to do
 			}
 		});
 	}

@@ -95,5 +95,6 @@ public class Registration extends Window {
 	 * own logic.
 	 */
 	public void afterSave() {
+		// Nothing to do
 	}
 }

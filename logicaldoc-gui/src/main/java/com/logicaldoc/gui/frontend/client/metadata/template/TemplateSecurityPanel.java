@@ -320,7 +320,7 @@ public class TemplateSecurityPanel extends VLayout {
 				if (template.isWrite())
 					template.setRights(getRights());
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 		return true;
 	}

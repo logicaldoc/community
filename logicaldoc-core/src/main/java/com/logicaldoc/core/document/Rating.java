@@ -24,9 +24,6 @@ public class Rating extends PersistentObject {
 
 	private Float average;
 
-	public Rating() {
-	}
-
 	public long getUserId() {
 		return userId;
 	}

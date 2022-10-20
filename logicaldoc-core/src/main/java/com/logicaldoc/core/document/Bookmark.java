@@ -41,9 +41,6 @@ public class Bookmark extends PersistentObject {
 
 	private int type = TYPE_DOCUMENT;
 
-	public Bookmark() {
-	}
-
 	public long getUserId() {
 		return userId;
 	}

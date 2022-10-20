@@ -468,6 +468,7 @@ public class ContextMenu extends Menu {
 
 					@Override
 					public void onFailure(Throwable caught) {
+						// Nothing to do
 					}
 
 					@Override

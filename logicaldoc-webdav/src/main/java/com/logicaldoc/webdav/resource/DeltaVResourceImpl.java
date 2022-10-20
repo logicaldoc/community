@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.webdav.DavCompliance;
 import org.apache.jackrabbit.webdav.DavException;
@@ -72,8 +74,9 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 			oR = new OptionsResponse();
 			// currently only DAV:version-history-collection-set is supported
 			if (optionsInfo.containsElement(DeltaVConstants.XML_VH_COLLECTION_SET, DeltaVConstants.NAMESPACE)) {
-				String[] hrefs = new String[] { getLocatorFromNodePath(
-						"/" + JcrConstants.JCR_SYSTEM + "/" + JcrConstants.JCR_VERSIONSTORAGE).getHref(true) };
+				String[] hrefs = new String[] {
+						getLocatorFromNodePath("/" + JcrConstants.JCR_SYSTEM + "/" + JcrConstants.JCR_VERSIONSTORAGE)
+								.getHref(true) };
 				oR.addEntry(DeltaVConstants.XML_VH_COLLECTION_SET, DeltaVConstants.NAMESPACE, hrefs);
 			}
 		}
@@ -82,24 +85,24 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 
 	public Report getReport(ReportInfo reportInfo) throws DavException {
 		if (reportInfo == null) {
-			throw new DavException(DavServletResponse.SC_BAD_REQUEST,
+			throw new DavException(HttpServletResponse.SC_BAD_REQUEST,
 					"A REPORT request must provide a valid XML request body.");
 		}
 		if (!exists()) {
-			throw new DavException(DavServletResponse.SC_NOT_FOUND);
+			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
 
 		if (supportedReports.isSupportedReport(reportInfo)) {
 			Report report = ReportType.getType(reportInfo).createReport(this, reportInfo);
 			return report;
 		} else {
-			throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY, "Unkown report "
-					+ reportInfo.getReportName() + "requested.");
+			throw new DavException(DavServletResponse.SC_UNPROCESSABLE_ENTITY,
+					"Unkown report " + reportInfo.getReportName() + "requested.");
 		}
 	}
 
 	public void addWorkspace(DavResource workspace) throws DavException {
-		throw new DavException(DavServletResponse.SC_FORBIDDEN);
+		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -117,7 +120,7 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 				resources.add(createResourceFromLocator(locator));
 			}
 		} else {
-			throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 		return (DavResource[]) resources.toArray(new DavResource[0]);
 	}
@@ -140,7 +143,9 @@ public class DeltaVResourceImpl extends DavResourceImpl implements DeltaVResourc
 				supportedReports.addReportType(ReportType.LOCATE_BY_HISTORY);
 			}
 
-			// properties.add(new DefaultDavProperty(DeltaVConstants.CREATOR_DISPLAYNAME, resource.getAuthor()));
+			// properties.add(new
+			// DefaultDavProperty(DeltaVConstants.CREATOR_DISPLAYNAME,
+			// resource.getAuthor()));
 		}
 	}
 

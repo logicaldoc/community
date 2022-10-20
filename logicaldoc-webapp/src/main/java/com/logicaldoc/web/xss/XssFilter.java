@@ -27,10 +27,12 @@ import javax.servlet.http.HttpServletRequest;
 public class XssFilter implements Filter {
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
+		// Nothing to do
 	}
 
 	@Override
 	public void destroy() {
+		// Nothing to do
 	}
 
 	@Override

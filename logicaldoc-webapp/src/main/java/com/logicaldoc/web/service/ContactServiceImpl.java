@@ -149,30 +149,37 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 				try {
 					contact.setFirstName(fields.get(firstName - 1));
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 				try {
 					contact.setLastName(fields.get(lastName - 1));
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 				try {
 					contact.setEmail(fields.get(email - 1));
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 				try {
 					contact.setAddress(fields.get(address - 1));
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 				try {
 					contact.setCompany(fields.get(company - 1));
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 				try {
 					contact.setMobile(fields.get(mobile - 1));
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 				try {
 					contact.setPhone(fields.get(phone - 1));
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 
 				if (StringUtils.isEmpty(contact.getEmail()))

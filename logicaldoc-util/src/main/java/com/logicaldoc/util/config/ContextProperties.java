@@ -180,8 +180,7 @@ public class ContextProperties extends OrderedProperties {
 			throw new IOException("File not given");
 		backup(file);
 
-		FileOutputStream fos = new FileOutputStream(file);
-		try {
+		try (FileOutputStream fos = new FileOutputStream(file);) {
 			store(fos, "");
 			log.info("Saved file {}", file);
 		} catch (IOException ex) {
@@ -189,13 +188,6 @@ public class ContextProperties extends OrderedProperties {
 				log.warn(ex.getMessage());
 			}
 			throw ex;
-		} finally {
-			if (fos != null)
-				try {
-					fos.flush();
-					fos.close();
-				} catch (Throwable t) {
-				}
 		}
 	}
 

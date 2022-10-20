@@ -880,6 +880,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	@Override
 	public void onDocumentSelected(GUIDocument document) {
+		// Nothing to do
 	}
 
 	@Override
@@ -938,6 +939,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 					if (record != null)
 						removeData(record);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 			}
 			RecordList recordList = getDataAsRecordList();
@@ -1018,6 +1020,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			try {
 				setViewState(gridState);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		if (getGridCursor() != null) {
 			getGridCursor().setPageSize(pageSize);

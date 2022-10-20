@@ -57,11 +57,7 @@ public class GUIInfo implements Serializable {
 	private GUIAttributeSet defaultAttributeSet;
 
 	private GUIBranding branding = new GUIBranding();
-
-	public GUIInfo() {
-
-	}
-
+	
 	public String getRelease() {
 		return release;
 	}

@@ -145,6 +145,7 @@ public class ImportArchivesList extends VLayout {
 				try {
 					showDetails(Long.parseLong(record.getAttribute("id")));
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 			}
 		});

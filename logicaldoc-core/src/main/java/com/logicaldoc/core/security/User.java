@@ -212,9 +212,6 @@ public class User extends PersistentObject implements Serializable {
 
 	private String timeZone;
 	
-	public User() {
-	}
-
 	public int getType() {
 		return type;
 	}

@@ -81,7 +81,7 @@ public class CookiesManager {
 		try {
 			Offline.remove(COOKIE_DOCSLIST_PREV_W);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		try {

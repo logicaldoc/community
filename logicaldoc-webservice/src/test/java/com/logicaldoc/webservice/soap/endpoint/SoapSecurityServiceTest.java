@@ -250,6 +250,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 			securityServiceImpl.deleteGroup("", 1);
 			fail("Expected exception was not thrown");
 		} catch (Exception e) {
+			// Nothing to do
 		}
 		
 		// Attempt to delete a user' group (not deletable)
@@ -257,6 +258,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 			securityServiceImpl.deleteGroup("", -2);
 			fail("Expected exception was not thrown");
 		} catch (Exception e) {
+			// Nothing to do
 		}		
 	}
 

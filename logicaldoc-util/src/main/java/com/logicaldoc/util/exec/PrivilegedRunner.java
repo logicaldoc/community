@@ -18,16 +18,7 @@ import java.util.logging.Logger;
  */
 public class PrivilegedRunner {
 
-	/**
-	 * The logger.
-	 */
 	private static final Logger logger = Logger.getLogger(PrivilegedRunner.class.getName());
-
-	/**
-	 * Builds a default privileged runner.
-	 */
-	public PrivilegedRunner() {
-	}
 
 	public int executeWithElevatedRights(String command) throws IOException, InterruptedException {
 		ProcessBuilder builder = new ProcessBuilder(getElevator(command));

@@ -885,7 +885,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				}
 
 				// The document must be not locked
-				if (doc.getStatus() != Document.DOC_UNLOCKED || doc.getExportStatus() != Document.EXPORT_UNLOCKED) {
+				if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED || doc.getExportStatus() != Document.EXPORT_UNLOCKED) {
 					continue;
 				}
 
@@ -967,12 +967,12 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void saveTemplates(GUIValue[] templates) throws ServerException {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void applyTemplate(long folderId, long templateId, boolean inheritSecurity) throws ServerException {
-
+		// Nothing to do
 	}
 
 	/**

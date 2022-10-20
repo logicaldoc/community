@@ -96,7 +96,7 @@ public class ConvertPdf extends HttpServlet {
 		try {
 			doGet(request, response);
 		} catch (Throwable r) {
-
+			// Nothing to do
 		}
 	}
 }

@@ -502,7 +502,7 @@ public class TaskEditor extends Window {
 					participantsGrid.setRecords(records.toArray(new ListGridRecord[0]));
 			}
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		if (isHumanInteraction)

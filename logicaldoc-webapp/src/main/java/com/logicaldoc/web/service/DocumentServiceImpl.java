@@ -294,7 +294,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 								// Create the new document
 								doc = documentManager.create(file, doc, transaction);
 
-								if (immediateIndexing && doc.getIndexed() == Document.INDEX_TO_INDEX)
+								if (immediateIndexing && doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX)
 									docsToIndex.add(doc.getId());
 
 								createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
@@ -311,7 +311,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 						for (String uploadedEntry : uploadedFilesMap.keySet())
 							FileUtil.strongDelete(uploadedFilesMap.get(uploadedEntry));
 					} catch (Throwable t) {
-
+						// Nothing to do
 					}
 
 					if (!docsToIndex.isEmpty())
@@ -1123,7 +1123,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				if (doc.getImmutable() == 0) {
 					// The document of the selected documentRecord must be
 					// not locked
-					if (doc.getStatus() != Document.DOC_UNLOCKED) {
+					if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED) {
 						continue;
 					}
 
@@ -1560,11 +1560,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					 * attachment
 					 */
 					zipFile = File.createTempFile("email", "zip");
-					OutputStream out = null;
-
-					try {
-						out = new FileOutputStream(zipFile);
-
+					try(OutputStream out = new FileOutputStream(zipFile);) {
 						// Create the document history event
 						DocumentHistory transaction = new DocumentHistory();
 						transaction.setSession(session);
@@ -1576,12 +1572,6 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 						createAttachment(mail, zipFile);
 					} catch (Throwable t) {
 						log.error(t.getMessage(), t);
-						try {
-							if (out != null)
-								out.close();
-						} catch (Throwable q) {
-
-						}
 					}
 				} else {
 					for (long id : email.getDocIds())
@@ -1644,11 +1634,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				try {
 					FileUtils.forceDelete(zipFile);
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 			if (thumbnailFile != null)
 				try {
 					FileUtils.forceDelete(thumbnailFile);
 				} catch (Throwable e) {
+					// Nothing to do
 				}
 		}
 	}
@@ -2058,7 +2050,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				try {
 					GUIDocument buf = getById(id);
 
-					if (buf.getImmutable() == 1 || buf.getStatus() != Document.DOC_UNLOCKED) {
+					if (buf.getImmutable() == 1 || buf.getStatus() != AbstractDocument.DOC_UNLOCKED) {
 						log.warn("Skip bulk update of document {} because it is locked or immutable", buf.getId());
 						continue;
 					}

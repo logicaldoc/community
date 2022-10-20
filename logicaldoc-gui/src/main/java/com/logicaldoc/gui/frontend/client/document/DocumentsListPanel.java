@@ -92,7 +92,7 @@ public class DocumentsListPanel extends VLayout {
 					try {
 						DocUtil.download(id, null);
 					} catch (Throwable t) {
-
+						// Nothing to do
 					}
 				else {
 					if (doc.getDocRef() != null) {

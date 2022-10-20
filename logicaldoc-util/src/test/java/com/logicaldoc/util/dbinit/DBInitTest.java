@@ -30,10 +30,6 @@ public class DBInitTest extends TestCase {
 		dbinit.setPassword("");
 	}
 
-	public void tearDown() throws Exception {
-
-	}
-
 	@Test
 	public void testExecute() {
 		String notThrownTest=null;
@@ -41,7 +37,7 @@ public class DBInitTest extends TestCase {
 			dbinit.execute();
 			notThrownTest="ok";
 		}catch(Throwable t) {
-			
+			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
 	}

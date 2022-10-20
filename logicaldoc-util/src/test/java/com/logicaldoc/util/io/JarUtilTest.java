@@ -25,6 +25,7 @@ public class JarUtilTest {
 			try {
 				FileUtils.forceDelete(dir);
 			} catch (IOException e) {
+				// Nothing to do
 			}
 	}
 

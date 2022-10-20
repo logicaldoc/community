@@ -67,10 +67,7 @@ public class GUICalendarEvent implements Serializable {
 	private Date deadline;
 
 	private String automation;
-
-	public GUICalendarEvent() {
-	}
-
+	
 	@Override
 	public String toString() {
 		return getId() + "-" + getTitle();

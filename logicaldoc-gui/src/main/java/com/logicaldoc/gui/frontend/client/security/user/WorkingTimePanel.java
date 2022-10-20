@@ -81,7 +81,7 @@ public class WorkingTimePanel extends VLayout {
 						350, new ValuesCallback() {
 							@Override
 							public void execute(String value) {
-
+								// Nothing to do
 							}
 
 							@Override
@@ -148,6 +148,7 @@ public class WorkingTimePanel extends VLayout {
 				try {
 					calendar.addEvent(wt.getStart(), wt.getEnd(), wt.getLabel(), wt.getDescription());
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 			}
 		}

@@ -70,10 +70,6 @@ public class GUIArchive implements Serializable {
 
 	private int importCustomId = 0;
 
-	public GUIArchive() {
-
-	}
-
 	/**
 	 * The archive name. Also alternative identifier.
 	 * 

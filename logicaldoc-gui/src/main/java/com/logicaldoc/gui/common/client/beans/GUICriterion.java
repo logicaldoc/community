@@ -19,9 +19,6 @@ public class GUICriterion implements Serializable {
 
 	private Double doubleValue;
 
-	public GUICriterion() {
-	}
-
 	public String getField() {
 		return field;
 	}

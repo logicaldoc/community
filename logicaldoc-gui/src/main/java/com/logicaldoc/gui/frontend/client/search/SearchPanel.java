@@ -171,7 +171,7 @@ public class SearchPanel extends HLayout implements SearchObserver, DocumentObse
 
 	@Override
 	public void onOptionsChanged(GUISearchOptions newOptions) {
-
+		// Nothing to do
 	}
 
 	public boolean isMenuOpened() {

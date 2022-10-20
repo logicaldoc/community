@@ -52,6 +52,7 @@ public abstract class PluginRegistry {
 				ContextProperties config = new ContextProperties();
 				pluginregistry = config.getProperty("plugin.registry");
 			} catch (IOException e1) {
+				// Nothing to do
 			}
 
 			if (StringUtils.isEmpty(pluginregistry)) {
@@ -193,7 +194,7 @@ public abstract class PluginRegistry {
 				exts = dbinitExtPoint.getConnectedExtensions();
 			}
 		} catch (Exception e) {
-
+			// Nothing to do
 		}
 		return exts;
 	}
@@ -309,6 +310,7 @@ public abstract class PluginRegistry {
 			ContextProperties conf = new ContextProperties();
 			pluginsPath = new File(conf.getPropertyWithSubstitutions("conf.plugindir"));
 		} catch (IOException e1) {
+			// Nothing to do
 		}
 
 		try {

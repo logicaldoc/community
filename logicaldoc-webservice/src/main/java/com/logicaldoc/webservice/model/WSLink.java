@@ -30,10 +30,6 @@ public class WSLink implements Serializable {
 	@WSDoc(description = "itentifier of document 2")
 	private long doc2;
 
-	public WSLink() {
-
-	}
-
 	public String getType() {
 		return type;
 	}

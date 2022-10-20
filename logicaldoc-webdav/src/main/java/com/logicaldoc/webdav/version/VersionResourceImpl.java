@@ -86,7 +86,7 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
     }
 
     public void label(LabelInfo labelInfo) throws DavException {
-        
+    	// Nothing to do
     }
 
     public VersionHistoryResource getVersionHistory() throws DavException {

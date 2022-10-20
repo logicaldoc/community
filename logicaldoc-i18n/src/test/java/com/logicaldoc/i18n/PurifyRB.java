@@ -93,33 +93,25 @@ public class PurifyRB {
 		System.out.println("written props n.: " + counter);
 		System.out.println("exceding keywords n.: " + mre);
 
-		FileOutputStream out = null;
-		OutputStreamWriter ow = null;
-		try {
-			// scrivo il prop destinazione su FileSystem
-			System.out.println(locale);
-			File dir = new File("target/po/i18n");
-			dir.mkdir();
-			dir.mkdirs();
+		System.out.println(locale);
+		File dir = new File("target/po/i18n");
+		dir.mkdir();
+		dir.mkdirs();
 
-			File file = new File("target/po/" + transalatedBundle + "_" + locale + ".properties");
-			out = new FileOutputStream(file);
-			ow = new OutputStreamWriter(out, "UTF-8");
+		File file = new File("target/po/" + transalatedBundle + "_" + locale + ".properties");
+
+		try (FileOutputStream out = new FileOutputStream(file);
+				OutputStreamWriter ow = new OutputStreamWriter(out, "UTF-8");) {
+			// scrivo il prop destinazione su FileSystem
 			destprop.store(ow, "comments");
 			ow.flush();
 			out.flush();
-			//out.close();
-			//ow.close();
+			// out.close();
+			// ow.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (ow != null) ow.close();
-				if (out != null) out.close();
-			} catch (IOException e) {
-			}
 		}
 	}
 

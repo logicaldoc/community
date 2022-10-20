@@ -113,6 +113,7 @@ public class TicketDownload extends HttpServlet {
 				out.println("Ticket " + ticketId + " is no more active"
 						+ (e.getMessage() != null ? ": " + e.getMessage() : ""));
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 	}
@@ -143,6 +144,7 @@ public class TicketDownload extends HttpServlet {
 				out.println("</HTML>");
 			}
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 
@@ -189,6 +191,7 @@ public class TicketDownload extends HttpServlet {
 					os.close();
 				}
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 

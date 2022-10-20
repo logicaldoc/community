@@ -220,7 +220,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			return new ArrayList<Long>();
 
 		StringBuffer query = new StringBuffer();
-		query.append(ALIAS_ENTITY+".folder.id in (");
+		query.append(ALIAS_ENTITY + ".folder.id in (");
 		boolean first = true;
 		for (Folder folder : folders) {
 			if (!first)
@@ -228,7 +228,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(folder.getId());
 			first = false;
 		}
-		query.append(") and not "+ALIAS_ENTITY+".status=" + AbstractDocument.DOC_ARCHIVED);
+		query.append(") and not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED);
 		try {
 			return findIdsByWhere(query.toString(), null, null);
 		} catch (PersistenceException e) {
@@ -311,17 +311,18 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			if (doc.getStopPublishing() != null)
 				doc.setStopPublishing(DateUtils.truncate(doc.getStopPublishing(), Calendar.DATE));
 
-			if (doc.getIndexed() == Document.INDEX_TO_INDEX || doc.getIndexed() == Document.INDEX_TO_INDEX_METADATA) {
+			if (doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
+					|| doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA) {
 				// Check if the document must be indexed
 				if (!FileUtil.matches(doc.getFileName(), config.getProperty(tenant.getName() + ".index.includes", ""),
 						config.getProperty(tenant.getName() + ".index.excludes", "")))
-					doc.setIndexed(Document.INDEX_SKIP);
+					doc.setIndexed(AbstractDocument.INDEX_SKIP);
 
 				// Check if the document must be indexed
-				if (doc.getIndexed() == Document.INDEX_SKIP && FileUtil.matches(doc.getFileName(),
+				if (doc.getIndexed() == AbstractDocument.INDEX_SKIP && FileUtil.matches(doc.getFileName(),
 						config.getProperty(tenant.getName() + ".index.includes.metadata", ""),
 						config.getProperty(tenant.getName() + ".index.excludes.metadata", "")))
-					doc.setIndexed(Document.INDEX_TO_INDEX_METADATA);
+					doc.setIndexed(AbstractDocument.INDEX_TO_INDEX_METADATA);
 			}
 
 			Set<Tag> src = doc.getTags();
@@ -525,13 +526,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public void updateDigest(Document doc) throws PersistenceException {
 		String resource = storer.getResourceName(doc, doc.getFileVersion(), null);
 		if (storer.exists(doc.getId(), resource)) {
-			
-			try(InputStream in = storer.getStream(doc.getId(), resource);) {
+
+			try (InputStream in = storer.getStream(doc.getId(), resource);) {
 				doc.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
 				log.error("Cannot retrieve the conten of document {}", doc, e);
 			}
-			
+
 			jdbcUpdate("update ld_document set ld_lastmodified=?, ld_digest=?  where ld_id=?", new Date(),
 					doc.getDigest(), doc.getId());
 
@@ -704,9 +705,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				tmpal.subList(0, maxResults - 1);
 			}
 
-			query = new StringBuffer("from Document "+ALIAS_ENTITY+" ");
-			query.append(" where not "+ALIAS_ENTITY+".status=" + AbstractDocument.DOC_ARCHIVED);
-			query.append(" and "+ALIAS_ENTITY+".id in (");
+			query = new StringBuffer("from Document " + ALIAS_ENTITY + " ");
+			query.append(" where not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED);
+			query.append(" and " + ALIAS_ENTITY + ".id in (");
 
 			for (int i = 0; i < docIds.size(); i++) {
 				Long docId = docIds.get(i);
@@ -758,7 +759,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		try {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("folderId", Long.valueOf(folderId));
-			return findByWhere(ALIAS_ENTITY+".folder.id = :folderId ", params, null, max);
+			return findByWhere(ALIAS_ENTITY + ".folder.id = :folderId ", params, null, max);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 			return new ArrayList<Document>();
@@ -768,9 +769,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findArchivedByFolder(long folderId) {
 		try {
-			return findByWhere(
-					ALIAS_ENTITY+".folder.id = " + folderId + " and "+ALIAS_ENTITY+".status=" + AbstractDocument.DOC_ARCHIVED, null,
-					null);
+			return findByWhere(ALIAS_ENTITY + ".folder.id = " + folderId + " and " + ALIAS_ENTITY + ".status="
+					+ AbstractDocument.DOC_ARCHIVED, null, null);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
 			return new ArrayList<Document>();
@@ -794,8 +794,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			List<Long> ids = (List<Long>) queryForList(query.toString(),
 					linkType != null ? new Object[] { docId } : new Object[] { docId, docId }, Long.class, null);
 			coll = findByWhere(
-					ALIAS_ENTITY+".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
-							+ ") and not "+ALIAS_ENTITY+".status=" + AbstractDocument.DOC_ARCHIVED,
+					ALIAS_ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+							+ ") and not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED,
 					null, null);
 
 		} catch (Throwable e) {
@@ -808,16 +808,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findByFileNameAndParentFolderId(Long folderId, String fileName, Long excludeId, Long tenantId,
 			Integer max) {
-		String query = "lower("+ALIAS_ENTITY+".fileName) like '%" + SqlUtil.doubleQuotes(fileName.toLowerCase()) + "%'";
+		String query = "lower(" + ALIAS_ENTITY + ".fileName) like '%" + SqlUtil.doubleQuotes(fileName.toLowerCase())
+				+ "%'";
 		if (tenantId != null) {
-			query += " and "+ALIAS_ENTITY+".tenantId = " + tenantId;
+			query += " and " + ALIAS_ENTITY + ".tenantId = " + tenantId;
 		}
 		if (folderId != null) {
-			query += " and "+ALIAS_ENTITY+".folder.id = " + folderId;
+			query += " and " + ALIAS_ENTITY + ".folder.id = " + folderId;
 		}
 		if (excludeId != null)
-			query += " and not("+ALIAS_ENTITY+".id = " + excludeId + ")";
-		query += " and not "+ALIAS_ENTITY+".status=" + AbstractDocument.DOC_ARCHIVED;
+			query += " and not(" + ALIAS_ENTITY + ".id = " + excludeId + ")";
+		query += " and not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED;
 
 		try {
 			return findByWhere(query, null, max);
@@ -935,8 +936,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findByIndexed(int indexed) {
 		try {
-			return findByWhere(ALIAS_ENTITY+".docRef is null and "+ALIAS_ENTITY+".indexed=" + indexed,
-					"order by "+ALIAS_ENTITY+".lastModified asc", null);
+			return findByWhere(ALIAS_ENTITY + ".docRef is null and " + ALIAS_ENTITY + ".indexed=" + indexed,
+					"order by " + ALIAS_ENTITY + ".lastModified asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Document>();
@@ -966,8 +967,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		Document doc = null;
 		if (customId != null)
 			try {
-				String query = ALIAS_ENTITY+".customId = '" + SqlUtil.doubleQuotes(customId) + "' " + " and "+ALIAS_ENTITY+".tenantId="
-						+ tenantId;
+				String query = ALIAS_ENTITY + ".customId = '" + SqlUtil.doubleQuotes(customId) + "' " + " and "
+						+ ALIAS_ENTITY + ".tenantId=" + tenantId;
 				List<Document> coll = findByWhere(query, null, null);
 				if (!coll.isEmpty()) {
 					doc = coll.get(0);
@@ -988,7 +989,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			doc = findById(docId);
 			initialize(doc);
 			doc.setImmutable(1);
-			doc.setStatus(Document.DOC_UNLOCKED);
+			doc.setStatus(AbstractDocument.DOC_UNLOCKED);
 			store(doc, transaction);
 		} catch (Exception e) {
 			if (log.isErrorEnabled())
@@ -1077,7 +1078,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Long> findAliasIds(long docId) {
 		try {
-			return findIdsByWhere(ALIAS_ENTITY+".docRef = " + Long.toString(docId), null, null);
+			return findIdsByWhere(ALIAS_ENTITY + ".docRef = " + Long.toString(docId), null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Long>();
@@ -1140,7 +1141,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			sb.append(ids[i]);
 		}
 		try {
-			docs = findByWhere(ALIAS_ENTITY+".id in(" + sb.toString() + ")", null, max);
+			docs = findByWhere(ALIAS_ENTITY + ".id in(" + sb.toString() + ")", null, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

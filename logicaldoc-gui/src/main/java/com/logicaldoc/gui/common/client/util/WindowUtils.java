@@ -97,7 +97,7 @@ public class WindowUtils {
 
 			DOM.appendChild(parent, link);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 

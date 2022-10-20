@@ -180,6 +180,7 @@ public class GridUtil {
 			try {
 				records = listGrid.getRecords();
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 
 			if (records == null || records.length < 1) {

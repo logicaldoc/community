@@ -38,10 +38,6 @@ public class SessionIdFilter extends GenericFilterBean {
 
 	static final String FILTER_APPLIED = "__com_logicaldoc_core_security_spring_SessionIdFilter_applied";
 
-	public SessionIdFilter() {
-
-	}
-
 	@Override
 	public void doFilter(ServletRequest rec, ServletResponse res, FilterChain chain)
 			throws IOException, ServletException {

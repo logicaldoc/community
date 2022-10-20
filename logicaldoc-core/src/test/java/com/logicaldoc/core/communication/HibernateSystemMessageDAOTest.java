@@ -53,13 +53,13 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testFindByRecipient() {
-		Collection<SystemMessage> coll = dao.findByRecipient("sebastian", SystemMessage.TYPE_SYSTEM, null);
+		Collection<SystemMessage> coll = dao.findByRecipient("sebastian", Message.TYPE_SYSTEM, null);
 		Assert.assertEquals(1, coll.size());
 		coll = dao.findByRecipient("marco", 1, null);
 		Assert.assertEquals(2, coll.size());
 		coll = dao.findByRecipient("paperino", 2, null);
 		Assert.assertEquals(0, coll.size());
-		coll = dao.findByRecipient("xxxx", SystemMessage.TYPE_SYSTEM, null);
+		coll = dao.findByRecipient("xxxx", Message.TYPE_SYSTEM, null);
 		Assert.assertEquals(0, coll.size());
 	}
 
@@ -68,15 +68,15 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 		dao.deleteExpiredMessages("sebastian");
 		Assert.assertNotNull(dao.findById(1));
 
-		dao.deleteExpiredMessages(SystemMessage.TYPE_SYSTEM);
+		dao.deleteExpiredMessages(Message.TYPE_SYSTEM);
 		Assert.assertNotNull(dao.findById(1));
 	}
 
 	@Test
 	public void testGetUnreadCount() {
-		Assert.assertEquals(1, dao.getUnreadCount("sebastian", SystemMessage.TYPE_SYSTEM));
+		Assert.assertEquals(1, dao.getUnreadCount("sebastian", Message.TYPE_SYSTEM));
 		Assert.assertEquals(2, dao.getUnreadCount("marco", 1));
-		Assert.assertEquals(0, dao.getUnreadCount("admin", SystemMessage.TYPE_SYSTEM));
+		Assert.assertEquals(0, dao.getUnreadCount("admin", Message.TYPE_SYSTEM));
 	}
 
 	@Test
@@ -123,7 +123,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 		message.setAuthor("admin");
 		message.setMessageText("text");
 		message.setLastNotified(new Date());
-		message.setType(SystemMessage.TYPE_SYSTEM);
+		message.setType(Message.TYPE_SYSTEM);
 		message.setStatus(SystemMessage.STATUS_NEW);
 		message.setRecipients(recipients);
 		Assert.assertTrue(dao.store(message));

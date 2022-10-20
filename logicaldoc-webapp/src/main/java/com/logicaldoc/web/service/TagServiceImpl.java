@@ -55,12 +55,12 @@ public class TagServiceImpl extends RemoteServiceServlet implements TagService {
 
 	@Override
 	public void delete(String tag) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void rename(String tag, String newTag) {
-
+		// Nothing to do
 	}
 
 	class TagCloudComparatorName implements Comparator<TagCloud> {
@@ -71,12 +71,12 @@ public class TagServiceImpl extends RemoteServiceServlet implements TagService {
 
 	@Override
 	public void addTag(String tag) throws ServerException {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void removeTag(String tag) throws ServerException {
-
+		// Nothing to do
 	}
 
 	@Override

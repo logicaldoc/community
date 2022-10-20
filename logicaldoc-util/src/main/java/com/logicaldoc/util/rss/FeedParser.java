@@ -110,6 +110,7 @@ public class FeedParser {
 						try {
 							description = event.asCharacters().getData();
 						} catch (Throwable t) {
+							// Nothing to do
 						}
 						continue;
 					}
@@ -119,7 +120,7 @@ public class FeedParser {
 						try {
 							link = event.asCharacters().getData();
 						} catch (Throwable t) {
-
+							// Nothing to do
 						}
 						continue;
 					}

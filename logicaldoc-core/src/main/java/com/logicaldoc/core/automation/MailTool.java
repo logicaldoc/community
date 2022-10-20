@@ -20,6 +20,7 @@ import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.MailUtil;
+import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
@@ -245,7 +246,7 @@ public class MailTool {
 		m.setAuthor(user.getUsername());
 		m.setSentDate(new Date());
 		m.setStatus(SystemMessage.STATUS_NEW);
-		m.setType(SystemMessage.TYPE_SYSTEM);
+		m.setType(Message.TYPE_SYSTEM);
 		m.setLastNotified(new Date());
 		m.setMessageText(message);
 		m.setSubject(subject);

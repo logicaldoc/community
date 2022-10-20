@@ -147,6 +147,7 @@ public class Envelopes extends com.smartgwt.client.widgets.Window {
 						list.getSelectedRecord().getAttributeAsString("id"), 300, new ValueCallback() {
 							@Override
 							public void execute(final String value) {
+								// Nothing to do
 							}
 						});
 				event.cancel();

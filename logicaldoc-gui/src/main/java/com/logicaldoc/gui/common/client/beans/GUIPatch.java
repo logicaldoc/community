@@ -31,9 +31,6 @@ public class GUIPatch implements Serializable {
 
 	private int rating = 0;
 
-	public GUIPatch() {
-	}
-
 	public String getId() {
 		return id;
 	}

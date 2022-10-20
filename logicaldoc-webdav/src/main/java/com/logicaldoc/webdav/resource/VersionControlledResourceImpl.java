@@ -115,7 +115,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @see org.apache.jackrabbit.webdav.version.VersionableResource#addVersionControl()
 	 */
 	public void addVersionControl() throws DavException {
-
+		// Nothing to do
 	}
 
 	/**
@@ -212,7 +212,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 						"DAV:checked-in property on '" + getHref() + "' did not point to a single VersionResource.");
 			}
 		} catch (Exception e) {
-
+			// Nothing to do
 		}
 	}
 

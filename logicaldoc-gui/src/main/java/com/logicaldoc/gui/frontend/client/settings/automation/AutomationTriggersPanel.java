@@ -64,9 +64,6 @@ public class AutomationTriggersPanel extends VLayout implements FolderChangeList
 
 	private SelectItem event;
 
-	public AutomationTriggersPanel() {
-	}
-
 	@Override
 	public void onDraw() {
 		final InfoPanel infoPanel = new InfoPanel("");

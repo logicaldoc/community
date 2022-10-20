@@ -31,6 +31,7 @@ public class ZipUtilTest {
 			try {
 				FileUtils.forceDelete(dir);
 			} catch (IOException e) {
+				// Nothing to do
 			}
 	}
 
@@ -97,6 +98,7 @@ public class ZipUtilTest {
 			log.debug("Found {} entries", entries.size());
 			notThrownTest="ok";
 		} catch (Throwable t) {
+			// Nothing to do
 
 		}
 		Assert.assertNotNull(notThrownTest);

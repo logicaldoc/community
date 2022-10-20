@@ -39,6 +39,7 @@ public class UserController {
 			try {
 				observer.onUserChanged(user);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 	}
 

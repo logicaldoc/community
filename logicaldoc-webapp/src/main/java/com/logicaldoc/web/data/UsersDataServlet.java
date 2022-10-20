@@ -61,6 +61,7 @@ public class UsersDataServlet extends AbstractDataServlet {
 			try {
 				group = groupDao.findById(Long.parseLong(groupIdOrName));
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 			if (group == null)
 				group = groupDao.findByName(groupIdOrName, session.getTenantId());

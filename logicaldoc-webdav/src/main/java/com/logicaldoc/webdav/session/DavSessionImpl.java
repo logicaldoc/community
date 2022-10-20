@@ -32,6 +32,7 @@ public class DavSessionImpl implements WebdavSession {
 
 	@Override
 	public void addLockToken(String arg0) {
+		// Nothing to do
 	}
 
 	@Override

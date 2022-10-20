@@ -328,7 +328,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			propertiesPanel = new StandardPropertiesPanel(document, changeHandler);
 			propertiesTabPanel.addMember(propertiesPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -353,7 +353,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 					templateChangedHandler);
 			extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -432,7 +432,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				if (tabSet.getTab(ID_TAB_ALIASES) == null)
 					tabSet.addTab(aliasesTab);
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 		} else
 			tabSet.removeTab(aliasesTab);
@@ -450,7 +450,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			linksPanel = new LinksPanel(document);
 			linksTabPanel.addMember(linksPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -465,7 +465,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			signaturePanel = new DigitalSignaturePanel(document);
 			signatureTabPanel.addMember(signaturePanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*
@@ -480,7 +480,7 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			notesPanel = new NotesPanel(document);
 			notesTabPanel.addMember(notesPanel);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		/*

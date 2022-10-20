@@ -14,10 +14,7 @@ public class WSParameter {
 	private String name;
 
 	private String value;
-
-	public WSParameter() {
-	}
-
+	
 	public String getName() {
 		return name;
 	}

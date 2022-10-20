@@ -578,6 +578,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 							}
 						}
 					} catch (Throwable t) {
+						// Nothing to do
 					}
 				}
 

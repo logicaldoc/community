@@ -198,6 +198,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 					tabSet.addTab(quotaTab);
 				}
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		Tab aliasesTab = new Tab(I18N.message("aliases"));
@@ -476,7 +477,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	@Override
 	public void onFolderSelected(GUIFolder folder) {
-
+		// Nothing to do
 	}
 
 	@Override

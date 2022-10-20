@@ -38,7 +38,7 @@ public abstract class Message extends PersistentObject {
 	 */
 	private Date receivedDate = new Date();
 
-	private int type = TYPE_SYSTEM;
+	private int type = Message.TYPE_SYSTEM;
 
 	private Set<Recipient> recipients = new HashSet<Recipient>();
 

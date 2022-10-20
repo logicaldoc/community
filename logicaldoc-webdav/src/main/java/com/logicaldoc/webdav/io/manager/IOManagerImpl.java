@@ -27,10 +27,7 @@ public class IOManagerImpl implements IOManager {
 	protected static Logger log = LoggerFactory.getLogger(IOManagerImpl.class);
 
 	private final List<IOHandler> ioHandlers = new ArrayList<IOHandler>();
-
-	public IOManagerImpl() {
-	}
-
+	
 	public void addIOHandler(IOHandler ioHandler) {
 		if (ioHandler == null) {
 			throw new IllegalArgumentException("'null' is not a valid IOHandler.");

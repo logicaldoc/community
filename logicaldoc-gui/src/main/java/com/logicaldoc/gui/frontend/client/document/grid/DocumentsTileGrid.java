@@ -352,6 +352,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 
 	@Override
 	public void onDocumentSelected(GUIDocument document) {
+		// Nothing to do
 	}
 
 	@Override
@@ -381,7 +382,7 @@ public class DocumentsTileGrid extends TileGrid implements DocumentsGrid, Docume
 					cursor.setMessage(I18N.message("showndocuments",
 							"" + (getData() != null ? Integer.toString(getData().length) : 0)));
 				} catch (Throwable t) {
-
+					// Nothing to do
 				}
 			}
 		}

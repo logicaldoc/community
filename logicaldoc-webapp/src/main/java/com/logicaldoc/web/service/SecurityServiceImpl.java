@@ -29,8 +29,8 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
+import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.Recipient;
-import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -181,7 +181,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_LOCKED).size());
 			guiUser.setCheckedOutDocs(
 					documentDao.findByLockUserAndStatus(user.getId(), AbstractDocument.DOC_CHECKED_OUT).size());
-			guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), SystemMessage.TYPE_SYSTEM));
+			guiUser.setUnreadMessages(messageDao.getUnreadCount(user.getUsername(), Message.TYPE_SYSTEM));
 			guiUser.setQuota(user.getQuota());
 			guiUser.setQuotaCount(seqDao.getCurrentValue("userquota", user.getId(), user.getTenantId()));
 			guiUser.setCertDN(user.getCertDN());
@@ -271,6 +271,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			try {
 				currentUser = ServiceUtil.getSessionUser(getThreadLocalRequest());
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 
 			/*
@@ -521,7 +522,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					dashlets.add(dashlet);
 				}
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 		}
 		usr.setDashlets(dashlets.toArray(new GUIDashlet[0]));

@@ -35,7 +35,7 @@ public class TarUtil {
 		try {
 			maxSize = Context.get().getProperties().getInt("zip.maxsize", 1024) * 1024 * 1024;
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 

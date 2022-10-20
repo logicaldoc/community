@@ -35,10 +35,6 @@ public class StringEncrypter {
 
 	private static final String UNICODE_FORMAT = "UTF8";
 
-	public static void main(String[] args) throws IOException {
-
-	}
-
 	public StringEncrypter(String encryptionScheme) throws EncryptionException {
 		this(encryptionScheme, DEFAULT_ENCRYPTION_KEY);
 	}

@@ -994,7 +994,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 				try {
 					FileUtils.forceDelete(pluginJarFile);
 				} catch (Throwable t) {
-
+					// Nothing to do
 				}
 			if (pluginJarFile.exists()) {
 				if (Exec.isWindows())

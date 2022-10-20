@@ -76,7 +76,7 @@ public class SystemUtil {
 			System.getProperties().store(new PrintWriter(writer), "Java Environment");
 			return writer.getBuffer().toString();
 		} catch (IOException e) {
-
+			// Nothing to do
 		}
 		return "";
 	}

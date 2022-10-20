@@ -61,6 +61,7 @@ public class I18N {
 				if (val != null && !val.isEmpty())
 					return val;
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 
@@ -92,6 +93,7 @@ public class I18N {
 						map.put(key, bundle.getString(key));
 				}
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 		return map;
@@ -106,7 +108,7 @@ public class I18N {
 			while (st.hasMoreTokens())
 				locales.add(st.nextToken());
 		} catch (IOException e) {
-			
+			// Nothing to do
 		}
 		return locales;
 	}

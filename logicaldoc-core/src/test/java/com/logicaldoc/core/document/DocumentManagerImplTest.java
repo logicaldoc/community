@@ -317,7 +317,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		documentManager.checkin(1L, file, "pippo", true, null, transaction);
 		doc = docDao.findById(1L);
 
-		Assert.assertEquals(Document.DOC_UNLOCKED, doc.getStatus());
+		Assert.assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
 		Assert.assertEquals("2.0", doc.getFileVersion());
 
 		doc = docDao.findById(1);
@@ -326,7 +326,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		Assert.assertEquals(AbstractDocument.INDEX_TO_INDEX, doc.getIndexed());
 		Assert.assertEquals(0, doc.getSigned());
-		Assert.assertEquals(Document.DOC_UNLOCKED, doc.getStatus());
+		Assert.assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
 
 		documentManager.checkout(1L, transaction);
 		doc = docDao.findById(1);

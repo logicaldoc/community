@@ -236,6 +236,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 					&& !((String) values.get("template")).isEmpty())
 				options.setTemplate(Long.parseLong((String) values.get("template")));
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		List<String> fields = new ArrayList<String>();
@@ -323,7 +324,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 
 	@Override
 	public void onSearchArrived() {
-
+		// Nothing to do
 	}
 
 	@Override

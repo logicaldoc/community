@@ -70,6 +70,6 @@ public abstract class DocumentDetailTab extends HLayout {
 	}
 
 	public void handleErrors(ServerValidationError[] errors) {
-
+		// Nothing to do
 	}
 }

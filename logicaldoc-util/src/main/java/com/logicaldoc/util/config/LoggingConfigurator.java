@@ -24,6 +24,7 @@ public class LoggingConfigurator {
 		try {
 			configFile = LoggingConfigurator.class.getClassLoader().getResource("/log.xml");
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		if (configFile == null)

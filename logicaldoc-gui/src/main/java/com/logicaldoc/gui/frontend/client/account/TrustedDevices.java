@@ -72,7 +72,7 @@ public class TrustedDevices extends com.smartgwt.client.widgets.Window {
 
 					@Override
 					public void onSuccess(Void arg) {
-						
+						// Nothing to do
 					}
 				});
 			}

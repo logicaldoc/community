@@ -27,7 +27,7 @@ public class WebConfiguratorTest {
 
 	@After
 	public void tearDown() throws Exception {
-
+		// Nothing to do
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class WebConfiguratorTest {
 			config.addServlet("DocumentsData", "pippo");
 			notThrownTest = "ok";
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
 	}
@@ -53,7 +53,7 @@ public class WebConfiguratorTest {
 		try {
 			notThrownTest = "ok";
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
 	}

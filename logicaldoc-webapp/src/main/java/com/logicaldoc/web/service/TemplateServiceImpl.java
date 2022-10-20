@@ -330,7 +330,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 		try {
 			session = ServiceUtil.validateSession(getThreadLocalRequest());
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		try {

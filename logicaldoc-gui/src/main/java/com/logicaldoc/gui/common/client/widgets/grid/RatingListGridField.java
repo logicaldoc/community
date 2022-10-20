@@ -40,7 +40,5 @@ public class RatingListGridField extends ColoredListGridField {
 			return super.format(val, record, rowNum, colNum);
 		}
 
-		public RatingCellFormatter() {
-		}
 	}
 }

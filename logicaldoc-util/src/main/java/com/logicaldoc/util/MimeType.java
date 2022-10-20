@@ -26,7 +26,7 @@ public class MimeType {
 			try {
 				mimeTypes.load(MimeType.class.getResourceAsStream("/mimetypes.properties"));
 			} catch (IOException e) {
-				
+				// Nothing to do
 			}
 		}
 		if (extension.startsWith("."))

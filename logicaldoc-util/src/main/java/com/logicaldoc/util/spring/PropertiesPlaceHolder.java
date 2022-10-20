@@ -48,58 +48,37 @@ public class PropertiesPlaceHolder extends PropertyPlaceholderConfigurer {
 	 */
 	private String getDbProperty(String property) {
 
-		Connection conn = null;
-		Statement stmt = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+		ContextProperties conf;
 		try {
-			ContextProperties conf = new ContextProperties();
+			conf = new ContextProperties();
 
 			// Load the database driver
 			Class.forName(conf.getProperty("jdbc.driver"));
-
-			// Get a connection to the database
-			conn = DriverManager.getConnection(conf.getProperty("jdbc.url"), conf.getProperty("jdbc.username"),
-					conf.getProperty("jdbc.password"));
-
-			// Get a statement from the connection
-			stmt = conn.createStatement();
-
-			// Execute the query
-			String query = "select ld_string1 from ld_generic where ld_deleted=0 and ld_type='conf' and ld_subtype=?";
-			pstmt = conn.prepareStatement(query);
-			pstmt.setString(1, property);
-			rs = pstmt.executeQuery();
-
-			// Loop through the result set
-			while (rs.next())
-				return rs.getString(1);
-
-			return null;
 		} catch (Throwable se) {
 			log.error(se.getMessage());
 			return null;
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (Throwable se) {
+		}
+
+		try (Connection conn = DriverManager.getConnection(conf.getProperty("jdbc.url"),
+				conf.getProperty("jdbc.username"), conf.getProperty("jdbc.password"));
+				Statement stmt = conn.createStatement();) {
+
+			// Execute the query
+			String query = "select ld_string1 from ld_generic where ld_deleted=0 and ld_type='conf' and ld_subtype=?";
+			try (PreparedStatement pstmt = conn.prepareStatement(query);) {
+				pstmt.setString(1, property);
+				try (ResultSet rs = pstmt.executeQuery();) {
+
+					// Loop through the result set
+					while (rs.next())
+						return rs.getString(1);
+
+					return null;
+				}
 			}
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (Throwable se) {
-			}
-			try {
-				if (pstmt != null)
-					pstmt.close();
-			} catch (Throwable se) {
-			}
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (Throwable se) {
-			}
+		} catch (Throwable se) {
+			log.error(se.getMessage());
+			return null;
 		}
 	}
 }

@@ -25,11 +25,6 @@ public class SecurityConfiguratorTest {
 		FileUtil.copyResource("/context-security.xml", contextSecurityXml);
 	}
 
-	@After
-	public void tearDown() throws Exception {
-
-	}
-
 	@Test
 	public void testGetContentSecurityPolicy() {
 		SecurityConfigurator config = new SecurityConfigurator(contextSecurityXml.getPath());

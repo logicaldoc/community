@@ -85,6 +85,7 @@ public class ImageUploader extends Window {
 
 					@Override
 					public void onFailure(Throwable caught) {
+						// Nothing to do0
 					}
 
 					@Override

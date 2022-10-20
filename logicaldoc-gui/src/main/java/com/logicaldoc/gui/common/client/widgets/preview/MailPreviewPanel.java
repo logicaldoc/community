@@ -167,6 +167,7 @@ public class MailPreviewPanel extends VLayout {
 					contents = "<iframe src='" + url
 							+ "' style='border:0px solid white; width:100%; height:100%; overflow:hidden;'  scrolling='no' seamless='seamless'></iframe>";
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 				html.setContents(contents);
 				body = html;

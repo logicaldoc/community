@@ -100,6 +100,7 @@ public abstract class AbstractWebappTCase {
 			if (tempDir.exists() && tempDir.isDirectory())
 				FileUtils.deleteDirectory(tempDir);
 		} catch (Exception e) {
+			// Nothing to do
 		}
 		tempDir.mkdirs();
 

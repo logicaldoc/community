@@ -43,11 +43,6 @@ public class CharsetDetector {
 	// just
 	// wants the data, and doesn't care about a char set name.
 
-	/**
-	 * Constructor
-	 */
-	public CharsetDetector() {
-	}
 
 	/**
 	 * Set the declared encoding for charset detection. The declared encoding of

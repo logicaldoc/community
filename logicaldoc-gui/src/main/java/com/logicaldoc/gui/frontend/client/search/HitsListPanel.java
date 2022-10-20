@@ -60,7 +60,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 						.parseInt(CookiesManager.get(CookiesManager.COOKIE_HITSLIST_MODE).toString());
 			}
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		Search.get().addObserver(this);
@@ -210,6 +210,7 @@ public class HitsListPanel extends VLayout implements SearchObserver, DocumentOb
 
 	@Override
 	public void onOptionsChanged(GUISearchOptions newOptions) {
+		// Nothing to do
 	}
 
 	private void onHitSelected() {

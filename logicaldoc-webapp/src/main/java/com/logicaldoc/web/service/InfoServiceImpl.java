@@ -19,7 +19,7 @@ import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.SystemInfo;
-import com.logicaldoc.core.communication.SystemMessage;
+import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
@@ -267,6 +267,7 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 			GUIAttributeSet defaultSet = new AttributeSetServiceImpl().getAttributeSet("default");
 			info.setDefaultAttributeSet(defaultSet);
 		} catch (Throwable t) {
+			// Nothing to dox
 		}
 
 		return info;
@@ -338,7 +339,7 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 
 			if (session != null) {
 				GUIParameter messages = new GUIParameter("messages",
-						"" + messageDao.getUnreadCount(session.getUsername(), SystemMessage.TYPE_SYSTEM));
+						"" + messageDao.getUnreadCount(session.getUsername(), Message.TYPE_SYSTEM));
 				parameters.add(messages);
 			}
 			parameters.add(new GUIParameter("valid", "" + SessionManager.get().isOpen(session.getSid())));

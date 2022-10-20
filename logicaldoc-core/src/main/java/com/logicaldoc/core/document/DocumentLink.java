@@ -19,10 +19,6 @@ public class DocumentLink extends PersistentObject {
 
 	private Document document2;
 
-	public DocumentLink() {
-
-	}
-
 	public String getType() {
 		return type;
 	}

@@ -41,11 +41,11 @@ public class SimpleSerializationPolicy extends SerializationPolicy {
 
 	@Override
 	public void validateDeserialize(Class<?> arg0) throws SerializationException {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void validateSerialize(Class<?> arg0) throws SerializationException {
-
+		// Nothing to do
 	}
 }

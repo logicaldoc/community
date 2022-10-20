@@ -91,7 +91,7 @@ public class Exec {
 			try {
 				process.destroy();
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 		}
 
@@ -169,7 +169,7 @@ public class Exec {
 		try {
 			process.destroy();
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		return exit;
@@ -245,7 +245,7 @@ public class Exec {
 		try {
 			process.destroy();
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		return exit;
@@ -298,7 +298,7 @@ public class Exec {
 		try {
 			process.destroy();
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		if (outputWriter != null) {
@@ -398,6 +398,7 @@ public class Exec {
 					try {
 						is.close();
 					} catch (IOException e) {
+						// Nothing to do
 					}
 			}
 		}

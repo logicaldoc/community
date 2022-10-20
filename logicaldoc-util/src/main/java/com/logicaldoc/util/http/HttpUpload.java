@@ -1,7 +1,6 @@
 package com.logicaldoc.util.http;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 import org.apache.http.HttpEntity;
@@ -34,33 +33,27 @@ public class HttpUpload {
 
 	private FileBodyCounter.ProgressListener listener;
 
-	public void UploadFile() {
-	}
-
 	public void upload() throws Exception {
+		HttpPost filePost = new HttpPost(url);
 
-		CloseableHttpResponse response = null;
-		try {
-			HttpPost filePost = new HttpPost(url);
+		String f = fileName;
+		if (f == null)
+			f = file.getName();
 
-			String f = fileName;
-			if (f == null)
-				f = file.getName();
+		String name = "LDOC-" + new Date().getTime();
 
-			String name = "LDOC-" + new Date().getTime();
+		FileBody filePart = null;
+		if (listener != null)
+			filePart = new FileBodyCounter(file, ContentType.create(MimeType.getByFilename(f), "UTF-8"), name,
+					listener);
+		else
+			filePart = new FileBody(file, ContentType.create(MimeType.getByFilename(f), "UTF-8"), name);
 
-			FileBody filePart = null;
-			if (listener != null)
-				filePart = new FileBodyCounter(file, ContentType.create(MimeType.getByFilename(f), "UTF-8"), name,
-						listener);
-			else
-				filePart = new FileBody(file, ContentType.create(MimeType.getByFilename(f), "UTF-8"), name);
+		HttpEntity reqEntity = MultipartEntityBuilder.create().addPart(name, filePart).build();
+		filePost.setEntity(reqEntity);
 
-			HttpEntity reqEntity = MultipartEntityBuilder.create().addPart(name, filePart).build();
-			filePost.setEntity(reqEntity);
-			
-			CloseableHttpClient client = HttpUtil.getNotValidatingClient(TIMEOUT);
-			response = client.execute(filePost);
+		CloseableHttpClient client = HttpUtil.getNotValidatingClient(TIMEOUT);
+		try (CloseableHttpResponse response = client.execute(filePost);) {
 
 			int status = response.getStatusLine().getStatusCode();
 			String respBody = "";
@@ -75,12 +68,6 @@ public class HttpUpload {
 				System.out.println(message);
 				throw new Exception(message);
 			}
-		} finally {
-			if (response != null)
-				try {
-					response.close();
-				} catch (IOException e) {
-				}
 		}
 	}
 

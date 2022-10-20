@@ -237,7 +237,7 @@ public class RetentionPoliciesPanel extends AdminPanel {
 
 					@Override
 					public void onSuccess(Void arg) {
-
+						// Nothing to do
 					}
 				});
 			}

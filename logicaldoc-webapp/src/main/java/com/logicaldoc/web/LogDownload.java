@@ -220,6 +220,7 @@ public class LogDownload extends HttpServlet {
 		try {
 			doGet(request, response);
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 }

@@ -219,7 +219,9 @@ public class SearchToolbar extends ToolStrip {
 				togglePreview.setTooltip(I18N.message("openpreview"));
 			}
 		} catch (Throwable t) {
+			// Nothing to do
 		}
+		
 		togglePreview.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

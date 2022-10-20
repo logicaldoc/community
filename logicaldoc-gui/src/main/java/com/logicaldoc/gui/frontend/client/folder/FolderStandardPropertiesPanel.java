@@ -212,6 +212,7 @@ public class FolderStandardPropertiesPanel extends FolderDetailTab {
 				LD.askForValue(I18N.message("path"), I18N.message("path"), path, new ValueCallback() {
 					@Override
 					public void execute(final String value) {
+						// Nothing to do
 					}
 				});
 				event.cancel();

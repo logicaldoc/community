@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.MessageTemplate;
 import com.logicaldoc.core.communication.MessageTemplateDAO;
 import com.logicaldoc.core.communication.Recipient;
@@ -140,7 +141,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 			m.setAuthor(session.getUsername());
 			m.setSentDate(new Date());
 			m.setStatus(SystemMessage.STATUS_NEW);
-			m.setType(SystemMessage.TYPE_SYSTEM);
+			m.setType(Message.TYPE_SYSTEM);
 			m.setLastNotified(new Date());
 			m.setMessageText(message.getMessage());
 			m.setSubject(message.getSubject());

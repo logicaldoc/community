@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.SystemMessage;
 import com.logicaldoc.core.communication.SystemMessageDAO;
 import com.logicaldoc.core.security.Session;
@@ -47,7 +48,7 @@ public class MessagesDataServlet extends AbstractDataServlet {
 		/*
 		 * Iterate over records composing the response XML document
 		 */
-		List<SystemMessage> unread = dao.findByRecipient(session.getUsername(), SystemMessage.TYPE_SYSTEM, 0);
+		List<SystemMessage> unread = dao.findByRecipient(session.getUsername(), Message.TYPE_SYSTEM, 0);
 		for (SystemMessage record : unread) {
 			writer.print("<message>");
 			writer.print("<id>" + record.getId() + "</id>");
@@ -61,7 +62,7 @@ public class MessagesDataServlet extends AbstractDataServlet {
 			writer.print("</message>");
 		}
 
-		List<SystemMessage> read = dao.findByRecipient(session.getUsername(), SystemMessage.TYPE_SYSTEM, 1);
+		List<SystemMessage> read = dao.findByRecipient(session.getUsername(), Message.TYPE_SYSTEM, 1);
 		for (SystemMessage record : read) {
 			writer.print("<message>");
 			writer.print("<id>" + record.getId() + "</id>");

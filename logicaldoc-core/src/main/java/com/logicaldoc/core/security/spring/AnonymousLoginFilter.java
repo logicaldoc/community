@@ -28,10 +28,6 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 
 	static final String FILTER_APPLIED = "__com_logicaldoc_core_security_spring_AnonymousLoginFilter_applied";
 
-	public AnonymousLoginFilter() {
-
-	}
-
 	@Override
 	public void doFilter(ServletRequest rec, ServletResponse res, FilterChain chain) throws IOException,
 			ServletException {

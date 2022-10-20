@@ -182,7 +182,7 @@ public class PswRecovery extends HttpServlet {
 			out.flush();
 			out.close();
 		} catch (Throwable e) {
-
+			// Nothing to do
 		}
 	}
 }

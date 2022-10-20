@@ -40,9 +40,6 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 
 	private static Logger log = LoggerFactory.getLogger(LDAuthenticationProvider.class);
 
-	public LDAuthenticationProvider() {
-	}
-
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;

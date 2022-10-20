@@ -168,6 +168,7 @@ public class ExportZip extends HttpServlet {
 			out.flush();
 			out.close();
 		} catch (Throwable e) {
+			// Nothing to do
 		}
 	}
 }

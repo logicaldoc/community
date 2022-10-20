@@ -563,6 +563,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				togglePreview.setTooltip(I18N.message("openpreview"));
 			}
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 		togglePreview.addClickHandler(new ClickHandler() {
 			@Override
@@ -693,6 +694,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				togglePreview.setDisabled(false);
 			}
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 

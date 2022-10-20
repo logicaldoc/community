@@ -31,6 +31,7 @@ public class HttpFirewall extends StrictHttpFirewall {
 
 				@Override
 				public void reset() {
+					// Nothing to do
 				}
 			};
 	}

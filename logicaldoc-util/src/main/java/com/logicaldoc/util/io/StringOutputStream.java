@@ -25,6 +25,7 @@ public class StringOutputStream extends OutputStream {
 	}
 
 	public void flush() throws IOException {
+		// Nothing to do
 	}
 
 	public void write(byte[] b) throws IOException {

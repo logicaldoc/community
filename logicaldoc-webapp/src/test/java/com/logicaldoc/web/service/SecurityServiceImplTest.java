@@ -192,7 +192,7 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 			service.saveSettings(securitySettings);
 			notThrownTest = "ok";
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
 	}

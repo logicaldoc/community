@@ -70,7 +70,7 @@ public class ZipUtil {
 			maxSize = Context.get().getProperties().getInt("zip.maxsize", 1024) * 1024 * 1024;
 			maxCompressionRatio = Context.get().getProperties().getDouble("zip.maxratio", 30D);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 
@@ -309,6 +309,7 @@ public class ZipUtil {
 				if (entryStream != null)
 					entryStream.close();
 			} catch (Throwable e) {
+				// Nothing to do
 			}
 		}
 	}

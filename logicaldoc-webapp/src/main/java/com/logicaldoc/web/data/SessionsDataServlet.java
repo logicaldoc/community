@@ -90,7 +90,7 @@ public class SessionsDataServlet extends HttpServlet {
 					try {
 						currentUser = ServiceUtil.getSessionUser(request);
 					} catch (Throwable t) {
-
+						// Nothing to do
 					}
 
 				/*

@@ -68,10 +68,6 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 
 	private Long template = null;
 
-	/** Necessary constructor for the Search Web Service */
-	public WSSearchOptions() {
-	}
-
 	public void setExpression(String expr) {
 		this.expression = expr;
 	}

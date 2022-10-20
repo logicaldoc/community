@@ -163,6 +163,7 @@ public class FileUtil {
 			try {
 				is.close();
 			} catch (IOException e) {
+				// Nothing to do
 			}
 		}
 		return null;
@@ -465,6 +466,7 @@ public class FileUtil {
 			try {
 				input.close();
 			} catch (Throwable e) {
+				// Nothing to do
 			}
 		}
 	}

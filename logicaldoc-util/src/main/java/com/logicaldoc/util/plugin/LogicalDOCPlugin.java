@@ -77,6 +77,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
 			ContextProperties conf = new ContextProperties();
 			id = conf.getProperty("id");
 		} catch (IOException e) {
+			// Nothing to do
 		}
 		return new File(resolveDataPath("install-" + id).toString());
 	}
@@ -118,6 +119,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
 			// The path may contain URL-encoded sequences
 			path = URLDecoder.decode(path, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
+			// Nothing to do
 		}
 		return path;
 	}
@@ -167,6 +169,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * @throws Exception raised if some errors happened during the installation
 	 */
 	public void install() throws Exception {
+		// Nothing to do
 	}
 
 	/**
@@ -176,6 +179,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * @throws Exception raised if some errors happened during the startup
 	 */
 	protected void onStart() throws Exception {
+		// Nothing to do
 	}
 
 	protected void setRestartRequired() {
@@ -195,6 +199,7 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 */
 	@Override
 	protected void doStop() throws Exception {
+		// Nothing to do
 	}
 
 	public Properties getData() {

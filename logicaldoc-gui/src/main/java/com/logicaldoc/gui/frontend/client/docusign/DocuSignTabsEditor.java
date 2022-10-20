@@ -85,7 +85,7 @@ public class DocuSignTabsEditor extends AbstractAnnotationsWindow {
 
 					@Override
 					public void onFailure(Throwable arg0) {
-
+						// Nothing to do
 					}
 				});
 				dialog.show();

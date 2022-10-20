@@ -51,6 +51,6 @@ public class SearchBox extends TextItem {
 	}
 
 	protected void onSearch() {
-
+		// Nothing to do
 	}
 }

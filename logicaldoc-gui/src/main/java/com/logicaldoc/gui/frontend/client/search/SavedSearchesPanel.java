@@ -133,7 +133,7 @@ public class SavedSearchesPanel extends VLayout {
 						350, new ValuesCallback() {
 							@Override
 							public void execute(String value) {
-
+								// Nothing to do
 							}
 
 							@Override

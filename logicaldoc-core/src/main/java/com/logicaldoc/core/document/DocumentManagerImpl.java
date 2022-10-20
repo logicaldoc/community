@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -147,7 +146,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		// identify the document and folder
 		Document document = documentDAO.findDocument(docId);
 
-		if (document.getImmutable() == 0 && document.getStatus() == Document.DOC_UNLOCKED) {
+		if (document.getImmutable() == 0 && document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
 			// Remove the files of the same fileVersion
 			List<String> resources = storer.listResources(document.getId(), fileVersion);
 			for (String resource : resources)
@@ -171,8 +170,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			// Update the document's record
 			documentDAO.initialize(document);
 			document.setFileSize(fileSize);
-			if (document.getIndexed() != Document.INDEX_SKIP)
-				document.setIndexed(Document.INDEX_TO_INDEX);
+			if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
+				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
 			document.setOcrd(0);
 			document.setBarcoded(0);
 			document.setSigned(0);
@@ -265,7 +264,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				document.setDate(new Date());
 				document.setPublisher(transaction.getUsername());
 				document.setPublisherId(transaction.getUserId());
-				document.setStatus(Document.DOC_UNLOCKED);
+				document.setStatus(AbstractDocument.DOC_UNLOCKED);
 				document.setLockUserId(null);
 				document.setFolder(folder);
 				document.setDigest(null);
@@ -276,7 +275,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 						DocumentEvent.CHECKEDIN.toString(), release);
 
-				document.setStatus(Document.DOC_UNLOCKED);
+				document.setStatus(AbstractDocument.DOC_UNLOCKED);
 				if (documentDAO.store(document, transaction) == false)
 					throw new Exception(String.format("Errors saving document %s", document.getId()));
 
@@ -363,7 +362,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				return;
 			}
 
-			if (document.getStatus() != Document.DOC_UNLOCKED)
+			if (document.getStatus() != AbstractDocument.DOC_UNLOCKED)
 				throw new PersistenceException(
 						String.format("Document %s is already locked by user %s and cannot be locked by %s", document,
 								document.getLockUser(), transaction.getUser().getFullName()));
@@ -783,7 +782,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			else
 				docVO.setCreatorId(transaction.getUserId());
 
-			docVO.setStatus(Document.DOC_UNLOCKED);
+			docVO.setStatus(AbstractDocument.DOC_UNLOCKED);
 			docVO.setType(type);
 			docVO.setVersion(config.getProperty("document.startversion"));
 			docVO.setFileVersion(docVO.getVersion());
@@ -885,8 +884,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				cloned.setFolder(folder);
 			cloned.setLastModified(null);
 			cloned.setDate(null);
-			if (cloned.getIndexed() == Document.INDEX_INDEXED)
-				cloned.setIndexed(Document.INDEX_TO_INDEX);
+			if (cloned.getIndexed() == AbstractDocument.INDEX_INDEXED)
+				cloned.setIndexed(AbstractDocument.INDEX_TO_INDEX);
 			cloned.setStamped(0);
 			cloned.setSigned(0);
 			cloned.setLinks(0);
@@ -927,7 +926,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			if (transaction.getUser().isMemberOf("admin")) {
 				document.setImmutable(0);
-			} else if (document.getLockUserId() == null || document.getStatus() == Document.DOC_UNLOCKED) {
+			} else if (document.getLockUserId() == null || document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
 				log.debug("The document {} is already unlocked", document);
 				return;
 			} else if (!transaction.getUserId().toString().equals(document.getLockUserId().toString())) {
@@ -943,7 +942,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			document.setLockUserId(null);
 			document.setLockUser(null);
 			document.setExtResId(null);
-			document.setStatus(Document.DOC_UNLOCKED);
+			document.setStatus(AbstractDocument.DOC_UNLOCKED);
 
 			// Modify document history entry
 			transaction.setEvent(DocumentEvent.UNLOCKED.toString());
@@ -1076,7 +1075,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			alias.setPublisherId(transaction.getUserId());
 			alias.setCreator(transaction.getUsername());
 			alias.setCreatorId(transaction.getUserId());
-			alias.setStatus(Document.DOC_UNLOCKED);
+			alias.setStatus(AbstractDocument.DOC_UNLOCKED);
 			alias.setType(type);
 
 			// Set the Doc Reference
@@ -1290,7 +1289,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		ticket.setEnabled(1);
 		ticket.setMaxCount(maxDownloads);
 
-		Calendar cal = GregorianCalendar.getInstance();
+		Calendar cal = Calendar.getInstance();
 		if (expireDate != null) {
 			cal.setTime(expireDate);
 			cal.set(Calendar.HOUR_OF_DAY, 23);
@@ -1372,7 +1371,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		// identify the document and folder
 		Document document = documentDAO.findDocument(docId);
-		if (document.getImmutable() == 0 && document.getStatus() == Document.DOC_UNLOCKED) {
+		if (document.getImmutable() == 0 && document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
 			Version ver = versionDAO.findByVersion(document.getId(), version);
 			assert (ver != null);
 			versionDAO.initialize(ver);

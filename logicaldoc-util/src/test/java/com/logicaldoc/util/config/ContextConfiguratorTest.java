@@ -25,11 +25,6 @@ public class ContextConfiguratorTest {
 		FileUtil.copyResource("/context.xml", contextXml);
 	}
 
-	@After
-	public void tearDown() throws Exception {
-
-	}
-
 	@Test
 	public void testAddTrigger() {
 		String notThrownTest = null;
@@ -38,7 +33,7 @@ public class ContextConfiguratorTest {
 			config.addTrigger("TestTrigger");
 			notThrownTest = "ok";
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 		Assert.assertNotNull(notThrownTest);
 	}

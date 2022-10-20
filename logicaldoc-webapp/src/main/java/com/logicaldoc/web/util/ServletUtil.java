@@ -198,14 +198,14 @@ public class ServletUtil {
 			try {
 				session = ServiceUtil.validateSession(request);
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 		if (user != null)
 			try {
 				udao.initialize(user);
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 		Document doc = dao.findById(docId);
@@ -707,6 +707,7 @@ public class ServletUtil {
 		try {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
 		} catch (Throwable e) {
+			// Nothing to do
 		}
 	}
 

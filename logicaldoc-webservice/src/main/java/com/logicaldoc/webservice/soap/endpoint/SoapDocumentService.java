@@ -26,6 +26,7 @@ import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.communication.Recipient;
 import com.logicaldoc.core.conversion.FormatConverterManager;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -191,7 +192,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (doc.getImmutable() == 1)
 			throw new Exception("The document is immutable");
 
-		if (doc.getStatus() != Document.DOC_UNLOCKED)
+		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
 			throw new Exception("The document is locked or already checked out");
 
 		checkWriteEnable(user, doc.getFolder().getId());
@@ -237,7 +238,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		if (doc.getImmutable() == 1)
 			throw new Exception("The document " + doc.getId() + " is immutable");
 
-		if (doc.getStatus() != Document.DOC_UNLOCKED && user.getId() != doc.getLockUserId())
+		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED && user.getId() != doc.getLockUserId())
 			throw new Exception("The document " + doc.getId() + " is locked");
 	}
 
@@ -558,7 +559,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		checkLocked(user, doc);
 
 		// Document is already unlocked, no need to do anything else
-		if (doc.getStatus() == Document.DOC_UNLOCKED)
+		if (doc.getStatus() == AbstractDocument.DOC_UNLOCKED)
 			return;
 
 		// Create the document history event
@@ -1229,7 +1230,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		checkWriteEnable(user, folder.getId());
 
 		doc = ddao.findDocument(docId);
-		if (doc.getStatus() != Document.DOC_UNLOCKED)
+		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
 			throw new Exception("The document is locked");
 
 		try {
@@ -1259,7 +1260,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		checkWriteEnable(user, folder.getId());
 
 		doc = ddao.findDocument(docId);
-		if (doc.getStatus() != Document.DOC_UNLOCKED)
+		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
 			throw new Exception("The document is locked");
 
 		try {

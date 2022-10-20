@@ -98,9 +98,6 @@ public class WSAttribute implements Serializable {
 	@WSDoc(required = false, description = "Optional initialization script")
 	private String initialization;
 
-	public WSAttribute() {
-	}
-
 	public String getName() {
 		return name;
 	}

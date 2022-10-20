@@ -98,7 +98,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 	 * @see com.logicaldoc.core.communication.SystemMessageDAO#deleteExpiredMessages(java.lang.String)
 	 */
 	public void deleteExpiredMessages(String recipient) {
-		collectGarbage(findByRecipient(recipient, SystemMessage.TYPE_SYSTEM, null), true);
+		collectGarbage(findByRecipient(recipient, Message.TYPE_SYSTEM, null), true);
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 		 * Store a new event for the recipient, in case this is a new system
 		 * message
 		 */
-		if (stored && originalId == 0L && message.getType() == SystemMessage.TYPE_SYSTEM) {
+		if (stored && originalId == 0L && message.getType() == Message.TYPE_SYSTEM) {
 			UserHistoryDAO hDao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 			for (Recipient rec : message.getRecipients()) {

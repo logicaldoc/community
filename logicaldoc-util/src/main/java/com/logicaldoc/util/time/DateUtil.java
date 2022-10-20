@@ -35,6 +35,7 @@ public class DateUtil {
 			try {
 				return df.format(date);
 			} catch (Exception e1) {
+				// Nothing to do
 			}
 		}
 		return null;
@@ -57,6 +58,7 @@ public class DateUtil {
 			try {
 				return df.format(date);
 			} catch (Exception e1) {
+				// Nothing to do
 			}
 		}
 		return null;
@@ -81,7 +83,7 @@ public class DateUtil {
 				SimpleDateFormat df = new SimpleDateFormat(format);
 				date = df.parse(formattedDate);
 			} catch (ParseException e) {
-
+				// Nothing to do
 			}
 		}
 		if (date == null)

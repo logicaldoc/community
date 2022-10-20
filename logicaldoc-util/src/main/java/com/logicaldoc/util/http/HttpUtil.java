@@ -40,7 +40,7 @@ public class HttpUtil {
 			try {
 				config = Context.get().getProperties();
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 			// fallback to the classpath resource
@@ -52,7 +52,7 @@ public class HttpUtil {
 			proxy[2] = config.getProperty("proxy.username");
 			proxy[3] = config.getProperty("proxy.password");
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		// The port must be an integer
@@ -113,6 +113,7 @@ public class HttpUtil {
 			try {
 				response.close();
 			} catch (IOException e) {
+				// Nothing to do
 			}
 	}
 
@@ -123,7 +124,7 @@ public class HttpUtil {
 			try {
 				respBody = EntityUtils.toString(rent, "UTF-8");
 			} catch (Throwable e) {
-
+				// Nothing to do
 			}
 			return respBody;
 		}

@@ -11,6 +11,6 @@ public final class VoidCallback implements AsyncCallback<Void> {
 
 	@Override
 	public void onSuccess(Void arg0) {
-
+		// Nothing to do
 	}
 }

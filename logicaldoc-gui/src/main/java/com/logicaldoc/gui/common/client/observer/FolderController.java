@@ -62,6 +62,7 @@ public class FolderController {
 				try {
 					observer.onFolderChanged(folder);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -72,6 +73,7 @@ public class FolderController {
 				try {
 					observer.onFolderDeleted(folder);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -82,6 +84,7 @@ public class FolderController {
 				try {
 					observer.onFolderCreated(folder);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -92,6 +95,7 @@ public class FolderController {
 				try {
 					observer.onFolderMoved(folder);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -102,6 +106,7 @@ public class FolderController {
 				try {
 					observer.onFolderBeginEditing(folder);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}
@@ -112,6 +117,7 @@ public class FolderController {
 				try {
 					observer.onFolderCancelEditing(folder);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 		}
 	}

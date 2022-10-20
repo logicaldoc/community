@@ -69,10 +69,6 @@ public class GUIBarcodeSpec implements Serializable {
 	 */
 	private String sampleText;
 
-	public GUIBarcodeSpec() {
-
-	}
-
 	public String getPatterns() {
 		return patterns;
 	}

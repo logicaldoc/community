@@ -21,5 +21,6 @@ public class DefaultIOManager extends IOManagerImpl {
 	}
 
 	protected void init() {
+		// Nothing to do
 	}
 }

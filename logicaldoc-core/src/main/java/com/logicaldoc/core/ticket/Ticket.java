@@ -44,10 +44,6 @@ public class Ticket extends PersistentObject {
 	 */
 	private String url;
 
-	public Ticket() {
-
-	}
-
 	public long getDocId() {
 		return docId;
 	}

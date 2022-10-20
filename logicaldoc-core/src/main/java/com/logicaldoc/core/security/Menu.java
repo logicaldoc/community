@@ -102,9 +102,6 @@ public class Menu extends PersistentObject implements Comparable<Menu> {
 
 	private Set<MenuGroup> menuGroups = new HashSet<MenuGroup>();
 
-	public Menu() {
-	}
-
 	public long getId() {
 		return id;
 	}

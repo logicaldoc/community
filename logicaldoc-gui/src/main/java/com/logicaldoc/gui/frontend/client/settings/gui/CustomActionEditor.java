@@ -148,7 +148,7 @@ public class CustomActionEditor extends Window {
 				if (rightsPanel != null)
 					action.setRights(rightsPanel.getRights());
 			} catch (Throwable t) {
-
+				// Nothing to do
 			}
 
 			panel.update(action);

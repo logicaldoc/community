@@ -123,9 +123,6 @@ public class SystemLoadMonitor {
 
 		private boolean running = true;
 
-		public LoadTracker() {
-		}
-
 		public void end() {
 			running = false;
 		}

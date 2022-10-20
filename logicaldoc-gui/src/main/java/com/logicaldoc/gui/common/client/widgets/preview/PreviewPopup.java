@@ -42,7 +42,7 @@ public class PreviewPopup extends Window {
 			if (size <= 0 || size > 100)
 				size = 100;
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		setWidth(Math.round((float) com.google.gwt.user.client.Window.getClientWidth() * (float) size / 100F));

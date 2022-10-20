@@ -128,12 +128,12 @@ public class StatusBarIcons extends HLayout implements ClipboardObserver, UserOb
 
 	@Override
 	public void onUserLogin(String username) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void onUserLogout(String username) {
-
+		// Nothing to do
 	}
 
 	@Override

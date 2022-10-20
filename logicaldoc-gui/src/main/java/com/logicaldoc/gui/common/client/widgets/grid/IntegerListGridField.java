@@ -45,8 +45,5 @@ public class IntegerListGridField extends ColoredListGridField {
 				val=Util.formatLong(Long.parseLong(value.toString()));
 			return super.format(val, record, rowNum, colNum);
 		}
-
-		public LongCellFormatter() {
-		}
 	}
 }

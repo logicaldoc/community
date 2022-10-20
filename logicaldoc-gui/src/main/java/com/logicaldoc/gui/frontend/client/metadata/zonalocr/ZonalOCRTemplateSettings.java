@@ -104,10 +104,12 @@ public class ZonalOCRTemplateSettings extends Window {
 
 			@Override
 			public void onFailure(Throwable caught) {
+				// Nothing to do
 			}
 
 			@Override
 			public void onSuccess(Void result) {
+				// Nothing to do
 			}
 		});
 	}

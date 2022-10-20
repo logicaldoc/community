@@ -213,7 +213,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 		try {
 			legacyDelete(session.getUserId(), names);
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 	}
 

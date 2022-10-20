@@ -69,6 +69,7 @@ public class ResourceUtil {
 				try {
 					is.close();
 				} catch (IOException e) {
+					// Nothing to do
 				}
 		}
 	}

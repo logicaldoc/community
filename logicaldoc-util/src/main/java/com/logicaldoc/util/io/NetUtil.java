@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NetUtil {
 	protected static Logger log = LoggerFactory.getLogger(JarUtil.class);
-	
+
 	/**
 	 * Checks if a port is available
 	 * 
@@ -44,11 +44,13 @@ public class NetUtil {
 				try {
 					socket.close();
 				} catch (IOException e) {
+					// Nothing to do
 				}
 			if (client != null)
 				try {
 					client.close();
 				} catch (IOException e) {
+					// Nothing to do
 				}
 		}
 	}

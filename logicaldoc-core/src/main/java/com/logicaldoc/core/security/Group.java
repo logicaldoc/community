@@ -56,9 +56,6 @@ public class Group extends PersistentObject implements Serializable {
 	 */
 	private Set<User> users = new HashSet<User>();
 
-	public Group() {
-	}
-
 	public int getType() {
 		return type;
 	}

@@ -28,6 +28,7 @@ import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.RunLevel;
+import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -1701,7 +1702,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				newDoc.setFileVersion(null);
 				newDoc.setFolder(newFolder);
 				newDoc.setIndexed(0);
-				newDoc.setStatus(Document.DOC_UNLOCKED);
+				newDoc.setStatus(AbstractDocument.DOC_UNLOCKED);
 				newDoc.setImmutable(0);
 				newDoc.setBarcoded(0);
 				newDoc.setRating(0);

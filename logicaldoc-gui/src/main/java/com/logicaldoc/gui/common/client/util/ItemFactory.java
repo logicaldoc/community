@@ -1441,7 +1441,6 @@ public class ItemFactory {
 					generator.show();
 				}
 			});
-		} else {
 		}
 
 		password.setIcons(generator);

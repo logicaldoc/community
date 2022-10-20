@@ -45,9 +45,6 @@ public class GUIEmail implements Serializable {
 
 	private boolean signed = false;
 
-	public GUIEmail() {
-	}
-
 	public boolean isSigned() {
 		return signed;
 	}

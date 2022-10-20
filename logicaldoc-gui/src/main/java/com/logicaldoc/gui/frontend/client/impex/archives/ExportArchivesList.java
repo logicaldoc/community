@@ -179,6 +179,7 @@ public class ExportArchivesList extends VLayout {
 					showDetails(Long.parseLong(record.getAttribute("id")),
 							!Integer.toString(GUIArchive.STATUS_OPENED).equals(record.getAttribute("status")));
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 			}
 		});

@@ -74,9 +74,6 @@ public class ResourceServiceImpl implements ResourceService {
 		this.documentManager = documentManager;
 	}
 
-	public ResourceServiceImpl() {
-	}
-
 	private Resource marshallFolder(Folder folder, long userId, WebdavSession session) throws PersistenceException {
 		Resource resource = new ResourceImpl();
 		resource.setID(String.valueOf(folder.getId()));
@@ -226,6 +223,7 @@ public class ResourceServiceImpl implements ResourceService {
 			if (folder != null)
 				return marshallFolder(folder, userId, session);
 		} catch (Exception e) {
+			// Nothing to do
 		}
 
 		Resource parentFolder = this.getParentResource(currentStablePath, userId, session);

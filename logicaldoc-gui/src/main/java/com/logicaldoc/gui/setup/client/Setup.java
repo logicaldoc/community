@@ -390,9 +390,7 @@ public class Setup implements EntryPoint {
 			Tab tab = tabs.getSelectedTab();
 			int tabIndex = tabs.getSelectedTabNumber();
 			DynamicForm form = (DynamicForm) tab.getPane();
-			if (form.hasErrors()) {
-
-			} else {
+			if (!form.hasErrors()) {
 				if (step == tabs.getTabs().length - 1) {
 					if (!vm.validate())
 						SC.warn("invalidfields");

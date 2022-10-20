@@ -82,6 +82,7 @@ public class HistoryPanel extends DocumentDetailTab {
 						list.getSelectedRecord().getAttributeAsString("comment"), new ValueCallback() {
 							@Override
 							public void execute(final String value) {
+								// Nothing to do
 							}
 						});
 				event.cancel();

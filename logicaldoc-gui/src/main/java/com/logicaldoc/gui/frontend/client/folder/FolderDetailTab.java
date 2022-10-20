@@ -46,6 +46,6 @@ public abstract class FolderDetailTab extends HLayout {
 	}
 
 	public void handleErrors(ServerValidationError[] errors) {
-
+		// Nothing to do
 	}
 }

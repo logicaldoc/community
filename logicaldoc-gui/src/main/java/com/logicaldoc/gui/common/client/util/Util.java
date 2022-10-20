@@ -333,7 +333,7 @@ public class Util {
 			if (skin == null)
 				skin = detectSkin();
 		} catch (Throwable t) {
-
+			// Nothing to do
 		}
 
 		if (skin == null)
@@ -902,8 +902,9 @@ public class Util {
 			RequestInfo request = WindowUtils.getRequestInfo();
 			key = request.getParameter(Constants.KEY);
 		} catch (Throwable t) {
+			// Nothing to do
 		}
-
+		
 		return key;
 	}
 
@@ -914,6 +915,7 @@ public class Util {
 			RequestInfo request = WindowUtils.getRequestInfo();
 			val = request.getParameter(name);
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		return val;
@@ -931,6 +933,7 @@ public class Util {
 			RequestInfo request = WindowUtils.getRequestInfo();
 			skin = request.getParameter(Constants.SKIN);
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 
 		return skin;
@@ -1087,7 +1090,7 @@ public class Util {
 		try {
 			checkRequest.send();
 		} catch (RequestException e) {
-
+			// Nothing to do
 		}
 	}
 

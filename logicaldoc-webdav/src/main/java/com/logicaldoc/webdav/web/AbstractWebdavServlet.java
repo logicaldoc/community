@@ -157,6 +157,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 					try {
 						webdavResponse.sendError(DavServletResponse.SC_PRECONDITION_FAILED);
 					} catch (Throwable t) {
+						// Nothing to do
 					}
 					return;
 				}
@@ -170,6 +171,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 					try {
 						webdavResponse.sendError(e);
 					} catch (Throwable t) {
+						// Nothing to do
 					}
 				}
 			} catch (Throwable e) {
@@ -181,8 +183,6 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 					log.error(e.getMessage(), e);
 					throw new RuntimeException(e);
 				}
-			} finally {
-
 			}
 
 			response.getOutputStream().flush();
@@ -309,6 +309,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 	}
@@ -564,6 +565,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 	}
@@ -611,6 +613,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 	}
@@ -648,6 +651,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 	}
@@ -672,6 +676,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(DavServletResponse.SC_BAD_REQUEST);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 			return;
 		}
@@ -688,6 +693,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(status);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 			return;
 		}
@@ -728,6 +734,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 				try {
 					response.sendError(status);
 				} catch (Throwable t) {
+					// Nothing to do
 				}
 				return;
 			}
@@ -742,6 +749,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 		}
 	}
@@ -829,6 +837,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 			return;
 		}
@@ -893,6 +902,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 		try {
 			response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
 		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 
@@ -920,6 +930,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 			try {
 				response.sendError(DavServletResponse.SC_METHOD_NOT_ALLOWED);
 			} catch (Throwable t) {
+				// Nothing to do
 			}
 			return;
 		}

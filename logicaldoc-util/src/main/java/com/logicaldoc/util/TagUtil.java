@@ -63,6 +63,7 @@ public class TagUtil {
 					}
 				}
 			} catch (IOException e) {
+				// Nothing to do
 			}
 
 		return coll;
