@@ -155,7 +155,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	@Deprecated(since = "8.9")
 	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException {
 		List<T> coll = new ArrayList<>();
 		try {
@@ -173,7 +172,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	}
 
 	@Override
-	@Deprecated(since = "8.9")
 	public List<T> findByObjectQuery(String query, Object[] values, Integer max) throws PersistenceException {
 		List<T> coll = new ArrayList<>();
 		try {
@@ -224,7 +222,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	@Deprecated(since = "8.9")
 	public List findByQuery(String query, Object[] values, Integer max) throws PersistenceException {
 		List<Object> coll = new ArrayList<Object>();
 		try {
@@ -368,7 +365,6 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	 * @return The Hibernate query
 	 */
 	@SuppressWarnings("rawtypes")
-	@Deprecated(since = "8.9")
 	protected Query prepareQueryForUpdate(String expression, Object[] values, Integer max) {
 		if (values != null)
 			for (int i = 0; i < values.length; i++)
@@ -436,6 +432,15 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return queryObject;
 	}
 
+	/**
+	 * Applies the params 
+	 * 
+	 * @param values the values
+	 * @param max max number of results
+	 * @param queryObject the query
+	 * 
+	 * @deprecated
+	 */
 	@Deprecated(since = "8.9")
 	private void applyParamsAndLimit(Object[] values, Integer max, @SuppressWarnings("rawtypes")
 	Query queryObject) {
@@ -645,12 +650,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			Long ret = jdbcTemplate.queryForObject(sql, Long.class);
-			if (ret != null)
-				return ret;
-			else
-				return 0L;
-		} catch (EmptyResultDataAccessException e) {
+			return jdbcTemplate.queryForObject(sql, Long.class);
+		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0L;
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
@@ -662,12 +663,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		try {
 			DataSource dataSource = (DataSource) Context.get().getBean(DATA_SOURCE);
 			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-			Long ret = jdbcTemplate.queryForObject(sql, Long.class, args);
-			if (ret != null)
-				return ret;
-			else
-				return 0L;
-		} catch (EmptyResultDataAccessException e) {
+			return jdbcTemplate.queryForObject(sql, Long.class, args);
+		} catch (NullPointerException | EmptyResultDataAccessException e) {
 			return 0L;
 		} catch (Throwable e) {
 			throw new PersistenceException(e);

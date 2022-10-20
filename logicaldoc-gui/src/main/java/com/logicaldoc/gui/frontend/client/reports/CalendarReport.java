@@ -334,7 +334,7 @@ public class CalendarReport extends AdminPanel {
 									record.setAttribute("description", result[i].getDescription());
 									record.setAttribute("endDate", result[i].getDeadline());
 
-									StringBuffer participants = new StringBuffer();
+									StringBuilder participants = new StringBuilder();
 									GUIUser[] users = result[i].getParticipants();
 									for (GUIUser user : users) {
 										if (participants.length() > 0)

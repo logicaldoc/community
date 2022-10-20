@@ -15,7 +15,7 @@ public class DummyParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer contentx) {
+			Document document, String fileVersion, StringBuilder contentx) {
 		// Noting to do
 	}
 }

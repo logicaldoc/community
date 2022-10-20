@@ -334,7 +334,7 @@ public class ZipExport {
 		}
 		Collections.reverse(folderNames);
 
-		StringBuffer path = new StringBuffer("");
+		StringBuilder path = new StringBuilder("");
 		for (String name : folderNames) {
 			path.append(name);
 			path.append("/");

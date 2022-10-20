@@ -25,7 +25,7 @@ public class TarParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws Exception {
 		File tarFile = File.createTempFile("parsetar", ".tar");
 		try {
 			FileUtil.writeFile(input, tarFile.getAbsolutePath());

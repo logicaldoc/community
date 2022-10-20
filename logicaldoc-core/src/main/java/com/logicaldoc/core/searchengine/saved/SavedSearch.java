@@ -50,7 +50,7 @@ public class SavedSearch extends PersistentObject implements Serializable, Compa
 
 	public void saveOptions(SearchOptions opt) throws IOException {
 		this.setType(opt.getType());
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenantName = tenantDao.getTenantName(getTenantId());

@@ -102,7 +102,7 @@ public class TimeDiff {
 		long minutes = duration.toMinutes() % 60;
 		long seconds = (duration.toMillis() / 1000) % 60;
 		long hours = duration.toMinutes() / 60;
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		if (hours > 0) {
 			out.append(StringUtils.leftPad(Long.toString(hours), 2, '0'));
 			out.append(":");

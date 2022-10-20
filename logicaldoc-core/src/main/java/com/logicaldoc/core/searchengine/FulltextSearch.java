@@ -130,7 +130,7 @@ public class FulltextSearch extends Search {
 		 * Prepare the query: the expression must be applied to all requested
 		 * fields.
 		 */
-		StringBuffer query = new StringBuffer();
+		StringBuilder query = new StringBuilder();
 		for (String field : opt.getFields()) {
 			if (query.length() > 0)
 				query.append(" OR ");
@@ -230,7 +230,7 @@ public class FulltextSearch extends Search {
 		log.debug("DB search");
 
 		Set<Long> hitsIds = hitsMap.keySet();
-		StringBuffer hitsIdsCondition = new StringBuffer();
+		StringBuilder hitsIdsCondition = new StringBuilder();
 		if (!hitsIds.isEmpty()) {
 			hitsIdsCondition.append(" and (");
 
@@ -252,9 +252,9 @@ public class FulltextSearch extends Search {
 			hitsIdsCondition.append(")");
 		}
 
-		StringBuffer richQuery = new StringBuffer();
+		StringBuilder richQuery = new StringBuilder();
 		// Find real documents
-		richQuery = new StringBuffer(
+		richQuery = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 		richQuery.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
 		richQuery.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");

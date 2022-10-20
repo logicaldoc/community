@@ -1468,7 +1468,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 
 			if (email.getTos() != null && email.getTos().length > 0) {
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (GUIContact contact : email.getTos()) {
 					if (sb.length() > 0)
 						sb.append(",");
@@ -1478,7 +1478,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 
 			if (email.getCcs() != null && email.getCcs().length > 0) {
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (GUIContact contact : email.getCcs()) {
 					if (sb.length() > 0)
 						sb.append(",");
@@ -1488,7 +1488,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 
 			if (email.getBccs() != null && email.getBccs().length > 0) {
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (GUIContact contact : email.getBccs()) {
 					if (sb.length() > 0)
 						sb.append(",");
@@ -2324,7 +2324,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		List<Long> childrenFolderIds = fdao.findIdsByParentId(folderId);
 		childrenFolderIds.add(folderId);
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select count(ld_id) from ld_document where ld_deleted=0 and ld_status=" + status);
 		query.append(" and ld_folderid in (" + childrenFolderIds.toString().substring(1).replace("]", ")"));
 
@@ -2768,7 +2768,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			List<String> digests = docDao.findDuplicatedDigests(session.getTenantId(), folderId);
 			log.info("Found {} duplicated digests", digests.size());
 
-			StringBuffer duplicationsQuery = new StringBuffer(
+			StringBuilder duplicationsQuery = new StringBuilder(
 					"select ld_id, ld_digest, ld_date, ld_folderid, ld_filename, ld_version from ld_document where ld_deleted=0 ");
 			duplicationsQuery.append(" and ld_tenantid = ");
 			duplicationsQuery.append(Long.toString(session.getTenantId()));
@@ -2835,7 +2835,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		List<Long> duplicatedIds = duplications.stream().map(d -> d.getId()).collect(Collectors.toList());
 
 		log.warn("Deleting the duplicated documents {}", duplicatedIds);
-		StringBuffer updateStatement = new StringBuffer("update ld_document set ld_deleted=1 where ");
+		StringBuilder updateStatement = new StringBuilder("update ld_document set ld_deleted=1 where ");
 		if (docDao.isOracle()) {
 			/*
 			 * In Oracle The limit of 1000 elements applies to sets of single

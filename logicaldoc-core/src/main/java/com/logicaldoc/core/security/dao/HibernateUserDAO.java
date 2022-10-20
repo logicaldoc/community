@@ -543,7 +543,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		log.info("Checking if the user {} has interactions in the last {} days", user.getUsername(), maxInactiveDays);
 
-		StringBuffer sb = new StringBuffer(
+		StringBuilder sb = new StringBuilder(
 				"select max(ld_date) from ld_history where ld_deleted=0 and ld_userid=" + user.getId());
 		sb.append(
 				" UNION select max(ld_date) from ld_user_history where ld_deleted=0 and not ld_event in ('event.user.updated', 'event.user.disabled', 'event.user.timeout', 'event.user.login.failed', 'event.user.deleted', 'event.user.messagereceived') and ld_userid="

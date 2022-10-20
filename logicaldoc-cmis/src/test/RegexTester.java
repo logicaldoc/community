@@ -210,7 +210,7 @@ public class RegexTester extends Applet implements ActionListener, TextListener 
      */
     String javaVersion(String regex) {
         String charsToQuote = "\b\t\n\r\"\'\\";
-        StringBuffer buffer = new StringBuffer(regex);
+        StringBuilder buffer = new StringBuilder(regex);
         for (int i = regex.length() - 1; i >= 0; i--) {
             if (charsToQuote.indexOf(buffer.charAt(i)) >= 0) {
                 buffer.insert(i, '\\');

@@ -41,7 +41,7 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 		FolderDAO folderDAO = (FolderDAO) context.getBean(FolderDAO.class);
 		Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select id, fileName, folder.id from Document where deleted = 0 and docRef = " + docId);
 
 		User user = session.getUser();

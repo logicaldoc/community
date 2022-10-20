@@ -19,7 +19,7 @@ import java.io.OutputStream;
 public class ResourceUtil {
 
 	public static String readAsString(String resourceName) throws IOException {
-		StringBuffer resourceData = new StringBuffer(1000);
+		StringBuilder resourceData = new StringBuilder(1000);
 		try (BufferedReader reader = new BufferedReader(
 				new InputStreamReader(ResourceUtil.class.getResourceAsStream(resourceName)))) {
 			char[] buf = new char[1024];

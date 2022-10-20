@@ -275,7 +275,7 @@ public class IndexerTask extends Task {
 
 	@Override
 	protected String prepareReport(Locale locale) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(I18N.message("indexationtime", locale) + ": ");
 		sb.append(TimeDiff.printDuration(indexingTime));
 		sb.append("\n");

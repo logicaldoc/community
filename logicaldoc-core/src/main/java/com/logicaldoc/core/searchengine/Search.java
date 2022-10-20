@@ -150,7 +150,7 @@ public abstract class Search {
 		if (StringUtils.isNotEmpty(extattrs) && !hits.isEmpty()) {
 			// the names of the extended attributes to show
 			List<String> attrs = Arrays.asList(extattrs.trim().split(","));
-			StringBuffer idsString = new StringBuffer("(");
+			StringBuilder idsString = new StringBuilder("(");
 			for (Hit hit : hits) {
 				if (idsString.length() > 1)
 					idsString.append(",");
@@ -164,7 +164,7 @@ public abstract class Search {
 			final Map<String, Attribute> extAtt = new HashMap<String, Attribute>();
 
 			DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			StringBuffer query = new StringBuffer();
+			StringBuilder query = new StringBuilder();
 
 			if (hits.get(0).getType().startsWith("folder")) {
 				query.append(

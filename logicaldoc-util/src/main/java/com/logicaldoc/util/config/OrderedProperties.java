@@ -77,7 +77,7 @@ public class OrderedProperties extends Properties {
 	 * @return a double-slashed string
 	 */
 	private String doubleSlash(String orig) {
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 
 		for (int i = 0; i < orig.length(); i++) {
 			if (orig.charAt(i) == '\\') {

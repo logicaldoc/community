@@ -27,7 +27,7 @@ public class XLSParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 
 		try (POIFSFileSystem fs = new POIFSFileSystem(input); ExcelExtractor extractor = new ExcelExtractor(fs);) {
 			String tmp = extractor.getText();

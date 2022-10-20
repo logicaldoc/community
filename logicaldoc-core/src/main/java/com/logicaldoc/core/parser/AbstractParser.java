@@ -54,7 +54,7 @@ public abstract class AbstractParser implements Parser {
 	public String parse(final InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion) throws ParseException {
 		log.debug("Parse started");
-		StringBuffer content = new StringBuffer();
+		StringBuilder content = new StringBuilder();
 
 		Locale lcl = locale != null ? locale : Locale.ENGLISH;
 		String tnt = locale != null ? tenant : Tenant.DEFAULT_NAME;
@@ -124,10 +124,10 @@ public abstract class AbstractParser implements Parser {
 
 		private String fileVersion;
 
-		private StringBuffer content;
+		private StringBuilder content;
 
 		public InternalParseTask(InputStream is, String filename, String encoding, Locale locale, String tenant,
-				Document document, String fileVersion, StringBuffer content) {
+				Document document, String fileVersion, StringBuilder content) {
 			super();
 			this.is = is;
 			this.filename = filename;
@@ -163,7 +163,7 @@ public abstract class AbstractParser implements Parser {
 	 * Invoked by the parse method
 	 */
 	abstract protected void internalParse(InputStream is, String filename, String encoding, Locale locale,
-			String tenant, Document document, String fileVersion, StringBuffer output) throws Exception;
+			String tenant, Document document, String fileVersion, StringBuilder output) throws Exception;
 
 	@Override
 	public int countPages(InputStream input, String filename) {

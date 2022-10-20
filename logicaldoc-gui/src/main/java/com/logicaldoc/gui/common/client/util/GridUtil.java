@@ -84,7 +84,7 @@ public class GridUtil {
 //
 //						String title = listGrid.getTitle() != null ? listGrid.getTitle() : I18N.message("print");
 //
-//						StringBuffer content = new StringBuffer("<html><head>\n");
+//						StringBuilder content = new StringBuilder("<html><head>\n");
 //
 //						// Prepare the header
 //						content.append("<title>" + title + "</title>");

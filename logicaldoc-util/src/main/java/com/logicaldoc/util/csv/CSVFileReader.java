@@ -98,7 +98,7 @@ public class CSVFileReader extends CSVFile implements Closeable {
 	 */
 	public Vector<String> readFields() throws IOException {
 		Vector<String> fields = new Vector<String>();
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		String line = in.readLine();
 		if (line == null)
 			return null;
@@ -142,7 +142,7 @@ public class CSVFileReader extends CSVFile implements Closeable {
 	 * 
 	 * @return index of next separator
 	 */
-	protected int handleQuotedField(String s, StringBuffer sb, int i) {
+	protected int handleQuotedField(String s, StringBuilder sb, int i) {
 		int j;
 		int len = s.length();
 		for (j = i; j < len; j++) {
@@ -176,7 +176,7 @@ public class CSVFileReader extends CSVFile implements Closeable {
 	 * 
 	 * @return index of next separator
 	 */
-	protected int handlePlainField(String s, StringBuffer sb, int i) {
+	protected int handlePlainField(String s, StringBuilder sb, int i) {
 		int j = s.indexOf(fieldSeparator, i); // look for separator
 		if (j == -1) { // none found
 			sb.append(s.substring(i));

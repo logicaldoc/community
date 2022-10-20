@@ -170,7 +170,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			if (!attrs.isEmpty()) {
 				log.debug("Search for extended attributes {}", extattrs);
 
-				StringBuffer query = new StringBuffer(
+				StringBuilder query = new StringBuilder(
 						"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
 				query.append(" from ld_document_ext where ld_docid in (");
 				query.append("select D.ld_id from ld_document D where D.ld_deleted=0 ");
@@ -217,7 +217,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			/*
 			 * Execute the Query
 			 */
-			StringBuffer query = new StringBuffer(
+			StringBuilder query = new StringBuilder(
 					"select A.id, A.customId, A.docRef, A.type, A.version, A.lastModified, A.date, A.publisher,"
 							+ " A.creation, A.creator, A.fileSize, A.immutable, A.indexed, A.lockUserId, A.fileName, A.status,"
 							+ " A.signed, A.type, A.rating, A.fileVersion, A.comment, A.workflowStatus,"
@@ -357,7 +357,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 			if (StringUtils.isNotEmpty(sort)) {
 				// make the sorting to be case insensitive (add lower
 				// function)
-				StringBuffer ciSort = new StringBuffer();
+				StringBuilder ciSort = new StringBuilder();
 				StringTokenizer st = new StringTokenizer(sort, ",", false);
 				while (st.hasMoreElements()) {
 					String token = (String) st.nextElement();

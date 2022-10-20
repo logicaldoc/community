@@ -679,7 +679,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 		User user = validateSession(sid);
 
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select docId from DocumentHistory where deleted=0 and (docId is not NULL) and userId=" + user.getId());
 		query.append(" order by date desc");
 		List<Object> records = (List<Object>) dao.findByQuery(query.toString(), (Map<String, Object>) null, max);

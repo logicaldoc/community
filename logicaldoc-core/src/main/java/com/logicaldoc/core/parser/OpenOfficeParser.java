@@ -45,14 +45,14 @@ public class OpenOfficeParser extends AbstractParser {
 	 */
 	private class OpenOfficeContentHandler extends DefaultHandler {
 
-		private StringBuffer content;
+		private StringBuilder content;
 
 		private boolean appendChar;
 
 		private boolean appendNewline;
 
 		public OpenOfficeContentHandler() {
-			content = new StringBuffer();
+			content = new StringBuilder();
 			appendChar = false;
 		}
 
@@ -176,7 +176,7 @@ public class OpenOfficeParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);

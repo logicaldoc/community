@@ -41,7 +41,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 
 	@Override
 	public List<DocumentHistory> findByDocIdAndEvent(long docId, String event) {
-		StringBuffer query = new StringBuffer(" "+ALIAS_ENTITY+".docId = " + docId);
+		StringBuilder query = new StringBuilder(" "+ALIAS_ENTITY+".docId = " + docId);
 		if (StringUtils.isNotEmpty(event))
 			query.append(" and "+ALIAS_ENTITY+".event='" + SqlUtil.doubleQuotes(event) + "'");
 
@@ -135,7 +135,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 	@Override
 	public List<DocumentHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) {
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"("+ALIAS_ENTITY+".path like :pathExpression or "+ALIAS_ENTITY+".pathOld like :pathExpression) ");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("pathExpression", pathExpression);
@@ -146,7 +146,7 @@ public class HibernateDocumentHistoryDAO extends HibernatePersistentObjectDAO<Do
 		}
 
 		if (events != null && !events.isEmpty()) {
-			StringBuffer eventsStr = new StringBuffer("(");
+			StringBuilder eventsStr = new StringBuilder("(");
 			for (String event : events) {
 				if (eventsStr.length() > 1)
 					eventsStr.append(",");

@@ -228,7 +228,7 @@ public class DashletContent extends HttpServlet {
 					if (!attrs.isEmpty()) {
 						log.debug("Search for extended attributes {}", attrs);
 
-						StringBuffer qry = new StringBuffer(
+						StringBuilder qry = new StringBuilder(
 								"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
 						qry.append(" from ld_document_ext where ld_docid in (");
 						qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getDocId()))
@@ -412,7 +412,7 @@ public class DashletContent extends HttpServlet {
 			if (!attrs.isEmpty()) {
 				log.debug("Search for extended attributes {}", attrs);
 
-				StringBuffer qry = new StringBuffer(
+				StringBuilder qry = new StringBuilder(
 						"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
 				qry.append(" from ld_document_ext where ld_docid in (");
 				qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getId())).collect(Collectors.joining(",")));

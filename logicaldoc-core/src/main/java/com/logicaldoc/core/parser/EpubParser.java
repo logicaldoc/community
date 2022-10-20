@@ -28,7 +28,7 @@ public class EpubParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 		File tmpFile = null;
 		try {
 			tmpFile = File.createTempFile("epubparser", ".epub");

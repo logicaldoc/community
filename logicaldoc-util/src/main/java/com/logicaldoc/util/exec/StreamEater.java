@@ -14,9 +14,9 @@ public class StreamEater implements Runnable {
 
 	private Writer output;
 
-	private StringBuffer buffer;
+	private StringBuilder buffer;
 
-	public StreamEater(String prefix, InputStream stream, StringBuffer buffer) {
+	public StreamEater(String prefix, InputStream stream, StringBuilder buffer) {
 		super();
 		this.prefix = prefix;
 		this.stream = stream;

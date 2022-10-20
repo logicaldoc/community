@@ -46,7 +46,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 
 		Map<String, Object> params = new HashMap<String, Object>();
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.id, A.username, A.event, A.version, A.fileVersion, A.versionDate, A.comment, A.docId, A.fileName,"
 						+ " A.customId, A.fileSize, A.type, A.templateName, A.workflowStatus, A.workflowStatusDisplay, A.userId, A.color ");
 		if (request.getParameter("docId") != null) {

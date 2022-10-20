@@ -48,7 +48,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 
 		String where = prepareWhere(request, session);
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select ld_id, ld_customid, ld_docref, ld_type, ld_version, ld_lastModified, ld_date, ld_publisher,"
 						+ " ld_creation, ld_creator, ld_filesize, ld_immutable, ld_indexed, ld_lockuserid, ld_filename, ld_status,"
 						+ " ld_signed, ld_type, ld_fileversion, ld_color from ld_document where " + where);
@@ -178,7 +178,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 		 */
 		String[] queryFragments = IndexerTask.prepareQuery();
 
-		StringBuffer where = new StringBuffer(queryFragments[0].replace("_entity.", "ld_"));
+		StringBuilder where = new StringBuilder(queryFragments[0].replace("_entity.", "ld_"));
 
 		where.append((StringUtils.isNotEmpty(queryFragments[1])
 				? " order by " + queryFragments[1].replace("_entity.", "ld_")

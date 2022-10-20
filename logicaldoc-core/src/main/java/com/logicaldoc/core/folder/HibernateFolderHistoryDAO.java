@@ -95,7 +95,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	@Override
 	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) {
-		StringBuffer query = new StringBuffer("(" + ALIAS_ENTITY + ".path like :pathExpression or " + ALIAS_ENTITY
+		StringBuilder query = new StringBuilder("(" + ALIAS_ENTITY + ".path like :pathExpression or " + ALIAS_ENTITY
 				+ ".pathOld like :pathExpression) ");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("pathExpression", pathExpression);
@@ -105,7 +105,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 			params.put("oldestDate", oldestDate);
 		}
 		if (events != null && !events.isEmpty()) {
-			StringBuffer eventsStr = new StringBuffer("(");
+			StringBuilder eventsStr = new StringBuilder("(");
 			for (String event : events) {
 				if (eventsStr.length() > 1)
 					eventsStr.append(",");

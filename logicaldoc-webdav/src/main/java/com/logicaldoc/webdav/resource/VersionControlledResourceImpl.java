@@ -93,7 +93,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @see org.apache.jackrabbit.webdav.DavResource#getSupportedMethods()
 	 */
 	public String getSupportedMethods() {
-		StringBuffer sb = new StringBuffer(super.getSupportedMethods());
+		StringBuilder sb = new StringBuilder(super.getSupportedMethods());
 		// Versioning support
 		sb.append(", ").append(VersionableResource.METHODS);
 		sb.append(", ").append(DavMethods.METHOD_CHECKOUT);

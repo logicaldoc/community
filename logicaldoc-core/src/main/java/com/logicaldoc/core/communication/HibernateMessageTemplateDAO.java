@@ -38,7 +38,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 
 	@Override
 	public List<MessageTemplate> findByTypeAndLanguage(String type, String language, long tenantId) {
-		StringBuffer query = new StringBuffer(ALIAS_ENTITY + ".language='" + language + "' ");
+		StringBuilder query = new StringBuilder(ALIAS_ENTITY + ".language='" + language + "' ");
 		query.append(" and " + ALIAS_ENTITY + ".tenantId=" + tenantId);
 		if (StringUtils.isNotEmpty(type))
 			query.append(" and " + ALIAS_ENTITY + ".type='" + type + "' ");

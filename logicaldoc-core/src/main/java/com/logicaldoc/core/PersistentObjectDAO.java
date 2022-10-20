@@ -114,6 +114,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @return The list of marching entities
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
+	 * 
+	 * @deprecated
 	 */
 	@Deprecated(since = "8.9")
 	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException;
@@ -173,6 +175,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @return Query result
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
+	 * 
+	 * @deprecated
 	 */
 	@Deprecated(since = "8.9")
 	public List<Object> findByQuery(String query, Object[] values, Integer max) throws PersistenceException;
@@ -444,6 +448,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @return the number of modified records
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
+	 * 
+	 * @deprecated
 	 */
 	@Deprecated(since = "8.9")
 	public int bulkUpdate(String expression, Object[] values) throws PersistenceException;

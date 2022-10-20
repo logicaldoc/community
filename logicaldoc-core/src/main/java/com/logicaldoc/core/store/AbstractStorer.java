@@ -119,7 +119,7 @@ public abstract class AbstractStorer implements Storer {
 	 * 123/45/doc/1.0.
 	 */
 	protected String computeRelativePath(long docId, String resource) {
-		StringBuffer tmp = new StringBuffer(computeRelativePath(docId));
+		StringBuilder tmp = new StringBuilder(computeRelativePath(docId));
 		if (StringUtils.isNotEmpty(resource)) {
 			if (!tmp.toString().endsWith("/"))
 				tmp.append("/");

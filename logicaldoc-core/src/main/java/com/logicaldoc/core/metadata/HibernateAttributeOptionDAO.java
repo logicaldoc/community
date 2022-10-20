@@ -129,7 +129,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 		try {
 			if (currentAttributes == null || currentAttributes.isEmpty() || !checkStoringAspect())
 				return;
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			for (String name : currentAttributes) {
 				if (buf.length() == 0)
 					buf.append("('");

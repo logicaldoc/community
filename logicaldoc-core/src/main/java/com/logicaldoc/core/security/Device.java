@@ -199,7 +199,7 @@ public class Device extends PersistentObject implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(getBrowser());
 		if (StringUtils.isNotEmpty(getBrowserVersion())) {
 			sb.append(" v");

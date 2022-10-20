@@ -139,7 +139,7 @@ public class FileUtil {
 			byte[] messageDigest = sha.digest();
 			// convert the array to String
 			int size = messageDigest.length;
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			int unsignedValue = 0;
 			String strUnsignedValue = null;
 			for (int i = 0; i < size; i++) {

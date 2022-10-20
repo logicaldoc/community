@@ -147,7 +147,7 @@ public class Util {
 	}
 
 	public static String webstartURL(String appName, Map<String, String> params) {
-		StringBuffer url = new StringBuffer(GWT.getHostPageBaseURL());
+		StringBuilder url = new StringBuilder(GWT.getHostPageBaseURL());
 		url.append("webstart/");
 		url.append(appName);
 		url.append(".jsp?random=");
@@ -1128,7 +1128,7 @@ public class Util {
 	 * @return the HTML content
 	 */
 	public static String getTagsHTML(String[] tags) {
-		StringBuffer buf = new StringBuffer(
+		StringBuilder buf = new StringBuilder(
 				"<div style='display: grid; grid-gap: 2px; padding: 1px; grid-auto-flow: row dense; grid-template-columns: auto auto auto; grid-template-rows: auto auto;'>");
 		if (tags != null)
 			for (String tag : tags) {

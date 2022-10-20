@@ -191,14 +191,14 @@ public class Exec {
 
 		Process process = Runtime.getRuntime().exec(commandLine, env, dir != null ? dir : null);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		String s;
 		while ((s = reader.readLine()) != null)
 			out.append(s);
 		return out.toString();
 	}
 
-	public static int exec(final String commandLine, String[] env, File dir, StringBuffer buffer, int timeout)
+	public static int exec(final String commandLine, String[] env, File dir, StringBuilder buffer, int timeout)
 			throws IOException {
 		checkAllowed(commandLine);
 

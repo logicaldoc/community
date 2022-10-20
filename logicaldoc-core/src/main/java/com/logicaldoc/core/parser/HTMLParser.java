@@ -27,7 +27,7 @@ public class HTMLParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 		try {
 			org.jsoup.nodes.Document doc = Jsoup.parse(FileUtil.readFile(new File("test.html")));
 			String title = doc.title();

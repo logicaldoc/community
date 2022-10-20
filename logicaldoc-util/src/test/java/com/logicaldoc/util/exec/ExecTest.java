@@ -181,7 +181,7 @@ public class ExecTest {
 		try {
 			if (Exec.isWindows()) {
 				File userDir = new File(System.getProperty("user.dir"));
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				int retval = Exec.exec(exeFile.getPath(), envp, userDir, sb, 20);
 				log.info("retval: {}", retval);
 				assertEquals(0, retval);		

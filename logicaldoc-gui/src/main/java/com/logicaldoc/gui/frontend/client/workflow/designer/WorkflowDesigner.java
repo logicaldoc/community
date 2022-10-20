@@ -167,7 +167,7 @@ public class WorkflowDesigner extends AdminPanel {
 				GUITransition transition = ((StateWidget) connection.getDecoration().getWidget()).getTransition();
 				transition.setTargetState(end.getWfState());
 				transitions.add(transition);
-				StringBuffer sb = new StringBuffer("");
+				StringBuilder sb = new StringBuilder("");
 				for (Point point : connection.getMovablePoints()) {
 					sb.append("" + point.getLeft());
 					sb.append("," + point.getTop());

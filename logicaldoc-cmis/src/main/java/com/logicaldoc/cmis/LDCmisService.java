@@ -62,7 +62,7 @@ public class LDCmisService extends AbstractCmisService {
 	/**
 	 * Key is the repository Id
 	 */
-	private final Map<String, LDRepository> repositories = new HashMap<String, LDRepository>();
+	private final Map<String, LDRepository> repositories = new HashMap<>();
 
 	private CallContext context;
 
@@ -91,8 +91,8 @@ public class LDCmisService extends AbstractCmisService {
 			Folder root = fdao.findRoot(session.getTenantId());
 
 			repositories.put(Long.toString(root.getId()), new LDRepository(root, sid));
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 
@@ -129,7 +129,7 @@ public class LDCmisService extends AbstractCmisService {
 
 		validateSession();
 
-		List<RepositoryInfo> result = new ArrayList<RepositoryInfo>();
+		List<RepositoryInfo> result = new ArrayList<>();
 
 		for (LDRepository repo : repositories.values()) {
 			String latestChangeLogToken = getLatestChangeLogToken(repo.getId());
@@ -157,7 +157,7 @@ public class LDCmisService extends AbstractCmisService {
 
 			String tenantIdStr = Long.toString(repo.getRoot().getTenantId());
 
-			StringBuffer query = new StringBuffer(
+			StringBuilder query = new StringBuilder(
 					"SELECT MAX(ld_date) FROM ld_history WHERE ld_deleted=0 AND ld_tenantid=");
 			query.append(tenantIdStr);
 			query.append(" AND ld_event IN ('");
@@ -174,7 +174,7 @@ public class LDCmisService extends AbstractCmisService {
 
 			Timestamp latestDate = (Timestamp) historyDao.queryForObject(query.toString(), Timestamp.class);
 
-			StringBuffer query2 = new StringBuffer(
+			StringBuilder query2 = new StringBuilder(
 					"SELECT MAX(ld_date) FROM ld_folder_history WHERE ld_deleted=0 AND ld_tenantid=");
 			query2.append(tenantIdStr);
 			query2.append(" AND ld_event IN ('");
@@ -199,7 +199,7 @@ public class LDCmisService extends AbstractCmisService {
 				log.debug("myDate.getTime(): {}", myDate.getTime());
 				return Long.toString(myDate.getTime());
 			}
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new CmisRuntimeException(e.toString(), e);
 		}

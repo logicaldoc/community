@@ -27,7 +27,7 @@ public class LDAuthenticationFailureHandler implements AuthenticationFailureHand
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
-		StringBuffer failureUrl = new StringBuffer(request.getContextPath());
+		StringBuilder failureUrl = new StringBuilder(request.getContextPath());
 		failureUrl.append("/");
 		if (request.getParameter(PARAM_FAILUREURL) != null)
 			failureUrl.append(request.getParameter(PARAM_FAILUREURL));

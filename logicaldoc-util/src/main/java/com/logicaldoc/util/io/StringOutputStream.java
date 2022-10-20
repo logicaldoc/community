@@ -11,17 +11,17 @@ import java.io.OutputStream;
  */
 public class StringOutputStream extends OutputStream {
 
-	StringBuffer sb = new StringBuffer();
+	StringBuilder sb = new StringBuilder();
 
 	public StringOutputStream() {
 	}
 
-	public StringOutputStream(StringBuffer sb) {
+	public StringOutputStream(StringBuilder sb) {
 		this.sb = sb;
 	}
 
 	public void close() throws IOException {
-		sb = new StringBuffer();
+		sb = new StringBuilder();
 	}
 
 	public void flush() throws IOException {

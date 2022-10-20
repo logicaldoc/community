@@ -160,7 +160,7 @@ public class StandardSearchEngine implements SearchEngine {
 		}
 
 		// Retrieve the notes
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		List<DocumentNote> notes = noteDao.findByDocId(doc.getId(), doc.getFileVersion());
 		for (DocumentNote note : notes) {
 			if (sb.length() > 0)

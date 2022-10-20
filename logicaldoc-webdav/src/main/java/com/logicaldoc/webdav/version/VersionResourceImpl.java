@@ -122,7 +122,7 @@ public class VersionResourceImpl extends DeltaVResourceImpl implements VersionRe
 
 	@Override
 	public String getSupportedMethods() {
-		StringBuffer sb = new StringBuffer(super.getSupportedMethods());
+		StringBuilder sb = new StringBuilder(super.getSupportedMethods());
 		// Versioning support
 		sb.append(", ").append(VersionableResource.METHODS);
 

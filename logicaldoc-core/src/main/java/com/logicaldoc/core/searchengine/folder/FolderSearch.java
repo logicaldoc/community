@@ -89,7 +89,7 @@ public class FolderSearch extends Search {
 
 		ArrayList<Serializable> params = new ArrayList<Serializable>();
 
-		StringBuffer query = new StringBuffer();
+		StringBuilder query = new StringBuilder();
 
 		if (options.isRetrieveAliases())
 			query.append("(");
@@ -132,7 +132,7 @@ public class FolderSearch extends Search {
 	 * 
 	 * @throws PersistenceException database error
 	 */
-	private void appendWhereClause(boolean searchAliases, ArrayList<Serializable> params, StringBuffer query)
+	private void appendWhereClause(boolean searchAliases, ArrayList<Serializable> params, StringBuilder query)
 			throws PersistenceException {
 		String tableAlias = "A";
 		if (searchAliases)

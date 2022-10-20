@@ -4,7 +4,7 @@ package com.logicaldoc.webservice.doc.view.simple;
 public class SimpleClassNameDisplayUtils {
 
     public static String display(String className) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int firstIndex = 0;
         int lastIndex = className.length() - 1;
         for (int i = firstIndex; i <= lastIndex; i++) {

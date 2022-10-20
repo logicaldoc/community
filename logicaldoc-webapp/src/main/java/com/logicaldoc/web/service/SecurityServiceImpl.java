@@ -1315,7 +1315,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 		try {
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
-			StringBuffer query = new StringBuffer(
+			StringBuilder query = new StringBuilder(
 					"select A.ld_id, A.ld_username, A.ld_name, A.ld_firstname from ld_user A ");
 			if (StringUtils.isNotEmpty(groupId))
 				query.append(", ld_usergroup B");

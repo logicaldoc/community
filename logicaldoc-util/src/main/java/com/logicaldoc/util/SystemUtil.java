@@ -32,7 +32,7 @@ public class SystemUtil {
 	}
 
 	public static String printEnvironment() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(printSystemEnvironment());
 		sb.append("\n\n");
 		sb.append(printJavaEnvironment());
@@ -40,7 +40,7 @@ public class SystemUtil {
 	}
 
 	public static String printStackTrace() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		for (StackTraceElement element : elements) {
 			if(element.getClassName().equals(Thread.class.getName()) && element.getMethodName().equals("getStackTrace"))
@@ -58,7 +58,7 @@ public class SystemUtil {
 	}
 	
 	public static String printSystemEnvironment() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		Map<String, String> env = System.getenv();
 		for (String key : env.keySet()) {
 			if (sb.length() > 0)
@@ -124,7 +124,7 @@ public class SystemUtil {
 			String java = System.getProperty("java.home") + "/bin/java";
 			// vm arguments
 			List<String> vmArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
-			StringBuffer vmArgsOneLine = new StringBuffer();
+			StringBuilder vmArgsOneLine = new StringBuilder();
 			for (String arg : vmArguments) {
 				// if it's the agent argument : we ignore it otherwise the
 				// address of the old application and the new one will be in
@@ -135,7 +135,7 @@ public class SystemUtil {
 				}
 			}
 			// init the command to execute, add the vm args
-			final StringBuffer cmd = new StringBuffer("\"" + java + "\" " + vmArgsOneLine);
+			final StringBuilder cmd = new StringBuilder("\"" + java + "\" " + vmArgsOneLine);
 
 			// program main and program arguments
 			String[] mainCommand = System.getProperty(SUN_JAVA_COMMAND).split(" ");

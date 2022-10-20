@@ -66,7 +66,7 @@ public class TemplateGroup implements Serializable {
 	 * @return Permissions settings as integer representation.
 	 */
 	public int getPermissions() {
-		StringBuffer sb = new StringBuffer("1");
+		StringBuilder sb = new StringBuilder("1");
 		sb.append(getWrite() == 1 ? "1" : "0");
 		return Integer.parseInt(sb.toString(), 2);
 	}

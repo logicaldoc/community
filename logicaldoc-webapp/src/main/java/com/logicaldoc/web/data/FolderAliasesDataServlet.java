@@ -40,7 +40,7 @@ public class FolderAliasesDataServlet extends AbstractDataServlet {
 		FolderDAO folderDAO = (FolderDAO) context.getBean(FolderDAO.class);
 		Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select id, name from Folder where deleted = 0 and foldRef = " + folderId);
 
 		User user = session.getUser();

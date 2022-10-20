@@ -252,7 +252,7 @@ public class User extends PersistentObject implements Serializable {
 	}
 
 	public String getInitials() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		String fullName = getFullName();
 		String[] tokens = fullName.split(" ");
 		for (String token : tokens) {

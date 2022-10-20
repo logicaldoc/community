@@ -17,7 +17,7 @@ import com.smartgwt.client.widgets.Canvas;
 public class PrintUtil {
 
 	public static void printPreview(String title, String htmlContent) {
-		StringBuffer content = new StringBuffer("<html><head>\n");
+		StringBuilder content = new StringBuilder("<html><head>\n");
 
 		// Prepare the header
 		content.append("<title>" + (title != null ? I18N.message(title) : I18N.message("print")) + "</title>");

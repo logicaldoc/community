@@ -26,7 +26,7 @@ public class PPTParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 
 		try (PowerPointExtractor extractor = new PowerPointExtractor(input);) {
 			String tmp = extractor.getText(true, true);

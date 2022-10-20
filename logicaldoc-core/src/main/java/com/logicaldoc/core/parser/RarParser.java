@@ -25,7 +25,7 @@ public class RarParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws Exception {
 		File rarFile = File.createTempFile("parserar", ".rar");
 		try {
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());

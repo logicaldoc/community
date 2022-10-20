@@ -84,7 +84,7 @@ public class TagUtil {
 	public static String normalizeTags(String tenantName, String words) {
 		// Extract tags ad compose the normalized string
 		Set<String> tags = extractTags(tenantName, words);
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (String tag : tags) {
 			// escape the , with \,
 			tag = tag.replace(",", "\\,");

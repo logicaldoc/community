@@ -49,7 +49,7 @@ public class LockedDocsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 		query.append(
 				" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_immutable, A.ld_folderid, A.ld_status, A.ld_lockuserid, ");

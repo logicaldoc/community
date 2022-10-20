@@ -397,7 +397,7 @@ public class GUIFolder extends GUIExtensibleObject implements Serializable {
 		if (tagsString != null && !tagsString.isEmpty())
 			return tagsString;
 		else {
-			StringBuffer buf = new StringBuffer("");
+			StringBuilder buf = new StringBuilder("");
 			if (getTags() != null)
 				for (String tag : getTags()) {
 					buf.append(tag);

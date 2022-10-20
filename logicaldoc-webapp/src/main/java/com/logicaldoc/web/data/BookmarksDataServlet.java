@@ -45,7 +45,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 		/*
 		 * Search for documents first.
 		 */
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, B.folder.id, B.color "
 						+ " from Bookmark A, Document B where A.type=" + Bookmark.TYPE_DOCUMENT
 						+ " and A.deleted = 0 and B.deleted = 0 and A.targetId = B.id and A.userId = "
@@ -55,7 +55,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 		/*
 		 * Than for folders
 		 */
-		query = new StringBuffer(
+		query = new StringBuilder(
 				"select A.id, A.fileType, A.title, A.description, A.position, A.userId, A.targetId, A.type, A.targetId, B.color "
 						+ " from Bookmark A, Folder B where A.targetId = B.id and A.type=" + Bookmark.TYPE_FOLDER
 						+ " and A.deleted = 0 and A.userId = " + session.getUserId());

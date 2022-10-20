@@ -448,7 +448,7 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 
 		if (log.isDebugEnabled()) {
 			DavPropertyNameIterator iter = requestProperties.iterator();
-			StringBuffer sb = new StringBuffer("Requested properties: ");
+			StringBuilder sb = new StringBuilder("Requested properties: ");
 			while (iter.hasNext()) {
 				sb.append(((DavPropertyName) iter.next()).getName());
 				sb.append(",");
