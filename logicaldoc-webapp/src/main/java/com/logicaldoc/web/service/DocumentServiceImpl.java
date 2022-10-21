@@ -2720,15 +2720,17 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			String resource = storer.getResourceName(docId, fileVersion, null);
 			is = storer.getStream(docId, resource);
 
-			EMail email = MailUtil.messageToMail(is, false);
+			EMail email = MailUtil.messageToMail(is, true);
 			EMailAttachment attachment = null;
-			if (email.getAttachments().size() > 0)
+			if (email.getAttachments().size() > 0) {
 				for (EMailAttachment att : email.getAttachments().values()) {
 					if (attachmentFileName.equals(att.getFileName())) {
 						attachment = att;
 						break;
 					}
 				}
+		    }
+			
 			if (attachment == null)
 				throw new IOException("Attachment not found");
 
