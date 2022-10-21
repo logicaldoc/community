@@ -179,7 +179,12 @@ values     (4,5,'2008-10-22 00:00:00',0,0,'d','testDocVer','2006-12-19 00:00:00'
 
 insert into ld_document
            (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages)
-values     (5,5,'2008-10-22 00:00:00',0,0,'e','1.0','2006-12-19 00:00:00','2006-12-19 00:00:00','myself',1,0,'eml',3,'en','Joyce Jinks shared the Bruce Duo post.eml',1356,1,0,'',1,0,0,1,1,1,5,0,0,0,0,1);
+values     (5,5,'2022-10-21 00:00:00',0,0,'e','1.0','2022-10-21 00:00:00','2022-10-21 00:00:00','myself',1,0,'eml',3,'en','Joyce Jinks shared the Bruce Duo post.eml',19003,1,0,'',1,0,0,1,1,1,5,0,0,0,0,1);
+
+insert into ld_document
+           (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages)
+values     (6,5,'2022-10-22 00:00:00',0,0,'f','1.0','2022-10-22 00:00:00','2022-10-22 00:00:00','myself',1,0,'msg',3,'en','Hurry up! Only a few hours for the Prime Day VGA promos !!!.msg',159744,1,0,'',1,0,0,1,1,1,5,0,0,0,0,1);
+
 
 insert into ld_ticket
            (ld_id,ld_lastmodified,ld_deleted,ld_ticketid,ld_docid,ld_userid,ld_type,ld_creation,ld_expired,ld_count,ld_tenantid,ld_recordversion,ld_enabled)
@@ -270,12 +275,12 @@ values   (4,'2008-10-22 00:00:00',0,2,1,'',1,1);
 insert into ld_template (ld_id, ld_lastmodified,ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid,ld_recordversion)
 values (5, '2008-11-07 00:00:00',0,'test1','test1_desc',0,0,1,1);
 insert into ld_template_ext (ld_templateid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple)
-values (5, 0, 0, 0, 'val1', 'attr1', 0, 0, 0);
+values (5, 1, 0, 0, 'val1', 'attr1', 0, 0, 0);
 
 insert into ld_attributeset (ld_id, ld_lastmodified,ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid,ld_recordversion)
 values (5, '2008-11-07 00:00:00',0,'test1','test1_desc',0,0,1,1);
 insert into ld_attributeset_ext (ld_attsetid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (5, 0, 0, 0, 'val1', 'attr1', 0, 5, 0, 0);
+values (5, 1, 0, 0, 'val1', 'attr1', 0, 5, 0, 0);
 
 insert into ld_template (ld_id, ld_lastmodified,ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid,ld_recordversion)
 values (6, '2008-11-07 00:00:00',0,'test2','test2_desc',0,0,1,1);

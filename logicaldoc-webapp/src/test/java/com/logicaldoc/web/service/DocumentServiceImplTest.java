@@ -1,5 +1,7 @@
 package com.logicaldoc.web.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -29,12 +31,17 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.document.dao.DocumentLinkDAO;
 import com.logicaldoc.core.document.dao.DocumentNoteDAO;
+import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.gui.common.client.ServerException;
+import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIBookmark;
 import com.logicaldoc.gui.common.client.beans.GUIContact;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIEmail;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
+import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.web.AbstractWebappTCase;
 
 import junit.framework.Assert;
@@ -49,6 +56,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	private DocumentServiceImpl service = new DocumentServiceImpl();
 
 	private DocumentDAO docDao;
+	private TemplateDAO templateDao;
 
 	private DocumentLinkDAO linkDao;
 
@@ -67,12 +75,17 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		noteDao = (DocumentNoteDAO) context.getBean("DocumentNoteDAO");
 		documentHistoryDao = (DocumentHistoryDAO) context.getBean("DocumentHistoryDAO");
 		bookDao = (BookmarkDAO) context.getBean("BookmarkDAO");
+		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
 		
 		File emailFile = new File("target/tmp/logicaldoc/docs/5/doc/1.0");
 		emailFile.getParentFile().mkdirs();
-
-		// Copy sql files
-		copyResource("/Joyce Jinks shared the Bruce Duo post.eml", emailFile.getCanonicalPath());		
+		// Copy email file
+		copyResource("/Joyce Jinks shared the Bruce Duo post.eml", emailFile.getCanonicalPath());
+		
+		emailFile = new File("target/tmp/logicaldoc/docs/6/doc/1.0");
+		emailFile.getParentFile().mkdirs();
+		// Copy email file
+		copyResource("/Hurry up! Only a few hours for the Prime Day VGA promos !!!.msg", emailFile.getCanonicalPath());					
 	}
 
 	@Test
@@ -329,14 +342,99 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testCountDocuments() throws ServerException {
-		Assert.assertEquals(5, service.countDocuments(new long[] { 5 }, 0));
+		Assert.assertEquals(6, service.countDocuments(new long[] { 5 }, 0));
 		Assert.assertEquals(0, service.countDocuments(new long[] { 5 }, 3));
 	}
-//	
-//	@Test
-//	public void testValidate() {
-//		fail("Not yet implemented");
-//	}
+	
+	@Test
+	public void testValidate() {
+		
+		// validate a simple document (no template assigned)
+		try {
+			GUIDocument gdoc = service.getById(1);
+			service.validate(gdoc);
+		} catch (ServerException e) {			
+			e.printStackTrace();
+			fail("Unexpected exception was thrown");			
+		} 		
+		
+		
+		// validate a document with template assigned
+		try {
+			// Update the document add a template
+			Document doc = docDao.findDocument(6);
+			docDao.initialize(doc);
+
+			Template template = templateDao.findById(5L);
+			templateDao.initialize(template);
+			// Set the validator for attribute "attr1" to be email format
+			template.getAttribute("attr1").setValidation("#if(!$value.matches('^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$')) $error.setDescription($I18N.get('invalidformat')); #end");
+			templateDao.store(template);			
+			
+			doc.setTemplate(template);			
+			docDao.store(doc);			
+			
+			GUIDocument gdoc = service.getById(6);
+			
+			// The value of attribute "attr1" is val1 so this should produce an error
+			
+			if (gdoc.getAttributes() != null && gdoc.getAttributes().length > 0) {
+				for (GUIAttribute gatt : gdoc.getAttributes()) {
+					System.err.println("gatt.getName(): " + gatt.getName());
+					System.err.println("gatt.isMandatory(): " + gatt.isMandatory());
+					System.err.println("gatt.getValue(): " + gatt.getValue());
+					System.err.println("gatt.getValidation(): " + gatt.getValidation());
+				}
+			} else {
+				System.err.println("attributs NULL or empoty");
+			}
+			
+			service.validate(gdoc);
+			fail("Expected exception was not thrown");
+		} catch (ServerException e) {			
+			String lcal = I18N.message("invalidformat");
+			assertTrue(e.getMessage().contains("attr1"));
+			assertTrue(e.getMessage().contains(lcal));
+		} catch (PersistenceException e) {
+			e.printStackTrace();
+			fail("Unexpected exception was thrown");			
+		}
+		
+		
+		// validate a document with template assigned
+		try {
+			// Update the document add a template
+			Document doc = docDao.findDocument(6);
+			docDao.initialize(doc);
+
+			Template template = templateDao.findById(5L);
+			templateDao.initialize(template);
+			// Set the validator for attribute "attr1" to be email format
+			template.getAttribute("attr1").setValidation("#if(!$value.matches('^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$')) $error.setDescription($I18N.get('invalidformat')); #end");
+			templateDao.store(template);			
+			
+			doc.setTemplate(template);	
+			
+			// update the attribute and set the value as an email format
+			Attribute xxx = new Attribute();
+			xxx.setValue("test.xx@acme.de");
+			doc.setAttribute("attr1", xxx);
+			docDao.store(doc);			
+			
+			GUIDocument gdoc = service.getById(6);
+			
+			// The value of attribute "attr1" is "test.xx@acme.de" this will validate correctly
+			
+			service.validate(gdoc);
+		} catch (ServerException e) {	
+			e.printStackTrace();
+			fail("Unexpected exception was thrown");				
+		} catch (PersistenceException e) {
+			e.printStackTrace();
+			fail("Unexpected exception was thrown");			
+		}		
+		
+	}
 
 	@Test
 	public void testSendAsEmail() throws Exception {
@@ -347,6 +445,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		
 		doNothing().when(emailSender).send(any(EMail.class));
 		
+		// Send the email as download ticket
 		try {						
 			GUIEmail gmail = service.extractEmail(5, "1.0");
 			System.err.println(gmail.getFrom().getEmail());
@@ -357,9 +456,18 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			tos.add(gc);
 			
 			GUIContact[] carr = new GUIContact[]{};
-			gmail.setTos(tos.toArray(carr));			
-			gmail.setBccs(null);
-			gmail.setCcs(null);
+			gmail.setTos(tos.toArray(carr));
+			
+			tos = new ArrayList<GUIContact>(); 
+			gc = new GUIContact("Riley", "Arnold", "riley-arnold@acme.com");
+			tos.add(gc);			
+			gmail.setBccs(tos.toArray(carr));
+			
+			tos = new ArrayList<GUIContact>(); 
+			gc = new GUIContact("Scout", "Marsh", "s.marsh@acme.com");
+			tos.add(gc);			
+			gmail.setCcs(tos.toArray(carr));
+			gmail.setSendAsTicket(true);
 			
 			long tid = this.session.getUser().getTenant().getTenantId();
 			long tid02 = this.session.getUser().getTenant().getId();
@@ -367,12 +475,39 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			System.err.println("tid:" + tid);
 			System.err.println("tid02:" + tid02);
 			
-			String retmess = service.sendAsEmail(gmail, "en-US");
-			System.err.println("returned message: " + retmess);
+			String retvalue = service.sendAsEmail(gmail, "en-US");
+			System.err.println("returned message: " + retvalue);
+			assertEquals("ok", retvalue);
 		} catch (ServerException e) {
 			e.printStackTrace();
-			
+			fail("Unexpected exception was thrown");
 		}
+		
+		// Send the email in .zip compressed form
+		try {						
+			GUIEmail gmail = service.extractEmail(5, "1.0");
+			System.err.println(gmail.getFrom().getEmail());
+			gmail.setDocIds(new long[]{5});
+			
+			List<GUIContact> tos = new ArrayList<GUIContact>(); 
+			GUIContact gc = new GUIContact("Kenneth", "Botterill", "ken-botterill@acme.com");
+			tos.add(gc);
+			
+			GUIContact[] carr = new GUIContact[]{};
+			gmail.setTos(tos.toArray(carr));
+			gmail.setBccs(null);			
+			gmail.setCcs(null);
+			
+			gmail.setSendAsTicket(false);
+			gmail.setZipCompression(true);
+			
+			String retvalue = service.sendAsEmail(gmail, "en-US");
+			System.err.println("returned message: " + retvalue);
+			assertEquals("ok", retvalue);
+		} catch (ServerException e) {
+			e.printStackTrace();
+			fail("Unexpected exception was thrown");
+		}		
 	}
 //
 //	@Test
@@ -392,12 +527,22 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testExtractEmail() {
+		
+		// test with document that is not an email (wrong or no extension)
 		try {
 			service.extractEmail(4, null);
 			fail("Expected exception was not thrown");
 		} catch (ServerException e) {
 			// nothing to do
 		}
+		
+		// test with document that is a .msg email file
+		try {
+			service.extractEmail(6, null);
+		} catch (ServerException e) {
+			e.printStackTrace();
+			fail("Unexpected exception was thrown");
+		}		
 	}
 
 //	@Test
