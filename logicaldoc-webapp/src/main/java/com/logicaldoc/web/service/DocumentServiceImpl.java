@@ -124,7 +124,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	private static Logger log = LoggerFactory.getLogger(DocumentServiceImpl.class);
 
-	private EMailSender emailSender;
+	// Useful method for mocking the email sender inside unit tests
+	private static EMailSender emailSender;
 
 	@Override
 	public void addBookmarks(long[] ids, int type) throws ServerException {
@@ -1563,7 +1564,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					 * attachment
 					 */
 					zipFile = File.createTempFile("email", "zip");
-					try(OutputStream out = new FileOutputStream(zipFile);) {
+					try (OutputStream out = new FileOutputStream(zipFile);) {
 						// Create the document history event
 						DocumentHistory transaction = new DocumentHistory();
 						transaction.setSession(session);
@@ -1648,13 +1649,12 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		}
 	}
 
-	private EMailSender getEmailSender(Session session) {
-		if (this.emailSender != null) 
-			this.emailSender.setTenant(session.getTenantId());
+	private static EMailSender getEmailSender(Session session) {
+		if (emailSender != null) 
+			emailSender.setTenant(session.getTenantId());
 		else
-			this.setEmailSender(new EMailSender(session.getTenantName()));
-			
-		return this.emailSender;
+			setEmailSender(new EMailSender(session.getTenantName()));
+		return emailSender;
 	}
 
 	private File createTile(Document doc, String sid) throws IOException {
@@ -3108,7 +3108,12 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		return tile;
 	}
 
-	void setEmailSender(EMailSender emailSender) {
-		this.emailSender = emailSender;
+	/**
+	 * Useful method for unit testing
+	 * 
+	 * @param emailSender The email sender to inject
+	 */
+	static void setEmailSender(EMailSender emailSender) {
+		DocumentServiceImpl.emailSender = emailSender;
 	}
 }
