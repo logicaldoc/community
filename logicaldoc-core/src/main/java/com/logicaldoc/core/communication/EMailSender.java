@@ -112,6 +112,15 @@ public class EMailSender {
 	public EMailSender(String tenant) {
 		loadSettings(tenant);
 	}
+	
+	public void setTenant(long tenant) {
+		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		try {
+			loadSettings(tenantDao.findById(tenant).getName());
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}		
+	}
 
 	private void loadSettings(String tenant) {
 		try {
