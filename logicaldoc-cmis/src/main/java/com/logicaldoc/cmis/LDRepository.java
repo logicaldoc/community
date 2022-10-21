@@ -1209,7 +1209,7 @@ public class LDRepository {
 	 * @return the list of children
 	 */
 	public ObjectInFolderList getChildren(CallContext context, String folderId, String filter,
-			Boolean includeAllowableActions, Boolean includePathSegment, BigInteger maxItems, BigInteger skipCount,
+			boolean includeAllowableActions, boolean includePathSegment, int maxItems, int skipCount,
 			ObjectInfoHandler objectInfos) {
 		debug("getChildren");
 
@@ -1218,21 +1218,6 @@ public class LDRepository {
 		try {
 			// split filter
 			Set<String> filterCollection = splitFilter(filter);
-
-			// set defaults if values not set
-			boolean iaa = (includeAllowableActions == null ? false : includeAllowableActions.booleanValue());
-			boolean ips = (includePathSegment == null ? false : includePathSegment.booleanValue());
-
-			// skip and max
-			int skip = (skipCount == null ? 0 : skipCount.intValue());
-			if (skip < 0) {
-				skip = 0;
-			}
-
-			int max = (maxItems == null ? Integer.MAX_VALUE : maxItems.intValue());
-			if (max < 0) {
-				max = Integer.MAX_VALUE;
-			}
 
 			// get the folder
 			Folder folder = getFolder(folderId);
@@ -1258,48 +1243,38 @@ public class LDRepository {
 
 				count++;
 
-				if (skip > 0) {
-					skip--;
+				if (skipCount > 0) {
+					skipCount--;
 					continue;
 				}
 
-				if (result.getObjects().size() >= max) {
+				if (result.getObjects().size() >= maxItems) {
 					result.setHasMoreItems(true);
 					continue;
 				}
 
 				// build and add child object
-				ObjectInFolderDataImpl objectInFolder = new ObjectInFolderDataImpl();
-				objectInFolder.setObject(compileObjectType(context, child, filterCollection, iaa, false, objectInfos));
-				if (ips) {
-					objectInFolder.setPathSegment(child.getName());
-				}
-
-				result.getObjects().add(objectInFolder);
+				buildAndAddChildFolder(child, result, includeAllowableActions, includePathSegment, objectInfos,
+						filterCollection, context);
 			}
 
 			// iterate through children documents
 			for (Document child : documentDao.findByFolder(folder.getId(), null)) {
 				count++;
 
-				if (skip > 0) {
-					skip--;
+				if (skipCount > 0) {
+					skipCount--;
 					continue;
 				}
 
-				if (result.getObjects().size() >= max) {
+				if (result.getObjects().size() >= maxItems) {
 					result.setHasMoreItems(true);
 					continue;
 				}
 
 				// build and add child object
-				ObjectInFolderDataImpl objectInFolder = new ObjectInFolderDataImpl();
-				objectInFolder.setObject(compileObjectType(context, child, filterCollection, iaa, false, objectInfos));
-				if (ips) {
-					objectInFolder.setPathSegment(child.getFileName());
-				}
-
-				result.getObjects().add(objectInFolder);
+				buildAndAddChildDocument(child, result, includeAllowableActions, includePathSegment, objectInfos,
+						filterCollection, context);
 			}
 
 			result.setNumItems(BigInteger.valueOf(count));
@@ -1308,6 +1283,28 @@ public class LDRepository {
 		} catch (Throwable t) {
 			return (ObjectInFolderList) catchError(t);
 		}
+	}
+
+	private void buildAndAddChildDocument(Document child, ObjectInFolderListImpl result,
+			boolean includeAllowableActions, boolean includePathSegment, ObjectInfoHandler objectInfos,
+			Set<String> filterCollection, CallContext context) {
+		ObjectInFolderDataImpl objectInFolder = new ObjectInFolderDataImpl();
+		objectInFolder.setObject(
+				compileObjectType(context, child, filterCollection, includeAllowableActions, false, objectInfos));
+		if (includePathSegment)
+			objectInFolder.setPathSegment(child.getFileName());
+		result.getObjects().add(objectInFolder);
+	}
+
+	private void buildAndAddChildFolder(Folder child, ObjectInFolderListImpl result, boolean includeAllowableActions,
+			boolean includePathSegment, ObjectInfoHandler objectInfos, Set<String> filterCollection,
+			CallContext context) {
+		ObjectInFolderDataImpl objectInFolder = new ObjectInFolderDataImpl();
+		objectInFolder.setObject(
+				compileObjectType(context, child, filterCollection, includeAllowableActions, false, objectInfos));
+		if (includePathSegment)
+			objectInFolder.setPathSegment(child.getName());
+		result.getObjects().add(objectInFolder);
 	}
 
 	private Folder getFolder(String folderId) {
@@ -2145,12 +2142,12 @@ public class LDRepository {
 			Document doc = (Document) object;
 			documentDao.initialize(doc);
 			updateDocumentMetadata(doc, result, false);
-			
+
 			{
 				addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
 				addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
 			}
-			
+
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);
@@ -2167,7 +2164,7 @@ public class LDRepository {
 				addPropertyId(result, typeId, null, PropertyIds.OBJECT_TYPE_ID, typeId);
 				addPropertyString(result, typeId, null, PropertyIds.LAST_MODIFIED_BY, getSessionUser().getFullName());
 			}
-			
+
 			FolderHistory transaction = new FolderHistory();
 			transaction.setUser(getSessionUser());
 			transaction.setSessionId(sid);

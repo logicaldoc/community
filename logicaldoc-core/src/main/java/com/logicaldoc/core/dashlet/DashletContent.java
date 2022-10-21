@@ -86,9 +86,6 @@ public class DashletContent extends HttpServlet {
 			else
 				response.setContentType("text/xml");
 
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-			df.setTimeZone(TimeZone.getTimeZone("UTC"));
-
 			Map<String, Object> dashletDictionary = new HashMap<String, Object>();
 			dashletDictionary.put(Automation.LOCALE, locale);
 			dashletDictionary.put(Automation.TENANT_ID, dashlet.getTenantId());
@@ -100,11 +97,11 @@ public class DashletContent extends HttpServlet {
 			PrintWriter writer = response.getWriter();
 
 			if (Dashlet.TYPE_DOCEVENT.equals(dashlet.getType()))
-				handleDocEvent(showSid, locale, dashlet, df, dashletDictionary, automation, writer);
+				handleDocumentEvent(showSid, locale, dashlet, dashletDictionary, automation, writer);
 			else if (Dashlet.TYPE_DOCUMENT.equals(dashlet.getType()))
-				handleDocument(showSid, locale, dashlet, df, dashletDictionary, automation, writer);
+				handleDocument(showSid, locale, dashlet, dashletDictionary, automation, writer);
 			else if (Dashlet.TYPE_NOTE.equals(dashlet.getType()))
-				handleNote(showSid, locale, dashlet, df, dashletDictionary, automation, writer);
+				handleNote(showSid, locale, dashlet, dashletDictionary, automation, writer);
 			else if (Dashlet.TYPE_CONTENT.equals(dashlet.getType()))
 				handleContent(dashlet, dashletDictionary, automation, writer);
 		} catch (Throwable e) {
@@ -113,7 +110,13 @@ public class DashletContent extends HttpServlet {
 		}
 	}
 
-	private void handleDocEvent(boolean showSid, Locale locale, Dashlet dashlet, DateFormat df,
+	private DateFormat getDateFormat() {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		df.setTimeZone(TimeZone.getTimeZone("UTC"));
+		return df;
+	}
+
+	private void handleDocumentEvent(boolean showSid, Locale locale, Dashlet dashlet,
 			Map<String, Object> dashletDictionary, Automation automation, PrintWriter writer)
 			throws PersistenceException {
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
@@ -123,37 +126,13 @@ public class DashletContent extends HttpServlet {
 		} else {
 			writer.write("<list>");
 
+			List<DocumentHistory> records = new ArrayList<DocumentHistory>();
 			DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
-			List<DocumentHistory> records = new ArrayList<DocumentHistory>();
+			records = hdao.findByObjectQuery(query.trim(), (Map<String, Object>) null,
+					dashlet.getUnique() == 0 ? dashlet.getMax() : null);
 
-			try {
-				records = hdao.findByObjectQuery(query.trim(), (Map<String, Object>) null,
-						dashlet.getUnique() == 0 ? dashlet.getMax() : null);
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
-
-			List<DocumentHistory> uniqueRecords = new ArrayList<DocumentHistory>();
-			if (dashlet.getUnique() == 1) {
-				log.debug("Ensure records uniqueness for query {}", query.trim());
-
-				/*
-				 * Make sure to have just one entry per document
-				 */
-				Set<Long> docIds = new HashSet<Long>();
-				for (DocumentHistory history : records) {
-					if (!docIds.contains(history.getDocId())) {
-						docIds.add(history.getDocId());
-						uniqueRecords.add(history);
-					}
-					if (dashlet.getMax() != null && dashlet.getMax() > 0 && uniqueRecords.size() >= dashlet.getMax())
-						break;
-				}
-
-				log.debug("retrieved {} unique records", uniqueRecords.size());
-			} else
-				uniqueRecords = records;
+			List<DocumentHistory> uniqueRecords = filterUniqueDocumentEvents(dashlet, records);
 
 			/*
 			 * Retrieve documents the histories refer to
@@ -163,198 +142,215 @@ public class DashletContent extends HttpServlet {
 				String docIds = uniqueRecords.stream().map(h -> Long.toString(h.getDocId()))
 						.collect(Collectors.joining(","));
 				DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-				try {
-					List<Document> docs = ddao.findByObjectQuery("from Document where id in (" + docIds + ")",
-							(Map<String, Object>) null, null);
-					for (Document document : docs)
-						docsMap.put(document.getId(), document);
-				} catch (PersistenceException e) {
-					log.error(e.getMessage(), e);
-				}
+				List<Document> docs = ddao.findByObjectQuery("from Document where id in (" + docIds + ")",
+						(Map<String, Object>) null, null);
+				for (Document document : docs)
+					docsMap.put(document.getId(), document);
 			}
 
 			/*
 			 * Iterate over records composing the response XML document
 			 */
-			DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-			df2.setTimeZone(TimeZone.getTimeZone("UTC"));
 			for (DocumentHistory history : uniqueRecords) {
-				writer.write("<document>");
-				writer.write("<id>" + history.getId() + "</id>");
-				writer.write("<user><![CDATA[" + history.getUsername() + "]]></user>");
-				writer.write("<event><![CDATA[" + I18N.message(history.getEvent(), locale) + "]]></event>");
-				writer.write("<version>" + history.getVersion() + "</version>");
-				writer.write("<date>" + df2.format(history.getDate()) + "</date>");
-				writer.write("<comment><![CDATA[" + (history.getComment() == null ? "" : history.getComment())
-						+ "]]></comment>");
-				writer.write("<filename><![CDATA[" + (history.getFilename() == null ? "" : history.getFilename())
-						+ "]]></filename>");
-				printIcon(writer, history.getFilename());
-				writer.write("<new>" + (1 == history.getIsNew()) + "</new>");
-				writer.write("<folderId>" + history.getFolderId() + "</folderId>");
-				writer.write("<docId>" + history.getDocId() + "</docId>");
-				writer.write("<path><![CDATA[" + (history.getPath() == null ? "" : history.getPath()) + "]]></path>");
-				if (showSid)
-					writer.write("<sid><![CDATA[" + (history.getSessionId() == null ? "" : history.getSessionId())
-							+ "]]></sid>");
-				writer.write("<userid>" + history.getUserId() + "</userid>");
-				writer.write("<reason><![CDATA[" + (history.getReason() == null ? "" : history.getReason())
-						+ "]]></reason>");
-				if (history.getColor() != null)
-					writer.write("<color><![CDATA[" + history.getColor() + "]]></color>");
-
-				Document doc = docsMap.get(history.getDocId());
-				if (doc != null) {
-					DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-
-					List<String> attrs = new ArrayList<String>();
-					if (StringUtils.isNotEmpty(dashlet.getColumns())) {
-						StringTokenizer st = new StringTokenizer(dashlet.getColumns().trim(), ",;");
-						while (st.hasMoreElements()) {
-							String token = st.nextToken().trim();
-							if (token.startsWith("ext_"))
-								attrs.add(token.substring(4));
-						}
-					}
-
-					/*
-					 * Contains the extended attributes of the documents. The
-					 * key is documentId-atttributeName, the value is the
-					 * attribute value. This fieldsMap is used to maximize the
-					 * listing performances.
-					 */
-					final Map<String, Object> extValues = new HashMap<String, Object>();
-
-					if (!attrs.isEmpty()) {
-						log.debug("Search for extended attributes {}", attrs);
-
-						StringBuilder qry = new StringBuilder(
-								"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
-						qry.append(" from ld_document_ext where ld_docid in (");
-						qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getDocId()))
-								.collect(Collectors.joining(",")));
-						qry.append(") and ld_name in ");
-						qry.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','")
-								.replace(" ", ""));
-
-						dao.query(qry.toString(), null, new RowMapper<Long>() {
-							@Override
-							public Long mapRow(ResultSet rs, int row) throws SQLException {
-								Long docId = rs.getLong(1);
-								String name = rs.getString(2);
-								int type = rs.getInt(3);
-
-								String key = docId + "-" + name;
-
-								if (type == Attribute.TYPE_STRING) {
-									if (StringUtils.isNotEmpty(rs.getString(8)))
-										extValues.put(key, rs.getString(8));
-									else
-										extValues.put(key, rs.getString(4));
-								} else if (type == Attribute.TYPE_INT) {
-									extValues.put(key, rs.getLong(5));
-								} else if (type == Attribute.TYPE_DOUBLE) {
-									extValues.put(key, rs.getDouble(6));
-								} else if (type == Attribute.TYPE_DATE) {
-									extValues.put(key, rs.getTimestamp(7));
-								} else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER) {
-									extValues.put(key, rs.getString(4));
-								} else if (type == Attribute.TYPE_BOOLEAN) {
-									extValues.put(key, rs.getLong(5) == 1L ? I18N.message("true", locale)
-											: I18N.message("false", locale));
-								}
-
-								return null;
-							}
-						}, null);
-					}
-
-					writer.write("<customId><![CDATA[" + (doc.getCustomId() != null ? doc.getCustomId() : "")
-							+ "]]></customId>");
-					if (doc.getDocRef() != null) {
-						writer.write("<docref>" + doc.getDocRef() + "</docref>");
-						if (doc.getDocRefType() != null)
-							writer.write("<docrefType>" + doc.getDocRefType() + "</docrefType>");
-					}
-					writer.write("<lastModified>"
-							+ (history.getLastModified() != null ? df.format(history.getLastModified()) : "")
-							+ "</lastModified>");
-					writer.write("<published>" + (history.getDate() != null ? df.format(history.getDate()) : "")
-							+ "</published>");
-					writer.write("<publisher><![CDATA[" + doc.getPublisher() + "]]></publisher>");
-					writer.write("<created>" + (doc.getCreation() != null ? df.format(doc.getCreation()) : "")
-							+ "</created>");
-					writer.write("<creator><![CDATA[" + doc.getCreator() + "]]></creator>");
-					writer.write("<size>" + doc.getFileSize() + "</size>");
-
-					writer.write("<status>" + doc.getStatus() + "</status>");
-					writer.write("<immutable>" + doc.getImmutable() + "</immutable>");
-					writer.write("<indexed>" + doc.getIndexed() + "</indexed>");
-					writer.write("<password>" + StringUtils.isNotEmpty(doc.getPassword()) + "</password>");
-					writer.write("<signed>" + doc.getSigned() + "</signed>");
-					writer.write("<stamped>" + doc.getStamped() + "</stamped>");
-
-					writer.write("<pages>" + doc.getPages() + "</pages>");
-
-					if (doc.getLockUserId() != null)
-						writer.write("<lockUserId>" + doc.getLockUserId() + "</lockUserId>");
-					if (doc.getLockUser() != null)
-						writer.write("<lockUser><![CDATA[" + doc.getLockUser() + "]]></lockUser>");
-					writer.write("<type><![CDATA[" + doc.getType() + "]]></type>");
-
-					writer.write("<fileVersion><![CDATA[" + doc.getFileVersion() + "]]></fileVersion>");
-					writer.write("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
-					writer.write("<workflowStatus><![CDATA["
-							+ (doc.getWorkflowStatus() != null ? doc.getWorkflowStatus() : "")
-							+ "]]></workflowStatus>");
-					writer.write("<workflowStatusDisplay><![CDATA["
-							+ (doc.getWorkflowStatusDisplay() != null ? doc.getWorkflowStatusDisplay() : "")
-							+ "]]></workflowStatusDisplay>");
-					if (doc.getStartPublishing() != null)
-						writer.write("<startPublishing>" + df.format(doc.getStartPublishing()) + "</startPublishing>");
-					else
-						writer.write("<startPublishing></startPublishing>");
-					if (doc.getStopPublishing() != null)
-						writer.write("<stopPublishing>" + df.format(doc.getStopPublishing()) + "</stopPublishing>");
-					else
-						writer.write("<stopPublishing></stopPublishing>");
-					writer.write("<publishedStatus>" + (doc.isPublishing() ? "yes" : "no") + "</publishedStatus>");
-
-					if (doc.getExtResId() != null)
-						writer.write("<extResId><![CDATA[" + doc.getExtResId() + "]]></extResId>");
-
-					if (doc.getTemplate() != null)
-						writer.write("<template><![CDATA[" + doc.getTemplate().getName() + "]]></template>");
-
-					for (String name : attrs) {
-						String key = doc.getId() + "-" + name;
-						Object val = extValues.get(key);
-						if (val != null) {
-							writer.print("<ext_" + name + ">");
-							if (val instanceof Date)
-								writer.print(df.format((Date) val));
-							else if (val instanceof Integer)
-								writer.print(Integer.toString((Integer) val));
-							else if (val instanceof Long)
-								writer.print(Long.toString((Long) val));
-							else if (val instanceof Double)
-								writer.print(Double.toString((Double) val));
-							else
-								writer.print("<![CDATA[" + val + "]]>");
-							writer.print("</ext_" + name + ">");
-						}
-					}
-				}
-
-				writer.write("</document>");
+				printDocumentEvent(showSid, locale, dashlet, uniqueRecords, docsMap, history, writer);
 			}
 			writer.write("</list>");
 		}
 	}
 
-	private void handleDocument(boolean showSid, Locale locale, Dashlet dashlet, DateFormat df,
-			Map<String, Object> dashletDictionary, Automation automation, PrintWriter writer)
-			throws PersistenceException {
+	private void printDocumentEvent(boolean showSid, Locale locale, Dashlet dashlet,
+			List<DocumentHistory> uniqueRecords, Map<Long, Document> docsMap, DocumentHistory history,
+			PrintWriter writer) throws PersistenceException {
+		DateFormat df2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+		df2.setTimeZone(TimeZone.getTimeZone("UTC"));
+		DateFormat df = getDateFormat();
+
+		writer.write("<document>");
+		writer.write("<id>" + history.getId() + "</id>");
+		writer.write("<user><![CDATA[" + history.getUsername() + "]]></user>");
+		writer.write("<event><![CDATA[" + I18N.message(history.getEvent(), locale) + "]]></event>");
+		writer.write("<version>" + history.getVersion() + "</version>");
+		writer.write("<date>" + df2.format(history.getDate()) + "</date>");
+		printField("comment", history.getComment(), writer);
+		printField("filename", history.getComment(), writer);
+		printIcon(writer, history.getFilename());
+		writer.write("<new>" + (1 == history.getIsNew()) + "</new>");
+		writer.write("<folderId>" + history.getFolderId() + "</folderId>");
+		writer.write("<docId>" + history.getDocId() + "</docId>");
+		printField("path", history.getPath(), writer);
+		if (showSid)
+			printField("sid", history.getSessionId(), writer);
+		writer.write("<userid>" + history.getUserId() + "</userid>");
+		printField("reason", history.getReason(), writer);
+		printField("color", history.getColor(), writer);
+
+		Document doc = docsMap.get(history.getDocId());
+		if (doc != null) {
+			printField("customId", doc.getCustomId(), writer);
+			printField("docref", doc.getDocRef(), writer);
+			printField("docrefType", doc.getDocRefType(), writer);
+
+			printField("lastModified", history.getLastModified(), df, writer);
+			printField("published", history.getDate(), df, writer);
+			writer.write("<publisher><![CDATA[" + doc.getPublisher() + "]]></publisher>");
+			printField("created", doc.getCreation(), df, writer);
+
+			writer.write("<creator><![CDATA[" + doc.getCreator() + "]]></creator>");
+			writer.write("<size>" + doc.getFileSize() + "</size>");
+
+			writer.write("<status>" + doc.getStatus() + "</status>");
+			writer.write("<immutable>" + doc.getImmutable() + "</immutable>");
+			writer.write("<indexed>" + doc.getIndexed() + "</indexed>");
+			writer.write("<password>" + StringUtils.isNotEmpty(doc.getPassword()) + "</password>");
+			writer.write("<signed>" + doc.getSigned() + "</signed>");
+			writer.write("<stamped>" + doc.getStamped() + "</stamped>");
+
+			writer.write("<pages>" + doc.getPages() + "</pages>");
+			printField("lockUserId", doc.getLockUserId(), writer);
+			printField("lockUser", doc.getLockUser(), writer);
+			writer.write("<type><![CDATA[" + doc.getType() + "]]></type>");
+
+			writer.write("<fileVersion><![CDATA[" + doc.getFileVersion() + "]]></fileVersion>");
+			writer.write("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
+			printField("workflowStatus", doc.getWorkflowStatus(), writer);
+			printField("workflowStatusDisplay", doc.getWorkflowStatusDisplay(), writer);
+
+			if (doc.getStartPublishing() != null)
+				writer.write("<startPublishing>" + df.format(doc.getStartPublishing()) + "</startPublishing>");
+			else
+				writer.write("<startPublishing></startPublishing>");
+			if (doc.getStopPublishing() != null)
+				writer.write("<stopPublishing>" + df.format(doc.getStopPublishing()) + "</stopPublishing>");
+			else
+				writer.write("<stopPublishing></stopPublishing>");
+			writer.write("<publishedStatus>" + (doc.isPublishing() ? "yes" : "no") + "</publishedStatus>");
+
+			printField("extResId", doc.getExtResId(), writer);
+
+			if (doc.getTemplate() != null)
+				writer.write("<template><![CDATA[" + doc.getTemplate().getName() + "]]></template>");
+
+			/*
+			 * List of names of those extended attributes declared as columns in
+			 * the dashlet
+			 */
+			List<String> attrs = getExtendedAttrsNamesInDasheltColumns(dashlet);
+
+			/*
+			 * Contains the extended attributes of the documents. The key is
+			 * documentId-atttributeName, the value is the attribute value. This
+			 * fieldsMap is used to maximize the listing performances.
+			 */
+			Map<String, Object> extValues = new HashMap<String, Object>();
+			retrieveExtendedAttributes(locale, dashlet, uniqueRecords, extValues, attrs);
+
+			printExtendedAttributes(df, writer, doc, attrs, extValues);
+		}
+
+		writer.write("</document>");
+	}
+
+	/**
+	 * Fills a map of name-value of all the extended attributes related to the
+	 * given history records
+	 * 
+	 * @param locale the current locale
+	 * @param dashlet the dashlet currently elaborated
+	 * @param records the list of retrieved histories
+	 * @param extValues The key is documentId-atttributeName, the value is the
+	 *        attribute value
+	 * @param attrs List of names of those extended attributes declared as
+	 *        columns in
+	 * @throws PersistenceException
+	 */
+	private void retrieveExtendedAttributes(Locale locale, Dashlet dashlet, List<DocumentHistory> records,
+			Map<String, Object> extValues, List<String> attrs) throws PersistenceException {
+
+		if (attrs.isEmpty())
+			return;
+
+		log.debug("Search for extended attributes {}", attrs);
+
+		StringBuilder qry = new StringBuilder(
+				"select ld_docid, ld_name, ld_type, ld_stringvalue, ld_intvalue, ld_doublevalue, ld_datevalue, ld_stringvalues ");
+		qry.append(" from ld_document_ext where ld_docid in (");
+		qry.append(records.stream().map(d -> Long.toString(d.getDocId())).collect(Collectors.joining(",")));
+		qry.append(") and ld_name in (");
+		qry.append(attrs.stream().map(a -> "'" + a + "'").collect(Collectors.joining(",")));
+		qry.append(")");
+
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		dao.query(qry.toString(), null, new EntendedAttributesRowMapper(locale, extValues), null);
+	}
+
+	private List<DocumentHistory> filterUniqueDocumentEvents(Dashlet dashlet, List<DocumentHistory> records) {
+		List<DocumentHistory> uniqueRecords = new ArrayList<DocumentHistory>();
+		if (dashlet.getUnique() == 1) {
+			log.debug("Ensure records uniqueness");
+
+			/*
+			 * Make sure to have just one entry per document
+			 */
+			Set<Long> docIds = new HashSet<Long>();
+			for (DocumentHistory history : records) {
+				if (!docIds.contains(history.getDocId())) {
+					docIds.add(history.getDocId());
+					uniqueRecords.add(history);
+				}
+				if (dashlet.getMax() != null && dashlet.getMax() > 0 && uniqueRecords.size() >= dashlet.getMax())
+					break;
+			}
+
+			log.debug("retrieved {} unique records", uniqueRecords.size());
+		} else
+			uniqueRecords = records;
+		return uniqueRecords;
+	}
+
+	private void printExtendedAttributes(DateFormat df, PrintWriter writer, Document doc, List<String> attrs,
+			final Map<String, Object> extValues) {
+		for (String name : attrs) {
+			String key = doc.getId() + "-" + name;
+			Object val = extValues.get(key);
+			if (val != null) {
+				writer.print("<ext_" + name + ">");
+				if (val instanceof Date)
+					writer.print(df.format((Date) val));
+				else if (val instanceof Integer)
+					writer.print(Integer.toString((Integer) val));
+				else if (val instanceof Long)
+					writer.print(Long.toString((Long) val));
+				else if (val instanceof Double)
+					writer.print(Double.toString((Double) val));
+				else
+					writer.print("<![CDATA[" + val + "]]>");
+				writer.print("</ext_" + name + ">");
+			}
+		}
+	}
+
+	private void printField(String fieldName, Date value, DateFormat df, PrintWriter writer) {
+		writer.write("<" + fieldName + ">" + (value != null ? df.format(value) : "") + "</" + fieldName + ">");
+	}
+
+	private void printField(String fieldName, String value, PrintWriter writer) {
+		if (StringUtils.isNotEmpty(value))
+			writer.write("<" + fieldName + "><![CDATA[" + value + "]]></" + fieldName + ">");
+	}
+
+	private void printField(String fieldName, Object value, PrintWriter writer) {
+		if (value == null)
+			return;
+		writer.write("<" + fieldName + ">");
+		if (value instanceof String)
+			writer.write("<![CDATA[" + (String) value + "]]>");
+		else
+			writer.write(value.toString());
+		writer.write("</" + fieldName + ">");
+	}
+
+	private void handleDocument(boolean showSid, Locale locale, Dashlet dashlet, Map<String, Object> dashletDictionary,
+			Automation automation, PrintWriter writer) throws PersistenceException {
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
 			if (StringUtils.isNotEmpty(content))
@@ -363,44 +359,11 @@ public class DashletContent extends HttpServlet {
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
 
-			List<Document> records = new ArrayList<Document>();
+			List<Document> records = dao.findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
 
-			try {
-				records = dao.findByObjectQuery(query.trim(), (Map<String, Object>) null, dashlet.getMax());
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
+			List<Document> uniqueRecords = filterUniqueDocuments(dashlet, records);
 
-			List<Document> uniqueRecords = new ArrayList<Document>();
-			if (dashlet.getUnique() == 1) {
-				log.debug("Ensure records uniqueness for query {}", query.trim());
-
-				/*
-				 * Make sure to have just one entry per document
-				 */
-				Set<Long> docIds = new HashSet<Long>();
-				for (Document doc : records) {
-					if (!docIds.contains(doc.getId())) {
-						docIds.add(doc.getId());
-						uniqueRecords.add(doc);
-					}
-					if (dashlet.getMax() != null && dashlet.getMax() > 0 && uniqueRecords.size() >= dashlet.getMax())
-						break;
-				}
-
-				log.debug("retrieved {} unique records", uniqueRecords.size());
-			} else
-				uniqueRecords = records;
-
-			List<String> attrs = new ArrayList<String>();
-			if (StringUtils.isNotEmpty(dashlet.getColumns())) {
-				StringTokenizer st = new StringTokenizer(dashlet.getColumns().trim(), ",;");
-				while (st.hasMoreElements()) {
-					String token = st.nextToken().trim();
-					if (token.startsWith("ext_"))
-						attrs.add(token.substring(4));
-				}
-			}
+			List<String> attrs = getExtendedAttrsNamesInDasheltColumns(dashlet);
 
 			/*
 			 * Contains the extended attributes of the documents. The key is
@@ -417,39 +380,9 @@ public class DashletContent extends HttpServlet {
 				qry.append(" from ld_document_ext where ld_docid in (");
 				qry.append(uniqueRecords.stream().map(d -> Long.toString(d.getId())).collect(Collectors.joining(",")));
 				qry.append(") and ld_name in ");
-				qry.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','")
-						.replace(" ", ""));
+				qry.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','").replace(" ", ""));
 
-				dao.query(qry.toString(), null, new RowMapper<Long>() {
-					@Override
-					public Long mapRow(ResultSet rs, int row) throws SQLException {
-						Long docId = rs.getLong(1);
-						String name = rs.getString(2);
-						int type = rs.getInt(3);
-
-						String key = docId + "-" + name;
-
-						if (type == Attribute.TYPE_STRING) {
-							if (StringUtils.isNotEmpty(rs.getString(8)))
-								extValues.put(key, rs.getString(8));
-							else
-								extValues.put(key, rs.getString(4));
-						} else if (type == Attribute.TYPE_INT) {
-							extValues.put(key, rs.getLong(5));
-						} else if (type == Attribute.TYPE_DOUBLE) {
-							extValues.put(key, rs.getDouble(6));
-						} else if (type == Attribute.TYPE_DATE) {
-							extValues.put(key, rs.getTimestamp(7));
-						} else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER) {
-							extValues.put(key, rs.getString(4));
-						} else if (type == Attribute.TYPE_BOOLEAN) {
-							extValues.put(key,
-									rs.getLong(5) == 1L ? I18N.message("true", locale) : I18N.message("false", locale));
-						}
-
-						return null;
-					}
-				}, null);
+				dao.query(qry.toString(), null, new EntendedAttributesRowMapper(locale, extValues), null);
 			}
 
 			writer.write("<list>");
@@ -458,99 +391,119 @@ public class DashletContent extends HttpServlet {
 			 * Iterate over records composing the response XML document
 			 */
 			for (Document doc : uniqueRecords) {
-				writer.write("<document>");
-				writer.write("<id>" + doc.getId() + "</id>");
-				writer.write("<customId><![CDATA[" + (doc.getCustomId() != null ? doc.getCustomId() : "")
-						+ "]]></customId>");
-				if (doc.getDocRef() != null) {
-					writer.write("<docref>" + doc.getDocRef() + "</docref>");
-					if (doc.getDocRefType() != null)
-						writer.write("<docrefType>" + doc.getDocRefType() + "</docrefType>");
-				}
-
-				writer.write("<version>" + doc.getVersion() + "</version>");
-				writer.write("<lastModified>" + (doc.getLastModified() != null ? df.format(doc.getLastModified()) : "")
-						+ "</lastModified>");
-				writer.write("<published>" + (doc.getDate() != null ? df.format(doc.getDate()) : "") + "</published>");
-				writer.write("<publisher><![CDATA[" + doc.getPublisher() + "]]></publisher>");
-				writer.write(
-						"<created>" + (doc.getCreation() != null ? df.format(doc.getCreation()) : "") + "</created>");
-				writer.write("<creator><![CDATA[" + doc.getCreator() + "]]></creator>");
-				writer.write("<size>" + doc.getFileSize() + "</size>");
-
-				writer.write("<status>" + doc.getStatus() + "</status>");
-				writer.write("<immutable>" + doc.getImmutable() + "</immutable>");
-				writer.write("<indexed>" + doc.getIndexed() + "</indexed>");
-				writer.write("<password>" + StringUtils.isNotEmpty(doc.getPassword()) + "</password>");
-				writer.write("<signed>" + doc.getSigned() + "</signed>");
-				writer.write("<stamped>" + doc.getStamped() + "</stamped>");
-
-				writer.write("<pages>" + doc.getPages() + "</pages>");
-
-				if (doc.getLockUserId() != null)
-					writer.write("<lockUserId>" + doc.getLockUserId() + "</lockUserId>");
-				if (doc.getLockUser() != null)
-					writer.write("<lockUser><![CDATA[" + doc.getLockUser() + "]]></lockUser>");
-				writer.write("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
-				printIcon(writer, doc.getFileName());
-				writer.write("<type><![CDATA[" + doc.getType() + "]]></type>");
-
-				writer.write("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
-				writer.write("<fileVersion><![CDATA[" + doc.getFileVersion() + "]]></fileVersion>");
-				writer.write(
-						"<comment><![CDATA[" + (doc.getComment() != null ? doc.getComment() : "") + "]]></comment>");
-				writer.write("<workflowStatus><![CDATA["
-						+ (doc.getWorkflowStatus() != null ? doc.getWorkflowStatus() : "") + "]]></workflowStatus>");
-				writer.write("<workflowStatusDisplay><![CDATA["
-						+ (doc.getWorkflowStatusDisplay() != null ? doc.getWorkflowStatusDisplay() : "")
-						+ "]]></workflowStatusDisplay>");
-				if (doc.getStartPublishing() != null)
-					writer.write("<startPublishing>" + df.format(doc.getStartPublishing()) + "</startPublishing>");
-				else
-					writer.write("<startPublishing></startPublishing>");
-				if (doc.getStopPublishing() != null)
-					writer.write("<stopPublishing>" + df.format(doc.getStopPublishing()) + "</stopPublishing>");
-				else
-					writer.write("<stopPublishing></stopPublishing>");
-				writer.write("<publishedStatus>" + (doc.isPublishing() ? "yes" : "no") + "</publishedStatus>");
-
-				if (doc.getExtResId() != null)
-					writer.write("<extResId><![CDATA[" + doc.getExtResId() + "]]></extResId>");
-
-				if (doc.getTemplate() != null)
-					writer.write("<template><![CDATA[" + doc.getTemplate().getName() + "]]></template>");
-
-				if (doc.getColor() != null)
-					writer.write("<color><![CDATA[" + doc.getColor() + "]]></color>");
-
-				for (String name : attrs) {
-					String key = doc.getId() + "-" + name;
-					Object val = extValues.get(key);
-					if (val != null) {
-						writer.print("<ext_" + name + ">");
-						if (val instanceof Date)
-							writer.print(df.format((Date) val));
-						else if (val instanceof Integer)
-							writer.print(Integer.toString((Integer) val));
-						else if (val instanceof Long)
-							writer.print(Long.toString((Long) val));
-						else if (val instanceof Double)
-							writer.print(Double.toString((Double) val));
-						else
-							writer.print("<![CDATA[" + val + "]]>");
-						writer.print("</ext_" + name + ">");
-					}
-				}
-
-				writer.write("</document>");
+				printDocument(doc, attrs, extValues, writer);
 			}
 
 			writer.write("</list>");
 		}
 	}
 
-	private void handleNote(boolean showSid, Locale locale, Dashlet dashlet, DateFormat df,
-			Map<String, Object> dashletDictionary, Automation automation, PrintWriter writer) {
+	private void printDocument(Document doc, List<String> attrs, final Map<String, Object> extValues,
+			PrintWriter writer) {
+		DateFormat df = getDateFormat();
+
+		writer.write("<document>");
+		writer.write("<id>" + doc.getId() + "</id>");
+		printField("customId", doc.getCustomId(), writer);
+		printField("docref", doc.getDocRef(), writer);
+		printField("docrefType", doc.getDocRefType(), writer);
+
+		writer.write("<version>" + doc.getVersion() + "</version>");
+
+		printField("lastModified", doc.getLastModified(), writer);
+		printField("published", doc.getDate(), writer);
+		writer.write("<publisher><![CDATA[" + doc.getPublisher() + "]]></publisher>");
+
+		printField("created", doc.getCreation(), writer);
+		writer.write("<creator><![CDATA[" + doc.getCreator() + "]]></creator>");
+		writer.write("<size>" + doc.getFileSize() + "</size>");
+
+		writer.write("<status>" + doc.getStatus() + "</status>");
+		writer.write("<immutable>" + doc.getImmutable() + "</immutable>");
+		writer.write("<indexed>" + doc.getIndexed() + "</indexed>");
+		writer.write("<password>" + StringUtils.isNotEmpty(doc.getPassword()) + "</password>");
+		writer.write("<signed>" + doc.getSigned() + "</signed>");
+		writer.write("<stamped>" + doc.getStamped() + "</stamped>");
+
+		writer.write("<pages>" + doc.getPages() + "</pages>");
+
+		printField("lockUserId", doc.getLockUserId(), writer);
+		printField("lockUser", doc.getLockUser(), writer);
+
+		writer.write("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
+		printIcon(writer, doc.getFileName());
+		writer.write("<type><![CDATA[" + doc.getType() + "]]></type>");
+
+		writer.write("<rating>" + (doc.getRating() != null ? doc.getRating() : "0") + "</rating>");
+		writer.write("<fileVersion><![CDATA[" + doc.getFileVersion() + "]]></fileVersion>");
+
+		printField("comment", doc.getComment(), writer);
+		printField("workflowStatus", doc.getWorkflowStatus(), writer);
+		printField("workflowStatusDisplay", doc.getWorkflowStatusDisplay(), writer);
+		printField("startPublishing", doc.getStartPublishing(), writer);
+		printField("stopPublishing", doc.getStopPublishing(), writer);
+
+		writer.write("<publishedStatus>" + (doc.isPublishing() ? "yes" : "no") + "</publishedStatus>");
+
+		printField("extResId", doc.getExtResId(), writer);
+
+		if (doc.getTemplate() != null)
+			writer.write("<template><![CDATA[" + doc.getTemplate().getName() + "]]></template>");
+
+		printField("color", doc.getColor(), writer);
+
+		printExtendedAttributes(df, writer, doc, attrs, extValues);
+
+		writer.write("</document>");
+	}
+
+	private List<Document> filterUniqueDocuments(Dashlet dashlet, List<Document> records) {
+		List<Document> uniqueRecords = new ArrayList<Document>();
+		if (dashlet.getUnique() == 1) {
+			log.debug("Ensure records uniqueness");
+
+			/*
+			 * Make sure to have just one entry per document
+			 */
+			Set<Long> docIds = new HashSet<Long>();
+			for (Document doc : records) {
+				if (!docIds.contains(doc.getId())) {
+					docIds.add(doc.getId());
+					uniqueRecords.add(doc);
+				}
+				if (dashlet.getMax() != null && dashlet.getMax() > 0 && uniqueRecords.size() >= dashlet.getMax())
+					break;
+			}
+
+			log.debug("retrieved {} unique records", uniqueRecords.size());
+		} else
+			uniqueRecords = records;
+		return uniqueRecords;
+	}
+
+	/**
+	 * Retrieves just the names of those extended attribues declared in a
+	 * dashlet columns
+	 * 
+	 * @param dashlet The dashlet
+	 * 
+	 * @return list of extended attribute names
+	 */
+	private List<String> getExtendedAttrsNamesInDasheltColumns(Dashlet dashlet) {
+		List<String> attrs = new ArrayList<String>();
+		if (StringUtils.isNotEmpty(dashlet.getColumns())) {
+			StringTokenizer st = new StringTokenizer(dashlet.getColumns().trim(), ",;");
+			while (st.hasMoreElements()) {
+				String token = st.nextToken().trim();
+				if (token.startsWith("ext_"))
+					attrs.add(token.substring(4));
+			}
+		}
+		return attrs;
+	}
+
+	private void handleNote(boolean showSid, Locale locale, Dashlet dashlet, Map<String, Object> dashletDictionary,
+			Automation automation, PrintWriter writer) {
 
 		if (StringUtils.isNotEmpty(dashlet.getContent())) {
 			String content = automation.evaluate(dashlet.getContent(), dashletDictionary);
@@ -571,6 +524,7 @@ public class DashletContent extends HttpServlet {
 			/*
 			 * Iterate over records composing the response XML document
 			 */
+			DateFormat df = getDateFormat();
 			for (DocumentNote record : records) {
 				writer.write("<post>");
 				writer.write("<id>" + record.getId() + "</id>");
@@ -611,5 +565,51 @@ public class DashletContent extends HttpServlet {
 			throw new ServletException("Invalid or Expired Session");
 		SessionManager.get().renew(sid);
 		return session;
+	}
+
+	/**
+	 * A row mapper we use to populate a map of extended attributes from a query
+	 * *
+	 * 
+	 * @author Marco Meschieri - LogicalDOC
+	 * @since 8.8.3
+	 */
+	private final class EntendedAttributesRowMapper implements RowMapper<Long> {
+		private final Locale locale;
+
+		private final Map<String, Object> extValues;
+
+		private EntendedAttributesRowMapper(Locale locale, Map<String, Object> extValues) {
+			this.locale = locale;
+			this.extValues = extValues;
+		}
+
+		@Override
+		public Long mapRow(ResultSet rs, int row) throws SQLException {
+			Long docId = rs.getLong(1);
+			String name = rs.getString(2);
+			int type = rs.getInt(3);
+
+			String key = docId + "-" + name;
+
+			if (type == Attribute.TYPE_STRING) {
+				if (StringUtils.isNotEmpty(rs.getString(8)))
+					extValues.put(key, rs.getString(8));
+				else
+					extValues.put(key, rs.getString(4));
+			} else if (type == Attribute.TYPE_INT) {
+				extValues.put(key, rs.getLong(5));
+			} else if (type == Attribute.TYPE_DOUBLE) {
+				extValues.put(key, rs.getDouble(6));
+			} else if (type == Attribute.TYPE_DATE) {
+				extValues.put(key, rs.getTimestamp(7));
+			} else if (type == Attribute.TYPE_USER || type == Attribute.TYPE_FOLDER) {
+				extValues.put(key, rs.getString(4));
+			} else if (type == Attribute.TYPE_BOOLEAN) {
+				extValues.put(key, rs.getLong(5) == 1L ? I18N.message("true", locale) : I18N.message("false", locale));
+			}
+
+			return null;
+		}
 	}
 }

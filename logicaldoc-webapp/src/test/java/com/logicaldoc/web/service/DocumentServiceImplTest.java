@@ -441,7 +441,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 						
 		emailSender = mock(EMailSender.class);
 		
-		service.setEmailSender(emailSender);
+		DocumentServiceImpl.setEmailSender(emailSender);
 		
 		doNothing().when(emailSender).send(any(EMail.class));
 		
