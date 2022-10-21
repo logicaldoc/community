@@ -49,6 +49,8 @@ import com.logicaldoc.util.io.P7M;
  * @since 7.6.4
  */
 public class MailUtil {
+	private static final String MULTIPART_STAR = "multipart/*";
+
 	private static final String IPM_NOTE_SMIME = "IPM.Note.SMIME";
 
 	protected static Logger log = LoggerFactory.getLogger(MailUtil.class);
@@ -60,7 +62,7 @@ public class MailUtil {
 	public static boolean emlContainsAttachments(InputStream is) {
 		try {
 			MimeMessage msg = readMime(is);
-			if (msg != null && msg.isMimeType("multipart/*")) {
+			if (msg != null && msg.isMimeType(MULTIPART_STAR)) {
 				Multipart mp = (Multipart) msg.getContent();
 				int count = mp.getCount();
 				return count > 1;
@@ -308,7 +310,7 @@ public class MailUtil {
 
 		setReplyTo(msg, email);
 
-		if (msg.isMimeType("multipart/*") && (msg.getContent() instanceof Multipart)) {
+		if (msg.isMimeType(MULTIPART_STAR) && (msg.getContent() instanceof Multipart)) {
 			Multipart mp = (Multipart) msg.getContent();
 			int count = mp.getCount();
 			for (int i = 1; i < count; i++) {
@@ -432,14 +434,14 @@ public class MailUtil {
 
 	private static void addAttachments(BodyPart p, EMail email, boolean extractAttachmentContent)
 			throws UnsupportedEncodingException, MessagingException, IOException {
-		if (p.isMimeType("multipart/*")) {
+		if (p.isMimeType(MULTIPART_STAR)) {
 			Multipart mp = (Multipart) p.getContent();
 			int count = mp.getCount();
 			for (int i = 1; i < count; i++) {
 				BodyPart bp = mp.getBodyPart(i);
 				if (bp.getFileName() != null && extractAttachmentContent) {
 					addAttachment(bp, email);
-				} else if (bp.isMimeType("multipart/*")) {
+				} else if (bp.isMimeType(MULTIPART_STAR)) {
 					addAttachments(bp, email, extractAttachmentContent);
 				}
 			}
@@ -507,7 +509,7 @@ public class MailUtil {
 			return extractTextFromTextStar(p);
 		} else if (p.isMimeType("multipart/alternative")) {
 			return extractTextFromMultipartAlernative(p);
-		} else if (p.isMimeType("multipart/*")) {
+		} else if (p.isMimeType(MULTIPART_STAR)) {
 			Multipart mp = (Multipart) p.getContent();
 			for (int i = 0; i < mp.getCount(); i++) {
 				String s = getText(mp.getBodyPart(i));

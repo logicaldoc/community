@@ -471,66 +471,62 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		log.debug("Reindexing document {} - {}", docId, doc.getFileName());
 
-		try {
-			boolean alreadyIndexed = doc.getIndexed() == AbstractDocument.INDEX_INDEXED;
+		boolean alreadyIndexed = doc.getIndexed() == AbstractDocument.INDEX_INDEXED;
 
-			String cont = content;
-			long parsingTime = 0;
-			if (doc.getDocRef() != null) {
-				// We are indexing an alias, so index the real document first
-				Document realDoc = documentDAO.findById(doc.getDocRef());
-				if (realDoc != null) {
-					if (realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
-							|| realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA)
-						parsingTime = reindex(realDoc.getId(), content, new DocumentHistory(transaction));
+		String cont = content;
+		long parsingTime = 0;
+		if (doc.getDocRef() != null) {
+			// We are indexing an alias, so index the real document first
+			Document realDoc = documentDAO.findById(doc.getDocRef());
+			if (realDoc != null) {
+				if (realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
+						|| realDoc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA)
+					parsingTime = reindex(realDoc.getId(), content, new DocumentHistory(transaction));
 
-					// Take the content from the real document to avoid double
-					// parsing
-					if (StringUtils.isEmpty(content))
-						cont = indexer.getHit(realDoc.getId()).getContent();
-				} else {
-					log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
-							doc.getDocRef());
-					documentDAO.initialize(doc);
-					doc.setIndexed(AbstractDocument.INDEX_SKIP);
-					documentDAO.store(doc);
-					return 0;
-				}
+				// Take the content from the real document to avoid double
+				// parsing
+				if (StringUtils.isEmpty(content))
+					cont = indexer.getHit(realDoc.getId()).getContent();
+			} else {
+				log.debug("Alias {} cannot be indexed because it references an unexisting document {}", doc,
+						doc.getDocRef());
+				documentDAO.initialize(doc);
+				doc.setIndexed(AbstractDocument.INDEX_SKIP);
+				documentDAO.store(doc);
+				return 0;
 			}
-
-			if (StringUtils.isEmpty(cont) && doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA) {
-				// Extracts the content from the file. This may take very long
-				// time.
-				Date beforeParsing = new Date();
-				cont = parseDocument(doc, null);
-				parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
-			}
-
-			// This may take time
-			indexer.addHit(doc, cont);
-
-			// For additional safety update the DB directly
-			doc.setIndexed(AbstractDocument.INDEX_INDEXED);
-
-			if (transaction != null)
-				transaction.setEvent(DocumentEvent.INDEXED.toString());
-
-			boolean stored = documentDAO.store(doc, transaction);
-			if (!stored)
-				throw new Exception("Document not stored");
-
-			/*
-			 * If the document was already indexed, mark the aliases to be
-			 * re-indexed
-			 */
-			if (alreadyIndexed)
-				markAliasesToIndex(docId);
-
-			return parsingTime;
-		} catch (Throwable e) {
-			log.error("Error reindexing document {} - {}", docId, doc.getFileName());
-			throw e;
 		}
+
+		if (StringUtils.isEmpty(cont) && doc.getIndexed() != AbstractDocument.INDEX_TO_INDEX_METADATA) {
+			// Extracts the content from the file. This may take very long
+			// time.
+			Date beforeParsing = new Date();
+			cont = parseDocument(doc, null);
+			parsingTime = TimeDiff.getTimeDifference(beforeParsing, new Date(), TimeField.MILLISECOND);
+		}
+
+		// This may take time
+		indexer.addHit(doc, cont);
+
+		// For additional safety update the DB directly
+		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
+
+		if (transaction != null)
+			transaction.setEvent(DocumentEvent.INDEXED.toString());
+
+		boolean stored = documentDAO.store(doc, transaction);
+		if (!stored)
+			throw new Exception("Document not stored");
+
+		/*
+		 * If the document was already indexed, mark the aliases to be
+		 * re-indexed
+		 */
+		if (alreadyIndexed)
+			markAliasesToIndex(docId);
+
+		return parsingTime;
+
 	}
 
 	private void markAliasesToIndex(long referencedDocId) throws PersistenceException {
@@ -684,7 +680,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (folder.equals(doc.getFolder()))
 			return;
 
-		if (doc.getImmutable() == 0 || ((doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
+		if (doc.getImmutable() == 0
+				|| ((doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
 
 			/*
 			 * Better to synchronize this block because under high
@@ -1256,7 +1253,8 @@ public class DocumentManagerImpl implements DocumentManager {
 			Document doc = dao.findById(id);
 
 			// Skip documents in folders without Archive permission
-			if (!(transaction.getUser().isMemberOf(Group.GROUP_ADMIN) || transaction.getUser().getUsername().equals("_retention"))
+			if (!(transaction.getUser().isMemberOf(Group.GROUP_ADMIN)
+					|| transaction.getUser().getUsername().equals("_retention"))
 					&& !folderIds.contains(doc.getFolder().getId()))
 				continue;
 
@@ -1541,8 +1539,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				Document document = docDao.findDocument(docId);
 
-				if (document != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
-						&& !document.isPublishing())
+				if (document != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN)
+						&& !user.isMemberOf("publisher") && !document.isPublishing())
 					continue;
 
 				FormatConverterManager manager = (FormatConverterManager) Context.get()

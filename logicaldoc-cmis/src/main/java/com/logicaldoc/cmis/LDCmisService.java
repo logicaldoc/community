@@ -388,7 +388,7 @@ public class LDCmisService extends AbstractCmisService {
 			Boolean includeAllowableActions, IncludeRelationships includeRelationships, String renditionFilter,
 			BigInteger maxItems, BigInteger skipCount, ExtensionsData extension) {
 		validateSession();
-		return getRepository().query(statement, maxItems != null ? maxItems.intValue() : null);
+		return getRepository().query(statement, maxItems != null ? maxItems.intValue() : 40);
 	}
 
 	@Override

@@ -3,9 +3,10 @@ package com.logicaldoc.core.document;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
-
 
 /**
  * Comparators to sort documents with different options
@@ -245,6 +246,65 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		};
 	}
 
+	/**
+	 * Map of comparators for legacy fields, Key is fieldname-CS or
+	 * fieldName-CI, value is the comparator
+	 */
+	private static Map<String, DocumentComparator> legacyComparators = new HashMap<>();
+
+	static {
+		legacyComparators.put("filename-CS", FILENAME_SORT_CS);
+		legacyComparators.put("filename-CI", FILENAME_SORT_CI);
+
+		legacyComparators.put("id-CS", ID_SORT);
+		legacyComparators.put("id-CI", ID_SORT);
+
+		legacyComparators.put("fileSize-CS", FILESIZE_SORT);
+		legacyComparators.put("fileSize-CI", FILESIZE_SORT);
+
+		legacyComparators.put("size-CS", FILESIZE_SORT);
+		legacyComparators.put("size-CI", FILESIZE_SORT);
+
+		legacyComparators.put("version-CS", VERSION_SORT);
+		legacyComparators.put("version-CI", VERSION_SORT);
+
+		legacyComparators.put("fileVersion-CS", FILEVERSION_SORT);
+		legacyComparators.put("fileVersion-CI", FILEVERSION_SORT);
+
+		legacyComparators.put("lastModified-CS", LASTMODIFIED_SORT);
+		legacyComparators.put("lastModified-CI", LASTMODIFIED_SORT);
+
+		legacyComparators.put("published-CS", PUBLISHED_SORT);
+		legacyComparators.put("published-CI", PUBLISHED_SORT);
+
+		legacyComparators.put("created-CS", CREATED_SORT);
+		legacyComparators.put("created-CI", CREATED_SORT);
+
+		legacyComparators.put("customId-CS", CUSTOMID_SORT);
+		legacyComparators.put("customId-CI", CUSTOMID_SORT);
+
+		legacyComparators.put("type-CS", TYPE_SORT);
+		legacyComparators.put("type-CI", TYPE_SORT);
+
+		legacyComparators.put("comment-CS", COMMENT_SORT_CS);
+		legacyComparators.put("comment-CI", COMMENT_SORT_CI);
+
+		legacyComparators.put("workflowStatus-CS", WFSTATUS_SORT_CS);
+		legacyComparators.put("workflowStatus-CI", WFSTATUS_SORT_CI);
+
+		legacyComparators.put("startPublishing-CS", STARTPUB_SORT);
+		legacyComparators.put("startPublishing-CI", STARTPUB_SORT);
+
+		legacyComparators.put("stopPublishing-CS", STOPPUB_SORT);
+		legacyComparators.put("stopPublishing-CI", STOPPUB_SORT);
+
+		legacyComparators.put("publishedStatus-CS", PUBSTATUS_SORT);
+		legacyComparators.put("publishedStatus-CI", PUBSTATUS_SORT);
+
+		legacyComparators.put("template-CS", TEMPLATE_NAME_SORT_CS);
+		legacyComparators.put("template-CI", TEMPLATE_NAME_SORT_CI);
+	}
+
 	public static Comparator<AbstractDocument> getComparator(String sort) {
 		StringTokenizer st = new StringTokenizer(sort, ",", false);
 		List<DocumentComparator> comparators = new ArrayList<DocumentComparator>();
@@ -257,44 +317,14 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 			boolean caseSensitive = true;
 			if (field.startsWith("lower(") || field.startsWith("upper(")) {
 				caseSensitive = false;
-				field = field.substring(field.indexOf('(')+1, field.lastIndexOf(')'));
+				field = field.substring(field.indexOf('(') + 1, field.lastIndexOf(')'));
 			}
 
 			DocumentComparator comp = null;
-			if ("filename".equalsIgnoreCase(field))
-				comp = caseSensitive ? FILENAME_SORT_CS : FILENAME_SORT_CI;
-			else if ("id".equalsIgnoreCase(field))
-				comp = ID_SORT;
-			else if ("fileSize".equalsIgnoreCase(field) || "size".equalsIgnoreCase(field))
-				comp = FILESIZE_SORT;
-			else if ("version".equalsIgnoreCase(field))
-				comp = VERSION_SORT;
-			else if ("fileVersion".equalsIgnoreCase(field))
-				comp = FILEVERSION_SORT;
-			else if ("lastModified".equalsIgnoreCase(field))
-				comp = LASTMODIFIED_SORT;
-			else if ("published".equalsIgnoreCase(field) || "date".equalsIgnoreCase(field))
-				comp = PUBLISHED_SORT;
-			else if ("created".equalsIgnoreCase(field) || "creation".equalsIgnoreCase(field))
-				comp = CREATED_SORT;
-			else if ("customId".equalsIgnoreCase(field))
-				comp = CUSTOMID_SORT;
-			else if ("type".equalsIgnoreCase(field))
-				comp = TYPE_SORT;
-			else if ("comment".equalsIgnoreCase(field))
-				comp = caseSensitive ? COMMENT_SORT_CS : COMMENT_SORT_CI;
-			else if ("workflowStatus".equalsIgnoreCase(field))
-				comp = caseSensitive ? WFSTATUS_SORT_CS : WFSTATUS_SORT_CI;
-			else if ("startPublishing".equalsIgnoreCase(field))
-				comp = STARTPUB_SORT;
-			else if ("stopPublishing".equalsIgnoreCase(field))
-				comp = STOPPUB_SORT;
-			else if ("publishedStatus".equalsIgnoreCase(field))
-				comp = PUBSTATUS_SORT;
-			if ("template".equalsIgnoreCase(field))
-				comp = caseSensitive ? TEMPLATE_NAME_SORT_CS : TEMPLATE_NAME_SORT_CI;
-			else if (field.startsWith("ext_"))
+			if (field.startsWith("ext_"))
 				comp = newComparatorForExtendedAttribute(field.substring(field.indexOf('_') + 1), caseSensitive);
+			else
+				comp = legacyComparators.get(field + "-" + (caseSensitive ? "CS" : "CI"));
 
 			if (comp != null && asc)
 				comparators.add(comp);

@@ -19,6 +19,10 @@ import com.logicaldoc.util.sql.SqlUtil;
 public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<MessageTemplate>
 		implements MessageTemplateDAO {
 
+	private static final String NAME = ".name='";
+
+	private static final String AND = "' and ";
+
 	private static final String TENANT_ID = ".tenantId=";
 
 	private static final String LANGUAGE = ".language='";
@@ -32,7 +36,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 	public List<MessageTemplate> findByLanguage(String language, long tenantId) {
 		try {
 			return findByWhere(
-					" " + ALIAS_ENTITY + LANGUAGE + language + "' and " + ALIAS_ENTITY + TENANT_ID + tenantId,
+					" " + ALIAS_ENTITY + LANGUAGE + language + AND + ALIAS_ENTITY + TENANT_ID + tenantId,
 					"order by " + ALIAS_ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -62,12 +66,12 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 			lang = "en";
 
 		try {
-			List<MessageTemplate> buf = findByWhere(" " + ALIAS_ENTITY + LANGUAGE + lang + "' and " + ALIAS_ENTITY
-					+ ".name='" + name + "' and " + ALIAS_ENTITY + TENANT_ID + tenantId, null, null);
+			List<MessageTemplate> buf = findByWhere(" " + ALIAS_ENTITY + LANGUAGE + lang + AND + ALIAS_ENTITY
+					+ NAME + name + AND + ALIAS_ENTITY + TENANT_ID + tenantId, null, null);
 			if (buf != null && !buf.isEmpty())
 				return buf.get(0);
 
-			buf = findByWhere(" " + ALIAS_ENTITY + ".language='en' and " + ALIAS_ENTITY + ".name='" + name + "' and "
+			buf = findByWhere(" " + ALIAS_ENTITY + ".language='en' and " + ALIAS_ENTITY + NAME + name + AND
 					+ ALIAS_ENTITY + TENANT_ID + tenantId, null, null);
 			if (buf != null && !buf.isEmpty())
 				return buf.get(0);
@@ -102,7 +106,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 	@Override
 	public List<MessageTemplate> findByName(String name, long tenantId) {
 		try {
-			return findByWhere(" " + ALIAS_ENTITY + ".name='" + SqlUtil.doubleQuotes(name) + "' and " + ALIAS_ENTITY
+			return findByWhere(" " + ALIAS_ENTITY + NAME + SqlUtil.doubleQuotes(name) + AND + ALIAS_ENTITY
 					+ TENANT_ID + tenantId, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -108,49 +107,25 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 
 			if (maxVersions > 0) {
 				List<Version> versions = findByDocId(version.getDocId());
+
 				// Inverse order the document versions
 				if (versions.size() > maxVersions) {
-					Collections.sort(versions, new Comparator<Version>() {
-						public int compare(Version v1, Version v2) {
-							return v2.compareTo(v1);
-						}
-					});
+					Collections.sort(versions, Collections.reverseOrder());
+
+					// Delete the oldest versions
+					deleteOldestVersions(versions, maxVersions);
 
 					// Prepare a list of files(fileVersion) that must be
 					// retained
-					Set<String> filesToBeRetained = new HashSet<String>();
+					Set<String> filesToBeRetained = new HashSet<>();
 					for (int i = 0; i < versions.size(); i++) {
 						if (i < maxVersions)
 							if (!filesToBeRetained.contains(versions.get(i).getFileVersion()))
 								filesToBeRetained.add(versions.get(i).getFileVersion());
 					}
 
-					// Delete the oldest versions
-					for (int i = 0; i < versions.size(); i++) {
-						if (i >= maxVersions) {
-							// Delete the version
-							Version deleteVersion = versions.get(i);
-							initialize(deleteVersion);
-							deleteVersion.setDeleted(1);
-							store(deleteVersion);
-						}
-					}
-
 					// Clean the files no more needed
-					List<String> resources = storer.listResources(version.getDocId(), null);
-					for (String resource : resources) {
-						boolean toDelete = true;
-						for (String fileVersionToRetain : filesToBeRetained) {
-							if (resource.trim().equals(fileVersionToRetain.trim())
-									|| resource.trim().startsWith(fileVersionToRetain.trim() + "-")) {
-								toDelete = false;
-								break;
-							}
-						}
-						if (toDelete) {
-							storer.delete(version.getDocId(), resource);
-						}
-					}
+					cleanUnusedFiles(version, filesToBeRetained);
 				}
 			}
 		} catch (Throwable e) {
@@ -158,6 +133,35 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 			result = false;
 		}
 		return result;
+	}
+
+	private void cleanUnusedFiles(Version version, Set<String> filesToBeRetained) {
+		List<String> resources = storer.listResources(version.getDocId(), null);
+		for (String resource : resources) {
+			boolean toDelete = true;
+			for (String fileVersionToRetain : filesToBeRetained) {
+				if (resource.trim().equals(fileVersionToRetain.trim())
+						|| resource.trim().startsWith(fileVersionToRetain.trim() + "-")) {
+					toDelete = false;
+					break;
+				}
+			}
+			if (toDelete) {
+				storer.delete(version.getDocId(), resource);
+			}
+		}
+	}
+
+	private void deleteOldestVersions(List<Version> versions, int maxVersions) {
+		for (int i = 0; i < versions.size(); i++) {
+			if (i >= maxVersions) {
+				// Delete the version
+				Version deleteVersion = versions.get(i);
+				initialize(deleteVersion);
+				deleteVersion.setDeleted(1);
+				store(deleteVersion);
+			}
+		}
 	}
 
 	@Override

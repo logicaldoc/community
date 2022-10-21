@@ -161,38 +161,17 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		boolean result = true;
 		try {
 			Document doc = (Document) findById(docId);
-			if (doc != null && doc.getImmutable() == 0
-					|| (doc != null && doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
+			if (doc != null && doc.getImmutable() == 0 || (doc != null && doc.getImmutable() == 1
+					&& transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 
 				// Remove versions
-				try {
-					for (Version version : versionDAO.findByDocId(docId)) {
-						version.setDeleted(delCode);
-						saveOrUpdate(version);
-					}
-				} catch (Throwable t) {
-					log.error("Error removing the versions of document {}", doc, t);
-				}
+				removeVersions(docId, delCode);
 
 				// Remove notes
-				try {
-					for (DocumentNote note : noteDAO.findByDocId(docId, null)) {
-						note.setDeleted(delCode);
-						saveOrUpdate(note);
-					}
-				} catch (Throwable t) {
-					log.error("Error removing the notes of document {}", doc, t);
-				}
+				removeNotes(docId, delCode);
 
 				// Remove links
-				try {
-					for (DocumentLink link : linkDAO.findByDocId(docId)) {
-						link.setDeleted(delCode);
-						saveOrUpdate(link);
-					}
-				} catch (Throwable t) {
-					log.error("Error removing the links of document {}", doc, t);
-				}
+				removeLinks(docId, delCode);
 
 				doc.setDeleted(delCode);
 				doc.setDeleteUserId(transaction.getUserId());
@@ -212,6 +191,39 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 
 		return result;
+	}
+
+	private void removeLinks(long docId, int delCode) {
+		try {
+			for (DocumentLink link : linkDAO.findByDocId(docId)) {
+				link.setDeleted(delCode);
+				saveOrUpdate(link);
+			}
+		} catch (Throwable t) {
+			log.error("Error removing the links of document {}", docId, t);
+		}
+	}
+
+	private void removeNotes(long docId, int delCode) {
+		try {
+			for (DocumentNote note : noteDAO.findByDocId(docId, null)) {
+				note.setDeleted(delCode);
+				saveOrUpdate(note);
+			}
+		} catch (Throwable t) {
+			log.error("Error removing the notes of document {}", docId, t);
+		}
+	}
+
+	private void removeVersions(long docId, int delCode) {
+		try {
+			for (Version version : versionDAO.findByDocId(docId)) {
+				version.setDeleted(delCode);
+				saveOrUpdate(version);
+			}
+		} catch (Throwable t) {
+			log.error("Error removing the versions of document {}", docId, t);
+		}
 	}
 
 	@Override
@@ -306,113 +318,23 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				transaction.setTenant(tenant.getName());
 			}
 
-			// Truncate publishing dates
-			if (doc.getStartPublishing() != null)
-				doc.setStartPublishing(DateUtils.truncate(doc.getStartPublishing(), Calendar.DATE));
-			if (doc.getStopPublishing() != null)
-				doc.setStopPublishing(DateUtils.truncate(doc.getStopPublishing(), Calendar.DATE));
+			truncatePublishingDates(doc);
 
-			if (doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
-					|| doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA) {
-				// Check if the document must be indexed
-				if (!FileUtil.matches(doc.getFileName(), config.getProperty(tenant.getName() + ".index.includes", ""),
-						config.getProperty(tenant.getName() + ".index.excludes", "")))
-					doc.setIndexed(AbstractDocument.INDEX_SKIP);
+			setIndexed(doc, tenant);
 
-				// Check if the document must be indexed
-				if (doc.getIndexed() == AbstractDocument.INDEX_SKIP && FileUtil.matches(doc.getFileName(),
-						config.getProperty(tenant.getName() + ".index.includes.metadata", ""),
-						config.getProperty(tenant.getName() + ".index.excludes.metadata", "")))
-					doc.setIndexed(AbstractDocument.INDEX_TO_INDEX_METADATA);
-			}
-
-			Set<Tag> src = doc.getTags();
-			if (src != null && src.size() > 0) {
-				// Trim too long tags
-				Set<Tag> dst = new HashSet<Tag>();
-				for (Tag str : src) {
-					str.setTenantId(doc.getTenantId());
-					String s = str.getTag();
-					if (s != null) {
-						if (s.length() > 255) {
-							s = s.substring(0, 255);
-							str.setTag(s);
-						}
-						if (!dst.contains(str))
-							dst.add(str);
-					}
-				}
-				doc.setTags(dst);
-				doc.setTgs(doc.getTagsString());
-			}
+			setTags(doc);
 
 			/*
 			 * Avoid documents inside folder alias
 			 */
-			if (doc.getFolder().getFoldRef() != null) {
-				Folder fld = folderDAO.findById(doc.getFolder().getFoldRef());
-				if (fld == null)
-					throw new Exception(
-							String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
-				doc.setFolder(fld);
-			}
+			setFolder(doc);
 
 			if (doc.getDocRef() == null) {
 				/*
 				 * In case of a regular document, check for attributes defaults
 				 * specified at folder's level
 				 */
-				if (doc.getFolder().getTemplate() != null) {
-					folderDAO.initialize(doc.getFolder());
-					if (doc.getTemplate() == null || doc.getTemplate().equals(doc.getFolder().getTemplate())) {
-						doc.setTemplate(doc.getFolder().getTemplate());
-						try {
-							for (String name : doc.getFolder().getAttributeNames()) {
-								Attribute fAtt = doc.getFolder().getAttribute(name);
-								if (fAtt.getValue() == null || StringUtils.isEmpty(fAtt.getValue().toString()))
-									continue;
-								Attribute dAtt = doc.getAttribute(name);
-								if (dAtt == null) {
-									dAtt = new Attribute();
-									dAtt.setType(fAtt.getType());
-									dAtt.setEditor(fAtt.getEditor());
-									dAtt.setLabel(fAtt.getLabel());
-									dAtt.setMandatory(fAtt.getMandatory());
-									dAtt.setHidden(fAtt.getHidden());
-									dAtt.setMultiple(fAtt.getMultiple());
-									dAtt.setPosition(fAtt.getPosition());
-									doc.getAttributes().put(name, dAtt);
-								}
-
-								if (dAtt.getValue() == null || StringUtils.isEmpty(dAtt.getValue().toString())) {
-									dAtt.setStringValue(fAtt.getStringValue());
-									dAtt.setDateValue(fAtt.getDateValue());
-									dAtt.setDoubleValue(fAtt.getDoubleValue());
-									dAtt.setIntValue(fAtt.getIntValue());
-								}
-							}
-						} catch (Throwable t) {
-							// From times to times during check-in a
-							// lazy-loading
-							// exception is thrown
-						}
-					}
-				}
-
-				/*
-				 * Check for OCR template at folder level
-				 */
-				if (doc.getOcrTemplateId() == null && doc.getFolder().getOcrTemplateId() != null)
-					doc.setOcrTemplateId(doc.getFolder().getOcrTemplateId());
-
-				/*
-				 * Check for Barcode template at folder level
-				 */
-				if (doc.getBarcodeTemplateId() == null && doc.getFolder().getBarcodeTemplateId() != null)
-					doc.setBarcodeTemplateId(doc.getFolder().getBarcodeTemplateId());
-
-				if (doc.getTemplate() == null)
-					doc.setOcrTemplateId(null);
+				copyFolderMetadata(doc);
 			}
 
 			if (!RunLevel.current().aspectEnabled("customId"))
@@ -431,11 +353,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			// Save the document
 			saveOrUpdate(doc);
-			try {
-				flush();
-			} catch (Throwable t) {
-				// Noting to do
-			}
+			internalFlush();
+
 			if (doc.getDeleted() == 0 && doc.getId() != 0L)
 				refresh(doc);
 
@@ -458,24 +377,154 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			/**
 			 * Update the aliases
 			 */
-			if (doc.getDocRef() == null)
-				jdbcUpdate("update ld_document set ld_filesize= " + doc.getFileSize() + ", ld_pages= " + doc.getPages()
-						+ ", ld_version='" + doc.getVersion() + "', ld_fileversion='" + doc.getFileVersion()
-						+ "' where ld_docref= " + doc.getId());
+			updateAliases(doc);
 		} catch (Throwable e) {
-			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
-				Session session = SessionManager.get().get(transaction.getSessionId());
-				session.logError(e.getMessage());
-			}
-			log.error(e.getMessage(), e);
 			result = false;
-			if (e instanceof PersistenceException)
-				throw (PersistenceException) e;
-			else
-				throw new PersistenceException(e);
+			handleStoreError(transaction, e);
 		}
 
 		return result;
+	}
+
+	private boolean handleStoreError(final DocumentHistory transaction, Throwable e) throws PersistenceException {
+		if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
+			Session session = SessionManager.get().get(transaction.getSessionId());
+			session.logError(e.getMessage());
+		}
+		log.error(e.getMessage(), e);
+
+		if (e instanceof PersistenceException)
+			throw (PersistenceException) e;
+		else
+			throw new PersistenceException(e);
+	}
+
+	private void updateAliases(Document doc) throws PersistenceException {
+		if (doc.getDocRef() == null)
+			jdbcUpdate("update ld_document set ld_filesize= " + doc.getFileSize() + ", ld_pages= " + doc.getPages()
+					+ ", ld_version='" + doc.getVersion() + "', ld_fileversion='" + doc.getFileVersion()
+					+ "' where ld_docref= " + doc.getId());
+	}
+
+	private void internalFlush() {
+		try {
+			flush();
+		} catch (Throwable t) {
+			// Noting to do
+		}
+	}
+
+	private void copyFolderMetadata(Document doc) {
+		if (doc.getFolder().getTemplate() != null) {
+			try {
+				copyFolderExtendedAttributes(doc);
+			} catch (Throwable t) {
+				// From times to times during check-in a
+				// lazy-loading
+				// exception is thrown
+			}
+		}
+
+		/*
+		 * Check for OCR template at folder level
+		 */
+		if (doc.getOcrTemplateId() == null && doc.getFolder().getOcrTemplateId() != null)
+			doc.setOcrTemplateId(doc.getFolder().getOcrTemplateId());
+
+		/*
+		 * Check for Barcode template at folder level
+		 */
+		if (doc.getBarcodeTemplateId() == null && doc.getFolder().getBarcodeTemplateId() != null)
+			doc.setBarcodeTemplateId(doc.getFolder().getBarcodeTemplateId());
+
+		if (doc.getTemplate() == null)
+			doc.setOcrTemplateId(null);
+	}
+
+	private void copyFolderExtendedAttributes(Document doc) {
+		folderDAO.initialize(doc.getFolder());
+		if (doc.getTemplate() == null || doc.getTemplate().equals(doc.getFolder().getTemplate())) {
+			doc.setTemplate(doc.getFolder().getTemplate());
+			for (String name : doc.getFolder().getAttributeNames()) {
+				Attribute fAtt = doc.getFolder().getAttribute(name);
+				if (fAtt.getValue() == null || StringUtils.isEmpty(fAtt.getValue().toString()))
+					continue;
+				Attribute dAtt = doc.getAttribute(name);
+				if (dAtt == null) {
+					dAtt = new Attribute();
+					dAtt.setType(fAtt.getType());
+					dAtt.setEditor(fAtt.getEditor());
+					dAtt.setLabel(fAtt.getLabel());
+					dAtt.setMandatory(fAtt.getMandatory());
+					dAtt.setHidden(fAtt.getHidden());
+					dAtt.setMultiple(fAtt.getMultiple());
+					dAtt.setPosition(fAtt.getPosition());
+					doc.getAttributes().put(name, dAtt);
+				}
+
+				if (dAtt.getValue() == null || StringUtils.isEmpty(dAtt.getValue().toString())) {
+					dAtt.setStringValue(fAtt.getStringValue());
+					dAtt.setDateValue(fAtt.getDateValue());
+					dAtt.setDoubleValue(fAtt.getDoubleValue());
+					dAtt.setIntValue(fAtt.getIntValue());
+				}
+			}
+		}
+	}
+
+	private void setFolder(Document doc) throws PersistenceException, Exception {
+		if (doc.getFolder().getFoldRef() != null) {
+			Folder fld = folderDAO.findById(doc.getFolder().getFoldRef());
+			if (fld == null)
+				throw new Exception(String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
+			doc.setFolder(fld);
+		}
+	}
+
+	private void setTags(Document doc) {
+		Set<Tag> src = doc.getTags();
+		if (src != null && src.size() > 0) {
+			// Trim too long tags
+			Set<Tag> dst = new HashSet<Tag>();
+			for (Tag str : src) {
+				str.setTenantId(doc.getTenantId());
+				String s = str.getTag();
+				if (s != null) {
+					if (s.length() > 255) {
+						s = s.substring(0, 255);
+						str.setTag(s);
+					}
+					if (!dst.contains(str))
+						dst.add(str);
+				}
+			}
+			doc.setTags(dst);
+			doc.setTgs(doc.getTagsString());
+		}
+	}
+
+	private void setIndexed(Document doc, Tenant tenant) {
+		if (doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX
+				|| doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX_METADATA) {
+			// Check if the document must be indexed
+			if (!FileUtil.matches(doc.getFileName(), config.getProperty(tenant.getName() + ".index.includes", ""),
+					config.getProperty(tenant.getName() + ".index.excludes", "")))
+				doc.setIndexed(AbstractDocument.INDEX_SKIP);
+
+			// Check if the document must be indexed
+			if (doc.getIndexed() == AbstractDocument.INDEX_SKIP && FileUtil.matches(doc.getFileName(),
+					config.getProperty(tenant.getName() + ".index.includes.metadata", ""),
+					config.getProperty(tenant.getName() + ".index.excludes.metadata", "")))
+				doc.setIndexed(AbstractDocument.INDEX_TO_INDEX_METADATA);
+		}
+	}
+
+	private void truncatePublishingDates(Document doc) {
+		// Truncate publishing dates
+		if (doc.getStartPublishing() != null)
+			doc.setStartPublishing(DateUtils.truncate(doc.getStartPublishing(), Calendar.DATE));
+		if (doc.getStopPublishing() != null)
+			doc.setStopPublishing(DateUtils.truncate(doc.getStopPublishing(), Calendar.DATE));
 	}
 
 	/**
@@ -1222,63 +1271,67 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void cleanUnexistingUniqueTags() {
-		StringBuilder deleteStatement = new StringBuilder("delete from ld_uniquetag UT where ");
-
-		// tags no more existing in the ld_tag table or that belong to deleted
-		// documents
-		deleteStatement.append(
-				" not UT.ld_tag in (select distinct(B.ld_tag) from ld_tag B, ld_document C where UT.ld_tenantid=B.ld_tenantid and UT.ld_tag=B.ld_tag and C.ld_id=B.ld_docid and C.ld_deleted=0) ");
-
-		// tags no more existing in the ld_foldertag table or that belong to
-		// deleted folders
-		deleteStatement.append(
-				" and not UT.ld_tag in (select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where UT.ld_tenantid=D.ld_tenantid and UT.ld_tag=D.ld_tag and E.ld_id=D.ld_folderid and E.ld_deleted=0) ");
-
 		try {
+			StringBuilder deleteStatement = new StringBuilder("delete from ld_uniquetag UT where ");
+
+			// tags no more existing in the ld_tag table or that belong to
+			// deleted
+			// documents
+			deleteStatement.append(
+					" not UT.ld_tag in (select distinct(B.ld_tag) from ld_tag B, ld_document C where UT.ld_tenantid=B.ld_tenantid and UT.ld_tag=B.ld_tag and C.ld_id=B.ld_docid and C.ld_deleted=0) ");
+
+			// tags no more existing in the ld_foldertag table or that belong to
+			// deleted folders
+			deleteStatement.append(
+					" and not UT.ld_tag in (select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where UT.ld_tenantid=D.ld_tenantid and UT.ld_tag=D.ld_tag and E.ld_id=D.ld_folderid and E.ld_deleted=0) ");
+
 			jdbcUpdate(deleteStatement.toString());
 		} catch (PersistenceException e) {
 			/*
 			 * The unique SQL query failed, so we do the same deletion
-			 * programmatically
+			 * programmatically one by one
 			 */
 			try {
-				List<Long> tenantIds = tenantDAO.findAllIds();
-				for (Long tenantId : tenantIds) {
-					log.debug("Clean unique tags of tenant {}", tenantId);
-
-					// Collect the currently unique used tags
-					@SuppressWarnings("unchecked")
-					Set<String> currentlyUsedTags = ((Map<String, String>) queryForList(
-							"select distinct(B.ld_tag) from ld_tag B, ld_document C where B.ld_tenantid=" + tenantId
-									+ " and C.ld_id=B.ld_docid and C.ld_deleted=0 "
-									+ " UNION select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where D.ld_tenantid="
-									+ tenantId + " and E.ld_id=D.ld_folderid and E.ld_deleted=0",
-							String.class).stream().collect(Collectors.groupingBy(Function.identity()))).keySet();
-
-					// Delete all currently recorded unique tags no more used
-					if (isOracle()) {
-						/*
-						 * In Oracle the limit of 1000 elements applies to sets
-						 * of single items: (x) IN ((1), (2), (3), ...). There
-						 * is no limit if the sets contain two or more items:
-						 * (x, 0) IN ((1,0), (2,0), (3,0), ...):
-						 */
-						String currentlyUsedTagsStr = currentlyUsedTags.stream()
-								.map(tag -> ("('" + SqlUtil.doubleQuotes(tag) + "',0)"))
-								.collect(Collectors.joining(","));
-						if (StringUtils.isNotEmpty(currentlyUsedTagsStr))
-							jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId
-									+ " and (ld_tag,0) not in (" + currentlyUsedTagsStr + ")");
-					} else {
-						String currentlyUsedTagsStr = currentlyUsedTags.stream()
-								.map(tag -> ("'" + SqlUtil.doubleQuotes(tag) + "'")).collect(Collectors.joining(","));
-						if (StringUtils.isNotEmpty(currentlyUsedTagsStr))
-							jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId + " and ld_tag not in ("
-									+ currentlyUsedTagsStr + ")");
-					}
-				}
+				cleanUnexistingUniqueTagsOneByOne();
 			} catch (Throwable t) {
 				log.warn(t.getMessage(), t);
+			}
+		}
+	}
+
+	private void cleanUnexistingUniqueTagsOneByOne() throws PersistenceException {
+		List<Long> tenantIds = tenantDAO.findAllIds();
+		for (Long tenantId : tenantIds) {
+			log.debug("Clean unique tags of tenant {}", tenantId);
+
+			// Collect the currently unique used tags
+			@SuppressWarnings("unchecked")
+			Set<String> currentlyUsedTags = ((Map<String, String>) queryForList(
+					"select distinct(B.ld_tag) from ld_tag B, ld_document C where B.ld_tenantid=" + tenantId
+							+ " and C.ld_id=B.ld_docid and C.ld_deleted=0 "
+							+ " UNION select distinct(D.ld_tag) from ld_foldertag D, ld_folder E where D.ld_tenantid="
+							+ tenantId + " and E.ld_id=D.ld_folderid and E.ld_deleted=0",
+					String.class).stream().collect(Collectors.groupingBy(Function.identity()))).keySet();
+
+			// Delete all currently recorded unique tags no more used
+			if (isOracle()) {
+				/*
+				 * In Oracle the limit of 1000 elements applies to sets of
+				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
+				 * if the sets contain two or more items: (x, 0) IN ((1,0),
+				 * (2,0), (3,0), ...):
+				 */
+				String currentlyUsedTagsStr = currentlyUsedTags.stream()
+						.map(tag -> ("('" + SqlUtil.doubleQuotes(tag) + "',0)")).collect(Collectors.joining(","));
+				if (StringUtils.isNotEmpty(currentlyUsedTagsStr))
+					jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId + " and (ld_tag,0) not in ("
+							+ currentlyUsedTagsStr + ")");
+			} else {
+				String currentlyUsedTagsStr = currentlyUsedTags.stream()
+						.map(tag -> ("'" + SqlUtil.doubleQuotes(tag) + "'")).collect(Collectors.joining(","));
+				if (StringUtils.isNotEmpty(currentlyUsedTagsStr))
+					jdbcUpdate("delete from ld_uniquetag where ld_tenantid=" + tenantId + " and ld_tag not in ("
+							+ currentlyUsedTagsStr + ")");
 			}
 		}
 	}

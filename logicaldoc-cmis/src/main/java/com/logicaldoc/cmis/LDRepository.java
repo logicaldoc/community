@@ -177,8 +177,6 @@ public class LDRepository {
 
 	private static final Logger log = LoggerFactory.getLogger(LDRepository.class);
 
-	private static final int DEFAULT_QUERY_SIZE = 40;
-
 	/** Repository id */
 	private final String id;
 
@@ -1397,25 +1395,20 @@ public class LDRepository {
 		}
 	}
 
-	public ObjectList query(String statement, Integer maxItems) {
-
-		int max = DEFAULT_QUERY_SIZE;
-		if (maxItems != null)
-			max = maxItems;
+	public ObjectList query(String statement, int maxItems) {
 
 		// As expression we will use the WHERE clause as is
 		final String where = "where";
-		String expr = StringUtils.removeStartIgnoreCase(statement, where);
-		String whereExp = expr;
-		if (whereExp.toLowerCase().contains(where))
-			whereExp = whereExp.substring(whereExp.toLowerCase().indexOf(where) + 6).trim();
+		String whereClause = StringUtils.removeStartIgnoreCase(statement, where);
+		if (whereClause.toLowerCase().contains(where))
+			whereClause = whereClause.substring(whereClause.toLowerCase().indexOf(where) + 6).trim();
 
-		log.debug("where: {}", whereExp);
+		log.debug("where: {}", whereClause);
 
 		/**
 		 * Try to detect if the request comes from LogicalDOC Mobile
 		 */
-		boolean fileNameSearch = whereExp.toLowerCase().contains("cmis:name");
+		boolean fileNameSearch = whereClause.toLowerCase().contains("cmis:name");
 		log.debug("fileNameSearch: {}", fileNameSearch);
 
 		Long parentFolderID = null;
@@ -1431,6 +1424,102 @@ public class LDRepository {
 		boolean hasMoreItems = false;
 
 		// Create the filter
+		Set<String> filter = buildQueryFilter(statement);
+
+		// Performs Full-text search
+		if (!fileNameSearch) {
+			hasMoreItems = doFulltextSearch(statement, whereClause, parentFolderID, list, filter, maxItems);
+		} else {
+			doFilenameSearch(statement, list, filter, maxItems);
+		}
+
+		ObjectListImpl objList = new ObjectListImpl();
+		objList.setObjects(list);
+		objList.setNumItems(BigInteger.valueOf(list.size()));
+		objList.setHasMoreItems(hasMoreItems);
+
+		return objList;
+	}
+
+	private void doFilenameSearch(String statement, List<ObjectData> list, Set<String> filter, int maxItems) {
+		// Performs file name search
+		User user = getSessionUser();
+
+		String expr = StringUtils.substringBetween(statement, "'", "'");
+		String filename = expr;
+		log.debug("filename: {}", filename);
+
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, getSessionUser().getId(),
+				maxItems);
+
+		for (int i = 0; i < docs.size(); i++) {
+			// Check permissions on the documents found
+			try {
+				checkReadEnable(user, docs.get(i).getFolder().getId());
+				checkPublished(user, docs.get(i));
+			} catch (Exception e) {
+				continue;
+			}
+			docDao.initialize(docs.get(i));
+
+			// filtro i risultati (lasciando solo le colonne richieste)
+			ObjectData result = compileObjectType(null, docs.get(i), filter, false, false, null);
+			list.add(result);
+		}
+	}
+
+	private boolean doFulltextSearch(String statement, String whereExpression, Long parentFolderID,
+			List<ObjectData> results, Set<String> filter, int maxItems) {
+		boolean hasMoreItems;
+		FulltextSearchOptions opt = buildFulltextSearchOptions(statement, parentFolderID, maxItems);
+
+		// Now detect if the search must be applied to specific fields
+		final String ldocPrefix = "ldoc:";
+		if (whereExpression.contains("cmis:") || whereExpression.contains(ldocPrefix)) {
+			List<String> fields = new ArrayList<>();
+			Pattern p = Pattern.compile("[(cmis),(ldoc)]+:\\w+");
+			Matcher m = p.matcher(whereExpression);
+			while (m.find()) {
+				String field = m.group();
+				if (field.startsWith(ldocPrefix))
+					field = field.substring(ldocPrefix.length());
+
+				log.debug("field: {}", field);
+				fields.add(field);
+			}
+
+			opt.setFields(fields.toArray(new String[0]));
+		}
+
+		// Execute the search
+		log.debug("opt: {}", opt);
+		Search search = Search.get(opt);
+		log.debug("search: {}", search);
+		List<Hit> hits = new ArrayList<>();
+		try {
+			hits = search.search();
+		} catch (SearchException e1) {
+			log.error(e1.getMessage(), e1);
+		}
+		log.debug("hits.size(): {}", hits.size());
+
+		// Iterate through the list of results
+		for (Hit hit : hits) {
+			try {
+				// filtro i risultati (lasciando solo le colonne
+				// richieste)
+				ObjectData result = compileObjectType(null, hit, filter, false, false, null);
+				results.add(result);
+			} catch (Throwable t) {
+				log.error("CMIS Exception populating data structure", t);
+			}
+		}
+		hasMoreItems = search.getEstimatedHitsNumber() > maxItems;
+		return hasMoreItems;
+	}
+
+	private Set<String> buildQueryFilter(String statement) {
 		Set<String> filter = null;
 		try {
 			// Parse the select list and compile a filter
@@ -1451,117 +1540,37 @@ public class LDRepository {
 		} catch (Throwable e1) {
 			log.error("CMIS Exception creating filter", e1);
 		}
+		return filter;
+	}
 
-		// Performs Full-text search
-		if (!fileNameSearch) {
-			log.debug("Performs Full-text search");
-			expr = StringUtils.substringBetween(statement, "'%", "%'");
-			if (StringUtils.isEmpty(expr))
-				expr = StringUtils.substringBetween(statement, "('", "')");
-			if (StringUtils.isEmpty(expr))
-				expr = StringUtils.substringBetween(statement, "'", "'");
-
-			log.debug("expr: {}", expr);
-
-			// Prepare the search options
-			FulltextSearchOptions opt = new FulltextSearchOptions();
-			opt.setMaxHits(max);
-
-			User user = getSessionUser();
-			opt.setUserId(user.getId());
-			log.debug("user.getLanguage(): {}", user.getLanguage());
-			opt.setExpressionLanguage(user.getLanguage());
-
-			// Check to search in Tree
-			if (parentFolderID != null) {
-				log.debug("parentFolderID != null");
-				opt.setFolderId(parentFolderID);
-				opt.setSearchInSubPath(true);
-			}
-
-			opt.setExpression(expr);
-
-			// Now detect if the search must be applied to specific fields
-			final String ldocPrefix = "ldoc:";
-			if (whereExp.contains("cmis:") || whereExp.contains(ldocPrefix)) {
-				List<String> fields = new ArrayList<>();
-				Pattern p = Pattern.compile("[(cmis),(ldoc)]+:\\w+");
-				Matcher m = p.matcher(whereExp);
-				while (m.find()) {
-					String field = m.group();
-					if (field.startsWith(ldocPrefix))
-						field = field.substring(ldocPrefix.length());
-
-					log.debug("field: {}", field);
-					fields.add(field);
-				}
-
-				opt.setFields(fields.toArray(new String[0]));
-			}
-
-			// Execute the search
-			log.debug("opt: {}", opt);
-			Search search = Search.get(opt);
-			log.debug("search: {}", search);
-			List<Hit> hits = new ArrayList<>();
-			try {
-				hits = search.search();
-			} catch (SearchException e1) {
-				log.error(e1.getMessage(), e1);
-			}
-			log.debug("hits.size(): {}", hits.size());
-
-			// Populate CMIS data structure
-			try {
-				// Iterate through the list of results
-				for (Hit hit : hits) {
-					try {
-						// filtro i risultati (lasciando solo le colonne
-						// richieste)
-						ObjectData result = compileObjectType(null, hit, filter, false, false, null);
-						list.add(result);
-					} catch (Throwable t) {
-						log.error("CMIS Exception populating data structure", t);
-					}
-				}
-			} catch (Throwable e) {
-				log.error("CMIS Exception populating data structure", e);
-			}
-			hasMoreItems = search.getEstimatedHitsNumber() > max;
-		} else {
-			User user = getSessionUser();
-
+	private FulltextSearchOptions buildFulltextSearchOptions(String statement, Long parentFolderID, int maxItems) {
+		log.debug("Performs Full-text search");
+		String expr = StringUtils.substringBetween(statement, "'%", "%'");
+		if (StringUtils.isEmpty(expr))
+			expr = StringUtils.substringBetween(statement, "('", "')");
+		if (StringUtils.isEmpty(expr))
 			expr = StringUtils.substringBetween(statement, "'", "'");
-			String filename = expr;
-			log.debug("filename: {}", filename);
 
-			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			List<Document> docs = docDao.findByFileNameAndParentFolderId(null, filename, null, getSessionUser().getId(),
-					max);
+		log.debug("expr: {}", expr);
 
-			for (int i = 0; i < docs.size(); i++) {
-				// Check permissions on the documents found
-				try {
-					checkReadEnable(user, docs.get(i).getFolder().getId());
-					checkPublished(user, docs.get(i));
-				} catch (Exception e) {
-					continue;
-				}
-				docDao.initialize(docs.get(i));
+		// Prepare the search options
+		FulltextSearchOptions opt = new FulltextSearchOptions();
+		opt.setMaxHits(maxItems);
 
-				// filtro i risultati (lasciando solo le colonne richieste)
-				ObjectData result = compileObjectType(null, docs.get(i), filter, false, false, null);
+		User user = getSessionUser();
+		opt.setUserId(user.getId());
+		log.debug("user.getLanguage(): {}", user.getLanguage());
+		opt.setExpressionLanguage(user.getLanguage());
 
-				list.add(result);
-			}
+		// Check to search in Tree
+		if (parentFolderID != null) {
+			log.debug("parentFolderID != null");
+			opt.setFolderId(parentFolderID);
+			opt.setSearchInSubPath(true);
 		}
 
-		ObjectListImpl objList = new ObjectListImpl();
-		objList.setObjects(list);
-		objList.setNumItems(BigInteger.valueOf(list.size()));
-		objList.setHasMoreItems(hasMoreItems);
-
-		return objList;
+		opt.setExpression(expr);
+		return opt;
 	}
 
 	// --- helper methods ---
@@ -1681,8 +1690,7 @@ public class LDRepository {
 	 * @return the compiled properties
 	 */
 	private Properties compileProperties(PersistentObject object, Set<String> orgfilter, ObjectInfoImpl objectInfo) {
-		if (object == null)
-			throw new IllegalArgumentException("Object must not be null!");
+		assert object != null : "Object must not be null!";
 
 		// copy filter
 		Set<String> filter = (orgfilter == null ? null : new HashSet<>(orgfilter));
@@ -1744,7 +1752,6 @@ public class LDRepository {
 
 			// name
 			String name = "";
-
 			if (object instanceof Folder)
 				name = ((Folder) object).getName();
 			else
@@ -1753,184 +1760,22 @@ public class LDRepository {
 			addPropertyString(result, typeId, filter, PropertyIds.NAME, name);
 			objectInfo.setName(name);
 
-			// creation and modification date
+			// modification date
 			GregorianCalendar lastModified = millisToCalendar(object.getLastModified().getTime());
-
-			GregorianCalendar creation;
-			if (object instanceof Folder) {
-				Folder f = ((Folder) object);
-				creation = millisToCalendar(f.getCreation().getTime());
-
-				// created and modified by
-				addPropertyString(result, typeId, filter, PropertyIds.CREATED_BY, f.getCreator());
-				addPropertyString(result, typeId, filter, PropertyIds.LAST_MODIFIED_BY, USER_UNKNOWN);
-				objectInfo.setCreatedBy(f.getCreator());
-
-			} else {
-				AbstractDocument d = ((AbstractDocument) object);
-				creation = millisToCalendar(d.getCreation().getTime());
-
-				// created and modified by
-				addPropertyString(result, typeId, filter, PropertyIds.CREATED_BY, d.getCreator());
-				addPropertyString(result, typeId, filter, PropertyIds.LAST_MODIFIED_BY, d.getPublisher());
-				objectInfo.setCreatedBy(d.getPublisher());
-			}
-
-			addPropertyDateTime(result, typeId, filter, PropertyIds.CREATION_DATE, creation);
 			addPropertyDateTime(result, typeId, filter, PropertyIds.LAST_MODIFICATION_DATE, lastModified);
-			objectInfo.setCreationDate(creation);
 			objectInfo.setLastModificationDate(lastModified);
-
 			// change token - always null
 			addPropertyString(result, typeId, filter, PropertyIds.CHANGE_TOKEN, null);
 
 			// directory or file
 			if (object instanceof Folder) {
-				// base type and type name
-				addPropertyId(result, typeId, filter, PropertyIds.BASE_TYPE_ID, BaseTypeId.CMIS_FOLDER.value());
-				if (((Folder) object).getType() == 1) {
-					addPropertyId(result, typeId, filter, PropertyIds.OBJECT_TYPE_ID, TypeManager.WORKSPACE_TYPE_ID);
-				} else {
-					addPropertyId(result, typeId, filter, PropertyIds.OBJECT_TYPE_ID, TypeManager.FOLDER_TYPE_ID);
-				}
-
-				String path = folderDao.computePathExtended(object.getId());
-				addPropertyString(result, typeId, filter, PropertyIds.PATH, (path.length() == 0 ? "/" : path));
-
-				// folder properties
-				if (!root.equals(object)) {
-					addPropertyId(result, typeId, filter, PropertyIds.PARENT_ID,
-							ID_PREFIX_FLD + ((Folder) object).getParentId());
-					objectInfo.setHasParent(true);
-				} else {
-					addPropertyId(result, typeId, filter, PropertyIds.PARENT_ID, null);
-					objectInfo.setHasParent(false);
-				}
-				addPropertyIdList(result, typeId, filter, PropertyIds.ALLOWED_CHILD_OBJECT_TYPE_IDS, null);
-				addPropertyString(result, typeId, filter, TypeManager.PROP_DESCRIPTION,
-						((Folder) object).getDescription());
-
-				// Identifica il tipo della cartella: workspace o normale
-				addPropertyInteger(result, typeId, filter, TypeManager.PROP_TYPE, ((Folder) object).getType());
+				// Object is a Folder
+				Folder folder = ((Folder) object);
+				compileFolderProperties(folder, objectInfo, filter, typeId, result);
 			} else {
-				// Object is a Document
-				AbstractDocument doc = (AbstractDocument) object;
-
-				// base type and type name
-				addPropertyId(result, typeId, filter, PropertyIds.BASE_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
-				addPropertyId(result, typeId, filter, PropertyIds.OBJECT_TYPE_ID, TypeManager.DOCUMENT_TYPE_ID);
-
-				// file properties
-				if (doc instanceof Document) {
-					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_LATEST_VERSION, true);
-					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION,
-							doc.getVersion() != null ? doc.getVersion().endsWith(".0") : true);
-				} else {
-					Version ver = (Version) doc;
-					AbstractDocument d = getDocument(ID_PREFIX_DOC + ver.getDocId());
-
-					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_LATEST_VERSION,
-							d.getVersion().equals(ver.getVersion()));
-					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION,
-							ver.getVersion().endsWith(".0"));
-				}
-				addPropertyString(result, typeId, filter, PropertyIds.VERSION_LABEL, doc.getVersion());
-				addPropertyId(result, typeId, filter, PropertyIds.VERSION_SERIES_ID, getId(doc));
-				if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT) {
-					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, false);
-					addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_BY, null);
-					addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, null);
-				} else {
-					User checkoutUser = null;
-					if (doc.getLockUserId() != null)
-						checkoutUser = userDao.findById(doc.getLockUserId());
-					addPropertyBoolean(result, typeId, filter, PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, true);
-					addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_BY,
-							checkoutUser != null ? checkoutUser.getFullName() : null);
-					addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, getId(doc));
-				}
-				addPropertyString(result, typeId, filter, PropertyIds.CHECKIN_COMMENT, doc.getComment());
-				addPropertyInteger(result, typeId, filter, PropertyIds.CONTENT_STREAM_LENGTH, doc.getFileSize());
-				objectInfo.setHasContent(true);
-
-				if (doc.getFileName() == null) {
-					addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_MIME_TYPE, null);
-					addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_FILE_NAME, null);
-
-					objectInfo.setContentType(null);
-					objectInfo.setFileName(null);
-				} else {
-					addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_MIME_TYPE,
-							MimeTypes.getMIMEType(FileUtil.getExtension(doc.getFileName())));
-					addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_FILE_NAME, doc.getFileName());
-
-					objectInfo.setContentType(FileUtil.getExtension(doc.getFileName()));
-					objectInfo.setFileName(doc.getFileName());
-				}
-
-				addPropertyId(result, typeId, filter, PropertyIds.CONTENT_STREAM_ID, null);
-				addPropertyBoolean(result, typeId, filter, PropertyIds.IS_IMMUTABLE, doc.getImmutable() != 0);
-
-				addPropertyString(result, typeId, filter, TypeManager.PROP_LANGUAGE, doc.getLanguage());
-				addPropertyInteger(result, typeId, filter, TypeManager.PROP_RATING,
-						doc.getRating() != null ? doc.getRating() : 0);
-				addPropertyString(result, typeId, filter, TypeManager.PROP_FILEVERSION, doc.getFileVersion());
-				addPropertyString(result, typeId, filter, TypeManager.PROP_VERSION, doc.getVersion());
-				addPropertyString(result, typeId, filter, TypeManager.PROP_CUSTOMID, doc.getCustomId());
-
-				try {
-					addPropertyString(result, typeId, filter, TypeManager.PROP_TAGS, doc.getTgs());
-				} catch (Exception e) {
-					log.error(e.getMessage(), e);
-				}
-
-				Template template = doc.getTemplate();
-				if (doc instanceof Version && ((Version) doc).getTemplateName() != null)
-					template = templateDao.findByName(((Version) doc).getTemplateName(), doc.getTenantId());
-
-				/*
-				 * Fill the extended attributes but only if we are not dealing
-				 * with a search hit
-				 */
-				if (template != null && !(doc instanceof Hit)) {
-					DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-					addPropertyString(result, typeId, filter, TypeManager.PROP_TEMPLATE, template.getName());
-
-					if (doc instanceof Document)
-						documentDao.initialize((Document) doc);
-					else
-						versionDao.initialize((Version) doc);
-
-					// Now load the extended properties
-					Map<String, Attribute> attributes = doc.getAttributes();
-					for (String attrName : attributes.keySet()) {
-						Attribute attribute = attributes.get(attrName);
-						String stringValue = null;
-						if (attribute.getValue() != null)
-							switch (attribute.getType()) {
-							case Attribute.TYPE_BOOLEAN:
-								stringValue = Long.toString(attribute.getIntValue());
-								break;
-							case Attribute.TYPE_DATE:
-								stringValue = df.format(attribute.getDateValue());
-								break;
-							case Attribute.TYPE_DOUBLE:
-								stringValue = attribute.getDoubleValue() != null ? attribute.getDoubleValue().toString()
-										: null;
-								break;
-							case Attribute.TYPE_INT:
-								stringValue = Long.toString(attribute.getIntValue());
-								break;
-							case Attribute.TYPE_USER:
-								stringValue = Long.toString(attribute.getIntValue());
-								break;
-							default:
-								stringValue = attribute.getValue().toString();
-							}
-						addPropertyString(result, typeId, filter, TypeManager.PROP_EXT + attrName, stringValue);
-					}
-				} else
-					addPropertyString(result, typeId, filter, TypeManager.PROP_TEMPLATE, null);
+				// Object is a Document or Version
+				AbstractDocument document = (AbstractDocument) object;
+				compileDocumentOrVersionProperties(document, objectInfo, filter, typeId, result);
 			}
 
 			if (filter != null) {
@@ -1946,6 +1791,185 @@ public class LDRepository {
 			}
 			throw new CmisRuntimeException(e.getMessage(), e);
 		}
+	}
+
+	private void compileDocumentOrVersionProperties(AbstractDocument doc, ObjectInfoImpl objectInfo, Set<String> filter,
+			String typeId, PropertiesImpl result) throws PersistenceException {
+		GregorianCalendar creation = millisToCalendar(doc.getCreation().getTime());
+
+		// created and modified by
+		addPropertyString(result, typeId, filter, PropertyIds.CREATED_BY, doc.getCreator());
+		addPropertyString(result, typeId, filter, PropertyIds.LAST_MODIFIED_BY, doc.getPublisher());
+		objectInfo.setCreatedBy(doc.getPublisher());
+
+		addPropertyDateTime(result, typeId, filter, PropertyIds.CREATION_DATE, creation);
+		objectInfo.setCreationDate(creation);
+
+		// base type and type name
+		addPropertyId(result, typeId, filter, PropertyIds.BASE_TYPE_ID, BaseTypeId.CMIS_DOCUMENT.value());
+		addPropertyId(result, typeId, filter, PropertyIds.OBJECT_TYPE_ID, TypeManager.DOCUMENT_TYPE_ID);
+
+		// file properties
+		if (doc instanceof Document) {
+			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_LATEST_VERSION, true);
+			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION,
+					doc.getVersion() != null ? doc.getVersion().endsWith(".0") : true);
+		} else {
+			Version ver = (Version) doc;
+			AbstractDocument d = getDocument(ID_PREFIX_DOC + ver.getDocId());
+
+			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_LATEST_VERSION,
+					d.getVersion().equals(ver.getVersion()));
+			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_MAJOR_VERSION, ver.getVersion().endsWith(".0"));
+		}
+		addPropertyString(result, typeId, filter, PropertyIds.VERSION_LABEL, doc.getVersion());
+		addPropertyId(result, typeId, filter, PropertyIds.VERSION_SERIES_ID, getId(doc));
+		if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT) {
+			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, false);
+			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_BY, null);
+			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, null);
+		} else {
+			User checkoutUser = null;
+			if (doc.getLockUserId() != null)
+				checkoutUser = userDao.findById(doc.getLockUserId());
+			addPropertyBoolean(result, typeId, filter, PropertyIds.IS_VERSION_SERIES_CHECKED_OUT, true);
+			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_BY,
+					checkoutUser != null ? checkoutUser.getFullName() : null);
+			addPropertyString(result, typeId, filter, PropertyIds.VERSION_SERIES_CHECKED_OUT_ID, getId(doc));
+		}
+		addPropertyString(result, typeId, filter, PropertyIds.CHECKIN_COMMENT, doc.getComment());
+		addPropertyInteger(result, typeId, filter, PropertyIds.CONTENT_STREAM_LENGTH, doc.getFileSize());
+		objectInfo.setHasContent(true);
+
+		if (doc.getFileName() == null) {
+			addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_MIME_TYPE, null);
+			addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_FILE_NAME, null);
+
+			objectInfo.setContentType(null);
+			objectInfo.setFileName(null);
+		} else {
+			addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_MIME_TYPE,
+					MimeTypes.getMIMEType(FileUtil.getExtension(doc.getFileName())));
+			addPropertyString(result, typeId, filter, PropertyIds.CONTENT_STREAM_FILE_NAME, doc.getFileName());
+
+			objectInfo.setContentType(FileUtil.getExtension(doc.getFileName()));
+			objectInfo.setFileName(doc.getFileName());
+		}
+
+		addPropertyId(result, typeId, filter, PropertyIds.CONTENT_STREAM_ID, null);
+		addPropertyBoolean(result, typeId, filter, PropertyIds.IS_IMMUTABLE, doc.getImmutable() != 0);
+
+		addPropertyString(result, typeId, filter, TypeManager.PROP_LANGUAGE, doc.getLanguage());
+		addPropertyInteger(result, typeId, filter, TypeManager.PROP_RATING,
+				doc.getRating() != null ? doc.getRating() : 0);
+		addPropertyString(result, typeId, filter, TypeManager.PROP_FILEVERSION, doc.getFileVersion());
+		addPropertyString(result, typeId, filter, TypeManager.PROP_VERSION, doc.getVersion());
+		addPropertyString(result, typeId, filter, TypeManager.PROP_CUSTOMID, doc.getCustomId());
+
+		try {
+			addPropertyString(result, typeId, filter, TypeManager.PROP_TAGS, doc.getTgs());
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+
+		compileDocumentOrVersionExtAttrsProperties(doc, typeId, result, filter);
+	}
+
+	private void compileDocumentOrVersionExtAttrsProperties(AbstractDocument doc, String typeId, PropertiesImpl result,
+			Set<String> filter) {
+
+		Template template = getTemplate(doc);
+
+		if (template == null || !(doc instanceof Hit)) {
+			addPropertyString(result, typeId, filter, TypeManager.PROP_TEMPLATE, null);
+			return;
+		}
+
+		/*
+		 * Fill the extended attributes but only if we are not dealing with a
+		 * search hit
+		 */
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		addPropertyString(result, typeId, filter, TypeManager.PROP_TEMPLATE, template.getName());
+
+		if (doc instanceof Document)
+			documentDao.initialize((Document) doc);
+		else
+			versionDao.initialize((Version) doc);
+
+		// Now load the extended properties
+		Map<String, Attribute> attributes = doc.getAttributes();
+		for (String attrName : attributes.keySet()) {
+			Attribute attribute = attributes.get(attrName);
+			String stringValue = null;
+			if (attribute.getValue() != null)
+				switch (attribute.getType()) {
+				case Attribute.TYPE_BOOLEAN:
+					stringValue = Long.toString(attribute.getIntValue());
+					break;
+				case Attribute.TYPE_DATE:
+					stringValue = df.format(attribute.getDateValue());
+					break;
+				case Attribute.TYPE_DOUBLE:
+					stringValue = attribute.getDoubleValue() != null ? attribute.getDoubleValue().toString() : null;
+					break;
+				case Attribute.TYPE_INT:
+					stringValue = Long.toString(attribute.getIntValue());
+					break;
+				case Attribute.TYPE_USER:
+					stringValue = Long.toString(attribute.getIntValue());
+					break;
+				default:
+					stringValue = attribute.getValue().toString();
+				}
+			addPropertyString(result, typeId, filter, TypeManager.PROP_EXT + attrName, stringValue);
+		}
+	}
+
+	private Template getTemplate(AbstractDocument doc) {
+		Template template = doc.getTemplate();
+		if (doc instanceof Version && ((Version) doc).getTemplateName() != null)
+			template = templateDao.findByName(((Version) doc).getTemplateName(), doc.getTenantId());
+		return template;
+	}
+
+	private void compileFolderProperties(Folder folder, ObjectInfoImpl objectInfo, Set<String> filter, String typeId,
+			PropertiesImpl result) throws PersistenceException {
+		GregorianCalendar creation = millisToCalendar(folder.getCreation().getTime());
+
+		// created and modified by
+		addPropertyString(result, typeId, filter, PropertyIds.CREATED_BY, folder.getCreator());
+		addPropertyString(result, typeId, filter, PropertyIds.LAST_MODIFIED_BY, USER_UNKNOWN);
+		objectInfo.setCreatedBy(folder.getCreator());
+
+		addPropertyDateTime(result, typeId, filter, PropertyIds.CREATION_DATE, creation);
+		objectInfo.setCreationDate(creation);
+
+		// base type and type name
+		addPropertyId(result, typeId, filter, PropertyIds.BASE_TYPE_ID, BaseTypeId.CMIS_FOLDER.value());
+		if (folder.getType() == 1) {
+			addPropertyId(result, typeId, filter, PropertyIds.OBJECT_TYPE_ID, TypeManager.WORKSPACE_TYPE_ID);
+		} else {
+			addPropertyId(result, typeId, filter, PropertyIds.OBJECT_TYPE_ID, TypeManager.FOLDER_TYPE_ID);
+		}
+
+		String path = folderDao.computePathExtended(folder.getId());
+		addPropertyString(result, typeId, filter, PropertyIds.PATH, (path.length() == 0 ? "/" : path));
+
+		// folder properties
+		if (!root.equals(folder)) {
+			addPropertyId(result, typeId, filter, PropertyIds.PARENT_ID,
+					ID_PREFIX_FLD + ((Folder) folder).getParentId());
+			objectInfo.setHasParent(true);
+		} else {
+			addPropertyId(result, typeId, filter, PropertyIds.PARENT_ID, null);
+			objectInfo.setHasParent(false);
+		}
+		addPropertyIdList(result, typeId, filter, PropertyIds.ALLOWED_CHILD_OBJECT_TYPE_IDS, null);
+		addPropertyString(result, typeId, filter, TypeManager.PROP_DESCRIPTION, ((Folder) folder).getDescription());
+
+		// Identifica il tipo della cartella: workspace o normale
+		addPropertyInteger(result, typeId, filter, TypeManager.PROP_TYPE, ((Folder) folder).getType());
 	}
 
 	public List<ObjectData> getAllVersions(String objectId) {
@@ -1980,139 +2004,174 @@ public class LDRepository {
 	private void updateDocumentMetadata(AbstractDocument doc, Properties properties, boolean create) {
 		log.debug("updateDocumentMetadata doc: {}", doc);
 		log.debug("updateDocumentMetadata properties: {}", properties);
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
 		// get the property definitions
 		TypeDefinition type = types.getType(TypeManager.DOCUMENT_TYPE_ID);
 
 		// update properties
 		for (PropertyData<?> p : properties.getProperties().values()) {
-			PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
+			updateDocumentMetadata(doc, properties, p, create, type);
+		}
+	}
 
-			// do we know that property?
-			if (propType == null)
-				throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), IS_UNKNOWN));
+	private void updateDocumentMetadata(AbstractDocument doc, Properties properties, PropertyData<?> p, boolean create,
+			TypeDefinition type) {
+		PropertyDefinition<?> propType = type.getPropertyDefinitions().get(p.getId());
 
-			// can it be set?
-			if ((propType.getUpdatability() == Updatability.READONLY))
-				throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), "is readonly!"));
+		// do we know that property?
+		if (propType == null)
+			throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), IS_UNKNOWN));
 
-			if (propType.getUpdatability() == Updatability.ONCREATE && !create)
-				throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), "can only be set on create!"));
+		// can it be set?
+		if ((propType.getUpdatability() == Updatability.READONLY))
+			throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), "is readonly!"));
 
-			if ((p.getId().equals(PropertyIds.CONTENT_STREAM_FILE_NAME) || p.getId().equals(PropertyIds.NAME))
-					&& StringUtils.isNotEmpty((String) p.getFirstValue())) {
-				doc.setFileName((String) p.getFirstValue());
-			} else if (p.getId().equals(TypeManager.PROP_CUSTOMID))
-				doc.setCustomId((String) p.getFirstValue());
-			else if (p.getId().equals(TypeManager.PROP_LANGUAGE)) {
-				LanguageManager langMan = LanguageManager.getInstance();
-				Language lang = langMan.getLanguage(LocaleUtil.toLocale((String) p.getFirstValue()));
-				if (lang != null)
-					doc.setCustomId((String) p.getFirstValue());
-			} else if (p.getId().equals(TypeManager.PROP_TAGS)) {
-				doc.getTags().clear();
-				doc.setTgs((String) p.getFirstValue());
-				if (doc.getTgs() != null) {
-					StringTokenizer st = new StringTokenizer(doc.getTgs(), ",", false);
-					while (st.hasMoreTokens()) {
-						String tg = st.nextToken();
-						if (StringUtils.isNotEmpty(tg))
-							doc.addTag(tg);
-					}
-				}
-			} else if (p.getId().equals(TypeManager.PROP_TEMPLATE)) {
-				if (p.getFirstValue() == null) {
-					doc.setTemplate(null);
-					if (doc instanceof Document)
-						((Document) doc).setTemplate(null);
-					else
-						((Version) doc).setTemplateName(null);
-				} else {
-					Template template = templateDao.findByName((String) p.getFirstValue(), doc.getTenantId());
-					if (template == null) {
-						doc.setTemplate(null);
-						if (doc instanceof Document)
-							((Document) doc).setTemplate(null);
-						else
-							((Version) doc).setTemplateName(null);
-					} else {
-						doc.setTemplate(template);
-						if (doc instanceof Document)
-							((Document) doc).setTemplateId(template.getId());
-						else
-							((Version) doc).setTemplateName(template.getName());
-					}
-				}
-			} else if (p.getId().startsWith(TypeManager.PROP_EXT)) {
-				/*
-				 * This is an extended attribute, so try to load the document
-				 * template first
-				 */
-				Template template = null;
-				PropertyData<?> tp = properties.getProperties().get(TypeManager.PROP_TEMPLATE);
-				if (tp != null)
-					template = templateDao.findByName((String) tp.getFirstValue(), doc.getTenantId());
+		if (propType.getUpdatability() == Updatability.ONCREATE && !create)
+			throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), "can only be set on create!"));
 
-				if (template != null) {
-					templateDao.initialize(template);
+		if ((p.getId().equals(PropertyIds.CONTENT_STREAM_FILE_NAME) || p.getId().equals(PropertyIds.NAME))) {
+			updateDocumentFileName(doc, p);
+		} else if (p.getId().equals(TypeManager.PROP_CUSTOMID)) {
+			doc.setCustomId((String) p.getFirstValue());
+		} else if (p.getId().equals(TypeManager.PROP_LANGUAGE)) {
+			updateDocumentLocale(doc, p);
+		} else if (p.getId().equals(TypeManager.PROP_TAGS)) {
+			updateDocumentTags(doc, p);
+		} else if (p.getId().equals(TypeManager.PROP_TEMPLATE)) {
+			updateDocumentTemplate(doc, p);
+		} else if (p.getId().startsWith(TypeManager.PROP_EXT)) {
+			/*
+			 * This is an extended attribute
+			 */
+			updateDocumentExtendedAttribute(doc, properties, p);
+		}
+	}
 
-					String attributeName = p.getId().substring(TypeManager.PROP_EXT.length());
-					String stringValue = (String) p.getFirstValue();
+	private void updateDocumentFileName(AbstractDocument doc, PropertyData<?> p) {
+		if (StringUtils.isNotEmpty((String) p.getFirstValue()))
+			doc.setFileName((String) p.getFirstValue());
+	}
 
-					Attribute attribute = template.getAttribute(attributeName);
+	private void updateDocumentLocale(AbstractDocument doc, PropertyData<?> p) {
+		LanguageManager langMan = LanguageManager.getInstance();
+		Language lang = langMan.getLanguage(LocaleUtil.toLocale((String) p.getFirstValue()));
+		if (lang != null)
+			doc.setLocale(LocaleUtil.toLocale((String) p.getFirstValue()));
+	}
 
-					switch (attribute.getType()) {
-					case Attribute.TYPE_BOOLEAN:
-						if (StringUtils.isNotEmpty(stringValue))
-							doc.setValue(attributeName,
-									Boolean.valueOf(("1".equals(stringValue) || "true".equals(stringValue))));
-						else
-							doc.setValue(attributeName, (Boolean) null);
-						break;
-					case Attribute.TYPE_DATE:
-						if (StringUtils.isNotEmpty(stringValue))
-							try {
-								doc.setValue(attributeName, df.parse(stringValue));
-							} catch (ParseException e) {
-								log.error("Invalid date " + stringValue);
-								doc.setValue(attributeName, (Date) null);
-							}
-						else
-							doc.setValue(attributeName, (Date) null);
-						break;
-					case Attribute.TYPE_DOUBLE:
-						if (StringUtils.isNotEmpty(stringValue))
-							doc.setValue(attributeName, Double.parseDouble(stringValue));
-						else
-							doc.setValue(attributeName, (Double) null);
-						break;
-					case Attribute.TYPE_INT:
-						if (StringUtils.isNotEmpty(stringValue))
-							doc.setValue(attributeName, Long.parseLong(stringValue));
-						else
-							doc.setValue(attributeName, (Long) null);
-						break;
-					case Attribute.TYPE_USER:
-						if (StringUtils.isNotEmpty(stringValue)) {
-							try {
-								doc.setValue(attributeName, userDao.findById(Long.parseLong(stringValue)));
-							} catch (Throwable e) {
-								log.warn(e.getMessage(), e);
-							}
-						} else
-							doc.setValue(attributeName, (User) null);
-						break;
-					case Attribute.TYPE_STRING:
-						doc.setValue(attributeName, stringValue);
-						break;
-					default:
-						// nothing to do here
-						break;
-					}
-				}
+	private void updateDocumentTags(AbstractDocument doc, PropertyData<?> p) {
+		doc.getTags().clear();
+		doc.setTgs((String) p.getFirstValue());
+		if (doc.getTgs() != null) {
+			StringTokenizer st = new StringTokenizer(doc.getTgs(), ",", false);
+			while (st.hasMoreTokens()) {
+				String tg = st.nextToken();
+				if (StringUtils.isNotEmpty(tg))
+					doc.addTag(tg);
 			}
 		}
+	}
+
+	private void updateDocumentTemplate(AbstractDocument doc, PropertyData<?> p) {
+		if (p.getFirstValue() == null) {
+			doc.setTemplate(null);
+			if (doc instanceof Document)
+				((Document) doc).setTemplate(null);
+			else
+				((Version) doc).setTemplateName(null);
+		} else {
+			Template template = templateDao.findByName((String) p.getFirstValue(), doc.getTenantId());
+			doc.setTemplate(template);
+			doc.setTemplateName(template != null ? template.getName() : null);
+			doc.setTemplateId(template != null ? template.getId() : null);
+		}
+	}
+
+	private void updateDocumentExtendedAttribute(AbstractDocument doc, Properties properties, PropertyData<?> p) {
+		// try to load the document template first
+		Template template = null;
+		PropertyData<?> tp = properties.getProperties().get(TypeManager.PROP_TEMPLATE);
+		if (tp != null)
+			template = templateDao.findByName((String) tp.getFirstValue(), doc.getTenantId());
+
+		if (template == null)
+			return;
+
+		templateDao.initialize(template);
+
+		String attributeName = p.getId().substring(TypeManager.PROP_EXT.length());
+		String stringValue = (String) p.getFirstValue();
+
+		Attribute attribute = template.getAttribute(attributeName);
+
+		switch (attribute.getType()) {
+		case Attribute.TYPE_BOOLEAN:
+			updateDocumentBooleanValue(doc, attributeName, stringValue);
+			break;
+		case Attribute.TYPE_DATE:
+			updateDocumentDateValue(doc, attributeName, stringValue);
+			break;
+		case Attribute.TYPE_DOUBLE:
+			updateDocumentDoubleValue(doc, attributeName, stringValue);
+			break;
+		case Attribute.TYPE_INT:
+			updateDocumentIntValue(doc, attributeName, stringValue);
+			break;
+		case Attribute.TYPE_USER:
+			updateDocumentUserValue(doc, attributeName, stringValue);
+			break;
+		case Attribute.TYPE_STRING:
+			doc.setValue(attributeName, stringValue);
+			break;
+		default:
+			// nothing to do here
+			break;
+		}
+	}
+
+	private void updateDocumentUserValue(AbstractDocument doc, String attributeName, String stringValue) {
+		if (StringUtils.isNotEmpty(stringValue)) {
+			try {
+				doc.setValue(attributeName, userDao.findById(Long.parseLong(stringValue)));
+			} catch (Throwable e) {
+				log.warn(e.getMessage(), e);
+			}
+		} else
+			doc.setValue(attributeName, (User) null);
+	}
+
+	private void updateDocumentIntValue(AbstractDocument doc, String attributeName, String stringValue) {
+		if (StringUtils.isNotEmpty(stringValue))
+			doc.setValue(attributeName, Long.parseLong(stringValue));
+		else
+			doc.setValue(attributeName, (Long) null);
+	}
+
+	private void updateDocumentDoubleValue(AbstractDocument doc, String attributeName, String stringValue) {
+		if (StringUtils.isNotEmpty(stringValue))
+			doc.setValue(attributeName, Double.parseDouble(stringValue));
+		else
+			doc.setValue(attributeName, (Double) null);
+	}
+
+	private void updateDocumentDateValue(AbstractDocument doc, String attributeName, String stringValue) {
+		if (StringUtils.isNotEmpty(stringValue))
+			try {
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+				doc.setValue(attributeName, df.parse(stringValue));
+			} catch (ParseException e) {
+				log.error("Invalid date {}", stringValue);
+				doc.setValue(attributeName, (Date) null);
+			}
+		else
+			doc.setValue(attributeName, (Date) null);
+	}
+
+	private void updateDocumentBooleanValue(AbstractDocument doc, String attributeName, String stringValue) {
+		if (StringUtils.isNotEmpty(stringValue))
+			doc.setValue(attributeName, Boolean.valueOf(("1".equals(stringValue) || "true".equals(stringValue))));
+		else
+			doc.setValue(attributeName, (Boolean) null);
 	}
 
 	/**

@@ -57,6 +57,10 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class DashletContent extends HttpServlet {
 
+	private static final String LIST_TAG_CLOSED = "</list>";
+
+	private static final String LIST_TAG = "<list>";
+
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(DashletContent.class);
@@ -124,7 +128,7 @@ public class DashletContent extends HttpServlet {
 			if (StringUtils.isNotEmpty(content))
 				writer.write(content.trim());
 		} else {
-			writer.write("<list>");
+			writer.write(LIST_TAG);
 
 			List<DocumentHistory> records = new ArrayList<DocumentHistory>();
 			DocumentHistoryDAO hdao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
@@ -154,7 +158,7 @@ public class DashletContent extends HttpServlet {
 			for (DocumentHistory history : uniqueRecords) {
 				printDocumentEvent(showSid, locale, dashlet, uniqueRecords, docsMap, history, writer);
 			}
-			writer.write("</list>");
+			writer.write(LIST_TAG_CLOSED);
 		}
 	}
 
@@ -166,7 +170,7 @@ public class DashletContent extends HttpServlet {
 		DateFormat df = getDateFormat();
 
 		writer.write("<document>");
-		writer.write("<id>" + history.getId() + "</id>");
+		printField("id", history.getId(), writer);
 		writer.write("<user><![CDATA[" + history.getUsername() + "]]></user>");
 		writer.write("<event><![CDATA[" + I18N.message(history.getEvent(), locale) + "]]></event>");
 		writer.write("<version>" + history.getVersion() + "</version>");
@@ -385,7 +389,7 @@ public class DashletContent extends HttpServlet {
 				dao.query(qry.toString(), null, new EntendedAttributesRowMapper(locale, extValues), null);
 			}
 
-			writer.write("<list>");
+			writer.write(LIST_TAG);
 
 			/*
 			 * Iterate over records composing the response XML document
@@ -394,7 +398,7 @@ public class DashletContent extends HttpServlet {
 				printDocument(doc, attrs, extValues, writer);
 			}
 
-			writer.write("</list>");
+			writer.write(LIST_TAG_CLOSED);
 		}
 	}
 
@@ -403,7 +407,7 @@ public class DashletContent extends HttpServlet {
 		DateFormat df = getDateFormat();
 
 		writer.write("<document>");
-		writer.write("<id>" + doc.getId() + "</id>");
+		printField("id", doc.getId(), writer);
 		printField("customId", doc.getCustomId(), writer);
 		printField("docref", doc.getDocRef(), writer);
 		printField("docrefType", doc.getDocRefType(), writer);
@@ -510,7 +514,7 @@ public class DashletContent extends HttpServlet {
 			if (StringUtils.isNotEmpty(content))
 				writer.write(content.trim());
 		} else {
-			writer.write("<list>");
+			writer.write(LIST_TAG);
 
 			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 			String query = automation.evaluate(dashlet.getQuery(), dashletDictionary);
@@ -527,7 +531,7 @@ public class DashletContent extends HttpServlet {
 			DateFormat df = getDateFormat();
 			for (DocumentNote record : records) {
 				writer.write("<post>");
-				writer.write("<id>" + record.getId() + "</id>");
+				printField("id", record.getId(), writer);
 				writer.write("<title><![CDATA[" + StringUtils.abbreviate(record.getMessage(), 100) + "]]></title>");
 				writer.write("<page>" + record.getPage() + "</page>");
 				writer.write("<user><![CDATA[" + record.getUsername() + "]]></user>");
@@ -540,7 +544,7 @@ public class DashletContent extends HttpServlet {
 				writer.write("</post>");
 			}
 
-			writer.write("</list>");
+			writer.write(LIST_TAG_CLOSED);
 		}
 	}
 
