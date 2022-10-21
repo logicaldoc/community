@@ -374,7 +374,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 										log.info("Notify the creation of new documents {} to {}", docs.toString(),
 												mail.getRecipients().toString());
-										EMailSender sender = new EMailSender(session.getTenantName());
+										EMailSender sender = getEmailSender(session);
 										sender.send(mail);
 
 										/*
@@ -496,7 +496,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 									log.info("Notify the checkin of document {} to {}", doc,
 											mail.getRecipients().toString());
-									EMailSender sender = new EMailSender(session.getTenantName());
+									EMailSender sender = getEmailSender(session);
 									sender.send(mail);
 
 									/*
@@ -1650,11 +1650,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	private static EMailSender getEmailSender(Session session) {
-		if (emailSender != null) 
+		if (emailSender != null) {
 			emailSender.setTenant(session.getTenantId());
-		else
-			setEmailSender(new EMailSender(session.getTenantName()));
-		return emailSender;
+			return emailSender;
+		} else
+			return new EMailSender(session.getTenantName());
 	}
 
 	private File createTile(Document doc, String sid) throws IOException {
@@ -3022,7 +3022,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		mail.setSubject(sys.getSubject());
 		mail.setMessageText(message);
 
-		EMailSender sender = new EMailSender(session.getTenantName());
+		EMailSender sender = getEmailSender(session);
 		sender.send(mail);
 	}
 
