@@ -352,9 +352,11 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 	}
 
 	@Test
-	public void testValidate() {
+	public void testValidate() throws PersistenceException, ServerException {
 
-		// validate a simple document (no template assigned)
+		/*
+		 * validate a simple document (no template assigned)
+		 */
 		try {
 			GUIDocument gdoc = service.getById(1);
 			service.validate(gdoc);
@@ -362,82 +364,76 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			fail("Unexpected exception was thrown");
 		}
 
-		// validate a document with template assigned
-		try {
-			// Update the document add a template
-			Document doc = docDao.findDocument(6);
-			docDao.initialize(doc);
+		// Update the document add a template
+		Document doc = docDao.findDocument(6);
+		docDao.initialize(doc);
 
-			Template template = templateDao.findById(5L);
-			templateDao.initialize(template);
-			// Set the validator for attribute "attr1" to be email format
-			template.getAttribute("attr1").setValidation(
-					"#if(!$value.matches('^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$')) $error.setDescription($I18N.get('invalidformat')); #end");
-			templateDao.store(template);
+		Template template = templateDao.findById(5L);
+		templateDao.initialize(template);
+		// Set the validator for attribute "attr1" to be email format
+		template.getAttribute("attr1").setValidation(
+				"#if(!$value.matches('^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$')) $error.setDescription($I18N.get('invalidformat')); #end");
+		templateDao.store(template);
 
-			doc.setTemplate(template);
-			docDao.store(doc);
+		doc.setTemplate(template);
+		docDao.store(doc);
 
-			GUIDocument gdoc = service.getById(6);
+		GUIDocument gdoc = service.getById(6);
 
-			// The value of attribute "attr1" is val1 so this should produce an
-			// error
+		/*
+		 * validate a document with template assigned
+		 */
 
-			if (gdoc.getAttributes() != null && gdoc.getAttributes().length > 0) {
-				for (GUIAttribute gatt : gdoc.getAttributes()) {
-					log.info("gatt.getName(): {}", gatt.getName());
-					log.info("gatt.isMandatory(): {}", gatt.isMandatory());
-					log.info("gatt.getValue(): {}", gatt.getValue());
-					log.info("gatt.getValidation(): {}", gatt.getValidation());
-				}
-			} else {
-				log.info("attributs NULL or empoty");
+		// The value of attribute "attr1" is val1 so this should produce an
+		// error
+		if (gdoc.getAttributes() != null && gdoc.getAttributes().length > 0) {
+			for (GUIAttribute gatt : gdoc.getAttributes()) {
+				log.info("gatt.getName(): {}", gatt.getName());
+				log.info("gatt.isMandatory(): {}", gatt.isMandatory());
+				log.info("gatt.getValue(): {}", gatt.getValue());
+				log.info("gatt.getValidation(): {}", gatt.getValidation());
 			}
+		} else {
+			log.info("attributs NULL or empoty");
+		}
 
+		try {
 			service.validate(gdoc);
 			fail("Expected exception was not thrown");
 		} catch (ServerException e) {
 			String lcal = I18N.message("invalidformat");
 			assertTrue(e.getMessage().contains("attr1"));
 			assertTrue(e.getMessage().contains(lcal));
-		} catch (PersistenceException e) {
-
-			fail("Unexpected exception was thrown");
 		}
 
-		// validate a document with template assigned
-		try {
-			// Update the document add a template
-			Document doc = docDao.findDocument(6);
-			docDao.initialize(doc);
+		/*
+		 * validate a document with template assigned
+		 */
 
-			Template template = templateDao.findById(5L);
-			templateDao.initialize(template);
-			// Set the validator for attribute "attr1" to be email format
-			template.getAttribute("attr1").setValidation(
-					"#if(!$value.matches('^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$')) $error.setDescription($I18N.get('invalidformat')); #end");
-			templateDao.store(template);
+		// Update the document add a template
+		doc = docDao.findDocument(6);
+		docDao.initialize(doc);
 
-			doc.setTemplate(template);
+		template = templateDao.findById(5L);
+		templateDao.initialize(template);
+		// Set the validator for attribute "attr1" to be email format
+		template.getAttribute("attr1").setValidation(
+				"#if(!$value.matches('^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$')) $error.setDescription($I18N.get('invalidformat')); #end");
+		templateDao.store(template);
 
-			// update the attribute and set the value as an email format
-			Attribute xxx = new Attribute();
-			xxx.setValue("test.xx@acme.de");
-			doc.setAttribute("attr1", xxx);
-			docDao.store(doc);
+		doc.setTemplate(template);
 
-			GUIDocument gdoc = service.getById(6);
+		// update the attribute and set the value as an email format
+		Attribute xxx = new Attribute();
+		xxx.setValue("test.xx@acme.de");
+		doc.setAttribute("attr1", xxx);
+		docDao.store(doc);
 
-			// The value of attribute "attr1" is "test.xx@acme.de" this will
-			// validate correctly
-			service.validate(gdoc);
-		} catch (ServerException e) {
-			fail("Unexpected exception was thrown");
-		} catch (PersistenceException e) {
+		gdoc = service.getById(6);
 
-			fail("Unexpected exception was thrown");
-		}
-
+		// The value of attribute "attr1" is "test.xx@acme.de" this will
+		// validate correctly
+		service.validate(gdoc);
 	}
 
 	@Test
