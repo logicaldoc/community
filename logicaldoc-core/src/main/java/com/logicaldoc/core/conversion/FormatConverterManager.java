@@ -517,8 +517,7 @@ public class FormatConverterManager {
 
 		for (Extension ext : exts) {
 			String className = ext.getParameter("class").valueAsString();
-			String in = ext.getParameter("in").valueAsString().toLowerCase();
-			String out = ext.getParameter("out").valueAsString().toLowerCase();
+			
 
 			// Try to instantiate the builder
 			Object converter;
@@ -538,22 +537,28 @@ public class FormatConverterManager {
 			for (String name : cnvrt.getParameterNames())
 				cnvrt.getParameters().put(name, null);
 
+			String in = ext.getParameter("in").valueAsString().toLowerCase();
+			String out = ext.getParameter("out").valueAsString().toLowerCase();
 			String[] ins = in.split(",");
 			String[] outs = out.split(",");
-			for (String i : ins)
-				for (String o : outs) {
-					String key = composeKey(i, o);
-					if (!converters.containsKey(key))
-						converters.put(key, new ArrayList<FormatConverter>());
-					if (!converters.get(composeKey(i, o)).contains(cnvrt))
-						converters.get(composeKey(i, o)).add(cnvrt);
-				}
+			updateConvertersMap(cnvrt, ins, outs);
 			log.info("Registered format converter {} for extensions {}", className, in);
 
 			// Save the converter in the list of available converters
 			if (!availableConverters.containsKey(cnvrt.getClass().getSimpleName()))
 				availableConverters.put(cnvrt.getClass().getSimpleName(), cnvrt);
 		}
+	}
+
+	private void updateConvertersMap(FormatConverter cnvrt, String[] ins, String[] outs) {
+		for (String i : ins)
+			for (String o : outs) {
+				String key = composeKey(i, o);
+				if (!converters.containsKey(key))
+					converters.put(key, new ArrayList<FormatConverter>());
+				if (!converters.get(composeKey(i, o)).contains(cnvrt))
+					converters.get(composeKey(i, o)).add(cnvrt);
+			}
 	}
 
 	public Map<String, List<FormatConverter>> getConverters() {

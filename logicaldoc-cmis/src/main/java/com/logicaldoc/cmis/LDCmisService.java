@@ -241,8 +241,11 @@ public class LDCmisService extends AbstractCmisService {
 			Boolean includeAllowableActions, IncludeRelationships includeRelationships, String renditionFilter,
 			Boolean includePathSegment, BigInteger maxItems, BigInteger skipCount, ExtensionsData extension) {
 		validateSession();
-		return getRepository().getChildren(getCallContext(), folderId, filter, includeAllowableActions,
-				includePathSegment, maxItems, skipCount, this);
+		return getRepository().getChildren(getCallContext(), folderId, filter,
+				includeAllowableActions == null ? false : includeAllowableActions.booleanValue(),
+				includePathSegment == null ? false : includePathSegment.booleanValue(),
+				maxItems == null || maxItems.intValue() < 0 ? Integer.MAX_VALUE : maxItems.intValue(),
+				skipCount == null || skipCount.intValue() < 0 ? 0 : skipCount.intValue(), this);
 	}
 
 	@Override
