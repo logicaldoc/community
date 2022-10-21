@@ -353,16 +353,11 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testValidate() throws PersistenceException, ServerException {
-
 		/*
 		 * validate a simple document (no template assigned)
 		 */
-		try {
-			GUIDocument gdoc = service.getById(1);
-			service.validate(gdoc);
-		} catch (ServerException e) {
-			fail("Unexpected exception was thrown");
-		}
+		GUIDocument gdoc = service.getById(1);
+		service.validate(gdoc);
 
 		// Update the document add a template
 		Document doc = docDao.findDocument(6);
@@ -378,7 +373,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setTemplate(template);
 		docDao.store(doc);
 
-		GUIDocument gdoc = service.getById(6);
+		gdoc = service.getById(6);
 
 		/*
 		 * validate a document with template assigned
