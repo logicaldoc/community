@@ -40,7 +40,7 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.username, A.event, A.date, A.comment, A.filename, A.path, A.sessionId, A.id, A.reason, A.ip, A.device, A.geolocation, A.userId, A.color from FolderHistory A where A.deleted = 0 ");
 		if (request.getParameter("id") != null)
 			query.append(" and A.folderId=" + request.getParameter("id"));

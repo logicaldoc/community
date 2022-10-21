@@ -31,6 +31,7 @@ import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.sequence.SequenceDAO;
@@ -880,12 +881,12 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				}
 
 				// The document must be not immutable
-				if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf("admin")) {
+				if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
 					continue;
 				}
 
 				// The document must be not locked
-				if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED || doc.getExportStatus() != Document.EXPORT_UNLOCKED) {
+				if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED || doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
 					continue;
 				}
 

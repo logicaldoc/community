@@ -35,7 +35,7 @@ public class JavaLauncher {
 		// get a jvm to execute with
 		String jvm = findJVM();
 
-		StringBuffer strClasspath = new StringBuffer("." + File.pathSeparator + classpath);
+		StringBuilder strClasspath = new StringBuilder("." + File.pathSeparator + classpath);
 
 		// combine all the arguments into 1 array.
 		String[] allArguments = new String[properties.length + jvmargs.length];
@@ -56,7 +56,7 @@ public class JavaLauncher {
 		command[allArguments.length + 4] = mainClass;
 
 		// combine to printable string for debugging
-		StringBuffer wholeCommand = new StringBuffer();
+		StringBuilder wholeCommand = new StringBuilder();
 		for (int i = 0; i < command.length; i++) {
 			wholeCommand.append(command[i] + " ");
 		}
@@ -101,7 +101,7 @@ public class JavaLauncher {
 		command[jvmargs.length + 2] = new File(pathToJar).getAbsolutePath();
 
 		// combine to printable string for debugging
-		StringBuffer wholeCommand = new StringBuffer();
+		StringBuilder wholeCommand = new StringBuilder();
 		for (int i = 0; i < command.length; i++) {
 			wholeCommand.append(command[i] + " ");
 		}

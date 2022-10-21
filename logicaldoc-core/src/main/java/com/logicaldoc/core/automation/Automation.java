@@ -126,25 +126,21 @@ public class Automation {
 		scanner.addIncludeFilter(new AnnotationTypeFilter(AutomationDictionary.class));
 		for (BeanDefinition bd : scanner.findCandidateComponents("com.logicaldoc")) {
 			String beanClassName = bd.getBeanClassName();
-			Class beanClass = null;
-			try {
-				beanClass = Class.forName(beanClassName);
-			} catch (ClassNotFoundException e) {
-				log.error(e.getMessage(), e);
-			}
-
-			if (beanClass == null)
-				continue;
-
-			String key = beanClass.getSimpleName();
-			AutomationDictionary annotation = (AutomationDictionary) beanClass
-					.getAnnotation(AutomationDictionary.class);
-			if (annotation != null && StringUtils.isNotEmpty(annotation.key()))
-				key = annotation.key();
 
 			try {
+				Class beanClass = Class.forName(beanClassName);
+
+				String key = beanClass.getSimpleName();
+				AutomationDictionary annotation = (AutomationDictionary) beanClass
+						.getAnnotation(AutomationDictionary.class);
+				if (annotation != null && StringUtils.isNotEmpty(annotation.key()))
+					key = annotation.key();
+
 				Object instance = beanClass.getDeclaredConstructor().newInstance();
 				dictionary.put(key, instance);
+			} catch (ClassNotFoundException e) {
+				log.error(e.getMessage(), e);
+				continue;
 			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
 			}
@@ -169,7 +165,8 @@ public class Automation {
 			clientDictionary.put(LOCALE, this.automationLocale != null ? this.automationLocale : Locale.ENGLISH);
 
 		// This is needed to format dates
-		AutomationDateTool dateTool = new AutomationDateTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
+		AutomationDateTool dateTool = new AutomationDateTool(
+				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_date"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_datelong"),
 				I18N.getMessages((Locale) clientDictionary.get(LOCALE)).get("format_dateshort"));
 		dictionary.put(AutomationDateTool.class.getSimpleName(), dateTool);
@@ -180,23 +177,12 @@ public class Automation {
 		// Localized messages map
 		dictionary.put("I18N", new I18NTool(I18N.getMessages((Locale) clientDictionary.get(LOCALE))));
 
-		if (Context.get() != null)
-			clientDictionary.put(SERVER_URL, Context.get().getProperties().get("server.url"));
-		else
-			try {
-				clientDictionary.put(SERVER_URL, new ContextProperties().getProperty("server.url"));
-			} catch (IOException e1) {
-				// Noting to do
-			}
+		putServerUrl(clientDictionary);
 
 		/*
 		 * Merge the client dictionary
 		 */
-		if (clientDictionary != null && !clientDictionary.isEmpty()) {
-			for (String key : clientDictionary.keySet())
-				if (key != null && clientDictionary.get(key) != null)
-					dictionary.put(key, clientDictionary.get(key));
-		}
+		mergeDictionary(dictionary, clientDictionary);
 
 		// Put some static classes
 		dictionary.put(Paths.class.getSimpleName(), Paths.class);
@@ -215,6 +201,25 @@ public class Automation {
 			dictionary.put(CONTEXT, Context.get());
 
 		return dictionary;
+	}
+
+	private void mergeDictionary(HashMap<String, Object> dictionary, Map<String, Object> clientDictionary) {
+		if (clientDictionary != null && !clientDictionary.isEmpty()) {
+			for (String key : clientDictionary.keySet())
+				if (key != null && clientDictionary.get(key) != null)
+					dictionary.put(key, clientDictionary.get(key));
+		}
+	}
+
+	private void putServerUrl(Map<String, Object> clientDictionary) {
+		if (Context.get() != null)
+			clientDictionary.put(SERVER_URL, Context.get().getProperties().get("server.url"));
+		else
+			try {
+				clientDictionary.put(SERVER_URL, new ContextProperties().getProperty("server.url"));
+			} catch (IOException e) {
+				// Nothing to do
+			}
 	}
 
 	private VelocityContext prepareContext(Map<String, Object> extendedDictionary) {

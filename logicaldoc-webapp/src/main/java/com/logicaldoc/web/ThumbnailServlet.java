@@ -15,6 +15,7 @@ import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.store.Storer;
@@ -93,7 +94,7 @@ public class ThumbnailServlet extends HttpServlet {
 			Session session = ServiceUtil.validateSession(request);
 			User user = session.getUser();
 
-			if (doc != null && !user.isMemberOf("admin") && !user.isMemberOf("publisher") && !doc.isPublishing())
+			if (doc != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 				throw new FileNotFoundException("Document not published");
 
 			String resource = storer.getResourceName(docId, fileVersion, suffix);

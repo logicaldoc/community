@@ -51,7 +51,7 @@ public class DeletedFoldersDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select ld_id, ld_name, ld_type, ld_lastmodified, ld_deleteuserid, ld_parentid, ld_deleteuser, ld_color ");
 		query.append(" from ld_folder ");
 		query.append(" where ld_tenantid = ");

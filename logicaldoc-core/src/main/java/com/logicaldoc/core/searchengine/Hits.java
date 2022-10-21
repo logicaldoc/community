@@ -57,7 +57,7 @@ public class Hits implements Iterator<Hit>, Serializable {
 		Hit hit = toHit(doc);
 
 		// Compose the summary as concatenation of snippets
-		StringBuffer summary = new StringBuffer();
+		StringBuilder summary = new StringBuilder();
 		Object id = doc.getFieldValue("id");
 		if (rsp.getHighlighting() != null && rsp.getHighlighting().get(id) != null) {
 			List<String> snippets = rsp.getHighlighting().get(id).get("content");

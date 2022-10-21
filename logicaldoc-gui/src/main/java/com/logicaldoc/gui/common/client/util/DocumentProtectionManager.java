@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
@@ -30,9 +31,9 @@ public class DocumentProtectionManager {
 	/**
 	 * Controls the document and asks the user for a password(if needed).
 	 * 
-	 * @param docId   identifier of the document
-	 * @param handler Optional handler to react something when the documents gets
-	 *                unlocked
+	 * @param docId identifier of the document
+	 * @param handler Optional handler to react something when the documents
+	 *        gets unlocked
 	 */
 	public static void askForPassword(final Long docId, final DocumentProtectionHandler handler) {
 		DocumentService.Instance.get().getById(docId, new AsyncCallback<GUIDocument>() {
@@ -57,7 +58,7 @@ public class DocumentProtectionManager {
 										if (password == null)
 											SC.warn(I18N.message("accesdenied"));
 										if ("--unset--".equals(password)
-												&& Session.get().getUser().isMemberOf("admin")) {
+												&& Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 											DocumentService.Instance.get().unsetPassword(result.getId(), password,
 													new AsyncCallback<Void>() {
 
@@ -85,7 +86,10 @@ public class DocumentProtectionManager {
 														@Override
 														public void onSuccess(Boolean granted) {
 															if (granted) {
-																// Save the password for further reference
+																// Save the
+																// password for
+																// further
+																// reference
 																unprotectedDocs.put(docId, password);
 																if (handler != null)
 																	handler.onUnprotected(result);

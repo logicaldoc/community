@@ -3,8 +3,6 @@ package com.logicaldoc.webservice.soap.endpoint;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 
 import com.logicaldoc.core.document.Document;
@@ -12,6 +10,8 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
+
+import junit.framework.Assert;
 
 public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
 

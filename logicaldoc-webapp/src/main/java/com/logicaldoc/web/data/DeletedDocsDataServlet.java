@@ -62,7 +62,7 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_type, A.ld_version, A.ld_fileversion, A.ld_lastmodified, ");
 		query.append(
 				" A.ld_publisher, A.ld_filesize, A.ld_filename, A.ld_folderid, B.ld_name, A.ld_creation, A.ld_deleteuserid, A.ld_deleteuser ");

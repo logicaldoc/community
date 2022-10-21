@@ -171,7 +171,7 @@ abstract public class AbstractDocumentProcessor extends Task {
 	
 	@Override
 	protected String prepareReport(Locale locale) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(I18N.message("processeddocs", locale) + ": ");
 		sb.append(processed);
 		sb.append("\n");

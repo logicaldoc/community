@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.jackrabbit.server.io.IOUtil;
@@ -321,7 +323,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	 * Fill the set of properties
 	 */
 	protected void initProperties() {
-		
+
 		if (!exists() || propsInitialized) {
 			return;
 		}
@@ -350,7 +352,8 @@ public class DavResourceImpl implements DavResource, Serializable {
 		// SupportedLock supportedLock = new SupportedLock();
 		// supportedLock.addEntry(Type.WRITE, Scope.EXCLUSIVE);
 		// properties.add(supportedLock);
-		properties.add(new DefaultDavProperty<Long>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
+		properties
+				.add(new DefaultDavProperty<Long>(DavPropertyName.GETCONTENTLENGTH, this.resource.getContentLength()));
 
 		// Set Dav property LastModified
 		long lastmodTime = IOUtil.UNDEFINED_TIME;
@@ -481,7 +484,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		boolean isChunkingComplete = false;
 
 		if (!exists()) {
-			throw new DavException(DavServletResponse.SC_CONFLICT);
+			throw new DavException(HttpServletResponse.SC_CONFLICT);
 		}
 		if (isLocked(this) || isLocked(member)) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
@@ -501,14 +504,15 @@ public class DavResourceImpl implements DavResource, Serializable {
 			// Check Write permission on the target folder
 			if (!member.isCollection() && !ctx.getResource().isWriteEnabled()) {
 //				log.debug("Target folder is not write enabled");
-				throw new DavException(DavServletResponse.SC_FORBIDDEN,
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN,
 						"Write Access not allowed on the selected folder");
 			}
 
 			// Check Write permission on the target folder
 			if (member.isCollection() && !ctx.getResource().isAddChildEnabled()) {
 //				log.debug("Target folder is not add-child enabled");
-				throw new DavException(DavServletResponse.SC_FORBIDDEN, "Add Child not allowed on the selected folder");
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN,
+						"Add Child not allowed on the selected folder");
 			}
 
 			/*
@@ -563,7 +567,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 					log.debug("tempFile {}", tempFile);
 
 					// Write the content on the file
-					try(OutputStream stream = new FileOutputStream(tempFile.toFile());) {
+					try (OutputStream stream = new FileOutputStream(tempFile.toFile());) {
 						IOUtils.copy(ctx.getInputStream(), stream);
 					}
 				}
@@ -644,14 +648,14 @@ public class DavResourceImpl implements DavResource, Serializable {
 
 			if (!config.getIOManager().importContent(ctx, member)) {
 				// any changes should have been reverted in the importer
-				throw new DavException(DavServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+				throw new DavException(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 			}
 
 		} catch (DavException dave) {
 			throw dave;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -661,7 +665,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	public void removeMember(DavResource member) throws DavException {
 
 		if (!exists() || !member.exists()) {
-			throw new DavException(DavServletResponse.SC_NOT_FOUND);
+			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
 		if (isLocked(this) || isLocked(member)) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
@@ -672,7 +676,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 		resource.setRequestedPerson(this.resource.getRequestedPerson());
 
 		if (!resource.isDeleteEnabled()) {
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Delete not allowed.");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Delete not allowed.");
 		}
 
 		resourceService.deleteResource(resource, session);
@@ -684,7 +688,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	public void move(DavResource destination) throws DavException {
 
 		if (!exists()) {
-			throw new DavException(DavServletResponse.SC_NOT_FOUND);
+			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
 		if (isLocked(this)) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
@@ -721,7 +725,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 	public void copy(DavResource destination, boolean shallow) throws DavException {
 
 		if (!exists()) {
-			throw new DavException(DavServletResponse.SC_NOT_FOUND);
+			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
 		if (isLocked(destination)) {
 			throw new DavException(DavServletResponse.SC_LOCKED);
@@ -731,7 +735,7 @@ public class DavResourceImpl implements DavResource, Serializable {
 			// Currently no support for shallow copy; however this is
 			// only relevant if the source resource is a collection, because
 			// otherwise it doesn't make a difference
-			throw new DavException(DavServletResponse.SC_FORBIDDEN, "Unable to perform shallow copy.");
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Unable to perform shallow copy.");
 		}
 
 		try {
@@ -873,7 +877,6 @@ public class DavResourceImpl implements DavResource, Serializable {
 	protected Resource getResource() {
 		return this.resource;
 	}
-
 
 	/**
 	 * Gets the customized factory

@@ -37,7 +37,7 @@ public class StringUtil {
 	 * @return the string with separators
 	 */
 	public static String split(String src, char separator, int tokenSize) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		String[] tokens = split(src, tokenSize);
 		for (int i = 0; i < tokens.length; i++) {
 			if (sb.length() > 0)
@@ -130,7 +130,7 @@ public class StringUtil {
 	}
 
 	public static String arrayToString(Object[] a, String separator) {
-		StringBuffer result = new StringBuffer("");
+		StringBuilder result = new StringBuilder("");
 		if (a.length > 0) {
 			result.append(a[0].toString()); // start with the first element
 			for (int i = 1; i < a.length; i++) {

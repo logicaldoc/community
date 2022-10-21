@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.quartz.Scheduler;
 import org.quartz.TriggerKey;
+import org.quartz.utils.Key;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,7 +145,7 @@ public class TaskScheduling {
 
 		// Reschedule the job
 		try {
-			TriggerKey key = new TriggerKey(taskName, TriggerKey.DEFAULT_GROUP);
+			TriggerKey key = new TriggerKey(taskName, Key.DEFAULT_GROUP);
 			Date date = scheduler.rescheduleJob(key, trigger.getObject());
 
 			if (date != null)

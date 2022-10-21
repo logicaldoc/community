@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.folder;
 
 import java.util.Map;
 
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.UsersDS;
@@ -37,7 +38,7 @@ public class FolderQuotaPanel extends FolderDetailTab {
 		setWidth100();
 		setHeight100();
 		setMembersMargin(20);
-		update = folder.isWorkspace() && Session.get().getUser().isMemberOf("admin");
+		update = folder.isWorkspace() && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
 		refresh();
 	}
 

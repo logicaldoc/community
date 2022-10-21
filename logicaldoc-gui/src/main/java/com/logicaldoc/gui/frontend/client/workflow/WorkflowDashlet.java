@@ -3,6 +3,7 @@ package com.logicaldoc.gui.frontend.client.workflow;
 import java.util.ArrayList;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIWorkflow;
 import com.logicaldoc.gui.common.client.data.WorkflowTasksDS;
@@ -308,7 +309,7 @@ public class WorkflowDashlet extends Portlet {
 			}
 		});
 
-		if (!Session.get().getUser().isMemberOf("admin"))
+		if (!Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN))
 			delete.setEnabled(false);
 
 		contextMenu.setItems(delete);

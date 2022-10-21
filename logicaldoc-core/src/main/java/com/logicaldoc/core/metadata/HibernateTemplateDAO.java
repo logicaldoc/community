@@ -154,14 +154,14 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			User user = userDAO.findById(userId);
 			if (user == null)
 				return false;
-			if (user.isMemberOf("admin"))
+			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return true;
 
 			Set<Group> groups = user.getGroups();
 			if (groups.isEmpty())
 				return false;
 
-			StringBuffer query = new StringBuffer(
+			StringBuilder query = new StringBuilder(
 					"select distinct(" + ALIAS_ENTITY + ") from Template " + ALIAS_ENTITY + "  ");
 			query.append(" left join " + ALIAS_ENTITY + ".templateGroups as _group ");
 			query.append(" where ");
@@ -206,7 +206,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 				return permissions;
 
 			// If the user is an administrator bypass all controls
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				return Permission.all();
 			}
 
@@ -214,7 +214,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			if (groups.isEmpty())
 				return permissions;
 
-			StringBuffer query = new StringBuffer("select ld_write as LDWRITE");
+			StringBuilder query = new StringBuilder("select ld_write as LDWRITE");
 			query.append(" from ld_templategroup ");
 			query.append(" where ");
 			query.append(" ld_templateid=" + templateId);

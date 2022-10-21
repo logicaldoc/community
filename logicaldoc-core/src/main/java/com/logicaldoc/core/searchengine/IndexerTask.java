@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.logicaldoc.core.HibernatePersistentObjectDAO;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
@@ -276,7 +275,7 @@ public class IndexerTask extends Task {
 
 	@Override
 	protected String prepareReport(Locale locale) {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(I18N.message("indexationtime", locale) + ": ");
 		sb.append(TimeDiff.printDuration(indexingTime));
 		sb.append("\n");
@@ -361,7 +360,7 @@ public class IndexerTask extends Task {
 								config.getProperty(tenant.getName() + ".index.excludes") == null ? ""
 										: config.getProperty(tenant.getName() + ".index.excludes"))) {
 							documentDao.initialize(doc);
-							doc.setIndexed(Document.INDEX_SKIP);
+							doc.setIndexed(AbstractDocument.INDEX_SKIP);
 							documentDao.store(doc);
 							log.warn("Thread {}: Document {} with filename '{}' marked as unindexable", number, id,
 									doc.getFileName());

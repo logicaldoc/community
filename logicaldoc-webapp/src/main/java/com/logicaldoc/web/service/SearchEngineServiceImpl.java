@@ -304,10 +304,10 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 					log.info("Removed {} entries from the index", hitsIds.size());
 
 					DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-					StringBuffer updateQuery = new StringBuffer();
-					updateQuery = new StringBuffer("update ld_document set ld_indexed=0 where ld_indexed = 1 ");
+					StringBuilder updateQuery = new StringBuilder();
+					updateQuery = new StringBuilder("update ld_document set ld_indexed=0 where ld_indexed = 1 ");
 
-					StringBuffer hitsIdsCondition = new StringBuffer();
+					StringBuilder hitsIdsCondition = new StringBuilder();
 					if (!hitsIds.isEmpty()) {
 						hitsIdsCondition.append(" and (");
 
@@ -368,9 +368,9 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 				hitsMap.put(hit.getId(), hit);
 			}
 
-			StringBuffer richQuery = new StringBuffer();
+			StringBuilder richQuery = new StringBuilder();
 			// Find real documents
-			richQuery = new StringBuffer(
+			richQuery = new StringBuilder(
 					"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 			richQuery
 					.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
@@ -388,7 +388,7 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 			richQuery.append(" where A.ld_deleted=0 and A.ld_folderid=FOLD.ld_id  ");
 
 			Set<Long> hitsIds = hitsMap.keySet();
-			StringBuffer hitsIdsCondition = new StringBuffer();
+			StringBuilder hitsIdsCondition = new StringBuilder();
 			if (!hitsIds.isEmpty()) {
 				hitsIdsCondition.append(" and (");
 

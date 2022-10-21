@@ -53,7 +53,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.id, B.folder.id, A.type, A.document1.id, A.document1.fileName, A.document1.type, A.document2.id, A.document2.fileName, A.document2.type, ");
 		query.append(
 				" A.document1.folder.id, A.document2.folder.id, A.document1.color, A.document2.color from DocumentLink A, Document B where A.deleted = 0 and B.deleted = 0 ");

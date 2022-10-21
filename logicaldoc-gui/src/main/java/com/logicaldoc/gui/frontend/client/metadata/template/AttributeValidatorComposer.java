@@ -98,7 +98,7 @@ public class AttributeValidatorComposer extends Window {
 	}
 
 	protected String composeAutomation() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		if (attributeType == GUIAttribute.TYPE_DATE) {
 			Date min = (Date) vm.getValue("date-min");

@@ -259,7 +259,7 @@ public class Geolocation {
 
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		if (city != null)
 			sb.append(city);
 

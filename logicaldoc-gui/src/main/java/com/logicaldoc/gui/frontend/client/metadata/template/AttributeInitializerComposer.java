@@ -101,7 +101,7 @@ public class AttributeInitializerComposer extends Window {
 	}
 
 	protected String composeAutomation() {
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		if (attributeType == GUIAttribute.TYPE_DATE) {
 			Date date = (Date) vm.getValue("date");

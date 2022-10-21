@@ -2,6 +2,7 @@ package com.logicaldoc.gui.frontend.client.reports.custom;
 
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.beans.GUIReport;
@@ -247,7 +248,7 @@ public class CustomReportsPanel extends AdminPanel {
 	}
 
 	private boolean canUploadDesign() {
-		return Session.get().getUser().getTenant().isDefault() && Session.get().getUser().isMemberOf("admin");
+		return Session.get().getUser().getTenant().isDefault() && Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
 	}
 
 	private void showContextMenu() {

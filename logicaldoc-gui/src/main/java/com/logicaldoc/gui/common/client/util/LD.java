@@ -3,6 +3,7 @@ package com.logicaldoc.gui.common.client.util;
 import java.util.Arrays;
 import java.util.List;
 
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.smartgwt.client.types.Alignment;
@@ -234,7 +235,7 @@ public class LD {
 		buttons.setAutoHeight();
 		buttons.addMember(ok);
 		buttons.addMember(cancel);
-		if (Session.get().getUser().isMemberOf("admin"))
+		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN))
 			buttons.addMember(unset);
 
 		container.addMember(form);

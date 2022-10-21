@@ -33,7 +33,7 @@ public class GroupsDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuffer query = new StringBuffer("select A.id, A.name, A.description, A.source "
+		StringBuilder query = new StringBuilder("select A.id, A.name, A.description, A.source "
 				+ "from com.logicaldoc.core.security.Group A where A.deleted = 0 and A.type = " + Group.TYPE_DEFAULT
 				+ " and A.tenantId=" + session.getTenantId());
 

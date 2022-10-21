@@ -22,7 +22,7 @@ public class CatchAllParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 		if (document == null)
 			parse1(input, filename, encoding, locale, tenant, content);
 		else
@@ -33,7 +33,7 @@ public class CatchAllParser extends AbstractParser {
 	 * Parses with document specification
 	 */
 	private void parse2(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 
 		try {
 			FormatConverterManager manager = (FormatConverterManager) Context.get()
@@ -59,7 +59,7 @@ public class CatchAllParser extends AbstractParser {
 	 * Parses without document specification
 	 */
 	private void parse1(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			StringBuffer content) {
+			StringBuilder content) {
 		FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(FormatConverterManager.class);
 		File inputFile = null;
 		File outputPdf = null;

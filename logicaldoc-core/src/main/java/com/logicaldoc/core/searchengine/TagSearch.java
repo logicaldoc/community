@@ -12,6 +12,7 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.util.Context;
 
@@ -51,7 +52,7 @@ public class TagSearch extends Search {
 	private void prepareExpression() {
 
 		// Find all real documents
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 		query.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
 		query.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");
@@ -97,7 +98,7 @@ public class TagSearch extends Search {
 	 *        search
 	 * @param query
 	 */
-	private void appendWhereClause(boolean aliases, StringBuffer query) {
+	private void appendWhereClause(boolean aliases, StringBuilder query) {
 		long tenantId = Tenant.DEFAULT_ID;
 		if (options.getTenantId() != null)
 			tenantId = options.getTenantId().longValue();
@@ -136,7 +137,7 @@ public class TagSearch extends Search {
 		query.append(!"()".equals(buf) ? buf : "(0)");
 
 		// For normal users we have to exclude not published documents
-		if (!searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
+		if (!searchUser.isMemberOf(Group.GROUP_ADMIN) && !searchUser.isMemberOf("publisher")) {
 			query.append(" and A.ld_published = 1 ");
 			query.append(" and A.ld_startpublishing <= CURRENT_TIMESTAMP ");
 			query.append(" and ( A.ld_stoppublishing is null or A.ld_stoppublishing > CURRENT_TIMESTAMP )");

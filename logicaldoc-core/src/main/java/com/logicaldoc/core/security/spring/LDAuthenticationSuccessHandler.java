@@ -55,7 +55,7 @@ public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 		response.addCookie(sidCookie);
 
 		if (requestedUrl != null) {
-			StringBuffer successUrl = new StringBuffer(requestedUrl);
+			StringBuilder successUrl = new StringBuilder(requestedUrl);
 			if (requestedUrl.indexOf('?') != -1)
 				successUrl.append("&");
 			else

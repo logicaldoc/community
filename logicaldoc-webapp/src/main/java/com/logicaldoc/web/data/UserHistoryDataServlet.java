@@ -54,7 +54,7 @@ public class UserHistoryDataServlet extends AbstractDataServlet {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("userId", userId);
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.id, A.username, A.event, A.date, A.comment, A.reason, A.sessionId, A.userId, A.ip, A.device, A.geolocation from UserHistory A where A.deleted = 0 and A.userId = :userId ");
 		if (StringUtils.isNotEmpty(event)) {
 			query.append(" and A.event = :event ");

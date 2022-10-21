@@ -42,6 +42,7 @@ import com.logicaldoc.core.parser.ParseException;
 import com.logicaldoc.core.parser.Parser;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.searchengine.SearchEngine;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -342,7 +343,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void checkout(long docId, DocumentHistory transaction) throws PersistenceException {
 		if (transaction.getEvent() == null)
 			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
-		lock(docId, Document.DOC_CHECKED_OUT, transaction);
+		lock(docId, AbstractDocument.DOC_CHECKED_OUT, transaction);
 	}
 
 	@Override
@@ -552,7 +553,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			synchronized (this) {
 				documentDAO.initialize(doc);
 				if (doc.getImmutable() == 0
-						|| ((doc.getImmutable() == 1 && transaction.getUser().isMemberOf("admin")))) {
+						|| ((doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
 					DocumentHistory renameTransaction = null;
 					if (!doc.getFileName().equals(docVO.getFileName()) && docVO.getFileName() != null) {
 						renameTransaction = new DocumentHistory(transaction);
@@ -683,7 +684,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (folder.equals(doc.getFolder()))
 			return;
 
-		if (doc.getImmutable() == 0 || ((doc.getImmutable() == 1 && transaction.getUser().isMemberOf("admin")))) {
+		if (doc.getImmutable() == 0 || ((doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
 
 			/*
 			 * Better to synchronize this block because under high
@@ -924,7 +925,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Document document = documentDAO.findDocument(docId);
 			documentDAO.initialize(document);
 
-			if (transaction.getUser().isMemberOf("admin")) {
+			if (transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
 				document.setImmutable(0);
 			} else if (document.getLockUserId() == null || document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
 				log.debug("The document {} is already unlocked", document);
@@ -983,7 +984,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Document document = documentDAO.findDocument(docId);
 
 			if (document.getImmutable() == 0
-					|| ((document.getImmutable() == 1 && transaction.getUser().isMemberOf("admin")))) {
+					|| ((document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
 				documentDAO.initialize(document);
 				document.setFileName(newName.trim());
 				String extension = FileUtil.getExtension(newName.trim());
@@ -1255,7 +1256,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Document doc = dao.findById(id);
 
 			// Skip documents in folders without Archive permission
-			if (!(transaction.getUser().isMemberOf("admin") || transaction.getUser().getUsername().equals("_retention"))
+			if (!(transaction.getUser().isMemberOf(Group.GROUP_ADMIN) || transaction.getUser().getUsername().equals("_retention"))
 					&& !folderIds.contains(doc.getFolder().getId()))
 				continue;
 
@@ -1540,7 +1541,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 				Document document = docDao.findDocument(docId);
 
-				if (document != null && user != null && !user.isMemberOf("admin") && !user.isMemberOf("publisher")
+				if (document != null && user != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
 						&& !document.isPublishing())
 					continue;
 

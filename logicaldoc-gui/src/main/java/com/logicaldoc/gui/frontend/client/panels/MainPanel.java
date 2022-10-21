@@ -4,6 +4,7 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.SessionObserver;
@@ -165,7 +166,7 @@ public class MainPanel extends VLayout implements SessionObserver {
 		/*
 		 * Check if there are alerts
 		 */
-		if (user.isMemberOf("admin") && !Session.get().isDemo()) {
+		if (user.isMemberOf(Constants.GROUP_ADMIN) && !Session.get().isDemo()) {
 			InfoService.Instance.get().getInfo(I18N.getLocale(), Session.get().getTenantName(), false,
 					new AsyncCallback<GUIInfo>() {
 						@Override

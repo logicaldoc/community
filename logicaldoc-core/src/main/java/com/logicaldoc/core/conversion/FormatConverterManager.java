@@ -2,6 +2,7 @@ package com.logicaldoc.core.conversion;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -518,36 +519,40 @@ public class FormatConverterManager {
 			String className = ext.getParameter("class").valueAsString();
 			String in = ext.getParameter("in").valueAsString().toLowerCase();
 			String out = ext.getParameter("out").valueAsString().toLowerCase();
+
+			// Try to instantiate the builder
+			Object converter;
 			try {
 				Class<?> clazz = Class.forName(className);
-				// Try to instantiate the builder
-				Object converter = clazz.getDeclaredConstructor().newInstance();
+				converter = clazz.getDeclaredConstructor().newInstance();
 				if (!(converter instanceof FormatConverter))
-					throw new Exception(
-							"The specified converter " + className + " doesn't implement FormatConverter interface");
-
-				FormatConverter cnvrt = (FormatConverter) converter;
-				for (String name : cnvrt.getParameterNames())
-					cnvrt.getParameters().put(name, null);
-
-				String[] ins = in.split(",");
-				String[] outs = out.split(",");
-				for (String i : ins)
-					for (String o : outs) {
-						String key = composeKey(i, o);
-						if (!converters.containsKey(key))
-							converters.put(key, new ArrayList<FormatConverter>());
-						if (!converters.get(composeKey(i, o)).contains(cnvrt))
-							converters.get(composeKey(i, o)).add(cnvrt);
-					}
-				log.info("Registered format converter {} for extensions {}", className, in);
-
-				// Save the converter in the list of available converters
-				if (!availableConverters.containsKey(cnvrt.getClass().getSimpleName()))
-					availableConverters.put(cnvrt.getClass().getSimpleName(), cnvrt);
-			} catch (Throwable e) {
+					throw new ClassNotFoundException(String.format(
+							"The specified converter %s doesn't implement FormatConverter interface", className));
+			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException | NoSuchMethodException | SecurityException  e) {
 				log.error(e.getMessage(), e);
+				break;
 			}
+
+			FormatConverter cnvrt = (FormatConverter) converter;
+			for (String name : cnvrt.getParameterNames())
+				cnvrt.getParameters().put(name, null);
+
+			String[] ins = in.split(",");
+			String[] outs = out.split(",");
+			for (String i : ins)
+				for (String o : outs) {
+					String key = composeKey(i, o);
+					if (!converters.containsKey(key))
+						converters.put(key, new ArrayList<FormatConverter>());
+					if (!converters.get(composeKey(i, o)).contains(cnvrt))
+						converters.get(composeKey(i, o)).add(cnvrt);
+				}
+			log.info("Registered format converter {} for extensions {}", className, in);
+
+			// Save the converter in the list of available converters
+			if (!availableConverters.containsKey(cnvrt.getClass().getSimpleName()))
+				availableConverters.put(cnvrt.getClass().getSimpleName(), cnvrt);
 		}
 	}
 

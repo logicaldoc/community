@@ -2,7 +2,6 @@ package com.logicaldoc.core.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
@@ -38,7 +37,7 @@ public class ZABWParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 		try {
 			AbiWordParser parser = new AbiWordParser();
 			content.append(parser.parse(input, filename, encoding, locale, tenant, document, fileVersion));

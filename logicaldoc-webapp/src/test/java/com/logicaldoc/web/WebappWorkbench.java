@@ -1,7 +1,6 @@
 package com.logicaldoc.web;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 
 public class WebappWorkbench {

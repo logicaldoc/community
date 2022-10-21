@@ -18,6 +18,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -129,9 +130,9 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		PrintWriter writer = response.getWriter();
 		writer.write("<list>");
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select ld_id, ld_parentid, ld_name, ld_type, ld_foldref, ld_color, ld_position from ld_folder where ld_deleted=0 and ld_hidden=0 and not ld_id=ld_parentid and ld_parentid = ? and ld_tenantid = ? ");
-		if (!user.isMemberOf("admin") && parentFolder != null) {
+		if (!user.isMemberOf(Group.GROUP_ADMIN) && parentFolder != null) {
 			Collection<Long> accessibleIds = folderDao.findFolderIdByUserId(session.getUserId(), parentFolder.getId(),
 					false);
 			if (!accessibleIds.isEmpty()) {
@@ -209,9 +210,9 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		}
 
 		if (request.getParameter("withdocs") != null) {
-			query = new StringBuffer(
+			query = new StringBuilder(
 					"select ld_id, ld_filename, ld_filesize, ld_published, ld_startpublishing, ld_stoppublishing, ld_status, ld_color from ld_document where ld_deleted=0 and ld_folderid=? ");
-			if (!user.isMemberOf("admin") && !user.isMemberOf("publisher")) {
+			if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")) {
 				query.append(" and ld_published=1");
 				query.append(" and (ld_startpublishing is null or CURRENT_TIMESTAMP > ld_startpublishing) ");
 				query.append(" and (ld_stoppublishing is null or CURRENT_TIMESTAMP < ld_stoppublishing) ");

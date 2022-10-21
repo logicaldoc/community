@@ -27,7 +27,7 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 	@Override
 	public List<Contact> findByUser(Long userId, String email) {
 		Map<String, Object> params = new HashMap<String, Object>();
-		StringBuffer sb = new StringBuffer("");
+		StringBuilder sb = new StringBuilder("");
 		if (userId == null) {
 			sb.append(" " + ALIAS_ENTITY + ".userId is null ");
 		} else {

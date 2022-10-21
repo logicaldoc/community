@@ -48,6 +48,8 @@ import com.logicaldoc.util.io.FileUtil;
 @AutomationDictionary
 public class DocTool {
 
+	private static final String SERVER_URL = "server.url";
+	
 	protected static Logger log = LoggerFactory.getLogger(DocTool.class);
 
 	/**
@@ -59,7 +61,7 @@ public class DocTool {
 	 */
 	public String downloadUrl(long docId) {
 		ContextProperties config = Context.get().getProperties();
-		String url = config.getProperty("server.url");
+		String url = config.getProperty(SERVER_URL);
 		if (!url.endsWith("/"))
 			url += "/";
 		url += "download?docId=" + docId;
@@ -76,7 +78,7 @@ public class DocTool {
 	 */
 	public String displayUrl(long tenantId, long docId) {
 		ContextProperties config = Context.get().getProperties();
-		String url = config.getProperty("server.url");
+		String url = config.getProperty(SERVER_URL);
 		if (!url.endsWith("/"))
 			url += "/";
 
@@ -154,7 +156,7 @@ public class DocTool {
 			Integer maxDownloads, String username) throws Exception {
 
 		ContextProperties config = Context.get().getProperties();
-		String urlPrefix = config.getProperty("server.url");
+		String urlPrefix = config.getProperty(SERVER_URL);
 		if (!urlPrefix.endsWith("/"))
 			urlPrefix += "/";
 

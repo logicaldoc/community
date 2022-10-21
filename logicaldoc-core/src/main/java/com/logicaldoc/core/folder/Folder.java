@@ -521,7 +521,7 @@ public class Folder extends ExtensibleObject implements Comparable<Folder> {
 	}
 
 	public String getTagsString() {
-		StringBuffer sb = new StringBuffer(",");
+		StringBuilder sb = new StringBuilder(",");
 		if (tags == null)
 			return "";
 

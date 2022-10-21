@@ -11,15 +11,12 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
 import javax.mail.MessagingException;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -41,8 +38,11 @@ public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
 		
-		EMail email = MailUtil.messageToMail(new File("C:\\Users\\marco\\Downloads\\lextrado-attachment.eml"), true);
-		System.out.println(email.getAttachments().keySet());
+		
+		Long xx=null;
+		long pp = xx;
+		
+		System.out.println("ppp "+pp);
 		
 //		String[] timezones = TimeZone.getAvailableIDs();
 //		for (String timezone : timezones) {

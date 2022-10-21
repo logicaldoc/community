@@ -46,6 +46,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.metadata.Attribute;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -161,7 +162,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		try {
 			Document doc = (Document) findById(docId);
 			if (doc != null && doc.getImmutable() == 0
-					|| (doc != null && doc.getImmutable() == 1 && transaction.getUser().isMemberOf("admin"))) {
+					|| (doc != null && doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 
 				// Remove versions
 				try {
@@ -219,7 +220,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (folders.isEmpty())
 			return new ArrayList<Long>();
 
-		StringBuffer query = new StringBuffer();
+		StringBuilder query = new StringBuilder();
 		query.append(ALIAS_ENTITY + ".folder.id in (");
 		boolean first = true;
 		for (Folder folder : folders) {
@@ -239,7 +240,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public List<Document> findByLockUserAndStatus(Long userId, Integer status) {
-		StringBuffer sb = new StringBuffer(
+		StringBuilder sb = new StringBuilder(
 				"select ld_id, ld_folderid, ld_version, ld_fileversion, ld_lastmodified, ld_filename from ld_document where ld_deleted = 0 ");
 		if (userId != null)
 			sb.append(" and ld_lockuserid=" + userId);
@@ -496,7 +497,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		 */
 		final Set<String> fileNames = new HashSet<String>();
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select lower(ld_filename) from ld_document where ld_deleted=0 and ld_folderid=");
 		query.append(Long.toString(doc.getFolder().getId()));
 		query.append(" and lower(ld_filename) like '");
@@ -633,7 +634,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		List<Long> ids = findDocIdByUserIdAndTag(userId, tag);
 		if (!ids.isEmpty()) {
-			StringBuffer query = new StringBuffer("select A from Document A where A.id in (");
+			StringBuilder query = new StringBuilder("select A from Document A where A.id in (");
 			query.append(ids.stream().map(f -> f.toString()).collect(Collectors.joining(",")));
 			query.append(")");
 			try {
@@ -653,9 +654,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			if (user == null)
 				return ids;
 
-			StringBuffer query = new StringBuffer();
+			StringBuilder query = new StringBuilder();
 
-			if (user.isMemberOf("admin")) {
+			if (user.isMemberOf(Group.GROUP_ADMIN)) {
 				ids = findDocIdByTag(tag);
 			} else {
 
@@ -689,7 +690,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		List<Document> coll = new ArrayList<Document>();
 
 		try {
-			StringBuffer query = new StringBuffer("select docId from DocumentHistory ");
+			StringBuilder query = new StringBuilder("select docId from DocumentHistory ");
 			query.append(" where userId = " + userId);
 			query.append(" and event = '" + DocumentEvent.DOWNLOADED + "' ");
 			query.append(" order by date desc");
@@ -705,7 +706,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				tmpal.subList(0, maxResults - 1);
 			}
 
-			query = new StringBuffer("from Document " + ALIAS_ENTITY + " ");
+			query = new StringBuilder("from Document " + ALIAS_ENTITY + " ");
 			query.append(" where not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED);
 			query.append(" and " + ALIAS_ENTITY + ".id in (");
 
@@ -780,9 +781,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findLinkedDocuments(long docId, String linkType, Integer direction) {
 		List<Document> coll = new ArrayList<Document>();
-		StringBuffer query = null;
+		StringBuilder query = null;
 		try {
-			query = new StringBuffer("");
+			query = new StringBuilder("");
 			if (direction == null)
 				query.append(
 						"select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1=?) UNION select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2=?)");
@@ -1134,7 +1135,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (ids.length < 1)
 			return docs;
 
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < ids.length; i++) {
 			if (i > 0)
 				sb.append(",");
@@ -1173,7 +1174,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public Collection<Long> findPublishedIds(Collection<Long> folderIds) {
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select ld_id from ld_document where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
 		if (folderIds != null && !folderIds.isEmpty()) {
 			query.append(" and ld_folderid in (");
@@ -1221,7 +1222,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void cleanUnexistingUniqueTags() {
-		StringBuffer deleteStatement = new StringBuffer("delete from ld_uniquetag UT where ");
+		StringBuilder deleteStatement = new StringBuilder("delete from ld_uniquetag UT where ");
 
 		// tags no more existing in the ld_tag table or that belong to deleted
 		// documents
@@ -1284,7 +1285,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void insertNewUniqueTags() {
-		StringBuffer insertStatement = new StringBuffer("insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) ");
+		StringBuilder insertStatement = new StringBuilder("insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) ");
 		insertStatement.append(" select distinct(B.ld_tag), B.ld_tenantid, 0 from ld_tag B, ld_document D ");
 		insertStatement.append(
 				" where B.ld_docid = D.ld_id and D.ld_deleted = 0 and B.ld_tag not in (select A.ld_tag from ld_uniquetag A where A.ld_tenantid=B.ld_tenantid) ");
@@ -1294,7 +1295,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			log.error(e.getMessage(), e);
 		}
 
-		insertStatement = new StringBuffer("insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) ");
+		insertStatement = new StringBuilder("insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) ");
 		insertStatement.append(" select distinct(B.ld_tag), B.ld_tenantid, 0 from ld_foldertag B, ld_folder F ");
 		insertStatement.append(
 				" where B.ld_folderid = F.ld_id and F.ld_deleted = 0 and B.ld_tag not in (select A.ld_tag from ld_uniquetag A where A.ld_tenantid=B.ld_tenantid) ");
@@ -1468,7 +1469,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<String> findDuplicatedDigests(Long tenantId, Long folderId) {
 		// First of all, find all duplicates digests.
-		StringBuffer digestQuery = new StringBuffer("select ld_digest from ld_document where ld_deleted = 0 ");
+		StringBuilder digestQuery = new StringBuilder("select ld_digest from ld_document where ld_deleted = 0 ");
 		if (tenantId != null) {
 			digestQuery.append(" and ld_tenantid = ");
 			digestQuery.append(Long.toString(tenantId));

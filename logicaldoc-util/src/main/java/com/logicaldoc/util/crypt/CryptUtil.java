@@ -136,7 +136,7 @@ public class CryptUtil {
 	}
 
 	private static String bytes2String(byte[] bytes) {
-		StringBuffer stringBuffer = new StringBuffer();
+		StringBuilder stringBuffer = new StringBuilder();
 		for (int i = 0; i < bytes.length; i++) {
 			stringBuffer.append((char) bytes[i]);
 		}

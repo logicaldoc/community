@@ -387,7 +387,7 @@ public abstract class AbstractDocument extends ExtensibleObject implements Trans
 	}
 
 	public String getTagsString() {
-		StringBuffer sb = new StringBuffer(",");
+		StringBuilder sb = new StringBuilder(",");
 		if (tags == null)
 			return "";
 

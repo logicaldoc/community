@@ -9,10 +9,10 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.HibernatePersistentObjectDAO;
+import com.logicaldoc.core.History;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.communication.EventCollector;
-import com.logicaldoc.core.document.DocumentHistory;
 import com.logicaldoc.core.security.Client;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
@@ -96,7 +96,7 @@ public class HibernateUserHistoryDAO extends HibernatePersistentObjectDAO<UserHi
 	@Override
 	public boolean store(UserHistory history) throws PersistenceException {
 		// Write only if the history is enabled
-		if (RunLevel.current().aspectEnabled(DocumentHistory.ASPECT)) {
+		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
 			if (history.getComment() != null && history.getComment().length() > 4000)
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
 			boolean ret = super.store(history);

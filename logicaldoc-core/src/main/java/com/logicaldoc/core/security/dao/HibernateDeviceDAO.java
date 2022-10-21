@@ -130,7 +130,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			try {
 				Map<String, Object> params = new HashMap<String, Object>();
 
-				StringBuffer query = new StringBuffer();
+				StringBuilder query = new StringBuilder();
 
 				query.append(ALIAS_ENTITY + ".userId = :userId");
 				params.put("userId", device.getUserId());

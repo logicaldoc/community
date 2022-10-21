@@ -74,7 +74,7 @@ public class TemplateRightsDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		// Prepare the query on the folder group in join with groups
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.ld_groupid, B.ld_name, B.ld_type, A.ld_write from ld_templategroup as A, ld_group B where A.ld_templateid = ");
 		query.append("" + template.getId());
 		query.append(" and B.ld_tenantid = " + template.getTenantId());

@@ -78,8 +78,6 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	public WebserviceInterceptor() {
 		super(Phase.RECEIVE);
-		
-		System.out.println(new Date()+" - Constructor  WebserviceInterceptor");
 	}
 
 	@Override
@@ -315,7 +313,7 @@ public class WebserviceInterceptor extends AbstractPhaseInterceptor<Message> {
 
 	private static String getCurrentMonth() {
 		LocalDate date = LocalDate.now();
-		StringBuffer sb = new StringBuffer(Integer.toString(date.getYear()));
+		StringBuilder sb = new StringBuilder(Integer.toString(date.getYear()));
 		int month = date.getMonthValue();
 		if (month < 10)
 			sb.append("0");

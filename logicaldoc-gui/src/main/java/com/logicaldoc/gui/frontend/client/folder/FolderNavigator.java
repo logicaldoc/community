@@ -732,7 +732,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 
 		Menu contextMenu = new Menu();
 
-		if (Session.get().getUser().isMemberOf("admin") && folder.isWorkspace()
+		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN) && folder.isWorkspace()
 				&& Feature.visible(Feature.MULTI_WORKSPACE)) {
 			delete.setEnabled(!folder.isDefaultWorkspace());
 			move.setEnabled(false);

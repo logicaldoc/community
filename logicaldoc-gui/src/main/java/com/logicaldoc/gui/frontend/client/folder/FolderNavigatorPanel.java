@@ -82,7 +82,7 @@ public class FolderNavigatorPanel extends VLayout implements FolderObserver {
 		newFolder.setDisabled(!folder.hasPermission(Constants.PERMISSION_ADD));
 		addDocuments.setDisabled(!folder.isWrite());
 		boolean newWorkspaceDisabled = !Feature.enabled(Feature.MULTI_WORKSPACE)
-				|| !Session.get().getUser().isMemberOf("admin");
+				|| !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN);
 		newWorkspace.setDisabled(newWorkspaceDisabled);
 		newWorkspace.setVisible(!newWorkspaceDisabled);
 	}

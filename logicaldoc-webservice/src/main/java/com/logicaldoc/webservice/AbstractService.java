@@ -163,7 +163,7 @@ public class AbstractService {
 	}
 
 	protected void checkPublished(User user, Document doc) throws Exception {
-		if (!user.isMemberOf("admin") && !user.isMemberOf("publisher") && !doc.isPublishing())
+		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new FileNotFoundException("Document not published");
 	}
 

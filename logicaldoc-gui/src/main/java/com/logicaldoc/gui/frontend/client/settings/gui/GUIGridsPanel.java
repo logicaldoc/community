@@ -276,7 +276,7 @@ public class GUIGridsPanel extends VLayout {
 		/*
 		 * Prepare the list of columns for the documents screen
 		 */
-		StringBuffer value = new StringBuffer();
+		StringBuilder value = new StringBuilder();
 		ListGridRecord[] attrs = documentsFieldsGrid.getRecords();
 		for (ListGridRecord att : attrs) {
 			if (value.length() > 0)
@@ -299,7 +299,7 @@ public class GUIGridsPanel extends VLayout {
 		/*
 		 * Prepare the list of columns for the search screen
 		 */
-		value = new StringBuffer();
+		value = new StringBuilder();
 		attrs = searchGrid.getRecords();
 		for (ListGridRecord att : attrs) {
 			if (value.length() > 0)
@@ -322,7 +322,7 @@ public class GUIGridsPanel extends VLayout {
 		 * Now taking care of defining what extended attributes have to be
 		 * retrieved when searching for the documents
 		 */
-		value = new StringBuffer();
+		value = new StringBuilder();
 		for (String att : extendedAttributes) {
 			if (value.length() > 0)
 				value.append(",");

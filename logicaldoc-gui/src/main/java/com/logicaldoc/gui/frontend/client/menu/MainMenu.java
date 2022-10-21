@@ -123,7 +123,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 		}
 
 		if (Feature.enabled(Feature.MULTI_TENANT)) {
-			if (Session.get().getUser().isMemberOf("admin")
+			if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)
 					&& Session.get().getUser().getTenant().getTenantId() == Constants.TENANT_DEFAULTID) {
 				SelectItem tenantItem = ItemFactory.newTenantSelector();
 				tenantItem.setShowTitle(false);
@@ -958,7 +958,7 @@ public class MainMenu extends ToolStrip implements FolderObserver, DocumentObser
 
 		menu.addItem(getSupportMenuItem());
 
-		if (Session.get().getUser().isMemberOf("admin")) {
+		if (Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
 			MenuItem registration = new MenuItem(I18N.message("registration"));
 			registration.addClickHandler(new ClickHandler() {
 				@Override

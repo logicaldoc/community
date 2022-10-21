@@ -28,7 +28,7 @@ public class ZipParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws Exception {
 
 		if (filename.toLowerCase().endsWith(".zip"))
 			internalParseZip(input, encoding, locale, tenant, document, fileVersion, content);
@@ -37,7 +37,7 @@ public class ZipParser extends AbstractParser {
 	}
 
 	private void internalParseGZip(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) throws Exception {
+			Document document, String fileVersion, StringBuilder content) throws Exception {
 		File ungzippedFile = null;
 		try {
 			ungzippedFile = gunzip(input, filename);
@@ -73,7 +73,7 @@ public class ZipParser extends AbstractParser {
 	}
 
 	private void internalParseZip(InputStream input, String encoding, Locale locale, String tenant, Document document,
-			String fileVersion, StringBuffer content) throws Exception {
+			String fileVersion, StringBuilder content) throws Exception {
 		File zipFile = File.createTempFile("parsezip", "zip");
 		try {
 			FileUtil.writeFile(input, zipFile.getAbsolutePath());

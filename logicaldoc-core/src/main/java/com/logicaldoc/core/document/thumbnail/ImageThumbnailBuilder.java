@@ -30,7 +30,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 		try {
 			String outExt = FileUtil.getExtension(dest.getName().toLowerCase());
 			ContextProperties conf = Context.get().getProperties();
-			StringBuffer commandLine = new StringBuffer(conf.getProperty("converter.ImageConverter.path"));
+			StringBuilder commandLine = new StringBuilder(conf.getProperty("converter.ImageConverter.path"));
 			if ("png".equals(outExt))
 				commandLine.append(" -alpha on ");
 			commandLine.append(" -compress JPEG -quality " + quality);

@@ -76,7 +76,7 @@ public class KOfficeParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			// to be compliant, completely disable DOCTYPE declaration:

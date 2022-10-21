@@ -46,7 +46,7 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	@Override
 	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId) {
 		Generic generic = null;
-		StringBuffer sb = new StringBuffer(" " + ALIAS_ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and "
+		StringBuilder sb = new StringBuilder(" " + ALIAS_ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and "
 				+ ALIAS_ENTITY + ".subtype='" + SqlUtil.doubleQuotes(subtype) + "' ");
 		sb.append(" and " + ALIAS_ENTITY + ".tenantId=" + tenantId);
 		if (qualifier != null)

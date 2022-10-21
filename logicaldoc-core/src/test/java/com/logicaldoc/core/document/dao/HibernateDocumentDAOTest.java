@@ -560,10 +560,10 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	@Test
 	public void testFindByLockUserAndStatus() {
 		Assert.assertEquals(4, dao.findByLockUserAndStatus(3L, null).size());
-		Assert.assertEquals(2, dao.findByLockUserAndStatus(3L, Document.DOC_CHECKED_OUT).size());
-		Assert.assertEquals(2, dao.findByLockUserAndStatus(null, Document.DOC_CHECKED_OUT).size());
+		Assert.assertEquals(2, dao.findByLockUserAndStatus(3L, AbstractDocument.DOC_CHECKED_OUT).size());
+		Assert.assertEquals(2, dao.findByLockUserAndStatus(null, AbstractDocument.DOC_CHECKED_OUT).size());
 		Assert.assertEquals(0, dao.findByLockUserAndStatus(1L, null).size());
-		Assert.assertEquals(0, dao.findByLockUserAndStatus(1L, Document.DOC_CHECKED_OUT).size());
+		Assert.assertEquals(0, dao.findByLockUserAndStatus(1L, AbstractDocument.DOC_CHECKED_OUT).size());
 		Assert.assertEquals(0, dao.findByLockUserAndStatus(987541L, null).size());
 	}
 

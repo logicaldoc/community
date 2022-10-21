@@ -76,6 +76,7 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.metadata.validation.Validator;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
@@ -661,7 +662,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			for (long id : docIds) {
 				Document doc = dao.findDocument(id);
 				if (doc != null)
-					documentManager.lock(doc.getId(), Document.DOC_LOCKED, new DocumentHistory(transaction));
+					documentManager.lock(doc.getId(), AbstractDocument.DOC_LOCKED, new DocumentHistory(transaction));
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -697,13 +698,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 					// The document of the selected documentRecord must be
 					// not immutable
-					if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf("admin")) {
+					if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
 						log.debug("Document {} was not deleted because immutable", id);
 						continue;
 					}
 
 					// The document must be not locked
-					if (doc.getStatus() == Document.DOC_LOCKED) {
+					if (doc.getStatus() == AbstractDocument.DOC_LOCKED) {
 						log.debug("Document {} was not deleted because locked", id);
 						continue;
 					}
@@ -1469,7 +1470,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 
 			if (email.getTos() != null && email.getTos().length > 0) {
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (GUIContact contact : email.getTos()) {
 					if (sb.length() > 0)
 						sb.append(",");
@@ -1479,7 +1480,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 
 			if (email.getCcs() != null && email.getCcs().length > 0) {
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (GUIContact contact : email.getCcs()) {
 					if (sb.length() > 0)
 						sb.append(",");
@@ -1489,7 +1490,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 
 			if (email.getBccs() != null && email.getBccs().length > 0) {
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (GUIContact contact : email.getBccs()) {
 					if (sb.length() > 0)
 						sb.append(",");
@@ -2130,7 +2131,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	protected static void checkPublished(User user, Document doc) throws Exception {
-		if (!user.isMemberOf("admin") && !user.isMemberOf("publisher") && !doc.isPublishing())
+		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
 			throw new FileNotFoundException("Document not published");
 	}
 
@@ -2219,7 +2220,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				document = documentManager.create(IOUtils.toInputStream(content, "UTF-8"), doc, transaction);
 
 			// If that VO is in checkout, perform a checkout also
-			if (vo.getStatus() == Document.DOC_CHECKED_OUT) {
+			if (vo.getStatus() == AbstractDocument.DOC_CHECKED_OUT) {
 				transaction = new DocumentHistory();
 				transaction.setSession(session);
 				documentManager.checkout(document.getId(), transaction);
@@ -2334,7 +2335,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		List<Long> childrenFolderIds = fdao.findIdsByParentId(folderId);
 		childrenFolderIds.add(folderId);
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select count(ld_id) from ld_document where ld_deleted=0 and ld_status=" + status);
 		query.append(" and ld_folderid in (" + childrenFolderIds.toString().substring(1).replace("]", ")"));
 
@@ -2407,7 +2408,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
 			Document doc = dao.findDocument(docId);
-			if (session.getUser().isMemberOf("admin") || doc.isGranted(currentPassword))
+			if (session.getUser().isMemberOf(Group.GROUP_ADMIN) || doc.isGranted(currentPassword))
 				dao.unsetPassword(docId, transaction);
 			else
 				throw new Exception("You cannot access the document");
@@ -2778,7 +2779,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			List<String> digests = docDao.findDuplicatedDigests(session.getTenantId(), folderId);
 			log.info("Found {} duplicated digests", digests.size());
 
-			StringBuffer duplicationsQuery = new StringBuffer(
+			StringBuilder duplicationsQuery = new StringBuilder(
 					"select ld_id, ld_digest, ld_date, ld_folderid, ld_filename, ld_version from ld_document where ld_deleted=0 ");
 			duplicationsQuery.append(" and ld_tenantid = ");
 			duplicationsQuery.append(Long.toString(session.getTenantId()));
@@ -2845,7 +2846,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		List<Long> duplicatedIds = duplications.stream().map(d -> d.getId()).collect(Collectors.toList());
 
 		log.warn("Deleting the duplicated documents {}", duplicatedIds);
-		StringBuffer updateStatement = new StringBuffer("update ld_document set ld_deleted=1 where ");
+		StringBuilder updateStatement = new StringBuilder("update ld_document set ld_deleted=1 where ");
 		if (docDao.isOracle()) {
 			/*
 			 * In Oracle The limit of 1000 elements applies to sets of single

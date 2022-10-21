@@ -40,7 +40,7 @@ public class XMLParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 		try {
 			CharArrayWriter writer = new CharArrayWriter();
 			ExtractorHandler handler = new ExtractorHandler(writer);

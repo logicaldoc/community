@@ -82,7 +82,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		fold.setId(5);
 		fold.setName("root");
 		document.setFolder(fold);
-		engine.addHit(document, "Questo è un documento di prova. Per fortuna che esistono i test. document");
+		engine.addHit(document, "Questo ï¿½ un documento di prova. Per fortuna che esistono i test. document");
 
 		// Adding unexisting document 111
 		document = new Document();
@@ -238,8 +238,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		assertEquals("fld.4", oi.getId());
 		assertEquals("Default", oi.getName());		
     }	
-	
-	
+
 	@Test
     public void testUpdateProperties() {
     	

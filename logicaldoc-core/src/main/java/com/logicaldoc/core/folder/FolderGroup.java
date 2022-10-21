@@ -115,7 +115,7 @@ public class FolderGroup implements Serializable {
 		 * Very important, see the Permission enumeration in order u replicate
 		 * the same mask order.
 		 */
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		sb.append(getStorage() == 1 ? "1" : "0");
 		sb.append(getAutomation() == 1 ? "1" : "0");
 		sb.append(getEmail() == 1 ? "1" : "0");

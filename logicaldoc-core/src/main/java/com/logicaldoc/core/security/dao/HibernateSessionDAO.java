@@ -42,7 +42,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 
 	@Override
 	public int countSessions(Long tenantId, Integer status) {
-		StringBuffer query = new StringBuffer(" 1=1 ");
+		StringBuilder query = new StringBuilder(" 1=1 ");
 		if (tenantId != null)
 			query.append(" and " + ALIAS_ENTITY + ".tenantId = " + tenantId);
 		if (status != null)

@@ -78,7 +78,7 @@ public class WebserviceClient {
 			response.add(envelope.getResponse());
 		}
 
-		StringBuffer path = new StringBuffer();
+		StringBuilder path = new StringBuilder();
 
 		for (Object object : response) {
 			SoapObject element = (SoapObject) object;

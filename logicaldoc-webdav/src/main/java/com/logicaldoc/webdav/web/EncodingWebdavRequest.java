@@ -4,12 +4,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.jackrabbit.webdav.AbstractLocatorFactory;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavLocatorFactory;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.WebdavRequest;
 import org.apache.jackrabbit.webdav.WebdavRequestImpl;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 					// verify that href is an absolute path
 					if (ref.startsWith("//") || !ref.startsWith("/")) {
 						log.warn("expected absolute path but found " + ref);
-						throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+						throw new DavException(HttpServletResponse.SC_BAD_REQUEST);
 					}
 				} else if (!auth.equals(request.getHeader("Host"))) {
 					// this looks like an unsupported cross-server
@@ -76,11 +76,11 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 					// we can't find out, we have to reject anyway.
 					// Better use absolute paths in DAV:href
 					// elements!
-					throw new DavException(DavServletResponse.SC_FORBIDDEN);
+					throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 				}
 			} catch (URISyntaxException e) {
 				log.warn("malformed uri: " + href, e);
-				throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+				throw new DavException(HttpServletResponse.SC_BAD_REQUEST);
 			}
 			// cut off the context path
 			String contextPath = request.getContextPath();
@@ -88,7 +88,7 @@ public class EncodingWebdavRequest extends WebdavRequestImpl {
 				ref = ref.substring(contextPath.length());
 			} else {
 				// absolute path has to start with context path
-				throw new DavException(DavServletResponse.SC_FORBIDDEN);
+				throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 
 			}
 		}

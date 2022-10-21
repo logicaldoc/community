@@ -40,7 +40,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 		writer.write("<list>");
 
 		TicketDAO dao = (TicketDAO) Context.get().getBean(TicketDAO.class);
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select A.ld_id, A.ld_ticketid, A.ld_docid, A.ld_creation, A.ld_expired, A.ld_count, A.ld_maxcount, A.ld_suffix, A.ld_enabled, B.ld_filename, B.ld_folderid from ld_ticket as A, ld_document as B where A.ld_deleted = 0 and A.ld_type = 0 and A.ld_tenantid="
 						+ session.getTenantId()
 						+ " and B.ld_deleted=0 and A.ld_docid=B.ld_id order by A.ld_creation desc");

@@ -310,7 +310,7 @@ public class StoragesPanel extends VLayout {
 								@Override
 								public void onSuccess(String[] paths) {
 									if (paths != null && paths.length > 0) {
-										StringBuffer report = new StringBuffer("<ul>");
+										StringBuilder report = new StringBuilder("<ul>");
 										for (String path : paths) {
 											report.append("<li>");
 											report.append(path);

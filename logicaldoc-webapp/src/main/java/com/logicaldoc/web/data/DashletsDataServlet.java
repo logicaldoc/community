@@ -42,7 +42,7 @@ public class DashletsDataServlet extends AbstractDataServlet {
 		/*
 		 * Search for folders first.
 		 */
-		StringBuffer query = new StringBuffer("select A.id, A.name, A.title, A.type, A.query, A.content"
+		StringBuilder query = new StringBuilder("select A.id, A.name, A.title, A.type, A.query, A.content"
 				+ " from Dashlet A where A.deleted = 0 and A.tenantId = " + session.getTenantId()
 				+ " order by A.id asc");
 		records.addAll(dao.findByQuery(query.toString(), (Map<String, Object>) null, null));

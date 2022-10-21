@@ -23,6 +23,7 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Template;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.util.Context;
@@ -129,7 +130,7 @@ public class FulltextSearch extends Search {
 		 * Prepare the query: the expression must be applied to all requested
 		 * fields.
 		 */
-		StringBuffer query = new StringBuffer();
+		StringBuilder query = new StringBuilder();
 		for (String field : opt.getFields()) {
 			if (query.length() > 0)
 				query.append(" OR ");
@@ -229,7 +230,7 @@ public class FulltextSearch extends Search {
 		log.debug("DB search");
 
 		Set<Long> hitsIds = hitsMap.keySet();
-		StringBuffer hitsIdsCondition = new StringBuffer();
+		StringBuilder hitsIdsCondition = new StringBuilder();
 		if (!hitsIds.isEmpty()) {
 			hitsIdsCondition.append(" and (");
 
@@ -251,9 +252,9 @@ public class FulltextSearch extends Search {
 			hitsIdsCondition.append(")");
 		}
 
-		StringBuffer richQuery = new StringBuffer();
+		StringBuilder richQuery = new StringBuilder();
 		// Find real documents
-		richQuery = new StringBuffer(
+		richQuery = new StringBuilder(
 				"select A.ld_id, A.ld_customid, A.ld_docref, A.ld_type, A.ld_version, A.ld_lastmodified, ");
 		richQuery.append(" A.ld_date, A.ld_publisher, A.ld_creation, A.ld_creator, A.ld_filesize, A.ld_immutable, ");
 		richQuery.append(" A.ld_indexed, A.ld_lockuserid, A.ld_filename, A.ld_status, A.ld_signed, A.ld_type, ");
@@ -270,7 +271,7 @@ public class FulltextSearch extends Search {
 				+ " and A.ld_nature=" + AbstractDocument.NATURE_DOC + " and A.ld_folderid=FOLD.ld_id  ");
 		richQuery.append(" and A.ld_tenantid = " + tenantId);
 		// For normal users we have to exclude not published documents
-		if (searchUser != null && !searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
+		if (searchUser != null && !searchUser.isMemberOf(Group.GROUP_ADMIN) && !searchUser.isMemberOf("publisher")) {
 			richQuery.append(" and A.ld_published = 1 ");
 			richQuery.append(" and A.ld_startpublishing <= CURRENT_TIMESTAMP ");
 			richQuery.append(" and ( A.ld_stoppublishing is null or A.ld_stoppublishing > CURRENT_TIMESTAMP )");
@@ -301,7 +302,7 @@ public class FulltextSearch extends Search {
 					+ " and A.ld_nature=" + AbstractDocument.NATURE_DOC + " and A.ld_folderid=FOLD.ld_id ");
 			richQuery.append(" and A.ld_tenantid = " + tenantId);
 			// For normal users we have to exclude not published documents
-			if (searchUser != null && !searchUser.isMemberOf("admin") && !searchUser.isMemberOf("publisher")) {
+			if (searchUser != null && !searchUser.isMemberOf(Group.GROUP_ADMIN) && !searchUser.isMemberOf("publisher")) {
 				richQuery.append(" and REF.ld_published = 1 ");
 				richQuery.append(" and REF.ld_startpublishing <= CURRENT_TIMESTAMP ");
 				richQuery.append(" and ( REF.ld_stoppublishing is null or REF.ld_stoppublishing > CURRENT_TIMESTAMP )");
@@ -341,7 +342,7 @@ public class FulltextSearch extends Search {
 			if (StringUtils.isEmpty(hit.getFileName()))
 				continue;
 
-			if ((searchUser.isMemberOf("admin") && opt.getFolderId() == null)
+			if ((searchUser.isMemberOf(Group.GROUP_ADMIN) && opt.getFolderId() == null)
 					|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId())))
 				hits.add(hit);
 		}

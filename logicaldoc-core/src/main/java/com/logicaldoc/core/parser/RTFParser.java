@@ -37,7 +37,7 @@ public class RTFParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) {
+			Document document, String fileVersion, StringBuilder content) {
 		
 		
 		try(BufferedInputStream bis0 = new BufferedInputStream(input); ) {
@@ -56,12 +56,12 @@ public class RTFParser extends AbstractParser {
 					out.write(buf, 0, len);
 			}
 			
-			StringBuffer strBuf = null;
+			StringBuilder strBuf = null;
 			try (FileInputStream fis = new FileInputStream(tempFile);
 					BufferedReader d = new BufferedReader(new InputStreamReader(fis))) {
 				String thisLine = "";
 
-				strBuf = new StringBuffer();
+				strBuf = new StringBuilder();
 				strBuf.append(content);
 
 				Pattern pattern = Pattern.compile("fldinst MERGEFIELD ");

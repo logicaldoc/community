@@ -35,7 +35,7 @@ public class PDFParser extends AbstractParser {
 
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
-			Document document, String fileVersion, StringBuffer content) throws ParseException {
+			Document document, String fileVersion, StringBuilder content) throws ParseException {
 		PDDocument pdfDocument = null;
 		try {
 			pdfDocument = PDDocument.load(input);
@@ -79,7 +79,7 @@ public class PDFParser extends AbstractParser {
 	 * Extract text and metadata from the main document
 	 * @throws Exception 
 	 */
-	protected void parseDocument(PDDocument pdfDocument, StringBuffer content) throws Exception {
+	protected void parseDocument(PDDocument pdfDocument, StringBuilder content) throws Exception {
 		PDDocumentInformation information = pdfDocument.getDocumentInformation();
 		if (information == null) {
 			throw new Exception("Can not get information from pdf document");
@@ -109,7 +109,7 @@ public class PDFParser extends AbstractParser {
 	/**
 	 * Extract the text from the form fields
 	 */
-	private void parseForm(PDDocument pdfDocument, StringBuffer content) throws IOException {
+	private void parseForm(PDDocument pdfDocument, StringBuilder content) throws IOException {
 		PDDocumentCatalog docCatalog = pdfDocument.getDocumentCatalog();
 		PDAcroForm acroForm = docCatalog.getAcroForm();
 

@@ -40,6 +40,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
 import com.logicaldoc.core.job.JobManager;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
@@ -513,7 +514,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 				tsk.getScheduling().setMaxLength(task.getScheduling().getMaxLength());
 
 				tsk.setSendActivityReport(task.isSendActivityReport());
-				StringBuffer sb = new StringBuffer();
+				StringBuilder sb = new StringBuilder();
 				for (GUIUser user : task.getReportRecipients()) {
 					if (sb.length() > 0)
 						sb.append(",");
@@ -641,7 +642,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			Long rootFolderId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		StringBuffer folderPredicate = new StringBuffer();
+		StringBuilder folderPredicate = new StringBuilder();
 		if (rootFolderId != null) {
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			Collection<Long> tree = fDao.findFolderIdInTree(rootFolderId, false);
@@ -674,7 +675,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 		try {
 
 			// Search in the document/folder history
-			StringBuffer query = new StringBuffer(
+			StringBuilder query = new StringBuilder(
 					"select A.ld_username, A.ld_event, A.ld_date, A.ld_filename, A.ld_folderid, A.ld_path, A.ld_sessionid, A.ld_docid, A.ld_userid, A.ld_ip as ip, A.ld_userlogin, A.ld_comment, A.ld_reason, A.ld_device, A.ld_geolocation from ld_history A where A.ld_tenantid = "
 							+ session.getTenantId());
 			if (userId != null)
@@ -893,7 +894,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			tenants.put(Tenant.SYSTEM_ID, "system");
 
 			// Search in the document/folder history
-			StringBuffer query = new StringBuffer(
+			StringBuilder query = new StringBuilder(
 					"select ld_username, ld_date, ld_path, ld_sessionid, ld_userid, ld_ip as ip, ld_userlogin, ld_comment, ld_device, ld_geolocation, ld_protocol, ld_tenantId from ld_webservicecall where 1 = 1 ");
 			if (userId != null)
 				query.append(" and ld_userid = " + userId);
@@ -964,7 +965,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	public void uninstallPlugin(String pluginId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
-			if (!session.getUser().isMemberOf("admin") || session.getTenantId() != Tenant.DEFAULT_ID)
+			if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 				throw new AccessDeniedException();
 
 			PluginRegistry pluginRegistry = PluginRegistry.getInstance();
@@ -1014,7 +1015,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	public void initializePlugin(String pluginId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
-			if (!session.getUser().isMemberOf("admin") || session.getTenantId() != Tenant.DEFAULT_ID)
+			if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 				throw new AccessDeniedException();
 
 			/*
@@ -1061,7 +1062,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	public void installPlugin() throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		try {
-			if (!session.getUser().isMemberOf("admin") || session.getTenantId() != Tenant.DEFAULT_ID)
+			if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 				throw new AccessDeniedException();
 
 			Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());

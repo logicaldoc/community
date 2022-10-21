@@ -235,7 +235,7 @@ public class ParserFactory {
 			config.setProperty(pAlias, "");
 		} else {
 			// Save as comma-separated values
-			StringBuffer sb = new StringBuffer();
+			StringBuilder sb = new StringBuilder();
 			for (String alias : aliases) {
 				sb.append(",");
 				sb.append(alias.trim());

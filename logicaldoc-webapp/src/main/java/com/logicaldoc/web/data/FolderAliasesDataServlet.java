@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.FolderDAO;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.util.Context;
@@ -39,11 +40,11 @@ public class FolderAliasesDataServlet extends AbstractDataServlet {
 		FolderDAO folderDAO = (FolderDAO) context.getBean(FolderDAO.class);
 		Collection<Long> accessibleFolderIds = folderDAO.findFolderIdByUserId(session.getUserId(), null, true);
 
-		StringBuffer query = new StringBuffer(
+		StringBuilder query = new StringBuilder(
 				"select id, name from Folder where deleted = 0 and foldRef = " + folderId);
 
 		User user = session.getUser();
-		if (!user.isMemberOf("admin")) {
+		if (!user.isMemberOf(Group.GROUP_ADMIN)) {
 			if (dao.isOracle()) {
 				/*
 				 * In Oracle The limit of 1000 elements applies to sets of

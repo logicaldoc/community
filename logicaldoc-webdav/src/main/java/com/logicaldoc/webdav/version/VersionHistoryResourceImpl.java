@@ -3,12 +3,13 @@ package com.logicaldoc.webdav.version;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.DavResourceLocator;
-import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.MultiStatusResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.property.DavProperty;
@@ -31,7 +32,6 @@ import com.logicaldoc.webdav.session.WebdavSession;
  * {@link org.apache.jackrabbit.webdav.simple.VersionHistoryResourceImpl}
  * 
  * @author Sebastian Wenzky
- * 
  */
 public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements VersionHistoryResource {
 
@@ -47,7 +47,7 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 	}
 
 	public void addMember(DavResource member, InputContext inputContext) throws DavException {
-		throw new DavException(DavServletResponse.SC_FORBIDDEN);
+		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	public void removeMember(DavResource member) throws DavException {
@@ -55,21 +55,21 @@ public class VersionHistoryResourceImpl extends DeltaVResourceImpl implements Ve
 	}
 
 	public void setProperty(DavProperty<?> property) throws DavException {
-		throw new DavException(DavServletResponse.SC_FORBIDDEN);
+		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	public void removeProperty(DavPropertyName propertyName) throws DavException {
-		throw new DavException(DavServletResponse.SC_FORBIDDEN);
+		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
 			throws DavException {
-		throw new DavException(DavServletResponse.SC_FORBIDDEN);
+		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	@SuppressWarnings("rawtypes")
 	public MultiStatusResponse alterProperties(List changeList) throws DavException {
-		throw new DavException(DavServletResponse.SC_FORBIDDEN);
+		throw new DavException(HttpServletResponse.SC_FORBIDDEN);
 	}
 
 	public VersionResource[] getVersions() throws DavException {

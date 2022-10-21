@@ -13,7 +13,7 @@ import org.wisepersist.gwt.uploader.client.events.UploadSuccessEvent;
 import org.wisepersist.gwt.uploader.client.events.UploadSuccessHandler;
 
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.logicaldoc.gui.common.client.Session;
@@ -110,8 +110,8 @@ public class Upload extends VerticalPanel {
 
 		add(uploader);
 		add(progressLabel);
-		setCellHorizontalAlignment(uploader, HorizontalPanel.ALIGN_LEFT);
-		setCellHorizontalAlignment(progressLabel, HorizontalPanel.ALIGN_LEFT);
+		setCellHorizontalAlignment(uploader, HasHorizontalAlignment.ALIGN_LEFT);
+		setCellHorizontalAlignment(progressLabel, HasHorizontalAlignment.ALIGN_LEFT);
 	}
 
 	private void resetText() {

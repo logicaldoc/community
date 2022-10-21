@@ -2,6 +2,8 @@ package com.logicaldoc.webdav.resource;
 
 import java.io.Serializable;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -91,7 +93,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @see org.apache.jackrabbit.webdav.DavResource#getSupportedMethods()
 	 */
 	public String getSupportedMethods() {
-		StringBuffer sb = new StringBuffer(super.getSupportedMethods());
+		StringBuilder sb = new StringBuilder(super.getSupportedMethods());
 		// Versioning support
 		sb.append(", ").append(VersionableResource.METHODS);
 		sb.append(", ").append(DavMethods.METHOD_CHECKOUT);
@@ -164,7 +166,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @see VersionControlledResource#update(UpdateInfo)
 	 */
 	public MultiStatus update(UpdateInfo updateInfo) throws DavException {
-		throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
+		throw new DavException(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 
 	/**
@@ -180,7 +182,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 * @see VersionControlledResource#merge(MergeInfo)
 	 */
 	public MultiStatus merge(MergeInfo mergeInfo) throws DavException {
-		throw new DavException(DavServletResponse.SC_NOT_IMPLEMENTED);
+		throw new DavException(HttpServletResponse.SC_NOT_IMPLEMENTED);
 	}
 
 	/**
@@ -197,10 +199,10 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 	 */
 	public void label(LabelInfo labelInfo) throws DavException {
 		if (labelInfo == null) {
-			throw new DavException(DavServletResponse.SC_BAD_REQUEST, "Valid label request body required.");
+			throw new DavException(HttpServletResponse.SC_BAD_REQUEST, "Valid label request body required.");
 		}
 		if (!exists()) {
-			throw new DavException(DavServletResponse.SC_NOT_FOUND);
+			throw new DavException(HttpServletResponse.SC_NOT_FOUND);
 		}
 
 		try {
@@ -208,7 +210,7 @@ public class VersionControlledResourceImpl extends DeltaVResourceImpl
 			if (resArr.length == 1 && resArr[0] instanceof VersionResource) {
 				((VersionResource) resArr[0]).label(labelInfo);
 			} else {
-				throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR,
+				throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 						"DAV:checked-in property on '" + getHref() + "' did not point to a single VersionResource.");
 			}
 		} catch (Exception e) {

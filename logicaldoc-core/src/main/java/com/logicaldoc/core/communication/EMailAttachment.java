@@ -20,7 +20,7 @@ import com.logicaldoc.util.Context;
  * @author Alessandro Gasparini - LogicalDOC
  */
 public class EMailAttachment implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 
 	protected static Logger log = LoggerFactory.getLogger(EMailAttachment.class);
@@ -103,24 +103,26 @@ public class EMailAttachment implements Serializable {
 		String content = null;
 
 		Parser parser = ParserFactory.getParser(getFileName());
+		if (parser == null) {
+			log.debug("Unexisting parser for attachment {}", getFileName());
+			return content;
+		}
 
 		log.debug("Using parser {} to parse attachment {}", parser.getClass().getName(), getFileName());
 
 		// and gets some fields
-		if (parser != null) {
-			try (InputStream contentStream = new ByteArrayInputStream(getData())) {
-				if (tenantId != null) {
-					TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-					content = parser.parse(contentStream, getFileName(),
-							StringUtils.isNotEmpty(encoding) ? encoding : "UTF-8",
-							locale != null ? locale : Locale.ENGLISH, tDao.findById(tenantId).getName());
-				} else
-					content = parser.parse(contentStream, getFileName(),
-							StringUtils.isNotEmpty(encoding) ? encoding : "UTF-8",
-							locale != null ? locale : Locale.ENGLISH, Tenant.DEFAULT_NAME);
-			} catch (Throwable e) {
-				log.error(e.getMessage(), e);
-			}
+		try (InputStream contentStream = new ByteArrayInputStream(getData())) {
+			if (tenantId != null) {
+				TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+				content = parser.parse(contentStream, getFileName(),
+						StringUtils.isNotEmpty(encoding) ? encoding : "UTF-8", locale != null ? locale : Locale.ENGLISH,
+						tDao.findById(tenantId).getName());
+			} else
+				content = parser.parse(contentStream, getFileName(),
+						StringUtils.isNotEmpty(encoding) ? encoding : "UTF-8", locale != null ? locale : Locale.ENGLISH,
+						Tenant.DEFAULT_NAME);
+		} catch (Throwable e) {
+			log.error(e.getMessage(), e);
 		}
 
 		return content;

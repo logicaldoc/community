@@ -1,10 +1,5 @@
 package com.logicaldoc.webservice;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
-
 public class Workbench {
 
 	public static void main(String[] args) {
