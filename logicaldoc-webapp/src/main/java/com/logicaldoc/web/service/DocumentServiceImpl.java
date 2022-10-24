@@ -691,9 +691,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					// If it is a shortcut, we delete only the shortcut
 					if (doc.getDocRef() != null) {
 						transaction.setEvent(DocumentEvent.SHORTCUT_DELETED.toString());
-						boolean deleted = dao.delete(doc.getId(), transaction);
-						if (!deleted)
-							throw new Exception("Document has not been deleted");
+						try {
+							dao.delete(doc.getId(), transaction);
+						} catch (Exception e) {
+							throw new Exception("Document has not been deleted", e);
+						}
 						continue;
 					}
 
@@ -716,9 +718,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 						for (Long shortcutId : dao.findAliasIds(doc.getId())) {
 							dao.delete(shortcutId);
 						}
-					boolean deleted = dao.delete(doc.getId(), transaction);
-					if (!deleted)
-						throw new Exception("Document has not been deleted");
+					try {
+						dao.delete(doc.getId(), transaction);
+					} catch (Exception e) {
+						throw new Exception("Document has not been deleted", e);
+					}
 				} catch (Throwable t) {
 					ServiceUtil.throwServerException(session, log, t);
 				}
@@ -733,9 +737,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			BookmarkDAO dao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 			for (long id : bookmarkIds) {
-				boolean deleted = dao.delete(id);
-				if (!deleted)
-					throw new Exception("Bookmarks have not been deleted");
+				try {
+					dao.delete(id);
+				} catch (Exception e) {
+					throw new Exception("Bookmarks have not been deleted", e);
+				}
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -749,9 +755,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			DocumentLinkDAO dao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 			for (long id : ids) {
-				boolean deleted = dao.delete(id);
-				if (!deleted)
-					throw new Exception("Bookmarks have not been deleted");
+				try {
+					dao.delete(id);
+				} catch (Exception e) {
+					throw new Exception("Bookmarks have not been deleted", e);
+				}
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -1237,9 +1245,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					document.setFileName(guiDocument.getFileName());
 					document.setColor(guiDocument.getColor());
 					document.setType(FileUtil.getExtension(document.getFileName()).toLowerCase());
-					boolean stored = docDao.store(document);
-					if (!stored)
-						throw new Exception("Alias not stored");
+					try {
+						docDao.store(document);
+					} catch (Exception e) {
+						throw new Exception("Alias not stored", e);
+					}
 
 					// Load the real target document for further updates
 					document = docDao.findById(guiDocument.getDocRef());

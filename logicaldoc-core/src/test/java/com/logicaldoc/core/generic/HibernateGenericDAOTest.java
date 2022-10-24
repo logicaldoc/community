@@ -70,7 +70,8 @@ public class HibernateGenericDAOTest extends AbstractCoreTCase {
 		generic.setSubtype("xxx");
 		generic.setInteger1(22L);
 		generic.setString1("aaa");
-		Assert.assertTrue(dao.store(generic));
+		dao.store(generic);
+		Assert.assertNotNull(generic);
 		generic = dao.findById(generic.getId());
 		Assert.assertEquals("xx", generic.getType());
 		Assert.assertEquals("xxx", generic.getSubtype());

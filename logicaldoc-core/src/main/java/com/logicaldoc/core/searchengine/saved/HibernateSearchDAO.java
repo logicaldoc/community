@@ -48,32 +48,22 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 	}
 
 	@Override
-	public boolean delete(long id, int code) throws PersistenceException {
+	public void delete(long id, int code) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
-
-		try {
-			SavedSearch search = (SavedSearch) findById(id);
-			if (search != null) {
-				search.setDeleted(code);
-				search.setName(search.getName() + "." + search.getId());
-				saveOrUpdate(search);
-			}
-
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
+		SavedSearch search = (SavedSearch) findById(id);
+		if (search != null) {
+			search.setDeleted(code);
+			search.setName(search.getName() + "." + search.getId());
+			saveOrUpdate(search);
 		}
-
-		return result;
 	}
 
 	@Override
-	public boolean store(SavedSearch search) throws PersistenceException {
+	public void store(SavedSearch search) throws PersistenceException {
 		setUniqueName(search);
-		return super.store(search);
+		super.store(search);
 	}
 
 	/**
@@ -87,7 +77,8 @@ public class HibernateSearchDAO extends HibernatePersistentObjectDAO<SavedSearch
 		 */
 		final Set<String> names = new HashSet<String>();
 
-		StringBuilder query = new StringBuilder("select lower(ld_name) from ld_search where ld_deleted=0 and ld_userid=");
+		StringBuilder query = new StringBuilder(
+				"select lower(ld_name) from ld_search where ld_deleted=0 and ld_userid=");
 		query.append(Long.toString(search.getId()));
 		query.append(" and lower(ld_name) like '");
 		query.append(SqlUtil.doubleQuotes(baseName.toLowerCase()));

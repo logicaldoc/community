@@ -41,7 +41,8 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 		menu.setName("text");
 		menu.setParentId(2);
 		menu.setMenuGroup(new long[] { 1, 2 });
-		Assert.assertTrue(dao.store(menu));
+		dao.store(menu);
+		Assert.assertNotNull(menu);
 
 		menu = dao.findById(2000);
 		Assert.assertEquals("menu.adminxxx", menu.getName());
@@ -56,22 +57,25 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 
 		menu = dao.findById(101);
 		menu.setName("pippo");
-		Assert.assertTrue(dao.store(menu));
+		dao.store(menu);
+		Assert.assertNotNull(menu);
 		menu = dao.findById(102);
 		Assert.assertNotNull(menu);
 
 		menu = dao.findById(101);
 		menu.setName("pippo2");
-		Assert.assertTrue(dao.store(menu));
+		dao.store(menu);
+		Assert.assertNotNull(menu);
 		menu = dao.findById(102);
 
 		menu = dao.findById(102);
-		Assert.assertTrue(dao.store(menu));
+		dao.store(menu);
+		Assert.assertNotNull(menu);
 	}
 
 	@Test
 	public void testDelete() throws PersistenceException {
-		Assert.assertTrue(dao.delete(99));
+		dao.delete(99);
 		Menu menu = dao.findById(99);
 		Assert.assertNull(menu);
 
@@ -79,7 +83,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 		docDao.delete(1);
 
 		// Delete a folder with documents
-		Assert.assertTrue(dao.delete(103));
+		dao.delete(103);
 		menu = dao.findById(103);
 		Assert.assertNull(menu);
 	}

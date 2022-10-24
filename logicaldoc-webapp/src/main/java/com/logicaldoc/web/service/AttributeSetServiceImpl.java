@@ -49,9 +49,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
-			boolean deleted = dao.delete(setId);
-			if (!deleted)
-				throw new Exception("Attribute Set has not been deleted");
+			dao.delete(setId);
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -68,9 +66,13 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				GUIValue value = values[i];
 				AttributeOption option = new AttributeOption(setId, attribute, value.getValue(), value.getCode());
 				option.setPosition(i);
-				boolean stored = dao.store(option);
-				if (!stored)
-					throw new Exception(String.format("Options have not been %s", setId != 0L ? "updated" : "stored"));
+
+				try {
+					dao.store(option);
+				} catch (Exception e) {
+					throw new Exception(String.format("Options have not been %s", setId != 0L ? "updated" : "stored"),
+							e);
+				}
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -87,9 +89,11 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 			for (AttributeOption option : options)
 				for (String value : values)
 					if (value.equals(option.getValue())) {
-						boolean deleted = dao.delete(option.getId());
-						if (!deleted)
-							throw new Exception("Option has not been deleted");
+						try {
+							dao.delete(option.getId());
+						} catch (Exception e) {
+							throw new Exception(String.format("Option has not been deleted"), e);
+						}
 						break;
 					}
 		} catch (Throwable t) {
@@ -156,10 +160,12 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 			if (attrs.size() > 0)
 				attSet.setAttributes(attrs);
 
-			boolean stored = dao.store(attSet);
-			if (!stored)
+			try {
+				dao.store(attSet);
+			} catch (Exception e) {
 				throw new Exception(String.format("Attribute Set has not been %s",
-						attributeSet.getId() != 0L ? "updated" : "stored"));
+						attributeSet.getId() != 0L ? "updated" : "stored"), e);
+			}
 
 			attributeSet.setId(attSet.getId());
 		} catch (Throwable t) {

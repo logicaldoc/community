@@ -305,10 +305,11 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			 */
 			user.setPasswordExpired(notify || requestorUserId == null || !requestorUserId.equals(userId) ? 1 : 0);
 
-			boolean stored = userDao.store(user, history);
-
-			if (!stored)
-				throw new Exception("User not stored");
+			try {
+				userDao.store(user, history);
+			} catch (Exception e1) {
+				throw new Exception("User not stored", e1);
+			}
 
 			if (notify)
 				try {
@@ -565,22 +566,27 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 				grp.setName(group.getName());
 				grp.setDescription(group.getDescription());
-				boolean stored = false;
-				if (group.getInheritGroupId() == null || group.getInheritGroupId().longValue() == 0) {
-					stored = groupDao.store(grp);
-				} else {
-					stored = groupDao.insert(grp, group.getInheritGroupId().longValue());
+
+				try {
+					if (group.getInheritGroupId() == null || group.getInheritGroupId().longValue() == 0) {
+						groupDao.store(grp);
+					} else {
+						groupDao.insert(grp, group.getInheritGroupId().longValue());
+					}
+				} catch (Exception e) {
+					throw new Exception("Group has not been updated", e);
 				}
-				if (!stored)
-					throw new Exception("Group has not been updated");
 			} else {
 				grp = new Group();
 				grp.setTenantId(session.getTenantId());
 				grp.setName(group.getName());
 				grp.setDescription(group.getDescription());
-				boolean stored = groupDao.store(grp);
-				if (!stored)
-					throw new Exception("Group has not been stored");
+
+				try {
+					groupDao.store(grp);
+				} catch (Exception e) {
+					throw new Exception("Group has not been stored", e);
+				}
 
 				if (group.getInheritGroupId() != null && group.getInheritGroupId().longValue() != 0)
 					groupDao.inheritACLs(grp, group.getInheritGroupId().longValue());
@@ -692,9 +698,11 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
 			transaction.setEvent(UserEvent.UPDATED.toString());
-			boolean stored = userDao.store(usr, transaction);
-			if (!stored)
-				throw new Exception("User not stored");
+			try {
+				userDao.store(usr, transaction);
+			} catch (Exception e1) {
+				throw new Exception("User not stored", e1);
+			}
 			guiUser.setId(usr.getId());
 
 			GroupDAO groupDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
@@ -875,9 +883,11 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			UserHistory transaction = new UserHistory();
 			transaction.setSession(session);
 			transaction.setEvent(UserEvent.UPDATED.toString());
-			boolean stored = userDao.store(usr, transaction);
-			if (!stored)
-				throw new Exception("Profile has not been updated");
+			try {
+				userDao.store(usr, transaction);
+			} catch (Exception e) {
+				throw new Exception("Profile has not been updated", e);
+			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -905,9 +915,11 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			usr.setDocsGrid(user.getDocsGrid());
 			usr.setHitsGrid(user.getHitsGrid());
 
-			boolean stored = userDao.store(usr);
-			if (!stored)
-				throw new Exception("Interface settings have not been updated");
+			try {
+				userDao.store(usr);
+			} catch (Exception e) {
+				throw new Exception("Interface settings have not been updated", e);
+			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -1102,8 +1114,9 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			}
 
 			menu.setMenuGroups(grps);
-			boolean stored = mdao.store(menu);
-			if (!stored) {
+			try {
+				mdao.store(menu);
+			} catch (Exception e) {
 				sqlerrors = true;
 			}
 		} catch (Throwable t) {
@@ -1403,10 +1416,12 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 		try {
 			SequenceDAO dao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
-			for (long id : ids) {
-				boolean deleted = dao.delete(id);
-				if (!deleted)
-					throw new Exception("Sequence has not been deleted");
+			try {
+				for (long id : ids) {
+					dao.delete(id);
+				}
+			} catch (Exception e) {
+				throw new Exception("Sequence has not been deleted", e);
 			}
 		} catch (Throwable e) {
 			ServiceUtil.throwServerException(session, log, e);

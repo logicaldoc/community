@@ -48,7 +48,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	private FolderHistoryDAO historyDao;
 
 	private TemplateDAO templateDao;
-	
+
 	protected static Logger log = LoggerFactory.getLogger(HibernateFolderDAOTest.class);
 
 	@Before
@@ -156,7 +156,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 				dao.store(folder);
 			}
 		}
-		
+
 		long size = dao.computeTreeSize(5L);
 		Assert.assertEquals(391049L, size);
 
@@ -257,7 +257,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 		Folder B = dao.findByPathExtended("/Default/A/B", 1L);
 		Assert.assertNull(B.getSecurityRef());
-	
+
 		Folder C = dao.findByPathExtended("/Default/A/B/C", 1L);
 		dao.initialize(C);
 		Assert.assertNull(C.getSecurityRef());
@@ -466,7 +466,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		folder.setName("text");
 		folder.setParentId(5);
 		folder.setFolderGroup(new long[] { 1, 2 });
-		Assert.assertTrue(dao.store(folder));
+		dao.store(folder);
+		Assert.assertNotNull(folder);
 
 		// Test updating the security rules
 		folder = dao.findById(folder.getId());
@@ -476,7 +477,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		fg.setGroupId(3L);
 		fg.setPermissions(5);
 		folder.addFolderGroup(fg);
-		Assert.assertTrue(dao.store(folder));
+		dao.store(folder);
+		Assert.assertNotNull(folder);
 		folder = dao.findById(folder.getId());
 		dao.initialize(folder);
 		Assert.assertTrue(folder.getFolderGroups().size() == 3);
@@ -516,7 +518,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		dao.initialize(folder);
 		folder.getFolderGroups().remove(folder.getFolderGroup(2));
 		Assert.assertEquals(2, folder.getFolderGroups().size());
-		Assert.assertTrue(dao.store(folder));
+		dao.store(folder);
+		Assert.assertNotNull(folder);
 		folder = dao.findById(Folder.ROOTID);
 		dao.initialize(folder);
 		Assert.assertEquals(4, folder.getFolderGroups().size());
@@ -524,14 +527,16 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		folder = dao.findById(1200);
 		dao.initialize(folder);
 		folder.setName("pippo");
-		Assert.assertTrue(dao.store(folder));
+		dao.store(folder);
+		Assert.assertNotNull(folder);
 		folder = dao.findById(1202);
 		Assert.assertNotNull(folder);
 
 		folder = dao.findById(1201);
 		dao.initialize(folder);
 		folder.setName("pippo2");
-		Assert.assertTrue(dao.store(folder));
+		dao.store(folder);
+		Assert.assertNotNull(folder);
 
 		// Try a folder with extended attributes
 		folder = dao.findById(1202);
@@ -540,7 +545,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(folder);
 		Assert.assertEquals("test_val_1", folder.getValue("val1"));
 		folder.setValue("val1", "xyz");
-		Assert.assertTrue(dao.store(folder));
+		dao.store(folder);
+		Assert.assertNotNull(folder);
 		folder = dao.findById(1202);
 		dao.initialize(folder);
 		Assert.assertNotNull(folder);
@@ -567,7 +573,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	public void testCreateAlias() throws PersistenceException {
 		Folder alias = dao.createAlias(4L, 3000L, null);
 		Assert.assertNotNull(alias);
-		
+
 		Assert.assertEquals(Long.valueOf(3000L), alias.getFoldRef());
 		Assert.assertEquals(Long.valueOf(3000L), alias.getSecurityRef());
 		Assert.assertEquals(new Integer(Folder.TYPE_ALIAS), new Integer(alias.getType()));
@@ -591,7 +597,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testDelete() throws PersistenceException {
-		Assert.assertTrue(dao.delete(1202));
+		dao.delete(1202);
 		Folder folder = dao.findById(12012);
 		Assert.assertNull(folder);
 
@@ -599,17 +605,17 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		docDao.delete(1202);
 
 		// Delete a folder with documents
-		Assert.assertTrue(dao.delete(1201));
+		dao.delete(1201);
 		folder = dao.findById(1201);
 		Assert.assertNull(folder);
-		
+
 		try {
 			dao.delete(Folder.DEFAULTWORKSPACEID);
 			Assert.fail("No exception was thrown");
 		} catch (PersistenceException e) {
 			log.debug("Delete error on DEFAULTWORKSPACEID", e);
 		}
-		
+
 		folder = dao.findById(Folder.DEFAULTWORKSPACEID);
 		Assert.assertNotNull(folder);
 	}

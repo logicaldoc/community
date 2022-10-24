@@ -710,8 +710,7 @@ public class LDRepository {
 				transaction.setEvent(FolderEvent.DELETED.toString());
 				transaction.setSessionId(sid);
 
-				if (!documentDao.delete(doc.getId(), transaction))
-					throw new Exception("Unable to delete document");
+				documentDao.delete(doc.getId(), transaction);
 			}
 
 			return true;
@@ -799,8 +798,7 @@ public class LDRepository {
 				transaction.setEvent(FolderEvent.DELETED.toString());
 				transaction.setSessionId(sid);
 
-				if (!documentDao.delete(doc.getId(), transaction))
-					throw new Exception("Unable to delete document");
+				documentDao.delete(doc.getId(), transaction);
 			}
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);

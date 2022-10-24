@@ -33,7 +33,7 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testDelete() throws PersistenceException {
-		Assert.assertTrue(dao.delete(1));
+		dao.delete(1);
 		AttributeSet set = dao.findById(1);
 		Assert.assertNull(set);
 	}
@@ -78,7 +78,7 @@ public class HibernateAttributeSetDAOTest extends AbstractCoreTCase {
 		set.setName("test3");
 		set.setValue("a1", "v1");
 		set.setValue("a2", "v2");
-		Assert.assertTrue(dao.store(set));
+		dao.store(set);
 		set = dao.findById(set.getId());
 		Assert.assertEquals("test3", set.getName());
 		Assert.assertTrue(set.getAttributes().containsKey("a1"));

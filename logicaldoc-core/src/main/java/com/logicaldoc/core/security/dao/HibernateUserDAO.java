@@ -1,5 +1,6 @@
 package com.logicaldoc.core.security.dao;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,7 +32,6 @@ import com.logicaldoc.core.security.UserHistory;
 import com.logicaldoc.core.security.UserListener;
 import com.logicaldoc.core.security.UserListenerManager;
 import com.logicaldoc.core.security.WorkingTime;
-import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authentication.PasswordAlreadyUsedException;
 import com.logicaldoc.core.security.authentication.PasswordWeakException;
 import com.logicaldoc.i18n.I18N;
@@ -215,177 +215,175 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public boolean store(User user) {
-		return store(user, null);
+	public void store(User user) throws PasswordAlreadyUsedException, PersistenceException {
+		store(user, null);
 	}
 
 	@Override
-	public boolean store(User user, UserHistory transaction) throws PasswordAlreadyUsedException {
+	public void store(User user, UserHistory transaction) throws PasswordAlreadyUsedException, PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
 		boolean newUser = user.getId() == 0;
 		boolean passwordChanged = false;
 		boolean enabledChanged = false;
 
-		try {
-			String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
-			passwordChanged = currentPassword == null || !currentPassword.equals(user.getPassword());
+		String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
+		passwordChanged = currentPassword == null || !currentPassword.equals(user.getPassword());
 
-			if (passwordChanged) {
-				checkAlreadyUsedPassword(user);
-				checkPasswordStrength(user);
-			}
+		if (passwordChanged) {
+			checkAlreadyUsedPassword(user);
+			checkPasswordStrength(user);
+		}
 
-			if ("admin".equals(user.getUsername()) && user.getType() != User.TYPE_DEFAULT)
-				throw new Exception("User admin must be default type");
-			if (newUser && findByUsernameIgnoreCase(user.getUsername()) != null)
-				throw new Exception(
-						String.format("Another user exists with the same username %s (perhaps with different case)",
-								user.getUsername()));
+		if ("admin".equals(user.getUsername()) && user.getType() != User.TYPE_DEFAULT)
+			throw new PersistenceException("User admin must be default type");
+		if (newUser && findByUsernameIgnoreCase(user.getUsername()) != null)
+			throw new PersistenceException(String.format(
+					"Another user exists with the same username %s (perhaps with different case)", user.getUsername()));
 
-			if (user.getType() == User.TYPE_SYSTEM)
-				user.setType(User.TYPE_DEFAULT);
+		if (user.getType() == User.TYPE_SYSTEM)
+			user.setType(User.TYPE_DEFAULT);
 
-			if (user.isReadonly()) {
-				GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-				Group guestGroup = gDao.findByName("guest", user.getTenantId());
-				Group userGroup = user.getUserGroup();
-				user.removeGroupMemberships(null);
-				user.addGroup(userGroup);
-				user.addGroup(guestGroup);
-			}
+		if (user.isReadonly()) {
+			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			Group guestGroup = gDao.findByName("guest", user.getTenantId());
+			Group userGroup = user.getUserGroup();
+			user.removeGroupMemberships(null);
+			user.addGroup(userGroup);
+			user.addGroup(guestGroup);
+		}
 
-			Map<String, Object> dictionary = new HashMap<String, Object>();
+		Map<String, Object> dictionary = new HashMap<String, Object>();
 
-			log.debug("Invoke listeners before store");
-			for (UserListener listener : userListenerManager.getListeners())
+		log.debug("Invoke listeners before store");
+		for (UserListener listener : userListenerManager.getListeners())
+			try {
 				listener.beforeStore(user, transaction, dictionary);
+			} catch (Exception e1) {
+				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e1);
+			}
 
-			if (newUser) {
-				user.setCreation(new Date());
+		if (newUser) {
+			user.setCreation(new Date());
+			user.setLastEnabled(user.getCreation());
+		} else {
+			int currentEnabled = queryForInt("select ld_enabled from ld_user where ld_id=" + user.getId());
+			enabledChanged = currentEnabled != user.getEnabled();
+
+			// Record the last enabled date in case the user is getting
+			// enabled
+			if (enabledChanged && user.getEnabled() == 1)
+				user.setLastEnabled(new Date());
+
+			// In any case the last enabled must at least equal the creation
+			// date
+			if (user.getLastEnabled() == null)
 				user.setLastEnabled(user.getCreation());
-			} else {
-				int currentEnabled = queryForInt("select ld_enabled from ld_user where ld_id=" + user.getId());
-				enabledChanged = currentEnabled != user.getEnabled();
 
-				// Record the last enabled date in case the user is getting
-				// enabled
-				if (enabledChanged && user.getEnabled() == 1)
-					user.setLastEnabled(new Date());
+			user.setPasswordExpired(isPasswordExpired(user) ? 1 : 0);
+		}
 
-				// In any case the last enabled must at least equal the creation
-				// date
-				if (user.getLastEnabled() == null)
-					user.setLastEnabled(user.getCreation());
+		if ("admin".equals(user.getUsername()) && user.getPassword() == null)
+			throw new PersistenceException(
+					String.format("Trying to alter the %s user with null password", user.getUsername()));
 
-				user.setPasswordExpired(isPasswordExpired(user) ? 1 : 0);
-			}
+		saveOrUpdate(user);
 
-			if ("admin".equals(user.getUsername()) && user.getPassword() == null)
-				throw new Exception(
-						String.format("Trying to alter the %s user with null password", user.getUsername()));
+		GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
+		String userGroupName = user.getUserGroupName();
+		Group grp = groupDAO.findByName(userGroupName, user.getTenantId());
+		if (grp == null) {
+			grp = new Group();
+			grp.setName(userGroupName);
+			grp.setType(Group.TYPE_USER);
+			grp.setTenantId(user.getTenantId());
+			groupDAO.store(grp);
+		}
+		if (!user.isMemberOf(grp.getName()))
+			user.addGroup(grp);
 
-			saveOrUpdate(user);
-
-			GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
-			String userGroupName = user.getUserGroupName();
-			Group grp = groupDAO.findByName(userGroupName, user.getTenantId());
-			if (grp == null) {
-				grp = new Group();
-				grp.setName(userGroupName);
-				grp.setType(Group.TYPE_USER);
-				grp.setTenantId(user.getTenantId());
-				groupDAO.store(grp);
-			}
-			if (!user.isMemberOf(grp.getName()))
-				user.addGroup(grp);
-
-			/*
-			 * Update the user-group assignments
-			 */
-			{
-				jdbcUpdate("delete from ld_usergroup where ld_userid = ?", user.getId());
-				for (UserGroup ug : user.getUserGroups()) {
-					int exists = queryForInt("select count(*) from ld_group where ld_id=" + ug.getGroupId());
-					if (exists > 0) {
-						jdbcUpdate("insert into ld_usergroup(ld_userid, ld_groupid) values (" + user.getId() + ", "
-								+ ug.getGroupId() + ")");
-					} else
-						log.warn("It seems that the usergroup {} does not exist anymore", ug.getGroupId());
-				}
-			}
-
-			// Save the password history to track the password change
-			if (passwordChanged) {
-				PasswordHistory pHist = new PasswordHistory();
-				pHist.setDate(transaction != null ? transaction.getDate() : new Date());
-				pHist.setUserId(user.getId());
-				pHist.setPassword(user.getPassword());
-				pHist.setTenantId(user.getTenantId());
-				passwordHistoryDAO.store(pHist);
-				passwordHistoryDAO.cleanOldHistories(user.getId(), getPasswordEnforce(user) * 2);
-			}
-
-			log.debug("Invoke listeners after store");
-			for (UserListener listener : userListenerManager.getListeners())
-				listener.afterStore(user, transaction, dictionary);
-
-			if (newUser) {
-				saveDefaultDashlets(user);
-
-				/*
-				 * Save an history to record the user creation
-				 */
-				UserHistory createdHistory = new UserHistory();
-				if (transaction != null)
-					createdHistory = new UserHistory(transaction);
-				createdHistory.setEvent(UserEvent.CREATED.toString());
-				createdHistory.setComment(user.getUsername());
-				saveUserHistory(user, createdHistory);
-			} else if (transaction != null)
-				saveUserHistory(user, transaction);
-
-			// If the admin password was changed the 'adminpasswd' also has to
-			// be updated
-			if ("admin".equals(user.getUsername()) && user.getTenantId() == Tenant.DEFAULT_ID) {
-				log.info("Updated adminpasswd");
-				config.setProperty("adminpasswd", user.getPassword());
-				config.write();
-			}
-
-			if (user.isReadonly()) {
-				user = findById(user.getId());
-				initialize(user);
-				for (Group group : user.getGroups())
-					groupDAO.fixGuestPermissions(group);
-			}
-
-			if (enabledChanged && (transaction == null || (!transaction.getEvent().equals(UserEvent.DISABLED.toString())
-					&& !transaction.getEvent().equals(UserEvent.ENABLED.toString())))) {
-				UserHistory enabledOrDisabledHistory = new UserHistory();
-				if (transaction != null)
-					enabledOrDisabledHistory = new UserHistory(transaction);
-				else {
-					enabledOrDisabledHistory.setUser(user);
-				}
-				enabledOrDisabledHistory.setEvent(
-						user.getEnabled() == 1 ? UserEvent.ENABLED.toString() : UserEvent.DISABLED.toString());
-				enabledOrDisabledHistory.setComment(null);
-				saveUserHistory(user, enabledOrDisabledHistory);
-			}
-		} catch (Throwable e) {
-			if (e instanceof AuthenticationException) {
-				throw (AuthenticationException) e;
-			} else {
-				log.error(e.getMessage(), e);
-				result = false;
-				throw new RuntimeException(e.getMessage());
+		/*
+		 * Update the user-group assignments
+		 */
+		{
+			jdbcUpdate("delete from ld_usergroup where ld_userid = ?", user.getId());
+			for (UserGroup ug : user.getUserGroups()) {
+				int exists = queryForInt("select count(*) from ld_group where ld_id=" + ug.getGroupId());
+				if (exists > 0) {
+					jdbcUpdate("insert into ld_usergroup(ld_userid, ld_groupid) values (" + user.getId() + ", "
+							+ ug.getGroupId() + ")");
+				} else
+					log.warn("It seems that the usergroup {} does not exist anymore", ug.getGroupId());
 			}
 		}
 
-		return result;
+		// Save the password history to track the password change
+		if (passwordChanged) {
+			PasswordHistory pHist = new PasswordHistory();
+			pHist.setDate(transaction != null ? transaction.getDate() : new Date());
+			pHist.setUserId(user.getId());
+			pHist.setPassword(user.getPassword());
+			pHist.setTenantId(user.getTenantId());
+			passwordHistoryDAO.store(pHist);
+			passwordHistoryDAO.cleanOldHistories(user.getId(), getPasswordEnforce(user) * 2);
+		}
+
+		log.debug("Invoke listeners after store");
+		for (UserListener listener : userListenerManager.getListeners())
+			try {
+				listener.afterStore(user, transaction, dictionary);
+			} catch (Exception e1) {
+				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e1);
+			}
+
+		if (newUser) {
+			saveDefaultDashlets(user);
+
+			/*
+			 * Save an history to record the user creation
+			 */
+			UserHistory createdHistory = new UserHistory();
+			if (transaction != null)
+				createdHistory = new UserHistory(transaction);
+			createdHistory.setEvent(UserEvent.CREATED.toString());
+			createdHistory.setComment(user.getUsername());
+			saveUserHistory(user, createdHistory);
+		} else if (transaction != null)
+			saveUserHistory(user, transaction);
+
+		// If the admin password was changed the 'adminpasswd' also has to
+		// be updated
+		if ("admin".equals(user.getUsername()) && user.getTenantId() == Tenant.DEFAULT_ID) {
+			log.info("Updated adminpasswd");
+			config.setProperty("adminpasswd", user.getPassword());
+			try {
+				config.write();
+			} catch (IOException e) {
+				log.warn("Cannot write the new admin password in the configuration file", e);
+			}
+		}
+
+		if (user.isReadonly()) {
+			user = findById(user.getId());
+			initialize(user);
+			for (Group group : user.getGroups())
+				groupDAO.fixGuestPermissions(group);
+		}
+
+		if (enabledChanged && (transaction == null || (!transaction.getEvent().equals(UserEvent.DISABLED.toString())
+				&& !transaction.getEvent().equals(UserEvent.ENABLED.toString())))) {
+			UserHistory enabledOrDisabledHistory = new UserHistory();
+			if (transaction != null)
+				enabledOrDisabledHistory = new UserHistory(transaction);
+			else {
+				enabledOrDisabledHistory.setUser(user);
+			}
+			enabledOrDisabledHistory
+					.setEvent(user.getEnabled() == 1 ? UserEvent.ENABLED.toString() : UserEvent.DISABLED.toString());
+			enabledOrDisabledHistory.setComment(null);
+			saveUserHistory(user, enabledOrDisabledHistory);
+		}
 	}
 
 	private void saveDefaultDashlets(User user) throws PersistenceException {
@@ -624,42 +622,33 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 	}
 
 	@Override
-	public boolean delete(long userId, int code) {
-		return delete(userId, null);
+	public void delete(long userId, int code) throws PersistenceException {
+		delete(userId, null);
 	}
 
 	@Override
-	public boolean delete(long userId, UserHistory transaction) {
+	public void delete(long userId, UserHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
+		User user = (User) findById(userId);
+		Group userGroup = user.getUserGroup();
 
-		try {
-			User user = (User) findById(userId);
-			Group userGroup = user.getUserGroup();
-
-			if (user != null) {
-				user.setDeleted(PersistentObject.DELETED_CODE_DEFAULT);
-				user.setUsername(user.getUsername() + "." + user.getId());
-				saveOrUpdate(user);
-			}
-
-			// Delete the user's group
-			if (userGroup != null) {
-				GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
-				groupDAO.delete(userGroup.getId());
-			}
-
-			jdbcUpdate("delete from ld_usergroup where ld_userid=" + userId);
-
-			saveUserHistory(user, transaction);
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
+		if (user != null) {
+			user.setDeleted(PersistentObject.DELETED_CODE_DEFAULT);
+			user.setUsername(user.getUsername() + "." + user.getId());
+			saveOrUpdate(user);
 		}
 
-		return result;
+		// Delete the user's group
+		if (userGroup != null) {
+			GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			groupDAO.delete(userGroup.getId());
+		}
+
+		jdbcUpdate("delete from ld_usergroup where ld_userid=" + userId);
+
+		saveUserHistory(user, transaction);
 	}
 
 	private void saveUserHistory(User user, UserHistory transaction) {
@@ -706,7 +695,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		refresh(user);
 
 		for (WorkingTime wt : user.getWorkingTimes())
-			wt.hashCode();
+			log.debug("Initializing working time {}", wt.getLabel());
 
 		List<Long> groupIds = new ArrayList<Long>();
 		try {

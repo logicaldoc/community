@@ -72,7 +72,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		transaction.setComment("");
 		transaction.setUser(new User());
 
-		Assert.assertTrue(dao.delete(1, transaction));
+		dao.delete(1, transaction);
 		Document doc = dao.findById(1);
 		Assert.assertNull(doc);
 	}
@@ -85,7 +85,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		transaction.setComment("");
 		transaction.setUser(new User());
 
-		Assert.assertTrue(dao.archive(1, transaction));
+		dao.archive(1, transaction);
 		Document doc = dao.findById(1);
 		Assert.assertNotNull(doc);
 		Assert.assertEquals(AbstractDocument.DOC_ARCHIVED, doc.getStatus());
@@ -99,7 +99,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		transaction.setComment("");
 		transaction.setUser(new User());
 
-		Assert.assertTrue(dao.archive(1, transaction));
+		dao.archive(1, transaction);
 		Document doc = dao.findById(1);
 
 		List<Document> docs = dao.findArchivedByFolder(doc.getFolder().getId());
@@ -115,7 +115,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		transaction.setComment("");
 		transaction.setUser(new User());
 
-		Assert.assertTrue(dao.archive(1, transaction));
+		dao.archive(1, transaction);
 		Document doc = dao.findById(1);
 		Assert.assertNotNull(doc);
 		Assert.assertEquals(AbstractDocument.DOC_ARCHIVED, doc.getStatus());
@@ -322,7 +322,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		doc.setFileName("pippo.pdf");
 
 		doc.setValues("multi", new String[] { "value1", "value2", "value3" });
-		Assert.assertTrue(dao.store(doc));
+		dao.store(doc);
 
 		doc = dao.findById(doc.getId());
 		Assert.assertNotNull(doc);

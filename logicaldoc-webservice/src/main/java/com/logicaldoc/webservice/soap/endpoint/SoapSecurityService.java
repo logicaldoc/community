@@ -167,8 +167,7 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 			else if (StringUtils.isEmpty(usr.getFirstName()))
 				throw new Exception("Missing mandatory value 'FirstName'");
 
-			if (!dao.store(usr))
-				throw new Exception("Unable to store the user");
+			dao.store(usr);
 
 			if (user.getGroupIds() != null && user.getGroupIds().length > 0) {
 				usr.removeGroupMemberships(null);
@@ -197,24 +196,24 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				if (grp.getType() != Group.TYPE_DEFAULT) {
 					throw new Exception(String.format("You cannot edit group with id %s because it is a system group",
 							grp.getId()));
-				}			
+				}
 				grp.setName(group.getName());
 				grp.setDescription(group.getDescription());
-				grp.setType(group.getType());				
+				grp.setType(group.getType());
 			}
 
 			if (StringUtils.isEmpty(grp.getName()))
 				throw new Exception("Missing mandatory value 'Name'");
 
 			if (group.getUserIds() != null && group.getUserIds().length > 0) {
-				
+
 				UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 				for (User usr : grp.getUsers()) {
 					usr.removeGroup(grp.getId());
 					userDao.store(usr);
 				}
 
-				for (long userId : group.getUserIds()) {					
+				for (long userId : group.getUserIds()) {
 					User user = userDao.findById(userId);
 					grp.getUsers().add(user);
 					user.addGroup(grp);
@@ -222,13 +221,11 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 				}
 			}
 
-			if (dao.store(grp)) {
-				if (group.getInheritGroupId() != null && group.getInheritGroupId().longValue() > 0)
-					dao.inheritACLs(grp, group.getInheritGroupId().longValue());
-				
-				return grp.getId();
-			} else
-				throw new Exception("Unable to store the group");
+			dao.store(grp);
+			if (group.getInheritGroupId() != null && group.getInheritGroupId().longValue() > 0)
+				dao.inheritACLs(grp, group.getInheritGroupId().longValue());
+
+			return grp.getId();
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
@@ -302,10 +299,8 @@ public class SoapSecurityService extends AbstractService implements SecurityServ
 
 			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 
-			boolean stored = dao.store(user, history);
-
-			if (!stored)
-				throw new Exception("User not stored");
+			dao.store(user, history);
+			
 			return 0;
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);

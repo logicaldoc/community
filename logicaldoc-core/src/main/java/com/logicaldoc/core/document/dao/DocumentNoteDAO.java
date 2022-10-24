@@ -16,7 +16,15 @@ import com.logicaldoc.core.document.DocumentNote;
  */
 public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 
-	public boolean store(DocumentNote note, DocumentHistory transaction) throws PersistenceException;
+	/**
+	 * Stores a note and saves the document's history
+	 * 
+	 * @param note the note
+	 * @param transaction session informations
+	 * 
+	 * @throws PersistenceException raised in case of database errors
+	 */
+	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * This method finds the list of document notes regarding a document with the

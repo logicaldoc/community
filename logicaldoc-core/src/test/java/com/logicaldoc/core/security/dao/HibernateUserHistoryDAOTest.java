@@ -39,10 +39,8 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(histories);
 		Assert.assertEquals(2, histories.size());
 
-		for (UserHistory history : histories) {
-			boolean result = dao.delete(history.getId());
-			Assert.assertTrue(result);
-		}
+		for (UserHistory history : histories)
+			dao.delete(history.getId());
 
 		histories = (Collection<UserHistory>) dao.findByUserId(4);
 		Assert.assertNotNull(histories);
@@ -74,7 +72,8 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 		userHistory.setUserId(3L);
 		userHistory.setEvent("first test User History store");
 
-		Assert.assertTrue(dao.store(userHistory));
+		dao.store(userHistory);
+		Assert.assertNotNull(userHistory);
 
 		UserHistory newUserHistory = new UserHistory();
 		newUserHistory.setDate(DateBean.dateFromCompactString("20061220"));
@@ -82,7 +81,8 @@ public class HibernateUserHistoryDAOTest extends AbstractCoreTCase {
 		newUserHistory.setUserId(3L);
 		newUserHistory.setEvent("second test User History store");
 
-		Assert.assertTrue(dao.store(newUserHistory));
+		dao.store(newUserHistory);
+		Assert.assertNotNull(newUserHistory);
 
 		// Test the stored history
 		Collection<UserHistory> histories = (Collection<UserHistory>) dao.findByUserId(3);

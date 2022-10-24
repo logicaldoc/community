@@ -112,22 +112,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public boolean archive(long docId, DocumentHistory transaction) {
-		boolean result = true;
-		try {
-			Document doc = (Document) findById(docId);
-			doc.setStatus(AbstractDocument.DOC_ARCHIVED);
-			if (doc.getIndexed() != AbstractDocument.INDEX_SKIP)
-				doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
-			doc.setLockUserId(transaction.getUserId());
-			transaction.setEvent(DocumentEvent.ARCHIVED.toString());
-			store(doc, transaction);
-			log.debug("Archived document {}", docId);
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
-		}
-		return result;
+	public void archive(long docId, DocumentHistory transaction) throws PersistenceException {
+		Document doc = (Document) findById(docId);
+		doc.setStatus(AbstractDocument.DOC_ARCHIVED);
+		if (doc.getIndexed() != AbstractDocument.INDEX_SKIP)
+			doc.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+		doc.setLockUserId(transaction.getUserId());
+		transaction.setEvent(DocumentEvent.ARCHIVED.toString());
+		store(doc, transaction);
+		log.debug("Archived document {}", docId);
 	}
 
 	@Override
@@ -145,52 +138,44 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public boolean delete(long docId, DocumentHistory transaction) {
-		return delete(docId, PersistentObject.DELETED_CODE_DEFAULT, transaction);
+	public void delete(long docId, DocumentHistory transaction) throws PersistenceException {
+		delete(docId, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 	}
 
 	@Override
-	public boolean delete(long docId, int delCode, DocumentHistory transaction) {
+	public void delete(long docId, int delCode, DocumentHistory transaction) throws PersistenceException {
 		assert (delCode != 0);
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
-		try {
-			Document doc = (Document) findById(docId);
-			if (doc != null && doc.getImmutable() == 0 || (doc != null && doc.getImmutable() == 1
-					&& transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
+		Document doc = (Document) findById(docId);
+		if (doc != null && doc.getImmutable() == 0
+				|| (doc != null && doc.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
 
-				// Remove versions
-				removeVersions(docId, delCode);
+			// Remove versions
+			removeVersions(docId, delCode);
 
-				// Remove notes
-				removeNotes(docId, delCode);
+			// Remove notes
+			removeNotes(docId, delCode);
 
-				// Remove links
-				removeLinks(docId, delCode);
+			// Remove links
+			removeLinks(docId, delCode);
 
-				doc.setDeleted(delCode);
-				doc.setDeleteUserId(transaction.getUserId());
+			doc.setDeleted(delCode);
+			doc.setDeleteUserId(transaction.getUserId());
 
-				if (transaction.getUser() != null)
-					doc.setDeleteUser(transaction.getUser().getFullName());
-				else
-					doc.setDeleteUser(transaction.getUsername());
+			if (transaction.getUser() != null)
+				doc.setDeleteUser(transaction.getUser().getFullName());
+			else
+				doc.setDeleteUser(transaction.getUsername());
 
-				if (doc.getCustomId() != null)
-					doc.setCustomId(doc.getCustomId() + "." + doc.getId());
-				result = store(doc, transaction);
-			}
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
+			if (doc.getCustomId() != null)
+				doc.setCustomId(doc.getCustomId() + "." + doc.getId());
+			store(doc, transaction);
 		}
-
-		return result;
 	}
 
 	private void removeLinks(long docId, int delCode) {
@@ -300,16 +285,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public boolean store(final Document doc) throws PersistenceException {
-		return store(doc, null);
+	public void store(final Document doc) throws PersistenceException {
+		store(doc, null);
 	}
 
 	@Override
-	public boolean store(Document doc, final DocumentHistory transaction) throws PersistenceException {
+	public void store(Document doc, final DocumentHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
 		try {
 			Tenant tenant = tenantDAO.findById(doc.getTenantId());
 
@@ -379,11 +363,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			 */
 			updateAliases(doc);
 		} catch (Throwable e) {
-			result = false;
 			handleStoreError(transaction, e);
 		}
-
-		return result;
 	}
 
 	private boolean handleStoreError(final DocumentHistory transaction, Throwable e) throws PersistenceException {
@@ -1048,18 +1029,18 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	}
 
-	public void deleteAll(Collection<Document> documents, DocumentHistory transaction) {
+	public void deleteAll(Collection<Document> documents, DocumentHistory transaction) throws PersistenceException {
 		deleteAll(documents, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 	}
 
 	@Override
-	public void deleteAll(Collection<Document> documents, int delCode, DocumentHistory transaction) {
+	public void deleteAll(Collection<Document> documents, int delCode, DocumentHistory transaction)
+			throws PersistenceException {
 		for (Document document : documents) {
 			DocumentHistory deleteHistory = new DocumentHistory(transaction);
 			deleteHistory.setEvent(DocumentEvent.DELETED.toString());
 			delete(document.getId(), delCode, deleteHistory);
 		}
-
 	}
 
 	public void setNoteDAO(DocumentNoteDAO noteDAO) {
@@ -1093,14 +1074,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			transaction.setDocument(doc);
 			transaction.setPath(folderDAO.computePathExtended(doc.getFolder().getId()));
 
-			boolean saved = documentHistoryDAO.store(transaction);
-			if (saved) {
-				log.debug("Invoke listeners after store");
-				for (DocumentListener listener : listenerManager.getListeners())
-					listener.afterSaveHistory(doc, transaction, dictionary);
+			documentHistoryDAO.store(transaction);
 
-				EventCollector.get().newEvent(transaction);
-			}
+			log.debug("Invoke listeners after store");
+			for (DocumentListener listener : listenerManager.getListeners())
+				listener.afterSaveHistory(doc, transaction, dictionary);
+
+			EventCollector.get().newEvent(transaction);
 		} catch (Throwable e) {
 			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());

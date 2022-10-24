@@ -74,9 +74,11 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 			if (template.getReadonly() == 1 || !dao.isWriteEnable(templateId, session.getUserId()))
 				throw new Exception("You do not have the permission");
 
-			boolean deleted = dao.delete(templateId);
-			if (!deleted)
-				throw new Exception("Template has not been deleted");
+			try {
+				dao.delete(templateId);
+			} catch (Exception e) {
+				throw new Exception("Template has not been deleted", e);
+			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
 		}
@@ -197,10 +199,12 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 				templ.getTemplateGroups().addAll(grps);
 			}
 
-			boolean stored = dao.store(templ);
-			if (!stored)
+			try {
+				dao.store(templ);
+			} catch (Exception e) {
 				throw new Exception(
-						String.format("Template has not been %s", templ.getId() != 0L ? "updated" : "stored"));
+						String.format("Template has not been %s", templ.getId() != 0L ? "updated" : "stored"), e);
+			}
 
 			template.setId(templ.getId());
 		} catch (Throwable t) {

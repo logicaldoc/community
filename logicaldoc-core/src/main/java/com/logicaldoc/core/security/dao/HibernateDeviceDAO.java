@@ -98,10 +98,10 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	}
 
 	@Override
-	public boolean store(Device entity) throws PersistenceException {
+	public void store(Device entity) throws PersistenceException {
 		if (StringUtils.isEmpty(entity.getDeviceId()))
 			entity.setDeviceId(UUID.randomUUID().toString());
-		return super.store(entity);
+		super.store(entity);
 	}
 
 	@Override
@@ -176,25 +176,16 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	}
 
 	@Override
-	public boolean delete(long deviceId, int code) {
+	public void delete(long deviceId, int code) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
-
-		try {
-			Device device = (Device) findById(deviceId);
-			if (device != null) {
-				device.setDeleted(code);
-				device.setDeviceId(device.getId() + "." + device.getDeviceId());
-				saveOrUpdate(device);
-			}
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
+		Device device = (Device) findById(deviceId);
+		if (device != null) {
+			device.setDeleted(code);
+			device.setDeviceId(device.getId() + "." + device.getDeviceId());
+			saveOrUpdate(device);
 		}
-
-		return result;
 	}
 
 	public void setUserDAO(UserDAO userDAO) {

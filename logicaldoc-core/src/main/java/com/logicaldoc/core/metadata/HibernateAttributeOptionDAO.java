@@ -103,18 +103,12 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 	}
 
 	@Override
-	public boolean delete(long id, int code) {
+	public void delete(long id, int code) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		try {
-			AttributeOption option = findById(id);
-			del(option, code);
-			return true;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return false;
-		}
+		AttributeOption option = findById(id);
+		del(option, code);
 	}
 
 	private void del(AttributeOption option, int code) {

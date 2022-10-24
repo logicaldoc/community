@@ -125,7 +125,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 	}
 
 	@Override
-	public boolean store(Tenant entity) {
+	public void store(Tenant entity) {
 		throw new RuntimeException("Feature not enabled");
 	}
 

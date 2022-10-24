@@ -43,8 +43,7 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(4, histories.size());
 
 		for (DocumentHistory history : histories) {
-			boolean result = dao.delete(history.getId());
-			Assert.assertTrue(result);
+			dao.delete(history.getId());			
 		}
 
 		histories = (Collection<DocumentHistory>) dao.findByUserId(4);
@@ -130,7 +129,8 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTCase {
 		history.setUserId(3L);
 		history.setEvent("test History store");
 
-		Assert.assertTrue(dao.store(history));
+		dao.store(history);
+		Assert.assertNotNull(history);
 		history = dao.findById(history.getId());
 		Assert.assertEquals("file.old", history.getFilenameOld());
 
@@ -141,7 +141,8 @@ public class HibernateDocumentHistoryDAOTest extends AbstractCoreTCase {
 		folderHistory.setUserId(3L);
 		folderHistory.setEvent("test History store");
 
-		Assert.assertTrue(dao.store(folderHistory));
+		dao.store(folderHistory);
+		Assert.assertNotNull(folderHistory);
 
 		// Test the stored history
 		Collection<DocumentHistory> histories = (Collection<DocumentHistory>) dao.findByUserId(3);

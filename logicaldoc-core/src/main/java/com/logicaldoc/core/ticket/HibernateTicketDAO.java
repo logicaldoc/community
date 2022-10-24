@@ -35,14 +35,14 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 	}
 
 	@Override
-	public boolean store(Ticket entity) {
-		return this.store(entity, null);
+	public void store(Ticket entity) throws PersistenceException {
+		this.store(entity, null);
 	}
 
 	@Override
-	public boolean store(Ticket entity, DocumentHistory transaction) {
+	public void store(Ticket entity, DocumentHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
 		if (entity.getExpired() == null) {
 			// Retrieve the time to live
@@ -55,12 +55,7 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 		if (StringUtils.isEmpty(entity.getSuffix()))
 			entity.setSuffix(null);
 
-		boolean ret = false;
-		try {
-			ret = super.store(entity);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		super.store(entity);
 
 		if (transaction != null) {
 			transaction.setEvent(DocumentEvent.DTICKET_CREATED.toString());
@@ -73,8 +68,6 @@ public class HibernateTicketDAO extends HibernatePersistentObjectDAO<Ticket> imp
 				log.warn(e.getMessage(), e);
 			}
 		}
-
-		return ret;
 	}
 
 	/**

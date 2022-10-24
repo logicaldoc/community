@@ -201,17 +201,17 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 	}
 
 	@Override
-	public boolean store(SystemMessage message) throws PersistenceException {
+	public void store(SystemMessage message) throws PersistenceException {
 		long originalId = message.getId();
 
 		// Do standard processing
-		boolean stored = super.store(message);
+		super.store(message);
 
 		/**
 		 * Store a new event for the recipient, in case this is a new system
 		 * message
 		 */
-		if (stored && originalId == 0L && message.getType() == Message.TYPE_SYSTEM) {
+		if (originalId == 0L && message.getType() == Message.TYPE_SYSTEM) {
 			UserHistoryDAO hDao = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 			for (Recipient rec : message.getRecipients()) {
@@ -236,7 +236,5 @@ public class HibernateSystemMessageDAO extends HibernatePersistentObjectDAO<Syst
 				hDao.store(history);
 			}
 		}
-
-		return stored;
 	}
 }

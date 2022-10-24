@@ -84,45 +84,38 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public boolean delete(long id, int code) {
+	public void delete(long id, int code) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		try {
-			DocumentLink link = findById(id);
-			if (link != null) {
-				long docId1 = link.getDocument1() != null ? link.getDocument1().getId() : 0;
-				long docId2 = link.getDocument2() != null ? link.getDocument2().getId() : 0;
+		DocumentLink link = findById(id);
+		if (link != null) {
+			long docId1 = link.getDocument1() != null ? link.getDocument1().getId() : 0;
+			long docId2 = link.getDocument2() != null ? link.getDocument2().getId() : 0;
 
-				getCurrentSession().delete(link);
+			getCurrentSession().delete(link);
 
-				flush();
+			flush();
 
-				updateLinksCount(docId1);
-				updateLinksCount(docId2);
-			}
-			return true;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return false;
+			updateLinksCount(docId1);
+			updateLinksCount(docId2);
 		}
+
 	}
 
 	@Override
-	public boolean store(DocumentLink entity) throws PersistenceException {
+	public void store(DocumentLink entity) throws PersistenceException {
 		boolean newLink = entity.getId() == 0L;
-		boolean result = super.store(entity);
+		super.store(entity);
 
 		flush();
 
-		if (newLink && result) {
+		if (newLink) {
 			if (entity.getDocument1() != null)
 				updateLinksCount(entity.getDocument1().getId());
 			if (entity.getDocument2() != null)
 				updateLinksCount(entity.getDocument2().getId());
 		}
-
-		return result;
 	}
 
 	private void updateLinksCount(long docId) {

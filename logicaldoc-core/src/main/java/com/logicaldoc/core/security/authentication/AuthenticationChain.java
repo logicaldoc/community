@@ -48,7 +48,12 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
-		User user = checkAnonymousLogin(username, key, client);
+		User user = null;
+		try {
+			user = checkAnonymousLogin(username, key, client);
+		} catch (AuthenticationException | PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 		if (user != null)
 			return user;
 
@@ -81,6 +86,10 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			errors.clear();
 			errors.add(ae);
 			user = null;
+		} catch (PersistenceException pe) {
+			log.error(pe.getMessage(), pe);
+			errors.clear();
+			user = null;
 		}
 
 		if (errors != null && !errors.isEmpty())
@@ -102,7 +111,8 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		return user;
 	}
 
-	protected void defaultValidations(String username, Client client) throws AuthenticationException {
+	protected void defaultValidations(String username, Client client)
+			throws AuthenticationException, PersistenceException {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		User user = userDao.findByUsername(username);
 		if (user == null)
@@ -161,7 +171,8 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	/*
 	 * Checks the anonymous login
 	 */
-	protected User checkAnonymousLogin(String username, String key, Client client) {
+	protected User checkAnonymousLogin(String username, String key, Client client)
+			throws AuthenticationException, PersistenceException {
 		String tenant = Tenant.DEFAULT_NAME;
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);

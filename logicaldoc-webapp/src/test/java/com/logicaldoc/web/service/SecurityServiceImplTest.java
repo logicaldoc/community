@@ -81,7 +81,12 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 
 		// Delete a non-deleteable group
 		Assert.assertNotNull(groupDAO.findById(1));
-		service.deleteGroup(1);
+		try {
+			service.deleteGroup(1);
+			Assert.fail("Admin group has been deleted");
+		} catch (Exception e) {
+			// We expect an exception here
+		}
 		Assert.assertNotNull(groupDAO.findById(1));
 	}
 

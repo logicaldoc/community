@@ -249,9 +249,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
 					document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
 
-				boolean stored = documentDAO.store(document);
-				if (!stored)
-					throw new Exception("Document not checked in");
+				documentDAO.store(document);
 
 				document = documentDAO.findById(document.getId());
 				Folder folder = document.getFolder();
@@ -277,8 +275,7 @@ public class DocumentManagerImpl implements DocumentManager {
 						DocumentEvent.CHECKEDIN.toString(), release);
 
 				document.setStatus(AbstractDocument.DOC_UNLOCKED);
-				if (documentDAO.store(document, transaction) == false)
-					throw new Exception(String.format("Errors saving document %s", document.getId()));
+				documentDAO.store(document, transaction);
 
 				// store the document in the repository (on the file system)
 				try {
@@ -302,17 +299,13 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				version.setFileSize(document.getFileSize());
 				version.setDigest(null);
-				stored = versionDAO.store(version);
-				if (!stored)
-					throw new Exception("Version not stored");
+				versionDAO.store(version);
 
 				log.debug("Stored version {}", version.getVersion());
 				log.debug("Invoke listeners after checkin");
 				for (DocumentListener listener : listenerManager.getListeners())
 					listener.afterCheckin(document, transaction, dictionary);
-				stored = documentDAO.store(document);
-				if (!stored)
-					throw new Exception("Document not stored");
+				documentDAO.store(document);
 
 				log.debug("Checked in document {}", docId);
 
@@ -378,13 +371,10 @@ public class DocumentManagerImpl implements DocumentManager {
 				transaction.setEvent(DocumentEvent.LOCKED.toString());
 
 			// Modify document history entry
-			boolean stored = documentDAO.store(document, transaction);
-			if (!stored)
-				throw new PersistenceException("Document not locked");
+			documentDAO.store(document, transaction);
 		}
 
 		log.debug("locked document {}", docId);
-
 	}
 
 	private void storeFile(Document doc, File file) throws IOException {
@@ -464,10 +454,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public long reindex(long docId, String content, DocumentHistory transaction) throws Exception {
 		Document doc = documentDAO.findById(docId);
-		if (doc == null) {
-			log.warn("Unexisting document with ID: {}", docId);
-			return 0;
-		}
+		assert doc != null : "Unexisting document with ID: " + docId;
 
 		log.debug("Reindexing document {} - {}", docId, doc.getFileName());
 
@@ -514,9 +501,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (transaction != null)
 			transaction.setEvent(DocumentEvent.INDEXED.toString());
 
-		boolean stored = documentDAO.store(doc, transaction);
-		if (!stored)
-			throw new Exception("Document not stored");
+		documentDAO.store(doc, transaction);
 
 		/*
 		 * If the document was already indexed, mark the aliases to be
@@ -638,24 +623,19 @@ public class DocumentManagerImpl implements DocumentManager {
 							DocumentEvent.CHANGED.toString(), false);
 					versionDAO.store(version);
 
-					boolean stored = false;
-
 					// Modify document history entry
 					doc.setVersion(version.getVersion());
 					if (renameTransaction != null) {
 						renameTransaction.setUser(transaction.getUser());
-						stored = documentDAO.store(doc, renameTransaction);
+						documentDAO.store(doc, renameTransaction);
 					} else {
-						stored = documentDAO.store(doc, transaction);
+						documentDAO.store(doc, transaction);
 					}
 
-					if (!stored) {
-						try {
-							versionDAO.delete(version.getId());
-						} catch (Throwable t) {
-							// Nothing to do
-						}
-						throw new Exception("Document not stored");
+					try {
+						versionDAO.delete(version.getId());
+					} catch (Throwable t) {
+						// Nothing to do
 					}
 
 					markAliasesToIndex(doc.getId());
@@ -713,12 +693,9 @@ public class DocumentManagerImpl implements DocumentManager {
 						DocumentEvent.MOVED.toString(), false);
 				version.setId(0);
 
-				boolean stored = documentDAO.store(doc, transaction);
-				if (!stored)
-					throw new PersistenceException("Document not stored");
-				stored = versionDAO.store(version);
-				if (!stored)
-					throw new PersistenceException("Version not stored");
+				documentDAO.store(doc, transaction);
+
+				versionDAO.store(version);
 			}
 		} else {
 			throw new PersistenceException("Document is immutable");
@@ -802,28 +779,25 @@ public class DocumentManagerImpl implements DocumentManager {
 
 				// Create the record
 				transaction.setEvent(DocumentEvent.STORED.toString());
-				stored = documentDAO.store(docVO, transaction);
+				documentDAO.store(docVO, transaction);
 
-				if (stored) {
-					/* store the document into filesystem */
-					if (file != null)
-						try {
-							storeFile(docVO, file);
-						} catch (Throwable e) {
-							String message = String.format("Unable to store the file of document %d", docVO.getId());
-							log.error(message);
-							documentDAO.delete(docVO.getId());
-							throw new Exception(message, e);
-						}
+				/* store the document into filesystem */
+				if (file != null)
+					try {
+						storeFile(docVO, file);
+					} catch (Throwable e) {
+						String message = String.format("Unable to store the file of document %d", docVO.getId());
+						log.error(message);
+						documentDAO.delete(docVO.getId());
+						throw new Exception(message, e);
+					}
 
-					// Store the initial version (default 1.0)
-					Version vers = Version.create(docVO, userDAO.findById(transaction.getUserId()),
-							transaction.getComment(), DocumentEvent.STORED.toString(), true);
-					versionDAO.store(vers);
-					log.debug("Stored version {}", vers.getVersion());
-					return docVO;
-				} else
-					throw new Exception("Document not stored");
+				// Store the initial version (default 1.0)
+				Version vers = Version.create(docVO, userDAO.findById(transaction.getUserId()),
+						transaction.getComment(), DocumentEvent.STORED.toString(), true);
+				versionDAO.store(vers);
+				log.debug("Stored version {}", vers.getVersion());
+				return docVO;
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
@@ -944,9 +918,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			// Modify document history entry
 			transaction.setEvent(DocumentEvent.UNLOCKED.toString());
-			boolean stored = documentDAO.store(document, transaction);
-			if (!stored)
-				throw new PersistenceException("Document not unlocked");
+			documentDAO.store(document, transaction);
 		}
 		log.debug("Unlocked document {}", docId);
 	}
@@ -998,8 +970,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				versionDAO.store(version);
 
 				transaction.setEvent(DocumentEvent.RENAMED.toString());
-				if (documentDAO.store(document, transaction) == false)
-					throw new PersistenceException(String.format("Errors saving document %s", document.getId()));
+				documentDAO.store(document, transaction);
 
 				markAliasesToIndex(docId);
 				log.debug("Document renamed: {}", document.getId());
@@ -1165,9 +1136,11 @@ public class DocumentManagerImpl implements DocumentManager {
 				}
 		}
 
-		boolean deleted = versionDAO.delete(versionId);
-		if (!deleted)
-			throw new PersistenceException("Version not deleted from the database");
+		try {
+			versionDAO.delete(versionId);
+		} catch (PersistenceException e) {
+			throw new PersistenceException("Version not deleted from the database", e);
+		}
 
 		// Save the version deletion history
 		DocumentHistory delHistory = null;
@@ -1204,9 +1177,7 @@ public class DocumentManagerImpl implements DocumentManager {
 						"Version changed to " + document.getVersion() + " (" + document.getFileVersion() + ")");
 			}
 
-			boolean stored = documentDAO.store(document, transaction);
-			if (!stored)
-				throw new PersistenceException("Document not stored");
+			documentDAO.store(document, transaction);
 		}
 
 		return lastVersion;
@@ -1260,8 +1231,8 @@ public class DocumentManagerImpl implements DocumentManager {
 
 			// Create the document history event
 			DocumentHistory t = new DocumentHistory(transaction);
-			if (dao.archive(id, t))
-				idsList.add(id);
+			dao.archive(id, t);
+			idsList.add(id);
 		}
 
 		// Remove all corresponding hits from the index

@@ -24,13 +24,12 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	}
 
 	@Override
-	public boolean delete(long genericId, int code) throws PersistenceException {
+	public void delete(long genericId, int code) throws PersistenceException {
 		assert (code != 0);
 
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
 		Generic generic = findById(genericId);
 		if (generic != null) {
 			generic.setType(generic.getType() + "." + generic.getId());
@@ -39,8 +38,6 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 			saveOrUpdate(generic);
 			flush();
 		}
-
-		return result;
 	}
 
 	@Override
@@ -67,13 +64,13 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) {
 		String query = " 1=1 ";
 		if (StringUtils.isNotEmpty(type))
-			query += " and "+ALIAS_ENTITY+".type like '" + SqlUtil.doubleQuotes(type) + "' ";
+			query += " and " + ALIAS_ENTITY + ".type like '" + SqlUtil.doubleQuotes(type) + "' ";
 		if (StringUtils.isNotEmpty(subtype))
-			query += " and "+ALIAS_ENTITY+".subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
+			query += " and " + ALIAS_ENTITY + ".subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
 		if (qualifier != null)
-			query += " and "+ALIAS_ENTITY+".qualifier = " + qualifier;
+			query += " and " + ALIAS_ENTITY + ".qualifier = " + qualifier;
 		if (tenantId != null)
-			query += " and "+ALIAS_ENTITY+".tenantId = " + tenantId;
+			query += " and " + ALIAS_ENTITY + ".tenantId = " + tenantId;
 
 		try {
 			return findByWhere(query, null, null);
@@ -93,9 +90,8 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	}
 
 	@Override
-	public boolean store(Generic entity) throws PersistenceException {
-		boolean stored = super.store(entity);
+	public void store(Generic entity) throws PersistenceException {
+		super.store(entity);
 		flush();
-		return stored;
 	}
 }

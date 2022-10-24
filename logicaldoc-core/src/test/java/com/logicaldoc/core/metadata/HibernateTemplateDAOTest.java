@@ -33,12 +33,12 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 	@Test
 	public void testDelete() throws PersistenceException {
 		try {
-			Assert.assertFalse(dao.delete(1));
+			dao.delete(1);
 		} catch (PersistenceException e) {
 			Assert.assertTrue(true);
 		}
-		
-		Assert.assertTrue(dao.delete(-1L));
+
+		dao.delete(-1L);
 		Template template = dao.findById(-1L);
 		Assert.assertNull(template);
 	}
@@ -94,7 +94,8 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 		template.setValue("a2", "v2");
 		template.setValue("object", "value");
 
-		Assert.assertTrue(dao.store(template));
+		dao.store(template);
+		Assert.assertNotNull(template);
 		template = dao.findById(template.getId());
 		dao.initialize(template);
 		Assert.assertEquals("test3", template.getName());
@@ -102,18 +103,18 @@ public class HibernateTemplateDAOTest extends AbstractCoreTCase {
 		Assert.assertTrue(template.getAttributes().containsKey("a2"));
 		Assert.assertTrue(template.getAttributes().containsKey("object"));
 	}
-	
+
 	@Test
 	public void testPermissions() throws PersistenceException {
 		Template template = dao.findById(1L);
 		Assert.assertNotNull(template);
-		
+
 		Assert.assertTrue(dao.isReadEnable(1L, 1L));
 		Assert.assertTrue(dao.isWriteEnable(1L, 1L));
-		
+
 		Assert.assertTrue(dao.isReadEnable(1L, 3L));
 		Assert.assertTrue(dao.isWriteEnable(1L, 3L));
-		
+
 		Assert.assertFalse(dao.isReadEnable(1L, 5L));
 		Assert.assertFalse(dao.isWriteEnable(1L, 5L));
 	}

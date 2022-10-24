@@ -35,8 +35,7 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 	@Override
 	public List<MessageTemplate> findByLanguage(String language, long tenantId) {
 		try {
-			return findByWhere(
-					" " + ALIAS_ENTITY + LANGUAGE + language + AND + ALIAS_ENTITY + TENANT_ID + tenantId,
+			return findByWhere(" " + ALIAS_ENTITY + LANGUAGE + language + AND + ALIAS_ENTITY + TENANT_ID + tenantId,
 					"order by " + ALIAS_ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -66,8 +65,8 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 			lang = "en";
 
 		try {
-			List<MessageTemplate> buf = findByWhere(" " + ALIAS_ENTITY + LANGUAGE + lang + AND + ALIAS_ENTITY
-					+ NAME + name + AND + ALIAS_ENTITY + TENANT_ID + tenantId, null, null);
+			List<MessageTemplate> buf = findByWhere(" " + ALIAS_ENTITY + LANGUAGE + lang + AND + ALIAS_ENTITY + NAME
+					+ name + AND + ALIAS_ENTITY + TENANT_ID + tenantId, null, null);
 			if (buf != null && !buf.isEmpty())
 				return buf.get(0);
 
@@ -83,31 +82,26 @@ public class HibernateMessageTemplateDAO extends HibernatePersistentObjectDAO<Me
 	}
 
 	@Override
-	public boolean delete(long id, int code) {
+	public void delete(long id, int code) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
 		assert (code != 0);
 
-		try {
-			MessageTemplate template = (MessageTemplate) findById(id);
-			if (template != null) {
-				template.setDeleted(code);
-				template.setName(template.getName() + "." + template.getId());
-				saveOrUpdate(template);
-			}
-			return true;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return false;
+		MessageTemplate template = (MessageTemplate) findById(id);
+		if (template != null) {
+			template.setDeleted(code);
+			template.setName(template.getName() + "." + template.getId());
+			saveOrUpdate(template);
 		}
 	}
 
 	@Override
 	public List<MessageTemplate> findByName(String name, long tenantId) {
 		try {
-			return findByWhere(" " + ALIAS_ENTITY + NAME + SqlUtil.doubleQuotes(name) + AND + ALIAS_ENTITY
-					+ TENANT_ID + tenantId, null, null);
+			return findByWhere(
+					" " + ALIAS_ENTITY + NAME + SqlUtil.doubleQuotes(name) + AND + ALIAS_ENTITY + TENANT_ID + tenantId,
+					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<MessageTemplate>();

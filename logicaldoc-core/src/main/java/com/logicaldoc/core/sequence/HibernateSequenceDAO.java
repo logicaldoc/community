@@ -152,13 +152,12 @@ public class HibernateSequenceDAO extends HibernatePersistentObjectDAO<Sequence>
 	}
 
 	@Override
-	public boolean delete(long id, int code) throws PersistenceException {
+	public void delete(long id, int code) throws PersistenceException {
 		Sequence seq = findById(id);
 		if (seq != null) {
 			seq.setName(seq.getId() + "." + seq.getName());
 			seq.setDeleted(code);
 			store(seq);
 		}
-		return true;
 	}
 }

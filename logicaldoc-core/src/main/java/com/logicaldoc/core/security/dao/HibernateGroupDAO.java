@@ -35,29 +35,19 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 		this.menuDAO = menuDAO;
 	}
 
-	public boolean delete(long groupId, int code) {
+	public void delete(long groupId, int code) throws PersistenceException {
 		assert (code != 0);
-		boolean result = true;
+		Group group = findById(groupId);
+		refresh(group);
 
-		try {
-			Group group = findById(groupId);
-			refresh(group);
+		if (group.getName().equals("admin") || group.getName().equals("guest") || group.getName().equals("publisher"))
+			throw new PersistenceException(String.format("Group %s cannot be deleted", group.getName()));
 
-			if (group.getName().equals("admin") || group.getName().equals("guest")
-					|| group.getName().equals("publisher"))
-				throw new Exception(String.format("Group %s cannot be deleted", group.getName()));
-
-			if (group != null) {
-				group.setName(group.getName() + "." + group.getId());
-				group.setDeleted(code);
-				saveOrUpdate(group);
-			}
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
+		if (group != null) {
+			group.setName(group.getName() + "." + group.getId());
+			group.setDeleted(code);
+			saveOrUpdate(group);
 		}
-
-		return result;
 	}
 
 	public boolean exists(String groupname, long tenantId) {
@@ -222,10 +212,9 @@ public class HibernateGroupDAO extends HibernatePersistentObjectDAO<Group> imple
 	}
 
 	@Override
-	public boolean store(Group group) throws PersistenceException {
-		boolean ret = super.store(group);
+	public void store(Group group) throws PersistenceException {
+		super.store(group);
 		fixGuestPermissions((Group) group);
-		return ret;
 	}
 
 	/**

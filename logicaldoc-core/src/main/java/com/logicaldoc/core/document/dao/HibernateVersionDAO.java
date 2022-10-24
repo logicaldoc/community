@@ -90,14 +90,21 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 			log.trace("Initialized {} attributes", version.getAttributes().keySet().size());
 	}
 
+	/**
+	 * This method persists the given version. Checks if is necessary to delete
+	 * some document versions reading the context property
+	 * 'document.maxversions' and the maxVersions property of the owning
+	 * workspace.
+	 * 
+	 * @param version version to be stored.
+	 * 
+	 * @throws PersistenceException raised in case of database errors
+	 */
 	@Override
-	public boolean store(Version version) {
-		boolean result = true;
-		try {
-			result = super.store(version);
-			if (!result)
-				return false;
+	public void store(Version version) throws PersistenceException {
+		super.store(version);
 
+		try {
 			// Checks the context property 'document.maxversions'
 			ContextProperties bean = new ContextProperties();
 			int maxVersions = bean.getInt("document.maxversions");
@@ -108,8 +115,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 			if (maxVersions > 0) {
 				List<Version> versions = findByDocId(version.getDocId());
 
-				// Inverse order the document versions
 				if (versions.size() > maxVersions) {
+					// Inverse order the document versions
 					Collections.sort(versions, Collections.reverseOrder());
 
 					// Delete the oldest versions
@@ -118,21 +125,17 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 					// Prepare a list of files(fileVersion) that must be
 					// retained
 					Set<String> filesToBeRetained = new HashSet<>();
-					for (int i = 0; i < versions.size(); i++) {
-						if (i < maxVersions)
-							if (!filesToBeRetained.contains(versions.get(i).getFileVersion()))
-								filesToBeRetained.add(versions.get(i).getFileVersion());
-					}
+					for (int i = 0; i < versions.size(); i++)
+						if (i < maxVersions && !filesToBeRetained.contains(versions.get(i).getFileVersion()))
+							filesToBeRetained.add(versions.get(i).getFileVersion());
 
 					// Clean the files no more needed
 					cleanUnusedFiles(version, filesToBeRetained);
 				}
 			}
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
+		} catch (IOException e) {
+			throw new PersistenceException(e.getMessage(), e);
 		}
-		return result;
 	}
 
 	private void cleanUnusedFiles(Version version, Set<String> filesToBeRetained) {
@@ -159,7 +162,11 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 				Version deleteVersion = versions.get(i);
 				initialize(deleteVersion);
 				deleteVersion.setDeleted(1);
-				store(deleteVersion);
+				try {
+					store(deleteVersion);
+				} catch (PersistenceException e) {
+					log.warn(e.getMessage(), e);
+				}
 			}
 		}
 	}
@@ -184,26 +191,19 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	}
 
 	@Override
-	public boolean delete(long versionId, int delCode) {
-		assert (delCode != 0);
+	public void delete(long versionId, int delCode) throws PersistenceException {
+		assert delCode != 0 : "delCode cannot be 0";
 
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
-		try {
-			Version ver = (Version) findById(versionId);
-			assert (ver != null);
-			if (ver != null) {
-				ver.setDeleted(delCode);
-				ver.setVersion(StringUtils.right(versionId + "." + ver.getVersion(), 10));
-				store(ver);
-			}
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
+		Version ver = (Version) findById(versionId);
+		assert ver != null : "Unezisting version with ID=" + versionId;
+		if (ver != null) {
+			ver.setDeleted(delCode);
+			ver.setVersion(StringUtils.right(versionId + "." + ver.getVersion(), 10));
+			store(ver);
 		}
-		return result;
 	}
 
 	public void setFolderDAO(FolderDAO folderDAO) {

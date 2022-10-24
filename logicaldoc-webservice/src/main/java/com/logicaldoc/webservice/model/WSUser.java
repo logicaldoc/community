@@ -17,6 +17,7 @@ import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.WorkingTime;
 import com.logicaldoc.core.security.dao.GroupDAO;
+import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
@@ -58,7 +59,7 @@ public class WSUser {
 	private String username = "";
 
 	private String password = "";
-	
+
 	private String decodedPassword = "";
 
 	private String passwordmd4 = "";
@@ -458,8 +459,11 @@ public class WSUser {
 	}
 
 	public static WSUser fromUser(User user) {
-		WSUser wsUser = new WSUser();
+		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
+		if (user.getId() != 0L)
+			dao.initialize(user);
 
+		WSUser wsUser = new WSUser();
 		try {
 			wsUser.setId(user.getId());
 			wsUser.setCity(user.getCity());

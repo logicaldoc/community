@@ -79,7 +79,7 @@ public class HibernateVersionDAOTest extends AbstractCoreTCase {
 		version.setUserId(1);
 		version.setUsername("matteo");
 		version.setDocId(1);
-		Assert.assertTrue(dao.store(version));
+		dao.store(version);
 		Assert.assertNotNull(dao.findById(2));
 		Assert.assertNotNull(dao.findById(1));
 

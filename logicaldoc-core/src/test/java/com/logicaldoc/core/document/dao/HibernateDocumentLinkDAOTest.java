@@ -54,7 +54,7 @@ public class HibernateDocumentLinkDAOTest extends AbstractCoreTCase {
 	public void testDelete() throws PersistenceException {
 		DocumentLink link = dao.findById(1);
 		Assert.assertNotNull(link);
-		Assert.assertTrue(dao.delete(1));
+		dao.delete(1);
 		link = dao.findById(1);
 		Assert.assertNull(link);
 

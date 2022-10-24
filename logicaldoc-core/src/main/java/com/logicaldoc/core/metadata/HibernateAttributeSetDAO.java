@@ -68,31 +68,23 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	@Override
-	public boolean delete(long id, int code) {
+	public void delete(long id, int code) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
-		try {
-			AttributeSet set = (AttributeSet) findById(id);
-			if (set == null)
-				return true;
+		AttributeSet set = (AttributeSet) findById(id);
+		if (set == null)
+			return;
 
-			set.setDeleted(code);
-			set.setName(set.getName() + "." + set.getId());
-			saveOrUpdate(set);
+		set.setDeleted(code);
+		set.setName(set.getName() + "." + set.getId());
+		saveOrUpdate(set);
 
-			optionsDao.deleteBySetIdAndAttribute(id, null);
+		optionsDao.deleteBySetIdAndAttribute(id, null);
 
-			List<Template> templates = templateDao.findAll(set.getTenantId());
-			for (Template template : templates)
-				templateDao.store(template);
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
-		}
-
-		return result;
+		List<Template> templates = templateDao.findAll(set.getTenantId());
+		for (Template template : templates)
+			templateDao.store(template);
 	}
 
 	@Override
@@ -111,15 +103,15 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	}
 
 	@Override
-	public boolean store(AttributeSet set) throws PersistenceException {
+	public void store(AttributeSet set) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
 		// Enforce the set specifications in all the attributes
 		for (Attribute att : set.getAttributes().values()) {
 			att.setSetId(set.getId());
 		}
-		boolean result = super.store(set);
+		super.store(set);
 		for (Attribute att : set.getAttributes().values())
 			att.setSetId(set.getId());
 		super.store(set);
@@ -158,8 +150,6 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 			}
 			templateDao.store(template);
 		}
-
-		return result;
 	}
 
 	public void setTemplateDao(TemplateDAO templateDao) {

@@ -34,7 +34,7 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testDelete() throws PersistenceException {
-		Assert.assertTrue(dao.delete(1));
+		dao.delete(1);
 		SystemMessage message = dao.findById(1);
 		Assert.assertNull(message);
 	}
@@ -126,7 +126,8 @@ public class HibernateSystemMessageDAOTest extends AbstractCoreTCase {
 		message.setType(Message.TYPE_SYSTEM);
 		message.setStatus(SystemMessage.STATUS_NEW);
 		message.setRecipients(recipients);
-		Assert.assertTrue(dao.store(message));
+		dao.store(message);
+		Assert.assertNotNull(message);
 		message = dao.findById(message.getId());
 		Assert.assertNotNull(message);
 		Assert.assertEquals(2, message.getRecipients().size());

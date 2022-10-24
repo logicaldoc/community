@@ -66,27 +66,21 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		this.entityClass = entityClass;
 	}
 
-	public boolean delete(long id, int code) throws PersistenceException {
+	public void delete(long id, int code) throws PersistenceException {
 		assert (code != 0);
 
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
-		try {
-			T entity = findById(id);
-			if (entity == null)
-				return false;
-			entity.setDeleted(code);
-			store(entity);
-		} catch (Throwable e) {
-			throw new PersistenceException(e);
-		}
-		return result;
+		T entity = findById(id);
+		if (entity == null)
+			return;
+		entity.setDeleted(code);
+		store(entity);
 	}
 
-	public boolean delete(long id) throws PersistenceException {
-		return delete(id, PersistentObject.DELETED_CODE_DEFAULT);
+	public void delete(long id) throws PersistenceException {
+		delete(id, PersistentObject.DELETED_CODE_DEFAULT);
 	}
 
 	public List<T> findAll() {
@@ -284,16 +278,14 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 		return true;
 	}
 
-	public boolean store(T entity) throws PersistenceException {
+	public void store(T entity) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
+		entity.setLastModified(new java.util.Date());
 
+		// Save the entity
 		try {
-			entity.setLastModified(new java.util.Date());
-
-			// Save the entity
 			saveOrUpdate(entity);
-			return true;
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
 		}

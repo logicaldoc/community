@@ -42,11 +42,17 @@ public class HibernateGroupDAOTest extends AbstractCoreTCase {
 	public void testDelete() throws PersistenceException {
 		Assert.assertNotNull(dao.findById(10));
 
-		Assert.assertTrue(dao.delete(10));
+		dao.delete(10);
 		Assert.assertNull(dao.findById(10));
 
 		// Try to delete undeletable group
-		Assert.assertFalse(dao.delete(1));
+		try {
+			dao.delete(1);
+			Assert.fail("Group admin cannot be deleted");
+		} catch (PersistenceException e) {
+			// we expect an exception here
+		}
+		Assert.assertNotNull(dao.findById(1L));
 	}
 
 	@Test
@@ -92,10 +98,9 @@ public class HibernateGroupDAOTest extends AbstractCoreTCase {
 		group.setName("LogicalObjects");
 		group.setDescription("Test group for store method");
 
-		boolean result = dao.store(group);
+		dao.store(group);
 		Assert.assertNotNull(dao.findByName("LogicalObjects", 1));
-		Assert.assertTrue(result);
-
+		
 		Group group2 = dao.findByName("LogicalObjects", 1);
 		Assert.assertEquals(group, group2);
 	}

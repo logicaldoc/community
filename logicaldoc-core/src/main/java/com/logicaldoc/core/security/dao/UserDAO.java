@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.security.User;
@@ -139,9 +140,9 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param userId The id of the user to delete
 	 * @param transaction entry to log the event
 	 * 
-	 * @return True if successfully deleted from the database.
+	 * @throws PersistenceException error at database level
 	 */
-	public boolean delete(long userId, UserHistory transaction);
+	public void delete(long userId, UserHistory transaction) throws PersistenceException;
 
 	/**
 	 * This method persists the user object and insert a new user history entry.
@@ -149,9 +150,9 @@ public interface UserDAO extends PersistentObjectDAO<User> {
 	 * @param user the user to store
 	 * @param transaction entry to log the event
 	 * 
-	 * @return True if successfully stored in a database.
+	 * @throws PersistenceException error at database level
 	 */
-	public boolean store(final User user, final UserHistory transaction);
+	public void store(final User user, final UserHistory transaction) throws PersistenceException;
 
 	/**
 	 * Retrieves the settings for a user. The settings are stored as Generics of

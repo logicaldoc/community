@@ -64,7 +64,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals(1, testUser.getGroups().size());
 
 		String name = testUser.getUserGroupName();
-		Assert.assertTrue(dao.delete(testUser.getId()));
+		dao.delete(testUser.getId());
 		user = dao.findByUsername("test");
 		Assert.assertNull(user);
 		Assert.assertNull(groupDao.findByName(name, 1));
@@ -209,7 +209,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 		transaction.setEvent(UserEvent.LOGIN.toString());
 		transaction.setUserId(user.getId());
 		transaction.setNotified(0);
-		Assert.assertTrue(dao.store(user, transaction));
+		dao.store(user, transaction);
 		Assert.assertNotNull(groupDao.findByName(user.getUserGroupName(), 1));
 
 		user.addGroup(groupDao.findById(1L));

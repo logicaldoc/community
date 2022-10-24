@@ -79,11 +79,10 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	}
 
 	@Override
-	public boolean delete(long id, int code) throws PersistenceException {
+	public void delete(long id, int code) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
 		Template template = (Template) findById(id);
 
 		if (countDocs(id) > 0)
@@ -99,8 +98,6 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			template.setName(template.getName() + "." + template.getId());
 			saveOrUpdate(template);
 		}
-
-		return result;
 	}
 
 	public int countFolders(long id) {

@@ -47,15 +47,11 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 		Context context = Context.get();
 		SystemMessageDAO dao = (SystemMessageDAO) context.getBean(SystemMessageDAO.class);
 		for (long id : ids) {
-			boolean deleted = false;
 			try {
-				deleted = dao.delete(id);
+				dao.delete(id);
 			} catch (PersistenceException e) {
-				deleted = false;
-				log.error(e.getMessage(), e);
-			}
-			if (!deleted)
 				throw new ServerException("Messages have not been deleted");
+			}
 		}
 	}
 
@@ -132,7 +128,6 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 		SystemMessageDAO dao = (SystemMessageDAO) context.getBean(SystemMessageDAO.class);
 		UserDAO uDao = (UserDAO) context.getBean(UserDAO.class);
 
-		boolean stored = false;
 		try {
 			User user = uDao.findById(recipientId);
 
@@ -157,13 +152,11 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 			m.setPrio(message.getPriority());
 			m.setConfirmation(message.isConfirmation() ? 1 : 0);
 
-			stored = dao.store(m);
+			dao.store(m);
 		} catch (PersistenceException e) {
-			stored = false;
 			log.error(e.getMessage(), e);
-		}
-		if (!stored)
 			throw new ServerException("Message has not been saved");
+		}
 	}
 
 	@Override
@@ -226,9 +219,11 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 				template.setSubject(t.getSubject());
 				template.setBody(t.getBody());
 				template.setType(t.getType());
-				boolean stored = dao.store(template);
-				if (!stored)
+				try {
+					dao.store(template);
+				} catch (Exception e) {
 					throw new Exception("Templates have not been saved");
+				}
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);
@@ -246,9 +241,11 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 			for (long id : ids) {
 				MessageTemplate template = dao.findById(id);
 				if (template != null && !"en".equals(template.getLanguage())) {
-					boolean deleted = dao.delete(id);
-					if (!deleted)
-						throw new Exception("Templates have not been saved");
+					try {
+						dao.delete(id);
+					} catch (Exception e) {
+						throw new Exception("Templates have not been saved", e);
+					}
 				}
 			}
 		} catch (Throwable t) {
@@ -267,9 +264,12 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 			for (MessageTemplate template : templates) {
 				if (template.getType().equals(MessageTemplate.TYPE_SYSTEM))
 					continue;
-				boolean deleted = dao.delete(template.getId());
-				if (!deleted)
-					throw new Exception("Templates have not been saved");
+
+				try {
+					dao.delete(template.getId());
+				} catch (Exception e) {
+					throw new Exception("Templates have not been saved", e);
+				}
 			}
 		} catch (Throwable t) {
 			ServiceUtil.throwServerException(session, log, t);

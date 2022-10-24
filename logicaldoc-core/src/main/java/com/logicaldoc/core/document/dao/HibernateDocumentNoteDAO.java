@@ -35,10 +35,8 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public boolean store(DocumentNote note, DocumentHistory transaction) throws PersistenceException {
-		boolean result = super.store(note);
-		if (!result)
-			return false;
+	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException {
+		super.store(note);
 
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document doc = documentDao.findById(note.getDocId());
@@ -59,10 +57,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 				session.logError(e.getMessage());
 			}
 			log.error(e.getMessage(), e);
-			result = false;
 		}
-
-		return result;
 	}
 
 	@Override
@@ -130,11 +125,11 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	}
 
 	@Override
-	public boolean delete(long id, int code) throws PersistenceException {
+	public void delete(long id, int code) throws PersistenceException {
 		DocumentNote note = findById(id);
 		if (note != null)
 			markToIndex(note.getDocId());
-		return super.delete(id, code);
+		super.delete(id, code);
 	}
 
 	@Override

@@ -14,23 +14,20 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
  * @since 4.0
  */
 public interface PersistentObjectDAO<T extends PersistentObject> {
-	
+
 	/**
 	 * The alias to use to reference the object in the queries
 	 */
 	public static final String ALIAS_ENTITY = "_entity";
-	
-	
+
 	/**
 	 * This method persists the entity object
 	 * 
 	 * @param entity entity to be stored
 	 * 
-	 * @return True if successfully stored in a database
-	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public boolean store(T entity) throws PersistenceException;
+	public void store(T entity) throws PersistenceException;
 
 	/**
 	 * This method finds an entity by ID
@@ -89,8 +86,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<Long> findAllIds(long tenantId);
 
 	/**
-	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY} alias to
-	 * reference attributes in the where expression.
+	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY}
+	 * alias to reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
 	 * @param order The order clause expression
@@ -103,8 +100,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<T> findByWhere(String where, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY} alias to
-	 * reference attributes in the where expression.
+	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY}
+	 * alias to reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
 	 * @param values Parameters used in the where expression
@@ -121,8 +118,8 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<T> findByWhere(String where, Object[] values, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY} alias to
-	 * reference attributes in the where expression.
+	 * Finds all entities by the given expression. Use {@value #ALIAS_ENTITY}
+	 * alias to reference attributes in the where expression.
 	 * 
 	 * @param where The where clause expression
 	 * @param parameters Parameters used in the where expression
@@ -196,8 +193,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 			throws PersistenceException;
 
 	/**
-	 * Finds all entities ids by the given expression. Use {@value #ALIAS_ENTITY} alias to
-	 * reference attributes in the where expression.
+	 * Finds all entities ids by the given expression. Use
+	 * {@value #ALIAS_ENTITY} alias to reference attributes in the where
+	 * expression.
 	 * 
 	 * @param where The where clause expression
 	 * @param order The order clause expression
@@ -210,8 +208,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	public List<Long> findIdsByWhere(String where, String order, Integer max) throws PersistenceException;
 
 	/**
-	 * Finds all entities ids by the given expression. Use {@value #ALIAS_ENTITY} alias to
-	 * reference attributes in the where expression.
+	 * Finds all entities ids by the given expression. Use
+	 * {@value #ALIAS_ENTITY} alias to reference attributes in the where
+	 * expression.
 	 * 
 	 * @param where The where clause expression (for positional parameters,
 	 *        please use JPA-style: ?1, ?2 ...)
@@ -400,12 +399,10 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * This method deletes an entity. Same as delete(id, 1)
 	 * 
 	 * @param id ID of the entity which should be deleted.
-	 *
-	 * @return if the record has been successfully deleted
 	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public boolean delete(long id) throws PersistenceException;
+	public void delete(long id) throws PersistenceException;
 
 	/**
 	 * This method deletes an entity and you can give a deletion code
@@ -413,11 +410,9 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * @param id ID of the entity which should be deleted
 	 * @param code Deletion code
 	 * 
-	 * @return if the record has been successfully deleted
-	 * 
 	 * @throws PersistenceException raised in case of errors in the database
 	 */
-	public boolean delete(long id, int code) throws PersistenceException;
+	public void delete(long id, int code) throws PersistenceException;
 
 	/**
 	 * Deletes all entries form the database

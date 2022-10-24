@@ -84,8 +84,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean store(Folder folder) throws PersistenceException {
-		return store(folder, null);
+	public void store(Folder folder) throws PersistenceException {
+		store(folder, null);
 	}
 
 	@Override
@@ -334,8 +334,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * Now search for all other folders that references accessible
 			 * folders
 			 */
-			StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY + " where "
-					+ ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
+			StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
+					+ " where " + ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
 			query2.append(" and " + ALIAS_ENTITY + ".securityRef in (");
 			query2.append("    select distinct(B.id) from Folder B ");
 			query2.append(" left join B.folderGroups as _group");
@@ -427,8 +427,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * Now search for all other folders that references accessible
 			 * folders
 			 */
-			StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY + " where "
-					+ ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
+			StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
+					+ " where " + ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
 			query2.append(" and " + ALIAS_ENTITY + ".securityRef in (");
 			query2.append("    select distinct(B.id) from Folder B ");
 			query2.append(" left join B.folderGroups as _group");
@@ -1276,9 +1276,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean delete(long folderId, int code) throws PersistenceException {
+	public void delete(long folderId, int code) throws PersistenceException {
 		checkIfCanDelete(folderId);
-		return super.delete(folderId, code);
+		super.delete(folderId, code);
 	}
 
 	@Override

@@ -38,16 +38,6 @@ public interface VersionDAO extends PersistentObjectDAO<Version> {
 	 */
 	public List<Version> findByDocId(long docId);
 
-	/**
-	 * This method persists the given version. Checks if is necessary to delete
-	 * some document versions reading the context property
-	 * 'document.maxversions' and the maxVersions property of the owning
-	 * workspace.
-	 * 
-	 * @param version version to be stored.
-	 * @return True if successfully stored in a database.
-	 */
-	public boolean store(Version version);
 
 	/**
 	 * Updates the version's digest (SHA-1)

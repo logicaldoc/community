@@ -164,6 +164,7 @@ public class SoapSecurityServiceTest extends AbstractWebserviceTestCase {
 
 		Long groupId = securityServiceImpl.storeGroup("", wsGroupTest);
 		Assert.assertNotNull(groupId);
+		Assert.assertTrue(groupId.longValue()!=0L);
 
 		Group createdGroup = groupDao.findById(groupId);
 		Assert.assertNotNull(createdGroup);

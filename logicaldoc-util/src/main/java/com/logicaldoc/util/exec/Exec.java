@@ -348,11 +348,14 @@ public class Exec {
 		if (allowedCommands.isEmpty())
 			return;
 
+		if (commandLine.startsWith("\""))
+			commandLine.substring(1);
+
 		boolean allowed = allowedCommands.contains(commandLine);
 		if (!allowed) {
 			for (String row : allowedCommands) {
-				if (commandLine.startsWith(row) && commandLine.length() > row.length()
-						&& commandLine.substring(row.length()).startsWith(" ", 0)) {
+				if ("*".equals(row) || (commandLine.startsWith(row) && commandLine.length() > row.length()
+						&& commandLine.substring(row.length()).startsWith(" ", 0))) {
 					allowed = true;
 					break;
 				}
@@ -404,7 +407,7 @@ public class Exec {
 		}
 		return allowedCommands;
 	}
-	
+
 	/**
 	 * Utility method for normalizing a path to be used to invoke a command
 	 * 

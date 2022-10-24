@@ -45,7 +45,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTCase {
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
 
-		Assert.assertTrue(dao.store(device));
+		dao.store(device);
 		Assert.assertNotNull(device.getDeviceId());
 	}
 
@@ -60,7 +60,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
-		Assert.assertTrue(dao.store(device));
+		dao.store(device);
 
 		device = new Device();
 		device.setCreation(DateBean.dateFromCompactString("20101201"));
@@ -72,7 +72,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 8");
 		device.setType("COMPUTER");
-		Assert.assertTrue(dao.store(device));
+		dao.store(device);
 
 		device = new Device();
 		device.setCreation(DateBean.dateFromCompactString("20101201"));
@@ -84,7 +84,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 7");
 		device.setType("COMPUTER");
-		Assert.assertTrue(dao.store(device));
+		dao.store(device);
 
 		Assert.assertEquals(3, dao.findAll(1L).size());
 		Assert.assertEquals(1, dao.findTrustedDevices(1L).size());
@@ -101,7 +101,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
-		Assert.assertTrue(dao.store(device));
+		dao.store(device);
 
 		device = new Device();
 		device.setCreation(DateBean.dateFromCompactString("20061201"));
@@ -112,7 +112,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
-		Assert.assertTrue(dao.store(device));
+		dao.store(device);
 
 		Assert.assertEquals(2, dao.findAll(1L).size());
 
@@ -133,7 +133,7 @@ public class HibernateDeviceDAOTest extends AbstractCoreTCase {
 		device.setBrowser("Firefox");
 		device.setOperativeSystem("Windows 10");
 		device.setType("COMPUTER");
-		Assert.assertTrue(dao.store(device));
+		dao.store(device);
 
 		String id = device.getDeviceId();
 		Device requestDevice = new Device();

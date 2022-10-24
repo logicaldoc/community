@@ -338,11 +338,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @param doc the document
 	 * @param transaction entry to log the event
-	 * @return True if successfully stored in a database
 	 * 
 	 * @throws PersistenceException raised in case of database errors
 	 */
-	public boolean store(Document doc, DocumentHistory transaction) throws PersistenceException;
+	public void store(Document doc, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * This method deletes the document object and insert a new document history
@@ -352,11 +351,9 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event
 	 * 
-	 * @return True if successfully deleted from the database.
-	 * 
 	 * @throws PersistenceException raised in case of database errors
 	 */
-	public boolean delete(long docId, int delCode, DocumentHistory transaction) throws PersistenceException;
+	public void delete(long docId, int delCode, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Shortcut for delete(docId, 1, transaction)
@@ -364,11 +361,9 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId identifier of the document
 	 * @param transaction entry to log the event
 	 * 
-	 * @return True if successfully deleted from the database.
-	 * 
 	 * @throws PersistenceException raised in case of database errors
 	 */
-	public boolean delete(long docId, DocumentHistory transaction) throws PersistenceException;
+	public void delete(long docId, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Archives a document
@@ -376,11 +371,9 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId identifier of the document
 	 * @param transaction entry to log the event
 	 * 
-	 * @return true if document has been archived
-	 * 
 	 * @throws PersistenceException raised in case of database errors
 	 */
-	public boolean archive(long docId, DocumentHistory transaction) throws PersistenceException;
+	public void archive(long docId, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Finds archived documents in a folder (direct childeren only)

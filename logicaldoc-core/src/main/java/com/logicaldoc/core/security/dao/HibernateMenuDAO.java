@@ -47,9 +47,7 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	}
 
 	@Override
-	public boolean store(Menu menu) throws PersistenceException {
-		boolean result = true;
-
+	public void store(Menu menu) throws PersistenceException {
 		try {
 			if (menu.getSecurityRef() != null)
 				menu.getMenuGroups().clear();
@@ -57,8 +55,6 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 		} catch (Throwable e) {
 			throw new PersistenceException(e);
 		}
-
-		return result;
 	}
 
 	@Override
@@ -121,9 +117,8 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 				return coll;
 			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findByWhere(
-						ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY
-								+".parentId and " + ALIAS_ENTITY + ".parentId=" + parentId
-								+ (type == null ? "" : (" and " + ALIAS_ENTITY + ".type=" + type))
+						ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY + ".parentId="
+								+ parentId + (type == null ? "" : (" and " + ALIAS_ENTITY + ".type=" + type))
 								+ (enabledOnly ? " and " + ALIAS_ENTITY + ".enabled=1" : ""),
 						" order by  " + ALIAS_ENTITY + ".position asc, " + ALIAS_ENTITY + ".name asc", null);
 			/*
@@ -669,12 +664,10 @@ public class HibernateMenuDAO extends HibernatePersistentObjectDAO<Menu> impleme
 	}
 
 	@Override
-	public boolean delete(long menuId, int code) throws PersistenceException {
-		boolean result = true;
+	public void delete(long menuId, int code) throws PersistenceException {
 		Menu menu = (Menu) findById(menuId);
 		menu.setDeleted(code);
-		result = store(menu);
-		return result;
+		store(menu);
 	}
 
 	@Override

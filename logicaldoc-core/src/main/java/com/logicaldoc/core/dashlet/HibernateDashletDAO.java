@@ -40,19 +40,13 @@ public class HibernateDashletDAO extends HibernatePersistentObjectDAO<Dashlet> i
 	}
 
 	@Override
-	public boolean delete(long id, int code) {
+	public void delete(long id, int code) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		try {
-			Dashlet dashlet = (Dashlet) findById(id);
-			dashlet.setName(dashlet.getName() + "." + id);
-			dashlet.setDeleted(code);
-			saveOrUpdate(dashlet);
-			return true;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return false;
-		}
+		Dashlet dashlet = (Dashlet) findById(id);
+		dashlet.setName(dashlet.getName() + "." + id);
+		dashlet.setDeleted(code);
+		saveOrUpdate(dashlet);
 	}
 }

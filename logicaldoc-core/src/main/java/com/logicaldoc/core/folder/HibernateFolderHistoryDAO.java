@@ -79,17 +79,14 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	}
 
 	@Override
-	public boolean store(FolderHistory history) throws PersistenceException {
+	public void store(FolderHistory history) throws PersistenceException {
 		// Write only if the history is enabled
 		if (RunLevel.current().aspectEnabled(History.ASPECT)) {
 			if (history.getComment() != null && history.getComment().length() > 4000)
 				history.setComment(StringUtils.abbreviate(history.getComment(), 4000));
-			boolean ret = super.store(history);
-			if (ret)
-				EventCollector.get().newEvent(history);
-			return ret;
-		} else
-			return true;
+			super.store(history);
+			EventCollector.get().newEvent(history);
+		}
 	}
 
 	@Override

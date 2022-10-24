@@ -1,5 +1,6 @@
 package com.logicaldoc.core.ticket;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.DocumentHistory;
 
@@ -51,6 +52,8 @@ public interface TicketDAO extends PersistentObjectDAO<Ticket> {
 	 * @param transaction entry to log the event
 	 * 
 	 * @return True if successfully stored in a database
+	 * 
+	 * @throws PersistenceException error at database level
 	 */
-	public boolean store(Ticket ticket, DocumentHistory transaction);
+	public void store(Ticket ticket, DocumentHistory transaction) throws PersistenceException;
 }

@@ -134,8 +134,8 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						att.setSetId(attribute.getSetId());
 						att.setDependsOn(attribute.getDependsOn());
 						att.setValidation(attribute.getValidation());
-						att.setInitialization(attribute.getInitialization());						
-						
+						att.setInitialization(attribute.getInitialization());
+
 						attrs.put(attribute.getName(), att);
 					}
 				}
@@ -143,10 +143,8 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			if (attrs.size() > 0)
 				templ.setAttributes(attrs);
 
-			if (dao.store(templ)) {
-				return templ.getId();
-			} else
-				throw new Exception("Unable to store the attributeSet");
+			dao.store(templ);
+			return templ.getId();
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());
@@ -315,7 +313,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 						att.setSetId(attribute.getSetId());
 						att.setDependsOn(attribute.getDependsOn());
 						att.setValidation(attribute.getValidation());
-						att.setInitialization(attribute.getInitialization());			
+						att.setInitialization(attribute.getInitialization());
 						attrs.put(attribute.getName(), att);
 					}
 				}
@@ -323,10 +321,8 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 			if (attrs.size() > 0)
 				set.setAttributes(attrs);
 
-			if (dao.store(set)) {
-				return set.getId();
-			} else
-				throw new Exception("Unable to store the AttributeSet");
+			dao.store(set);
+			return set.getId();
 		} catch (Throwable t) {
 			log.error(t.getMessage(), t);
 			throw new Exception(t.getMessage());

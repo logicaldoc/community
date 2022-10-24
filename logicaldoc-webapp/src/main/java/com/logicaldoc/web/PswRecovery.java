@@ -114,36 +114,33 @@ public class PswRecovery extends HttpServlet {
 					user.setPasswordChanged(new Date());
 					user.setPasswordExpired(1);
 
-					boolean stored = userDao.store(user);
-					if (stored) {
-						Locale locale = user.getLocale();
+					userDao.store(user);
 
-						email.setSentDate(new Date());
-						email.setUsername(user.getUsername());
-						email.setLocale(locale);
-						email.setHtml(1);
+					Locale locale = user.getLocale();
 
-						/*
-						 * Prepare the template
-						 */
-						Map<String, Object> dictionary = new HashMap<String, Object>();
-						String address = request.getScheme() + "://" + request.getServerName() + ":"
-								+ request.getServerPort() + request.getContextPath();
-						dictionary.put("url", address);
-						dictionary.put("user", user);
-						dictionary.put("password", password);
-						dictionary.put(Automation.LOCALE, locale);
+					email.setSentDate(new Date());
+					email.setUsername(user.getUsername());
+					email.setLocale(locale);
+					email.setHtml(1);
 
-						EMailSender sender = new EMailSender(tenant);
-						sender.send(email, "psw.rec1", dictionary);
+					/*
+					 * Prepare the template
+					 */
+					Map<String, Object> dictionary = new HashMap<String, Object>();
+					String address = request.getScheme() + "://" + request.getServerName() + ":"
+							+ request.getServerPort() + request.getContextPath();
+					dictionary.put("url", address);
+					dictionary.put("user", user);
+					dictionary.put("password", password);
+					dictionary.put(Automation.LOCALE, locale);
 
-						response.getWriter().println(String.format("A message was sent to %s", user.getEmail()));
+					EMailSender sender = new EMailSender(tenant);
+					sender.send(email, "psw.rec1", dictionary);
 
-						ticket.setCount(ticket.getCount() + 1);
-						ticketDao.store(ticket);
-					} else {
-						response.getWriter().println("Unable to recover password");
-					}
+					response.getWriter().println(String.format("A message was sent to %s", user.getEmail()));
+
+					ticket.setCount(ticket.getCount() + 1);
+					ticketDao.store(ticket);
 				} catch (Throwable e) {
 					log.error(e.getMessage(), e);
 					response.getWriter().println("Request not correctly processed");

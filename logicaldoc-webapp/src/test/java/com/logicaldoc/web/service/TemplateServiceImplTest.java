@@ -65,15 +65,15 @@ public class TemplateServiceImplTest extends AbstractWebappTCase {
 		template = service.getTemplate(8);
 		Assert.assertNull(template);
 	}
-	
+
 	@Test
 	public void testGetAttributes() throws ServerException, PersistenceException {
 		Template template = new Template();
 		template.setName("test3");
 		template.setValue("attr1", "v1");
 		template.setValue("a2", 23L);
-		Assert.assertTrue(templateDao.store(template));
-		
+		templateDao.store(template);
+
 		GUITemplate guiTemplate = service.getTemplate(template.getId());
 		Assert.assertNotNull(guiTemplate);
 		Assert.assertEquals("v1", guiTemplate.getAttribute("attr1").getValue());
