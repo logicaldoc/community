@@ -459,9 +459,10 @@ public class WSUser {
 	}
 
 	public static WSUser fromUser(User user) {
-		UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
-		if (user.getId() != 0L)
+		if (user.getId() != 0L) {
+			UserDAO dao = (UserDAO) Context.get().getBean(UserDAO.class);
 			dao.initialize(user);
+		}
 
 		WSUser wsUser = new WSUser();
 		try {
