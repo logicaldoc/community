@@ -108,6 +108,37 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		GUIVersion[] versions = service.getVersionsById(1, 2);
 		Assert.assertNotNull(versions);
 		Assert.assertEquals(2, versions.length);
+		
+		// only the first version of the two
+		versions = service.getVersionsById(1, 23);
+		Assert.assertNotNull(versions);
+		Assert.assertEquals(1, versions.length);
+		
+		// only the 2nd version of the two
+		versions = service.getVersionsById(21, 2);
+		Assert.assertNotNull(versions);
+		Assert.assertEquals(1, versions.length);
+		
+		// no versions
+		versions = service.getVersionsById(21, 22);
+		Assert.assertNull(versions);
+	}
+	
+	@Test
+	public void testDeleteVersions() throws ServerException {
+		long[] ids = new long[] {21,22,23};
+		GUIDocument gdoc;
+		try {
+			gdoc = service.deleteVersions(ids);
+			fail("Expected exception was not thrown");
+		} catch (ServerException e) {
+			// nothing to do
+		}
+		
+		ids = new long[] {1,2};
+		gdoc = service.deleteVersions(ids);
+		assertNotNull(gdoc);
+		assertEquals(1, gdoc.getId());
 	}
 
 	@Test

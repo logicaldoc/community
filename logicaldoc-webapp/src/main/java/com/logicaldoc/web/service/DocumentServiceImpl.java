@@ -941,7 +941,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
 			Version docVersion = versDao.findById(id1);
-			versDao.initialize(docVersion);
+			if (docVersion != null) 
+				versDao.initialize(docVersion);
 
 			GUIVersion version1 = null;
 			if (docVersion != null) {
@@ -1004,7 +1005,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 
 			docVersion = versDao.findById(id2);
-			versDao.initialize(docVersion);
+			if (docVersion != null) 
+				versDao.initialize(docVersion);
 
 			GUIVersion version2 = null;
 			if (docVersion != null) {
