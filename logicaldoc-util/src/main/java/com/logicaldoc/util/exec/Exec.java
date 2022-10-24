@@ -349,7 +349,7 @@ public class Exec {
 			return;
 
 		if (commandLine.startsWith("\""))
-			commandLine.substring(1);
+			commandLine = commandLine.substring(1);
 
 		boolean allowed = allowedCommands.contains(commandLine);
 		if (!allowed) {
