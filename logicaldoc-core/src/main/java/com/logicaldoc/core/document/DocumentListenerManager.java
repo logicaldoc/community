@@ -20,6 +20,9 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  * @since 4.0
  */
 public class DocumentListenerManager {
+	
+	private static final String POSITION = "position";
+
 	protected static Logger log = LoggerFactory.getLogger(DocumentListenerManager.class);
 
 	private List<DocumentListener> listeners = new ArrayList<DocumentListener>();
@@ -40,8 +43,8 @@ public class DocumentListenerManager {
 		}
 		Collections.sort(sortedExts, new Comparator<Extension>() {
 			public int compare(Extension e1, Extension e2) {
-				int position1 = Integer.parseInt(e1.getParameter("position").valueAsString());
-				int position2 = Integer.parseInt(e2.getParameter("position").valueAsString());
+				int position1 = Integer.parseInt(e1.getParameter(POSITION).valueAsString());
+				int position2 = Integer.parseInt(e2.getParameter(POSITION).valueAsString());
 				if (position1 < position2)
 					return -1;
 				else if (position1 > position2)
@@ -63,7 +66,7 @@ public class DocumentListenerManager {
 							"The specified listener " + className + " doesn't implement DocumentListener interface");
 				listeners.add((DocumentListener) listener);
 				log.info("Added new document listener " + className + " position "
-						+ ext.getParameter("position").valueAsString());
+						+ ext.getParameter(POSITION).valueAsString());
 			} catch (Throwable e) {
 				log.error(e.getMessage());
 			}

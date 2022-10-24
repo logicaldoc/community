@@ -116,29 +116,33 @@ public class FolderGroup implements Serializable {
 		 * the same mask order.
 		 */
 		StringBuilder sb = new StringBuilder();
-		sb.append(getStorage() == 1 ? "1" : "0");
-		sb.append(getAutomation() == 1 ? "1" : "0");
-		sb.append(getEmail() == 1 ? "1" : "0");
-		sb.append(getMove() == 1 ? "1" : "0");
-		sb.append(getPassword() == 1 ? "1" : "0");
-		sb.append(getPrint() == 1 ? "1" : "0");
-		sb.append(getSubscription() == 1 ? "1" : "0");
-		sb.append(getCalendar() == 1 ? "1" : "0");
-		sb.append(getDownload() == 1 ? "1" : "0");
-		sb.append(getWorkflow() == 1 ? "1" : "0");
-		sb.append(getArchive() == 1 ? "1" : "0");
-		sb.append(getSign() == 1 ? "1" : "0");
-		sb.append(getExport() == 1 ? "1" : "0");
-		sb.append(getImport() == 1 ? "1" : "0");
-		sb.append(getRename() == 1 ? "1" : "0");
-		sb.append(getDelete() == 1 ? "1" : "0");
-		sb.append(getImmutable() == 1 ? "1" : "0");
-		sb.append(getSecurity() == 1 ? "1" : "0");
-		sb.append(getAdd() == 1 ? "1" : "0");
-		sb.append(getWrite() == 1 ? "1" : "0");
-		sb.append(getRead() == 1 ? "1" : "0");
+		sb.append(codeFlag(getStorage()));
+		sb.append(codeFlag(getAutomation()));
+		sb.append(codeFlag(getEmail()));
+		sb.append(codeFlag(getMove()));
+		sb.append(codeFlag(getPassword()));
+		sb.append(codeFlag(getPrint()));
+		sb.append(codeFlag(getSubscription()));
+		sb.append(codeFlag(getCalendar()));
+		sb.append(codeFlag(getDownload()));
+		sb.append(codeFlag(getWorkflow()));
+		sb.append(codeFlag(getArchive()));
+		sb.append(codeFlag(getSign()));
+		sb.append(codeFlag(getExport()));
+		sb.append(codeFlag(getImport()));
+		sb.append(codeFlag(getRename()));
+		sb.append(codeFlag(getDelete()));
+		sb.append(codeFlag(getImmutable()));
+		sb.append(codeFlag(getSecurity()));
+		sb.append(codeFlag(getAdd()));
+		sb.append(codeFlag(getWrite()));
+		sb.append(codeFlag(getRead()));
 
 		return Integer.parseInt(sb.toString(), 2);
+	}
+
+	private String codeFlag(int flagValue) {
+		return flagValue == 1 ? "1" : "0";
 	}
 
 	/**
@@ -148,29 +152,33 @@ public class FolderGroup implements Serializable {
 	 *        is not evaluated)
 	 */
 	public void setPermissions(int permissions) {
-		setRead(Permission.READ.match(permissions) ? 1 : 0);
-		setWrite(Permission.WRITE.match(permissions) ? 1 : 0);
-		setAdd(Permission.ADD.match(permissions) ? 1 : 0);
-		setSecurity(Permission.SECURITY.match(permissions) ? 1 : 0);
-		setImmutable(Permission.IMMUTABLE.match(permissions) ? 1 : 0);
-		setDelete(Permission.DELETE.match(permissions) ? 1 : 0);
-		setRename(Permission.RENAME.match(permissions) ? 1 : 0);
-		setImport(Permission.IMPORT.match(permissions) ? 1 : 0);
-		setExport(Permission.EXPORT.match(permissions) ? 1 : 0);
-		setSign(Permission.SIGN.match(permissions) ? 1 : 0);
-		setArchive(Permission.ARCHIVE.match(permissions) ? 1 : 0);
-		setWorkflow(Permission.WORKFLOW.match(permissions) ? 1 : 0);
-		setDownload(Permission.DOWNLOAD.match(permissions) ? 1 : 0);
-		setCalendar(Permission.CALENDAR.match(permissions) ? 1 : 0);
-		setSubscription(Permission.SUBSCRIPTION.match(permissions) ? 1 : 0);
-		setPrint(Permission.PRINT.match(permissions) ? 1 : 0);
-		setPassword(Permission.PASSWORD.match(permissions) ? 1 : 0);
-		setMove(Permission.MOVE.match(permissions) ? 1 : 0);
-		setEmail(Permission.EMAIL.match(permissions) ? 1 : 0);
-		setAutomation(Permission.AUTOMATION.match(permissions) ? 1 : 0);
-		setStorage(Permission.STORAGE.match(permissions) ? 1 : 0);
+		setRead(decodeFlag(Permission.READ.match(permissions)));
+		setWrite(decodeFlag(Permission.WRITE.match(permissions)));
+		setAdd(decodeFlag(Permission.ADD.match(permissions)));
+		setSecurity(decodeFlag(Permission.SECURITY.match(permissions)));
+		setImmutable(decodeFlag(Permission.IMMUTABLE.match(permissions)));
+		setDelete(decodeFlag(Permission.DELETE.match(permissions)));
+		setRename(decodeFlag(Permission.RENAME.match(permissions)));
+		setImport(decodeFlag(Permission.IMPORT.match(permissions)));
+		setExport(decodeFlag(Permission.EXPORT.match(permissions)));
+		setSign(decodeFlag(Permission.SIGN.match(permissions)));
+		setArchive(decodeFlag(Permission.ARCHIVE.match(permissions)));
+		setWorkflow(decodeFlag(Permission.WORKFLOW.match(permissions)));
+		setDownload(decodeFlag(Permission.DOWNLOAD.match(permissions)));
+		setCalendar(decodeFlag(Permission.CALENDAR.match(permissions)));
+		setSubscription(decodeFlag(Permission.SUBSCRIPTION.match(permissions)));
+		setPrint(decodeFlag(Permission.PRINT.match(permissions)));
+		setPassword(decodeFlag(Permission.PASSWORD.match(permissions)));
+		setMove(decodeFlag(Permission.MOVE.match(permissions)));
+		setEmail(decodeFlag(Permission.EMAIL.match(permissions)));
+		setAutomation(decodeFlag(Permission.AUTOMATION.match(permissions)));
+		setStorage(decodeFlag(Permission.STORAGE.match(permissions)));
 	}
 
+	private int decodeFlag(boolean flagValue) {
+		return flagValue ? 1 : 0;
+	}
+	
 	public int getRead() {
 		return read;
 	}

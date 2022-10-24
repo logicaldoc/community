@@ -153,9 +153,11 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class LDRepository {
 
+	private static final String OBJECT_IS_NOT_A_DOCUMENT = "Object %s is not a Document!";
+
 	private static final String IS_UNKNOWN = "is unknown!";
 
-	private static final String PROPERTY_S_S = "Property '%s' %s";
+	private static final String PROPERTY = "Property '%s' %s";
 
 	private static final String TYPE_S_IS_UNKNOWN = "Type '%s' is unknown!";
 
@@ -874,7 +876,7 @@ public class LDRepository {
 
 			if (!(object instanceof Document))
 				throw new CmisObjectNotFoundException(
-						String.format("Object %s is not a Document!", objectId.getValue()));
+						String.format(OBJECT_IS_NOT_A_DOCUMENT, objectId.getValue()));
 
 			// Create the document history event
 			DocumentHistory transaction = new DocumentHistory();
@@ -901,7 +903,7 @@ public class LDRepository {
 			PersistentObject object = getObject(objectId);
 
 			if (!(object instanceof Document))
-				throw new CmisObjectNotFoundException(String.format("Object %s is not a Document!", objectId));
+				throw new CmisObjectNotFoundException(String.format(OBJECT_IS_NOT_A_DOCUMENT, objectId));
 
 			Document doc = (Document) object;
 
@@ -936,7 +938,7 @@ public class LDRepository {
 
 			if (!(object instanceof Document))
 				throw new CmisObjectNotFoundException(
-						String.format("Object %s is not a Document!", objectId.getValue()));
+						String.format(OBJECT_IS_NOT_A_DOCUMENT, objectId.getValue()));
 
 			Document doc = (Document) object;
 
@@ -2018,14 +2020,14 @@ public class LDRepository {
 
 		// do we know that property?
 		if (propType == null)
-			throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), IS_UNKNOWN));
+			throw new CmisConstraintException(String.format(PROPERTY, p.getId(), IS_UNKNOWN));
 
 		// can it be set?
 		if ((propType.getUpdatability() == Updatability.READONLY))
-			throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), "is readonly!"));
+			throw new CmisConstraintException(String.format(PROPERTY, p.getId(), "is readonly!"));
 
 		if (propType.getUpdatability() == Updatability.ONCREATE && !create)
-			throw new CmisConstraintException(String.format(PROPERTY_S_S, p.getId(), "can only be set on create!"));
+			throw new CmisConstraintException(String.format(PROPERTY, p.getId(), "can only be set on create!"));
 
 		if ((p.getId().equals(PropertyIds.CONTENT_STREAM_FILE_NAME) || p.getId().equals(PropertyIds.NAME))) {
 			updateDocumentFileName(doc, p);
@@ -2238,15 +2240,15 @@ public class LDRepository {
 
 			// do we know that property?
 			if (propType == null)
-				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), IS_UNKNOWN));
+				throw new CmisConstraintException(String.format(PROPERTY, prop.getId(), IS_UNKNOWN));
 
 			// can it be set?
 			if ((propType.getUpdatability() == Updatability.READONLY))
-				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), "is readonly!"));
+				throw new CmisConstraintException(String.format(PROPERTY, prop.getId(), "is readonly!"));
 
 			if ((propType.getUpdatability() == Updatability.ONCREATE))
 				throw new CmisConstraintException(
-						String.format(PROPERTY_S_S, prop.getId(), "can only be set on create!"));
+						String.format(PROPERTY, prop.getId(), "can only be set on create!"));
 
 			// default or value
 			if (isEmptyProperty(prop)) {
@@ -2263,7 +2265,7 @@ public class LDRepository {
 
 			// do we know that property?
 			if (propType == null)
-				throw new CmisConstraintException(String.format(PROPERTY_S_S, prop.getId(), IS_UNKNOWN));
+				throw new CmisConstraintException(String.format(PROPERTY, prop.getId(), IS_UNKNOWN));
 
 			// only add read/write properties
 			if ((propType.getUpdatability() != Updatability.READWRITE))

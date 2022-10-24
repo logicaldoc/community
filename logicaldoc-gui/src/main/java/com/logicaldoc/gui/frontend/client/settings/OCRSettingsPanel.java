@@ -144,9 +144,17 @@ public class OCRSettingsPanel extends AdminPanel {
 		maxSize.setMin(1);
 		maxSize.setStep(5);
 
+		RadioGroupItem cropImage = ItemFactory.newBooleanSelector("ocr_cropimage",
+				I18N.message("cropvisiblepartofimage"));
+		cropImage.setWrapTitle(false);
+		cropImage.setRequired(true);
+		cropImage.setDisabled(!Session.get().isDefaultTenant());
+
 		for (GUIParameter param : params) {
 			if (param.getName().endsWith("ocr.enabled"))
 				enabled.setValue(param.getValue().equals("true") ? "yes" : "no");
+			if (param.getName().endsWith("ocr.cropImage"))
+				cropImage.setValue(param.getValue().equals("true") ? "yes" : "no");
 			else if (param.getName().endsWith("ocr.resolution.threshold"))
 				resolutionThreshold.setValue(Integer.parseInt(param.getValue()));
 			else if (param.getName().endsWith("ocr.text.threshold"))
@@ -174,7 +182,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		if (Session.get().isDefaultTenant()) {
 			items.addAll(Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold,
-					ocrrendres, batch, batchTimeout, engine));
+					ocrrendres, cropImage, batch, batchTimeout, engine));
 		} else
 			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold));
 		form.setItems(items.toArray(new FormItem[0]));
@@ -247,6 +255,8 @@ public class OCRSettingsPanel extends AdminPanel {
 			if (Session.get().isDefaultTenant()) {
 				params.add(new GUIParameter("ocr.enabled", values.get("ocr_enabled").equals("yes") ? "true" : "false"));
 
+				params.add(new GUIParameter("ocr.cropImage", values.get("ocr_cropimage").equals("yes") ? "true" : "false"));
+				
 				if (values.get("ocr_timeout") instanceof Integer)
 					params.add(new GUIParameter("ocr.timeout", ((Integer) values.get("ocr_timeout")).toString()));
 				else

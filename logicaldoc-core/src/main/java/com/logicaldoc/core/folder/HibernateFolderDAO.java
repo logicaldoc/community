@@ -1646,15 +1646,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	private Folder internalCopy(Folder source, Folder target, String newName, boolean foldersOnly,
 			String securityOption, FolderHistory transaction) throws PersistenceException {
 		assert (securityOption == null || "inherit".equals(securityOption) || "replicate".equals(securityOption));
-		assert (source != null);
-		assert (target != null);
-		assert (transaction != null);
+		assert source != null : "Source folder cannot be null";
+		assert target != null : "Target folder cannot be null";
+		assert transaction != null : "Transaction cannot be null";
 		assert (transaction.getUser() != null);
 
 		target = findFolder(target);
 
-		if (isInPath(source.getId(), target.getId()))
-			throw new IllegalArgumentException("Cannot copy a folder inside the same path");
+		assert !isInPath(source.getId(), target.getId()) : "Cannot copy a folder inside the same path";
 
 		// Create the same folder in the target
 		Folder newFolder = null;
@@ -1662,20 +1661,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				"inherit".equals(securityOption), new FolderHistory(transaction));
 		newFolder.setFoldRef(source.getFoldRef());
 
-		if ("replicate".equals(securityOption) && newFolder.getFoldRef() == null) {
-			initialize(source);
-			initialize(newFolder);
-
-			if (source.getSecurityRef() != null) {
-				newFolder.setSecurityRef(source.getSecurityRef());
-			} else {
-				newFolder.getFolderGroups().clear();
-				for (FolderGroup fg : source.getFolderGroups()) {
-					newFolder.addFolderGroup(new FolderGroup(fg));
-				}
-			}
-			store(newFolder);
-		}
+		replicateSecurityPolicies(source, securityOption, newFolder);
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		DocumentManager docMan = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -1731,6 +1717,24 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		return newFolder;
+	}
+
+	private void replicateSecurityPolicies(Folder source, String securityOption, Folder newFolder)
+			throws PersistenceException {
+		if ("replicate".equals(securityOption) && newFolder.getFoldRef() == null) {
+			initialize(source);
+			initialize(newFolder);
+
+			if (source.getSecurityRef() != null) {
+				newFolder.setSecurityRef(source.getSecurityRef());
+			} else {
+				newFolder.getFolderGroups().clear();
+				for (FolderGroup fg : source.getFolderGroups()) {
+					newFolder.addFolderGroup(new FolderGroup(fg));
+				}
+			}
+			store(newFolder);
+		}
 	}
 
 	@Override
