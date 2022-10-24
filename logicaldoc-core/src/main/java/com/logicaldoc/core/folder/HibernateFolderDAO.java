@@ -2510,9 +2510,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@Override
 	public void merge(Folder source, Folder target, FolderHistory transaction) throws PersistenceException {
-		assert (source != null);
-		assert (target != null);
-		assert (transaction != null);
+		assert source != null : "Source folder cannot be null";
+		assert target != null : "Target folder cannot be null";
+		assert transaction != null : "Transaction cannot be null";
 		assert (transaction.getUser() != null);
 
 		if (!checkStoringAspect())
@@ -2529,21 +2529,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			session = SessionManager.get().get(transaction.getSessionId());
 
 		/*
-		 * Process the document first
+		 * Process the documents first
 		 */
-		log.debug("move documents fom folder {} to folder {}", source, target);
-		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		List<Document> docs = docDao.findByFolder(source.getId(), null);
-		for (Document document : docs) {
-			DocumentHistory hist = new DocumentHistory();
-			hist.setDocument(document);
-			hist.setSessionId(transaction.getSessionId());
-			if (session != null)
-				hist.setSession(session);
-			hist.setUser(transaction.getUser());
-			manager.moveToFolder(document, target, hist);
-		}
+		moveDocumentsOnMerge(source, target, transaction, session);
 
 		log.debug("move non-clashing folders fom folder {} to folder {}", source, target);
 		List<Folder> foldersInSource = findByParentId(source.getId());
@@ -2565,8 +2553,25 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 
 		log.debug("delete the empty source folder {}", source);
-		if (docDao.findByFolder(source.getId(), null).isEmpty() && findByParentId(source.getId()).isEmpty()) {
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		if (docDao.findByFolder(source.getId(), null).isEmpty() && findByParentId(source.getId()).isEmpty())
 			delete(source.getId(), transaction != null ? new FolderHistory(transaction) : null);
+	}
+
+	private void moveDocumentsOnMerge(Folder source, Folder target, FolderHistory transaction, Session session)
+			throws PersistenceException {
+		log.debug("move documents fom folder {} to folder {}", source, target);
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		List<Document> docs = docDao.findByFolder(source.getId(), null);
+		for (Document document : docs) {
+			DocumentHistory hist = new DocumentHistory();
+			hist.setDocument(document);
+			hist.setSessionId(transaction.getSessionId());
+			if (session != null)
+				hist.setSession(session);
+			hist.setUser(transaction.getUser());
+			manager.moveToFolder(document, target, hist);
 		}
 	}
 
