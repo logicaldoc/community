@@ -29,7 +29,7 @@ public class NotAvailableConverter implements FormatConverter {
 		String ext = FileUtil.getExtension(dest.getName());
 
 		if (!"pdf".equalsIgnoreCase(ext))
-			throw new IOException("Format " + ext + " not supported");
+			throw new IOException(String.format("Format %s not supported", ext));
 
 		ResourceUtil.copyResource("/pdf/notavailable.pdf", dest);
 	}

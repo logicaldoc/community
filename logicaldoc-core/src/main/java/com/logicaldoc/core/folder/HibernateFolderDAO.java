@@ -89,11 +89,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean store(Folder folder, FolderHistory transaction) throws PersistenceException {
+	public void store(Folder folder, FolderHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
 		if (folder.getId() != 0L && getCurrentSession().contains(folder))
 			getCurrentSession().merge(folder);
 
@@ -113,73 +112,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (folder.getSecurityRef() != null)
 				folder.getFolderGroups().clear();
 
-			if (transaction != null) {
-				folder.setCreator(transaction.getUser() != null ? transaction.getUser().getFullName()
-						: transaction.getUsername());
-				folder.setCreatorId(transaction.getUserId());
-				if (folder.getId() == 0 && transaction.getEvent() == null)
-					transaction.setEvent(FolderEvent.CREATED.toString());
-			}
+			setCreator(folder, transaction);
 
-			if (folder.getId() != 0L) {
-				List<Folder> aliases = findAliases(folder.getId(), folder.getTenantId());
-				for (Folder alias : aliases) {
-					alias.setDeleted(folder.getDeleted());
-					alias.setDeleteUserId(folder.getDeleteUserId());
-					if (folder.getSecurityRef() != null)
-						alias.setSecurityRef(folder.getSecurityRef());
-					else
-						alias.setSecurityRef(folder.getId());
-					initialize(alias);
-					saveOrUpdate(alias);
-				}
-			}
+			updateAliases(folder);
 		}
 
-		Set<Tag> src = folder.getTags();
-		if (src != null && src.size() > 0) {
-			// Trim too long tags
-			Set<Tag> dst = new HashSet<Tag>();
-			for (Tag str : src) {
-				str.setTenantId(folder.getTenantId());
-				String s = str.getTag();
-				if (s != null) {
-					if (s.length() > 255) {
-						s = s.substring(0, 255);
-						str.setTag(s);
-					}
-					if (!dst.contains(str))
-						dst.add(str);
-				}
-			}
-			folder.setTags(dst);
-			folder.setTgs(folder.getTagsString());
-		}
+		setTags(folder);
 
-		// Remove the forbidden permissions for the guests
-		GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-		Iterator<FolderGroup> iter = folder.getFolderGroups().iterator();
-		while (iter.hasNext()) {
-			FolderGroup fg = iter.next();
-			Group group = gDao.findById(fg.getGroupId());
-			if (group != null && group.isGuest()) {
-				fg.setAdd(0);
-				fg.setArchive(0);
-				fg.setAutomation(0);
-				fg.setCalendar(0);
-				fg.setDelete(0);
-				fg.setExport(0);
-				fg.setImmutable(0);
-				fg.setImport(0);
-				fg.setMove(0);
-				fg.setPassword(0);
-				fg.setRename(0);
-				fg.setSecurity(0);
-				fg.setSign(0);
-				fg.setWorkflow(0);
-				fg.setWrite(0);
-			}
-		}
+		removeForbiddenPermissionsForGuests(folder);
 
 		if (folder.getTemplate() == null)
 			folder.setOcrTemplateId(null);
@@ -210,156 +150,214 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			saveFolderHistory(new Folder(folder), transaction);
 		} catch (Throwable e) {
-			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
-				Session session = SessionManager.get().get(transaction.getSessionId());
-				session.logError(e.getMessage());
-			}
-			log.error(e.getMessage(), e);
-			result = false;
-			if (e instanceof PersistenceException)
-				throw (PersistenceException) e;
-			else
-				throw new PersistenceException(e);
+			handleStoreError(transaction, e);
 		}
-		return result;
+	}
+
+	private void updateAliases(Folder folder) {
+		if (folder.getId() != 0L) {
+			List<Folder> aliases = findAliases(folder.getId(), folder.getTenantId());
+			for (Folder alias : aliases) {
+				alias.setDeleted(folder.getDeleted());
+				alias.setDeleteUserId(folder.getDeleteUserId());
+				if (folder.getSecurityRef() != null)
+					alias.setSecurityRef(folder.getSecurityRef());
+				else
+					alias.setSecurityRef(folder.getId());
+				initialize(alias);
+				saveOrUpdate(alias);
+			}
+		}
+	}
+
+	private void setCreator(Folder folder, FolderHistory transaction) {
+		if (transaction != null) {
+			if (folder.getId() == 0 && transaction.getEvent() == null)
+				transaction.setEvent(FolderEvent.CREATED.toString());
+
+			// In case of creation event we set the creator
+			if (FolderEvent.CREATED.toString().equals(transaction.getEvent())) {
+				folder.setCreator(transaction.getUser() != null ? transaction.getUser().getFullName()
+						: transaction.getUsername());
+				folder.setCreatorId(transaction.getUserId());
+			}
+		}
+	}
+
+	private void handleStoreError(FolderHistory transaction, Throwable e) throws PersistenceException {
+		if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
+			Session session = SessionManager.get().get(transaction.getSessionId());
+			session.logError(e.getMessage());
+		}
+		log.error(e.getMessage(), e);
+		if (e instanceof PersistenceException)
+			throw (PersistenceException) e;
+		else
+			throw new PersistenceException(e);
+	}
+
+	private void removeForbiddenPermissionsForGuests(Folder folder) throws PersistenceException {
+		// Remove the forbidden permissions for the guests
+		GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+		Iterator<FolderGroup> iter = folder.getFolderGroups().iterator();
+		while (iter.hasNext()) {
+			FolderGroup fg = iter.next();
+			Group group = gDao.findById(fg.getGroupId());
+			if (group != null && group.isGuest()) {
+				fg.setAdd(0);
+				fg.setArchive(0);
+				fg.setAutomation(0);
+				fg.setCalendar(0);
+				fg.setDelete(0);
+				fg.setExport(0);
+				fg.setImmutable(0);
+				fg.setImport(0);
+				fg.setMove(0);
+				fg.setPassword(0);
+				fg.setRename(0);
+				fg.setSecurity(0);
+				fg.setSign(0);
+				fg.setWorkflow(0);
+				fg.setWrite(0);
+			}
+		}
+	}
+
+	private void setTags(Folder folder) {
+		Set<Tag> src = folder.getTags();
+		if (src != null && src.size() > 0) {
+			// Trim too long tags
+			Set<Tag> dst = new HashSet<Tag>();
+			for (Tag str : src) {
+				str.setTenantId(folder.getTenantId());
+				String s = str.getTag();
+				if (s != null) {
+					if (s.length() > 255) {
+						s = s.substring(0, 255);
+						str.setTag(s);
+					}
+					if (!dst.contains(str))
+						dst.add(str);
+				}
+			}
+			folder.setTags(dst);
+			folder.setTgs(folder.getTagsString());
+		}
 	}
 
 	@Override
-	@SuppressWarnings("rawtypes")
-	public List<Folder> findByUserId(long userId) {
-		List<Folder> coll = new ArrayList<Folder>();
+	public List<Folder> findByUserId(long userId) throws PersistenceException {
+		List<Folder> folders = new ArrayList<Folder>();
 
-		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return coll;
+		User user = geExistingtUser(userId);
 
-			// The administrators can see all folders
-			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return findAll();
+		// The administrators can see all folders
+		if (user.isMemberOf(Group.GROUP_ADMIN))
+			return findAll();
 
-			Set<Group> precoll = user.getGroups();
-			if (!precoll.isEmpty()) {
-				// First of all collect all folders that define it's own
-				// policies
-				StringBuilder query = new StringBuilder("select distinct(_folder) from Folder _folder  ");
-				query.append(" left join _folder.folderGroups as _group ");
-				query.append(" where _group.groupId in (");
+		Set<Group> userGroups = user.getGroups();
+		if (!userGroups.isEmpty()) {
+			// First of all collect all folders that define it's own
+			// policies
+			StringBuilder query = new StringBuilder("select distinct(_folder) from Folder _folder  ");
+			query.append(" left join _folder.folderGroups as _group ");
+			query.append(" where _group.groupId in (");
+			query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+			query.append(")");
+			folders = (List<Folder>) find(query.toString(), user.getTenantId());
 
-				boolean first = true;
-				Iterator iter = precoll.iterator();
-				while (iter.hasNext()) {
-					if (!first)
-						query.append(",");
-					Group ug = (Group) iter.next();
-					query.append(Long.toString(ug.getId()));
-					first = false;
-				}
+			if (folders.isEmpty()) {
+				return folders;
+			} else {
+				// Now collect all folders that references the policies of
+				// the previously found folders
+				List<Folder> tmp = new ArrayList<Folder>();
+				query = new StringBuilder("select _folder from Folder _folder  where _folder.securityRef in (");
+				query.append(folders.stream().map(f -> Long.toString(f.getId())).collect(Collectors.joining(",")));
 				query.append(")");
-				coll = (List<Folder>) find(query.toString(), user.getTenantId());
+				tmp = (List<Folder>) find(query.toString(), user.getTenantId());
 
-				if (coll.isEmpty()) {
-					return coll;
-				} else {
-
-					// Now collect all folders that references the policies of
-					// the previously found folders
-					List<Folder> tmp = new ArrayList<Folder>();
-					query = new StringBuilder("select _folder from Folder _folder  where _folder.securityRef in (");
-					first = true;
-					for (Folder folder : coll) {
-						if (!first)
-							query.append(",");
-						query.append(Long.toString(folder.getId()));
-						first = false;
-					}
-					query.append(")");
-					tmp = (List<Folder>) find(query.toString(), user.getTenantId());
-
-					for (Folder folder : tmp) {
-						if (!coll.contains(folder))
-							coll.add(folder);
-					}
+				for (Folder folder : tmp) {
+					if (!folders.contains(folder))
+						folders.add(folder);
 				}
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
 		}
 
-		return coll;
+		return folders;
+	}
+
+	private User geExistingtUser(long userId) throws PersistenceException {
+		User user = userDAO.findById(userId);
+		assert user != null : "User " + userId + " not found";
+		return user;
 	}
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public List<Folder> findByUserId(long userId, long parentId) {
+	public List<Folder> findByUserId(long userId, long parentId) throws PersistenceException {
 		List<Folder> coll = new ArrayList<Folder>();
 
-		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return coll;
-			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return findByWhere(ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY
-						+ ".parentId=" + parentId, " order by " + ALIAS_ENTITY + ".name ", null);
-			/*
-			 * Search for all those folders that defines its own security
-			 * policies
-			 */
-			StringBuilder query1 = new StringBuilder();
-			Set<Group> precoll = user.getGroups();
-			if (precoll.isEmpty())
-				return coll;
+		User user = geExistingtUser(userId);
 
-			query1.append("select distinct(" + ALIAS_ENTITY + ") from Folder " + ALIAS_ENTITY + " ");
-			query1.append(" left join " + ALIAS_ENTITY + ".folderGroups as _group");
-			query1.append(" where _group.groupId in (");
+		if (user.isMemberOf(Group.GROUP_ADMIN))
+			return findByWhere(
+					ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY + ".parentId=" + parentId,
+					" order by " + ALIAS_ENTITY + ".name ", null);
+		/*
+		 * Search for all those folders that defines its own security policies
+		 */
+		StringBuilder query1 = new StringBuilder();
+		Set<Group> precoll = user.getGroups();
+		if (precoll.isEmpty())
+			return coll;
 
-			boolean first = true;
-			Iterator iter = precoll.iterator();
-			while (iter.hasNext()) {
-				if (!first)
-					query1.append(",");
-				Group ug = (Group) iter.next();
-				query1.append(Long.toString(ug.getId()));
-				first = false;
-			}
-			query1.append(") and " + ALIAS_ENTITY + ".parentId = :parentId and " + ALIAS_ENTITY + ".id != "
-					+ ALIAS_ENTITY + ".parentId");
+		query1.append("select distinct(" + ALIAS_ENTITY + ") from Folder " + ALIAS_ENTITY + " ");
+		query1.append(" left join " + ALIAS_ENTITY + ".folderGroups as _group");
+		query1.append(" where _group.groupId in (");
 
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("parentId", parentId);
-			coll = (List<Folder>) findByQuery(query1.toString(), params, null);
+		boolean first = true;
+		Iterator iter = precoll.iterator();
+		while (iter.hasNext()) {
+			if (!first)
+				query1.append(",");
+			Group ug = (Group) iter.next();
+			query1.append(Long.toString(ug.getId()));
+			first = false;
+		}
+		query1.append(") and " + ALIAS_ENTITY + ".parentId = :parentId and " + ALIAS_ENTITY + ".id != " + ALIAS_ENTITY
+				+ ".parentId");
 
-			/*
-			 * Now search for all other folders that references accessible
-			 * folders
-			 */
-			StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
-					+ " where " + ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
-			query2.append(" and " + ALIAS_ENTITY + ".securityRef in (");
-			query2.append("    select distinct(B.id) from Folder B ");
-			query2.append(" left join B.folderGroups as _group");
-			query2.append(" where _group.groupId in (");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("parentId", parentId);
+		coll = (List<Folder>) findByQuery(query1.toString(), params, null);
 
-			first = true;
-			iter = precoll.iterator();
-			while (iter.hasNext()) {
-				if (!first)
-					query2.append(",");
-				Group ug = (Group) iter.next();
-				query2.append(Long.toString(ug.getId()));
-				first = false;
-			}
-			query2.append("))");
+		/*
+		 * Now search for all other folders that references accessible folders
+		 */
+		StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY + " where "
+				+ ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
+		query2.append(" and " + ALIAS_ENTITY + ".securityRef in (");
+		query2.append("    select distinct(B.id) from Folder B ");
+		query2.append(" left join B.folderGroups as _group");
+		query2.append(" where _group.groupId in (");
 
-			params.put("parentId", parentId);
-			List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), params, null);
-			for (Folder folder : coll2) {
-				if (!coll.contains(folder))
-					coll.add(folder);
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+		first = true;
+		iter = precoll.iterator();
+		while (iter.hasNext()) {
+			if (!first)
+				query2.append(",");
+			Group ug = (Group) iter.next();
+			query2.append(Long.toString(ug.getId()));
+			first = false;
+		}
+		query2.append("))");
+
+		params.put("parentId", parentId);
+		List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), params, null);
+		for (Folder folder : coll2) {
+			if (!coll.contains(folder))
+				coll.add(folder);
 		}
 
 		Collections.sort(coll, new Comparator<Folder>() {
@@ -393,7 +391,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		try {
 			Folder parent = findFolder(parentId);
 
-			User user = userDAO.findById(userId);
+			User user = geExistingtUser(userId);
 			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findChildren(parent.getId(), null);
 
@@ -499,22 +497,22 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean isPrintEnabled(long folderId, long userId) {
+	public boolean isPrintEnabled(long folderId, long userId) throws PersistenceException {
 		return isPermissionEnabled(Permission.PRINT, folderId, userId);
 	}
 
 	@Override
-	public boolean isWriteEnabled(long folderId, long userId) {
+	public boolean isWriteEnabled(long folderId, long userId) throws PersistenceException {
 		return isPermissionEnabled(Permission.WRITE, folderId, userId);
 	}
 
 	@Override
-	public boolean isDownloadEnabled(long id, long userId) {
+	public boolean isDownloadEnabled(long id, long userId) throws PersistenceException {
 		return isPermissionEnabled(Permission.DOWNLOAD, id, userId);
 	}
 
 	@Override
-	public boolean isMoveEnabled(long id, long userId) {
+	public boolean isMoveEnabled(long id, long userId) throws PersistenceException {
 		return isPermissionEnabled(Permission.MOVE, id, userId);
 	}
 
@@ -522,9 +520,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public boolean isReadEnabled(long folderId, long userId) {
 		boolean result = true;
 		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return false;
+			User user = geExistingtUser(userId);
 			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return true;
 
@@ -559,12 +555,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public Collection<Long> findFolderIdByUserId(long userId, Long parentId, boolean tree) {
+	public Collection<Long> findFolderIdByUserId(long userId, Long parentId, boolean tree) throws PersistenceException {
 		return findFolderIdByUserIdAndPermission(userId, Permission.READ, parentId, tree);
 	}
 
 	@Override
-	public boolean hasWriteAccess(Folder folder, long userId) {
+	public boolean hasWriteAccess(Folder folder, long userId) throws PersistenceException {
 		if (isWriteEnabled(folder.getId(), userId) == false) {
 			return false;
 		}
@@ -633,9 +629,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public List<Long> findIdByUserId(long userId, long parentId) {
 		List<Long> ids = new ArrayList<Long>();
 		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return ids;
+			User user = geExistingtUser(userId);
+
 			if (user.isMemberOf(Group.GROUP_ADMIN))
 				return findIdsByWhere(ALIAS_ENTITY + ".parentId=" + parentId, null, null);
 
@@ -778,10 +773,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			return;
 
 		Folder root = findRoot(folder.getTenantId());
-		if (root == null) {
-			log.warn("Unable to find root for folder {}", folder);
-			return;
-		}
+		assert root != null : String.format("Unable to find root for folder %s", folder.toString());
 
 		long rootId = root.getId();
 
@@ -802,11 +794,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		transaction.setFolder(folder);
 		transaction.setColor(folder.getColor());
 
-		try {
-			historyDAO.store(transaction);
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
-		}
+		historyDAO.store(transaction);
 
 		// Check if is necessary to add a new history entry for the parent
 		// folder. This operation is not recursive, because we want to notify
@@ -816,41 +804,46 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			// The parent folder can be 'null' when the user wants to delete a
 			// folder with sub-folders under it (method 'deleteAll()').
 			if (parent != null) {
-				FolderHistory parentHistory = new FolderHistory();
-				parentHistory.setFolderId(parent.getId());
-				parentHistory.setFilename(folder.getName());
-				parentHistory.setPath(pathExtended);
-				parentHistory.setUser(transaction.getUser());
-				parentHistory.setComment("");
-				parentHistory.setSessionId(transaction.getSessionId());
-				parentHistory.setComment(transaction.getComment());
-				parentHistory.setPathOld(transaction.getPathOld());
-				parentHistory.setFilenameOld(transaction.getFilenameOld());
-				parentHistory.setColor(transaction.getColor());
-
-				if (transaction.getEvent().equals(FolderEvent.CREATED.toString())
-						|| transaction.getEvent().equals(FolderEvent.MOVED.toString())) {
-					parentHistory.setEvent(FolderEvent.SUBFOLDER_CREATED.toString());
-				} else if (transaction.getEvent().equals(FolderEvent.RENAMED.toString())) {
-					parentHistory.setEvent(FolderEvent.SUBFOLDER_RENAMED.toString());
-				} else if (transaction.getEvent().equals(FolderEvent.PERMISSION.toString())) {
-					parentHistory.setEvent(FolderEvent.SUBFOLDER_PERMISSION.toString());
-				} else if (transaction.getEvent().equals(FolderEvent.DELETED.toString())) {
-					parentHistory.setEvent(FolderEvent.SUBFOLDER_DELETED.toString());
-				} else if (transaction.getEvent().equals(FolderEvent.CHANGED.toString())) {
-					parentHistory.setEvent(FolderEvent.SUBFOLDER_CHANGED.toString());
-				} else if (transaction.getEvent().equals(FolderEvent.RESTORED.toString())) {
-					parentHistory.setEvent(FolderEvent.SUBFOLDER_RESTORED.toString());
-				}
-
-				if (StringUtils.isNotEmpty(parentHistory.getEvent()))
-					try {
-						historyDAO.store(parentHistory);
-					} catch (PersistenceException e) {
-						log.warn(e.getMessage(), e);
-					}
+				saveHistoryInParentFolder(parent, folder, transaction, pathExtended);
 			}
 		}
+	}
+
+	private void saveHistoryInParentFolder(Folder parent, Folder folder, FolderHistory transaction,
+			String pathExtended) {
+		FolderHistory parentHistory = new FolderHistory();
+		parentHistory.setFolderId(parent.getId());
+		parentHistory.setFilename(folder.getName());
+		parentHistory.setPath(pathExtended);
+		parentHistory.setUser(transaction.getUser());
+		parentHistory.setComment("");
+		parentHistory.setSessionId(transaction.getSessionId());
+		parentHistory.setComment(transaction.getComment());
+		parentHistory.setPathOld(transaction.getPathOld());
+		parentHistory.setFilenameOld(transaction.getFilenameOld());
+		parentHistory.setColor(transaction.getColor());
+
+		if (transaction.getEvent().equals(FolderEvent.CREATED.toString())
+				|| transaction.getEvent().equals(FolderEvent.MOVED.toString())) {
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_CREATED.toString());
+		} else if (transaction.getEvent().equals(FolderEvent.RENAMED.toString())) {
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_RENAMED.toString());
+		} else if (transaction.getEvent().equals(FolderEvent.PERMISSION.toString())) {
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_PERMISSION.toString());
+		} else if (transaction.getEvent().equals(FolderEvent.DELETED.toString())) {
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_DELETED.toString());
+		} else if (transaction.getEvent().equals(FolderEvent.CHANGED.toString())) {
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_CHANGED.toString());
+		} else if (transaction.getEvent().equals(FolderEvent.RESTORED.toString())) {
+			parentHistory.setEvent(FolderEvent.SUBFOLDER_RESTORED.toString());
+		}
+
+		if (StringUtils.isNotEmpty(parentHistory.getEvent()))
+			try {
+				historyDAO.store(parentHistory);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage(), e);
+			}
 	}
 
 	@Override
@@ -907,7 +900,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean isPermissionEnabled(Permission permission, long folderId, long userId) {
+	public boolean isPermissionEnabled(Permission permission, long folderId, long userId) throws PersistenceException {
 		Set<Permission> permissions = getEnabledPermissions(folderId, userId);
 		return permissions.contains(permission);
 	}
@@ -950,109 +943,76 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public Set<Permission> getEnabledPermissions(long folderId, long userId) {
-
+	public Set<Permission> getEnabledPermissions(long folderId, long userId) throws PersistenceException {
 		Set<Permission> permissions = new HashSet<Permission>();
+		User user = geExistingtUser(userId);
 
-		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return permissions;
-
-			// If the user is an administrator bypass all controls
-			if (user.isMemberOf(Group.GROUP_ADMIN)) {
-				return Permission.all();
-			}
-
-			Set<Group> groups = user.getGroups();
-			if (groups.isEmpty())
-				return permissions;
-
-			// If the folder defines a security ref, use another folder to find
-			// the policies
-			long id = folderId;
-			Folder folder = findById(folderId);
-			if (folder.getSecurityRef() != null) {
-				id = folder.getSecurityRef().longValue();
-				log.debug("Use the security reference " + id);
-			}
-
-			StringBuilder query = new StringBuilder(
-					"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL, A.ld_automation LDAUTOMATION, A.ld_storage LDSTORAGE");
-			query.append(" from ld_foldergroup A");
-			query.append(" where ");
-			query.append(" A.ld_folderid=" + id);
-			query.append(" and A.ld_groupid in (");
-
-			boolean first = true;
-			Iterator<Group> iter = groups.iterator();
-			while (iter.hasNext()) {
-				if (!first)
-					query.append(",");
-				Group ug = (Group) iter.next();
-				query.append(Long.toString(ug.getId()));
-				first = false;
-			}
-			query.append(")");
-
-			/**
-			 * IMPORTANT: the connection MUST be explicitly closed, otherwise it
-			 * is probable that the connection pool will leave open it
-			 * indefinitely.
-			 */
-			try (Connection con = getConnection();
-					Statement stmt = con.createStatement();
-					ResultSet rs = stmt.executeQuery(query.toString())) {
-				while (rs.next()) {
-					permissions.add(Permission.READ);
-					if (rs.getInt("LDADD") == 1)
-						permissions.add(Permission.ADD);
-					if (rs.getInt("LDEXPORT") == 1)
-						permissions.add(Permission.EXPORT);
-					if (rs.getInt("LDIMPORT") == 1)
-						permissions.add(Permission.IMPORT);
-					if (rs.getInt("LDDELETE") == 1)
-						permissions.add(Permission.DELETE);
-					if (rs.getInt("LDIMMUTABLE") == 1)
-						permissions.add(Permission.IMMUTABLE);
-					if (rs.getInt("LDSECURITY") == 1)
-						permissions.add(Permission.SECURITY);
-					if (rs.getInt("LDRENAME") == 1)
-						permissions.add(Permission.RENAME);
-					if (rs.getInt("LDWRITE") == 1)
-						permissions.add(Permission.WRITE);
-					if (rs.getInt("LDDELETE") == 1)
-						permissions.add(Permission.DELETE);
-					if (rs.getInt("LDSIGN") == 1)
-						permissions.add(Permission.SIGN);
-					if (rs.getInt("LDARCHIVE") == 1)
-						permissions.add(Permission.ARCHIVE);
-					if (rs.getInt("LDWORKFLOW") == 1)
-						permissions.add(Permission.WORKFLOW);
-					if (rs.getInt("LDDOWNLOAD") == 1)
-						permissions.add(Permission.DOWNLOAD);
-					if (rs.getInt("LDCALENDAR") == 1)
-						permissions.add(Permission.CALENDAR);
-					if (rs.getInt("LDSUBSCRIPTION") == 1)
-						permissions.add(Permission.SUBSCRIPTION);
-					if (rs.getInt("LDPRINT") == 1)
-						permissions.add(Permission.PRINT);
-					if (rs.getInt("LDPASSWORD") == 1)
-						permissions.add(Permission.PASSWORD);
-					if (rs.getInt("LDMOVE") == 1)
-						permissions.add(Permission.MOVE);
-					if (rs.getInt("LDEMAIL") == 1)
-						permissions.add(Permission.EMAIL);
-					if (rs.getInt("LDAUTOMATION") == 1)
-						permissions.add(Permission.AUTOMATION);
-					if (rs.getInt("LDSTORAGE") == 1)
-						permissions.add(Permission.STORAGE);
-				}
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+		// If the user is an administrator bypass all controls
+		if (user.isMemberOf(Group.GROUP_ADMIN)) {
+			return Permission.all();
 		}
 
+		Set<Group> userGroups = user.getGroups();
+		if (userGroups.isEmpty())
+			return permissions;
+
+		// If the folder defines a security ref, use another folder to find
+		// the policies
+		long id = folderId;
+		Folder folder = findById(folderId);
+		if (folder.getSecurityRef() != null) {
+			id = folder.getSecurityRef().longValue();
+			log.debug("Use the security reference {}", id);
+		}
+
+		StringBuilder query = new StringBuilder(
+				"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL, A.ld_automation LDAUTOMATION, A.ld_storage LDSTORAGE");
+		query.append(" from ld_foldergroup A");
+		query.append(" where ");
+		query.append(" A.ld_folderid=" + id);
+		query.append(" and A.ld_groupid in (");
+		query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
+		query.append(")");
+
+		Map<String, Permission> permissionColumn = new HashMap<>();
+		permissionColumn.put("LDADD", Permission.ADD);
+		permissionColumn.put("LDEXPORT", Permission.EXPORT);
+		permissionColumn.put("LDIMPORT", Permission.IMPORT);
+		permissionColumn.put("LDDELETE", Permission.DELETE);
+		permissionColumn.put("LDIMMUTABLE", Permission.IMMUTABLE);
+		permissionColumn.put("LDSECURITY", Permission.SECURITY);
+		permissionColumn.put("LDRENAME", Permission.RENAME);
+		permissionColumn.put("LDWRITE", Permission.WRITE);
+		permissionColumn.put("LDSIGN", Permission.SIGN);
+		permissionColumn.put("LDARCHIVE", Permission.ARCHIVE);
+		permissionColumn.put("LDWORKFLOW", Permission.WORKFLOW);
+		permissionColumn.put("LDDOWNLOAD", Permission.DOWNLOAD);
+		permissionColumn.put("LDCALENDAR", Permission.CALENDAR);
+		permissionColumn.put("LDSUBSCRIPTION", Permission.SUBSCRIPTION);
+		permissionColumn.put("LDPRINT", Permission.PRINT);
+		permissionColumn.put("LDPASSWORD", Permission.PASSWORD);
+		permissionColumn.put("LDMOVE", Permission.MOVE);
+		permissionColumn.put("LDEMAIL", Permission.EMAIL);
+		permissionColumn.put("LDAUTOMATION", Permission.AUTOMATION);
+		permissionColumn.put("LDSTORAGE", Permission.STORAGE);
+
+		/**
+		 * IMPORTANT: the connection MUST be explicitly closed, otherwise it is
+		 * probable that the connection pool will leave open it indefinitely.
+		 */
+		try (Connection con = getConnection();
+				Statement stmt = con.createStatement();
+				ResultSet rs = stmt.executeQuery(query.toString())) {
+			while (rs.next()) {
+				permissions.add(Permission.READ);
+				for (String column : permissionColumn.keySet()) {
+					if (rs.getInt(column) == 1)
+						permissions.add(permissionColumn.get(column));
+				}
+			}
+		} catch (SQLException se) {
+			throw new PersistenceException(se.getMessage(), se);
+		}
 		return permissions;
 	}
 
@@ -1064,9 +1024,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 */
 		Set<Long> ids = new HashSet<Long>();
 		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return ids;
+			User user = geExistingtUser(userId);
 
 			// The administrators have all permissions on all folders
 			if (user.isMemberOf(Group.GROUP_ADMIN)) {
@@ -1154,90 +1112,93 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@Override
 	public Collection<Long> findFolderIdByUserIdAndPermission(long userId, Permission permission, Long parentId,
-			boolean tree) {
+			boolean tree) throws PersistenceException {
+		User user = geExistingtUser(userId);
+
 		/*
 		 * Important: use an HashSet because of extremely quick in existence
 		 * checks.
 		 */
 		Set<Long> ids = new HashSet<Long>();
-		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return ids;
 
-			// The administrators have all permissions on all folders
-			if (user.isMemberOf(Group.GROUP_ADMIN)) {
-				if (parentId != null) {
-					if (tree) {
-						return findFolderIdInTree(parentId, false);
-					} else {
-						StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted=0 ");
-						query.append(" and (ld_id=" + parentId);
-						query.append(" or ld_parentid=" + parentId);
-						query.append(" ) ");
-						return queryForList(query.toString(), Long.class);
-					}
-				}
-			}
-
-			/*
-			 * Check folders that specify its own permissions. Here we cannot
-			 * restrict to the tree since a folder in the tree can reference
-			 * another folder outside.
-			 */
-			StringBuilder query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_foldergroup A where 1=1 ");
-			if (permission != Permission.READ)
-				query1.append(" and A.ld_" + permission.getName() + "=1 ");
-
-			List<Long> groupIds = user.getUserGroups().stream().map(g -> g.getGroupId()).collect(Collectors.toList());
-			if (!groupIds.isEmpty()) {
-				query1.append(" and A.ld_groupid in (");
-				query1.append(StringUtil.arrayToString(groupIds.toArray(new Long[0]), ","));
-				query1.append(") ");
-			}
-
-			List<Long> masterIds = (List<Long>) queryForList(query1.toString(), Long.class);
-			if (masterIds.isEmpty())
-				return ids;
-
-			String masterIdsString = masterIds.toString().replace('[', '(').replace(']', ')');
-
-			/*
-			 * Now search for those folders that are or reference the masterIds
-			 */
-			StringBuilder query2 = new StringBuilder("select B.ld_id from ld_folder B where B.ld_deleted=0 ");
-			query2.append(" and ( B.ld_id in " + masterIdsString);
-			query2.append(" or B.ld_securityref in " + masterIdsString + ") ");
-
+		// The administrators have all permissions on all folders
+		if (user.isMemberOf(Group.GROUP_ADMIN)) {
 			if (parentId != null) {
-				query2.append(" and ");
 				if (tree) {
-					Set<Long> folderIds = findFolderIdInTree(parentId, false);
-					if (isOracle()) {
-						/*
-						 * In Oracle The limit of 1000 elements applies to sets
-						 * of single items: (x) IN ((1), (2), (3), ...). There
-						 * is no limit if the sets contain two or more items:
-						 * (x, 0) IN ((1,0), (2,0), (3,0), ...):
-						 */
-						query2.append("( (B.ld_id,0) in ( ");
-						query2.append(
-								folderIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
-						query2.append(" ) )");
-					} else {
-						query2.append("  B.ld_id in " + folderIds.toString().replace('[', '(').replace(']', ')'));
-					}
+					return findFolderIdInTree(parentId, false);
 				} else {
-					query2.append(" (B.ld_id=" + parentId + " or B.ld_parentId=" + parentId + ") ");
+					StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted=0 ");
+					query.append(" and (ld_id=" + parentId);
+					query.append(" or ld_parentid=" + parentId);
+					query.append(" ) ");
+					return queryForList(query.toString(), Long.class);
 				}
 			}
-
-			ids.addAll((List<Long>) queryForList(query2.toString(), Long.class));
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
 		}
 
+		/*
+		 * Check folders that specify its own permissions. Here we cannot
+		 * restrict to the tree since a folder in the tree can reference another
+		 * folder outside.
+		 */
+		StringBuilder query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_foldergroup A where 1=1 ");
+		if (permission != Permission.READ)
+			query1.append(" and A.ld_" + permission.getName() + "=1 ");
+
+		appendUserGroupIdsCondition(user, query1);
+
+		List<Long> masterIds = (List<Long>) queryForList(query1.toString(), Long.class);
+		if (masterIds.isEmpty())
+			return ids;
+
+		String masterIdsString = masterIds.toString().replace('[', '(').replace(']', ')');
+
+		/*
+		 * Now search for those folders that are or reference the masterIds
+		 */
+		StringBuilder query2 = new StringBuilder("select B.ld_id from ld_folder B where B.ld_deleted=0 ");
+		query2.append(" and ( B.ld_id in " + masterIdsString);
+		query2.append(" or B.ld_securityref in " + masterIdsString + ") ");
+
+		appendParentCondition(parentId, query2, tree);
+
+		ids.addAll((List<Long>) queryForList(query2.toString(), Long.class));
+
 		return ids;
+	}
+
+	private void appendParentCondition(Long parentId, StringBuilder query, boolean tree) {
+		if (parentId != null) {
+			query.append(" and ");
+			if (tree) {
+				Set<Long> folderIds = findFolderIdInTree(parentId, false);
+				if (isOracle()) {
+					/*
+					 * In Oracle The limit of 1000 elements applies to sets of
+					 * single items: (x) IN ((1), (2), (3), ...). There is no
+					 * limit if the sets contain two or more items: (x, 0) IN
+					 * ((1,0), (2,0), (3,0), ...):
+					 */
+					query.append("( (B.ld_id,0) in ( ");
+					query.append(folderIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+					query.append(" ) )");
+				} else {
+					query.append("  B.ld_id in " + folderIds.toString().replace('[', '(').replace(']', ')'));
+				}
+			} else {
+				query.append(" (B.ld_id=" + parentId + " or B.ld_parentId=" + parentId + ") ");
+			}
+		}
+	}
+
+	private void appendUserGroupIdsCondition(User user, StringBuilder query) {
+		List<String> groupIds = user.getUserGroups().stream().map(g -> Long.toString(g.getGroupId()))
+				.collect(Collectors.toList());
+		if (!groupIds.isEmpty()) {
+			query.append(" and A.ld_groupid in (");
+			query.append(groupIds.stream().collect(Collectors.joining(",")));
+			query.append(") ");
+		}
 	}
 
 	public FolderHistoryDAO getHistoryDAO() {
@@ -1282,27 +1243,22 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean delete(long folderId, FolderHistory transaction) throws PersistenceException {
-		return delete(folderId, PersistentObject.DELETED_CODE_DEFAULT, transaction);
+	public void delete(long folderId, FolderHistory transaction) throws PersistenceException {
+		delete(folderId, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 	}
 
 	@Override
-	public boolean delete(long folderId, int delCode, FolderHistory transaction) throws PersistenceException {
+	public void delete(long folderId, int delCode, FolderHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
 		checkIfCanDelete(folderId);
-		assert (transaction.getUser() != null);
+		assert transaction != null : "transaction cannot be null";
+		assert transaction.getUser() != null;
 
 		Folder folder = findById(folderId);
-		boolean result = true;
-		try {
-			prepareHistory(folder, delCode, transaction);
-			result = store(folder, transaction);
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-			result = false;
-		}
+		prepareHistory(folder, delCode, transaction);
+		store(folder, transaction);
 
 		/**
 		 * Delete the aliases pointing to this deleted folder
@@ -1317,8 +1273,6 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				log.info("Removed {} aliases pointing to the deleted folder {}", count, folderId);
 			}
 		}
-
-		return result;
 	}
 
 	private void prepareHistory(Folder folder, int delCode, FolderHistory transaction) throws PersistenceException {
@@ -1337,23 +1291,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean applyRightToTree(long rootId, FolderHistory transaction) {
+	public void applyRightToTree(long rootId, FolderHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getSessionId() != null);
 
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
-
-		Folder folder = null;
-		try {
-			folder = findById(rootId);
-		} catch (PersistenceException e1) {
-			log.error(e1.getMessage(), e1);
-		}
-		if (folder == null)
-			return result;
+		Folder folder = getExistingFolder(rootId);
 
 		long securityRef = rootId;
 		if (folder.getSecurityRef() != null && folder.getId() != folder.getSecurityRef())
@@ -1364,40 +1309,29 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		int records = 0;
 
-		try {
-			/*
-			 * Apply the securityRef
-			 */
-			records = jdbcUpdate("update ld_folder set ld_securityref = ?, ld_lastmodified = ? where not ld_id = ? "
-					+ " and ld_id in " + treeIdsString, securityRef, new Date(), rootId);
+		/*
+		 * Apply the securityRef
+		 */
+		records = jdbcUpdate("update ld_folder set ld_securityref = ?, ld_lastmodified = ? where not ld_id = ? "
+				+ " and ld_id in " + treeIdsString, securityRef, new Date(), rootId);
 
-			log.warn("Applied rights to {} folders in tree {}", records, rootId);
+		log.warn("Applied rights to {} folders in tree {}", records, rootId);
 
-			/*
-			 * Delete all the specific rights associated to the folders in the
-			 * tree
-			 */
-			jdbcUpdate("delete from ld_foldergroup where not ld_folderid = ? and ld_folderid in " + treeIdsString,
-					rootId);
-			log.warn("Removed {} specific rights in tree {}", records, rootId);
+		/*
+		 * Delete all the specific rights associated to the folders in the tree
+		 */
+		jdbcUpdate("delete from ld_foldergroup where not ld_folderid = ? and ld_folderid in " + treeIdsString, rootId);
+		log.warn("Removed {} specific rights in tree {}", records, rootId);
 
-			if (getSessionFactory().getCache() != null)
-				getSessionFactory().getCache().evictEntityRegions();
-		} catch (Throwable e) {
-			result = false;
-			log.error(e.getMessage(), e);
-		}
-
-		return result;
+		if (getSessionFactory().getCache() != null)
+			getSessionFactory().getCache().evictEntityRegions();
 	}
 
 	@Override
 	public Folder createAlias(long parentId, long foldRef, FolderHistory transaction) throws PersistenceException {
-		Folder targetFolder = findFolder(foldRef);
-		assert (targetFolder != null);
+		Folder targetFolder = getExistingFolder(foldRef);
 
-		Folder parentFolder = findFolder(parentId);
-		assert (parentFolder != null);
+		Folder parentFolder = getExistingFolder(parentId);
 
 		/*
 		 * Detect possible cycle
@@ -1451,22 +1385,15 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		folder.setType(folderVO.getType());
 		folder.setDescription(folderVO.getDescription());
 		folder.setTenantId(parent.getTenantId());
-
-		if (folderVO.getCreation() != null)
-			folder.setCreation(folderVO.getCreation());
-		if (folderVO.getCreatorId() != null)
-			folder.setCreatorId(folderVO.getCreatorId());
-		if (folderVO.getCreator() != null)
-			folder.setCreator(folderVO.getCreator());
 		folder.setParentId(parent.getId());
+
+		setCreator(folder, folderVO);
 
 		setUniqueName(folder);
 
 		folder.setTemplate(folderVO.getTemplate());
 		folder.setTemplateLocked(folderVO.getTemplateLocked());
-		if (folderVO.getAttributes() != null && !folderVO.getAttributes().isEmpty())
-			for (String name : folderVO.getAttributes().keySet())
-				folder.getAttributes().put(name, folderVO.getAttributes().get(name));
+		setExtendedAttributes(folder, folderVO);
 
 		folder.setQuotaDocs(folderVO.getQuotaDocs());
 		folder.setQuotaSize(folderVO.getQuotaSize());
@@ -1506,6 +1433,29 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		/*
 		 * Replicate the parent's metadata
 		 */
+		replicateParentMetadata(folder, folderVO, parent);
+
+		if (folderVO.getOcrTemplateId() != null)
+			folder.setOcrTemplateId(folderVO.getOcrTemplateId());
+		else
+			folder.setOcrTemplateId(parent.getOcrTemplateId());
+
+		if (folderVO.getBarcodeTemplateId() != null)
+			folder.setBarcodeTemplateId(folderVO.getBarcodeTemplateId());
+		else
+			folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
+
+		store(folder, transaction);
+		return folder;
+	}
+
+	private void setExtendedAttributes(Folder folder, Folder folderVO) {
+		if (folderVO.getAttributes() != null && !folderVO.getAttributes().isEmpty())
+			for (String name : folderVO.getAttributes().keySet())
+				folder.getAttributes().put(name, folderVO.getAttributes().get(name));
+	}
+
+	private void replicateParentMetadata(Folder folder, Folder folderVO, Folder parent) {
 		if (parent.getTemplate() != null && folderVO.getTemplate() == null && folderVO.getFoldRef() == null) {
 			initialize(parent);
 			folder.setTemplate(parent.getTemplate());
@@ -1518,15 +1468,15 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				log.warn(t.getMessage());
 			}
 		}
+	}
 
-		if (folderVO.getOcrTemplateId() != null)
-			folder.setOcrTemplateId(folderVO.getOcrTemplateId());
-		else
-			folder.setOcrTemplateId(parent.getOcrTemplateId());
-
-		if (store(folder, transaction) == false)
-			return null;
-		return folder;
+	private void setCreator(Folder folder, Folder folderVO) {
+		if (folderVO.getCreation() != null)
+			folder.setCreation(folderVO.getCreation());
+		if (folderVO.getCreatorId() != null)
+			folder.setCreatorId(folderVO.getCreatorId());
+		if (folderVO.getCreator() != null)
+			folder.setCreator(folderVO.getCreator());
 	}
 
 	@Override
@@ -2084,32 +2034,24 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction) {
-		boolean result = true;
-		try {
-			Folder f = findById(folderId);
-			initialize(f);
+	public void updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction)
+			throws PersistenceException {
+		Folder f = findById(folderId);
+		initialize(f);
 
-			Folder rightsFolder = findById(rightsFolderId);
-			long securityRef = rightsFolderId;
-			if (rightsFolder.getSecurityRef() != null)
-				securityRef = rightsFolder.getSecurityRef();
+		Folder rightsFolder = findById(rightsFolderId);
+		long securityRef = rightsFolderId;
+		if (rightsFolder.getSecurityRef() != null)
+			securityRef = rightsFolder.getSecurityRef();
 
-			if (transaction != null)
-				transaction.setEvent(FolderEvent.PERMISSION.toString());
+		if (transaction != null)
+			transaction.setEvent(FolderEvent.PERMISSION.toString());
 
-			f.setSecurityRef(securityRef);
-			if (!store(f, transaction))
-				return false;
+		f.setSecurityRef(securityRef);
+		store(f, transaction);
 
-			// Now all the folders that are referencing this one must be updated
-			bulkUpdate("set securityRef=" + securityRef + " where securityRef=" + folderId, (Map<String, Object>) null);
-		} catch (Throwable e) {
-			result = false;
-			log.error(e.getMessage(), e);
-		}
-
-		return result;
+		// Now all the folders that are referencing this one must be updated
+		bulkUpdate("set securityRef=" + securityRef + " where securityRef=" + folderId, (Map<String, Object>) null);
 	}
 
 	@Override
@@ -2198,216 +2140,147 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public boolean applyMetadataToTree(long id, FolderHistory transaction) {
+	public void applyMetadataToTree(long id, FolderHistory transaction) throws PersistenceException {
 		if (!checkStoringAspect())
-			return false;
+			return;
 
-		boolean result = true;
+		Folder parent = getExistingFolder(id);
 
-		Folder parent = null;
-		try {
-			parent = findById(id);
-		} catch (PersistenceException e1) {
-			log.error(e1.getMessage(), e1);
-		}
-		if (parent == null)
-			return result;
+		initialize(parent);
+		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setTenantId(parent.getTenantId());
+		transaction.setNotifyEvent(false);
 
-		try {
-			initialize(parent);
-			transaction.setEvent(FolderEvent.CHANGED.toString());
-			transaction.setTenantId(parent.getTenantId());
-			transaction.setNotifyEvent(false);
+		// Iterate over all children setting the template and field values
+		List<Folder> children = findChildren(id, null);
+		for (Folder folder : children) {
+			initialize(folder);
 
-			// Iterate over all children setting the template and field values
-			List<Folder> children = findChildren(id, null);
-			for (Folder folder : children) {
-				initialize(folder);
+			FolderHistory tr = new FolderHistory(transaction);
+			tr.setFolderId(folder.getId());
 
-				FolderHistory tr = new FolderHistory(transaction);
-				tr.setFolderId(folder.getId());
-
-				folder.setTemplate(parent.getTemplate());
-				folder.setTemplateLocked(parent.getTemplateLocked());
-				for (String name : parent.getAttributeNames()) {
-					Attribute ext = new Attribute(parent.getAttributes().get(name));
-					folder.getAttributes().put(name, ext);
-				}
-
-				store(folder, tr);
-				flush();
-
-				if (!applyMetadataToTree(folder.getId(), transaction))
-					return false;
+			folder.setTemplate(parent.getTemplate());
+			folder.setTemplateLocked(parent.getTemplateLocked());
+			for (String name : parent.getAttributeNames()) {
+				Attribute ext = new Attribute(parent.getAttributes().get(name));
+				folder.getAttributes().put(name, ext);
 			}
-		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
+
+			store(folder, tr);
+			flush();
+
+			applyMetadataToTree(folder.getId(), transaction);
 		}
-		return result;
+	}
+
+	private Folder getExistingFolder(long id) throws PersistenceException {
+		Folder folder = findById(id);
+		assert folder != null : "Unexisting folder " + id;
+		return folder;
 	}
 
 	@Override
-	public boolean applyTagsToTree(long id, FolderHistory transaction) {
-		boolean result = true;
+	public void applyTagsToTree(long id, FolderHistory transaction) throws PersistenceException {
+		Folder parent = getExistingFolder(id);
 
-		Folder parent = null;
-		try {
-			parent = findById(id);
-		} catch (PersistenceException e1) {
-			log.error(e1.getMessage(), e1);
+		initialize(parent);
+		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setTenantId(parent.getTenantId());
+		transaction.setNotifyEvent(false);
+
+		// Iterate over all children setting the template and field values
+		List<Folder> children = findChildren(id, null);
+		for (Folder folder : children) {
+			initialize(folder);
+
+			FolderHistory tr = new FolderHistory(transaction);
+			tr.setFolderId(folder.getId());
+
+			if (folder.getTags() != null)
+				folder.getTags().clear();
+			if (parent.getTags() != null)
+				for (Tag tag : parent.getTags())
+					folder.addTag(tag.getTag());
+
+			store(folder, tr);
+			flush();
+
+			applyTagsToTree(folder.getId(), transaction);
 		}
-		if (parent == null)
-			return result;
-
-		try {
-			initialize(parent);
-			transaction.setEvent(FolderEvent.CHANGED.toString());
-			transaction.setTenantId(parent.getTenantId());
-			transaction.setNotifyEvent(false);
-
-			// Iterate over all children setting the template and field values
-			List<Folder> children = findChildren(id, null);
-			for (Folder folder : children) {
-				initialize(folder);
-
-				FolderHistory tr = new FolderHistory(transaction);
-				tr.setFolderId(folder.getId());
-
-				if (folder.getTags() != null)
-					folder.getTags().clear();
-				if (parent.getTags() != null)
-					for (Tag tag : parent.getTags())
-						folder.addTag(tag.getTag());
-
-				store(folder, tr);
-				flush();
-
-				if (!applyTagsToTree(folder.getId(), transaction))
-					return false;
-			}
-		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
-		}
-		return result;
 	}
 
 	@Override
-	public boolean applyGridToTree(long id, FolderHistory transaction) {
-		boolean result = true;
+	public void applyGridToTree(long id, FolderHistory transaction) throws PersistenceException {
+		Folder parent = getExistingFolder(id);
 
-		Folder parent = null;
-		try {
-			parent = findById(id);
-		} catch (PersistenceException e1) {
-			log.error(e1.getMessage(), e1);
+		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setTenantId(parent.getTenantId());
+		transaction.setNotifyEvent(false);
+
+		// Iterate over all children setting the template and field values
+		List<Folder> children = findChildren(id, null);
+		for (Folder folder : children) {
+			initialize(folder);
+			folder.setGrid(parent.getGrid());
+
+			FolderHistory tr = new FolderHistory(transaction);
+			tr.setFolderId(folder.getId());
+
+			store(folder, tr);
+			flush();
+
+			applyGridToTree(folder.getId(), transaction);
 		}
-		if (parent == null)
-			return result;
-
-		try {
-			transaction.setEvent(FolderEvent.CHANGED.toString());
-			transaction.setTenantId(parent.getTenantId());
-			transaction.setNotifyEvent(false);
-
-			// Iterate over all children setting the template and field values
-			List<Folder> children = findChildren(id, null);
-			for (Folder folder : children) {
-				initialize(folder);
-				folder.setGrid(parent.getGrid());
-
-				FolderHistory tr = new FolderHistory(transaction);
-				tr.setFolderId(folder.getId());
-
-				store(folder, tr);
-				flush();
-
-				if (!applyGridToTree(folder.getId(), transaction))
-					return false;
-			}
-		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
-		}
-		return result;
 	}
 
 	@Override
-	public boolean applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException {
-		boolean result = true;
-
-		Folder parent = findById(id);
-		if (parent == null)
-			return result;
+	public void applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException {
+		Folder parent = getExistingFolder(id);
 		initialize(parent);
 
-		try {
-			transaction.setEvent(FolderEvent.CHANGED.toString());
-			transaction.setTenantId(parent.getTenantId());
-			transaction.setNotifyEvent(false);
+		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setTenantId(parent.getTenantId());
+		transaction.setNotifyEvent(false);
 
-			// Iterate over all children setting the template and field values
-			List<Folder> children = findChildren(id, null);
-			for (Folder folder : children) {
-				initialize(folder);
-				folder.setStorage(parent.getStorage());
+		// Iterate over all children setting the template and field values
+		List<Folder> children = findChildren(id, null);
+		for (Folder folder : children) {
+			initialize(folder);
+			folder.setStorage(parent.getStorage());
 
-				FolderHistory tr = new FolderHistory(transaction);
-				tr.setFolderId(folder.getId());
+			FolderHistory tr = new FolderHistory(transaction);
+			tr.setFolderId(folder.getId());
 
-				store(folder, tr);
-				flush();
+			store(folder, tr);
+			flush();
 
-				if (!applyGridToTree(folder.getId(), transaction))
-					return false;
-			}
-		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
+			applyGridToTree(folder.getId(), transaction);
 		}
-		return result;
 	}
 
 	@Override
-	public boolean applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
-		boolean result = true;
+	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
+		Folder parent = getExistingFolder(id);
 
-		Folder parent = findById(id);
-		if (parent == null)
-			return result;
+		transaction.setEvent(FolderEvent.CHANGED.toString());
+		transaction.setTenantId(parent.getTenantId());
+		transaction.setNotifyEvent(false);
 
-		try {
-			transaction.setEvent(FolderEvent.CHANGED.toString());
-			transaction.setTenantId(parent.getTenantId());
-			transaction.setNotifyEvent(false);
+		// Iterate over all children setting the template and field values
+		List<Folder> children = findChildren(id, null);
+		for (Folder folder : children) {
+			initialize(folder);
+			folder.setOcrTemplateId(parent.getOcrTemplateId());
+			folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
 
-			// Iterate over all children setting the template and field values
-			List<Folder> children = findChildren(id, null);
-			for (Folder folder : children) {
-				initialize(folder);
-				folder.setOcrTemplateId(parent.getOcrTemplateId());
-				folder.setBarcodeTemplateId(parent.getBarcodeTemplateId());
+			FolderHistory tr = new FolderHistory(transaction);
+			tr.setFolderId(folder.getId());
 
-				FolderHistory tr = new FolderHistory(transaction);
-				tr.setFolderId(folder.getId());
+			store(folder, tr);
+			flush();
 
-				store(folder, tr);
-				flush();
-
-				if (!applyOCRToTree(folder.getId(), transaction))
-					return false;
-			}
-		} catch (Throwable e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			result = false;
+			applyOCRToTree(folder.getId(), transaction);
 		}
-		return result;
 	}
 
 	public List<Long> findFolderIdByTag(String tag) {
@@ -2426,9 +2299,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public List<Long> findFolderIdByUserIdAndTag(long userId, String tag) {
 		List<Long> ids = new ArrayList<Long>();
 		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return ids;
+			User user = geExistingtUser(userId);
 
 			StringBuilder query = new StringBuilder();
 
@@ -2520,13 +2391,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		log.debug("merge folder {} into folder {}", target, source);
 
-		Set<Long> treeIds = findFolderIdInTree(target.getId(), true);
-		if (treeIds.contains(source.getId()))
-			throw new PersistenceException("You cannot merge a folder inside a parent");
+		checkOutsideParentTree(source, target);
 
-		Session session = null;
-		if (transaction != null && transaction.getSessionId() != null)
-			session = SessionManager.get().get(transaction.getSessionId());
+		Session session = getSession(transaction);
 
 		/*
 		 * Process the documents first
@@ -2538,7 +2405,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		for (Folder folder : foldersInSource) {
 			// Move only non-clashing folders
 			if (findByNameAndParentId(folder.getName(), target.getId()).isEmpty())
-				move(folder, target, transaction != null ? new FolderHistory(transaction) : null);
+				move(folder, target, new FolderHistory(transaction));
 		}
 
 		/*
@@ -2549,13 +2416,30 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			List<Folder> foldersInTarget = findByNameAndParentId(fldSource.getName(), target.getId());
 			if (foldersInTarget.isEmpty())
 				continue;
-			merge(fldSource, foldersInTarget.get(0), transaction != null ? new FolderHistory(transaction) : null);
+			merge(fldSource, foldersInTarget.get(0), new FolderHistory(transaction));
 		}
 
+		deleteEmptySourceFolders(source, transaction);
+	}
+
+	private void deleteEmptySourceFolders(Folder source, FolderHistory transaction) throws PersistenceException {
 		log.debug("delete the empty source folder {}", source);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		if (docDao.findByFolder(source.getId(), null).isEmpty() && findByParentId(source.getId()).isEmpty())
-			delete(source.getId(), transaction != null ? new FolderHistory(transaction) : null);
+			delete(source.getId(), new FolderHistory(transaction));
+	}
+
+	private void checkOutsideParentTree(Folder source, Folder target) throws PersistenceException {
+		Set<Long> treeIds = findFolderIdInTree(target.getId(), true);
+		if (treeIds.contains(source.getId()))
+			throw new PersistenceException("You cannot merge a folder inside a parent");
+	}
+
+	private Session getSession(FolderHistory transaction) {
+		Session session = null;
+		if (transaction.getSessionId() != null)
+			session = SessionManager.get().get(transaction.getSessionId());
+		return session;
 	}
 
 	private void moveDocumentsOnMerge(Folder source, Folder target, FolderHistory transaction, Session session)

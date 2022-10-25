@@ -48,8 +48,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @param userId ID of the user.
 	 * @return Collection of all documentId required for the specified user.
+	 * 
+	 * @throws PersistenceException error in the database 
 	 */
-	public List<Long> findByUserId(long userId);
+	public List<Long> findByUserId(long userId) throws PersistenceException;
 
 	/**
 	 * Finds all document ids inside the given folder.

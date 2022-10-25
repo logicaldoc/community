@@ -100,7 +100,7 @@ public class SecurityManagerImpl implements SecurityManager {
 	}
 
 	@Override
-	public boolean isWriteEnabled(long docId, long userId) {
+	public boolean isWriteEnabled(long docId, long userId) throws PersistenceException {
 		Document doc = null;
 		try {
 			doc = documentDAO.findById(docId, true);
@@ -114,7 +114,7 @@ public class SecurityManagerImpl implements SecurityManager {
 	}
 
 	@Override
-	public boolean isReadEnabled(long docId, long userId) {
+	public boolean isReadEnabled(long docId, long userId) throws PersistenceException {
 		Document doc = null;
 		try {
 			doc = documentDAO.findById(docId, true);
@@ -128,7 +128,7 @@ public class SecurityManagerImpl implements SecurityManager {
 	}
 
 	@Override
-	public boolean isPrintEnabled(long docId, long userId) {
+	public boolean isPrintEnabled(long docId, long userId) throws PersistenceException {
 		Document doc = null;
 		try {
 			doc = documentDAO.findById(docId, true);
@@ -142,7 +142,7 @@ public class SecurityManagerImpl implements SecurityManager {
 	}
 
 	@Override
-	public boolean isDownloadEnabled(long docId, long userId) {
+	public boolean isDownloadEnabled(long docId, long userId) throws PersistenceException {
 		Document doc = null;
 		try {
 			doc = documentDAO.findById(docId, true);
@@ -156,7 +156,7 @@ public class SecurityManagerImpl implements SecurityManager {
 	}
 
 	@Override
-	public boolean isPermissionEnabled(Permission permission, long docId, long userId) {
+	public boolean isPermissionEnabled(Permission permission, long docId, long userId) throws PersistenceException {
 		Document doc = null;
 		try {
 			doc = documentDAO.findById(docId, true);
@@ -170,7 +170,7 @@ public class SecurityManagerImpl implements SecurityManager {
 	}
 
 	@Override
-	public Set<Permission> getEnabledPermissions(long docId, long userId) {
+	public Set<Permission> getEnabledPermissions(long docId, long userId) throws PersistenceException {
 		Document doc = null;
 		try {
 			doc = documentDAO.findById(docId, true);

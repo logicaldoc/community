@@ -26,6 +26,7 @@ import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.model.WSUtil;
 
 /**
@@ -240,7 +241,7 @@ public class AbstractService {
 	}
 
 	public static String convertDateToString(Date date) {
-		return WSUtil.convertDateToString(date);
+		return DateUtil.format(date);
 	}
 
 	public static Date convertStringToDate(String date) {

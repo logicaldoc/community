@@ -111,36 +111,8 @@ public class Language implements Comparable<Language> {
 	}
 
 	public Analyzer getAnalyzer() {
-		if (analyzer == null && !StringUtils.isEmpty(analyzerClass)) {
-			// Try to instantiate the specified analyzer (Using default
-			// constructor)
-			Class<?> aClass = null;
-			try {
-				aClass = Class.forName(analyzerClass);
-			} catch (Throwable t) {
-				log.error(analyzerClass + " not found");
-			}
-
-			// Try to use constructor (Set<?> stopwords)
-			if (aClass != null && stopWords != null && (!stopWords.isEmpty())) {
-				try {
-					Constructor<?> constructor = aClass.getConstructor(new Class[] { java.util.Set.class });
-					if (constructor != null)
-						analyzer = (Analyzer) constructor.newInstance(stopWords);
-				} catch (Throwable e) {
-					log.debug("constructor (Version matchVersion, Set<?> stopwords)  not found");
-				}
-			}
-
-			// Try with default constructor
-			if (aClass != null && analyzer == null) {
-				try {
-					analyzer = (Analyzer) aClass.newInstance();
-				} catch (Throwable e) {
-					log.debug("constructor without arguments not found");
-				}
-			}
-		}
+		if (analyzer == null && !StringUtils.isEmpty(analyzerClass))
+			initAnalyzer();
 
 		if (analyzer == null) {
 			analyzer = new SimpleAnalyzer();
@@ -150,6 +122,37 @@ public class Language implements Comparable<Language> {
 		analyzer.setVersion(StandardSearchEngine.VERSION);
 
 		return analyzer;
+	}
+
+	private void initAnalyzer() {
+		// Try to instantiate the specified analyzer (Using default
+		// constructor)
+		Class<?> aClass = null;
+		try {
+			aClass = Class.forName(analyzerClass);
+		} catch (Throwable t) {
+			log.error(analyzerClass + " not found");
+		}
+
+		// Try to use constructor (Set<?> stopwords)
+		if (aClass != null && stopWords != null && (!stopWords.isEmpty())) {
+			try {
+				Constructor<?> constructor = aClass.getConstructor(new Class[] { java.util.Set.class });
+				if (constructor != null)
+					analyzer = (Analyzer) constructor.newInstance(stopWords);
+			} catch (Throwable e) {
+				log.debug("constructor (Version matchVersion, Set<?> stopwords)  not found");
+			}
+		}
+
+		// Try with default constructor
+		if (aClass != null && analyzer == null) {
+			try {
+				analyzer = (Analyzer) aClass.getDeclaredConstructor().newInstance();
+			} catch (Throwable e) {
+				log.debug("constructor without arguments not found");
+			}
+		}
 	}
 
 	public void setAnalyzer(Analyzer analyzer) {

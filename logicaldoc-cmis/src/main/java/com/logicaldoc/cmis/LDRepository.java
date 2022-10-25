@@ -703,8 +703,7 @@ public class LDRepository {
 				transaction.setEvent(FolderEvent.DELETED.toString());
 				transaction.setSessionId(sid);
 
-				if (!folderDao.delete(folder.getId(), transaction))
-					throw new Exception("Unable to delete folder");
+				folderDao.delete(folder.getId(), transaction);
 			} else {
 				Document doc = (Document) object;
 				DocumentHistory transaction = new DocumentHistory();
@@ -1959,17 +1958,17 @@ public class LDRepository {
 		// folder properties
 		if (!root.equals(folder)) {
 			addPropertyId(result, typeId, filter, PropertyIds.PARENT_ID,
-					ID_PREFIX_FLD + ((Folder) folder).getParentId());
+					ID_PREFIX_FLD + folder.getParentId());
 			objectInfo.setHasParent(true);
 		} else {
 			addPropertyId(result, typeId, filter, PropertyIds.PARENT_ID, null);
 			objectInfo.setHasParent(false);
 		}
 		addPropertyIdList(result, typeId, filter, PropertyIds.ALLOWED_CHILD_OBJECT_TYPE_IDS, null);
-		addPropertyString(result, typeId, filter, TypeManager.PROP_DESCRIPTION, ((Folder) folder).getDescription());
+		addPropertyString(result, typeId, filter, TypeManager.PROP_DESCRIPTION, folder.getDescription());
 
 		// Identifica il tipo della cartella: workspace o normale
-		addPropertyInteger(result, typeId, filter, TypeManager.PROP_TYPE, ((Folder) folder).getType());
+		addPropertyInteger(result, typeId, filter, TypeManager.PROP_TYPE, folder.getType());
 	}
 
 	public List<ObjectData> getAllVersions(String objectId) {

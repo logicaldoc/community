@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.ExtensibleObject;
@@ -125,7 +126,7 @@ public class ServiceUtil {
 		return session;
 	}
 
-	public static void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
+	public static void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException, PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),

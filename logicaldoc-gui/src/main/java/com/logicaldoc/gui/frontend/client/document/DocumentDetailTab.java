@@ -1,14 +1,10 @@
 package com.logicaldoc.gui.frontend.client.document;
 
 import com.logicaldoc.gui.common.client.Constants;
-import com.logicaldoc.gui.common.client.ServerValidationError;
-import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
-import com.logicaldoc.gui.common.client.beans.GUIValue;
-import com.logicaldoc.gui.common.client.log.GuiLog;
+import com.logicaldoc.gui.frontend.client.panels.DetailTab;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
 
 /**
  * Superclass for all tab panels in the document details area
@@ -16,10 +12,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public abstract class DocumentDetailTab extends HLayout {
+public abstract class DocumentDetailTab extends DetailTab {
 	protected GUIDocument document;
-
-	protected ChangedHandler changedHandler;
 
 	protected boolean updateEnabled = false;
 
@@ -54,22 +48,5 @@ public abstract class DocumentDetailTab extends HLayout {
 
 	public GUIDocument getDocument() {
 		return document;
-	}
-
-	public ChangedHandler getChangedHandler() {
-		return changedHandler;
-	}
-
-	public boolean validate() {
-		return true;
-	}
-
-	public void handleErrors(ServerValidationException errorException) {
-		GuiLog.serverError(errorException);
-		handleErrors(errorException.getErrors());
-	}
-
-	public void handleErrors(ServerValidationError[] errors) {
-		// Nothing to do
 	}
 }

@@ -26,6 +26,7 @@ import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
+import com.logicaldoc.util.time.DateUtil;
 
 public class WSUtil {
 	protected static Logger log = LoggerFactory.getLogger(WSUtil.class);
@@ -61,7 +62,7 @@ public class WSUtil {
 			wsDoc.setDigest(document.getDigest());
 			wsDoc.setDocRef(document.getDocRef());
 			wsDoc.setDocRefType(document.getDocRefType());
-			wsDoc.setLastModified(convertDateToString(document.getLastModified()));
+			wsDoc.setLastModified(DateUtil.format(document.getLastModified()));
 			wsDoc.setRating(document.getRating());
 			wsDoc.setPages(document.getPages());
 			wsDoc.setSigned(document.getSigned());
@@ -76,19 +77,19 @@ public class WSUtil {
 
 			String date = null;
 			if (document.getDate() != null)
-				date = convertDateToString(document.getDate());
+				date = DateUtil.format(document.getDate());
 			wsDoc.setDate(date);
 			date = null;
 			if (document.getCreation() != null)
-				date = convertDateToString(document.getCreation());
+				date = DateUtil.format(document.getCreation());
 			wsDoc.setCreation(date);
 			date = null;
 			if (document.getStartPublishing() != null)
-				date = convertDateToString(document.getStartPublishing());
+				date = DateUtil.format(document.getStartPublishing());
 			wsDoc.setStartPublishing(date);
 			date = null;
 			if (document.getStopPublishing() != null)
-				date = convertDateToString(document.getStopPublishing());
+				date = DateUtil.format(document.getStopPublishing());
 			wsDoc.setStopPublishing(date);
 			wsDoc.setPublished(document.getPublished());
 
@@ -253,44 +254,6 @@ public class WSUtil {
 		return doc;
 	}
 
-	public static String convertDateToString(Date date) {
-		if(date==null)
-			return null;
-		
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
-		try {
-			return df.format(date);
-		} catch (Exception e) {
-			df = new SimpleDateFormat("yyyy-MM-dd");
-			try {
-				return df.format(date);
-			} catch (Exception e1) {
-				// Nothing to do
-			}
-		}
-		
-		return null;
-	}
-
-	public static String convertDateToStringWithMillis(Date date) {
-		if(date==null)
-			return null;
-		
-		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
-		try {
-			return df.format(date);
-		} catch (Exception e) {
-			df = new SimpleDateFormat("yyyy-MM-dd");
-			try {
-				return df.format(date);
-			} catch (Exception e1) {
-				// Nothing to do
-			}
-		}
-		
-		return null;
-	}
-
 	public static Date convertStringToDate(String date) {
 		if (StringUtils.isEmpty(date))
 			return null;
@@ -312,7 +275,7 @@ public class WSUtil {
 			wsAttributeSet.setId(attributeSet.getId());
 			wsAttributeSet.setName(attributeSet.getName());
 			wsAttributeSet.setDescription(attributeSet.getDescription());
-			wsAttributeSet.setLastModified(convertDateToString(attributeSet.getLastModified()));
+			wsAttributeSet.setLastModified(DateUtil.format(attributeSet.getLastModified()));
 
 			// Populate extended attributes
 			WSAttribute[] attributes = new WSAttribute[0];
@@ -333,7 +296,7 @@ public class WSUtil {
 					attribute.setStringValue(attr.getStringValue());
 					attribute.setIntValue(attr.getIntValue());
 					attribute.setDoubleValue(attr.getDoubleValue());
-					attribute.setDateValue(convertDateToString(attr.getDateValue()));
+					attribute.setDateValue(DateUtil.format(attr.getDateValue()));
 					attribute.setEditor(attr.getEditor());
 					attribute.setSetId(attr.getSetId());
 					attribute.setType(attr.getType());
@@ -443,7 +406,7 @@ public class WSUtil {
 			wsTemplate.setName(template.getName());
 			wsTemplate.setDescription(template.getDescription());
 			wsTemplate.setValidation(template.getValidation());
-			wsTemplate.setLastModified(convertDateToString(template.getLastModified()));
+			wsTemplate.setLastModified(DateUtil.format(template.getLastModified()));
 
 			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 			templateDao.initialize(template);
@@ -468,7 +431,7 @@ public class WSUtil {
 					attribute.setStringValues(attr.getStringValues());
 					attribute.setIntValue(attr.getIntValue());
 					attribute.setDoubleValue(attr.getDoubleValue());
-					attribute.setDateValue(convertDateToString(attr.getDateValue()));
+					attribute.setDateValue(DateUtil.format(attr.getDateValue()));
 					attribute.setEditor(attr.getEditor());
 					attribute.setSetId(attr.getSetId());
 					attribute.setType(attr.getType());

@@ -10,6 +10,7 @@ import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
@@ -148,7 +149,7 @@ public class WSGroup implements Serializable {
 			wsGroup.setName(group.getName());
 			wsGroup.setDescription(group.getDescription());
 			wsGroup.setType(group.getType());
-			wsGroup.setLastModified(WSUtil.convertDateToString(group.getLastModified()));
+			wsGroup.setLastModified(DateUtil.format(group.getLastModified()));
 			wsGroup.setSource(group.getSource());
 
 			if (group.getUsers() != null && group.getUsers().size() > 0) {

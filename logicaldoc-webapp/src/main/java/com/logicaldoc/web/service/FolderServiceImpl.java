@@ -72,8 +72,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
 
-			if (!fdao.updateSecurityRef(folderId, rightsFolderId, transaction))
-				throw new Exception("Error updating the database");
+			fdao.updateSecurityRef(folderId, rightsFolderId, transaction);
 
 			return getFolder(session, folderId);
 		} catch (Throwable t) {
@@ -102,7 +101,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 						FolderHistory history = new FolderHistory();
 						history.setSession(session);
 						history.setEvent(FolderEvent.PERMISSION.toString());
-						fdao.applyRightToTree(folder.getId(), history);
+						try {
+							fdao.applyRightToTree(folder.getId(), history);
+						} catch (PersistenceException e) {
+							log.error(e.getMessage(), e);
+						}
 					}
 
 				};
@@ -708,7 +711,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					fg = new FolderGroup();
 					fg.setGroupId(right.getEntityId());
 				}
-				
+
 				if (fg == null)
 					continue;
 
@@ -886,7 +889,8 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				}
 
 				// The document must be not locked
-				if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED || doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
+				if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED
+						|| doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
 					continue;
 				}
 
@@ -1182,7 +1186,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					FolderHistory history = new FolderHistory();
 					history.setSession(session);
 					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-					fdao.applyGridToTree(folderId, history);
+					try {
+						fdao.applyGridToTree(folderId, history);
+					} catch (PersistenceException e) {
+						log.error(e.getMessage(), e);
+					}
 				}
 
 			};
@@ -1253,14 +1261,14 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-		if (!folderDao.isPermissionEnabled(Permission.ADD, targetId, session.getUserId()))
-			throw new ServerException("Add Child rights not granted on the target folder");
-		if (!folderDao.isPermissionEnabled(Permission.WRITE, targetId, session.getUserId()))
-			throw new ServerException("Write rights not granted on the target folder");
-		if (!folderDao.isPermissionEnabled(Permission.DELETE, targetId, session.getUserId()))
-			throw new ServerException("Delete rights not granted on the target folder");
-
 		try {
+			if (!folderDao.isPermissionEnabled(Permission.ADD, targetId, session.getUserId()))
+				throw new ServerException("Add Child rights not granted on the target folder");
+			if (!folderDao.isPermissionEnabled(Permission.WRITE, targetId, session.getUserId()))
+				throw new ServerException("Write rights not granted on the target folder");
+			if (!folderDao.isPermissionEnabled(Permission.DELETE, targetId, session.getUserId()))
+				throw new ServerException("Delete rights not granted on the target folder");
+			
 			Runnable runnable = new Runnable() {
 
 				@Override

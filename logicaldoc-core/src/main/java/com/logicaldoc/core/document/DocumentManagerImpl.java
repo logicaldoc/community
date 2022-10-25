@@ -66,6 +66,10 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  */
 public class DocumentManagerImpl implements DocumentManager {
 
+	private static final String MERGE = "merge";
+
+	private static final String UNKNOWN = "unknown";
+
 	private static final String DOCUMENT_IS_IMMUTABLE = "Document is immutable";
 
 	protected static Logger log = LoggerFactory.getLogger(DocumentManagerImpl.class);
@@ -797,7 +801,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	private void setAtributesForCreation(File file, Document docVO, DocumentHistory transaction) {
-		String type = "unknown";
+		String type = UNKNOWN;
 		int lastDotIndex = docVO.getFileName().lastIndexOf(".");
 		if (lastDotIndex > 0) {
 			type = FileUtil.getExtension(docVO.getFileName()).toLowerCase();
@@ -992,7 +996,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				if (StringUtils.isNotEmpty(extension)) {
 					document.setType(FileUtil.getExtension(newName));
 				} else {
-					document.setType("unknown");
+					document.setType(UNKNOWN);
 				}
 
 				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
@@ -1061,7 +1065,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			alias.setVersion(doc.getVersion());
 			alias.setFileVersion(doc.getFileVersion());
 
-			String type = "unknown";
+			String type = UNKNOWN;
 			int lastDotIndex = doc.getFileName().lastIndexOf(".");
 			if (lastDotIndex > 0)
 				type = FileUtil.getExtension(doc.getFileName());
@@ -1540,12 +1544,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	 * @throws IOException
 	 */
 	private File preparePdfs(User user, List<Long> docIds) throws IOException {
-
-//		File temp = File.createTempFile("merge", "");
-//		temp.delete();
-//		temp.mkdir();
-
-		Path tempPath = Files.createTempDirectory("merge");
+		Path tempPath = Files.createTempDirectory(MERGE);
 		File tempDir = tempPath.toFile();
 
 		DecimalFormat nf = new DecimalFormat("00000000");
@@ -1584,18 +1583,12 @@ public class DocumentManagerImpl implements DocumentManager {
 	 * @throws COSVisitorException
 	 */
 	private static File mergePdf(File[] pdfs) throws IOException {
-
-		// File temp = null;
 		File tempDir = null;
 		try {
-//			temp = File.createTempFile("merge", "");
-//			temp.delete();
-//			temp.mkdir();
-
-			Path tempPath = Files.createTempDirectory("merge");
+			Path tempPath = Files.createTempDirectory(MERGE);
 			tempDir = tempPath.toFile();
 
-			File dst = File.createTempFile("merge", ".pdf");
+			File dst = File.createTempFile(MERGE, ".pdf");
 
 			PDFMergerUtility merger = new PDFMergerUtility();
 			for (File file : pdfs) {

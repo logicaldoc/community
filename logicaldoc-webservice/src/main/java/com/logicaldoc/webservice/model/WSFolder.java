@@ -18,6 +18,7 @@ import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
@@ -141,8 +142,8 @@ public class WSFolder implements Serializable {
 		wsFolder.setType(folder.getType());
 		wsFolder.setDescription(folder.getDescription());
 		wsFolder.setParentId(folder.getParentId());
-		wsFolder.setLastModified(WSUtil.convertDateToString(folder.getLastModified()));
-		wsFolder.setCreation(WSUtil.convertDateToString(folder.getCreation()));
+		wsFolder.setLastModified(DateUtil.format(folder.getLastModified()));
+		wsFolder.setCreation(DateUtil.format(folder.getCreation()));
 		wsFolder.setCreator(folder.getCreator());
 		wsFolder.setPosition(folder.getPosition());
 		wsFolder.setTemplateLocked(folder.getTemplateLocked());

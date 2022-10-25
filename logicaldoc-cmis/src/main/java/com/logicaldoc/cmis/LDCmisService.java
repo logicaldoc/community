@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -110,7 +111,11 @@ public class LDCmisService extends AbstractCmisService {
 		if (cachedChangeLogToken != null) {
 			latestChangeLogToken = cachedChangeLogToken;
 		} else {
-			latestChangeLogToken = getLatestChangeLogToken(repositoryId);
+			try {
+				latestChangeLogToken = getLatestChangeLogToken(repositoryId);
+			} catch (PersistenceException e) {
+				throw new CmisRuntimeException(e.getMessage(), e);
+			}
 			cachedChangeLogToken = latestChangeLogToken;
 		}
 
@@ -132,7 +137,12 @@ public class LDCmisService extends AbstractCmisService {
 		List<RepositoryInfo> result = new ArrayList<>();
 
 		for (LDRepository repo : repositories.values()) {
-			String latestChangeLogToken = getLatestChangeLogToken(repo.getId());
+			String latestChangeLogToken;
+			try {
+				latestChangeLogToken = getLatestChangeLogToken(repo.getId());
+			} catch (PersistenceException e) {
+				throw new CmisRuntimeException(e.getMessage(), e);
+			}
 			result.add(repo.getRepositoryInfo(getCallContext(), latestChangeLogToken));
 		}
 
@@ -144,64 +154,62 @@ public class LDCmisService extends AbstractCmisService {
 	 * 
 	 * @param repositoryId
 	 * @return The getTime() of the latest date
+	 * 
+	 * @throws PersistenceException error in the datbae
 	 */
-	protected String getLatestChangeLogToken(String repositoryId) {
+	protected String getLatestChangeLogToken(String repositoryId) throws PersistenceException {
 		log.debug("** getLatestChangeLogToken: {}", repositoryId);
-		try {
-			ContextProperties settings = Context.get().getProperties();
-			if (!"true".equals(settings.getProperty("cmis.changelog"))) {
-				return null;
-			}
 
-			LDRepository repo = repositories.get(repositoryId);
+		ContextProperties settings = Context.get().getProperties();
+		if (!"true".equals(settings.getProperty("cmis.changelog"))) {
+			return null;
+		}
 
-			String tenantIdStr = Long.toString(repo.getRoot().getTenantId());
+		LDRepository repo = repositories.get(repositoryId);
 
-			StringBuilder query = new StringBuilder(
-					"SELECT MAX(ld_date) FROM ld_history WHERE ld_deleted=0 AND ld_tenantid=");
-			query.append(tenantIdStr);
-			query.append(" AND ld_event IN ('");
-			query.append(DocumentEvent.STORED);
-			query.append("','");
-			query.append(DocumentEvent.CHECKEDIN);
-			query.append("','");
-			query.append(DocumentEvent.MOVED);
-			query.append("','");
-			query.append(DocumentEvent.RENAMED);
-			query.append("','");
-			query.append(DocumentEvent.DELETED);
-			query.append("')");
+		String tenantIdStr = Long.toString(repo.getRoot().getTenantId());
 
-			Timestamp latestDate = (Timestamp) historyDao.queryForObject(query.toString(), Timestamp.class);
+		StringBuilder query = new StringBuilder(
+				"SELECT MAX(ld_date) FROM ld_history WHERE ld_deleted=0 AND ld_tenantid=");
+		query.append(tenantIdStr);
+		query.append(" AND ld_event IN ('");
+		query.append(DocumentEvent.STORED);
+		query.append("','");
+		query.append(DocumentEvent.CHECKEDIN);
+		query.append("','");
+		query.append(DocumentEvent.MOVED);
+		query.append("','");
+		query.append(DocumentEvent.RENAMED);
+		query.append("','");
+		query.append(DocumentEvent.DELETED);
+		query.append("')");
 
-			StringBuilder query2 = new StringBuilder(
-					"SELECT MAX(ld_date) FROM ld_folder_history WHERE ld_deleted=0 AND ld_tenantid=");
-			query2.append(tenantIdStr);
-			query2.append(" AND ld_event IN ('");
-			query2.append(FolderEvent.CREATED);
-			query2.append("','");
-			query2.append(FolderEvent.RENAMED);
-			query2.append("','");
-			query2.append(FolderEvent.MOVED);
-			query2.append("','");
-			query2.append(FolderEvent.DELETED);
-			query2.append("')");
+		Timestamp latestDate = (Timestamp) historyDao.queryForObject(query.toString(), Timestamp.class);
 
-			Timestamp latestFolderDate = (Timestamp) historyDao.queryForObject(query2.toString(), Timestamp.class);
+		StringBuilder query2 = new StringBuilder(
+				"SELECT MAX(ld_date) FROM ld_folder_history WHERE ld_deleted=0 AND ld_tenantid=");
+		query2.append(tenantIdStr);
+		query2.append(" AND ld_event IN ('");
+		query2.append(FolderEvent.CREATED);
+		query2.append("','");
+		query2.append(FolderEvent.RENAMED);
+		query2.append("','");
+		query2.append(FolderEvent.MOVED);
+		query2.append("','");
+		query2.append(FolderEvent.DELETED);
+		query2.append("')");
 
-			if (latestDate == null && latestFolderDate == null) {
-				return "0";
-			} else {
-				log.debug("latestDate.getTime(): {}", latestDate != null ? latestDate.getTime() : "");
-				log.debug("latestFolderDate.getTime(): {}", latestDate != null ? latestFolderDate.getTime() : "");
-				Timestamp myDate = getLatestTimestamp(latestDate, latestFolderDate);
+		Timestamp latestFolderDate = (Timestamp) historyDao.queryForObject(query2.toString(), Timestamp.class);
 
-				log.debug("myDate.getTime(): {}", myDate.getTime());
-				return Long.toString(myDate.getTime());
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			throw new CmisRuntimeException(e.toString(), e);
+		if (latestDate == null && latestFolderDate == null) {
+			return "0";
+		} else {
+			log.debug("latestDate.getTime(): {}", latestDate != null ? latestDate.getTime() : "");
+			log.debug("latestFolderDate.getTime(): {}", latestDate != null ? latestFolderDate.getTime() : "");
+			Timestamp myDate = getLatestTimestamp(latestDate, latestFolderDate);
+
+			log.debug("myDate.getTime(): {}", myDate.getTime());
+			return Long.toString(myDate.getTime());
 		}
 	}
 
@@ -242,8 +250,8 @@ public class LDCmisService extends AbstractCmisService {
 			Boolean includePathSegment, BigInteger maxItems, BigInteger skipCount, ExtensionsData extension) {
 		validateSession();
 		return getRepository().getChildren(getCallContext(), folderId, filter,
-				includeAllowableActions == null ? false : includeAllowableActions.booleanValue(),
-				includePathSegment == null ? false : includePathSegment.booleanValue(),
+				includeAllowableActions != null && includeAllowableActions.booleanValue(),
+				includePathSegment != null && includePathSegment.booleanValue(),
 				maxItems == null || maxItems.intValue() < 0 ? Integer.MAX_VALUE : maxItems.intValue(),
 				skipCount == null || skipCount.intValue() < 0 ? 0 : skipCount.intValue(), this);
 	}

@@ -171,7 +171,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindByUserId() {
+	public void testFindByUserId() throws PersistenceException {
 		Collection<Long> ids = dao.findByUserId(3);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(4, ids.size());

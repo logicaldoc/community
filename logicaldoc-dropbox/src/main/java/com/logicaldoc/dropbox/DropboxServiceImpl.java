@@ -258,11 +258,11 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-		if (!fdao.isPermissionEnabled(Permission.IMPORT, targetFolder, session.getUserId()))
-			return 0;
-
 		int count = 0;
 		try {
+			if (!fdao.isPermissionEnabled(Permission.IMPORT, targetFolder, session.getUserId()))
+				return 0;
+			
 			User user = session.getUser();
 			Dropbox dbox = new Dropbox();
 			String token = loadAccessToken(user);

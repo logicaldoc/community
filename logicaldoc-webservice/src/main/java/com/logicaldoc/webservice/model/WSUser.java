@@ -20,6 +20,7 @@ import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
@@ -487,15 +488,15 @@ public class WSUser {
 			wsUser.setSource(user.getSource());
 			wsUser.setPassword(user.getPassword());
 			wsUser.setPasswordmd4(user.getPasswordmd4());
-			wsUser.setPasswordChanged(WSUtil.convertDateToString(user.getPasswordChanged()));
-			wsUser.setLastModified(WSUtil.convertDateToString(user.getLastModified()));
+			wsUser.setPasswordChanged(DateUtil.format(user.getPasswordChanged()));
+			wsUser.setLastModified(DateUtil.format(user.getLastModified()));
 			wsUser.setEmailSignature(user.getEmailSignature());
 			wsUser.setEmailSignature2(user.getEmailSignature2());
 			wsUser.setDateFormat(user.getDateFormat());
 			wsUser.setDateFormatShort(user.getDateFormatShort());
 			wsUser.setDateFormatLong(user.getDateFormatLong());
 			wsUser.setSearchPref(user.getSearchPref());
-			wsUser.setExpire(WSUtil.convertDateToString(user.getExpire()));
+			wsUser.setExpire(DateUtil.format(user.getExpire()));
 			wsUser.setEnforceWorkingTime(user.getEnforceWorkingTime());
 			wsUser.setMaxInactivity(user.getMaxInactivity());
 			wsUser.setTimeZone(user.getTimeZone());

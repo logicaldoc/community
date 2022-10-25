@@ -2,6 +2,8 @@ package com.logicaldoc.core.security;
 
 import java.util.Set;
 
+import com.logicaldoc.core.PersistenceException;
+
 /**
  * Manager for security objects like users and groups
  * 
@@ -43,14 +45,16 @@ public interface SecurityManager {
 	 * @param userId ID of the user
 	 * 
 	 * @return if the user has the write permission on the document
+	 * 
+	 * @throws PersistenceException error in the database 
 	 */
-	public boolean isWriteEnabled(long docId, long userId);
+	public boolean isWriteEnabled(long docId, long userId) throws PersistenceException;
 
-	public boolean isReadEnabled(long docId, long userId);
+	public boolean isReadEnabled(long docId, long userId) throws PersistenceException;
 
-	public boolean isPrintEnabled(long docId, long userId);
+	public boolean isPrintEnabled(long docId, long userId) throws PersistenceException;
 
-	public boolean isDownloadEnabled(long docId, long userId);
+	public boolean isDownloadEnabled(long docId, long userId) throws PersistenceException;
 
 	/**
 	 * This method checks if the given permission is enabled for a document and
@@ -61,8 +65,10 @@ public interface SecurityManager {
 	 * @param userId ID of the user
 	 * 
 	 * @return if the permission is granted to the user on the document
+	 * 
+	 * @throws PersistenceException error in the database 
 	 */
-	public boolean isPermissionEnabled(Permission permission, long docId, long userId);
+	public boolean isPermissionEnabled(Permission permission, long docId, long userId) throws PersistenceException;
 
 	/**
 	 * Finds all permissions of a user enabled on the specified document
@@ -71,6 +77,8 @@ public interface SecurityManager {
 	 * @param userId ID of the user
 	 * 
 	 * @return Collection of permissions granted to the user on the document
+	 * 
+	 * @throws PersistenceException error in the database 
 	 */
-	public Set<Permission> getEnabledPermissions(long docId, long userId);
+	public Set<Permission> getEnabledPermissions(long docId, long userId) throws PersistenceException;
 }

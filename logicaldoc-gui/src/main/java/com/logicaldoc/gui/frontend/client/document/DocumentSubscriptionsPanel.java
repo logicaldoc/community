@@ -1,8 +1,5 @@
 package com.logicaldoc.gui.frontend.client.document;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
@@ -12,6 +9,7 @@ import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.widgets.grid.DateListGridField;
+import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.UserListGridField;
 import com.logicaldoc.gui.frontend.client.services.AuditService;
 import com.logicaldoc.gui.frontend.client.subscription.SubscriptionDialog;
@@ -21,7 +19,6 @@ import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -68,35 +65,7 @@ public class DocumentSubscriptionsPanel extends DocumentDetailTab {
 
 		DateListGridField created = new DateListGridField("created", "subscription");
 
-		ListGridField events = new ListGridField("events", I18N.message("notifyon"));
-		events.setWidth("*");
-		events.setCanEdit(false);
-		events.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					if (value != null && !value.toString().isEmpty()) {
-						// Translate the set of events
-						String[] key = null;
-
-						if (!value.toString().contains(","))
-							key = new String[] { value.toString().trim() };
-						else
-							key = value.toString().split(",");
-						List<String> labels = new ArrayList<String>();
-						for (String string : key) {
-							labels.add(I18N.message(string + ".short"));
-						}
-						String str = labels.toString().substring(1);
-						return str.substring(0, str.length() - 1);
-					} else
-						return "";
-				} catch (Throwable e) {
-					return "";
-				}
-			}
-		});
+		EventsListGridField events = new EventsListGridField("events", I18N.message("notifyon"));
 
 		list = new ListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));

@@ -24,7 +24,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return A real folder that is referenced by the given ID
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error in the database
 	 */
 	public Folder findFolder(long folderId) throws PersistenceException;
 
@@ -75,8 +75,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param userId ID of the user
 	 * 
 	 * @return List of found folders
+	 * 
+	 * @throws PersistenceException error in the database
 	 */
-	public List<Folder> findByUserId(long userId);
+	public List<Folder> findByUserId(long userId) throws PersistenceException;
 
 	/**
 	 * Finds authorized folders for a user having a specified tag.
@@ -100,9 +102,11 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 *        tree
 	 * 
 	 * @return List of selected folder IDs.
+	 * 
+	 * @throws PersistenceException error in the database
 	 */
 	public Collection<Long> findFolderIdByUserIdAndPermission(long userId, Permission permission, Long parentId,
-			boolean tree);
+			boolean tree) throws PersistenceException;
 
 	/**
 	 * This method selects only the folder ID from the folders for which a user
@@ -114,8 +118,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 *        tree
 	 * 
 	 * @return List of selected folder IDs.
+	 * 
+	 * @throws PersistenceException error in the database
 	 */
-	public Collection<Long> findFolderIdByUserId(long userId, Long parentId, boolean tree);
+	public Collection<Long> findFolderIdByUserId(long userId, Long parentId, boolean tree) throws PersistenceException;
 
 	/**
 	 * Retrieve all the ids of the folders in a given tree
@@ -156,8 +162,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param userId identifier of the user
 	 * 
 	 * @return List of found folders sorted by text
+	 * 
+	 * @throws PersistenceException Error in the database
 	 */
-	public List<Folder> findByUserId(long userId, long parentId);
+	public List<Folder> findByUserId(long userId, long parentId) throws PersistenceException;
 
 	/**
 	 * Finds all children(direct and indirect) by parentId
@@ -205,15 +213,15 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return if the write permission is granted
 	 */
-	public boolean isWriteEnabled(long folderId, long userId);
+	public boolean isWriteEnabled(long folderId, long userId) throws PersistenceException;
 
-	public boolean isReadEnabled(long folderId, long userId);
+	public boolean isReadEnabled(long folderId, long userId) throws PersistenceException;
 
-	public boolean isPrintEnabled(long folderId, long userId);
+	public boolean isPrintEnabled(long folderId, long userId) throws PersistenceException;
 
-	public boolean isDownloadEnabled(long folderId, long userId);
+	public boolean isDownloadEnabled(long folderId, long userId) throws PersistenceException;
 
-	public boolean isMoveEnabled(long folderId, long userId);
+	public boolean isMoveEnabled(long folderId, long userId) throws PersistenceException;
 
 	/**
 	 * This method checks if the given permission is enabled for a folder and an
@@ -224,8 +232,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param userId ID of the user
 	 * 
 	 * @return if the permission is granted to the user
+	 * 
+	 * @throws PersistenceException error in the database
 	 */
-	public boolean isPermissionEnabled(Permission permission, long folderId, long userId);
+	public boolean isPermissionEnabled(Permission permission, long folderId, long userId) throws PersistenceException;
 
 	/**
 	 * Finds all permissions of a user enabled on the specified folder
@@ -234,8 +244,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param userId ID of the user
 	 * 
 	 * @return Collection of enabled permissions
+	 * 
+	 * @throws PersistenceException error in the database
 	 */
-	public Set<Permission> getEnabledPermissions(long folderId, long userId);
+	public Set<Permission> getEnabledPermissions(long folderId, long userId) throws PersistenceException;
 
 	/**
 	 * This method selects only the folder ID from the folders for which a user
@@ -255,8 +267,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param userId identifier of the document
 	 * 
 	 * @return if the user has write permission
+	 * 
+	 * @throws PersistenceException error in the database 
 	 */
-	public boolean hasWriteAccess(Folder folder, long userId);
+	public boolean hasWriteAccess(Folder folder, long userId) throws PersistenceException;
 
 	/**
 	 * Finds all folders accessible by the passed group
@@ -317,11 +331,9 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param folder the folder to store
 	 * @param transaction current session informations
 	 * 
-	 * @return true if the folder has been correctly stored
-	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public boolean store(Folder folder, FolderHistory transaction) throws PersistenceException;
+	public void store(Folder folder, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Shortcut for deleteAll(folders, 1, transaction)
@@ -352,11 +364,9 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param id the folder identifier
 	 * @param transaction the session informations
 	 * 
-	 * @return if the folde has been succesfully deleted
-	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public boolean delete(long id, FolderHistory transaction) throws PersistenceException;
+	public void delete(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * This method deletes the folder object and insert a new folder history
@@ -366,11 +376,9 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event
 	 * 
-	 * @return True if successfully deleted from the database
-	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public boolean delete(long id, int delCode, FolderHistory transaction) throws PersistenceException;
+	public void delete(long id, int delCode, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Creates a new folder in the parent Folder
@@ -452,7 +460,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @throws PersistenceException error in the database
 	 */
 	public String computePath(Folder folder) throws PersistenceException;
-	
+
 	/**
 	 * Dynamically computes the path extended for the specified folder. The path
 	 * extended is a human readable path in the form: /folder1/folder2/folder3
@@ -464,7 +472,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @throws PersistenceException error in the database
 	 */
 	public String computePathExtended(Folder folder) throws PersistenceException;
-	
+
 	/**
 	 * Dynamically computes the path extended for the specified folder. The path
 	 * extended is a human readable path in the form: /folder1/folder2/folder3
@@ -473,7 +481,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return The path extended
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error in the database
 	 */
 	public String computePathExtended(long folderId) throws PersistenceException;
 
@@ -506,13 +514,16 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param newName optional new name of the copied folder
 	 * @param foldersOnly True if only the folders tree has to be copied; if
 	 *        false, the documents will also be copied
-	 * @param securityOption How to assign the security policies to the newly created folders:
-	 * <ul>
-	 * <li><b>null</b> or <b>none</b>: empty security policies</li>
-	 * <li><b>inherit</b>: the new folder will point to the parent for the security policies</li>
-	 * <li><b>replicate</b>: the new folder will have a copy of the security policies of the source folder</li>
-	 * </ul>
-	 *        
+	 * @param securityOption How to assign the security policies to the newly
+	 *        created folders:
+	 *        <ul>
+	 *        <li><b>null</b> or <b>none</b>: empty security policies</li>
+	 *        <li><b>inherit</b>: the new folder will point to the parent for
+	 *        the security policies</li>
+	 *        <li><b>replicate</b>: the new folder will have a copy of the
+	 *        security policies of the source folder</li>
+	 *        </ul>
+	 * 
 	 * @param transaction entry to log the event (set the user)
 	 * @return The new folder created
 	 * 
@@ -611,8 +622,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param transaction session informations
 	 * 
 	 * @return if the rights have been correctly applied
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public boolean applyRightToTree(long rootId, FolderHistory transaction);
+	public void applyRightToTree(long rootId, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Propagates the grid layout of a node to the whole subtree
@@ -621,8 +634,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param transaction session informations
 	 * 
 	 * @return if the grid layout has been correctly replicated
+	 * 
+	 * @throws PersistenceException in case of database error
 	 */
-	public boolean applyGridToTree(long rootId, FolderHistory transaction);
+	public void applyGridToTree(long rootId, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Changes the securityRef of the given folder, all the other folders that
@@ -632,9 +647,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param rightsFolderId id of the folder to inherit from
 	 * @param transaction session informations
 	 * 
-	 * @return is the update has been successful
+	 * @throws PersistenceException in case of database error
 	 */
-	public boolean updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction);
+	public void updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction)
+			throws PersistenceException;
 
 	/**
 	 * Propagates the template metadata to the whole subree
@@ -642,47 +658,39 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param id identifier of the folder
 	 * @param transaction session informations
 	 * 
-	 * @return is the update has been successful
-	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public boolean applyMetadataToTree(long id, FolderHistory transaction) throws PersistenceException;
+	public void applyMetadataToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Propagates the tags to the whole subree
 	 * 
 	 * @param id identifier of the folder
 	 * @param transaction session informations
-	 *
-	 * @return is the update has been successful
 	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public boolean applyTagsToTree(long id, FolderHistory transaction) throws PersistenceException;
+	public void applyTagsToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Propagates the storage setting to the whole subree
 	 * 
 	 * @param id identifier of the folder
 	 * @param transaction session informations
-	 *
-	 * @return is the update has been successful
 	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public boolean applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException;
+	public void applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Propagates the OCR settings to the whole subree
 	 * 
 	 * @param id identifier of the folder
 	 * @param transaction session informations
-	 *
-	 * @return is the update has been successful
 	 * 
 	 * @throws PersistenceException in case of database error
 	 */
-	public boolean applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException;
+	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Counts the number of folders

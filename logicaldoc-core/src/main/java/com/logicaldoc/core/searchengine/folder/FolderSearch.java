@@ -66,7 +66,12 @@ public class FolderSearch extends Search {
 		estimatedHitsNumber = folders.size();
 
 		// Traverse the results checking visibility and count
-		Collection<Long> accessibleFolderIds = findAccessibleFolderIds(user);
+		Collection<Long> accessibleFolderIds;
+		try {
+			accessibleFolderIds = findAccessibleFolderIds(user);
+		} catch (PersistenceException e) {
+			throw new SearchException(e.getMessage(), e);
+		}
 		for (Hit folder : folders) {
 			if (accessibleFolderIds.contains(folder.getId()) || user.isMemberOf(Group.GROUP_ADMIN))
 				hits.add(folder);
@@ -428,7 +433,7 @@ public class FolderSearch extends Search {
 		}
 	}
 
-	private Collection<Long> findAccessibleFolderIds(User user) {
+	private Collection<Long> findAccessibleFolderIds(User user) throws PersistenceException {
 		Collection<Long> ids = new HashSet<Long>();
 		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 

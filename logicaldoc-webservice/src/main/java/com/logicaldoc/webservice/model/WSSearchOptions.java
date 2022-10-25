@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import com.logicaldoc.core.searchengine.FulltextSearchOptions;
 import com.logicaldoc.core.searchengine.SearchOptions;
+import com.logicaldoc.util.time.DateUtil;
 
 /**
  * Search options through Web Services.
@@ -267,10 +268,10 @@ public class WSSearchOptions implements Comparable<WSSearchOptions> {
 
 		switch (opt.getType()) {
 		case SearchOptions.TYPE_FULLTEXT:
-			wopt.setCreationFrom(WSUtil.convertDateToString(((FulltextSearchOptions) opt).getCreationFrom()));
-			wopt.setCreationTo(WSUtil.convertDateToString(((FulltextSearchOptions) opt).getCreationTo()));
-			wopt.setDateFrom(WSUtil.convertDateToString(((FulltextSearchOptions) opt).getDateFrom()));
-			wopt.setDateTo(WSUtil.convertDateToString(((FulltextSearchOptions) opt).getDateTo()));
+			wopt.setCreationFrom(DateUtil.format(((FulltextSearchOptions) opt).getCreationFrom()));
+			wopt.setCreationTo(DateUtil.format(((FulltextSearchOptions) opt).getCreationTo()));
+			wopt.setDateFrom(DateUtil.format(((FulltextSearchOptions) opt).getDateFrom()));
+			wopt.setDateTo(DateUtil.format(((FulltextSearchOptions) opt).getDateTo()));
 			wopt.setExpressionLanguage(((FulltextSearchOptions) opt).getExpressionLanguage());
 			wopt.setLanguage(((FulltextSearchOptions) opt).getLanguage());
 			wopt.setFields(((FulltextSearchOptions) opt).getFields());

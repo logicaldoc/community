@@ -6,7 +6,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
-import com.logicaldoc.gui.common.client.beans.GUIBarcodeSpec;
+import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
@@ -86,7 +86,7 @@ public interface BarcodeService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIBarcodeSpec updateZone(GUIBarcodeSpec zone) throws ServerException;
+	public GUIBarcodeZone updateZone(GUIBarcodeZone zone) throws ServerException;
 
 	public static class Instance {
 		private static BarcodeServiceAsync instance;

@@ -218,7 +218,7 @@ public class BarcodeTemplateSettings extends Window {
 
 			@Override
 			public void onSuccess(GUIBarcodeTemplate tmpl) {
-				panel.setSelectedBarcodeTemplate(tmpl);
+				panel.setSelectedOcrTemplate(tmpl);
 				destroy();
 			}
 		});

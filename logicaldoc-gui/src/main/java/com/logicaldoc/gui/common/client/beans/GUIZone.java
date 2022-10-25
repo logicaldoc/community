@@ -180,10 +180,6 @@ public class GUIZone implements Serializable {
 		this.templateId = templateId;
 	}
 
-	public String getSampleUrl() {
-		return Util.contextPath() + "ocrtemplateimage/" + templateId + "?zone=" + name + "&random="
-				+ new Date().getTime();
-	}
 
 	public String getSampleText() {
 		return sampleText;
@@ -207,5 +203,14 @@ public class GUIZone implements Serializable {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+	
+	public String getSampleUrl() {
+		return Util.contextPath() + "ocrtemplateimage/" + getTemplateId() + "?zone=" + name + "&random="
+				+ new Date().getTime();
+	}
+	
+	public String getDisplayContent() {
+		return getName();		
 	}
 }

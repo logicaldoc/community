@@ -248,6 +248,10 @@ public class GUIDocumentNote implements Serializable {
 		this.shape = shape;
 	}
 
+	public boolean isSquareShape() {
+		return getShape() == null || getShape().isEmpty() || "square".equals(getShape());
+	}
+	
 	@Override
 	public int hashCode() {
 		return Long.valueOf(id).hashCode();

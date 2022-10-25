@@ -5,9 +5,11 @@ import java.util.Date;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.widgetideas.graphics.client.ImageLoader.CallBack;
-import com.logicaldoc.gui.common.client.beans.GUIBarcodeSpec;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
+import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
+import com.logicaldoc.gui.common.client.beans.GUIOCRTemplate;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
+import com.logicaldoc.gui.common.client.beans.GUIZone;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.GridUtil;
@@ -16,6 +18,8 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.PrintUtil;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ImageWithCanvases;
+import com.logicaldoc.gui.frontend.client.panels.zone.ZoneCanvas;
+import com.logicaldoc.gui.frontend.client.panels.zone.ZoneTemplatePanel;
 import com.logicaldoc.gui.frontend.client.services.BarcodeService;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Overflow;
@@ -29,7 +33,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -39,19 +42,13 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.1
  */
-public class BarcodeTemplatesPanel extends VLayout {
+public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 
 	private PositionalBarcodesGrid positionalGrid;
-
-	private ImageWithCanvases zonalCanvas;
 
 	private SelectItem templateSelector;
 
 	private SelectItem barcodeTemplateSelector;
-
-	private GUIBarcodeTemplate selectedBarcodeTemplate;
-
-	private GUITemplate selectedDocumentTemplate;
 
 	private ToolStripButton save;
 
@@ -77,6 +74,8 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 	private HTMLFlow hint;
 
+	private GUITemplate selectedDocumentTemplate;
+
 	public BarcodeTemplatesPanel(GUITemplate selectedDocumentTemplate) {
 		setWidth100();
 		setHeight100();
@@ -93,12 +92,12 @@ public class BarcodeTemplatesPanel extends VLayout {
 	 * Sends the patterns to the server to save them.
 	 */
 	private void onSave() {
-		if (!selectedBarcodeTemplate.isZonal()) {
+		if (!((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
 			Record[] records = positionalGrid.getRecords();
-			GUIBarcodeSpec[] patterns = new GUIBarcodeSpec[records.length];
+			GUIBarcodeZone[] patterns = new GUIBarcodeZone[records.length];
 			int i = 0;
 			for (Record record : records) {
-				GUIBarcodeSpec patt = new GUIBarcodeSpec();
+				GUIBarcodeZone patt = new GUIBarcodeZone();
 				patt.setPatterns(record.getAttributeAsString("pattern"));
 				patt.setInclude(record.getAttributeAsString("include"));
 				patt.setExclude(record.getAttributeAsString("exclude"));
@@ -106,20 +105,21 @@ public class BarcodeTemplatesPanel extends VLayout {
 				patterns[i++] = patt;
 				patt.setIndex(i);
 			}
-			selectedBarcodeTemplate.setBarcodeSpecs(patterns);
+			selectedOcrTemplate.setZones(patterns);
 		}
 
-		BarcodeService.Instance.get().save(selectedBarcodeTemplate, new AsyncCallback<GUIBarcodeTemplate>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				GuiLog.serverError(caught);
-			}
+		BarcodeService.Instance.get().save((GUIBarcodeTemplate) selectedOcrTemplate,
+				new AsyncCallback<GUIBarcodeTemplate>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						GuiLog.serverError(caught);
+					}
 
-			@Override
-			public void onSuccess(GUIBarcodeTemplate template) {
-				GuiLog.info(I18N.message("settingssaved"), null);
-			}
-		});
+					@Override
+					public void onSuccess(GUIBarcodeTemplate template) {
+						GuiLog.info(I18N.message("settingssaved"), null);
+					}
+				});
 	}
 
 	private void refresh(Long documentTemplateId, Long barcodeTemplateId) {
@@ -141,7 +141,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 			@Override
 			public void onChanged(ChangedEvent event) {
-				selectedBarcodeTemplate = null;
+				selectedOcrTemplate = null;
 
 				ListGridRecord record = templateSelector.getSelectedRecord();
 				if (record == null || record.getAttributeAsLong("id") == null
@@ -177,7 +177,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 							@Override
 							public void onSuccess(GUIBarcodeTemplate tmpl) {
-								setSelectedBarcodeTemplate(tmpl);
+								setSelectedOcrTemplate(tmpl);
 							}
 						});
 			}
@@ -195,20 +195,21 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 		append = new ToolStripButton();
 		append.setAutoFit(true);
-		append.setTitle(selectedBarcodeTemplate != null && selectedBarcodeTemplate.isZonal() ? I18N.message("addzone")
+		append.setTitle(selectedOcrTemplate != null && ((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()
+				? I18N.message("addzone")
 				: I18N.message("appendpattern"));
 		append.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				event.cancel();
 
-				if (selectedBarcodeTemplate != null && selectedBarcodeTemplate.isZonal()) {
-					GUIBarcodeSpec zone = new GUIBarcodeSpec();
-					zone.setTemplateId(selectedBarcodeTemplate.getId());
+				if (selectedOcrTemplate != null && ((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
+					GUIBarcodeZone zone = new GUIBarcodeZone();
+					zone.setTemplateId(selectedOcrTemplate.getId());
 					zone.setPatterns("<customId>");
-					selectedBarcodeTemplate.appendBarcodeSpec(zone);
-					Canvas zoneCanvas = new ZoneCanvas(zone, BarcodeTemplatesPanel.this);
-					zonalCanvas.addCanvas(zoneCanvas);
+					selectedOcrTemplate.appendZone(zone);
+					Canvas zoneCanvas = new BarcodeZoneCanvas(zone, BarcodeTemplatesPanel.this);
+					sample.addCanvas(zoneCanvas);
 				} else {
 					ListGridRecord record = new ListGridRecord();
 					record.setAttribute("pattern", "");
@@ -223,7 +224,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 			@Override
 			public void onClick(ClickEvent event) {
 				BarcodeTemplateSettings editor = new BarcodeTemplateSettings(BarcodeTemplatesPanel.this,
-						selectedBarcodeTemplate);
+						((GUIBarcodeTemplate) selectedOcrTemplate));
 				editor.show();
 			}
 		});
@@ -251,7 +252,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 					@Override
 					public void execute(Boolean value) {
 						if (value)
-							BarcodeService.Instance.get().delete(selectedBarcodeTemplate.getId(),
+							BarcodeService.Instance.get().delete(selectedOcrTemplate.getId(),
 									new AsyncCallback<Void>() {
 
 										@Override
@@ -261,7 +262,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 
 										@Override
 										public void onSuccess(Void arg0) {
-											selectedBarcodeTemplate = null;
+											selectedOcrTemplate = null;
 											refresh(selectedDocumentTemplate.getId(), null);
 										}
 									});
@@ -275,7 +276,7 @@ public class BarcodeTemplatesPanel extends VLayout {
 		close.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				selectedBarcodeTemplate = null;
+				selectedOcrTemplate = null;
 				refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null, null);
 			}
 		});
@@ -284,9 +285,9 @@ public class BarcodeTemplatesPanel extends VLayout {
 		print.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (selectedBarcodeTemplate.isZonal())
-					PrintUtil.printScreenShot(zonalCanvas.getID(),
-							I18N.message("zonalocr") + " - " + selectedBarcodeTemplate.getName());
+				if (((GUIBarcodeTemplate) selectedOcrTemplate).isZonal())
+					PrintUtil.printScreenShot(sample.getID(),
+							I18N.message("zonalocr") + " - " + selectedOcrTemplate.getName());
 				else
 					GridUtil.print(positionalGrid);
 
@@ -298,9 +299,9 @@ public class BarcodeTemplatesPanel extends VLayout {
 		zoomIn.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (zonalCanvas != null) {
-					zonalCanvas.clearCanvases();
-					zonalCanvas.resize(+100);
+				if (sample != null) {
+					sample.clearCanvases();
+					sample.resize(+100);
 					showZones();
 				}
 			}
@@ -311,9 +312,9 @@ public class BarcodeTemplatesPanel extends VLayout {
 		zoomOut.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (zonalCanvas != null) {
-					zonalCanvas.clearCanvases();
-					zonalCanvas.resize(-100);
+				if (sample != null) {
+					sample.clearCanvases();
+					sample.resize(-100);
 					showZones();
 				}
 			}
@@ -344,52 +345,40 @@ public class BarcodeTemplatesPanel extends VLayout {
 		editorPanel.setOverflow(Overflow.AUTO);
 		setMembers(hint, toolStrip, editorPanel);
 
-		if (selectedBarcodeTemplate != null && selectedBarcodeTemplate.isZonal()) {
-			String url = Util.contextPath() + "barcodetemplateimage/" + selectedBarcodeTemplate.getId() + "?random="
+		if (selectedOcrTemplate != null && ((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
+			String url = Util.contextPath() + "barcodetemplateimage/" + selectedOcrTemplate.getId() + "?random="
 					+ new Date().getTime();
-			zonalCanvas = new ImageWithCanvases(url, getWidth().intValue() - 50, null, new CallBack() {
+			sample = new ImageWithCanvases(url, getWidth().intValue() - 50, null, new CallBack() {
 
 				@Override
 				public void onImagesLoaded(ImageElement[] imageElements) {
 					showZones();
 				}
 			});
-			editorPanel.addMember(zonalCanvas);
+			editorPanel.addMember(sample);
 		} else {
-			positionalGrid = new PositionalBarcodesGrid(selectedBarcodeTemplate);
+			positionalGrid = new PositionalBarcodesGrid((GUIBarcodeTemplate) selectedOcrTemplate);
 			editorPanel.addMember(positionalGrid);
 		}
 
-		settings.setDisabled(selectedBarcodeTemplate == null);
-		save.setDisabled(selectedBarcodeTemplate == null);
-		append.setDisabled(selectedBarcodeTemplate == null);
-		delete.setDisabled(selectedBarcodeTemplate == null || selectedBarcodeTemplate.getId() == 0L);
-		close.setDisabled(selectedBarcodeTemplate == null);
-		print.setDisabled(selectedBarcodeTemplate == null);
-		zoomIn.setDisabled(selectedBarcodeTemplate == null || zonalCanvas == null);
-		zoomOut.setDisabled(selectedBarcodeTemplate == null || zonalCanvas == null);
+		settings.setDisabled(selectedOcrTemplate == null);
+		save.setDisabled(selectedOcrTemplate == null);
+		append.setDisabled(selectedOcrTemplate == null);
+		delete.setDisabled(selectedOcrTemplate == null || selectedOcrTemplate.getId() == 0L);
+		close.setDisabled(selectedOcrTemplate == null);
+		print.setDisabled(selectedOcrTemplate == null);
+		zoomIn.setDisabled(selectedOcrTemplate == null || sample == null);
+		zoomOut.setDisabled(selectedOcrTemplate == null || sample == null);
 	}
 
-	void showZones() {
-		if (selectedBarcodeTemplate.getBarcodeSpecs() != null)
-			for (GUIBarcodeSpec zone : selectedBarcodeTemplate.getBarcodeSpecs()) {
-				zone.setTemplateId(selectedBarcodeTemplate.getId());
-				Canvas zoneCanvas = new ZoneCanvas(zone, BarcodeTemplatesPanel.this);
-				zonalCanvas.addCanvas(zoneCanvas);
-			}
-	}
-
-	public GUIBarcodeTemplate getSelectedBarcodeTemplate() {
-		return selectedBarcodeTemplate;
-	}
-
-	public void setSelectedBarcodeTemplate(GUIBarcodeTemplate selectedBarcodeTemplate) {
-		this.selectedBarcodeTemplate = selectedBarcodeTemplate;
+	@Override
+	public void setSelectedOcrTemplate(GUIOCRTemplate selectedOcrTemplate) {
 		refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null,
-				selectedBarcodeTemplate.getId());
+				selectedOcrTemplate.getId());
 	}
 
-	public ImageWithCanvases getZonalCanvas() {
-		return zonalCanvas;
+	@Override
+	protected ZoneCanvas newZoneCanvas(GUIZone zone) {
+		return new BarcodeZoneCanvas(zone, this);
 	}
 }

@@ -66,6 +66,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @since 3.0
  */
 public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document> implements DocumentDAO {
+	private static final String STATUS = ".status=";
+
 	private DocumentHistoryDAO documentHistoryDAO;
 
 	private VersionDAO versionDAO;
@@ -212,7 +214,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public List<Long> findByUserId(long userId) {
+	public List<Long> findByUserId(long userId) throws PersistenceException {
 		Collection<Folder> folders = folderDAO.findByUserId(userId);
 		if (folders.isEmpty())
 			return new ArrayList<Long>();
@@ -226,13 +228,8 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query.append(folder.getId());
 			first = false;
 		}
-		query.append(") and not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED);
-		try {
-			return findIdsByWhere(query.toString(), null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
-		}
+		query.append(") and not " + ALIAS_ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED);
+		return findIdsByWhere(query.toString(), null, null);
 	}
 
 	@Override
@@ -737,7 +734,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			}
 
 			query = new StringBuilder("from Document " + ALIAS_ENTITY + " ");
-			query.append(" where not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED);
+			query.append(" where not " + ALIAS_ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED);
 			query.append(" and " + ALIAS_ENTITY + ".id in (");
 
 			for (int i = 0; i < docIds.size(); i++) {
@@ -800,7 +797,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	@Override
 	public List<Document> findArchivedByFolder(long folderId) {
 		try {
-			return findByWhere(ALIAS_ENTITY + ".folder.id = " + folderId + " and " + ALIAS_ENTITY + ".status="
+			return findByWhere(ALIAS_ENTITY + ".folder.id = " + folderId + " and " + ALIAS_ENTITY + STATUS
 					+ AbstractDocument.DOC_ARCHIVED, null, null);
 		} catch (PersistenceException e) {
 			log.warn(e.getMessage(), e);
@@ -826,7 +823,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 					linkType != null ? new Object[] { docId } : new Object[] { docId, docId }, Long.class, null);
 			coll = findByWhere(
 					ALIAS_ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
-							+ ") and not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED,
+							+ ") and not " + ALIAS_ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED,
 					null, null);
 
 		} catch (Throwable e) {
@@ -849,7 +846,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 		if (excludeId != null)
 			query += " and not(" + ALIAS_ENTITY + ".id = " + excludeId + ")";
-		query += " and not " + ALIAS_ENTITY + ".status=" + AbstractDocument.DOC_ARCHIVED;
+		query += " and not " + ALIAS_ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED;
 
 		try {
 			return findByWhere(query, null, max);

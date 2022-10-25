@@ -19,6 +19,8 @@ import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.ImageWithCanvases;
 import com.logicaldoc.gui.frontend.client.administration.AdminScreen;
 import com.logicaldoc.gui.frontend.client.metadata.template.AttributeTypeFormatter;
+import com.logicaldoc.gui.frontend.client.panels.zone.ZoneCanvas;
+import com.logicaldoc.gui.frontend.client.panels.zone.ZoneTemplatePanel;
 import com.logicaldoc.gui.frontend.client.services.ZonalOCRService;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.BooleanCallback;
@@ -32,7 +34,6 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 
@@ -42,7 +43,7 @@ import com.smartgwt.client.widgets.toolbar.ToolStripButton;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
  */
-public class ZonalOCRTemplatesPanel extends VLayout {
+public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 
 	private SelectItem templateSelector;
 
@@ -71,10 +72,6 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 	private ToolStrip toolStrip;
 
 	private HLayout editorPanel = new HLayout();
-
-	private ImageWithCanvases sample;
-
-	private GUIOCRTemplate selectedOcrTemplate;
 
 	private GUITemplate selectedDocumentTemplate;
 
@@ -292,7 +289,7 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 							zone.setFormat("#,###.00");
 
 						selectedOcrTemplate.appendZone(zone);
-						Canvas zoneCanvas = new ZoneCanvas(zone, ZonalOCRTemplatesPanel.this);
+						Canvas zoneCanvas = new ZonalOCRZoneCanvas(zone, ZonalOCRTemplatesPanel.this);
 						sample.addCanvas(zoneCanvas);
 					}
 				});
@@ -377,25 +374,27 @@ public class ZonalOCRTemplatesPanel extends VLayout {
 		}
 	}
 
-	void showZones() {
+	public void showZones() {
 		if (selectedOcrTemplate.getZones() != null)
 			for (GUIZone zone : selectedOcrTemplate.getZones()) {
 				zone.setTemplateId(selectedOcrTemplate.getId());
-				Canvas zoneCanvas = new ZoneCanvas(zone, ZonalOCRTemplatesPanel.this);
+				Canvas zoneCanvas = new ZonalOCRZoneCanvas(zone, ZonalOCRTemplatesPanel.this);
 				sample.addCanvas(zoneCanvas);
 			}
 	}
 
-	public ImageWithCanvases getSample() {
-		return sample;
-	}
-
+	@Override
 	public void setSelectedOcrTemplate(GUIOCRTemplate selectedOcrTemplate) {
-		this.selectedOcrTemplate = selectedOcrTemplate;
+		super.setSelectedOcrTemplate(selectedOcrTemplate);
 		AdminScreen.get().setContent(new ZonalOCRPanel(selectedDocumentTemplate, selectedOcrTemplate));
 	}
 
 	public GUIOCRTemplate getSelectedOcrTemplate() {
 		return selectedOcrTemplate;
+	}
+
+	@Override
+	protected ZoneCanvas newZoneCanvas(GUIZone zone) {
+		return new ZonalOCRZoneCanvas(zone, this);
 	}
 }

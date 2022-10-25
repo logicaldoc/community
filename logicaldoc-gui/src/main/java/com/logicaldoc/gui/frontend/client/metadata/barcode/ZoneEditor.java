@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUIBarcodeSpec;
+import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.widgets.ImageWithCanvases;
@@ -30,9 +30,9 @@ public class ZoneEditor extends Window {
 
 	private DynamicForm form;
 
-	private GUIBarcodeSpec zone;
+	private GUIBarcodeZone zone;
 
-	public ZoneEditor(GUIBarcodeSpec zone) {
+	public ZoneEditor(GUIBarcodeZone zone) {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("zone"));
 		setCanDragResize(true);

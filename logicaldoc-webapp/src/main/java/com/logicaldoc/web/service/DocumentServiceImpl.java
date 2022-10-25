@@ -238,8 +238,12 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 						throw new RuntimeException(new Exception("No file uploaded"));
 
 					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-					if (!fdao.isWriteEnabled(metadata.getFolder().getId(), session.getUserId()))
-						throw new RuntimeException("The user doesn't have the write permission on the current folder");
+					try {
+						if (!fdao.isWriteEnabled(metadata.getFolder().getId(), session.getUserId()))
+							throw new RuntimeException("The user doesn't have the write permission on the current folder");
+					} catch (PersistenceException e2) {
+						throw new RuntimeException(e2.getMessage(), e2);
+					}
 
 					List<Long> docsToIndex = new ArrayList<Long>();
 					for (String filename : uploadedFilesMap.keySet()) {

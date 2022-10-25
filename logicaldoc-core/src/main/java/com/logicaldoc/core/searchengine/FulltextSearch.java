@@ -191,9 +191,14 @@ public class FulltextSearch extends Search {
 			accessibleFolderIds = fdao.findFolderIdByUserIdInPath(opt.getUserId(), opt.getFolderId());
 			log.debug("End of Folders search");
 		}
-		if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
-				&& fdao.isReadEnabled(opt.getFolderId().longValue(), opt.getUserId()))
-			accessibleFolderIds.add(opt.getFolderId());
+		
+		try {
+			if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
+					&& fdao.isReadEnabled(opt.getFolderId().longValue(), opt.getUserId()))
+				accessibleFolderIds.add(opt.getFolderId());
+		} catch (PersistenceException e1) {
+			throw new SearchException(e1.getMessage(), e1);
+		}
 
 		if (!accessibleFolderIds.isEmpty() && opt.getFolderId() != null) {
 			for (Long id : accessibleFolderIds)

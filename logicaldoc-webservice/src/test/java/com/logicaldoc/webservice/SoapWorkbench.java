@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.searchengine.SearchOptions;
+import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.model.WSDocument;
@@ -18,7 +19,6 @@ import com.logicaldoc.webservice.model.WSSearchOptions;
 import com.logicaldoc.webservice.model.WSSearchResult;
 import com.logicaldoc.webservice.model.WSTemplate;
 import com.logicaldoc.webservice.model.WSUser;
-import com.logicaldoc.webservice.model.WSUtil;
 import com.logicaldoc.webservice.model.WSWorkingTime;
 import com.logicaldoc.webservice.soap.client.SoapAuthClient;
 import com.logicaldoc.webservice.soap.client.SoapBookmarkClient;
@@ -50,8 +50,8 @@ public class SoapWorkbench {
 		System.out.println("Sid: " + sid);
 
 		try {
-			System.out.println(info.getInfo().getProductName()+"  "+info.getInfo().getDate());
-			
+			System.out.println(info.getInfo().getProductName() + "  " + info.getInfo().getDate());
+
 			String[] features = systemClient.getInfo().getFeatures();
 			System.out.println("Features:");
 			for (String feature : features) {
@@ -187,8 +187,8 @@ public class SoapWorkbench {
 //		System.out.println(folderClient.findByPath(sid, "/Default/Kofax"));
 //
 //		folderClient.grantGroup(sid, 4L, 299630592L, 65537, false);
-		
-		WSFolder fld=folderClient.getFolder(sid, 93356033L);
+
+		WSFolder fld = folderClient.getFolder(sid, 93356033L);
 		fld.setColor("red");
 		folderClient.update(sid, fld);
 	}
@@ -564,7 +564,7 @@ public class SoapWorkbench {
 		WSDocument wsDoc = new WSDocument();
 		wsDoc.setFileName("build.xml");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		wsDoc.setCreation(WSUtil.convertDateToString(df.parse("2018-01-25")));
+		wsDoc.setCreation(DateUtil.format(df.parse("2018-01-25")));
 		wsDoc.setFolderId(Folder.DEFAULTWORKSPACEID);
 		// wsDoc.setTemplateId(547815424L);
 //		

@@ -129,11 +129,18 @@ public class ResourceServiceImpl implements ResourceService {
 		return resource;
 	}
 
+	@Override
 	public List<Resource> getChildResources(Resource parentResource) {
 		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		List<Resource> resourceList = new LinkedList<Resource>();
 		final Long folderID = Long.parseLong(parentResource.getID());
-		boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
+		boolean hasAccess;
+		try {
+			hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
+		} catch (PersistenceException e1) {
+			hasAccess = false;
+			log.error(e1.getMessage(), e1);
+		}
 
 		if (hasAccess == false) {
 			// Check if the folder is a root and in that case we mark it as
@@ -238,7 +245,13 @@ public class ResourceServiceImpl implements ResourceService {
 			return null;
 
 		Document document = docs.iterator().next();
-		boolean hasAccess = folderDAO.isReadEnabled(document.getFolder().getId(), userId);
+		boolean hasAccess;
+		try {
+			hasAccess = folderDAO.isReadEnabled(document.getFolder().getId(), userId);
+		} catch (PersistenceException e1) {
+			log.error(e1.getMessage(), e1);
+			hasAccess = false;
+		}
 
 		if (hasAccess == false)
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN,

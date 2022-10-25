@@ -159,45 +159,20 @@ public class ImageUtil {
 	public static int[] cropVisibleContent(File src, File dst) throws IOException {
 		BufferedImage srcImage = ImageIO.read(src);
 
-		int top = srcImage.getHeight() - 1;
-		for (int x = 1; x < srcImage.getWidth(); x++) {
-			for (int y = srcImage.getHeight() - 1; y > 0; y--) {
-				Color pixelColor = new Color(srcImage.getRGB(x, y));
-				if (!pixelColor.equals(Color.WHITE)) {
-					if (y < top) {
-						top = y;
-						break;
-					}
-				}
-			}
-		}
+		int top = getVisibleTop(srcImage);
 
-		int bottom = 0;
-		for (int x = 0; x < srcImage.getWidth(); x++) {
-			for (int y = 0; y < srcImage.getHeight(); y++) {
-				Color pixelColor = new Color(srcImage.getRGB(x, y));
-				if (!pixelColor.equals(Color.WHITE)) {
-					if (y > bottom) {
-						bottom = y;
-						break;
-					}
-				}
-			}
-		}
+		int bottom = getVisibleBottom(srcImage);
 
-		int left = srcImage.getWidth() - 1;
-		for (int x = srcImage.getWidth() - 1; x > 0; x--) {
-			for (int y = 1; y < srcImage.getHeight(); y++) {
-				Color pixelColor = new Color(srcImage.getRGB(x, y));
-				if (!pixelColor.equals(Color.WHITE)) {
-					if (x < left) {
-						left = x;
-						break;
-					}
-				}
-			}
-		}
+		int left = getVisibleLeft(srcImage);
 
+		int right = getVisibleRight(srcImage);
+
+		BufferedImage croppedImage = srcImage.getSubimage(left - 1, top - 1, right - left + 2, bottom - top + 2);
+		ImageIO.write(croppedImage, "png", dst);
+		return new int[] { croppedImage.getWidth(), croppedImage.getHeight() };
+	}
+
+	private static int getVisibleRight(BufferedImage srcImage) {
 		int right = 1;
 		for (int x = 0; x < srcImage.getWidth(); x++) {
 			for (int y = 1; y < srcImage.getHeight(); y++) {
@@ -210,10 +185,55 @@ public class ImageUtil {
 				}
 			}
 		}
+		return right;
+	}
 
-		BufferedImage croppedImage = srcImage.getSubimage(left - 1, top - 1, right - left + 2, bottom - top + 2);
-		ImageIO.write(croppedImage, "png", dst);
-		return new int[] { croppedImage.getWidth(), croppedImage.getHeight() };
+	private static int getVisibleLeft(BufferedImage srcImage) {
+		int left = srcImage.getWidth() - 1;
+		for (int x = srcImage.getWidth() - 1; x > 0; x--) {
+			for (int y = 1; y < srcImage.getHeight(); y++) {
+				Color pixelColor = new Color(srcImage.getRGB(x, y));
+				if (!pixelColor.equals(Color.WHITE)) {
+					if (x < left) {
+						left = x;
+						break;
+					}
+				}
+			}
+		}
+		return left;
+	}
+
+	private static int getVisibleBottom(BufferedImage srcImage) {
+		int bottom = 0;
+		for (int x = 0; x < srcImage.getWidth(); x++) {
+			for (int y = 0; y < srcImage.getHeight(); y++) {
+				Color pixelColor = new Color(srcImage.getRGB(x, y));
+				if (!pixelColor.equals(Color.WHITE)) {
+					if (y > bottom) {
+						bottom = y;
+						break;
+					}
+				}
+			}
+		}
+		return bottom;
+	}
+
+	private static int getVisibleTop(BufferedImage srcImage) {
+		int top = srcImage.getHeight() - 1;
+		for (int x = 1; x < srcImage.getWidth(); x++) {
+			for (int y = srcImage.getHeight() - 1; y > 0; y--) {
+				Color pixelColor = new Color(srcImage.getRGB(x, y));
+				if (!pixelColor.equals(Color.WHITE)) {
+					if (y < top) {
+						top = y;
+						break;
+					}
+				}
+			}
+		}
+		return top;
 	}
 
 	/**

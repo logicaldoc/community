@@ -2,8 +2,9 @@ package com.logicaldoc.gui.frontend.client.metadata.barcode;
 
 import java.util.ArrayList;
 
-import com.logicaldoc.gui.common.client.beans.GUIBarcodeSpec;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
+import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
+import com.logicaldoc.gui.common.client.beans.GUIZone;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
 import com.logicaldoc.gui.common.client.util.LD;
@@ -73,20 +74,21 @@ public class PositionalBarcodesGrid extends ListGrid {
 
 		if (barcodeTemplate != null) {
 			ArrayList<ListGridRecord> records = new ArrayList<ListGridRecord>();
-			if (barcodeTemplate.getBarcodeSpecs() != null)
-				for (GUIBarcodeSpec pat : barcodeTemplate.getBarcodeSpecs()) {
+			if (barcodeTemplate.getZones() != null)
+				for (GUIZone pat : barcodeTemplate.getZones()) {
+					GUIBarcodeZone brcPat = (GUIBarcodeZone) pat;
 					ListGridRecord record = new ListGridRecord();
-					record.setAttribute("pattern", pat.getPatterns());
-					record.setAttribute("include", pat.getInclude());
-					record.setAttribute("exclude", pat.getExclude());
+					record.setAttribute("pattern", brcPat.getPatterns());
+					record.setAttribute("include", brcPat.getInclude());
+					record.setAttribute("exclude", brcPat.getExclude());
 
-					String frmts = pat.getFormats();
+					String frmts = brcPat.getFormats();
 					if (frmts == null || frmts.trim().isEmpty())
 						record.setAttribute("formats", (String) null);
 					else if (!frmts.trim().contains(","))
 						record.setAttribute("formats", frmts.trim());
 					else
-						record.setAttribute("formats", pat.getFormats().replace(" ", "").split(","));
+						record.setAttribute("formats", brcPat.getFormats().replace(" ", "").split(","));
 					records.add(record);
 				}
 			setRecords(records.toArray(new ListGridRecord[0]));

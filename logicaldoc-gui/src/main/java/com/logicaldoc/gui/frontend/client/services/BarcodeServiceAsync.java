@@ -1,7 +1,7 @@
 package com.logicaldoc.gui.frontend.client.services;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.logicaldoc.gui.common.client.beans.GUIBarcodeSpec;
+import com.logicaldoc.gui.common.client.beans.GUIBarcodeZone;
 import com.logicaldoc.gui.common.client.beans.GUIBarcodeTemplate;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 
@@ -18,5 +18,5 @@ public interface BarcodeServiceAsync {
 
 	void process(long docId, AsyncCallback<GUIDocument> callback);
 
-	void updateZone(GUIBarcodeSpec zone, AsyncCallback<GUIBarcodeSpec> callback);
+	void updateZone(GUIBarcodeZone zone, AsyncCallback<GUIBarcodeZone> callback);
 }

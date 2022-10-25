@@ -346,12 +346,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Assert.assertNull(book);
 		
 		// delete an already deleted bookmark
-		try {
-			service.deleteBookmarks(new long[] { bookmark.getId() });
-			fail("Expected exception was not thrown");
-		} catch (ServerException e1) {
-			// nothing to do
-		}
+		service.deleteBookmarks(new long[] { bookmark.getId() });
 		
 		// Add bookmarks on folders
 		service.addBookmarks(new long[] { 6, 7 }, Bookmark.TYPE_FOLDER);

@@ -2,6 +2,7 @@ package com.logicaldoc.webdav.resource.model;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -270,7 +271,7 @@ public class ResourceImpl implements Resource {
 		}
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		Set<Permission> permissions = null;
+		Set<Permission> permissions = new HashSet<>();
 		long fid = 0;
 		if (isFolder)
 			fid = Long.parseLong(id);
@@ -296,7 +297,11 @@ public class ResourceImpl implements Resource {
 			downloadEnabled = true;
 			moveEnabled = true;
 		} else {
-			permissions = fdao.getEnabledPermissions(fid, personRequest);
+			try {
+				permissions = fdao.getEnabledPermissions(fid, personRequest);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
 			writeEnabled = permissions.contains(Permission.WRITE);
 			deleteEnabled = permissions.contains(Permission.DELETE);
 			renameEnabled = permissions.contains(Permission.RENAME);

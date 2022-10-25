@@ -1,22 +1,18 @@
 package com.logicaldoc.gui.frontend.client.workflow;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.WorkflowTriggersDS;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.util.LD;
+import com.logicaldoc.gui.common.client.widgets.grid.EventsListGridField;
 import com.logicaldoc.gui.frontend.client.services.WorkflowService;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -93,46 +89,16 @@ public class WorkflowTriggersPanel extends VLayout {
 	}
 
 	void refresh() {
-		if(list!=null)
+		if (list != null)
 			removeMember(list);
-		
+
 		ListGridField workflow = new ListGridField("workflow", I18N.message("workflow"), 200);
 		workflow.setCanFilter(true);
 
 		ListGridField template = new ListGridField("template", I18N.message("template"), 200);
 		template.setCanFilter(true);
 
-		ListGridField events = new ListGridField("events", I18N.message("triggeron"));
-		events.setCanFilter(false);
-		events.setAlign(Alignment.LEFT);
-		events.setWidth("*");
-		events.setCanEdit(false);
-		events.setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					if (value != null && !value.toString().isEmpty()) {
-						// Translate the set of events
-						String[] key = null;
-
-						if (!value.toString().contains(","))
-							key = new String[] { value.toString().trim() };
-						else
-							key = value.toString().split(",");
-						List<String> labels = new ArrayList<String>();
-						for (String string : key) {
-							labels.add(I18N.message(string + ".short"));
-						}
-						String str = labels.toString().substring(1);
-						return str.substring(0, str.length() - 1);
-					} else
-						return "";
-				} catch (Throwable e) {
-					return "";
-				}
-			}
-		});
+		EventsListGridField events = new EventsListGridField("events", I18N.message("triggeron"));
 
 		list = new ListGrid() {
 			@Override

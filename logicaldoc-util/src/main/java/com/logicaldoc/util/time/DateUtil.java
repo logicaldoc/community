@@ -27,6 +27,9 @@ public class DateUtil {
 	 * @return the formatted date
 	 */
 	public static String format(Date date) {
+		if(date==null)
+			return null;
+		
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 		try {
 			return df.format(date);
@@ -50,6 +53,9 @@ public class DateUtil {
 	 * @return the formatted date
 	 */
 	public static String formatWithMillis(Date date) {
+		if(date==null)
+			return null;
+		
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
 		try {
 			return df.format(date);

@@ -61,7 +61,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 
 	private FolderSecurityPanel securityPanel;
 
-	private HistoryPanel historyPanel;
+	private FolderHistoryPanel historyPanel;
 
 	private AliasesPanel aliasesPanel;
 
@@ -313,7 +313,7 @@ public class FolderDetailsPanel extends VLayout implements FolderObserver {
 				historyPanel.destroy();
 				historyTabPanel.removeMember(historyPanel);
 			}
-			historyPanel = new HistoryPanel(folder);
+			historyPanel = new FolderHistoryPanel(folder);
 			historyTabPanel.addMember(historyPanel);
 
 			if (Feature.enabled(Feature.WORKFLOW) && folder.hasPermission(Constants.PERMISSION_WORKFLOW)) {

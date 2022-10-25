@@ -15,34 +15,12 @@ public class UserHistory extends History {
 	public String author;
 	
 	public UserHistory() {
+		super();
 	}
 
 	public UserHistory(UserHistory source) {
-		setDate(source.getDate());
-		setDocId(source.getDocId());
-		setFolderId(source.getFolderId());
-		setUser(source.getUser());
-		setEvent(source.getEvent());
-		setComment(source.getComment());
-		setReason(source.getReason());
-		setVersion(source.getVersion());
-		setFileVersion(source.getFileVersion());
-		setPath(source.getPath());
-		setPathOld(source.getPathOld());
-		setNotified(source.getNotified());
-		setSessionId(source.getSessionId());
-		setIsNew(source.getIsNew());
-		setFilename(source.getFilename());
-		setFilenameOld(source.getFilenameOld());
-		setUserId(source.getUserId());
-		setUsername(source.getUsername());
-		setUserLogin(source.getUserLogin());
-		setNotifyEvent(isNotifyEvent());
+		copyAttributesFrom(source);
 		setAuthor(source.getAuthor());
-		setIp(source.getIp());
-		setDevice(source.getDevice());
-		setGeolocation(source.getGeolocation());
-		setFileSize(source.getFileSize());
 	}
 	
 	public String getAuthor() {

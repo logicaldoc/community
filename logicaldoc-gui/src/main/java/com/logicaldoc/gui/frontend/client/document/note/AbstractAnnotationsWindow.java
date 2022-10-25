@@ -175,7 +175,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 								note.setWidth(line.getEndLeftAsDouble() / (double) pageDrawingPane.getImageWidth());
 								note.setHeight(line.getEndTopAsDouble() / (double) pageDrawingPane.getImageHeight());
 							} else {
-								Double[] box = item.getBoundingBoxAsDouble();							
+								Double[] box = item.getBoundingBoxAsDouble();
 								note.setLeft(box[0] / (double) pageDrawingPane.getImageWidth());
 								note.setTop(box[1] / (double) pageDrawingPane.getImageHeight());
 								note.setWidth((box[2] - box[0]) / (double) pageDrawingPane.getImageWidth());
@@ -225,7 +225,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 			@Override
 			public void onClick(ClickEvent event) {
 				DrawItem[] items = pageDrawingPane.getDrawItems();
-				if(items!=null)
+				if (items != null)
 					for (DrawItem item : items)
 						item.hideAllKnobs();
 				showPrintPreview(pageDrawingPane);
@@ -354,7 +354,7 @@ public abstract class AbstractAnnotationsWindow extends Window {
 
 		final DrawItem drawItem;
 
-		if (note.getShape() == null || note.getShape().isEmpty() || "square".equals(note.getShape())) {
+		if (note.isSquareShape()) {
 			DrawRect square = new DrawRect();
 			square.setLeft((int) Math.round(left));
 			square.setTop((int) Math.round(top));

@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import com.logicaldoc.util.time.DateUtil;
 import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
@@ -237,7 +238,7 @@ public class WSAttribute implements Serializable {
 			setDoubleValue((Double) value);
 		} else if (value instanceof Date) {
 			this.type = TYPE_DATE;
-			setDateValue(WSUtil.convertDateToString((Date) value));
+			setDateValue(DateUtil.format((Date) value));
 		} else if (value instanceof WSUser) {
 			this.stringValue = ((WSUser) value).getFullName();
 			this.intValue = ((WSUser) value).getId();
@@ -252,9 +253,9 @@ public class WSAttribute implements Serializable {
 				XMLGregorianCalendar theXGCal = (XMLGregorianCalendar) value;
 				GregorianCalendar theGCal = theXGCal.toGregorianCalendar();
 				Date theDate = theGCal.getTime();
-				setDateValue(WSUtil.convertDateToString((Date) theDate));
+				setDateValue(DateUtil.format((Date) theDate));
 			} else if (value != null && value instanceof Date) {
-				setDateValue(WSUtil.convertDateToString((Date) value));
+				setDateValue(DateUtil.format((Date) value));
 			} else
 				setDateValue(null);
 		}
