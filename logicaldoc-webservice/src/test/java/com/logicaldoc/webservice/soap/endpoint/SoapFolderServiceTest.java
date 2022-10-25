@@ -1,5 +1,12 @@
 package com.logicaldoc.webservice.soap.endpoint;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.junit.Test;
 
 import com.logicaldoc.core.folder.Folder;
@@ -7,14 +14,14 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderGroup;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.webservice.AbstractWebserviceTestCase;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSRight;
-
-import junit.framework.Assert;
 
 /**
  * Test case for <code>SoapFolderService</code>
@@ -33,6 +40,8 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	// Instance under test
 	private SoapFolderService folderServiceImpl;
 
+	private SoapSecurityService securityServiceImpl;
+
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
@@ -43,19 +52,22 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		// Make sure that this is a SoapFolderService instance
 		folderServiceImpl = new SoapFolderService();
 		folderServiceImpl.setValidateSession(false);
+		
+		securityServiceImpl = new SoapSecurityService();
+		securityServiceImpl.setValidateSession(false);
 	}
 
 	@Test
 	public void testMove() throws Exception {
 		Folder folderToMove = folderDao.findById(1203);
-		Assert.assertNotNull(folderToMove);
-		Assert.assertEquals(1201, folderToMove.getParentId());
+		assertNotNull(folderToMove);
+		assertEquals(1201, folderToMove.getParentId());
 		Folder parentFolder = folderDao.findById(1200);
-		Assert.assertNotNull(parentFolder);
+		assertNotNull(parentFolder);
 
 		folderServiceImpl.move("", folderToMove.getId(), 1200L);
 		folderToMove = folderDao.findById(1203);
-		Assert.assertEquals(1200, folderToMove.getParentId());
+		assertEquals(1200, folderToMove.getParentId());
 	}
 
 	@Test
@@ -66,106 +78,135 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		wsFolderTest.setParentId(103);
 
 		WSFolder wsFolder = folderServiceImpl.create("", wsFolderTest);
-		Assert.assertNotNull(wsFolder);
-		Assert.assertEquals("folder test", wsFolder.getName());
-		Assert.assertEquals(103, wsFolder.getParentId());
+		assertNotNull(wsFolder);
+		assertEquals("folder test", wsFolder.getName());
+		assertEquals(103, wsFolder.getParentId());
 
 		wsFolder = folderServiceImpl.getFolder("", wsFolder.getId());
-		Assert.assertNotNull(wsFolder);
+		assertNotNull(wsFolder);
 		System.out.println(">>>>>> "+wsFolder.getId() +"    "+wsFolder.getName()+"    "+wsFolder.getDescription());
 		
-		Assert.assertEquals("folder test", wsFolder.getName());
-		Assert.assertEquals(103, wsFolder.getParentId());
+		assertEquals("folder test", wsFolder.getName());
+		assertEquals(103, wsFolder.getParentId());
 		
 		Folder createdFolder = folderDao.findByNameAndParentId("folder test", 103).get(0);
-		Assert.assertNotNull(createdFolder);
-		Assert.assertEquals("folder test", createdFolder.getName());
-		Assert.assertEquals("descr folder test", createdFolder.getDescription());
+		assertNotNull(createdFolder);
+		assertEquals("folder test", createdFolder.getName());
+		assertEquals("descr folder test", createdFolder.getDescription());
 	}
 
 	@Test
 	public void testDelete() throws Exception {
 		folderServiceImpl.delete("", 1201);
 		Folder folder = folderDao.findById(1201);
-		Assert.assertNull(folder);
+		assertNull(folder);
 	}
 
 	@Test
 	public void testRename() throws Exception {
 		Folder folder = folderDao.findById(103);
-		Assert.assertNotNull(folder);
-		Assert.assertEquals("menu.admin", folder.getName());
+		assertNotNull(folder);
+		assertEquals("menu.admin", folder.getName());
 		folderDao.initialize(folder);
 
 		folderServiceImpl.rename("", 103, "paperino");
 
 		folder = folderDao.findById(103);
-		Assert.assertEquals("paperino", folder.getName());
-		Assert.assertEquals(101, folder.getParentId());
-		Assert.assertEquals(3, folder.getType());
+		assertEquals("paperino", folder.getName());
+		assertEquals(101, folder.getParentId());
+		assertEquals(3, folder.getType());
 	}
 
 	@Test
 	public void testGetFolder() throws Exception {
+		
 		Folder folder = folderDao.findById(103);
-		Assert.assertNotNull(folder);
+		assertNotNull(folder);
 
 		WSFolder wsFolder = folderServiceImpl.getFolder("", 103);
 
-		Assert.assertEquals(103, wsFolder.getId());
-		Assert.assertEquals("menu.admin", wsFolder.getName());
-		Assert.assertEquals(101, wsFolder.getParentId());
-		Assert.assertEquals("description", wsFolder.getDescription());
+		assertEquals(103, wsFolder.getId());
+		assertEquals("menu.admin", wsFolder.getName());
+		assertEquals(101, wsFolder.getParentId());
+		assertEquals("description", wsFolder.getDescription());
+		
+		// trying to get a non existent folder
+		try {
+			wsFolder = folderServiceImpl.getFolder("", 2510);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+			// nothing to do here
+		}
+		
+		// trying to get a folder alias
+		wsFolder = folderServiceImpl.getFolder("", 1204);
+		assertNotNull(wsFolder);
+		assertEquals(101, wsFolder.getFoldRef().longValue());
+		assertEquals("text", wsFolder.getName());
+		
+		// trying to get a folder for which the user does not have read permission
+		SessionManager sm = SessionManager.get();
+		Session session1 = sm.newSession("guest", "admin", null);
+		
+		try {
+			folderServiceImpl.setValidateSession(true);		
+			wsFolder = folderServiceImpl.getFolder(session1.getSid(), 99);
+			fail("Expected exception was not thrown");
+		} catch (Exception e) {
+			// nothing to do here
+		} finally {		
+			folderServiceImpl.setValidateSession(false);
+		}
 	}
 
 	@Test
 	public void testIsReadable() throws Exception {
-		Assert.assertTrue(folderServiceImpl.isReadable("", 1200));
-		Assert.assertTrue(folderServiceImpl.isReadable("", 99));
+		assertTrue(folderServiceImpl.isReadable("", 1200));
+		assertTrue(folderServiceImpl.isReadable("", 99));
 	}
 
 	@Test
 	public void testGrantUser() throws Exception {
 		User user = userDao.findById(4);
 
-		Assert.assertTrue(folderDao.isPermissionEnabled(Permission.ADD, 80, user.getId()));
-		Assert.assertFalse(folderDao.isPermissionEnabled(Permission.IMMUTABLE, 80, user.getId()));
+		assertTrue(folderDao.isPermissionEnabled(Permission.ADD, 80, user.getId()));
+		assertFalse(folderDao.isPermissionEnabled(Permission.IMMUTABLE, 80, user.getId()));
 
 		int permissionsInt = 4091;
-		Assert.assertFalse(Permission.ADD.match(permissionsInt));
-		Assert.assertTrue(Permission.IMMUTABLE.match(permissionsInt));
+		assertFalse(Permission.ADD.match(permissionsInt));
+		assertTrue(Permission.IMMUTABLE.match(permissionsInt));
 		folderServiceImpl.grantUser("", 80, user.getId(), permissionsInt, false);
 
 		// Because of these methods use JDBC directly, they fails when the test
 		// is executed by maven. Probably the folder groups are not already
 		// persisted in the DB
-		// Assert.assertTrue(folderDao.isPermissionEnabled(Permission.IMMUTABLE,
+		// assertTrue(folderDao.isPermissionEnabled(Permission.IMMUTABLE,
 		// 80, user.getId()));
-		// Assert.assertFalse(folderDao.isPermissionEnabled(Permission.ADD, 80,
+		// assertFalse(folderDao.isPermissionEnabled(Permission.ADD, 80,
 		// user.getId()));
 	}
 
 	@Test
 	public void testGrantGroup() throws Exception {
 		Group group = groupDao.findById(3);
-		Assert.assertNotNull(group);
+		assertNotNull(group);
 		Folder folder = folderDao.findById(99);
-		Assert.assertNotNull(folder);
+		assertNotNull(folder);
 		Folder folder2 = folderDao.findById(80);
-		Assert.assertNotNull(folder2);
+		assertNotNull(folder2);
 		folderDao.initialize(folder);
 		FolderGroup mg = folder.getFolderGroup(3);
-		Assert.assertNull(mg);
+		assertNull(mg);
 		folderDao.initialize(folder2);
 		FolderGroup mg2 = folder2.getFolderGroup(3);
-		Assert.assertNotNull(mg2);
+		assertNotNull(mg2);
 
 		folderServiceImpl.grantGroup("", 99, 3, 4095, false);
 
 //		folder = folderDao.findById(99);
 //		folderDao.initialize(folder);
 //		mg = folder.getFolderGroup(3);
-//		Assert.assertNotNull(mg);
+//		assertNotNull(mg);
 	}
 
 	@Test
@@ -173,8 +214,8 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 		try {
 			WSRight[] rights = new WSRight[0];
 			rights = folderServiceImpl.getGrantedUsers("", 80);
-			Assert.assertEquals(2, rights.length);
-			Assert.assertEquals(3, rights[0].getId());
+			assertEquals(2, rights.length);
+			assertEquals(3, rights[0].getId());
 		} catch (Exception e) {
 			// Nothing to do
 		}
@@ -184,14 +225,14 @@ public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
 	public void testGetGrantedGroups() throws Exception {
 		WSRight[] rights = new WSRight[0];
 		rights = folderServiceImpl.getGrantedGroups("", 80);
-		Assert.assertEquals(2, rights.length);
+		assertEquals(2, rights.length);
 	}
 
 	@Test
 	public void testListWorkspaces() throws Exception {
 		WSFolder[] folders = folderServiceImpl.listWorkspaces("");
-		Assert.assertNotNull(folders);
-		Assert.assertEquals(1, folders.length);
-		Assert.assertEquals("Default", folders[0].getName());
+		assertNotNull(folders);
+		assertEquals(1, folders.length);
+		assertEquals("Default", folders[0].getName());
 	}
 }

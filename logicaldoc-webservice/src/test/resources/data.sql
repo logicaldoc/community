@@ -66,6 +66,16 @@ values     (-5,'2008-10-22 00:00:00',0,1,'_user_5',1,1);
 insert into ld_usergroup
 values (-5,5);
 
+-- add user guest
+insert into ld_user
+           (ld_id,ld_lastmodified,ld_deleted,ld_enabled,ld_username,ld_password,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime)
+values     (6,'2008-10-22 00:00:00',0,1,'guest','d033e22ae348aeb566fc214aec3585c4da997','test','Test','','','','','de','test@acme.com','',0,null,0,0,-1,0,1,1,0);
+--insert into ld_group
+--           (ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion)
+--values     (-6,'2008-10-22 00:00:00',0,1,'_user_6',1,1);
+--insert into ld_usergroup
+--values (-6,6);
+
 insert into ld_folder
            (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
 values     (99,'2008-10-22 00:00:00',0,'menu.admin',5,5,0,1,1,1,0);
@@ -108,6 +118,10 @@ values     (1202,'2009-10-19 00:00:00',0,'xyz',1201,3,0,1,1,1,0);
 insert into ld_folder
            (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
 values     (1203,'2009-10-19 00:00:00',0,'qqqq',1201,3,0,1,1,7,0);
+
+insert into ld_folder
+           (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_foldref,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
+values     (1204,'2009-10-19 00:00:00',0,'text',1200,2,101,0,1,1,7,0);
 
 insert into ld_foldergroup
 			   (ld_folderid, ld_groupid, ld_write, ld_add, ld_security, ld_immutable, ld_delete, ld_rename, ld_import, ld_export, ld_sign, ld_archive, ld_workflow, ld_download, ld_calendar, ld_subscription, ld_print, ld_password, ld_move, ld_email, ld_automation, ld_storage)
@@ -182,6 +196,11 @@ values     (4,10);
 insert into ld_usergroup
            (ld_userid,ld_groupid)
 values     (5,10);
+
+-- user guest in group guest
+insert into ld_usergroup
+           (ld_userid,ld_groupid)
+values     (6,3);
 
 insert into ld_document
            (ld_id,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_folderid,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_links,ld_ocrd,ld_previewpages)
