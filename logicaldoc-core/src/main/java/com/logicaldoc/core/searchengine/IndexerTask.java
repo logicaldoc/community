@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObjectDAO;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
@@ -109,16 +110,11 @@ public class IndexerTask extends Task {
 		indexed = 0;
 		indexingTime = 0;
 		try {
+			Integer max = getMax();
+
+			setSize(max);
+
 			ContextProperties config = Context.get().getProperties();
-			Integer max = config.getProperty("index.batch") != null
-					? Integer.parseInt(config.getProperty("index.batch"))
-					: null;
-
-			if (max != null && max.intValue() < size && max.intValue() > 0)
-				size = max.intValue();
-
-			if (max != null && max.intValue() < 1)
-				max = null;
 
 			// Retrieve the actual transactions
 			List<String> transactionIds = lockManager.getAllTransactions();
@@ -128,28 +124,19 @@ public class IndexerTask extends Task {
 			// First of all find documents to be indexed and not already
 			// involved into a transaction
 			String[] query = IndexerTask.prepareQuery();
-			List<Long> ids = documentDao.findIdsByWhere(query[0] + " and (" + PersistentObjectDAO.ALIAS_ENTITY
-					+ ".transactionId is null or " + PersistentObjectDAO.ALIAS_ENTITY
-					+ ".transactionId not in " + transactionIdsStr + ") ", query[1], max);
-			size = ids.size();
+			List<Long> docIds = documentDao.findIdsByWhere(
+					query[0] + " and (" + PersistentObjectDAO.ALIAS_ENTITY + ".transactionId is null or "
+							+ PersistentObjectDAO.ALIAS_ENTITY + ".transactionId not in " + transactionIdsStr + ") ",
+					query[1], max);
+			size = docIds.size();
 			log.info("Found a total of {} documents to be processed", size);
 
 			// Must take into account start and end of the transaction
 			size += 2;
-
-			if (!ids.isEmpty()) {
-				// Mark all these documents as belonging to the current
-				// transaction. This may require time
-				String idsStr = ids.toString().replace('[', '(').replace(']', ')');
-
-				Map<String, Object> params = new HashMap<String, Object>();
-				params.put("transactionId", transactionId);
-
-				documentDao.bulkUpdate(
-						" set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in " + idsStr,
-						params);
-			}
-			log.info("Documents marked for indexing in transaction {}", transactionId);
+			
+			// Mark all the documents as belonging to the current
+			// transaction. This may require time
+			assignTransition(docIds);
 
 			// First step done
 			next();
@@ -157,12 +144,12 @@ public class IndexerTask extends Task {
 			// Now we can release the lock
 			lockManager.release(getName(), transactionId);
 
-			if (!ids.isEmpty()) {
+			if (!docIds.isEmpty()) {
 				int threadsTotal = config.getInt("index.threads", 1);
 				log.info("Distribute the indexing among {} threads", threadsTotal);
 
 				// Divide the docs in groups of N
-				Collection<List<Long>> partitions = CollectionUtil.partition(ids, threadsTotal);
+				Collection<List<Long>> partitions = CollectionUtil.partition(docIds, threadsTotal);
 
 				startIndexerThreads(threadsTotal);
 				List<IndexerThread> threads = new ArrayList<IndexerThread>();
@@ -176,29 +163,8 @@ public class IndexerTask extends Task {
 					log.debug("Launched the thread for documents {}", partition);
 				}
 
-				log.info("Waiting for completion");
-				boolean threadsCompleted = false;
-				while (!threadsCompleted) {
-					synchronized (this) {
-						try {
-							wait(2);
-						} catch (InterruptedException e) {
-							Thread.currentThread().interrupt();
-						}
-					}
-
-					threadsCompleted = true;
-					for (IndexerThread iThread : threads) {
-						if (!iThread.isCompleted()) {
-							threadsCompleted = false;
-							;
-							break;
-						}
-					}
-
-					if (interruptRequested)
-						threadsCompleted = true;
-				}
+				// Wait for the threads to complete
+				waitThreadsCompleteion(threads);
 
 				log.info("All threads have completed");
 
@@ -234,6 +200,62 @@ public class IndexerTask extends Task {
 			next();
 			log.info("Documents released from transaction {}", transactionId);
 		}
+	}
+
+	private void waitThreadsCompleteion(List<IndexerThread> threads) {
+		log.info("Waiting for completion");
+		boolean threadsCompleted = false;
+		while (!threadsCompleted) {
+			synchronized (this) {
+				try {
+					wait(2);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+			}
+
+			threadsCompleted = true;
+			for (IndexerThread iThread : threads) {
+				if (!iThread.isCompleted()) {
+					threadsCompleted = false;
+					;
+					break;
+				}
+			}
+
+			if (interruptRequested)
+				threadsCompleted = true;
+		}
+	}
+
+	private void assignTransition(List<Long> docIds) throws PersistenceException {
+		if (!docIds.isEmpty()) {
+			// Mark all these documents as belonging to the current
+			// transaction. This may require time
+			String idsStr = docIds.toString().replace('[', '(').replace(']', ')');
+
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("transactionId", transactionId);
+
+			documentDao.bulkUpdate(
+					" set ld_transactionid = :transactionId where ld_transactionid is null and ld_id in " + idsStr,
+					params);
+		}
+		log.info("Documents marked for indexing in transaction {}", transactionId);
+	}
+
+	private Integer getMax() {
+		Integer max = Context.get().getProperties().getProperty("index.batch") != null
+				? Integer.parseInt(config.getProperty("index.batch"))
+				: null;
+		if (max != null && max.intValue() < 1)
+			max = null;
+		return max;
+	}
+
+	private void setSize(Integer max) {
+		if (max != null && max.intValue() < size && max.intValue() > 0)
+			size = max.intValue();
 	}
 
 	/**

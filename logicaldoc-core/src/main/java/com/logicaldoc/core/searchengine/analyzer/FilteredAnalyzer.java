@@ -112,37 +112,44 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 				log.error("{} not found", filterClass);
 			}
 
-			if (aClass != null) {
-				try {
-					@SuppressWarnings({ "rawtypes", "unchecked" })
-					Constructor constructor = aClass.getConstructor(new Class[] { java.util.Map.class });
-
-					TokenFilterFactory factory = (TokenFilterFactory) constructor.newInstance(configs);
-
-					if (factory instanceof WordDelimiterGraphFilterFactory) {
-						/**
-						 * This class may need initialization from files
-						 */
-						ResourceLoader loader = new FilesystemResourceLoader(
-								new File(Context.get().getProperties().getProperty("index.dir") + "/logicaldoc/conf")
-										.toPath(),
-								this.getClass().getClassLoader());
-						((WordDelimiterGraphFilterFactory) factory).inform(loader);
-					}
-
-					ts = factory.create(ts);
-
-					log.debug("Appended token stream filter {}", filterClass);
-				} catch (NoSuchMethodException nse) {
-					log.warn("constructor (Map<String, String>) not found for {}", filterClass);
-				} catch (Throwable e) {
-					log.warn("constructor (Map<String, String>) of {} raised an error: {}", filterClass, e.getMessage(),
-							e);
-				}
-			}
+			ts = intantiateFilterClass(aClass, ts, configs);
 		}
 
 		return new TokenStreamComponents(components.getSource(), ts);
+	}
+
+	private TokenStream intantiateFilterClass(@SuppressWarnings("rawtypes")
+	Class aClass, TokenStream ts,
+			Map<String, String> configs) {
+		if (aClass != null) {
+			try {
+				@SuppressWarnings({ "rawtypes", "unchecked" })
+				Constructor constructor = aClass.getConstructor(new Class[] { java.util.Map.class });
+
+				TokenFilterFactory factory = (TokenFilterFactory) constructor.newInstance(configs);
+
+				if (factory instanceof WordDelimiterGraphFilterFactory) {
+					/**
+					 * This class may need initialization from files
+					 */
+					ResourceLoader loader = new FilesystemResourceLoader(
+							new File(Context.get().getProperties().getProperty("index.dir") + "/logicaldoc/conf")
+									.toPath(),
+							this.getClass().getClassLoader());
+					((WordDelimiterGraphFilterFactory) factory).inform(loader);
+				}
+
+				ts = factory.create(ts);
+
+				log.debug("Appended token stream filter {}", aClass.getName());
+			} catch (NoSuchMethodException nse) {
+				log.warn("constructor (Map<String, String>) not found for {}", aClass.getName());
+			} catch (Throwable e) {
+				log.warn("constructor (Map<String, String>) of {} raised an error: {}", aClass.getName(), e.getMessage(),
+						e);
+			}
+		}
+		return ts;
 	}
 
 	private static Map<String, String> getTokenFilters() {

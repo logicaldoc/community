@@ -57,6 +57,22 @@
 		</for>
 	</target>
 
+	<target name="deploy-classes" depends="init-all" description="Copy classes into a deployed webapp">
+		<property environment="env" />
+		<property id="properties" file="build.properties" />
+
+		<for list="${logicaldoc.webroot}" param="webroot">
+			<sequential>
+				<echo message="Deploying into @{webroot}" />
+				<copy todir="@{webroot}/WEB-INF/classes" verbose="true">
+					<fileset dir="war/WEB-INF/classes">
+						<include name="com/logicaldoc/gui/**" />
+					</fileset>
+				</copy>
+			</sequential>
+		</for>
+	</target>
+	
 	<target name="compile-deploy-frontend" depends="init-all">
 		<replace dir=".">
 			<include name="**/Common.gwt.xml" />

@@ -28,9 +28,9 @@ public class FolderCriterion implements Serializable {
 	public final static String OPERATOR_NOTCONTAINS = "notcontains";
 
 	public final static String OPERATOR_BEGINSWITH = "beginswith";
-	
+
 	public final static String OPERATOR_ENDSWITH = "endswith";
-	
+
 	public final static String OPERATOR_GREATER = "greaterthan";
 
 	public final static String OPERATOR_LESSER = "lessthan";
@@ -151,19 +151,20 @@ public class FolderCriterion implements Serializable {
 		if (OPERATOR_NULL.equals(operator))
 			return false;
 
-		if ((getType() == Attribute.TYPE_STRING && StringUtils.isEmpty(getStringValue().trim()))
-				|| (getType() == Attribute.TYPE_INT && getLongValue() == null)
-				|| (getType() == Attribute.TYPE_DOUBLE && getDoubleValue() == null)
-				|| (getType() == Attribute.TYPE_DATE && getDateValue() == null)
-				|| (getType() == Attribute.TYPE_BOOLEAN && getLongValue() == null)
-				|| (getType() == Attribute.TYPE_USER && getLongValue() == null)
-				|| (getType() == Attribute.TYPE_FOLDER && getLongValue() == null)
-				|| (getType() == TYPE_FOLDER && getLongValue() == null)
-				|| (getType() == TYPE_TEMPLATE && getLongValue() == null)
-				|| (getType() == TYPE_LANGUAGE && getStringValue() == null))
-			return true;
-
-		return false;
+		switch (getType()) {
+		case Attribute.TYPE_INT:
+		case Attribute.TYPE_BOOLEAN:
+		case Attribute.TYPE_USER:
+		case TYPE_FOLDER:
+		case TYPE_TEMPLATE:
+			return getLongValue() == null;
+		case Attribute.TYPE_DOUBLE:
+			return getDoubleValue() == null;
+		case Attribute.TYPE_DATE:
+			return getDateValue() == null;
+		default:
+			return StringUtils.isEmpty(getStringValue());
+		}
 	}
 
 	public void setValue(Serializable value) {
@@ -207,7 +208,7 @@ public class FolderCriterion implements Serializable {
 			setStringValue((String) value);
 			break;
 		default:
-			// do noting			
+			// do noting
 		}
 	}
 

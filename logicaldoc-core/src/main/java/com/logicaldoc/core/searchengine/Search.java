@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
@@ -123,18 +124,11 @@ public abstract class Search {
 		log.info("Launch search");
 		log.info("Expression: {}", options.getExpression());
 
-		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-		try {
-			searchUser = uDao.findById(options.getUserId());
-		} catch (PersistenceException e1) {
-			throw new SearchException(e1);
-		}
+		initSearchUser();
+
 		if (searchUser == null) {
 			log.warn("Unexisting user");
 			return hits;
-		} else {
-			uDao.initialize(searchUser);
-			log.info("Search User: {}", searchUser.getUsername());
 		}
 
 		Date start = new Date();
@@ -150,12 +144,9 @@ public abstract class Search {
 		if (StringUtils.isNotEmpty(extattrs) && !hits.isEmpty()) {
 			// the names of the extended attributes to show
 			List<String> attrs = Arrays.asList(extattrs.trim().split(","));
+
 			StringBuilder idsString = new StringBuilder("(");
-			for (Hit hit : hits) {
-				if (idsString.length() > 1)
-					idsString.append(",");
-				idsString.append(hit.getId());
-			}
+			idsString.append(hits.stream().map(h -> Long.toString(h.getId())).collect(Collectors.joining(",")));
 			idsString.append(")");
 
 			log.debug("Start searching for extended attributes: {}", attrs);
@@ -178,8 +169,7 @@ public abstract class Search {
 
 			query.append(idsString);
 			query.append(" and ld_name in ");
-			query.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','")
-					.replace(" ", ""));
+			query.append(attrs.toString().replace("[", "('").replace("]", "')").replace(",", "','").replace(" ", ""));
 
 			try {
 				ddao.query(query.toString(), null, new RowMapper<Long>() {
@@ -204,15 +194,8 @@ public abstract class Search {
 				log.error(e.getMessage(), e);
 			}
 
-			for (Hit h : hits) {
-				for (String name : attrs) {
-					Attribute att = extAtt.get(h.getId() + "-" + name);
-					if (h.getDocRef() != null && h.getDocRef().longValue() != 0L)
-						att = extAtt.get(h.getDocRef() + "-" + name);
-					if (att != null)
-						h.getAttributes().put(name, att);
-				}
-			}
+			
+			copyExtendedAttributesToHits(attrs, extAtt);
 
 			log.debug("End searching for extended attributes");
 		}
@@ -222,6 +205,31 @@ public abstract class Search {
 		log.info("Search finished in {} ms", execTime);
 
 		return hits;
+	}
+
+	private void copyExtendedAttributesToHits(List<String> atributeNames, final Map<String, Attribute> extAttribute) {
+		for (Hit h : hits) {
+			for (String name : atributeNames) {
+				Attribute att = extAttribute.get(h.getId() + "-" + name);
+				if (h.getDocRef() != null && h.getDocRef().longValue() != 0L)
+					att = extAttribute.get(h.getDocRef() + "-" + name);
+				if (att != null)
+					h.getAttributes().put(name, att);
+			}
+		}
+	}
+
+	private void initSearchUser() throws SearchException {
+		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		try {
+			searchUser = uDao.findById(options.getUserId());
+		} catch (PersistenceException e1) {
+			throw new SearchException(e1);
+		}
+		if (searchUser != null) {
+			uDao.initialize(searchUser);
+			log.info("Search User: {}", searchUser.getUsername());
+		}
 	}
 
 	/**

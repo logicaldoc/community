@@ -120,90 +120,23 @@ public class FulltextSearch extends Search {
 		FulltextSearchOptions opt = (FulltextSearchOptions) options;
 		SearchEngine engine = (SearchEngine) Context.get().getBean(SearchEngine.class);
 
-		if (opt.getFields() == null) {
-			String[] fields = new String[] { HitField.FILENAME.toString(), HitField.TITLE.toString(),
-					HitField.TAGS.toString(), HitField.CONTENT.toString() };
-			opt.setFields(fields);
-		}
+		setDefaultFields(opt);
 
 		/*
 		 * Prepare the query: the expression must be applied to all requested
 		 * fields.
 		 */
-		StringBuilder query = new StringBuilder();
-		for (String field : opt.getFields()) {
-			if (query.length() > 0)
-				query.append(" OR ");
+		StringBuilder query = prepareQuery(opt);
 
-			query.append(field + ":(" + opt.getExpression() + ")");
-		}
-
+		Collection<Long> accessibleFolderIds = getAccessibleFolderIds(opt);
+		
+		long tenantId = getTenant(opt);
+		
 		/*
 		 * Prepare the filters
 		 */
-		ArrayList<String> filters = new ArrayList<String>();
-
-		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		long tenantId = Tenant.DEFAULT_ID;
-		if (opt.getTenantId() != null)
-			tenantId = opt.getTenantId().longValue();
-		else if (searchUser != null)
-			tenantId = searchUser.getTenantId();
-
-		if (searchUser != null && tdao.count() > 1)
-			filters.add(HitField.TENANT_ID + ":" + (tenantId < 0 ? "\\" : "") + tenantId);
-
-		if (opt.getTemplate() != null)
-			filters.add(HitField.TEMPLATE_ID + ":" + (opt.getTemplate() < 0 ? "\\" : "") + opt.getTemplate());
-
-		if (StringUtils.isNotEmpty(opt.getLanguage()))
-			filters.add(HitField.LANGUAGE + ":" + opt.getLanguage());
-
-		if (opt.getSizeMin() != null)
-			filters.add(HitField.SIZE + ":[" + opt.getSizeMin() + " TO *]");
-
-		if (opt.getSizeMax() != null)
-			filters.add(HitField.SIZE + ":[* TO " + opt.getSizeMax() + "]");
-
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-		if (opt.getDateFrom() != null)
-			filters.add(HitField.DATE + ":[" + df.format(opt.getDateFrom()) + "T00:00:00Z TO *]");
-
-		if (opt.getDateTo() != null)
-			filters.add(HitField.DATE + ":[* TO " + df.format(opt.getDateTo()) + "T00:00:00Z]");
-
-		if (opt.getCreationFrom() != null)
-			filters.add(HitField.CREATION + ":[" + df.format(opt.getCreationFrom()) + "T00:00:00Z TO *]");
-
-		if (opt.getCreationTo() != null)
-			filters.add(HitField.CREATION + ":[* TO " + df.format(opt.getCreationTo()) + "T00:00:00Z]");
-
-		/*
-		 * We have to see what folders the user can access. But we need to
-		 * perform this check only if the search is not restricted to one folder
-		 * only.
-		 */
-		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		Collection<Long> accessibleFolderIds = new TreeSet<Long>();
-		boolean searchInSingleFolder = (opt.getFolderId() != null && !opt.isSearchInSubPath());
-		if (!searchInSingleFolder) {
-			log.debug("Folders search");
-			accessibleFolderIds = fdao.findFolderIdByUserIdInPath(opt.getUserId(), opt.getFolderId());
-			log.debug("End of Folders search");
-		}
-		
-		try {
-			if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
-					&& fdao.isReadEnabled(opt.getFolderId().longValue(), opt.getUserId()))
-				accessibleFolderIds.add(opt.getFolderId());
-		} catch (PersistenceException e1) {
-			throw new SearchException(e1.getMessage(), e1);
-		}
-
-		if (!accessibleFolderIds.isEmpty() && opt.getFolderId() != null) {
-			for (Long id : accessibleFolderIds)
-				filters.add(HitField.FOLDER_ID + ":" + (id < 0 ? "\\" : "") + id);
-		}
+		List<String> filters = new ArrayList<>();
+		setQueryFilters(opt, filters, tenantId, accessibleFolderIds);
 
 		/*
 		 * Launch the search
@@ -215,17 +148,7 @@ public class FulltextSearch extends Search {
 		log.debug("Fulltext hits count: {}", (results != null ? results.getCount() : 0));
 
 		// Save here the binding between ID and Hit
-		Map<Long, Hit> hitsMap = new HashMap<Long, Hit>();
-		while (results != null && results.hasNext()) {
-			Hit hit = results.next();
-
-			// Skip a document if not in the filter set
-			if (opt.getFilterIds() != null && !opt.getFilterIds().isEmpty()) {
-				if (!opt.getFilterIds().contains(hit.getId()))
-					continue;
-			}
-			hitsMap.put(hit.getId(), hit);
-		}
+		Map<Long, Hit> hitsMap = buildHitsMap(opt, results);
 
 		if (hitsMap.isEmpty())
 			return;
@@ -238,7 +161,7 @@ public class FulltextSearch extends Search {
 		StringBuilder hitsIdsCondition = new StringBuilder();
 		if (!hitsIds.isEmpty()) {
 			hitsIdsCondition.append(" and (");
-
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			if (fdao.isOracle()) {
 				/*
 				 * In Oracle The limit of 1000 elements applies to sets of
@@ -328,13 +251,47 @@ public class FulltextSearch extends Search {
 
 		// Now sort the hits by score desc
 		List<Hit> sortedHitsList = new ArrayList<Hit>(hitsMap.values());
-		try {
-			Collections.sort(sortedHitsList);
-		} catch (Throwable t) {
-			log.warn(t.getMessage());
-		}
+		Collections.sort(sortedHitsList);
 
 		// Populate the hits list discarding unexisting documents
+		propulateHits(opt, accessibleFolderIds, sortedHitsList);
+	}
+
+	private Map<Long, Hit> buildHitsMap(FulltextSearchOptions opt, Hits results) {
+		Map<Long, Hit> hitsMap = new HashMap<Long, Hit>();
+		while (results != null && results.hasNext()) {
+			Hit hit = results.next();
+
+			// Skip a document if not in the filter set
+			if (opt.getFilterIds() != null && !opt.getFilterIds().isEmpty()) {
+				if (!opt.getFilterIds().contains(hit.getId()))
+					continue;
+			}
+			hitsMap.put(hit.getId(), hit);
+		}
+		return hitsMap;
+	}
+
+	private Collection<Long> getAccessibleFolderIds(FulltextSearchOptions opt) {
+		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		
+		/*
+		 * We have to see what folders the user can access. But we need to
+		 * perform this check only if the search is not restricted to one folder
+		 * only.
+		 */
+		Collection<Long> accessibleFolderIds = new TreeSet<>();
+		boolean searchInSingleFolder = (opt.getFolderId() != null && !opt.isSearchInSubPath());
+		if (!searchInSingleFolder) {
+			log.debug("Folders search");
+			accessibleFolderIds = fdao.findFolderIdByUserIdInPath(opt.getUserId(), opt.getFolderId());
+			log.debug("End of Folders search");
+		}
+		return accessibleFolderIds;
+	}
+
+	private void propulateHits(FulltextSearchOptions opt, Collection<Long> accessibleFolderIds,
+			List<Hit> sortedHitsList) {
 		Iterator<Hit> iter = sortedHitsList.iterator();
 		while (iter.hasNext()) {
 			if (options.getMaxHits() > 0 && hits.size() >= options.getMaxHits()) {
@@ -350,6 +307,84 @@ public class FulltextSearch extends Search {
 			if ((searchUser.isMemberOf(Group.GROUP_ADMIN) && opt.getFolderId() == null)
 					|| (accessibleFolderIds != null && accessibleFolderIds.contains(hit.getFolder().getId())))
 				hits.add(hit);
+		}
+	}
+
+	private void setQueryFilters(FulltextSearchOptions opt, List<String> filters, long tenantId, Collection<Long> accessibleFolderIds) throws SearchException {
+		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+		if (searchUser != null && tdao.count() > 1)
+			filters.add(HitField.TENANT_ID + ":" + (tenantId < 0 ? "\\" : "") + tenantId);
+
+		if (opt.getTemplate() != null)
+			filters.add(HitField.TEMPLATE_ID + ":" + (opt.getTemplate() < 0 ? "\\" : "") + opt.getTemplate());
+
+		if (StringUtils.isNotEmpty(opt.getLanguage()))
+			filters.add(HitField.LANGUAGE + ":" + opt.getLanguage());
+
+		if (opt.getSizeMin() != null)
+			filters.add(HitField.SIZE + ":[" + opt.getSizeMin() + " TO *]");
+
+		if (opt.getSizeMax() != null)
+			filters.add(HitField.SIZE + ":[* TO " + opt.getSizeMax() + "]");
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		if (opt.getDateFrom() != null)
+			filters.add(HitField.DATE + ":[" + df.format(opt.getDateFrom()) + "T00:00:00Z TO *]");
+
+		if (opt.getDateTo() != null)
+			filters.add(HitField.DATE + ":[* TO " + df.format(opt.getDateTo()) + "T00:00:00Z]");
+
+		if (opt.getCreationFrom() != null)
+			filters.add(HitField.CREATION + ":[" + df.format(opt.getCreationFrom()) + "T00:00:00Z TO *]");
+
+		if (opt.getCreationTo() != null)
+			filters.add(HitField.CREATION + ":[* TO " + df.format(opt.getCreationTo()) + "T00:00:00Z]");
+		
+		setFolderQueryFilters(opt, filters, accessibleFolderIds);
+	}
+
+	private void setFolderQueryFilters(FulltextSearchOptions opt, List<String> filters,
+			Collection<Long> accessibleFolderIds) throws SearchException {
+		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		try {
+			if (opt.getFolderId() != null && !accessibleFolderIds.contains(opt.getFolderId())
+					&& fdao.isReadEnabled(opt.getFolderId().longValue(), opt.getUserId()))
+				accessibleFolderIds.add(opt.getFolderId());
+		} catch (PersistenceException e1) {
+			throw new SearchException(e1.getMessage(), e1);
+		}
+
+		if (!accessibleFolderIds.isEmpty() && opt.getFolderId() != null) {
+			for (Long id : accessibleFolderIds)
+				filters.add(HitField.FOLDER_ID + ":" + (id < 0 ? "\\" : "") + id);
+		}
+	}
+
+	private long getTenant(FulltextSearchOptions opt) {
+		long tenantId = Tenant.DEFAULT_ID;
+		if (opt.getTenantId() != null)
+			tenantId = opt.getTenantId().longValue();
+		else if (searchUser != null)
+			tenantId = searchUser.getTenantId();
+		return tenantId;
+	}
+
+	private StringBuilder prepareQuery(FulltextSearchOptions opt) {
+		StringBuilder query = new StringBuilder();
+		for (String field : opt.getFields()) {
+			if (query.length() > 0)
+				query.append(" OR ");
+
+			query.append(field + ":(" + opt.getExpression() + ")");
+		}
+		return query;
+	}
+
+	private void setDefaultFields(FulltextSearchOptions opt) {
+		if (opt.getFields() == null) {
+			String[] fields = new String[] { HitField.FILENAME.toString(), HitField.TITLE.toString(),
+					HitField.TAGS.toString(), HitField.CONTENT.toString() };
+			opt.setFields(fields);
 		}
 	}
 }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.CharacterCodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentNote;
@@ -85,23 +87,9 @@ public class StandardSearchEngine implements SearchEngine {
 	 */
 	@Override
 	public synchronized void addHit(Document document, String content) throws Exception {
-		documentDao.initialize(document);
-		Document doc = document;
-
-		if (document.getDocRef() != null) {
-			// This is an alias
-			Document referencedDoc = documentDao.findById(document.getDocRef());
-			documentDao.initialize(referencedDoc);
-			doc = new Document(referencedDoc);
-			doc.setId(document.getId());
-			doc.setTenantId(document.getTenantId());
-			doc.setDocRef(document.getDocRef());
-			doc.setDocRefType(document.getDocRefType());
-			doc.setFolder(document.getFolder());
-		}
+		Document doc = getDocument(document);
 
 		SolrInputDocument hit = new SolrInputDocument();
-
 		hit.addField(HitField.ID.getName(), Long.toString(doc.getId()));
 		hit.addField(HitField.TENANT_ID.getName(), Long.toString(doc.getTenantId()));
 		hit.addField(HitField.LANGUAGE.getName(), doc.getLanguage());
@@ -115,48 +103,12 @@ public class StandardSearchEngine implements SearchEngine {
 		hit.addField(HitField.TAGS.getName(), doc.getTagsString());
 		hit.addField(HitField.DOC_REF.getName(), doc.getDocRef());
 
-		int maxText = -1;
-		if (StringUtils.isNotEmpty(config.getProperty("index.maxtext"))) {
-			try {
-				maxText = config.getInt("index.maxtext");
-			} catch (Exception e) {
-				// Nothing to do
-			}
-		}
+		setContent(content, hit);
 
-		if (content != null) {
-			String utf8Content = StringUtil.removeNonUtf8Chars(content);
-			if (maxText > 0 && utf8Content.length() > maxText)
-				hit.addField(HitField.CONTENT.getName(), StringUtils.substring(utf8Content, 0, maxText));
-			else
-				hit.addField(HitField.CONTENT.getName(), utf8Content);
-		}
-
-		if (doc.getFolder() != null) {
-			hit.addField(HitField.FOLDER_ID.getName(), doc.getFolder().getId());
-			hit.addField(HitField.FOLDER_NAME.getName(), doc.getFolder().getName());
-		}
+		setFolder(doc, hit);
 
 		if (doc.getTemplateId() != null) {
-			hit.addField(HitField.TEMPLATE_ID.getName(), doc.getTemplateId());
-
-			for (String attribute : doc.getAttributeNames()) {
-				Attribute ext = doc.getAttribute(attribute);
-				if (StringUtils.isNotEmpty(ext.getParent()))
-					continue;
-
-				// Skip all non-string attributes
-				if ((ext.getType() == Attribute.TYPE_STRING || ext.getType() == Attribute.TYPE_USER)
-						&& (StringUtils.isNotEmpty(ext.getStringValue())
-								|| StringUtils.isNotEmpty(ext.getStringValues()))) {
-
-					// Prefix all extended attributes with 'ext_' in order to
-					// avoid collisions with standard fields
-					hit.addField("ext_" + attribute,
-							StringUtils.isNotEmpty(ext.getStringValues()) ? ext.getStringValues()
-									: ext.getStringValue());
-				}
-			}
+			addExtendedAttributes(doc, hit);
 		}
 
 		// Retrieve the notes
@@ -177,6 +129,75 @@ public class StandardSearchEngine implements SearchEngine {
 		} finally {
 			FilteredAnalyzer.lang.remove();
 		}
+	}
+
+	private void addExtendedAttributes(Document doc, SolrInputDocument hit) {
+		hit.addField(HitField.TEMPLATE_ID.getName(), doc.getTemplateId());
+
+		for (String attribute : doc.getAttributeNames()) {
+			Attribute ext = doc.getAttribute(attribute);
+			if (StringUtils.isNotEmpty(ext.getParent()))
+				continue;
+
+			// Skip all non-string attributes
+			if ((ext.getType() == Attribute.TYPE_STRING || ext.getType() == Attribute.TYPE_USER)
+					&& (StringUtils.isNotEmpty(ext.getStringValue())
+							|| StringUtils.isNotEmpty(ext.getStringValues()))) {
+
+				// Prefix all extended attributes with 'ext_' in order to
+				// avoid collisions with standard fields
+				hit.addField("ext_" + attribute,
+						StringUtils.isNotEmpty(ext.getStringValues()) ? ext.getStringValues()
+								: ext.getStringValue());
+			}
+		}
+	}
+
+	private void setFolder(Document doc, SolrInputDocument hit) {
+		if (doc.getFolder() != null) {
+			hit.addField(HitField.FOLDER_ID.getName(), doc.getFolder().getId());
+			hit.addField(HitField.FOLDER_NAME.getName(), doc.getFolder().getName());
+		}
+	}
+
+	private void setContent(String content, SolrInputDocument hit) throws CharacterCodingException {
+		int maxText = getMaxText();
+		if (content != null) {
+			String utf8Content = StringUtil.removeNonUtf8Chars(content);
+			if (maxText > 0 && utf8Content.length() > maxText)
+				hit.addField(HitField.CONTENT.getName(), StringUtils.substring(utf8Content, 0, maxText));
+			else
+				hit.addField(HitField.CONTENT.getName(), utf8Content);
+		}
+	}
+
+	private int getMaxText() {
+		int maxText = -1;
+		if (StringUtils.isNotEmpty(config.getProperty("index.maxtext"))) {
+			try {
+				maxText = config.getInt("index.maxtext");
+			} catch (Exception e) {
+				// Nothing to do
+			}
+		}
+		return maxText;
+	}
+
+	private Document getDocument(Document document) throws PersistenceException {
+		documentDao.initialize(document);
+		Document doc = document;
+		if (document.getDocRef() != null) {
+			// This is an alias
+			Document referencedDoc = documentDao.findById(document.getDocRef());
+			documentDao.initialize(referencedDoc);
+			doc = new Document(referencedDoc);
+			doc.setId(document.getId());
+			doc.setTenantId(document.getTenantId());
+			doc.setDocRef(document.getDocRef());
+			doc.setDocRefType(document.getDocRefType());
+			doc.setFolder(document.getFolder());
+		}
+		return doc;
 	}
 
 	/*
@@ -229,21 +250,14 @@ public class StandardSearchEngine implements SearchEngine {
 	public String check() {
 		log.warn("Checking index");
 
-		
 		String statMsg = "";
-		
-		try(CheckIndex ci = new CheckIndex(getIndexDataDirectory()); ByteArrayOutputStream baos =new ByteArrayOutputStream();) {
+
+		try (CheckIndex ci = new CheckIndex(getIndexDataDirectory());
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
 			PrintStream ps = new PrintStream(baos);
 
 			// Retrieve the status collecting all informations in a string
-			Status status = null;
-			ci.setInfoStream(ps);
-			try {
-				status = ci.checkIndex();
-			} catch (Exception e) {
-				ps.println("ERROR: caught exception, giving up.\n\n");
-				log.error(e.getMessage());
-			}
+			Status status = retrieveStatus(ci, ps);
 
 			// Elaborate the status showing needed informations
 			if (status != null) {
@@ -264,21 +278,38 @@ public class StandardSearchEngine implements SearchEngine {
 					}
 				}
 
-				String content = "";
-				try {
-					content = baos.toString("UTF-8");
-				} catch (UnsupportedEncodingException e) {
-					// Nothing to do
-				}
+				String content = getContent(baos);
 
 				statMsg += "\n" + content;
 			}
 		} catch (Throwable t) {
 			log.error(t.getMessage());
 		}
-		
+
 		log.warn("Finished checking index");
 		return statMsg;
+	}
+
+	private Status retrieveStatus(CheckIndex ci, PrintStream ps) {
+		Status status = null;
+		ci.setInfoStream(ps);
+		try {
+			status = ci.checkIndex();
+		} catch (Exception e) {
+			ps.println("ERROR: caught exception, giving up.\n\n");
+			log.error(e.getMessage());
+		}
+		return status;
+	}
+
+	private String getContent(ByteArrayOutputStream baos) {
+		String content = "";
+		try {
+			content = baos.toString("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// Nothing to do
+		}
+		return content;
 	}
 
 	/*

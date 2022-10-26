@@ -62,6 +62,10 @@ import com.logicaldoc.util.sql.SqlUtil;
 @SuppressWarnings("unchecked")
 public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> implements FolderDAO {
 
+	private static final String PARENT_ID = "parentId";
+
+	private static final String AND2 = ") and ";
+
 	private static final String REPLICATE = "replicate";
 
 	private static final String AND_A_LD_GROUPID_IN = " AND A.ld_groupid in (";
@@ -76,7 +80,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String FROM_FOLDER = ") from Folder ";
 
-	private static final String PARENT_ID = ".parentId=";
+	private static final String PARENT_ID2 = ".parentId=";
 
 	private static final String WHERE_GROUP_GROUP_ID_IN = " where _group.groupId in (";
 
@@ -320,7 +324,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		if (user.isMemberOf(Group.GROUP_ADMIN))
 			return findByWhere(
-					ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY + PARENT_ID + parentId,
+					ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY + PARENT_ID2 + parentId,
 					" order by " + ALIAS_ENTITY + ".name ", null);
 		/*
 		 * Search for all those folders that defines its own security policies
@@ -343,11 +347,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query1.append(Long.toString(ug.getId()));
 			first = false;
 		}
-		query1.append(") and " + ALIAS_ENTITY + ".parentId = :parentId and " + ALIAS_ENTITY + ".id != " + ALIAS_ENTITY
+		query1.append(AND2 + ALIAS_ENTITY + ".parentId = :parentId and " + ALIAS_ENTITY + ".id != " + ALIAS_ENTITY
 				+ ".parentId");
 
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("parentId", parentId);
+		params.put(PARENT_ID, parentId);
 		coll = (List<Folder>) findByQuery(query1.toString(), params, null);
 
 		/*
@@ -371,7 +375,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 		query2.append("))");
 
-		params.put("parentId", parentId);
+		params.put(PARENT_ID, parentId);
 		List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), params, null);
 		for (Folder folder : coll2) {
 			if (!coll.contains(folder))
@@ -392,7 +396,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		try {
 			Folder parent = findFolder(parentId);
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("parentId", parent.getId());
+			params.put(PARENT_ID, parent.getId());
 			return findByWhere(
 					ALIAS_ENTITY + ".parentId = :parentId and " + ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId",
 					params, "order by " + ALIAS_ENTITY + ".name", max);
@@ -434,7 +438,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				query1.append(Long.toString(ug.getId()));
 				first = false;
 			}
-			query1.append(") and " + ALIAS_ENTITY + PARENT_ID + parent.getId());
+			query1.append(AND2 + ALIAS_ENTITY + PARENT_ID2 + parent.getId());
 			query1.append(" and not(" + ALIAS_ENTITY + ".id=" + parent.getId() + ")");
 
 			coll = (List<Folder>) findByQuery(query1.toString(), (Map<String, Object>) null, null);
@@ -443,8 +447,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * Now search for all other folders that references accessible
 			 * folders
 			 */
-			StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
-					+ " where " + ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
+			StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY + " where "
+					+ ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
 			query2.append(AND + ALIAS_ENTITY + ".securityRef in (");
 			query2.append("    select distinct(B.id) from Folder B ");
 			query2.append(" left join B.folderGroups as _group");
@@ -463,7 +467,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query2.append(" and not(" + ALIAS_ENTITY + ".id=" + parent.getId() + ")");
 
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("parentId", parent.getId());
+			params.put(PARENT_ID, parent.getId());
 			List<Folder> coll2 = (List<Folder>) findByQuery(query2.toString(), params, null);
 			for (Folder folder : coll2) {
 				if (!coll.contains(folder))
@@ -553,12 +557,11 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (userGroups.isEmpty())
 				return false;
 
-			StringBuilder query = new StringBuilder(
-					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
+			StringBuilder query = new StringBuilder(SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
 			query.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group ");
 			query.append(WHERE_GROUP_GROUP_ID_IN);
 			query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
-			query.append(") and " + ALIAS_ENTITY + ".id = :id");
+			query.append(AND2 + ALIAS_ENTITY + ".id = :id");
 
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("id", Long.valueOf(id));
@@ -606,8 +609,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			/*
 			 * Search for folders that define its own security policies
 			 */
-			StringBuilder query = new StringBuilder(
-					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
+			StringBuilder query = new StringBuilder(SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
 			query.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group ");
 			query.append(" where " + ALIAS_ENTITY + ".deleted=0 and _group.groupId =" + groupId);
 
@@ -650,7 +652,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			User user = geExistingtUser(userId);
 
 			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return findIdsByWhere(ALIAS_ENTITY + PARENT_ID + parentId, null, null);
+				return findIdsByWhere(ALIAS_ENTITY + PARENT_ID2 + parentId, null, null);
 
 			StringBuilder query1 = new StringBuilder();
 			Set<Group> precoll = user.getGroups();
@@ -1959,9 +1961,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		long rootId = root.getId();
 
 		try {
-			return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + ") and " + ALIAS_ENTITY + PARENT_ID
-					+ rootId + AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE + AND + ALIAS_ENTITY
-					+ ".tenantId=" + tenantId, "order by lower(" + ALIAS_ENTITY + ".name)", null);
+			return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + AND2 + ALIAS_ENTITY + PARENT_ID2 + rootId
+					+ AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE + AND + ALIAS_ENTITY + ".tenantId="
+					+ tenantId, "order by lower(" + ALIAS_ENTITY + ".name)", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Folder>();

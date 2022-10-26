@@ -149,29 +149,12 @@ public class FolderSearch extends Search {
 		 * the TOP operator is OR we have to use just one join to avoid high
 		 * load on the database.
 		 */
-		int counter = 0;
-		if (((FolderSearchOptions) options).getCriteria() != null)
-			for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
-				if (criterion.isExtendedAttribute()) {
-					if (!criterion.isEmpty()) {
-						counter++;
-						query.append(", ld_folder_ext C" + counter);
-						if ("or".equals(options.getTopOperator()))
-							break;
-					}
-				}
-			}
+		prepareExtendedAttributesJoins(query);
 
 		query.append(" where A.ld_deleted=0 and A.ld_hidden=0 ");
 		query.append(" and " + (searchAliases ? "" : "not") + " A.ld_type=" + Folder.TYPE_ALIAS);
 
-		long tenantId = Tenant.DEFAULT_ID;
-		if (options.getTenantId() != null)
-			tenantId = options.getTenantId().longValue();
-		else if (searchUser != null)
-			tenantId = searchUser.getTenantId();
-
-		query.append(" and A.ld_tenantid=" + tenantId);
+		setTenantCondition(query);
 
 		if (options.getTemplate() != null)
 			query.append(" and " + tableAlias + ".ld_templateid=" + options.getTemplate());
@@ -187,20 +170,7 @@ public class FolderSearch extends Search {
 				query.append(tableAlias + ".ld_parentid = " + fOptions.getFolderId());
 		}
 
-		String composition = null;
-		if ("not".equals(options.getTopOperator())) {
-			composition = "and not";
-		} else {
-			composition = options.getTopOperator();
-		}
-
-		/*
-		 * If a top operator was specified, it will overwrite all criteria
-		 * operators
-		 */
-		if (composition != null && fOptions.getCriteria() != null)
-			for (FolderCriterion criterion : fOptions.getCriteria())
-				criterion.setComposition(composition);
+		setComposition(fOptions);
 
 		if (searchAliases)
 			query.append(" and A.ld_foldref is not null and REF.ld_deleted=0 and A.ld_foldref = REF.ld_id ");
@@ -209,7 +179,7 @@ public class FolderSearch extends Search {
 
 		// Now add all criteria
 		boolean first = true;
-		counter = 0;
+		int joinsCounter = 0;
 
 		if (options != null && fOptions.getCriteria() != null)
 			for (FolderCriterion criterion : fOptions.getCriteria()) {
@@ -229,15 +199,15 @@ public class FolderSearch extends Search {
 				if (criterion.isExtendedAttribute()) {
 					// In case of OR top operator we only have a single join
 					// with extended attributes
-					if (!"or".equals(options.getTopOperator()) || counter == 0)
-						counter++;
-					query.append("(C" + counter + ".ld_folderid=" + tableAlias + ".ld_id");
-					query.append(" and (C" + counter + ".ld_name='");
+					if (!"or".equals(options.getTopOperator()) || joinsCounter == 0)
+						joinsCounter++;
+					query.append("(C" + joinsCounter + ".ld_folderid=" + tableAlias + ".ld_id");
+					query.append(" and (C" + joinsCounter + ".ld_name='");
 					query.append(criterion.getFieldName());
-					query.append("' or C" + counter + ".ld_name like '");
+					query.append("' or C" + joinsCounter + ".ld_name like '");
 					query.append(criterion.getFieldName());
 					query.append("-%') and ");
-					columnName = "C" + counter + ".";
+					columnName = "C" + joinsCounter + ".";
 					switch (criterion.getType()) {
 					case Attribute.TYPE_INT:
 					case Attribute.TYPE_USER:
@@ -264,154 +234,7 @@ public class FolderSearch extends Search {
 						columnName = tableAlias + "." + columnName;
 				}
 
-				switch (criterion.getType()) {
-				case Attribute.TYPE_INT:
-					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is null ");
-					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is not null ");
-					} else {
-						params.add(criterion.getLongValue());
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append(columnName + " = ?");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not " + columnName + " = ?)");
-						else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-							query.append(columnName + " > ?");
-						else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-							query.append(columnName + " < ?");
-					}
-					break;
-				case Attribute.TYPE_FOLDER:
-				case Attribute.TYPE_USER:
-					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is null ");
-					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is not null ");
-					} else {
-						params.add(criterion.getLongValue());
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append(columnName + " = ?");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not " + columnName + " = ?)");
-					}
-					break;
-				case Attribute.TYPE_BOOLEAN:
-					if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator())) {
-						params.add(criterion.getLongValue());
-						query.append(columnName + " = ?");
-					} else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is null ");
-					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is not null ");
-					}
-					break;
-				case Attribute.TYPE_DOUBLE:
-					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is null ");
-					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is not null ");
-					} else {
-						params.add(criterion.getDoubleValue());
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append(columnName + " = ?");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not " + columnName + " = ?)");
-						else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-							query.append(columnName + " > ?");
-						else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-							query.append(columnName + " < ?");
-					}
-					break;
-				case Attribute.TYPE_DATE:
-					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is null ");
-					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is not null ");
-					} else {
-						params.add(criterion.getSqlDateValue());
-						if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
-							query.append(columnName + " > ?");
-						else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
-							query.append(columnName + " < ?");
-					}
-					break;
-				case FolderCriterion.TYPE_TEMPLATE:
-					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is null ");
-					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is not null ");
-					} else {
-						params.add(criterion.getLongValue());
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append(columnName + " = ?");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not " + columnName + " = ?)");
-					}
-					break;
-				case FolderCriterion.TYPE_LANGUAGE:
-					if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is null ");
-					} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
-						query.append(columnName + " is not null ");
-					} else {
-						String val2 = criterion.getStringValue();
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append(columnName + " = '" + val2 + "'");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not " + columnName + " = '" + val2 + "')");
-					}
-					break;
-				case FolderCriterion.TYPE_FOLDER:
-					if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
-						String path = dao.computePath(criterion.getLongValue());
-						query.append(tableAlias + ".ld_path like '" + path + "/%'");
-					} else
-						query.append(columnName + " = " + criterion.getLongValue());
-					break;
-				default:
-					if (options.isCaseSensitive()) {
-						String val = SqlUtil.doubleQuotes(criterion.getStringValue());
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append(columnName + " = '" + val + "'");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not " + columnName + " = '" + val + "')");
-						else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
-							query.append(columnName + " like '%" + val + "%'");
-						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
-							query.append(
-									" (" + columnName + " is null or not (" + columnName + " like '%" + val + "%'))");
-						else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
-							query.append(columnName + " like '" + val + "%'");
-						else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
-							query.append(columnName + " like '%" + val + "'");
-						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
-							query.append(columnName + " is null ");
-						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
-							query.append(columnName + " is not null ");
-					} else {
-						String val = SqlUtil.doubleQuotes(criterion.getStringValue().toLowerCase());
-						if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
-							query.append("lower(" + columnName + ") = '" + val + "'");
-						else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
-							query.append("(not lower(" + columnName + ") = '" + val + "')");
-						else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
-							query.append("lower(" + columnName + ") like '%" + val + "%'");
-						else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
-							query.append(" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val
-									+ "%')");
-						else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
-							query.append("lower(" + columnName + ") like '" + val + "%'");
-						else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
-							query.append("lower(" + columnName + ") like  '%" + val + "'");
-						else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
-							query.append(columnName + " is null ");
-						else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
-							query.append(columnName + " is not null ");
-						break;
-					}
-					break;
-				}
+				appendAttributeCriterionColumnCondition(query, tableAlias, columnName, criterion, params);
 
 				if (criterion.isExtendedAttribute())
 					query.append(")");
@@ -433,31 +256,270 @@ public class FolderSearch extends Search {
 		}
 	}
 
-	private Collection<Long> findAccessibleFolderIds(User user) throws PersistenceException {
-		Collection<Long> ids = new HashSet<Long>();
-		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
+	private void appendAttributeCriterionColumnCondition(StringBuilder query, String tableAlias, String columnName,
+			FolderCriterion criterion, ArrayList<Serializable> params) throws PersistenceException {
+		switch (criterion.getType()) {
+		case Attribute.TYPE_INT:
+			appendIntegerCriterion(query, columnName, criterion, params);
+			break;
+		case Attribute.TYPE_FOLDER:
+		case Attribute.TYPE_USER:
+		case FolderCriterion.TYPE_TEMPLATE:
+			appendFolderOrUserOrTemplateCriterion(query, columnName, criterion, params);
+			break;
+		case Attribute.TYPE_BOOLEAN:
+			appendBooleanCriterion(query, columnName, criterion, params);
+			break;
+		case Attribute.TYPE_DOUBLE:
+			appendDoubleCriterion(query, columnName, criterion, params);
+			break;
+		case Attribute.TYPE_DATE:
+			appendDateCriterion(query, columnName, criterion, params);
+			break;
+		case FolderCriterion.TYPE_LANGUAGE:
+			appendLanguageCriterion(query, columnName, criterion);
+			break;
+		case FolderCriterion.TYPE_FOLDER:
+			appendFolderCriterion(query, tableAlias, columnName, criterion);
+			break;
+		default:
+			if (options.isCaseSensitive()) {
+				appendStringCriterionCaseSensitive(query, columnName, criterion);
+			} else {
+				appendStringCriterionCaseInsensitive(query, columnName, criterion);
+			}
+			break;
+		}
+	}
 
-		// Check if there is a folder specification in the criteria
+	private void appendStringCriterionCaseInsensitive(StringBuilder query, String columnName,
+			FolderCriterion criterion) {
+		String val = SqlUtil.doubleQuotes(criterion.getStringValue().toLowerCase());
+		if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+			query.append("lower(" + columnName + ") = '" + val + "'");
+		else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+			query.append("(not lower(" + columnName + ") = '" + val + "')");
+		else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
+			query.append("lower(" + columnName + ") like '%" + val + "%'");
+		else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
+			query.append(
+					" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val + "%')");
+		else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
+			query.append("lower(" + columnName + ") like '" + val + "%'");
+		else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
+			query.append("lower(" + columnName + ") like  '%" + val + "'");
+		else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
+			query.append(columnName + " is null ");
+		else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
+			query.append(columnName + " is not null ");
+	}
+
+	private void appendStringCriterionCaseSensitive(StringBuilder query, String columnName, FolderCriterion criterion) {
+		String val = SqlUtil.doubleQuotes(criterion.getStringValue());
+		if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+			query.append(columnName + " = '" + val + "'");
+		else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+			query.append("(not " + columnName + " = '" + val + "')");
+		else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
+			query.append(columnName + " like '%" + val + "%'");
+		else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
+			query.append(" (" + columnName + " is null or not (" + columnName + " like '%" + val + "%'))");
+		else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
+			query.append(columnName + " like '" + val + "%'");
+		else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
+			query.append(columnName + " like '%" + val + "'");
+		else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator()))
+			query.append(columnName + " is null ");
+		else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator()))
+			query.append(columnName + " is not null ");
+	}
+
+	private void appendFolderCriterion(StringBuilder query, String tableAlias, String columnName,
+			FolderCriterion criterion) throws PersistenceException {
+		if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
+			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			String path = dao.computePath(criterion.getLongValue());
+			query.append(tableAlias + ".ld_path like '" + path + "/%'");
+		} else
+			query.append(columnName + " = " + criterion.getLongValue());
+	}
+
+	private void appendLanguageCriterion(StringBuilder query, String columnName, FolderCriterion criterion) {
+		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is null ");
+		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is not null ");
+		} else {
+			String val2 = criterion.getStringValue();
+			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+				query.append(columnName + " = '" + val2 + "'");
+			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+				query.append("(not " + columnName + " = '" + val2 + "')");
+		}
+	}
+
+	private void appendDateCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
+			ArrayList<Serializable> params) {
+		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is null ");
+		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is not null ");
+		} else {
+			params.add(criterion.getSqlDateValue());
+			if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
+				query.append(columnName + " > ?");
+			else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
+				query.append(columnName + " < ?");
+		}
+	}
+
+	private void appendDoubleCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
+			ArrayList<Serializable> params) {
+		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is null ");
+		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is not null ");
+		} else {
+			params.add(criterion.getDoubleValue());
+			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+				query.append(columnName + " = ?");
+			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+				query.append("(not " + columnName + " = ?)");
+			else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
+				query.append(columnName + " > ?");
+			else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
+				query.append(columnName + " < ?");
+		}
+	}
+
+	private void appendBooleanCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
+			ArrayList<Serializable> params) {
+		if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator())) {
+			params.add(criterion.getLongValue());
+			query.append(columnName + " = ?");
+		} else if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is null ");
+		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is not null ");
+		}
+	}
+
+	private void appendFolderOrUserOrTemplateCriterion(StringBuilder query, String columnName,
+			FolderCriterion criterion, ArrayList<Serializable> params) {
+		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is null ");
+		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is not null ");
+		} else {
+			params.add(criterion.getLongValue());
+			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+				query.append(columnName + " = ?");
+			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+				query.append("(not " + columnName + " = ?)");
+		}
+	}
+
+	private void appendIntegerCriterion(StringBuilder query, String columnName, FolderCriterion criterion,
+			ArrayList<Serializable> params) {
+		if (FolderCriterion.OPERATOR_NULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is null ");
+		} else if (FolderCriterion.OPERATOR_NOTNULL.equals(criterion.getOperator())) {
+			query.append(columnName + " is not null ");
+		} else {
+			params.add(criterion.getLongValue());
+			if (FolderCriterion.OPERATOR_EQUALS.equals(criterion.getOperator()))
+				query.append(columnName + " = ?");
+			else if (FolderCriterion.OPERATOR_NOTEQUAL.equals(criterion.getOperator()))
+				query.append("(not " + columnName + " = ?)");
+			else if (FolderCriterion.OPERATOR_GREATER.equals(criterion.getOperator()))
+				query.append(columnName + " > ?");
+			else if (FolderCriterion.OPERATOR_LESSER.equals(criterion.getOperator()))
+				query.append(columnName + " < ?");
+		}
+	}
+
+	private void setComposition(FolderSearchOptions fOptions) {
+		String composition = null;
+		if ("not".equals(options.getTopOperator())) {
+			composition = "and not";
+		} else {
+			composition = options.getTopOperator();
+		}
+
+		/*
+		 * If a top operator was specified, it will overwrite all criteria
+		 * operators
+		 */
+		if (composition != null && fOptions.getCriteria() != null)
+			for (FolderCriterion criterion : fOptions.getCriteria())
+				criterion.setComposition(composition);
+	}
+
+	private void setTenantCondition(StringBuilder query) {
+		long tenantId = Tenant.DEFAULT_ID;
+		if (options.getTenantId() != null)
+			tenantId = options.getTenantId().longValue();
+		else if (searchUser != null)
+			tenantId = searchUser.getTenantId();
+		query.append(" and A.ld_tenantid=" + tenantId);
+	}
+
+	/**
+	 * Prepares the joins for the extended attributes. If the TOP condition is
+	 * AND we have to do multiple joins(one per criteria), otherwise if the TOP
+	 * operator is OR we have to use just one join to avoid high load on the
+	 * database.
+	 * 
+	 * @param query the current query
+	 */
+	private void prepareExtendedAttributesJoins(StringBuilder query) {
+		int counter = 0;
 		if (((FolderSearchOptions) options).getCriteria() != null)
 			for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
-				if (criterion.getType() == FolderCriterion.TYPE_FOLDER) {
+				if (criterion.isExtendedAttribute()) {
 					if (!criterion.isEmpty()) {
-						if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
-							ids.addAll(folderDAO.findFolderIdByUserIdInPath(user.getId(), criterion.getLongValue()));
-						} else if (folderDAO.isReadEnabled(criterion.getLongValue(), user.getId())) {
-							ids.add(criterion.getLongValue());
-						}
+						counter++;
+						query.append(", ld_folder_ext C" + counter);
+						if ("or".equals(options.getTopOperator()))
+							break;
 					}
 				}
 			}
+	}
+
+	private Collection<Long> findAccessibleFolderIds(User user) throws PersistenceException {
+
+		// Check if there are folder specifications in the criteria and use them
+		Collection<Long> ids = new HashSet<>();
+		if (((FolderSearchOptions) options).getCriteria() != null)
+			ids = retrieveAccessibleFolderIdsFromFolderCriterions(user);
 
 		/*
 		 * In case of normal user and without a folder criterion, we have to
 		 * collect all accessible folders.
 		 */
-		if (!user.isMemberOf(Group.GROUP_ADMIN))
+		if (ids.isEmpty() && !user.isMemberOf(Group.GROUP_ADMIN)) {
+			FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			ids = folderDAO.findFolderIdByUserIdInPath(options.getUserId(), null);
+		}
 
+		return ids;
+	}
+
+	private Collection<Long> retrieveAccessibleFolderIdsFromFolderCriterions(User user) throws PersistenceException {
+		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		Collection<Long> ids = new HashSet<>();
+		for (FolderCriterion criterion : ((FolderSearchOptions) options).getCriteria()) {
+			if (criterion.getType() == FolderCriterion.TYPE_FOLDER) {
+				if (!criterion.isEmpty()) {
+					if (FolderCriterion.OPERATOR_INORSUBFOLDERS.equals(criterion.getOperator())) {
+						ids.addAll(folderDAO.findFolderIdByUserIdInPath(user.getId(), criterion.getLongValue()));
+					} else if (folderDAO.isReadEnabled(criterion.getLongValue(), user.getId())) {
+						ids.add(criterion.getLongValue());
+					}
+				}
+			}
+		}
 		return ids;
 	}
 

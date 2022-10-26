@@ -231,15 +231,15 @@ public class Session implements DocumentObserver {
 	}
 
 	public int getConfigAsInt(String name) {
-		return Integer.parseInt(getConfig(name));
+		return Integer.parseInt(getConfig(name) != null ? getConfig(name) : "0");
 	}
 
 	public long getConfigAsLong(String name) {
-		return Long.parseLong(getConfig(name));
+		return Long.parseLong(getConfig(name) != null ? getConfig(name) : "0");
 	}
 
 	public boolean getConfigAsBoolean(String name) {
-		return Boolean.parseBoolean(getConfig(name));
+		return Boolean.parseBoolean(getConfig(name) != null ? getConfig(name) : "0");
 	}
 
 	public boolean getTenantConfigAsBoolean(String name) {
