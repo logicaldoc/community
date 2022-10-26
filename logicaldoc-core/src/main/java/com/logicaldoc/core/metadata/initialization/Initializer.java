@@ -51,16 +51,7 @@ public class Initializer {
 		if (object.getDeleted() != 0 || template == null)
 			return;
 
-		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
-		if (user == null && transaction != null && transaction.getUserId() != null) {
-			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-			try {
-				user = uDao.findById(transaction.getUserId());
-				transaction.setUser(user);
-			} catch (PersistenceException e) {
-				log.warn(e.getMessage());
-			}
-		}
+		setUser(transaction);
 
 		try {
 			TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
@@ -73,15 +64,7 @@ public class Initializer {
 						if (attribute.getValue() == null
 								&& StringUtils.isNotEmpty(templateAttribute.getInitialization())) {
 
-							Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
-							fieldValidationDictionary.put("object", object);
-							fieldValidationDictionary.put("event", transaction);
-							fieldValidationDictionary.put("attributeName", attributeName);
-							fieldValidationDictionary.put("attribute", attribute);
-
-							Automation script = new Automation("initializer-" + attributeName,
-									user != null ? user.getLocale() : Locale.getDefault(), object.getTenantId());
-							script.evaluate(templateAttribute.getInitialization(), fieldValidationDictionary);
+							executeInitialization(object, transaction, attributeName, attribute, templateAttribute);
 						}
 				} catch (Throwable e) {
 					log.error(e.getMessage(), e);
@@ -89,6 +72,32 @@ public class Initializer {
 			}
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
+		}
+	}
+
+	private void executeInitialization(ExtensibleObject object, History transaction, String attributeName,
+			Attribute attribute, Attribute templateAttribute) {
+		Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
+		fieldValidationDictionary.put("object", object);
+		fieldValidationDictionary.put("event", transaction);
+		fieldValidationDictionary.put("attributeName", attributeName);
+		fieldValidationDictionary.put("attribute", attribute);
+
+		Automation script = new Automation("initializer-" + attributeName,
+				transaction!=null && transaction.getUser() != null ? transaction.getUser().getLocale() : Locale.getDefault(), object.getTenantId());
+		script.evaluate(templateAttribute.getInitialization(), fieldValidationDictionary);
+	}
+
+	private void setUser(History transaction) {
+		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
+		if (user == null && transaction != null && transaction.getUserId() != null) {
+			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			try {
+				user = uDao.findById(transaction.getUserId());
+				transaction.setUser(user);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage());
+			}
 		}
 	}
 }

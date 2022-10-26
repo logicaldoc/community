@@ -56,54 +56,67 @@ public abstract class AbstractParser implements Parser {
 		log.debug("Parse started");
 		StringBuilder content = new StringBuilder();
 
-		Locale lcl = locale != null ? locale : Locale.ENGLISH;
-		String tnt = locale != null ? tenant : Tenant.DEFAULT_NAME;
+		Locale lcl = getLocale(locale);
+		String tnt = getTenant(locale, tenant);
 
-		long timeout = 0;
-
-		try {
-			timeout = Context.get().getProperties().getInt(tenant + ".parser.timeout", 120);
-		} catch (Throwable e) {
-			log.warn(e.getMessage());
-		}
-
-		if (timeout <= 0)
-			try {
-				internalParse(input, filename, encoding, lcl, tnt, document, fileVersion, content);
-			} catch (Exception e) {
-				if (e instanceof ParseException)
-					throw (ParseException) e;
-				else
-					throw new ParseException(e);
-			}
-		else {
-			// Invoke in a separate thread
-			ExecutorService executor = Executors.newSingleThreadExecutor();
-			try {
-				String ret = null;
-				try {
-					ret = executor.invokeAll(Arrays.asList(
-							new InternalParseTask(input, filename, encoding, lcl, tnt, document, fileVersion, content)),
-							timeout, TimeUnit.SECONDS).get(0).get();
-				} catch (InterruptedException ie) {
-					log.warn("Interrupted parse");
-					Thread.currentThread().interrupt();
-				} catch (Throwable e) {
-					log.warn(e.getMessage(), e);
-					if (e instanceof ParseException)
-						throw (ParseException) e;
-				}
-				if (!"completed".equals(ret))
-					throw new ParseException(ret);
-
-			} finally {
-				if (executor != null)
-					executor.shutdownNow();
-			}
+		long timeout = Context.get().getProperties().getInt(tenant + ".parser.timeout", 120);
+		
+		if (timeout <= 0) {
+			parseInCurrentThread(input, filename, encoding, document, fileVersion, content, lcl, tnt);
+		} else {
+			parseInNewThread(input, filename, encoding, document, fileVersion, content, lcl, tnt, timeout);
 		}
 
 		log.debug("Parse Finished");
 		return content.toString();
+	}
+
+	private void parseInNewThread(final InputStream input, String filename, String encoding, Document document,
+			String fileVersion, StringBuilder content, Locale locale, String tenant, long timeout) throws ParseException {
+		// Invoke in a separate thread
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		try {
+			String ret = null;
+			try {
+				ret = executor.invokeAll(Arrays.asList(
+						new InternalParseTask(input, filename, encoding, locale, tenant, document, fileVersion, content)),
+						timeout, TimeUnit.SECONDS).get(0).get();
+			} catch (InterruptedException ie) {
+				log.warn("Interrupted parse");
+				Thread.currentThread().interrupt();
+			} catch (Throwable e) {
+				log.warn(e.getMessage(), e);
+				if (e instanceof ParseException)
+					throw (ParseException) e;
+			}
+			if (!"completed".equals(ret))
+				throw new ParseException(ret);
+		} finally {
+			if (executor != null)
+				executor.shutdownNow();
+		}
+	}
+
+	private void parseInCurrentThread(final InputStream input, String filename, String encoding, Document document,
+			String fileVersion, StringBuilder content, Locale locale, String tenant) throws ParseException {
+		try {
+			internalParse(input, filename, encoding, locale, tenant, document, fileVersion, content);
+		} catch (Exception e) {
+			if (e instanceof ParseException)
+				throw (ParseException) e;
+			else
+				throw new ParseException(e);
+		}
+	}
+
+	private String getTenant(Locale locale, String tenant) {
+		String tnt = locale != null ? tenant : Tenant.DEFAULT_NAME;
+		return tnt;
+	}
+
+	private Locale getLocale(Locale locale) {
+		Locale lcl = locale != null ? locale : Locale.ENGLISH;
+		return lcl;
 	}
 
 	/**

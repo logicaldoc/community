@@ -11,12 +11,14 @@ import com.smartgwt.client.types.Alignment;
  */
 public class VersionListGridField extends ColoredListGridField {
 
+	private static final String VERSION = "version";
+
 	public VersionListGridField() {
-		this("version", "version");
+		this(VERSION, VERSION);
 	}
 
 	public VersionListGridField(String name) {
-		this(name, "version");
+		this(name, VERSION);
 	}
 
 	public VersionListGridField(String name, String title) {

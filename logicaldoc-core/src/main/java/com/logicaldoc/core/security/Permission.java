@@ -1,7 +1,9 @@
 package com.logicaldoc.core.security;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,48 +48,31 @@ public enum Permission {
 
 	private Permission(String name) {
 		this.name = name;
-		if ("read".equals(name))
-			mask = Integer.parseInt("000000000000000000001", 2);
-		if ("write".equals(name))
-			mask = Integer.parseInt("000000000000000000010", 2);
-		if ("add".equals(name))
-			mask = Integer.parseInt("000000000000000000100", 2);
-		if ("security".equals(name))
-			mask = Integer.parseInt("000000000000000001000", 2);
-		if ("immutable".equals(name))
-			mask = Integer.parseInt("000000000000000010000", 2);
-		if ("delete".equals(name))
-			mask = Integer.parseInt("000000000000000100000", 2);
-		if ("rename".equals(name))
-			mask = Integer.parseInt("000000000000001000000", 2);
-		if ("import".equals(name))
-			mask = Integer.parseInt("000000000000010000000", 2);
-		if ("export".equals(name))
-			mask = Integer.parseInt("000000000000100000000", 2);
-		if ("sign".equals(name))
-			mask = Integer.parseInt("000000000001000000000", 2);
-		if ("archive".equals(name))
-			mask = Integer.parseInt("000000000010000000000", 2);
-		if ("workflow".equals(name))
-			mask = Integer.parseInt("000000000100000000000", 2);
-		if ("download".equals(name))
-			mask = Integer.parseInt("000000001000000000000", 2);
-		if ("calendar".equals(name))
-			mask = Integer.parseInt("000000010000000000000", 2);
-		if ("subscription".equals(name))
-			mask = Integer.parseInt("000000100000000000000", 2);
-		if ("print".equals(name))
-			mask = Integer.parseInt("000001000000000000000", 2);
-		if ("password".equals(name))
-			mask = Integer.parseInt("000010000000000000000", 2);
-		if ("move".equals(name))
-			mask = Integer.parseInt("000100000000000000000", 2);
-		if ("email".equals(name))
-			mask = Integer.parseInt("001000000000000000000", 2);
-		if ("automation".equals(name))
-			mask = Integer.parseInt("010000000000000000000", 2);
-		if ("storage".equals(name))
-			mask = Integer.parseInt("100000000000000000000", 2);
+
+		Map<String, String> masks = new HashMap<>();
+		masks.put("read", "000000000000000000001");
+		masks.put("write", "000000000000000000010");
+		masks.put("add", "000000000000000000100");
+		masks.put("security", "000000000000000001000");
+		masks.put("immutable", "000000000000000010000");
+		masks.put("delete", "000000000000000100000");
+		masks.put("rename", "000000000000001000000");
+		masks.put("import", "000000000000010000000");
+		masks.put("export", "000000000000100000000");
+		masks.put("sign", "000000000001000000000");
+		masks.put("archive", "000000000010000000000");
+		masks.put("workflow", "000000000100000000000");
+		masks.put("download", "000000001000000000000");
+		masks.put("calendar", "000000010000000000000");
+		masks.put("subscription", "000000100000000000000");
+		masks.put("print", "000001000000000000000");
+		masks.put("password", "000010000000000000000");
+		masks.put("move", "000100000000000000000");
+		masks.put("email", "001000000000000000000");
+		masks.put("automation", "010000000000000000000");
+		masks.put("storage", "100000000000000000000");
+
+		this.mask = Integer.parseInt(masks.get(name), 2);
 	}
 
 	public String getName() {

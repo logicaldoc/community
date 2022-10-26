@@ -108,14 +108,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 			return;
 
 		// Enforce the set specifications in all the attributes
-		for (Attribute att : set.getAttributes().values()) {
-			att.setSetId(set.getId());
-		}
-		super.store(set);
-		for (Attribute att : set.getAttributes().values())
-			att.setSetId(set.getId());
-		super.store(set);
-		optionsDao.deleteOrphaned(set.getId(), set.getAttributeNames());
+		enforceSetSpecInAllAttributes(set);
 
 		/*
 		 * Update the attributes referenced in the templates
@@ -126,30 +119,45 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 			List<String> names = template.getAttributeNames(set.getId());
 			for (String name : names) {
 				Attribute setAttribute = set.getAttribute(name);
-				if (setAttribute != null) {
-					// the attribute exists both in template and set so update
-					// it but preserve the position and the validation(if any)
-					// declared in the template
-					Attribute templateAttribute = template.getAttribute(name);
-					int currentPosition = templateAttribute.getPosition();
-					String currentValidation = templateAttribute.getValidation();
-					String currentInitialization = templateAttribute.getInitialization();
-
-					Attribute clonedAttribute = new Attribute(setAttribute);
-					clonedAttribute.setPosition(currentPosition);
-					if (StringUtils.isNotEmpty(currentValidation))
-						clonedAttribute.setValidation(currentValidation);
-					if (StringUtils.isNotEmpty(currentInitialization))
-						clonedAttribute.setInitialization(currentInitialization);
-					template.getAttributes().put(name, clonedAttribute);
-				} else {
-					// the attribute exists in template but not in the set so
-					// remove it
-					template.removeAttribute(name);
-				}
+				replicateAttributeToTemplate(name, setAttribute, template);
 			}
 			templateDao.store(template);
 		}
+	}
+
+	private void replicateAttributeToTemplate(String name, Attribute attribute, Template template) {
+		if (attribute != null) {
+			// the attribute exists both in template and set so update
+			// it but preserve the position and the validation(if any)
+			// declared in the template
+			Attribute templateAttribute = template.getAttribute(name);
+			int currentPosition = templateAttribute.getPosition();
+			String currentValidation = templateAttribute.getValidation();
+			String currentInitialization = templateAttribute.getInitialization();
+
+			Attribute clonedAttribute = new Attribute(attribute);
+			clonedAttribute.setPosition(currentPosition);
+			if (StringUtils.isNotEmpty(currentValidation))
+				clonedAttribute.setValidation(currentValidation);
+			if (StringUtils.isNotEmpty(currentInitialization))
+				clonedAttribute.setInitialization(currentInitialization);
+			template.getAttributes().put(name, clonedAttribute);
+		} else {
+			// the attribute exists in template but not in the set so
+			// remove it
+			template.removeAttribute(name);
+		}
+	}
+
+	private void enforceSetSpecInAllAttributes(AttributeSet set) throws PersistenceException {
+		for (Attribute att : set.getAttributes().values()) {
+			att.setSetId(set.getId());
+		}
+		super.store(set);
+		for (Attribute att : set.getAttributes().values())
+			att.setSetId(set.getId());
+		super.store(set);
+		optionsDao.deleteOrphaned(set.getId(), set.getAttributeNames());
 	}
 
 	public void setTemplateDao(TemplateDAO templateDao) {

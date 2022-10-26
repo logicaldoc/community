@@ -39,6 +39,8 @@ import com.maxmind.geoip2.model.CityResponse;
  */
 public class Geolocation {
 
+	private static final String GEOLOCATION = "geolocation";
+
 	private static Logger log = LoggerFactory.getLogger(Geolocation.class);
 
 	private String countryCode;
@@ -56,7 +58,7 @@ public class Geolocation {
 	private DatabaseReader dbReader;
 
 	private Geolocation() {
-
+		// Empty constructor
 	}
 
 	/**
@@ -163,7 +165,7 @@ public class Geolocation {
 				if (result != HttpStatus.SC_OK)
 					throw new IOException("HTTP error " + result);
 
-				gzFile = File.createTempFile("geolocation", ".tar.gz");
+				gzFile = File.createTempFile(GEOLOCATION, ".tar.gz");
 
 				try (InputStream in = HttpUtil.getBodyStream(response);
 						FileOutputStream fos = new FileOutputStream(gzFile);
@@ -181,7 +183,7 @@ public class Geolocation {
 			/*
 			 * Prepare a temporary folder and hunzip the downloaded file in it
 			 */
-			tmpDir = File.createTempFile("geolocation", null);
+			tmpDir = File.createTempFile(GEOLOCATION, null);
 			FileUtil.strongDelete(tmpDir);
 			tmpDir.mkdir();
 			new ZipUtil().unGZipUnTar(gzFile, tmpDir);
@@ -283,7 +285,7 @@ public class Geolocation {
 	}
 
 	private static File getDatabaseFile() {
-		File folder = PluginRegistry.getPluginResource("logicaldoc-core", "geolocation");
+		File folder = PluginRegistry.getPluginResource("logicaldoc-core", GEOLOCATION);
 		return new File(folder, "geolocation.db");
 	}
 

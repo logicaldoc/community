@@ -61,7 +61,8 @@ public class JobManager {
 	 * 
 	 * @throws SchedulerException error in the scheduler
 	 */
-	public void schedule(AbstractJob job, Map<String, Object> dictionary, Object... triggers) throws SchedulerException {
+	public void schedule(AbstractJob job, Map<String, Object> dictionary, Object... triggers)
+			throws SchedulerException {
 		Map<Object, Map<String, Object>> trgs = new HashMap<Object, Map<String, Object>>();
 		for (Object trigger : triggers) {
 			trgs.put(trigger, new HashMap<String, Object>());
@@ -96,46 +97,50 @@ public class JobManager {
 				.withDescription(job.getDescription() != null ? job.getDescription() : "")
 				.usingJobData(new JobDataMap(dictionary)).build();
 
-		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
 		Set<Trigger> trgs = new HashSet<Trigger>();
 		for (Object triggerSpec : triggers.keySet()) {
-			Trigger trig = null;
-
-			if (!triggers.get(triggerSpec).containsKey(TENANT_ID))
-				triggers.get(triggerSpec).put(TENANT_ID, job.getTenantId());
-
-			if (triggerSpec instanceof Date) {
-				// The job must be fired on a specific data
-
-				SimpleScheduleBuilder schedule = SimpleScheduleBuilder.simpleSchedule();
-				if (MISSFIRE_RUNNOW.equals(getMissfireInstruction(job.getGroup())))
-					schedule = schedule.withMisfireHandlingInstructionFireNow();
-				else
-					schedule = schedule.withMisfireHandlingInstructionIgnoreMisfires();
-
-				trig = TriggerBuilder.newTrigger()
-						.withIdentity(job.getName() + "-" + df.format(triggerSpec), job.getGroup())
-						.usingJobData(new JobDataMap(triggers.get(triggerSpec))).startAt((Date) triggerSpec)
-						.withSchedule(schedule).build();
-			} else if (triggerSpec instanceof String) {
-				// The job must be fired on a specific data
-				CronScheduleBuilder schedule = CronScheduleBuilder.cronSchedule((String) triggerSpec);
-				if (MISSFIRE_RUNNOW.equals(getMissfireInstruction(job.getGroup())))
-					schedule = schedule.withMisfireHandlingInstructionFireAndProceed();
-				else
-					schedule = schedule.withMisfireHandlingInstructionDoNothing();
-
-				trig = TriggerBuilder.newTrigger().withIdentity(job.getName() + "-" + triggerSpec, job.getGroup())
-						.usingJobData(new JobDataMap(triggers.get(triggerSpec))).withSchedule(schedule).build();
-			} else {
-				log.warn("Skipping trigger {} because not a string nor a date", triggerSpec);
-			}
-
-			if (trig != null)
-				trgs.add(trig);
+			Trigger trig = prepareTrigger(job, triggerSpec, triggers);
+			trgs.add(trig);
 		}
 
 		scheduler.scheduleJob(jobDetail, trgs, true);
+	}
+
+	private Trigger prepareTrigger(AbstractJob job, Object triggerSpec, Map<Object, Map<String, Object>> triggersMap) {
+		Trigger trig = null;
+
+		if (!triggersMap.get(triggerSpec).containsKey(TENANT_ID))
+			triggersMap.get(triggerSpec).put(TENANT_ID, job.getTenantId());
+
+		if (triggerSpec instanceof Date) {
+			// The job must be fired on a specific data
+
+			SimpleScheduleBuilder schedule = SimpleScheduleBuilder.simpleSchedule();
+			if (MISSFIRE_RUNNOW.equals(getMissfireInstruction(job.getGroup())))
+				schedule = schedule.withMisfireHandlingInstructionFireNow();
+			else
+				schedule = schedule.withMisfireHandlingInstructionIgnoreMisfires();
+
+			SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd_HHmmss");
+			trig = TriggerBuilder.newTrigger()
+					.withIdentity(job.getName() + "-" + df.format(triggerSpec), job.getGroup())
+					.usingJobData(new JobDataMap(triggersMap.get(triggerSpec))).startAt((Date) triggerSpec)
+					.withSchedule(schedule).build();
+		} else if (triggerSpec instanceof String) {
+			// The job must be fired on a specific data
+			CronScheduleBuilder schedule = CronScheduleBuilder.cronSchedule((String) triggerSpec);
+			if (MISSFIRE_RUNNOW.equals(getMissfireInstruction(job.getGroup())))
+				schedule = schedule.withMisfireHandlingInstructionFireAndProceed();
+			else
+				schedule = schedule.withMisfireHandlingInstructionDoNothing();
+
+			trig = TriggerBuilder.newTrigger().withIdentity(job.getName() + "-" + triggerSpec, job.getGroup())
+					.usingJobData(new JobDataMap(triggersMap.get(triggerSpec))).withSchedule(schedule).build();
+		} else {
+			log.warn("Skipping trigger {} because not a string nor a date", triggerSpec);
+		}
+
+		return trig;
 	}
 
 	/**

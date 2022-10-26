@@ -207,7 +207,7 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 					GUIBarcodeZone zone = new GUIBarcodeZone();
 					zone.setTemplateId(selectedOcrTemplate.getId());
 					zone.setPatterns("<customId>");
-					selectedOcrTemplate.appendZone(zone);
+					((GUIBarcodeTemplate) selectedOcrTemplate).appendBarcodeZone(zone);
 					Canvas zoneCanvas = new BarcodeZoneCanvas(zone, BarcodeTemplatesPanel.this);
 					sample.addCanvas(zoneCanvas);
 				} else {
@@ -345,7 +345,30 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 		editorPanel.setOverflow(Overflow.AUTO);
 		setMembers(hint, toolStrip, editorPanel);
 
-		if (selectedOcrTemplate != null && ((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
+		settings.setDisabled(selectedOcrTemplate == null);
+		save.setDisabled(selectedOcrTemplate == null);
+		append.setDisabled(selectedOcrTemplate == null);
+		delete.setDisabled(selectedOcrTemplate == null || selectedOcrTemplate.getId() == 0L);
+		close.setDisabled(selectedOcrTemplate == null);
+		print.setDisabled(selectedOcrTemplate == null);
+		zoomIn.setDisabled(
+				selectedOcrTemplate == null || sample == null || !((GUIBarcodeTemplate) selectedOcrTemplate).isZonal());
+		zoomOut.setDisabled(
+				selectedOcrTemplate == null || sample == null || !((GUIBarcodeTemplate) selectedOcrTemplate).isZonal());
+
+		if (selectedOcrTemplate != null && !((GUIBarcodeTemplate) selectedOcrTemplate).isZonal()) {
+			positionalGrid = new PositionalBarcodesGrid((GUIBarcodeTemplate) selectedOcrTemplate);
+			editorPanel.addMember(positionalGrid);
+		}
+
+		updateSample();
+	}
+
+	/**
+	 * Redisplays the sample image where the zones can be visually defined
+	 */
+	private void updateSample() {
+		if (selectedOcrTemplate != null && selectedOcrTemplate.getSample() != null) {
 			String url = Util.contextPath() + "barcodetemplateimage/" + selectedOcrTemplate.getId() + "?random="
 					+ new Date().getTime();
 			sample = new ImageWithCanvases(url, getWidth().intValue() - 50, null, new CallBack() {
@@ -355,24 +378,14 @@ public class BarcodeTemplatesPanel extends ZoneTemplatePanel {
 					showZones();
 				}
 			});
-			editorPanel.addMember(sample);
-		} else {
-			positionalGrid = new PositionalBarcodesGrid((GUIBarcodeTemplate) selectedOcrTemplate);
-			editorPanel.addMember(positionalGrid);
-		}
 
-		settings.setDisabled(selectedOcrTemplate == null);
-		save.setDisabled(selectedOcrTemplate == null);
-		append.setDisabled(selectedOcrTemplate == null);
-		delete.setDisabled(selectedOcrTemplate == null || selectedOcrTemplate.getId() == 0L);
-		close.setDisabled(selectedOcrTemplate == null);
-		print.setDisabled(selectedOcrTemplate == null);
-		zoomIn.setDisabled(selectedOcrTemplate == null || sample == null);
-		zoomOut.setDisabled(selectedOcrTemplate == null || sample == null);
+			editorPanel.addMember(sample);
+		}
 	}
 
 	@Override
 	public void setSelectedOcrTemplate(GUIOCRTemplate selectedOcrTemplate) {
+		super.setSelectedOcrTemplate(selectedOcrTemplate);
 		refresh(selectedDocumentTemplate != null ? selectedDocumentTemplate.getId() : null,
 				selectedOcrTemplate.getId());
 	}

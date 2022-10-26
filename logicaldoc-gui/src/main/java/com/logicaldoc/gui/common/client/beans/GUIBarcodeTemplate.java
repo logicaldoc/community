@@ -63,8 +63,8 @@ public class GUIBarcodeTemplate extends GUIOCRTemplate {
 	public void appendBarcodeZone(GUIBarcodeZone a) {
 		List<GUIBarcodeZone> newSpecs = new ArrayList<GUIBarcodeZone>();
 		if (getZones() != null)
-			for (GUIBarcodeZone barcodeZone : newSpecs)
-				newSpecs.add(barcodeZone);
+			for (GUIZone barcodeZone : getZones())
+				newSpecs.add((GUIBarcodeZone)barcodeZone);
 		newSpecs.add(a);
 		setZones(newSpecs.toArray(new GUIBarcodeZone[0]));
 	}

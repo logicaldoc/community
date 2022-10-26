@@ -14,6 +14,11 @@ import java.util.Date;
  * @version 1.1
  */
 public class DateBean extends Date {
+	
+	private static final String YYYY_MM_DD = "yyyyMMdd";
+
+	private static final String YYYY_MMDD_HMMSS = "yyyyMMdd HHmmss";
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -23,7 +28,7 @@ public class DateBean extends Date {
 	 */
 	public static String toCompactString() {
 		SimpleDateFormat targetFormat = new SimpleDateFormat();
-		targetFormat.applyPattern("yyyyMMdd HHmmss");
+		targetFormat.applyPattern(YYYY_MMDD_HMMSS);
 
 		String result = targetFormat.format(new DateBean());
 
@@ -39,9 +44,9 @@ public class DateBean extends Date {
 	 * @return the date
 	 */
 	public static Date dateFromCompactString(String compactString) {
-		SimpleDateFormat targetFormat = new SimpleDateFormat("yyyyMMdd HHmmss");
+		SimpleDateFormat targetFormat = new SimpleDateFormat(YYYY_MMDD_HMMSS);
 		if (compactString.length() < 9)
-			targetFormat = new SimpleDateFormat("yyyyMMdd");
+			targetFormat = new SimpleDateFormat(YYYY_MM_DD);
 
 		try {
 			return targetFormat.parse(compactString);
@@ -58,7 +63,7 @@ public class DateBean extends Date {
 	 * @return a string containing the converted date
 	 */
 	public static String toCompactString(Date date) {
-		DateFormat df = new SimpleDateFormat("yyyyMMdd");
+		DateFormat df = new SimpleDateFormat(YYYY_MM_DD);
 		return df.format(date);
 	}
 
@@ -73,7 +78,7 @@ public class DateBean extends Date {
 	 */
 	public static String toCompactString(String date, String dateFormat, String lang) {
 		if ((date != null) && !date.equals("")) {
-			return convertDate(dateFormat, "yyyyMMdd HHmmss", date);
+			return convertDate(dateFormat, YYYY_MMDD_HMMSS, date);
 		} else {
 			return "";
 		}
@@ -94,7 +99,7 @@ public class DateBean extends Date {
 				return (new SimpleDateFormat(formatOut)).format((new SimpleDateFormat(formatIn).parse(dateIn,
 						new ParsePosition(0))));
 			} else {
-				return (new SimpleDateFormat(formatOut)).format((new SimpleDateFormat("yyyyMMdd").parse(dateIn,
+				return (new SimpleDateFormat(formatOut)).format((new SimpleDateFormat(YYYY_MM_DD).parse(dateIn,
 						new ParsePosition(0))));
 			}
 		} catch (Exception ex) {

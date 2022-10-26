@@ -946,6 +946,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Folder folder = dao.findById(1200);
 		Assert.assertNull(folder.getSecurityRef());
 		
+		dao.applyRightToTree(1200L, transaction);
+		
 		folder = dao.findById(1201);
 		Assert.assertEquals(1200L, folder.getSecurityRef().longValue());
 		folder = dao.findById(1202);
@@ -956,6 +958,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		dao.initialize(folder);
 		folder.setSecurityRef(5L);
 		dao.store(folder);
+		dao.applyRightToTree(1200L, transaction);
 		
 		folder = dao.findById(1201);
 		Assert.assertEquals(5L, folder.getSecurityRef().longValue());
@@ -998,6 +1001,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		// The root defines it's own policies
 		Folder folder = dao.findById(1200);
 		Assert.assertNull(folder.getSecurityRef());
+		dao.applyRightToTree(1200, transaction);
 		
 		folder = dao.findById(1201);
 		Assert.assertEquals(1200L, folder.getSecurityRef().longValue());
@@ -1006,7 +1010,9 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 		// The root has its own policies
 		folder = dao.findById(1200);
-
+		
+		dao.updateSecurityRef(1200, 5L, transaction);
+		
 		folder = dao.findById(1200);
 		Assert.assertEquals(5L, folder.getSecurityRef().longValue());
 		folder = dao.findById(1201);
@@ -1016,7 +1022,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testMetadataToTree() throws PersistenceException {
+	public void testApplyMetadataToTree() throws PersistenceException {
 		FolderHistory transaction = new FolderHistory();
 		User user = new User();
 		user.setId(4);
@@ -1039,8 +1045,10 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		folder.setValue("attr1", "test");
 		dao.store(folder);
 
+		dao.applyMetadataToTree(1200L, transaction);
 		folder = dao.findById(1202);
 		dao.initialize(folder);
+		Assert.assertTrue(dao.isInPath(1200L, 1202L));
 		Assert.assertEquals("test1", folder.getTemplate().getName());
 		Assert.assertEquals("test", folder.getValue("attr1"));
 
@@ -1059,7 +1067,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		folder.getAttributes().clear();
 		folder.setTemplate(null);
 		dao.store(folder);
-
+		dao.applyMetadataToTree(1200L, transaction);
+		
 		folder = dao.findById(1201);
 		dao.initialize(folder);
 		Assert.assertEquals(null, folder.getTemplate());

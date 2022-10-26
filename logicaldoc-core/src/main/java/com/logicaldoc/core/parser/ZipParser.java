@@ -156,29 +156,7 @@ public class ZipParser extends AbstractParser {
 	public int countPages(File input, String filename) {
 		if (filename.toLowerCase().endsWith(".zip")) {
 			try {
-				ZipUtil zipUtil = new ZipUtil();
-				List<String> entries = zipUtil.listEntries(input);
-				if (entries.size() > 1) {
-					return entries.size();
-				} else {
-					/*
-					 * If we have just one entry, count it's pages
-					 */
-					String entry = entries.get(0);
-					String entryExtension = FileUtil.getExtension(entry);
-					File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
-					try {
-						Parser entryParser = ParserFactory.getParser(entryExtension);
-						if (entryParser == null)
-							throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
-
-						zipUtil.unzipEntry(input, entry, uncompressedEntryFile);
-						return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
-					} finally {
-						if (uncompressedEntryFile != null)
-							FileUtil.strongDelete(uncompressedEntryFile);
-					}
-				}
+				return countPagesInZipFile(input);
 			} catch (Throwable e) {
 				log.error(e.getMessage(), e);
 			}
@@ -197,5 +175,31 @@ public class ZipParser extends AbstractParser {
 			}
 		}
 		return 1;
+	}
+
+	private int countPagesInZipFile(File zipFile) throws IOException {
+		ZipUtil zipUtil = new ZipUtil();
+		List<String> entries = zipUtil.listEntries(zipFile);
+		if (entries.size() > 1) {
+			return entries.size();
+		} else {
+			/*
+			 * If we have just one entry, count it's pages
+			 */
+			String entry = entries.get(0);
+			String entryExtension = FileUtil.getExtension(entry);
+			File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+			try {
+				Parser entryParser = ParserFactory.getParser(entryExtension);
+				if (entryParser == null)
+					throw new IOException(String.format("Unable to find a parser for %s", entryExtension));
+
+				zipUtil.unzipEntry(zipFile, entry, uncompressedEntryFile);
+				return entryParser.countPages(uncompressedEntryFile, uncompressedEntryFile.getName());
+			} finally {
+				if (uncompressedEntryFile != null)
+					FileUtil.strongDelete(uncompressedEntryFile);
+			}
+		}
 	}
 }

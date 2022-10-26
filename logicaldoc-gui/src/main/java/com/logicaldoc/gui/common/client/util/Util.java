@@ -1102,6 +1102,8 @@ public class Util {
 	 * @return the escaped string
 	 */
 	public static String escapeHTML(String originalText) {
+		if(originalText==null)
+			return "";
 		return originalText.replace("<", "&lt;").replace(">", "&gt;");
 	}
 

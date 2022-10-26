@@ -168,54 +168,64 @@ public class StringExtractor {
 			// - all upper case
 			// - none upper case
 			// - first character upper case, rest not upper case
-			if (Character.isUpperCase(word.charAt(0))) {
-				if (Character.isUpperCase(word.charAt(1))) {
-					// all upper case?
-					for (int i = 2; i < wordLength && result == true; i++) {
-						result = Character.isUpperCase(word.charAt(i));
-					}
-				}
-				else {
-					// rest not upper case?
-					for (int i = 2; i < wordLength && result == true; i++) {
-						result = !Character.isUpperCase(word.charAt(i));
-					}
+			result = checkUpperAndLowerCase(word, wordLength, result);
+
+			// check character frequency
+			result = checkCharacterFrequency(word, wordLength, result);
+		}
+
+		return result;
+	}
+
+	private boolean checkUpperAndLowerCase(String word, int wordLength, boolean result) {
+		if (Character.isUpperCase(word.charAt(0))) {
+			if (Character.isUpperCase(word.charAt(1))) {
+				// all upper case?
+				for (int i = 2; i < wordLength && result == true; i++) {
+					result = Character.isUpperCase(word.charAt(i));
 				}
 			}
 			else {
-				// all not upper case?
-				for (int i = 0; i < wordLength && result == true; i++) {
+				// rest not upper case?
+				for (int i = 2; i < wordLength && result == true; i++) {
 					result = !Character.isUpperCase(word.charAt(i));
 				}
 			}
-
-			// check character frequency
-			if (result == true) {
-				Map charFreq = new HashMap(32);
-				for (int i = 0; i < wordLength; i++) {
-					Character c = new Character(word.charAt(i));
-
-					Integer freq = (Integer) charFreq.get(c);
-					if (freq == null) {
-						freq = new Integer(1);
-					}
-					else {
-						freq = new Integer(freq.intValue() + 1);
-					}
-					charFreq.put(c, freq);
-				}
-
-				// no word should consist for 50% or more of a single character
-				int freqThreshold = wordLength / 2;
-
-				Iterator valueIter = charFreq.values().iterator();
-				while (valueIter.hasNext() && result == true) {
-					Integer freq = (Integer) valueIter.next();
-					result = (freq.intValue() < freqThreshold);
-				}
+		}
+		else {
+			// all not upper case?
+			for (int i = 0; i < wordLength && result == true; i++) {
+				result = !Character.isUpperCase(word.charAt(i));
 			}
 		}
+		return result;
+	}
 
+	private boolean checkCharacterFrequency(String word, int wordLength, boolean result) {
+		if (result == true) {
+			Map charFreq = new HashMap(32);
+			for (int i = 0; i < wordLength; i++) {
+				Character c = new Character(word.charAt(i));
+
+				Integer freq = (Integer) charFreq.get(c);
+				if (freq == null) {
+					freq = new Integer(1);
+				}
+				else {
+					freq = new Integer(freq.intValue() + 1);
+				}
+				charFreq.put(c, freq);
+			}
+
+			// no word should consist for 50% or more of a single character
+			int freqThreshold = wordLength / 2;
+
+			Iterator valueIter = charFreq.values().iterator();
+			while (valueIter.hasNext() && result == true) {
+				Integer freq = (Integer) valueIter.next();
+				result = (freq.intValue() < freqThreshold);
+			}
+		}
 		return result;
 	}
 }

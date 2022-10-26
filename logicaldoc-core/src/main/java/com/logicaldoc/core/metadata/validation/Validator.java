@@ -55,63 +55,19 @@ public class Validator {
 		if (object.getDeleted() != 0 || template == null)
 			return;
 
-		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
-		if (user == null && transaction != null && transaction.getUserId() != null) {
-			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
-			try {
-				user = uDao.findById(transaction.getUserId());
-				transaction.setUser(user);
-			} catch (PersistenceException e) {
-				log.warn(e.getMessage());
-			}
-		}
+		setUser(transaction);
 
 		Map<String, String> errors = new HashMap<String, String>();
 
-		Map<String, Object> automationDictionary = new HashMap<String, Object>();
-		automationDictionary.put("object", object);
-		automationDictionary.put("event", transaction);
-		automationDictionary.put("errors", errors);
-
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		tDao.initialize(template);
-		for (String attributeName : template.getAttributeNames()) {
-			Attribute attribute = object.getAttribute(attributeName);
-			if (attribute == null)
-				continue;
+		
+		// Validate each attribute
+		validateAttributes(object, template, transaction, errors);
 
-			Attribute templateAttribute = template.getAttribute(attributeName);
-			if (StringUtils.isNotEmpty(templateAttribute.getValidation())) {
-				Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
-				fieldValidationDictionary.put("object", object);
-				fieldValidationDictionary.put("event", transaction);
-				fieldValidationDictionary.put("errors", errors);
-				fieldValidationDictionary.put("attributeName", attributeName);
-				fieldValidationDictionary.put("attribute", attribute);
-				fieldValidationDictionary.put("value", attribute.getValue());
-
-				ValidationError error = new ValidationError(attributeName, attribute.getLabel(), null);
-				fieldValidationDictionary.put("error", error);
-				Automation script = new Automation("validator-" + attributeName,
-						user != null ? user.getLocale() : Locale.getDefault(), object.getTenantId());
-				script.evaluate(templateAttribute.getValidation(), fieldValidationDictionary);
-
-				if (StringUtils.isNotEmpty(error.getDescription()))
-					errors.put(attributeName, error.getDescription());
-			}
-		}
-
-		/*
-		 * Skip the general validation script only if the template defines a
-		 * validation script and only if there are not errors in fields
-		 * validation
-		 */
-		if (errors.isEmpty() && StringUtils.isNotEmpty(template.getValidation())) {
-			Automation script = new Automation("validator", user != null ? user.getLocale() : Locale.ENGLISH,
-					object.getTenantId());
-			script.evaluate(template.getValidation(), automationDictionary);
-		}
-
+		// Validate the whole object
+		executeObjectValidation(object, template, transaction, errors);
+		
 		if (!errors.isEmpty()) {
 			List<ValidationError> errorsList = new ArrayList<ValidationError>();
 			for (String key : errors.keySet()) {
@@ -124,6 +80,75 @@ public class Validator {
 
 			throw new ValidationException(errorsList);
 		}
+	}
 
+	private void validateAttributes(ExtensibleObject object, Template template, History transaction,
+			Map<String, String> errors) {
+		for (String attributeName : template.getAttributeNames()) {
+			Attribute attribute = object.getAttribute(attributeName);
+			if (attribute == null)
+				continue;
+
+			Attribute templateAttribute = template.getAttribute(attributeName);
+			if (StringUtils.isNotEmpty(templateAttribute.getValidation()))
+				executeAttributeValidation(object, transaction, errors, attributeName, attribute, templateAttribute);
+		}
+	}
+
+	private void executeObjectValidation(ExtensibleObject object, Template template, History transaction,
+			Map<String, String> errors) throws ValidationException {
+
+		Map<String, Object> automationDictionary = new HashMap<>();
+		automationDictionary.put("object", object);
+		automationDictionary.put("event", transaction);
+		automationDictionary.put("errors", errors);
+
+		/*
+		 * Skip the general validation script only if the template defines a
+		 * validation script and only if there are not errors in fields
+		 * validation
+		 */
+		if (errors.isEmpty() && StringUtils.isNotEmpty(template.getValidation())) {
+			Automation script = new Automation("validator",
+					transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
+							: Locale.ENGLISH,
+					object.getTenantId());
+			script.evaluate(template.getValidation(), automationDictionary);
+		}
+	}
+
+	private void executeAttributeValidation(ExtensibleObject object, History transaction, Map<String, String> errors,
+			String attributeName, Attribute attribute, Attribute templateAttribute) {
+		Map<String, Object> fieldValidationDictionary = new HashMap<String, Object>();
+		fieldValidationDictionary.put("object", object);
+		fieldValidationDictionary.put("event", transaction);
+		fieldValidationDictionary.put("errors", errors);
+		fieldValidationDictionary.put("attributeName", attributeName);
+		fieldValidationDictionary.put("attribute", attribute);
+		fieldValidationDictionary.put("value", attribute.getValue());
+
+		ValidationError error = new ValidationError(attributeName, attribute.getLabel(), null);
+		fieldValidationDictionary.put("error", error);
+		Automation script = new Automation("validator-" + attributeName,
+				transaction != null && transaction.getUser() != null ? transaction.getUser().getLocale()
+						: Locale.getDefault(),
+				object.getTenantId());
+		script.evaluate(templateAttribute.getValidation(), fieldValidationDictionary);
+
+		if (StringUtils.isNotEmpty(error.getDescription()))
+			errors.put(attributeName, error.getDescription());
+	}
+
+	private void setUser(History transaction) {
+		User user = transaction != null && transaction.getUser() != null ? transaction.getUser() : null;
+		if (user == null && transaction != null && transaction.getUserId() != null) {
+			UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			try {
+				user = uDao.findById(transaction.getUserId());
+				transaction.setUser(user);
+			} catch (PersistenceException e) {
+				log.warn(e.getMessage());
+			}
+		}
 	}
 }

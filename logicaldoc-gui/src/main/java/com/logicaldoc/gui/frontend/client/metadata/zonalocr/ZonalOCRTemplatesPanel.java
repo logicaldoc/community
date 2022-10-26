@@ -374,15 +374,6 @@ public class ZonalOCRTemplatesPanel extends ZoneTemplatePanel {
 		}
 	}
 
-	public void showZones() {
-		if (selectedOcrTemplate.getZones() != null)
-			for (GUIZone zone : selectedOcrTemplate.getZones()) {
-				zone.setTemplateId(selectedOcrTemplate.getId());
-				Canvas zoneCanvas = new ZonalOCRZoneCanvas(zone, ZonalOCRTemplatesPanel.this);
-				sample.addCanvas(zoneCanvas);
-			}
-	}
-
 	@Override
 	public void setSelectedOcrTemplate(GUIOCRTemplate selectedOcrTemplate) {
 		super.setSelectedOcrTemplate(selectedOcrTemplate);

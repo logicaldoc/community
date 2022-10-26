@@ -25,6 +25,12 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<FolderHistory> implements FolderHistoryDAO {
 
+	private static final String AND = " and ";
+
+	private static final String DATE_ASC = ".date asc";
+
+	private static final String ORDER_BY = "order by ";
+
 	private HibernateFolderHistoryDAO() {
 		super(FolderHistory.class);
 		super.log = LoggerFactory.getLogger(HibernateFolderHistoryDAO.class);
@@ -38,7 +44,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	@Override
 	public List<FolderHistory> findByFolderId(long folderId) {
 		try {
-			return findByWhere(ALIAS_ENTITY + ".folderId =" + folderId, "order by " + ALIAS_ENTITY + ".date asc", null);
+			return findByWhere(ALIAS_ENTITY + ".folderId =" + folderId, ORDER_BY + ALIAS_ENTITY + DATE_ASC, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -48,7 +54,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	@Override
 	public List<FolderHistory> findNotNotified(Integer max) {
 		try {
-			return findByWhere(ALIAS_ENTITY + ".notified = 0", "order by " + ALIAS_ENTITY + ".date asc", max);
+			return findByWhere(ALIAS_ENTITY + ".notified = 0", ORDER_BY + ALIAS_ENTITY + DATE_ASC, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -71,7 +77,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 			query += " and lower(" + ALIAS_ENTITY + ".event) like '" + SqlUtil.doubleQuotes(event.toLowerCase()) + "'";
 
 		try {
-			return findByWhere(query, "order by " + ALIAS_ENTITY + ".date asc", null);
+			return findByWhere(query, ORDER_BY + ALIAS_ENTITY + DATE_ASC, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -98,7 +104,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 		params.put("pathExpression", pathExpression);
 
 		if (oldestDate != null) {
-			query.append(" and " + ALIAS_ENTITY + ".date >= :oldestDate ");
+			query.append(AND + ALIAS_ENTITY + ".date >= :oldestDate ");
 			params.put("oldestDate", oldestDate);
 		}
 		if (events != null && !events.isEmpty()) {
@@ -109,11 +115,11 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 				eventsStr.append("'" + event + "'");
 			}
 			eventsStr.append(")");
-			query.append(" and " + ALIAS_ENTITY + ".event in " + eventsStr);
+			query.append(AND + ALIAS_ENTITY + ".event in " + eventsStr);
 		}
 
 		try {
-			return findByWhere(query.toString(), params, "order by " + ALIAS_ENTITY + ".date asc", max);
+			return findByWhere(query.toString(), params, ORDER_BY + ALIAS_ENTITY + DATE_ASC, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -129,12 +135,12 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 		params.put("event", event);
 
 		if (oldestDate != null) {
-			query += " and " + ALIAS_ENTITY + ".date >= :oldestDate ";
+			query += AND + ALIAS_ENTITY + ".date >= :oldestDate ";
 			params.put("oldestDate", oldestDate);
 		}
 
 		try {
-			return findByWhere(query, params, "order by " + ALIAS_ENTITY + ".date asc", null);
+			return findByWhere(query, params, ORDER_BY + ALIAS_ENTITY + DATE_ASC, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();

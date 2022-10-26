@@ -29,6 +29,9 @@ import com.logicaldoc.util.Context;
  */
 public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<DocumentNote> implements DocumentNoteDAO {
 
+	private static final String DOC_ID_DOC_ID_AND = ".docId = :docId and ";
+	private static final String DOC_ID = "docId";
+
 	public HibernateDocumentNoteDAO() {
 		super(DocumentNote.class);
 		super.log = LoggerFactory.getLogger(HibernateDocumentNoteDAO.class);
@@ -78,24 +81,24 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 					return findByWhere(ALIAS_ENTITY + ".docId = " + docId, null, null);
 				else {
 					Map<String, Object> params = new HashMap<String, Object>();
-					params.put("docId", docId);
+					params.put(DOC_ID, docId);
 					params.put("types", types);
 
-					return findByWhere(ALIAS_ENTITY + ".docId = :docId and " + ALIAS_ENTITY + ".type in (:types)",
+					return findByWhere(ALIAS_ENTITY + DOC_ID_DOC_ID_AND + ALIAS_ENTITY + ".type in (:types)",
 							params, null, null);
 				}
 			else if (types == null || types.isEmpty()) {
 				Map<String, Object> params = new HashMap<String, Object>();
-				params.put("docId", docId);
+				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);
-				return findByWhere(ALIAS_ENTITY + ".docId = :docId and " + ALIAS_ENTITY + ".fileVersion = :fileVersion",
+				return findByWhere(ALIAS_ENTITY + DOC_ID_DOC_ID_AND + ALIAS_ENTITY + ".fileVersion = :fileVersion",
 						params, null, null);
 			} else {
 				Map<String, Object> params = new HashMap<String, Object>();
-				params.put("docId", docId);
+				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);
 				params.put("types", types);
-				return findByWhere(ALIAS_ENTITY + ".docId = :docId and " + ALIAS_ENTITY
+				return findByWhere(ALIAS_ENTITY + DOC_ID_DOC_ID_AND + ALIAS_ENTITY
 						+ ".fileVersion = :fileVersion and " + ALIAS_ENTITY + ".type in (:types)", params, null, null);
 			}
 		} catch (PersistenceException e) {

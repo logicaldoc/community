@@ -436,12 +436,10 @@ public class LDCmisService extends AbstractCmisService {
 				throw new CmisPermissionDeniedException("Invalid or Expired Session " + getSid());
 			SessionManager.get().renew(getSid());
 			return session;
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			if (t instanceof CmisBaseException)
-				throw (CmisBaseException) t;
-			else
-				throw new CmisPermissionDeniedException("Invalid session!");
+		} catch (CmisBaseException cbe) {
+			throw cbe;
+		} catch (Exception e) {
+			throw new CmisPermissionDeniedException("Invalid session!", e);
 		}
 	}
 
@@ -509,9 +507,8 @@ public class LDCmisService extends AbstractCmisService {
 			ObjectList ret = getRepository().getContentChanges(changeLogToken,
 					maxItems != null ? (int) maxItems.doubleValue() : 2000);
 			return ret;
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			throw t;
+		} catch (Exception e) {
+			throw e;
 		}
 	}
 

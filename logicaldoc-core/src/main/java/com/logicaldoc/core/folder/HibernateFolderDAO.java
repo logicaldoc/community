@@ -62,6 +62,24 @@ import com.logicaldoc.util.sql.SqlUtil;
 @SuppressWarnings("unchecked")
 public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> implements FolderDAO {
 
+	private static final String REPLICATE = "replicate";
+
+	private static final String AND_A_LD_GROUPID_IN = " AND A.ld_groupid in (";
+
+	private static final String AND = " and ";
+
+	private static final String SELECT = "select ";
+
+	private static final String LEFT_JOIN = " left join ";
+
+	private static final String SELECT_DISTINCT = "select distinct(";
+
+	private static final String FROM_FOLDER = ") from Folder ";
+
+	private static final String PARENT_ID = ".parentId=";
+
+	private static final String WHERE_GROUP_GROUP_ID_IN = " where _group.groupId in (";
+
 	private UserDAO userDAO;
 
 	private FolderHistoryDAO historyDAO;
@@ -126,7 +144,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		try {
 			log.debug("Invoke listeners before store");
-			Map<String, Object> dictionary = new HashMap<String, Object>();
+			Map<String, Object> dictionary = new HashMap<>();
 			for (FolderListener listener : listenerManager.getListeners())
 				listener.beforeStore(folder, transaction, dictionary);
 
@@ -261,7 +279,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			// policies
 			StringBuilder query = new StringBuilder("select distinct(_folder) from Folder _folder  ");
 			query.append(" left join _folder.folderGroups as _group ");
-			query.append(" where _group.groupId in (");
+			query.append(WHERE_GROUP_GROUP_ID_IN);
 			query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 			query.append(")");
 			folders = (List<Folder>) find(query.toString(), user.getTenantId());
@@ -302,7 +320,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		if (user.isMemberOf(Group.GROUP_ADMIN))
 			return findByWhere(
-					ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY + ".parentId=" + parentId,
+					ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY + PARENT_ID + parentId,
 					" order by " + ALIAS_ENTITY + ".name ", null);
 		/*
 		 * Search for all those folders that defines its own security policies
@@ -312,9 +330,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (precoll.isEmpty())
 			return coll;
 
-		query1.append("select distinct(" + ALIAS_ENTITY + ") from Folder " + ALIAS_ENTITY + " ");
-		query1.append(" left join " + ALIAS_ENTITY + ".folderGroups as _group");
-		query1.append(" where _group.groupId in (");
+		query1.append(SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + " ");
+		query1.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group");
+		query1.append(WHERE_GROUP_GROUP_ID_IN);
 
 		boolean first = true;
 		Iterator iter = precoll.iterator();
@@ -335,12 +353,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		/*
 		 * Now search for all other folders that references accessible folders
 		 */
-		StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY + " where "
+		StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY + " where "
 				+ ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
-		query2.append(" and " + ALIAS_ENTITY + ".securityRef in (");
+		query2.append(AND + ALIAS_ENTITY + ".securityRef in (");
 		query2.append("    select distinct(B.id) from Folder B ");
 		query2.append(" left join B.folderGroups as _group");
-		query2.append(" where _group.groupId in (");
+		query2.append(WHERE_GROUP_GROUP_ID_IN);
 
 		first = true;
 		iter = precoll.iterator();
@@ -403,9 +421,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * Search for the folders that define its own policies
 			 */
 			StringBuilder query1 = new StringBuilder(
-					"select distinct(" + ALIAS_ENTITY + ") from Folder " + ALIAS_ENTITY + "  ");
-			query1.append(" left join " + ALIAS_ENTITY + ".folderGroups as _group ");
-			query1.append(" where _group.groupId in (");
+					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
+			query1.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group ");
+			query1.append(WHERE_GROUP_GROUP_ID_IN);
 
 			boolean first = true;
 			Iterator iter = groups.iterator();
@@ -416,7 +434,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				query1.append(Long.toString(ug.getId()));
 				first = false;
 			}
-			query1.append(") and " + ALIAS_ENTITY + ".parentId=" + parent.getId());
+			query1.append(") and " + ALIAS_ENTITY + PARENT_ID + parent.getId());
 			query1.append(" and not(" + ALIAS_ENTITY + ".id=" + parent.getId() + ")");
 
 			coll = (List<Folder>) findByQuery(query1.toString(), (Map<String, Object>) null, null);
@@ -425,12 +443,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * Now search for all other folders that references accessible
 			 * folders
 			 */
-			StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
+			StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
 					+ " where " + ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
-			query2.append(" and " + ALIAS_ENTITY + ".securityRef in (");
+			query2.append(AND + ALIAS_ENTITY + ".securityRef in (");
 			query2.append("    select distinct(B.id) from Folder B ");
 			query2.append(" left join B.folderGroups as _group");
-			query2.append(" where _group.groupId in (");
+			query2.append(WHERE_GROUP_GROUP_ID_IN);
 
 			first = true;
 			iter = groups.iterator();
@@ -536,9 +554,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				return false;
 
 			StringBuilder query = new StringBuilder(
-					"select distinct(" + ALIAS_ENTITY + ") from Folder " + ALIAS_ENTITY + "  ");
-			query.append(" left join " + ALIAS_ENTITY + ".folderGroups as _group ");
-			query.append(" where _group.groupId in (");
+					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
+			query.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group ");
+			query.append(WHERE_GROUP_GROUP_ID_IN);
 			query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
 			query.append(") and " + ALIAS_ENTITY + ".id = :id");
 
@@ -589,8 +607,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * Search for folders that define its own security policies
 			 */
 			StringBuilder query = new StringBuilder(
-					"select distinct(" + ALIAS_ENTITY + ") from Folder " + ALIAS_ENTITY + "  ");
-			query.append(" left join " + ALIAS_ENTITY + ".folderGroups as _group ");
+					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
+			query.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group ");
 			query.append(" where " + ALIAS_ENTITY + ".deleted=0 and _group.groupId =" + groupId);
 
 			coll = (List<Folder>) findByQuery(query.toString(), (Map<String, Object>) null, null);
@@ -600,9 +618,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * ones
 			 */
 			if (!coll.isEmpty()) {
-				StringBuilder query2 = new StringBuilder("select " + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
+				StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
 						+ " where " + ALIAS_ENTITY + ".deleted=0 ");
-				query2.append(" and " + ALIAS_ENTITY + ".securityRef in (");
+				query2.append(AND + ALIAS_ENTITY + ".securityRef in (");
 				boolean first = true;
 				for (Folder folder : coll) {
 					if (!first)
@@ -632,7 +650,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			User user = geExistingtUser(userId);
 
 			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return findIdsByWhere(ALIAS_ENTITY + ".parentId=" + parentId, null, null);
+				return findIdsByWhere(ALIAS_ENTITY + PARENT_ID + parentId, null, null);
 
 			StringBuilder query1 = new StringBuilder();
 			Set<Group> precoll = user.getGroups();
@@ -640,7 +658,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (!precoll.isEmpty()) {
 				query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_foldergroup A, ld_folder B "
 						+ " where B.ld_deleted=0 and A.ld_folderid=B.ld_id AND (B.ld_parentid=" + parentId
-						+ " OR B.ld_id=" + parentId + ")" + " AND A.ld_groupid in (");
+						+ " OR B.ld_id=" + parentId + ")" + AND_A_LD_GROUPID_IN);
 				boolean first = true;
 				while (iter.hasNext()) {
 					if (!first)
@@ -689,13 +707,13 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 					"lower(" + ALIAS_ENTITY + ".name) like '" + SqlUtil.doubleQuotes(name.toLowerCase()) + "' ");
 
 		if (parent != null) {
-			query.append(" AND " + ALIAS_ENTITY + ".parentId = " + parent.getId());
+			query.append(AND + ALIAS_ENTITY + ".parentId = " + parent.getId());
 			if (tenantId == null)
-				query.append(" AND " + ALIAS_ENTITY + ".tenantId = " + parent.getTenantId());
+				query.append(AND + ALIAS_ENTITY + ".tenantId = " + parent.getTenantId());
 		}
 
 		if (tenantId != null)
-			query.append(" AND " + ALIAS_ENTITY + ".tenantId = " + tenantId);
+			query.append(AND + ALIAS_ENTITY + ".tenantId = " + tenantId);
 		try {
 			return findByWhere(query.toString(), null, null);
 		} catch (PersistenceException e) {
@@ -849,7 +867,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public List<Folder> findByNameAndParentId(String name, long parentId) {
 		try {
-			return findByWhere(ALIAS_ENTITY + ".parentId = " + parentId + " and " + ALIAS_ENTITY + ".name like '"
+			return findByWhere(ALIAS_ENTITY + ".parentId = " + parentId + AND + ALIAS_ENTITY + ".name like '"
 					+ SqlUtil.doubleQuotes(name) + "'", null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -1085,7 +1103,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query2.append(" ) ");
 
 			if (parentId != null) {
-				query2.append(" and ");
+				query2.append(AND);
 				Set<Long> folderIds = findFolderIdInPath(parentId, false);
 				if (isOracle()) {
 					/*
@@ -1169,7 +1187,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private void appendParentCondition(Long parentId, StringBuilder query, boolean tree) {
 		if (parentId != null) {
-			query.append(" and ");
+			query.append(AND);
 			if (tree) {
 				Set<Long> folderIds = findFolderIdInTree(parentId, false);
 				if (isOracle()) {
@@ -1558,7 +1576,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			FolderHistory transaction) throws PersistenceException {
 		Folder newFolder = internalCopy(source, target, newName, foldersOnly, securityOption, transaction);
 
-		if ("replicate".equals(securityOption)) {
+		if (REPLICATE.equals(securityOption)) {
 			String sourcePath = computePathExtended(source.getId());
 			String newPath = computePathExtended(newFolder.getId());
 
@@ -1595,7 +1613,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private Folder internalCopy(Folder source, Folder target, String newName, boolean foldersOnly,
 			String securityOption, FolderHistory transaction) throws PersistenceException {
-		assert (securityOption == null || "inherit".equals(securityOption) || "replicate".equals(securityOption));
+		assert (securityOption == null || "inherit".equals(securityOption) || REPLICATE.equals(securityOption));
 		assert source != null : "Source folder cannot be null";
 		assert target != null : "Target folder cannot be null";
 		assert transaction != null : "Transaction cannot be null";
@@ -1671,7 +1689,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private void replicateSecurityPolicies(Folder source, String securityOption, Folder newFolder)
 			throws PersistenceException {
-		if ("replicate".equals(securityOption) && newFolder.getFoldRef() == null) {
+		if (REPLICATE.equals(securityOption) && newFolder.getFoldRef() == null) {
 			initialize(source);
 			initialize(newFolder);
 
@@ -1941,8 +1959,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		long rootId = root.getId();
 
 		try {
-			return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + ") and " + ALIAS_ENTITY + ".parentId="
-					+ rootId + " and " + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE + " and " + ALIAS_ENTITY
+			return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + ") and " + ALIAS_ENTITY + PARENT_ID
+					+ rootId + AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE + AND + ALIAS_ENTITY
 					+ ".tenantId=" + tenantId, "order by lower(" + ALIAS_ENTITY + ".name)", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -2016,9 +2034,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		List<Folder> workspaces = new ArrayList<Folder>();
 
 		try {
-			workspaces = findByWhere(ALIAS_ENTITY + ".parentId = " + root.getId() + " and " + ALIAS_ENTITY + ".name = '"
+			workspaces = findByWhere(ALIAS_ENTITY + ".parentId = " + root.getId() + AND + ALIAS_ENTITY + ".name = '"
 					+ SqlUtil.doubleQuotes(Folder.DEFAULTWORKSPACENAME) + "' and " + ALIAS_ENTITY + ".tenantId="
-					+ tenantId + " and " + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE, null, null);
+					+ tenantId + AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -2106,7 +2124,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	public List<Folder> findAliases(Long foldRef, long tenantId) {
 		String query = " " + ALIAS_ENTITY + ".tenantId=" + tenantId;
 		if (foldRef != null)
-			query += " and " + ALIAS_ENTITY + ".foldRef=" + foldRef;
+			query += AND + ALIAS_ENTITY + ".foldRef=" + foldRef;
 
 		try {
 			return findByWhere(query, null, null);
