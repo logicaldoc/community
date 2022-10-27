@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration name="ConfigTest" status="ERROR" monitorInterval="5">
   <Properties>
-    <Property name="root"><![CDATA[c:/LogicalDOC-Export30/logs/]]></Property>
+    <Property name="root"><![CDATA[target]]></Property>
     <Property name="pattern">%d{dd.MM.yyyy HH:mm:ss,SSS} %-5p (%c:%4L) -- %m%n</Property>
     <Property name="dateformat">ISO8601</Property>
     <Property name="fontsize">x-small</Property>
@@ -9,7 +9,7 @@
   
  <Appenders>
  
-    <RollingFile name="FILE" fileName="${root}/export.log" filePattern="${root}/export.log.%i">
+    <RollingFile name="FILE" fileName="${root}/file.log" filePattern="${root}/file.log.%i">
       <PatternLayout>
         <Pattern>${pattern}</Pattern>
       </PatternLayout>
@@ -29,7 +29,7 @@
     <Logger name="org.apache.cxf" level="fatal" additivity="false">
       <Appender-Ref ref="FILE" />
     </Logger>
-    <Logger name="com.logicaldoc.export" level="info" additivity="true">
+    <Logger name="com.logicaldoc" level="info" additivity="true">
       <Appender-Ref ref="FILE" />
     </Logger>
 	<Root level="error">

@@ -139,9 +139,7 @@ public class FolderSearch extends Search {
 	 */
 	private void appendWhereClause(boolean searchAliases, ArrayList<Serializable> params, StringBuilder query)
 			throws PersistenceException {
-		String tableAlias = "A";
-		if (searchAliases)
-			tableAlias = "REF";
+		FolderSearchOptions fOptions = (FolderSearchOptions) options;
 
 		/*
 		 * Prepare the joins for the extended attributes. If the TOP condition
@@ -154,13 +152,123 @@ public class FolderSearch extends Search {
 		query.append(" where A.ld_deleted=0 and A.ld_hidden=0 ");
 		query.append(" and " + (searchAliases ? "" : "not") + " A.ld_type=" + Folder.TYPE_ALIAS);
 
-		setTenantCondition(query);
+		appendTenantCondition(query);
 
+		String tableAlias = getTableAlias(searchAliases);
+
+		appendTemplateCondition(query, tableAlias);
+
+		appendMainFolderCondition(query, tableAlias, fOptions);
+
+		appendComposition(fOptions);
+
+		appendFoldRefConfition(searchAliases, query);
+
+		// Now add all criteria
+		StringBuilder sb=new StringBuilder();
+		
+		boolean first = true;
+		int joinsCounter = 0;
+
+		for (FolderCriterion criterion : fOptions.getCriteria()) {
+			if (criterion.isEmpty())
+				continue;
+
+			if (first) {
+				query.append(" and ( ");
+				if ("not".equals(options.getTopOperator()))
+					query.append("not");
+			} else
+				query.append(" " + criterion.getComposition());
+			first = false;
+			query.append("(");
+
+			String columnName = "";
+			if (criterion.isExtendedAttribute()) {
+				// In case of OR top operator we only have a single join
+				// with extended attributes
+				if (!"or".equals(options.getTopOperator()) || joinsCounter == 0)
+					joinsCounter++;
+				query.append("(C" + joinsCounter + ".ld_folderid=" + tableAlias + ".ld_id");
+				query.append(" and (C" + joinsCounter + ".ld_name='");
+				query.append(criterion.getFieldName());
+				query.append("' or C" + joinsCounter + ".ld_name like '");
+				query.append(criterion.getFieldName());
+				query.append("-%') and ");
+				columnName = "C" + joinsCounter + ".";
+				switch (criterion.getType()) {
+				case Attribute.TYPE_INT:
+				case Attribute.TYPE_USER:
+				case Attribute.TYPE_FOLDER:
+				case Attribute.TYPE_BOOLEAN:
+					columnName += "ld_intvalue";
+					break;
+				case Attribute.TYPE_DOUBLE:
+					columnName += "ld_doublevalue";
+					break;
+				case Attribute.TYPE_DATE:
+					columnName += "ld_datevalue";
+					break;
+				default:
+					columnName += "ld_stringvalue";
+					break;
+				}
+			} else {
+				columnName = criterion.getColumnName();
+
+				// If the column name is not qualified, prepend the current
+				// table alias
+				if (!columnName.contains("."))
+					columnName = tableAlias + "." + columnName;
+			}
+
+			appendAttributeCriterionColumnCondition(query, tableAlias, columnName, criterion, params);
+
+			if (criterion.isExtendedAttribute())
+				query.append(")");
+			query.append(")");
+		}
+		if (!first)
+			query.append(")");
+
+		appendSorting(query, fOptions);
+	}
+
+	private String getTableAlias(boolean searchAliases) {
+		String tableAlias = "A";
+		if (searchAliases)
+			tableAlias = "REF";
+		return tableAlias;
+	}
+
+	private void appendSorting(StringBuilder query, FolderSearchOptions fOptions) {
+		if (fOptions.getOrder() != null && !fOptions.getOrder().isEmpty()) {
+			query.append(" order by ");
+			int i = 0;
+			for (String poption : fOptions.getOrder()) {
+				if (i > 0)
+					query.append(", ");
+				query.append("A.ld_" + poption);
+				i++;
+			}
+		}
+	}
+
+	private void appendTemplateCondition(StringBuilder query, String tableAlias) {
 		if (options.getTemplate() != null)
 			query.append(" and " + tableAlias + ".ld_templateid=" + options.getTemplate());
+	}
 
+	private void appendFoldRefConfition(boolean searchAliases, StringBuilder query) {
+		if (searchAliases)
+			query.append(" and A.ld_foldref is not null and REF.ld_deleted=0 and A.ld_foldref = REF.ld_id ");
+		else
+			query.append(" and A.ld_foldref is null ");
+	}
+
+	private void appendMainFolderCondition(StringBuilder query, String tableAlias, FolderSearchOptions fOptions)
+			throws PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		FolderSearchOptions fOptions = (FolderSearchOptions) options;
 		if (fOptions.getFolderId() != null) {
 			query.append(" and ");
 			if (fOptions.isSearchInSubPath()) {
@@ -168,91 +276,6 @@ public class FolderSearch extends Search {
 				query.append(tableAlias + ".ld_path like '" + path + "/%'");
 			} else
 				query.append(tableAlias + ".ld_parentid = " + fOptions.getFolderId());
-		}
-
-		setComposition(fOptions);
-
-		if (searchAliases)
-			query.append(" and A.ld_foldref is not null and REF.ld_deleted=0 and A.ld_foldref = REF.ld_id ");
-		else
-			query.append(" and A.ld_foldref is null ");
-
-		// Now add all criteria
-		boolean first = true;
-		int joinsCounter = 0;
-
-		if (options != null && fOptions.getCriteria() != null)
-			for (FolderCriterion criterion : fOptions.getCriteria()) {
-				if (criterion.isEmpty())
-					continue;
-
-				if (first) {
-					query.append(" and ( ");
-					if ("not".equals(options.getTopOperator()))
-						query.append("not");
-				} else
-					query.append(" " + criterion.getComposition());
-				first = false;
-				query.append("(");
-
-				String columnName = "";
-				if (criterion.isExtendedAttribute()) {
-					// In case of OR top operator we only have a single join
-					// with extended attributes
-					if (!"or".equals(options.getTopOperator()) || joinsCounter == 0)
-						joinsCounter++;
-					query.append("(C" + joinsCounter + ".ld_folderid=" + tableAlias + ".ld_id");
-					query.append(" and (C" + joinsCounter + ".ld_name='");
-					query.append(criterion.getFieldName());
-					query.append("' or C" + joinsCounter + ".ld_name like '");
-					query.append(criterion.getFieldName());
-					query.append("-%') and ");
-					columnName = "C" + joinsCounter + ".";
-					switch (criterion.getType()) {
-					case Attribute.TYPE_INT:
-					case Attribute.TYPE_USER:
-					case Attribute.TYPE_FOLDER:
-					case Attribute.TYPE_BOOLEAN:
-						columnName += "ld_intvalue";
-						break;
-					case Attribute.TYPE_DOUBLE:
-						columnName += "ld_doublevalue";
-						break;
-					case Attribute.TYPE_DATE:
-						columnName += "ld_datevalue";
-						break;
-					default:
-						columnName += "ld_stringvalue";
-						break;
-					}
-				} else {
-					columnName = criterion.getColumnName();
-
-					// If the column name is not qualified, prepend the current
-					// table alias
-					if (!columnName.contains("."))
-						columnName = tableAlias + "." + columnName;
-				}
-
-				appendAttributeCriterionColumnCondition(query, tableAlias, columnName, criterion, params);
-
-				if (criterion.isExtendedAttribute())
-					query.append(")");
-				query.append(")");
-			}
-		if (!first)
-			query.append(")");
-
-		FolderSearchOptions poptions = (FolderSearchOptions) options;
-		if (poptions.getOrder() != null && !poptions.getOrder().isEmpty()) {
-			query.append(" order by ");
-			int i = 0;
-			for (String poption : poptions.getOrder()) {
-				if (i > 0)
-					query.append(", ");
-				query.append("A.ld_" + poption);
-				i++;
-			}
 		}
 	}
 
@@ -302,8 +325,7 @@ public class FolderSearch extends Search {
 		else if (FolderCriterion.OPERATOR_CONTAINS.equals(criterion.getOperator()))
 			query.append("lower(" + columnName + ") like '%" + val + "%'");
 		else if (FolderCriterion.OPERATOR_NOTCONTAINS.equals(criterion.getOperator()))
-			query.append(
-					" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val + "%')");
+			query.append(" (" + columnName + " is null or not (lower(" + columnName + ") like '%" + val + "%')");
 		else if (FolderCriterion.OPERATOR_BEGINSWITH.equals(criterion.getOperator()))
 			query.append("lower(" + columnName + ") like '" + val + "%'");
 		else if (FolderCriterion.OPERATOR_ENDSWITH.equals(criterion.getOperator()))
@@ -438,7 +460,7 @@ public class FolderSearch extends Search {
 		}
 	}
 
-	private void setComposition(FolderSearchOptions fOptions) {
+	private void appendComposition(FolderSearchOptions fOptions) {
 		String composition = null;
 		if ("not".equals(options.getTopOperator())) {
 			composition = "and not";
@@ -455,7 +477,7 @@ public class FolderSearch extends Search {
 				criterion.setComposition(composition);
 	}
 
-	private void setTenantCondition(StringBuilder query) {
+	private void appendTenantCondition(StringBuilder query) {
 		long tenantId = Tenant.DEFAULT_ID;
 		if (options.getTenantId() != null)
 			tenantId = options.getTenantId().longValue();
