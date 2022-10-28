@@ -4,10 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -29,17 +32,17 @@ public class P7M {
 
 	private byte[] content;
 
-	public P7M(File file) throws Exception {
+	public P7M(File file) {
 		super();
 		this.file = file;
 	}
 
-	public P7M(InputStream is) throws Exception {
+	public P7M(InputStream is) throws IOException {
 		super();
 		read(is);
 	}
 
-	public P7M(byte[] content) throws Exception {
+	public P7M(byte[] content) {
 		super();
 		read(content);
 	}
@@ -59,29 +62,24 @@ public class P7M {
 	 * content.
 	 * 
 	 * @param is The inputStream
+	 * 
+	 * @throws IOException I/O error 
 	 */
-	public void read(InputStream is) {
+	public void read(InputStream is) throws IOException {
 		byte[] buffer = new byte[4096];
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		try {
 			while (is.read(buffer) > 0) {
 				baos.write(buffer);
 			}
-		} catch (Exception ex) {
-			log.error("Error reading file");
-		}
+
 		byte[] tmp = baos.toByteArray();
 
-		try {
+
 			// if the content is on Base64, we must decode it into DER format
 			content = Base64.decode(tmp);
 			log.debug("Decoding on Base64 completed");
 			log.debug("The signed file is in DER format");
-		} catch (Exception e) {
-			// the content has the DER format
-			content = tmp;
-			log.debug("The signed file is probably in DER format");
-		}
+		
 
 		read(content);
 	}
@@ -89,9 +87,9 @@ public class P7M {
 	/**
 	 * Reads a p7m file from a file.
 	 * 
-	 * @throws Exception if the file cannot be read
+	 * @throws IOException I/O error
 	 */
-	public void read() throws Exception {
+	public void read() throws IOException {
 		read(new FileInputStream(file));
 	}
 
@@ -100,9 +98,10 @@ public class P7M {
 	 * 
 	 * @return the stream representing the enclosed file
 	 * 
-	 * @throws Exception in case the enclosed file cannot be extracted
+	 * @throws CMSException in case the enclosed file cannot be extracted
+	 * @throws IOException I/O error
 	 */
-	public InputStream extractOriginalFileStream() throws Exception {
+	public InputStream extractOriginalFileStream() throws IOException, CMSException {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		cms.getSignedContent().write(os);
 		return new ByteArrayInputStream(os.toByteArray());
@@ -113,11 +112,12 @@ public class P7M {
 	 * 
 	 * @param outFile The file in which will contained the original file
 	 *        content.
-	 * 
-	 * @throws Exception in case the embedded file cannot be extracted
+	 * @throws IOException I/O exception
+	 * @throws FileNotFoundException file not found
+	 * @throws CMSException in case the embedded file cannot be extracted
 	 */
-	public void extractOriginalFile(File outFile) throws Exception {
-		try(OutputStream os = new FileOutputStream(outFile)){
+	public void extractOriginalFile(File outFile) throws FileNotFoundException, IOException, CMSException {
+		try (OutputStream os = new FileOutputStream(outFile)) {
 			cms.getSignedContent().write(os);
 			os.flush();
 		}

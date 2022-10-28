@@ -2,6 +2,7 @@ package com.logicaldoc.core.communication;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -33,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.bouncycastle.cms.CMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,9 +93,12 @@ public class MailUtil {
 	 * 
 	 * @return the EMail object
 	 * 
-	 * @throws Exception error reading the contents
+	 * @throws IOException I/O error
+	 * @throws MessagingException error reading the contents
+	 * @throws CMSException error reading the contents
 	 */
-	public static EMail msgToMail(InputStream is, boolean extractAttachmentContent) throws Exception {
+	public static EMail msgToMail(InputStream is, boolean extractAttachmentContent)
+			throws IOException, MessagingException, CMSException {
 
 		EMail email = new EMail();
 		MsgParser msgp = new MsgParser();
@@ -207,9 +212,15 @@ public class MailUtil {
 	 * 
 	 * @return the EMail object
 	 * 
-	 * @throws Exception raised if the message cannot be read
+	 * @throws IOException I/O error
+	 * @throws FileNotFoundException cannot open the file
+	 * @throws CMSException cannot read the content
+	 * @throws MessagingException cannot read the content
+	 * 
+	 * @ raised if the message cannot be read
 	 */
-	public static EMail msgToMail(File msgFile, boolean extractAttachmentContent) throws Exception {
+	public static EMail msgToMail(File msgFile, boolean extractAttachmentContent)
+			throws FileNotFoundException, IOException, MessagingException, CMSException {
 		try (InputStream is = new FileInputStream(msgFile)) {
 			return msgToMail(is, extractAttachmentContent);
 		}

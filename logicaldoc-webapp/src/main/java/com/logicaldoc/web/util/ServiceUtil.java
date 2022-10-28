@@ -126,7 +126,8 @@ public class ServiceUtil {
 		return session;
 	}
 
-	public static void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException, PersistenceException {
+	public static void checkPermission(Permission permission, User user, long folderId)
+			throws AccessDeniedException, PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
@@ -189,6 +190,8 @@ public class ServiceUtil {
 					ie.getErrors().values().stream()
 							.map(e -> new ServerValidationError(e.getAttribute(), e.getLabel(), e.getDescription()))
 							.collect(Collectors.toList()).toArray(new ServerValidationError[0]));
+		} else if (t instanceof ServerException) {
+			throw (ServerException) t;
 		} else
 			throw new ServerException(message);
 	}
@@ -227,10 +230,10 @@ public class ServiceUtil {
 	 * 
 	 * @return true if the runnable already completed successfully
 	 * 
-	 * @throws Throwable Whatever error that may occur
+	 * @throws ServerException Whatever error that may occur
 	 */
 	public static boolean executeLongRunningOperation(String name, Runnable runnable, Session session)
-			throws Throwable {
+			throws ServerException {
 		ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);
 
 		/*
@@ -253,7 +256,7 @@ public class ServiceUtil {
 
 		if (task.isOver() && task.getError() != null) {
 			// In case it already completed with error, re-throw the exception
-			throw task.getError();
+			throw new ServerException(task.getError());
 		} else if (!task.isOver()) {
 			// Otherwise detach the current thread but add a listener to notify
 			// the pending users

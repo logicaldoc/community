@@ -19,6 +19,7 @@ public class WebserviceFaultInterceptor extends FaultOutInterceptor {
 	private Logger log = LoggerFactory.getLogger(HibernatePersistentObjectDAO.class);
 
 	public WebserviceFaultInterceptor() {
+		super();
 	}
 
 	@Override
