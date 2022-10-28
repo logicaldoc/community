@@ -165,9 +165,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	private void index(Long[] docIds, Session session) throws Exception {
+		
 		if (docIds == null)
 			return;
-		log.info("Indexing documents {}", Arrays.toString(docIds));
+		
+		if (log.isInfoEnabled()) {
+			log.info("Indexing documents {}", Arrays.toString(docIds));
+		}
+		
 		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		for (Long id : docIds) {
 			if (id != null) {
@@ -370,8 +375,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 										mail.setMessageText("<html><body>" + template.getFormattedBody(dictionary)
 												+ "</html></body>");
 
-										log.info("Notify the creation of new documents {} to {}", docs,
-												mail.getRecipients());
+										if (log.isInfoEnabled())
+											log.info("Notify the creation of new documents {} to {}", docs, mail.getRecipients());
 										EMailSender sender = getEmailSender(session);
 										sender.send(mail);
 
@@ -403,7 +408,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			if (ServiceUtil.executeLongRunningOperation("Add Documents", runnable, session))
 				return createdDocs.toArray(new GUIDocument[0]);
 			else
-				return null;
+				return new GUIDocument[0];
+			
 		} catch (Throwable t) {
 			return (GUIDocument[]) ServiceUtil.throwServerException(session, log, t);
 		}
@@ -492,8 +498,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 									mail.setMessageText(
 											"<html><body>" + template.getFormattedBody(dictionary) + "</html></body>");
 
-									log.info("Notify the checkin of document {} to {}", doc,
-											mail.getRecipients());
+									if (log.isInfoEnabled())
+										log.info("Notify the checkin of document {} to {}", doc, mail.getRecipients());
 									EMailSender sender = getEmailSender(session);
 									sender.send(mail);
 
@@ -1060,7 +1066,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				versions = new GUIVersion[1];
 				versions[0] = version2;
 			} else
-				return null;
+				return new GUIVersion[0];
 
 			return versions;
 		} catch (Throwable t) {
