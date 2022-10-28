@@ -208,7 +208,6 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		try {
 			List<GUIDocument> createdDocs = new ArrayList<GUIDocument>();
-//			HttpServletRequest servletRequest = getThreadLocalRequest();
 
 			Runnable runnable = new Runnable() {
 
@@ -216,13 +215,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				public void run() {
 					List<Document> docs = new ArrayList<Document>();
 
-//					Map<String, File> uploadedFilesMap = GWTUploadServlet.getReceivedFiles(servletRequest,
-//							session.getSid());
 					Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 					log.debug("Uploading {} files", uploadedFilesMap.size());
-
-//					Map<String, String> uploadedFileNames = GWTUploadServlet.getReceivedFileNames(servletRequest,
-//							session.getSid());
 
 					DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
@@ -376,8 +370,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 										mail.setMessageText("<html><body>" + template.getFormattedBody(dictionary)
 												+ "</html></body>");
 
-										log.info("Notify the creation of new documents {} to {}", docs.toString(),
-												mail.getRecipients().toString());
+										log.info("Notify the creation of new documents {} to {}", docs,
+												mail.getRecipients());
 										EMailSender sender = getEmailSender(session);
 										sender.send(mail);
 
@@ -499,7 +493,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 											"<html><body>" + template.getFormattedBody(dictionary) + "</html></body>");
 
 									log.info("Notify the checkin of document {} to {}", doc,
-											mail.getRecipients().toString());
+											mail.getRecipients());
 									EMailSender sender = getEmailSender(session);
 									sender.send(mail);
 
@@ -796,37 +790,12 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			fDao.initialize(doc.getFolder());
 			folder = FolderServiceImpl.fromFolder(doc.getFolder(), false);
 
-//			Long aliasId = null;
-//			String aliasFileName = null;
-//			String aliasType = null;
-//			String aliasColor = null;
-//
-//			// Check if it is an alias
-//			if (doc.getDocRef() != null) {
-//				aliasFileName = doc.getFileName();
-//				aliasType = doc.getType();
-//				aliasColor = doc.getColor();
-//				long id = doc.getDocRef();
-//				doc = docDao.findById(id);
-//				aliasId = docId;
-//			}
-
 			if (session != null)
 				checkPublished(session.getUser(), doc);
 
 			docDao.initialize(doc);
 
 			document = fromDocument(doc, folder, session != null ? session.getUser() : null);
-
-//			if (aliasId != null)
-//				document.setDocRef(aliasId);
-//			if (StringUtils.isNotEmpty(aliasFileName))
-//				document.setFileName(aliasFileName);
-//			if (StringUtils.isNotEmpty(aliasColor))
-//				document.setColor(aliasColor);
-//			if (StringUtils.isNotEmpty(aliasType)) {
-//				document.setType(aliasType);
-//			}
 
 			if (session != null && folder != null) {
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -1704,12 +1673,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		String resource = storer.getResourceName(doc, null, null);
 
 		boolean convertToPdf = pdfConversion;
-		if (doc.getDocRef() != null) {
+		if ((doc.getDocRef() != null) && ("pdf".equals(doc.getDocRefType()))) {
 			// this is an alias
-			if ("pdf".equals(doc.getDocRefType())) {
-				doc = docDao.findById(doc.getDocRef());
-				convertToPdf = true;
-			}
+			doc = docDao.findById(doc.getDocRef());
+			convertToPdf = true;
 		}
 
 		EMailAttachment att = new EMailAttachment();
@@ -1731,9 +1698,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		att.setData(storer.getBytes(doc.getId(), resource));
 
-		if (att != null) {
-			email.addAttachment(2 + email.getAttachments().size(), att);
-		}
+		email.addAttachment(2 + email.getAttachments().size(), att);
 	}
 
 	private void createAttachment(EMail email, File zipFile) throws IOException {
@@ -1743,9 +1708,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		String extension = "zip";
 		att.setMimeType(MimeType.get(extension));
 
-		if (att != null) {
-			email.addAttachment(2 + email.getAttachments().size(), att);
-		}
+		email.addAttachment(2 + email.getAttachments().size(), att);
 	}
 
 	@Override
@@ -2336,7 +2299,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		long count = 0;
 		try {
 			for (int i = 0; i < folderIds.length; i++) {
-				count += countDocuments(session.getUser(), folderIds[i], status);
+				count += countDocuments(folderIds[i], status);
 			}
 		} catch (Throwable t) {
 			return (Long) ServiceUtil.throwServerException(session, log, t);
@@ -2344,7 +2307,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		return count;
 	}
 
-	private long countDocuments(User user, long folderId, int status) throws ServerException {
+	private long countDocuments(long folderId, int status) throws ServerException {
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -2598,8 +2561,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			if (rat == null)
 				return 0;
 
-			if (rat != null && rat.getUserId() != session.getUserId())
+			if (rat.getUserId() != session.getUserId())
 				throw new Exception("Cannot delete the rating left by another user");
+			
 			rDao.delete(id);
 
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
