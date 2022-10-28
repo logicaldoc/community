@@ -62,9 +62,15 @@ import com.logicaldoc.util.sql.SqlUtil;
 @SuppressWarnings("unchecked")
 public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> implements FolderDAO {
 
+	private static final String FROM_FOLDER = " from Folder ";
+
+	private static final String FROM_FOLDER2 = ") from Folder ";
+
+	private static final String WHERE = " where ";
+
 	private static final String PARENT_ID = "parentId";
 
-	private static final String AND2 = ") and ";
+	private static final String PARENT_ID2 = ".parentId=";
 
 	private static final String REPLICATE = "replicate";
 
@@ -72,15 +78,13 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String AND = " and ";
 
+	private static final String AND2 = ") and ";
+
 	private static final String SELECT = "select ";
 
 	private static final String LEFT_JOIN = " left join ";
 
 	private static final String SELECT_DISTINCT = "select distinct(";
-
-	private static final String FROM_FOLDER = ") from Folder ";
-
-	private static final String PARENT_ID2 = ".parentId=";
 
 	private static final String WHERE_GROUP_GROUP_ID_IN = " where _group.groupId in (";
 
@@ -334,7 +338,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (precoll.isEmpty())
 			return coll;
 
-		query1.append(SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + " ");
+		query1.append(SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER2 + ALIAS_ENTITY + " ");
 		query1.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group");
 		query1.append(WHERE_GROUP_GROUP_ID_IN);
 
@@ -357,7 +361,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		/*
 		 * Now search for all other folders that references accessible folders
 		 */
-		StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY + " where "
+		StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + WHERE
 				+ ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
 		query2.append(AND + ALIAS_ENTITY + ".securityRef in (");
 		query2.append("    select distinct(B.id) from Folder B ");
@@ -425,7 +429,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * Search for the folders that define its own policies
 			 */
 			StringBuilder query1 = new StringBuilder(
-					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
+					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER2 + ALIAS_ENTITY + "  ");
 			query1.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group ");
 			query1.append(WHERE_GROUP_GROUP_ID_IN);
 
@@ -447,7 +451,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * Now search for all other folders that references accessible
 			 * folders
 			 */
-			StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY + " where "
+			StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + WHERE
 					+ ALIAS_ENTITY + ".deleted=0 and " + ALIAS_ENTITY + ".parentId = :parentId ");
 			query2.append(AND + ALIAS_ENTITY + ".securityRef in (");
 			query2.append("    select distinct(B.id) from Folder B ");
@@ -557,7 +561,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			if (userGroups.isEmpty())
 				return false;
 
-			StringBuilder query = new StringBuilder(SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
+			StringBuilder query = new StringBuilder(
+					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER2 + ALIAS_ENTITY + "  ");
 			query.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group ");
 			query.append(WHERE_GROUP_GROUP_ID_IN);
 			query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
@@ -609,9 +614,10 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			/*
 			 * Search for folders that define its own security policies
 			 */
-			StringBuilder query = new StringBuilder(SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + "  ");
+			StringBuilder query = new StringBuilder(
+					SELECT_DISTINCT + ALIAS_ENTITY + FROM_FOLDER2 + ALIAS_ENTITY + "  ");
 			query.append(LEFT_JOIN + ALIAS_ENTITY + ".folderGroups as _group ");
-			query.append(" where " + ALIAS_ENTITY + ".deleted=0 and _group.groupId =" + groupId);
+			query.append(WHERE + ALIAS_ENTITY + ".deleted=0 and _group.groupId =" + groupId);
 
 			coll = (List<Folder>) findByQuery(query.toString(), (Map<String, Object>) null, null);
 
@@ -620,8 +626,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			 * ones
 			 */
 			if (!coll.isEmpty()) {
-				StringBuilder query2 = new StringBuilder(SELECT + ALIAS_ENTITY + " from Folder " + ALIAS_ENTITY
-						+ " where " + ALIAS_ENTITY + ".deleted=0 ");
+				StringBuilder query2 = new StringBuilder(
+						SELECT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + WHERE + ALIAS_ENTITY + ".deleted=0 ");
 				query2.append(AND + ALIAS_ENTITY + ".securityRef in (");
 				boolean first = true;
 				for (Folder folder : coll) {
@@ -988,7 +994,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		StringBuilder query = new StringBuilder(
 				"select A.ld_write as LDWRITE, A.ld_add as LDADD, A.ld_security as LDSECURITY, A.ld_immutable as LDIMMUTABLE, A.ld_delete as LDDELETE, A.ld_rename as LDRENAME, A.ld_import as LDIMPORT, A.ld_export as LDEXPORT, A.ld_sign as LDSIGN, A.ld_archive as LDARCHIVE, A.ld_workflow as LDWORKFLOW, A.ld_download as LDDOWNLOAD, A.ld_calendar as LDCALENDAR, A.ld_subscription as LDSUBSCRIPTION, A.ld_print as LDPRINT, A.ld_password as LDPASSWORD, A.ld_move as LDMOVE, A.ld_email as LDEMAIL, A.ld_automation LDAUTOMATION, A.ld_storage LDSTORAGE");
 		query.append(" from ld_foldergroup A");
-		query.append(" where ");
+		query.append(WHERE);
 		query.append(" A.ld_folderid=" + id);
 		query.append(" and A.ld_groupid in (");
 		query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
@@ -1343,8 +1349,13 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		jdbcUpdate("delete from ld_foldergroup where not ld_folderid = ? and ld_folderid in " + treeIdsString, rootId);
 		log.warn("Removed {} specific rights in tree {}", records, rootId);
 
-		if (getSessionFactory().getCache() != null)
-			getSessionFactory().getCache().evictEntityRegions();
+		if (getSessionFactory().getCache() != null) {
+			getSessionFactory().getCache().evictEntityData(Folder.class);
+			getSessionFactory().getCache().evictCollectionData(Folder.class.getCanonicalName() + ".folderGroups");
+
+//			getSessionFactory().getCache().evictAllRegions();
+//			getSessionFactory().getCache().evictCollectionRegions();
+		}
 	}
 
 	@Override
@@ -1766,12 +1777,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public List<Folder> deleteTree(long folderId, FolderHistory transaction) throws Exception {
+	public List<Folder> deleteTree(long folderId, FolderHistory transaction) throws PersistenceException {
 		return deleteTree(folderId, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 	}
 
 	@Override
-	public List<Folder> deleteTree(long folderId, int delCode, FolderHistory transaction) throws Exception {
+	public List<Folder> deleteTree(long folderId, int delCode, FolderHistory transaction) throws PersistenceException {
 		List<Folder> notDeleted = deleteTree(findById(folderId), delCode, transaction);
 		return notDeleted;
 	}

@@ -10,8 +10,11 @@ import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.dao.BookmarkDAO;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.webservice.AbstractService;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
@@ -27,13 +30,13 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	protected static Logger log = LoggerFactory.getLogger(SoapBookmarkService.class);
 
 	@Override
-	public WSBookmark saveBookmark(String sid, WSBookmark bookmark) throws Exception {
+	public WSBookmark saveBookmark(String sid, WSBookmark bookmark) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		checkObjectAvailability(sid, bookmark);
 		return storeBookmark(bookmark, user);
 	}
 
-	private void checkObjectAvailability(String sid, WSBookmark bookmark) throws Exception {
+	private void checkObjectAvailability(String sid, WSBookmark bookmark) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		if (bookmark.getType() == Bookmark.TYPE_DOCUMENT) {
 			checkDocumentAvailable(sid, bookmark.getTargetId());
 		} else {
@@ -41,24 +44,20 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 		}
 	}
 
-	private WSFolder checkFolderAvailable(String sid, long folderId) throws Exception {
+	private WSFolder checkFolderAvailable(String sid, long folderId) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException  {
 		SoapFolderService folderService = new SoapFolderService();
 		folderService.setValidateSession(isValidateSession());
 		WSFolder folder = folderService.getFolder(sid, folderId);
 		if (folder == null)
-			throw new Exception("Folder " + folderId + " not found or not accessible");
+			throw new PermissionException("Folder " + folderId + " not found or not accessible");
 		else
 			return folder;
 	}
 
-	private WSDocument checkDocumentAvailable(String sid, long docId) throws Exception {
+	private WSDocument checkDocumentAvailable(String sid, long docId) throws PermissionException, AuthenticationException, WebserviceException, PersistenceException {
 		SoapDocumentService docService = new SoapDocumentService();
 		docService.setValidateSession(isValidateSession());
-		WSDocument doc = docService.getDocument(sid, docId);
-		if (doc == null)
-			throw new Exception("Document " + docId + " not found or not accessible");
-		else
-			return doc;
+		return docService.getDocument(sid, docId);
 	}
 
 	private WSBookmark storeBookmark(WSBookmark bookmark, User user) {
@@ -91,7 +90,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	}
 
 	@Override
-	public WSBookmark bookmarkDocument(String sid, long docId) throws Exception {
+	public WSBookmark bookmarkDocument(String sid, long docId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 
 		WSDocument doc = checkDocumentAvailable(sid, docId);
@@ -112,7 +111,8 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	}
 
 	@Override
-	public WSBookmark bookmarkFolder(String sid, long folderId) throws Exception {
+	public WSBookmark bookmarkFolder(String sid, long folderId)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		checkFolderAvailable(sid, folderId);
 		User user = validateSession(sid);
 
@@ -134,7 +134,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	}
 
 	@Override
-	public WSBookmark[] getBookmarks(String sid) throws Exception {
+	public WSBookmark[] getBookmarks(String sid) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		List<Bookmark> list = bDao.findByUserId(user.getId());
@@ -145,17 +145,17 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	}
 
 	@Override
-	public void deleteBookmark(String sid, long bookmarkId) throws Exception {
+	public void deleteBookmark(String sid, long bookmarkId) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		Bookmark bookmark = bDao.findById(bookmarkId);
 		if (bookmark == null || bookmark.getUserId() != user.getId())
-			throw new Exception("Bookmark " + bookmarkId + " not found or not accessible");
+			throw new WebserviceException("Bookmark " + bookmarkId + " not found or not accessible");
 		bDao.delete(bookmarkId);
 	}
 
 	@Override
-	public void unbookmarkDocument(String sid, long docId) throws Exception {
+	public void unbookmarkDocument(String sid, long docId) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		Bookmark bookmark = bDao.findByUserIdAndDocId(user.getId(), docId);
@@ -164,7 +164,7 @@ public class SoapBookmarkService extends AbstractService implements BookmarkServ
 	}
 
 	@Override
-	public void unbookmarkFolder(String sid, long folderId) throws Exception {
+	public void unbookmarkFolder(String sid, long folderId) throws AuthenticationException, WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		Bookmark bookmark = bDao.findByUserIdAndFolderId(user.getId(), folderId);

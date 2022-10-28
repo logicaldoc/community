@@ -5,6 +5,10 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.model.WSAttributeOption;
 import com.logicaldoc.webservice.model.WSAttributeSet;
@@ -22,13 +26,15 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return The list of all templates
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "template")
 	@WebMethod
 	@WSDoc(description = "lists all the templates")
 	public WSTemplate[] listTemplates(@WebParam(name = "sid")
-	String sid) throws Exception;
+	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets template's metadata
@@ -38,14 +44,16 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return A value object containing the template's metadata.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid sessionon
 	 */
 	@WebResult(name = "template")
 	@WebMethod
 	@WSDoc(description = "gets an existing template by it's name")
 	public WSTemplate getTemplate(@WebParam(name = "sid")
 	String sid, @WebParam(name = "name")
-	String name) throws Exception;
+	String name) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets template's metadata
@@ -55,14 +63,16 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return A value object containing the template's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "template")
 	@WebMethod
 	@WSDoc(description = "gets an existing template by it's identifier")
 	public WSTemplate getTemplateById(@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
-	long templateId) throws Exception;
+	long templateId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Create/Update a template. You can completely customize the template
@@ -73,14 +83,17 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return The ID of the new template
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PermissionException The permission has not been granted
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "templateId")
 	@WebMethod
 	@WSDoc(description = "creates/updates a template; you can completely customize the template through a value object; returns the identifier of the created/updated template")
 	public long storeTemplate(@WebParam(name = "sid")
 	String sid, @WebParam(name = "template")
-	WSTemplate template) throws Exception;
+	WSTemplate template) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Deletes an existing template with the given identifier
@@ -88,13 +101,16 @@ public interface DocumentMetadataService {
 	 * @param sid Session identifier (need to be administrator)
 	 * @param templateId The template's id
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PermissionException The permission has not been granted
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "deletes an existing template")
 	public void deleteTemplate(@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
-	long templateId) throws Exception;
+	long templateId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Gets metadata of all existing attribute sets.
@@ -102,13 +118,15 @@ public interface DocumentMetadataService {
 	 * @param sid Session identifier
 	 * @return The list of all attribute sets
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "attributeSet")
 	@WebMethod
 	@WSDoc(description = "lists all the attribute sets")
 	public WSAttributeSet[] listAttributeSets(@WebParam(name = "sid")
-	String sid) throws Exception;
+	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets attribute set's metadata
@@ -118,14 +136,16 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return A value object containing the attribute set's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "attributeSet")
 	@WebMethod
 	@WSDoc(description = "gets an attribute set by it's name")
 	public WSAttributeSet getAttributeSet(@WebParam(name = "sid")
 	String sid, @WebParam(name = "name")
-	String name) throws Exception;
+	String name) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets attribute set's metadata
@@ -135,14 +155,16 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return A value object containing the attribute set's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "attributeSet")
 	@WebMethod
 	@WSDoc(description = "gets an attribute set by it's identifier")
 	public WSAttributeSet getAttributeSetById(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
-	long setId) throws Exception;
+	long setId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Create/Update an attribute set. You can completely customize the
@@ -154,15 +176,16 @@ public interface DocumentMetadataService {
 	 *        metadata
 	 * 
 	 * @return The ID of the new attribute set
-	 * 
-	 * @throws Exception error in the server application
+	 *
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebResult(name = "setId")
 	@WebMethod
 	@WSDoc(description = "creates/updates an attribute set; you can completely customize the set through a value object; returns the identifier of the created/updated set")
 	public long storeAttributeSet(@WebParam(name = "sid")
 	String sid, @WebParam(name = "attributeSet")
-	WSAttributeSet attributeSet) throws Exception;
+	WSAttributeSet attributeSet) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Deletes an existing attribute set with the given identifier.
@@ -170,13 +193,14 @@ public interface DocumentMetadataService {
 	 * @param sid Session identifier (need to be administrator)
 	 * @param setId The attribute set's id
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebMethod
 	@WSDoc(description = "deletes an existing attribute set")
 	public void deleteAttributeSet(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
-	long setId) throws Exception;
+	long setId) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Saves the options for the given attribute
@@ -185,8 +209,9 @@ public interface DocumentMetadataService {
 	 * @param setId The attribute set's id
 	 * @param attribute The attribute's name
 	 * @param options The attribute's options
-	 * 
-	 * @throws Exception error in the server application
+	 *
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
 	 */
 	@WebMethod
 	@WSDoc(description = "saves the options for the given attribute")
@@ -194,7 +219,7 @@ public interface DocumentMetadataService {
 	String sid, @WebParam(name = "setId")
 	long setId, @WebParam(name = "attribute")
 	String attribute, @WebParam(name = "options")
-	WSAttributeOption[] options) throws Exception;
+	WSAttributeOption[] options) throws WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the options for the given attribute
@@ -205,15 +230,17 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return the list of all the attribute's options
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the options for the given attribute")
 	public String[] getAttributeOptions(@WebParam(name = "sid")
 	String sid, @WebParam(name = "setId")
 	long setId, @WebParam(name = "attribute")
-	String attribute) throws Exception;
-	
+	String attribute) throws AuthenticationException, WebserviceException, PersistenceException;
+
 	/**
 	 * Retrieves the options for the given attribute inside a given category
 	 * 
@@ -224,7 +251,9 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return the list of all the attribute's options
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the options for the given attribute inside a given category")
@@ -232,8 +261,7 @@ public interface DocumentMetadataService {
 	String sid, @WebParam(name = "setId")
 	long setId, @WebParam(name = "attribute")
 	String attribute, @WebParam(name = "category")
-	String category) throws Exception;
-
+	String category) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Tests if a template is readable.
@@ -244,14 +272,16 @@ public interface DocumentMetadataService {
 	 * @return True if the identifier denotes a readable template, otherwise
 	 *         false.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "tests if a template is readable")
 	public boolean isTemplateReadable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
-	long templateId) throws Exception;
+	long templateId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Tests if a template is writable
@@ -261,14 +291,16 @@ public interface DocumentMetadataService {
 	 * @return True if the identifier denotes a writable template, otherwise
 	 *         false
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "tests if a template is writable")
 	public boolean isTemplateWritable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
-	long templateId) throws Exception;
+	long templateId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Grants user permission to the template.
@@ -279,7 +311,10 @@ public interface DocumentMetadataService {
 	 * @param permissions the permission integer representation. If '0', the
 	 *        user will be not granted to access the template.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PermissionException The permission has not been granted
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "grants user permission to the template")
@@ -290,7 +325,8 @@ public interface DocumentMetadataService {
 	long userId,
 			@WSDoc(description = "the permission integer representation; if '0', the user will be not granted to access the template")
 			@WebParam(name = "permissions")
-			int permissions) throws Exception;
+			int permissions)
+			throws PersistenceException, AuthenticationException, WebserviceException, PermissionException;
 
 	/**
 	 * Grants group permission to the template.
@@ -301,7 +337,10 @@ public interface DocumentMetadataService {
 	 * @param permissions the permission integer representation. If '0', the
 	 *        group will be not granted to access the template.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PermissionException The permission has not been granted
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "grants group permission to the template")
@@ -312,7 +351,8 @@ public interface DocumentMetadataService {
 	long groupId,
 			@WSDoc(description = "the permission integer representation; if '0', the group will be not granted to access the template")
 			@WebParam(name = "permissions")
-			int permissions) throws Exception;
+			int permissions)
+			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Retrieves the list of granted users for the given template.
@@ -322,14 +362,17 @@ public interface DocumentMetadataService {
 	 * 
 	 * @return 'error' if error occurred, the right objects collection.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PermissionException The permission has not been granted
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the list of granted users for the given folder")
 	public WSRight[] getGrantedUsers(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
-	long templateId) throws Exception;
+	long templateId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Retrieves the list of granted groups for the given template
@@ -338,12 +381,15 @@ public interface DocumentMetadataService {
 	 * @param templateId Template id
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PermissionException The permission has not been granted
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the list of granted groups for the given folder")
 	public WSRight[] getGrantedGroups(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "templateId")
-	long templateId) throws Exception;
+	long templateId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 }

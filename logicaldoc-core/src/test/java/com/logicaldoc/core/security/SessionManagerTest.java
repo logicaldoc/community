@@ -1,8 +1,11 @@
 package com.logicaldoc.core.security;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.core.AbstractCoreTCase;
+import com.logicaldoc.core.security.dao.GroupDAO;
+import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -16,6 +19,11 @@ import junit.framework.Assert;
  */
 public class SessionManagerTest extends AbstractCoreTCase {
 
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+	}
+	
 	@Test
 	public void testNewSession() {
 		SessionManager sm = SessionManager.get();

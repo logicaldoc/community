@@ -567,7 +567,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @throws Exception in case of any error
 	 */
-	public List<Folder> deleteTree(long folderId, int delCode, FolderHistory transaction) throws Exception;
+	public List<Folder> deleteTree(long folderId, int delCode, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Shortcut for deleteTree(folderId, 1, transaction)
@@ -580,7 +580,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @throws Exception in case of any error
 	 */
-	public List<Folder> deleteTree(long folderId, FolderHistory transaction) throws Exception;
+	public List<Folder> deleteTree(long folderId, FolderHistory transaction) throws PersistenceException;
 
 	/**
 	 * Useful method that allows to find all folders that contains the given

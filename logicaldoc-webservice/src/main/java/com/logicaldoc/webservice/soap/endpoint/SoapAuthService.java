@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.soap.AuthService;
 
@@ -22,7 +23,7 @@ public class SoapAuthService extends AbstractService implements AuthService {
 	protected static Logger log = LoggerFactory.getLogger(SoapAuthService.class);
 
 	@Override
-	public String login(String username, String password) throws Exception {
+	public String login(String username, String password) throws AuthenticationException {
 		HttpServletRequest request = null;
 		if (context != null) {
 			MessageContext ctx = context.getMessageContext();
@@ -33,8 +34,8 @@ public class SoapAuthService extends AbstractService implements AuthService {
 		if (request == null)
 			request = messageContext.getHttpServletRequest();
 
-		Session session = SessionManager.get()
-				.newSession(username, password, SessionManager.get().buildClient(request));
+		Session session = SessionManager.get().newSession(username, password,
+				SessionManager.get().buildClient(request));
 		return session.getSid();
 	}
 

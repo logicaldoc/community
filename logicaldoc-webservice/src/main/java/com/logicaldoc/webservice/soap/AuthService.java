@@ -4,6 +4,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.doc.WSDoc;
 
 /**
@@ -23,12 +24,13 @@ public interface AuthService {
 	 * 
 	 * @return The newly created session identifier(sid)
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws AuthenticationException the user was not authenticated
 	 */
 	@WebMethod
 	@WSDoc(description = "starts a new session; returns the session identifier(SID)")
-	public String login(@WebParam(name = "username") String username, @WebParam(name = "password") String password)
-			throws Exception;
+	public String login(@WebParam(name = "username")
+	String username, @WebParam(name = "password")
+	String password) throws AuthenticationException;
 
 	/**
 	 * Closes a session.
@@ -37,7 +39,9 @@ public interface AuthService {
 	 */
 	@WebMethod
 	@WSDoc(description = "closes a session")
-	public void logout(@WSDoc(description = "the session identifier") @WebParam(name = "sid") String sid);
+	public void logout(@WSDoc(description = "the session identifier")
+	@WebParam(name = "sid")
+	String sid);
 
 	/**
 	 * Checks if a SID is valid
@@ -48,7 +52,9 @@ public interface AuthService {
 	 */
 	@WebMethod
 	@WSDoc(description = "checks if a SID is valid; returns true only if the session is valid")
-	public boolean valid(@WSDoc(description = "the session identifier") @WebParam(name = "sid") String sid);
+	public boolean valid(@WSDoc(description = "the session identifier")
+	@WebParam(name = "sid")
+	String sid);
 
 	/**
 	 * Renews a session
@@ -57,5 +63,7 @@ public interface AuthService {
 	 */
 	@WebMethod
 	@WSDoc(description = "renews an existing session")
-	public void renew(@WSDoc(description = "the session identifier") @WebParam(name = "sid") String sid);
+	public void renew(@WSDoc(description = "the session identifier")
+	@WebParam(name = "sid")
+	String sid);
 }

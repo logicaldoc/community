@@ -43,6 +43,8 @@
         <property name="settings" ref="ContextProperties" />
     	<property name="sequenceDAO" ref="SequenceDAO" />
     </bean>
+    <bean id="WebserviceFaultInterceptor" class="com.logicaldoc.webservice.WebserviceFaultInterceptor" />
+    
     
     <!-- ############################## -->
     <!-- ####### JAX-WS (SOAP) ######## -->
@@ -52,7 +54,7 @@
         address="/Auth">
         <jaxws:inInterceptors>
             <ref bean="WebserviceInterceptor" />
-        </jaxws:inInterceptors>        
+        </jaxws:inInterceptors>
         <jaxws:properties>
             <entry key="mtom-enabled" value="${webservice.mtom}"/>
         </jaxws:properties>
@@ -152,7 +154,10 @@
 		address="/DocumentMetadata">
         <jaxws:inInterceptors>
             <ref bean="WebserviceInterceptor" />
-        </jaxws:inInterceptors>		
+        </jaxws:inInterceptors>
+        <jaxws:outFaultInterceptors>
+           <ref bean="WebserviceFaultInterceptor" />
+        </jaxws:outFaultInterceptors>        
 		<jaxws:properties>
 			<entry key="mtom-enabled" value="${webservice.mtom}" />
 		</jaxws:properties>

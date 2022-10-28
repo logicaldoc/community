@@ -126,7 +126,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void replaceFile(long docId, String fileVersion, InputStream content, DocumentHistory transaction)
-			throws Exception {
+			throws IOException, PersistenceException {
 		assert (transaction != null);
 
 		// Write content to temporary file, then delete it
@@ -142,7 +142,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void replaceFile(long docId, String fileVersion, File newFile, DocumentHistory transaction)
-			throws Exception {
+			throws PersistenceException, IOException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 		assert (transaction.getComment() != null);
@@ -191,7 +191,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void checkin(long docId, File file, String filename, boolean release, AbstractDocument docVO,
-			DocumentHistory transaction) throws Exception {
+			DocumentHistory transaction) throws PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 		assert (transaction.getComment() != null);
@@ -282,7 +282,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				// store the document in the repository (on the file system)
 				try {
 					storeFile(document, file);
-				} catch (Throwable t) {
+				} catch (Exception t) {
 					log.error("Cannot save the new version {} into the storage", document, t);
 
 					document.copyAttributes(oldDocument);
@@ -296,7 +296,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					document.setStamped(oldDocument.getStamped());
 					document.setSigned(oldDocument.getSigned());
 					documentDAO.store(document);
-					throw t;
+					throw new PersistenceException(t.getMessage());
 				}
 
 				version.setFileSize(document.getFileSize());
@@ -317,17 +317,18 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	private void checkCustomIdUniquenessOnCheckin(Document document, AbstractDocument docVO) throws Exception {
+	private void checkCustomIdUniquenessOnCheckin(Document document, AbstractDocument docVO)
+			throws PersistenceException {
 		if (docVO != null && docVO.getCustomId() != null) {
 			Document test = documentDAO.findByCustomId(docVO.getCustomId(), document.getTenantId());
 			if (test != null && test.getId() != document.getId())
-				throw new Exception("Duplicated CustomID");
+				throw new PersistenceException("Duplicated CustomID");
 		}
 	}
 
 	@Override
 	public void checkin(long docId, InputStream content, String filename, boolean release, AbstractDocument docVO,
-			DocumentHistory transaction) throws Exception {
+			DocumentHistory transaction) throws IOException, PersistenceException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 		assert (transaction.getComment() != null);
@@ -462,7 +463,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public long reindex(long docId, String content, DocumentHistory transaction) throws Exception {
+	public long reindex(long docId, String content, DocumentHistory transaction) throws PersistenceException, ParseException  {
 		Document doc = documentDAO.findById(docId);
 		assert doc != null : "Unexisting document with ID: " + docId;
 
@@ -503,7 +504,11 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 
 		// This may take time
-		indexer.addHit(doc, cont);
+		try {
+			indexer.addHit(doc, cont);
+		} catch (Exception e) {
+			throw new ParseException(e.getMessage(), e);
+		}
 
 		// For additional safety update the DB directly
 		doc.setIndexed(AbstractDocument.INDEX_INDEXED);
@@ -680,11 +685,11 @@ public class DocumentManagerImpl implements DocumentManager {
 		document.setOcrTemplateId(docVO.getOcrTemplateId());
 	}
 
-	private void checkCustomIdUniquenesOnUpdate(Document document, Document docVO) throws Exception {
+	private void checkCustomIdUniquenesOnUpdate(Document document, Document docVO) throws PersistenceException {
 		if (docVO.getCustomId() != null) {
 			Document test = documentDAO.findByCustomId(docVO.getCustomId(), docVO.getTenantId());
 			if (test != null && test.getId() != document.getId())
-				throw new Exception("Duplicated CustomID");
+				throw new PersistenceException("Duplicated CustomID");
 			document.setCustomId(docVO.getCustomId());
 		}
 	}
@@ -740,16 +745,22 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public Document create(InputStream content, Document docVO, DocumentHistory transaction) throws Exception {
+	public Document create(InputStream content, Document docVO, DocumentHistory transaction)
+			throws PersistenceException {
 		assert (transaction != null);
 		assert (docVO != null);
 
 		// Write content to temporary file, then delete it
-		File tmp = File.createTempFile("create", "");
+		File tmp = null;
 		try {
+			tmp = File.createTempFile("create", "");
 			if (content != null)
 				FileUtil.writeFile(content, tmp.getPath());
 			return create(tmp, docVO, transaction);
+		} catch (PersistenceException pe) {
+			throw pe;
+		} catch (Exception ioe) {
+			throw new PersistenceException(ioe.getMessage(), ioe);
 		} finally {
 			FileUtils.deleteQuietly(tmp);
 		}
@@ -872,7 +883,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction) throws Exception {
+	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction) throws PersistenceException, IOException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -1379,7 +1390,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public void promoteVersion(long docId, String version, DocumentHistory transaction) throws Exception {
+	public void promoteVersion(long docId, String version, DocumentHistory transaction) throws PersistenceException, IOException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -1425,7 +1436,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws Exception {
+	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws PersistenceException, IOException {
 		Folder rootFolder = folderDAO.findFolder(rootFolderId);
 		assert rootFolder == null : "Unexisting folder ID  " + rootFolderId;
 
@@ -1490,7 +1501,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public Document merge(Collection<Document> documents, long targetFolderId, String fileName,
-			DocumentHistory transaction) throws Exception {
+			DocumentHistory transaction) throws IOException, PersistenceException {
 		List<Long> docIds = documents.stream().map(d -> d.getId()).collect(Collectors.toList());
 		File tempDir = null;
 		File bigPdf = null;

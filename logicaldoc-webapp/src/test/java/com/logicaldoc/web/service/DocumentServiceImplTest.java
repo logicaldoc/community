@@ -121,7 +121,8 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		
 		// no versions
 		versions = service.getVersionsById(21, 22);
-		Assert.assertNull(versions);
+		Assert.assertNotNull(versions);
+		Assert.assertEquals(0, versions.length);
 	}
 	
 	@Test

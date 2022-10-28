@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.logicaldoc.core.folder.Folder;
 
 /**
@@ -23,6 +26,8 @@ public class EMail extends Message {
 
 	private static final long serialVersionUID = 1L;
 
+	private static Logger log = LoggerFactory.getLogger(EMail.class);
+	
 	private String authorAddress = "";
 
 	private String username = "";
@@ -140,27 +145,31 @@ public class EMail extends Message {
 		attachments.put(max.intValue() + 1, attachment);
 	}
 
-	public InternetAddress[] getAddresses() throws Exception {
+	public InternetAddress[] getAddresses() {
 		return getAddresses(getRecipients());
 	}
 
-	public InternetAddress[] getAddressesCC() throws Exception {
+	public InternetAddress[] getAddressesCC() {
 		return getAddresses(recipientsCC);
 	}
 
-	public InternetAddress[] getAddressesBCC() throws Exception {
+	public InternetAddress[] getAddressesBCC() {
 		return getAddresses(recipientsBCC);
 	}
 
-	private InternetAddress[] getAddresses(Collection<Recipient> recipients) throws AddressException {
+	private InternetAddress[] getAddresses(Collection<Recipient> recipients) {
 		InternetAddress[] recs = new InternetAddress[recipients.size()];
 		Iterator<Recipient> iter = recipients.iterator();
 		int i = 0;
 
 		while (iter.hasNext()) {
-			Recipient rec = iter.next();
-			recs[i] = new InternetAddress(rec.getAddress());
-			i++;
+			try {
+				Recipient rec = iter.next();
+				recs[i] = new InternetAddress(rec.getAddress());
+				i++;
+			} catch (AddressException e) {
+				log.warn(e.getMessage());
+			}
 		}
 
 		return recs;

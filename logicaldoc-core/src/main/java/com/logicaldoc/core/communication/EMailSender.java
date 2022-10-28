@@ -3,6 +3,7 @@ package com.logicaldoc.core.communication;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -255,9 +256,11 @@ public class EMailSender {
 	 * 
 	 * @param email E-Mail which should be sent.
 	 * 
-	 * @throws Exception raised if the email cannot be sent
+	 * @throws MessagingException raised if the email cannot be sent
+	 * @throws UnsupportedEncodingException raised if the email cannot be sent
+	 * @throws MalformedURLException raised if the email cannot be sent
 	 */
-	public void send(EMail email) throws Exception {
+	public void send(EMail email) throws MessagingException, UnsupportedEncodingException, MalformedURLException {
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenantName = tDao.getTenantName(email.getTenantId());
 		if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))

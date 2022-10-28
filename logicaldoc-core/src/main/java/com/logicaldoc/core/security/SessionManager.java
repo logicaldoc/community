@@ -350,21 +350,9 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 	 * @return The SID if any
 	 */
 	public String getSessionId(HttpServletRequest request) {
-		if (request != null) {
-			if (request.getSession(false) != null && request.getSession(false).getAttribute(PARAM_SID) != null)
-				return (String) request.getSession(false).getAttribute(PARAM_SID);
-			if (request.getAttribute(PARAM_SID) != null)
-				return (String) request.getAttribute(PARAM_SID);
-			if (request.getParameter(PARAM_SID) != null)
-				return (String) request.getParameter(PARAM_SID);
-
-			Cookie cookies[] = request.getCookies();
-			if (cookies != null)
-				for (Cookie cookie : cookies) {
-					if (COOKIE_SID.equals(cookie.getName()))
-						return cookie.getValue();
-				}
-		}
+		String sid = getSessionIdFromRequest(request);
+		if (sid != null)
+			return sid;
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null && auth instanceof LDAuthenticationToken)
@@ -378,6 +366,29 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 		}
 
 		return null;
+	}
+
+	private String getSessionIdFromRequest(HttpServletRequest request) {
+		String sid = null;
+		if (request != null) {
+			if (request.getSession(false) != null && request.getSession(false).getAttribute(PARAM_SID) != null)
+				sid = (String) request.getSession(false).getAttribute(PARAM_SID);
+			else if (request.getAttribute(PARAM_SID) != null)
+				sid = (String) request.getAttribute(PARAM_SID);
+			else if (request.getParameter(PARAM_SID) != null)
+				sid = (String) request.getParameter(PARAM_SID);
+			else {
+				Cookie cookies[] = request.getCookies();
+				if (cookies != null)
+					for (Cookie cookie : cookies) {
+						if (COOKIE_SID.equals(cookie.getName())) {
+							sid = cookie.getValue();
+							break;
+						}
+					}
+			}
+		}
+		return sid;
 	}
 
 	/**

@@ -490,7 +490,7 @@ public class LDCmisService extends AbstractCmisService {
 			Holder<String> changeToken, ContentStream contentStream, ExtensionsData extension) {
 		validateSession();
 		log.debug("setContentStream {}", objectId);
-		checkOut(repositoryId, objectId, extension, new Holder<Boolean>(false));
+		checkOut(repositoryId, objectId, extension, new Holder<>(false));
 		checkIn(repositoryId, objectId, false, null, contentStream, "", null, null, null, extension);
 	}
 

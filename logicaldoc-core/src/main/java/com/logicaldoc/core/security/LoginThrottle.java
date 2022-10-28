@@ -99,7 +99,6 @@ public class LoginThrottle {
 	 * @throws AuthenticationException if the authentication fails
 	 */
 	public static void checkLoginThrottle(String username, String ip) throws AuthenticationException {
-		ContextProperties config = Context.get().getProperties();
 		if (!Context.get().getProperties().getBoolean(THROTTLE_ENABLED))
 			return;
 
@@ -108,39 +107,21 @@ public class LoginThrottle {
 
 		log.debug("Take anti brute force attack countermeasures");
 
-		// Check if the username and/or ip is temporarily blocked
+		// Check if the username is temporarily blocked
+		checkUsername(username);
+
+		// Check if the IP is temporarily blocked
+		checkIp(ip);
+	}
+
+	private static void checkIp(String ip) throws IPBlockedException {
 		SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
-
 		Calendar cal = Calendar.getInstance();
-		int wait = config.getInt("throttle.username.wait", 0);
-		int maxTrials = config.getInt("throttle.username.max", 0);
-		if (maxTrials > 0 && wait > 0) {
-			String counterName = LOGINFAIL_USERNAME + username;
-			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
-			if (seq != null) {
-				long count = seq.getValue();
-				if (count >= maxTrials) {
-					cal.add(Calendar.MINUTE, -wait);
-					Date oldestDate = cal.getTime();
-					if (oldestDate.before(seq.getLastModified())) {
-						log.warn("Possible brute force attack detected for username {}", username);
-						throw new UsernameBlockedException();
-					} else {
-						log.info("Login block for username {} expired", username);
 
-						try {
-							sDao.delete(seq.getId());
-						} catch (PersistenceException e) {
-							log.warn(e.getMessage(), e);
-						}
-					}
-				}
-			}
-		}
+		ContextProperties config = Context.get().getProperties();
+		int wait = config.getInt("throttle.ip.wait", 0);
+		int maxTrials = config.getInt("throttle.ip.max", 0);
 
-		cal = Calendar.getInstance();
-		wait = config.getInt("throttle.ip.wait", 0);
-		maxTrials = config.getInt("throttle.ip.max", 0);
 		if (maxTrials > 0 && wait > 0) {
 			String counterName = LOGINFAIL_IP + ip;
 			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
@@ -154,15 +135,47 @@ public class LoginThrottle {
 						throw new IPBlockedException();
 					} else {
 						log.info("Login block for IP {} expired", ip);
-
-						try {
-							sDao.delete(seq.getId());
-						} catch (PersistenceException e) {
-							log.warn(e.getMessage(), e);
-						}
+						deleteSequence(seq);
 					}
 				}
 			}
+		}
+	}
+
+	private static void checkUsername(String username) throws UsernameBlockedException {
+		SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+		Calendar cal = Calendar.getInstance();
+
+		ContextProperties config = Context.get().getProperties();
+		int wait = config.getInt("throttle.username.wait", 0);
+		int maxTrials = config.getInt("throttle.username.max", 0);
+
+		if (maxTrials > 0 && wait > 0) {
+			String counterName = LOGINFAIL_USERNAME + username;
+			Sequence seq = sDao.findByAlternateKey(counterName, 0L, Tenant.SYSTEM_ID);
+			if (seq != null) {
+				long count = seq.getValue();
+				if (count >= maxTrials) {
+					cal.add(Calendar.MINUTE, -wait);
+					Date oldestDate = cal.getTime();
+					if (oldestDate.before(seq.getLastModified())) {
+						log.warn("Possible brute force attack detected for username {}", username);
+						throw new UsernameBlockedException();
+					} else {
+						log.info("Login block for username {} expired", username);
+						deleteSequence(seq);
+					}
+				}
+			}
+		}
+	}
+	
+	private static void deleteSequence(Sequence seq) {
+		try {
+			SequenceDAO sDao = (SequenceDAO) Context.get().getBean(SequenceDAO.class);
+			sDao.delete(seq.getId());
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
 		}
 	}
 }

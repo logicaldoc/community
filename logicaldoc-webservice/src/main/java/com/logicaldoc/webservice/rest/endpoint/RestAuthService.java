@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.rest.AuthService;
 import com.logicaldoc.webservice.soap.endpoint.SoapAuthService;
 
@@ -42,7 +43,7 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 
 	@GET
     @Path("/login")
-	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) throws Exception {
+	public String login(@QueryParam("u") String username, @QueryParam("pw") String password) throws AuthenticationException {
 		return super.login(username, password);
 	}
 

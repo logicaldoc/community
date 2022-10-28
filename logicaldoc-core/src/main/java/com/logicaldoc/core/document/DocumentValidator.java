@@ -5,6 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.validation.ValidationException;
 import com.logicaldoc.core.metadata.validation.Validator;
 
@@ -23,31 +24,31 @@ public class DocumentValidator extends Validator implements DocumentListener {
 
 	@Override
 	public void beforeStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
-			throws Exception {
+			throws PersistenceException {
 		onValidate(document, transaction, dictionary);
 	}
 
 	@Override
 	public void beforeCheckin(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
-			throws Exception {
+			throws PersistenceException {
 		onValidate(document, transaction, dictionary);
 	}
 
 	@Override
 	public void afterStore(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
-			throws Exception {
+			throws PersistenceException {
 		// Nothing to do
 	}
 
 	@Override
 	public void afterCheckin(Document document, DocumentHistory transaction, Map<String, Object> dictionary)
-			throws Exception {
+			throws PersistenceException {
 		// Nothing to do
 	}
 
 	@Override
 	public void afterSaveHistory(Document document, DocumentHistory event, Map<String, Object> dictionary)
-			throws Exception {
+			throws PersistenceException {
 		// Nothing to do
 	}
 

@@ -4,6 +4,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.rest.AuthService;
 
 /**
@@ -19,7 +20,7 @@ public class RestAuthClient extends AbstractRestClient implements AuthService {
 
 	private AuthService proxy = null;
 
-	public RestAuthClient(String endpoint) {
+	public RestAuthClient(String endpoint) throws AuthenticationException {
 		super(endpoint, null, null);
 		proxy = JAXRSClientFactory.create(endpoint, AuthService.class);
 	}

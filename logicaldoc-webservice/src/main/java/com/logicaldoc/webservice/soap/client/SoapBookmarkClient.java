@@ -4,6 +4,10 @@ import java.io.IOException;
 
 import javax.jws.WebService;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.model.WSBookmark;
 import com.logicaldoc.webservice.soap.BookmarkService;
 
@@ -25,37 +29,44 @@ public class SoapBookmarkClient extends SoapClient<BookmarkService> implements B
 	}
 
 	@Override
-	public WSBookmark saveBookmark(String sid, WSBookmark bookmark) throws Exception {
+	public WSBookmark saveBookmark(String sid, WSBookmark bookmark)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.saveBookmark(sid, bookmark);
 	}
 
 	@Override
-	public WSBookmark bookmarkDocument(String sid, long docId) throws Exception {
+	public WSBookmark bookmarkDocument(String sid, long docId)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.bookmarkDocument(sid, docId);
 	}
 
 	@Override
-	public WSBookmark bookmarkFolder(String sid, long folderId) throws Exception {
+	public WSBookmark bookmarkFolder(String sid, long folderId)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException {
 		return client.bookmarkFolder(sid, folderId);
 	}
 
 	@Override
-	public WSBookmark[] getBookmarks(String sid) throws Exception {
+	public WSBookmark[] getBookmarks(String sid)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		return client.getBookmarks(sid);
 	}
 
 	@Override
-	public void deleteBookmark(String sid, long bookmarkId) throws Exception {
+	public void deleteBookmark(String sid, long bookmarkId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		client.deleteBookmark(sid, bookmarkId);
 	}
 
 	@Override
-	public void unbookmarkDocument(String sid, long docId) throws Exception {
+	public void unbookmarkDocument(String sid, long docId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		client.unbookmarkDocument(sid, docId);
 	}
 
 	@Override
-	public void unbookmarkFolder(String sid, long folderId) throws Exception {
+	public void unbookmarkFolder(String sid, long folderId)
+			throws AuthenticationException, WebserviceException, PersistenceException {
 		client.unbookmarkFolder(sid, folderId);
 	}
 }

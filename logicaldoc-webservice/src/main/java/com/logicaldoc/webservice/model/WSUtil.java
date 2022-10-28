@@ -1,8 +1,6 @@
 package com.logicaldoc.webservice.model;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +14,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
@@ -148,11 +147,11 @@ public class WSUtil {
 		return wsDoc;
 	}
 
-	public static Document toDocument(WSDocument wsDoc) throws Exception {
+	public static Document toDocument(WSDocument wsDoc) throws PersistenceException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Folder folder = fdao.findById(wsDoc.getFolderId());
 		if (folder == null) {
-			throw new Exception("error - folder not found");
+			throw new PersistenceException("error - folder not found");
 		}
 		// fdao.initialize(folder);
 

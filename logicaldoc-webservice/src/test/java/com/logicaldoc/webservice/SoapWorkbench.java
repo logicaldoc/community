@@ -52,11 +52,11 @@ public class SoapWorkbench {
 		try {
 			System.out.println(info.getInfo().getProductName() + "  " + info.getInfo().getDate());
 
-			String[] features = systemClient.getInfo().getFeatures();
-			System.out.println("Features:");
-			for (String feature : features) {
-				System.out.println(Arrays.asList(feature).stream().sorted().collect(Collectors.toList()));
-			}
+//			String[] features = systemClient.getInfo().getFeatures();
+//			System.out.println("Features:");
+//			for (String feature : features) {
+//				System.out.println(Arrays.asList(feature).stream().sorted().collect(Collectors.toList()));
+//			}
 
 //		    securityStuff(sid);
 
@@ -77,7 +77,7 @@ public class SoapWorkbench {
 
 			// bookmarkStuff(sid);
 
-			// metadataStuff(metadataClient, sid);
+			 metadataStuff(metadataClient, sid);
 
 			// WSFolder newFolder = new WSFolder();
 			// newFolder.setName("ddddd");

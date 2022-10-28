@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.jws.WebService;
 
+import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.webservice.soap.AuthService;
 
 /**
@@ -12,15 +13,15 @@ import com.logicaldoc.webservice.soap.AuthService;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
  */
-@WebService(name="Auth", serviceName="Auth")
+@WebService(name = "Auth", serviceName = "Auth")
 public class SoapAuthClient extends SoapClient<AuthService> implements AuthService {
 
 	public SoapAuthClient(String endpoint) throws IOException {
 		super(endpoint, AuthService.class, -1, true, -1);
 	}
-	
+
 	@Override
-	public String login(String username, String password) throws Exception {
+	public String login(String username, String password) throws AuthenticationException {
 		return client.login(username, password);
 	}
 

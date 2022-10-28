@@ -5,6 +5,10 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
+import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authorization.PermissionException;
+import com.logicaldoc.webservice.WebserviceException;
 import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSRight;
@@ -28,7 +32,11 @@ public interface FolderService {
 	 * 
 	 * @return The value object containing the folder's metadata
 	 * 
-	 * @throws Exception error during folder creation
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "folder")
@@ -37,7 +45,7 @@ public interface FolderService {
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "definition of the new folder")
 	@WebParam(name = "folder")
-	WSFolder folder) throws Exception;
+	WSFolder folder) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Creates a new folder alias
@@ -48,7 +56,11 @@ public interface FolderService {
 	 * 
 	 * @return The newly created alias
 	 * 
-	 * @throws Exception error during alias creation
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "folder")
@@ -57,7 +69,7 @@ public interface FolderService {
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "identifier of the folder in which the alias will be created")
 	long parentId, @WSDoc(description = "identifier of the referenced folder")
-	long foldRef) throws Exception;
+	long foldRef) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Create a new folder.
@@ -67,7 +79,11 @@ public interface FolderService {
 	 * @param name The new folder's name
 	 * @return The newly created folder ID
 	 * 
-	 * @throws Exception error during folder creation
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "folderId")
@@ -76,7 +92,7 @@ public interface FolderService {
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "parentId")
 	long parentId, @WebParam(name = "name")
-	String name) throws Exception;
+	String name) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Deletes an existing folder.
@@ -84,14 +100,18 @@ public interface FolderService {
 	 * @param sid Session identifier
 	 * @param folderId The folder id
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WSDoc(description = "deletes an existing folder")
 	public void delete(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
-	long folderId) throws Exception;
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Renames an existing folder.
@@ -100,7 +120,11 @@ public interface FolderService {
 	 * @param folderId The folder id
 	 * @param name The new folder name
 	 * 
-	 * @throws Exception error during folder rename
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WSDoc(description = "renames an existing folder")
@@ -109,7 +133,7 @@ public interface FolderService {
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WSDoc(description = "the new folder's name")
 	@WebParam(name = "name")
-	String name) throws Exception;
+	String name) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Updates an existing folder. To perform this you need the RENAME
@@ -118,14 +142,18 @@ public interface FolderService {
 	 * @param sid Session identifier
 	 * @param folder The folders metadata(please compile the ID)
 	 * 
-	 * @throws Exception error during update
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WSDoc(description = "updates an existing folder; you need the RENAME permission")
 	public void update(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folder")
-	WSFolder folder) throws Exception;
+	WSFolder folder) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Moves an existing folder with the given identifier.
@@ -133,6 +161,10 @@ public interface FolderService {
 	 * @param sid Session identifier
 	 * @param folderId The folder id
 	 * @param parentId The folder id of the new parent folder
+	 * 
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 * 
 	 * @throws Exception error in the server application
 	 */
@@ -143,7 +175,7 @@ public interface FolderService {
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WSDoc(description = "the new folder's parent")
 	@WebParam(name = "parentId")
-	long parentId) throws Exception;
+	long parentId) throws PersistenceException, AuthenticationException, WebserviceException;
 
 	/**
 	 * Merges the contents of folder into a target
@@ -152,7 +184,11 @@ public interface FolderService {
 	 * @param sourceId Identifier of the source folder
 	 * @param targetId Identifier of the target folder
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WSDoc(description = "merges the contents of folder into a target")
@@ -160,7 +196,7 @@ public interface FolderService {
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "sourceId")
 	long sourceId, @WebParam(name = "targetId")
-	long targetId) throws Exception;
+	long targetId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Copies an existing folder with the given identifier.
@@ -180,7 +216,9 @@ public interface FolderService {
 	 *        security policies of the source folder</li>
 	 *        </ul>
 	 * 
-	 * @throws Exception error during copy
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "copies an existing folder into another location")
@@ -194,7 +232,7 @@ public interface FolderService {
 	int foldersOnly,
 			@WSDoc(description = "<b>null</b> or </b>none</b> = no sec. policies are created, <b>inherit</b>: the new folder will point to the parent for the security policies, <b>replicate</b> = sec. policies are inherited from the new parent folder")
 			@WebParam(name = "securityOption")
-			String securityOption) throws Exception;
+			String securityOption) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets an existing folder
@@ -204,7 +242,11 @@ public interface FolderService {
 	 * 
 	 * @return A value object containing the folder's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "folder")
@@ -212,7 +254,7 @@ public interface FolderService {
 	public WSFolder getFolder(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
-	long folderId) throws Exception;
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Gets root metadata
@@ -221,14 +263,16 @@ public interface FolderService {
 	 * 
 	 * @return A value object containing the folder's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WebResult(name = "folder")
 	@WSDoc(description = "gets the root folder")
 	public WSFolder getRootFolder(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
-	String sid) throws Exception;
+	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Gets the Default workspace
@@ -236,14 +280,18 @@ public interface FolderService {
 	 * @param sid Session identifier
 	 * @return A value object containing the workspace's metadata
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "workspace")
 	@WSDoc(description = "gets the default workspace")
 	public WSFolder getDefaultWorkspace(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
-	String sid) throws Exception;
+	String sid) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Lists all direct folders of a parent folder.<br>
@@ -254,7 +302,11 @@ public interface FolderService {
 	 * 
 	 * @return Array of folders contained in the folder
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "folder")
@@ -262,7 +314,7 @@ public interface FolderService {
 	public WSFolder[] listChildren(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
-	long folderId) throws Exception;
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Tests if a folder is readable.
@@ -273,14 +325,16 @@ public interface FolderService {
 	 * @return True if the identifier denotes a readable folder, otherwise
 	 *         false.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "tests if a folder is readable")
 	public boolean isReadable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
-	long folderId) throws Exception;
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Tests if a folder is writable
@@ -289,14 +343,16 @@ public interface FolderService {
 	 * @param folderId The folder id
 	 * @return True if the identifier denotes a writable folder, otherwise false
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "tests if a folder is writable")
 	public boolean isWritable(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
-	long folderId) throws Exception;
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Tests if the current user has a specific permission on a folder
@@ -308,7 +364,9 @@ public interface FolderService {
 	 * @return True if the identifier denotes a granted permission, otherwise
 	 *         false
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "tests if the current user has a specific permission on a folder")
@@ -317,7 +375,7 @@ public interface FolderService {
 	String sid, @WebParam(name = "folderId")
 	long folderId, @WSDoc(description = "the permissions' integer representation")
 	@WebParam(name = "permission")
-	int permission) throws Exception;
+	int permission) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Computes the path from the root to the target folder.
@@ -327,7 +385,11 @@ public interface FolderService {
 	 * @return The list of folder, the first is the root, the last is the target
 	 *         folder
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "folders")
@@ -335,7 +397,7 @@ public interface FolderService {
 	public WSFolder[] getPath(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
-	long folderId) throws Exception;
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Grants user permission to the folder.
@@ -348,7 +410,11 @@ public interface FolderService {
 	 * @param recursive recursion option. If true, the grant operation is
 	 *        applied also to the subfolders.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WSDoc(description = "grants user permission to the folder")
@@ -361,7 +427,8 @@ public interface FolderService {
 			@WebParam(name = "permissions")
 			int permissions, @WSDoc(description = "the grant operation is applied also to the subfolders")
 			@WebParam(name = "recursive")
-			boolean recursive) throws Exception;
+			boolean recursive)
+			throws PersistenceException, PermissionException, AuthenticationException, WebserviceException;
 
 	/**
 	 * Grants group permission to the folder
@@ -374,7 +441,11 @@ public interface FolderService {
 	 * @param recursive recursion option. If true, the grant operation is
 	 *        applied also to the subfolders
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WSDoc(description = "grants group permission to the folder")
@@ -387,7 +458,8 @@ public interface FolderService {
 			@WebParam(name = "permissions")
 			int permissions, @WSDoc(description = "the grant operation is applied also to the subfolders")
 			@WebParam(name = "recursive")
-			boolean recursive) throws Exception;
+			boolean recursive)
+			throws PermissionException, PersistenceException, AuthenticationException, WebserviceException;
 
 	/**
 	 * Retrieves the list of granted users for the given folder.
@@ -397,14 +469,16 @@ public interface FolderService {
 	 * 
 	 * @return 'error' if error occurred, the right objects collection.
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the list of granted users for the given folder")
 	public WSRight[] getGrantedUsers(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
-	long folderId) throws Exception;
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the list of granted groups for the given folder
@@ -413,14 +487,16 @@ public interface FolderService {
 	 * @param folderId Folder id
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "retrieves the list of granted groups for the given folder")
 	public WSRight[] getGrantedGroups(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
 	String sid, @WebParam(name = "folderId")
-	long folderId) throws Exception;
+	long folderId) throws AuthenticationException, WebserviceException, PersistenceException;
 
 	/**
 	 * Creates the folder for the specified path. All unexisting nodes specified
@@ -430,9 +506,11 @@ public interface FolderService {
 	 * @param parentId The parent folder
 	 * @param path The folder's path(for example /Default/dog/cat/mouse)
 	 * 
-	 * @return The created folder
-	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "folder")
@@ -442,7 +520,7 @@ public interface FolderService {
 	String sid, @WebParam(name = "parentId")
 	long parentId, @WSDoc(description = "the folder's path(for example /Default/dog/cat/mouse)")
 	@WebParam(name = "path")
-	String path) throws Exception;
+	String path) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Finds the folder at the specified path
@@ -452,7 +530,11 @@ public interface FolderService {
 	 * 
 	 * @return The created folder
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "folder")
@@ -461,21 +543,23 @@ public interface FolderService {
 	@WebParam(name = "sid")
 	String sid, @WSDoc(description = "the folder's path(for example /Default/dog/cat/mouse)")
 	@WebParam(name = "path")
-	String path) throws Exception;
+	String path) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Retrieves the list of all workspaces.
 	 * 
 	 * @param sid Session identifier
 	 * 
-	 * @return the list of all workspaces
-	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException The user does not have the required
+	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "workspaces")
 	@WSDoc(description = "retrieves the list of all workspaces")
 	public WSFolder[] listWorkspaces(@WSDoc(description = "identifier of the session", required = true)
 	@WebParam(name = "sid")
-	String sid) throws Exception;
+	String sid) throws AuthenticationException, WebserviceException, PersistenceException;
 }

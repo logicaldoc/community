@@ -104,7 +104,6 @@ public class FolderSearch extends Search {
 				"select A.ld_id, A.ld_parentid, A.ld_name, A.ld_description, A.ld_creation, A.ld_lastmodified, A.ld_type, A.ld_foldref, C.ld_name, A.ld_templateid, A.ld_tgs, A.ld_color ");
 		query.append(" from ld_folder A ");
 		query.append(" left outer join ld_template C on A.ld_templateid=C.ld_id ");
-
 		appendWhereClause(false, params, query);
 
 		if (options.isRetrieveAliases()) {
@@ -162,39 +161,46 @@ public class FolderSearch extends Search {
 
 		appendComposition(fOptions);
 
-		appendFoldRefConfition(searchAliases, query);
+		appendFoldRefConfition(query, searchAliases);
 
-		// Now add all criteria
-		StringBuilder sb=new StringBuilder();
-		
-		boolean first = true;
+		// Now add all the criteria
+		String criteriaQueryPart = prepareCriteriaConditions(tableAlias, fOptions, params);
+
+		System.out.println(criteriaQueryPart);
+
+		if (StringUtils.isNotEmpty(criteriaQueryPart)) {
+			query.append(" and ( ");
+			if ("not".equals(fOptions.getTopOperator()))
+				query.append("not");
+			query.append(criteriaQueryPart);
+			query.append(")");
+		}
+
+		appendSorting(query, fOptions);
+	}
+
+	private String prepareCriteriaConditions(String tableAlias, FolderSearchOptions fOptions,
+			ArrayList<Serializable> params) throws PersistenceException {
+		StringBuilder criteriaQueryPart = new StringBuilder();
 		int joinsCounter = 0;
 
-		for (FolderCriterion criterion : fOptions.getCriteria()) {
-			if (criterion.isEmpty())
-				continue;
-
-			if (first) {
-				query.append(" and ( ");
-				if ("not".equals(options.getTopOperator()))
-					query.append("not");
-			} else
-				query.append(" " + criterion.getComposition());
-			first = false;
-			query.append("(");
+		for (FolderCriterion criterion : fOptions.getNotEmptyCriteria()) {
+			if (criteriaQueryPart.length() > 0)
+				criteriaQueryPart.append(" " + criterion.getComposition());
+			criteriaQueryPart.append("(");
 
 			String columnName = "";
 			if (criterion.isExtendedAttribute()) {
 				// In case of OR top operator we only have a single join
 				// with extended attributes
-				if (!"or".equals(options.getTopOperator()) || joinsCounter == 0)
+				if (!"or".equals(fOptions.getTopOperator()) || joinsCounter == 0)
 					joinsCounter++;
-				query.append("(C" + joinsCounter + ".ld_folderid=" + tableAlias + ".ld_id");
-				query.append(" and (C" + joinsCounter + ".ld_name='");
-				query.append(criterion.getFieldName());
-				query.append("' or C" + joinsCounter + ".ld_name like '");
-				query.append(criterion.getFieldName());
-				query.append("-%') and ");
+				criteriaQueryPart.append("(C" + joinsCounter + ".ld_folderid=" + tableAlias + ".ld_id");
+				criteriaQueryPart.append(" and (C" + joinsCounter + ".ld_name='");
+				criteriaQueryPart.append(criterion.getFieldName());
+				criteriaQueryPart.append("' or C" + joinsCounter + ".ld_name like '");
+				criteriaQueryPart.append(criterion.getFieldName());
+				criteriaQueryPart.append("-%') and ");
 				columnName = "C" + joinsCounter + ".";
 				switch (criterion.getType()) {
 				case Attribute.TYPE_INT:
@@ -214,24 +220,27 @@ public class FolderSearch extends Search {
 					break;
 				}
 			} else {
-				columnName = criterion.getColumnName();
-
-				// If the column name is not qualified, prepend the current
-				// table alias
-				if (!columnName.contains("."))
-					columnName = tableAlias + "." + columnName;
+				columnName = getCriterionColumnName(tableAlias, criterion);
 			}
 
-			appendAttributeCriterionColumnCondition(query, tableAlias, columnName, criterion, params);
+			appendAttributeCriterionColumnCondition(criteriaQueryPart, tableAlias, columnName, criterion, params);
 
 			if (criterion.isExtendedAttribute())
-				query.append(")");
-			query.append(")");
+				criteriaQueryPart.append(")");
+			criteriaQueryPart.append(")");
 		}
-		if (!first)
-			query.append(")");
+		return criteriaQueryPart.toString();
+	}
 
-		appendSorting(query, fOptions);
+	private String getCriterionColumnName(String tableAlias, FolderCriterion criterion) {
+		String columnName;
+		columnName = criterion.getColumnName();
+
+		// If the column name is not qualified, prepend the current
+		// table alias
+		if (!columnName.contains("."))
+			columnName = tableAlias + "." + columnName;
+		return columnName;
 	}
 
 	private String getTableAlias(boolean searchAliases) {
@@ -259,7 +268,7 @@ public class FolderSearch extends Search {
 			query.append(" and " + tableAlias + ".ld_templateid=" + options.getTemplate());
 	}
 
-	private void appendFoldRefConfition(boolean searchAliases, StringBuilder query) {
+	private void appendFoldRefConfition(StringBuilder query, boolean searchAliases) {
 		if (searchAliases)
 			query.append(" and A.ld_foldref is not null and REF.ld_deleted=0 and A.ld_foldref = REF.ld_id ");
 		else

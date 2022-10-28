@@ -1,6 +1,7 @@
 package com.logicaldoc.core.document;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -29,10 +30,12 @@ public interface DocumentManager {
 	 * @param docVO The value object containing document's metadata applied
 	 *        during the checkin (optional)
 	 * @param transaction entry to log the event, set the user and comment
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * 
+	 * @throws IOException I/O error
+	 * @throws PersistenceException error in the database
 	 */
 	public void checkin(long docId, InputStream fileInputStream, String filename, boolean release,
-			AbstractDocument docVO, DocumentHistory transaction) throws Exception;
+			AbstractDocument docVO, DocumentHistory transaction) throws IOException, PersistenceException;
 
 	/**
 	 * Checks in the given document
@@ -45,19 +48,21 @@ public interface DocumentManager {
 	 * @param docVO The value object containing document's metadata applied
 	 *        during the checkin (optional)
 	 * @param transaction entry to log the event, set the user and comment
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * 
+	 * @throws PersistenceException error in the database
 	 */
 	public void checkin(long docId, File file, String filename, boolean release, AbstractDocument docVO,
-			DocumentHistory transaction) throws Exception;
+			DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Checks out the given document
 	 * 
 	 * @param docId the document to be checked out
 	 * @param transaction entry to log the event (set the user)
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * 
+	 * @throws PersistenceException error in the database
 	 */
-	public void checkout(long docId, DocumentHistory transaction) throws Exception;
+	public void checkout(long docId, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Replaces the file of a given version
@@ -66,9 +71,12 @@ public interface DocumentManager {
 	 * @param fileVersion the file version
 	 * @param newFile the file to use
 	 * @param transaction entry to log the event (set the user)
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * 
+	 * @throws IOException I/O error
+	 * @throws PersistenceException error in the database
 	 */
-	public void replaceFile(long docId, String fileVersion, File newFile, DocumentHistory transaction) throws Exception;
+	public void replaceFile(long docId, String fileVersion, File newFile, DocumentHistory transaction)
+			throws PersistenceException, IOException;
 
 	/**
 	 * Replaces the file of a given version
@@ -77,10 +85,12 @@ public interface DocumentManager {
 	 * @param fileVersion the file version
 	 * @param newFile the file to use
 	 * @param transaction entry to log the event (set the user)
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * 
+	 * @throws PersistenceException error in the database
+	 * @throws IOException I/O error
 	 */
 	public void replaceFile(long docId, String fileVersion, InputStream newFile, DocumentHistory transaction)
-			throws Exception;
+			throws IOException, PersistenceException;
 
 	/**
 	 * Promotes an old version to the current default one. If you promote a
@@ -90,9 +100,11 @@ public interface DocumentManager {
 	 * @param docId the document to be updated
 	 * @param version the version
 	 * @param transaction entry to log the event (set the user)
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * 
+	 * @throws PersistenceException error in the database
+	 * @throws IOException I/O error
 	 */
-	public void promoteVersion(long docId, String version, DocumentHistory transaction) throws Exception;
+	public void promoteVersion(long docId, String version, DocumentHistory transaction) throws PersistenceException, IOException;
 
 	/**
 	 * Locks the given document
@@ -139,9 +151,10 @@ public interface DocumentManager {
 	 *        the comment)
 	 * @return The newly created document
 	 * 
-	 * @throws Exception raised if the document cannot be created
+	 * @throws PersistenceException raised if the document cannot be created
 	 */
-	public Document create(InputStream content, Document docVO, DocumentHistory transaction) throws Exception;
+	public Document create(InputStream content, Document docVO, DocumentHistory transaction)
+			throws PersistenceException;
 
 	/**
 	 * Re-indexes an existing document in the full-text index.
@@ -152,9 +165,11 @@ public interface DocumentManager {
 	 * @param transaction entry to log the event (set the user)
 	 * 
 	 * @return the number of milliseconds required to parse the document
-	 * @throws Exception if an error occurs, this exception is thrown
+	 * 
+	 * @throws PersistenceException error in the database
+	 * @throws ParseException error during parsing
 	 */
-	public long reindex(long docId, String content, DocumentHistory transaction) throws Exception;
+	public long reindex(long docId, String content, DocumentHistory transaction) throws PersistenceException, ParseException;
 
 	/**
 	 * Rename an existing document filename.
@@ -173,7 +188,7 @@ public interface DocumentManager {
 	 * @param docVO value object containing the new metadata
 	 * @param transaction entry to log the event (set the user)
 	 * 
-     * @throws PersistenceException if an error occurs, this exception is thrown
+	 * @throws PersistenceException if an error occurs, this exception is thrown
 	 */
 	public void update(Document doc, Document docVO, DocumentHistory transaction) throws PersistenceException;
 
@@ -217,7 +232,8 @@ public interface DocumentManager {
 	 * @param docId identifier of the document
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws PersistenceException raised if the document cannot be marked immutable
+	 * @throws PersistenceException raised if the document cannot be marked
+	 *         immutable
 	 */
 	public void makeImmutable(long docId, DocumentHistory transaction) throws PersistenceException;
 
@@ -241,9 +257,10 @@ public interface DocumentManager {
 	 * @param transaction entry to log the event (set the user)
 	 * @return The created document
 	 * 
-	 * @throws Exception raised if the document cannot be copied
+	 * @throws PersistenceException error in the database
+	 * @throws IOException I/O error
 	 */
-	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction) throws Exception;
+	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction) throws PersistenceException, IOException;
 
 	/**
 	 * Create an alias(shortcut) associated to the given doc to the specified
@@ -257,9 +274,9 @@ public interface DocumentManager {
 	 * 
 	 * @return The created document
 	 * 
-	 * @throws Exception raised if the alias cannot be created
+	 * @throws PersistenceException error in the database
 	 */
-	public Document createAlias(Document doc, Folder folder, String type, DocumentHistory transaction) throws Exception;
+	public Document createAlias(Document doc, Folder folder, String type, DocumentHistory transaction) throws PersistenceException;
 
 	/**
 	 * Replaces an alias with a copy of the original file
@@ -305,7 +322,8 @@ public interface DocumentManager {
 	 * 
 	 * @return Total number of archived documents
 	 * 
-	 * @throws PersistenceException raised if at least a document cannot be archived
+	 * @throws PersistenceException raised if at least a document cannot be
+	 *         archived
 	 */
 	public long archiveFolder(long folderId, DocumentHistory transaction) throws PersistenceException;
 
@@ -315,7 +333,8 @@ public interface DocumentManager {
 	 * @param docIds Documents to be archived
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws PersistenceException raised if at least a document cannot be archived
+	 * @throws PersistenceException raised if at least a document cannot be
+	 *         archived
 	 */
 	public void archiveDocuments(long[] docIds, DocumentHistory transaction) throws PersistenceException;
 
@@ -334,7 +353,8 @@ public interface DocumentManager {
 	 * 
 	 * @return The created ticket with the url property filled
 	 * 
-	 * @throws PersistenceException raised if the download ticket cannot be created
+	 * @throws PersistenceException raised if the download ticket cannot be
+	 *         created
 	 */
 	public Ticket createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
 			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws PersistenceException;
@@ -360,9 +380,10 @@ public interface DocumentManager {
 	 * 
 	 * @return number of moved files
 	 * 
-	 * @throws Exception In case of error during the process
+	 * @throws PersistenceException error in the database
+	 * @throws IOException I/O error
 	 */
-	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws Exception;
+	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws PersistenceException, IOException;
 
 	/**
 	 * Merges a set of documents into a single PDF file
@@ -374,10 +395,11 @@ public interface DocumentManager {
 	 * 
 	 * @return the generated merged document
 	 * 
-	 * @throws Exception generic error happened
+	 * @throws IOException I/O error
+	 * @throws PersistenceException error in the database
 	 */
 	public Document merge(Collection<Document> documents, long targetFolderId, String fileName,
-			DocumentHistory transaction) throws Exception;
+			DocumentHistory transaction) throws IOException, PersistenceException;
 
 	/**
 	 * Counts the number of pages of a document

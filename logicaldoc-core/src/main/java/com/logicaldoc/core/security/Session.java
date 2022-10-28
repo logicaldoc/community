@@ -117,10 +117,9 @@ public class Session extends PersistentObject implements Comparable<Session> {
 	 */
 	protected int getTimeout() {
 		int timeout = 30;
-		ContextProperties config = Context.get().getProperties();
+		ContextProperties config = Context.get().getProperties();		
 		if (config.getInt(getTenantName() + ".session.timeout") > 0)
 			timeout = config.getInt(getTenantName() + ".session.timeout");
-
 		return timeout;
 	}
 
@@ -198,29 +197,14 @@ public class Session extends PersistentObject implements Comparable<Session> {
 		this.setLastRenew(creation);
 
 		TenantDAO tenantDAO = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		tenantName = tenantDAO.getTenantName(tenantId);
-
-		/*
-		 * The history comment the remote host and IP
-		 */
-		String historyComment = "";
-		if (client != null) {
-			String addr = client.getAddress();
-			String host = client.getHost();
-			if (StringUtils.isNotEmpty(host) && !host.equals(addr))
-				historyComment = host + " (" + addr + ") ";
-			else
-				historyComment = addr;
-		}
-
-		// Add a user history entry
-		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
-		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
-				client);
+		this.tenantName = tenantDAO.getTenantName(tenantId);
+		
+		UserHistory history = saveUserHistory(user, client);
 
 		/*
 		 * Add / update the device in the DB
 		 */
+		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
 		if (client != null && client.getDevice() != null) {
 			client.getDevice().setUserId(user.getId());
 			client.getDevice().setUsername(user.getFullName());
@@ -274,6 +258,27 @@ public class Session extends PersistentObject implements Comparable<Session> {
 
 		log.info("Session {} has been started", getSid());
 		logInfo("Session started");
+	}
+
+	private UserHistory saveUserHistory(User user, Client client) {
+		/*
+		 * The history comment the remote host and IP
+		 */
+		String historyComment = "";
+		if (client != null) {
+			String addr = client.getAddress();
+			String host = client.getHost();
+			if (StringUtils.isNotEmpty(host) && !host.equals(addr))
+				historyComment = host + " (" + addr + ") ";
+			else
+				historyComment = addr;
+		}
+
+		// Add a user history entry
+		UserHistoryDAO userHistoryDAO = (UserHistoryDAO) Context.get().getBean(UserHistoryDAO.class);
+		UserHistory history = userHistoryDAO.createUserHistory(user, UserEvent.LOGIN.toString(), historyComment, sid,
+				client);
+		return history;
 	}
 
 	public String getUsername() {

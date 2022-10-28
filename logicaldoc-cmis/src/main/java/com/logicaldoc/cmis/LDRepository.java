@@ -292,14 +292,14 @@ public class LDRepository {
 		aclCapability.setAclPropagation(AclPropagation.OBJECTONLY);
 
 		// permissions
-		List<PermissionDefinition> permissions = new ArrayList<PermissionDefinition>();
+		List<PermissionDefinition> permissions = new ArrayList<>();
 		permissions.add(createPermission(CMIS_READ, "Read"));
 		permissions.add(createPermission(CMIS_WRITE, "Write"));
 		permissions.add(createPermission(CMIS_ALL, "All"));
 		aclCapability.setPermissionDefinitionData(permissions);
 
 		// mapping
-		List<PermissionMapping> list = new ArrayList<PermissionMapping>();
+		List<PermissionMapping> list = new ArrayList<>();
 		list.add(createMapping(PermissionMapping.CAN_CREATE_DOCUMENT_FOLDER, CMIS_READ));
 		list.add(createMapping(PermissionMapping.CAN_CREATE_FOLDER_FOLDER, CMIS_READ));
 		list.add(createMapping(PermissionMapping.CAN_DELETE_CONTENT_DOCUMENT, CMIS_WRITE));
@@ -319,7 +319,7 @@ public class LDRepository {
 		list.add(createMapping(PermissionMapping.CAN_UPDATE_PROPERTIES_OBJECT, CMIS_WRITE));
 		list.add(createMapping(PermissionMapping.CAN_VIEW_CONTENT_OBJECT, CMIS_READ));
 
-		Map<String, PermissionMapping> map = new LinkedHashMap<String, PermissionMapping>();
+		Map<String, PermissionMapping> map = new LinkedHashMap<>();
 		for (PermissionMapping pm : list) {
 			map.put(pm.getKey(), pm);
 		}
@@ -350,7 +350,7 @@ public class LDRepository {
 		extElements.add(new CmisExtensionElementImpl(ns, "sid", null, this.sid));
 
 		// set the extension list
-		List<CmisExtensionElement> extensions = new ArrayList<CmisExtensionElement>();
+		List<CmisExtensionElement> extensions = new ArrayList<>();
 		extensions.add(new CmisExtensionElementImpl(ns, "LogicaldocExtension", null, extElements));
 
 		repoInfo.setExtensions(extensions);
@@ -786,7 +786,7 @@ public class LDRepository {
 		PersistentObject object = getObject(folderId);
 
 		FailedToDeleteDataImpl result = new FailedToDeleteDataImpl();
-		result.setIds(new ArrayList<String>());
+		result.setIds(new ArrayList<>());
 
 		try {
 			if (object instanceof Folder) {
@@ -1226,7 +1226,7 @@ public class LDRepository {
 
 			// prepare result
 			ObjectInFolderListImpl result = new ObjectInFolderListImpl();
-			result.setObjects(new ArrayList<ObjectInFolderData>());
+			result.setObjects(new ArrayList<>());
 			result.setHasMoreItems(false);
 			int count = 0;
 
@@ -1419,7 +1419,7 @@ public class LDRepository {
 		}
 
 		// Empty list of ObjectData
-		List<ObjectData> list = new ArrayList<ObjectData>();
+		List<ObjectData> list = new ArrayList<>();
 		boolean hasMoreItems = false;
 
 		// Create the filter
@@ -1974,7 +1974,7 @@ public class LDRepository {
 	public List<ObjectData> getAllVersions(String objectId) {
 		validatePermission(objectId, null, null);
 
-		List<ObjectData> versions = new ArrayList<ObjectData>();
+		List<ObjectData> versions = new ArrayList<>();
 
 		AbstractDocument doc = getDocument(objectId);
 
@@ -2552,7 +2552,7 @@ public class LDRepository {
 			// create ACE
 			AccessControlEntryImpl entry = new AccessControlEntryImpl();
 			entry.setPrincipal(principal);
-			entry.setPermissions(new ArrayList<String>());
+			entry.setPermissions(new ArrayList<>());
 			entry.getPermissions().add(CMIS_READ);
 
 			if (!ue.getValue().booleanValue() && checkPermission(object, null, Permission.WRITE)
@@ -2823,12 +2823,12 @@ public class LDRepository {
 		List<ObjectData> odsFolders = getFolderLastChanges(minDate, max);
 
 		// put together the 2 lists
-		List<ObjectData> complex = new ArrayList<ObjectData>();
+		List<ObjectData> complex = new ArrayList<>();
 		complex.addAll(odsDocs);
 		complex.addAll(odsFolders);
 
 		// sort the content of list complex by date
-		Collections.sort(complex, new Comparator<ObjectData>() {
+		Collections.sort(complex, new Comparator<>() {
 			public int compare(ObjectData o1, ObjectData o2) {
 				return o1.getChangeEventInfo().getChangeTime().getTime()
 						.compareTo(o2.getChangeEventInfo().getChangeTime().getTime());
@@ -2874,7 +2874,7 @@ public class LDRepository {
 		query.append(DocumentEvent.DELETED);
 		query.append("')");
 
-		List<DocumentHistory> entries = new ArrayList<DocumentHistory>();
+		List<DocumentHistory> entries = new ArrayList<>();
 
 		try {
 			Map<String, Object> params = new HashMap<>();
@@ -2887,7 +2887,7 @@ public class LDRepository {
 			log.error(e.getMessage(), e);
 		}
 
-		List<ObjectData> ods = new ArrayList<ObjectData>(entries.size());
+		List<ObjectData> ods = new ArrayList<>(entries.size());
 		Date date = null;
 		for (DocumentHistory logEntry : entries) {
 			ObjectDataImpl od = new ObjectDataImpl();
@@ -2940,7 +2940,7 @@ public class LDRepository {
 		query.append(FolderEvent.DELETED);
 		query.append("')");
 
-		List<FolderHistory> entries = new ArrayList<FolderHistory>();
+		List<FolderHistory> entries = new ArrayList<>();
 
 		try {
 			Map<String, Object> params = new HashMap<>();
@@ -2952,7 +2952,7 @@ public class LDRepository {
 			log.error(e.getMessage(), e);
 		}
 
-		List<ObjectData> ods = new ArrayList<ObjectData>(entries.size());
+		List<ObjectData> ods = new ArrayList<>(entries.size());
 		Date date = null;
 		for (FolderHistory logEntry : entries) {
 			ObjectDataImpl od = new ObjectDataImpl();

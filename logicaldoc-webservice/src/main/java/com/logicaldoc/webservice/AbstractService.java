@@ -1,6 +1,5 @@
 package com.logicaldoc.webservice;
 
-import java.io.FileNotFoundException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +13,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -22,6 +22,10 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authentication.AccountNotFoundException;
+import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.core.security.authentication.InvalidSessionException;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
@@ -37,7 +41,7 @@ import com.logicaldoc.webservice.model.WSUtil;
  */
 public class AbstractService {
 
-	protected static Logger log = LoggerFactory.getLogger(AbstractService.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractService.class);
 
 	private boolean validateSession = true;
 
@@ -56,10 +60,14 @@ public class AbstractService {
 	 * user
 	 * 
 	 * @param sid The session identifier
-	 * @return
-	 * @throws Exception
+	 * @return the user in session
+	 * 
+	 * @throws PersistenceException error in the database
+	 * @throws WebserviceException in case the webservices are not enabled
+	 * @throws AuthenticationException the given session is invalid
 	 */
-	protected User validateSession(String sid) throws Exception {
+	protected User validateSession(String sid)
+			throws WebserviceException, PersistenceException, AuthenticationException {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		if (!validateSession) {
 			User user = new User();
@@ -74,17 +82,17 @@ public class AbstractService {
 		}
 
 		if (!isWebserviceEnabled())
-			throw new Exception("WebServices are disabled");
+			throw new WebserviceException("WebServices are disabled");
 
 		if (sid == null || !SessionManager.get().isOpen(sid)) {
-			throw new Exception(String.format("Invalid session %s", sid));
+			throw new InvalidSessionException(sid);
 		} else {
 			SessionManager.get().renew(sid);
 		}
 		String username = SessionManager.get().get(sid).getUsername();
 		User user = userDao.findByUsername(username);
 		if (user == null)
-			throw new Exception(String.format("User %s not found", username));
+			throw new AccountNotFoundException(null, String.format("User %s not found", username));
 		else
 			userDao.initialize(user);
 		return user;
@@ -92,85 +100,98 @@ public class AbstractService {
 
 	/**
 	 * Checks if the current user belongs to a group
+	 * 
+	 * @throws PersistenceException error in the database
+	 * 
+	 * @throws WebserviceException the user is not member of group
+	 * 
 	 */
-	protected void checkGroup(String sid, String group) throws Exception {
+	protected void checkGroup(String sid, String group) throws WebserviceException, PersistenceException {
 		User user = validateSession(sid);
 		if (!user.isMemberOf(group)) {
 			String message = String.format("User %s doesn't belong to group %s", user.getUsername(), group);
 			log.error(message);
-			throw new Exception(message);
+			throw new WebserviceException(message);
 		}
 	}
 
 	/**
 	 * Checks if the current user is an administrator (group admin).
+	 * 
+	 * @throws PersistenceException error in the database
+	 * 
+	 * @throws WebserviceException the user is not member of admin
 	 */
-	protected void checkAdministrator(String sid) throws Exception {
+	protected void checkAdministrator(String sid) throws WebserviceException, PersistenceException {
 		checkGroup(sid, "admin");
 	}
 
-	protected void checkMenu(String sid, long menuId) throws Exception {
+	protected void checkMenu(String sid, long menuId)
+			throws WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, user.getId())) {
 			String message = String.format("User %s cannot access menu %s", user.getUsername(), menuId);
 			log.error(message);
-			throw new Exception(message);
+			throw new PermissionException(user.getUsername(), "menu " + menuId, "access");
 		}
 	}
 
-	protected void checkPermission(Permission permission, User user, long folderId) throws Exception {
+	protected void checkPermission(Permission permission, User user, long folderId)
+			throws WebserviceException, PersistenceException, PermissionException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
 					permission.getName(), folderId);
 			log.error(message);
-			throw new Exception(message);
+			throw new PermissionException(user.getUsername(), "folder " + folderId, permission);
 		}
 	}
 
-	protected void checkMenu(User user, long menuId) throws Exception {
+	protected void checkMenu(User user, long menuId) throws WebserviceException, PermissionException {
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, user.getId())) {
 			String message = String.format("User %s doesn't have read permission on menu %s", user.getUsername(),
 					menuId);
 			log.error(message);
-			throw new Exception(message);
+			throw new PermissionException(user.getUsername(), "menu " + menuId, Permission.READ);
 		}
 	}
 
-	protected void checkWriteEnable(User user, long folderId) throws Exception {
+	protected void checkWriteEnable(User user, long folderId)
+			throws PermissionException, WebserviceException, PersistenceException {
 		checkPermission(Permission.WRITE, user, folderId);
 	}
 
-	protected void checkReadEnable(User user, long folderId) throws Exception {
+	protected void checkReadEnable(User user, long folderId) throws PersistenceException, PermissionException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isReadEnabled(folderId, user.getId())) {
 			String message = String.format("User %s doesn't have read permission on folder %s", user.getUsername(),
 					folderId);
 			log.error(message);
-			throw new Exception(message);
+			throw new PermissionException(user.getUsername(), "folder " + folderId, Permission.READ);
 		}
 	}
 
-	protected void checkDownloadEnable(User user, long folderId) throws Exception {
+	protected void checkDownloadEnable(User user, long folderId)
+			throws PersistenceException, WebserviceException, PermissionException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(Permission.DOWNLOAD, folderId, user.getId())) {
 			String message = String.format("User %s doesn't have download permission on folder %s", user.getUsername(),
 					folderId);
 			log.error(message);
-			throw new Exception(message);
+			throw new PermissionException(user.getUsername(), "folder " + folderId, Permission.DOWNLOAD);
 		}
 	}
 
-	protected void checkPublished(User user, Document doc) throws Exception {
+	protected void checkPublished(User user, Document doc) throws WebserviceException {
 		if (!user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
-			throw new FileNotFoundException("Document not published");
+			throw new WebserviceException("Document not published");
 	}
 
-	protected void checkNotArchived(Document doc) throws Exception {
+	protected void checkNotArchived(Document doc) throws WebserviceException {
 		if (doc.getStatus() == AbstractDocument.DOC_ARCHIVED)
-			throw new FileNotFoundException("Document is archived");
+			throw new WebserviceException("Document is archived");
 	}
 
 	protected boolean isWebserviceEnabled() {
@@ -228,13 +249,14 @@ public class AbstractService {
 	 * session
 	 * 
 	 * @return The session ID (if valid)
-	 * @throws Exception
+	 * 
+	 * @throws InvalidSessionException the session is not valid
 	 */
-	protected String validateSession() throws Exception {
+	protected String validateSession() throws InvalidSessionException {
 		if (validateSession) {
 			String sid = getCurrentSessionId();
 			if (sid == null)
-				throw new Exception("Invalid session");
+				throw new InvalidSessionException();
 			return sid;
 		} else
 			return null;
