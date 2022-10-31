@@ -755,6 +755,6 @@ public class FileUtil {
 	 * @throws IOException If a file could not be created
 	 */
 	public static File createTempFile(String prefix, String suffix) throws IOException {
-		return FileUtil.createTempFile(prefix, suffix);
+		return File.createTempFile(prefix, suffix);
 	}
 }
