@@ -475,7 +475,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 				systemMessageDao.store(sys);
 			}
-		} catch (UnsupportedEncodingException | MalformedURLException | PersistenceException | MessagingException e) {
+		} catch (PersistenceException | MessagingException e) {
 			log.warn(e.getMessage(), e);
 		}
 	}
@@ -1877,12 +1877,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
+		List<GUIDocumentNote> notesList = new ArrayList<>();
+		Document document = null;
 		try {
-			Document document = retrieveDocument(docId);
-			if (document == null)
-				throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
+			document = retrieveDocument(docId);
 
-			List<GUIDocumentNote> notesList = new ArrayList<>();
 			if (notes != null && notes.length > 0)
 				notesList = Arrays.asList(notes);
 
@@ -1896,78 +1895,91 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			for (Long actualNoteId : actualNoteIds)
 				if (!noteIds.contains(actualNoteId))
 					dao.delete(actualNoteId);
-
-			/*
-			 * Do the updates / inserts
-			 */
-			for (GUIDocumentNote guiNote : notesList) {
-				DocumentNote note = dao.findById(guiNote.getId());
-				if (note == null) {
-					note = new DocumentNote();
-					note.setTenantId(session.getTenantId());
-					note.setDocId(document.getId());
-					note.setUserId(session.getUserId());
-					note.setUsername(session.getUser().getFullName());
-					note.setDate(new Date());
-					note.setPage(guiNote.getPage());
-				}
-
-				note.setFileName(document.getFileName());
-				note.setFileVersion(document.getFileVersion());
-				note.setMessage(guiNote.getMessage());
-				note.setColor(guiNote.getColor());
-				note.setTop(guiNote.getTop());
-				note.setLeft(guiNote.getLeft());
-				note.setWidth(guiNote.getWidth());
-				note.setHeight(guiNote.getHeight());
-				note.setType(guiNote.getType());
-				note.setRecipient(guiNote.getRecipient());
-				note.setRecipientEmail(guiNote.getRecipientEmail());
-				note.setShape(guiNote.getShape());
-				note.setLineColor(guiNote.getLineColor());
-				note.setLineOpacity(guiNote.getLineOpacity());
-				note.setLineWidth(guiNote.getLineWidth());
-				note.setRotation(guiNote.getRotation());
-
-				saveNote(note, session);
-
-				/*
-				 * If the note specifies a recipient, update the user's address
-				 * book
-				 */
-				if (StringUtils.isNotEmpty(note.getRecipientEmail())) {
-					ContactDAO cDao = (ContactDAO) Context.get().getBean(ContactDAO.class);
-					List<Contact> contacts = cDao.findByUser(session.getUserId(), note.getRecipientEmail());
-					if (contacts.isEmpty()) {
-						String firstName = note.getRecipient();
-						String lastName = null;
-						if (firstName.contains(" ")) {
-							firstName = firstName.substring(0, note.getRecipient().lastIndexOf(' ')).trim();
-							lastName = note.getRecipient().substring(note.getRecipient().lastIndexOf(' ')).trim();
-						}
-
-						Contact contact = new Contact();
-						contact.setUserId(session.getUserId());
-						contact.setFirstName(firstName);
-						contact.setLastName(lastName);
-						contact.setEmail(note.getRecipientEmail());
-						saveContact(contact);
-					}
-				}
-			}
-		} catch (PersistenceException | ServerException e) {
+		} catch (PersistenceException e) {
 			ServiceUtil.throwServerException(session, log, e);
 		}
+
+		if (document == null)
+			throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
+
+		/*
+		 * Do the updates / inserts
+		 */
+		for (GUIDocumentNote guiNote : notesList) {
+			DocumentNote note = null;
+			try {
+				note = dao.findById(guiNote.getId());
+			} catch (PersistenceException e) {
+				// Unexisting note
+			}
+
+			if (note == null) {
+				note = new DocumentNote();
+				note.setTenantId(session.getTenantId());
+				note.setDocId(document.getId());
+				note.setUserId(session.getUserId());
+				note.setUsername(session.getUser().getFullName());
+				note.setDate(new Date());
+				note.setPage(guiNote.getPage());
+			}
+
+			note.setFileName(document.getFileName());
+			note.setFileVersion(document.getFileVersion());
+			note.setMessage(guiNote.getMessage());
+			note.setColor(guiNote.getColor());
+			note.setTop(guiNote.getTop());
+			note.setLeft(guiNote.getLeft());
+			note.setWidth(guiNote.getWidth());
+			note.setHeight(guiNote.getHeight());
+			note.setType(guiNote.getType());
+			note.setRecipient(guiNote.getRecipient());
+			note.setRecipientEmail(guiNote.getRecipientEmail());
+			note.setShape(guiNote.getShape());
+			note.setLineColor(guiNote.getLineColor());
+			note.setLineOpacity(guiNote.getLineOpacity());
+			note.setLineWidth(guiNote.getLineWidth());
+			note.setRotation(guiNote.getRotation());
+
+			saveNote(note, session);
+
+			/*
+			 * If the note specifies a recipient, update the user's address book
+			 */
+			if (StringUtils.isNotEmpty(note.getRecipientEmail())) {
+				ContactDAO cDao = (ContactDAO) Context.get().getBean(ContactDAO.class);
+				List<Contact> contacts = cDao.findByUser(session.getUserId(), note.getRecipientEmail());
+				if (contacts.isEmpty()) {
+					String firstName = note.getRecipient();
+					String lastName = null;
+					if (firstName.contains(" ")) {
+						firstName = firstName.substring(0, note.getRecipient().lastIndexOf(' ')).trim();
+						lastName = note.getRecipient().substring(note.getRecipient().lastIndexOf(' ')).trim();
+					}
+
+					Contact contact = new Contact();
+					contact.setUserId(session.getUserId());
+					contact.setFirstName(firstName);
+					contact.setLastName(lastName);
+					contact.setEmail(note.getRecipientEmail());
+					saveContact(contact);
+				}
+			}
+		}
+
 	}
 
-	private void saveNote(DocumentNote note, Session session) throws PersistenceException {
-		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
-		if (note.getId() == 0L) {
-			DocumentHistory transaction = new DocumentHistory();
-			transaction.setSession(session);
-			dao.store(note, transaction);
-		} else {
-			dao.store(note);
+	private void saveNote(DocumentNote note, Session session) throws ServerException {
+		try {
+			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
+			if (note.getId() == 0L) {
+				DocumentHistory transaction = new DocumentHistory();
+				transaction.setSession(session);
+				dao.store(note, transaction);
+			} else {
+				dao.store(note);
+			}
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 
@@ -2000,13 +2012,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		List<GUIDocument> updatedDocs = new ArrayList<>();
 		for (long docId : ids) {
 			try {
-				GUIDocument buf = null;
-				try {
-					buf = bulkUpdateDocument(docId, vo, ignoreEmptyFields, session);
-				} catch (PermissionException e) {
-					log.warn("Skip bulk update of document {} due to permissions", docId);
-				}
-
+				GUIDocument buf = bulkUpdateDocument(docId, vo, ignoreEmptyFields, session);
 				if (buf != null)
 					updatedDocs.add(save(buf));
 			} catch (ServerException | PersistenceException e) {
@@ -2017,13 +2023,20 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	private GUIDocument bulkUpdateDocument(long docId, GUIDocument vo, boolean ignoreEmptyFields, Session session)
-			throws ServerException, PermissionException, PersistenceException {
+			throws ServerException, PersistenceException {
 		GUIDocument buf = getById(docId);
 
-		if (buf.getImmutable() == 1 || buf.getStatus() != AbstractDocument.DOC_UNLOCKED)
-			throw new PermissionException("Document immutable or locked");
+		if (buf.getImmutable() == 1 || buf.getStatus() != AbstractDocument.DOC_UNLOCKED) {
+			log.warn("Skip document {} because immutable or locked", docId);
+			return null;
+		}
 
-		ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), buf.getFolder().getId());
+		try {
+			ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), buf.getFolder().getId());
+		} catch (AccessDeniedException | PersistenceException e) {
+			log.warn("Skip document {} because  user {} does not have write permission", docId, session.getUsername());
+			return null;
+		}
 
 		buf.setComment(vo.getComment() != null ? vo.getComment() : "");
 
@@ -2260,7 +2273,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		return count;
 	}
 
-	private long countDocuments(long folderId, int status) throws ServerException {
+	private long countDocuments(long folderId, int status) {
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -2401,10 +2414,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
-				throw new IOException("You don't have the WRITE permission");
+				throw new PermissionException(session.getUsername(), "Document " + docId, Permission.WRITE);
 
 			if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT || doc.getLockUserId() != session.getUserId())
-				throw new IOException("You have not checked our the file");
+				throw new PermissionException("You have not checked our the file " + docId);
 
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setComment("Text content editing");
@@ -2414,7 +2427,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			manager.checkin(docId, IOUtils.toInputStream(content, UTF_8), doc.getFileName(), false, null, transaction);
 
 			return getById(docId);
-		} catch (PersistenceException | ServerException | IOException e) {
+		} catch (PermissionException | PersistenceException | ServerException | IOException e) {
 			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
 		}
 
@@ -2426,34 +2439,34 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
-		if (file != null) {
+		if (file == null)
+			return;
 
-			try {
-				DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-				Document doc = docDao.findById(docId);
-				if (doc == null)
-					throw new ServerException(UNEXISTING_DOCUMENT);
+		try {
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			Document doc = docDao.findById(docId);
+			if (doc == null)
+				throw new ServerException(UNEXISTING_DOCUMENT);
 
-				FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-				if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
-					throw new IOException("You don't have the WRITE permission");
+			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			if (!fDao.isWriteEnabled(doc.getFolder().getId(), session.getUserId()))
+				throw new IOException("You don't have the WRITE permission");
 
-				doc = docDao.findDocument(docId);
+			doc = docDao.findDocument(docId);
 
-				if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
-					throw new IOException("The document is locked");
+			if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED)
+				throw new IOException("The document is locked");
 
-				DocumentHistory transaction = new DocumentHistory();
-				transaction.setComment(comment);
-				transaction.setSession(session);
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setComment(comment);
+			transaction.setSession(session);
 
-				DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-				manager.replaceFile(doc.getId(), fileVersion, file, transaction);
+			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+			manager.replaceFile(doc.getId(), fileVersion, file, transaction);
 
-				UploadServlet.cleanReceivedFiles(session.getSid());
-			} catch (PersistenceException | ServerException | IOException e) {
-				ServiceUtil.throwServerException(session, log, e);
-			}
+			UploadServlet.cleanReceivedFiles(session.getSid());
+		} catch (PersistenceException | ServerException | IOException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 

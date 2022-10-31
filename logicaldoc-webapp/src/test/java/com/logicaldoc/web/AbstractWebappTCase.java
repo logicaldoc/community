@@ -24,6 +24,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
+import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
@@ -77,7 +78,7 @@ public abstract class AbstractWebappTCase {
 
 	}
 
-	private GUISession prepareSession() {
+	private GUISession prepareSession() throws ServerException {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 
 		GUISession session = new GUISession();

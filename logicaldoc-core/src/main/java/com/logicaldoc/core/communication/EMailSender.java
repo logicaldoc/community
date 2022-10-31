@@ -119,14 +119,14 @@ public class EMailSender {
 	public EMailSender(String tenant) {
 		loadSettings(tenant);
 	}
-	
+
 	public void setTenant(long tenant) {
 		TenantDAO tenantDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		try {
 			loadSettings(tenantDao.findById(tenant).getName());
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-		}		
+		}
 	}
 
 	private void loadSettings(String tenant) {
@@ -216,9 +216,11 @@ public class EMailSender {
 	 * @param templateName Name of the template to be applied
 	 * @param dictionary The dictionary to be used in the template
 	 * 
+	 * @throws MessagingException raised if the email cannot be sent
+	 * 
 	 * @throws Exception raised if the message cannot be sent
 	 */
-	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws Exception {
+	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException {
 		MessageTemplateDAO templateDao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);
 		MessageTemplate template = templateDao.findByNameAndLanguage(templateName, email.getLocale().toString(),
 				email.getTenantId());
@@ -257,10 +259,8 @@ public class EMailSender {
 	 * @param email E-Mail which should be sent.
 	 * 
 	 * @throws MessagingException raised if the email cannot be sent
-	 * @throws UnsupportedEncodingException raised if the email cannot be sent
-	 * @throws MalformedURLException raised if the email cannot be sent
 	 */
-	public void send(EMail email) throws MessagingException, UnsupportedEncodingException, MalformedURLException {
+	public void send(EMail email) throws MessagingException {
 		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		String tenantName = tDao.getTenantName(email.getTenantId());
 		if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
@@ -291,7 +291,12 @@ public class EMailSender {
 			message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc);
 		message.setSubject(email.getSubject(), UTF_8);
 
-		MimeBodyPart body = buildBodyPart(email);
+		MimeBodyPart body;
+		try {
+			body = buildBodyPart(email);
+		} catch (UnsupportedEncodingException e) {
+			throw new MessagingException(e.getMessage(), e);
+		}
 
 		/*
 		 * If we have to images, the parts must be 'related' otherwise 'mixed'
@@ -302,8 +307,14 @@ public class EMailSender {
 		int i = 1;
 		for (String image : email.getImages()) {
 			MimeBodyPart imageBodyPart = new MimeBodyPart();
-			DataSource ds = new URLDataSource(new URL(image));
-			imageBodyPart.setDataHandler(new DataHandler(ds));
+
+			try {
+				DataSource ds = new URLDataSource(new URL(image));
+				imageBodyPart.setDataHandler(new DataHandler(ds));
+			} catch (MalformedURLException e) {
+				throw new MessagingException(e.getMessage(), e);
+			}
+
 			imageBodyPart.setHeader("Content-ID", "<image_" + (i++) + ">");
 			imageBodyPart.setDisposition("inline");
 			mpMessage.addBodyPart(imageBodyPart);
@@ -316,8 +327,12 @@ public class EMailSender {
 			DataHandler fdHandler = new DataHandler(fdSource);
 			MimeBodyPart part = new MimeBodyPart();
 			part.setDataHandler(fdHandler);
-			String fileName = MimeUtility.encodeText(att.getFileName(), UTF_8, null);
-			part.setFileName(fileName);
+			try {
+				String fileName = MimeUtility.encodeText(att.getFileName(), UTF_8, null);
+				part.setFileName(fileName);
+			} catch (UnsupportedEncodingException e) {
+				throw new MessagingException(e.getMessage(), e);
+			}
 			mpMessage.addBodyPart(part);
 		}
 
