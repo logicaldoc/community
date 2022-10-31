@@ -53,6 +53,7 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.plugin.PluginRegistry;
 
 /**
@@ -652,7 +653,7 @@ public class ServletUtil {
 		List<FileItem> fileItems = upload.parseRequest(request);
 		for (FileItem item : fileItems) {
 			if (!item.isFormField()) {
-				File savedFile = File.createTempFile("", "");
+				File savedFile = FileUtil.createTempFile("", "");
 				item.write(savedFile);
 
 				InputStream is = null;

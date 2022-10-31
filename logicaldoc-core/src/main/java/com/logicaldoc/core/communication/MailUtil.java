@@ -42,6 +42,7 @@ import com.auxilii.msgparser.MsgParser;
 import com.auxilii.msgparser.RecipientEntry;
 import com.auxilii.msgparser.attachment.Attachment;
 import com.auxilii.msgparser.attachment.FileAttachment;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.P7M;
 
 /**
@@ -108,7 +109,7 @@ public class MailUtil {
 		if (messageClass.toLowerCase().contains(IPM_NOTE_SMIME.toLowerCase())) {
 			FileAttachment p7mAttachment = (FileAttachment) msg.getAttachments().get(0);
 			byte[] p7mBytes = p7mAttachment.getData();
-			File tmp = File.createTempFile("msg", null);
+			File tmp = FileUtil.createTempFile("msg", null);
 			try {
 				P7M p7m = new P7M(p7mBytes);
 				p7m.extractOriginalFile(tmp);
@@ -649,7 +650,7 @@ public class MailUtil {
 			if (messageClass.toLowerCase().contains(IPM_NOTE_SMIME.toLowerCase())) {
 				FileAttachment p7mAttachment = (FileAttachment) msg.getAttachments().get(0);
 				byte[] p7mBytes = p7mAttachment.getData();
-				File tmp = File.createTempFile("msg", null);
+				File tmp = FileUtil.createTempFile("msg", null);
 				try (FileInputStream fis = new FileInputStream(tmp);) {
 					P7M p7m = new P7M(p7mBytes);
 					p7m.extractOriginalFile(tmp);
@@ -676,7 +677,7 @@ public class MailUtil {
 			if (messageClass.toLowerCase().contains(IPM_NOTE_SMIME.toLowerCase())) {
 				FileAttachment p7mAttachment = (FileAttachment) msg.getAttachments().get(0);
 				byte[] p7mBytes = p7mAttachment.getData();
-				File tmp = File.createTempFile("msg", null);
+				File tmp = FileUtil.createTempFile("msg", null);
 				try (FileInputStream fis = new FileInputStream(tmp);) {
 					P7M p7m = new P7M(p7mBytes);
 					p7m.extractOriginalFile(tmp);

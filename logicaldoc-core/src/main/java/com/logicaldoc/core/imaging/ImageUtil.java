@@ -80,7 +80,7 @@ public class ImageUtil {
 	public static void cropImageToFile(String content, ImageZone zone, File file) throws IOException {
 		File tmpFile = null;
 		try {
-			tmpFile = File.createTempFile("zonalocr", ".jpg");
+			tmpFile = FileUtil.createTempFile("zonalocr", ".jpg");
 			saveImage(content, tmpFile);
 			cropImageToFile(tmpFile, zone, file);
 		} finally {
@@ -285,7 +285,7 @@ public class ImageUtil {
 		if (ext.equals("jpg") || ext.equals("jpeg")) {
 			FileUtil.copyFile(originalFile, out);
 		} else {
-			File pdfFile = File.createTempFile("zonalocr", ".pdf");
+			File pdfFile = FileUtil.createTempFile("zonalocr", ".pdf");
 			try {
 				if (!"pdf".equals(ext)) {
 					FormatConverterManager manager = (FormatConverterManager) Context.get()

@@ -145,7 +145,7 @@ public class FormatConverterManager {
 
 		// Prepare I/O files
 		File src = null;
-		File dest = File.createTempFile("conversion", ".pdf");
+		File dest = FileUtil.createTempFile("conversion", ".pdf");
 
 		try {
 			src = writeToFile(document, fileVersion);
@@ -199,7 +199,7 @@ public class FormatConverterManager {
 		File out = null;
 		FormatConverter converter = null;
 		try {
-			out = File.createTempFile("conv", "." + format);
+			out = FileUtil.createTempFile("conv", "." + format);
 			converter = getConverter(fileName, format);
 
 			if (converter == null)
@@ -483,7 +483,7 @@ public class FormatConverterManager {
 	 * @throws IOException raised if the file cannot be written
 	 */
 	private File writeToFile(Document document, String fileVersion) throws IOException {
-		File target = File.createTempFile("scr", "." + AbstractFormatConverter.getExtension(document.getFileName()));
+		File target = FileUtil.createTempFile("scr", "." + AbstractFormatConverter.getExtension(document.getFileName()));
 		String fver = getSuitableFileVersion(document, fileVersion);
 		String resource = storer.getResourceName(document, fver, null);
 		storer.writeToFile(document.getId(), resource, target);

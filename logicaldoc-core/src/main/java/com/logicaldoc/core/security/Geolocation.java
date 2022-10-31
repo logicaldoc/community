@@ -165,7 +165,7 @@ public class Geolocation {
 				if (result != HttpStatus.SC_OK)
 					throw new IOException("HTTP error " + result);
 
-				gzFile = File.createTempFile(GEOLOCATION, ".tar.gz");
+				gzFile = FileUtil.createTempFile(GEOLOCATION, ".tar.gz");
 
 				try (InputStream in = HttpUtil.getBodyStream(response);
 						FileOutputStream fos = new FileOutputStream(gzFile);
@@ -183,7 +183,7 @@ public class Geolocation {
 			/*
 			 * Prepare a temporary folder and hunzip the downloaded file in it
 			 */
-			tmpDir = File.createTempFile(GEOLOCATION, null);
+			tmpDir = FileUtil.createTempFile(GEOLOCATION, null);
 			FileUtil.strongDelete(tmpDir);
 			tmpDir.mkdir();
 			new ZipUtil().unGZipUnTar(gzFile, tmpDir);

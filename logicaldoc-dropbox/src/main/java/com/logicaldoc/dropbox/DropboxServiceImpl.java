@@ -39,6 +39,7 @@ import com.logicaldoc.gui.common.client.InvalidSessionException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Implementation of the DropboxService
@@ -211,7 +212,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 		File temp = null;
 		try {
-			temp = File.createTempFile("dboxupload", ".tmp");
+			temp = FileUtil.createTempFile("dboxupload", ".tmp");
 			store.writeToFile(docId, store.getResourceName(docId, null, null), temp);
 			dropbox.uploadFile(temp, path);
 
@@ -320,7 +321,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 		File temp = null;
 		try {
-			temp = File.createTempFile("dboxdownload", ".tmp");
+			temp = FileUtil.createTempFile("dboxdownload", ".tmp");
 			dbox.downloadFile(src.getPathDisplay(), temp);
 
 			List<Document> docs = ddao.findByFileNameAndParentFolderId(root.getId(), src.getPathDisplay(), null,

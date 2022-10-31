@@ -124,7 +124,7 @@ public class UserUtil {
 
 		File tmpAvatarImage = null;
 		try {
-			tmpAvatarImage = File.createTempFile("avatar", ".png");
+			tmpAvatarImage = FileUtil.createTempFile("avatar", ".png");
 			BufferedImage avatar = ImageIO.read(avatarImageFile);
 			avatar = ImageUtil.cropCenterSquare(avatar, size);
 			ImageIO.write(avatar, "png", tmpAvatarImage);
@@ -154,7 +154,7 @@ public class UserUtil {
 
 		File tmpAvatarImage = null;
 		try {
-			tmpAvatarImage = File.createTempFile("avatar", ".png");
+			tmpAvatarImage = FileUtil.createTempFile("avatar", ".png");
 			BufferedImage avatar = UserUtil.generateDefaultAvatarImage(user, size);
 			ImageIO.write(avatar, "png", tmpAvatarImage);
 			user.setAvatar(ImageUtil.encodeImage(tmpAvatarImage));

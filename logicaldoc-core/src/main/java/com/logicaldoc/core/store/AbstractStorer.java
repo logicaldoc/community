@@ -262,7 +262,7 @@ public abstract class AbstractStorer implements Storer {
 		String resource = "1.0";
 		File tmpFile = null;
 		try {
-			tmpFile = File.createTempFile("st-test", ".txt");
+			tmpFile = FileUtil.createTempFile("st-test", ".txt");
 			FileUtil.writeFile("test", tmpFile.getAbsolutePath());
 			store(tmpFile, 0L, resource);
 			return exists(0L, resource);

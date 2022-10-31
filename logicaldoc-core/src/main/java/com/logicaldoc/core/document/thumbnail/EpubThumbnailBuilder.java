@@ -44,14 +44,14 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 				/*
 				 * The eBook defines a cover image, so extract and use it
 				 */
-				tmp = File.createTempFile(EBOOKCOVER,
+				tmp = FileUtil.createTempFile(EBOOKCOVER,
 						"." + (reader.getCoverImageFileName() != null
 								? FileUtil.getExtension(reader.getCoverImageFileName())
 								: "png"));
 				FileUtil.writeFile(reader.getCoverImage(), tmp.getAbsolutePath());
 				super.buildThumbnail(sid, document, fileVersion, tmp, dest, size, compression);
 			} else {
-				tmp = File.createTempFile(EBOOKCOVER, ".pdf");
+				tmp = FileUtil.createTempFile(EBOOKCOVER, ".pdf");
 				/*
 				 * The eBook does not define a cover, so we create one using the
 				 * first page
@@ -75,13 +75,13 @@ public class EpubThumbnailBuilder extends ImageThumbnailBuilder {
 					 * file, convert it into PDF and then generate it's
 					 * thumbnail
 					 */
-					tmp = File.createTempFile(EBOOKCOVER, ".txt");
+					tmp = FileUtil.createTempFile(EBOOKCOVER, ".txt");
 					List<NavPoint> navPoints = reader.getToc().getNavMap().getNavPoints();
 					String toc = navPoints.stream().map(p -> p.getNavLabel()).filter(p -> StringUtils.isNotEmpty(p))
 							.collect(Collectors.joining("\n"));
 					FileUtil.writeFile(toc, tmp.getAbsolutePath());
 
-					File pdf = File.createTempFile(EBOOKCOVER, ".pdf");
+					File pdf = FileUtil.createTempFile(EBOOKCOVER, ".pdf");
 					try {
 						pdfConverter = ((FormatConverterManager) Context.get().getBean(FormatConverterManager.class))
 								.getConverter("txt", "pdf");

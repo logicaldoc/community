@@ -482,7 +482,7 @@ public class ZipUtil {
 			/*
 			 * Ungzip file to extract TAR file.
 			 */
-			tarFile = File.createTempFile("ungizp", ".tar");
+			tarFile = FileUtil.createTempFile("ungizp", ".tar");
 			unGZip(tarGzFile, tarFile);
 
 			/*

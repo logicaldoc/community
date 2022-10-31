@@ -29,10 +29,10 @@
     <Logger name="org.apache.cxf" level="fatal" additivity="false">
       <Appender-Ref ref="FILE" />
     </Logger>
-    <Logger name="com.logicaldoc" level="info" additivity="true">
+    <Logger name="com.logicaldoc" level="info" additivity="false">
       <Appender-Ref ref="FILE" />
     </Logger>
-	<Root level="error">
+	<Root level="fatal">
 		<AppenderRef ref="CONSOLE"/>
     </Root>
   </Loggers>

@@ -739,4 +739,22 @@ public class FileUtil {
 			return false;
 		}
 	}
+
+	/**
+	 * Creates an empty file in the default temporary-file directory, usingthe
+	 * given prefix and suffix to generate its name. Invoking this methodis
+	 * equivalent to invoking
+	 * 
+	 * @param prefix The prefix string to be used in generating the file'sname;
+	 *        must be at least three characters longsuffix
+	 * @param suffix The suffix string to be used in generating the file'sname;
+	 *        may be null, in which case thesuffix ".tmp" will be used
+	 * 
+	 * @return An abstract pathname denoting a newly-created empty file
+	 * 
+	 * @throws IOException If a file could not be created
+	 */
+	public static File createTempFile(String prefix, String suffix) throws IOException {
+		return FileUtil.createTempFile(prefix, suffix);
+	}
 }

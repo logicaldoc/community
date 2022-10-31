@@ -114,7 +114,7 @@ public class LogDownload extends HttpServlet {
 		File tmp = null;
 
 		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));) {
-			tmp = File.createTempFile("logs", ".zip");
+			tmp = FileUtil.createTempFile("logs", ".zip");
 
 			LoggingConfigurator conf = new LoggingConfigurator();
 			Collection<String> appenders = conf.getLoggingFiles();
@@ -134,7 +134,7 @@ public class LogDownload extends HttpServlet {
 			 * Now create a copy of the configuration and store it in the zip
 			 * file
 			 */
-			File buf = File.createTempFile("context", ".properties");
+			File buf = FileUtil.createTempFile("context", ".properties");
 			ContextProperties cp = Context.get().getProperties();
 			OrderedProperties prop = new OrderedProperties();
 			for (String key : cp.getKeys()) {
@@ -152,7 +152,7 @@ public class LogDownload extends HttpServlet {
 			 * Now create a file with the environment
 			 */
 			String env = SystemUtil.printEnvironment();
-			buf = File.createTempFile("environment", ".txt");
+			buf = FileUtil.createTempFile("environment", ".txt");
 			FileUtil.writeFile(env, buf.getPath());
 			writeEntry(out, "environment.txt", buf);
 			FileUtil.strongDelete(buf);

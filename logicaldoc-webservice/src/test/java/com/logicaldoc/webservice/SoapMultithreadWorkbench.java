@@ -112,7 +112,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 							System.out.println("## checkout " + i);
 							documentClient.checkout(sid, docId);
 						} else {
-							File tmp = File.createTempFile("wstest", wsDoc.getFileName());
+							File tmp = FileUtil.createTempFile("wstest", wsDoc.getFileName());
 							try {
 								System.out.println("## checkin " + i);
 								documentClient.downloadContent(sid, docId, tmp);

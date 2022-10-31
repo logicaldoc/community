@@ -477,7 +477,7 @@ public class EMailSender {
 
 		File emlFile = null;
 		try {
-			emlFile = File.createTempFile("emailsender", ".eml");
+			emlFile = FileUtil.createTempFile("emailsender", ".eml");
 
 			try (FileOutputStream fos = new FileOutputStream(emlFile);) {
 				message.writeTo(new FileOutputStream(emlFile));

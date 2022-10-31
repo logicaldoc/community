@@ -26,7 +26,7 @@ public class SevenZipParser extends AbstractParser {
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuilder content) throws Exception {
-		File sevenFile = File.createTempFile("parse7z", ".7z");
+		File sevenFile = FileUtil.createTempFile("parse7z", ".7z");
 		try {
 			FileUtil.writeFile(input, sevenFile.getAbsolutePath());
 			List<String> entries = new SevenZipUtil().listEntries(sevenFile);
@@ -44,7 +44,7 @@ public class SevenZipParser extends AbstractParser {
 				 */
 				String entry = entries.get(0);
 				String entryExtension = FileUtil.getExtension(entry);
-				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+				File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
 					if (entryParser == null)
@@ -75,7 +75,7 @@ public class SevenZipParser extends AbstractParser {
 	public int countPages(InputStream input, String filename) {
 		File rarFile = null;
 		try {
-			rarFile = File.createTempFile("parse7z", ".7z");
+			rarFile = FileUtil.createTempFile("parse7z", ".7z");
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());
 			return countPages(rarFile, filename);
 		} catch (Throwable t) {
@@ -102,7 +102,7 @@ public class SevenZipParser extends AbstractParser {
 				 */
 				String entry = entries.get(0);
 				String entryExtension = FileUtil.getExtension(entry);
-				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+				File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
 					if (entryParser == null)

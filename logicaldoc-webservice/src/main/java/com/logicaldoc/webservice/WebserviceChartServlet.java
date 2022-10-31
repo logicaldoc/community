@@ -85,7 +85,7 @@ public class WebserviceChartServlet extends HttpServlet {
 			if (request.getParameter("tenantId") != null)
 				tenantId = Long.parseLong(request.getParameter("tenantId"));
 
-			chartFile = File.createTempFile("chart", ".png");
+			chartFile = FileUtil.createTempFile("chart", ".png");
 			
 			/**
 			 * Retrieve the sequences and order them by date

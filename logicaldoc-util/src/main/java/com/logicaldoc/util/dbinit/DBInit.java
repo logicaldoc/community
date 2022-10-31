@@ -116,7 +116,7 @@ public class DBInit {
 
 		File file = new File(sqlFile);
 		if (!file.exists() || !file.canRead()) {
-			file = File.createTempFile(file.getName(), ".sql");
+			file = FileUtil.createTempFile(file.getName(), ".sql");
 			file.deleteOnExit();
 			FileUtil.copyResource(sqlFile, file);
 		}

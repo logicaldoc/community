@@ -24,12 +24,16 @@
 		<Logger name="com.logicaldoc" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
-		<Logger name="com.logicaldoc.web.service" level="warn" additivity="true">
+		<Logger name="com.logicaldoc.web.service" level="warn" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
 		<Logger name="org.hibernate" level="error" additivity="false">
 			<AppenderRef ref="file" />
 		</Logger>
+        <Logger name="org.apache.solr" level="fatal" additivity="false">
+			<AppenderRef ref="file" />
+		</Logger>		
+		
 		<Root level="warn">
 			<AppenderRef ref="file" />
 			<AppenderRef ref="console" />

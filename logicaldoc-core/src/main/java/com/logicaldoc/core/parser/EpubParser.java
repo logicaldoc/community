@@ -31,7 +31,7 @@ public class EpubParser extends AbstractParser {
 			Document document, String fileVersion, StringBuilder content) {
 		File tmpFile = null;
 		try {
-			tmpFile = File.createTempFile("epubparser", ".epub");
+			tmpFile = FileUtil.createTempFile("epubparser", ".epub");
 			FileUtil.writeFile(input, tmpFile.getAbsolutePath());
 
 			Reader reader = new Reader();

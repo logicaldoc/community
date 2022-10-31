@@ -13,6 +13,7 @@ import com.logicaldoc.core.AbstractCoreTCase;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
+import com.logicaldoc.util.io.FileUtil;
 
 public class XMLConverterTest extends AbstractCoreTCase {
 
@@ -46,13 +47,13 @@ public class XMLConverterTest extends AbstractCoreTCase {
 		File targetFile = null;
 		try {
 			// Creating a temp file
-			targetFile = File.createTempFile("converted", ".txt");
+			targetFile = FileUtil.createTempFile("converted", ".txt");
 			System.err.println(targetFile);
 
 			convert.internalConvert("sid1", doc, srcXMLFile, targetFile);
-			
+
 			// read file and print length the outputstream
-			System.err.println("targetFile.length(): " +targetFile.length());
+			System.err.println("targetFile.length(): " + targetFile.length());
 
 		} catch (IOException e) {
 			log.error("Exception during conversion", e);
@@ -62,8 +63,7 @@ public class XMLConverterTest extends AbstractCoreTCase {
 			if (targetFile != null && targetFile.exists())
 				targetFile.delete();
 		}
-		
-		
+
 	}
 
 }

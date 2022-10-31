@@ -52,7 +52,7 @@ public class StatChartServlet extends HttpServlet {
 			User user = session.getUser();
 
 			// Create the folder for the chart
-			chartFile = File.createTempFile("chart", ".png");
+			chartFile = FileUtil.createTempFile("chart", ".png");
 
 			String chart = request.getParameter("chart");
 			SystemServiceImpl service = new SystemServiceImpl();

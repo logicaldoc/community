@@ -64,8 +64,8 @@ public class CatchAllParser extends AbstractParser {
 		File inputFile = null;
 		File outputPdf = null;
 		try {
-			inputFile = File.createTempFile("input", filename);
-			outputPdf = File.createTempFile("output", ".pdf");
+			inputFile = FileUtil.createTempFile("input", filename);
+			outputPdf = FileUtil.createTempFile("output", ".pdf");
 
 			// Copy the input stream into a temporary file and convert into PDF
 			FileUtils.copyInputStreamToFile(input, inputFile);

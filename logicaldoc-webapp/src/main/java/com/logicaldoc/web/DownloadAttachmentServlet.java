@@ -65,7 +65,7 @@ public class DownloadAttachmentServlet extends HttpServlet {
 			String filename = request.getParameter("attachmentFileName");
 
 			Version version = null;
-			tmp = File.createTempFile("attdown", null);
+			tmp = FileUtil.createTempFile("attdown", null);
 
 			Document doc = docDao.findById(docId);
 			if (session.getUser() != null && !folderDao.isPermissionEnabled(Permission.DOWNLOAD,

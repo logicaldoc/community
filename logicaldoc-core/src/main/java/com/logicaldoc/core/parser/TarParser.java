@@ -26,7 +26,7 @@ public class TarParser extends AbstractParser {
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuilder content) throws Exception {
-		File tarFile = File.createTempFile("parsetar", ".tar");
+		File tarFile = FileUtil.createTempFile("parsetar", ".tar");
 		try {
 			FileUtil.writeFile(input, tarFile.getAbsolutePath());
 			List<String> entries = new TarUtil().listEntries(tarFile);
@@ -44,7 +44,7 @@ public class TarParser extends AbstractParser {
 				 */
 				String entry = entries.get(0);
 				String entryExtension = FileUtil.getExtension(entry);
-				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+				File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
 					if (entryParser == null)
@@ -75,7 +75,7 @@ public class TarParser extends AbstractParser {
 	public int countPages(InputStream input, String filename) {
 		File tarFile = null;
 		try {
-			tarFile = File.createTempFile("parsetar", ".tar");
+			tarFile = FileUtil.createTempFile("parsetar", ".tar");
 			FileUtil.writeFile(input, tarFile.getAbsolutePath());
 			return countPages(tarFile, filename);
 		} catch (Throwable t) {
@@ -99,7 +99,7 @@ public class TarParser extends AbstractParser {
 				 */
 				String entry = entries.get(0);
 				String entryExtension = FileUtil.getExtension(entry);
-				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+				File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
 					if (entryParser == null)

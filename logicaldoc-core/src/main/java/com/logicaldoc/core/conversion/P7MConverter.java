@@ -30,7 +30,7 @@ public class P7MConverter extends AbstractFormatConverter {
 			String enclosedExtension = FileUtil.getExtension(baseName).toLowerCase();
 			String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 
-			tmp = File.createTempFile("p7m", "." + enclosedExtension);
+			tmp = FileUtil.createTempFile("p7m", "." + enclosedExtension);
 
 			P7M p7m = new P7M(src);
 			p7m.read();

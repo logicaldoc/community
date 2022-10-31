@@ -96,11 +96,11 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		emailFile.getParentFile().mkdirs();
 		// Copy email file
 		copyResource("/Hurry up! Only a few hours for the Prime Day VGA promos !!!.msg", emailFile.getCanonicalPath());
-		
+
 		emailFile = new File("target/tmp/logicaldoc/docs/7/doc/1.0");
 		emailFile.getParentFile().mkdirs();
 		// Copy email file
-		copyResource("/New error indexing documents.eml", emailFile.getCanonicalPath());		
+		copyResource("/New error indexing documents.eml", emailFile.getCanonicalPath());
 	}
 
 	@Test
@@ -108,35 +108,36 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		GUIVersion[] versions = service.getVersionsById(1, 2);
 		Assert.assertNotNull(versions);
 		Assert.assertEquals(2, versions.length);
-		
+
 		// only the first version of the two
 		versions = service.getVersionsById(1, 23);
 		Assert.assertNotNull(versions);
 		Assert.assertEquals(1, versions.length);
-		
+
 		// only the 2nd version of the two
 		versions = service.getVersionsById(21, 2);
 		Assert.assertNotNull(versions);
 		Assert.assertEquals(1, versions.length);
-		
+
 		// no versions
 		versions = service.getVersionsById(21, 22);
 		Assert.assertNotNull(versions);
 		Assert.assertEquals(0, versions.length);
 	}
-	
+
 	@Test
 	public void testDeleteVersions() throws ServerException {
-		long[] ids = new long[] {21,22,23};
+		long[] ids = new long[] { 21, 22, 23 };
 		GUIDocument gdoc;
+		boolean exceptionHappened = false;
 		try {
 			gdoc = service.deleteVersions(ids);
-			fail("Expected exception was not thrown");
-		} catch (ServerException e) {
-			// nothing to do
+		} catch (AssertionError | ServerException e) {
+			exceptionHappened = true;
 		}
-		
-		ids = new long[] {1,2};
+		Assert.assertTrue(exceptionHappened);
+
+		ids = new long[] { 1, 2 };
 		gdoc = service.deleteVersions(ids);
 		assertNotNull(gdoc);
 		assertEquals(1, gdoc.getId());
@@ -218,6 +219,8 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Assert.assertNotNull(doc);
 		Assert.assertEquals("pippo", doc.getFileName());
 
+		doc = docDao.findById(1);
+		Assert.assertNotNull(doc);
 		service.delete(new long[] { 2, 3 });
 
 		doc = docDao.findById(1);
@@ -257,7 +260,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		notes = noteDao.findByDocId(1L, "1.0");
 		Assert.assertNotNull(notes);
 		Assert.assertEquals(2, notes.size());
-		
+
 		try {
 			// add note to a non existent doc
 			service.addNote(21L, "Midnight Rain");
@@ -345,18 +348,19 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Assert.assertNull(book);
 		book = bookDao.findById(2);
 		Assert.assertNull(book);
-		
+
 		// delete an already deleted bookmark
 		service.deleteBookmarks(new long[] { bookmark.getId() });
-		
+
 		// Add bookmarks on folders
 		service.addBookmarks(new long[] { 6, 7 }, Bookmark.TYPE_FOLDER);
-		
+
 		// Add bookmarks on non existent documents
 		try {
 			service.addBookmarks(new long[] { 21, 22 }, Bookmark.TYPE_DOCUMENT);
 			fail("Expected exception was not thrown");
-		} catch (ServerException e) {
+		} catch (Throwable e) {
+			e.printStackTrace();
 			// nothing to do
 		}
 	}
@@ -429,7 +433,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		Template template = templateDao.findById(5L);
 		templateDao.initialize(template);
-		
+
 		// Set the validator for attribute "attr1" to be email format
 		template.getAttribute("attr1").setValidation(
 				"#if(!$value.matches('^([\\w-\\.]+){1,64}@([\\w&&[^_]]+){2,255}.[a-z]{2,}$')) $error.setDescription($I18N.get('invalidformat')); #end");
@@ -444,8 +448,9 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		 * validate a document with template assigned
 		 */
 
-		// // The value of attribute "attr1" is: "val1" so this should produce an error
-		
+		// // The value of attribute "attr1" is: "val1" so this should produce
+		// an error
+
 		try {
 			service.validate(gdoc);
 			fail("Expected exception was not thrown");
@@ -471,7 +476,8 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		gdoc = service.getById(6);
 
-		// The value of attribute "attr1" is "test.xx@acme.de" this will validate correctly
+		// The value of attribute "attr1" is "test.xx@acme.de" this will
+		// validate correctly
 		service.validate(gdoc);
 	}
 
@@ -549,7 +555,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testGetNotes() {
-		
+
 		// test on a non existent doc
 		try {
 			service.getNotes(600, "1.0", null);
@@ -557,7 +563,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		} catch (ServerException e) {
 			// nothing to do
 		}
-		
+
 		// test on a doc without notes
 		try {
 			GUIDocumentNote[] notes = service.getNotes(6, "1.0", null);
@@ -565,29 +571,29 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
 		}
-		
+
 		// get a document with a single note
 		try {
 			GUIDocumentNote[] notes = service.getNotes(4, "1.0", null);
 			assertEquals(1, notes.length);
-			
+
 			notes = service.getNotes(4, null, null);
-			assertEquals(1, notes.length);			
+			assertEquals(1, notes.length);
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
-		}				
+		}
 	}
-	
+
 	@Test
 	public void testSaveNotes() {
 		try {
 			List<GUIDocumentNote> notes = new ArrayList<>();
-			service.saveNotes(888, notes.toArray(new GUIDocumentNote[]{}), null);
+			service.saveNotes(888, notes.toArray(new GUIDocumentNote[] {}), null);
 			fail("Expected exception was not thrown");
 		} catch (ServerException e) {
 			// nothing to do
 		}
-		
+
 		try {
 			List<GUIDocumentNote> notes = new ArrayList<>();
 			GUIDocumentNote gdn01 = new GUIDocumentNote();
@@ -600,69 +606,69 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			gdn02.setRecipientEmail("ken-botterill@acme.com");
 			notes.add(gdn01);
 			notes.add(gdn02);
-			service.saveNotes(5, notes.toArray(new GUIDocumentNote[]{}), null);
+			service.saveNotes(5, notes.toArray(new GUIDocumentNote[] {}), null);
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
-		}		
+		}
 	}
-	
+
 	@Test
 	public void testBulkUpdate() throws ParseException, PersistenceException {
-		
-		long[] ids = new long[]{2,3,4};
+
+		long[] ids = new long[] { 2, 3, 4 };
 		GUIDocument vo = new GUIDocument();
 		vo.setPublished(1);
-		
+
 		String sDate1 = "10-21-2022";
 		Date date1 = new SimpleDateFormat("MM-dd-yyyy").parse(sDate1);
 		String sDate2 = "12-31-2089";
 		Date date2 = new SimpleDateFormat("MM-dd-yyyy").parse(sDate2);
-		
+
 		vo.setStartPublishing(date1);
 		vo.setStopPublishing(date2);
 		vo.setLanguage("en");
-		vo.setTags(new String[]{"Maroon","Anti-Hero","Karma"});
+		vo.setTags(new String[] { "Maroon", "Anti-Hero", "Karma" });
 		vo.setTemplateId(5L);
-		
+
 		// set attributes
 		GUIAttribute[] attributes = new GUIAttribute[1];
 		GUIAttribute gat = new GUIAttribute();
 		gat.setName("attr1");
 		gat.setType(0);
 		gat.setStringValue("Snow on the Beach");
-		
+
 		attributes[0] = gat;
 		vo.setAttributes(attributes);
-		
+
 		try {
 			GUIDocument[] gdocs = service.bulkUpdate(ids, vo, true);
 			assertNotNull(gdocs);
 			assertTrue(gdocs.length > 0);
 			assertNotNull(gdocs[0].getTags());
 			assertTrue(gdocs[0].getTags().length == 3);
-			
+
 			GUIAttribute gatX = gdocs[0].getAttribute("attr1");
 			assertNotNull(gatX);
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
 		}
-		
+
 		// Test with a doc locked
-		
+
 		Document doc = docDao.findDocument(5);
 		docDao.initialize(doc);
 		doc.setStatus(AbstractDocument.DOC_CHECKED_OUT);
 		docDao.store(doc);
-		
-		ids = new long[]{5,6};
+
+		ids = new long[] { 5, 6 };
 		vo = new GUIDocument();
 		vo.setPublished(0);
-		
+
 		try {
 			GUIDocument[] gdocs = service.bulkUpdate(ids, vo, true);
 			assertNotNull(gdocs);
 			assertTrue(gdocs.length > 0);
-			
+
 			// only one document updated because 1 was locked (checked-out)
 			assertEquals(1, gdocs.length);
 		} catch (ServerException e) {
@@ -691,7 +697,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testSaveEmailAttachment() {
-		
+
 		// try to extract an attachment from a non email document
 		try {
 			service.saveEmailAttachment(4, "testDocVer", "data.sql");
@@ -699,7 +705,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		} catch (ServerException e) {
 			// nothing to do
 		}
-		
+
 		// try to save an attachment that is not present in the document
 		try {
 			service.saveEmailAttachment(5, "1.0", "data.sql");
@@ -707,13 +713,13 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		} catch (ServerException e) {
 			// nothing to do
 		}
-		
+
 		// try to save an attachment that is not present in the document
 		try {
 			service.saveEmailAttachment(7, "1.0", "2022-01-04_15h54_11.png");
 		} catch (ServerException e) {
 			fail("Unexpected exception was thrown");
-		}		
-	}	
-	
+		}
+	}
+
 }

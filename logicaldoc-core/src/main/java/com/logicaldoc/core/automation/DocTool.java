@@ -436,7 +436,7 @@ public class DocTool {
 		File tmpFile = null;
 
 		try {
-			tmpFile = File.createTempFile("res-", suffix);
+			tmpFile = FileUtil.createTempFile("res-", suffix);
 			storer.writeToFile(doc.getId(), resource, tmpFile);
 
 			Document docVO = new Document();

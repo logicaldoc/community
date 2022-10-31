@@ -58,7 +58,7 @@ public class ZipConverter extends CompressedArchiveConverter {
 				? FilenameUtils.getBaseName(fileName) + ".tar.gz"
 				: fileName;
 		unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
-		File ungzippedFile = File.createTempFile("parsegzip",
+		File ungzippedFile = FileUtil.createTempFile("parsegzip",
 				"." + FileUtil.getExtension(unpackedFileName).toLowerCase());
 		ZipUtil zipUtil = new ZipUtil();
 		zipUtil.unGZip(input, ungzippedFile);

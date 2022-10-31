@@ -25,7 +25,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 
 	protected void convertMultipleEntries(String sid, Document document, File src, File dest, List<String> entries)
 			throws IOException {
-		File tempFile = File.createTempFile("zipconvert", ".txt");
+		File tempFile = FileUtil.createTempFile("zipconvert", ".txt");
 		try (FileWriter writer = new FileWriter(tempFile);) {
 			for (String line : entries) {
 				writer.write(line);
@@ -60,7 +60,7 @@ public abstract class CompressedArchiveConverter extends AbstractFormatConverter
 	protected void convertSingleEntry(String sid, Document document, File src, File dest, String entry)
 			throws IOException {
 		String entryExtension = FileUtil.getExtension(entry);
-		File uncompressedEntryFile = File.createTempFile("unzip", "." + entryExtension);
+		File uncompressedEntryFile = FileUtil.createTempFile("unzip", "." + entryExtension);
 
 		String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 		try {

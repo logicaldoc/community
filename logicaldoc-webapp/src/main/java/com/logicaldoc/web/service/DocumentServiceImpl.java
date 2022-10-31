@@ -43,6 +43,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
+import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.automation.Automation;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
@@ -129,9 +130,13 @@ import com.logicaldoc.web.util.ServiceUtil;
  */
 public class DocumentServiceImpl extends RemoteServiceServlet implements DocumentService {
 
-	private static final String DOWNLOAD_TICKET = "downloadTicket";
+	private static final String UTF_8 = "UTF-8";
 
 	private static final String UNEXISTING_DOCUMENT = "Unexisting document";
+
+	private static final String UNEXISTING_DOCUMENT2 = "Unexisting document ";
+
+	private static final String DOWNLOAD_TICKET = "downloadTicket";
 
 	private static final String MESSAGE = "message";
 
@@ -154,7 +159,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		BookmarkDAO bookmarkDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		for (long id : ids) {
 			try {
 				Bookmark bookmark = null;
@@ -168,7 +173,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					bookmark.setUserId(session.getUserId());
 
 					if (type == Bookmark.TYPE_DOCUMENT) {
-						Document doc = retrieveDocument(id);
+						Document doc = dao.findById(id);
 						bookmark.setTitle(doc.getFileName());
 						bookmark.setFileType(doc.getType());
 					} else {
@@ -250,8 +255,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			checkWritePermission(metadata, session);
 
 			List<Long> docIdsToIndex = new ArrayList<>();
-			for (String filename : uploadedFilesMap.keySet()) {
-				final File file = uploadedFilesMap.get(filename);
+			for (Entry<String, File> entry : uploadedFilesMap.entrySet()) {
+				String filename = entry.getKey();
+				File file = entry.getValue();
 				try {
 					if (filename.toLowerCase().endsWith(".zip") && importZip) {
 						// Prepare the import thread
@@ -331,7 +337,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			log.debug("zip file = {}", uploadedFile);
 
 			// copy the zip into a temporary file
-			tempZip = File.createTempFile("upload-", ".zip");
+			tempZip = FileUtil.createTempFile("upload-", ".zip");
 			FileUtils.copyFile(uploadedFile, tempZip);
 
 			Document doc = toDocument(metadata);
@@ -341,7 +347,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			InMemoryZipImport importer = new InMemoryZipImport(doc, charset);
 			importer.process(tempZip, parent, session.getUserId(), session.getSid());
 		} catch (PersistenceException | IOException e) {
-			log.error("Unable to delete temporary file {}", tempZip.getAbsolutePath(), e);
+			log.error("Unable to delete temporary file", e);
 		} finally {
 			FileUtil.strongDelete(tempZip);
 		}
@@ -623,51 +629,56 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		if (ids.length > 0) {
-			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-			for (long id : ids) {
+			for (long docId : ids) {
 				try {
-					Document doc = retrieveDocument(id);
-					if (doc == null)
-						continue;
-
-					// Create the document history event
-					DocumentHistory transaction = new DocumentHistory();
-					transaction.setSession(session);
-					transaction.setEvent(DocumentEvent.DELETED.toString());
-					transaction.setComment("");
-
-					// If it is a shortcut, we delete only the shortcut
-					if (doc.getDocRef() != null) {
-						transaction.setEvent(DocumentEvent.SHORTCUT_DELETED.toString());
-						dao.delete(doc.getId(), transaction);
-						continue;
-					}
-
-					// The document of the selected documentRecord must be
-					// not immutable
-					if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
-						log.debug("Document {} was not deleted because immutable", id);
-						continue;
-					}
-
-					// The document must be not locked
-					if (doc.getStatus() == AbstractDocument.DOC_LOCKED) {
-						log.debug("Document {} was not deleted because locked", id);
-						continue;
-					}
-
-					// Check if there are some shortcuts associated to the
-					// deleting document. All the shortcuts must be deleted.
-					for (Long shortcutId : dao.findAliasIds(doc.getId())) {
-						dao.delete(shortcutId);
-					}
-
-					dao.delete(doc.getId(), transaction);
+					deleteDocument(docId, session);
 				} catch (PersistenceException e) {
 					ServiceUtil.throwServerException(session, log, e);
 				}
 			}
 		}
+	}
+
+	private void deleteDocument(long docId, Session session) throws PersistenceException {
+		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+		Document doc = dao.findById(docId);
+		if (doc == null)
+			return;
+
+		// Create the document history event
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setSession(session);
+		transaction.setEvent(DocumentEvent.DELETED.toString());
+		transaction.setComment("");
+
+		// If it is a shortcut, we delete only the shortcut
+		if (doc.getDocRef() != null
+				|| (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN))) {
+			transaction.setEvent(DocumentEvent.SHORTCUT_DELETED.toString());
+			dao.delete(doc.getId(), transaction);
+			return;
+		}
+
+		// The document of the selected documentRecord must be
+		// not immutable
+		if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
+			log.debug("Document {} was not deleted because immutable", docId);
+			return;
+		}
+
+		// The document must be not locked
+		if (doc.getStatus() == AbstractDocument.DOC_LOCKED) {
+			log.debug("Document {} was not deleted because locked", docId);
+			return;
+		}
+
+		// Check if there are some shortcuts associated to the
+		// deleting document. All the shortcuts must be deleted.
+		for (Long shortcutId : dao.findAliasIds(doc.getId())) {
+			dao.delete(shortcutId);
+		}
+
+		dao.delete(doc.getId(), transaction);
 	}
 
 	@Override
@@ -824,12 +835,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			document.setTemplateId(realDoc.getTemplate().getId());
 		}
 
-		if (sessionUser != null && !isFolder) {
-			BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
-			document.setBookmarked(bDao.isDocBookmarkedByUser(document.getId(), sessionUser.getId()));
-			if (document.getDocRef() != null)
-				document.setBookmarked(bDao.isDocBookmarkedByUser(document.getDocRef(), sessionUser.getId()));
-		}
+		setBookmarked(document, isFolder, sessionUser);
 
 		GUIAttribute[] attributes = TemplateServiceImpl.prepareGUIAttributes(realDoc.getTemplate(), realDoc,
 				sessionUser);
@@ -847,6 +853,15 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		document.setPathExtended(fdao.computePathExtended(document.getFolder().getId()));
 
 		return document;
+	}
+
+	private static void setBookmarked(GUIDocument document, boolean isFolder, User sessionUser) {
+		if (sessionUser != null && !isFolder) {
+			BookmarkDAO bDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
+			document.setBookmarked(bDao.isDocBookmarkedByUser(document.getId(), sessionUser.getId()));
+			if (document.getDocRef() != null)
+				document.setBookmarked(bDao.isDocBookmarkedByUser(document.getDocRef(), sessionUser.getId()));
+		}
 	}
 
 	@Override
@@ -895,28 +910,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			version1.setOcrd(docVersion.getOcrd());
 			version1.setOcrTemplateId(docVersion.getOcrTemplateId());
 
-			version1.setTemplate(docVersion.getTemplateName());
-			versDao.initialize(docVersion);
-			for (String attrName : docVersion.getAttributeNames()) {
-				Attribute extAttr = docVersion.getAttributes().get(attrName);
-				GUIAttribute att = new GUIAttribute();
-				att.setName(attrName);
-				att.setSetId(extAttr.getSetId());
-				att.setPosition(extAttr.getPosition());
-				att.setLabel(extAttr.getLabel());
-				att.setMandatory(extAttr.getMandatory() == 1);
-				att.setHidden(extAttr.getHidden() == 1);
-				att.setMultiple(extAttr.getMultiple() == 1);
-				att.setParent(extAttr.getParent());
-				att.setStringValues(extAttr.getStringValues());
-				att.setEditor(extAttr.getEditor());
-				att.setStringValue(extAttr.getStringValue());
-				att.setIntValue(extAttr.getIntValue());
-				att.setBooleanValue(extAttr.getBooleanValue());
-				att.setDoubleValue(extAttr.getDoubleValue());
-				att.setType(extAttr.getType());
-				version1.addAttribute(att);
-			}
+			setGUIExtendedAttributes(docVersion, version1);
+
 			GUIFolder folder1 = new GUIFolder();
 			folder1.setName(docVersion.getFolderName());
 			folder1.setId(docVersion.getFolderId());
@@ -962,28 +957,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			version2.setOcrTemplateId(docVersion.getOcrTemplateId());
 			version2.setBarcodeTemplateId(docVersion.getBarcodeTemplateId());
 
-			version2.setTemplateId(docVersion.getTemplateId());
-			version2.setTemplate(docVersion.getTemplateName());
-			versDao.initialize(docVersion);
-			for (String attrName : docVersion.getAttributeNames()) {
-				Attribute extAttr = docVersion.getAttributes().get(attrName);
-				GUIAttribute att = new GUIAttribute();
-				att.setName(attrName);
-				att.setSetId(extAttr.getSetId());
-				att.setPosition(extAttr.getPosition());
-				att.setLabel(extAttr.getLabel());
-				att.setMandatory(extAttr.getMandatory() == 1);
-				att.setHidden(extAttr.getHidden() == 1);
-				att.setMultiple(extAttr.getMultiple() == 1);
-				att.setParent(extAttr.getParent());
-				att.setEditor(extAttr.getEditor());
-				att.setStringValue(extAttr.getStringValue());
-				att.setIntValue(extAttr.getIntValue());
-				att.setBooleanValue(extAttr.getBooleanValue());
-				att.setDoubleValue(extAttr.getDoubleValue());
-				att.setType(extAttr.getType());
-				version2.addAttribute(att);
-			}
+			setGUIExtendedAttributes(docVersion, version2);
+
 			GUIFolder folder2 = new GUIFolder();
 			folder2.setName(docVersion.getFolderName());
 			folder2.setId(docVersion.getFolderId());
@@ -995,16 +970,43 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			versions = new GUIVersion[2];
 			versions[0] = version1;
 			versions[1] = version2;
-		} else if (version1 != null && version2 == null) {
+		} else if (version1 != null) {
 			versions = new GUIVersion[1];
 			versions[0] = version1;
-		} else if (version1 == null && version2 != null) {
+		} else if (version2 != null) {
 			versions = new GUIVersion[1];
 			versions[0] = version2;
 		} else
 			return new GUIVersion[0];
 
 		return versions;
+	}
+
+	private void setGUIExtendedAttributes(Version docVersion, GUIVersion guiVersion) {
+		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
+		guiVersion.setTemplate(docVersion.getTemplateName());
+		guiVersion.setTemplateId(docVersion.getTemplateId());
+		versDao.initialize(docVersion);
+		for (String attrName : docVersion.getAttributeNames()) {
+			Attribute extAttr = docVersion.getAttributes().get(attrName);
+			GUIAttribute att = new GUIAttribute();
+			att.setName(attrName);
+			att.setSetId(extAttr.getSetId());
+			att.setPosition(extAttr.getPosition());
+			att.setLabel(extAttr.getLabel());
+			att.setMandatory(extAttr.getMandatory() == 1);
+			att.setHidden(extAttr.getHidden() == 1);
+			att.setMultiple(extAttr.getMultiple() == 1);
+			att.setParent(extAttr.getParent());
+			att.setStringValues(extAttr.getStringValues());
+			att.setEditor(extAttr.getEditor());
+			att.setStringValue(extAttr.getStringValue());
+			att.setIntValue(extAttr.getIntValue());
+			att.setBooleanValue(extAttr.getBooleanValue());
+			att.setDoubleValue(extAttr.getDoubleValue());
+			att.setType(extAttr.getType());
+			guiVersion.addAttribute(att);
+		}
 	}
 
 	@Override
@@ -1364,200 +1366,225 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	@Override
-	public String sendAsEmail(GUIEmail email, String locale) throws ServerException {
+	public String sendAsEmail(GUIEmail guiMail, String locale) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-		ContextProperties config = Context.get().getProperties();
 
-		// Needed in case the zip compression was requested by the user
-		File zipFile = null;
+		EMail mail = new EMail();
+		mail.setHtml(1);
+		mail.setTenantId(session.getTenantId());
+		mail.setAccountId(-1);
+		mail.setFolder(OUTBOX);
+		mail.setSentDate(new Date());
+		mail.setUsername(session.getUsername());
 
-		// Needed in case of thumbnail generation
-		File thumbnailFile = null;
+		setAuthorAddress(mail, guiMail, session);
 
-		EMail mail;
+		setRecipients(mail, guiMail);
+
+		setReceipientsCC(mail, guiMail);
+
+		setRecipientsBCC(mail, guiMail);
+
+		List<Document> attachedDocs = documentDao.findByIds(ArrayUtils.toObject(guiMail.getDocIds()), null);
+		for (Document document : attachedDocs)
+			documentDao.initialize(document);
+
+		/*
+		 * Subject and email are processed by the scripting engine
+		 */
+		Automation engine = new Automation("sendmail", LocaleUtil.toLocale(locale), session.getTenantId());
+		Map<String, Object> dictionary = new HashMap<>();
+		dictionary.put(Automation.LOCALE, LocaleUtil.toLocale(locale));
+		dictionary.put("sender", session.getUser());
+		dictionary.put("documents", attachedDocs);
+		dictionary.put(DOCUMENT, attachedDocs.get(0));
+
 		try {
-			mail = new EMail();
-			mail.setHtml(1);
-			mail.setTenantId(session.getTenantId());
+			prepareDownloadTicket(guiMail, locale, session, dictionary);
 
-			mail.setAccountId(-1);
-			mail.setAuthor(session.getUser().getUsername());
+			String message = engine.evaluate(guiMail.getMessage(), dictionary);
+			mail.setSubject(engine.evaluate(guiMail.getSubject(), dictionary));
 
-			if (config.getBoolean(session.getTenantName() + SMTP_USERASFROM, true)) {
-				if (email.getFrom() != null)
-					mail.setAuthorAddress(email.getFrom().getEmail());
-				else
-					mail.setAuthorAddress(session.getUser().getEmail());
-			}
-
-			if (email.getTos() != null && email.getTos().length > 0) {
-				StringBuilder sb = new StringBuilder();
-				for (GUIContact contact : email.getTos()) {
-					if (sb.length() > 0)
-						sb.append(",");
-					sb.append(contact.getEmail());
-				}
-				mail.parseRecipients(sb.toString());
-			}
-
-			if (email.getCcs() != null && email.getCcs().length > 0) {
-				StringBuilder sb = new StringBuilder();
-				for (GUIContact contact : email.getCcs()) {
-					if (sb.length() > 0)
-						sb.append(",");
-					sb.append(contact.getEmail());
-				}
-				mail.parseRecipientsCC(sb.toString());
-			}
-
-			if (email.getBccs() != null && email.getBccs().length > 0) {
-				StringBuilder sb = new StringBuilder();
-				for (GUIContact contact : email.getBccs()) {
-					if (sb.length() > 0)
-						sb.append(",");
-					sb.append(contact.getEmail());
-				}
-				mail.parseRecipientsBCC(sb.toString());
-			}
-
-			mail.setFolder(OUTBOX);
-			mail.setSentDate(new Date());
-			mail.setUsername(session.getUsername());
-
-			List<Document> attachedDocs = documentDao.findByIds(ArrayUtils.toObject(email.getDocIds()), null);
-			for (Document document : attachedDocs)
-				documentDao.initialize(document);
-
-			/*
-			 * Subject and email are processed by the scripting engine
-			 */
-			Automation engine = new Automation("sendmail", LocaleUtil.toLocale(locale), session.getTenantId());
-			Map<String, Object> dictionary = new HashMap<>();
-			dictionary.put(Automation.LOCALE, LocaleUtil.toLocale(locale));
-			dictionary.put("sender", session.getUser());
-			dictionary.put("documents", attachedDocs);
-			dictionary.put(DOCUMENT, attachedDocs.get(0));
-
-			if (email.isSendAsTicket()) {
-				// Prepare a new download ticket
-				DocumentHistory transaction = new DocumentHistory();
-				transaction.setSession(session);
-
-				Document doc = documentDao.findDocument(email.getDocIds()[0]);
-				Ticket ticket = manager.createDownloadTicket(email.getDocIds()[0], null, null, null, null, null,
-						transaction);
-				String ticketDiv = "<div style='margin-top:10px; border-top:1px solid black; background-color:#CCCCCC;'><b>&nbsp;"
-						+ I18N.message("clicktodownload", LocaleUtil.toLocale(locale)) + ": <a href='" + ticket.getUrl()
-						+ "'>" + doc.getFileName() + "</a></b></div>";
-				dictionary.put(DOWNLOAD_TICKET, ticketDiv);
-			}
-
-			String message = engine.evaluate(email.getMessage(), dictionary);
-			mail.setSubject(engine.evaluate(email.getSubject(), dictionary));
-
-			if (email.isSendAsTicket()) {
-				if (!email.getMessage().contains(DOWNLOAD_TICKET))
+			if (guiMail.isSendAsTicket()) {
+				if (!guiMail.getMessage().contains(DOWNLOAD_TICKET))
 					message += "<br/><br/>" + dictionary.get(DOWNLOAD_TICKET);
 
-				Document doc = documentDao.findDocument(email.getDocIds()[0]);
+				Document doc = documentDao.findDocument(guiMail.getDocIds()[0]);
 
 				if (doc.getDocRef() != null)
 					doc = documentDao.findById(doc.getDocRef());
 
-				try {
-					thumbnailFile = createTile(doc, session.getSid());
-					if (thumbnailFile != null) {
-						String thumb = thumbnailFile.toURI().toURL().toString();
-						mail.getImages().add(thumb);
-						message += "<p><img src='cid:image_1'/></p>";
-					}
-				} catch (IOException ioe) {
-					log.warn(ioe.getMessage());
-				}
-
-				mail.setMessageText(
-						"<html><head><meta charset='utf-8' /></head><body>" + message + "<rl /></body></html>");
+				writeMessageWithThumbnail(mail, doc, message, session);
 			} else {
-				if (email.isZipCompression()) {
-					/*
-					 * Create a temporary archive for sending it as unique
-					 * attachment
-					 */
-					zipFile = File.createTempFile("email", "zip");
-					try (OutputStream out = new FileOutputStream(zipFile);) {
-						// Create the document history event
-						DocumentHistory transaction = new DocumentHistory();
-						transaction.setSession(session);
-						transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
-
-						ZipExport export = new ZipExport();
-						export.process(ArrayUtils.toObject(email.getDocIds()), out, email.isPdfConversion(),
-								transaction);
-						createAttachment(mail, zipFile);
-					} catch (Throwable t) {
-						log.error(t.getMessage(), t);
-					}
+				if (guiMail.isZipCompression()) {
+					prepareZipAttachment(mail, guiMail.getDocIds(), guiMail.isPdfConversion(), session);
 				} else {
-					for (long id : email.getDocIds())
-						createAttachment(mail, id, email.isPdfConversion(), session.getSid());
+					for (long id : guiMail.getDocIds())
+						createAttachment(mail, id, guiMail.isPdfConversion(), session.getSid());
 				}
+
+				mail.setMessageText("<html><head><meta charset='utf-8' /></head><body>" + message + "</body></html>");
 			}
 
-			try {
-				message = "<html><head><meta charset='utf-8' /></head><body>" + message + "</body></html>";
-				mail.setMessageText(message);
-
-				// Send the message
-				EMailSender sender = getEmailSender(session);
-				sender.send(mail);
-
-				FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-				for (Document d : attachedDocs) {
-					Document doc = d;
-					if (doc.getDocRef() != null)
-						doc = documentDao.findById(doc.getDocRef());
-
-					// Create the document history event
-					DocumentHistory history = new DocumentHistory();
-					history.setSession(session);
-					history.setDocument(doc);
-					history.setEvent(DocumentEvent.SENT.toString());
-					history.setComment(
-							StringUtils.abbreviate(StringUtil.collectionToString(mail.getRecipients(), ", "), 4000));
-					history.setFilename(doc.getFileName());
-					history.setVersion(doc.getVersion());
-					history.setFileVersion(doc.getFileVersion());
-					history.setPath(fDao.computePathExtended(doc.getFolder().getId()));
-					documentDao.saveDocumentHistory(doc, history);
-				}
-
-				/*
-				 * Save the recipients in the user's contacts
-				 */
-				ContactDAO cdao = (ContactDAO) Context.get().getBean(ContactDAO.class);
-				for (Recipient recipient : mail.getRecipients()) {
-					List<Contact> contacts = cdao.findByUser(session.getUserId(), recipient.getAddress());
-					if (contacts.isEmpty()) {
-						Contact cont = new Contact();
-						cont.setUserId(session.getUserId());
-						cont.setEmail(recipient.getAddress().trim());
-						cdao.store(cont);
-					}
-				}
-
-				return "ok";
-			} catch (Exception ex) {
-				log.warn(ex.getMessage(), ex);
-				return "error";
-			}
+			return sendEmail(mail, session, attachedDocs);
 		} catch (PersistenceException | IOException e) {
 			log.warn(e.getMessage(), e);
 			return "error";
+		}
+	}
+
+	private void setRecipientsBCC(EMail mail, GUIEmail guiMail) {
+		if (guiMail.getBccs() != null && guiMail.getBccs().length > 0) {
+			StringBuilder sb = new StringBuilder();
+			for (GUIContact contact : guiMail.getBccs()) {
+				if (sb.length() > 0)
+					sb.append(",");
+				sb.append(contact.getEmail());
+			}
+			mail.parseRecipientsBCC(sb.toString());
+		}
+	}
+
+	private void setReceipientsCC(EMail mail, GUIEmail guiMail) {
+		if (guiMail.getCcs() != null && guiMail.getCcs().length > 0) {
+			StringBuilder sb = new StringBuilder();
+			for (GUIContact contact : guiMail.getCcs()) {
+				if (sb.length() > 0)
+					sb.append(",");
+				sb.append(contact.getEmail());
+			}
+			mail.parseRecipientsCC(sb.toString());
+		}
+	}
+
+	private void setRecipients(EMail mail, GUIEmail guiMail) {
+		if (guiMail.getTos() != null && guiMail.getTos().length > 0) {
+			StringBuilder sb = new StringBuilder();
+			for (GUIContact contact : guiMail.getTos()) {
+				if (sb.length() > 0)
+					sb.append(",");
+				sb.append(contact.getEmail());
+			}
+			mail.parseRecipients(sb.toString());
+		}
+	}
+
+	private void setAuthorAddress(EMail mail, GUIEmail guiMail, Session session) {
+		mail.setAuthor(session.getUser().getUsername());
+		if (Context.get().getProperties().getBoolean(session.getTenantName() + SMTP_USERASFROM, true)) {
+			if (guiMail.getFrom() != null)
+				mail.setAuthorAddress(guiMail.getFrom().getEmail());
+			else
+				mail.setAuthorAddress(session.getUser().getEmail());
+		}
+	}
+
+	private void prepareZipAttachment(EMail mail, long[] docIds, boolean pdfConversion, Session session)
+			throws IOException {
+		/*
+		 * Create a temporary archive for sending it as unique attachment
+		 */
+		File zipFile = FileUtil.createTempFile("email", "zip");
+		try (OutputStream out = new FileOutputStream(zipFile);) {
+			// Create the document history event
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSession(session);
+			transaction.setEvent(DocumentEvent.DOWNLOADED.toString());
+
+			ZipExport export = new ZipExport();
+			export.process(ArrayUtils.toObject(docIds), out, pdfConversion, transaction);
+			createAttachment(mail, zipFile);
+		} catch (IOException | PersistenceException t) {
+			log.error(t.getMessage(), t);
 		} finally {
 			FileUtil.strongDelete(zipFile);
+		}
+	}
+
+	private void writeMessageWithThumbnail(EMail mail, Document doc, String message, Session session) {
+		File thumbnailFile = null;
+		try {
+			thumbnailFile = createTile(doc, session.getSid());
+			if (thumbnailFile != null) {
+				String thumb = thumbnailFile.toURI().toURL().toString();
+				mail.getImages().add(thumb);
+				message += "<p><img src='cid:image_1'/></p>";
+			}
+			mail.setMessageText("<html><head><meta charset='utf-8' /></head><body>" + message + "<rl /></body></html>");
+		} catch (IOException ioe) {
+			log.warn(ioe.getMessage());
+		} finally {
 			FileUtil.strongDelete(thumbnailFile);
+		}
+	}
+
+	private void prepareDownloadTicket(GUIEmail email, String locale, Session session, Map<String, Object> dictionary)
+			throws PersistenceException {
+		if (email.isSendAsTicket()) {
+			DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+
+			// Prepare a new download ticket
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSession(session);
+
+			Document doc = documentDao.findDocument(email.getDocIds()[0]);
+			Ticket ticket = manager.createDownloadTicket(email.getDocIds()[0], null, null, null, null, null,
+					transaction);
+			String ticketDiv = "<div style='margin-top:10px; border-top:1px solid black; background-color:#CCCCCC;'><b>&nbsp;"
+					+ I18N.message("clicktodownload", LocaleUtil.toLocale(locale)) + ": <a href='" + ticket.getUrl()
+					+ "'>" + doc.getFileName() + "</a></b></div>";
+			dictionary.put(DOWNLOAD_TICKET, ticketDiv);
+		}
+	}
+
+	private String sendEmail(EMail mail, Session session, List<Document> attachedDocs) {
+		try {
+			DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+
+			// Send the message
+			EMailSender sender = getEmailSender(session);
+			sender.send(mail);
+
+			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			for (Document d : attachedDocs) {
+				Document doc = d;
+				if (doc.getDocRef() != null)
+					doc = documentDao.findById(doc.getDocRef());
+
+				// Create the document history event
+				DocumentHistory history = new DocumentHistory();
+				history.setSession(session);
+				history.setDocument(doc);
+				history.setEvent(DocumentEvent.SENT.toString());
+				history.setComment(
+						StringUtils.abbreviate(StringUtil.collectionToString(mail.getRecipients(), ", "), 4000));
+				history.setFilename(doc.getFileName());
+				history.setVersion(doc.getVersion());
+				history.setFileVersion(doc.getFileVersion());
+				history.setPath(fDao.computePathExtended(doc.getFolder().getId()));
+				documentDao.saveDocumentHistory(doc, history);
+			}
+
+			/*
+			 * Save the recipients in the user's contacts
+			 */
+			ContactDAO cdao = (ContactDAO) Context.get().getBean(ContactDAO.class);
+			for (Recipient recipient : mail.getRecipients()) {
+				List<Contact> contacts = cdao.findByUser(session.getUserId(), recipient.getAddress());
+				if (contacts.isEmpty()) {
+					Contact cont = new Contact();
+					cont.setUserId(session.getUserId());
+					cont.setEmail(recipient.getAddress().trim());
+					cdao.store(cont);
+				}
+			}
+
+			return "ok";
+		} catch (Exception ex) {
+			log.warn(ex.getMessage(), ex);
+			return "error";
 		}
 	}
 
@@ -1584,7 +1611,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		}
 
 		if (storer.exists(doc.getId(), tileResource)) {
-			File file = File.createTempFile("tile-", ".png");
+			File file = FileUtil.createTempFile("tile-", ".png");
 			storer.writeToFile(doc.getId(), tileResource, file);
 			return file;
 		}
@@ -1628,7 +1655,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		email.addAttachment(2 + email.getAttachments().size(), att);
 	}
 
-	private void createAttachment(EMail email, File zipFile) throws IOException {
+	private void createAttachment(EMail email, File zipFile) {
 		EMailAttachment att = new EMailAttachment();
 		att.setData(FileUtil.toByteArray(zipFile));
 		att.setFileName("doc.zip");
@@ -1642,19 +1669,19 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	public void unlock(long[] docIds) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			// Create the document history event
-			DocumentHistory transaction = new DocumentHistory();
-			transaction.setSession(session);
+		// Create the document history event
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setSession(session);
 
+		try {
 			// Unlock the document; throws an exception if something
 			// goes wrong
 			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			for (long id : docIds) {
 				documentManager.unlock(id, transaction);
 			}
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 
@@ -1771,7 +1798,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document document = docDao.findDocument(docId);
 			if (document == null)
-				throw new ServerException("Unexisting document " + docId);
+				throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
 
 			DocumentNote note = new DocumentNote();
 			note.setTenantId(session.getTenantId());
@@ -1807,7 +1834,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		}
 
 		if (document == null)
-			throw new ServerException("Unexisting document " + docId);
+			throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
 
 		List<GUIDocumentNote> guiNotes = new ArrayList<>();
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
@@ -1850,11 +1877,10 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
 			Document document = retrieveDocument(docId);
 			if (document == null)
-				throw new ServerException("Unexisting document " + docId);
+				throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
 
 			List<GUIDocumentNote> notesList = new ArrayList<>();
 			if (notes != null && notes.length > 0)
@@ -1865,8 +1891,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			 */
 			List<DocumentNote> documentNotes = dao.findByDocIdAndTypes(document.getId(), document.getFileVersion(),
 					types);
-			List<Long> actualNoteIds = documentNotes.stream().map(n -> n.getId()).collect(Collectors.toList());
-			List<Long> noteIds = notesList.stream().map(n -> n.getId()).collect(Collectors.toList());
+			List<Long> actualNoteIds = documentNotes.stream().map(PersistentObject::getId).collect(Collectors.toList());
+			List<Long> noteIds = notesList.stream().map(GUIDocumentNote::getId).collect(Collectors.toList());
 			for (Long actualNoteId : actualNoteIds)
 				if (!noteIds.contains(actualNoteId))
 					dao.delete(actualNoteId);
@@ -1903,13 +1929,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				note.setLineWidth(guiNote.getLineWidth());
 				note.setRotation(guiNote.getRotation());
 
-				if (note.getId() == 0L) {
-					DocumentHistory transaction = new DocumentHistory();
-					transaction.setSession(session);
-					dao.store(note, transaction);
-				} else {
-					dao.store(note);
-				}
+				saveNote(note, session);
 
 				/*
 				 * If the note specifies a recipient, update the user's address
@@ -1919,30 +1939,45 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					ContactDAO cDao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 					List<Contact> contacts = cDao.findByUser(session.getUserId(), note.getRecipientEmail());
 					if (contacts.isEmpty()) {
-						try {
-							String firstName = note.getRecipient();
-							String lastName = null;
-							if (firstName.contains(" ")) {
-								firstName = firstName.substring(0, note.getRecipient().lastIndexOf(' ')).trim();
-								lastName = note.getRecipient().substring(note.getRecipient().lastIndexOf(' ')).trim();
-							}
-
-							Contact contact = new Contact();
-							contact.setUserId(session.getUserId());
-							contact.setFirstName(firstName);
-							contact.setLastName(lastName);
-							contact.setEmail(note.getRecipientEmail());
-							cDao.store(contact);
-						} catch (Throwable t) {
-							log.warn("Error storing new contact {}", note.getRecipientEmail(), t);
+						String firstName = note.getRecipient();
+						String lastName = null;
+						if (firstName.contains(" ")) {
+							firstName = firstName.substring(0, note.getRecipient().lastIndexOf(' ')).trim();
+							lastName = note.getRecipient().substring(note.getRecipient().lastIndexOf(' ')).trim();
 						}
+
+						Contact contact = new Contact();
+						contact.setUserId(session.getUserId());
+						contact.setFirstName(firstName);
+						contact.setLastName(lastName);
+						contact.setEmail(note.getRecipientEmail());
+						saveContact(contact);
 					}
 				}
 			}
 		} catch (PersistenceException | ServerException e) {
 			ServiceUtil.throwServerException(session, log, e);
 		}
+	}
 
+	private void saveNote(DocumentNote note, Session session) throws PersistenceException {
+		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
+		if (note.getId() == 0L) {
+			DocumentHistory transaction = new DocumentHistory();
+			transaction.setSession(session);
+			dao.store(note, transaction);
+		} else {
+			dao.store(note);
+		}
+	}
+
+	private void saveContact(Contact contact) {
+		try {
+			ContactDAO cDao = (ContactDAO) Context.get().getBean(ContactDAO.class);
+			cDao.store(contact);
+		} catch (PersistenceException e) {
+			log.warn("Error storing new contact {}", contact.getEmail(), e);
+		}
 	}
 
 	@Override
@@ -1963,73 +1998,77 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		List<GUIDocument> updatedDocs = new ArrayList<>();
-		for (long id : ids) {
+		for (long docId : ids) {
 			try {
-				GUIDocument buf = getById(id);
-
-				if (buf.getImmutable() == 1 || buf.getStatus() != AbstractDocument.DOC_UNLOCKED) {
-					log.warn("Skip bulk update of document {} because it is locked or immutable", buf.getId());
-					continue;
-				}
-
+				GUIDocument buf = null;
 				try {
-					ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), buf.getFolder().getId());
-				} catch (AccessDeniedException e) {
-					log.warn("Skip bulk update of document {} because the user {} does not have the write permission",
-							buf.getId(), session.getUsername());
-					continue;
+					buf = bulkUpdateDocument(docId, vo, ignoreEmptyFields, session);
+				} catch (PermissionException e) {
+					log.warn("Skip bulk update of document {} due to permissions", docId);
 				}
 
-				buf.setComment(vo.getComment() != null ? vo.getComment() : "");
-
-				if (vo.getPublished() > -1)
-					buf.setPublished(vo.getPublished());
-				if (vo.getStartPublishing() != null)
-					buf.setStartPublishing(vo.getStartPublishing());
-				if (vo.getStopPublishing() != null)
-					buf.setStopPublishing(vo.getStopPublishing());
-				if (StringUtils.isNotEmpty(vo.getLanguage()))
-					buf.setLanguage(vo.getLanguage());
-				if (vo.getTags() != null && vo.getTags().length > 0)
-					buf.setTags(vo.getTags());
-				else if (!ignoreEmptyFields)
-					buf.setTags(null);
-				if (vo.getTemplateId() != null)
-					buf.setTemplateId(vo.getTemplateId());
-
-				if (vo.getOcrTemplateId() != null)
-					buf.setOcrTemplateId(vo.getOcrTemplateId());
-				else if (!ignoreEmptyFields)
-					buf.setOcrTemplateId(null);
-
-				if (vo.getBarcodeTemplateId() != null)
-					buf.setBarcodeTemplateId(vo.getBarcodeTemplateId());
-				else if (!ignoreEmptyFields)
-					buf.setBarcodeTemplateId(null);
-
-				if (vo.getAttributes() != null && vo.getAttributes().length > 0) {
-					if (ignoreEmptyFields) {
-						Map<String, GUIAttribute> attributes = new HashMap<>();
-						for (GUIAttribute att : buf.getAttributes())
-							attributes.put(att.getName(), att);
-
-						for (GUIAttribute att : vo.getAttributes()) {
-							if (att.getValue() != null && StringUtils.isNotEmpty(att.getValue().toString()))
-								attributes.put(att.getName(), att);
-						}
-						buf.setAttributes(attributes.values().toArray(new GUIAttribute[0]));
-					} else {
-						buf.setAttributes(vo.getAttributes());
-					}
-				}
-
-				updatedDocs.add(save(buf));
-			} catch (Throwable e) {
+				if (buf != null)
+					updatedDocs.add(save(buf));
+			} catch (ServerException | PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}
 		}
 		return updatedDocs.toArray(new GUIDocument[0]);
+	}
 
+	private GUIDocument bulkUpdateDocument(long docId, GUIDocument vo, boolean ignoreEmptyFields, Session session)
+			throws ServerException, PermissionException, PersistenceException {
+		GUIDocument buf = getById(docId);
+
+		if (buf.getImmutable() == 1 || buf.getStatus() != AbstractDocument.DOC_UNLOCKED)
+			throw new PermissionException("Document immutable or locked");
+
+		ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), buf.getFolder().getId());
+
+		buf.setComment(vo.getComment() != null ? vo.getComment() : "");
+
+		if (vo.getPublished() > -1)
+			buf.setPublished(vo.getPublished());
+		if (vo.getStartPublishing() != null)
+			buf.setStartPublishing(vo.getStartPublishing());
+		if (vo.getStopPublishing() != null)
+			buf.setStopPublishing(vo.getStopPublishing());
+		if (StringUtils.isNotEmpty(vo.getLanguage()))
+			buf.setLanguage(vo.getLanguage());
+		if (vo.getTags() != null && vo.getTags().length > 0)
+			buf.setTags(vo.getTags());
+		else if (!ignoreEmptyFields)
+			buf.setTags(null);
+		if (vo.getTemplateId() != null)
+			buf.setTemplateId(vo.getTemplateId());
+
+		if (vo.getOcrTemplateId() != null)
+			buf.setOcrTemplateId(vo.getOcrTemplateId());
+		else if (!ignoreEmptyFields)
+			buf.setOcrTemplateId(null);
+
+		if (vo.getBarcodeTemplateId() != null)
+			buf.setBarcodeTemplateId(vo.getBarcodeTemplateId());
+		else if (!ignoreEmptyFields)
+			buf.setBarcodeTemplateId(null);
+
+		if (vo.getAttributes() != null && vo.getAttributes().length > 0) {
+			if (ignoreEmptyFields) {
+				Map<String, GUIAttribute> attributes = new HashMap<>();
+				for (GUIAttribute att : buf.getAttributes())
+					attributes.put(att.getName(), att);
+
+				for (GUIAttribute att : vo.getAttributes()) {
+					if (att.getValue() != null && StringUtils.isNotEmpty(att.getValue().toString()))
+						attributes.put(att.getName(), att);
+				}
+				buf.setAttributes(attributes.values().toArray(new GUIAttribute[0]));
+			} else {
+				buf.setAttributes(vo.getAttributes());
+			}
+		}
+
+		return buf;
 	}
 
 	protected static void checkPublished(User user, Document doc) throws PermissionException {
@@ -2045,7 +2084,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document document = docDao.findDocument(docId);
 			if (document == null)
-				throw new ServerException("Unexisting document " + docId);
+				throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
 
 			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 			DocumentNote note = dao.findById(noteId);
@@ -2065,13 +2104,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			note.setUsername(session.getUser().getFullName());
 			note.setMessage(message);
 
-			if (note.getId() == 0L) {
-				DocumentHistory transaction = new DocumentHistory();
-				transaction.setSession(session);
-				dao.store(note, transaction);
-			} else {
-				dao.store(note);
-			}
+			saveNote(note, session);
 		} catch (PersistenceException | ServerException e) {
 			ServiceUtil.throwServerException(session, log, e);
 		}
@@ -2089,7 +2122,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			Version version;
 			try {
 				version = manager.deleteVersion(id, transaction);
-			} catch (PersistenceException e) {
+			} catch (Exception e) {
 				return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
 			}
 			docId = version.getDocId();
@@ -2118,9 +2151,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			transaction.setEvent(DocumentEvent.STORED.toString());
 			Document document;
 			if (StringUtils.isEmpty(content))
-				document = documentManager.create(IOUtils.toInputStream("", "UTF-8"), doc, transaction);
+				document = documentManager.create(IOUtils.toInputStream("", UTF_8), doc, transaction);
 			else
-				document = documentManager.create(IOUtils.toInputStream(content, "UTF-8"), doc, transaction);
+				document = documentManager.create(IOUtils.toInputStream(content, UTF_8), doc, transaction);
 
 			// If that VO is in checkout, perform a checkout also
 			if (vo.getStatus() == AbstractDocument.DOC_CHECKED_OUT) {
@@ -2219,17 +2252,12 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public long countDocuments(long[] folderIds, int status) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-
+		ServiceUtil.validateSession(getThreadLocalRequest());
 		long count = 0;
-		try {
-			for (int i = 0; i < folderIds.length; i++) {
-				count += countDocuments(folderIds[i], status);
-			}
-			return count;
-		} catch (Throwable t) {
-			return (Long) ServiceUtil.throwServerException(session, log, t);
+		for (int i = 0; i < folderIds.length; i++) {
+			count += countDocuments(folderIds[i], status);
 		}
+		return count;
 	}
 
 	private long countDocuments(long folderId, int status) throws ServerException {
@@ -2383,8 +2411,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			transaction.setSession(session);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-			manager.checkin(docId, IOUtils.toInputStream(content, "UTF-8"), doc.getFileName(), false, null,
-					transaction);
+			manager.checkin(docId, IOUtils.toInputStream(content, UTF_8), doc.getFileName(), false, null, transaction);
 
 			return getById(docId);
 		} catch (PersistenceException | ServerException | IOException e) {
@@ -2444,7 +2471,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			transaction.setSession(session);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-			Document doc = manager.create(IOUtils.toInputStream(content, "UTF-8"), toDocument(document), transaction);
+			Document doc = manager.create(IOUtils.toInputStream(content, UTF_8), toDocument(document), transaction);
 
 			return getById(doc.getId());
 		} catch (PersistenceException | IOException | ServerException e) {
@@ -2615,7 +2642,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		InputStream is = null;
 		File tmp = null;
 		try {
-			tmp = File.createTempFile("attcopy", null);
+			tmp = FileUtil.createTempFile("attcopy", null);
 			GUIDocument doc = getById(docId);
 			if (!doc.getFileName().toLowerCase().endsWith(".eml") && !doc.getFileName().toLowerCase().endsWith(".msg"))
 				throw new ServerException("Not an email file");

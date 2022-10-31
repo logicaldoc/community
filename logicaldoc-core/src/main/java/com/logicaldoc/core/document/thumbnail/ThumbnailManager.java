@@ -130,7 +130,7 @@ public class ThumbnailManager {
 
 		// Prepare I/O files
 		File src = null;
-		File dest = File.createTempFile("dest", suffix);
+		File dest = FileUtil.createTempFile("dest", suffix);
 
 		try {
 			src = writeToTempFile(document, fileVersion);
@@ -231,7 +231,7 @@ public class ThumbnailManager {
 	 * @throws IOException raised if the temporary file cannot be written
 	 */
 	private File writeToTempFile(Document document, String fileVersion) throws IOException {
-		File target = File.createTempFile("scr",
+		File target = FileUtil.createTempFile("scr",
 				"." + FileUtil.getExtension(DocUtil.getFileName(document, fileVersion)));
 		String fver = getSuitableFileVersion(document, fileVersion);
 		String resource = storer.getResourceName(document, fver, null);

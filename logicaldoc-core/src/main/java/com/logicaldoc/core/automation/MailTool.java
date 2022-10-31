@@ -302,7 +302,7 @@ public class MailTool {
 
 						File tmpFile = null;
 						try {
-							tmpFile = File.createTempFile("att-", null);
+							tmpFile = FileUtil.createTempFile("att-", null);
 							FileUtils.writeByteArrayToFile(tmpFile, att.getData());
 
 							Document docVO = new Document();

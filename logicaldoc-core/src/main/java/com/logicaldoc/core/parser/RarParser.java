@@ -26,7 +26,7 @@ public class RarParser extends AbstractParser {
 	@Override
 	public void internalParse(InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion, StringBuilder content) throws Exception {
-		File rarFile = File.createTempFile("parserar", ".rar");
+		File rarFile = FileUtil.createTempFile("parserar", ".rar");
 		try {
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());
 			List<String> entries = new RarUtil().listEntries(rarFile);
@@ -44,7 +44,7 @@ public class RarParser extends AbstractParser {
 				 */
 				String entry = entries.get(0);
 				String entryExtension = FileUtil.getExtension(entry);
-				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+				File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
 					if (entryParser == null)
@@ -75,7 +75,7 @@ public class RarParser extends AbstractParser {
 	public int countPages(InputStream input, String filename) {
 		File rarFile = null;
 		try {
-			rarFile = File.createTempFile("parserar", ".rar");
+			rarFile = FileUtil.createTempFile("parserar", ".rar");
 			FileUtil.writeFile(input, rarFile.getAbsolutePath());
 			return countPages(rarFile, filename);
 		} catch (Throwable t) {
@@ -102,7 +102,7 @@ public class RarParser extends AbstractParser {
 				 */
 				String entry = entries.get(0);
 				String entryExtension = FileUtil.getExtension(entry);
-				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+				File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
 					if (entryParser == null)

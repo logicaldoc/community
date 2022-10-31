@@ -58,8 +58,8 @@ public class XMLConverter extends AbstractFormatConverter {
 		File xml = null;
 		try {
 			try {
-				xslt = File.createTempFile("xslt", ".xsl");
-				xml = File.createTempFile("xml", ".xml");
+				xslt = FileUtil.createTempFile("xslt", ".xsl");
+				xml = FileUtil.createTempFile("xml", ".xml");
 				FileUtil.copyFile(src, xml);
 
 				// Parse the XML searching for a stylesheet
@@ -128,7 +128,7 @@ public class XMLConverter extends AbstractFormatConverter {
 				// format so
 				// execute the transformation and then the
 				// conversion
-				File transformedFile = File.createTempFile("trs", "." + xsltOutFormat);
+				File transformedFile = FileUtil.createTempFile("trs", "." + xsltOutFormat);
 				try (FileOutputStream fos = new FileOutputStream(transformedFile)) {
 					Result result = new StreamResult(fos);
 

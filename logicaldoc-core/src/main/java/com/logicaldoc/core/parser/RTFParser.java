@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.util.StringUtil;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * @author Michael Scholz
@@ -48,7 +49,7 @@ public class RTFParser extends AbstractParser {
 
 			// Check if there are some variable code that must be added to the content
 			bis0.reset();
-			File tempFile = File.createTempFile("rtf", ".rtf");
+			File tempFile = FileUtil.createTempFile("rtf", ".rtf");
 			try (OutputStream out = new FileOutputStream(tempFile)) {
 				byte buf[] = new byte[512];
 				int len;

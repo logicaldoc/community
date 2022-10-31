@@ -130,7 +130,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		assert (transaction != null);
 
 		// Write content to temporary file, then delete it
-		File tmp = File.createTempFile("replacefile", "");
+		File tmp = FileUtil.createTempFile("replacefile", "");
 		try {
 			if (content != null)
 				FileUtil.writeFile(content, tmp.getPath());
@@ -334,7 +334,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		assert (transaction.getComment() != null);
 
 		// Write content to temporary file, then delete it
-		File tmp = File.createTempFile("checkin", "");
+		File tmp = FileUtil.createTempFile("checkin", "");
 		try {
 			FileUtil.writeFile(content, tmp.getPath());
 			checkin(docId, tmp, filename, release, docVO, transaction);
@@ -753,7 +753,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		// Write content to temporary file, then delete it
 		File tmp = null;
 		try {
-			tmp = File.createTempFile("create", "");
+			tmp = FileUtil.createTempFile("create", "");
 			if (content != null)
 				FileUtil.writeFile(content, tmp.getPath());
 			return create(tmp, docVO, transaction);
@@ -1150,7 +1150,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public Version deleteVersion(long versionId, DocumentHistory transaction) throws PersistenceException {
 		Version versionToDelete = versionDAO.findById(versionId);
-		assert versionToDelete != null : "Unezisting version " + versionId;
+		assert versionToDelete != null : "Unexisting version " + versionId;
 
 		String versionToDeleteSpec = versionToDelete.getVersion();
 
@@ -1407,7 +1407,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			checkout(document.getId(), transaction);
 
 			// Write the version file into a temporary file
-			File tmp = File.createTempFile("promotion", "");
+			File tmp = FileUtil.createTempFile("promotion", "");
 			try {
 				Folder originalFolder = document.getFolder();
 				Version docVO = new Version(ver);
@@ -1599,7 +1599,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			Path tempPath = Files.createTempDirectory(MERGE);
 			tempDir = tempPath.toFile();
 
-			File dst = File.createTempFile(MERGE, ".pdf");
+			File dst = FileUtil.createTempFile(MERGE, ".pdf");
 
 			PDFMergerUtility merger = new PDFMergerUtility();
 			for (File file : pdfs) {

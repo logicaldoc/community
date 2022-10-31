@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.util.io.FileUtil;
 import com.mpatric.mp3agic.ID3v2;
 import com.mpatric.mp3agic.Mp3File;
 
@@ -37,7 +38,7 @@ public class Mp3ThumbnailBuilder extends AbstractThumbnailBuilder {
 				else
 					mimeType = extension = "." + mimeType.toLowerCase();
 
-				File albumImage = File.createTempFile("album-", extension);
+				File albumImage = FileUtil.createTempFile("album-", extension);
 				try (RandomAccessFile file = new RandomAccessFile(albumImage, "rw");) {
 					file.write(albumData);
 					ImageThumbnailBuilder imageTBuilder = new ImageThumbnailBuilder();

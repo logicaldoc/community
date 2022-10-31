@@ -44,7 +44,7 @@ public class ExportContextImpl extends AbstractExportContext {
 		this.outputCtx = outputCtx;
 		if (hasStream()) {
 			// we need a tmp file, since the export could fail
-			outFile = File.createTempFile("__exportcontext", "tmp");
+			outFile = FileUtil.createTempFile("__exportcontext", "tmp");
 		}
 	}
 

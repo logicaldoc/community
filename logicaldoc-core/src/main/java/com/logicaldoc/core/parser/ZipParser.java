@@ -65,7 +65,7 @@ public class ZipParser extends AbstractParser {
 				? FilenameUtils.getBaseName(fileName) + ".tar.gz"
 				: fileName;
 		unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
-		File ungzippedFile = File.createTempFile("parsegzip",
+		File ungzippedFile = FileUtil.createTempFile("parsegzip",
 				"." + FileUtil.getExtension(unpackedFileName).toLowerCase());
 		ZipUtil zipUtil = new ZipUtil();
 		zipUtil.unGZip(input, ungzippedFile);
@@ -74,7 +74,7 @@ public class ZipParser extends AbstractParser {
 
 	private void internalParseZip(InputStream input, String encoding, Locale locale, String tenant, Document document,
 			String fileVersion, StringBuilder content) throws Exception {
-		File zipFile = File.createTempFile("parsezip", "zip");
+		File zipFile = FileUtil.createTempFile("parsezip", "zip");
 		try {
 			FileUtil.writeFile(input, zipFile.getAbsolutePath());
 			ZipUtil zipUtil = new ZipUtil();
@@ -94,7 +94,7 @@ public class ZipParser extends AbstractParser {
 				 */
 				String entry = entries.get(0);
 				String entryExtension = FileUtil.getExtension(entry);
-				File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+				File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
 				try {
 					Parser entryParser = ParserFactory.getParser(entryExtension);
 					if (entryParser == null)
@@ -123,7 +123,7 @@ public class ZipParser extends AbstractParser {
 		if (filename.toLowerCase().endsWith(".zip")) {
 			File zipFile = null;
 			try {
-				zipFile = File.createTempFile("parsezip", "zip");
+				zipFile = FileUtil.createTempFile("parsezip", "zip");
 				FileUtil.writeFile(input, zipFile.getAbsolutePath());
 				return countPages(zipFile, filename);
 			} catch (Throwable t) {
@@ -188,7 +188,7 @@ public class ZipParser extends AbstractParser {
 			 */
 			String entry = entries.get(0);
 			String entryExtension = FileUtil.getExtension(entry);
-			File uncompressedEntryFile = File.createTempFile("parse", "." + entryExtension);
+			File uncompressedEntryFile = FileUtil.createTempFile("parse", "." + entryExtension);
 			try {
 				Parser entryParser = ParserFactory.getParser(entryExtension);
 				if (entryParser == null)

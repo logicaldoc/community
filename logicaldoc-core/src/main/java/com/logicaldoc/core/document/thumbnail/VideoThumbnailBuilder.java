@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.document.Document;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Takes care of generating thumbnails for videos
@@ -31,7 +32,7 @@ public class VideoThumbnailBuilder extends AbstractThumbnailBuilder {
 	@Override
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,
 			int size, int quality) throws IOException {
-		File frameImage = File.createTempFile("album-", ".png");
+		File frameImage = FileUtil.createTempFile("album-", ".png");
 		try {
 			if (document.getFileName().toLowerCase().endsWith(".mp4"))
 				writeMp4Frame(src, frameImage);

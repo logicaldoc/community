@@ -23,7 +23,7 @@ public class PdfThumbnailBuilder extends ImageThumbnailBuilder {
 	public synchronized void buildThumbnail(String sid, Document document, String fileVersion, File src, File dest,
 			int size, int compression) throws IOException {
 
-		File tmp = File.createTempFile("rendertmb", ThumbnailManager.SUFFIX_THUMB);
+		File tmp = FileUtil.createTempFile("rendertmb", ThumbnailManager.SUFFIX_THUMB);
 		try {
 			GhostUtil.print(src, tmp, 1);
 			super.buildThumbnail(sid, document, fileVersion, tmp, dest, size, compression);

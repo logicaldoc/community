@@ -188,7 +188,7 @@ public class OpenOfficeParser extends AbstractParser {
 			xmlReader.setFeature("http://xml.org/sax/features/validation", false);
 			xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
-			File contentXml = File.createTempFile("openoffice-content", ".xml");
+			File contentXml = FileUtil.createTempFile("openoffice-content", ".xml");
 			try {
 				if (new ZipUtil().unzip(input, "content.xml", contentXml) > 0) {
 					try (InputStream contentStream = new FileInputStream(contentXml)) {
@@ -210,7 +210,7 @@ public class OpenOfficeParser extends AbstractParser {
 	public int countPages(InputStream input, String filename) {
 		File tmp = null;
 		try {
-			tmp = File.createTempFile("countpages", null);
+			tmp = FileUtil.createTempFile("countpages", null);
 			IOUtil.write(input, tmp);
 			return countPages(tmp, filename);
 		} catch (Throwable e) {
