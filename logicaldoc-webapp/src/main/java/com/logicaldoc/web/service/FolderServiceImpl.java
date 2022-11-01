@@ -1,9 +1,9 @@
 package com.logicaldoc.web.service;
 
+import java.io.IOException;
 import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +31,11 @@ import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
-import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.sequence.SequenceDAO;
+import com.logicaldoc.gui.common.client.AccessDeniedException;
 import com.logicaldoc.gui.common.client.Constants;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
@@ -55,6 +56,8 @@ import com.logicaldoc.web.util.ServiceUtil;
  */
 public class FolderServiceImpl extends RemoteServiceServlet implements FolderService {
 
+	private static final String FOLDER = "Folder ";
+
 	private static final long serialVersionUID = 1L;
 
 	private static Logger log = LoggerFactory.getLogger(FolderServiceImpl.class);
@@ -63,30 +66,28 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	public GUIFolder inheritRights(long folderId, long rightsFolderId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
+		/*
+		 * Just apply the current security settings to the whole subtree
+		 */
+		FolderHistory transaction = new FolderHistory();
+		transaction.setSession(session);
+
 		try {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
-			/*
-			 * Just apply the current security settings to the whole subtree
-			 */
-			FolderHistory transaction = new FolderHistory();
-			transaction.setSession(session);
-
 			fdao.updateSecurityRef(folderId, rightsFolderId, transaction);
-
-			return getFolder(session, folderId);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
-		return null;
+
+		return getFolder(session, folderId);
 	}
 
 	@Override
 	public void applyRights(GUIFolder folder, boolean subtree) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
+		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			Folder f = fdao.findById(folder.getId());
 			fdao.initialize(f);
 
@@ -94,28 +95,21 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				/*
 				 * Just apply the current security settings to the whole subtree
 				 */
-				Runnable runnable = new Runnable() {
-
-					@Override
-					public void run() {
-						FolderHistory history = new FolderHistory();
-						history.setSession(session);
-						history.setEvent(FolderEvent.PERMISSION.toString());
-						try {
-							fdao.applyRightToTree(folder.getId(), history);
-						} catch (PersistenceException e) {
-							log.error(e.getMessage(), e);
-						}
+				ServiceUtil.executeLongRunningOperation("Apply Rights to Tree", () -> {
+					FolderHistory history = new FolderHistory();
+					history.setSession(session);
+					history.setEvent(FolderEvent.PERMISSION.toString());
+					try {
+						fdao.applyRightToTree(folder.getId(), history);
+					} catch (PersistenceException e) {
+						log.error(e.getMessage(), e);
 					}
-
-				};
-
-				ServiceUtil.executeLongRunningOperation("Apply Rights to Tree", runnable, session);
+				}, session);
 			} else {
-				saveRules(session, f, session.getUserId(), folder.getRights());
+				saveRules(session, f, folder.getRights());
 			}
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 
@@ -123,45 +117,34 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	public void applyMetadata(long parentId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			Runnable runnable = new Runnable() {
+		ServiceUtil.executeLongRunningOperation("Apply Folder Metadata", () -> {
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderHistory transaction = new FolderHistory();
+			transaction.setSession(session);
 
-				@Override
-				public void run() {
-					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-					FolderHistory transaction = new FolderHistory();
-					transaction.setSession(session);
-
-					try {
-						fdao.applyMetadataToTree(parentId, transaction);
-					} catch (PersistenceException e) {
-						throw new RuntimeException(e.getMessage(), e);
-					}
-				}
-
-			};
-
-			ServiceUtil.executeLongRunningOperation("Apply Folder Metadata", runnable, session);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
+			try {
+				fdao.applyMetadataToTree(parentId, transaction);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
+		}, session);
 	}
 
 	@Override
 	public void delete(final long[] folderIds) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		try {
-			for (int i = 0; i < folderIds.length; i++)
+		for (int i = 0; i < folderIds.length; i++)
+			try {
 				delete(session, folderIds[i]);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
+			} catch (PersistenceException | PermissionException e) {
+				ServiceUtil.throwServerException(session, log, e);
+			}
 	}
 
-	private void delete(Session session, final long folderId) throws Exception {
+	private void delete(Session session, final long folderId) throws PermissionException, PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!dao.isPermissionEnabled(Permission.DELETE, folderId, session.getUserId()))
-			throw new ServerException("Permission DELETE not granted");
+			throw new PermissionException(session.getUsername(), FOLDER + folderId, Permission.DELETE);
 
 		// Add a folder history entry
 		FolderHistory transaction = new FolderHistory();
@@ -220,7 +203,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			f.setAttributes(attributes);
 		}
 
-		if (folder.getTags() != null && folder.getTags().size() > 0)
+		if (folder.getTags() != null && !folder.getTags().isEmpty())
 			f.setTags(folder.getTagsAsWords().toArray(new String[folder.getTags().size()]));
 		else
 			f.setTags(new String[0]);
@@ -232,39 +215,25 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	@Override
 	public int[] computeStats(long folderId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-
 		try {
 			return new int[] { countDocs(folderId), countChildren(folderId) };
-		} catch (Throwable t) {
-			return (int[]) ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			return (int[]) ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 
-	private static int countDocs(long folderId) {
-		int count = 0;
+	private static int countDocs(long folderId) throws PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
-		try {
-			count = dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid="
-					+ folderId + " and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-		}
-		return count;
+		return dao.queryForInt("select count(ld_id) from ld_document where ld_deleted=0 and ld_folderid=" + folderId
+				+ " and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
 	}
 
-	private static int countChildren(long folderId) {
+	private static int countChildren(long folderId) throws PersistenceException {
 		int count = 0;
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
-		try {
-			count = dao.queryForInt(
-					"select count(ld_id) from ld_folder where not ld_id=ld_parentid and ld_deleted=0 and ld_parentid="
-							+ folderId);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-		}
-
+		count = dao.queryForInt(
+				"select count(ld_id) from ld_folder where not ld_id=ld_parentid and ld_deleted=0 and ld_parentid="
+						+ folderId);
 		return count;
 	}
 
@@ -275,20 +244,21 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	public static GUIFolder getFolder(Session session, long folderId, boolean computePath) throws ServerException {
 		if (session != null)
 			ServiceUtil.validateSession(session.getSid());
-		try {
-			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-			if (session != null && !dao.isReadEnabled(folderId, session.getUserId()))
-				return null;
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+		try {
+			if (session != null)
+				ServiceUtil.checkPermission(Permission.READ, session.getUser(), folderId);
 
 			Folder folder = null;
 			Folder test = dao.findById(folderId);
 			if (test == null)
-				return null;
+				throw new ServerException("Unexisting folder " + folderId);
 
 			dao.initialize(test);
-			GUIFolder guiFolder = null;
 
+			GUIFolder guiFolder = null;
 			// Check if it is an alias
 			if (test.getFoldRef() != null) {
 				folder = dao.findById(test.getFoldRef());
@@ -302,67 +272,81 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				guiFolder.setPosition(test.getPosition());
 				guiFolder.setFoldRef(test.getFoldRef());
 				guiFolder.setId(test.getId());
-				if (test.getSecurityRef() != null)
-					guiFolder.setSecurityRef(getFolder(session, test.getSecurityRef()));
-				else
-					guiFolder.setSecurityRef(null);
 				guiFolder.setType(Folder.TYPE_ALIAS);
+
+				setSecurityRef(session, test, guiFolder);
 			} else {
 				folder = test;
 				guiFolder = fromFolder(folder, computePath);
 			}
 
-			if (session != null) {
-				Set<Permission> permissions = dao.getEnabledPermissions(folderId, session.getUserId());
-				List<String> permissionsList = new ArrayList<String>();
-				for (Permission permission : permissions)
-					permissionsList.add(permission.toString());
-				guiFolder.setPermissions(permissionsList.toArray(new String[permissionsList.size()]));
-			}
+			setPermissions(session, folderId, guiFolder);
 
 			Folder securityRef = folder;
 			if (test.getSecurityRef() != null)
 				securityRef = dao.findById(test.getSecurityRef());
 			dao.initialize(securityRef);
 
-			int i = 0;
-			GUIRight[] rights = new GUIRight[(securityRef != null && securityRef.getFolderGroups() != null)
-					? securityRef.getFolderGroups().size()
-					: 0];
-			if (securityRef != null && securityRef.getFolderGroups() != null)
-				for (FolderGroup fg : securityRef.getFolderGroups()) {
-					GUIRight right = new GUIRight();
-					right.setEntityId(fg.getGroupId());
-					right.setAdd(fg.getAdd() == 1 ? true : false);
-					right.setWrite(fg.getWrite() == 1 ? true : false);
-					right.setSecurity(fg.getSecurity() == 1 ? true : false);
-					right.setImmutable(fg.getImmutable() == 1 ? true : false);
-					right.setDelete(fg.getDelete() == 1 ? true : false);
-					right.setRename(fg.getRename() == 1 ? true : false);
-					right.setImport(fg.getImport() == 1 ? true : false);
-					right.setExport(fg.getExport() == 1 ? true : false);
-					right.setSign(fg.getSign() == 1 ? true : false);
-					right.setArchive(fg.getArchive() == 1 ? true : false);
-					right.setWorkflow(fg.getWorkflow() == 1 ? true : false);
-					right.setDownload(fg.getDownload() == 1 ? true : false);
-					right.setCalendar(fg.getCalendar() == 1 ? true : false);
-					right.setSubscription(fg.getSubscription() == 1 ? true : false);
-					right.setPassword(fg.getPassword() == 1 ? true : false);
-					right.setMove(fg.getMove() == 1 ? true : false);
-					right.setEmail(fg.getEmail() == 1 ? true : false);
-					right.setAutomation(fg.getAutomation() == 1 ? true : false);
-					right.setStorage(fg.getStorage() == 1 ? true : false);
-
-					rights[i] = right;
-					i++;
-				}
-			guiFolder.setRights(rights);
+			setRights(securityRef, guiFolder);
 			return guiFolder;
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
-
 		return null;
+	}
+
+	private static void setSecurityRef(Session session, Folder test, GUIFolder guiFolder) throws ServerException {
+		if (test.getSecurityRef() != null)
+			guiFolder.setSecurityRef(getFolder(session, test.getSecurityRef()));
+		else
+			guiFolder.setSecurityRef(null);
+	}
+
+	private static void setRights(Folder securityRef, GUIFolder guiFolder) {
+		int i = 0;
+		GUIRight[] rights = new GUIRight[(securityRef != null && securityRef.getFolderGroups() != null)
+				? securityRef.getFolderGroups().size()
+				: 0];
+		if (securityRef != null && securityRef.getFolderGroups() != null)
+			for (FolderGroup fg : securityRef.getFolderGroups()) {
+				GUIRight right = new GUIRight();
+				right.setEntityId(fg.getGroupId());
+				right.setAdd(fg.getAdd() == 1);
+				right.setWrite(fg.getWrite() == 1);
+				right.setSecurity(fg.getSecurity() == 1);
+				right.setImmutable(fg.getImmutable() == 1);
+				right.setDelete(fg.getDelete() == 1);
+				right.setRename(fg.getRename() == 1);
+				right.setImport(fg.getImport() == 1);
+				right.setExport(fg.getExport() == 1);
+				right.setSign(fg.getSign() == 1);
+				right.setArchive(fg.getArchive() == 1);
+				right.setWorkflow(fg.getWorkflow() == 1);
+				right.setDownload(fg.getDownload() == 1);
+				right.setCalendar(fg.getCalendar() == 1);
+				right.setSubscription(fg.getSubscription() == 1);
+				right.setPassword(fg.getPassword() == 1);
+				right.setMove(fg.getMove() == 1);
+				right.setEmail(fg.getEmail() == 1);
+				right.setAutomation(fg.getAutomation() == 1);
+				right.setStorage(fg.getStorage() == 1);
+
+				rights[i] = right;
+				i++;
+			}
+		guiFolder.setRights(rights);
+	}
+
+	private static void setPermissions(Session session, long folderId, GUIFolder guiFolder)
+			throws PersistenceException {
+		if (session != null) {
+			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			Set<Permission> permissions = dao.getEnabledPermissions(folderId, session.getUserId());
+			List<String> permissionsList = new ArrayList<>();
+			for (Permission permission : permissions)
+				permissionsList.add(permission.toString());
+			guiFolder.setPermissions(permissionsList.toArray(new String[permissionsList.size()]));
+		}
 	}
 
 	@Override
@@ -370,52 +354,53 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		GUIFolder folder = getFolder(session, folderId);
+		if (folder == null)
+			return null;
 
-			GUIFolder folder = getFolder(session, folderId);
-			if (folder == null)
-				return null;
+		try {
 			if (computeDocs)
 				folder.setDocumentCount(countDocs(folder.getId()));
 			if (computeSubfolders)
 				folder.setSubfolderCount(countChildren(folder.getId()));
-
-			if (computePath) {
-				String pathExtended = dao.computePathExtended(folderId);
-
-				StringTokenizer st = new StringTokenizer(pathExtended, "/", false);
-				int elements = st.countTokens();
-				GUIFolder[] path = new GUIFolder[elements];
-				Folder parent = dao.findRoot(session.getTenantId());
-				List<Folder> list = new ArrayList<Folder>();
-				int j = 0;
-				while (st.hasMoreTokens()) {
-					String text = st.nextToken();
-					list = dao.findByName(parent, text, null, true);
-					if (list.isEmpty())
-						return null;
-
-					if (parent.getId() == Folder.ROOTID || parent.getId() == parent.getParentId()) {
-						GUIFolder f = new GUIFolder(parent.getId());
-						f.setName("/");
-						f.setParentId(parent.getId());
-						if (computeSubfolders)
-							f.setSubfolderCount(countChildren(f.getId()));
-						path[j] = f;
-					} else
-						path[j] = getFolder(parent.getId(), false, false, computeSubfolders);
-					parent = list.get(0);
-					j++;
-				}
-
-				folder.setPath(path);
-			}
-
+			if (computePath)
+				folder.setPath(computePath(folderId, session.getTenantId(), computeSubfolders));
 			return folder;
-		} catch (Throwable t) {
-			return (GUIFolder) ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			return (GUIFolder) ServiceUtil.throwServerException(session, log, e);
 		}
+	}
+
+	private GUIFolder[] computePath(long folderId, long tenantId, boolean computeSubfolders)
+			throws PersistenceException, ServerException {
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		String pathExtended = dao.computePathExtended(folderId);
+
+		StringTokenizer st = new StringTokenizer(pathExtended, "/", false);
+		int elements = st.countTokens();
+		GUIFolder[] path = new GUIFolder[elements];
+		Folder parent = dao.findRoot(tenantId);
+		int j = 0;
+		while (st.hasMoreTokens()) {
+			String text = st.nextToken();
+			List<Folder> list = dao.findByName(parent, text, null, true);
+			if (list.isEmpty())
+				return new GUIFolder[0];
+
+			if (parent.getId() == Folder.ROOTID || parent.getId() == parent.getParentId()) {
+				GUIFolder f = new GUIFolder(parent.getId());
+				f.setName("/");
+				f.setParentId(parent.getId());
+				if (computeSubfolders)
+					f.setSubfolderCount(countChildren(f.getId()));
+				path[j] = f;
+			} else
+				path[j] = getFolder(parent.getId(), false, false, computeSubfolders);
+			parent = list.get(0);
+			j++;
+		}
+
+		return path;
 	}
 
 	@Override
@@ -427,13 +412,13 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			for (int i = 0; i < folderIds.length; i++) {
 				copyFolder(session, folderIds[i], targetId, foldersOnly, securityOption, model);
 			}
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 
 	private void copyFolder(Session session, long folderId, long targetId, boolean foldersOnly, String securityOption,
-			GUIFolder model) throws Exception {
+			GUIFolder model) throws PersistenceException, ServerException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		Folder folderToCopy = folderDao.findById(folderId);
 
@@ -484,12 +469,12 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			for (long folderId : folderIds) {
 				move(session, folderId, targetId);
 			}
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 
-	private void move(Session session, long folderId, long targetId) throws Exception {
+	private void move(Session session, long folderId, long targetId) throws PersistenceException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		Folder folderToMove = folderDao.findById(folderId);
@@ -538,9 +523,10 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
 		try {
 			List<Folder> folders = dao.findByNameAndParentId(name, dao.findById(folderId).getParentId());
-			if (folders.size() > 0 && folders.get(0).getId() != folderId) {
+			if (!folders.isEmpty() && folders.get(0).getId() != folderId) {
 				return;
 			}
 			// To avoid a 'org.hibernate.StaleObjectStateException', we
@@ -557,8 +543,8 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 			folder.setName(name.trim());
 			dao.store(folder, history);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 	}
 
@@ -567,6 +553,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
 		try {
 			Folder folder = folderDao.findById(guiFolder.getId());
 			folderDao.initialize(folder);
@@ -619,13 +606,13 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			updateExtendedAttributes(folder, guiFolder);
 
 			if (guiFolder.getTags() != null && guiFolder.getTags().length > 0)
-				folder.setTagsFromWords(new HashSet<String>(Arrays.asList(guiFolder.getTags())));
+				folder.setTagsFromWords(new HashSet<>(Arrays.asList(guiFolder.getTags())));
 			else
 				folder.getTags().clear();
 
 			folderDao.store(folder, transaction);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
 
 		return getFolder(session, guiFolder.getId());
@@ -636,210 +623,272 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+		String folderName = newFolder.getName().replace("/", "");
+
+		FolderHistory transaction = new FolderHistory();
+		transaction.setSession(session);
+		transaction.setEvent(FolderEvent.CREATED.toString());
+
+		Folder folderVO = new Folder();
+		folderVO.setName(folderName);
+		folderVO.setType(newFolder.getType());
+		folderVO.setTenantId(session.getTenantId());
+
+		Folder root = folderDao.findRoot(session.getTenantId());
+
+		if (newFolder.getType() == Folder.TYPE_WORKSPACE)
+			newFolder.setParentId(root.getId());
+
+		Folder f = null;
 		try {
-			String folderName = newFolder.getName().replace("/", "");
-
-			FolderHistory transaction = new FolderHistory();
-			transaction.setSession(session);
-			transaction.setEvent(FolderEvent.CREATED.toString());
-
-			Folder folderVO = new Folder();
-			folderVO.setName(folderName);
-			folderVO.setType(newFolder.getType());
-			folderVO.setTenantId(session.getTenantId());
-
-			Folder root = folderDao.findRoot(session.getTenantId());
-
-			if (newFolder.getType() == Folder.TYPE_WORKSPACE)
-				newFolder.setParentId(root.getId());
-
 			Folder parent = folderDao.findById(newFolder.getParentId());
 			if (parent.getFoldRef() != null)
 				folderVO.setParentId(parent.getFoldRef());
 
-			Folder f = null;
 			if (newFolder.getType() == Folder.TYPE_WORKSPACE)
 				f = folderDao.create(root, folderVO, inheritSecurity, transaction);
 			else
 				f = folderDao.create(folderDao.findById(newFolder.getParentId()), folderVO, inheritSecurity,
 						transaction);
-
-			if (f == null)
-				throw new Exception("Folder not stored");
-
-			return getFolder(session, f.getId());
-		} catch (Throwable t) {
-			return (GUIFolder) ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
+
+		if (f == null)
+			throw new ServerException("Folder not stored");
+
+		return getFolder(session, f.getId());
+
 	}
 
 	@Override
 	public GUIFolder createAlias(long parentId, long foldRef) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
+		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
+		// Prepare the transaction
+		FolderHistory transaction = new FolderHistory();
+		transaction.setSession(session);
+		transaction.setEvent(FolderEvent.CREATED.toString());
+
+		// Finally create the alias
+		Folder f;
 		try {
-			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
-			// Prepare the transaction
-			FolderHistory transaction = new FolderHistory();
-			transaction.setSession(session);
-			transaction.setEvent(FolderEvent.CREATED.toString());
-
-			// Finally create the alias
-			Folder f = folderDao.createAlias(parentId, foldRef, transaction);
-
-			return getFolder(session, f.getId());
-		} catch (Throwable t) {
-			return (GUIFolder) ServiceUtil.throwServerException(session, log, t);
+			f = folderDao.createAlias(parentId, foldRef, transaction);
+		} catch (PersistenceException e) {
+			return (GUIFolder) ServiceUtil.throwServerException(session, log, e);
 		}
+
+		return getFolder(session, f.getId());
+
 	}
 
-	private boolean saveRules(Session session, Folder folder, long userId, GUIRight[] rights) throws Exception {
+	private boolean saveRules(Session session, Folder folder, GUIRight[] rights) throws PersistenceException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		boolean sqlerrors = false;
-		try {
-			log.info("Applying {} rights to folder {}", (rights != null ? rights.length : 0), folder.getId());
+		log.info("Applying {} rights to folder {}", (rights != null ? rights.length : 0), folder.getId());
 
-			folder.setSecurityRef(null);
-			sqlerrors = false;
-			Set<FolderGroup> grps = new HashSet<FolderGroup>();
-			for (GUIRight right : rights) {
-				boolean isAdmin = right.getEntityId() == 1;
-				FolderGroup fg = null;
-				if (right.isRead()) {
-					fg = new FolderGroup();
-					fg.setGroupId(right.getEntityId());
-				}
-
-				if (fg == null)
-					continue;
-
-				grps.add(fg);
-
-				if (isAdmin || right.isPrint())
-					fg.setPrint(1);
-				else
-					fg.setPrint(0);
-
-				if (isAdmin || right.isWrite())
-					fg.setWrite(1);
-				else
-					fg.setWrite(0);
-
-				if (isAdmin || right.isAdd())
-					fg.setAdd(1);
-				else
-					fg.setAdd(0);
-
-				if (isAdmin || right.isSecurity())
-					fg.setSecurity(1);
-				else
-					fg.setSecurity(0);
-
-				if (isAdmin || right.isImmutable())
-					fg.setImmutable(1);
-				else
-					fg.setImmutable(0);
-
-				if (isAdmin || right.isDelete())
-					fg.setDelete(1);
-				else
-					fg.setDelete(0);
-
-				if (isAdmin || right.isRename())
-					fg.setRename(1);
-				else
-					fg.setRename(0);
-
-				if (isAdmin || right.isImport())
-					fg.setImport(1);
-				else
-					fg.setImport(0);
-
-				if (isAdmin || right.isExport())
-					fg.setExport(1);
-				else
-					fg.setExport(0);
-
-				if (isAdmin || right.isArchive())
-					fg.setArchive(1);
-				else
-					fg.setArchive(0);
-
-				if (isAdmin || right.isWorkflow())
-					fg.setWorkflow(1);
-				else
-					fg.setWorkflow(0);
-
-				if (isAdmin || right.isSign())
-					fg.setSign(1);
-				else
-					fg.setSign(0);
-
-				if (isAdmin || right.isDownload())
-					fg.setDownload(1);
-				else
-					fg.setDownload(0);
-
-				if (isAdmin || right.isCalendar())
-					fg.setCalendar(1);
-				else
-					fg.setCalendar(0);
-
-				if (isAdmin || right.isSubscription())
-					fg.setSubscription(1);
-				else
-					fg.setSubscription(0);
-
-				if (isAdmin || right.isPassword())
-					fg.setPassword(1);
-				else
-					fg.setPassword(0);
-
-				if (isAdmin || right.isMove())
-					fg.setMove(1);
-				else
-					fg.setMove(0);
-
-				if (isAdmin || right.isEmail())
-					fg.setEmail(1);
-				else
-					fg.setEmail(0);
-
-				if (isAdmin || right.isAutomation())
-					fg.setAutomation(1);
-				else
-					fg.setAutomation(0);
-
-				if (isAdmin || right.isStorage())
-					fg.setStorage(1);
-				else
-					fg.setStorage(0);
+		folder.setSecurityRef(null);
+		sqlerrors = false;
+		Set<FolderGroup> grps = new HashSet<>();
+		for (GUIRight right : rights) {
+			boolean isAdmin = right.getEntityId() == 1;
+			FolderGroup fg = null;
+			if (right.isRead()) {
+				fg = new FolderGroup();
+				fg.setGroupId(right.getEntityId());
 			}
 
-			folder.getFolderGroups().clear();
-			folder.getFolderGroups().addAll(grps);
+			if (fg == null)
+				continue;
+			grps.add(fg);
 
-			// Add a folder history entry
-			FolderHistory history = new FolderHistory();
-			history.setEvent(FolderEvent.PERMISSION.toString());
-			history.setSession(session);
-			fdao.store(folder, history);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
+			setPring(right, isAdmin, fg);
+			setWrite(right, isAdmin, fg);
+			setAdd(right, isAdmin, fg);
+			setSecurity(right, isAdmin, fg);
+			setImmutable(right, isAdmin, fg);
+			setDelete(right, isAdmin, fg);
+			setRename(right, isAdmin, fg);
+			setImport(right, isAdmin, fg);
+			setExport(right, isAdmin, fg);
+			setArchive(right, isAdmin, fg);
+			setWorkflow(right, isAdmin, fg);
+			setSign(right, isAdmin, fg);
+			setDownload(right, isAdmin, fg);
+			setCalendar(right, isAdmin, fg);
+			setSubscription(right, isAdmin, fg);
+			setPassword(right, isAdmin, fg);
+			setMove(right, isAdmin, fg);
+			setEmail(right, isAdmin, fg);
+			setAutomation(right, isAdmin, fg);
+			setStorage(right, isAdmin, fg);
 		}
+
+		folder.getFolderGroups().clear();
+		folder.getFolderGroups().addAll(grps);
+
+		// Add a folder history entry
+		FolderHistory history = new FolderHistory();
+		history.setEvent(FolderEvent.PERMISSION.toString());
+		history.setSession(session);
+		fdao.store(folder, history);
+
 		return !sqlerrors;
+	}
+
+	private void setStorage(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isStorage())
+			fg.setStorage(1);
+		else
+			fg.setStorage(0);
+	}
+
+	private void setAutomation(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isAutomation())
+			fg.setAutomation(1);
+		else
+			fg.setAutomation(0);
+	}
+
+	private void setEmail(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isEmail())
+			fg.setEmail(1);
+		else
+			fg.setEmail(0);
+	}
+
+	private void setMove(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isMove())
+			fg.setMove(1);
+		else
+			fg.setMove(0);
+	}
+
+	private void setPassword(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isPassword())
+			fg.setPassword(1);
+		else
+			fg.setPassword(0);
+	}
+
+	private void setSubscription(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isSubscription())
+			fg.setSubscription(1);
+		else
+			fg.setSubscription(0);
+	}
+
+	private void setCalendar(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isCalendar())
+			fg.setCalendar(1);
+		else
+			fg.setCalendar(0);
+	}
+
+	private void setDownload(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isDownload())
+			fg.setDownload(1);
+		else
+			fg.setDownload(0);
+	}
+
+	private void setSign(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isSign())
+			fg.setSign(1);
+		else
+			fg.setSign(0);
+	}
+
+	private void setWorkflow(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isWorkflow())
+			fg.setWorkflow(1);
+		else
+			fg.setWorkflow(0);
+	}
+
+	private void setArchive(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isArchive())
+			fg.setArchive(1);
+		else
+			fg.setArchive(0);
+	}
+
+	private void setExport(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isExport())
+			fg.setExport(1);
+		else
+			fg.setExport(0);
+	}
+
+	private void setImport(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isImport())
+			fg.setImport(1);
+		else
+			fg.setImport(0);
+	}
+
+	private void setRename(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isRename())
+			fg.setRename(1);
+		else
+			fg.setRename(0);
+	}
+
+	private void setDelete(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isDelete())
+			fg.setDelete(1);
+		else
+			fg.setDelete(0);
+	}
+
+	private void setImmutable(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isImmutable())
+			fg.setImmutable(1);
+		else
+			fg.setImmutable(0);
+	}
+
+	private void setSecurity(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isSecurity())
+			fg.setSecurity(1);
+		else
+			fg.setSecurity(0);
+	}
+
+	private void setAdd(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isAdd())
+			fg.setAdd(1);
+		else
+			fg.setAdd(0);
+	}
+
+	private void setWrite(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isWrite())
+			fg.setWrite(1);
+		else
+			fg.setWrite(0);
+	}
+
+	private void setPring(GUIRight right, boolean isAdmin, FolderGroup fg) {
+		if (isAdmin || right.isPrint())
+			fg.setPrint(1);
+		else
+			fg.setPrint(0);
 	}
 
 	@Override
 	public void paste(long[] docIds, long folderId, String action) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-			Folder folder = fdao.findFolder(folderId);
+		Folder folder;
+		try {
+			folder = fdao.findFolder(folderId);
 
 			if (!fdao.isWriteEnabled(folder.getId(), session.getUserId()))
 				throw new AccessControlException("Cannot write in folder " + folder.getName());
@@ -848,9 +897,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				cut(session, docIds, folder.getId());
 			else if (action.equals(Clipboard.COPY))
 				copy(session, docIds, folder.getId());
-		} catch (Throwable t) {
-			log.error("Exception moving documents: " + t.getMessage(), t);
-			ServiceUtil.throwServerException(session, null, t);
+		} catch (PersistenceException e) {
+			log.error("Exception moving documents: {}", e.getMessage(), e);
+			ServiceUtil.throwServerException(session, null, e);
 		}
 	}
 
@@ -866,9 +915,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				Document doc = docDao.findById(id);
 
 				// The MOVE permission must be granted in the source folder
-				if (!folderDao.isPermissionEnabled(Permission.MOVE, doc.getFolder().getId(), session.getUserId()))
-					throw new AccessControlException(String.format("User %s has not the MOVE permission on folder %s",
-							session.getUsername(), doc.getFolder().getName()));
+				ServiceUtil.checkPermission(Permission.MOVE, session.getUser(), doc.getFolder().getId());
 
 				// Create the document history event
 				DocumentHistory transaction = new DocumentHistory();
@@ -884,23 +931,30 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				}
 
 				// The document must be not immutable
-				if (doc.getImmutable() == 1 && !transaction.getUser().isMemberOf(Group.GROUP_ADMIN)) {
-					continue;
-				}
+				checkImmutable(doc);
 
 				// The document must be not locked
-				if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED
-						|| doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
-					continue;
-				}
+				checkLocked(doc);
 
 				docManager.moveToFolder(doc, selectedFolderFolder, transaction);
 			}
-		} catch (AccessControlException t) {
-			ServiceUtil.throwServerException(session, log, t);
-		} catch (Throwable t) {
-			log.error("Exception moving documents: " + t.getMessage(), t);
-			ServiceUtil.throwServerException(session, null, t);
+		} catch (PermissionException | PersistenceException e) {
+			log.error("Exception moving documents: {}", e.getMessage(), e);
+			ServiceUtil.throwServerException(session, null, e);
+		}
+
+	}
+
+	private void checkLocked(Document doc) throws PermissionException {
+		if (doc.getStatus() != AbstractDocument.DOC_UNLOCKED
+				|| doc.getExportStatus() != AbstractDocument.EXPORT_UNLOCKED) {
+			throw new PermissionException("Document " + doc.getId() + " is locked");
+		}
+	}
+
+	private void checkImmutable(Document doc) throws PermissionException {
+		if (doc.getImmutable() == 1) {
+			throw new PermissionException("Document " + doc.getId() + " is immutable");
 		}
 	}
 
@@ -908,6 +962,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+
 		try {
 			Folder selectedFolderFolder = folderDao.findById(folderId);
 			for (long id : docIds) {
@@ -927,10 +982,8 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					}
 				}
 			}
-		} catch (AccessControlException t) {
-			ServiceUtil.throwServerException(session, log, t);
-		} catch (Throwable e) {
-			log.error("Exception copying documents: " + e.getMessage(), e);
+		} catch (PersistenceException | IOException e) {
+			log.error("Exception copying documents: {}", e.getMessage(), e);
 			ServiceUtil.throwServerException(session, null, e);
 		}
 	}
@@ -957,11 +1010,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 					docManager.createAlias(doc, selectedFolderFolder, StringUtils.isNotEmpty(type) ? type : null,
 							transaction);
 			}
-		} catch (AccessControlException t) {
-			ServiceUtil.throwServerException(session, log, t);
-		} catch (Throwable t) {
-			log.error("Exception copying documents alias: " + t.getMessage(), t);
-			ServiceUtil.throwServerException(session, null, t);
+		} catch (PersistenceException e) {
+			log.error("Exception copying documents alias: {}", e.getMessage(), e);
+			ServiceUtil.throwServerException(session, null, e);
 		}
 	}
 
@@ -990,129 +1041,125 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	 * @throws PersistenceException error in the database
 	 */
 	private void updateExtendedAttributes(Folder folder, GUIFolder f) throws PersistenceException {
-		if (f.getTemplateId() != null) {
-			TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
-			Template template = templateDao.findById(f.getTemplateId());
-			templateDao.initialize(template);
-
-			folder.setTemplate(template);
-			folder.setTemplateLocked(f.getTemplateLocked());
+		if (f.getTemplateId() == null) {
+			folder.setTemplate(null);
 			folder.getAttributes().clear();
+			return;
+		}
 
-			if (f.getAttributes() != null && f.getAttributes().length > 0) {
-				for (GUIAttribute attr : f.getAttributes()) {
-					Attribute templateAttribute = template.getAttributes()
-							.get(attr.getParent() != null ? attr.getParent() : attr.getName());
-					// This control is necessary because, changing
-					// the template, the values of the old template
-					// attributes keys remains on the form value
-					// manager,
-					// so the GUIFolder contains also the old
-					// template attributes keys that must be
-					// skipped.
-					if (templateAttribute == null)
-						continue;
+		TemplateDAO templateDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		Template template = templateDao.findById(f.getTemplateId());
+		templateDao.initialize(template);
 
-					Attribute extAttr = new Attribute();
-					int templateType = templateAttribute.getType();
-					int extAttrType = attr.getType();
+		folder.setTemplate(template);
+		folder.setTemplateLocked(f.getTemplateLocked());
+		folder.getAttributes().clear();
 
-					if (templateType != extAttrType) {
-						// This check is useful to avoid errors
-						// related to the old template
-						// attributes keys that remains on the form
-						// value manager
-						if (attr.getValue().toString().trim().isEmpty() && templateType != 0) {
-							if (templateType == Attribute.TYPE_INT || templateType == Attribute.TYPE_BOOLEAN) {
-								extAttr.setIntValue(null);
-							} else if (templateType == Attribute.TYPE_DOUBLE) {
-								extAttr.setDoubleValue(null);
-							} else if (templateType == Attribute.TYPE_DATE) {
-								extAttr.setDateValue(null);
-							}
-						} else if (templateType == GUIAttribute.TYPE_DOUBLE) {
-							extAttr.setValue(Double.parseDouble(attr.getValue().toString()));
-						} else if (templateType == GUIAttribute.TYPE_INT) {
-							extAttr.setValue(Long.parseLong(attr.getValue().toString()));
-						} else if (templateType == GUIAttribute.TYPE_BOOLEAN) {
-							extAttr.setValue(attr.getBooleanValue());
-							extAttr.setType(Attribute.TYPE_BOOLEAN);
-						} else if (templateType == GUIAttribute.TYPE_USER || templateType == GUIAttribute.TYPE_FOLDER) {
-							extAttr.setIntValue(attr.getIntValue());
-							extAttr.setStringValue(attr.getStringValue());
-						}
-					} else {
-						if (templateType == Attribute.TYPE_INT) {
-							if (attr.getValue() != null)
-								extAttr.setIntValue((Long) attr.getValue());
-							else
-								extAttr.setIntValue(null);
-						} else if (templateType == Attribute.TYPE_BOOLEAN) {
-							if (attr.getBooleanValue() != null)
-								extAttr.setValue(attr.getBooleanValue());
-							else
-								extAttr.setBooleanValue(null);
-						} else if (templateType == Attribute.TYPE_DOUBLE) {
-							if (attr.getValue() != null)
-								extAttr.setDoubleValue((Double) attr.getValue());
-							else
-								extAttr.setDoubleValue(null);
-						} else if (templateType == Attribute.TYPE_DATE) {
-							if (attr.getValue() != null)
-								extAttr.setDateValue((Date) attr.getValue());
-							else
-								extAttr.setDateValue(null);
-						} else if (templateType == Attribute.TYPE_STRING) {
-							if (attr.getValue() != null)
-								extAttr.setStringValue((String) attr.getValue());
-							else
-								extAttr.setStringValue(null);
-						} else if (templateType == Attribute.TYPE_USER || templateType == Attribute.TYPE_FOLDER) {
-							if (attr.getValue() != null) {
-								extAttr.setStringValue((String) attr.getStringValue());
-								extAttr.setIntValue((Long) attr.getIntValue());
-							} else {
-								extAttr.setStringValue(null);
-								extAttr.setIntValue(null);
-							}
-						}
-					}
+		if (f.getAttributes() != null && f.getAttributes().length > 0) {
+			for (GUIAttribute guiAttribute : f.getAttributes()) {
+				Attribute templateAttribute = template.getAttributes()
+						.get(guiAttribute.getParent() != null ? guiAttribute.getParent() : guiAttribute.getName());
+				// This control is necessary because, changing
+				// the template, the values of the old template
+				// attributes keys remains on the form value
+				// manager,
+				// so the GUIFolder contains also the old
+				// template attributes keys that must be
+				// skipped.
+				if (templateAttribute == null)
+					continue;
 
-					extAttr.setParent(attr.getParent());
-					extAttr.setDependsOn(attr.getDependsOn());
-					extAttr.setLabel(templateAttribute.getLabel());
-					extAttr.setType(templateType);
-					extAttr.setPosition(templateAttribute.getPosition());
-					extAttr.setMandatory(templateAttribute.getMandatory());
-					extAttr.setHidden(templateAttribute.getHidden());
-					extAttr.setMultiple(templateAttribute.getMultiple());
+				Attribute extAttr = newAttribute(guiAttribute, templateAttribute);
 
-					folder.getAttributes().put(attr.getName(), extAttr);
+				folder.getAttributes().put(guiAttribute.getName(), extAttr);
+			}
+		}
+	}
+
+	private Attribute newAttribute(GUIAttribute guiAttribute, Attribute templateAttribute) {
+		Attribute extAttr = new Attribute();
+		int extAttrType = guiAttribute.getType();
+		int currentTemplateExtAttrType = templateAttribute.getType();
+		if (currentTemplateExtAttrType != extAttrType) {
+			// This check is useful to avoid errors
+			// related to the old template
+			// attributes keys that remains on the form
+			// value manager
+			if (guiAttribute.getValue().toString().trim().isEmpty() && currentTemplateExtAttrType != 0) {
+				extAttr.setValue(null);
+			} else {
+				switch (currentTemplateExtAttrType) {
+				case GUIAttribute.TYPE_DOUBLE:
+					extAttr.setValue(Double.parseDouble(guiAttribute.getValue().toString()));
+					break;
+				case GUIAttribute.TYPE_INT:
+					extAttr.setValue(Long.parseLong(guiAttribute.getValue().toString()));
+					break;
+				case GUIAttribute.TYPE_BOOLEAN:
+					extAttr.setValue(guiAttribute.getBooleanValue());
+					extAttr.setType(Attribute.TYPE_BOOLEAN);
+					break;
+				case GUIAttribute.TYPE_USER:
+				case GUIAttribute.TYPE_FOLDER:
+					extAttr.setIntValue(guiAttribute.getIntValue());
+					extAttr.setStringValue(guiAttribute.getStringValue());
+					break;
+				default:
+					extAttr.setStringValue(guiAttribute.getStringValue());
 				}
 			}
 		} else {
-			folder.setTemplate(null);
-			folder.getAttributes().clear();
+			switch (currentTemplateExtAttrType) {
+			case Attribute.TYPE_USER:
+			case Attribute.TYPE_FOLDER:
+				if (guiAttribute.getValue() != null) {
+					extAttr.setStringValue(guiAttribute.getStringValue());
+					extAttr.setIntValue(guiAttribute.getIntValue());
+				} else {
+					extAttr.setStringValue(null);
+					extAttr.setIntValue(null);
+				}
+				break;
+			case Attribute.TYPE_BOOLEAN:
+				extAttr.setValue(guiAttribute.getBooleanValue());
+				break;
+			default:
+				extAttr.setValue(guiAttribute.getValue());
+				break;
+			}
 		}
+
+		extAttr.setType(currentTemplateExtAttrType);
+
+		extAttr.setParent(guiAttribute.getParent());
+		extAttr.setDependsOn(guiAttribute.getDependsOn());
+		extAttr.setLabel(templateAttribute.getLabel());
+		extAttr.setPosition(templateAttribute.getPosition());
+		extAttr.setMandatory(templateAttribute.getMandatory());
+		extAttr.setHidden(templateAttribute.getHidden());
+		extAttr.setMultiple(templateAttribute.getMultiple());
+
+		return extAttr;
 	}
 
 	@Override
 	public void restore(Long[] folderIds, long parentId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-			for (Long foldId : folderIds) {
-				if (foldId == null)
-					continue;
-				FolderHistory transaction = new FolderHistory();
-				transaction.setSession(session);
+		for (Long foldId : folderIds) {
+			if (foldId == null)
+				continue;
+			FolderHistory transaction = new FolderHistory();
+			transaction.setSession(session);
+			try {
 				dao.restore(foldId, parentId, transaction);
+			} catch (PersistenceException e) {
+				ServiceUtil.throwServerException(session, log, e);
 			}
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
 		}
+
 	}
 
 	@Override
@@ -1121,40 +1168,30 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		if (ids == null || ids.length < 1)
 			return;
 
+		String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');
+		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
-			String idsStr = Arrays.asList(ids).toString().replace('[', '(').replace(']', ')');
-			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, (Map<String, Object>) null);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			ServiceUtil.throwServerException(session, log, e);
 		}
+
 	}
 
 	@Override
 	public void applyTags(long parentId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			Runnable runnable = new Runnable() {
-
-				@Override
-				public void run() {
-					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-					FolderHistory transaction = new FolderHistory();
-					transaction.setSession(session);
-					try {
-						fdao.applyTagsToTree(parentId, transaction);
-					} catch (PersistenceException e) {
-						throw new RuntimeException(e.getMessage(), e);
-					}
-				}
-
-			};
-
-			ServiceUtil.executeLongRunningOperation("Apply Tags", runnable, session);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
+		ServiceUtil.executeLongRunningOperation("Apply Tags", () -> {
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderHistory transaction = new FolderHistory();
+			transaction.setSession(session);
+			try {
+				fdao.applyTagsToTree(parentId, transaction);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
+		}, session);
 	}
 
 	@Override
@@ -1174,126 +1211,78 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	public void applyGridLayout(long folderId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			Runnable runnable = new Runnable() {
-
-				@Override
-				public void run() {
-					/*
-					 * Just apply the current security settings to the whole
-					 * subtree
-					 */
-					FolderHistory history = new FolderHistory();
-					history.setSession(session);
-					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-					try {
-						fdao.applyGridToTree(folderId, history);
-					} catch (PersistenceException e) {
-						log.error(e.getMessage(), e);
-					}
-				}
-
-			};
-
-			ServiceUtil.executeLongRunningOperation("Apply Grid Layout", runnable, session);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
+		/*
+		 * Just apply the current security settings to the whole subtree
+		 */
+		ServiceUtil.executeLongRunningOperation("Apply Grid Layout", () -> {
+			FolderHistory history = new FolderHistory();
+			history.setSession(session);
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			try {
+				fdao.applyGridToTree(folderId, history);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
+		}, session);
 	}
 
 	@Override
 	public void applyOCR(long parentId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			Runnable runnable = new Runnable() {
-
-				@Override
-				public void run() {
-					FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-					FolderHistory transaction = new FolderHistory();
-					transaction.setSession(session);
-					try {
-						fdao.applyOCRToTree(parentId, transaction);
-					} catch (PersistenceException e) {
-						throw new RuntimeException(e.getMessage(), e);
-					}
-				}
-
-			};
-
-			ServiceUtil.executeLongRunningOperation("Apply OCR", runnable, session);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
+		ServiceUtil.executeLongRunningOperation("Apply OCR", () -> {
+			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+			FolderHistory transaction = new FolderHistory();
+			transaction.setSession(session);
+			try {
+				fdao.applyOCRToTree(parentId, transaction);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
+		}, session);
 	}
 
 	@Override
 	public void applyStorage(long parentId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 
-		try {
-			Runnable runnable = new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						ServiceUtil.checkPermission(Permission.STORAGE, session.getUser(), parentId);
-						FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-						FolderHistory transaction = new FolderHistory();
-						transaction.setSession(session);
-						fdao.applyStorageToTree(parentId, transaction);
-					} catch (Exception e) {
-						throw new RuntimeException(e.getMessage(), e);
-					}
-				}
-
-			};
-
-			ServiceUtil.executeLongRunningOperation("Apply Storage", runnable, session);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
+		ServiceUtil.executeLongRunningOperation("Apply Storage", () -> {
+			try {
+				ServiceUtil.checkPermission(Permission.STORAGE, session.getUser(), parentId);
+				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+				FolderHistory transaction = new FolderHistory();
+				transaction.setSession(session);
+				fdao.applyStorageToTree(parentId, transaction);
+			} catch (PersistenceException | AccessDeniedException e) {
+				log.error(e.getMessage(), e);
+			}
+		}, session);
 	}
 
 	@Override
 	public void merge(long[] folderIds, long targetId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
-		try {
-			if (!folderDao.isPermissionEnabled(Permission.ADD, targetId, session.getUserId()))
-				throw new ServerException("Add Child rights not granted on the target folder");
-			if (!folderDao.isPermissionEnabled(Permission.WRITE, targetId, session.getUserId()))
-				throw new ServerException("Write rights not granted on the target folder");
-			if (!folderDao.isPermissionEnabled(Permission.DELETE, targetId, session.getUserId()))
-				throw new ServerException("Delete rights not granted on the target folder");
-			
-			Runnable runnable = new Runnable() {
+		ServiceUtil.checkPermission(Permission.ADD, session.getUser(), targetId);
+		ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), targetId);
+		ServiceUtil.checkPermission(Permission.DELETE, session.getUser(), targetId);
 
-				@Override
-				public void run() {
-					try {
-						FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-						Folder target = fDao.findFolder(targetId);
-						fDao.initialize(target);
+		ServiceUtil.executeLongRunningOperation("Merge", () -> {
+			try {
+				FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+				Folder target = fDao.findFolder(targetId);
+				fDao.initialize(target);
 
-						FolderHistory transaction = new FolderHistory();
-						transaction.setSession(session);
+				FolderHistory transaction = new FolderHistory();
+				transaction.setSession(session);
 
-						for (long sourceId : folderIds) {
-							Folder source = fDao.findById(sourceId);
-							fDao.merge(source, target, transaction);
-						}
-					} catch (Exception e) {
-						throw new RuntimeException(e.getMessage(), e);
-					}
+				for (long sourceId : folderIds) {
+					Folder source = fDao.findById(sourceId);
+					fDao.merge(source, target, transaction);
 				}
-			};
-
-			ServiceUtil.executeLongRunningOperation("Merge", runnable, session);
-		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
-		}
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
+		}, session);
 	}
 }

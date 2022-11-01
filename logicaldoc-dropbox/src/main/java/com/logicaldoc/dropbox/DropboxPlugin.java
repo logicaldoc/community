@@ -1,6 +1,7 @@
 package com.logicaldoc.dropbox;
 
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * Entry-point for the Dropbox plug-in
@@ -11,7 +12,7 @@ import com.logicaldoc.util.plugin.LogicalDOCPlugin;
 public class DropboxPlugin extends LogicalDOCPlugin {
 
 	@Override
-	public void install() throws Exception {
+	public void install() throws PluginException {
 		super.install();
 
 		addServlet("DropboxService", DropboxServiceImpl.class.getName(), "/frontend/dropbox");

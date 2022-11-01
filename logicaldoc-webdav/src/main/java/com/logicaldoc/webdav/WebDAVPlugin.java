@@ -1,10 +1,12 @@
 package com.logicaldoc.webdav;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
+import com.logicaldoc.util.plugin.PluginException;
 import com.logicaldoc.webdav.web.WebdavServlet;
 
 /**
@@ -17,7 +19,7 @@ public class WebDAVPlugin extends LogicalDOCPlugin {
 	private static final String SERVLET_NAME = "Webdav";
 
 	@Override
-	public void install() throws Exception {
+	public void install() throws PluginException {
 		super.install();
 
 		File dest = new File(getPluginPath());
@@ -32,10 +34,14 @@ public class WebDAVPlugin extends LogicalDOCPlugin {
 		config.addServletMapping(SERVLET_NAME, "/webdav/*");
 		config.writeXMLDoc();
 
-		ContextProperties pbean = new ContextProperties();
-		pbean.setProperty("webdav.enabled", "true");
-		pbean.setProperty("webdav.depth", "1");
-		pbean.write();
+		try {
+			ContextProperties pbean = new ContextProperties();
+			pbean.setProperty("webdav.enabled", "true");
+			pbean.setProperty("webdav.depth", "1");
+			pbean.write();
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		setRestartRequired();
 	}

@@ -211,37 +211,37 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 			setIntValue(null);
 			setDoubleValue(null);
 			setDateValue(null);
-		}
-
-		if (value instanceof String) {
-			this.type = TYPE_STRING;
-			setStringValue((String) value);
-		} else if (value instanceof Integer) {
-			this.type = TYPE_INT;
-			setIntValue(Long.valueOf((Integer) value));
-		} else if (value instanceof Long) {
-			this.type = TYPE_INT;
-			setIntValue((Long) value);
-		} else if (value instanceof Double) {
-			this.type = TYPE_DOUBLE;
-			setDoubleValue((Double) value);
-		} else if (value instanceof Date) {
-			this.type = TYPE_DATE;
-			setDateValue((Date) value);
-		} else if (value instanceof User) {
-			this.type = TYPE_USER;
-			this.intValue = ((User) value).getId();
-			this.stringValue = ((User) value).getUsername();
-		} else if (value instanceof Folder) {
-			this.type = TYPE_FOLDER;
-			this.intValue = ((Folder) value).getId();
-			this.stringValue = ((Folder) value).getName();
-		} else if (value instanceof Boolean) {
-			this.type = TYPE_BOOLEAN;
-			this.intValue = ((Boolean) value).booleanValue() ? 1L : 0L;
+			setBooleanValue(null);
 		} else {
-			if (value != null)
-				throw new IllegalArgumentException("No a String, Long, Double, Date, Boolean, User, Folder value");
+			if (value instanceof String) {
+				this.type = TYPE_STRING;
+				setStringValue((String) value);
+			} else if (value instanceof Integer) {
+				this.type = TYPE_INT;
+				setIntValue(Long.valueOf((Integer) value));
+			} else if (value instanceof Long) {
+				this.type = TYPE_INT;
+				setIntValue((Long) value);
+			} else if (value instanceof Double) {
+				this.type = TYPE_DOUBLE;
+				setDoubleValue((Double) value);
+			} else if (value instanceof Date) {
+				this.type = TYPE_DATE;
+				setDateValue((Date) value);
+			} else if (value instanceof User) {
+				this.type = TYPE_USER;
+				this.intValue = ((User) value).getId();
+				this.stringValue = ((User) value).getUsername();
+			} else if (value instanceof Folder) {
+				this.type = TYPE_FOLDER;
+				this.intValue = ((Folder) value).getId();
+				this.stringValue = ((Folder) value).getName();
+			} else if (value instanceof Boolean) {
+				this.type = TYPE_BOOLEAN;
+				this.intValue = ((Boolean) value).booleanValue() ? 1L : 0L;
+			} else {
+				throw new IllegalArgumentException("Not a String, Long, Double, Date, Boolean, User, Folder value");
+			}
 		}
 	}
 

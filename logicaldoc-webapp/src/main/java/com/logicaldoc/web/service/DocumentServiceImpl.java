@@ -1881,6 +1881,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		Document document = null;
 		try {
 			document = retrieveDocument(docId);
+			if (document == null)
+				throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
 
 			if (notes != null && notes.length > 0)
 				notesList = Arrays.asList(notes);
@@ -2033,7 +2035,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		try {
 			ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), buf.getFolder().getId());
-		} catch (AccessDeniedException | PersistenceException e) {
+		} catch (AccessDeniedException e) {
 			log.warn("Skip document {} because  user {} does not have write permission", docId, session.getUsername());
 			return null;
 		}

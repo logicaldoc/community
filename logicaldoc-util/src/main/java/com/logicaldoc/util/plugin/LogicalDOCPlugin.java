@@ -44,13 +44,14 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * installed(@link #isInstallNeeded())the <code>install()</code> method is
 	 * called
 	 * 
-	 * @throws Exception if an error has occurred during plug-in start-up
+	 * @throws PluginException if an error has occurred during plug-in start-up
 	 * @see org.java.plugin.Plugin#doStart()
 	 */
 	@Override
-	protected void doStart() throws Exception {
-		loadData();
+	protected void doStart() throws PluginException {
 		try {
+			loadData();
+
 			if (isInstallNeeded()) {
 				install();
 				boolean created = getInstallMark().createNewFile();
@@ -59,12 +60,12 @@ public abstract class LogicalDOCPlugin extends Plugin {
 				else
 					logger.error("Cannot install plugin {}", getDescriptor().getId());
 			}
-		} catch (Exception e) {
+			onStart();
+			saveData();
+		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-			throw e;
+			throw new PluginException(e);
 		}
-		onStart();
-		saveData();
 	}
 
 	/**
@@ -166,9 +167,10 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * Concrete implementations of this method must insert first installation
 	 * logic such as database initialization.
 	 * 
-	 * @throws Exception raised if some errors happened during the installation
+	 * @throws PluginException raised if some errors happened during the
+	 *         installation
 	 */
-	public void install() throws Exception {
+	public void install() throws PluginException {
 		// Nothing to do
 	}
 
@@ -176,9 +178,9 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * Concrete implementations of this method must insert startup
 	 * initializations.
 	 * 
-	 * @throws Exception raised if some errors happened during the startup
+	 * @throws PluginException raised if some errors happened during the startup
 	 */
-	protected void onStart() throws Exception {
+	protected void onStart() throws PluginException {
 		// Nothing to do
 	}
 
@@ -194,11 +196,11 @@ public abstract class LogicalDOCPlugin extends Plugin {
 	 * {@link #doStart()} method will be called again (but for another instance
 	 * of this class).
 	 * 
-	 * @throws Exception if an error has occurred during plug-in shutdown
+	 * @throws PluginException if an error has occurred during plug-in shutdown
 	 * @see org.java.plugin.Plugin#doStop()
 	 */
 	@Override
-	protected void doStop() throws Exception {
+	protected void doStop() throws PluginException {
 		// Nothing to do
 	}
 

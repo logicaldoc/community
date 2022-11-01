@@ -93,7 +93,12 @@ public class FolderServiceImplTest extends AbstractWebappTCase {
 		Assert.assertEquals("/test/ABC/xyz", folder.getPathExtended());
 
 		// Try with unexisting id
-		folder = service.getFolder(9999, false, false, false);
+		folder = null;
+		try {
+			folder = service.getFolder(9999, false, false, false);
+		} catch (ServerException e) {
+			// We expect an exception here;
+		}
 		Assert.assertNull(folder);
 	}
 

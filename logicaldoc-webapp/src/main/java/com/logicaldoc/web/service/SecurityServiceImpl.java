@@ -1029,16 +1029,20 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 					settings.getGeolocationKey() != null ? settings.getGeolocationKey() : "");
 
 			// Update the web.xml
-			ServletContext context = getServletContext();
-			String policy = "true".equals(conf.getProperty(SSL_REQUIRED)) ? "CONFIDENTIAL" : "NONE";
-			WebConfigurator webConfigurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
-			restartRequired = webConfigurator.setTransportGuarantee(policy);
+			try {
+				ServletContext context = getServletContext();
+				String policy = "true".equals(conf.getProperty(SSL_REQUIRED)) ? "CONFIDENTIAL" : "NONE";
+				WebConfigurator webConfigurator = new WebConfigurator(context.getRealPath("/WEB-INF/web.xml"));
+				restartRequired = webConfigurator.setTransportGuarantee(policy);
 
-			// Update the context-security.xml
-			SecurityConfigurator secConfigurator = new SecurityConfigurator();
-			restartRequired = restartRequired
-					|| secConfigurator.setContentSecurityPolicy(settings.getContentSecurityPolicy());
-
+				// Update the context-security.xml
+				SecurityConfigurator secConfigurator = new SecurityConfigurator();
+				restartRequired = restartRequired
+						|| secConfigurator.setContentSecurityPolicy(settings.getContentSecurityPolicy());
+			} catch (Exception e) {
+				log.warn(e.getMessage(), e);
+			}
+			
 			// Invalidate then Geolocation
 			Geolocation.get().dispose();
 		}

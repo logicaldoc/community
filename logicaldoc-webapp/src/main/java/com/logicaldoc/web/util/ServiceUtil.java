@@ -27,6 +27,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Session.Log;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.threading.NotifyingThread;
@@ -127,12 +128,16 @@ public class ServiceUtil {
 	}
 
 	public static void checkPermission(Permission permission, User user, long folderId)
-			throws AccessDeniedException, PersistenceException {
+			throws AccessDeniedException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
-			String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
-					permission.getName(), folderId);
-			throw new AccessDeniedException(message);
+		try {
+			if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
+				String message = String.format("User %s doesn't have permission %s on folder %s", user.getUsername(),
+						permission.getName(), folderId);
+				throw new AccessDeniedException(message);
+			}
+		} catch (PersistenceException e) {
+			throw new AccessDeniedException(e.getMessage());
 		}
 	}
 
@@ -190,6 +195,8 @@ public class ServiceUtil {
 					ie.getErrors().values().stream()
 							.map(e -> new ServerValidationError(e.getAttribute(), e.getLabel(), e.getDescription()))
 							.collect(Collectors.toList()).toArray(new ServerValidationError[0]));
+		} else if (t instanceof PermissionException) {
+			throw new AccessDeniedException(t.getMessage());
 		} else if (t instanceof ServerException) {
 			throw (ServerException) t;
 		} else

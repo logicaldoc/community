@@ -1,6 +1,7 @@
 package com.logicaldoc.cmis;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.chemistry.opencmis.server.impl.CmisRepositoryContextListener;
 import org.apache.chemistry.opencmis.server.shared.BasicAuthCallContextHandler;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.WebConfigurator;
 import com.logicaldoc.util.plugin.LogicalDOCPlugin;
+import com.logicaldoc.util.plugin.PluginException;
 
 /**
  * This class provides initializations needed by Cmis-Plugin
@@ -23,7 +25,7 @@ public class CmisPlugin extends LogicalDOCPlugin {
 	private static final String SERVLET_NAME = "Cmis";
 
 	@Override
-	public void install() throws Exception {
+	public void install() throws PluginException {
 		super.install();
 
 		addServlet(SERVLET_NAME, CmisServlet.class.getName(), "/service/cmis/*", 4);
@@ -41,11 +43,15 @@ public class CmisPlugin extends LogicalDOCPlugin {
 				null, WebConfigurator.INIT_PARAM.PARAM_OVERWRITE);
 		config.writeXMLDoc();
 
-		ContextProperties pbean = new ContextProperties();
-		pbean.setProperty("cmis.enabled", "true");
-		pbean.setProperty("cmis.changelog", "true");
-		pbean.setProperty("cmis.maxitems", "200");
-		pbean.write();
+		try {
+			ContextProperties pbean = new ContextProperties();
+			pbean.setProperty("cmis.enabled", "true");
+			pbean.setProperty("cmis.changelog", "true");
+			pbean.setProperty("cmis.maxitems", "200");
+			pbean.write();
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
 
 		setRestartRequired();
 	}
