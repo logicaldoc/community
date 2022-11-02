@@ -61,12 +61,11 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-@SuppressWarnings("unchecked")
 public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> implements FolderDAO {
 
 	private static final String TENANT_ID_EQUAL = ".tenantId=";
 
-	private static final String PARENT_ID_EQUAL = ".parentId=";
+	private static final String PARENTID_EQUAL = ".parentId=";
 
 	private static final String FOLDER_GROUPS_AS_GROUP = ".folderGroups as _group ";
 
@@ -82,7 +81,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private static final String REPLICATE = "replicate";
 
-	private static final String AND_A_LD_GROUPID_IN = " and A.ld_groupid in (";
+	private static final String AND_LDGROUPID_IN = " and A.ld_groupid in (";
 
 	private static final String AND = " and ";
 
@@ -317,10 +316,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	private User geExistingtUser(long userId) throws PersistenceException {
 		User user = userDAO.findById(userId);
-		assert user != null : "User " + userId + " not found";
+		if (user == null)
+			throw new PersistenceException("User " + userId + " not found");
 		return user;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Folder> findByUserId(long userId, long parentId) throws PersistenceException {
 		List<Folder> coll = new ArrayList<>();
@@ -328,8 +329,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		User user = geExistingtUser(userId);
 
 		if (user.isMemberOf(Group.GROUP_ADMIN))
-			return findByWhere(ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY + PARENT_ID_EQUAL
-					+ parentId, " order by " + ALIAS_ENTITY + ".name ", null);
+			return findByWhere(
+					ALIAS_ENTITY + ".id!=" + ALIAS_ENTITY + ".parentId and " + ALIAS_ENTITY + PARENTID_EQUAL + parentId,
+					" order by " + ALIAS_ENTITY + ".name ", null);
 		/*
 		 * Search for all those folders that defines its own security policies
 		 */
@@ -400,6 +402,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				params, "order by " + ALIAS_ENTITY + ".name", max);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Folder> findChildren(long parentId, long userId) throws PersistenceException {
 		List<Folder> coll = new ArrayList<>();
@@ -431,7 +434,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			query1.append(Long.toString(ug.getId()));
 			first = false;
 		}
-		query1.append(") " + AND + ALIAS_ENTITY + ") " + FROM_FOLDER + parent.getId());
+		query1.append(") " + AND + ALIAS_ENTITY + PARENTID_EQUAL + parent.getId());
 		query1.append(" and not(" + ALIAS_ENTITY + ".id=" + parent.getId() + ")");
 
 		coll = findByQuery(query1.toString(), (Map<String, Object>) null, null);
@@ -525,6 +528,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return isPermissionEnabled(Permission.MOVE, id, userId);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean isReadEnabled(long folderId, long userId) {
 		boolean result = true;
@@ -584,6 +588,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Folder> findByGroupId(long groupId) {
 		List<Folder> coll = new ArrayList<>();
@@ -632,6 +637,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return coll;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Long> findIdByUserId(long userId, long parentId) throws PersistenceException {
 		List<Long> ids = new ArrayList<>();
@@ -639,7 +645,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		User user = geExistingtUser(userId);
 
 		if (user.isMemberOf(Group.GROUP_ADMIN))
-			return findIdsByWhere(ALIAS_ENTITY + ") " + FROM_FOLDER + parentId, null, null);
+			return findIdsByWhere(ALIAS_ENTITY + PARENTID_EQUAL + parentId, null, null);
 
 		Set<Group> precoll = user.getGroups();
 		Iterator<Group> iter = precoll.iterator();
@@ -647,7 +653,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			StringBuilder query1 = new StringBuilder(
 					"select distinct(A.ld_folderid) from ld_foldergroup A, ld_folder B "
 							+ " where B.ld_deleted=0 and A.ld_folderid=B.ld_id AND (B.ld_parentid=" + parentId
-							+ " OR B.ld_id=" + parentId + ")" + AND_A_LD_GROUPID_IN);
+							+ " OR B.ld_id=" + parentId + ")" + AND_LDGROUPID_IN);
 			boolean first = true;
 			while (iter.hasNext()) {
 				if (!first)
@@ -694,7 +700,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 					"lower(" + ALIAS_ENTITY + ".name) like '" + SqlUtil.doubleQuotes(name.toLowerCase()) + "' ");
 
 		if (parent != null) {
-			query.append(AND + ALIAS_ENTITY + PARENT_ID_EQUAL + parent.getId());
+			query.append(AND + ALIAS_ENTITY + PARENTID_EQUAL + parent.getId());
 			if (tenantId == null)
 				query.append(AND + ALIAS_ENTITY + ".tenantId = " + parent.getTenantId());
 		}
@@ -863,7 +869,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	@Override
 	public List<Folder> findByNameAndParentId(String name, long parentId) {
 		try {
-			return findByWhere(ALIAS_ENTITY + PARENT_ID_EQUAL + parentId + AND + ALIAS_ENTITY + ".name like '"
+			return findByWhere(ALIAS_ENTITY + PARENTID_EQUAL + parentId + AND + ALIAS_ENTITY + ".name like '"
 					+ SqlUtil.doubleQuotes(name) + "'", null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -976,7 +982,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		query.append(" from ld_foldergroup A");
 		query.append(WHERE);
 		query.append(" A.ld_folderid=" + id);
-		query.append(AND_A_LD_GROUPID_IN);
+		query.append(AND_LDGROUPID_IN);
 		query.append(userGroups.stream().map(ug -> Long.toString(ug.getId())).collect(Collectors.joining(",")));
 		query.append(")");
 
@@ -1024,6 +1030,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return permissions;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Long> findFolderIdByUserIdInPath(long userId, Long parentId) {
 		/*
@@ -1048,7 +1055,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			List<Long> groupIds = user.getUserGroups().stream().map(UserGroup::getGroupId).collect(Collectors.toList());
 			if (!groupIds.isEmpty()) {
-				query1.append(" and A.ld_groupid in (");
+				query1.append(AND_LDGROUPID_IN);
 				query1.append(StringUtil.arrayToString(groupIds.toArray(new Long[0]), ","));
 				query1.append(") ");
 			}
@@ -1117,6 +1124,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return ids;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Collection<Long> findFolderIdByUserIdAndPermission(long userId, Permission permission, Long parentId,
 			boolean tree) throws PersistenceException {
@@ -1200,7 +1208,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		List<String> groupIds = user.getUserGroups().stream().map(g -> Long.toString(g.getGroupId()))
 				.collect(Collectors.toList());
 		if (!groupIds.isEmpty()) {
-			query.append(" and A.ld_groupid in (");
+			query.append(AND_LDGROUPID_IN);
 			query.append(groupIds.stream().collect(Collectors.joining(",")));
 			query.append(") ");
 		}
@@ -1550,6 +1558,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return folder;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void setUniqueName(Folder folder) {
 		int counter = 1;
 
@@ -1777,7 +1786,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (!checkStoringAspect())
 			throw new PersistenceException("Tree has not been deleted");
 
-		if (delCode != 0)
+		if (delCode == 0)
 			throw new PersistenceException("Deletion code cannot be 0");
 		if (folder == null)
 			throw new PersistenceException("No folder was specified");
@@ -1805,6 +1814,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		 * Check if in the folders to be deleted there is at least one immutable
 		 * document
 		 */
+		@SuppressWarnings("unchecked")
 		List<Long> ids = queryForList(
 				"select ld_folderid from ld_document where ld_deleted=0 and ld_immutable=1 and ld_folderid in "
 						+ treeIdsString,
@@ -1845,6 +1855,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return notDeletableFolders;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<Long> findFolderIdInTree(long rootId, boolean includeDeleted) {
 		log.debug("findFolderIdInTree, rootID: {}, includeDeleted: {}", rootId, includeDeleted);
@@ -1894,6 +1905,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return ids;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<Long> findFolderIdInPath(long rootId, boolean includeDeleted) {
 		Set<Long> ids = new HashSet<>();
@@ -1912,7 +1924,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		String query = "select ld_id from ld_folder where ld_tenantid=" + rootFolder.getTenantId()
 				+ (includeDeleted ? "" : " and ld_deleted=0 ");
-		query += " and ld_path like '" + SqlUtil.doubleQuotes(rootFolder.getPath()) + "/%'";
+		if (rootFolder.getPath() != null)
+			query += " and ld_path like '" + SqlUtil.doubleQuotes(rootFolder.getPath()) + "/%'";
 
 		try {
 			ids = new HashSet<>(queryForList(query, Long.class));
@@ -1957,7 +1970,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		long rootId = root.getId();
 
 		try {
-			return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + ") " + AND + ALIAS_ENTITY + PARENT_ID_EQUAL
+			return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + ") " + AND + ALIAS_ENTITY + PARENTID_EQUAL
 					+ rootId + AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE + AND + ALIAS_ENTITY
 					+ TENANT_ID_EQUAL + tenantId, "order by lower(" + ALIAS_ENTITY + ".name)", null);
 		} catch (PersistenceException e) {
@@ -1983,6 +1996,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			log.trace("Initialized {} storages", folder.getStorages().keySet().size());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Folder> findDeleted(long userId, Integer maxHits) {
 		List<Folder> results = new ArrayList<>();
@@ -2030,7 +2044,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		try {
 			workspaces = findByWhere(
-					ALIAS_ENTITY + PARENT_ID_EQUAL + root.getId() + AND + ALIAS_ENTITY + ".name = '"
+					ALIAS_ENTITY + PARENTID_EQUAL + root.getId() + AND + ALIAS_ENTITY + ".name = '"
 							+ SqlUtil.doubleQuotes(Folder.DEFAULTWORKSPACENAME) + "' and " + ALIAS_ENTITY
 							+ TENANT_ID_EQUAL + tenantId + AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE,
 					null, null);
@@ -2289,16 +2303,17 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Long> findFolderIdByTag(String tag) {
 		StringBuilder query = new StringBuilder(
 				"select distinct(A.ld_folderid) from ld_foldertag A, ld_folder B where A.ld_folderid=B.ld_id and B.ld_deleted= 0");
 		query.append(" and lower(ld_tag)='" + SqlUtil.doubleQuotes(tag).toLowerCase() + "'");
 
 		try {
-			return (List<Long>) queryForList(query.toString(), Long.class);
+			return queryForList(query.toString(), Long.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -2338,6 +2353,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 				query.append(" AND D.ld_tag='" + SqlUtil.doubleQuotes(tag.toLowerCase()) + "' ");
 
+				@SuppressWarnings("unchecked")
 				List<Long> docIds = queryForList(query.toString(), Long.class);
 				ids.addAll(docIds);
 			}
@@ -2348,6 +2364,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return ids;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Folder> findByUserIdAndTag(long userId, String tag, Integer max) {
 		List<Folder> coll = new ArrayList<>();
@@ -2376,13 +2393,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		return coll;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<String> findTags(long folderId) {
 		try {
 			return queryForList("select ld_tag from ld_foldertag where ld_folderid=" + folderId + " order by ld_tag",
 					String.class);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
 	}
 

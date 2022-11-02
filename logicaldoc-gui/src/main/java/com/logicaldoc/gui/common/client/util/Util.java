@@ -1,10 +1,12 @@
 package com.logicaldoc.gui.common.client.util;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
@@ -29,25 +31,55 @@ import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.widgets.ToastNotification;
 import com.smartgwt.client.widgets.Canvas;
 
-public class Util {
-	public static String[] OFFICE_EXTS = new String[] { ".doc", ".xls", ".xlsm", ".ppt", ".docx", ".docxm", ".dotm",
-			".xlsx", ".xlsm", ".pptx", ".rtf", ".odt", ".ods", ".odp", ".vsd", ".vsdx", ".mpp" };
+/**
+ * General utilities container for the GUI
+ * 
+ * @author Marco Meschieri - LogicalDOC
+ * 
+ * @since 8.8.3
+ */
+public abstract class Util {
 
-	public static String[] SPREADSHEET_EXTS = new String[] { ".xls", ".xlsm", ".xlsx", ".xlsm", ".ods" };
+	private static final String FORMAT_PATTERN_ONE_DIGIT = "###.#";
 
-	public static String[] IMAGE_EXTS = new String[] { ".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png",
+	private static final String FORMAT_PATTERN_TWO_DIGITS = "###.##";
+
+	private static final String FORMAT_PATTERN_BYTES = "#,###";
+
+	private static final String AND_LOCALE_EQUAL = "&locale=";
+
+	private static final String END_DIV = "</div>";
+
+	private static final String NBSP = "&nbsp;";
+
+	private static final String DIV_CLASS_BOX = "<div class='box'>";
+
+	private static final String AND_SID_EQUAL = "&sid=";
+
+	private static final String AND_FILEVERSION_EQUAL = "&fileVersion=";
+
+	private static final String[] officeExts = new String[] { ".doc", ".xls", ".xlsm", ".ppt", ".docx", ".docxm",
+			".dotm", ".xlsx", ".pptx", ".rtf", ".odt", ".ods", ".odp", ".vsd", ".vsdx", ".mpp" };
+
+	private static final String[] spreadsheetExts = new String[] { ".xls", ".xlsm", ".xlsx", ".ods" };
+
+	private static final String[] imageExts = new String[] { ".gif", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".png",
 			".jfif", ".webp" };
 
-	public static String[] VIDEO_EXTS = new String[] { ".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov", ".rm",
-			".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v" };
+	private static final String[] videoExts = new String[] { ".mp4", ".avi", ".mpg", ".wmv", ".wma", ".asf", ".mov",
+			".rm", ".flv", ".aac", ".vlc", ".ogg", ".webm", ".swf", ".mpeg", ".swf", ".m2v", ".m2ts", ".mkv", ".m4v" };
 
-	public static String[] AUDIO_EXTS = new String[] { ".mp3", ".m4p", ".m4a", ".wav" };
+	private static final String[] audioExts = new String[] { ".mp3", ".m4p", ".m4a", ".wav" };
 
-	public static String[] WEBCONTENT_EXTS = new String[] { ".html", ".htm", ".xhtml" };
+	private static final String[] webcontentExts = new String[] { ".html", ".htm", ".xhtml" };
 
-	public static String[] EMAIL_EXTS = new String[] { ".eml", ".msg" };
+	private static final String[] emailExts = new String[] { ".eml", ".msg" };
 
-	public static String[] DICOM_EXTS = new String[] { ".dcm", ".dicom" };
+	private static final String[] dicomExts = new String[] { ".dcm", ".dicom" };
+
+	private Util() {
+		// Empty constructor
+	}
 
 	/**
 	 * Generates HTML image code with style.
@@ -79,7 +111,7 @@ public class Util {
 	public static String downloadAttachmentURL(long docId, String fileVersion, String attachmentFileName) {
 		String url = contextPath() + "download-attachment?docId=" + docId;
 		if (fileVersion != null)
-			url += "&fileVersion=" + fileVersion;
+			url += AND_FILEVERSION_EQUAL + fileVersion;
 		if (attachmentFileName != null)
 			url += "&attachmentFileName=" + URL.encode(attachmentFileName);
 		return url;
@@ -88,7 +120,7 @@ public class Util {
 	public static String downloadURL(long docId, String fileVersion, String suffix, boolean open) {
 		String url = contextPath() + "download?docId=" + docId;
 		if (fileVersion != null)
-			url += "&fileVersion=" + fileVersion;
+			url += AND_FILEVERSION_EQUAL + fileVersion;
 		if (suffix != null)
 			url += "&suffix=" + suffix;
 		if (open)
@@ -135,15 +167,13 @@ public class Util {
 	}
 
 	public static String webEditorUrl(long docId, String fileName, int height) {
-		String url = contextPath() + "ckeditor/index.jsp?docId=" + docId + "&lang=" + I18N.getLocale() + "&fileName="
-				+ fileName + "&height=" + height + "&sid=" + Session.get().getSid();
-		return url;
+		return contextPath() + "ckeditor/index.jsp?docId=" + docId + "&lang=" + I18N.getLocale() + "&fileName="
+				+ fileName + "&height=" + height + AND_SID_EQUAL + Session.get().getSid();
 	}
 
 	public static String webEditorUrl(int height) {
-		String url = contextPath() + "ckeditor/index.jsp?docId=nodoc&lang=" + I18N.getLocale() + "&height=" + height
-				+ "&sid=" + Session.get().getSid();
-		return url;
+		return contextPath() + "ckeditor/index.jsp?docId=nodoc&lang=" + I18N.getLocale() + "&height=" + height
+				+ AND_SID_EQUAL + Session.get().getSid();
 	}
 
 	public static String webstartURL(String appName, Map<String, String> params) {
@@ -156,14 +186,14 @@ public class Util {
 		url.append(I18N.getLocale());
 		url.append("&docLanguage=");
 		url.append(I18N.getDefaultLocaleForDoc());
-		url.append("&sid=");
+		url.append(AND_SID_EQUAL);
 		url.append(Session.get().getSid());
 		if (params != null)
-			for (String p : params.keySet()) {
+			for (Entry<String, String> entry : params.entrySet()) {
 				url.append("&");
-				url.append(p);
+				url.append(entry.getKey());
 				url.append("=");
-				url.append(URL.encode(params.get(p)));
+				url.append(URL.encode(params.get(entry.getValue())));
 			}
 		return url.toString();
 	}
@@ -206,7 +236,7 @@ public class Util {
 	public static String thumbnailUrl(long docId, String fileVersion) {
 		String url = GWT.getHostPageBaseURL() + "thumbnail?docId=" + docId + "&random=" + new Date().getTime();
 		if (fileVersion != null)
-			url += "&fileVersion=" + fileVersion;
+			url += AND_FILEVERSION_EQUAL + fileVersion;
 		return url;
 	}
 
@@ -217,8 +247,7 @@ public class Util {
 		if (height != null)
 			style += "height:" + height + "px; ";
 
-		String img = "<img src='" + thumbnailUrl(docId, fileVersion) + "' style='" + style + "' />";
-		return img;
+		return "<img src='" + thumbnailUrl(docId, fileVersion) + "' style='" + style + "' />";
 	}
 
 	public static String tileUrl(long docId, String fileVersion) {
@@ -232,8 +261,7 @@ public class Util {
 		if (height != null)
 			style += "height:" + height + "px; ";
 
-		String img = "<img src='" + tileUrl(docId, fileVersion) + "' style='" + style + "' />";
-		return img;
+		return "<img src='" + tileUrl(docId, fileVersion) + "' style='" + style + "' />";
 	}
 
 	public static String imageUrl(String imageName) {
@@ -248,19 +276,19 @@ public class Util {
 	}
 
 	public static String iconWithFilename(String iconName, String fileName) {
-		return "<div class='box'>" + fileNameIcon(iconName, 16) + "&nbsp;" + fileName + "</div>";
+		return DIV_CLASS_BOX + fileNameIcon(iconName, 16) + NBSP + fileName + END_DIV;
 	}
 
 	public static String avatarWithText(String userIdOrName, String text) {
-		return "<div class='box'>" + avatarImg(userIdOrName, 16) + "&nbsp;" + text + "</div>";
+		return DIV_CLASS_BOX + avatarImg(userIdOrName, 16) + NBSP + text + END_DIV;
 	}
 
 	public static String avatarWithText(Long userId, String text) {
-		return "<div class='box'>" + avatarImg(userId != null ? "" + userId : "0", 16) + "&nbsp;" + text + "</div>";
+		return DIV_CLASS_BOX + avatarImg(userId != null ? "" + userId : "0", 16) + NBSP + text + END_DIV;
 	}
 
 	public static String textWithAvatar(Long userId, String text) {
-		return "<div class='box'>" + text + "&nbsp;" + avatarImg(userId != null ? "" + userId : "0", 16) + "</div>";
+		return DIV_CLASS_BOX + text + NBSP + avatarImg(userId != null ? "" + userId : "0", 16) + END_DIV;
 	}
 
 	public static String avatarImg(Long userId, int size) {
@@ -281,9 +309,8 @@ public class Util {
 	}
 
 	public static String avatarUrl(String userIdOrName, boolean avoidCaching) {
-		String url = GWT.getHostPageBaseURL() + "avatar?userId=" + userIdOrName.trim()
+		return GWT.getHostPageBaseURL() + "avatar?userId=" + userIdOrName.trim()
 				+ (avoidCaching ? "&random=" + new Date().getTime() : "");
-		return url;
 	}
 
 	public static String licenseUrl() {
@@ -302,17 +329,17 @@ public class Util {
 		if (src == null)
 			return null;
 		else
-			return src.replaceAll("\\<.*?\\>", "").replace("&nbsp;", " ");
+			return src.replaceAll("\\<.*?\\>", "").replace(NBSP, " ");
 	}
 
 	public static String toString(Object[] elements) {
 		if (elements == null || elements.length == 0)
 			return null;
+
 		try {
 			String str = Arrays.asList(elements).toString();
 			return str.substring(1, str.length() - 1);
-		} catch (Throwable t) {
-
+		} catch (Exception e) {
 			return null;
 		}
 	}
@@ -332,7 +359,7 @@ public class Util {
 				skin = Session.get().getInfo().getBranding().getSkin();
 			if (skin == null)
 				skin = detectSkin();
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -365,7 +392,7 @@ public class Util {
 
 	public static boolean isOfficeFile(String fileName) {
 		String tmp = fileName.toLowerCase();
-		for (String ext : OFFICE_EXTS) {
+		for (String ext : officeExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -374,7 +401,7 @@ public class Util {
 
 	public static boolean isSpreadsheetFile(String fileName) {
 		String tmp = fileName.toLowerCase();
-		for (String ext : SPREADSHEET_EXTS) {
+		for (String ext : spreadsheetExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -383,7 +410,7 @@ public class Util {
 
 	public static boolean isDICOMFile(String fileName) {
 		String tmp = fileName.toLowerCase();
-		for (String ext : DICOM_EXTS) {
+		for (String ext : dicomExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -412,7 +439,7 @@ public class Util {
 
 	public static boolean isImageFile(String fileName) {
 		String tmp = fileName.toLowerCase();
-		for (String ext : IMAGE_EXTS) {
+		for (String ext : imageExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -421,7 +448,7 @@ public class Util {
 
 	public static boolean isWebContentFile(String fileName) {
 		String tmp = fileName.toLowerCase();
-		for (String ext : WEBCONTENT_EXTS) {
+		for (String ext : webcontentExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -430,11 +457,11 @@ public class Util {
 
 	public static boolean isMediaFile(String fileName) {
 		String tmp = fileName.toLowerCase();
-		for (String ext : VIDEO_EXTS) {
+		for (String ext : videoExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
-		for (String ext : AUDIO_EXTS) {
+		for (String ext : audioExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -443,7 +470,7 @@ public class Util {
 
 	public static boolean isAudioFile(String fileName) {
 		String tmp = fileName.toLowerCase();
-		for (String ext : AUDIO_EXTS) {
+		for (String ext : audioExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -451,7 +478,7 @@ public class Util {
 	}
 
 	public static boolean isOfficeFileType(String type) {
-		for (String ext : OFFICE_EXTS) {
+		for (String ext : officeExts) {
 			if (type.equalsIgnoreCase(ext))
 				return true;
 		}
@@ -460,7 +487,7 @@ public class Util {
 
 	public static boolean isEmailFile(String fileName) {
 		String tmp = fileName.toLowerCase();
-		for (String ext : EMAIL_EXTS) {
+		for (String ext : emailExts) {
 			if (tmp.endsWith(ext))
 				return true;
 		}
@@ -507,7 +534,7 @@ public class Util {
 
 	public static String formatLong(long number) {
 		String str;
-		NumberFormat fmt = NumberFormat.getFormat("#,###");
+		NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
 		str = fmt.format(number);
 		str = str.replace(',', I18N.groupingSepator());
 		return str;
@@ -515,7 +542,7 @@ public class Util {
 
 	public static String formatInt(int number) {
 		String str;
-		NumberFormat fmt = NumberFormat.getFormat("#,###");
+		NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
 		str = fmt.format(number);
 		str = str.replace(',', I18N.groupingSepator());
 		return str;
@@ -550,7 +577,7 @@ public class Util {
 		} else if (size < 1024) {
 			str = "1 KB";
 		} else {
-			NumberFormat fmt = NumberFormat.getFormat("#,###");
+			NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
 			str = fmt.format(Math.ceil(size / 1024)) + " KB";
 			str = str.replace(',', I18N.groupingSepator());
 		}
@@ -593,69 +620,45 @@ public class Util {
 		if (size < 0)
 			return "";
 
-		double KB = 1024;
-		double MB = 1024 * KB;
-		double GB = 1024 * MB;
-		double TB = 1024 * GB;
+		double kb = 1024;
+		double mb = 1024 * kb;
+		double gb = 1024 * mb;
+		double tb = 1024 * gb;
 
 		String str;
 		if (size < 1) {
 			str = "0 bytes";
-		} else if (size < KB) {
+		} else if (size < kb) {
 			str = size + " bytes";
-		} else if (size < MB) {
-			double tmp = size / KB;
-			if (tmp < 10) {
-				NumberFormat fmt = NumberFormat.getFormat("###.##");
-				str = fmt.format(tmp) + " KB";
-			} else if (tmp < 100) {
-				NumberFormat fmt = NumberFormat.getFormat("###.#");
-				str = fmt.format(tmp) + " KB";
-			} else {
-				NumberFormat fmt = NumberFormat.getFormat("###");
-				str = fmt.format(tmp) + " KB";
-			}
-			str = str.replace('.', I18N.decimalSepator());
-		} else if (size < GB) {
-			double tmp = size / MB;
-			if (tmp < 10) {
-				NumberFormat fmt = NumberFormat.getFormat("###.##");
-				str = fmt.format(tmp) + " MB";
-			} else if (tmp < 100) {
-				NumberFormat fmt = NumberFormat.getFormat("###.#");
-				str = fmt.format(tmp) + " MB";
-			} else {
-				NumberFormat fmt = NumberFormat.getFormat("###");
-				str = fmt.format(tmp) + " MB";
-			}
-			str = str.replace('.', I18N.decimalSepator());
-		} else if (size < TB) {
-			double tmp = size / GB;
-			if (tmp < 10) {
-				NumberFormat fmt = NumberFormat.getFormat("###.##");
-				str = fmt.format(tmp) + " GB";
-			} else if (tmp < 100) {
-				NumberFormat fmt = NumberFormat.getFormat("###.#");
-				str = fmt.format(tmp) + " GB";
-			} else {
-				NumberFormat fmt = NumberFormat.getFormat("###");
-				str = fmt.format(tmp) + " GB";
-			}
-			str = str.replace('.', I18N.decimalSepator());
+		} else if (size < mb) {
+			double tmp = size / kb;
+			str = formatSizeW7(tmp, "KB");
+		} else if (size < gb) {
+			double tmp = size / mb;
+			str = formatSizeW7(tmp, "MB");
+		} else if (size < tb) {
+			double tmp = size / gb;
+			str = formatSizeW7(tmp, "GB");
 		} else {
-			double tmp = size / TB;
-			if (tmp < 10) {
-				NumberFormat fmt = NumberFormat.getFormat("###.##");
-				str = fmt.format(tmp) + " TB";
-			} else if (tmp < 100) {
-				NumberFormat fmt = NumberFormat.getFormat("###.#");
-				str = fmt.format(tmp) + " TB";
-			} else {
-				NumberFormat fmt = NumberFormat.getFormat("###");
-				str = fmt.format(tmp) + " TB";
-			}
-			str = str.replace('.', I18N.decimalSepator());
+			double tmp = size / tb;
+			str = formatSizeW7(tmp, "TB");
 		}
+		return str;
+	}
+
+	private static String formatSizeW7(double size, String unitSymbol) {
+		String str;
+		if (size < 10) {
+			NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_TWO_DIGITS);
+			str = fmt.format(size) + " " + unitSymbol;
+		} else if (size < 100) {
+			NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_ONE_DIGIT);
+			str = fmt.format(size) + " " + unitSymbol;
+		} else {
+			NumberFormat fmt = NumberFormat.getFormat("###");
+			str = fmt.format(size) + " " + unitSymbol;
+		}
+		str = str.replace('.', I18N.decimalSepator());
 		return str;
 	}
 
@@ -668,7 +671,7 @@ public class Util {
 	 */
 	public static String formatSizeBytes(double size) {
 		String str;
-		NumberFormat fmt = NumberFormat.getFormat("#,###");
+		NumberFormat fmt = NumberFormat.getFormat(FORMAT_PATTERN_BYTES);
 		str = fmt.format(size) + " bytes";
 		str = str.replace(',', I18N.groupingSepator());
 		return str;
@@ -783,7 +786,7 @@ public class Util {
 		if (!WindowUtils.isWindows())
 			return;
 
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> params = new HashMap<>();
 		params.put("targetFolderId", "" + FolderController.get().getCurrentFolder().getId());
 		String url = Util.webstartURL("scan", params);
 
@@ -791,7 +794,7 @@ public class Util {
 	}
 
 	public static void openBulkCheckout(List<Long> unlockedIds) {
-		Map<String, String> params = new HashMap<String, String>();
+		Map<String, String> params = new HashMap<>();
 		params.put("targetFolderId", "" + FolderController.get().getCurrentFolder().getId());
 		params.put("docIds", unlockedIds.toString().replace('[', ' ').replace(']', ' ').trim());
 		String url = Util.webstartURL("bulkcheckout", params);
@@ -901,10 +904,10 @@ public class Util {
 		try {
 			RequestInfo request = WindowUtils.getRequestInfo();
 			key = request.getParameter(Constants.KEY);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
-		
+
 		return key;
 	}
 
@@ -914,7 +917,7 @@ public class Util {
 		try {
 			RequestInfo request = WindowUtils.getRequestInfo();
 			val = request.getParameter(name);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -932,7 +935,7 @@ public class Util {
 		try {
 			RequestInfo request = WindowUtils.getRequestInfo();
 			skin = request.getParameter(Constants.SKIN);
-		} catch (Throwable t) {
+		} catch (Exception t) {
 			// Nothing to do
 		}
 
@@ -967,11 +970,13 @@ public class Util {
 	 */
 	public static void redirectToSuccessUrl(String locale) {
 		String url = Util.getJavascriptVariable("j_successurl");
-		if (locale != null && !"".equals(locale))
-			if (url.contains("?"))
-				url += "&locale=" + locale;
-			else
+		if (locale != null && !"".equals(locale)) {
+			if (url.contains("?")) {
+				url += AND_LOCALE_EQUAL + locale;
+			} else {
 				url += "?locale=" + locale;
+			}
+		}
 		Util.redirect(url);
 	}
 
@@ -989,7 +994,7 @@ public class Util {
 	public static String getLoginUrl(String tenant) {
 		String url = Util.getJavascriptVariable("j_loginurl");
 		url += "?tenant=" + tenant;
-		url += "&locale=" + I18N.getLocale();
+		url += AND_LOCALE_EQUAL + I18N.getLocale();
 		return url;
 	}
 
@@ -1045,7 +1050,7 @@ public class Util {
 	}
 
 	public static Map<String, String> convertToMap(GUIParameter[] parameters) {
-		Map<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<>();
 		if (parameters != null)
 			for (GUIParameter param : parameters)
 				map.put(param.getName(), param.getValue());
@@ -1053,7 +1058,7 @@ public class Util {
 	}
 
 	public static void waitForUpAndRunning(String tenant, String locale) {
-		final String url = Util.getJavascriptVariable("j_loginurl") + "?tenant=" + tenant + "&locale=" + locale;
+		final String url = Util.getJavascriptVariable("j_loginurl") + "?tenant=" + tenant + AND_LOCALE_EQUAL + locale;
 
 		RequestBuilder checkRequest = new RequestBuilder(RequestBuilder.HEAD, url);
 		checkRequest.setCallback(new RequestCallback() {
@@ -1102,7 +1107,7 @@ public class Util {
 	 * @return the escaped string
 	 */
 	public static String escapeHTML(String originalText) {
-		if(originalText==null)
+		if (originalText == null)
 			return "";
 		return originalText.replace("<", "&lt;").replace(">", "&gt;");
 	}
@@ -1138,7 +1143,7 @@ public class Util {
 				buf.append(tag);
 				buf.append("</span>");
 			}
-		buf.append("</div>");
+		buf.append(END_DIV);
 		return buf.toString();
 	}
 
@@ -1149,9 +1154,9 @@ public class Util {
 
 	public static String encodeUTF8(String rawString) {
 		try {
-			byte[] bytes = rawString.getBytes("UTF-8");
-			return new String(bytes, "UTF-8");
-		} catch (Throwable t) {
+			byte[] bytes = rawString.getBytes(StandardCharsets.UTF_8);
+			return new String(bytes, StandardCharsets.UTF_8);
+		} catch (Exception t) {
 			return rawString;
 		}
 	}

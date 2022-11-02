@@ -53,34 +53,36 @@ public abstract class AbstractParser implements Parser {
 	@Override
 	public String parse(final InputStream input, String filename, String encoding, Locale locale, String tenant,
 			Document document, String fileVersion) throws ParseException {
-		log.debug("Parse started");
+		if (log.isDebugEnabled())
+			log.debug("Parse started");
 		StringBuilder content = new StringBuilder();
 
 		Locale lcl = getLocale(locale);
 		String tnt = getTenant(locale, tenant);
 
 		long timeout = Context.get().getProperties().getInt(tenant + ".parser.timeout", 120);
-		
+
 		if (timeout <= 0) {
 			parseInCurrentThread(input, filename, encoding, document, fileVersion, content, lcl, tnt);
 		} else {
 			parseInNewThread(input, filename, encoding, document, fileVersion, content, lcl, tnt, timeout);
 		}
 
-		log.debug("Parse Finished");
+		if (log.isDebugEnabled())
+			log.debug("Parse Finished");
 		return content.toString();
 	}
 
 	private void parseInNewThread(final InputStream input, String filename, String encoding, Document document,
-			String fileVersion, StringBuilder content, Locale locale, String tenant, long timeout) throws ParseException {
+			String fileVersion, StringBuilder content, Locale locale, String tenant, long timeout)
+			throws ParseException {
 		// Invoke in a separate thread
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		try {
 			String ret = null;
 			try {
-				ret = executor.invokeAll(Arrays.asList(
-						new InternalParseTask(input, filename, encoding, locale, tenant, document, fileVersion, content)),
-						timeout, TimeUnit.SECONDS).get(0).get();
+				ret = executor.invokeAll(Arrays.asList(new InternalParseTask(input, filename, encoding, locale, tenant,
+						document, fileVersion, content)), timeout, TimeUnit.SECONDS).get(0).get();
 			} catch (InterruptedException ie) {
 				log.warn("Interrupted parse");
 				Thread.currentThread().interrupt();

@@ -117,7 +117,6 @@ public class PDFParserTest extends AbstractCoreTCase {
 		assertNotNull(content);
 		assertTrue(StringUtils.isNotEmpty(content));
 
-		System.err.println("content.length(): " + content.length());
 		assertEquals(3034, content.length());
 
 		try {
@@ -147,7 +146,6 @@ public class PDFParserTest extends AbstractCoreTCase {
 		assertNotNull(content);
 		assertTrue(StringUtils.isNotEmpty(content));
 
-		System.err.println("content.length(): " + content.length());
 		assertEquals(8759, content.length());
 	}
 
@@ -174,7 +172,6 @@ public class PDFParserTest extends AbstractCoreTCase {
 		x = pdfp.parse(file, filename, null, Locale.ENGLISH, Tenant.DEFAULT_NAME);
 		assertNotNull(x);
 		log.debug("Extracted text size: " + x.length());
-		assertTrue(x.length() > 2500);
-		
+		assertTrue(x.length() > 2500);		
 	}
 }

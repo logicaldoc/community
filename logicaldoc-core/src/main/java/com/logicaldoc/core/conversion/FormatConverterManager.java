@@ -191,10 +191,11 @@ public class FormatConverterManager {
 	 *
 	 * @return the document that represents the conversion
 	 * 
-	 * @throws Exception If something went wrong
+	 * @throws IOException I/O error
+	 * @throws PersistenceException Error in the database
 	 */
 	public Document convert(Document document, String fileVersion, String format, DocumentHistory transaction)
-			throws Exception {
+			throws IOException, PersistenceException {
 		String fileName = DocUtil.getFileName(document, fileVersion);
 		File out = null;
 		FormatConverter converter = null;
@@ -483,7 +484,8 @@ public class FormatConverterManager {
 	 * @throws IOException raised if the file cannot be written
 	 */
 	private File writeToFile(Document document, String fileVersion) throws IOException {
-		File target = FileUtil.createTempFile("scr", "." + AbstractFormatConverter.getExtension(document.getFileName()));
+		File target = FileUtil.createTempFile("scr",
+				"." + AbstractFormatConverter.getExtension(document.getFileName()));
 		String fver = getSuitableFileVersion(document, fileVersion);
 		String resource = storer.getResourceName(document, fver, null);
 		storer.writeToFile(document.getId(), resource, target);
@@ -517,7 +519,6 @@ public class FormatConverterManager {
 
 		for (Extension ext : exts) {
 			String className = ext.getParameter("class").valueAsString();
-			
 
 			// Try to instantiate the builder
 			Object converter;
@@ -528,7 +529,7 @@ public class FormatConverterManager {
 					throw new ClassNotFoundException(String.format(
 							"The specified converter %s doesn't implement FormatConverter interface", className));
 			} catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException | NoSuchMethodException | SecurityException  e) {
+					| InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				log.error(e.getMessage(), e);
 				break;
 			}

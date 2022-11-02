@@ -166,8 +166,6 @@ public class FolderSearch extends Search {
 		// Now add all the criteria
 		String criteriaQueryPart = prepareCriteriaConditions(tableAlias, fOptions, params);
 
-		System.out.println(criteriaQueryPart);
-
 		if (StringUtils.isNotEmpty(criteriaQueryPart)) {
 			query.append(" and ( ");
 			if ("not".equals(fOptions.getTopOperator()))

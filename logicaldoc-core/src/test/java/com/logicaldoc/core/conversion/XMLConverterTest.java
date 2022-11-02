@@ -31,13 +31,7 @@ public class XMLConverterTest extends AbstractCoreTCase {
 
 	@Test
 	public void testInternalConvert() throws PersistenceException, IOException {
-
 		Document doc = ddao.findById(7);
-
-		System.err.println(doc.getFileName());
-		System.err.println(doc.getFileExtension());
-		log.error(doc.getFileName());
-		log.error(doc.getFileExtension());
 
 		XMLConverter convert = new XMLConverter();
 
@@ -48,22 +42,13 @@ public class XMLConverterTest extends AbstractCoreTCase {
 		try {
 			// Creating a temp file
 			targetFile = FileUtil.createTempFile("converted", ".txt");
-			System.err.println(targetFile);
 
 			convert.internalConvert("sid1", doc, srcXMLFile, targetFile);
-
-			// read file and print length the outputstream
-			System.err.println("targetFile.length(): " + targetFile.length());
-
 		} catch (IOException e) {
 			log.error("Exception during conversion", e);
-			e.printStackTrace();
 			Assert.fail();
 		} finally {
-			if (targetFile != null && targetFile.exists())
-				targetFile.delete();
+			FileUtil.strongDelete(targetFile);
 		}
-
 	}
-
 }

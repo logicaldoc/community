@@ -48,8 +48,6 @@ public interface DocumentService {
 	 * @param contentDetail the file binaries
 	 * 
 	 * @return data structure representing the created document
-	 * 
-	 * 
 	 */
 	@POST
 	@Path("/create")
@@ -108,8 +106,6 @@ public interface DocumentService {
 	 * @param release it this is a major version or not
 	 * @param filename filename of the document
 	 * @param filedataDetail binary content of the file
-	 * 
-	 * 
 	 */
 	@POST
 	@Path("/checkin")

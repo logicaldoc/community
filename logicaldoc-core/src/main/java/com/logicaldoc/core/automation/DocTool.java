@@ -1,6 +1,7 @@
 package com.logicaldoc.core.automation;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,7 +50,7 @@ import com.logicaldoc.util.io.FileUtil;
 public class DocTool {
 
 	private static final String SERVER_URL = "server.url";
-	
+
 	protected static Logger log = LoggerFactory.getLogger(DocTool.class);
 
 	/**
@@ -149,11 +150,9 @@ public class DocTool {
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @return the complete download ticket's URL
-	 * 
-	 * @throws Exception a generic error happened
 	 */
 	public String downloadTicket(final long docId, boolean pdfConversion, Integer expireHours, Date expireDate,
-			Integer maxDownloads, String username) throws Exception {
+			Integer maxDownloads, String username) {
 
 		ContextProperties config = Context.get().getProperties();
 		String urlPrefix = config.getProperty(SERVER_URL);
@@ -165,10 +164,14 @@ public class DocTool {
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
-		Ticket ticket = manager.createDownloadTicket(docId, pdfConversion ? "" : "conversion.pdf", expireHours,
-				expireDate, maxDownloads, urlPrefix, transaction);
-
-		return ticket.getUrl();
+		try {
+			Ticket ticket = manager.createDownloadTicket(docId, pdfConversion ? "" : "conversion.pdf", expireHours,
+					expireDate, maxDownloads, urlPrefix, transaction);
+			return ticket.getUrl();
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -243,10 +246,8 @@ public class DocTool {
 	 * @param doc the document
 	 * @param targetPath the full path of the target folder
 	 * @param username the user in whose name the method is run
-	 * 
-	 * @throws Exception a generic error happened
 	 */
-	public void move(Document doc, String targetPath, String username) throws Exception {
+	public void move(Document doc, String targetPath, String username) {
 		User user = new SecurityTool().getUser(username);
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
@@ -257,7 +258,11 @@ public class DocTool {
 		transaction.setDate(new Date());
 		transaction.setUser(user);
 
-		manager.moveToFolder(doc, folder, transaction);
+		try {
+			manager.moveToFolder(doc, folder, transaction);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -268,10 +273,8 @@ public class DocTool {
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @return the new document created
-	 * 
-	 * @throws Exception a generic error happened
 	 */
-	public Document copy(Document doc, String targetPath, String username) throws Exception {
+	public Document copy(Document doc, String targetPath, String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -282,7 +285,12 @@ public class DocTool {
 		transaction.setDocId(doc.getId());
 		transaction.setUser(user);
 
-		return manager.copyToFolder(doc, folder, transaction);
+		try {
+			return manager.copyToFolder(doc, folder, transaction);
+		} catch (PersistenceException | IOException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -291,10 +299,8 @@ public class DocTool {
 	 * @param doc1 first document
 	 * @param doc2 second document
 	 * @param type type of link(optional)
-	 * 
-	 * @throws Exception a generic error happened
 	 */
-	public void link(Document doc1, Document doc2, String type) throws Exception {
+	public void link(Document doc1, Document doc2, String type) {
 		DocumentLinkDAO linkDao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		DocumentLink link = linkDao.findByDocIdsAndType(doc1.getId(), doc2.getId(), "default");
 		if (link == null) {
@@ -304,7 +310,11 @@ public class DocTool {
 			link.setDocument1(doc1);
 			link.setDocument2(doc2);
 			link.setType(StringUtils.isEmpty(type) ? "default" : type);
-			linkDao.store(link);
+			try {
+				linkDao.store(link);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
 		}
 	}
 
@@ -319,10 +329,10 @@ public class DocTool {
 	 * 
 	 * @return The new alias created
 	 * 
-	 * @throws Exception a generic error happened
+	 * @throws PersistenceException Error in the database
 	 */
 	public Document createAlias(Document originalDoc, String targetPath, String type, String username)
-			throws Exception {
+			throws PersistenceException {
 		Folder targetFolder = createPath(originalDoc, targetPath, username);
 		return createAlias(originalDoc, targetFolder, type, username);
 	}
@@ -337,18 +347,20 @@ public class DocTool {
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @return The new alias created
-	 * 
-	 * @throws Exception a generic error happened
 	 */
-	public Document createAlias(Document originalDoc, Folder targetFolder, String type, String username)
-			throws Exception {
+	public Document createAlias(Document originalDoc, Folder targetFolder, String type, String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
-		return manager.createAlias(originalDoc, targetFolder, type, transaction);
+		try {
+			return manager.createAlias(originalDoc, targetFolder, type, transaction);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -356,10 +368,8 @@ public class DocTool {
 	 * 
 	 * @param docId identifier of the document
 	 * @param username the user that locks the document
-	 * 
-	 * @throws Exception a generic error happened
 	 */
-	public void lock(long docId, String username) throws Exception {
+	public void lock(long docId, String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -368,7 +378,11 @@ public class DocTool {
 		transaction.setDocId(docId);
 		transaction.setUser(user);
 
-		manager.lock(docId, AbstractDocument.DOC_LOCKED, transaction);
+		try {
+			manager.lock(docId, AbstractDocument.DOC_LOCKED, transaction);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -376,10 +390,8 @@ public class DocTool {
 	 * 
 	 * @param docId identifier of the document
 	 * @param username the user that locks the document
-	 * 
-	 * @throws Exception a generic error happened
 	 */
-	public void unlock(long docId, String username) throws Exception {
+	public void unlock(long docId, String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -388,7 +400,11 @@ public class DocTool {
 		transaction.setDocId(docId);
 		transaction.setUser(user);
 
-		manager.unlock(docId, transaction);
+		try {
+			manager.unlock(docId, transaction);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -396,10 +412,8 @@ public class DocTool {
 	 * 
 	 * @param docId identifier of the document
 	 * @param username the user in whose name the method is run
-	 * 
-	 * @throws Exception a generic error happened
 	 */
-	public void delete(long docId, String username) throws Exception {
+	public void delete(long docId, String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentHistory transaction = new DocumentHistory();
@@ -407,7 +421,11 @@ public class DocTool {
 		transaction.setUser(user);
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		dao.delete(docId, transaction);
+		try {
+			dao.delete(docId, transaction);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -420,11 +438,8 @@ public class DocTool {
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @return the document
-	 * 
-	 * @throws Exception a generic error happened
 	 */
-	public Document copyResource(Document doc, String fileVersion, String suffix, String newFileName, String username)
-			throws Exception {
+	public Document copyResource(Document doc, String fileVersion, String suffix, String newFileName, String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentHistory transaction = new DocumentHistory();
@@ -447,9 +462,11 @@ public class DocTool {
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 			return manager.create(tmpFile, docVO, transaction);
+		} catch (IOException | PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
 		} finally {
-			if (tmpFile != null)
-				FileUtil.strongDelete(tmpFile);
+			FileUtil.strongDelete(tmpFile);
 		}
 	}
 
@@ -460,13 +477,15 @@ public class DocTool {
 	 * @param fileVersion The file version
 	 * @param suffix the suffix (eg conversion.pdf)
 	 * @param outputFile the user in name of which to take this action
-	 * 
-	 * @throws Exception error writing the file
 	 */
-	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) throws Exception {
+	public void writeToFile(long docId, String fileVersion, String suffix, String outputFile) {
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(docId, fileVersion, suffix);
-		storer.writeToFile(docId, resource, new File(outputFile));
+		try {
+			storer.writeToFile(docId, resource, new File(outputFile));
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -476,12 +495,14 @@ public class DocTool {
 	 * already exists, nothing will be done.
 	 * 
 	 * @param doc the document to convert
-	 * 
-	 * @throws Exception generic error happened
 	 */
-	public void convertPDF(Document doc) throws Exception {
+	public void convertPDF(Document doc) {
 		FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(FormatConverterManager.class);
-		manager.convertToPdf(doc, null);
+		try {
+			manager.convertToPdf(doc, null);
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -493,18 +514,20 @@ public class DocTool {
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @return the generated conversion document
-	 * 
-	 * @throws Exception generic error happened
 	 */
-	public Document convert(Document doc, String format, String username) throws Exception {
+	public Document convert(Document doc, String format, String username) {
 		User user = new SecurityTool().getUser(username);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
 		FormatConverterManager manager = (FormatConverterManager) Context.get().getBean(FormatConverterManager.class);
-		Document conversion = manager.convert(doc, null, format, transaction);
-		return conversion;
+		try {
+			return manager.convert(doc, null, format, transaction);
+		} catch (IOException | PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -516,19 +539,21 @@ public class DocTool {
 	 * @param username the user in whose name the method is run
 	 * 
 	 * @return the generated merged document
-	 * 
-	 * @throws Exception generic error happened
 	 */
-	public Document merge(Collection<Document> documents, long targetFolderId, String fileName, String username)
-			throws Exception {
+	public Document merge(Collection<Document> documents, long targetFolderId, String fileName, String username) {
+
 		User user = new SecurityTool().getUser(username);
 
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(user);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
-		Document merged = manager.merge(documents, targetFolderId, fileName, transaction);
-		return merged;
+		try {
+			return manager.merge(documents, targetFolderId, fileName, transaction);
+		} catch (IOException | PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
