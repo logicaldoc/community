@@ -1485,16 +1485,20 @@ public class DocumentManagerImpl implements DocumentManager {
 		if (folder.getStorage() != null)
 			targetStorage = folder.getStorage().intValue();
 		else {
-			// Check if one of the parent folders references the storer
-			List<Folder> parents = folderDAO.findParents(folder.getId());
-			Collections.reverse(parents);
+			try {
+				// Check if one of the parent folders references the storer
+				List<Folder> parents = folderDAO.findParents(folder.getId());
+				Collections.reverse(parents);
 
-			for (Folder parentFolder : parents)
-				if (parentFolder.getStorage() != null) {
-					folderDAO.initialize(parentFolder);
-					targetStorage = parentFolder.getStorage().intValue();
-					break;
-				}
+				for (Folder parentFolder : parents)
+					if (parentFolder.getStorage() != null) {
+						folderDAO.initialize(parentFolder);
+						targetStorage = parentFolder.getStorage().intValue();
+						break;
+					}
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
 		}
 		return targetStorage;
 	}

@@ -243,7 +243,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		}
 	}
 
-	private void loadFoldersTree(long parentId, String parentPath, long userId, Map<Long, String> folders) {
+	private void loadFoldersTree(long parentId, String parentPath, long userId, Map<Long, String> folders) throws PersistenceException {
 		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		folders.put(parentId, parentPath);
 		for (Folder folder : fDao.findChildren(parentId, userId)) {

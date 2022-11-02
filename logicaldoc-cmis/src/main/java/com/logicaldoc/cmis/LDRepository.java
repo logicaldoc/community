@@ -1193,10 +1193,12 @@ public class LDRepository {
 	 * @param objectInfos informations
 	 * 
 	 * @return the list of children
+	 * 
+	 * @throws PersistenceException error in the database 
 	 */
 	public ObjectInFolderList getChildren(CallContext context, String folderId, String filter,
 			boolean includeAllowableActions, boolean includePathSegment, int maxItems, int skipCount,
-			ObjectInfoHandler objectInfos) {
+			ObjectInfoHandler objectInfos) throws PersistenceException {
 		validatePermission(folderId, context, null);
 
 		// split filter
@@ -1574,8 +1576,10 @@ public class LDRepository {
 	 * @param ftd informations about the failure
 	 * 
 	 * @return if the execution has been done successfully
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	private boolean deleteFolder(Folder folder, boolean continueOnFailure, FailedToDeleteDataImpl ftd) {
+	private boolean deleteFolder(Folder folder, boolean continueOnFailure, FailedToDeleteDataImpl ftd) throws PersistenceException {
 		boolean success = true;
 		for (Document doc : documentDao.findByFolder(folder.getId(), null)) {
 			if (!delete(doc)) {

@@ -313,8 +313,10 @@ public class ZipExport {
 	 * 
 	 * @param folder The folder of the document to be inserted
 	 * @return The full path
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	private String getZipEntryPath(Folder folder) {
+	private String getZipEntryPath(Folder folder) throws PersistenceException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		long rootId = folderDao.findRoot(folder.getTenantId()).getId();

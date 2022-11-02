@@ -807,7 +807,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindIdByUserId() {
+	public void testFindIdByUserId() throws PersistenceException {
 		Collection<Long> ids = dao.findIdByUserId(1, 1201);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(1, ids.size());
@@ -924,7 +924,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindChildren() {
+	public void testFindChildren() throws PersistenceException {
 		List<Folder> dirs = dao.findChildren(1200L, 1L);
 		Assert.assertNotNull(dirs);
 		Assert.assertEquals(1, dirs.size());

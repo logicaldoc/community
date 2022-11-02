@@ -47,8 +47,10 @@ public interface ResourceService extends Serializable {
 	 *        direct childs has to be fetched and turned back
 	 *        s
 	 * @return direct childs of the parent resource
+	 * 
+	 * @throws DavException error in the DAV communication
 	 */
-	public List<Resource> getChildResources(Resource parentResource);
+	public List<Resource> getChildResources(Resource parentResource) throws DavException;
 
 	/**
 	 * Handle of resource creation by passed parent resource as well as the most

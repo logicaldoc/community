@@ -74,7 +74,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	public List<Document> findByFolder(long folderId, Integer max);
 
 	/**
-	 * Finds all document of the specified status and locked by the specified
+	 * Finds all document of0 the specified status and locked by the specified
 	 * user
 	 * 
 	 * @param userId The user id(optional)

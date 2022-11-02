@@ -130,65 +130,56 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	@Override
-	public List<Resource> getChildResources(Resource parentResource) {
+	public List<Resource> getChildResources(Resource parentResource) throws DavException {
 		FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		List<Resource> resourceList = new LinkedList<Resource>();
 		final Long folderID = Long.parseLong(parentResource.getID());
-		boolean hasAccess;
-		try {
-			hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
-		} catch (PersistenceException e1) {
-			hasAccess = false;
-			log.error(e1.getMessage(), e1);
-		}
 
-		if (hasAccess == false) {
-			// Check if the folder is a root and in that case we mark it as
-			// readable.
-			Folder folder = null;
-			try {
-				folder = folderDAO.findFolder(folderID);
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
+		try {
+			boolean hasAccess = folderDAO.isReadEnabled(folderID, parentResource.getRequestedPerson());
+
+			if (hasAccess == false) {
+				// Check if the folder is a root and in that case we mark it as
+				// readable.
+				Folder folder = null;
+				try {
+					folder = folderDAO.findFolder(folderID);
+				} catch (PersistenceException e) {
+					log.error(e.getMessage(), e);
+				}
+				if (folder != null && folder.equals(folderDAO.findRoot(folder.getTenantId())))
+					hasAccess = true;
 			}
-			if (folder != null && folder.equals(folderDAO.findRoot(folder.getTenantId())))
-				hasAccess = true;
-		}
 
-		if (hasAccess == false)
-			return resourceList;
+			if (hasAccess == false)
+				return resourceList;
 
-		User user = null;
-		try {
-			user = userDAO.findById(parentResource.getRequestedPerson());
+			User user = userDAO.findById(parentResource.getRequestedPerson());
 			userDAO.initialize(user);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
 
-		// Find children visible by the current user
-		Collection<Folder> folders = folderDAO.findChildren(folderID, parentResource.getRequestedPerson());
-		if (folders != null) {
-			for (Folder currentFolder : folders) {
-				if (currentFolder.getHidden() == 0)
-					try {
+			// Find children visible by the current user
+			Collection<Folder> folders = folderDAO.findChildren(folderID, parentResource.getRequestedPerson());
+			if (folders != null) {
+				for (Folder currentFolder : folders) {
+					if (currentFolder.getHidden() == 0)
 						resourceList.add(marshallFolder(currentFolder, parentResource.getRequestedPerson(),
 								parentResource.getSession()));
-					} catch (PersistenceException e) {
-						log.error(e.getMessage(), e);
-					}
+				}
 			}
-		}
 
-		Collection<Document> documents = documentDAO.findByFolder(folderID, null);
-		for (Iterator<Document> iterator = documents.iterator(); iterator.hasNext();) {
-			Document document = iterator.next();
-			try {
-				checkPublished(user, document);
-			} catch (Throwable t) {
-				continue;
+			Collection<Document> documents = documentDAO.findByFolder(folderID, null);
+			for (Iterator<Document> iterator = documents.iterator(); iterator.hasNext();) {
+				Document document = iterator.next();
+				try {
+					checkPublished(user, document);
+				} catch (Exception t) {
+					continue;
+				}
+				resourceList.add(marshallDocument(document, parentResource.getSession()));
 			}
-			resourceList.add(marshallDocument(document, parentResource.getSession()));
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			throw new DavException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
 		}
 
 		return resourceList;

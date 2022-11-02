@@ -192,8 +192,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param max Optional, maximum number of children
 	 * 
 	 * @return List of found folders
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	public List<Folder> findChildren(long parentId, Integer max);
+	public List<Folder> findChildren(long parentId, Integer max) throws PersistenceException;
 
 	/**
 	 * Finds direct children of a folder accessible by the given user
@@ -202,8 +204,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param userId Identifier of the user that must have read access
 	 * 
 	 * @return List of found folders
+	 * 
+	 * @throws PersistenceException Error in the database 
 	 */
-	public List<Folder> findChildren(long parentId, long userId);
+	public List<Folder> findChildren(long parentId, long userId) throws PersistenceException;
 
 	/**
 	 * This method is looking up for writing rights for a folder and an user.
@@ -256,9 +260,12 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param userId ID of the user
 	 * @param parentId Parent folder
+	 * 
 	 * @return List of selected folder ID's.
+	 * 
+	 * @throws PersistenceException error in the database  
 	 */
-	public List<Long> findIdByUserId(long userId, long parentId);
+	public List<Long> findIdByUserId(long userId, long parentId) throws PersistenceException;
 
 	/**
 	 * Checks that the user has access to the folder and all its sub-items
@@ -289,8 +296,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param id ID of the folder
 	 * 
 	 * @return the hierarchy of parent folders
+	 * 
+	 * @throws PersistenceException error in the database
 	 */
-	public List<Folder> findParents(long id);
+	public List<Folder> findParents(long id) throws PersistenceException;
 
 	/**
 	 * Returns the workspace that contains the given folder
@@ -612,8 +621,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return True if the folder with the given parentId is parent of the
 	 *         folder with the given childId
+	 *         
+	 * @throws PersistenceException error in the database
 	 */
-	public boolean isInPath(long parentId, long childId);
+	public boolean isInPath(long parentId, long childId) throws PersistenceException;
 
 	/**
 	 * Propagates the security policies of a node to the whole subtree

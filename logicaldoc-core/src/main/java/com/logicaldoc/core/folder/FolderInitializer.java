@@ -5,6 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.metadata.initialization.Initializer;
 
 /**
@@ -21,20 +22,21 @@ public class FolderInitializer extends Initializer implements FolderListener {
 
 	@Override
 	public void beforeStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary)
-			throws Exception {
+			throws PersistenceException {
 		try {
 			if ("true".equals(dictionary.get(INITIALIZED_FLAG))
 					|| "true".equals(System.getProperty("ld.bulkloadextreme")))
 				return;
-			
+
 			initialize(folder, folder.getTemplate(), transaction);
 		} finally {
 			dictionary.put(INITIALIZED_FLAG, "true");
 		}
 	}
+
 	@Override
 	public void afterStore(Folder document, FolderHistory transaction, Map<String, Object> dictionary)
-			throws Exception {
+			throws PersistenceException {
 		// Nothing to do
 	}
 }

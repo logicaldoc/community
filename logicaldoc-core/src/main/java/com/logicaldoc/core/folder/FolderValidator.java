@@ -5,6 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.DocumentValidator;
 import com.logicaldoc.core.metadata.validation.Validator;
 
@@ -22,7 +23,8 @@ public class FolderValidator extends Validator implements FolderListener {
 	protected static Logger log = LoggerFactory.getLogger(DocumentValidator.class);
 
 	@Override
-	public void beforeStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary) throws Exception {
+	public void beforeStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary)
+			throws PersistenceException {
 		try {
 			if ("true".equals(dictionary.get(VALIDATED_FLAG))
 					|| "true".equals(System.getProperty("ld.bulkloadextreme")))
@@ -40,7 +42,8 @@ public class FolderValidator extends Validator implements FolderListener {
 	}
 
 	@Override
-	public void afterStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary) throws Exception {
+	public void afterStore(Folder folder, FolderHistory transaction, Map<String, Object> dictionary)
+			throws PersistenceException {
 		// Nothing to do
 	}
 }

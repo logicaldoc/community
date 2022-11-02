@@ -31,6 +31,7 @@ import org.apache.chemistry.opencmis.commons.exceptions.CmisBaseException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisPermissionDeniedException;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ObjectInFolderListImpl;
 import org.apache.chemistry.opencmis.commons.impl.server.AbstractCmisService;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.commons.server.ObjectInfo;
@@ -249,11 +250,20 @@ public class LDCmisService extends AbstractCmisService {
 			Boolean includeAllowableActions, IncludeRelationships includeRelationships, String renditionFilter,
 			Boolean includePathSegment, BigInteger maxItems, BigInteger skipCount, ExtensionsData extension) {
 		validateSession();
-		return getRepository().getChildren(getCallContext(), folderId, filter,
-				includeAllowableActions != null && includeAllowableActions.booleanValue(),
-				includePathSegment != null && includePathSegment.booleanValue(),
-				maxItems == null || maxItems.intValue() < 0 ? Integer.MAX_VALUE : maxItems.intValue(),
-				skipCount == null || skipCount.intValue() < 0 ? 0 : skipCount.intValue(), this);
+		try {
+			return getRepository().getChildren(getCallContext(), folderId, filter,
+					includeAllowableActions != null && includeAllowableActions.booleanValue(),
+					includePathSegment != null && includePathSegment.booleanValue(),
+					maxItems == null || maxItems.intValue() < 0 ? Integer.MAX_VALUE : maxItems.intValue(),
+					skipCount == null || skipCount.intValue() < 0 ? 0 : skipCount.intValue(), this);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			ObjectInFolderListImpl result = new ObjectInFolderListImpl();
+			result.setObjects(new ArrayList<>());
+			result.setHasMoreItems(false);
+			result.setNumItems(BigInteger.valueOf(0));
+			return result;
+		}
 	}
 
 	@Override
