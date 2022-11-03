@@ -24,7 +24,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return A real folder that is referenced by the given ID
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public Folder findFolder(long folderId) throws PersistenceException;
 
@@ -35,8 +35,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param tenantId Specification of the owning tenant (optional).
 	 * 
 	 * @return List of folders with given folder name.
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> findByName(String name, Long tenantId);
+	public List<Folder> findByName(String name, Long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds all folders by folder text, contained in the parent folder.
@@ -48,8 +50,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param caseSensitive true if the search must be case sensitive
 	 * 
 	 * @return List of folders with given name
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive);
+	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive) throws PersistenceException;
 
 	/**
 	 * Retrieves the root folder of the given tenant
@@ -57,8 +61,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return the root folder
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public Folder findRoot(long tenantId);
+	public Folder findRoot(long tenantId) throws PersistenceException;
 
 	/**
 	 * Retrieves the Default workspace of the given tenant
@@ -66,8 +72,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return The default workspace
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public Folder findDefaultWorkspace(long tenantId);
+	public Folder findDefaultWorkspace(long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds authorized folders for a user
@@ -76,7 +84,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return List of found folders
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Folder> findByUserId(long userId) throws PersistenceException;
 
@@ -103,7 +111,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return List of selected folder IDs.
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public Collection<Long> findFolderIdByUserIdAndPermission(long userId, Permission permission, Long parentId,
 			boolean tree) throws PersistenceException;
@@ -119,7 +127,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return List of selected folder IDs.
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public Collection<Long> findFolderIdByUserId(long userId, Long parentId, boolean tree) throws PersistenceException;
 
@@ -152,8 +160,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param parentId The id of the parent folder to inspect (optional)
 	 * 
 	 * @return List of selected folder IDs.
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public Collection<Long> findFolderIdByUserIdInPath(long userId, Long parentId);
+	public Collection<Long> findFolderIdByUserIdInPath(long userId, Long parentId) throws PersistenceException;
 
 	/**
 	 * Finds direct children of a folder.
@@ -237,7 +247,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return if the permission is granted to the user
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public boolean isPermissionEnabled(Permission permission, long folderId, long userId) throws PersistenceException;
 
@@ -249,7 +259,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return Collection of enabled permissions
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public Set<Permission> getEnabledPermissions(long folderId, long userId) throws PersistenceException;
 
@@ -263,7 +273,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return List of selected folder ID's.
 	 * 
-	 * @throws PersistenceException error in the database  
+	 * @throws PersistenceException error at data layer  
 	 */
 	public List<Long> findIdByUserId(long userId, long parentId) throws PersistenceException;
 
@@ -275,7 +285,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return if the user has write permission
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error at data layer 
 	 */
 	public boolean hasWriteAccess(Folder folder, long userId) throws PersistenceException;
 
@@ -285,8 +295,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param groupId The group id
 	 * 
 	 * @return The List of folders
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<Folder> findByGroupId(long groupId);
+	public List<Folder> findByGroupId(long groupId) throws PersistenceException;
 
 	/**
 	 * Returns a List of folders being a parent of the given folder. The list is
@@ -297,7 +309,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return the hierarchy of parent folders
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Folder> findParents(long id) throws PersistenceException;
 
@@ -308,7 +320,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return the workspace containing the given folder
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public Folder findWorkspace(long folderId) throws PersistenceException;
 
@@ -319,7 +331,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param parentId The parent folder to restore in
 	 * @param transaction Current session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void restore(long folderId, long parentId, FolderHistory transaction) throws PersistenceException;
 
@@ -331,8 +343,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param parentId identifier of the parent folder
 	 * 
 	 * @return list of folders
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> findByNameAndParentId(String name, long parentId);
+	public List<Folder> findByNameAndParentId(String name, long parentId) throws PersistenceException;
 
 	/**
 	 * Same as store(Folder, boolean, FolderHistory)
@@ -340,7 +354,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param folder the folder to store
 	 * @param transaction current session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void store(Folder folder, FolderHistory transaction) throws PersistenceException;
 
@@ -350,7 +364,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param folders the folders
 	 * @param transaction current session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void deleteAll(Collection<Folder> folders, FolderHistory transaction) throws PersistenceException;
 
@@ -362,7 +376,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event on each folder
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void deleteAll(Collection<Folder> folders, int delCode, FolderHistory transaction)
 			throws PersistenceException;
@@ -373,7 +387,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param id the folder identifier
 	 * @param transaction the session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void delete(long id, FolderHistory transaction) throws PersistenceException;
 
@@ -385,7 +399,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void delete(long id, int delCode, FolderHistory transaction) throws PersistenceException;
 
@@ -400,7 +414,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return The newly created folder
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public Folder create(Folder parent, Folder folderVO, boolean inheritSecurity, FolderHistory transaction)
 			throws PersistenceException;
@@ -414,7 +428,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return The newly created alias
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public Folder createAlias(long parentId, long foldRef, FolderHistory transaction) throws PersistenceException;
 
@@ -441,7 +455,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return The created folder
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public Folder createPath(Folder parent, String path, boolean inheritSecurity, FolderHistory transaction)
 			throws PersistenceException;
@@ -454,7 +468,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return the folder's path
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public String computePath(long folderId) throws PersistenceException;
 
@@ -466,7 +480,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return the folder's path
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public String computePath(Folder folder) throws PersistenceException;
 
@@ -478,7 +492,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return The path extended
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public String computePathExtended(Folder folder) throws PersistenceException;
 
@@ -490,7 +504,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return The path extended
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public String computePathExtended(long folderId) throws PersistenceException;
 
@@ -501,8 +515,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param tenantId identifier of the tenant
 	 * 
 	 * @return The folder that matched the given path
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public Folder findByPathExtended(String pathExtended, long tenantId);
+	public Folder findByPathExtended(String pathExtended, long tenantId) throws PersistenceException;
 
 	/**
 	 * Moves a folder into another folder
@@ -511,7 +527,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param target The target folder
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void move(Folder source, Folder target, FolderHistory transaction) throws PersistenceException;
 
@@ -536,7 +552,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param transaction entry to log the event (set the user)
 	 * @return The new folder created
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public Folder copy(Folder source, Folder target, String newName, boolean foldersOnly, String securityOption,
 			FolderHistory transaction) throws PersistenceException;
@@ -555,7 +571,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @return List of folders that the user cannot delete(permissions, o
 	 *         immutable documents presents)
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Folder> deleteTree(Folder folder, int delCode, FolderHistory transaction) throws PersistenceException;
 
@@ -574,7 +590,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @return List of folders that the user cannot delete(permissions, o
 	 *         immutable documents presents)
 	 * 
-	 * @throws Exception in case of any error
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Folder> deleteTree(long folderId, int delCode, FolderHistory transaction) throws PersistenceException;
 
@@ -587,7 +603,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @return List of folders that the user cannot delete(permissions, o
 	 *         immutable documents presents)
 	 * 
-	 * @throws Exception in case of any error
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Folder> deleteTree(long folderId, FolderHistory transaction) throws PersistenceException;
 
@@ -599,8 +615,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param tenantId The tenant to search in
 	 * 
 	 * @return List of folders that contains the given name into their text.
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> find(String name, Long tenantId);
+	public List<Folder> find(String name, Long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds all deleted folders of a specific user.
@@ -622,31 +640,31 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @return True if the folder with the given parentId is parent of the
 	 *         folder with the given childId
 	 *         
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public boolean isInPath(long parentId, long childId) throws PersistenceException;
 
 	/**
-	 * Propagates the security policies of a node to the whole subtree
+	 * Propagates the security policies of a node to the whole sub-tree
 	 * 
 	 * @param rootId identifier of the root folder
 	 * @param transaction session informations
 	 * 
 	 * @return if the rights have been correctly applied
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void applyRightToTree(long rootId, FolderHistory transaction) throws PersistenceException;
 
 	/**
-	 * Propagates the grid layout of a node to the whole subtree
+	 * Propagates the grid layout of a node to the whole sub-tree
 	 * 
 	 * @param rootId identifier of the root folder
 	 * @param transaction session informations
 	 * 
 	 * @return if the grid layout has been correctly replicated
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void applyGridToTree(long rootId, FolderHistory transaction) throws PersistenceException;
 
@@ -658,7 +676,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param rightsFolderId id of the folder to inherit from
 	 * @param transaction session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void updateSecurityRef(long folderId, long rightsFolderId, FolderHistory transaction)
 			throws PersistenceException;
@@ -669,7 +687,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param id identifier of the folder
 	 * @param transaction session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void applyMetadataToTree(long id, FolderHistory transaction) throws PersistenceException;
 
@@ -679,7 +697,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param id identifier of the folder
 	 * @param transaction session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void applyTagsToTree(long id, FolderHistory transaction) throws PersistenceException;
 
@@ -689,7 +707,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param id identifier of the folder
 	 * @param transaction session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void applyStorageToTree(long id, FolderHistory transaction) throws PersistenceException;
 
@@ -699,7 +717,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param id identifier of the folder
 	 * @param transaction session informations
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException;
 
@@ -719,8 +737,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param tanantId identifier of the tenant
 	 * 
 	 * @return list of folders
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> findWorkspaces(long tanantId);
+	public List<Folder> findWorkspaces(long tanantId) throws PersistenceException;
 
 	/**
 	 * Initializes lazy loaded collections
@@ -736,7 +756,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param folder the folder
 	 * @param transaction the session informations
 	 * 
-	 * @throws PersistenceException database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public void saveFolderHistory(Folder folder, FolderHistory transaction) throws PersistenceException;
 

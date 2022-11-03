@@ -100,7 +100,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	 * 
 	 * @param version version to be stored.
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	@Override
 	public void store(Version version) throws PersistenceException {

@@ -111,7 +111,7 @@ public class ZipExport {
 	 * 
 	 * @return The Stream of the zip archive
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public ByteArrayOutputStream process(Long[] docIds, boolean pdfConversion, DocumentHistory transaction)
 			throws PersistenceException {
@@ -200,7 +200,7 @@ public class ZipExport {
 	 * @param pdfConversion if the PDF conversions have to be used instead
 	 * @param sid identifier of the session
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	protected void appendChildren(Folder folder, int depth, boolean pdfConversion, String sid)
 			throws PersistenceException {

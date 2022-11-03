@@ -1484,7 +1484,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public Document findByPath(String path, long tenantId) {
+	public Document findByPath(String path, long tenantId) throws PersistenceException {
 		String folderPath = FilenameUtils.getPath(path);
 		Folder folder = folderDAO.findByPathExtended(folderPath, tenantId);
 		if (folder == null)

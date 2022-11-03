@@ -49,7 +49,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param userId ID of the user.
 	 * @return Collection of all documentId required for the specified user.
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error at data layer 
 	 */
 	public List<Long> findByUserId(long userId) throws PersistenceException;
 
@@ -197,6 +197,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param excludeId Optional id of a document that must not be considered
 	 * @param tenantId Optional id of the tenant
 	 * @param max Optional maximum number of returned elements
+	 * 
 	 * @return The list of documents with the given fileName. If the folder id
 	 *         is null, the searched document can belong to any folder in the
 	 *         repository.
@@ -211,8 +212,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param tenantId The tenant
 	 * 
 	 * @return the found document
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public Document findByPath(String path, long tenantId);
+	public Document findByPath(String path, long tenantId) throws PersistenceException;
 
 	/**
 	 * Initializes lazy loaded collections
@@ -286,7 +289,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param folderId Id of the folder the document will be restored into
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void restore(long docId, long folderId, DocumentHistory transaction) throws PersistenceException;
 
@@ -296,7 +299,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId Ids of the document to be restored
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void unarchive(long docId, DocumentHistory transaction) throws PersistenceException;
 
@@ -307,7 +310,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId identifier of the document
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void makeImmutable(long docId, DocumentHistory transaction) throws PersistenceException;
 
@@ -317,7 +320,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param documents the documents
 	 * @param transaction the current session
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void deleteAll(Collection<Document> documents, DocumentHistory transaction) throws PersistenceException;
 
@@ -329,7 +332,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void deleteAll(Collection<Document> documents, int delCode, DocumentHistory transaction)
 			throws PersistenceException;
@@ -341,7 +344,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param doc the document
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void store(Document doc, DocumentHistory transaction) throws PersistenceException;
 
@@ -353,7 +356,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param delCode The deletion code
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void delete(long docId, int delCode, DocumentHistory transaction) throws PersistenceException;
 
@@ -363,7 +366,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId identifier of the document
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void delete(long docId, DocumentHistory transaction) throws PersistenceException;
 
@@ -373,7 +376,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId identifier of the document
 	 * @param transaction entry to log the event
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void archive(long docId, DocumentHistory transaction) throws PersistenceException;
 
@@ -413,7 +416,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @return True if successfully deleted from the database.
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public boolean deleteOrphaned(long deleteUserId) throws PersistenceException;
 
@@ -432,7 +435,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @param doc The document to be processed
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void updateDigest(Document doc) throws PersistenceException;
 
@@ -441,7 +444,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * document referencing a given transaction, the transactionId will be set
 	 * to null.
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void cleanExpiredTransactions() throws PersistenceException;
 
@@ -452,7 +455,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @param transaction the current session
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void saveDocumentHistory(Document doc, DocumentHistory transaction) throws PersistenceException;
 
@@ -497,7 +500,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @return the parent workspace
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public Folder getWorkspace(long docId) throws PersistenceException;
 
@@ -509,7 +512,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param password The new password in clear
 	 * @param transaction history informations
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void setPassword(long docId, String password, DocumentHistory transaction) throws PersistenceException;
 
@@ -520,7 +523,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId ID of the document
 	 * @param transaction session informations
 	 *
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void unsetPassword(long docId, DocumentHistory transaction) throws PersistenceException;
 

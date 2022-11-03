@@ -86,7 +86,7 @@ public class FolderSearch extends Search {
 	/**
 	 * Utility method that prepares the query expression
 	 * 
-	 * @throws PersistenceException database error
+	 * PersistenceException error at data layer
 	 */
 	private Serializable[] prepareExpression() throws PersistenceException {
 		if (StringUtils.isNotEmpty(options.getExpression()))
@@ -134,7 +134,7 @@ public class FolderSearch extends Search {
 	 * @param params
 	 * @param query
 	 * 
-	 * @throws PersistenceException database error
+	 * PersistenceException error at data layer
 	 */
 	private void appendWhereClause(boolean searchAliases, ArrayList<Serializable> params, StringBuilder query)
 			throws PersistenceException {

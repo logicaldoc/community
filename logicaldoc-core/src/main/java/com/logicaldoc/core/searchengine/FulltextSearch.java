@@ -128,10 +128,15 @@ public class FulltextSearch extends Search {
 		 */
 		StringBuilder query = prepareQuery(opt);
 
-		Collection<Long> accessibleFolderIds = getAccessibleFolderIds(opt);
-		
+		Collection<Long> accessibleFolderIds;
+		try {
+			accessibleFolderIds = getAccessibleFolderIds(opt);
+		} catch (PersistenceException e) {
+			throw new SearchException(e);
+		}
+
 		long tenantId = getTenant(opt);
-		
+
 		/*
 		 * Prepare the filters
 		 */
@@ -230,7 +235,8 @@ public class FulltextSearch extends Search {
 					+ " and A.ld_nature=" + AbstractDocument.NATURE_DOC + " and A.ld_folderid=FOLD.ld_id ");
 			richQuery.append(" and A.ld_tenantid = " + tenantId);
 			// For normal users we have to exclude not published documents
-			if (searchUser != null && !searchUser.isMemberOf(Group.GROUP_ADMIN) && !searchUser.isMemberOf("publisher")) {
+			if (searchUser != null && !searchUser.isMemberOf(Group.GROUP_ADMIN)
+					&& !searchUser.isMemberOf("publisher")) {
 				richQuery.append(" and REF.ld_published = 1 ");
 				richQuery.append(" and REF.ld_startpublishing <= CURRENT_TIMESTAMP ");
 				richQuery.append(" and ( REF.ld_stoppublishing is null or REF.ld_stoppublishing > CURRENT_TIMESTAMP )");
@@ -272,9 +278,9 @@ public class FulltextSearch extends Search {
 		return hitsMap;
 	}
 
-	private Collection<Long> getAccessibleFolderIds(FulltextSearchOptions opt) {
+	private Collection<Long> getAccessibleFolderIds(FulltextSearchOptions opt) throws PersistenceException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		
+
 		/*
 		 * We have to see what folders the user can access. But we need to
 		 * perform this check only if the search is not restricted to one folder
@@ -310,7 +316,8 @@ public class FulltextSearch extends Search {
 		}
 	}
 
-	private void setQueryFilters(FulltextSearchOptions opt, List<String> filters, long tenantId, Collection<Long> accessibleFolderIds) throws SearchException {
+	private void setQueryFilters(FulltextSearchOptions opt, List<String> filters, long tenantId,
+			Collection<Long> accessibleFolderIds) throws SearchException {
 		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		if (searchUser != null && tdao.count() > 1)
 			filters.add(HitField.TENANT_ID + ":" + (tenantId < 0 ? "\\" : "") + tenantId);
@@ -339,7 +346,7 @@ public class FulltextSearch extends Search {
 
 		if (opt.getCreationTo() != null)
 			filters.add(HitField.CREATION + ":[* TO " + df.format(opt.getCreationTo()) + "T00:00:00Z]");
-		
+
 		setFolderQueryFilters(opt, filters, accessibleFolderIds);
 	}
 

@@ -635,7 +635,12 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		folderVO.setType(newFolder.getType());
 		folderVO.setTenantId(session.getTenantId());
 
-		Folder root = folderDao.findRoot(session.getTenantId());
+		Folder root=null;
+		try {
+			root = folderDao.findRoot(session.getTenantId());
+		} catch (PersistenceException e) {
+			return (GUIFolder) ServiceUtil.throwServerException(session, log, e);
+		}
 
 		if (newFolder.getType() == Folder.TYPE_WORKSPACE)
 			newFolder.setParentId(root.getId());
@@ -652,7 +657,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				f = folderDao.create(folderDao.findById(newFolder.getParentId()), folderVO, inheritSecurity,
 						transaction);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			return (GUIFolder) ServiceUtil.throwServerException(session, log, e);
 		}
 
 		if (f == null)
@@ -1038,7 +1043,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	 * @param folder The folder to update
 	 * @param f The model to use
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	private void updateExtendedAttributes(Folder folder, GUIFolder f) throws PersistenceException {
 		if (f.getTemplateId() == null) {

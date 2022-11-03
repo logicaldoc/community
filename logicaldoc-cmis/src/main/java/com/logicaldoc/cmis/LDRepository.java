@@ -219,7 +219,6 @@ public class LDRepository {
 	 * @param root root folder
 	 */
 	public LDRepository(Folder root, String sid) {
-
 		// check root folder
 		if (root == null)
 			throw new IllegalArgumentException("Invalid root folder!");
@@ -247,7 +246,12 @@ public class LDRepository {
 
 		repositoryInfo.setId(id);
 
-		long rootId = folderDao.findRoot(SessionManager.get().get(sid).getTenantId()).getId();
+		long rootId;
+		try {
+			rootId = folderDao.findRoot(SessionManager.get().get(sid).getTenantId()).getId();
+		} catch (PersistenceException e) {
+			throw new IllegalArgumentException("Root folder not found", e);
+		}
 		if (root.getId() == rootId) {
 			repositoryInfo.setName("Main Repository");
 			repositoryInfo.setDescription("Main Repository");
@@ -1194,7 +1198,7 @@ public class LDRepository {
 	 * 
 	 * @return the list of children
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error at data layer 
 	 */
 	public ObjectInFolderList getChildren(CallContext context, String folderId, String filter,
 			boolean includeAllowableActions, boolean includePathSegment, int maxItems, int skipCount,

@@ -229,7 +229,7 @@ public interface MenuDAO extends PersistentObjectDAO<Menu> {
 	 * 
 	 * @return The created folder
 	 * 
-	 * @throws PersistenceException in case of database error
+	 * @throws PersistenceException error at data layer
 	 */
 	public Menu createPath(long parentId, long tenantId, int type, String path, boolean inheritSecurity)
 			throws PersistenceException;

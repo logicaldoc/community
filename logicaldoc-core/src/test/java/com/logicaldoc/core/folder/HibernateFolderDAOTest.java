@@ -734,7 +734,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindByPath() {
+	public void testFindByPath() throws PersistenceException {
 		Assert.assertNotNull(dao.findByPathExtended("/Default/Elard", 1L));
 		Assert.assertNull(dao.findByPathExtended("/Default/Elard", 99L));
 	}
@@ -743,10 +743,24 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	public void testIsReadEnable() throws PersistenceException {
 		Assert.assertTrue(dao.isReadEnabled(Folder.ROOTID, 1));
 		Assert.assertTrue(dao.isReadEnabled(5, 1));
-		Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 22));
 
-		// Unexisting user
-		Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 999));
+		boolean runOk = false;
+		try {
+			Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 22));
+			runOk = true;
+		} catch (PersistenceException e) {
+			Assert.assertEquals("User 22 not found", e.getMessage());
+		}
+		Assert.assertFalse(runOk);
+
+		runOk = false;
+		try {
+			// Unexisting user
+			Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 999));
+		} catch (PersistenceException e) {
+			Assert.assertEquals("User 999 not found", e.getMessage());
+		}
+		Assert.assertFalse(runOk);
 
 		Assert.assertTrue(dao.isReadEnabled(1200, 3));
 	}
@@ -865,7 +879,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindByGroupId() {
+	public void testFindByGroupId() throws PersistenceException {
 		Collection<Folder> folders = dao.findByGroupId(1);
 		Assert.assertEquals(9, folders.size());
 		folders = dao.findByGroupId(10);
@@ -1103,7 +1117,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindWorkspaces() {
+	public void testFindWorkspaces() throws PersistenceException {
 		List<Folder> dirs = dao.findWorkspaces(1L);
 		Assert.assertNotNull(dirs);
 		Assert.assertEquals(2, dirs.size());
@@ -1136,13 +1150,13 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindbyPathExtended() {
+	public void testFindbyPathExtended() throws PersistenceException {
 		Folder folder = dao.findByPathExtended("/Default/Elard", 1L);
 		Assert.assertNotNull(folder);
 	}
 
 	@Test
-	public void testFindDefaultWorkspace() {
+	public void testFindDefaultWorkspace() throws PersistenceException {
 		Folder folder = dao.findDefaultWorkspace(1L);
 		Assert.assertNotNull(folder);
 		Assert.assertEquals(Folder.DEFAULTWORKSPACENAME, folder.getName());

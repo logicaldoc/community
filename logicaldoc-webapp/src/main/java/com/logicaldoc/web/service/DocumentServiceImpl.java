@@ -534,14 +534,18 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			boolean immediateIndexing, final Long templateId) throws ServerException {
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		if (folderId == fdao.findRoot(session.getTenantId()).getId())
-			throw new ServerException("Cannot add documents in the root");
+		try {
+			if (folderId == fdao.findRoot(session.getTenantId()).getId())
+				throw new ServerException("Cannot add documents in the root");
 
-		GUIDocument metadata = new GUIDocument();
-		metadata.setLanguage(language);
-		metadata.setFolder(new GUIFolder(folderId));
-		metadata.setTemplateId(templateId);
-		return addDocuments(importZip, charset, immediateIndexing, metadata);
+			GUIDocument metadata = new GUIDocument();
+			metadata.setLanguage(language);
+			metadata.setFolder(new GUIFolder(folderId));
+			metadata.setTemplateId(templateId);
+			return addDocuments(importZip, charset, immediateIndexing, metadata);
+		} catch (PersistenceException | ServerException e) {
+			return (GUIDocument[]) ServiceUtil.throwServerException(session, log, e);
+		}
 	}
 
 	@Override
@@ -1216,7 +1220,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	 * 
 	 * @return the core Document
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public static Document toDocument(GUIDocument guiDocument) throws PersistenceException {
 		Document docVO = new Document();

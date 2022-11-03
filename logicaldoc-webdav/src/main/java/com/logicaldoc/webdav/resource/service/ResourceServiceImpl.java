@@ -295,15 +295,15 @@ public class ResourceServiceImpl implements ResourceService {
 		if (name.startsWith("/"))
 			name = name.substring(1);
 
-		log.debug("Find DMS resource {} in path {}", name, resourcePath);
-
-		Folder folder = null;
-		if ("/".equals(resourcePath.trim()) && "".equals(name))
-			folder = folderDAO.findRoot(tenantId);
-		else
-			folder = folderDAO.findByPathExtended(resourcePath + "/" + name, tenantId);
+		if (log.isDebugEnabled())
+			log.debug("Find DMS resource {} in path {}", name, resourcePath);
 
 		try {
+			Folder folder = null;
+			if ("/".equals(resourcePath.trim()) && "".equals(name))
+				folder = folderDAO.findRoot(tenantId);
+			else
+				folder = folderDAO.findByPathExtended(resourcePath + "/" + name, tenantId);
 			return marshallFolder(folder, userId, session);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -320,14 +320,19 @@ public class ResourceServiceImpl implements ResourceService {
 		Folder parentFolder;
 		try {
 			parentFolder = folderDAO.findById(Long.parseLong(parentResource.getID()));
-		} catch (PersistenceException e1) {
-			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e1);
+		} catch (PersistenceException e) {
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
 		String sid = null;
 		if (session != null)
 			sid = (String) session.getObject("sid");
 
-		long rootId = folderDAO.findRoot(parentFolder.getTenantId()).getId();
+		long rootId = 0;
+		try {
+			rootId = folderDAO.findRoot(parentFolder.getTenantId()).getId();
+		} catch (PersistenceException e) {
+			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
+		}
 
 		if (parentFolder.getId() == rootId)
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, "Cannot write in the root.");
@@ -693,14 +698,14 @@ public class ResourceServiceImpl implements ResourceService {
 	public void copyResource(Resource destinationResource, Resource resource, WebdavSession session)
 			throws DavException {
 		String sid = (String) session.getObject("sid");
+		long rootId = 0L;
 		User user = null;
 		try {
 			user = userDAO.findById(resource.getRequestedPerson());
+			rootId = folderDAO.findRoot(user.getTenantId()).getId();
 		} catch (PersistenceException e) {
 			throw new DavException(HttpServletResponse.SC_FORBIDDEN, e);
 		}
-
-		long rootId = folderDAO.findRoot(user.getTenantId()).getId();
 
 		/*
 		 * Cannot write in the root

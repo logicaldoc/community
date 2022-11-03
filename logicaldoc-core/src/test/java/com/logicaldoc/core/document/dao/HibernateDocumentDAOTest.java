@@ -453,7 +453,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindByPath() {
+	public void testFindByPath() throws PersistenceException {
 		Document doc = dao.findByPath("/Workspace X/folder6/pluto", 1L);
 		Assert.assertNotNull(doc);
 		Assert.assertEquals("pluto", doc.getFileName());

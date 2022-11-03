@@ -62,7 +62,7 @@ public class AbstractService {
 	 * @param sid The session identifier
 	 * @return the user in session
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 * @throws WebserviceException in case the webservices are not enabled
 	 * @throws AuthenticationException the given session is invalid
 	 */
@@ -101,7 +101,7 @@ public class AbstractService {
 	/**
 	 * Checks if the current user belongs to a group
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 * 
 	 * @throws WebserviceException the user is not member of group
 	 * 
@@ -118,7 +118,7 @@ public class AbstractService {
 	/**
 	 * Checks if the current user is an administrator (group admin).
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 * 
 	 * @throws WebserviceException the user is not member of admin
 	 */

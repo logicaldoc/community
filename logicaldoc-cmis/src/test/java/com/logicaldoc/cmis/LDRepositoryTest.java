@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
@@ -130,7 +131,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 	}	
 
 	@Test
-	public void testQuery() throws PluginLifecycleException {
+	public void testQuery() throws PluginLifecycleException, PersistenceException {
 		
 		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
 		assertNotNull(folder);
@@ -219,7 +220,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 	}
 		
 	@Test
-    public void testGetObjectInfo() {
+    public void testGetObjectInfo() throws PersistenceException {
     	
 		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
 		log.info(folder.getName());
@@ -240,7 +241,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
     }	
 
 	@Test
-    public void testUpdateProperties() {
+    public void testUpdateProperties() throws PersistenceException {
     	
 		Folder folder = fdao.findDefaultWorkspace(Tenant.DEFAULT_ID);
 		log.info(folder.getName());

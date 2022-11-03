@@ -501,11 +501,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		if (coll == null || coll.isEmpty())
 			return new ArrayList<>();
 		else
-			try {
-				return coll.stream().map(Folder::getId).collect(Collectors.toList());
-			} catch (NullPointerException e) {
-				return new ArrayList<>();
-			}
+			return coll.stream().map(Folder::getId).collect(Collectors.toList());
 	}
 
 	@Override
@@ -530,42 +526,33 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean isReadEnabled(long folderId, long userId) {
-		boolean result = true;
+	public boolean isReadEnabled(long folderId, long userId) throws PersistenceException {
+		User user = geExistingtUser(userId);
+		if (user.isMemberOf(Group.GROUP_ADMIN))
+			return true;
 
-		try {
-			User user = geExistingtUser(userId);
-			if (user.isMemberOf(Group.GROUP_ADMIN))
-				return true;
+		long id = folderId;
+		Folder folder = findById(folderId);
+		if (folder == null)
+			return false;
+		if (folder.getSecurityRef() != null)
+			id = folder.getSecurityRef().longValue();
 
-			long id = folderId;
-			Folder folder = findById(folderId);
-			if (folder == null)
-				return false;
-			if (folder.getSecurityRef() != null)
-				id = folder.getSecurityRef().longValue();
+		Set<Group> userGroups = user.getGroups();
+		if (userGroups.isEmpty())
+			return false;
 
-			Set<Group> userGroups = user.getGroups();
-			if (userGroups.isEmpty())
-				return false;
+		StringBuilder query = new StringBuilder(
+				SELECT_DISTINCT + ALIAS_ENTITY + ") " + FROM_FOLDER + ALIAS_ENTITY + "  ");
+		query.append(LEFT_JOIN + ALIAS_ENTITY + FOLDER_GROUPS_AS_GROUP);
+		query.append(WHERE_GROUP_GROUPID_IN);
+		query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
+		query.append(") " + AND + ALIAS_ENTITY + ".id = :id");
 
-			StringBuilder query = new StringBuilder(
-					SELECT_DISTINCT + ALIAS_ENTITY + ") " + FROM_FOLDER + ALIAS_ENTITY + "  ");
-			query.append(LEFT_JOIN + ALIAS_ENTITY + FOLDER_GROUPS_AS_GROUP);
-			query.append(WHERE_GROUP_GROUPID_IN);
-			query.append(userGroups.stream().map(g -> Long.toString(g.getId())).collect(Collectors.joining(",")));
-			query.append(") " + AND + ALIAS_ENTITY + ".id = :id");
-
-			Map<String, Object> params = new HashMap<>();
-			params.put("id", Long.valueOf(id));
-			List<FolderGroup> coll = findByQuery(query.toString(), params, null);
-			result = !coll.isEmpty();
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			result = false;
-		}
-
-		return result;
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", Long.valueOf(id));
+		List<FolderGroup> coll = findByQuery(query.toString(), params, null);
+		return !coll.isEmpty();
 	}
 
 	@Override
@@ -590,48 +577,43 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Folder> findByGroupId(long groupId) {
+	public List<Folder> findByGroupId(long groupId) throws PersistenceException {
 		List<Folder> coll = new ArrayList<>();
 
 		// The administrators can see all folders
 		if (groupId == Group.GROUPID_ADMIN)
 			return findAll();
 
-		try {
-			/*
-			 * Search for folders that define its own security policies
-			 */
-			StringBuilder query = new StringBuilder(
-					SELECT_DISTINCT + ALIAS_ENTITY + ") " + FROM_FOLDER + ALIAS_ENTITY + "  ");
-			query.append(LEFT_JOIN + ALIAS_ENTITY + FOLDER_GROUPS_AS_GROUP);
-			query.append(WHERE + ALIAS_ENTITY + ".deleted=0 and _group.groupId =" + groupId);
+		/*
+		 * Search for folders that define its own security policies
+		 */
+		StringBuilder query = new StringBuilder(
+				SELECT_DISTINCT + ALIAS_ENTITY + ") " + FROM_FOLDER + ALIAS_ENTITY + "  ");
+		query.append(LEFT_JOIN + ALIAS_ENTITY + FOLDER_GROUPS_AS_GROUP);
+		query.append(WHERE + ALIAS_ENTITY + ".deleted=0 and _group.groupId =" + groupId);
 
-			coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
+		coll = findByQuery(query.toString(), (Map<String, Object>) null, null);
 
-			/*
-			 * Now search for all other folders that references the previous
-			 * ones
-			 */
-			if (!coll.isEmpty()) {
-				StringBuilder query2 = new StringBuilder(
-						SELECT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + WHERE + ALIAS_ENTITY + ".deleted=0 ");
-				query2.append(AND + ALIAS_ENTITY + SECURITY_REF_IN);
-				boolean first = true;
-				for (Folder folder : coll) {
-					if (!first)
-						query2.append(",");
-					query2.append(Long.toString(folder.getId()));
-					first = false;
-				}
-				query2.append(")");
-				List<Folder> coll2 = findByQuery(query2.toString(), (Map<String, Object>) null, null);
-				for (Folder folder : coll2) {
-					if (!coll.contains(folder))
-						coll.add(folder);
-				}
+		/*
+		 * Now search for all other folders that references the previous ones
+		 */
+		if (!coll.isEmpty()) {
+			StringBuilder query2 = new StringBuilder(
+					SELECT + ALIAS_ENTITY + FROM_FOLDER + ALIAS_ENTITY + WHERE + ALIAS_ENTITY + ".deleted=0 ");
+			query2.append(AND + ALIAS_ENTITY + SECURITY_REF_IN);
+			boolean first = true;
+			for (Folder folder : coll) {
+				if (!first)
+					query2.append(",");
+				query2.append(Long.toString(folder.getId()));
+				first = false;
 			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			query2.append(")");
+			List<Folder> coll2 = findByQuery(query2.toString(), (Map<String, Object>) null, null);
+			for (Folder folder : coll2) {
+				if (!coll.contains(folder))
+					coll.add(folder);
+			}
 		}
 
 		return coll;
@@ -686,12 +668,13 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public List<Folder> findByName(String name, Long tenantId) {
+	public List<Folder> findByName(String name, Long tenantId) throws PersistenceException {
 		return findByName(null, name, tenantId, true);
 	}
 
 	@Override
-	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive) {
+	public List<Folder> findByName(Folder parent, String name, Long tenantId, boolean caseSensitive)
+			throws PersistenceException {
 		StringBuilder query = null;
 		if (caseSensitive)
 			query = new StringBuilder(ALIAS_ENTITY + ".name like '" + SqlUtil.doubleQuotes(name) + "' ");
@@ -707,12 +690,8 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 		if (tenantId != null)
 			query.append(AND + ALIAS_ENTITY + ".tenantId = " + tenantId);
-		try {
-			return findByWhere(query.toString(), null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+
+		return findByWhere(query.toString(), null, null);
 	}
 
 	@Override
@@ -784,7 +763,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	 * @param folder the folder to persist
 	 * @param transaction informations about the session
 	 * 
-	 * @throws PersistenceException database error
+	 * PersistenceException error at data layer
 	 */
 	@Override
 	public void saveFolderHistory(Folder folder, FolderHistory transaction) throws PersistenceException {
@@ -867,14 +846,9 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public List<Folder> findByNameAndParentId(String name, long parentId) {
-		try {
-			return findByWhere(ALIAS_ENTITY + PARENTID_EQUAL + parentId + AND + ALIAS_ENTITY + ".name like '"
-					+ SqlUtil.doubleQuotes(name) + "'", null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+	public List<Folder> findByNameAndParentId(String name, long parentId) throws PersistenceException {
+		return findByWhere(ALIAS_ENTITY + PARENTID_EQUAL + parentId + AND + ALIAS_ENTITY + ".name like '"
+				+ SqlUtil.doubleQuotes(name) + "'", null, null);
 	}
 
 	@Override
@@ -1032,94 +1006,88 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Collection<Long> findFolderIdByUserIdInPath(long userId, Long parentId) {
+	public Collection<Long> findFolderIdByUserIdInPath(long userId, Long parentId) throws PersistenceException {
 		/*
 		 * Important: use an HashSet because of extremely quick in existence
 		 * checks.
 		 */
 		Set<Long> ids = new HashSet<>();
 
-		try {
-			User user = geExistingtUser(userId);
+		User user = geExistingtUser(userId);
 
-			// The administrators have all permissions on all folders
-			if (user.isMemberOf(Group.GROUP_ADMIN) && parentId != null)
-				return findFolderIdInPath(parentId, false);
+		// The administrators have all permissions on all folders
+		if (user.isMemberOf(Group.GROUP_ADMIN) && parentId != null)
+			return findFolderIdInPath(parentId, false);
 
-			/*
-			 * Check folders that specify their own permissions. Here we cannot
-			 * restrict to the tree since a folder in the tree can reference
-			 * another folder outside.
-			 */
-			StringBuilder query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_foldergroup A where 1=1 ");
+		/*
+		 * Check folders that specify their own permissions. Here we cannot
+		 * restrict to the tree since a folder in the tree can reference another
+		 * folder outside.
+		 */
+		StringBuilder query1 = new StringBuilder("select distinct(A.ld_folderid) from ld_foldergroup A where 1=1 ");
 
-			List<Long> groupIds = user.getUserGroups().stream().map(UserGroup::getGroupId).collect(Collectors.toList());
-			if (!groupIds.isEmpty()) {
-				query1.append(AND_LDGROUPID_IN);
-				query1.append(StringUtil.arrayToString(groupIds.toArray(new Long[0]), ","));
-				query1.append(") ");
-			}
-
-			List<Long> masterIds = queryForList(query1.toString(), Long.class);
-			if (masterIds.isEmpty())
-				return ids;
-
-			/*
-			 * Now search for those folders that are or reference the masterIds
-			 */
-			StringBuilder query2 = new StringBuilder("select B.ld_id from ld_folder B where B.ld_deleted=0 and ( ");
-			if (isOracle()) {
-				/*
-				 * In Oracle The limit of 1000 elements applies to sets of
-				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
-				 * if the sets contain two or more items: (x, 0) IN ((1,0),
-				 * (2,0), (3,0), ...):
-				 */
-				query2.append("(B.ld_id,0) in ( ");
-				query2.append(masterIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
-				query2.append(" ) ");
-			} else {
-				query2.append(" B.ld_id in " + masterIds.toString().replace('[', '(').replace(']', ')'));
-			}
-
-			query2.append(" or ");
-			if (isOracle()) {
-				/*
-				 * In Oracle The limit of 1000 elements applies to sets of
-				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
-				 * if the sets contain two or more items: (x, 0) IN ((1,0),
-				 * (2,0), (3,0), ...):
-				 */
-				query2.append(" (B.ld_securityref,0) in ( ");
-				query2.append(masterIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
-				query2.append(" ) ");
-			} else {
-				query2.append(" B.ld_securityref in " + masterIds.toString().replace('[', '(').replace(']', ')'));
-			}
-			query2.append(" ) ");
-
-			if (parentId != null) {
-				query2.append(AND);
-				Set<Long> folderIds = findFolderIdInPath(parentId, false);
-				if (isOracle()) {
-					/*
-					 * In Oracle The limit of 1000 elements applies to sets of
-					 * single items: (x) IN ((1), (2), (3), ...). There is no
-					 * limit if the sets contain two or more items: (x, 0) IN
-					 * ((1,0), (2,0), (3,0), ...):
-					 */
-					query2.append("( (B.ld_id,0) in ( ");
-					query2.append(folderIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
-					query2.append(" ) )");
-				} else {
-					query2.append("  B.ld_id in " + folderIds.toString().replace('[', '(').replace(']', ')'));
-				}
-			}
-
-			ids.addAll(queryForList(query2.toString(), Long.class));
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
+		List<Long> groupIds = user.getUserGroups().stream().map(UserGroup::getGroupId).collect(Collectors.toList());
+		if (!groupIds.isEmpty()) {
+			query1.append(AND_LDGROUPID_IN);
+			query1.append(StringUtil.arrayToString(groupIds.toArray(new Long[0]), ","));
+			query1.append(") ");
 		}
+
+		List<Long> masterIds = queryForList(query1.toString(), Long.class);
+		if (masterIds.isEmpty())
+			return ids;
+
+		/*
+		 * Now search for those folders that are or reference the masterIds
+		 */
+		StringBuilder query2 = new StringBuilder("select B.ld_id from ld_folder B where B.ld_deleted=0 and ( ");
+		if (isOracle()) {
+			/*
+			 * In Oracle The limit of 1000 elements applies to sets of single
+			 * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
+			 * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
+			 */
+			query2.append("(B.ld_id,0) in ( ");
+			query2.append(masterIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+			query2.append(" ) ");
+		} else {
+			query2.append(" B.ld_id in " + masterIds.toString().replace('[', '(').replace(']', ')'));
+		}
+
+		query2.append(" or ");
+		if (isOracle()) {
+			/*
+			 * In Oracle The limit of 1000 elements applies to sets of single
+			 * items: (x) IN ((1), (2), (3), ...). There is no limit if the sets
+			 * contain two or more items: (x, 0) IN ((1,0), (2,0), (3,0), ...):
+			 */
+			query2.append(" (B.ld_securityref,0) in ( ");
+			query2.append(masterIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+			query2.append(" ) ");
+		} else {
+			query2.append(" B.ld_securityref in " + masterIds.toString().replace('[', '(').replace(']', ')'));
+		}
+		query2.append(" ) ");
+
+		if (parentId != null) {
+			query2.append(AND);
+			Set<Long> folderIds = findFolderIdInPath(parentId, false);
+			if (isOracle()) {
+				/*
+				 * In Oracle The limit of 1000 elements applies to sets of
+				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
+				 * if the sets contain two or more items: (x, 0) IN ((1,0),
+				 * (2,0), (3,0), ...):
+				 */
+				query2.append("( (B.ld_id,0) in ( ");
+				query2.append(folderIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+				query2.append(" ) )");
+			} else {
+				query2.append("  B.ld_id in " + folderIds.toString().replace('[', '(').replace(']', ')'));
+			}
+		}
+
+		ids.addAll(queryForList(query2.toString(), Long.class));
 
 		return ids;
 	}
@@ -1538,7 +1506,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public Folder findByPathExtended(String pathExtended, long tenantId) {
+	public Folder findByPathExtended(String pathExtended, long tenantId) throws PersistenceException {
 		if (StringUtils.isEmpty(pathExtended))
 			return null;
 
@@ -1559,21 +1527,13 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@SuppressWarnings("unchecked")
-	private void setUniqueName(Folder folder) {
-		int counter = 1;
-
+	private void setUniqueName(Folder folder) throws PersistenceException {
 		String folderName = folder.getName();
+		List<String> collisions = queryForList("select ld_name from ld_folder where ld_deleted=0 and ld_parentid="
+				+ folder.getParentId() + " and ld_name like'" + SqlUtil.doubleQuotes(folderName) + "%' and not ld_id="
+				+ folder.getId(), String.class);
 
-		List<String> collisions = new ArrayList<>();
-
-		try {
-			collisions = queryForList("select ld_name from ld_folder where ld_deleted=0 and ld_parentid="
-					+ folder.getParentId() + " and ld_name like'" + SqlUtil.doubleQuotes(folderName)
-					+ "%' and not ld_id=" + folder.getId(), String.class);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-
+		int counter = 1;
 		while (collisions.contains(folder.getName()))
 			folder.setName(folderName + "(" + (counter++) + ")");
 	}
@@ -1938,7 +1898,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public List<Folder> find(String name, Long tenantId) {
+	public List<Folder> find(String name, Long tenantId) throws PersistenceException {
 		return findByName(null, "%" + name + "%", tenantId, false);
 	}
 
@@ -1963,20 +1923,15 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public List<Folder> findWorkspaces(long tenantId) {
+	public List<Folder> findWorkspaces(long tenantId) throws PersistenceException {
 		Folder root = findRoot(tenantId);
 		if (root == null)
 			return new ArrayList<>();
 		long rootId = root.getId();
 
-		try {
-			return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + ") " + AND + ALIAS_ENTITY + PARENTID_EQUAL
-					+ rootId + AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE + AND + ALIAS_ENTITY
-					+ TENANT_ID_EQUAL + tenantId, "order by lower(" + ALIAS_ENTITY + ".name)", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<>();
-		}
+		return findByWhere(" (not " + ALIAS_ENTITY + ".id=" + rootId + ") " + AND + ALIAS_ENTITY + PARENTID_EQUAL
+				+ rootId + AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE + AND + ALIAS_ENTITY + TENANT_ID_EQUAL
+				+ tenantId, "order by lower(" + ALIAS_ENTITY + ".name)", null);
 	}
 
 	@Override
@@ -2027,7 +1982,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public Folder findRoot(long tenantId) {
+	public Folder findRoot(long tenantId) throws PersistenceException {
 		List<Folder> folders = findByName(SLASH, tenantId);
 		if (!folders.isEmpty())
 			return folders.get(0);
@@ -2035,22 +1990,16 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 	}
 
 	@Override
-	public Folder findDefaultWorkspace(long tenantId) {
+	public Folder findDefaultWorkspace(long tenantId) throws PersistenceException {
 		Folder root = findRoot(tenantId);
 		if (root == null)
 			return null;
 
-		List<Folder> workspaces = new ArrayList<>();
-
-		try {
-			workspaces = findByWhere(
+		List<Folder> workspaces = findByWhere(
 					ALIAS_ENTITY + PARENTID_EQUAL + root.getId() + AND + ALIAS_ENTITY + ".name = '"
 							+ SqlUtil.doubleQuotes(Folder.DEFAULTWORKSPACENAME) + "' and " + ALIAS_ENTITY
 							+ TENANT_ID_EQUAL + tenantId + AND + ALIAS_ENTITY + ".type=" + Folder.TYPE_WORKSPACE,
 					null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
 
 		if (workspaces.isEmpty())
 			return null;

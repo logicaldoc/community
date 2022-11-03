@@ -22,7 +22,7 @@ public interface DocumentNoteDAO extends PersistentObjectDAO<DocumentNote> {
 	 * @param note the note
 	 * @param transaction session informations
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void store(DocumentNote note, DocumentHistory transaction) throws PersistenceException;
 

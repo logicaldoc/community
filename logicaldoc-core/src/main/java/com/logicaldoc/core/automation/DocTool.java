@@ -478,14 +478,14 @@ public class DocTool {
 	 * @param fileVersion The file version
 	 * @param suffix The suffix
 	 * 
-	 * @returns the file content as string 
+	 * @returns the file content as string
 	 */
 	public String readAsString(long docId, String fileVersion, String suffix) {
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
 		String resource = storer.getResourceName(docId, fileVersion, suffix);
 		return storer.getString(docId, resource);
 	}
-	
+
 	/**
 	 * Writes a resource in a file in the local file system
 	 * 
@@ -612,8 +612,12 @@ public class DocTool {
 	 */
 	public Document findByPath(String path, Long tenantId) {
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		Document doc = docDao.findByPath(path, tenantId != null ? tenantId : Tenant.DEFAULT_ID);
-		return doc;
+		try {
+			return docDao.findByPath(path, tenantId != null ? tenantId : Tenant.DEFAULT_ID);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
@@ -830,9 +834,10 @@ public class DocTool {
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		return manager.countPages(document);
 	}
-	
+
 	/**
-	 * Extracts the texts from a document, using the same analyzer used for the full-text processing.
+	 * Extracts the texts from a document, using the same analyzer used for the
+	 * full-text processing.
 	 * 
 	 * @param document The document to elaborate
 	 * @param fileVersion Optional file version to consier

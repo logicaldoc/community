@@ -32,7 +32,7 @@ public interface DocumentManager {
 	 * @param transaction entry to log the event, set the user and comment
 	 * 
 	 * @throws IOException I/O error
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public void checkin(long docId, InputStream fileInputStream, String filename, boolean release,
 			AbstractDocument docVO, DocumentHistory transaction) throws IOException, PersistenceException;
@@ -49,7 +49,7 @@ public interface DocumentManager {
 	 *        during the checkin (optional)
 	 * @param transaction entry to log the event, set the user and comment
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public void checkin(long docId, File file, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws PersistenceException;
@@ -60,7 +60,7 @@ public interface DocumentManager {
 	 * @param docId the document to be checked out
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public void checkout(long docId, DocumentHistory transaction) throws PersistenceException;
 
@@ -73,7 +73,7 @@ public interface DocumentManager {
 	 * @param transaction entry to log the event (set the user)
 	 * 
 	 * @throws IOException I/O error
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public void replaceFile(long docId, String fileVersion, File newFile, DocumentHistory transaction)
 			throws PersistenceException, IOException;
@@ -86,7 +86,7 @@ public interface DocumentManager {
 	 * @param newFile the file to use
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
 	public void replaceFile(long docId, String fileVersion, InputStream newFile, DocumentHistory transaction)
@@ -101,7 +101,7 @@ public interface DocumentManager {
 	 * @param version the version
 	 * @param transaction entry to log the event (set the user)
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
 	public void promoteVersion(long docId, String version, DocumentHistory transaction) throws PersistenceException, IOException;
@@ -166,7 +166,7 @@ public interface DocumentManager {
 	 * 
 	 * @return the number of milliseconds required to parse the document
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 * @throws ParseException error during parsing
 	 */
 	public long reindex(long docId, String content, DocumentHistory transaction) throws PersistenceException, ParseException;
@@ -257,7 +257,7 @@ public interface DocumentManager {
 	 * @param transaction entry to log the event (set the user)
 	 * @return The created document
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
 	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction) throws PersistenceException, IOException;
@@ -274,7 +274,7 @@ public interface DocumentManager {
 	 * 
 	 * @return The created document
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public Document createAlias(Document doc, Folder folder, String type, DocumentHistory transaction) throws PersistenceException;
 
@@ -380,7 +380,7 @@ public interface DocumentManager {
 	 * 
 	 * @return number of moved files
 	 * 
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 * @throws IOException I/O error
 	 */
 	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws PersistenceException, IOException;
@@ -396,7 +396,7 @@ public interface DocumentManager {
 	 * @return the generated merged document
 	 * 
 	 * @throws IOException I/O error
-	 * @throws PersistenceException error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public Document merge(Collection<Document> documents, long targetFolderId, String fileName,
 			DocumentHistory transaction) throws IOException, PersistenceException;

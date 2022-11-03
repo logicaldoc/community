@@ -46,7 +46,7 @@ public interface SecurityManager {
 	 * 
 	 * @return if the user has the write permission on the document
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error at data layer 
 	 */
 	public boolean isWriteEnabled(long docId, long userId) throws PersistenceException;
 
@@ -66,7 +66,7 @@ public interface SecurityManager {
 	 * 
 	 * @return if the permission is granted to the user on the document
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error at data layer 
 	 */
 	public boolean isPermissionEnabled(Permission permission, long docId, long userId) throws PersistenceException;
 
@@ -78,7 +78,7 @@ public interface SecurityManager {
 	 * 
 	 * @return Collection of permissions granted to the user on the document
 	 * 
-	 * @throws PersistenceException error in the database 
+	 * @throws PersistenceException error at data layer 
 	 */
 	public Set<Permission> getEnabledPermissions(long docId, long userId) throws PersistenceException;
 }

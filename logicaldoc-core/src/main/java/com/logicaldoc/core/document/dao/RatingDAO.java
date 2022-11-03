@@ -21,7 +21,7 @@ public interface RatingDAO extends PersistentObjectDAO<Rating> {
 	 * @param rating the rating
 	 * @param transaction session informations
 	 * 
-	 * @throws PersistenceException raised in case of database errors
+	 * @throws PersistenceException error at data layer
 	 */
 	public void store(Rating rating, DocumentHistory transaction) throws PersistenceException;
 

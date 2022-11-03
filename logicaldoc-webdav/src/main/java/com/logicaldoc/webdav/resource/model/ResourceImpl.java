@@ -205,59 +205,72 @@ public class ResourceImpl implements Resource {
 		return this.comment;
 	}
 
+	@Override
 	public void setCreationDate(Date creation) {
 		this.creationDate = creation;
 	}
 
+	@Override
 	public Date getCreationDate() {
 		return this.creationDate;
 	}
 
+	@Override
 	public boolean isDeleteEnabled() {
 		initPermissions();
 		return this.deleteEnabled;
 	}
 
+	@Override
 	public boolean isMoveEnabled() {
 		initPermissions();
 		return this.moveEnabled;
 	}
 
+	@Override
 	public boolean isRenameEnabled() {
 		initPermissions();
 		return this.renameEnabled;
 	}
 
+	@Override
 	public void setDeleteEnabled(boolean deleteEnabled) {
 		this.deleteEnabled = deleteEnabled;
 	}
 
+	@Override
 	public void setRenameEnabled(boolean renameEnabled) {
 		this.renameEnabled = renameEnabled;
 	}
 
+	@Override
 	public boolean isWriteEnabled() {
 		initPermissions();
 		return writeEnabled;
 	}
 
+	@Override
 	public void setWriteEnabled(boolean writeEnabled) {
 		this.writeEnabled = writeEnabled;
 	}
 
+	@Override
 	public boolean isAddChildEnabled() {
 		initPermissions();
 		return this.addChildEnabled;
 	}
 
+	@Override
 	public void setAddChildEnabled(boolean addChildEnabled) {
 		this.addChildEnabled = addChildEnabled;
 	}
 
+	@Override
 	public WebdavSession getSession() {
 		return session;
 	}
 
+	@Override
 	public void setSession(WebdavSession session) {
 		this.session = session;
 	}
@@ -287,7 +300,13 @@ public class ResourceImpl implements Resource {
 		}
 		isWorkspace = folder.getType() == Folder.TYPE_WORKSPACE;
 
-		long rootId = fdao.findRoot(folder.getTenantId()).getId();
+		long rootId = 0;
+		try {
+			rootId = fdao.findRoot(folder.getTenantId()).getId();
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return;
+		}
 
 		if (fid == rootId) {
 			writeEnabled = false;

@@ -78,7 +78,7 @@ public class FolderTool {
 	 * @param folderId identifier of the folder
 	 * 
 	 * @return the path
-	 * @throws PersistenceException error at database level 
+	 * @throws PersistenceException error at database level
 	 */
 	public String getPath(Long folderId) throws PersistenceException {
 		if (folderId == null)
@@ -108,7 +108,12 @@ public class FolderTool {
 	 */
 	public Folder findByPath(String path, Long tenantId) {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-		return folderDao.findByPathExtended(path, tenantId != null ? tenantId : Tenant.DEFAULT_ID);
+		try {
+			return folderDao.findByPathExtended(path, tenantId != null ? tenantId : Tenant.DEFAULT_ID);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 
 	/**
