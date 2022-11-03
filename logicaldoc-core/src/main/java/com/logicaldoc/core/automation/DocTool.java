@@ -31,6 +31,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.parser.ParseException;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.TenantDAO;
@@ -471,6 +472,21 @@ public class DocTool {
 	}
 
 	/**
+	 * Gets the content of a resource and stores it as a string
+	 * 
+	 * @param docId The document's identifier
+	 * @param fileVersion The file version
+	 * @param suffix The suffix
+	 * 
+	 * @returns the file content as string 
+	 */
+	public String readAsString(long docId, String fileVersion, String suffix) {
+		Storer storer = (Storer) Context.get().getBean(Storer.class);
+		String resource = storer.getResourceName(docId, fileVersion, suffix);
+		return storer.getString(docId, resource);
+	}
+	
+	/**
 	 * Writes a resource in a file in the local file system
 	 * 
 	 * @param docId The document's identifier
@@ -813,5 +829,23 @@ public class DocTool {
 	public int countPages(Document document) {
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		return manager.countPages(document);
+	}
+	
+	/**
+	 * Extracts the texts from a document, using the same analyzer used for the full-text processing.
+	 * 
+	 * @param document The document to elaborate
+	 * @param fileVersion Optional file version to consier
+	 * 
+	 * @return the extracted texts
+	 */
+	public String parse(Document document, String fileVersion) {
+		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		try {
+			return manager.parseDocument(document, fileVersion);
+		} catch (ParseException e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
 	}
 }
