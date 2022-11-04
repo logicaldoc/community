@@ -1076,7 +1076,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 				StringBuilder query = new StringBuilder("select ld_id from ld_folder where ld_deleted=0 ");
 				query.append(" and (ld_id=" + parentId);
 				query.append(" or ld_parentid=" + parentId);
-				query.append(" ) ");
+				query.append(") ");
 				return queryForList(query.toString(), Long.class);
 			}
 		}
@@ -1166,9 +1166,12 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			deleteHistory.setEvent(FolderEvent.DELETED.toString());
 			deleteHistory.setFolderId(folder.getId());
 			deleteHistory.setPath(computePathExtended(folder.getId()));
-			delete(folder.getId(), code, deleteHistory);
+			try {
+				delete(folder.getId(), code, deleteHistory);
+			} catch (PersistenceException e) {
+				log.warn("Error deleting folder " + folder.getId() + ", it may be normal", e);
+			}
 		}
-
 	}
 
 	private void checkIfCanDelete(long folderId) throws PersistenceException {
@@ -2183,14 +2186,14 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 			store(folder, tr);
 			flush();
 
-			applyGridToTree(folder.getId(), transaction);
+			applyStorageToTree(folder.getId(), transaction);
 		}
 	}
 
 	@Override
 	public void applyOCRToTree(long id, FolderHistory transaction) throws PersistenceException {
 		Folder parent = getExistingFolder(id);
-
+		
 		transaction.setEvent(FolderEvent.CHANGED.toString());
 		transaction.setTenantId(parent.getTenantId());
 		transaction.setNotifyEvent(false);
@@ -2207,7 +2210,7 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 			store(folder, tr);
 			flush();
-
+			
 			applyOCRToTree(folder.getId(), transaction);
 		}
 	}
@@ -2226,48 +2229,46 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 		}
 	}
 
-	public List<Long> findFolderIdByUserIdAndTag(long userId, String tag) {
+	private List<Long> findFolderIdByUserIdAndTag(long userId, String tag) throws PersistenceException {
 		List<Long> ids = new ArrayList<>();
 
-		try {
-			User user = getExistingtUser(userId);
+		User user = getExistingtUser(userId);
 
-			StringBuilder query = new StringBuilder();
+		StringBuilder query = new StringBuilder();
 
-			if (user.isMemberOf(Group.GROUP_ADMIN)) {
-				ids = findFolderIdByTag(tag);
-			} else {
+		if (user.isMemberOf(Group.GROUP_ADMIN)) {
+			ids = findFolderIdByTag(tag);
+		} else {
 
+			/*
+			 * Search for all accessible folders
+			 */
+			Collection<Long> accessibleIds = findFolderIdByUserId(userId, null, true);
+
+			query.append("select distinct(C.ld_id) from ld_folder C, ld_foldertag D "
+					+ " where C.ld_id=D.ld_folderid AND C.ld_deleted=0 ");
+
+			if (isOracle()) {
 				/*
-				 * Search for all accessible folders
+				 * In Oracle The limit of 1000 elements applies to sets of
+				 * single items: (x) IN ((1), (2), (3), ...). There is no limit
+				 * if the sets contain two or more items: (x, 0) IN ((1,0),
+				 * (2,0), (3,0), ...):
 				 */
-				Collection<Long> precoll = findFolderIdByUserId(userId, null, true);
-
-				query.append("select distinct(C.ld_id) from ld_folder C, ld_foldertag D "
-						+ " where C.ld_id=D.ld_folderid AND C.ld_deleted=0 ");
-
-				if (isOracle()) {
-					/*
-					 * In Oracle The limit of 1000 elements applies to sets of
-					 * single items: (x) IN ((1), (2), (3), ...). There is no
-					 * limit if the sets contain two or more items: (x, 0) IN
-					 * ((1,0), (2,0), (3,0), ...):
-					 */
-					query.append(" and (C.ld_folderid,0) in ( ");
-					query.append(precoll.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
-					query.append(" ) ");
-				} else {
-					query.append(" and C.ld_folderid in " + precoll.toString().replace('[', '(').replace(']', ')'));
-				}
-
-				query.append(" AND D.ld_tag='" + SqlUtil.doubleQuotes(tag.toLowerCase()) + "' ");
-
-				@SuppressWarnings("unchecked")
-				List<Long> docIds = queryForList(query.toString(), Long.class);
-				ids.addAll(docIds);
+				query.append(" and (C.ld_id,0) in ( ");
+				query.append(accessibleIds.stream().map(id -> ("(" + id + ",0)")).collect(Collectors.joining(",")));
+				query.append(") ");
+			} else {
+				query.append(" and C.ld_id in (");
+				query.append(accessibleIds.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")));
+				query.append(") ");
 			}
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
+
+			query.append(" AND D.ld_tag = '" + SqlUtil.doubleQuotes(tag) + "' ");
+
+			@SuppressWarnings("unchecked")
+			List<Long> folderIds = queryForList(query.toString(), Long.class);
+			ids.addAll(folderIds);
 		}
 
 		return ids;
@@ -2275,29 +2276,21 @@ public class HibernateFolderDAO extends HibernatePersistentObjectDAO<Folder> imp
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Folder> findByUserIdAndTag(long userId, String tag, Integer max) {
+	public List<Folder> findByUserIdAndTag(long userId, String tag, Integer max) throws PersistenceException {
 		List<Folder> coll = new ArrayList<>();
 
 		Collection<Long> ids = findFolderIdByUserIdAndTag(userId, tag);
-		StringBuilder buf = new StringBuilder();
-		if (!ids.isEmpty()) {
-			boolean first = true;
-			for (Long id : ids) {
-				if (!first)
-					buf.append(",");
-				buf.append(id);
-				first = false;
-			}
+		if (ids.isEmpty())
+			return coll;
 
-			StringBuilder query = new StringBuilder("select A from Folder A where A.id in (");
-			query.append(buf);
-			query.append(")");
+		StringBuilder query = new StringBuilder("select A from Folder A where A.id in (");
+		query.append(ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(",")));
+		query.append(")");
 
-			try {
-				coll = findByQuery(query.toString(), (Map<String, Object>) null, max);
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
+		try {
+			coll = findByQuery(query.toString(), (Map<String, Object>) null, max);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 		return coll;
 	}

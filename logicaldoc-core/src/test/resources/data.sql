@@ -167,8 +167,8 @@ insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_t
 values (8,CURRENT_TIMESTAMP,1,'folder8',7,0,0,3,1,1,4,0);
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (1200,CURRENT_TIMESTAMP,0,'test',5,0,0,1,1,4,0,'/1200');
-insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation,ld_description,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
-values (1201,CURRENT_TIMESTAMP,0,'ABC',1200,0,'2012-01-08 00:00:00','test description',0,1,1,5,0,'/1200/1201');
+insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_creation,ld_description,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_templateid,ld_path)
+values (1201,CURRENT_TIMESTAMP,0,'ABC',1200,0,'2012-01-08 00:00:00','test description',0,1,1,5,0,1,'/1200/1201');
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templateid,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (1202,CURRENT_TIMESTAMP,0,'xyz',1201,0,1,0,1,1,6,0,'/1200/1201/1002');
 insert into ld_folder_ext (ld_folderid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple)
@@ -192,6 +192,7 @@ values (1201,4,1,1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,1,0,0);
 
 insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1200, 1, 'ftag1');
 insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1200, 1, 'ftag2');
+insert into ld_foldertag(ld_folderid, ld_tenantid, ld_tag) values (1201, 1, 'ftag3');
 
 insert into ld_document
            (ld_id,ld_folderid,ld_lastmodified,ld_deleted,ld_immutable,ld_customid,ld_version,ld_fileversion,ld_date,ld_creation,ld_publisher,ld_publisherid,ld_status,ld_type,ld_lockuserid,ld_language,ld_filename,ld_filesize,ld_indexed,ld_signed,ld_creator,ld_creatorid,ld_exportstatus,ld_barcoded,ld_published,ld_tenantid,ld_recordversion,ld_pages,ld_stamped,ld_nature,ld_digest,ld_links,ld_ocrd,ld_previewpages)

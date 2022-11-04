@@ -96,8 +96,10 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param max Optional, defines the maximum records number
 	 * 
 	 * @return Collection of found folders
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Folder> findByUserIdAndTag(long userId, String tag, Integer max);
+	public List<Folder> findByUserIdAndTag(long userId, String tag, Integer max) throws PersistenceException;
 
 	/**
 	 * Finds all folders ids with a specific permission enabled on the specifies

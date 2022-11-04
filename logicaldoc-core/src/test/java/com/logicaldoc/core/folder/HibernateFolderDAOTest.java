@@ -26,6 +26,7 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.util.Context;
 
 import junit.framework.Assert;
 
@@ -172,10 +173,36 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		User user = new User();
 		user.setUsername("admin");
 		user.setId(1);
-		FolderHistory history = new FolderHistory();
-		history.setUser(user);
-		dao.deleteTree(1200L, PersistentObject.DELETED_CODE_DEFAULT, history);
+		FolderHistory transaction = new FolderHistory();
+		transaction.setUser(user);
+		dao.deleteTree(1200L, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 		Assert.assertNull(dao.findById(1200));
+		
+		boolean runOk=false;
+		try {
+			dao.deleteTree(null,1, new FolderHistory(transaction));
+			runOk=true;
+		}catch(PersistenceException e) {
+			Assert.assertEquals("No folder was specified", e.getMessage());
+		}
+		
+		Assert.assertFalse(runOk);
+		
+		runOk=false;
+		try {
+			dao.deleteTree(dao.findById(1200), 0, new FolderHistory(transaction));
+			runOk=true;
+		}catch(PersistenceException e) {
+			Assert.assertEquals("Deletion code cannot be 0", e.getMessage());
+		}
+		Assert.assertFalse(runOk);
+		
+		
+		// Delete an alias
+		Folder alias = dao.createAlias(4L, 6, new FolderHistory(transaction));
+		Assert.assertNotNull(alias);
+		dao.deleteTree(alias, 1, new FolderHistory(transaction));
+		Assert.assertNull(dao.findById(alias.getId()));
 	}
 
 	@Test
@@ -663,6 +690,24 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
+	public void testDeleteAll() throws PersistenceException {
+		List<Folder> folders = dao.findByParentId(1200);
+		Assert.assertEquals(2, folders.size());
+
+		User user = userDao.findByUsername("admin");
+
+		FolderHistory transaction = new FolderHistory();
+		transaction.setNotified(0);
+		transaction.setComment("");
+		transaction.setUser(user);
+
+		dao.deleteAll(folders, 1, transaction);
+
+		folders = dao.findByParentId(1200);
+		Assert.assertTrue(folders.isEmpty());
+	}
+
+	@Test
 	public void testFindById() throws PersistenceException {
 		// Try with a folder id
 		Folder folder = dao.findById(Folder.ROOTID);
@@ -960,11 +1005,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Collection<Long> ids = dao.findFolderIdByUserIdInPath(1, Long.valueOf(1200));
 		Assert.assertEquals(3, ids.size());
 		Assert.assertTrue(ids.contains(1201L));
-		
+
 		ids = dao.findFolderIdByUserIdInPath(4, Long.valueOf(1200));
 		Assert.assertEquals(1, ids.size());
 		Assert.assertTrue(ids.contains(1201L));
-		
+
 		ids = dao.findFolderIdByUserIdInPath(4, Long.valueOf(1202));
 		Assert.assertTrue(ids.isEmpty());
 
@@ -1083,6 +1128,18 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		ids = dao.findFolderIdByUserIdAndPermission(3, Permission.WRITE, null, true);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(3, ids.size());
+
+		ids = dao.findFolderIdByUserIdAndPermission(4, Permission.WRITE, 1200L, true);
+		Assert.assertNotNull(ids);
+		Assert.assertEquals(1, ids.size());
+
+		ids = dao.findFolderIdByUserIdAndPermission(User.USERID_ADMIN, Permission.WRITE, 1200L, true);
+		Assert.assertNotNull(ids);
+		Assert.assertEquals(3, ids.size());
+
+		ids = dao.findFolderIdByUserIdAndPermission(User.USERID_ADMIN, Permission.WRITE, 1200L, false);
+		Assert.assertNotNull(ids);
+		Assert.assertEquals(2, ids.size());
 	}
 
 	@Test
@@ -1095,6 +1152,10 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		List<Folder> ids = dao.findByUserIdAndTag(1L, "xyz", null);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(1, ids.size());
+
+		ids = dao.findByUserIdAndTag(4L, "ftag3", null);
+		Assert.assertEquals(1, ids.size());
+		Assert.assertTrue(ids.contains(dao.findById(1201)));
 	}
 
 	@Test
@@ -1175,7 +1236,8 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 		folder = dao.findById(1201);
 		dao.initialize(folder);
-		Assert.assertTrue(folder.getTags().isEmpty());
+		Assert.assertEquals(1, folder.getTags().size());
+		Assert.assertTrue(folder.getTagsAsWords().contains("ftag3"));
 
 		dao.applyTagsToTree(1200L, transaction);
 		dao.findById(1201);
@@ -1226,7 +1288,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		dao.initialize(folder);
 		Assert.assertNull(folder.getTemplate());
 		folder = dao.findById(1201);
-		Assert.assertNull(folder.getTemplate());
+		Assert.assertEquals(1L, folder.getTemplate().getId());
 		folder = dao.findById(1202);
 		Assert.assertNotNull(folder.getTemplate());
 
@@ -1412,5 +1474,85 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertTrue(folder == null || folder.getDeleted() != 0);
 
 		docDao.findByPath("/Default/Target/Pollo/DEF/doc4.txt", 1L);
+	}
+
+	@Test
+	public void testApplyGridToTree() throws PersistenceException {
+		Folder folder = dao.findById(1200);
+		dao.initialize(folder);
+		Assert.assertNull(folder.getGrid());
+		folder.setGrid("xyz");
+		dao.store(folder);
+		folder = dao.findById(1200);
+		Assert.assertEquals("xyz", folder.getGrid());
+
+		folder = dao.findById(1201);
+		Assert.assertNull(folder.getGrid());
+
+		FolderHistory transaction = new FolderHistory();
+		transaction.setUser(userDao.findById(User.USERID_ADMIN));
+		transaction.setNotified(0);
+		dao.applyGridToTree(1200, transaction);
+
+		folder = dao.findById(1201);
+		Assert.assertEquals("xyz", folder.getGrid());
+	}
+
+	@Test
+	public void testApplyStorageToTree() throws PersistenceException {
+		Folder folder = dao.findById(1200);
+		dao.initialize(folder);
+		Assert.assertNull(folder.getStorage());
+		folder.setStorage(1);
+		dao.store(folder);
+		folder = dao.findById(1200);
+		dao.initialize(folder);
+		Assert.assertEquals(Integer.valueOf(1), folder.getStorage());
+
+		folder = dao.findById(1201);
+		dao.initialize(folder);
+		Assert.assertNull(folder.getStorage());
+
+		FolderHistory transaction = new FolderHistory();
+		transaction.setUser(userDao.findById(User.USERID_ADMIN));
+		transaction.setNotified(0);
+		dao.applyStorageToTree(1200, transaction);
+
+		folder = dao.findById(1201);
+		dao.initialize(folder);
+		Assert.assertEquals(Integer.valueOf(1), folder.getStorage());
+	}
+
+	@Test
+	public void testApplyOCRToTree() throws PersistenceException {
+		Folder folder = dao.findById(1200);
+		dao.initialize(folder);
+		Assert.assertNull(folder.getOcrTemplateId());
+		folder.setOcrTemplateId(1L);
+		dao.store(folder);
+		folder = dao.findById(1200);
+
+		// Without a template the OCR template also must be forced to null
+		Assert.assertNull(folder.getOcrTemplateId());
+
+		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
+		folder = dao.findById(1200);
+		dao.initialize(folder);
+		folder.setTemplate(tDao.findById(1));
+		Assert.assertNull(folder.getOcrTemplateId());
+		folder.setOcrTemplateId(1L);
+		dao.store(folder);
+		Assert.assertEquals(Long.valueOf(1), folder.getOcrTemplateId());
+
+		folder = dao.findById(1201);
+		Assert.assertNull(folder.getOcrTemplateId());
+
+		FolderHistory transaction = new FolderHistory();
+		transaction.setUser(userDao.findById(User.USERID_ADMIN));
+		transaction.setNotified(0);
+		dao.applyOCRToTree(1200, transaction);
+
+		folder = dao.findById(1201);
+		Assert.assertEquals(Long.valueOf(1), folder.getOcrTemplateId());
 	}
 }
