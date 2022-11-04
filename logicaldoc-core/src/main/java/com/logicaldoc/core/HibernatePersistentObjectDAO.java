@@ -55,7 +55,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	protected static final String ASPECT_STORING = "storing";
 
-	private static final String DEFAULT_WHERE_PREAMBLE = " " + ALIAS_ENTITY + " where " + ALIAS_ENTITY + ".deleted=0 ";
+	private static final String DEFAULT_WHERE_PREAMBLE = " " + ENTITY + " where " + ENTITY + ".deleted=0 ";
 
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
@@ -94,7 +94,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	public List<T> findAll(long tenantId) {
 		try {
-			return findByWhere(" " + ALIAS_ENTITY + ".tenantId=" + tenantId, "", null);
+			return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<>();
@@ -112,7 +112,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 
 	public List<Long> findAllIds(long tenantId) {
 		try {
-			return findIdsByWhere(" " + ALIAS_ENTITY + ".tenantId=" + tenantId, "", null);
+			return findIdsByWhere(" " + ENTITY + ".tenantId=" + tenantId, "", null);
 		} catch (Throwable e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Long>();
@@ -255,7 +255,7 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY)
 					? ORDER_BY + " " + order
 					: order;
-			String query = "select " + ALIAS_ENTITY + ".id from " + entityClass.getCanonicalName()
+			String query = "select " + ENTITY + ".id from " + entityClass.getCanonicalName()
 					+ DEFAULT_WHERE_PREAMBLE + (StringUtils.isNotEmpty(where) ? AND + where + ") " : " ")
 					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
 			logQuery(query);

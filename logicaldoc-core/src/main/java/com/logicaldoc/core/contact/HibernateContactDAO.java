@@ -29,19 +29,19 @@ public class HibernateContactDAO extends HibernatePersistentObjectDAO<Contact> i
 		Map<String, Object> params = new HashMap<String, Object>();
 		StringBuilder sb = new StringBuilder("");
 		if (userId == null) {
-			sb.append(" " + ALIAS_ENTITY + ".userId is null ");
+			sb.append(" " + ENTITY + ".userId is null ");
 		} else {
-			sb.append(" " + ALIAS_ENTITY + ".userId = :userId ");
+			sb.append(" " + ENTITY + ".userId = :userId ");
 			params.put("userId", userId);
 		}
 		if (email != null) {
-			sb.append(" and " + ALIAS_ENTITY + ".email = :email ");
+			sb.append(" and " + ENTITY + ".email = :email ");
 			params.put("email", email);
 		}
 
 		try {
 			return findByWhere(sb.toString(), params,
-					"order by " + ALIAS_ENTITY + ".firstName, " + ALIAS_ENTITY + ".lastName", null);
+					"order by " + ENTITY + ".firstName, " + ENTITY + ".lastName", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Contact>();

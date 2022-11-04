@@ -42,7 +42,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	@Override
 	public List<Version> findByDocId(long docId) {
 		try {
-			return findByWhere(" " + ALIAS_ENTITY + DOC_ID + docId, "order by " + ALIAS_ENTITY + ".versionDate desc",
+			return findByWhere(" " + ENTITY + DOC_ID + docId, "order by " + ENTITY + ".versionDate desc",
 					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -56,7 +56,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		List<Version> versions = new ArrayList<Version>();
 		try {
 			versions = findByWhere(
-					" " + ALIAS_ENTITY + DOC_ID + docId + " and " + ALIAS_ENTITY + ".version='" + version + "'",
+					" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".version='" + version + "'",
 					null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -72,8 +72,8 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 	public Version findByFileVersion(long docId, String fileVersion) {
 		List<Version> versions = new ArrayList<Version>();
 		try {
-			versions = findByWhere(" " + ALIAS_ENTITY + DOC_ID + docId + " and " + ALIAS_ENTITY + ".fileVersion='"
-					+ fileVersion + "'", "order by " + ALIAS_ENTITY + ".date asc", null);
+			versions = findByWhere(" " + ENTITY + DOC_ID + docId + " and " + ENTITY + ".fileVersion='"
+					+ fileVersion + "'", "order by " + ENTITY + ".date asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

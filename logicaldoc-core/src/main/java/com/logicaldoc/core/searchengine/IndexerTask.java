@@ -125,8 +125,8 @@ public class IndexerTask extends Task {
 			// involved into a transaction
 			String[] query = IndexerTask.prepareQuery();
 			List<Long> docIds = documentDao.findIdsByWhere(
-					query[0] + " and (" + PersistentObjectDAO.ALIAS_ENTITY + ".transactionId is null or "
-							+ PersistentObjectDAO.ALIAS_ENTITY + ".transactionId not in " + transactionIdsStr + ") ",
+					query[0] + " and (" + PersistentObjectDAO.ENTITY + ".transactionId is null or "
+							+ PersistentObjectDAO.ENTITY + ".transactionId not in " + transactionIdsStr + ") ",
 					query[1], max);
 			size = docIds.size();
 			log.info("Found a total of {} documents to be processed", size);
@@ -270,13 +270,13 @@ public class IndexerTask extends Task {
 		String sorting = config.getProperty("index.sorting");
 		if (StringUtils.isNotEmpty(sorting))
 			if ("oldestfirst".equals(sorting))
-				sorting = PersistentObjectDAO.ALIAS_ENTITY + ".date asc";
+				sorting = PersistentObjectDAO.ENTITY + ".date asc";
 			else if ("mostrecentfirst".equals(sorting))
-				sorting = PersistentObjectDAO.ALIAS_ENTITY + ".date desc";
+				sorting = PersistentObjectDAO.ENTITY + ".date desc";
 			else if ("smallestfirst".equals(sorting))
-				sorting = PersistentObjectDAO.ALIAS_ENTITY + ".fileSize asc";
+				sorting = PersistentObjectDAO.ENTITY + ".fileSize asc";
 			else
-				sorting = PersistentObjectDAO.ALIAS_ENTITY + ".fileSize desc";
+				sorting = PersistentObjectDAO.ENTITY + ".fileSize desc";
 
 		// This hidden setting overrides the default sorting policy(some really
 		// demanding users may need this optimization).
@@ -284,9 +284,9 @@ public class IndexerTask extends Task {
 		if (StringUtils.isNotEmpty(sortingCustom))
 			sorting = sortingCustom;
 
-		String where = " (" + PersistentObjectDAO.ALIAS_ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX
-				+ " or " + PersistentObjectDAO.ALIAS_ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX_METADATA
-				+ ") and not " + PersistentObjectDAO.ALIAS_ENTITY + ".status = " + AbstractDocument.DOC_ARCHIVED;
+		String where = " (" + PersistentObjectDAO.ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX
+				+ " or " + PersistentObjectDAO.ENTITY + ".indexed = " + AbstractDocument.INDEX_TO_INDEX_METADATA
+				+ ") and not " + PersistentObjectDAO.ENTITY + ".status = " + AbstractDocument.DOC_ARCHIVED;
 
 		return new String[] { where, sorting };
 	}

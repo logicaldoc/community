@@ -44,7 +44,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	@Override
 	public List<FolderHistory> findByFolderId(long folderId) {
 		try {
-			return findByWhere(ALIAS_ENTITY + ".folderId =" + folderId, ORDER_BY + ALIAS_ENTITY + DATE_ASC, null);
+			return findByWhere(ENTITY + ".folderId =" + folderId, ORDER_BY + ENTITY + DATE_ASC, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -54,7 +54,7 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	@Override
 	public List<FolderHistory> findNotNotified(Integer max) {
 		try {
-			return findByWhere(ALIAS_ENTITY + ".notified = 0", ORDER_BY + ALIAS_ENTITY + DATE_ASC, max);
+			return findByWhere(ENTITY + ".notified = 0", ORDER_BY + ENTITY + DATE_ASC, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -72,12 +72,12 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 
 	@Override
 	public List<FolderHistory> findByUserIdAndEvent(long userId, String event) {
-		String query = ALIAS_ENTITY + ".userId =" + userId;
+		String query = ENTITY + ".userId =" + userId;
 		if (event != null && StringUtils.isNotEmpty(event))
-			query += " and lower(" + ALIAS_ENTITY + ".event) like '" + SqlUtil.doubleQuotes(event.toLowerCase()) + "'";
+			query += " and lower(" + ENTITY + ".event) like '" + SqlUtil.doubleQuotes(event.toLowerCase()) + "'";
 
 		try {
-			return findByWhere(query, ORDER_BY + ALIAS_ENTITY + DATE_ASC, null);
+			return findByWhere(query, ORDER_BY + ENTITY + DATE_ASC, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -98,13 +98,13 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 	@Override
 	public List<FolderHistory> findByPath(String pathExpression, Date oldestDate, Collection<String> events,
 			Integer max) {
-		StringBuilder query = new StringBuilder("(" + ALIAS_ENTITY + ".path like :pathExpression or " + ALIAS_ENTITY
+		StringBuilder query = new StringBuilder("(" + ENTITY + ".path like :pathExpression or " + ENTITY
 				+ ".pathOld like :pathExpression) ");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("pathExpression", pathExpression);
 
 		if (oldestDate != null) {
-			query.append(AND + ALIAS_ENTITY + ".date >= :oldestDate ");
+			query.append(AND + ENTITY + ".date >= :oldestDate ");
 			params.put("oldestDate", oldestDate);
 		}
 		if (events != null && !events.isEmpty()) {
@@ -115,11 +115,11 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 				eventsStr.append("'" + event + "'");
 			}
 			eventsStr.append(")");
-			query.append(AND + ALIAS_ENTITY + ".event in " + eventsStr);
+			query.append(AND + ENTITY + ".event in " + eventsStr);
 		}
 
 		try {
-			return findByWhere(query.toString(), params, ORDER_BY + ALIAS_ENTITY + DATE_ASC, max);
+			return findByWhere(query.toString(), params, ORDER_BY + ENTITY + DATE_ASC, max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();
@@ -128,19 +128,19 @@ public class HibernateFolderHistoryDAO extends HibernatePersistentObjectDAO<Fold
 
 	@Override
 	public List<FolderHistory> findByFolderIdAndEvent(long folderId, String event, Date oldestDate) {
-		String query = ALIAS_ENTITY + ".folderId = :folderId and " + ALIAS_ENTITY + ".event = :event ";
+		String query = ENTITY + ".folderId = :folderId and " + ENTITY + ".event = :event ";
 
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("folderId", folderId);
 		params.put("event", event);
 
 		if (oldestDate != null) {
-			query += AND + ALIAS_ENTITY + ".date >= :oldestDate ";
+			query += AND + ENTITY + ".date >= :oldestDate ";
 			params.put("oldestDate", oldestDate);
 		}
 
 		try {
-			return findByWhere(query, params, ORDER_BY + ALIAS_ENTITY + DATE_ASC, null);
+			return findByWhere(query, params, ORDER_BY + ENTITY + DATE_ASC, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<FolderHistory>();

@@ -74,7 +74,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("name", name.toLowerCase());
 
-			return findByWhere("lower(" + ALIAS_ENTITY + ".name) like :name", params, null, null);
+			return findByWhere("lower(" + ENTITY + ".name) like :name", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<User>();
@@ -88,7 +88,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("username", username);
 
-			List<User> coll = findByWhere(ALIAS_ENTITY + ".username = :username", params, null, null);
+			List<User> coll = findByWhere(ENTITY + ".username = :username", params, null, null);
 			if (coll.size() > 0)
 				user = coll.iterator().next();
 			initialize(user);
@@ -105,7 +105,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("username", username.toLowerCase());
 
-			List<User> coll = findByWhere("lower(" + ALIAS_ENTITY + ".username) = :username", params, null, null);
+			List<User> coll = findByWhere("lower(" + ENTITY + ".username) = :username", params, null, null);
 			if (coll.size() > 0)
 				user = coll.iterator().next();
 			initialize(user);
@@ -123,7 +123,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("username", username);
 
-			return findByWhere(ALIAS_ENTITY + ".username like :username", params, null, null);
+			return findByWhere(ENTITY + ".username like :username", params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<User>();
@@ -138,7 +138,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			params.put("name", name.toLowerCase());
 
 			return findByWhere(
-					"lower(" + ALIAS_ENTITY + ".name) like :name and " + ALIAS_ENTITY + ".username like :username",
+					"lower(" + ENTITY + ".name) like :name and " + ENTITY + ".username like :username",
 					params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -713,7 +713,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			try {
 				List<Group> groups = gDao.findByWhere(
-						ALIAS_ENTITY + ".id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")",
+						ENTITY + ".id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")",
 						null, null);
 				for (Group group : groups) {
 					user.getGroups().add(group);
@@ -757,7 +757,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 		Set<User> set = new HashSet<User>();
 		if (!docIds.isEmpty()) {
-			String query = ALIAS_ENTITY + ".id in (" + StringUtil.arrayToString(docIds.toArray(new Long[0]), ",") + ")";
+			String query = ENTITY + ".id in (" + StringUtil.arrayToString(docIds.toArray(new Long[0]), ",") + ")";
 
 			try {
 				List<User> users = findByWhere(query, (Map<String, Object>) null, null, null);

@@ -37,7 +37,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("deviceId", deviceId);
 
-			List<Device> devices = findByWhere(ALIAS_ENTITY + ".deviceId = :deviceId", params, null, null);
+			List<Device> devices = findByWhere(ENTITY + ".deviceId = :deviceId", params, null, null);
 			return devices.isEmpty() ? null : devices.get(0);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -51,8 +51,8 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("userId", userId);
 
-			return findByWhere(ALIAS_ENTITY + ".trusted=1 and " + ALIAS_ENTITY + ".userId = :userId", params,
-					ALIAS_ENTITY + ".lastLogin desc", null);
+			return findByWhere(ENTITY + ".trusted=1 and " + ENTITY + ".userId = :userId", params,
+					ENTITY + ".lastLogin desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Device>();
@@ -65,7 +65,7 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("userId", userId);
 
-			return findByWhere(ALIAS_ENTITY + ".userId = :userId", params, ALIAS_ENTITY + ".lastLogin desc", null);
+			return findByWhere(ENTITY + ".userId = :userId", params, ENTITY + ".lastLogin desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Device>();
@@ -132,36 +132,36 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 
 				StringBuilder query = new StringBuilder();
 
-				query.append(ALIAS_ENTITY + ".userId = :userId");
+				query.append(ENTITY + ".userId = :userId");
 				params.put("userId", device.getUserId());
 
 				query.append(" and ");
 				if (device.getBrowser() != null) {
-					query.append(ALIAS_ENTITY + ".browser = :browser");
+					query.append(ENTITY + ".browser = :browser");
 					params.put("browser", device.getBrowser());
 				} else
-					query.append(ALIAS_ENTITY + ".browser is null");
+					query.append(ENTITY + ".browser is null");
 
 				query.append(" and ");
 				if (device.getBrowserVersion() != null) {
-					query.append(ALIAS_ENTITY + ".browserVersion = :browserVersion");
+					query.append(ENTITY + ".browserVersion = :browserVersion");
 					params.put("browserVersion", device.getBrowserVersion());
 				} else
-					query.append(ALIAS_ENTITY + ".browserVersion is null");
+					query.append(ENTITY + ".browserVersion is null");
 
 				query.append(" and ");
 				if (device.getOperativeSystem() != null) {
-					query.append(ALIAS_ENTITY + ".operativeSystem = :operativeSystem");
+					query.append(ENTITY + ".operativeSystem = :operativeSystem");
 					params.put("operativeSystem", device.getOperativeSystem());
 				} else
-					query.append(ALIAS_ENTITY + ".operativeSystem is null");
+					query.append(ENTITY + ".operativeSystem is null");
 
 				query.append(" and ");
 				if (device.getType() != null) {
-					query.append(ALIAS_ENTITY + ".type = :type");
+					query.append(ENTITY + ".type = :type");
 					params.put("type", device.getType());
 				} else
-					query.append(ALIAS_ENTITY + ".type is null");
+					query.append(ENTITY + ".type is null");
 
 				List<Device> devices = findByWhere(query.toString(), params, null, null);
 				if (devices.isEmpty())

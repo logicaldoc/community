@@ -66,8 +66,8 @@ public class DigestProcessor extends Task {
 
 			log.info("Found a total of {} documents to be processed", size);
 
-			List<Long> ids = documentDao.findIdsByWhere(PersistentObjectDAO.ALIAS_ENTITY + ".docRef is null and "
-					+ PersistentObjectDAO.ALIAS_ENTITY + ".digest is null and deleted = 0", null, max);
+			List<Long> ids = documentDao.findIdsByWhere(PersistentObjectDAO.ENTITY + ".docRef is null and "
+					+ PersistentObjectDAO.ENTITY + ".digest is null and deleted = 0", null, max);
 			for (Long id : ids) {
 				try {
 					log.debug("Processing document {}", id);

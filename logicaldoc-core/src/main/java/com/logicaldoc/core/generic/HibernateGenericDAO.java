@@ -43,13 +43,13 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	@Override
 	public Generic findByAlternateKey(String type, String subtype, Long qualifier, long tenantId) {
 		Generic generic = null;
-		StringBuilder sb = new StringBuilder(" " + ALIAS_ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and "
-				+ ALIAS_ENTITY + ".subtype='" + SqlUtil.doubleQuotes(subtype) + "' ");
-		sb.append(" and " + ALIAS_ENTITY + ".tenantId=" + tenantId);
+		StringBuilder sb = new StringBuilder(" " + ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and "
+				+ ENTITY + ".subtype='" + SqlUtil.doubleQuotes(subtype) + "' ");
+		sb.append(" and " + ENTITY + ".tenantId=" + tenantId);
 		if (qualifier != null)
-			sb.append(" and " + ALIAS_ENTITY + ".qualifier=" + qualifier);
+			sb.append(" and " + ENTITY + ".qualifier=" + qualifier);
 		else
-			sb.append(" and " + ALIAS_ENTITY + ".qualifier is null");
+			sb.append(" and " + ENTITY + ".qualifier is null");
 		try {
 			Collection<Generic> coll = findByWhere(sb.toString(), null, null);
 			if (coll.size() > 0)
@@ -64,13 +64,13 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) {
 		String query = " 1=1 ";
 		if (StringUtils.isNotEmpty(type))
-			query += " and " + ALIAS_ENTITY + ".type like '" + SqlUtil.doubleQuotes(type) + "' ";
+			query += " and " + ENTITY + ".type like '" + SqlUtil.doubleQuotes(type) + "' ";
 		if (StringUtils.isNotEmpty(subtype))
-			query += " and " + ALIAS_ENTITY + ".subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
+			query += " and " + ENTITY + ".subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
 		if (qualifier != null)
-			query += " and " + ALIAS_ENTITY + ".qualifier = " + qualifier;
+			query += " and " + ENTITY + ".qualifier = " + qualifier;
 		if (tenantId != null)
-			query += " and " + ALIAS_ENTITY + ".tenantId = " + tenantId;
+			query += " and " + ENTITY + ".tenantId = " + tenantId;
 
 		try {
 			return findByWhere(query, null, null);

@@ -48,7 +48,6 @@ public class TagSearchTest extends AbstractCoreTCase {
 		try {
 			search.search();
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error(e.getMessage(), e);
 		}
 

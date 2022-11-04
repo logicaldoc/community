@@ -41,10 +41,10 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("docId", docId);
 
-		StringBuilder query = new StringBuilder("(" + ALIAS_ENTITY + ".document1.id = :docId ");
-		query.append(" or " + ALIAS_ENTITY + ".document2.id = :docId) ");
+		StringBuilder query = new StringBuilder("(" + ENTITY + ".document1.id = :docId ");
+		query.append(" or " + ENTITY + ".document2.id = :docId) ");
 		if (StringUtils.isNotEmpty(type)) {
-			query.append("and " + ALIAS_ENTITY + ".type = :type");
+			query.append("and " + ENTITY + ".type = :type");
 			params.put("type", type);
 		}
 
@@ -63,8 +63,8 @@ public class HibernateDocumentLinkDAO extends HibernatePersistentObjectDAO<Docum
 
 		DocumentLink link = null;
 		StringBuilder query = new StringBuilder(
-				ALIAS_ENTITY + ".document1.id = :docId1 and " + ALIAS_ENTITY + ".document2.id = :docId2 ");
-		query.append(" and " + ALIAS_ENTITY + ".type = :type");
+				ENTITY + ".document1.id = :docId1 and " + ENTITY + ".document2.id = :docId2 ");
+		query.append(" and " + ENTITY + ".type = :type");
 
 		List<DocumentLink> links = new ArrayList<DocumentLink>();
 		try {

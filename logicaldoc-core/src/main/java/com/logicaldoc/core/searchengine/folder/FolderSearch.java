@@ -529,7 +529,7 @@ public class FolderSearch extends Search {
 		 */
 		if (ids.isEmpty() && !user.isMemberOf(Group.GROUP_ADMIN)) {
 			FolderDAO folderDAO = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			ids = folderDAO.findFolderIdByUserIdInPath(options.getUserId(), null);
+			ids = folderDAO.findFolderIdByUserId(options.getUserId(), null, true);
 		}
 
 		return ids;

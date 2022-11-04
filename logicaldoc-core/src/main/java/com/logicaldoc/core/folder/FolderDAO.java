@@ -149,21 +149,23 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param includeDeleted True if the deleted records need to be loaded
 	 * 
 	 * @return List of selected folder IDs, rootId is included as well
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public Collection<Long> findFolderIdInPath(long rootId, boolean includeDeleted);
+	public Collection<Long> findFolderIdInPath(long rootId, boolean includeDeleted) throws PersistenceException;
 
 	/**
 	 * This method selects only the folder ID from the folders for which a user
 	 * is authorized.
 	 * 
 	 * @param userId ID of the user.
-	 * @param parentId The id of the parent folder to inspect (optional)
+	 * @param parentId The id of the parent folder to inspect
 	 * 
 	 * @return List of selected folder IDs.
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public Collection<Long> findFolderIdByUserIdInPath(long userId, Long parentId) throws PersistenceException;
+	public Collection<Long> findFolderIdByUserIdInPath(long userId, long parentId) throws PersistenceException;
 
 	/**
 	 * Finds direct children of a folder.
@@ -173,7 +175,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return List of found folders sorted by text
 	 * 
-	 * @throws PersistenceException Error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Folder> findByUserId(long userId, long parentId) throws PersistenceException;
 

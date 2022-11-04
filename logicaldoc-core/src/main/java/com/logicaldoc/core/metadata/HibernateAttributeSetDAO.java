@@ -33,7 +33,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	@Override
 	public List<AttributeSet> findAll() {
 		try {
-			return findByWhere(" 1=1", "order by " + ALIAS_ENTITY + ".name", null);
+			return findByWhere(" 1=1", "order by " + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<AttributeSet>();
@@ -43,7 +43,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	@Override
 	public List<AttributeSet> findAll(long tenantId) {
 		try {
-			return findByWhere(" " + ALIAS_ENTITY + ".tenantId=" + tenantId, "order by " + ALIAS_ENTITY + ".name",
+			return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "order by " + ENTITY + ".name",
 					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -55,8 +55,8 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	public AttributeSet findByName(String name, long tenantId) {
 		AttributeSet template = null;
 		try {
-			List<AttributeSet> coll = findByWhere(ALIAS_ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and "
-					+ ALIAS_ENTITY + ".tenantId=" + tenantId, null, null);
+			List<AttributeSet> coll = findByWhere(ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and "
+					+ ENTITY + ".tenantId=" + tenantId, null, null);
 			if (coll.size() > 0)
 				template = coll.iterator().next();
 			if (template != null && template.getDeleted() == 1)
@@ -90,8 +90,8 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	@Override
 	public List<AttributeSet> findByType(int type, long tenantId) {
 		try {
-			return findByWhere(ALIAS_ENTITY + ".type =" + type + " and " + ALIAS_ENTITY + ".tenantId=" + tenantId,
-					"order by " + ALIAS_ENTITY + ".name asc", null);
+			return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + ".tenantId=" + tenantId,
+					"order by " + ENTITY + ".name asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<AttributeSet>();

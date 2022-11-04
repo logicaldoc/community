@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -466,8 +467,21 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		folder.setName("text");
 		folder.setParentId(5);
 		folder.setFolderGroup(new long[] { 1, 2 });
+
+		folder.addTag("A");
+
+		// Add a very big tag
+		folder.addTag(StringUtils.repeat("B", 500));
+
 		dao.store(folder);
 		Assert.assertNotNull(folder);
+
+		FolderHistory transaction = new FolderHistory();
+		transaction.setFolderId(folder.getId());
+		transaction.setUser(userDao.findById(1));
+		transaction.setNotified(0);
+		Folder alias = dao.createAlias(5L, folder.getId(), transaction);
+		Assert.assertNotNull(alias);
 
 		// Test updating the security rules
 		folder = dao.findById(folder.getId());
@@ -483,6 +497,34 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		dao.initialize(folder);
 		Assert.assertTrue(folder.getFolderGroups().size() == 3);
 
+		// Set a securityRef
+		folder.setSecurityRef(5L);
+		dao.store(folder);
+
+		// Check if aliases have been updates
+		alias = dao.findById(alias.getId());
+		Assert.assertEquals(folder.getSecurityRef(), alias.getSecurityRef());
+
+		// Delete the folder
+		dao.delete(folder.getId());
+
+		// Check aliases were deleted too
+		Assert.assertTrue(dao.findAliases(folder.getId(), folder.getTenantId()).isEmpty());
+
+		folder = new Folder();
+		folder.setName("unexisting parent");
+		folder.setParentId(99999L);
+
+		boolean runOk = false;
+		try {
+			transaction.setSessionId("xxxxx");
+			dao.store(folder, transaction);
+			runOk = true;
+		} catch (PersistenceException e) {
+			Assert.assertEquals("Unexisting parent folder " + folder.getParentId(), e.getMessage());
+		}
+		Assert.assertFalse(runOk);
+
 		folder = dao.findById(6);
 		dao.initialize(folder);
 		Assert.assertEquals("folder6", folder.getName());
@@ -493,7 +535,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		dao.initialize(folder);
 		Assert.assertEquals("folder6", folder.getName());
 
-		FolderHistory transaction = new FolderHistory();
+		transaction = new FolderHistory();
 		transaction.setFolderId(folder.getId());
 		transaction.setEvent(FolderEvent.RENAMED.toString());
 		transaction.setUser(userDao.findById(1));
@@ -576,7 +618,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 		Assert.assertEquals(Long.valueOf(3000L), alias.getFoldRef());
 		Assert.assertEquals(Long.valueOf(3000L), alias.getSecurityRef());
-		Assert.assertEquals(new Integer(Folder.TYPE_ALIAS), new Integer(alias.getType()));
+		Assert.assertEquals(Integer.valueOf(Folder.TYPE_ALIAS), Integer.valueOf(alias.getType()));
 		Folder orig = dao.findById(3000L);
 		Assert.assertEquals("Workspace X", orig.getName());
 		Assert.assertEquals(Folder.TYPE_WORKSPACE, orig.getType());
@@ -678,11 +720,26 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testFindByUserId() throws PersistenceException {
-		List<Folder> folders = dao.findByUserId(1, Folder.ROOTID);
+		Folder alias = dao.createAlias(1200L, 6L, null);
+		Assert.assertNotNull(alias);
+
+		List<Folder> folders = dao.findByUserId(1L);
+		Assert.assertNotNull(folders);
+		Assert.assertEquals(10, folders.size());
+
+		alias = dao.createAlias(1200L, 6L, null);
+		Assert.assertNotNull(alias);
+
+		alias = dao.createAlias(6L, 1201L, null);
+		folders = dao.findByUserId(4L);
+		Assert.assertNotNull(folders);
+		Assert.assertEquals(4, folders.size());
+
+		folders = dao.findByUserId(1, Folder.ROOTID);
 		Assert.assertNotNull(folders);
 		Assert.assertEquals(3, folders.size());
 
-		// Try with unexisting user and folders
+		// Try with existing user and unexisting folder
 		folders = dao.findByUserId(1, 70);
 		Assert.assertNotNull(folders);
 		Assert.assertEquals(0, folders.size());
@@ -693,12 +750,11 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 			folders = dao.findByUserId(99, Folder.ROOTID);
 			runOk = "ok";
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 99 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 99", e.getMessage());
 		}
 		Assert.assertNull(runOk);
 
 		folders = dao.findByUserId(4, Folder.ROOTID);
-
 		Assert.assertNotNull(folders);
 		Assert.assertEquals(1, folders.size());
 	}
@@ -716,7 +772,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testIsWriteEnable() throws PersistenceException {
+	public void testIsWriteEnabled() throws PersistenceException {
 		Assert.assertTrue(dao.isWriteEnabled(Folder.ROOTID, 1));
 		Assert.assertTrue(dao.isWriteEnabled(6, 1));
 		Assert.assertTrue(dao.isWriteEnabled(1200, 3));
@@ -725,12 +781,30 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		// Unexisting user
 		String runOk = null;
 		try {
-			Assert.assertFalse(dao.isWriteEnabled(Folder.ROOTID, 999));
+			Assert.assertFalse(dao.isWriteEnabled(Folder.ROOTID, 99));
 			runOk = "ok";
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 999 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 99", e.getMessage());
 		}
 		Assert.assertNull(runOk);
+	}
+
+	@Test
+	public void testIsDownloadEnabled() throws PersistenceException {
+		Assert.assertTrue(dao.isDownloadEnabled(Folder.ROOTID, 1));
+		Assert.assertTrue(dao.isDownloadEnabled(6, 1));
+		Assert.assertTrue(dao.isDownloadEnabled(1200, 3));
+		Assert.assertTrue(dao.isDownloadEnabled(Folder.ROOTID, 3));
+		Assert.assertFalse(dao.isDownloadEnabled(1200, 4));
+	}
+
+	@Test
+	public void testIsMoveEnabled() throws PersistenceException {
+		Assert.assertTrue(dao.isMoveEnabled(Folder.ROOTID, 1));
+		Assert.assertTrue(dao.isMoveEnabled(6, 1));
+		Assert.assertTrue(dao.isMoveEnabled(1200, 3));
+		Assert.assertTrue(dao.isMoveEnabled(Folder.ROOTID, 3));
+		Assert.assertFalse(dao.isMoveEnabled(1200, 4));
 	}
 
 	@Test
@@ -740,7 +814,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testIsReadEnable() throws PersistenceException {
+	public void testIsReadEnabled() throws PersistenceException {
 		Assert.assertTrue(dao.isReadEnabled(Folder.ROOTID, 1));
 		Assert.assertTrue(dao.isReadEnabled(5, 1));
 
@@ -749,20 +823,28 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 			Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 22));
 			runOk = true;
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 22 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 22", e.getMessage());
 		}
 		Assert.assertFalse(runOk);
 
 		runOk = false;
 		try {
 			// Unexisting user
-			Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 999));
+			Assert.assertFalse(dao.isReadEnabled(Folder.ROOTID, 99));
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 999 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 99", e.getMessage());
 		}
 		Assert.assertFalse(runOk);
 
-		Assert.assertTrue(dao.isReadEnabled(1200, 3));
+		Assert.assertTrue(dao.isReadEnabled(1200L, 3L));
+		Assert.assertFalse(dao.isReadEnabled(1200L, 4L));
+		Assert.assertTrue(dao.isReadEnabled(1201L, 4L));
+
+		Folder folder = dao.findById(6L);
+		dao.initialize(folder);
+		folder.setSecurityRef(1201L);
+		dao.store(folder);
+		Assert.assertTrue(dao.isReadEnabled(6L, 4L));
 	}
 
 	@Test
@@ -775,7 +857,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 			dao.isPrintEnabled(Folder.ROOTID, 22L);
 			runOk = "ok";
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 22 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 22", e.getMessage());
 		}
 		Assert.assertNull(runOk);
 
@@ -783,7 +865,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 			dao.isPrintEnabled(Folder.ROOTID, 999L);
 			runOk = "ok";
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 999 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 999", e.getMessage());
 		}
 		Assert.assertNull(runOk);
 
@@ -799,10 +881,10 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		// Unexisting user
 		String runOk = null;
 		try {
-			Assert.assertFalse(dao.isPermissionEnabled(Permission.WRITE, Folder.ROOTID, 999));
+			Assert.assertFalse(dao.isPermissionEnabled(Permission.WRITE, Folder.ROOTID, 99));
 			runOk = "ok";
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 999 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 99", e.getMessage());
 		}
 		Assert.assertNull(runOk);
 
@@ -838,7 +920,7 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 			ids = dao.findFolderIdByUserId(99, null, true);
 			runOk = "ok";
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 99 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 99", e.getMessage());
 		}
 		Assert.assertNull(runOk);
 	}
@@ -854,6 +936,10 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(1, ids.size());
 
+		ids = dao.findIdByUserId(4, 1200);
+		Assert.assertNotNull(ids);
+		Assert.assertEquals(1, ids.size());
+
 		ids = dao.findIdByUserId(1, 1201);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(1, ids.size());
@@ -864,9 +950,70 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 			ids = dao.findIdByUserId(99, 1201);
 			runOk = "ok";
 		} catch (PersistenceException e) {
-			Assert.assertEquals("User 99 not found", e.getMessage());
+			Assert.assertEquals("Unexisting user 99", e.getMessage());
 		}
 		Assert.assertNull(runOk);
+	}
+
+	@Test
+	public void testFindFolderIdByUserIdInPath() throws PersistenceException {
+		Collection<Long> ids = dao.findFolderIdByUserIdInPath(1, Long.valueOf(1200));
+		Assert.assertEquals(3, ids.size());
+		Assert.assertTrue(ids.contains(1201L));
+		
+		ids = dao.findFolderIdByUserIdInPath(4, Long.valueOf(1200));
+		Assert.assertEquals(1, ids.size());
+		Assert.assertTrue(ids.contains(1201L));
+		
+		ids = dao.findFolderIdByUserIdInPath(4, Long.valueOf(1202));
+		Assert.assertTrue(ids.isEmpty());
+
+		// Try with unexisting user
+		boolean runOk = false;
+		try {
+			ids = dao.findFolderIdByUserIdInPath(99, Long.valueOf(1200));
+			runOk = true;
+		} catch (PersistenceException e) {
+			Assert.assertEquals("Unexisting user 99", e.getMessage());
+		}
+		Assert.assertFalse(runOk);
+
+		// Try with unexisting folder
+		runOk = false;
+		try {
+			ids = dao.findFolderIdByUserIdInPath(4, Long.valueOf(999));
+			runOk = true;
+		} catch (PersistenceException e) {
+			Assert.assertEquals("Unexisting folder 999", e.getMessage());
+		}
+		Assert.assertFalse(runOk);
+	}
+
+	@Test
+	public void testFindTags() throws PersistenceException {
+		List<String> tags = dao.findTags(1200);
+		Assert.assertEquals(2, tags.size());
+		Assert.assertTrue(tags.contains("ftag1"));
+
+		tags = dao.findTags(6);
+		Assert.assertTrue(tags.isEmpty());
+	}
+
+	@Test
+	public void testFindIdByParentId() throws PersistenceException {
+		Collection<Long> ids = dao.findIdsByParentId(1200);
+		Assert.assertNotNull(ids);
+		Assert.assertEquals(2, ids.size());
+		Assert.assertTrue(ids.contains(1202L));
+
+		ids = dao.findIdsByParentId(1201);
+		Assert.assertNotNull(ids);
+		Assert.assertEquals(1, ids.size());
+		Assert.assertTrue(ids.contains(1202L));
+
+		ids = dao.findIdsByParentId(1204);
+		Assert.assertNotNull(ids);
+		Assert.assertTrue(ids.isEmpty());
 	}
 
 	@Test
@@ -968,7 +1115,14 @@ public class HibernateFolderDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(dirs);
 		Assert.assertEquals(1, dirs.size());
 
+		Folder alias = dao.createAlias(1201L, 6L, null);
+		Assert.assertNotNull(alias);
+
 		dirs = dao.findChildren(1201L, 3L);
+		Assert.assertNotNull(dirs);
+		Assert.assertEquals(2, dirs.size());
+
+		dirs = dao.findChildren(1201L, 4L);
 		Assert.assertNotNull(dirs);
 		Assert.assertEquals(1, dirs.size());
 	}

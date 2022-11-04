@@ -78,28 +78,28 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 		try {
 			if (StringUtils.isEmpty(fileVersion))
 				if (types == null || types.isEmpty())
-					return findByWhere(ALIAS_ENTITY + ".docId = " + docId, null, null);
+					return findByWhere(ENTITY + ".docId = " + docId, null, null);
 				else {
 					Map<String, Object> params = new HashMap<String, Object>();
 					params.put(DOC_ID, docId);
 					params.put("types", types);
 
-					return findByWhere(ALIAS_ENTITY + DOC_ID_DOC_ID_AND + ALIAS_ENTITY + ".type in (:types)",
+					return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".type in (:types)",
 							params, null, null);
 				}
 			else if (types == null || types.isEmpty()) {
 				Map<String, Object> params = new HashMap<String, Object>();
 				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);
-				return findByWhere(ALIAS_ENTITY + DOC_ID_DOC_ID_AND + ALIAS_ENTITY + ".fileVersion = :fileVersion",
+				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY + ".fileVersion = :fileVersion",
 						params, null, null);
 			} else {
 				Map<String, Object> params = new HashMap<String, Object>();
 				params.put(DOC_ID, docId);
 				params.put("fileVersion", fileVersion);
 				params.put("types", types);
-				return findByWhere(ALIAS_ENTITY + DOC_ID_DOC_ID_AND + ALIAS_ENTITY
-						+ ".fileVersion = :fileVersion and " + ALIAS_ENTITY + ".type in (:types)", params, null, null);
+				return findByWhere(ENTITY + DOC_ID_DOC_ID_AND + ENTITY
+						+ ".fileVersion = :fileVersion and " + ENTITY + ".type in (:types)", params, null, null);
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -110,7 +110,7 @@ public class HibernateDocumentNoteDAO extends HibernatePersistentObjectDAO<Docum
 	@Override
 	public List<DocumentNote> findByUserId(long userId) {
 		try {
-			return findByWhere(ALIAS_ENTITY + ".userId =" + userId, "order by " + ALIAS_ENTITY + ".date desc", null);
+			return findByWhere(ENTITY + ".userId =" + userId, "order by " + ENTITY + ".date desc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<DocumentNote>();

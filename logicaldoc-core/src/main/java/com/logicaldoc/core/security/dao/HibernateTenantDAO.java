@@ -57,7 +57,7 @@ public class HibernateTenantDAO extends HibernatePersistentObjectDAO<Tenant> imp
 		try {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("name", name);
-			Collection<Tenant> coll = findByWhere(ALIAS_ENTITY + ".name = :name", params, null, null);
+			Collection<Tenant> coll = findByWhere(ENTITY + ".name = :name", params, null, null);
 			if (coll.size() > 0) {
 				tenant = coll.iterator().next();
 				if (tenant.getDeleted() == 1)

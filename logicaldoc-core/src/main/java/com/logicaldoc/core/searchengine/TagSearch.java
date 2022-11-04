@@ -85,7 +85,7 @@ public class TagSearch extends Search {
 
 		appendWhereClause(true, query);
 
-		log.info("executing tag search query={}", query.toString());
+		log.info("executing tag search query = {}", query.toString());
 
 		options.setExpression(query.toString());
 	}

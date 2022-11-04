@@ -44,9 +44,9 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	public int countSessions(Long tenantId, Integer status) {
 		StringBuilder query = new StringBuilder(" 1=1 ");
 		if (tenantId != null)
-			query.append(" and " + ALIAS_ENTITY + ".tenantId = " + tenantId);
+			query.append(" and " + ENTITY + ".tenantId = " + tenantId);
 		if (status != null)
-			query.append(" and " + ALIAS_ENTITY + ".status = " + status);
+			query.append(" and " + ENTITY + ".status = " + status);
 
 		try {
 			List<Session> sessions = findByWhere(query.toString(), null, null);
@@ -62,7 +62,7 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 		try {
 			Map<String, Object> params = new HashMap<String, Object>();
 			params.put("sid", sid);
-			List<Session> sessions = findByWhere(ALIAS_ENTITY + ".sid = :sid", params, null, null);
+			List<Session> sessions = findByWhere(ENTITY + ".sid = :sid", params, null, null);
 			for (Session session : sessions) {
 				if (session.getDeleted() == 0)
 					return session;
@@ -82,13 +82,13 @@ public class HibernateSessionDAO extends HibernatePersistentObjectDAO<Session> i
 	public List<Session> findByNode(String node) {
 		try {
 			if (StringUtils.isEmpty(node))
-				return findByWhere(" 1=1 ", (Map<String, Object>) null, "order by " + ALIAS_ENTITY + ".creation desc",
+				return findByWhere(" 1=1 ", (Map<String, Object>) null, "order by " + ENTITY + ".creation desc",
 						null);
 			else {
 				Map<String, Object> params = new HashMap<String, Object>();
 				params.put("node", node);
-				return findByWhere(ALIAS_ENTITY + ".node = :node", params,
-						"order by " + ALIAS_ENTITY + ".creation desc", null);
+				return findByWhere(ENTITY + ".node = :node", params,
+						"order by " + ENTITY + ".creation desc", null);
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);

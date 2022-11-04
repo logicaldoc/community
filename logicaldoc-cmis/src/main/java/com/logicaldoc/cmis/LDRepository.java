@@ -2819,9 +2819,9 @@ public class LDRepository {
 	}
 
 	public List<ObjectData> getDocumentLastChanges(long minDate, int max) {
-		StringBuilder query = new StringBuilder(" " + PersistentObjectDAO.ALIAS_ENTITY + ".tenantId = :tenantId and "
-				+ PersistentObjectDAO.ALIAS_ENTITY + ".date >= :minDate ");
-		query.append(" and " + PersistentObjectDAO.ALIAS_ENTITY + ".event in ('");
+		StringBuilder query = new StringBuilder(" " + PersistentObjectDAO.ENTITY + ".tenantId = :tenantId and "
+				+ PersistentObjectDAO.ENTITY + ".date >= :minDate ");
+		query.append(" and " + PersistentObjectDAO.ENTITY + ".event in ('");
 		query.append(DocumentEvent.STORED);
 		query.append("','");
 		query.append(DocumentEvent.CHECKEDIN);
@@ -2841,7 +2841,7 @@ public class LDRepository {
 			params.put("minDate", new Date(minDate));
 
 			entries = historyDao.findByWhere(query.toString(), params,
-					"order by " + PersistentObjectDAO.ALIAS_ENTITY + ".date", max);
+					"order by " + PersistentObjectDAO.ENTITY + ".date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
@@ -2887,9 +2887,9 @@ public class LDRepository {
 
 	public List<ObjectData> getFolderLastChanges(long minDate, int max) {
 
-		StringBuilder query = new StringBuilder(" " + PersistentObjectDAO.ALIAS_ENTITY + ".tenantId = :tenantId and "
-				+ PersistentObjectDAO.ALIAS_ENTITY + ".date >= :minDate ");
-		query.append(" and " + PersistentObjectDAO.ALIAS_ENTITY + ".event in ('");
+		StringBuilder query = new StringBuilder(" " + PersistentObjectDAO.ENTITY + ".tenantId = :tenantId and "
+				+ PersistentObjectDAO.ENTITY + ".date >= :minDate ");
+		query.append(" and " + PersistentObjectDAO.ENTITY + ".event in ('");
 		query.append(FolderEvent.CREATED);
 		query.append("','");
 		query.append(FolderEvent.RENAMED);
@@ -2906,7 +2906,7 @@ public class LDRepository {
 			params.put("tenantId", getRoot().getTenantId());
 			params.put("minDate", new Date(minDate));
 			entries = folderHistoryDao.findByWhere(query.toString(), params,
-					"order by " + PersistentObjectDAO.ALIAS_ENTITY + ".date", max);
+					"order by " + PersistentObjectDAO.ENTITY + ".date", max);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}

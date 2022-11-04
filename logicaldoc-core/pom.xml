@@ -373,6 +373,10 @@
 			<version>1.1.15</version>
 		</dependency>
 		<dependency>
+    		<groupId>org.apache.commons</groupId>
+    		<artifactId>commons-math3</artifactId>
+		</dependency>		
+		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
 			<scope>test</scope>
@@ -617,7 +621,6 @@
 									<exclude name="zookeeper*" />
 									<exclude name="*restlet*" />
 									<exclude name="*zip4j*" />
-									<exclude name="*msgparser*" />
 									<exclude name="*tika*" />
 									<exclude name="*mp3*" />
 									<exclude name="*javacv*" />
@@ -636,6 +639,8 @@
 									<exclude name="*calcite*" />
 									<exclude name="*avatica*" />
 									<exclude name="*caffeine*" />
+									<exclude name="*msgparser*" />
+									<exclude name="commons-math*" />
 								</delete>
 								<delete dir="target/plugin/WEB-INF/lib">
 									<include name="opencv-*-android-*" />
