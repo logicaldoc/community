@@ -294,7 +294,7 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 						return dao.computePathExtended(f);
 					} catch (PersistenceException e) {
 						log.error(e.getMessage(), e);
-						return null;
+						return "";
 					}
 				}).collect(Collectors.toList());
 				paths.sort(null);
