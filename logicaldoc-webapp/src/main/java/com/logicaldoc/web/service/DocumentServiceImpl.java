@@ -2726,26 +2726,26 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
 		ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.REPORTS);
 
-		// First of all, find all duplicates digests
-		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
-		List<String> digests = docDao.findDuplicatedDigests(session.getTenantId(), folderId);
-		log.info("Found {} duplicated digests", digests.size());
-
-		StringBuilder duplicationsQuery = new StringBuilder(
-				"select ld_id, ld_digest, ld_date, ld_folderid, ld_filename, ld_version from ld_document where ld_deleted=0 ");
-		duplicationsQuery.append(" and ld_tenantid = ");
-		duplicationsQuery.append(Long.toString(session.getTenantId()));
-		duplicationsQuery.append(" and ld_docref is null and ld_digest in ('");
-		duplicationsQuery.append(String.join("','", digests));
-		duplicationsQuery.append("') order by ld_digest asc, ld_date ");
-		if (retainNewest)
-			duplicationsQuery.append(" desc ");
-		else
-			duplicationsQuery.append(" asc ");
-
-		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-
 		try {
+			// First of all, find all duplicates digests
+			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
+			List<String> digests = docDao.findDuplicatedDigests(session.getTenantId(), folderId);
+			log.info("Found {} duplicated digests", digests.size());
+
+			StringBuilder duplicationsQuery = new StringBuilder(
+					"select ld_id, ld_digest, ld_date, ld_folderid, ld_filename, ld_version from ld_document where ld_deleted=0 ");
+			duplicationsQuery.append(" and ld_tenantid = ");
+			duplicationsQuery.append(Long.toString(session.getTenantId()));
+			duplicationsQuery.append(" and ld_docref is null and ld_digest in ('");
+			duplicationsQuery.append(String.join("','", digests));
+			duplicationsQuery.append("') order by ld_digest asc, ld_date ");
+			if (retainNewest)
+				duplicationsQuery.append(" desc ");
+			else
+				duplicationsQuery.append(" asc ");
+
+			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+
 			@SuppressWarnings("unchecked")
 			List<Document> duplications = (List<Document>) docDao.query(duplicationsQuery.toString(), null,
 					new RowMapper<Document>() {

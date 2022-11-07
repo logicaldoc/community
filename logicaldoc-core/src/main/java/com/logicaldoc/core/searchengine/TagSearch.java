@@ -30,7 +30,11 @@ public class TagSearch extends Search {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void internalSearch() throws SearchException {
-		prepareExpression();
+		try {
+			prepareExpression();
+		} catch (PersistenceException e) {
+			throw new SearchException(e);
+		}
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
@@ -48,8 +52,10 @@ public class TagSearch extends Search {
 
 	/**
 	 * Utility method that prepare the query expression.
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	private void prepareExpression() {
+	private void prepareExpression() throws PersistenceException {
 
 		// Find all real documents
 		StringBuilder query = new StringBuilder(
@@ -97,8 +103,10 @@ public class TagSearch extends Search {
 	 * @param aliases If true, also the shortcut must be considered in the
 	 *        search
 	 * @param query
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	private void appendWhereClause(boolean aliases, StringBuilder query) {
+	private void appendWhereClause(boolean aliases, StringBuilder query) throws PersistenceException {
 		long tenantId = Tenant.DEFAULT_ID;
 		if (options.getTenantId() != null)
 			tenantId = options.getTenantId().longValue();

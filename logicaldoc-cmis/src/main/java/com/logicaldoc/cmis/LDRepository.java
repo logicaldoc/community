@@ -1412,7 +1412,11 @@ public class LDRepository {
 		if (!fileNameSearch) {
 			hasMoreItems = doFulltextSearch(statement, whereClause, parentFolderID, list, filter, maxItems);
 		} else {
-			doFilenameSearch(statement, list, filter, maxItems);
+			try {
+				doFilenameSearch(statement, list, filter, maxItems);
+			} catch (PersistenceException e) {
+				log.error(e.getMessage(), e);
+			}
 		}
 
 		ObjectListImpl objList = new ObjectListImpl();
@@ -1423,7 +1427,7 @@ public class LDRepository {
 		return objList;
 	}
 
-	private void doFilenameSearch(String statement, List<ObjectData> list, Set<String> filter, int maxItems) {
+	private void doFilenameSearch(String statement, List<ObjectData> list, Set<String> filter, int maxItems) throws PersistenceException {
 		// Performs file name search
 		User user = getSessionUser();
 

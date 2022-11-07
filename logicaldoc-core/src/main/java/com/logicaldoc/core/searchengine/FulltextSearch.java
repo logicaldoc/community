@@ -290,7 +290,10 @@ public class FulltextSearch extends Search {
 		boolean searchInSingleFolder = (opt.getFolderId() != null && !opt.isSearchInSubPath());
 		if (!searchInSingleFolder) {
 			log.debug("Folders search");
-			accessibleFolderIds = fdao.findFolderIdByUserIdInPath(opt.getUserId(), opt.getFolderId());
+			if (opt.getFolderId() != null)
+				accessibleFolderIds = fdao.findFolderIdByUserIdInPath(opt.getUserId(), opt.getFolderId());
+			else
+				accessibleFolderIds = fdao.findFolderIdByUserId(opt.getUserId(), null, true);
 			log.debug("End of Folders search");
 		}
 		return accessibleFolderIds;

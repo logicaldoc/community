@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.task.Task;
 
@@ -52,8 +53,10 @@ public class IndexOptimizer extends Task {
 
 	/**
 	 * Removes from index all documents deleted in the database
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	private void deleteOrphaned() {
+	private void deleteOrphaned() throws PersistenceException {
 		List<Long> ids = documentDao.findDeletedDocIds();
 		indexer.deleteHits(ids);
 	}

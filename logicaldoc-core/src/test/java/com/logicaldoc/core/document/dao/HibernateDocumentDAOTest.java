@@ -11,6 +11,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -22,12 +23,15 @@ import com.logicaldoc.core.document.AbstractDocument;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentEvent;
 import com.logicaldoc.core.document.DocumentHistory;
+import com.logicaldoc.core.document.TagCloud;
 import com.logicaldoc.core.document.TagsProcessor;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.lock.LockManager;
 import com.logicaldoc.core.metadata.Template;
 import com.logicaldoc.core.metadata.TemplateDAO;
+import com.logicaldoc.core.security.Session;
+import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.util.crypt.CryptUtil;
@@ -38,6 +42,7 @@ import junit.framework.Assert;
  * Test case for <code>HibernateDocumentDAO</code>
  * 
  * @author Marco Meschieri - LogicalDOC
+ * 
  * @since 3.0
  */
 public class HibernateDocumentDAOTest extends AbstractCoreTCase {
@@ -58,9 +63,55 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		// Retrieve the instance under test from spring context. Make sure that
 		// it is an HibernateDocumentDAO
 		dao = (DocumentDAO) context.getBean("DocumentDAO");
+
 		folderDao = (FolderDAO) context.getBean("FolderDAO");
 		lockManager = (LockManager) context.getBean("LockManager");
 		templateDao = (TemplateDAO) context.getBean("TemplateDAO");
+	}
+
+	@Test
+	public void testComputeTotalSize() throws PersistenceException {
+		long totalSize = dao.computeTotalSize(1L, null, false);
+		Assert.assertEquals(268704L, totalSize);
+
+		totalSize = dao.computeTotalSize(1L, null, true);
+		Assert.assertEquals(635739L, totalSize);
+
+		totalSize = dao.computeTotalSize(1L, 1L, true);
+		Assert.assertEquals(635739L, totalSize);
+
+		totalSize = dao.computeTotalSize(1L, 3L, true);
+		Assert.assertEquals(0L, totalSize);
+
+		// Unexisting tenant
+		totalSize = dao.computeTotalSize(99L, 1L, true);
+		Assert.assertEquals(0L, totalSize);
+	}
+
+	@Test
+	public void testGetTagCloud() throws PersistenceException {
+		Session session = SessionManager.get().newSession("admin", "admin", null);
+		try {
+			List<TagCloud> cloud = dao.getTagCloud(session.getSid());
+			Assert.assertNotNull(cloud);
+			Assert.assertEquals("approved,rejected",
+					cloud.stream().map(TagCloud::getTag).collect(Collectors.joining(",")));
+		} finally {
+			SessionManager.get().kill(session.getSid());
+		}
+	}
+
+	@Test
+	public void testUpdateDigest() throws PersistenceException, IOException {
+		Document doc = dao.findById(1);
+		Assert.assertNotNull(doc);
+		dao.initialize(doc);
+		Assert.assertEquals("xx", doc.getDigest());
+
+		copyResource("/Digital_Day.pdf", "target/store/1/doc/1.0");
+
+		dao.updateDigest(doc);
+		Assert.assertEquals("ee6225dab489cfa38ba070c9c45c884efaa34ad8", doc.getDigest());
 	}
 
 	@Test
@@ -152,7 +203,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindByCustomId() {
+	public void testFindByCustomId() throws PersistenceException {
 		Document doc = dao.findByCustomId("a", Tenant.DEFAULT_ID);
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);
@@ -184,7 +235,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindDocIdByFolder() {
+	public void testFindDocIdByFolder() throws PersistenceException {
 		Collection<Long> ids = dao.findDocIdByFolder(6, null);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(4, ids.size());
@@ -208,7 +259,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindIndexed() {
+	public void testFindIndexed() throws PersistenceException {
 		List<Document> docs = dao.findByIndexed(1);
 		Assert.assertNotNull(docs);
 		Assert.assertEquals(2, docs.size());
@@ -231,12 +282,12 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindDocIdByTag() {
+	public void testFindDocIdByTag() throws PersistenceException {
 		Collection<Long> ids = dao.findDocIdByTag("abc");
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(1, ids.size());
-		Assert.assertEquals(Long.valueOf(1L), ids.iterator().next());		
-		
+		Assert.assertEquals(Long.valueOf(1L), ids.iterator().next());
+
 		ids = dao.findDocIdByTag("xxx");
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(0, ids.size());
@@ -366,10 +417,24 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		dao.initialize(doc);
 		Assert.assertEquals(1, doc.getTemplate().getId());
 		Assert.assertEquals("test_val_1", doc.getValue("val1"));
+
+		// Try to store into an alias folder
+		Folder alias = folderDao.createAlias(4L, 6L, null);
+		doc = dao.findById(1);
+		Assert.assertNotNull(doc);
+		dao.initialize(doc);
+		doc.setFolder(alias);
+		dao.store(doc);
+
+		// The document should be stored in the referenced folder
+		doc = dao.findById(1);
+		Assert.assertNotNull(doc);
+		Folder realFolder = folderDao.findById(6L);
+		Assert.assertEquals(realFolder, doc.getFolder());
 	}
 
 	@Test
-	public void testFindTags() {
+	public void testFindTags() throws PersistenceException {
 		TagsProcessor processor = (TagsProcessor) context.getBean("TagsProcessor");
 		processor.run();
 
@@ -388,7 +453,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindAllTags() {
+	public void testFindAllTags() throws PersistenceException {
 		TagsProcessor processor = (TagsProcessor) context.getBean("TagsProcessor");
 		processor.run();
 
@@ -398,13 +463,13 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Assert.assertTrue(tags.contains("abc"));
 		tags = dao.findAllTags(null, 1L);
 		Assert.assertNotNull(tags);
-		Assert.assertEquals(7, tags.size());
+		Assert.assertEquals(8, tags.size());
 		Assert.assertTrue(tags.contains("abc"));
 		Assert.assertTrue(tags.contains("ftag2"));
 	}
 
 	@Test
-	public void testFindDocIdByUserIdAndTag() {
+	public void testFindDocIdByUserIdAndTag() throws PersistenceException {
 		Collection<Long> ids = dao.findDocIdByUserIdAndTag(1, "abc");
 		Assert.assertNotNull(ids);
 		// There is also the shortcut
@@ -421,7 +486,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindByUserIdAndTag() {
+	public void testFindByUserIdAndTag() throws PersistenceException {
 		List<Document> ids = dao.findByUserIdAndTag(1, "abc", null);
 		Assert.assertNotNull(ids);
 		// There is also the shortcut
@@ -446,7 +511,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindLastDownloadsByUserId() {
+	public void testFindLastDownloadsByUserId() throws PersistenceException {
 		Collection<Document> documents = dao.findLastDownloadsByUserId(1, 5);
 		Assert.assertNotNull(documents);
 		Assert.assertEquals(2, documents.size());
@@ -495,7 +560,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindLinkedDocuments() {
+	public void testFindLinkedDocuments() throws PersistenceException {
 		Collection<Document> docs = dao.findLinkedDocuments(1, null, null);
 		Assert.assertNotNull(docs);
 		Assert.assertEquals(1, docs.size());
@@ -512,7 +577,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindDeletedDocIds() {
+	public void testFindDeletedDocIds() throws PersistenceException {
 		List<Long> coll = dao.findDeletedDocIds();
 		Assert.assertNotNull(coll);
 		Assert.assertEquals(3, coll.size());
@@ -520,20 +585,20 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindDeletedDocs() {
+	public void testFindDeletedDocs() throws PersistenceException {
 		List<Document> coll = dao.findDeletedDocs();
 		Assert.assertNotNull(coll);
 		Assert.assertEquals(3, coll.size());
 	}
 
 	@Test
-	public void testCount() {
+	public void testCount() throws PersistenceException {
 		Assert.assertEquals(7L, dao.count(null, true, false));
 		Assert.assertEquals(4L, dao.count(Tenant.DEFAULT_ID, false, false));
 	}
 
 	@Test
-	public void testCountByIndexed() {
+	public void testCountByIndexed() throws PersistenceException {
 		Assert.assertEquals(2L, dao.countByIndexed(0));
 		Assert.assertEquals(2L, dao.countByIndexed(1));
 	}
@@ -568,7 +633,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindAliasIds() {
+	public void testFindAliasIds() throws PersistenceException {
 		Collection<Long> ids = dao.findAliasIds(1);
 		Assert.assertNotNull(ids);
 		Assert.assertEquals(1, ids.size());
@@ -604,7 +669,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindDeleted() {
+	public void testFindDeleted() throws PersistenceException {
 		List<Document> deletedDocs = dao.findDeleted(1, 5);
 		Assert.assertNotNull(deletedDocs);
 		Assert.assertEquals(1, deletedDocs.size());
@@ -632,7 +697,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testFindDuplicatedDigests() {
+	public void testFindDuplicatedDigests() throws PersistenceException {
 		List<String> duplicates = dao.findDuplicatedDigests(1L, 6L);
 		Assert.assertEquals(1, duplicates.size());
 		Assert.assertEquals("xx", duplicates.iterator().next());
@@ -672,6 +737,13 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	public void cleanUnexistingUniqueTags() throws PersistenceException {
 		Assert.assertEquals(2, dao.queryForInt("select count(*) from ld_uniquetag"));
 		dao.cleanUnexistingUniqueTags();
+		Assert.assertEquals(0, dao.queryForInt("select count(*) from ld_uniquetag"));
+	}
+
+	@Test
+	public void cleanUnexistingUniqueTagsOneByOne() throws PersistenceException {
+		Assert.assertEquals(2, dao.queryForInt("select count(*) from ld_uniquetag"));
+		dao.cleanUnexistingUniqueTagsOneByOne();
 		Assert.assertEquals(0, dao.queryForInt("select count(*) from ld_uniquetag"));
 	}
 }

@@ -85,7 +85,7 @@ public class FolderSearchTest extends AbstractCoreTCase {
 		}
 
 		results = search.getHits();
-		Assert.assertEquals(1, results.size());
-		Assert.assertEquals(1202L, results.get(0).getId());
+		Assert.assertEquals(2, results.size());
+		Assert.assertEquals(1201L, results.get(0).getId());
 	}
 }

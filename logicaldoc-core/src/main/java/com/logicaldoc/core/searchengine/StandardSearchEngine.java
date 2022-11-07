@@ -23,6 +23,7 @@ import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
@@ -147,8 +148,7 @@ public class StandardSearchEngine implements SearchEngine {
 				// Prefix all extended attributes with 'ext_' in order to
 				// avoid collisions with standard fields
 				hit.addField("ext_" + attribute,
-						StringUtils.isNotEmpty(ext.getStringValues()) ? ext.getStringValues()
-								: ext.getStringValue());
+						StringUtils.isNotEmpty(ext.getStringValues()) ? ext.getStringValues() : ext.getStringValue());
 			}
 		}
 	}
@@ -508,9 +508,14 @@ public class StandardSearchEngine implements SearchEngine {
 		/*
 		 * Remove from the index all the entries related to deleted files
 		 */
-		List<Long> deletedDocs = documentDao.findDeletedDocIds();
-		deleteHits(deletedDocs);
-		log.info("{} entries marked as deleted because refer to deleted documents", deletedDocs.size());
+		List<Long> deletedDocs = new ArrayList<>();
+		try {
+			deletedDocs = documentDao.findDeletedDocIds();
+			deleteHits(deletedDocs);
+			log.info("{} entries marked as deleted because refer to deleted documents", deletedDocs.size());
+		} catch (PersistenceException e) {
+			log.warn(e.getMessage(), e);
+		}
 
 		/*
 		 * Iterate over all the entries in pages of 1000 elements checking if
@@ -545,7 +550,7 @@ public class StandardSearchEngine implements SearchEngine {
 					done = true;
 				cursorMark = nextCursorMark;
 			}
-		} catch (Throwable e) {
+		} catch (NumberFormatException | SolrServerException | IOException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 		}
 

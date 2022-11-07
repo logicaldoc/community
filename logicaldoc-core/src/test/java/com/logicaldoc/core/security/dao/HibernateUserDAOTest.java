@@ -50,7 +50,7 @@ public class HibernateUserDAOTest extends AbstractCoreTCase {
 	public void testDelete() throws PersistenceException {
 		// User with history, not deletable
 		User user = dao.findByUsername("author");
-		Assert.assertEquals(2, user.getGroups().size());
+		Assert.assertEquals(3, user.getGroups().size());
 		dao.delete(user.getId());
 		user = dao.findByUsername("author");
 		Assert.assertNull(user);

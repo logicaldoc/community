@@ -130,17 +130,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public void unarchive(long docId, DocumentHistory transaction) {
-		try {
-			Document doc = (Document) findById(docId);
-			doc.setStatus(AbstractDocument.DOC_UNLOCKED);
-			doc.setLockUserId(null);
-			transaction.setEvent(DocumentEvent.RESTORED.toString());
-			store(doc, transaction);
-			log.debug("Unarchived document {}", docId);
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-		}
+	public void unarchive(long docId, DocumentHistory transaction) throws PersistenceException {
+		Document doc = (Document) findById(docId);
+		doc.setStatus(AbstractDocument.DOC_UNLOCKED);
+		doc.setLockUserId(null);
+		transaction.setEvent(DocumentEvent.RESTORED.toString());
+		store(doc, transaction);
+		log.debug("Unarchived document {}", docId);
 	}
 
 	@Override
@@ -185,35 +181,23 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	private void removeLinks(long docId, int delCode) {
-		try {
-			for (DocumentLink link : linkDAO.findByDocId(docId)) {
-				link.setDeleted(delCode);
-				saveOrUpdate(link);
-			}
-		} catch (Throwable t) {
-			log.error("Error removing the links of document {}", docId, t);
+		for (DocumentLink link : linkDAO.findByDocId(docId)) {
+			link.setDeleted(delCode);
+			saveOrUpdate(link);
 		}
 	}
 
 	private void removeNotes(long docId, int delCode) {
-		try {
-			for (DocumentNote note : noteDAO.findByDocId(docId, null)) {
-				note.setDeleted(delCode);
-				saveOrUpdate(note);
-			}
-		} catch (Throwable t) {
-			log.error("Error removing the notes of document {}", docId, t);
+		for (DocumentNote note : noteDAO.findByDocId(docId, null)) {
+			note.setDeleted(delCode);
+			saveOrUpdate(note);
 		}
 	}
 
 	private void removeVersions(long docId, int delCode) {
-		try {
-			for (Version version : versionDAO.findByDocId(docId)) {
-				version.setDeleted(delCode);
-				saveOrUpdate(version);
-			}
-		} catch (Throwable t) {
-			log.error("Error removing the versions of document {}", docId, t);
+		for (Version version : versionDAO.findByDocId(docId)) {
+			version.setDeleted(delCode);
+			saveOrUpdate(version);
 		}
 	}
 
@@ -272,17 +256,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Long> findDocIdByTag(String tag) {
+	public List<Long> findDocIdByTag(String tag) throws PersistenceException {
 		StringBuilder query = new StringBuilder(
 				"select distinct(A.ld_docid) from ld_tag A, ld_document B where A.ld_docid=B.ld_id and not B.ld_status="
 						+ AbstractDocument.DOC_ARCHIVED);
 		query.append(" and lower(ld_tag)='" + SqlUtil.doubleQuotesAndBackslashes(tag).toLowerCase() + "'");
-		try {
-			return (List<Long>) queryForList(query.toString(), Long.class);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
-		}
+		return (List<Long>) queryForList(query.toString(), Long.class);
 	}
 
 	@Override
@@ -338,7 +317,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 			// Save the document
 			saveOrUpdate(doc);
-			internalFlush();
+			flush();
 
 			if (doc.getDeleted() == 0 && doc.getId() != 0L)
 				refresh(doc);
@@ -363,9 +342,10 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			 * Update the aliases
 			 */
 			updateAliases(doc);
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			handleStoreError(transaction, e);
 		}
+
 	}
 
 	private boolean handleStoreError(final DocumentHistory transaction, Throwable e) throws PersistenceException {
@@ -388,25 +368,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 					+ "' where ld_docref= " + doc.getId());
 	}
 
-	private void internalFlush() {
-		try {
-			flush();
-		} catch (Throwable t) {
-			// Noting to do
-		}
-	}
-
 	private void copyFolderMetadata(Document doc) {
-		if (doc.getFolder().getTemplate() != null) {
-			try {
-				copyFolderExtendedAttributes(doc);
-			} catch (Throwable t) {
-				// From times to times during check-in a
-				// lazy-loading
-				// exception is thrown
-			}
-		}
-
+		if (doc.getFolder().getTemplate() != null)
+			copyFolderExtendedAttributes(doc);
 		/*
 		 * Check for OCR template at folder level
 		 */
@@ -454,11 +418,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 	}
 
-	private void setFolder(Document doc) throws PersistenceException, Exception {
+	private void setFolder(Document doc) throws PersistenceException {
 		if (doc.getFolder().getFoldRef() != null) {
 			Folder fld = folderDAO.findById(doc.getFolder().getFoldRef());
 			if (fld == null)
-				throw new Exception(String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
+				throw new PersistenceException(
+						String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
 			doc.setFolder(fld);
 		}
 	}
@@ -602,65 +567,54 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<String> findTags(long docId) {
-		try {
-			return queryForList("select ld_tag from ld_tag where ld_docid=" + docId + " order by ld_tag", String.class);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<String>();
-		}
+	public List<String> findTags(long docId) throws PersistenceException {
+		return queryForList("select ld_tag from ld_tag where ld_docid=" + docId + " order by ld_tag", String.class);
 	}
 
 	@Override
-	public Map<String, Long> findTags(String firstLetter, Long tenantId) {
+	public Map<String, Long> findTags(String firstLetter, Long tenantId) throws PersistenceException {
 		final Map<String, Long> map = new HashMap<String, Long>();
 
-		try {
-			StringBuilder query = new StringBuilder("SELECT ld_count, ld_tag from ld_uniquetag where 1=1 ");
-			if (StringUtils.isNotEmpty(firstLetter))
-				query.append(" and lower(ld_tag) like '" + firstLetter.toLowerCase() + "%' ");
-			if (tenantId != null)
-				query.append(AND_LD_TENANTID + tenantId);
+		StringBuilder query = new StringBuilder("SELECT ld_count, ld_tag from ld_uniquetag where 1=1 ");
+		if (StringUtils.isNotEmpty(firstLetter))
+			query.append(" and lower(ld_tag) like '" + firstLetter.toLowerCase() + "%' ");
+		if (tenantId != null)
+			query.append(AND_LD_TENANTID + tenantId);
 
-			query(query.toString(), null, new RowMapper<Object>() {
+		query(query.toString(), null, new RowMapper<Object>() {
 
-				@Override
-				public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
-					Long value = (Long) rs.getLong(1);
-					String key = (String) rs.getString(2);
-					map.put(key, value);
-					return null;
-				}
+			@Override
+			public Object mapRow(ResultSet rs, int rowNumber) throws SQLException {
+				Long value = (Long) rs.getLong(1);
+				String key = (String) rs.getString(2);
+				map.put(key, value);
+				return null;
+			}
 
-			}, null);
-		} catch (Throwable e) {
-			log.error(e.getMessage(), e);
-		}
+		}, null);
+
 		return map;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> findAllTags(String firstLetter, Long tenantId) {
-		try {
-			StringBuilder sb = new StringBuilder("select ld_tag from ld_uniquetag where 1=1 ");
-			if (tenantId != null) {
-				sb.append(AND_LD_TENANTID + tenantId);
-			}
-
-			List<Object> parameters = new ArrayList<Object>();
-			if (firstLetter != null) {
-				sb.append(" and lower(ld_tag) like ? ");
-				parameters.add(firstLetter.toLowerCase() + "%");
-			}
-			return (List<String>) queryForList(sb.toString(), parameters.toArray(new Object[0]), String.class, null);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+	public List<String> findAllTags(String firstLetter, Long tenantId) throws PersistenceException {
+		StringBuilder sb = new StringBuilder("select ld_tag from ld_uniquetag where 1=1 ");
+		if (tenantId != null) {
+			sb.append(AND_LD_TENANTID + tenantId);
 		}
-		return new ArrayList<String>();
+
+		List<Object> parameters = new ArrayList<Object>();
+		if (firstLetter != null) {
+			sb.append(" and lower(ld_tag) like ? ");
+			parameters.add(firstLetter.toLowerCase() + "%");
+		}
+		return (List<String>) queryForList(sb.toString(), parameters.toArray(new Object[0]), String.class, null);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Document> findByUserIdAndTag(long userId, String tag, Integer max) {
+	public List<Document> findByUserIdAndTag(long userId, String tag, Integer max) throws PersistenceException {
 		List<Document> coll = new ArrayList<Document>();
 
 		List<Long> ids = findDocIdByUserIdAndTag(userId, tag);
@@ -678,96 +632,90 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public List<Long> findDocIdByUserIdAndTag(long userId, String tag) {
+	public List<Long> findDocIdByUserIdAndTag(long userId, String tag) throws PersistenceException {
 		List<Long> ids = new ArrayList<Long>();
-		try {
-			User user = userDAO.findById(userId);
-			if (user == null)
-				return ids;
 
-			StringBuilder query = new StringBuilder();
+		User user = userDAO.findById(userId);
+		if (user == null)
+			return ids;
 
-			if (user.isMemberOf(Group.GROUP_ADMIN)) {
-				ids = findDocIdByTag(tag);
-			} else {
+		StringBuilder query = new StringBuilder();
 
-				/*
-				 * Search for all accessible folders
-				 */
-				Collection<Long> precoll = folderDAO.findFolderIdByUserId(userId, null, true);
-				String precollString = precoll.toString().replace('[', '(').replace(']', ')');
+		if (user.isMemberOf(Group.GROUP_ADMIN)) {
+			ids = findDocIdByTag(tag);
+		} else {
 
-				query.append("select distinct(C.ld_id) from ld_document C, ld_tag D "
-						+ " where C.ld_id=D.ld_docid AND C.ld_deleted=0 and not C.ld_status="
-						+ AbstractDocument.DOC_ARCHIVED);
-				query.append(" AND C.ld_folderid in ");
-				query.append(precollString);
-				query.append(" AND lower(D.ld_tag)='" + SqlUtil.doubleQuotes(tag.toLowerCase()) + "' ");
+			/*
+			 * Search for all accessible folders
+			 */
+			Collection<Long> precoll = folderDAO.findFolderIdByUserId(userId, null, true);
+			String precollString = precoll.toString().replace('[', '(').replace(']', ')');
 
-				log.debug("Find by tag: {}", query);
+			query.append("select distinct(C.ld_id) from ld_document C, ld_tag D "
+					+ " where C.ld_id=D.ld_docid AND C.ld_deleted=0 and not C.ld_status="
+					+ AbstractDocument.DOC_ARCHIVED);
+			query.append(" AND C.ld_folderid in ");
+			query.append(precollString);
+			query.append(" AND lower(D.ld_tag)='" + SqlUtil.doubleQuotes(tag.toLowerCase()) + "' ");
 
-				List<Long> docIds = (List<Long>) queryForList(query.toString(), Long.class);
-				ids.addAll(docIds);
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			log.debug("Find by tag: {}", query);
+
+			List<Long> docIds = (List<Long>) queryForList(query.toString(), Long.class);
+			ids.addAll(docIds);
 		}
 
 		return ids;
 	}
 
 	@Override
-	public List<Document> findLastDownloadsByUserId(long userId, int maxResults) {
+	public List<Document> findLastDownloadsByUserId(long userId, int maxResults) throws PersistenceException {
 		List<Document> coll = new ArrayList<Document>();
 
-		try {
-			StringBuilder query = new StringBuilder("select docId from DocumentHistory ");
-			query.append(" where userId = " + userId);
-			query.append(" and event = '" + DocumentEvent.DOWNLOADED + "' ");
-			query.append(" order by date desc");
+		StringBuilder query = new StringBuilder("select docId from DocumentHistory ");
+		query.append(" where userId = " + userId);
+		query.append(" and event = '" + DocumentEvent.DOWNLOADED + "' ");
+		query.append(" order by date desc");
 
-			List<Long> results = (List<Long>) findByQuery(query.toString(), (Map<String, Object>) null, null);
-			ArrayList<Long> tmpal = new ArrayList<Long>(results);
-			List<Long> docIds = tmpal;
+		@SuppressWarnings("unchecked")
+		List<Long> results = (List<Long>) findByQuery(query.toString(), (Map<String, Object>) null, null);
+		ArrayList<Long> tmpal = new ArrayList<Long>(results);
+		List<Long> docIds = tmpal;
 
-			if (docIds.isEmpty())
-				return coll;
+		if (docIds.isEmpty())
+			return coll;
 
-			if (docIds.size() > maxResults) {
-				tmpal.subList(0, maxResults - 1);
-			}
+		if (docIds.size() > maxResults) {
+			tmpal.subList(0, maxResults - 1);
+		}
 
-			query = new StringBuilder("from Document " + ENTITY + " ");
-			query.append(" where not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED);
-			query.append(AND + ENTITY + ".id in (");
+		query = new StringBuilder("from Document " + ENTITY + " ");
+		query.append(" where not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED);
+		query.append(AND + ENTITY + ".id in (");
 
-			for (int i = 0; i < docIds.size(); i++) {
-				Long docId = docIds.get(i);
-				if (i > 0)
-					query.append(",");
-				query.append(docId);
-			}
-			query.append(")");
+		for (int i = 0; i < docIds.size(); i++) {
+			Long docId = docIds.get(i);
+			if (i > 0)
+				query.append(",");
+			query.append(docId);
+		}
+		query.append(")");
 
-			// execute the query
-			List<Document> unorderdColl = (List<Document>) findByQuery(query.toString(), (Map<String, Object>) null,
-					null);
+		// execute the query
+		@SuppressWarnings("unchecked")
+		List<Document> unorderdColl = (List<Document>) findByQuery(query.toString(), (Map<String, Object>) null, null);
 
-			// put all elements in a map
-			HashMap<Long, Document> hm = new HashMap<Long, Document>();
-			for (Document doc : unorderdColl) {
-				hm.put(doc.getId(), doc);
-			}
+		// put all elements in a map
+		HashMap<Long, Document> hm = new HashMap<Long, Document>();
+		for (Document doc : unorderdColl) {
+			hm.put(doc.getId(), doc);
+		}
 
-			// Access the map using the folderIds
-			// if a match is found, put it in the original list
-			for (Long docId : docIds) {
-				Document myDoc = hm.get(docId);
-				if (myDoc != null)
-					coll.add(myDoc);
-			}
-		} catch (Exception e) {
-			log.warn(e.getMessage(), e);
+		// Access the map using the folderIds
+		// if a match is found, put it in the original list
+		for (Long docId : docIds) {
+			Document myDoc = hm.get(docId);
+			if (myDoc != null)
+				coll.add(myDoc);
 		}
 
 		return coll;
@@ -775,73 +723,50 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Long> findDocIdByFolder(long folderId, Integer max) {
+	public List<Long> findDocIdByFolder(long folderId, Integer max) throws PersistenceException {
 		String sql = "select ld_id from ld_document where ld_deleted=0 and ld_folderid = " + folderId
 				+ " and not ld_status=" + AbstractDocument.DOC_ARCHIVED;
-		try {
-			return (List<Long>) queryForList(sql, null, Long.class, max);
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
-			return new ArrayList<Long>();
-		}
+		return (List<Long>) queryForList(sql, null, Long.class, max);
 	}
 
 	@Override
-	public List<Document> findByFolder(long folderId, Integer max) {
-		try {
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("folderId", Long.valueOf(folderId));
-			return findByWhere(ENTITY + ".folder.id = :folderId ", params, null, max);
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
-			return new ArrayList<Document>();
-		}
+	public List<Document> findByFolder(long folderId, Integer max) throws PersistenceException {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("folderId", Long.valueOf(folderId));
+		return findByWhere(ENTITY + ".folder.id = :folderId ", params, null, max);
 	}
 
 	@Override
-	public List<Document> findArchivedByFolder(long folderId) {
-		try {
-			return findByWhere(ENTITY + ".folder.id = " + folderId + AND + ENTITY + STATUS
-					+ AbstractDocument.DOC_ARCHIVED, null, null);
-		} catch (PersistenceException e) {
-			log.warn(e.getMessage(), e);
-			return new ArrayList<Document>();
-		}
+	public List<Document> findArchivedByFolder(long folderId) throws PersistenceException {
+		return findByWhere(ENTITY + ".folder.id = " + folderId + AND + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED,
+				null, null);
 	}
 
 	@Override
-	public List<Document> findLinkedDocuments(long docId, String linkType, Integer direction) {
+	public List<Document> findLinkedDocuments(long docId, String linkType, Integer direction)
+			throws PersistenceException {
 		List<Document> coll = new ArrayList<Document>();
-		StringBuilder query = null;
-		try {
-			query = new StringBuilder("");
-			if (direction == null)
-				query.append(
-						"select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1=?) UNION select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2=?)");
-			else if (direction.intValue() == 1)
-				query.append("select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1=?)");
-			else if (direction.intValue() == 2)
-				query.append("select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2=?)");
-			@SuppressWarnings("unchecked")
-			List<Long> ids = (List<Long>) queryForList(query.toString(),
-					linkType != null ? new Object[] { docId } : new Object[] { docId, docId }, Long.class, null);
-			coll = findByWhere(
-					ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
-							+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED,
-					null, null);
-
-		} catch (Throwable e) {
-			log.warn(e.getMessage(), e);
-		}
+		StringBuilder query = new StringBuilder("");
+		if (direction == null)
+			query.append(
+					"select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1=?) UNION select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2=?)");
+		else if (direction.intValue() == 1)
+			query.append("select distinct(ld_docid2) from ld_link where ld_deleted=0 and (ld_docid1=?)");
+		else if (direction.intValue() == 2)
+			query.append("select distinct(ld_docid1) from ld_link where ld_deleted=0 and (ld_docid2=?)");
+		@SuppressWarnings("unchecked")
+		List<Long> ids = (List<Long>) queryForList(query.toString(),
+				linkType != null ? new Object[] { docId } : new Object[] { docId, docId }, Long.class, null);
+		coll = findByWhere(ENTITY + ".id in (" + ids.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+				+ ") and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED, null, null);
 
 		return coll;
 	}
 
 	@Override
 	public List<Document> findByFileNameAndParentFolderId(Long folderId, String fileName, Long excludeId, Long tenantId,
-			Integer max) {
-		String query = "lower(" + ENTITY + ".fileName) like '%" + SqlUtil.doubleQuotes(fileName.toLowerCase())
-				+ "%'";
+			Integer max) throws PersistenceException {
+		String query = "lower(" + ENTITY + ".fileName) like '%" + SqlUtil.doubleQuotes(fileName.toLowerCase()) + "%'";
 		if (tenantId != null) {
 			query += AND + ENTITY + ".tenantId = " + tenantId;
 		}
@@ -852,103 +777,71 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			query += " and not(" + ENTITY + ".id = " + excludeId + ")";
 		query += " and not " + ENTITY + STATUS + AbstractDocument.DOC_ARCHIVED;
 
-		try {
-			return findByWhere(query, null, max);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<Document>();
-		}
+		return findByWhere(query, null, max);
 	}
 
 	@Override
 	public void initialize(Document doc) {
-		try {
-			refresh(doc);
+		refresh(doc);
 
-			if (doc.getAttributes() != null)
-				log.trace("Initialized {} attributes", doc.getAttributes().keySet().size());
+		if (doc.getAttributes() != null)
+			log.trace("Initialized {} attributes", doc.getAttributes().keySet().size());
 
-			if (doc.getTags() != null)
-				log.trace("Initialized {} tags", doc.getTags().size());
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		if (doc.getTags() != null)
+			log.trace("Initialized {} tags", doc.getTags().size());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Long> findDeletedDocIds() {
+	public List<Long> findDeletedDocIds() throws PersistenceException {
 		String query = "select ld_id from ld_document where ld_deleted=1 order by ld_lastmodified desc";
-		try {
-			return (List<Long>) queryForList(query, Long.class);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
-		}
+		return (List<Long>) queryForList(query, Long.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Document> findDeletedDocs() throws PersistenceException {
+		String query = "select ld_id, ld_customid, ld_lastModified, ld_filename from ld_document where ld_deleted=1 order by ld_lastmodified desc";
+
+		@SuppressWarnings("rawtypes")
+		RowMapper docMapper = new BeanPropertyRowMapper() {
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+
+				Document doc = new Document();
+				doc.setId(rs.getLong(1));
+				doc.setCustomId(rs.getString(2));
+				doc.setLastModified(rs.getDate(3));
+				doc.setFileName(rs.getString(4));
+
+				return doc;
+			}
+		};
+
+		return (List<Document>) query(query, new Object[] {}, docMapper, null);
 	}
 
 	@Override
-	public List<Document> findDeletedDocs() {
-		List<Document> coll = new ArrayList<Document>();
-		try {
-			String query = "select ld_id, ld_customid, ld_lastModified, ld_filename from ld_document where ld_deleted=1 order by ld_lastmodified desc";
-
-			@SuppressWarnings("rawtypes")
-			RowMapper docMapper = new BeanPropertyRowMapper() {
-				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-					Document doc = new Document();
-					doc.setId(rs.getLong(1));
-					doc.setCustomId(rs.getString(2));
-					doc.setLastModified(rs.getDate(3));
-					doc.setFileName(rs.getString(4));
-
-					return doc;
-				}
-			};
-
-			coll = (List<Document>) query(query, new Object[] {}, docMapper, null);
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-		}
-		return coll;
-	}
-
-	@Override
-	public long computeTotalSize(Long tenantId, Long userId, boolean computeDeleted) {
-		long sizeDocs = 0;
-
-		try {
-			// we do not count the aliases
-			sizeDocs = queryForLong("SELECT SUM(ld_filesize) from ld_document where ld_docref is null "
-					+ (computeDeleted ? "" : " and ld_deleted=0 ")
-					+ (userId != null ? " and ld_publisherid=" + userId : "")
-					+ (tenantId != Tenant.SYSTEM_ID ? AND_LD_TENANTID + tenantId : ""));
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+	public long computeTotalSize(Long tenantId, Long userId, boolean computeDeleted) throws PersistenceException {
+		// we do not count the aliases
+		long sizeDocs = queryForLong("SELECT SUM(ld_filesize) from ld_document where ld_docref is null "
+				+ (computeDeleted ? "" : " and ld_deleted=0 ") + (userId != null ? " and ld_publisherid=" + userId : "")
+				+ (tenantId != Tenant.SYSTEM_ID ? AND_LD_TENANTID + tenantId : ""));
 
 		long sizeVersions = 0;
 
-		try {
-			sizeVersions = queryForLong(
-					"select SUM(V.ld_filesize) from ld_version V where V.ld_version = V.ld_fileversion"
-							+ (computeDeleted ? "" : " and V.ld_deleted=0 ")
-							+ (userId != null ? " and V.ld_publisherid=" + userId : "")
-							+ (tenantId != Tenant.SYSTEM_ID ? " and V.ld_tenantid=" + tenantId : "")
-							+ "   and not exists (select D.ld_id from ld_document D"
-							+ "                   where D.ld_id=V.ld_documentid "
-							+ "                     and D.ld_fileversion=V.ld_fileversion)");
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		sizeVersions = queryForLong("select SUM(V.ld_filesize) from ld_version V where V.ld_version = V.ld_fileversion"
+				+ (computeDeleted ? "" : " and V.ld_deleted=0 ")
+				+ (userId != null ? " and V.ld_publisherid=" + userId : "")
+				+ (tenantId != Tenant.SYSTEM_ID ? " and V.ld_tenantid=" + tenantId : "")
+				+ "   and not exists (select D.ld_id from ld_document D"
+				+ "                   where D.ld_id=V.ld_documentid "
+				+ "                     and D.ld_fileversion=V.ld_fileversion)");
 
 		return sizeDocs + sizeVersions;
 	}
 
 	@Override
-	public long count(Long tenantId, boolean computeDeleted, boolean computeArchived) {
+	public long count(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException {
 		String query = "select count(*) from ld_document where 1=1 ";
 		if (!computeDeleted)
 			query += " and ld_deleted = 0 ";
@@ -957,23 +850,13 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		if (tenantId != null)
 			query += " and ld_tenantid = " + tenantId;
 
-		try {
-			return queryForLong(query);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
+		return queryForLong(query);
 	}
 
 	@Override
-	public List<Document> findByIndexed(int indexed) {
-		try {
-			return findByWhere(ENTITY + ".docRef is null and " + ENTITY + ".indexed=" + indexed,
-					"order by " + ENTITY + ".lastModified asc", null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<Document>();
-		}
+	public List<Document> findByIndexed(int indexed) throws PersistenceException {
+		return findByWhere(ENTITY + ".docRef is null and " + ENTITY + ".indexed=" + indexed,
+				"order by " + ENTITY + ".lastModified asc", null);
 	}
 
 	@Override
@@ -995,39 +878,28 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public Document findByCustomId(String customId, long tenantId) {
+	public Document findByCustomId(String customId, long tenantId) throws PersistenceException {
 		Document doc = null;
-		if (customId != null)
-			try {
-				String query = ENTITY + ".customId = '" + SqlUtil.doubleQuotes(customId) + "' " + AND
-						+ ENTITY + ".tenantId=" + tenantId;
-				List<Document> coll = findByWhere(query, null, null);
-				if (!coll.isEmpty()) {
-					doc = coll.get(0);
-					if (doc.getDeleted() == 1)
-						doc = null;
-				}
-			} catch (Exception e) {
-				if (log.isErrorEnabled())
-					log.error(e.getMessage(), e);
+		if (customId != null) {
+			String query = ENTITY + ".customId = '" + SqlUtil.doubleQuotes(customId) + "' " + AND + ENTITY
+					+ ".tenantId=" + tenantId;
+			List<Document> coll = findByWhere(query, null, null);
+			if (!coll.isEmpty()) {
+				doc = coll.get(0);
+				if (doc.getDeleted() == 1)
+					doc = null;
 			}
+		}
 		return doc;
 	}
 
 	@Override
-	public void makeImmutable(long docId, DocumentHistory transaction) {
-		Document doc = null;
-		try {
-			doc = findById(docId);
-			initialize(doc);
-			doc.setImmutable(1);
-			doc.setStatus(AbstractDocument.DOC_UNLOCKED);
-			store(doc, transaction);
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-		}
-
+	public void makeImmutable(long docId, DocumentHistory transaction) throws PersistenceException {
+		Document doc = findById(docId);
+		initialize(doc);
+		doc.setImmutable(1);
+		doc.setStatus(AbstractDocument.DOC_UNLOCKED);
+		store(doc, transaction);
 	}
 
 	public void deleteAll(Collection<Document> documents, DocumentHistory transaction) throws PersistenceException {
@@ -1082,7 +954,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 				listener.afterSaveHistory(doc, transaction, dictionary);
 
 			EventCollector.get().newEvent(transaction);
-		} catch (Throwable e) {
+		} catch (PersistenceException e) {
 			if (transaction != null && StringUtils.isNotEmpty(transaction.getSessionId())) {
 				Session session = SessionManager.get().get(transaction.getSessionId());
 				session.logError(e.getMessage());
@@ -1096,59 +968,41 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public long countByIndexed(int indexed) {
-		String query = "select count(*) from ld_document where ld_deleted=0 and ld_indexed = " + indexed;
-		try {
-			return queryForLong(query);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return 0;
-		}
+	public long countByIndexed(int indexed) throws PersistenceException {
+		return queryForLong("select count(*) from ld_document where ld_deleted=0 and ld_indexed = " + indexed);
 	}
 
 	@Override
-	public List<Long> findAliasIds(long docId) {
-		try {
-			return findIdsByWhere(ENTITY + ".docRef = " + Long.toString(docId), null, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
-		}
+	public List<Long> findAliasIds(long docId) throws PersistenceException {
+		return findIdsByWhere(ENTITY + ".docRef = " + Long.toString(docId), null, null);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Document> findDeleted(long userId, Integer maxHits) {
-		List<Document> results = new ArrayList<Document>();
-		try {
-			String query = "select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid, ld_color from ld_document where ld_deleted=1 and ld_deleteuserid = "
-					+ userId + " order by ld_lastmodified desc";
+	public List<Document> findDeleted(long userId, Integer maxHits) throws PersistenceException {
+		String query = "select ld_id, ld_lastmodified, ld_filename, ld_customid, ld_tenantid, ld_folderid, ld_color from ld_document where ld_deleted=1 and ld_deleteuserid = "
+				+ userId + " order by ld_lastmodified desc";
 
-			@SuppressWarnings("rawtypes")
-			RowMapper docMapper = new BeanPropertyRowMapper() {
-				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-					Document doc = new Document();
-					doc.setId(rs.getLong(1));
-					doc.setLastModified(rs.getTimestamp(2));
-					doc.setFileName(rs.getString(3));
-					doc.setCustomId(rs.getString(4));
-					doc.setTenantId(rs.getLong(5));
+		@SuppressWarnings("rawtypes")
+		RowMapper docMapper = new BeanPropertyRowMapper() {
+			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+				Document doc = new Document();
+				doc.setId(rs.getLong(1));
+				doc.setLastModified(rs.getTimestamp(2));
+				doc.setFileName(rs.getString(3));
+				doc.setCustomId(rs.getString(4));
+				doc.setTenantId(rs.getLong(5));
 
-					Folder folder = new Folder();
-					folder.setId(rs.getLong(6));
-					doc.setFolder(folder);
+				Folder folder = new Folder();
+				folder.setId(rs.getLong(6));
+				doc.setFolder(folder);
 
-					doc.setColor(rs.getString(7));
-					return doc;
-				}
-			};
+				doc.setColor(rs.getString(7));
+				return doc;
+			}
+		};
 
-			results = (List<Document>) query(query, null, docMapper, maxHits);
-
-		} catch (Throwable e) {
-			log.error(e.getMessage());
-		}
-
-		return results;
+		return (List<Document>) query(query, null, docMapper, maxHits);
 	}
 
 	public void setConfig(ContextProperties config) {
@@ -1180,30 +1034,21 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public boolean deleteOrphaned(long deleteUserId) {
-		try {
-			String dbms = config.getProperty("jdbc.dbms") != null ? config.getProperty("jdbc.dbms").toLowerCase()
-					: "mysql";
+	public void deleteOrphaned(long deleteUserId) throws PersistenceException {
+		String dbms = config.getProperty("jdbc.dbms") != null ? config.getProperty("jdbc.dbms").toLowerCase() : "mysql";
 
-			String concat = "CONCAT(ld_id,CONCAT('.',ld_customid))";
-			if (dbms.contains("postgre"))
-				concat = "ld_id || '.' || ld_customid";
-			if (dbms.contains("mssql"))
-				concat = "CAST(ld_id AS varchar) + '.' + ld_customid";
+		String concat = "CONCAT(ld_id,CONCAT('.',ld_customid))";
+		if (dbms.contains("postgre"))
+			concat = "ld_id || '.' || ld_customid";
+		if (dbms.contains("mssql"))
+			concat = "CAST(ld_id AS varchar) + '.' + ld_customid";
 
-			jdbcUpdate("update ld_document set ld_deleted=1,ld_customid=" + concat + ", ld_deleteuserid=" + deleteUserId
-					+ " where ld_deleted=0 and ld_folderid in (select ld_id from ld_folder where ld_deleted  > 0)");
-		} catch (Exception e) {
-			if (log.isErrorEnabled())
-				log.error(e.getMessage(), e);
-			return false;
-		}
-
-		return true;
+		jdbcUpdate("update ld_document set ld_deleted=1,ld_customid=" + concat + ", ld_deleteuserid=" + deleteUserId
+				+ " where ld_deleted=0 and ld_folderid in (select ld_id from ld_folder where ld_deleted  > 0)");
 	}
 
 	@Override
-	public Collection<Long> findPublishedIds(Collection<Long> folderIds) {
+	public Collection<Long> findPublishedIds(Collection<Long> folderIds) throws PersistenceException {
 		StringBuilder query = new StringBuilder(
 				"select ld_id from ld_document where ld_deleted=0 and not ld_status=" + AbstractDocument.DOC_ARCHIVED);
 		if (folderIds != null && !folderIds.isEmpty()) {
@@ -1217,20 +1062,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 		Date now = new Date();
 
-		try {
-			@SuppressWarnings("unchecked")
-			Collection<Long> buf = (Collection<Long>) queryForList(query.toString(), new Object[] { now, now },
-					Long.class, null);
-			Set<Long> ids = new HashSet<Long>();
-			for (Long id : buf) {
-				if (!ids.contains(id))
-					ids.add(id);
-			}
-			return ids;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<Long>();
+		@SuppressWarnings("unchecked")
+		Collection<Long> buf = (Collection<Long>) queryForList(query.toString(), new Object[] { now, now }, Long.class,
+				null);
+		Set<Long> ids = new HashSet<Long>();
+		for (Long id : buf) {
+			if (!ids.contains(id))
+				ids.add(id);
 		}
+		return ids;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1251,7 +1091,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public void cleanUnexistingUniqueTags() {
+	public void cleanUnexistingUniqueTags() throws PersistenceException {
 		try {
 			StringBuilder deleteStatement = new StringBuilder("delete from ld_uniquetag UT where ");
 
@@ -1272,15 +1112,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			 * The unique SQL query failed, so we do the same deletion
 			 * programmatically one by one
 			 */
-			try {
-				cleanUnexistingUniqueTagsOneByOne();
-			} catch (Throwable t) {
-				log.warn(t.getMessage(), t);
-			}
+			cleanUnexistingUniqueTagsOneByOne();
 		}
 	}
 
-	private void cleanUnexistingUniqueTagsOneByOne() throws PersistenceException {
+	@Override
+	public void cleanUnexistingUniqueTagsOneByOne() throws PersistenceException {
 		List<Long> tenantIds = tenantDAO.findAllIds();
 		for (Long tenantId : tenantIds) {
 			log.debug("Clean unique tags of tenant {}", tenantId);
@@ -1318,41 +1155,27 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public void insertNewUniqueTags() {
+	public void insertNewUniqueTags() throws PersistenceException {
 		StringBuilder insertStatement = new StringBuilder("insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) ");
 		insertStatement.append(" select distinct(B.ld_tag), B.ld_tenantid, 0 from ld_tag B, ld_document D ");
 		insertStatement.append(
 				" where B.ld_docid = D.ld_id and D.ld_deleted = 0 and B.ld_tag not in (select A.ld_tag from ld_uniquetag A where A.ld_tenantid=B.ld_tenantid) ");
-		try {
-			jdbcUpdate(insertStatement.toString());
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		jdbcUpdate(insertStatement.toString());
 
 		insertStatement = new StringBuilder("insert into ld_uniquetag(ld_tag, ld_tenantid, ld_count) ");
 		insertStatement.append(" select distinct(B.ld_tag), B.ld_tenantid, 0 from ld_foldertag B, ld_folder F ");
 		insertStatement.append(
 				" where B.ld_folderid = F.ld_id and F.ld_deleted = 0 and B.ld_tag not in (select A.ld_tag from ld_uniquetag A where A.ld_tenantid=B.ld_tenantid) ");
-		try {
-			jdbcUpdate(insertStatement.toString());
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+		jdbcUpdate(insertStatement.toString());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void updateCountUniqueTags() {
+	public void updateCountUniqueTags() throws PersistenceException {
 		List<Long> tenantIds = tenantDAO.findAllIds();
 		for (Long tenantId : tenantIds) {
 			// Get the actual unique tags for the given tenant
-			List<String> uniqueTags = new ArrayList<String>();
-
-			try {
-				uniqueTags = (List<String>) queryForList("select ld_tag from ld_uniquetag", String.class);
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
-			}
+			List<String> uniqueTags = (List<String>) queryForList("select ld_tag from ld_uniquetag", String.class);
 
 			// Update the count for each tag skipping those tags that belong to
 			// deleted documents
@@ -1371,22 +1194,18 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<TagCloud> getTagCloud(long tenantId, int maxTags) {
+	public List<TagCloud> getTagCloud(long tenantId, int maxTags) throws PersistenceException {
 		GenericDAO gendao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
-		List<TagCloud> list = new ArrayList<TagCloud>();
-		try {
-			list = (List<TagCloud>) gendao.query("select ld_tag, ld_count from ld_uniquetag where ld_tenantid="
-					+ tenantId + " order by ld_count desc", null, new RowMapper<TagCloud>() {
+		List<TagCloud> list = (List<TagCloud>) gendao.query(
+				"select ld_tag, ld_count from ld_uniquetag where ld_tenantid=" + tenantId + " order by ld_count desc",
+				null, new RowMapper<TagCloud>() {
 
-						@Override
-						public TagCloud mapRow(ResultSet rs, int arg1) throws SQLException {
-							return new TagCloud(rs.getString(1), rs.getLong(2));
-						}
-					}, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
+					@Override
+					public TagCloud mapRow(ResultSet rs, int arg1) throws SQLException {
+						return new TagCloud(rs.getString(1), rs.getLong(2));
+					}
+				}, null);
 
 		/**
 		 * Get the most used tags
@@ -1413,7 +1232,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public List<TagCloud> getTagCloud(String sid) {
+	public List<TagCloud> getTagCloud(String sid) throws PersistenceException {
 		Session session = SessionManager.get().get(sid);
 		ContextProperties config = Context.get().getProperties();
 
@@ -1501,7 +1320,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	}
 
 	@Override
-	public List<String> findDuplicatedDigests(Long tenantId, Long folderId) {
+	public List<String> findDuplicatedDigests(Long tenantId, Long folderId) throws PersistenceException {
 		// First of all, find all duplicates digests.
 		StringBuilder digestQuery = new StringBuilder("select ld_digest from ld_document where ld_deleted = 0 ");
 		if (tenantId != null) {
@@ -1519,15 +1338,11 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 		}
 		digestQuery.append(" and ld_docref is null and ld_digest is not null group by ld_digest having count(*) > 1");
 
-		try {
-			return (List<String>) query(digestQuery.toString(), null, new RowMapper<String>() {
-				public String mapRow(ResultSet rs, int rowNum) throws SQLException {
-					return rs.getString(1);
-				}
-			}, null);
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-			return new ArrayList<String>();
-		}
+		return (List<String>) query(digestQuery.toString(), null, new RowMapper<String>() {
+			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return rs.getString(1);
+			}
+		}, null);
+
 	}
 }

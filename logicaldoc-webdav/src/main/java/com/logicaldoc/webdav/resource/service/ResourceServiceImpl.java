@@ -228,19 +228,21 @@ public class ResourceServiceImpl implements ResourceService {
 		}
 
 		Resource parentFolder = this.getParentResource(currentStablePath, userId, session);
-
-		Collection<Document> docs = documentDAO.findByFileNameAndParentFolderId(Long.parseLong(parentFolder.getID()),
-				name, null, session.getTenantId(), null);
-
-		if (docs.isEmpty())
-			return null;
-
-		Document document = docs.iterator().next();
 		boolean hasAccess;
+		Document document = null;
+
 		try {
+			Collection<Document> docs = documentDAO.findByFileNameAndParentFolderId(
+					Long.parseLong(parentFolder.getID()), name, null, session.getTenantId(), null);
+
+			if (docs.isEmpty())
+				return null;
+
+			document = docs.iterator().next();
+
 			hasAccess = folderDAO.isReadEnabled(document.getFolder().getId(), userId);
-		} catch (PersistenceException e1) {
-			log.error(e1.getMessage(), e1);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 			hasAccess = false;
 		}
 

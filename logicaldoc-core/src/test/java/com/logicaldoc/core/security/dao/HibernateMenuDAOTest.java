@@ -152,11 +152,11 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 
 		menus = dao.findByUserId(4, 2, false);
 		Assert.assertNotNull(menus);
-		Assert.assertEquals(1, menus.size());
+		Assert.assertEquals(2, menus.size());
 		
 		menus = dao.findByUserId(4);
 		Assert.assertNotNull(menus);
-		Assert.assertEquals(22, menus.size());		
+		Assert.assertEquals(25, menus.size());		
 	}
 
 	@Test
@@ -193,7 +193,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 	public void testFindMenuIdByUserId() {
 		Collection<Long> ids = dao.findMenuIdByUserId(4, true);
 		Assert.assertNotNull(ids);
-		Assert.assertEquals(22, ids.size());
+		Assert.assertEquals(25, ids.size());
 		Assert.assertTrue(ids.contains(-104L));
 		Assert.assertTrue(ids.contains(1200L));
 
@@ -319,7 +319,7 @@ public class HibernateMenuDAOTest extends AbstractCoreTCase {
 
 		dirs = dao.findChildren(2L, 4L);
 		Assert.assertNotNull(dirs);
-		Assert.assertEquals(1, dirs.size());
+		Assert.assertEquals(2, dirs.size());
 		Assert.assertTrue(dirs.contains(dao.findById(1200L)));
 	}
 

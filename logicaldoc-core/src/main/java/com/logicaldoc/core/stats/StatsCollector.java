@@ -508,8 +508,10 @@ public class StatsCollector extends Task {
 	 *         <li>docdir (total size of the whole repository)</li>
 	 *         <li>notindexabledocs</li>
 	 *         </ol>
+	 *         
+	 * @throws PersistenceException error at data layer 
 	 */
-	private long[] extractDocStats(long tenantId) {
+	private long[] extractDocStats(long tenantId) throws PersistenceException {
 		long[] stats = new long[7];
 		stats[0] = 0;
 		try {

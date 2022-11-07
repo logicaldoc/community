@@ -40,8 +40,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param tenantId ID of the contained tenant.
 	 * 
 	 * @return Document with given ID.
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public Document findByCustomId(String customId, long tenantId);
+	public Document findByCustomId(String customId, long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds all documents for an user.
@@ -60,8 +62,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param max Optional, maximum number of returned elements
 	 * 
 	 * @return Collection of all document id in the folder.
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Long> findDocIdByFolder(long folderId, Integer max);
+	public List<Long> findDocIdByFolder(long folderId, Integer max) throws PersistenceException;
 
 	/**
 	 * Finds all documents direct children of the given folder.
@@ -69,9 +73,11 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param folderId Folder identifier
 	 * @param max Optional, defines the maximum records number
 	 * 
-	 * @return Collection of all documents in the folder.
+	 * @return Collection of all documents in the folder
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Document> findByFolder(long folderId, Integer max);
+	public List<Document> findByFolder(long folderId, Integer max) throws PersistenceException;
 
 	/**
 	 * Finds all document of0 the specified status and locked by the specified
@@ -93,7 +99,7 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @return Collection of the last documents changed by the specified user.
 	 * 
-	 * @throws PersistenceException an error in the database
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Document> findLastModifiedByUserId(long userId, int max) throws PersistenceException;
 
@@ -104,8 +110,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param max maximum number of returned elements
 	 * 
 	 * @return list of documents
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Document> findLastDownloadsByUserId(long userId, int max);
+	public List<Document> findLastDownloadsByUserId(long userId, int max) throws PersistenceException;
 
 	/**
 	 * Finds all documents whose id is included in the given pool of ids
@@ -123,8 +131,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param tag Tag of the document.
 	 * 
 	 * @return Document with specified tag.
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<Long> findDocIdByTag(String tag);
+	public List<Long> findDocIdByTag(String tag) throws PersistenceException;
 
 	/**
 	 * Selects all tags and counts the occurrences.
@@ -133,8 +143,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param tenantId identifier of the tenant
 	 *
 	 * @return the map tag - count
+	 * 
+	 * @throws PersistenceException error at data layer  
 	 */
-	public Map<String, Long> findTags(String firstLetter, Long tenantId);
+	public Map<String, Long> findTags(String firstLetter, Long tenantId) throws PersistenceException;
 
 	/**
 	 * Searches for all tags,
@@ -143,8 +155,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param tenantId ID of the tenant to search in
 	 * 
 	 * @return The list of all tags in the system
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<String> findAllTags(String firstLetter, Long tenantId);
+	public List<String> findAllTags(String firstLetter, Long tenantId) throws PersistenceException;
 
 	/**
 	 * Finds authorized documents for a user having a specified tag.
@@ -154,8 +168,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param max Optional, defines the maximum records number
 	 * 
 	 * @return Collection of found documents
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<Document> findByUserIdAndTag(long userId, String tag, Integer max);
+	public List<Document> findByUserIdAndTag(long userId, String tag, Integer max) throws PersistenceException;
 
 	/**
 	 * Finds authorized documents ids for a user having a specified tag.
@@ -164,8 +180,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param tag Tag of the document
 	 * 
 	 * @return Set of found ids.
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<Long> findDocIdByUserIdAndTag(long userId, String tag);
+	public List<Long> findDocIdByUserIdAndTag(long userId, String tag) throws PersistenceException;
 
 	/**
 	 * This method enlists documents linked to the given document.
@@ -185,8 +203,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 *        compared to both document1 and document2 of the link.
 	 * 
 	 * @return The collection of linked documents
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Document> findLinkedDocuments(long docId, String linkType, Integer direction);
+	public List<Document> findLinkedDocuments(long docId, String linkType, Integer direction) throws PersistenceException;
 
 	/**
 	 * Finds that document that lies under a specific folder (given by the id)
@@ -200,10 +220,12 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * 
 	 * @return The list of documents with the given fileName. If the folder id
 	 *         is null, the searched document can belong to any folder in the
-	 *         repository.
+	 *         repository
+	 *         
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Document> findByFileNameAndParentFolderId(Long folderId, String fileName, Long excludeId, Long tenantId,
-			Integer max);
+			Integer max) throws PersistenceException;
 
 	/**
 	 * Finds a document by it's full path
@@ -233,15 +255,19 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param computeDeleted If true, even deleted documents are considered
 	 * 
 	 * @return the total size expressed in bytes
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public long computeTotalSize(Long tenantId, Long publisherId, boolean computeDeleted);
+	public long computeTotalSize(Long tenantId, Long publisherId, boolean computeDeleted) throws PersistenceException;
 
 	/**
 	 * Gets the collection of deleted document ids
 	 * 
 	 * @return collection of document identifiers
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<Long> findDeletedDocIds();
+	public List<Long> findDeletedDocIds() throws PersistenceException;
 
 	/**
 	 * Finds the list of deleted documents.
@@ -251,8 +277,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * </p>
 	 * 
 	 * @return the list of documents
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Document> findDeletedDocs();
+	public List<Document> findDeletedDocs() throws PersistenceException;
 
 	/**
 	 * Counts the number of documents
@@ -262,16 +290,20 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param computeArchived If true, even archived documents are considered
 	 * 
 	 * @return number of documents
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public long count(Long tenantId, boolean computeDeleted, boolean computeArchived);
+	public long count(Long tenantId, boolean computeDeleted, boolean computeArchived) throws PersistenceException;
 
 	/**
 	 * Finds all documents by the indexed state. Order by ascending lastModifed
 	 * 
 	 * @param indexed the indexed property
 	 * @return Collection of all documents
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<Document> findByIndexed(int indexed);
+	public List<Document> findByIndexed(int indexed) throws PersistenceException;
 
 	/**
 	 * Counts the number of documents in a given indexation status(@see {@link AbstractDocument#getIndexed()}
@@ -279,8 +311,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param indexed the indexation status to check
 	 * 
 	 * @return number of documents
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public long countByIndexed(int indexed);
+	public long countByIndexed(int indexed) throws PersistenceException;
 
 	/**
 	 * Restores a previously deleted document
@@ -386,8 +420,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param folderId identifier of the folder
 	 * 
 	 * @return list of documents
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<Document> findArchivedByFolder(long folderId);
+	public List<Document> findArchivedByFolder(long folderId) throws PersistenceException;
 
 	/**
 	 * Gets the ids of all aliases associated to the document with the given
@@ -396,8 +432,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId identifier of the document
 	 * 
 	 * @return list of identifiers of aliases
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<Long> findAliasIds(long docId);
+	public List<Long> findAliasIds(long docId) throws PersistenceException;
 
 	/**
 	 * Finds all deleted docs of a specific user.
@@ -406,19 +444,19 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param max Optional, defines the max number of returned elements
 	 * 
 	 * @return The documents list
+	 * 
+	 * @throws PersistenceException error at data layer  
 	 */
-	public List<Document> findDeleted(long userId, Integer max);
+	public List<Document> findDeleted(long userId, Integer max) throws PersistenceException;
 
 	/**
 	 * This method deletes the documents into deleted folders.
 	 * 
-	 * @param deleteUserId The id of the user that performs the deleting.
-	 * 
-	 * @return True if successfully deleted from the database.
+	 * @param deleteUserId The id of the user that performs the deleting
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */
-	public boolean deleteOrphaned(long deleteUserId) throws PersistenceException;
+	public void deleteOrphaned(long deleteUserId) throws PersistenceException;
 
 	/**
 	 * Finds all document ids inside the specified folders that are published in
@@ -427,8 +465,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param folderIds Set of folder ids in which the method will search
 	 * 
 	 * @return List of published document ids
+	 * 
+	 * @throws PersistenceException error at data layer  
 	 */
-	public Collection<Long> findPublishedIds(Collection<Long> folderIds);
+	public Collection<Long> findPublishedIds(Collection<Long> folderIds) throws PersistenceException;
 
 	/**
 	 * Updates the document's digest (SHA-1)
@@ -460,19 +500,32 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	public void saveDocumentHistory(Document doc, DocumentHistory transaction) throws PersistenceException;
 
 	/**
-	 * Cleans the ld_uniquetag table removing no more used tags
+	 * Cleans the ld_uniquetag table removing no more used tags, this method is optimized and uses a couple of prepared statements, in case of error it switches to {@link DocumentDAO#cleanUnexistingUniqueTagsOneByOne()}
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public void cleanUnexistingUniqueTags();
+	public void cleanUnexistingUniqueTags() throws PersistenceException;
 
 	/**
-	 * Puts into ld_uniquetag the new unique tags
+	 * Cleans the ld_uniquetag table removing no more used tags programmatically one by one. This method is not as optimized as {@link DocumentDAO#cleanUnexistingUniqueTags()} and should not be invoked directly
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public void insertNewUniqueTags();
+	void cleanUnexistingUniqueTagsOneByOne() throws PersistenceException;
+	
+	/**
+	 * Puts into ld_uniquetag the new unique tags
+	 * 
+	 * @throws PersistenceException error at data layer 
+	 */
+	public void insertNewUniqueTags() throws PersistenceException;
 
 	/**
 	 * Updates the count of the unique tags
+	 * 
+	 * @throws PersistenceException error at data layer  
 	 */
-	public void updateCountUniqueTags();
+	public void updateCountUniqueTags() throws PersistenceException;
 
 	/**
 	 * Gets the tag cloud for the given tenant
@@ -481,8 +534,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param max maximum number of returned elements
 	 * 
 	 * @return list of tag clouds
+	 * 
+	 * @throws PersistenceException error at data layer 
 	 */
-	public List<TagCloud> getTagCloud(long tenantId, int max);
+	public List<TagCloud> getTagCloud(long tenantId, int max) throws PersistenceException;
 
 	/**
 	 * Gets the tag cloud for the given tenant
@@ -490,8 +545,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param sid identifier of the session
 	 * 
 	 * @return list of tag clouds
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<TagCloud> getTagCloud(String sid);
+	public List<TagCloud> getTagCloud(String sid) throws PersistenceException;
 
 	/**
 	 * Retrieves, the workspace where the document(or alias) is stored
@@ -534,8 +591,10 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param folderId identifier of the folder
 	 * 
 	 * @return list of duplicated digests
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<String> findDuplicatedDigests(Long tenantId, Long folderId);
+	public List<String> findDuplicatedDigests(Long tenantId, Long folderId) throws PersistenceException;
 
 	/**
 	 * Retrieves the alphabetically ordered list of all the document's tags
@@ -543,6 +602,8 @@ public interface DocumentDAO extends PersistentObjectDAO<Document> {
 	 * @param docId identifier of the document
 	 * 
 	 * @return list of the document's tags
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
-	public List<String> findTags(long docId);
+	public List<String> findTags(long docId) throws PersistenceException;
 }
