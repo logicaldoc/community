@@ -644,7 +644,7 @@ public class StandardSearchEngine implements SearchEngine {
 			container.load();
 
 			unlock();
-		} catch (Exception e) {
+		} catch (Error | Exception e) {
 			log.error("Unable to initialize the Full-text search engine", e);
 		}
 	}
