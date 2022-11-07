@@ -32,7 +32,7 @@ import junit.framework.Assert;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
-public abstract class AbstractWebserviceTestCase {
+public abstract class AbstractWebserviceTCase {
 
 	protected ApplicationContext context;
 
@@ -50,9 +50,12 @@ public abstract class AbstractWebserviceTestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		System.setProperty("solr.http1", "true");
+		
 		userHome = System.getProperty("user.home");
 		System.setProperty("user.home", tempDir.getPath());
 		createTestDirs();
+		
 		context = new ClassPathXmlApplicationContext(new String[] { "/context.xml" });
 		createTestDatabase();
 	}

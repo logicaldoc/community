@@ -255,17 +255,7 @@
 			<artifactId>jaxb-core</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<!-- dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency -->
+
 		<dependency>
 			<groupId>jfree</groupId>
 			<artifactId>jfreechart</artifactId>
@@ -286,12 +276,6 @@
 			<groupId>org.eclipse.jetty.http2</groupId>
 			<artifactId>http2-client</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty.http2</groupId>
-			<artifactId>http2-http-client-transport</artifactId>			
-			<scope>test</scope>
-			<version>9.4.49.v20220914</version>
 		</dependency>
 	</dependencies>
 	<build>

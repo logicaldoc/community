@@ -64,9 +64,12 @@ public abstract class AbstractWebappTCase {
 
 	@Before
 	public void setUp() throws Exception {
+		System.setProperty("solr.http1", "true");
+		
 		tempDir = new File("target/tmp");
 
 		userHome = System.getProperty("user.home");
+		
 		System.setProperty("user.home", tempDir.getPath());
 		context = new ClassPathXmlApplicationContext(new String[] { "/contexttest.xml" });
 		createTestDirs();

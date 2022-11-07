@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -103,6 +104,22 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		copyResource("/New error indexing documents.eml", emailFile.getCanonicalPath());
 	}
 
+	@Test
+	public void testIndex() throws ServerException, IOException {
+		GUIDocument doc = service.getById(7);
+		doc.setIndexed(0);
+		service.save(doc);
+		
+		doc = service.getById(7);
+		Assert.assertEquals(0, doc.getIndexed());
+		
+		copyResource("/New error indexing documents.eml", "target/tmp/logicaldoc/docs/7/doc/1.1");
+		
+		service.indexDocuments(new Long[]{doc.getId()});
+		doc = service.getById(1);
+		Assert.assertEquals(1, doc.getIndexed());
+	}
+	
 	@Test
 	public void testGetVersionsById() throws ServerException {
 		GUIVersion[] versions = service.getVersionsById(1, 2);

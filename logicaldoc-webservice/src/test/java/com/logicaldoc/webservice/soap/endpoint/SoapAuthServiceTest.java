@@ -22,10 +22,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.logicaldoc.util.Context;
-import com.logicaldoc.webservice.AbstractWebserviceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTCase;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SoapAuthServiceTest extends AbstractWebserviceTestCase {
+public class SoapAuthServiceTest extends AbstractWebserviceTCase {
 
 	@Mock WebServiceContext wscontext;
     @Mock MessageContext messageContext;

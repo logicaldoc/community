@@ -17,7 +17,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
-import com.logicaldoc.webservice.AbstractWebserviceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTCase;
 import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSNote;
@@ -32,7 +32,7 @@ import junit.framework.Assert;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
-public class SoapDocumentServiceTest extends AbstractWebserviceTestCase {
+public class SoapDocumentServiceTest extends AbstractWebserviceTCase {
 
 	private DocumentDAO docDao;
 

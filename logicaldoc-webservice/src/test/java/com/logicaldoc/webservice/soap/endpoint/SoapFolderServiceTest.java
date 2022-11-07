@@ -19,7 +19,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.GroupDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.webservice.AbstractWebserviceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTCase;
 import com.logicaldoc.webservice.model.WSFolder;
 import com.logicaldoc.webservice.model.WSRight;
 
@@ -29,7 +29,7 @@ import com.logicaldoc.webservice.model.WSRight;
  * @author Matteo Caruso - LogicalDOC
  * @since 5.2
  */
-public class SoapFolderServiceTest extends AbstractWebserviceTestCase {
+public class SoapFolderServiceTest extends AbstractWebserviceTCase {
 
 	private FolderDAO folderDao;
 

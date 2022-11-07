@@ -16,7 +16,7 @@ import junit.framework.Assert;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.7
  */
-public class HibernateWebserviceCallDAOTest extends AbstractWebserviceTestCase {
+public class HibernateWebserviceCallDAOTest extends AbstractWebserviceTCase {
 
 	// Instance under test
 	private WebserviceCallDAO dao;

@@ -7,13 +7,13 @@ import org.junit.Test;
 
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
-import com.logicaldoc.webservice.AbstractWebserviceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTCase;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSFolder;
 
 import junit.framework.Assert;
 
-public class SoapSearchServiceTest extends AbstractWebserviceTestCase {
+public class SoapSearchServiceTest extends AbstractWebserviceTCase {
 
 	private DocumentDAO docDao;
 

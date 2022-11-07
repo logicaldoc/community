@@ -2,7 +2,7 @@ package com.logicaldoc.webservice.soap.endpoint;
 
 import org.junit.Test;
 
-import com.logicaldoc.webservice.AbstractWebserviceTestCase;
+import com.logicaldoc.webservice.AbstractWebserviceTCase;
 import com.logicaldoc.webservice.model.WSParameter;
 import com.logicaldoc.webservice.model.WSSystemInfo;
 
@@ -14,7 +14,7 @@ import junit.framework.Assert;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.1
  */
-public class SoapSystemServiceTest extends AbstractWebserviceTestCase {
+public class SoapSystemServiceTest extends AbstractWebserviceTCase {
 	// Instance under test
 	private SoapSystemService systemServiceImpl;
 
