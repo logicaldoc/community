@@ -20,7 +20,6 @@ import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailSender;
 import com.logicaldoc.core.conversion.FormatConverter;
-import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.generic.Generic;
 import com.logicaldoc.core.generic.GenericDAO;
@@ -36,6 +35,7 @@ import com.logicaldoc.gui.common.client.beans.GUIParameter;
 import com.logicaldoc.gui.frontend.client.services.SettingService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.web.firewall.HttpFirewall;
 import com.logicaldoc.web.util.ServiceUtil;
 import com.logicaldoc.web.util.ServletUtil;
@@ -278,11 +278,20 @@ public class SettingServiceImpl extends RemoteServiceServlet implements SettingS
 						"You cannot delete the storage " + storageId + " because it is the current default");
 
 			FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			List<Folder> folders = (List<Folder>) dao.findByWhere("_entity.storage=" + storageId, null, null);
-			if (!folders.isEmpty()) {
-				List<String> paths = folders.stream().map(f -> {
+
+			
+			/*
+			 * Search for those folders that refer this storage
+			 */
+			@SuppressWarnings("unchecked")
+			List<Long> folderIds = (List<Long>) dao.queryForList(
+					"select ld_folderid from ld_folder_storage where ld_storageid = " + storageId + " and ld_nodeid = '"
+							+ SqlUtil.doubleQuotesAndBackslashes(config.getProperty("id")) + "'",
+					Long.class);
+			if (!folderIds.isEmpty()) {
+				List<String> paths = folderIds.stream().map(f -> {
 					try {
-						return dao.computePathExtended(f.getId());
+						return dao.computePathExtended(f);
 					} catch (PersistenceException e) {
 						log.error(e.getMessage(), e);
 						return null;
