@@ -24,6 +24,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.security.spring.LDAuthenticationToken;
+import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.Context;
@@ -48,101 +49,89 @@ public abstract class AbstractWebappTCase {
 
 	protected DataSource ds;
 
-	protected File tempDir = new File("target/tmp");
+	protected File repositoryDir = new File("target/repository");
 
 	protected File dbSchemaFile;
 
 	protected File dataFile;
 
-	private String userHome;
+	protected GUISession guiSession;
 
-	protected GUISession session;
+	protected Session session;
 
-	static {
-		System.setProperty("LOGICALDOC_REPOSITORY", "target");
-	}
+	protected MockServletSession servletSession = new MockServletSession();
 
 	@Before
 	public void setUp() throws Exception {
 		System.setProperty("solr.http1", "true");
-		
-		tempDir = new File("target/tmp");
 
-		userHome = System.getProperty("user.home");
-		
-		System.setProperty("user.home", tempDir.getPath());
 		context = new ClassPathXmlApplicationContext(new String[] { "/contexttest.xml" });
 		createTestDirs();
 		createTestDatabase();
 
-		this.session = prepareSession();
-		Assert.assertNotNull(session);
-		Assert.assertNotNull(SessionManager.get().get(session.getSid()));
-
-	}
-
-	private GUISession prepareSession() throws ServerException {
-		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-
-		GUISession session = new GUISession();
-		Session sess = SessionManager.get().newSession("admin", "admin", null, new Client());
-		if (sess != null) {
-			User user = userDao.findByUsernameIgnoreCase("admin");
-			userDao.initialize(user);
-			LDAuthenticationToken token = new LDAuthenticationToken("admin");
-			token.setSid(sess.getSid());
-			SecurityContextHolder.getContext().setAuthentication(token);
-			session = new SecurityServiceImpl().loadSession(sess, null);
-		}
-
-		return session;
-	}
-
-	protected void createTestDirs() throws IOException {
-		// Create test dirs
-		try {
-			if (tempDir.exists() && tempDir.isDirectory())
-				FileUtils.deleteDirectory(tempDir);
-		} catch (Exception e) {
-			// Nothing to do
-		}
-		tempDir.mkdirs();
-
-		dbSchemaFile = new File(tempDir, "logicaldoc-core.sql");
-		dataFile = new File(tempDir, "data.sql");
-
-		// Copy sql files
-		copyResource("/sql/logicaldoc-core.sql", dbSchemaFile.getCanonicalPath());
-		copyResource("/data.sql", dataFile.getCanonicalPath());
-	}
-
-	protected void copyResource(String classpath, String destinationPath) throws IOException {
-		FileUtil.copyResource(classpath, new File(destinationPath));
+		prepareSession("admin", "admin");
+		Assert.assertNotNull(guiSession);
+		Assert.assertNotNull(SessionManager.get().get(guiSession.getSid()));
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		destroyDatabase();
 		((AbstractApplicationContext) context).close();
+	}
 
-		// Restore user home system property
-		System.setProperty("user.home", userHome);
+	protected void prepareSession(String username, String password) throws ServerException {
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+
+		guiSession = new GUISession();
+		session = SessionManager.get().newSession(username, password, null, new Client());
+		if (session != null) {
+			User user = userDao.findByUsernameIgnoreCase(username);
+			userDao.initialize(user);
+			LDAuthenticationToken token = new LDAuthenticationToken(username);
+			token.setSid(session.getSid());
+			SecurityContextHolder.getContext().setAuthentication(token);
+			guiSession = new SecurityServiceImpl().loadSession(session, null);
+
+			LDSecurityContextRepository.bindServletSession(guiSession.getSid(), servletSession);
+		}
+	}
+
+	protected void createTestDirs() throws IOException {
+		deleteTestDirs();
+		repositoryDir.mkdirs();
+		repositoryDir.mkdir();
+
+		dbSchemaFile = new File(repositoryDir, "logicaldoc-core.sql");
+		dataFile = new File(repositoryDir, "data.sql");
+
+		// Copy sql files
+		copyResource("/sql/logicaldoc-core.sql", dbSchemaFile.getCanonicalPath());
+		copyResource("/data.sql", dataFile.getCanonicalPath());
+	}
+
+	private void deleteTestDirs() {
+		// Create test dirs
+		try {
+			if (repositoryDir.exists() && repositoryDir.isDirectory())
+				FileUtils.deleteDirectory(repositoryDir);
+		} catch (Exception e) {
+			// Nothing to do
+		}
+	}
+
+	protected void copyResource(String classpath, String destinationPath) throws IOException {
+		FileUtil.copyResource(classpath, new File(destinationPath));
 	}
 
 	/**
 	 * Destroys the in-memory database
 	 * 
-	 * @throws SQLException error at database level 
+	 * @throws SQLException error at database level
 	 */
 	private void destroyDatabase() throws SQLException {
-		Connection con = null;
-		try {
-			con = ds.getConnection();
+		try (Connection con = ds.getConnection();) {
 			con.createStatement().execute("shutdown");
-		} catch (Exception e) {
-			if (con != null)
-				con.close();
-			e.printStackTrace();
 		}
 	}
 
@@ -156,10 +145,7 @@ public abstract class AbstractWebappTCase {
 		ds = (DataSource) context.getBean("DataSource");
 		Assert.assertNotNull(ds);
 
-		Connection con = null;
-		try {
-			con = ds.getConnection();
-
+		try (Connection con = ds.getConnection();) {
 			// Load schema
 			SqlFile sqlFile = new SqlFile(dbSchemaFile, "Cp1252", false);
 			sqlFile.setConnection(con);
@@ -175,9 +161,6 @@ public abstract class AbstractWebappTCase {
 			rs.next();
 
 			Assert.assertEquals(2, rs.getInt(1));
-		} finally {
-			if (con != null)
-				con.close();
 		}
 	}
 }

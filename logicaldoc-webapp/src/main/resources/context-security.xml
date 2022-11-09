@@ -200,10 +200,11 @@
         
         <security:headers>
             <!-- security:header name="Content-Security-Policy" value="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src http://localhost:9080 'unsafe-inline' 'unsafe-eval'; frame-ancestors *; style-src * 'unsafe-inline';" / -->
-            <security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; object-src none; img-src * data: blob: 'unsafe-inline'; frame-src 'self' https://*.google.com https://*.zoho.com; frame-ancestors *; style-src * 'unsafe-inline';" />
+            <!-- security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; object-src none; img-src * data: blob: 'unsafe-inline'; frame-src 'self' https://*.google.com https://*.zoho.com ; frame-ancestors *; style-src * 'unsafe-inline';" / -->
+            <security:header name="Content-Security-Policy" value="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; object-src none; img-src * data: blob: 'unsafe-inline'; frame-src 'self' https://*.google.com https://*.zoho.com ; frame-ancestors *; style-src * 'unsafe-inline'; frame-ancestors * 'unsafe-inline'; form-action * 'unsafe-inline'; " />
             <security:frame-options policy="SAMEORIGIN"/>
             <security:xss-protection block="true"/>
-        </security:headers> 
+        </security:headers>
         <security:csrf disabled="true" />
         
         <!-- Protected areas -->

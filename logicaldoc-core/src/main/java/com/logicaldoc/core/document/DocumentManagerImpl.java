@@ -463,7 +463,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public long reindex(long docId, String content, DocumentHistory transaction) throws PersistenceException, ParseException  {
+	public long reindex(long docId, String content, DocumentHistory transaction)
+			throws PersistenceException, ParseException {
 		Document doc = documentDAO.findById(docId);
 		assert doc != null : "Unexisting document with ID: " + docId;
 
@@ -883,7 +884,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
-	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction) throws PersistenceException, IOException {
+	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction)
+			throws PersistenceException, IOException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -1373,7 +1375,6 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		if (session.getUnprotectedDocs().containsKey(docId))
 			return session.getUnprotectedDocs().get(docId).equals(password);
-
 		try {
 			Document doc = documentDAO.findDocument(docId);
 			if (!doc.isPasswordProtected())
@@ -1390,7 +1391,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public void promoteVersion(long docId, String version, DocumentHistory transaction) throws PersistenceException, IOException {
+	public void promoteVersion(long docId, String version, DocumentHistory transaction)
+			throws PersistenceException, IOException {
 		assert (transaction != null);
 		assert (transaction.getUser() != null);
 
@@ -1400,7 +1402,8 @@ public class DocumentManagerImpl implements DocumentManager {
 		Document document = documentDAO.findDocument(docId);
 		if (document.getImmutable() == 0 && document.getStatus() == AbstractDocument.DOC_UNLOCKED) {
 			Version ver = versionDAO.findByVersion(document.getId(), version);
-			assert (ver != null);
+			if (ver == null)
+				throw new PersistenceException(String.format("Unexisting version %s of document %d", version, docId));
 			versionDAO.initialize(ver);
 
 			transaction.setEvent(DocumentEvent.CHECKEDOUT.toString());
@@ -1436,9 +1439,11 @@ public class DocumentManagerImpl implements DocumentManager {
 	}
 
 	@Override
-	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction) throws PersistenceException, IOException {
+	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction)
+			throws PersistenceException, IOException {
 		Folder rootFolder = folderDAO.findFolder(rootFolderId);
-		assert rootFolder == null : "Unexisting folder ID  " + rootFolderId;
+		if(rootFolder == null)
+			throw new PersistenceException("Unexisting folder ID  " + rootFolderId);
 
 		if (transaction != null)
 			transaction.setEvent(DocumentEvent.CHANGED.toString());
@@ -1489,13 +1494,14 @@ public class DocumentManagerImpl implements DocumentManager {
 				// Check if one of the parent folders references the storer
 				List<Folder> parents = folderDAO.findParents(folder.getId());
 				Collections.reverse(parents);
-
-				for (Folder parentFolder : parents)
+				
+				for (Folder parentFolder : parents) {
+					folderDAO.initialize(parentFolder);
 					if (parentFolder.getStorage() != null) {
-						folderDAO.initialize(parentFolder);
 						targetStorage = parentFolder.getStorage().intValue();
 						break;
 					}
+				}
 			} catch (PersistenceException e) {
 				log.error(e.getMessage(), e);
 			}

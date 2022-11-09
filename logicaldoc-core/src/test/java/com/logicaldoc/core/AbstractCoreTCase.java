@@ -43,11 +43,7 @@ public abstract class AbstractCoreTCase {
 	protected File dataFile = new File("src/test/resources/data.sql");
 
 	private String userHome;
-
-	static {
-		System.setProperty("LOGICALDOC_REPOSITORY", "target");
-	}
-
+	
 	@Before
 	public void setUp() throws Exception {
 		userHome = System.getProperty("user.home");
@@ -89,14 +85,8 @@ public abstract class AbstractCoreTCase {
 	 * @throws SQLException error at database level 
 	 */
 	private void destroyDatabase() throws SQLException {
-		Connection con = null;
-		try {
-			con = ds.getConnection();
+		try(Connection con = ds.getConnection()) {
 			con.createStatement().execute("shutdown");
-		} catch (Exception e) {
-			if (con != null)
-				con.close();
-			e.printStackTrace();
 		}
 	}
 
@@ -108,10 +98,7 @@ public abstract class AbstractCoreTCase {
 	 */
 	private void createTestDatabase() throws Exception {
 		ds = (DataSource) context.getBean("DataSource");
-
-		Connection con = null;
-		try {
-			con = ds.getConnection();
+		try(Connection con = ds.getConnection()) {
 
 			// Load schema
 			SqlFile sqlFile = new SqlFile(dbSchemaFile, "Cp1252", false);
@@ -128,9 +115,6 @@ public abstract class AbstractCoreTCase {
 			rs.next();
 
 			Assert.assertEquals(2, rs.getInt(1));
-		} finally {
-			if (con != null)
-				con.close();
 		}
 	}
 }

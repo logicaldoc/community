@@ -135,6 +135,7 @@ public class ProtocolsPanel extends AdminPanel {
 		cmisEnabledItem.setRequired(true);
 		cmisEnabledItem.setWrapTitle(false);
 		cmisEnabledItem.setValue(cmisEnabled.getValue().equals("true") ? "yes" : "no");
+		cmisEnabledItem.setDisabled(!Session.get().isDefaultTenant());
 
 		// CMIS Changelog
 		RadioGroupItem cmisChangelogItem = ItemFactory.newBooleanSelector("cmisChangelog", "changelog");
@@ -153,7 +154,7 @@ public class ProtocolsPanel extends AdminPanel {
 		if (Session.get().isDefaultTenant())
 			cmisForm.setItems(cmisUrl, cmisEnabledItem, cmisChangelogItem, cmisMaxItemsItem);
 		else
-			cmisForm.setItems(cmisUrl);
+			cmisForm.setItems(cmisUrl, cmisEnabledItem);
 		cmis.setPane(cmisForm);
 
 		Tab webDav = new Tab();
@@ -178,6 +179,7 @@ public class ProtocolsPanel extends AdminPanel {
 		RadioGroupItem wdEnabledItem = ItemFactory.newBooleanSelector("wdEnabled", "enabled");
 		wdEnabledItem.setRequired(true);
 		wdEnabledItem.setValue(wdEnabled.getValue().equals("true") ? "yes" : "no");
+		wdEnabledItem.setDisabled(!Session.get().isDefaultTenant());
 
 		// Default depth
 		SpinnerItem wdDepthItem = ItemFactory.newSpinnerItem("wdDepth", "depth",
@@ -189,27 +191,30 @@ public class ProtocolsPanel extends AdminPanel {
 		if (Session.get().isDefaultTenant())
 			webDavForm.setItems(wdUrl, wdbUrl, wdEnabledItem, wdDepthItem);
 		else
-			webDavForm.setItems(wdUrl, wdbUrl);
+			webDavForm.setItems(wdUrl, wdbUrl, wdEnabledItem);
 		webDav.setPane(webDavForm);
 
 		// FTP Service status
 		RadioGroupItem ftpEnabledItem = ItemFactory.newBooleanSelector("ftpEnabled", "enabled");
 		ftpEnabledItem.setRequired(true);
 		ftpEnabledItem.setWrapTitle(false);
-		ftpEnabledItem.setValue(ftpEnabled.getValue().equals("true") ? "yes" : "no");
-
+		ftpEnabledItem.setValue( ftpEnabled.getValue().equals("true") ? "yes" : "no");
+		ftpEnabledItem.setDisabled(!Session.get().isDefaultTenant());
+		
 		// FTP port
 		IntegerItem ftpPortItem = ItemFactory.newIntegerItem("ftpPort", "port", 21);
 		ftpPortItem.setRequired(true);
 		ftpPortItem.setWrapTitle(false);
 		ftpPortItem.setWidth(80);
 		ftpPortItem.setValue(Integer.parseInt(ftpPort.getValue()));
-
+		ftpPortItem.setDisabled(!Session.get().isDefaultTenant());
+		
 		// FTP security
 		RadioGroupItem ftpSslItem = ItemFactory.newBooleanSelector("ftpSsl", "encryptionftps");
 		ftpSslItem.setRequired(true);
 		ftpSslItem.setWrapTitle(false);
 		ftpSslItem.setValue(ftpSsl.getValue().equals("true") ? "yes" : "no");
+		ftpSslItem.setDisabled(!Session.get().isDefaultTenant());
 
 		TextItem ftpKeystoreFileItem = ItemFactory.newTextItem("ftpKeystoreFile", "keystore",
 				ftpKeystoreFile.getValue());
@@ -244,8 +249,14 @@ public class ProtocolsPanel extends AdminPanel {
 		ftpForm.setNumCols(2);
 		ftpForm.setColWidths(1, "*");
 		ftpForm.setPadding(5);
-		ftpForm.setItems(ftpEnabledItem, ftpPortItem, ftpSslItem, ftpKeystoreFileItem, ftpKeystorePasswordItem,
-				ftpKeystoreAliasItem, ftpKeystoreAliasPasswordItem);
+		
+		if (Session.get().isDefaultTenant())
+			ftpForm.setItems(ftpEnabledItem, ftpPortItem, ftpSslItem, ftpKeystoreFileItem, ftpKeystorePasswordItem,
+					ftpKeystoreAliasItem, ftpKeystoreAliasPasswordItem);
+		else {
+			ftpForm.setItems(ftpEnabledItem, ftpPortItem, ftpSslItem);
+		}
+		
 		ftp.setPane(ftpForm);
 
 		if (Feature.visible(Feature.CMIS)) {

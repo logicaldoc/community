@@ -52,7 +52,7 @@ public abstract class PluginRegistry {
 				ContextProperties config = new ContextProperties();
 				pluginregistry = config.getProperty("plugin.registry");
 			} catch (IOException e1) {
-				// Nothing to do
+				System.err.println(e1.getMessage());
 			}
 
 			if (StringUtils.isEmpty(pluginregistry)) {

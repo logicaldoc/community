@@ -59,7 +59,7 @@ public class WebservicesPanel extends VLayout {
 
 		webServiceForm = new DynamicForm();
 		webServiceForm.setValuesManager(vm);
-		webServiceForm.setTitleOrientation(TitleOrientation.LEFT);
+		webServiceForm.setTitleOrientation(TitleOrientation.LEFT); 
 		webServiceForm.setNumCols(4);
 		webServiceForm.setWidth(1);
 		webServiceForm.setPadding(5);
@@ -98,6 +98,7 @@ public class WebservicesPanel extends VLayout {
 		wsEnabled.setRequired(true);
 		wsEnabled.setValue(enabled.getValue().equals("true") ? "yes" : "no");
 		wsEnabled.setColSpan(4);
+		wsEnabled.setDisabled(!Session.get().isDefaultTenant());
 
 		SpinnerItem ttl = ItemFactory.newSpinnerItem("wsTtl", "timetolive", Integer.parseInt(callsTtl.getValue()));
 		ttl.setHint(I18N.message("days"));
@@ -146,7 +147,7 @@ public class WebservicesPanel extends VLayout {
 			webServiceForm.setItems(soapUrl, restUrl, wsEnabled, recordCalls, recordCallsPayload, ttl, tenantStat,
 					apicalls, apicallsCurrent);
 		else
-			webServiceForm.setItems(soapUrl, restUrl, apicalls, apicallsCurrent);
+			webServiceForm.setItems(soapUrl, restUrl, wsEnabled, apicalls, apicallsCurrent);
 
 		setMembers(webServiceForm);
 		if (Session.get().isDefaultTenant())

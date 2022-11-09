@@ -51,18 +51,27 @@ public class ContextProperties extends OrderedProperties {
 
 	public ContextProperties() throws IOException {
 		try {
+			load(ContextProperties.class.getClassLoader().getResource("context.properties"));
+		} catch (Exception e) {
 			load(ContextProperties.class.getClassLoader().getResource("/context.properties"));
-		} catch (Throwable t) {
-			try {
-				load(ContextProperties.class.getClassLoader().getResource("context.properties"));
-			} catch (Throwable q) {
-				throw new IOException(q.getMessage(), q);
-			}
 		}
 	}
 
 	public ContextProperties(String filePath) throws IOException {
 		this.file = new File(filePath);
+
+		// If the file does not exist, interpet it as a classpath reference
+		if (!this.file.exists()) {
+			try {
+				if (filePath.startsWith("/"))
+					filePath = filePath.substring(1);
+				URL url = ContextProperties.class.getClassLoader().getResource(filePath);
+				if ("file".equals(url.getProtocol())) 
+					this.file = new File(url.getPath());
+			} catch (Exception e) {
+				log.error("Unable to find classpath resource {}", filePath, e);
+			}
+		}
 
 		try (FileInputStream fis = new FileInputStream(this.file)) {
 			load(fis);
@@ -141,7 +150,7 @@ public class ContextProperties extends OrderedProperties {
 		if (overrideFile != null) {
 			try (FileInputStream fis = new FileInputStream(overrideFile)) {
 				load(fis);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				log.error("Unable to read from {}", overrideFile.getPath(), e);
 				throw e;
 			}

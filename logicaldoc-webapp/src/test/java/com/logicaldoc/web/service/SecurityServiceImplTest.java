@@ -38,8 +38,8 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 
 	@Test
 	public void testLogout() {
-		Assert.assertEquals("admin", session.getUser().getUsername());
-		Assert.assertEquals(1, session.getUser().getId());
+		Assert.assertEquals("admin", guiSession.getUser().getUsername());
+		Assert.assertEquals(1, guiSession.getUser().getId());
 		int sessions = SessionManager.get().countOpened();
 		service.logout();
 
@@ -154,14 +154,14 @@ public class SecurityServiceImplTest extends AbstractWebappTCase {
 	public void testSaveUser() throws ServerException {
 		GUIUser user = service.getUser(1);
 
-		user = service.saveUser(user, session.getInfo());
+		user = service.saveUser(user, guiSession.getInfo());
 		Assert.assertNotNull(user);
 		Assert.assertEquals("admin", user.getUsername());
 		Assert.assertEquals("admin@admin.net", user.getEmail());
 
 		user = service.getUser(3);
 
-		user = service.saveUser(user, session.getInfo());
+		user = service.saveUser(user, guiSession.getInfo());
 		Assert.assertNotNull(user);
 		Assert.assertEquals("sebastian", user.getUsername());
 		Assert.assertEquals("seb_stein@gmx.de", user.getEmail());

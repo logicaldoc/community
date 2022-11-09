@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.automation.Automation;
@@ -119,7 +118,6 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.html.HTMLSanitizer;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.UploadServlet;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * The document service for the operations on the documents done through the
@@ -128,13 +126,11 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class DocumentServiceImpl extends RemoteServiceServlet implements DocumentService {
+public class DocumentServiceImpl extends ServiceServlet implements DocumentService {
 
 	private static final String UTF_8 = "UTF-8";
 
 	private static final String UNEXISTING_DOCUMENT = "Unexisting document";
-
-	private static final String UNEXISTING_DOCUMENT2 = "Unexisting document ";
 
 	private static final String DOWNLOAD_TICKET = "downloadTicket";
 
@@ -155,7 +151,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void addBookmarks(long[] ids, int type) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		BookmarkDAO bookmarkDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -174,6 +170,8 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 					if (type == Bookmark.TYPE_DOCUMENT) {
 						Document doc = dao.findById(id);
+						if (doc == null)
+							throw new ServerException("Unexisting document " + id);
 						bookmark.setTitle(doc.getFileName());
 						bookmark.setFileType(doc.getType());
 					} else {
@@ -184,7 +182,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					bookmarkDao.store(bookmark);
 				}
 			} catch (PersistenceException e) {
-				ServiceUtil.throwServerException(session, log, e);
+				throwServerException(session, log, e);
 			}
 		}
 	}
@@ -208,9 +206,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void indexDocuments(Long[] docIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
-		ServiceUtil.executeLongRunningOperation("Index Documents", () -> {
+		executeLongRunningOperation("Index Documents", () -> {
 			try {
 				index(docIds, session);
 			} catch (ParseException | PersistenceException e) {
@@ -222,18 +220,24 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	@Override
 	public GUIDocument[] addDocuments(boolean importZip, String charset, boolean immediateIndexing,
 			final GUIDocument metadata) throws ServerException {
-		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		final Session session = validateSession(getThreadLocalRequest());
+
+		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 
 		List<GUIDocument> createdDocs = new ArrayList<>();
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		if (log.isDebugEnabled())
 			log.debug("Uploading {} files", uploadedFilesMap.size());
 		if (uploadedFilesMap.isEmpty())
-			throw new ServerException(new Exception("No file uploaded"));
+			throw new ServerException("No file uploaded");
 
-		if (ServiceUtil.executeLongRunningOperation("Add Documents",
-				() -> addDocuments(importZip, charset, immediateIndexing, metadata, session, createdDocs), session)) {
+		if (executeLongRunningOperation("Add Documents", () -> {
+			try {
+				addDocuments(importZip, charset, immediateIndexing, metadata, session, createdDocs);
+			} catch (ServerException | PersistenceException | ParseException e) {
+				log.error(e.getMessage(), e);
+			}
+		}, session)) {
 			return createdDocs.toArray(new GUIDocument[0]);
 		} else {
 			return new GUIDocument[0];
@@ -241,71 +245,68 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	private void addDocuments(boolean importZip, String charset, boolean immediateIndexing, final GUIDocument metadata,
-			final Session session, List<GUIDocument> createdDocs) {
-		try {
-			Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+			final Session session, List<GUIDocument> createdDocs)
+			throws PersistenceException, ServerException, ParseException {
 
-			List<Document> docs = new ArrayList<>();
-			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
+		checkWritePermission(metadata, session);
 
-			FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
-			Folder parent;
-			parent = folderDao.findFolder(metadata.getFolder().getId());
+		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 
-			checkWritePermission(metadata, session);
+		List<Document> docs = new ArrayList<>();
+		DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 
-			List<Long> docIdsToIndex = new ArrayList<>();
-			for (Entry<String, File> entry : uploadedFilesMap.entrySet()) {
-				String filename = entry.getKey();
-				File file = entry.getValue();
-				try {
-					if (filename.toLowerCase().endsWith(".zip") && importZip) {
-						// Prepare the import thread
-						Thread zipImporter = new Thread(() -> importZip(charset, metadata, session, parent, file));
+		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
+		Folder parent;
+		parent = folderDao.findFolder(metadata.getFolder().getId());
 
-						// And launch it
-						zipImporter.start();
-					} else {
-						// Create the document history event
-						DocumentHistory transaction = new DocumentHistory();
-						transaction.setSession(session);
-						transaction.setEvent(DocumentEvent.STORED.toString());
-						transaction.setComment(metadata.getComment());
+		List<Long> docIdsToIndex = new ArrayList<>();
+		for (Entry<String, File> entry : uploadedFilesMap.entrySet()) {
+			String filename = entry.getKey();
+			File file = entry.getValue();
+			try {
+				if (filename.toLowerCase().endsWith(".zip") && importZip) {
+					// Prepare the import thread
+					Thread zipImporter = new Thread(() -> importZip(charset, metadata, session, parent, file));
 
-						/*
-						 * Prepare the Master document used to create the new
-						 * one
-						 */
-						Document doc = toDocument(metadata);
-						doc.setTenantId(session.getTenantId());
-						doc.setCreation(new Date());
-						doc.setFileName(filename);
+					// And launch it
+					zipImporter.start();
+				} else {
+					// Create the document history event
+					DocumentHistory transaction = new DocumentHistory();
+					transaction.setSession(session);
+					transaction.setEvent(DocumentEvent.STORED.toString());
+					transaction.setComment(metadata.getComment());
 
-						// Create the new document
-						doc = documentManager.create(file, doc, transaction);
+					/*
+					 * Prepare the Master document used to create the new one
+					 */
+					Document doc = toDocument(metadata);
+					doc.setTenantId(session.getTenantId());
+					doc.setCreation(new Date());
+					doc.setFileName(filename);
 
-						if (immediateIndexing && doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX)
-							docIdsToIndex.add(doc.getId());
+					// Create the new document
+					doc = documentManager.create(file, doc, transaction);
 
-						createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
-						docs.add(doc);
-					}
-				} finally {
-					FileUtil.strongDelete(file);
+					if (immediateIndexing && doc.getIndexed() == AbstractDocument.INDEX_TO_INDEX)
+						docIdsToIndex.add(doc.getId());
+
+					createdDocs.add(fromDocument(doc, metadata.getFolder(), null));
+					docs.add(doc);
 				}
+			} finally {
+				FileUtil.strongDelete(file);
 			}
-
-			cleanUploadedFiles(session);
-
-			indexDocuments(docIdsToIndex, session);
-
-			/*
-			 * We have to notify the specified users in a separate thread
-			 */
-			notifyUsersInNewThread(docs, metadata, "newdoc", session);
-		} catch (ServerException | ParseException | PersistenceException e) {
-			log.error(e.getMessage(), e);
 		}
+
+		cleanUploadedFiles(session);
+
+		indexDocuments(docIdsToIndex, session);
+
+		/*
+		 * We have to notify the specified users in a separate thread
+		 */
+		notifyUsersInNewThread(docs, metadata, "newdoc", session);
 	}
 
 	private void checkWritePermission(final GUIDocument metadata, final Session session)
@@ -322,7 +323,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	}
 
 	private void cleanUploadedFiles(Session session) {
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 		for (File uploadedEntry : uploadedFilesMap.values())
 			FileUtil.strongDelete(uploadedEntry);
 	}
@@ -364,9 +365,9 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIDocument checkin(GUIDocument document, boolean major) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
 		String fileName = uploadedFilesMap.keySet().iterator().next();
 
@@ -386,7 +387,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			doc = retrieveDocument(document.getId());
 		} catch (PersistenceException e1) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e1);
+			return (GUIDocument) throwServerException(session, log, e1);
 		}
 
 		// checkin the document; throws an exception if
@@ -395,7 +396,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try (FileInputStream fis = new FileInputStream(file)) {
 			documentManager.checkin(doc.getId(), fis, fileName, major, toDocument(document), transaction);
 		} catch (IOException | PersistenceException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 
 		UploadServlet.cleanReceivedFiles(session.getSid());
@@ -411,10 +412,18 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	private void notifyDocuments(List<Document> docs, String messageTemplate, String notificationMessage,
 			long[] recipientIds, Session session) {
+
+		// Prepare the tile of the first uploaded file, by default we use a
+		// single transparent pixel
+		String tile = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+		try {
+			tile = prepareTileAsString(session, docs.get(0));
+		} catch (Exception e) {
+			log.warn("Cannot prepare the tile image", e);
+		}
+
 		try {
 			SystemMessageDAO systemMessageDao = (SystemMessageDAO) Context.get().getBean(SystemMessageDAO.class);
-
-			String tile = prepareTileAsString(session, docs.get(0));
 
 			Map<Locale, Set<Recipient>> emailRecipientsMap = new HashMap<>();
 			Map<Locale, Set<Recipient>> systemRecipientsMap = new HashMap<>();
@@ -532,25 +541,25 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	@Override
 	public GUIDocument[] addDocuments(String language, long folderId, boolean importZip, String charset,
 			boolean immediateIndexing, final Long templateId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
 			if (folderId == fdao.findRoot(session.getTenantId()).getId())
-				throw new ServerException("Cannot add documents in the root");
+				throw new PermissionException("Cannot add documents in the root");
 
 			GUIDocument metadata = new GUIDocument();
 			metadata.setLanguage(language);
 			metadata.setFolder(new GUIFolder(folderId));
 			metadata.setTemplateId(templateId);
 			return addDocuments(importZip, charset, immediateIndexing, metadata);
-		} catch (PersistenceException | ServerException e) {
-			return (GUIDocument[]) ServiceUtil.throwServerException(session, log, e);
+		} catch (PermissionException | PersistenceException | ServerException e) {
+			return (GUIDocument[]) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIDocument promoteVersion(long docId, String version) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		log.debug("Promoting version {} of document {}", version, docId);
 
 		try {
@@ -574,13 +583,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			return getById(doc.getId());
 		} catch (PersistenceException | ServerException | IOException | PermissionException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void checkout(long[] docIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		// Checkout the document; throws an exception if something
 		// goes wrong
@@ -598,13 +607,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					documentManager.checkout(doc.getId(), new DocumentHistory(transaction));
 			}
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void lock(long[] docIds, String comment) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		// Unlock the document; throws an exception if something
 		// goes wrong
@@ -624,20 +633,20 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					documentManager.lock(doc.getId(), AbstractDocument.DOC_LOCKED, new DocumentHistory(transaction));
 			}
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void delete(long[] ids) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		if (ids.length > 0) {
 			for (long docId : ids) {
 				try {
 					deleteDocument(docId, session);
 				} catch (PersistenceException e) {
-					ServiceUtil.throwServerException(session, log, e);
+					throwServerException(session, log, e);
 				}
 			}
 		}
@@ -687,7 +696,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void deleteBookmarks(long[] bookmarkIds) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 		BookmarkDAO dao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		for (long id : bookmarkIds) {
 			try {
@@ -700,7 +709,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void deleteLinks(long[] ids) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		DocumentLinkDAO dao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		for (long id : ids) {
@@ -714,19 +723,19 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIDocument getById(long docId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			return getDocument(session, docId);
 		} catch (InvalidSessionException | PermissionException | PersistenceException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
 
 	public static GUIDocument getDocument(Session session, long docId)
 			throws InvalidSessionException, PersistenceException, PermissionException {
 		if (session != null)
-			ServiceUtil.validateSession(session.getSid());
+			validateSession(session.getSid());
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		Document doc = docDao.findById(docId);
@@ -870,14 +879,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIVersion[] getVersionsById(long id1, long id2) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		VersionDAO versDao = (VersionDAO) Context.get().getBean(VersionDAO.class);
 		Version docVersion;
 		try {
 			docVersion = versDao.findById(id1);
 		} catch (PersistenceException e) {
-			return (GUIVersion[]) ServiceUtil.throwServerException(session, null, e);
+			return (GUIVersion[]) throwServerException(session, null, e);
 		}
 		if (docVersion != null)
 			versDao.initialize(docVersion);
@@ -925,7 +934,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			docVersion = versDao.findById(id2);
 		} catch (PersistenceException e) {
-			return (GUIVersion[]) ServiceUtil.throwServerException(session, null, e);
+			return (GUIVersion[]) throwServerException(session, null, e);
 		}
 		if (docVersion != null)
 			versDao.initialize(docVersion);
@@ -1015,7 +1024,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void linkDocuments(long[] inDocIds, long[] outDocIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentLinkDAO linkDao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1034,7 +1043,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 							link.setType("default");
 							linkDao.store(link);
 						} catch (PersistenceException e) {
-							ServiceUtil.throwServerException(session, log, e);
+							throwServerException(session, log, e);
 						}
 					}
 				}
@@ -1045,7 +1054,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void makeImmutable(long[] docIds, String comment) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -1069,20 +1078,20 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				}
 			}
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void markHistoryAsRead(String event) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		DocumentHistoryDAO dao = (DocumentHistoryDAO) Context.get().getBean(DocumentHistoryDAO.class);
 		dao.markHistoriesAsRead(event, session.getUserId());
 	}
 
 	@Override
 	public void markIndexable(long[] docIds, int policy) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1090,14 +1099,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			try {
 				manager.changeIndexingStatus(docDao.findById(id), policy);
 			} catch (PersistenceException e) {
-				ServiceUtil.throwServerException(session, log, e);
+				throwServerException(session, log, e);
 			}
 
 	}
 
 	@Override
 	public void markUnindexable(long[] docIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -1105,13 +1114,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			try {
 				manager.changeIndexingStatus(docDao.findById(id), AbstractDocument.INDEX_SKIP);
 			} catch (PersistenceException e) {
-				ServiceUtil.throwServerException(session, log, e);
+				throwServerException(session, log, e);
 			}
 	}
 
 	@Override
 	public void restore(Long[] docIds, long folderId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
@@ -1131,7 +1140,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void validate(GUIDocument document) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			Document object = toDocument(document);
@@ -1145,14 +1154,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			Validator validator = new Validator();
 			validator.validate(object, object.getTemplate(), transaction);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public GUIDocument save(GUIDocument guiDocument) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		if (guiDocument.getId() == 0L)
 			return null;
 
@@ -1208,7 +1217,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			documentManager.update(document, docVO, transaction);
 			return getById(guiDocument.getId());
 		} catch (PersistenceException | ServerException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 
 	}
@@ -1371,7 +1380,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public String sendAsEmail(GUIEmail guiMail, String locale) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
 		EMail mail = new EMail();
@@ -1671,7 +1680,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void unlock(long[] docIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
@@ -1685,13 +1694,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				documentManager.unlock(id, transaction);
 			}
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void updateBookmark(GUIBookmark bookmark) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		BookmarkDAO bookmarkDao = (BookmarkDAO) Context.get().getBean(BookmarkDAO.class);
 		Bookmark bk;
@@ -1708,14 +1717,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			bookmarkDao.store(bk);
 			bookmark.setId(bk.getId());
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public void updateLink(long id, String type) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentLinkDAO dao = (DocumentLinkDAO) Context.get().getBean(DocumentLinkDAO.class);
 		try {
@@ -1724,13 +1733,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			link.setType(type);
 			dao.store(link);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void cleanUploadedFileFolder() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		UploadServlet.cleanReceivedFiles(session.getSid());
 
 		File dir = new File(System.getProperty("java.io.tmpdir") + "/upload/" + session.getSid());
@@ -1740,7 +1749,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIRating getRating(long docId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		RatingDAO ratingDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
 
@@ -1768,7 +1777,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public int saveRating(GUIRating rating) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		RatingDAO ratingDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
 		Rating rat = ratingDao.findByDocIdAndUserId(rating.getDocId(), rating.getUserId());
@@ -1790,19 +1799,19 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			Document doc = docDao.findById(rating.getDocId());
 			return doc.getRating();
 		} catch (PersistenceException e) {
-			return (Integer) ServiceUtil.throwServerException(session, log, e);
+			return (Integer) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public long addNote(long docId, String message) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document document = docDao.findDocument(docId);
 			if (document == null)
-				throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
+				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
 
 			DocumentNote note = new DocumentNote();
 			note.setTenantId(session.getTenantId());
@@ -1822,23 +1831,23 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			return note.getId();
 		} catch (PersistenceException | ServerException e) {
-			return (Long) ServiceUtil.throwServerException(session, log, e);
+			return (Long) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIDocumentNote[] getNotes(long docId, String fileVersion, Collection<String> types) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		Document document;
 		try {
 			document = retrieveDocument(docId);
 		} catch (PersistenceException e) {
-			return (GUIDocumentNote[]) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocumentNote[]) throwServerException(session, log, e);
 		}
 
 		if (document == null)
-			throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
+			throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
 
 		List<GUIDocumentNote> guiNotes = new ArrayList<>();
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
@@ -1878,7 +1887,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void saveNotes(long docId, GUIDocumentNote[] notes, Collection<String> types) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 		List<GUIDocumentNote> notesList = new ArrayList<>();
@@ -1886,7 +1895,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			document = retrieveDocument(docId);
 			if (document == null)
-				throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
+				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
 
 			if (notes != null && notes.length > 0)
 				notesList = Arrays.asList(notes);
@@ -1902,11 +1911,11 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				if (!noteIds.contains(actualNoteId))
 					dao.delete(actualNoteId);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 		if (document == null)
-			throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
+			throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
 
 		/*
 		 * Do the updates / inserts
@@ -1985,7 +1994,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				dao.store(note);
 			}
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
@@ -2000,7 +2009,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void deleteNotes(long[] ids) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 		for (long id : ids)
@@ -2013,7 +2022,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIDocument[] bulkUpdate(long[] ids, GUIDocument vo, boolean ignoreEmptyFields) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		List<GUIDocument> updatedDocs = new ArrayList<>();
 		for (long docId : ids) {
@@ -2038,7 +2047,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		}
 
 		try {
-			ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), buf.getFolder().getId());
+			checkPermission(Permission.WRITE, session.getUser(), buf.getFolder().getId());
 		} catch (AccessDeniedException e) {
 			log.warn("Skip document {} because  user {} does not have write permission", docId, session.getUsername());
 			return null;
@@ -2097,13 +2106,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void updateNote(long docId, long noteId, String message) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			Document document = docDao.findDocument(docId);
 			if (document == null)
-				throw new ServerException(UNEXISTING_DOCUMENT2 + docId);
+				throw new ServerException(UNEXISTING_DOCUMENT + " " + docId);
 
 			DocumentNoteDAO dao = (DocumentNoteDAO) Context.get().getBean(DocumentNoteDAO.class);
 			DocumentNote note = dao.findById(noteId);
@@ -2125,13 +2134,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			saveNote(note, session);
 		} catch (PersistenceException | ServerException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIDocument deleteVersions(long[] ids) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		long docId = 0;
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -2142,7 +2151,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			try {
 				version = manager.deleteVersion(id, transaction);
 			} catch (Exception e) {
-				return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+				return (GUIDocument) throwServerException(session, log, e);
 			}
 			docId = version.getDocId();
 		}
@@ -2152,7 +2161,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIDocument createWithContent(GUIDocument vo, String content) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			DocumentManager documentManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -2170,26 +2179,24 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			transaction.setEvent(DocumentEvent.STORED.toString());
 			Document document;
 			if (StringUtils.isEmpty(content))
-				document = documentManager.create(IOUtils.toInputStream("", UTF_8), doc, transaction);
+				document = documentManager.create(IOUtils.toInputStream(" ", UTF_8), doc, transaction);
 			else
 				document = documentManager.create(IOUtils.toInputStream(content, UTF_8), doc, transaction);
 
-			// If that VO is in checkout, perform a checkout also
-			if (vo.getStatus() == AbstractDocument.DOC_CHECKED_OUT) {
-				transaction = new DocumentHistory();
-				transaction.setSession(session);
-				documentManager.checkout(document.getId(), transaction);
-			}
+			// Perform a checkout also
+			transaction = new DocumentHistory();
+			transaction.setSession(session);
+			documentManager.checkout(document.getId(), transaction);
 
 			return fromDocument(document, vo.getFolder(), null);
 		} catch (PermissionException | PersistenceException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void deleteFromTrash(Long[] ids) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		if (ids == null || ids.length < 1)
 			return;
 
@@ -2198,14 +2205,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, (Map<String, Object>) null);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public void emptyTrash() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2216,14 +2223,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			fdao.bulkUpdate("set ld_deleted=2 where ld_deleted=1 and  ld_deleteuserid=" + session.getUserId(),
 					(Map<String, Object>) null);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public void archiveDocuments(long[] docIds, String comment) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -2231,13 +2238,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			manager.archiveDocuments(docIds, transaction);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public long archiveFolder(long folderId, String comment) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -2246,13 +2253,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 		try {
 			return manager.archiveFolder(folderId, transaction);
 		} catch (PersistenceException e) {
-			return (Long) ServiceUtil.throwServerException(session, log, e);
+			return (Long) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void unarchiveDocuments(long[] docIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
@@ -2264,14 +2271,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			try {
 				dao.unarchive(id, transaction);
 			} catch (PersistenceException e) {
-				ServiceUtil.throwServerException(session, log, e);
+				throwServerException(session, log, e);
 			}
 		}
 	}
 
 	@Override
 	public long countDocuments(long[] folderIds, int status) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 		long count = 0;
 		for (int i = 0; i < folderIds.length; i++) {
 			count += countDocuments(folderIds[i], status);
@@ -2301,11 +2308,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	@Override
 	public String[] createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
 			Integer maxDownloads) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
+		String urlPrefix = "";
 		HttpServletRequest request = this.getThreadLocalRequest();
-		String urlPrefix = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-				+ request.getContextPath();
+		if (request != null)
+			urlPrefix = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+					+ request.getContextPath();
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -2322,13 +2331,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 							.normalize().toString();
 			return result;
 		} catch (PersistenceException | URISyntaxException e) {
-			return (String[]) ServiceUtil.throwServerException(session, log, e);
+			return (String[]) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void setPassword(long docId, String password) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
@@ -2339,17 +2348,17 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 		try {
 			Document doc = dao.findById(docId);
-			ServiceUtil.checkPermission(Permission.PASSWORD, session.getUser(), doc.getFolder().getId());
+			checkPermission(Permission.PASSWORD, session.getUser(), doc.getFolder().getId());
 
 			dao.setPassword(docId, password, transaction);
 		} catch (AccessDeniedException | PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void unsetPassword(long docId, String currentPassword) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		// Create the document history event
 		DocumentHistory transaction = new DocumentHistory();
@@ -2365,13 +2374,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			else
 				throw new ServerException("You cannot access the document");
 		} catch (PersistenceException | ServerException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public boolean unprotect(long docId, String password) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		return manager.unprotect(session.getSid(), docId, password);
@@ -2379,7 +2388,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public String getContentAsString(long docId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2403,14 +2412,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			return storer.getString(doc.getId(), resource);
 		} catch (PersistenceException | ServerException | IOException e) {
-			return (String) ServiceUtil.throwServerException(session, log, e);
+			return (String) throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public GUIDocument checkinContent(long docId, String content) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2423,7 +2432,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				throw new PermissionException(session.getUsername(), "Document " + docId, Permission.WRITE);
 
 			if (doc.getStatus() != AbstractDocument.DOC_CHECKED_OUT || doc.getLockUserId() != session.getUserId())
-				throw new PermissionException("You have not checked our the file " + docId);
+				throw new PermissionException("You have not checked out the file " + docId);
 
 			DocumentHistory transaction = new DocumentHistory();
 			transaction.setComment("Text content editing");
@@ -2434,16 +2443,16 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			return getById(docId);
 		} catch (PermissionException | PersistenceException | ServerException | IOException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public void replaceFile(long docId, String fileVersion, String comment) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
-		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
+		Map<String, File> uploadedFilesMap = getUploadedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
 		if (file == null)
 			return;
@@ -2472,13 +2481,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			UploadServlet.cleanReceivedFiles(session.getSid());
 		} catch (PersistenceException | ServerException | IOException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIDocument createDocument(GUIDocument document, String content) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -2494,13 +2503,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			return getById(doc.getId());
 		} catch (PersistenceException | IOException | ServerException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIRating getUserRating(long docId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		RatingDAO rDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
 		GUIRating rating = null;
@@ -2522,7 +2531,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public Integer deleteRating(long id) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			RatingDAO rDao = (RatingDAO) Context.get().getBean(RatingDAO.class);
@@ -2539,13 +2548,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			Document doc = docDao.findById(rat.getDocId());
 			return doc.getRating();
 		} catch (PersistenceException | ServerException e) {
-			return (Integer) ServiceUtil.throwServerException(session, log, e);
+			return (Integer) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIDocument convert(long docId, String fileVersion, String format) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -2566,14 +2575,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 				throw new ServerException("Unable to convert");
 			return getById(conversion.getId());
 		} catch (Exception e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public GUIEmail extractEmail(long docId, String fileVersion) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		InputStream is = null;
 		try {
@@ -2647,7 +2656,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 			return guiMail;
 		} catch (IOException e1) {
-			return (GUIEmail) ServiceUtil.throwServerException(session, log, e1);
+			return (GUIEmail) throwServerException(session, log, e1);
 		} finally {
 			IOUtils.closeQuietly(is);
 		}
@@ -2656,7 +2665,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 	@Override
 	public GUIDocument saveEmailAttachment(long docId, String fileVersion, String attachmentFileName)
 			throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		InputStream is = null;
 		File tmp = null;
@@ -2665,7 +2674,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			GUIDocument doc = getById(docId);
 			if (!doc.getFileName().toLowerCase().endsWith(".eml") && !doc.getFileName().toLowerCase().endsWith(".msg"))
 				throw new ServerException("Not an email file");
-			ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), doc.getFolder().getId());
+			checkPermission(Permission.WRITE, session.getUser(), doc.getFolder().getId());
 
 			Storer storer = (Storer) Context.get().getBean(Storer.class);
 			String resource = storer.getResourceName(docId, fileVersion, null);
@@ -2699,7 +2708,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			Document d = manager.create(tmp, docVO, transaction);
 			return getById(d.getId());
 		} catch (IOException | PersistenceException | MessagingException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		} finally {
 			IOUtils.closeQuietly(is);
 			FileUtil.strongDelete(tmp);
@@ -2708,7 +2717,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIDocument replaceAlias(long aliasId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -2717,14 +2726,14 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			Document doc = manager.replaceAlias(aliasId, transaction);
 			return getDocument(session, doc.getId());
 		} catch (InvalidSessionException | PermissionException | PersistenceException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void deDuplicate(Long folderId, boolean retainNewest) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.REPORTS);
+		Session session = validateSession(getThreadLocalRequest());
+		checkMenu(getThreadLocalRequest(), Menu.REPORTS);
 
 		try {
 			// First of all, find all duplicates digests
@@ -2785,7 +2794,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			if (!currentDuplications.isEmpty())
 				deduplicateDocuments(session, currentDuplications);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
@@ -2856,19 +2865,19 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public void deleteTicket(long ticketId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		TicketDAO dao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 		try {
 			dao.delete(ticketId);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void enableTicket(long ticketId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		TicketDAO dao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 		try {
@@ -2876,13 +2885,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			ticket.setEnabled(1);
 			dao.store(ticket);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void disableTicket(long ticketId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		TicketDAO dao = (TicketDAO) Context.get().getBean(TicketDAO.class);
 		try {
@@ -2890,13 +2899,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			ticket.setEnabled(0);
 			dao.store(ticket);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void enforceFilesIntoFolderStorage(long folderId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		User user = session.getUser();
 
 		new Thread(() -> {
@@ -2984,7 +2993,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 	@Override
 	public GUIDocument merge(long[] docIds, long targetFolderId, String fileName) throws ServerException {
-		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		final Session session = validateSession(getThreadLocalRequest());
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentHistory transaction = new DocumentHistory();
@@ -3000,13 +3009,13 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 					fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf", transaction);
 			return getDocument(session, doc.getId());
 		} catch (InvalidSessionException | PermissionException | PersistenceException | IOException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public int updatePages(long docId) throws ServerException {
-		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		final Session session = validateSession(getThreadLocalRequest());
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -3020,20 +3029,20 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 			}
 			return 1;
 		} catch (PersistenceException e) {
-			return (Integer) ServiceUtil.throwServerException(session, log, e);
+			return (Integer) throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public GUIDocument rename(long documentId, String name) throws ServerException {
-		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		final Session session = validateSession(getThreadLocalRequest());
 
 		User user = session.getUser();
 		DocumentDAO docDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 		try {
 			Document doc = docDao.findById(documentId);
-			ServiceUtil.checkPermission(Permission.RENAME, user, doc.getFolder().getId());
+			checkPermission(Permission.RENAME, user, doc.getFolder().getId());
 			checkPublished(user, doc);
 
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -3045,7 +3054,7 @@ public class DocumentServiceImpl extends RemoteServiceServlet implements Documen
 
 			return getDocument(session, documentId);
 		} catch (AccessDeniedException | PermissionException | InvalidSessionException | PersistenceException e) {
-			return (GUIDocument) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
 

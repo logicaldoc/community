@@ -36,6 +36,7 @@
 
 	<bean id="ContextProperties"
 		class="com.logicaldoc.util.config.ContextProperties">
+		<constructor-arg value="contexttest.properties" />
 	</bean>
 
 	<bean id="Context" class="com.logicaldoc.util.Context"

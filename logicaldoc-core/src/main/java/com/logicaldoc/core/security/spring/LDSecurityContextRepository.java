@@ -81,7 +81,10 @@ public class LDSecurityContextRepository implements SecurityContextRepository {
 	}
 
 	public static void bindServletSession(String sid, HttpServletRequest request) {
-		HttpSession servletSession = request.getSession();
+		bindServletSession(sid, request.getSession());
+	}
+	
+	public static void bindServletSession(String sid, HttpSession servletSession) {
 		servletSession.setAttribute(SessionManager.PARAM_SID, sid);
 		servletSessionMapping.put(sid, servletSession);
 	}
