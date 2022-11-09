@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.java.plugin.JpfException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +64,7 @@ import com.logicaldoc.gui.common.client.beans.GUIRating;
 import com.logicaldoc.gui.common.client.beans.GUIVersion;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.io.FileUtil;
+import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.web.AbstractWebappTCase;
 import com.logicaldoc.web.UploadServlet;
 
@@ -119,6 +121,8 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		emailSender = mock(EMailSender.class);
 		doNothing().when(emailSender).send(any(EMail.class));
 		DocumentServiceImpl.setEmailSender(emailSender);
+		
+		activateCorePlugin();
 	}
 
 	@After
@@ -129,6 +133,19 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		super.tearDown();
 	}
 
+	private void activateCorePlugin() throws JpfException, IOException {
+		File pluginsDir = new File("target/tests-plugins");
+		pluginsDir.mkdir();
+		 		
+		File corePluginFile = new File(pluginsDir, "logicaldoc-core-plugin.jar");
+		
+		// copy plugin file to target resources
+		copyResource("/logicaldoc-core-8.8.3-plugin.jar", corePluginFile.getAbsolutePath());
+		
+		PluginRegistry registry = PluginRegistry.getInstance();		
+		registry.init(pluginsDir.getAbsolutePath());
+	}
+	
 	private void prepareUploadedFiles() throws IOException {
 		File file3 = new File(repositoryDir.getPath() + "/docs/3/doc/1.0");
 		file3.getParentFile().mkdirs();
@@ -667,10 +684,20 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		service.deDuplicate(null, true);
 
 		Assert.assertNull(service.getById(doc5.getId()));
-		Assert.assertNotNull(service.getById(newDoc.getId()));
-		Assert.assertEquals(1201, service.getById(newDoc.getFolder().getId()));
+		GUIDocument dc = service.getById(newDoc.getId());
+		Assert.assertNotNull(dc);
+		Assert.assertEquals(1201, dc.getFolder().getId());
 	}
 
+	@Test
+	public void testConvert() throws ServerException, IOException {
+		GUIDocument doc = service.getById(7);
+		GUIDocument conversion = service.convert(doc.getId(), doc.getFileVersion(), "pdf");
+		conversion = service.getById(conversion.getId());
+		Assert.assertNotNull(conversion);
+		Assert.assertTrue(conversion.getFileName().endsWith(".pdf"));
+	}
+	
 	@Test
 	public void testIndex() throws ServerException, IOException {
 		searchEngine.init();
@@ -1142,6 +1169,13 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		// Send the email with attached file
 		gmail.setZipCompression(false);
 
+		retvalue = service.sendAsEmail(gmail, "en-US");
+		log.info("returned message: {}", retvalue);
+		assertEquals("ok", retvalue);
+		
+		
+		// Send the email with attached file as pdf conversion
+		gmail.setPdfConversion(true);
 		retvalue = service.sendAsEmail(gmail, "en-US");
 		log.info("returned message: {}", retvalue);
 		assertEquals("ok", retvalue);

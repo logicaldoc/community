@@ -42,8 +42,6 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 	
 	protected SearchEngine engine;
 	
-	protected File pluginFile = new File("target/test/resources/core-plugin.xml");
-	
 	@Before
 	public void setUp() throws Exception {
 		super.setUp();
@@ -58,7 +56,6 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 	}
 	
 	private void activateCorePlugin() throws JpfException, IOException {
-
 		File pluginsDir = new File("target/tests-plugins");
 		pluginsDir.mkdir();
 		 		
