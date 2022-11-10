@@ -106,7 +106,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Document doc = dao.findById(1);
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);
-		Assert.assertEquals("xx", doc.getDigest());
+		Assert.assertEquals("ee6225dab489cfa38ba070c9c45c884efaa34ad8", doc.getDigest());
 
 		copyResource("/Digital_Day.pdf", "target/store/1/doc/1.0");
 
