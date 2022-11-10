@@ -1,11 +1,13 @@
 package com.logicaldoc.webservice;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.servlet.CXFServlet;
 
-import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 
 /**
@@ -24,8 +26,12 @@ public class WebserviceServlet extends CXFServlet {
 				super.service(request, response);
 			else
 				response.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
-		} catch (Throwable t) {
-			ServletUtil.sendError(response, t.getMessage());
+		} catch (ServletException | IOException e) {
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			} catch (IOException ioe) {
+				// Nothing to do
+			}
 		}
 	}
 }

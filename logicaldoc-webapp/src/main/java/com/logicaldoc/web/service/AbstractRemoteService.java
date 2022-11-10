@@ -36,7 +36,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.threading.NotifyingThread;
 import com.logicaldoc.core.threading.ThreadPools;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
-import com.logicaldoc.gui.common.client.InvalidSessionException;
+import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.ServerValidationError;
 import com.logicaldoc.gui.common.client.ServerValidationException;
@@ -54,21 +54,21 @@ import com.logicaldoc.web.websockets.WebsocketTool;
  * 
  * @since 8.3.3
  */
-public abstract class ServiceServlet extends RemoteServiceServlet {
+public abstract class AbstractRemoteService extends RemoteServiceServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger log = LoggerFactory.getLogger(ServiceServlet.class);
+	private static Logger log = LoggerFactory.getLogger(AbstractRemoteService.class);
 
 	protected final String LOCALE = "locale";
 
 	protected final String USER = "user";
 
-	public ServiceServlet() {
+	public AbstractRemoteService() {
 		super();
 	}
 
-	public ServiceServlet(Object delegate) {
+	public AbstractRemoteService(Object delegate) {
 		super(delegate);
 	}
 
@@ -76,7 +76,7 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 		return UploadServlet.getReceivedFiles(sid);
 	}
 	
-	protected Session validateSession(HttpServletRequest request) throws InvalidSessionException {
+	protected Session validateSession(HttpServletRequest request) throws InvalidSessionServerException {
 		String sid = SessionManager.get().getSessionId(request);
 		return validateSession(sid);
 	}
@@ -88,14 +88,14 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 	 * 
 	 * @return the session
 	 * 
-	 * @throws InvalidSessionException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is expired
 	 */
-	protected static Session validateSession(String sid) throws InvalidSessionException {
+	protected static Session validateSession(String sid) throws InvalidSessionServerException {
 		Session session = SessionManager.get().get(sid);
 		if (session == null)
-			throw new InvalidSessionException("Invalid Session");
+			throw new InvalidSessionServerException("Invalid Session");
 		if (!SessionManager.get().isOpen(sid))
-			throw new InvalidSessionException("Invalid or Expired Session");
+			throw new InvalidSessionServerException("Invalid or Expired Session");
 		SessionManager.get().renew(sid);
 		return session;
 	}
@@ -109,11 +109,11 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 	 * 
 	 * @return the current session
 	 * 
-	 * @throws InvalidSessionException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is expired
 	 * @throws AccessDeniedException the user cannot access any menu
 	 */
 	protected Session checkEvenOneMenu(HttpServletRequest request, long... menuIds)
-			throws InvalidSessionException, AccessDeniedException {
+			throws InvalidSessionServerException, AccessDeniedException {
 		Session session = validateSession(request);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		for (long menuId : menuIds) {
@@ -134,11 +134,11 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 	 * 
 	 * @return the curent session
 	 * 
-	 * @throws InvalidSessionException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is expired
 	 * @throws AccessDeniedException the user cannot access any menu
 	 */
 	protected Session checkMenu(HttpServletRequest request, long menuId)
-			throws InvalidSessionException, AccessDeniedException {
+			throws InvalidSessionServerException, AccessDeniedException {
 		Session session = validateSession(request);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, session.getUserId())) {
@@ -148,7 +148,7 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 		return session;
 	}
 
-	protected void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
+	protected static void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
 			if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
@@ -161,16 +161,16 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 		}
 	}
 
-	protected Locale currentLocale(Session session) throws InvalidSessionException {
+	protected Locale currentLocale(Session session) throws InvalidSessionServerException {
 		return (Locale) session.getDictionary().get(LOCALE);
 	}
 
-	protected Locale currentLocale(String sid) throws InvalidSessionException {
+	protected Locale currentLocale(String sid) throws InvalidSessionServerException {
 		Session session = validateSession(sid);
 		return currentLocale(session);
 	}
 
-	protected User getSessionUser(String sid) throws InvalidSessionException {
+	protected User getSessionUser(String sid) throws InvalidSessionServerException {
 		Session session = validateSession(sid);
 		User user = (User) session.getDictionary().get(USER);
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -178,7 +178,7 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 		return user;
 	}
 
-	protected User getSessionUser(HttpServletRequest request) throws InvalidSessionException {
+	protected User getSessionUser(HttpServletRequest request) throws InvalidSessionServerException {
 		Session session = validateSession(request);
 		User user = (User) session.getDictionary().get(USER);
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
@@ -231,7 +231,7 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 	 * @return if <code>src</code> is instance of {@link Timestamp} it will be
 	 *         converted to plain {@link Date}
 	 */
-	protected Date convertToDate(Date src) {
+	protected static Date convertToDate(Date src) {
 		if (src == null)
 			return null;
 
@@ -305,7 +305,7 @@ public abstract class ServiceServlet extends RemoteServiceServlet {
 	 * 
 	 * @return The array of attributes
 	 */
-	protected GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
+	protected static GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		tDao.initialize(template);
 

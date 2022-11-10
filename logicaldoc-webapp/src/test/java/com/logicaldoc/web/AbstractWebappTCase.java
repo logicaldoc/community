@@ -11,7 +11,6 @@ import javax.sql.DataSource;
 import org.apache.commons.io.FileUtils;
 import org.hsqldb.cmdline.SqlFile;
 import org.hsqldb.cmdline.SqlTool.SqlToolException;
-import org.java.plugin.JpfException;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.context.ApplicationContext;
@@ -30,7 +29,6 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
-import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.web.service.SecurityServiceImpl;
 
 import junit.framework.Assert;
@@ -81,7 +79,7 @@ public abstract class AbstractWebappTCase {
 		destroyDatabase();
 		((AbstractApplicationContext) context).close();
 	}
-	
+
 	protected void prepareSession(String username, String password) throws ServerException {
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 

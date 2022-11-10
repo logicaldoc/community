@@ -96,7 +96,7 @@ import com.logicaldoc.core.transfer.InMemoryZipImport;
 import com.logicaldoc.core.transfer.ZipExport;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
-import com.logicaldoc.gui.common.client.InvalidSessionException;
+import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
@@ -126,7 +126,7 @@ import com.logicaldoc.web.UploadServlet;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class DocumentServiceImpl extends ServiceServlet implements DocumentService {
+public class DocumentServiceImpl extends AbstractRemoteService implements DocumentService {
 
 	private static final String UTF_8 = "UTF-8";
 
@@ -727,13 +727,13 @@ public class DocumentServiceImpl extends ServiceServlet implements DocumentServi
 
 		try {
 			return getDocument(session, docId);
-		} catch (InvalidSessionException | PermissionException | PersistenceException e) {
+		} catch (InvalidSessionServerException | PermissionException | PersistenceException e) {
 			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
 
 	public static GUIDocument getDocument(Session session, long docId)
-			throws InvalidSessionException, PersistenceException, PermissionException {
+			throws InvalidSessionServerException, PersistenceException, PermissionException {
 		if (session != null)
 			validateSession(session.getSid());
 
@@ -2725,7 +2725,7 @@ public class DocumentServiceImpl extends ServiceServlet implements DocumentServi
 		try {
 			Document doc = manager.replaceAlias(aliasId, transaction);
 			return getDocument(session, doc.getId());
-		} catch (InvalidSessionException | PermissionException | PersistenceException e) {
+		} catch (InvalidSessionServerException | PermissionException | PersistenceException e) {
 			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
@@ -3008,7 +3008,7 @@ public class DocumentServiceImpl extends ServiceServlet implements DocumentServi
 			Document doc = manager.merge(docs, targetFolderId,
 					fileName.toLowerCase().endsWith(".pdf") ? fileName : fileName + ".pdf", transaction);
 			return getDocument(session, doc.getId());
-		} catch (InvalidSessionException | PermissionException | PersistenceException | IOException e) {
+		} catch (InvalidSessionServerException | PermissionException | PersistenceException | IOException e) {
 			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}
@@ -3053,7 +3053,7 @@ public class DocumentServiceImpl extends ServiceServlet implements DocumentServi
 			manager.rename(documentId, name, transaction);
 
 			return getDocument(session, documentId);
-		} catch (AccessDeniedException | PermissionException | InvalidSessionException | PersistenceException e) {
+		} catch (AccessDeniedException | PermissionException | InvalidSessionServerException | PersistenceException e) {
 			return (GUIDocument) throwServerException(session, log, e);
 		}
 	}

@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.RunLevel;
 import com.logicaldoc.core.SystemInfo;
@@ -78,7 +77,6 @@ import com.logicaldoc.util.plugin.PluginRegistry;
 import com.logicaldoc.util.sql.SqlUtil;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.listener.ApplicationListener;
-import com.logicaldoc.web.util.ServiceUtil;
 import com.logicaldoc.web.websockets.WebsocketTool;
 
 /**
@@ -88,7 +86,7 @@ import com.logicaldoc.web.websockets.WebsocketTool;
  * 
  * @since 6.0
  */
-public class SystemServiceImpl extends RemoteServiceServlet implements SystemService {
+public class SystemServiceImpl extends AbstractRemoteService implements SystemService {
 
 	private static final String SECONDS = "seconds";
 
@@ -100,7 +98,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	@Override
 	public boolean disableTask(String taskName) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		Task task = getTask(taskName);
 
@@ -112,13 +110,13 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			task.getScheduling().save();
 			return true;
 		} catch (IOException | ParseException e) {
-			return (Boolean) ServiceUtil.throwServerException(session, log, e);
+			return (Boolean) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public boolean enableTask(String taskName) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		Task task = getTask(taskName);
 		if (task == null)
@@ -135,13 +133,13 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 			return true;
 		} catch (IOException | ParseException e) {
-			return (Boolean) ServiceUtil.throwServerException(session, log, e);
+			return (Boolean) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIParameter[][] getStatistics(String locale) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		GenericDAO genDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 
@@ -319,7 +317,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	@Override
 	public GUITask getTaskByName(String taskName, String locale) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		Task tsk = getTask(taskName);
 		if (tsk == null)
@@ -399,7 +397,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	@Override
 	public GUITask[] loadTasks(String locale) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
 		GUITask[] tasks = new GUITask[manager.getTasks().size()];
@@ -446,7 +444,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	@Override
 	public GUITask saveTask(GUITask task, String locale) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		TaskManager manager = (TaskManager) Context.get().getBean(TaskManager.class);
 		Task tsk = null;
@@ -530,20 +528,20 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	@Override
 	public void setGUILanguageStatus(String language, boolean active) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		ContextProperties conf = Context.get().getProperties();
 		conf.setProperty(session.getTenantName() + ".lang." + language + ".gui", active ? "enabled" : "disabled");
 		try {
 			conf.write();
 		} catch (IOException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void confirmUpdate() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		ContextProperties conf = Context.get().getProperties();
 		String prevRunLevel = conf.getProperty("runlevel.back", RunLevel.DEFAULT.toString());
@@ -552,13 +550,13 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			conf.write();
 			log.info("Update confirmed");
 		} catch (IOException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void restart() throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		try {
 			log.warn("Alerting the connected users about the shutdown");
@@ -595,7 +593,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	@Override
 	public GUIHistory[] search(Long userId, Date from, Date till, int maxResult, String historySid, String[] events,
 			Long rootFolderId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		// Search in the document/folder history
 		StringBuilder query = new StringBuilder(
@@ -660,7 +658,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 			List<GUIHistory> histories = executeQuery(query.toString(), maxResult, session);
 			return histories.toArray(new GUIHistory[histories.size()]);
 		} catch (PersistenceException e) {
-			return (GUIHistory[]) ServiceUtil.throwServerException(session, log, e);
+			return (GUIHistory[]) throwServerException(session, log, e);
 		}
 	}
 
@@ -764,7 +762,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 	@Override
 	public GUIHistory[] searchApiCalls(Long userId, Date from, Date till, String callSid, String protocol, String uri,
 			int maxResult) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		TenantDAO dao = (TenantDAO) Context.get().getBean(TenantDAO.class);
 		Map<Long, String> tenants = dao.findAll().stream().collect(Collectors.toMap(Tenant::getId, Tenant::getName));
@@ -823,26 +821,26 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 			return calls.toArray(new GUIHistory[calls.size()]);
 		} catch (PersistenceException e) {
-			return (GUIHistory[]) ServiceUtil.throwServerException(session, log, e);
+			return (GUIHistory[]) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void unscheduleJobs(GUIValue[] jobs) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		JobManager jobManager = (JobManager) Context.get().getBean(JobManager.class);
 		for (GUIValue trigger : jobs)
 			try {
 				jobManager.unscheduleTrigger(trigger.getCode(), trigger.getValue());
 			} catch (SchedulerException e) {
-				ServiceUtil.throwServerException(session, log, e);
+				throwServerException(session, log, e);
 			}
 
 	}
 
 	@Override
 	public void uninstallPlugin(String pluginId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 			throw new AccessDeniedException();
@@ -884,7 +882,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 					Exec.exec("rm -rf \"" + pluginJarFile.getAbsolutePath() + "\"", null, null);
 			}
 		} catch (IOException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 		if (pluginJarFile.exists())
@@ -894,7 +892,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	@Override
 	public void initializePlugin(String pluginId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 			throw new AccessDeniedException();
@@ -930,13 +928,13 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException | ClassNotFoundException | PluginException
 				| ServerException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void installPlugin() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		if (!session.getUser().isMemberOf(Group.GROUP_ADMIN) || session.getTenantId() != Tenant.DEFAULT_ID)
 			throw new AccessDeniedException();
@@ -1023,7 +1021,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 				ApplicationListener.restartRequired();
 		} catch (ServerException | IOException | NoSuchMethodException | SecurityException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		} finally {
 			UploadServlet.cleanReceivedFiles(session.getSid());
 		}
@@ -1031,7 +1029,7 @@ public class SystemServiceImpl extends RemoteServiceServlet implements SystemSer
 
 	@Override
 	public GUIValue[] getPlugins() throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		Collection<PluginDescriptor> descriptors = PluginRegistry.getInstance().getPlugins();
 		List<GUIValue> plugins = new ArrayList<>();

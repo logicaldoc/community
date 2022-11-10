@@ -12,7 +12,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.contact.Contact;
 import com.logicaldoc.core.contact.ContactDAO;
@@ -25,7 +24,6 @@ import com.logicaldoc.gui.frontend.client.services.ContactService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.csv.CSVFileReader;
 import com.logicaldoc.web.UploadServlet;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the ContactService
@@ -33,7 +31,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.8
  */
-public class ContactServiceImpl extends RemoteServiceServlet implements ContactService {
+public class ContactServiceImpl extends AbstractRemoteService implements ContactService {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,7 +39,7 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 
 	@Override
 	public void delete(long[] ids) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
@@ -55,7 +53,7 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 
 	@Override
 	public void save(GUIContact contact) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 			Contact cnt = dao.findById(contact.getId());
@@ -77,14 +75,14 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 
 	@Override
 	public GUIContact load(long id) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 			Contact contact = dao.findById(id);
 			return fromContact(contact);
 		} catch (Throwable t) {
-			return (GUIContact) ServiceUtil.throwServerException(session, log, t);
+			return (GUIContact) throwServerException(session, log, t);
 		}
 	}
 
@@ -109,7 +107,7 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 	public GUIContact[] parseContacts(boolean preview, String separator, String delimiter, boolean skipFirstRow,
 			int firstName, int lastName, int email, int company, int phone, int mobile, int address)
 			throws ServerException {
-		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		final Session session = validateSession(getThreadLocalRequest());
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
@@ -205,7 +203,7 @@ public class ContactServiceImpl extends RemoteServiceServlet implements ContactS
 
 	@Override
 	public void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 		try {
 			HashSet<Long> users = new HashSet<Long>();
 			if (userIds != null)

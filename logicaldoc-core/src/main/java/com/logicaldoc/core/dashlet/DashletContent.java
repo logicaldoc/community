@@ -43,7 +43,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.util.IconSelector;
-import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
@@ -66,8 +65,8 @@ public class DashletContent extends HttpServlet {
 	private static Logger log = LoggerFactory.getLogger(DashletContent.class);
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response) {
+
 		try {
 			Session session = validateSession(request);
 
@@ -108,9 +107,13 @@ public class DashletContent extends HttpServlet {
 				handleNote(showSid, locale, dashlet, dashletDictionary, automation, writer);
 			else if (Dashlet.TYPE_CONTENT.equals(dashlet.getType()))
 				handleContent(dashlet, dashletDictionary, automation, writer);
-		} catch (Throwable e) {
+		} catch (NumberFormatException | ServletException | PersistenceException | IOException e) {
 			log.error(e.getMessage(), e);
-			ServletUtil.sendError(response, e.getMessage());
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			} catch (IOException ioe) {
+				// Nothing to do
+			}
 		}
 	}
 

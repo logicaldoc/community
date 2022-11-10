@@ -35,7 +35,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.store.Storer;
-import com.logicaldoc.gui.common.client.InvalidSessionException;
+import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.frontend.client.services.DropboxService;
 import com.logicaldoc.util.Context;
@@ -52,13 +52,13 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 
 	private static Logger log = LoggerFactory.getLogger(DropboxServiceImpl.class);
 
-	public static Session validateSession(HttpServletRequest request) throws InvalidSessionException {
+	public static Session validateSession(HttpServletRequest request) throws InvalidSessionServerException {
 		String sid = SessionManager.get().getSessionId(request);
 		Session session = SessionManager.get().get(sid);
 		if (session == null)
-			throw new InvalidSessionException("Invalid Session");
+			throw new InvalidSessionServerException("Invalid Session");
 		if (!SessionManager.get().isOpen(sid))
-			throw new InvalidSessionException("Invalid or Expired Session");
+			throw new InvalidSessionServerException("Invalid or Expired Session");
 		SessionManager.get().renew(sid);
 		return session;
 	}

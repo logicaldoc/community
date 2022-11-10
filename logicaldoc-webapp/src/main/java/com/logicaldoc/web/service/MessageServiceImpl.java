@@ -11,7 +11,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.MessageTemplate;
@@ -27,7 +26,6 @@ import com.logicaldoc.gui.common.client.beans.GUIMessage;
 import com.logicaldoc.gui.common.client.beans.GUIMessageTemplate;
 import com.logicaldoc.gui.frontend.client.services.MessageService;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the MessageService
@@ -35,7 +33,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class MessageServiceImpl extends RemoteServiceServlet implements MessageService {
+public class MessageServiceImpl extends AbstractRemoteService implements MessageService {
 
 	private static Logger log = LoggerFactory.getLogger(MessageServiceImpl.class);
 
@@ -43,7 +41,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 
 	@Override
 	public void delete(long[] ids) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 		Context context = Context.get();
 		SystemMessageDAO dao = (SystemMessageDAO) context.getBean(SystemMessageDAO.class);
 		for (long id : ids) {
@@ -57,7 +55,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 
 	@Override
 	public GUIMessage getMessage(long messageId, boolean markAsRead) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			Context context = Context.get();
@@ -107,19 +105,19 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 			return m;
 
 		} catch (Throwable e) {
-			return (GUIMessage) ServiceUtil.throwServerException(session, log, e);
+			return (GUIMessage) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void save(GUIMessage message, long[] recipientIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			for (long id : recipientIds)
 				saveMessage(message, session, id);
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
@@ -161,7 +159,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 
 	@Override
 	public GUIMessageTemplate[] loadTemplates(String language, String type) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		Context context = Context.get();
 
 		try {
@@ -196,13 +194,13 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 
 			return buf.toArray(new GUIMessageTemplate[0]);
 		} catch (Throwable t) {
-			return (GUIMessageTemplate[]) ServiceUtil.throwServerException(session, log, t);
+			return (GUIMessageTemplate[]) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void saveTemplates(GUIMessageTemplate[] templates) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			Context context = Context.get();
@@ -226,13 +224,13 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 				}
 			}
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void deleteTemplates(long[] ids) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			Context context = Context.get();
@@ -249,13 +247,13 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 				}
 			}
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void deleteTemplates(String name) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			Context context = Context.get();
@@ -272,13 +270,13 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 				}
 			}
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public GUIMessageTemplate getTemplate(long templateId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			Context context = Context.get();
@@ -296,7 +294,7 @@ public class MessageServiceImpl extends RemoteServiceServlet implements MessageS
 			t.setType(template.getType());
 			return t;
 		} catch (Throwable t) {
-			return (GUIMessageTemplate) ServiceUtil.throwServerException(session, log, t);
+			return (GUIMessageTemplate) throwServerException(session, log, t);
 		}
 	}
 }

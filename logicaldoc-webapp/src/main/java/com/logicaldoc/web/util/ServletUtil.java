@@ -45,11 +45,10 @@ import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
-import com.logicaldoc.gui.common.client.InvalidSessionException;
-import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.MimeType;
 import com.logicaldoc.util.config.ContextProperties;
@@ -67,16 +66,50 @@ public class ServletUtil {
 
 	private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 
-	public static Session validateSession(HttpServletRequest request) throws ServletException {
-		try {
-			String sid = SessionManager.get().getSessionId(request);
-			return ServiceUtil.validateSession(sid);
-		} catch (Throwable t) {
-			throw new ServletException(t.getMessage());
-		}
+	private static final String USER = "user";
+
+	public static Session validateSession(HttpServletRequest request) throws InvalidSessionException {
+		String sid = SessionManager.get().getSessionId(request);
+		return validateSession(sid);
 	}
 
-	public static Session checkMenu(HttpServletRequest request, long menuId) throws ServletException {
+	/**
+	 * Throws a runtime exception id the given session is invalid
+	 * 
+	 * @param sid identifier of the session
+	 * 
+	 * @return the session
+	 * 
+	 * @throws InvalidSessionException the session does not exist or is expired
+	 */
+	public static Session validateSession(String sid) throws InvalidSessionException {
+		Session session = SessionManager.get().get(sid);
+		if (session == null)
+			throw new InvalidSessionException("Invalid Session");
+		if (!SessionManager.get().isOpen(sid))
+			throw new InvalidSessionException("Invalid or Expired Session");
+		SessionManager.get().renew(sid);
+		return session;
+	}
+
+	public static User getSessionUser(HttpServletRequest request) throws InvalidSessionException {
+		Session session = validateSession(request);
+		User user = (User) session.getDictionary().get(USER);
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		userDao.initialize(user);
+		return user;
+	}
+
+	public static User getSessionUser(String sid) throws InvalidSessionException {
+		Session session = validateSession(sid);
+		User user = (User) session.getDictionary().get(USER);
+		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
+		userDao.initialize(user);
+		return user;
+	}
+
+	public static Session checkMenu(HttpServletRequest request, long menuId)
+			throws ServletException, InvalidSessionException {
 		Session session = validateSession(request);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		if (!dao.isReadEnable(menuId, session.getUserId())) {
@@ -96,8 +129,10 @@ public class ServletUtil {
 	 * @return if at least one of the menus is accessible
 	 * 
 	 * @throws ServletException error in the servlet container
+	 * @throws InvalidSessionException if the session is not valid
 	 */
-	public static Session checkEvenOneMenu(HttpServletRequest request, long... menuIds) throws ServletException {
+	public static Session checkEvenOneMenu(HttpServletRequest request, long... menuIds)
+			throws ServletException, InvalidSessionException {
 		Session session = validateSession(request);
 		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		for (long menuId : menuIds) {
@@ -122,20 +157,15 @@ public class ServletUtil {
 	 * @throws FileNotFoundException cannot find the plugin dir
 	 * @throws IOException generic I/O error
 	 * @throws ServletException error in the servlet container
-	 * @throws InvalidSessionException the session is unexisting or not valid
 	 */
 	public static void downloadPluginResource(HttpServletRequest request, HttpServletResponse response, String sid,
 			String pluginName, String resourcePath, String fileName)
 			throws FileNotFoundException, IOException, ServletException, InvalidSessionException {
 
 		if (sid != null)
-			try {
-				ServiceUtil.validateSession(sid);
-			} catch (ServerException e) {
-				throw new ServletException(e.getMessage(), e);
-			}
+			validateSession(sid);
 		else
-			ServiceUtil.validateSession(request);
+			validateSession(request);
 
 		String filename = fileName;
 		if (filename == null)
@@ -192,21 +222,21 @@ public class ServletUtil {
 		Session session = null;
 		if (sid != null)
 			try {
-				session = ServiceUtil.validateSession(sid);
-			} catch (ServerException e) {
+				session = validateSession(sid);
+			} catch (InvalidSessionException e) {
 				throw new ServletException(e.getMessage(), e);
 			}
 		else
 			try {
-				session = ServiceUtil.validateSession(request);
-			} catch (Throwable t) {
+				session = validateSession(request);
+			} catch (InvalidSessionException e1) {
 				// Nothing to do
 			}
 
 		if (user != null)
 			try {
 				udao.initialize(user);
-			} catch (Throwable t) {
+			} catch (Exception e) {
 				// Nothing to do
 			}
 
@@ -710,6 +740,24 @@ public class ServletUtil {
 			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
 		} catch (Throwable e) {
 			// Nothing to do
+		}
+	}
+
+	/**
+	 * Retrieves the original full URL of a request
+	 * 
+	 * @param request The request to inspect
+	 * 
+	 * @return The full URL
+	 */
+	public static String getFullURL(HttpServletRequest request) {
+		StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
+		String queryString = request.getQueryString();
+
+		if (queryString == null) {
+			return requestURL.toString();
+		} else {
+			return requestURL.append('?').append(queryString).toString();
 		}
 	}
 

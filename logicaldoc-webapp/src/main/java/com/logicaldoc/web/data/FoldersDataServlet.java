@@ -23,7 +23,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.util.IconSelector;
-import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -87,7 +86,11 @@ public class FoldersDataServlet extends AbstractDataServlet {
 		if (parentFolder == null) {
 			String message = String.format("No folder found with ID=%d parent %s", parentFolderId, parent);
 			log.error(message);
-			ServletUtil.sendError(response, message);
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
+			} catch (IOException e) {
+				// Nothing to do
+			}
 		}
 
 		Context context = Context.get();

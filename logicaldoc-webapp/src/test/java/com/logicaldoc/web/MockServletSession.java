@@ -29,7 +29,7 @@ public class MockServletSession implements HttpSession {
 	}
 
 	public MockServletSession() {
-
+		super();
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class MockServletSession implements HttpSession {
 
 	@Override
 	public void invalidate() {
-
+// Nothing to do
 	}
 
 	@Override
@@ -105,17 +105,17 @@ public class MockServletSession implements HttpSession {
 
 	@Override
 	public void putValue(String arg0, Object arg1) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void removeAttribute(String arg0) {
-
+		// Nothing to do
 	}
 
 	@Override
 	public void removeValue(String arg0) {
-
+		// Nothing to do
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class MockServletSession implements HttpSession {
 
 	@Override
 	public void setMaxInactiveInterval(int arg0) {
-
+		// Nothing to do
 	}
 
 }

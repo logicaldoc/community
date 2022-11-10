@@ -7,7 +7,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.dashlet.Dashlet;
 import com.logicaldoc.core.dashlet.DashletDAO;
 import com.logicaldoc.core.generic.Generic;
@@ -19,7 +18,6 @@ import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIDashlet;
 import com.logicaldoc.gui.frontend.client.services.DashletService;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * The dashlet service for the operations on the dashlets done through the GUI.
@@ -27,7 +25,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.2.3
  */
-public class DashletServiceImpl extends RemoteServiceServlet implements DashletService {
+public class DashletServiceImpl extends AbstractRemoteService implements DashletService {
 
 	private static final long serialVersionUID = 1L;
 
@@ -35,8 +33,8 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 
 	@Override
 	public void save(GUIDashlet guiDashlet) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
+		Session session = validateSession(getThreadLocalRequest());
+		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 			Dashlet dashlet = dao.findByName(guiDashlet.getName(), session.getTenantId());
@@ -54,7 +52,7 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 
 			dao.store(dashlet);
 		} catch (Throwable e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
@@ -69,7 +67,7 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 
 	@Override
 	public GUIDashlet[] loadDashlets() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 			List<Dashlet> dashlets = dao.findAll(session.getTenantId());
@@ -78,13 +76,13 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 				guiDashlets.add(fromDashlet(dashlet));
 			return guiDashlets.toArray(new GUIDashlet[0]);
 		} catch (Throwable e) {
-			return (GUIDashlet[]) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDashlet[]) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIDashlet get(long dashletId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 			Dashlet dashlet = dao.findById(dashletId);
@@ -92,13 +90,13 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 				throw new ServerException("Unexisting dashlet " + dashletId);
 			return fromDashlet(dashlet);
 		} catch (Throwable e) {
-			return (GUIDashlet) ServiceUtil.throwServerException(session, log, e);
+			return (GUIDashlet) throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIDashlet get(String name) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 		Dashlet dashlet = dao.findByName(name, session.getTenantId());
 		if (dashlet == null)
@@ -108,19 +106,19 @@ public class DashletServiceImpl extends RemoteServiceServlet implements DashletS
 
 	@Override
 	public void delete(long dashletId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
-		ServiceUtil.checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
+		Session session = validateSession(getThreadLocalRequest());
+		checkMenu(getThreadLocalRequest(), Menu.SETTINGS);
 		try {
 			DashletDAO dao = (DashletDAO) Context.get().getBean(DashletDAO.class);
 			dao.delete(dashletId);
 		} catch (Throwable e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void saveUserDashlets(GUIDashlet[] dashlets) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		GenericDAO gDao = (GenericDAO) Context.get().getBean(GenericDAO.class);
 		UserDAO uDao = (UserDAO) Context.get().getBean(UserDAO.class);
 

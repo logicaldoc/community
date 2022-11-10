@@ -4,7 +4,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.logicaldoc.gui.common.client.InvalidSessionException;
+import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.LDRpcRequestBuilder;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIInfo;
@@ -35,9 +35,9 @@ public interface InfoService extends RemoteService {
 	 * 
 	 * @return array with all the settings
 	 * 
-	 * @throws InvalidSessionException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is expired
 	 */
-	public GUIParameter[] getSessionInfo() throws InvalidSessionException;
+	public GUIParameter[] getSessionInfo() throws InvalidSessionServerException;
 
 	/**
 	 * Retrieves the natural language description of a given cron expression
@@ -56,9 +56,9 @@ public interface InfoService extends RemoteService {
 	 * 
 	 * @return if the server has been successfully contacted
 	 * 
-	 * @throws InvalidSessionException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is expired
 	 */
-	public boolean ping() throws InvalidSessionException;
+	public boolean ping() throws InvalidSessionServerException;
 
 	public static class Instance {
 		private static InfoServiceAsync instance;

@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.folder.Folder;
@@ -38,7 +37,6 @@ import com.logicaldoc.gui.common.client.beans.GUISearchEngine;
 import com.logicaldoc.gui.frontend.client.services.SearchEngineService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the SearchEngineService
@@ -46,7 +44,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
-public class SearchEngineServiceImpl extends RemoteServiceServlet implements SearchEngineService {
+public class SearchEngineServiceImpl extends AbstractRemoteService implements SearchEngineService {
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,7 +52,7 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 
 	@Override
 	public GUISearchEngine getInfo() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			GUISearchEngine searchEngine = new GUISearchEngine();
@@ -90,13 +88,13 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 
 			return searchEngine;
 		} catch (Exception t) {
-			return (GUISearchEngine) ServiceUtil.throwServerException(session, log, t);
+			return (GUISearchEngine) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void rescheduleAll(final boolean dropIndex) throws ServerException {
-		final Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		final Session session = validateSession(getThreadLocalRequest());
 
 		if (dropIndex)
 			try {
@@ -130,31 +128,31 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 
 	@Override
 	public void unlock() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 			indexer.unlock();
 		} catch (Exception t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public String check() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 			return indexer.check();
 		} catch (Exception t) {
-			return (String) ServiceUtil.throwServerException(session, log, t);
+			return (String) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void save(GUISearchEngine searchEngine) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			ContextProperties conf = Context.get().getProperties();
@@ -183,26 +181,26 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 
 			conf.write();
 		} catch (Exception t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void setLanguageStatus(String language, boolean active) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			ContextProperties conf = Context.get().getProperties();
 			conf.setProperty(session.getTenantName() + ".lang." + language, active ? "enabled" : "disabled");
 			conf.write();
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void setAliases(String extension, String aliases) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			StringTokenizer st = new StringTokenizer(aliases, ",", false);
@@ -212,24 +210,24 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 
 			ParserFactory.setAliases(extension, buf.toArray(new String[0]));
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public long countEntries() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 			return indexer.getCount();
 		} catch (Throwable t) {
-			return (Long) ServiceUtil.throwServerException(session, log, t);
+			return (Long) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void reorderTokenFilters(String[] filters) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			ContextProperties conf = Context.get().getProperties();
 			int i = 1;
@@ -237,13 +235,13 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 				conf.setProperty("index.tokenfilter." + filter + ".position", Integer.toString(i++));
 			conf.write();
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void saveTokenFilterSettings(String filter, GUIParameter[] settings) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			String prefix = "index.tokenfilter." + filter + ".";
 			ContextProperties conf = Context.get().getProperties();
@@ -251,25 +249,25 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 				conf.setProperty(prefix + setting.getName(), setting.getValue().trim());
 			conf.write();
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void setTokenFilterStatus(String filter, boolean active) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			ContextProperties conf = Context.get().getProperties();
 			conf.setProperty("index.tokenfilter." + filter, active ? "enabled" : "disabled");
 			conf.write();
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void purge() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			Runnable runnable = new Runnable() {
@@ -282,15 +280,15 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 
 			};
 
-			ServiceUtil.executeLongRunningOperation("Purge Index", runnable, session);
+			executeLongRunningOperation("Purge Index", runnable, session);
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void remove(Long[] entryIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			Runnable runnable = new Runnable() {
@@ -342,15 +340,15 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 
 			};
 
-			ServiceUtil.executeLongRunningOperation("Delete Index Entries", runnable, session);
+			executeLongRunningOperation("Delete Index Entries", runnable, session);
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	};
 
 	@Override
 	public GUIResult query(String query, int page, int size) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			SearchEngine indexer = (SearchEngine) Context.get().getBean(SearchEngine.class);
 			Hits hits = indexer.query(query, page, size);
@@ -497,7 +495,7 @@ public class SearchEngineServiceImpl extends RemoteServiceServlet implements Sea
 
 			return result;
 		} catch (Throwable t) {
-			return (GUIResult) ServiceUtil.throwServerException(session, log, t);
+			return (GUIResult) throwServerException(session, log, t);
 		}
 	}
 

@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.Session;
+import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.util.LocaleUtil;
-import com.logicaldoc.web.util.ServiceUtil;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**
@@ -60,10 +60,10 @@ public abstract class AbstractDataServlet extends HttpServlet {
 			if (StringUtils.isNotEmpty(request.getParameter("locale")))
 				locale = LocaleUtil.toLocale(request.getParameter("locale"));
 
-			Session session = ServiceUtil.validateSession(request);
+			Session session = ServletUtil.validateSession(request);
 
 			service(request, response, session, max, locale);
-		} catch (Throwable e) {
+		} catch (NumberFormatException | PersistenceException | IOException e) {
 			log.error(e.getMessage(), e);
 			ServletUtil.sendError(response, e.getMessage());
 		}

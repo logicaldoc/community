@@ -16,7 +16,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.History;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.DocumentHistory;
@@ -47,7 +46,6 @@ import com.logicaldoc.gui.common.client.beans.GUIRight;
 import com.logicaldoc.gui.common.client.beans.GUITemplate;
 import com.logicaldoc.gui.frontend.client.services.TemplateService;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the TemplateService
@@ -55,7 +53,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
-public class TemplateServiceImpl extends RemoteServiceServlet implements TemplateService {
+public class TemplateServiceImpl extends AbstractRemoteService implements TemplateService {
 
 	private static final long serialVersionUID = 1L;
 
@@ -63,7 +61,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 	@Override
 	public void delete(long templateId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
@@ -80,13 +78,13 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 				throw new Exception("Template has not been deleted", e);
 			}
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public long countDocuments(long templateId) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		return dao.countDocs(templateId);
@@ -94,7 +92,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 	@Override
 	public GUITemplate save(GUITemplate template) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		User sessionUser = session.getUser();
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
@@ -208,7 +206,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 			template.setId(templ.getId());
 		} catch (Throwable t) {
-			return (GUITemplate) ServiceUtil.throwServerException(session, log, t);
+			return (GUITemplate) throwServerException(session, log, t);
 		}
 
 		return template;
@@ -216,7 +214,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 	@Override
 	public GUITemplate getTemplate(long templateId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		TemplateDAO dao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		try {
@@ -276,7 +274,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 				else if (templateExtAttr.getValue() instanceof Double)
 					att.setDoubleValue(templateExtAttr.getDoubleValue());
 				else if (templateExtAttr.getValue() instanceof Date)
-					att.setDateValue(ServiceUtil.convertToDate(templateExtAttr.getDateValue()));
+					att.setDateValue(convertToDate(templateExtAttr.getDateValue()));
 				else if (templateExtAttr.getValue() instanceof Boolean)
 					att.setBooleanValue(templateExtAttr.getBooleanValue());
 
@@ -333,7 +331,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 	public GUIAttribute[] getAttributes(long templateId, GUIExtensibleObject extensibleObject) throws ServerException {
 		Session session = null;
 		try {
-			session = ServiceUtil.validateSession(getThreadLocalRequest());
+			session = validateSession(getThreadLocalRequest());
 		} catch (Throwable t) {
 			// Nothing to do
 		}
@@ -381,7 +379,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 			return attributes;
 		} catch (Throwable t) {
-			return (GUIAttribute[]) ServiceUtil.throwServerException(session, log, t);
+			return (GUIAttribute[]) throwServerException(session, log, t);
 		}
 	}
 
@@ -473,7 +471,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 					// Normalize dates
 					if (guiAttribute.getValue() instanceof Date)
-						guiAttribute.setValue(ServiceUtil.convertToDate((Date) guiAttribute.getValue()));
+						guiAttribute.setValue(convertToDate((Date) guiAttribute.getValue()));
 
 					guiAttribute.setType(templateExtAttr.getType());
 					attributes.add(guiAttribute);
@@ -502,7 +500,7 @@ public class TemplateServiceImpl extends RemoteServiceServlet implements Templat
 
 								// Normalize dates
 								if (valAtt.getValue() instanceof Date)
-									valAtt.setValue(ServiceUtil.convertToDate((Date) valAtt.getValue()));
+									valAtt.setValue(convertToDate((Date) valAtt.getValue()));
 
 								if (valAtt.getType() == Attribute.TYPE_USER)
 									valAtt.setUsername(valAttribute.getStringValue());

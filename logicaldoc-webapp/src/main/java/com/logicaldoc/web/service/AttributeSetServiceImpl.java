@@ -14,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.metadata.Attribute;
 import com.logicaldoc.core.metadata.AttributeOption;
 import com.logicaldoc.core.metadata.AttributeOptionDAO;
@@ -29,7 +28,6 @@ import com.logicaldoc.gui.frontend.client.services.AttributeSetService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.csv.CSVFileReader;
 import com.logicaldoc.web.UploadServlet;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the AttributeSetService
@@ -37,7 +35,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 7.5
  */
-public class AttributeSetServiceImpl extends RemoteServiceServlet implements AttributeSetService {
+public class AttributeSetServiceImpl extends AbstractRemoteService implements AttributeSetService {
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,19 +43,19 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 
 	@Override
 	public void delete(long setId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 			dao.delete(setId);
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void saveOptions(long setId, String attribute, GUIValue[] values) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 		try {
@@ -75,13 +73,13 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				}
 			}
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void deleteOptions(long setId, String attribute, String[] values) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		AttributeOptionDAO dao = (AttributeOptionDAO) Context.get().getBean(AttributeOptionDAO.class);
 		try {
@@ -97,13 +95,13 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 						break;
 					}
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public GUIAttributeSet save(GUIAttributeSet attributeSet) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 		try {
@@ -169,14 +167,14 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 
 			attributeSet.setId(attSet.getId());
 		} catch (Throwable t) {
-			return (GUIAttributeSet) ServiceUtil.throwServerException(session, log, t);
+			return (GUIAttributeSet) throwServerException(session, log, t);
 		}
 
 		return attributeSet;
 	}
 
 	public GUIAttributeSet getAttributeSet(String name) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 		AttributeSet set = dao.findByName(name, session.getTenantId());
 		if (set != null)
@@ -187,7 +185,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 
 	@Override
 	public GUIAttributeSet getAttributeSet(long setId) throws ServerException {
-		ServiceUtil.validateSession(getThreadLocalRequest());
+		validateSession(getThreadLocalRequest());
 
 		AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 		try {
@@ -230,7 +228,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				else if (extAttr.getValue() instanceof Double)
 					att.setDoubleValue(extAttr.getDoubleValue());
 				else if (extAttr.getValue() instanceof Date)
-					att.setDateValue(ServiceUtil.convertToDate(extAttr.getDateValue()));
+					att.setDateValue(convertToDate(extAttr.getDateValue()));
 				else if (extAttr.getValue() instanceof Boolean)
 					att.setBooleanValue(extAttr.getBooleanValue());
 
@@ -271,7 +269,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 
 	@Override
 	public GUIAttributeSet[] getAttributeSets() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 			List<GUIAttributeSet> guiSets = new ArrayList<GUIAttributeSet>();
@@ -280,13 +278,13 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 				guiSets.add(getAttributeSet(setId));
 			return guiSets.toArray(new GUIAttributeSet[0]);
 		} catch (Throwable t) {
-			return (GUIAttributeSet[]) ServiceUtil.throwServerException(session, log, t);
+			return (GUIAttributeSet[]) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public GUIValue[] parseOptions(long setId, String attribute) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		Map<String, File> uploadedFilesMap = UploadServlet.getReceivedFiles(session.getSid());
 		File file = uploadedFilesMap.values().iterator().next();
@@ -317,7 +315,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 
 	@Override
 	public void applyValidationToTemplates(long setId, String attribute) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
@@ -332,13 +330,13 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 					setAttribute.getValidation(), attribute);
 			log.info("Updated the validation of {} template attributes named {}", count, attribute);
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void applyInitializationToTemplates(long setId, String attribute) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			AttributeSetDAO dao = (AttributeSetDAO) Context.get().getBean(AttributeSetDAO.class);
 			AttributeSet set = dao.findById(setId);
@@ -352,7 +350,7 @@ public class AttributeSetServiceImpl extends RemoteServiceServlet implements Att
 					setAttribute.getInitialization(), attribute);
 			log.info("Updated the initialization of {} template attributes named {}", count, attribute);
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 }

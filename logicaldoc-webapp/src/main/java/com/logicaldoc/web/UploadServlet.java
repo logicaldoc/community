@@ -26,7 +26,6 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionListener;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.spring.LDSecurityContextRepository;
-import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
@@ -190,8 +189,8 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+
 		try {
 			String sid = getSid(request);
 			String tenant = SessionManager.get().get(sid).getTenantName();
@@ -255,10 +254,15 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			}
 			out.println("</body>");
 			out.println("</html>");
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			ServletUtil.sendError(response, e.getMessage());
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			} catch (IOException ioe) {
+				// Nothing to do
+			}
 		}
+
 	}
 
 	@Override

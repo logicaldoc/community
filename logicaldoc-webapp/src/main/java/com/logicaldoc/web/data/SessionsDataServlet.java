@@ -25,7 +25,7 @@ import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.SessionDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
+import com.logicaldoc.web.util.ServletUtil;
 
 /**
  * This servlet is responsible for sessions data.
@@ -78,7 +78,7 @@ public class SessionsDataServlet extends HttpServlet {
 
 				Session currentSession = null;
 				if (request.getServletPath().contains("data")) {
-					currentSession = ServiceUtil.validateSession(request);
+					currentSession = ServletUtil.validateSession(request);
 					if (!Tenant.DEFAULT_NAME.equals(currentSession.getTenantName()))
 						tenant = currentSession.getTenantName();
 				}
@@ -88,7 +88,7 @@ public class SessionsDataServlet extends HttpServlet {
 					currentUser = currentSession.getUser();
 				else
 					try {
-						currentUser = ServiceUtil.getSessionUser(request);
+						currentUser = ServletUtil.getSessionUser(request);
 					} catch (Throwable t) {
 						// Nothing to do
 					}
@@ -97,7 +97,8 @@ public class SessionsDataServlet extends HttpServlet {
 				 * The current user must be enabled to see the sessions.
 				 */
 				MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-				boolean showSid = currentUser==null || (currentUser != null && mDao.isReadEnable(Menu.ADMIN_SESSIONS, currentUser.getId()));
+				boolean showSid = currentUser == null
+						|| (currentUser != null && mDao.isReadEnable(Menu.ADMIN_SESSIONS, currentUser.getId()));
 
 				PrintWriter writer = response.getWriter();
 				if (!csvFormat)

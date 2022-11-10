@@ -18,7 +18,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.BookmarkDAO;
@@ -46,7 +45,6 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the SearchService
@@ -54,7 +52,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class SearchServiceImpl extends RemoteServiceServlet implements SearchService {
+public class SearchServiceImpl extends AbstractRemoteService implements SearchService {
 
 	private static final long serialVersionUID = 1L;
 
@@ -62,7 +60,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 	@Override
 	public GUIResult search(GUISearchOptions options) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		options.setUserId(session.getUserId());
 
 		GUIResult result = new GUIResult();
@@ -166,13 +164,13 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 			return result;
 		} catch (Throwable t) {
-			return (GUIResult) ServiceUtil.throwServerException(session, log, t);
+			return (GUIResult) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public boolean save(GUISearchOptions options) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			SearchOptions opt = toSearchOptions(options);
@@ -190,13 +188,13 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 			log.debug("Saved query {}", opt.getName());
 			return true;
 		} catch (Throwable t) {
-			return (Boolean) ServiceUtil.throwServerException(session, log, t);
+			return (Boolean) throwServerException(session, log, t);
 		}
 	}
 
 	@Override
 	public void delete(String[] names) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
@@ -207,7 +205,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 					dao.delete(search.getId());
 			}
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 
 		try {
@@ -238,7 +236,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 	@Override
 	public GUISearchOptions load(String name) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
@@ -249,7 +247,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 			else
 				return legacyLoad(session.getUserId(), name);
 		} catch (Throwable t) {
-			return (GUISearchOptions) ServiceUtil.throwServerException(session, log, t);
+			return (GUISearchOptions) throwServerException(session, log, t);
 		}
 	}
 
@@ -391,7 +389,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 
 	@Override
 	public void shareSearch(String name, long[] userIds, long[] groupIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		SearchDAO dao = (SearchDAO) Context.get().getBean(SearchDAO.class);
 
 		try {
@@ -436,7 +434,7 @@ public class SearchServiceImpl extends RemoteServiceServlet implements SearchSer
 				}
 			}
 		} catch (Throwable t) {
-			ServiceUtil.throwServerException(session, log, t);
+			throwServerException(session, log, t);
 		}
 	}
 

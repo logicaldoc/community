@@ -1,7 +1,9 @@
 package com.logicaldoc.web;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.Version;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -18,9 +21,9 @@ import com.logicaldoc.core.document.thumbnail.ThumbnailManager;
 import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
 import com.logicaldoc.web.util.ServletUtil;
 
 /**
@@ -91,10 +94,11 @@ public class ThumbnailServlet extends HttpServlet {
 					fileVersion = ver.getFileVersion();
 			}
 
-			Session session = ServiceUtil.validateSession(request);
+			Session session = ServletUtil.validateSession(request);
 			User user = session.getUser();
 
-			if (doc != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher") && !doc.isPublishing())
+			if (doc != null && !user.isMemberOf(Group.GROUP_ADMIN) && !user.isMemberOf("publisher")
+					&& !doc.isPublishing())
 				throw new FileNotFoundException("Document not published");
 
 			String resource = storer.getResourceName(docId, fileVersion, suffix);
@@ -105,9 +109,10 @@ public class ThumbnailServlet extends HttpServlet {
 			// 3) return the the thumbnail resource
 			ServletUtil.downloadDocument(request, response, session.getSid(), docId, fileVersion,
 					storer.getResourceName(doc, fileVersion, suffix), suffix, user);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			ServletUtil.sendError(response, t.getMessage());
+		} catch (NumberFormatException | InvalidSessionException
+				| PersistenceException | IOException | ServletException e) {
+			log.error(e.getMessage(), e);
+			ServletUtil.sendError(response, e.getMessage());
 		}
 	}
 

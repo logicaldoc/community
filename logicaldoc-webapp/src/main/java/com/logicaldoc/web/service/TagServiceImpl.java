@@ -7,7 +7,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.document.TagCloud;
 import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Session;
@@ -17,7 +16,6 @@ import com.logicaldoc.gui.common.client.beans.GUITag;
 import com.logicaldoc.gui.frontend.client.services.TagService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the TagService
@@ -25,7 +23,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class TagServiceImpl extends RemoteServiceServlet implements TagService {
+public class TagServiceImpl extends AbstractRemoteService implements TagService {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,7 +31,7 @@ public class TagServiceImpl extends RemoteServiceServlet implements TagService {
 
 	@Override
 	public GUITag[] getTagCloud() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			ArrayList<GUITag> ret = new ArrayList<GUITag>();
 			DocumentDAO dao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
@@ -49,7 +47,7 @@ public class TagServiceImpl extends RemoteServiceServlet implements TagService {
 
 			return ret.toArray(new GUITag[0]);
 		} catch (Throwable t) {
-			return (GUITag[]) ServiceUtil.throwServerException(session, log, t);
+			return (GUITag[]) throwServerException(session, log, t);
 		}
 	}
 
@@ -81,7 +79,7 @@ public class TagServiceImpl extends RemoteServiceServlet implements TagService {
 
 	@Override
 	public GUIParameter[] getSettings() throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		ContextProperties conf = Context.get().getProperties();
 		List<GUIParameter> params = new ArrayList<GUIParameter>();

@@ -14,7 +14,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.PersistentObject;
 import com.logicaldoc.core.document.AbstractDocument;
@@ -46,7 +45,6 @@ import com.logicaldoc.gui.frontend.client.clipboard.Clipboard;
 import com.logicaldoc.gui.frontend.client.services.FolderService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.data.FoldersDataServlet;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the FolderService
@@ -54,7 +52,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Matteo Caruso - LogicalDOC
  * @since 6.0
  */
-public class FolderServiceImpl extends RemoteServiceServlet implements FolderService {
+public class FolderServiceImpl extends AbstractRemoteService implements FolderService {
 
 	private static final String FOLDER = "Folder ";
 
@@ -64,7 +62,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public GUIFolder inheritRights(long folderId, long rightsFolderId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		/*
 		 * Just apply the current security settings to the whole subtree
@@ -76,7 +74,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			fdao.updateSecurityRef(folderId, rightsFolderId, transaction);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 		return getFolder(session, folderId);
@@ -84,7 +82,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void applyRights(GUIFolder folder, boolean subtree) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
@@ -95,7 +93,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				/*
 				 * Just apply the current security settings to the whole subtree
 				 */
-				ServiceUtil.executeLongRunningOperation("Apply Rights to Tree", () -> {
+				executeLongRunningOperation("Apply Rights to Tree", () -> {
 					FolderHistory history = new FolderHistory();
 					history.setSession(session);
 					history.setEvent(FolderEvent.PERMISSION.toString());
@@ -109,15 +107,15 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				saveRules(session, f, folder.getRights());
 			}
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public void applyMetadata(long parentId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
-		ServiceUtil.executeLongRunningOperation("Apply Folder Metadata", () -> {
+		executeLongRunningOperation("Apply Folder Metadata", () -> {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
@@ -132,12 +130,12 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void delete(final long[] folderIds) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		for (int i = 0; i < folderIds.length; i++)
 			try {
 				delete(session, folderIds[i]);
 			} catch (PersistenceException | PermissionException e) {
-				ServiceUtil.throwServerException(session, log, e);
+				throwServerException(session, log, e);
 			}
 	}
 
@@ -199,7 +197,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			f.setTemplateId(folder.getTemplate().getId());
 			f.setTemplate(folder.getTemplate().getName());
 			f.setTemplateLocked(folder.getTemplateLocked());
-			GUIAttribute[] attributes = ServiceUtil.prepareGUIAttributes(folder.getTemplate(), folder);
+			GUIAttribute[] attributes = prepareGUIAttributes(folder.getTemplate(), folder);
 			f.setAttributes(attributes);
 		}
 
@@ -214,11 +212,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public int[] computeStats(long folderId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		try {
 			return new int[] { countDocs(folderId), countChildren(folderId) };
 		} catch (PersistenceException e) {
-			return (int[]) ServiceUtil.throwServerException(session, log, e);
+			return (int[]) throwServerException(session, log, e);
 		}
 	}
 
@@ -243,13 +241,13 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	public static GUIFolder getFolder(Session session, long folderId, boolean computePath) throws ServerException {
 		if (session != null)
-			ServiceUtil.validateSession(session.getSid());
+			validateSession(session.getSid());
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
 		try {
 			if (session != null)
-				ServiceUtil.checkPermission(Permission.READ, session.getUser(), folderId);
+				checkPermission(Permission.READ, session.getUser(), folderId);
 
 			Folder folder = null;
 			Folder test = dao.findById(folderId);
@@ -352,7 +350,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	@Override
 	public GUIFolder getFolder(long folderId, boolean computePath, boolean computeDocs, boolean computeSubfolders)
 			throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		GUIFolder folder = getFolder(session, folderId);
 		if (folder == null)
@@ -367,7 +365,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				folder.setPath(computePath(folderId, session.getTenantId(), computeSubfolders));
 			return folder;
 		} catch (PersistenceException e) {
-			return (GUIFolder) ServiceUtil.throwServerException(session, log, e);
+			return (GUIFolder) throwServerException(session, log, e);
 		}
 	}
 
@@ -406,14 +404,14 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 	@Override
 	public void copyFolders(long[] folderIds, long targetId, boolean foldersOnly, String securityOption,
 			GUIFolder model) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			for (int i = 0; i < folderIds.length; i++) {
 				copyFolder(session, folderIds[i], targetId, foldersOnly, securityOption, model);
 			}
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
@@ -463,14 +461,14 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void move(long[] folderIds, long targetId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			for (long folderId : folderIds) {
 				move(session, folderId, targetId);
 			}
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
@@ -520,7 +518,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void rename(long folderId, String name) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -544,13 +542,13 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			folder.setName(name.trim());
 			dao.store(folder, history);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 	}
 
 	@Override
 	public GUIFolder save(GUIFolder guiFolder) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -612,7 +610,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 			folderDao.store(folder, transaction);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 		return getFolder(session, guiFolder.getId());
@@ -620,7 +618,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public GUIFolder create(GUIFolder newFolder, boolean inheritSecurity) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -635,11 +633,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		folderVO.setType(newFolder.getType());
 		folderVO.setTenantId(session.getTenantId());
 
-		Folder root=null;
+		Folder root = null;
 		try {
 			root = folderDao.findRoot(session.getTenantId());
 		} catch (PersistenceException e) {
-			return (GUIFolder) ServiceUtil.throwServerException(session, log, e);
+			return (GUIFolder) throwServerException(session, log, e);
 		}
 
 		if (newFolder.getType() == Folder.TYPE_WORKSPACE)
@@ -657,7 +655,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				f = folderDao.create(folderDao.findById(newFolder.getParentId()), folderVO, inheritSecurity,
 						transaction);
 		} catch (PersistenceException e) {
-			return (GUIFolder) ServiceUtil.throwServerException(session, log, e);
+			return (GUIFolder) throwServerException(session, log, e);
 		}
 
 		if (f == null)
@@ -669,7 +667,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public GUIFolder createAlias(long parentId, long foldRef) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -683,7 +681,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		try {
 			f = folderDao.createAlias(parentId, foldRef, transaction);
 		} catch (PersistenceException e) {
-			return (GUIFolder) ServiceUtil.throwServerException(session, log, e);
+			return (GUIFolder) throwServerException(session, log, e);
 		}
 
 		return getFolder(session, f.getId());
@@ -887,7 +885,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void paste(long[] docIds, long folderId, String action) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -904,7 +902,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				copy(session, docIds, folder.getId());
 		} catch (PersistenceException e) {
 			log.error("Exception moving documents: {}", e.getMessage(), e);
-			ServiceUtil.throwServerException(session, null, e);
+			throwServerException(session, null, e);
 		}
 	}
 
@@ -920,7 +918,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 				Document doc = docDao.findById(id);
 
 				// The MOVE permission must be granted in the source folder
-				ServiceUtil.checkPermission(Permission.MOVE, session.getUser(), doc.getFolder().getId());
+				checkPermission(Permission.MOVE, session.getUser(), doc.getFolder().getId());
 
 				// Create the document history event
 				DocumentHistory transaction = new DocumentHistory();
@@ -945,7 +943,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			}
 		} catch (PermissionException | PersistenceException e) {
 			log.error("Exception moving documents: {}", e.getMessage(), e);
-			ServiceUtil.throwServerException(session, null, e);
+			throwServerException(session, null, e);
 		}
 
 	}
@@ -989,13 +987,13 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			}
 		} catch (PersistenceException | IOException e) {
 			log.error("Exception copying documents: {}", e.getMessage(), e);
-			ServiceUtil.throwServerException(session, null, e);
+			throwServerException(session, null, e);
 		}
 	}
 
 	@Override
 	public void pasteAsAlias(long[] docIds, long folderId, String type) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		DocumentManager docManager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -1017,7 +1015,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			}
 		} catch (PersistenceException e) {
 			log.error("Exception copying documents alias: {}", e.getMessage(), e);
-			ServiceUtil.throwServerException(session, null, e);
+			throwServerException(session, null, e);
 		}
 	}
 
@@ -1149,7 +1147,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void restore(Long[] folderIds, long parentId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 
@@ -1161,7 +1159,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 			try {
 				dao.restore(foldId, parentId, transaction);
 			} catch (PersistenceException e) {
-				ServiceUtil.throwServerException(session, log, e);
+				throwServerException(session, log, e);
 			}
 		}
 
@@ -1169,7 +1167,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void deleteFromTrash(Long[] ids) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 		if (ids == null || ids.length < 1)
 			return;
 
@@ -1178,16 +1176,16 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 		try {
 			dao.bulkUpdate("set ld_deleted=2 where ld_id in " + idsStr, (Map<String, Object>) null);
 		} catch (PersistenceException e) {
-			ServiceUtil.throwServerException(session, log, e);
+			throwServerException(session, log, e);
 		}
 
 	}
 
 	@Override
 	public void applyTags(long parentId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
-		ServiceUtil.executeLongRunningOperation("Apply Tags", () -> {
+		executeLongRunningOperation("Apply Tags", () -> {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
@@ -1201,7 +1199,7 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void setFolderPagination(long folderId, Integer startRecord, Integer pageSize) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		if (pageSize != null && startRecord != null) {
 			session.getDictionary().put(FoldersDataServlet.FOLDER_PAGE_SIZE + ":" + folderId, pageSize);
@@ -1214,12 +1212,12 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void applyGridLayout(long folderId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		/*
 		 * Just apply the current security settings to the whole subtree
 		 */
-		ServiceUtil.executeLongRunningOperation("Apply Grid Layout", () -> {
+		executeLongRunningOperation("Apply Grid Layout", () -> {
 			FolderHistory history = new FolderHistory();
 			history.setSession(session);
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -1233,9 +1231,9 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void applyOCR(long parentId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
-		ServiceUtil.executeLongRunningOperation("Apply OCR", () -> {
+		executeLongRunningOperation("Apply OCR", () -> {
 			FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			FolderHistory transaction = new FolderHistory();
 			transaction.setSession(session);
@@ -1249,11 +1247,11 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void applyStorage(long parentId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
-		ServiceUtil.executeLongRunningOperation("Apply Storage", () -> {
+		executeLongRunningOperation("Apply Storage", () -> {
 			try {
-				ServiceUtil.checkPermission(Permission.STORAGE, session.getUser(), parentId);
+				checkPermission(Permission.STORAGE, session.getUser(), parentId);
 				FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 				FolderHistory transaction = new FolderHistory();
 				transaction.setSession(session);
@@ -1266,13 +1264,13 @@ public class FolderServiceImpl extends RemoteServiceServlet implements FolderSer
 
 	@Override
 	public void merge(long[] folderIds, long targetId) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
-		ServiceUtil.checkPermission(Permission.ADD, session.getUser(), targetId);
-		ServiceUtil.checkPermission(Permission.WRITE, session.getUser(), targetId);
-		ServiceUtil.checkPermission(Permission.DELETE, session.getUser(), targetId);
+		checkPermission(Permission.ADD, session.getUser(), targetId);
+		checkPermission(Permission.WRITE, session.getUser(), targetId);
+		checkPermission(Permission.DELETE, session.getUser(), targetId);
 
-		ServiceUtil.executeLongRunningOperation("Merge", () -> {
+		executeLongRunningOperation("Merge", () -> {
 			try {
 				FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 				Folder target = fDao.findFolder(targetId);

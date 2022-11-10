@@ -18,9 +18,8 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.SessionDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.gui.common.client.InvalidSessionException;
 import com.logicaldoc.util.Context;
-import com.logicaldoc.web.util.ServiceUtil;
+import com.logicaldoc.web.util.ServletUtil;
 
 /**
  * This servlet retrieves the users currently logged in
@@ -45,7 +44,7 @@ public class OnlineUsersDataServlet extends HttpServlet {
 
 			UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 			SessionDAO sessionDao = (SessionDAO) Context.get().getBean(SessionDAO.class);
-			Session currentSession = ServiceUtil.validateSession(request);
+			Session currentSession = ServletUtil.validateSession(request);
 			String tenant = currentSession.getTenantName();
 
 			List<Session> sessions = sessionDao.findByNode(null);
@@ -72,10 +71,7 @@ public class OnlineUsersDataServlet extends HttpServlet {
 				writer.print("</user>");
 			}
 			writer.print("</list>");
-		} catch (InvalidSessionException se) {
-			// By the way no need to treat this as error
-			log.debug(se.getMessage());
-		} catch (Throwable e) {
+		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			if (e instanceof ServletException)
 				throw (ServletException) e;

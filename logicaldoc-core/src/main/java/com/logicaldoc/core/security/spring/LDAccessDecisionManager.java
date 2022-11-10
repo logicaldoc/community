@@ -18,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 
@@ -75,9 +74,20 @@ public class LDAccessDecisionManager extends UnanimousBased {
 	private void saveOriginalUrl() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
-		String url = ServletUtil.getFullURL(request);
+		String url = getFullURL(request);
 		request.getSession(true).setAttribute(REQUESTED_URL, url);
 		log.debug("Resource {} requires authentication", url);
+	}
+
+	private String getFullURL(HttpServletRequest request) {
+		StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
+		String queryString = request.getQueryString();
+
+		if (queryString == null) {
+			return requestURL.toString();
+		} else {
+			return requestURL.append('?').append(queryString).toString();
+		}
 	}
 
 	@Override

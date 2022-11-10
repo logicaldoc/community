@@ -17,7 +17,6 @@ import com.cronutils.model.CronType;
 import com.cronutils.model.definition.CronDefinition;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.SystemInfo;
 import com.logicaldoc.core.communication.Message;
 import com.logicaldoc.core.communication.SystemMessageDAO;
@@ -32,7 +31,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.gui.common.client.InvalidSessionException;
+import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIAttributeSet;
@@ -47,7 +46,6 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.web.listener.ApplicationListener;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implementation of the InfoService
@@ -55,7 +53,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class InfoServiceImpl extends RemoteServiceServlet implements InfoService {
+public class InfoServiceImpl extends AbstractRemoteService implements InfoService {
 
 	private static Logger log = LoggerFactory.getLogger(InfoServiceImpl.class);
 
@@ -329,8 +327,8 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 	}
 
 	@Override
-	public GUIParameter[] getSessionInfo() throws InvalidSessionException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+	public GUIParameter[] getSessionInfo() throws InvalidSessionServerException {
+		Session session = validateSession(getThreadLocalRequest());
 		log.debug("Requested info for session {}", session.getSid());
 
 		try {
@@ -352,9 +350,9 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 	}
 
 	@Override
-	public boolean ping() throws InvalidSessionException {
+	public boolean ping() throws InvalidSessionServerException {
 		try {
-			Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+			Session session = validateSession(getThreadLocalRequest());
 			if (session == null)
 				return false;
 		} catch (Throwable t) {
@@ -365,7 +363,7 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 
 	@Override
 	public String getCronDescription(String expression, String locale) throws ServerException {
-		Session session = ServiceUtil.validateSession(getThreadLocalRequest());
+		Session session = validateSession(getThreadLocalRequest());
 
 		try {
 			CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ);
@@ -375,7 +373,7 @@ public class InfoServiceImpl extends RemoteServiceServlet implements InfoService
 			CronDescriptor descriptor = CronDescriptor.instance(LocaleUtil.toLocale(locale));
 			return descriptor.describe(parser.parse(expression));
 		} catch (Throwable e) {
-			return (String) ServiceUtil.throwServerException(session, log, e);
+			return (String) throwServerException(session, log, e);
 		}
 	}
 }

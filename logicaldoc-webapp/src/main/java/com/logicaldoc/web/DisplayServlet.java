@@ -1,5 +1,7 @@
 package com.logicaldoc.web;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,11 +10,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
-import com.logicaldoc.core.util.ServletUtil;
 import com.logicaldoc.util.Context;
 
 /**
@@ -65,9 +67,13 @@ public class DisplayServlet extends HttpServlet {
 			}
 
 			response.sendRedirect(redirectUrl);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
-			ServletUtil.sendError(response, t.getMessage());
+		} catch (PersistenceException | IOException e) {
+			log.error(e.getMessage(), e);
+			try {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+			} catch (IOException ioe) {
+				// Nothing to do
+			}
 		}
 	}
 }

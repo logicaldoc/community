@@ -17,12 +17,11 @@ import org.java.plugin.registry.PluginDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.logicaldoc.core.dbinit.PluginDbInit;
 import com.logicaldoc.core.searchengine.SearchEngine;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.gui.common.client.AccessDeniedException;
-import com.logicaldoc.gui.common.client.InvalidSessionException;
+import com.logicaldoc.gui.common.client.InvalidSessionServerException;
 import com.logicaldoc.gui.common.client.ServerException;
 import com.logicaldoc.gui.setup.client.SetupInfo;
 import com.logicaldoc.gui.setup.client.services.SetupService;
@@ -30,7 +29,6 @@ import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.config.LoggingConfigurator;
 import com.logicaldoc.util.plugin.PluginRegistry;
-import com.logicaldoc.web.util.ServiceUtil;
 
 /**
  * Implements the
@@ -38,7 +36,7 @@ import com.logicaldoc.web.util.ServiceUtil;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class SetupServiceImpl extends RemoteServiceServlet implements SetupService {
+public class SetupServiceImpl extends AbstractRemoteService implements SetupService {
 
 	private static final long serialVersionUID = 1L;
 
@@ -282,8 +280,8 @@ public class SetupServiceImpl extends RemoteServiceServlet implements SetupServi
 	public void securityCheck() throws ServerException {
 		User user = null;
 		try {
-			user = ServiceUtil.getSessionUser(getThreadLocalRequest());
-		} catch (InvalidSessionException e) {
+			user = getSessionUser(getThreadLocalRequest());
+		} catch (InvalidSessionServerException e) {
 			// We don't expect to have a session
 		}
 

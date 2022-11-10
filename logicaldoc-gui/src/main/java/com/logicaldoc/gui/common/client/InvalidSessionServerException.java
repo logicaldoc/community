@@ -6,15 +6,15 @@ package com.logicaldoc.gui.common.client;
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
-public class InvalidSessionException extends ServerException {
+public class InvalidSessionServerException extends ServerException {
 
 	private static final long serialVersionUID = 1L;
 
-	public InvalidSessionException() {
+	public InvalidSessionServerException() {
 		super();
 	}
 
-	public InvalidSessionException(String message) {
+	public InvalidSessionServerException(String message) {
 		super(message);
 	}
 }
