@@ -62,7 +62,7 @@ public class EventEndpoint implements EventListener {
 	private static Set<Session> peers = Collections.synchronizedSet(new HashSet<Session>());
 
 	private boolean registered = false;
-	
+
 	@OnOpen
 	public void onOpen(final Session session) {
 		if (!registered) {
@@ -120,10 +120,10 @@ public class EventEndpoint implements EventListener {
 				GUIFolder folder = null;
 				if (event.getFolder() != null) {
 					String color = event.getFolder().getColor();
-					folder = FolderServiceImpl.fromFolder(event.getFolder(), true);
+					folder = new FolderServiceImpl().fromFolder(event.getFolder(), true);
 					folder.setColor(color);
 				} else if (event.getFolderId() != null)
-					folder = FolderServiceImpl.getFolder(null, event.getFolderId(), true);
+					folder = new FolderServiceImpl().getFolder(null, event.getFolderId(), true);
 				if (folder != null)
 					message.setFolder(folder);
 

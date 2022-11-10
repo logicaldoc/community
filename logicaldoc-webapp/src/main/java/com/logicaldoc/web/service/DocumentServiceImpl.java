@@ -732,7 +732,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		}
 	}
 
-	public static GUIDocument getDocument(Session session, long docId)
+	public GUIDocument getDocument(Session session, long docId)
 			throws InvalidSessionServerException, PersistenceException, PermissionException {
 		if (session != null)
 			validateSession(session.getSid());
@@ -746,7 +746,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		if (doc != null) {
 			FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 			fDao.initialize(doc.getFolder());
-			folder = FolderServiceImpl.fromFolder(doc.getFolder(), false);
+			folder = new FolderServiceImpl().fromFolder(doc.getFolder(), false);
 
 			if (session != null)
 				checkPublished(session.getUser(), doc);
@@ -850,7 +850,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		setBookmarked(document, isFolder, sessionUser);
 
-		GUIAttribute[] attributes = TemplateServiceImpl.prepareGUIAttributes(realDoc.getTemplate(), realDoc,
+		GUIAttribute[] attributes = new TemplateServiceImpl().prepareGUIAttributes(realDoc.getTemplate(), realDoc,
 				sessionUser);
 		document.setAttributes(attributes);
 

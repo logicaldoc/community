@@ -3,7 +3,6 @@ package com.logicaldoc.web.service;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -12,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -28,10 +28,9 @@ import com.logicaldoc.core.metadata.validation.ValidationException;
 import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.Session.Log;
-import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authentication.InvalidSessionException;
 import com.logicaldoc.core.security.authorization.PermissionException;
-import com.logicaldoc.core.security.dao.MenuDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.threading.NotifyingThread;
 import com.logicaldoc.core.threading.ThreadPools;
@@ -45,6 +44,7 @@ import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.web.UploadServlet;
 import com.logicaldoc.web.util.LongRunningOperationCompleteListener;
+import com.logicaldoc.web.util.ServletUtil;
 import com.logicaldoc.web.websockets.WebsocketTool;
 
 /**
@@ -75,10 +75,13 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	protected Map<String, File> getUploadedFiles(String sid) {
 		return UploadServlet.getReceivedFiles(sid);
 	}
-	
+
 	protected Session validateSession(HttpServletRequest request) throws InvalidSessionServerException {
-		String sid = SessionManager.get().getSessionId(request);
-		return validateSession(sid);
+		try {
+			return ServletUtil.validateSession(request);
+		} catch (InvalidSessionException e) {
+			throw new InvalidSessionServerException(e.getMessage());
+		}
 	}
 
 	/**
@@ -88,16 +91,15 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * 
 	 * @return the session
 	 * 
-	 * @throws InvalidSessionServerException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is
+	 *         expired
 	 */
-	protected static Session validateSession(String sid) throws InvalidSessionServerException {
-		Session session = SessionManager.get().get(sid);
-		if (session == null)
-			throw new InvalidSessionServerException("Invalid Session");
-		if (!SessionManager.get().isOpen(sid))
-			throw new InvalidSessionServerException("Invalid or Expired Session");
-		SessionManager.get().renew(sid);
-		return session;
+	protected Session validateSession(String sid) throws InvalidSessionServerException {
+		try {
+			return ServletUtil.validateSession(sid);
+		} catch (InvalidSessionException e) {
+			throw new InvalidSessionServerException(e.getMessage());
+		}
 	}
 
 	/**
@@ -109,21 +111,19 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * 
 	 * @return the current session
 	 * 
-	 * @throws InvalidSessionServerException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is
+	 *         expired
 	 * @throws AccessDeniedException the user cannot access any menu
 	 */
 	protected Session checkEvenOneMenu(HttpServletRequest request, long... menuIds)
 			throws InvalidSessionServerException, AccessDeniedException {
-		Session session = validateSession(request);
-		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-		for (long menuId : menuIds) {
-			if (dao.isReadEnable(menuId, session.getUserId()))
-				return session;
+		try {
+			return ServletUtil.checkEvenOneMenu(request, menuIds);
+		} catch (InvalidSessionException e) {
+			throw new InvalidSessionServerException(e.getMessage());
+		} catch (ServletException e) {
+			throw new AccessDeniedException(e.getMessage());
 		}
-
-		String message = String.format("User %s cannot access the menus %s", session.getUsername(),
-				Arrays.asList(menuIds));
-		throw new AccessDeniedException(message);
 	}
 
 	/**
@@ -132,23 +132,24 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * @param request the HTTP request
 	 * @param menuId identifier of the menus
 	 * 
-	 * @return the curent session
+	 * @return the current session
 	 * 
-	 * @throws InvalidSessionServerException the session does not exist or is expired
+	 * @throws InvalidSessionServerException the session does not exist or is
+	 *         expired
 	 * @throws AccessDeniedException the user cannot access any menu
 	 */
 	protected Session checkMenu(HttpServletRequest request, long menuId)
 			throws InvalidSessionServerException, AccessDeniedException {
-		Session session = validateSession(request);
-		MenuDAO dao = (MenuDAO) Context.get().getBean(MenuDAO.class);
-		if (!dao.isReadEnable(menuId, session.getUserId())) {
-			String message = String.format("User %s cannot access the menu %s", session.getUsername(), menuId);
-			throw new AccessDeniedException(message);
+		try {
+			return ServletUtil.checkMenu(request, menuId);
+		} catch (InvalidSessionException e) {
+			throw new InvalidSessionServerException(e.getMessage());
+		} catch (ServletException e) {
+			throw new AccessDeniedException(e.getMessage());
 		}
-		return session;
 	}
 
-	protected static void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
+	protected void checkPermission(Permission permission, User user, long folderId) throws AccessDeniedException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
 			if (!dao.isPermissionEnabled(permission, folderId, user.getId())) {
@@ -231,7 +232,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * @return if <code>src</code> is instance of {@link Timestamp} it will be
 	 *         converted to plain {@link Date}
 	 */
-	protected static Date convertToDate(Date src) {
+	protected Date convertToDate(Date src) {
 		if (src == null)
 			return null;
 
@@ -305,7 +306,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 	 * 
 	 * @return The array of attributes
 	 */
-	protected static GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
+	protected GUIAttribute[] prepareGUIAttributes(Template template, ExtensibleObject extensibleObject) {
 		TemplateDAO tDao = (TemplateDAO) Context.get().getBean(TemplateDAO.class);
 		tDao.initialize(template);
 

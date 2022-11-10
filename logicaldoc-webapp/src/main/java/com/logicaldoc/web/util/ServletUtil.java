@@ -140,7 +140,8 @@ public class ServletUtil {
 				return session;
 		}
 
-		String message = "User " + session.getUsername() + " cannot access the menus " + Arrays.asList(menuIds);
+		String message = String.format("User %s cannot access the menus %s", session.getUsername(),
+				Arrays.asList(menuIds));
 		throw new ServletException(message);
 	}
 

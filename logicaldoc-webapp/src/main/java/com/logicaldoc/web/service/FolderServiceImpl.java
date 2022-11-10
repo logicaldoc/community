@@ -151,7 +151,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		dao.deleteTree(folderId, PersistentObject.DELETED_CODE_DEFAULT, transaction);
 	}
 
-	public static GUIFolder fromFolder(Folder folder, boolean computePath) throws PersistenceException {
+	public GUIFolder fromFolder(Folder folder, boolean computePath) throws PersistenceException {
 		FolderDAO dao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		dao.initialize(folder);
 
@@ -235,11 +235,11 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		return count;
 	}
 
-	public static GUIFolder getFolder(Session session, long folderId) throws ServerException {
+	public GUIFolder getFolder(Session session, long folderId) throws ServerException {
 		return getFolder(session, folderId, false);
 	}
 
-	public static GUIFolder getFolder(Session session, long folderId, boolean computePath) throws ServerException {
+	public GUIFolder getFolder(Session session, long folderId, boolean computePath) throws ServerException {
 		if (session != null)
 			validateSession(session.getSid());
 
@@ -293,7 +293,7 @@ public class FolderServiceImpl extends AbstractRemoteService implements FolderSe
 		return null;
 	}
 
-	private static void setSecurityRef(Session session, Folder test, GUIFolder guiFolder) throws ServerException {
+	private void setSecurityRef(Session session, Folder test, GUIFolder guiFolder) throws ServerException {
 		if (test.getSecurityRef() != null)
 			guiFolder.setSecurityRef(getFolder(session, test.getSecurityRef()));
 		else

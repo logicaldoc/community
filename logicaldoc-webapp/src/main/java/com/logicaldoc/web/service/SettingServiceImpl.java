@@ -73,7 +73,7 @@ public class SettingServiceImpl extends AbstractRemoteService implements Setting
 			emailSettings.setUserAsFrom(conf.getBoolean(session.getTenantName() + ".smtp.userasfrom", true));
 			emailSettings.setFoldering(conf.getInt(session.getTenantName() + ".smtp.save.foldering", 3));
 
-			emailSettings.setTargetFolder(FolderServiceImpl.getFolder(session,
+			emailSettings.setTargetFolder(new FolderServiceImpl().getFolder(session,
 					conf.getLong(session.getTenantName() + ".smtp.save.folderId", 0)));
 
 			log.info("Email settings data loaded successfully.");
