@@ -523,15 +523,15 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 	public void updateDigest(Document doc) throws PersistenceException {
 		String resource = storer.getResourceName(doc, doc.getFileVersion(), null);
 		if (storer.exists(doc.getId(), resource)) {
-
 			try (InputStream in = storer.getStream(doc.getId(), resource);) {
 				doc.setDigest(FileUtil.computeDigest(in));
 			} catch (IOException e) {
-				log.error("Cannot retrieve the conten of document {}", doc, e);
+				log.error("Cannot retrieve the content of document {}", doc, e);
 			}
 
-			jdbcUpdate("update ld_document set ld_lastmodified=?, ld_digest=?  where ld_id=?", new Date(),
-					doc.getDigest(), doc.getId());
+			saveOrUpdate(doc);
+			flush();
+			evict(doc);
 
 			// Update the versions also
 			jdbcUpdate("update ld_version set ld_digest=?  where ld_documentid=? and ld_fileversion=?", doc.getDigest(),
@@ -782,6 +782,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void initialize(Document doc) {
+		if(doc==null)
+			return;
+		
 		refresh(doc);
 
 		if (doc.getAttributes() != null)

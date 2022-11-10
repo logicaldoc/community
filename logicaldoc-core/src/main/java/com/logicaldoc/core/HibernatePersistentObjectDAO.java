@@ -255,8 +255,8 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 			String sorting = StringUtils.isNotEmpty(order) && !order.toLowerCase().contains(ORDER_BY)
 					? ORDER_BY + " " + order
 					: order;
-			String query = "select " + ENTITY + ".id from " + entityClass.getCanonicalName()
-					+ DEFAULT_WHERE_PREAMBLE + (StringUtils.isNotEmpty(where) ? AND + where + ") " : " ")
+			String query = "select " + ENTITY + ".id from " + entityClass.getCanonicalName() + DEFAULT_WHERE_PREAMBLE
+					+ (StringUtils.isNotEmpty(where) ? AND + where + ") " : " ")
 					+ (StringUtils.isNotEmpty(sorting) ? sorting : " ");
 			logQuery(query);
 			Query<Long> queryObject = prepareQueryForLong(query, values, max);
@@ -316,20 +316,22 @@ public abstract class HibernatePersistentObjectDAO<T extends PersistentObject> i
 	protected void flush() {
 		try {
 			sessionFactory.getCurrentSession().flush();
-		} catch (Throwable t) {
+		} catch (Exception e) {
 			// Nothing to do
 
 		}
 	}
 
 	protected void refresh(Object entity) {
+		if(entity==null)
+			return;
+		
 		try {
 			if (!sessionFactory.getCurrentSession().contains(entity)) {
 				sessionFactory.getCurrentSession().refresh(entity);
 			}
-		} catch (Throwable t) {
+		} catch (Exception e) {
 			// Nothing to do
-
 		}
 	}
 

@@ -35,6 +35,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.util.crypt.CryptUtil;
+import com.logicaldoc.util.io.FileUtil;
 
 import junit.framework.Assert;
 
@@ -106,12 +107,19 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Document doc = dao.findById(1);
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);
-		Assert.assertEquals("ee6225dab489cfa38ba070c9c45c884efaa34ad8", doc.getDigest());
+		Assert.assertEquals("xx", doc.getDigest());
 
-		copyResource("/Digital_Day.pdf", "target/store/1/doc/1.0");
+		String filePath = "target/store/1/doc/"+doc.getFileVersion();
+		copyResource("Digital_Day.pdf", filePath);
+		Assert.assertTrue(new File(filePath).exists());
+		String digest = FileUtil.computeDigest(new File(filePath));
 
 		dao.updateDigest(doc);
-		Assert.assertEquals("ee6225dab489cfa38ba070c9c45c884efaa34ad8", doc.getDigest());
+		Assert.assertEquals(digest, doc.getDigest());
+		
+		Document updatedDoc = dao.findById(1);
+		dao.initialize(updatedDoc);
+		Assert.assertEquals(doc.getVersion(), updatedDoc.getVersion());
 	}
 
 	@Test

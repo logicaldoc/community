@@ -108,7 +108,7 @@ public class WindowUtils {
 	public static native void openUrlInNewTab(String url)/*-{
 	    $wnd.open(url, '_blank', null);
     }-*/;
-	
+
 	public static native void openUrl(String url, String window)/*-{
 		$wnd.open(url, window, null);
 	}-*/;
@@ -116,7 +116,7 @@ public class WindowUtils {
 	public static native void openUrl(String url, String window, String specs)/*-{
 		$wnd.open(url, window, specs);
 	}-*/;
-	
+
 	public static native void focus()/*-{
 		$wnd.focus();
 	}-*/;

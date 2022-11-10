@@ -7,7 +7,7 @@
 <%@ page import="com.logicaldoc.web.util.*" %>
 
 <%
-  com.logicaldoc.core.security.Session ldSession = ServiceUtil.validateSession(request); 
+  com.logicaldoc.core.security.Session ldSession = ServletUtil.validateSession(request); 
   
   Long userId = ldSession.getUserId();
   Long docId = Long.parseLong(request.getParameter("docId"));

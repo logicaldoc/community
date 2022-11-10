@@ -257,6 +257,7 @@ public class FileUtil {
 	 * @throws IOException if the copy caused an error
 	 */
 	public static void copyResource(String resourceName, File out) throws IOException {
+		out.getParentFile().mkdirs();
 		InputStream is = null;
 		try {
 			try {
@@ -267,7 +268,6 @@ public class FileUtil {
 			}
 
 			try (OutputStream os = new BufferedOutputStream(new FileOutputStream(out));) {
-
 				for (;;) {
 					int b = is.read();
 					if (b == -1)

@@ -63,11 +63,7 @@ public abstract class AbstractCoreTCase {
 	}
 
 	protected void copyResource(String classpath, String destinationPath) throws IOException {
-		try {
-			FileUtil.copyResource(classpath, new File(destinationPath));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		FileUtil.copyResource(classpath, new File(destinationPath));
 	}
 
 	@After

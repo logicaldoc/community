@@ -188,13 +188,15 @@ public abstract class Util {
 		url.append(I18N.getDefaultLocaleForDoc());
 		url.append(AND_SID_EQUAL);
 		url.append(Session.get().getSid());
+
 		if (params != null)
 			for (Entry<String, String> entry : params.entrySet()) {
 				url.append("&");
 				url.append(entry.getKey());
 				url.append("=");
-				url.append(URL.encode(params.get(entry.getValue())));
+				url.append(URL.encode(entry.getValue()));
 			}
+
 		return url.toString();
 	}
 
@@ -785,9 +787,9 @@ public abstract class Util {
 	public static void openScan() {
 		if (!WindowUtils.isWindows())
 			return;
-
 		Map<String, String> params = new HashMap<>();
 		params.put("targetFolderId", "" + FolderController.get().getCurrentFolder().getId());
+
 		String url = Util.webstartURL("scan", params);
 
 		openWebstartApp(url);
@@ -804,6 +806,7 @@ public abstract class Util {
 
 	private static void openWebstartApp(String url) {
 		uninstallCloseWindowAlert();
+
 		try {
 			if (isWebstartMode()) {
 				url = url.replace("=", "_x_");
