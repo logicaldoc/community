@@ -216,6 +216,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 		}, session);
 	}
+	
+	private void indexAddedDocs(List<Long> docIdsToIndex, final Session session)
+			throws PersistenceException, ParseException {
+		if (!docIdsToIndex.isEmpty())
+			index(docIdsToIndex.toArray(new Long[0]), session);
+	}
 
 	@Override
 	public GUIDocument[] addDocuments(boolean importZip, String charset, boolean immediateIndexing,
@@ -301,7 +307,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 
 		cleanUploadedFiles(session);
 
-		indexDocuments(docIdsToIndex, session);
+		indexAddedDocs(docIdsToIndex, session);
 
 		/*
 		 * We have to notify the specified users in a separate thread
@@ -314,12 +320,6 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		if (!fdao.isWriteEnabled(metadata.getFolder().getId(), session.getUserId()))
 			throw new ServerException("The user doesn't have the write permission on the current folder");
-	}
-
-	private void indexDocuments(List<Long> docIdsToIndex, final Session session)
-			throws PersistenceException, ParseException {
-		if (!docIdsToIndex.isEmpty())
-			index(docIdsToIndex.toArray(new Long[0]), session);
 	}
 
 	private void cleanUploadedFiles(Session session) {

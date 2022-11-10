@@ -563,29 +563,33 @@ public class ContextMenu extends Menu {
 		item.setTitle(I18N.message("index"));
 		item.addClickHandler(event -> {
 			LD.contactingServer();
-			DocumentService.Instance.get().indexDocuments(Arrays.asList(selectionIds).toArray(new Long[0]),
-					new AsyncCallback<Void>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							LD.clearPrompt();
-							GuiLog.serverError(caught);
-						}
+			
+			Long[] docIds = new Long[selectionIds.length];
+			for (int i = 0; i < selectionIds.length; i++)
+				docIds[i] = Long.valueOf(selectionIds[i]);
 
-						@Override
-						public void onSuccess(Void result) {
-							LD.clearPrompt();
-							for (GUIDocument doc : selection) {
-								doc.setIndexed(Constants.INDEX_INDEXED);
-								if (DocumentController.get().getCurrentDocument() != null
-										&& DocumentController.get().getCurrentDocument().getId() == doc.getId()) {
-									DocumentController.get().getCurrentDocument().setIndexed(Constants.INDEX_INDEXED);
-									DocumentController.get().modified(DocumentController.get().getCurrentDocument());
-								} else {
-									DocumentController.get().modified(doc);
-								}
-							}
+			DocumentService.Instance.get().indexDocuments(docIds, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					LD.clearPrompt();
+					GuiLog.serverError(caught);
+				}
+
+				@Override
+				public void onSuccess(Void result) {
+					LD.clearPrompt();
+					for (GUIDocument doc : selection) {
+						doc.setIndexed(Constants.INDEX_INDEXED);
+						if (DocumentController.get().getCurrentDocument() != null
+								&& DocumentController.get().getCurrentDocument().getId() == doc.getId()) {
+							DocumentController.get().getCurrentDocument().setIndexed(Constants.INDEX_INDEXED);
+							DocumentController.get().modified(DocumentController.get().getCurrentDocument());
+						} else {
+							DocumentController.get().modified(doc);
 						}
-					});
+					}
+				}
+			});
 		});
 		return item;
 	}
@@ -1144,62 +1148,57 @@ public class ContextMenu extends Menu {
 	}
 
 	private void onClickCustomAction(final long folderId, final long[] selectedDocIds, GUIMenu menuAction) {
-		SecurityService.Instance.get().getMenu(menuAction.getId(),
-				I18N.getLocale(), new AsyncCallback<GUIMenu>() {
+		SecurityService.Instance.get().getMenu(menuAction.getId(), I18N.getLocale(), new AsyncCallback<GUIMenu>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(GUIMenu action) {
-						Session.get().getUser().updateCustomAction(action);
+			@Override
+			public void onSuccess(GUIMenu action) {
+				Session.get().getUser().updateCustomAction(action);
 
-						if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
-								&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
-							/*
-							 * An automation cript is specified directly, so
-							 * launch it's execution
-							 */
-							GUIAutomationRoutine routine = new GUIAutomationRoutine();
-							routine.setAutomation(action.getAutomation());
-							executeRoutine(folderId, selectedDocIds, routine);
-						} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
-							AutomationService.Instance.get().getRoutine(action.getRoutineId(),
-									new AsyncCallback<GUIAutomationRoutine>() {
+				if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
+						&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
+					/*
+					 * An automation cript is specified directly, so launch it's
+					 * execution
+					 */
+					GUIAutomationRoutine routine = new GUIAutomationRoutine();
+					routine.setAutomation(action.getAutomation());
+					executeRoutine(folderId, selectedDocIds, routine);
+				} else if (action.getRoutineId() != null && action.getRoutineId().longValue() != 0L) {
+					AutomationService.Instance.get().getRoutine(action.getRoutineId(),
+							new AsyncCallback<GUIAutomationRoutine>() {
 
-										@Override
-										public void onFailure(Throwable caught) {
-											GuiLog.serverError(caught);
-										}
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
 
-										@Override
-										public void onSuccess(GUIAutomationRoutine routine) {
-											if (routine.getTemplateId() != null
-													&& routine.getTemplateId().longValue() != 0L) {
-												/*
-												 * A routine with parameters
-												 * is referenced, so open
-												 * the input popup
-												 */
-												FillRoutineParams dialog = new FillRoutineParams(action.getName(),
-														routine, folderId,
-														Arrays.asList(selectedDocIds).toArray(new Long[0]));
-												dialog.show();
-											} else {
-												/*
-												 * A routine without
-												 * parameters is referenced,
-												 * so launch directly
-												 */
-												executeRoutine(folderId, selectedDocIds, routine);
-											}
-										}
-									});
-						}
-					}
-				});
+								@Override
+								public void onSuccess(GUIAutomationRoutine routine) {
+									if (routine.getTemplateId() != null && routine.getTemplateId().longValue() != 0L) {
+										/*
+										 * A routine with parameters is
+										 * referenced, so open the input popup
+										 */
+										FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
+												folderId, Arrays.asList(selectedDocIds).toArray(new Long[0]));
+										dialog.show();
+									} else {
+										/*
+										 * A routine without parameters is
+										 * referenced, so launch directly
+										 */
+										executeRoutine(folderId, selectedDocIds, routine);
+									}
+								}
+							});
+				}
+			}
+		});
 	}
 
 	private boolean checkStatusInSelection(int status, GUIDocument[] selection) {
