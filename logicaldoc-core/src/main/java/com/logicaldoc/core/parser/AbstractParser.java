@@ -87,9 +87,10 @@ public abstract class AbstractParser implements Parser {
 				log.warn("Interrupted parse");
 				Thread.currentThread().interrupt();
 			} catch (Throwable e) {
-				log.warn(e.getMessage(), e);
 				if (e instanceof ParseException)
 					throw (ParseException) e;
+				else
+					log.warn(e.getMessage(), e);
 			}
 			if (!"completed".equals(ret))
 				throw new ParseException(ret);

@@ -36,6 +36,12 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
  */
 public class OCRSettingsPanel extends AdminPanel {
 
+	private static final String FALSE = "false";
+
+	private static final String TRUE = "true";
+
+	private static final String YES = "yes";
+
 	// Stores the engine's parameters
 	private DynamicForm engineForm = null;
 
@@ -150,11 +156,18 @@ public class OCRSettingsPanel extends AdminPanel {
 		cropImage.setRequired(true);
 		cropImage.setDisabled(!Session.get().isDefaultTenant());
 
+		RadioGroupItem errorOnEmpty = ItemFactory.newBooleanSelector("ocr_erroronempty",
+				I18N.message("erroronemptyextraction"));
+		errorOnEmpty.setWrapTitle(false);
+		errorOnEmpty.setRequired(true);
+
 		for (GUIParameter param : params) {
 			if (param.getName().endsWith("ocr.enabled"))
-				enabled.setValue(param.getValue().equals("true") ? "yes" : "no");
-			if (param.getName().endsWith("ocr.cropImage"))
-				cropImage.setValue(param.getValue().equals("true") ? "yes" : "no");
+				enabled.setValue(param.getValue().equals(TRUE) ? YES : "no");
+			else if (param.getName().endsWith("ocr.cropImage"))
+				cropImage.setValue(param.getValue().equals(TRUE) ? YES : "no");
+			else if (param.getName().endsWith(".ocr.erroronempty"))
+				errorOnEmpty.setValue(param.getValue().equals(TRUE) ? YES : "no");
 			else if (param.getName().endsWith("ocr.resolution.threshold"))
 				resolutionThreshold.setValue(Integer.parseInt(param.getValue()));
 			else if (param.getName().endsWith("ocr.text.threshold"))
@@ -182,9 +195,9 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		if (Session.get().isDefaultTenant()) {
 			items.addAll(Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold,
-					ocrrendres, cropImage, batch, batchTimeout, engine));
+					ocrrendres, cropImage, batch, batchTimeout, errorOnEmpty, engine));
 		} else
-			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold));
+			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold, errorOnEmpty));
 		form.setItems(items.toArray(new FormItem[0]));
 
 		IButton save = new IButton();
@@ -238,6 +251,7 @@ public class OCRSettingsPanel extends AdminPanel {
 					(String) values.get("ocr_includes")));
 			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.excludes",
 					(String) values.get("ocr_excludes")));
+			
 			if (values.get("ocr_text_threshold") instanceof Integer)
 				params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.text.threshold",
 						((Integer) values.get("ocr_text_threshold")).toString()));
@@ -251,11 +265,15 @@ public class OCRSettingsPanel extends AdminPanel {
 			else
 				params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.resolution.threshold",
 						(String) values.get("ocr_resolution_threshold")));
+			
+			params.add(new GUIParameter(Session.get().getTenantName() + ".ocr.erroronempty",
+					values.get("ocr_erroronempty").equals(YES) ? TRUE : FALSE));
 
 			if (Session.get().isDefaultTenant()) {
-				params.add(new GUIParameter("ocr.enabled", values.get("ocr_enabled").equals("yes") ? "true" : "false"));
+				params.add(new GUIParameter("ocr.enabled", values.get("ocr_enabled").equals(YES) ? TRUE : FALSE));
 
-				params.add(new GUIParameter("ocr.cropImage", values.get("ocr_cropimage").equals("yes") ? "true" : "false"));
+				params.add(new GUIParameter("ocr.cropImage",
+						values.get("ocr_cropimage").equals(YES) ? TRUE : FALSE));
 				
 				if (values.get("ocr_timeout") instanceof Integer)
 					params.add(new GUIParameter("ocr.timeout", ((Integer) values.get("ocr_timeout")).toString()));
@@ -285,13 +303,13 @@ public class OCRSettingsPanel extends AdminPanel {
 
 				String engine = (String) values.get("ocr_engine");
 				params.add(new GUIParameter("ocr.engine", engine));
-
+				
 				for (String name : values.keySet()) {
 					if (name.startsWith("ocr_" + engine + "_"))
 						params.add(new GUIParameter(name.replace('_', '.'), values.get(name).toString()));
 				}
 			}
-
+			
 			SettingService.Instance.get().saveSettings(params.toArray(new GUIParameter[0]), new AsyncCallback<Void>() {
 
 				@Override

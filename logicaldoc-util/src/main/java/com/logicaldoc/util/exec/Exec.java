@@ -348,14 +348,14 @@ public class Exec {
 		if (allowedCommands.isEmpty())
 			return;
 
-		if (commandLine.startsWith("\""))
-			commandLine = commandLine.substring(1);
+		String cmdLine = commandLine;
+		if (cmdLine.startsWith("\""))
+			cmdLine = commandLine.substring(1);
 
-		boolean allowed = allowedCommands.contains(commandLine);
+		boolean allowed = allowedCommands.contains(cmdLine);
 		if (!allowed) {
 			for (String row : allowedCommands) {
-				if ("*".equals(row) || (commandLine.startsWith(row) && commandLine.length() > row.length()
-						&& commandLine.substring(row.length()).startsWith(" ", 0))) {
+				if ("*".equals(row) || cmdLine.startsWith(row)) {
 					allowed = true;
 					break;
 				}
