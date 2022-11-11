@@ -143,9 +143,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public void replaceFile(long docId, String fileVersion, File newFile, DocumentHistory transaction)
 			throws PersistenceException, IOException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
-		assert (transaction.getComment() != null);
+		validateTransaction(transaction);
+		assert transaction.getComment() != null : "No comment in transaction";
 
 		transaction.setEvent(DocumentEvent.VERSION_REPLACED.toString());
 		transaction.setComment(String.format("file version %s - %s", fileVersion, transaction.getComment()));
@@ -189,13 +188,17 @@ public class DocumentManagerImpl implements DocumentManager {
 		}
 	}
 
+	private void validateTransaction(DocumentHistory transaction) {
+		assert transaction != null : "No transaction";
+		assert transaction.getUser() != null : "No user in transaction";
+	}
+
 	@Override
 	public void checkin(long docId, File file, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
-		assert (transaction.getComment() != null);
-		assert (filename != null);
+		validateTransaction(transaction);
+		assert transaction.getComment() != null : "No comment in transaction";
+		assert filename != null : "File name is mandatory";
 
 		transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
 
@@ -282,8 +285,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				// store the document in the repository (on the file system)
 				try {
 					storeFile(document, file);
-				} catch (Exception t) {
-					log.error("Cannot save the new version {} into the storage", document, t);
+				} catch (IOException ioe) {
+					log.error("Cannot save the new version {} into the storage", document, ioe);
 
 					document.copyAttributes(oldDocument);
 					document.setOcrd(oldDocument.getOcrd());
@@ -295,8 +298,9 @@ public class DocumentManagerImpl implements DocumentManager {
 					document.setStatus(oldDocument.getStatus());
 					document.setStamped(oldDocument.getStamped());
 					document.setSigned(oldDocument.getSigned());
+					document.setComment(oldDocument.getComment());
 					documentDAO.store(document);
-					throw new PersistenceException(t.getMessage());
+					throw new PersistenceException(ioe.getMessage());
 				}
 
 				version.setFileSize(document.getFileSize());
@@ -329,10 +333,9 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public void checkin(long docId, InputStream content, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws IOException, PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
-		assert (transaction.getComment() != null);
-
+		validateTransaction(transaction);
+		assert transaction.getComment() != null : "No comment in transaction";
+		
 		// Write content to temporary file, then delete it
 		File tmp = FileUtil.createTempFile("checkin", "");
 		try {
@@ -352,8 +355,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void lock(long docId, int status, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		/*
 		 * Better to synchronize this block because under high multi-threading
@@ -537,8 +539,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void update(Document document, Document docVO, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 		assert (document != null);
 		assert (docVO != null);
 		try {
@@ -697,8 +698,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void moveToFolder(Document doc, Folder folder, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		if (folder.equals(doc.getFolder()))
 			return;
@@ -886,8 +886,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	public Document copyToFolder(Document doc, Folder folder, DocumentHistory transaction)
 			throws PersistenceException, IOException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		// initialize the document
 		documentDAO.initialize(doc);
@@ -934,8 +933,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void unlock(long docId, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUserId() != null);
+		validateTransaction(transaction);
 
 		/*
 		 * Better to synchronize this block because under high multi-threading
@@ -974,8 +972,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void makeImmutable(long docId, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		Document document = documentDAO.findById(docId);
 		if (document.getImmutable() == 0) {
@@ -991,8 +988,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public void rename(long docId, String newName, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		/*
 		 * Better to synchronize this block because under high multi-threading
@@ -1031,8 +1027,7 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public Document replaceAlias(long aliasId, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		try {
 			// get the alias
@@ -1063,8 +1058,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			throws PersistenceException {
 		assert (doc != null);
 		assert (folder != null);
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		try {
 			// initialize the document
@@ -1304,7 +1298,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public Ticket createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
 			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws PersistenceException {
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		Document document = documentDAO.findById(docId);
 		if (document == null)
@@ -1393,8 +1387,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	@Override
 	public void promoteVersion(long docId, String version, DocumentHistory transaction)
 			throws PersistenceException, IOException {
-		assert (transaction != null);
-		assert (transaction.getUser() != null);
+		validateTransaction(transaction);
 
 		transaction.setComment(String.format("promoted version %s", version));
 

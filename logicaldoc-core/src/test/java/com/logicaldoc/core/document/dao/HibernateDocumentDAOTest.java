@@ -110,7 +110,6 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Assert.assertEquals("xx", doc.getDigest());
 
 		String filePath = "target/store/1/doc/"+doc.getFileVersion();
-		copyResource("Digital_Day.pdf", filePath);
 		Assert.assertTrue(new File(filePath).exists());
 		String digest = FileUtil.computeDigest(new File(filePath));
 

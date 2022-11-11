@@ -2,6 +2,7 @@ package com.logicaldoc.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.util.io.FileUtil;
 
 import junit.framework.Assert;
@@ -43,16 +45,27 @@ public abstract class AbstractCoreTCase {
 	protected File dataFile = new File("src/test/resources/data.sql");
 
 	private String userHome;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		userHome = System.getProperty("user.home");
 		System.setProperty("user.home", tempDir.getPath());
 		System.setProperty("solr.http1", "true");
-		
+
 		createTestDirs();
 		context = new ClassPathXmlApplicationContext(new String[] { "/context.xml" });
 		createTestDatabase();
+		
+		prepareStore();
+	}
+
+	private void prepareStore() throws IOException {
+		Storer storer = (Storer) context.getBean("Storer");
+
+		// Store the file of document 1
+		try (InputStream is = getClass().getResourceAsStream("/Digital_Day.pdf")) {
+			storer.store(is, 1, storer.getResourceName(1, "1.0", null));
+		}
 	}
 
 	protected void createTestDirs() throws IOException {
@@ -60,10 +73,6 @@ public abstract class AbstractCoreTCase {
 		FileUtil.strongDelete(tempDir);
 		FileUtil.strongDelete(tempDir);
 		tempDir.mkdirs();
-	}
-
-	protected void copyResource(String classpath, String destinationPath) throws IOException {
-		FileUtil.copyResource(classpath, new File(destinationPath));
 	}
 
 	@After
@@ -78,10 +87,10 @@ public abstract class AbstractCoreTCase {
 	/**
 	 * Destroys the in-memory database
 	 * 
-	 * @throws SQLException error at database level 
+	 * @throws SQLException error at database level
 	 */
 	private void destroyDatabase() throws SQLException {
-		try(Connection con = ds.getConnection()) {
+		try (Connection con = ds.getConnection()) {
 			con.createStatement().execute("shutdown");
 		}
 	}
@@ -94,7 +103,7 @@ public abstract class AbstractCoreTCase {
 	 */
 	private void createTestDatabase() throws Exception {
 		ds = (DataSource) context.getBean("DataSource");
-		try(Connection con = ds.getConnection()) {
+		try (Connection con = ds.getConnection()) {
 
 			// Load schema
 			SqlFile sqlFile = new SqlFile(dbSchemaFile, "Cp1252", false);

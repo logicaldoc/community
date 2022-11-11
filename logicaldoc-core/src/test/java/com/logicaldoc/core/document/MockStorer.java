@@ -13,9 +13,8 @@ import com.logicaldoc.core.store.FSStorer;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.4.2
- *
  */
-public class DummyStorer extends FSStorer {
+public class MockStorer extends FSStorer {
 	private boolean raiseError = false;
 
 	private boolean useDummyFile = false;
