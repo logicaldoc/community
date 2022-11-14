@@ -26,7 +26,7 @@ import com.logicaldoc.webservice.soap.endpoint.SoapAuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path("/")
-@Tag(name = "author")
+@Tag(name = "authorize")
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_JSON })
 public class RestAuthService extends SoapAuthService implements AuthService {
