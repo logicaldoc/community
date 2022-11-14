@@ -2,7 +2,6 @@ package com.logicaldoc.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +17,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.logicaldoc.core.store.Storer;
+import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 
 import junit.framework.Assert;
@@ -60,12 +60,18 @@ public abstract class AbstractCoreTCase {
 	}
 
 	private void prepareStore() throws IOException {
+		String storePath = Context.get().getProperties().getPropertyWithSubstitutions("store.1.dir");
+		new File(storePath).mkdir();
+		new File(Context.get().getProperties().getPropertyWithSubstitutions("store.2.dir")).mkdir();
+		
 		Storer storer = (Storer) context.getBean("Storer");
-
+		storer.init();
+				
 		// Store the file of document 1
-		try (InputStream is = getClass().getResourceAsStream("/Digital_Day.pdf")) {
-			storer.store(is, 1, storer.getResourceName(1, "1.0", null));
-		}
+		FileUtil.copyResource("/Digital_Day.pdf", new File(storePath+"/1/doc/1.0"));
+		
+		// Store the file of document 3
+		FileUtil.copyResource("/small.pdf", new File(storePath+"/3/doc/1.3"));
 	}
 
 	protected void createTestDirs() throws IOException {

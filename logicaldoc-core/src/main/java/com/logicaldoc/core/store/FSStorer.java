@@ -79,11 +79,11 @@ public class FSStorer extends AbstractStorer {
 
 	@Override
 	public void store(InputStream stream, long docId, String resource) throws IOException {
-		if (!isEnabled())
-			throw new IOException("Storer not enabled");
-
 		File file = null;
 		try {
+			if (!isEnabled())
+				throw new IOException("Storer not enabled");
+			
 			File dir = getContainer(docId);
 			FileUtils.forceMkdir(dir);
 			file = new File(new StringBuilder(dir.getPath()).append("/").append(resource).toString());

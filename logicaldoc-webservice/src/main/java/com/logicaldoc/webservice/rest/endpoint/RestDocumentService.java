@@ -561,7 +561,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "exact expiration date expressed in the format yyyy-MM-dd")
 	String expireDate, @FormParam("maxDownloads")
 	@Parameter(description = "maximum number of downloads allowed", required = true)
-	Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException {
+	Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		String sid = validateSession();
 		return super.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
 	}

@@ -967,7 +967,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 
 	@Override
 	public String createDownloadTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException {
+			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		validateSession(sid);
 
 		DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);

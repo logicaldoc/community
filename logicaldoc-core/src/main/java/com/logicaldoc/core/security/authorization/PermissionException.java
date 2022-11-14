@@ -71,6 +71,6 @@ public class PermissionException extends AuthorizationException {
 	}
 
 	private static String buildMessage(String username, String securityObject, String permission) {
-		return String.format("User %s does not have permission %s on %s", username, securityObject, permission);
+		return String.format("User %s does not have permission %s on %s", username, permission, securityObject);
 	}
 }

@@ -216,7 +216,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 		}, session);
 	}
-	
+
 	private void indexAddedDocs(List<Long> docIdsToIndex, final Session session)
 			throws PersistenceException, ParseException {
 		if (!docIdsToIndex.isEmpty())
@@ -1441,7 +1441,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			}
 
 			return sendEmail(mail, session, attachedDocs);
-		} catch (PersistenceException | IOException e) {
+		} catch (PermissionException | PersistenceException | IOException e) {
 			log.warn(e.getMessage(), e);
 			return "error";
 		}
@@ -1533,7 +1533,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	private void prepareDownloadTicket(GUIEmail email, String locale, Session session, Map<String, Object> dictionary)
-			throws PersistenceException {
+			throws PersistenceException, PermissionException {
 		if (email.isSendAsTicket()) {
 			DocumentDAO documentDao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 			DocumentManager manager = (DocumentManager) Context.get().getBean(DocumentManager.class);
@@ -2330,7 +2330,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 					ticket.getUrl().replace(urlPrefix, Context.get().getProperties().getProperty("server.url")))
 							.normalize().toString();
 			return result;
-		} catch (PersistenceException | URISyntaxException e) {
+		} catch (PermissionException | PersistenceException | URISyntaxException e) {
 			return (String[]) throwServerException(session, log, e);
 		}
 	}

@@ -982,6 +982,7 @@ public interface DocumentService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
+	 * @throws PermissionException  The user does not have the download permission
 	 */
 	@WebResult(name = "ticket")
 	@WebMethod
@@ -999,7 +1000,7 @@ public interface DocumentService {
 			@WebParam(name = "expireDate")
 			String expireDate, @WSDoc(description = "maximum number of downloads allowed", required = false)
 			@WebParam(name = "maxDownloads")
-			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException;
+			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Puts a password protection to the document

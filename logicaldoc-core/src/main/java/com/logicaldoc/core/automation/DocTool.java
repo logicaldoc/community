@@ -34,6 +34,7 @@ import com.logicaldoc.core.metadata.TemplateDAO;
 import com.logicaldoc.core.parser.ParseException;
 import com.logicaldoc.core.security.Tenant;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
@@ -169,7 +170,7 @@ public class DocTool {
 			Ticket ticket = manager.createDownloadTicket(docId, pdfConversion ? "" : "conversion.pdf", expireHours,
 					expireDate, maxDownloads, urlPrefix, transaction);
 			return ticket.getUrl();
-		} catch (PersistenceException e) {
+		} catch (PermissionException | PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return null;
 		}

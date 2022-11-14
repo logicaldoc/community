@@ -591,12 +591,13 @@ public interface DocumentService {
 	 * @throws PersistenceException Error in the database 
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials 
+	 * @throws PermissionException  The user does not have the download permission
 	 */
 	@POST
 	@Path("/createDownloadTicket")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	public String createDownloadTicket(long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException;
+			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Removes an existing link
