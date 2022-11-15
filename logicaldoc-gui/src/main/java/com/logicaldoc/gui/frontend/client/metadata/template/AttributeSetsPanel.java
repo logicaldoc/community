@@ -86,7 +86,8 @@ public class AttributeSetsPanel extends VLayout {
 		description.setCanSort(false);
 
 		ListGridField documents = new ListGridField("documents", I18N.message("documents"), 100);
-		documents.setCanSort(true);
+		documents.setCanSort(false);
+		documents.setCanFilter(false);
 
 		ListGridField typeSet = new ListGridField("type", I18N.message("type"), 100);
 		typeSet.setHidden(true);
