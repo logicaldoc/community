@@ -1,4 +1,4 @@
-package com.logicaldoc.web;
+package com.logicaldoc.web.util;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -14,7 +14,6 @@ import javax.servlet.http.HttpSessionContext;
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 8.3.3
- *
  */
 public class MockServletSession implements HttpSession {
 

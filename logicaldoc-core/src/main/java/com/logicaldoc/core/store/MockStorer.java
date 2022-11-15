@@ -1,4 +1,4 @@
-package com.logicaldoc.core.document;
+package com.logicaldoc.core.store;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import com.logicaldoc.core.store.FSStorer;
 import com.logicaldoc.util.Context;
 
 /**
@@ -17,21 +16,22 @@ import com.logicaldoc.util.Context;
  * @since 8.4.2
  */
 public class MockStorer extends FSStorer {
-	private boolean raiseError = false;
+	
+	private boolean errorOnStore = false;
 
 	private boolean useDummyFile = false;
 
 	public boolean isRaiseError() {
-		return raiseError;
+		return errorOnStore;
 	}
 
-	public void setRaiseError(boolean raiseError) {
-		this.raiseError = raiseError;
+	public void setErrorOnStore(boolean errorOnStore) {
+		this.errorOnStore = errorOnStore;
 	}
 
 	@Override
 	public void store(File file, long docId, String resource) throws IOException {
-		if (raiseError)
+		if (errorOnStore)
 			throw new IOException("error");
 		if (useDummyFile)
 			super.store(new File("pom.xml"), docId, resource);
@@ -41,7 +41,7 @@ public class MockStorer extends FSStorer {
 
 	@Override
 	public void store(InputStream stream, long docId, String resource) throws IOException {
-		if (raiseError)
+		if (errorOnStore)
 			throw new IOException("error");
 		if (useDummyFile)
 			super.store(new FileInputStream("pom.xml"), docId, resource);
@@ -85,7 +85,6 @@ public class MockStorer extends FSStorer {
 			moved++;
 			
 			// Delete the original resource
-			System.out.println("Delete "+docId+"   "+resource);
 			delete(docId, resource);
 		}
 		

@@ -594,9 +594,6 @@ public class FileUtil {
 	}
 
 	public static void strongDelete(File file) {
-		if (file == null || !file.exists())
-			return;
-
 		try {
 			if (file != null && file.exists())
 				FileUtils.forceDelete(file);
@@ -607,10 +604,13 @@ public class FileUtil {
 		if (file != null && file.exists())
 			try {
 				log.debug("Delete file {} using OS command", file.getAbsolutePath());
-				if (SystemUtil.isUnix() || SystemUtil.isMac() || SystemUtil.isSolaris())
+				if (SystemUtil.isWindows()) {
+					if (file.isDirectory())
+						java.lang.Runtime.getRuntime().exec("cmd /C del /F /Q \"" + file.getAbsolutePath() + "\"");
+					else
+						java.lang.Runtime.getRuntime().exec("cmd /C rmdir /S /Q \"" + file.getAbsolutePath() + "\"");
+				} else
 					java.lang.Runtime.getRuntime().exec("rm -rf \"" + file.getAbsolutePath() + "\"");
-				else
-					java.lang.Runtime.getRuntime().exec("cmd /C del /F /Q \"" + file.getAbsolutePath() + "\"");
 			} catch (IOException e) {
 				log.warn(e.getMessage(), e);
 			}

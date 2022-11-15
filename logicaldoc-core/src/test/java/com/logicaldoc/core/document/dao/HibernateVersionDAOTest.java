@@ -63,9 +63,9 @@ public class HibernateVersionDAOTest extends AbstractCoreTCase {
 
 	@Test
 	public void testFindByFileVersion() {
-		Version version = dao.findByFileVersion(1, "fileVer02");
+		Version version = dao.findByFileVersion(1, "1.0");
 		Assert.assertNotNull(version);
-		Assert.assertEquals("fileVer02", version.getFileVersion());
+		Assert.assertEquals("1.0", version.getFileVersion());
 
 		version = dao.findByVersion(1, "30");
 		Assert.assertNull(version);

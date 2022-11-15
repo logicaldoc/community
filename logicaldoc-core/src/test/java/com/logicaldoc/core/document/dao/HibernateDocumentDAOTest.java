@@ -73,13 +73,13 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 	@Test
 	public void testComputeTotalSize() throws PersistenceException {
 		long totalSize = dao.computeTotalSize(1L, null, false);
-		Assert.assertEquals(268704L, totalSize);
+		Assert.assertEquals(246046, totalSize);
 
 		totalSize = dao.computeTotalSize(1L, null, true);
-		Assert.assertEquals(635739L, totalSize);
+		Assert.assertEquals(613081L, totalSize);
 
 		totalSize = dao.computeTotalSize(1L, 1L, true);
-		Assert.assertEquals(635739L, totalSize);
+		Assert.assertEquals(613081L, totalSize);
 
 		totalSize = dao.computeTotalSize(1L, 3L, true);
 		Assert.assertEquals(0L, totalSize);
@@ -200,7 +200,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);
 		Assert.assertEquals(1, doc.getId());
-		Assert.assertEquals("pippo", doc.getFileName());
+		Assert.assertEquals("pippo.pdf", doc.getFileName());
 		Assert.assertNotNull(doc.getFolder());
 		Assert.assertEquals(6, doc.getFolder().getId());
 
@@ -215,7 +215,7 @@ public class HibernateDocumentDAOTest extends AbstractCoreTCase {
 		Assert.assertNotNull(doc);
 		dao.initialize(doc);
 		Assert.assertEquals(1, doc.getId());
-		Assert.assertEquals("pippo", doc.getFileName());
+		Assert.assertEquals("pippo.pdf", doc.getFileName());
 		Assert.assertNotNull(doc.getFolder());
 		Assert.assertEquals(6, doc.getFolder().getId());
 

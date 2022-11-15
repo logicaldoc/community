@@ -24,6 +24,7 @@ import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.store.MockStorer;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.Context;
@@ -265,8 +266,6 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		transaction = new DocumentHistory();
 		transaction.setUser(user);
 		Assert.assertEquals(1, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
-
-		Thread.sleep(1000);
 
 		Assert.assertFalse(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
 		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
@@ -591,7 +590,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		// Reproduce an error in the storage
 		transaction.setComment("reason3");
-		storer.setRaiseError(true);
+		storer.setErrorOnStore(true);
 
 		boolean exceptionHappened = false;
 		try (InputStream is = getClass().getResourceAsStream("/abel.eml")) {
@@ -748,12 +747,12 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		boolean exceptionHappened = false;
 		try {
-			storer.setRaiseError(true);
+			storer.setErrorOnStore(true);
 			documentManager.create(fis, doc, history);
 		} catch (Exception e) {
 			exceptionHappened = true;
 		} finally {
-			storer.setRaiseError(false);
+			storer.setErrorOnStore(false);
 		}
 		Assert.assertTrue(exceptionHappened);
 
@@ -787,13 +786,13 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertNotNull(documentNoteDao.findById(2L));
 
 		try {
-			storer.setRaiseError(true);
+			storer.setErrorOnStore(true);
 			documentManager.checkin(1L, file, "pippo", true, null, transaction);
 			Assert.fail("an exception should have been raised at this point");
 		} catch (Exception e) {
 			// Noting to do
 		} finally {
-			storer.setRaiseError(false);
+			storer.setErrorOnStore(false);
 		}
 
 		doc = docDao.findById(1L);
