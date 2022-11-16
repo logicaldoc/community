@@ -530,7 +530,7 @@ public class SearchIndexingPanel extends AdminPanel {
 		// The optional parse timeout
 		SpinnerItem timeout = ItemFactory.newSpinnerItem("timeout", "parsingtimeout",
 				this.searchEngine.getParsingTimeout());
-		timeout.setHint(I18N.message("seconds"));
+		timeout.setHint(I18N.message("seconds").toLowerCase());
 		timeout.setWidth(100);
 		timeout.setMin(0);
 		timeout.setStep(10);
