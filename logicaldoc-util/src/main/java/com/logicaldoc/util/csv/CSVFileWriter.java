@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * CSVFileWriter is a class derived from CSVFile used to format some fields into
@@ -120,7 +120,7 @@ public class CSVFileWriter extends CSVFile  implements Closeable {
 	 * 
 	 * @param fields The vector of strings containing the fields
 	 */
-	public void writeFields(Vector<String> fields) {
+	public void writeFields(List<String> fields) {
 		int n = fields.size();
 		for (int i = 0; i < n; i++) {
 			out.print(textQualifier + fields.get(i) + textQualifier);

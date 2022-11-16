@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -123,7 +122,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 			if (skipFirstRow)
 				reader.readFields();
 
-			Vector<String> fields = reader.readFields();
+			List<String> fields = reader.readFields();
 			long i = 1;
 			while (fields != null) {
 				String emailStr = fields.get(email - 1);
@@ -174,22 +173,14 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	@Override
 	public void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException {
 		validateSession(getThreadLocalRequest());
-		HashSet<Long> users = new HashSet<Long>();
+		HashSet<Long> users = new HashSet<>();
 		if (userIds != null)
 			for (Long uId : userIds) {
 				if (!users.contains(uId))
 					users.add(uId);
 			}
-		if (groupIds != null) {
-			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
-			for (Long gId : groupIds) {
-				Set<User> usrs = gDao.findByGroup(gId);
-				for (User user : usrs) {
-					if (!users.contains(user.getId()))
-						users.add(user.getId());
-				}
-			}
-		}
+
+		appendUserIdsFromGroups(groupIds, users);
 
 		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
@@ -201,16 +192,34 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 						Contact cloned = new Contact(originalContact);
 						cloned.setId(0L);
 						cloned.setUserId(userId);
-						try {
-							dao.store(cloned);
-						} catch (PersistenceException e) {
-							log.warn("Cannot share contact {} with user {}", originalContact.getEmail(), userId);
-						}
+						storeContact(cloned);
 					}
 				}
 			}
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
+		}
+	}
+
+	private void storeContact(Contact contact) {
+		ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
+		try {
+			dao.store(contact);
+		} catch (PersistenceException e) {
+			log.warn("Cannot share contact {} with user {}", contact.getEmail(), contact.getUserId());
+		}
+	}
+
+	private void appendUserIdsFromGroups(long[] groupIds, HashSet<Long> users) {
+		if (groupIds != null) {
+			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			for (Long gId : groupIds) {
+				Set<User> usrs = gDao.findByGroup(gId);
+				for (User user : usrs) {
+					if (!users.contains(user.getId()))
+						users.add(user.getId());
+				}
+			}
 		}
 	}
 }

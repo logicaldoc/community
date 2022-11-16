@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -291,7 +290,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 		List<GUIValue> options = new ArrayList<GUIValue>();
 
 		try (CSVFileReader reader = new CSVFileReader(file.getPath());) {
-			Vector<String> row = reader.readFields();
+			List<String> row = reader.readFields();
 			if (row != null && "value".equals(row.get(0).toLowerCase()))
 				row = reader.readFields();
 			while (row != null && !row.isEmpty()) {
