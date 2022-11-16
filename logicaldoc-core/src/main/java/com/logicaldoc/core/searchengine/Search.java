@@ -202,7 +202,7 @@ public abstract class Search {
 
 		Date finish = new Date();
 		execTime = finish.getTime() - start.getTime();
-		log.info("Search finished in {} ms", execTime);
+		log.info("Search completed in {} ms and found {} hits (estimated {})", execTime, hits.size(), estimatedHitsNumber);
 
 		return hits;
 	}

@@ -207,7 +207,7 @@ public class LDRepositoryTest extends AbstractCmisTCase {
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE CONTAINS('FLEXSPACE') in_tree ('fld.6')";
 		ol = ldrep.query(query, 40);
 		log.info("found results: {}", ol.getObjects().size());	
-		assertEquals(0, ol.getObjects().size());
+		assertEquals(1, ol.getObjects().size());
 		
 		// Search full text on: content with folderId tree filter
 		query = "SELECT cmis:objectId,cmis:name,cmis:lastModifiedBy,cmis:lastModificationDate,cmis:baseTypeId,cmis:contentStreamLength,cmis:versionSeriesId,cmis:contentStreamMimeType FROM cmis:document WHERE ldoc:content CONTAINS('document') in_tree ('fld.5')";
