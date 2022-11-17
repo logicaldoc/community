@@ -601,6 +601,13 @@ public class FileUtil {
 			log.warn(e.getMessage());
 		}
 
+		try {
+			if (file != null && file.exists())
+				Files.deleteIfExists(file.toPath());
+		} catch (IOException e) {
+			log.warn(e.getMessage());
+		}
+		
 		if (file != null && file.exists())
 			try {
 				log.debug("Delete file {} using OS command", file.getAbsolutePath());

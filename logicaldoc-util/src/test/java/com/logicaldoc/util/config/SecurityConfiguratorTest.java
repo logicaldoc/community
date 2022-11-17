@@ -2,13 +2,11 @@ package com.logicaldoc.util.config;
 
 import java.io.File;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.logicaldoc.util.io.FileUtil;
-
 
 /**
  * Test case for <code>SecurityConfigurator</code>
