@@ -111,13 +111,13 @@ public class ContextProperties extends OrderedProperties {
 	private void load(URL fileUrl) throws IOException {
 		try {
 			file = new File(URLDecoder.decode(fileUrl.getPath(), "UTF-8"));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Unable to read from {}", file, e);
 			throw e;
 		}
 		try (FileInputStream fis = new FileInputStream(file)) {
 			load(fis);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Unable to read from {}", file, e);
 			throw e;
 		}
@@ -142,7 +142,7 @@ public class ContextProperties extends OrderedProperties {
 					load(fis);
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Unable to read from " + file.getPath(), e);
 			throw e;
 		}
@@ -170,7 +170,7 @@ public class ContextProperties extends OrderedProperties {
 		overrideFile = null;
 		try {
 			load(is);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Unable to read from stream");
 			throw e;
 		}
@@ -196,7 +196,7 @@ public class ContextProperties extends OrderedProperties {
 			try (FileOutputStream fos = new FileOutputStream(tmpFile);) {
 				store(fos, "");
 				log.info("Saved settings into temp file {}", tmpFile.getAbsolutePath());
-			} catch (IOException ex) {
+			} catch (Exception ex) {
 				if (log.isWarnEnabled()) {
 					log.warn(ex.getMessage());
 				}

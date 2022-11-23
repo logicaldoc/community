@@ -100,6 +100,8 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	private static final String SECURITY_GEOLOCATION_APIKEY = "security.geolocation.apikey";
 
 	private static final String SSL_REQUIRED = "ssl.required";
+	
+	private static final String COOKIES_SECURE = "cookies.secure";
 
 	private static final String ANONYMOUS_USER = ".anonymous.user";
 
@@ -994,7 +996,9 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		}
 		if (StringUtils.isNotEmpty(pbean.getProperty(SSL_REQUIRED)))
 			securitySettings.setForceSsl("true".equals(pbean.getProperty(SSL_REQUIRED)));
-
+		if (StringUtils.isNotEmpty(pbean.getProperty(COOKIES_SECURE)))
+			securitySettings.setCookiesSecure("true".equals(pbean.getProperty(COOKIES_SECURE)));
+		
 		securitySettings.setAlertNewDevice(pbean.getBoolean(session.getTenantName() + ".alertnewdevice", true));
 
 		securitySettings.setGeolocationEnabled(pbean.getBoolean("security.geolocation.enabled", true));
@@ -1020,6 +1024,7 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 		if (session.getTenantId() == Tenant.DEFAULT_ID) {
 			conf.setProperty("login.ignorecase", Boolean.toString(settings.isIgnoreLoginCase()));
 			conf.setProperty(SSL_REQUIRED, Boolean.toString(settings.isForceSsl()));
+			conf.setProperty(COOKIES_SECURE, Boolean.toString(settings.isCookiesSecure()));
 			conf.setProperty("security.acceptsid", Boolean.toString(settings.isAllowSidInRequest()));
 			conf.setProperty("security.geolocation.enabled", Boolean.toString(settings.isGeolocationEnabled()));
 			conf.setProperty("security.geolocation.cache", Boolean.toString(settings.isGeolocationCache()));

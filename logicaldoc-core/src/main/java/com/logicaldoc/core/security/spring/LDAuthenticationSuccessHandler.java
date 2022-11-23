@@ -16,6 +16,7 @@ import org.springframework.security.web.savedrequest.RequestCache;
 
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
+import com.logicaldoc.util.Context;
 
 /**
  * This handler gets the j_successurl request parameter and use it's value to
@@ -51,7 +52,7 @@ public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 		
 		Cookie sidCookie = new Cookie(LDAuthenticationToken.COOKIE_SID, token.getSid());
 		sidCookie.setHttpOnly(true);
-		sidCookie.setSecure(true);
+		sidCookie.setSecure(Context.get().getProperties().getBoolean("cookies.secure", false));	
 		response.addCookie(sidCookie);
 
 		if (requestedUrl != null) {

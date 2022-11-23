@@ -135,7 +135,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdOccurrence.setWidth(50);
 		pwdOccurrence.setMin(1);
 		pwdOccurrence.setStep(1);
-		
+
 		final ButtonItem generatePassword = new ButtonItem(I18N.message("generate"));
 		generatePassword.setStartRow(false);
 		generatePassword.setColSpan(2);
@@ -195,6 +195,13 @@ public class SecuritySettingsPanel extends AdminPanel {
 		allowSid.setRequired(true);
 		allowSid.setDisabled(Session.get().isDemo());
 
+		final RadioGroupItem secureCookies = ItemFactory.newBooleanSelector("secureCookies",
+				I18N.message("usesecurecookies"));
+		secureCookies.setValue(settings.isCookiesSecure() ? "yes" : "no");
+		secureCookies.setWrapTitle(false);
+		secureCookies.setRequired(true);
+		secureCookies.setDisabled(Session.get().isDemo());
+
 		final RadioGroupItem forceSsl = ItemFactory.newBooleanSelector("forcessl", I18N.message("forcessl"));
 		forceSsl.setValue(settings.isForceSsl() ? "yes" : "no");
 		forceSsl.setWrapTitle(false);
@@ -207,8 +214,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 		contentSecurityPolicy.setWidth(400);
 
 		if (Session.get().isDefaultTenant())
-			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, ignorelogincase, allowSid, forceSsl,
-					contentSecurityPolicy);
+			securityForm.setFields(maxInactivity, savelogin, alertnewdevice, ignorelogincase, allowSid, secureCookies,
+					forceSsl, contentSecurityPolicy);
 		else
 			securityForm.setFields(maxInactivity, savelogin, alertnewdevice);
 
@@ -246,7 +253,6 @@ public class SecuritySettingsPanel extends AdminPanel {
 					SecuritySettingsPanel.this.settings.setMaxInactivity((Integer) values.get("maxinactivity"));
 					SecuritySettingsPanel.this.settings
 							.setSaveLogin(values.get("savelogin").equals("yes") ? true : false);
-
 					SecuritySettingsPanel.this.settings
 							.setEnableAnonymousLogin(values.get("enableanonymous").equals("yes") ? true : false);
 					SecuritySettingsPanel.this.settings
@@ -268,6 +274,8 @@ public class SecuritySettingsPanel extends AdminPanel {
 
 						SecuritySettingsPanel.this.settings
 								.setIgnoreLoginCase(values.get("ignorelogincase").equals("yes") ? true : false);
+						SecuritySettingsPanel.this.settings
+								.setCookiesSecure(values.get("secureCookies").equals("yes") ? true : false);
 						SecuritySettingsPanel.this.settings
 								.setForceSsl(values.get("forcessl").equals("yes") ? true : false);
 						SecuritySettingsPanel.this.settings
