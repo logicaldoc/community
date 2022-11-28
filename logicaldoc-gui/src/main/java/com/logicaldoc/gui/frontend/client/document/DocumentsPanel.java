@@ -348,6 +348,8 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		DocumentsGrid grid = getDocumentsGrid();
 		if (grid.getSelectedDocument().getId() == document.getId()) {
 			enableAll();
+		} else if(document.getDocRef()!=null && grid.getSelectedDocument().getId() == document.getDocRef()) {
+			enableAll();
 		}
 	}
 
