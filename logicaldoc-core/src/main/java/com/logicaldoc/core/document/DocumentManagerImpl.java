@@ -996,7 +996,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		 * may lead to hibernate's sessions rollbacks
 		 */
 		synchronized (this) {
-			Document document = documentDAO.findDocument(docId);
+			Document document = documentDAO.findById(docId);
 
 			if (document.getImmutable() == 0
 					|| ((document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
