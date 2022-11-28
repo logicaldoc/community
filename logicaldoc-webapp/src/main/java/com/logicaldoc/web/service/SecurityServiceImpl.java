@@ -599,7 +599,6 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
 		boolean createNew = false;
-		String decodedPassword = "";
 
 		try {
 			// Disallow the editing of other users if you do not have access to
@@ -718,7 +717,7 @@ public class SecurityServiceImpl extends RemoteServiceServlet implements Securit
 			// Notify the user by email
 			if (createNew && guiUser.isNotifyCredentials())
 				try {
-					notifyAccount(usr, decodedPassword);
+					notifyAccount(usr, usr.getDecodedPassword());
 				} catch (Throwable e) {
 					log.warn(e.getMessage(), e);
 				}
