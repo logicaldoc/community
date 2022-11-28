@@ -59,7 +59,7 @@ public class Profile extends Window {
 		setHeaderControls(HeaderControls.HEADER_LABEL, HeaderControls.CLOSE_BUTTON);
 		setTitle(I18N.message("profile"));
 		setWidth(600);
-		setHeight(350);
+		setHeight(400);
 		setIsModal(true);
 		setShowModalMask(true);
 		centerInPage();

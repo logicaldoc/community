@@ -588,7 +588,12 @@ public class StandardSearchEngine implements SearchEngine {
 	 */
 	@Override
 	public void init() {
+		log.info("Initializing the full-text search engine");
 		try {
+			// Put some environment variable we need
+			System.setProperty("solr.disable.shardsWhitelist", "true");
+			System.setProperty("solr.http1", "true");
+			
 			File indexHome = new File(config.getPropertyWithSubstitutions("index.dir"));
 			File solr_xml = new File(indexHome, "solr.xml");
 
@@ -644,6 +649,8 @@ public class StandardSearchEngine implements SearchEngine {
 			container.load();
 
 			unlock();
+			
+			log.info("The full-text search engine has been initialized");
 		} catch (Error | Exception e) {
 			log.error("Unable to initialize the Full-text search engine", e);
 		}
