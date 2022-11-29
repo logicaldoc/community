@@ -383,7 +383,12 @@ public class ServletUtil {
 				// Return single part of file.
 				Range r = ranges.get(0);
 				response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
-				response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
+				
+				if(length == r.length)
+					response.setStatus(HttpServletResponse.SC_OK); // 200.		
+				else
+					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
+				
 
 				// Copy single part range.
 				storer.writeToStream(docId, resource, output, r.start, r.length);
