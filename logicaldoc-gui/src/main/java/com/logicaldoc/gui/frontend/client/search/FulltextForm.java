@@ -72,7 +72,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		setAlign(Alignment.LEFT);
 		Search.get().addObserver(this);
 	}
-
+	
 	private void initGUI() {
 		vm.clearValues();
 		if (getMembers() != null)
@@ -90,8 +90,8 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		});
 		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
 			public void onFormItemClick(FormItemIconClickEvent event) {
-				if(expression != null)
-					expression.clearValue();
+				vm.clearValues();
+				prepareFields(null);
 			}
 		});
 
