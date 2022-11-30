@@ -61,10 +61,9 @@ public class FileUtil {
 	 * 
 	 * @param in the input stream
 	 * @param filepath the target file path
+	 * 
 	 * @throws IOException I/O error
 	 * @throws FileNotFoundException Unexisting output file
-	 * 
-	 * @throws Exception raised in case of I/O error
 	 */
 	public static void writeFile(InputStream in, String filepath) throws FileNotFoundException, IOException {
 		try (OutputStream os = new FileOutputStream(filepath);) {

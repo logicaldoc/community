@@ -52,7 +52,7 @@ public interface DocumentMetadataService {
 	 * 
 	 * @param setId The attribute set's id
 	 * @param attribute The attribute's name
-	 * @param values The attribute's options
+	 * @param options The attribute's options
 	 * 
 	 * @throws Exception error in the server application
 	 */

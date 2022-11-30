@@ -217,8 +217,6 @@ public class EMailSender {
 	 * @param dictionary The dictionary to be used in the template
 	 * 
 	 * @throws MessagingException raised if the email cannot be sent
-	 * 
-	 * @throws Exception raised if the message cannot be sent
 	 */
 	public void send(EMail email, String templateName, Map<String, Object> dictionary) throws MessagingException {
 		MessageTemplateDAO templateDao = (MessageTemplateDAO) Context.get().getBean(MessageTemplateDAO.class);

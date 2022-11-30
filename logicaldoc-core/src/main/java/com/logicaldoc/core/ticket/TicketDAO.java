@@ -51,8 +51,6 @@ public interface TicketDAO extends PersistentObjectDAO<Ticket> {
 	 * @param ticket the ticket to store
 	 * @param transaction entry to log the event
 	 * 
-	 * @return True if successfully stored in a database
-	 * 
 	 * @throws PersistenceException error at database level
 	 */
 	public void store(Ticket ticket, DocumentHistory transaction) throws PersistenceException;

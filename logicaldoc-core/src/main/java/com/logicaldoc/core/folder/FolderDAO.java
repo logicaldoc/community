@@ -219,7 +219,7 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @return List of found folders
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException error at data layer
 	 */
 	public List<Folder> findChildren(long parentId, long userId) throws PersistenceException;
 
@@ -230,6 +230,8 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param userId ID of the user
 	 * 
 	 * @return if the write permission is granted
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
 	public boolean isWriteEnabled(long folderId, long userId) throws PersistenceException;
 
@@ -654,8 +656,6 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * @param rootId identifier of the root folder
 	 * @param transaction session informations
 	 * 
-	 * @return if the rights have been correctly applied
-	 * 
 	 * @throws PersistenceException error at data layer
 	 */
 	public void applyRightToTree(long rootId, FolderHistory transaction) throws PersistenceException;
@@ -665,8 +665,6 @@ public interface FolderDAO extends PersistentObjectDAO<Folder> {
 	 * 
 	 * @param rootId identifier of the root folder
 	 * @param transaction session informations
-	 * 
-	 * @return if the grid layout has been correctly replicated
 	 * 
 	 * @throws PersistenceException error at data layer
 	 */

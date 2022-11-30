@@ -106,9 +106,6 @@ abstract public class AbstractWebdavServlet extends HttpServlet implements DavCo
 	 * 
 	 * @param request the HTTP request
 	 * @param response the server's response
-	 * 
-	 * @throws ServletException error inside the servlet container
-	 * @throws IOException generic I/O error
 	 */
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) {

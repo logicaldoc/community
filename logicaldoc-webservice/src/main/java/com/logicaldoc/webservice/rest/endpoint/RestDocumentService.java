@@ -67,8 +67,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	 * @param document the document's metadata
 	 * @param contentDetail the file content
 	 * 
-	 * @throws Exception a generic error
-	 *
+	 * @return the created document
 	 */
 	@Override
 	@POST

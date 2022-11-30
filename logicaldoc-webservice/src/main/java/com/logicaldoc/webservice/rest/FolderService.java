@@ -73,6 +73,8 @@ public interface FolderService {
 	/**
 	 * Gets the root folder
 	 * 
+	 * @return the root folder
+	 * 
 	 * @throws PersistenceException Error in the database 
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials

@@ -96,7 +96,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	/**
 	 * Retrieves the root of the upload folder
 	 * 
-	 * @param sid The current session ID
+	 * @param httpSession The current session
 	 * 
 	 * @return the upload folder
 	 */
@@ -155,7 +155,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	/**
 	 * Removes all the uploaded files from session and file system.
 	 * 
-	 * @param sid The current session
+	 * @param httpSession The current session
 	 */
 	public static void cleanReceivedFiles(HttpSession httpSession) {
 		FileUtil.strongDelete(getUploadDir(httpSession));

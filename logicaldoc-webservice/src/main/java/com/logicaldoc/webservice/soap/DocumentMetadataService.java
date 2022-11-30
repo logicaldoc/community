@@ -247,7 +247,7 @@ public interface DocumentMetadataService {
 	 * @param sid Session identifier
 	 * @param setId The attribute set's id
 	 * @param attribute The attribute's name
-	 * @param categirt The options category (not mandatory)
+	 * @param category The options category (not mandatory)
 	 * 
 	 * @return the list of all the attribute's options
 	 * 

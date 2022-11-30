@@ -65,7 +65,6 @@ public interface DocumentService {
 	 * @param sid identifier of the session
 	 * @param docId The document id
 	 * 
-	 * @throws IOException I/O error
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
@@ -769,8 +768,6 @@ public interface DocumentService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
-	 * @throws PermissionException The user does not have the required
-	 *         permission
 	 * @throws IOException I/O error
 	 * @throws MessagingException error sending the email
 	 */
@@ -874,11 +871,10 @@ public interface DocumentService {
 	 * 
 	 * @param sid identifier of the session
 	 * @param id ID of the link
-	 * @throws PersistenceException
-	 * @throws WebserviceException
-	 * @throws AuthenticationException
 	 * 
-	 * @throws Exception error in the server application
+	 * @throws PersistenceException Error at data layer
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebMethod
 	@WSDoc(description = "removes an existing link")
@@ -895,11 +891,9 @@ public interface DocumentService {
 	 * @param docId The document id
 	 * @param content The content to be used (if null the file is parsed)
 	 * 
-	 * @throws PersistenceException Error in the database
+	 * @throws PersistenceException Error at data layer
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
-	 * @throws PermissionException The user does not have the required
-	 *         permission
 	 * @throws ParseException Error in adding the entry into fulltext index
 	 */
 	@WebMethod
@@ -1014,7 +1008,6 @@ public interface DocumentService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws PermissionException The user does not have the required
 	 *         permission
-	 * @throws IOException I/O error
 	 */
 	@WebMethod
 	@WSDoc(description = "protects with a password the given document")
@@ -1151,7 +1144,6 @@ public interface DocumentService {
 	 * @throws AuthenticationException Invalid session
 	 * @throws PermissionException The user does not have the required
 	 *         permission
-	 * @throws IOException I/O errorn
 	 */
 	@WebMethod
 	@WebResult(name = "note")
@@ -1169,6 +1161,8 @@ public interface DocumentService {
 	 * @param sid identifier of the session
 	 * @param docId The document id
 	 * @param version The specific version
+	 * 
+	 * @return the latest version specification
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
@@ -1215,6 +1209,8 @@ public interface DocumentService {
 	 * 
 	 * @param sid identifier of the session
 	 * @param docId identifier of the document
+	 * 
+	 * @return array of ratings
 	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice

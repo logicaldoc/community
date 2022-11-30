@@ -479,7 +479,7 @@ public class DocTool {
 	 * @param fileVersion The file version
 	 * @param suffix The suffix
 	 * 
-	 * @returns the file content as string
+	 * @return the file content as string
 	 */
 	public String readAsString(long docId, String fileVersion, String suffix) {
 		Storer storer = (Storer) Context.get().getBean(Storer.class);
