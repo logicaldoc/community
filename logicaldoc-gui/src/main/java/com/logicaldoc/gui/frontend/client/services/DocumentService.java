@@ -578,12 +578,13 @@ public interface DocumentService extends RemoteService {
 	 * 
 	 * @param vo the value object to use as template
 	 * @param content the text body of the new document
+	 * @param checkout if the new document must be checked out
 	 * 
 	 * @return the created document
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public GUIDocument createWithContent(GUIDocument vo, String content) throws ServerException;
+	public GUIDocument createWithContent(GUIDocument vo, String content, boolean checkout) throws ServerException;
 
 	/**
 	 * Puts a password protection to the document

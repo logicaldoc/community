@@ -87,7 +87,7 @@ public class WebcontentCreate extends Window {
 		vo.setLanguage(I18N.getDefaultLocaleForDoc());
 		vo.setFolder(FolderController.get().getCurrentFolder());
 
-		DocumentService.Instance.get().createWithContent(vo, "<html><body></body></html>",
+		DocumentService.Instance.get().createWithContent(vo, "<html><body></body></html>", true,
 				new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {

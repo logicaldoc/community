@@ -75,7 +75,7 @@ public interface DocumentServiceAsync {
 
 	void deleteVersions(long[] ids, AsyncCallback<GUIDocument> callback);
 
-	void createWithContent(GUIDocument vo, String content, AsyncCallback<GUIDocument> callback);
+	void createWithContent(GUIDocument vo, String content, boolean checkout, AsyncCallback<GUIDocument> callback);
 
 	void indexDocuments(Long[] docIds, AsyncCallback<Void> callback);
 
