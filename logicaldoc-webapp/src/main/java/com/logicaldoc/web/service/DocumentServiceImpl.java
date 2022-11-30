@@ -2160,7 +2160,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 	}
 
 	@Override
-	public GUIDocument createWithContent(GUIDocument vo, String content) throws ServerException {
+	public GUIDocument createWithContent(GUIDocument vo, String content, boolean checkout) throws ServerException {
 		Session session = validateSession(getThreadLocalRequest());
 
 		try {
@@ -2183,10 +2183,12 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			else
 				document = documentManager.create(IOUtils.toInputStream(content, UTF_8), doc, transaction);
 
-			// Perform a checkout also
-			transaction = new DocumentHistory();
-			transaction.setSession(session);
-			documentManager.checkout(document.getId(), transaction);
+			if (checkout) {
+				// Perform a checkout also
+				transaction = new DocumentHistory();
+				transaction.setSession(session);
+				documentManager.checkout(document.getId(), transaction);
+			}
 
 			return fromDocument(document, vo.getFolder(), null);
 		} catch (PermissionException | PersistenceException e) {

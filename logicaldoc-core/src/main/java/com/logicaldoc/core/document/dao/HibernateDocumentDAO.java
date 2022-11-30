@@ -424,6 +424,7 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 			if (fld == null)
 				throw new PersistenceException(
 						String.format("Unable to find refrenced folder %s", doc.getFolder().getFoldRef()));
+			folderDAO.initialize(fld);
 			doc.setFolder(fld);
 		}
 	}
@@ -782,9 +783,9 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public void initialize(Document doc) {
-		if(doc==null)
+		if (doc == null)
 			return;
-		
+
 		refresh(doc);
 
 		if (doc.getAttributes() != null)

@@ -77,7 +77,8 @@ public class PDFParser extends AbstractParser {
 
 	/**
 	 * Extract text and metadata from the main document
-	 * @throws Exception 
+	 * 
+	 * @throws Exception
 	 */
 	protected void parseDocument(PDDocument pdfDocument, StringBuilder content) throws Exception {
 		PDDocumentInformation information = pdfDocument.getDocumentInformation();
@@ -134,7 +135,8 @@ public class PDFParser extends AbstractParser {
 		try {
 			return internalCountPages(PDDocument.load(file));
 		} catch (Throwable e) {
-			log.warn(e.getMessage(), e);
+			if (log.isDebugEnabled())
+				log.warn(e.getMessage(), e);
 			return 1;
 		}
 	}
@@ -144,7 +146,8 @@ public class PDFParser extends AbstractParser {
 		try {
 			return internalCountPages(PDDocument.load(input));
 		} catch (Throwable e) {
-			log.warn(e.getMessage(), e);
+			if (log.isDebugEnabled())
+				log.warn(e.getMessage(), e);
 			return 1;
 		}
 	}
@@ -157,14 +160,16 @@ public class PDFParser extends AbstractParser {
 				return pdfDocument.getNumberOfPages();
 			}
 		} catch (Throwable ex) {
-			log.warn(ex.getMessage(), ex);
+			if (log.isDebugEnabled())
+				log.warn(ex.getMessage(), ex);
 			return 1;
 		} finally {
 			try {
 				if (pdfDocument != null)
 					pdfDocument.close();
 			} catch (Throwable e) {
-				log.warn(e.getMessage(), e);
+				if (log.isDebugEnabled())
+					log.warn(e.getMessage(), e);
 			}
 		}
 	}
