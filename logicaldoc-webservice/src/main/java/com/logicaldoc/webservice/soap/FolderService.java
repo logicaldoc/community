@@ -165,8 +165,6 @@ public interface FolderService {
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
-	 * 
-	 * @throws Exception error in the server application
 	 */
 	@WebMethod
 	@WSDoc(description = "moves an existing folder with the given identifier")
@@ -506,6 +504,8 @@ public interface FolderService {
 	 * @param parentId The parent folder
 	 * @param path The folder's path(for example /Default/dog/cat/mouse)
 	 * 
+	 * @return the folder that represents the given path
+	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
@@ -550,11 +550,11 @@ public interface FolderService {
 	 * 
 	 * @param sid Session identifier
 	 * 
+	 * @return array of workspaces
+	 * 
 	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException Error in the webservice
 	 * @throws AuthenticationException Invalid session
-	 * @throws PermissionException The user does not have the required
-	 *         permission
 	 */
 	@WebMethod
 	@WebResult(name = "workspaces")

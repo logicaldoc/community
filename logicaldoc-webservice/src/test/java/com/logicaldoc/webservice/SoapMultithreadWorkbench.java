@@ -201,7 +201,7 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 						Double value = null;
 						for (WSAttribute att : attributes) {
 							if (att.getName().equals("Total")) {
-								att.setValue(att.getDoubleValue() + 1);
+								WSAttribute.setValue(att, att.getDoubleValue() + 1);
 								value = att.getDoubleValue();
 							}
 						}
@@ -238,12 +238,12 @@ public class SoapMultithreadWorkbench extends SoapWorkbench {
 
 						WSAttribute att1 = new WSAttribute();
 						att1.setName("industries");
-						att1.setValue("Banking");
+						WSAttribute.setValue(att1, "Banking");
 						wsDoc.addAttribute(att1);
 
 						WSAttribute att2 = new WSAttribute();
 						att2.setName("industries-001");
-						att2.setValue("Accounting");
+						WSAttribute.setValue(att2, "Accounting");
 						att2.setParent("industries");
 						wsDoc.addAttribute(att2);
 

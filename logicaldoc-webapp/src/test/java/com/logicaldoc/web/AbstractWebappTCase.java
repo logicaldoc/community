@@ -30,6 +30,7 @@ import com.logicaldoc.gui.common.client.beans.GUISession;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.web.service.SecurityServiceImpl;
+import com.logicaldoc.web.util.MockServletSession;
 
 import junit.framework.Assert;
 

@@ -184,7 +184,12 @@ public class Options extends com.smartgwt.client.widgets.Window {
 		list.setCanReorderRecords(!readOnly);
 		list.setCanDragRecordsOut(!readOnly);
 		list.setCanAcceptDroppedRecords(!readOnly);
+		
 		list.setShowRowNumbers(true);
+		ListGridField numbers=new ListGridField(" ", 60);
+		numbers.setAutoFitWidth(true);
+		list.setRowNumberFieldProperties(numbers);
+		
 		list.setDragDataAction(DragDataAction.MOVE);
 		list.setFields(id, value, category);
 		list.sort("position", SortDirection.ASCENDING);

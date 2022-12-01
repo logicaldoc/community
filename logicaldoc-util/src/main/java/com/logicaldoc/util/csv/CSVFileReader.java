@@ -7,7 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * CSVFileReader is a class derived from CSVFile used to parse an existing CSV
@@ -96,8 +97,8 @@ public class CSVFileReader extends CSVFile implements Closeable {
 	 * @throws IOException If an error occurs while reading the new line from
 	 *         the file
 	 */
-	public Vector<String> readFields() throws IOException {
-		Vector<String> fields = new Vector<String>();
+	public List<String> readFields() throws IOException {
+		List<String> fields = new ArrayList<>();
 		StringBuilder sb = new StringBuilder();
 		String line = in.readLine();
 		if (line == null)

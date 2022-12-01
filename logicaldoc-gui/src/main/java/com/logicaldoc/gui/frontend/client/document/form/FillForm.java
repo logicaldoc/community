@@ -76,7 +76,7 @@ public class FillForm extends Window {
 			return;
 
 		LD.contactingServer();
-		DocumentService.Instance.get().createWithContent((GUIDocument) propertiesPanel.getObject(), null,
+		DocumentService.Instance.get().createWithContent((GUIDocument) propertiesPanel.getObject(), null, false,
 				new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {
@@ -88,7 +88,7 @@ public class FillForm extends Window {
 					public void onSuccess(GUIDocument doc) {
 						LD.clearPrompt();
 						DocumentsPanel.get().refresh();
-						destroy();
+						destroy();						
 					}
 				});
 	}

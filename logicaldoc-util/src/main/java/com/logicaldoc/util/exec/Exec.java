@@ -50,6 +50,8 @@ public class Exec {
 	/**
 	 * Executes the command by using the process builder.
 	 * 
+	 * @return the return value
+	 * 
 	 * @param commandLine The command line to process
 	 * @param directory The folder where the command will be executed
 	 * @param timeout The timeout in seconds

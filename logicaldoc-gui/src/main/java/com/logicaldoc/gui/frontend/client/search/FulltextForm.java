@@ -62,6 +62,8 @@ public class FulltextForm extends VLayout implements SearchObserver {
 	private MultiComboBoxItem searchinItem = null;
 
 	private FolderSelector folder;
+	
+	private TextItem expression;
 
 	public FulltextForm() {
 		setHeight100();
@@ -70,7 +72,7 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		setAlign(Alignment.LEFT);
 		Search.get().addObserver(this);
 	}
-
+	
 	private void initGUI() {
 		vm.clearValues();
 		if (getMembers() != null)
@@ -88,11 +90,12 @@ public class FulltextForm extends VLayout implements SearchObserver {
 		});
 		PickerIcon clear = new PickerIcon(PickerIcon.CLEAR, new FormItemClickHandler() {
 			public void onFormItemClick(FormItemIconClickEvent event) {
-				initGUI();
+				vm.clearValues();
+				prepareFields(null);
 			}
 		});
 
-		TextItem expression = ItemFactory.newTextItem("expression", "expression", I18N.message("search") + "...");
+		expression = ItemFactory.newTextItem("expression", "expression", I18N.message("search") + "...");
 		expression.setWidth("*");
 		expression.setColSpan(3);
 		expression.setRequired(true);

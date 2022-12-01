@@ -219,7 +219,11 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 		if (visualizationMode != null)
 			this.visualizationMode = visualizationMode;
 		updateListingPanel(folder);
-		scheduleFolderDetailsRefresh();
+
+		// Avoid to show the folder's details panel in case of open in folder
+		// where a doc ID has been specified
+		if (Session.get().getHiliteDocId() == null)
+			scheduleFolderDetailsRefresh();
 	}
 
 	public void changePageSize(Integer pageSize) {
@@ -347,6 +351,8 @@ public class DocumentsPanel extends HLayout implements FolderObserver, DocumentO
 	public void onDocumentCancelEditing(GUIDocument document) {
 		DocumentsGrid grid = getDocumentsGrid();
 		if (grid.getSelectedDocument().getId() == document.getId()) {
+			enableAll();
+		} else if (document.getDocRef() != null && grid.getSelectedDocument().getId() == document.getDocRef()) {
 			enableAll();
 		}
 	}

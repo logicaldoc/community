@@ -238,6 +238,7 @@ public class UserDetailsPanel extends VLayout implements UserObserver {
 		}
 		workingTimePanel = new WorkingTimePanel(user, changeHandler);
 		workingTimeTabPanel.addMember(workingTimePanel);
+		workingTimePanel.setDisabled("admin".equals(user.getUsername()));
 
 		/*
 		 * Prepare the quota tab

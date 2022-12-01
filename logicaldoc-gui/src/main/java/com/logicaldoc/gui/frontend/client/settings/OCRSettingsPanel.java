@@ -149,6 +149,19 @@ public class OCRSettingsPanel extends AdminPanel {
 		maxSize.setHint("MB");
 		maxSize.setMin(1);
 		maxSize.setStep(5);
+		
+		SpinnerItem threads = ItemFactory.newSpinnerItem("ocr_threads", I18N.message("allowedthreads"), (Integer) null);
+		threads.setRequired(true);
+		threads.setWrapTitle(false);
+		threads.setMin(1);
+		threads.setStep(1);
+		
+		SpinnerItem threadsWait = ItemFactory.newSpinnerItem("ocr_threads_wait", I18N.message("waitforthread"), (Integer) null);
+		threadsWait.setRequired(true);
+		threadsWait.setWrapTitle(false);
+		threadsWait.setHint(I18N.message("seconds").toLowerCase());
+		threadsWait.setMin(1);
+		threadsWait.setStep(10);
 
 		RadioGroupItem cropImage = ItemFactory.newBooleanSelector("ocr_cropimage",
 				I18N.message("cropvisiblepartofimage"));
@@ -188,6 +201,10 @@ public class OCRSettingsPanel extends AdminPanel {
 				excludes.setValue(param.getValue());
 			else if (param.getName().endsWith("ocr.engine"))
 				engine.setValue(param.getValue());
+			else if (param.getName().endsWith("ocr.threads"))
+				threads.setValue(Integer.parseInt(param.getValue()));
+			else if (param.getName().endsWith("ocr.threads.wait"))
+				threadsWait.setValue(Integer.parseInt(param.getValue()));
 		}
 
 		List<FormItem> items = new ArrayList<FormItem>();
@@ -195,7 +212,7 @@ public class OCRSettingsPanel extends AdminPanel {
 
 		if (Session.get().isDefaultTenant()) {
 			items.addAll(Arrays.asList(timeout, includes, excludes, maxSize, textThreshold, resolutionThreshold,
-					ocrrendres, cropImage, batch, batchTimeout, errorOnEmpty, engine));
+					ocrrendres, cropImage, batch, batchTimeout, threads, threadsWait, errorOnEmpty, engine));
 		} else
 			items.addAll(Arrays.asList(includes, excludes, textThreshold, resolutionThreshold, errorOnEmpty));
 		form.setItems(items.toArray(new FormItem[0]));
@@ -300,6 +317,16 @@ public class OCRSettingsPanel extends AdminPanel {
 					params.add(new GUIParameter("ocr.batch", ((Integer) values.get("ocr_batch")).toString()));
 				else
 					params.add(new GUIParameter("ocr.batch", (String) values.get("ocr_batch")));
+				
+				if (values.get("ocr_threads") instanceof Integer)
+					params.add(new GUIParameter("ocr.threads", ((Integer) values.get("ocr_threads")).toString()));
+				else
+					params.add(new GUIParameter("ocr.threads", (String) values.get("ocr_threads")));
+				
+				if (values.get("ocr_threads_wait") instanceof Integer)
+					params.add(new GUIParameter("ocr.threads.wait", ((Integer) values.get("ocr_threads_wait")).toString()));
+				else
+					params.add(new GUIParameter("ocr.threads.wait", (String) values.get("ocr_threads_wait")));
 
 				String engine = (String) values.get("ocr_engine");
 				params.add(new GUIParameter("ocr.engine", engine));

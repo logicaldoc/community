@@ -9,6 +9,7 @@ import java.util.Date;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.ticket.Ticket;
 
 /**
@@ -355,9 +356,10 @@ public interface DocumentManager {
 	 * 
 	 * @throws PersistenceException raised if the download ticket cannot be
 	 *         created
+	 * @throws PermissionException  raised if the user does not have the download permission
 	 */
 	public Ticket createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws PersistenceException;
+			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws PersistenceException, PermissionException;
 
 	/**
 	 * Tries to unprotect a document, If the password is correct, the document

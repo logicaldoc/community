@@ -3,19 +3,20 @@ package com.logicaldoc.util.config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -66,7 +67,7 @@ public class ContextProperties extends OrderedProperties {
 				if (filePath.startsWith("/"))
 					filePath = filePath.substring(1);
 				URL url = ContextProperties.class.getClassLoader().getResource(filePath);
-				if ("file".equals(url.getProtocol())) 
+				if ("file".equals(url.getProtocol()))
 					this.file = new File(url.getPath());
 			} catch (Exception e) {
 				log.error("Unable to find classpath resource {}", filePath, e);
@@ -110,13 +111,13 @@ public class ContextProperties extends OrderedProperties {
 	private void load(URL fileUrl) throws IOException {
 		try {
 			file = new File(URLDecoder.decode(fileUrl.getPath(), "UTF-8"));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Unable to read from {}", file, e);
 			throw e;
 		}
 		try (FileInputStream fis = new FileInputStream(file)) {
 			load(fis);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Unable to read from {}", file, e);
 			throw e;
 		}
@@ -141,7 +142,7 @@ public class ContextProperties extends OrderedProperties {
 					load(fis);
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Unable to read from " + file.getPath(), e);
 			throw e;
 		}
@@ -169,7 +170,7 @@ public class ContextProperties extends OrderedProperties {
 		overrideFile = null;
 		try {
 			load(is);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			log.error("Unable to read from stream");
 			throw e;
 		}
@@ -182,67 +183,91 @@ public class ContextProperties extends OrderedProperties {
 	 * 
 	 * @throws IOException raised when the file cannot be written
 	 */
-	public void write() throws IOException {
+	public synchronized void write() throws IOException {
+		checkFile();
+		backup();
+
+		File tmpFile = new File(file.getParentFile(), file.getName() + ".tmp");
+
+		try {
+			Files.deleteIfExists(tmpFile.toPath());
+			Files.createFile(tmpFile.toPath());
+
+			try (FileOutputStream fos = new FileOutputStream(tmpFile);) {
+				store(fos, "");
+				log.info("Saved settings into temp file {}", tmpFile.getAbsolutePath());
+			} catch (Exception ex) {
+				if (log.isWarnEnabled()) {
+					log.warn(ex.getMessage());
+				}
+				throw ex;
+			}
+
+			Files.move(tmpFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE,
+					StandardCopyOption.REPLACE_EXISTING);
+		} finally {
+			FileUtil.strongDelete(tmpFile);
+		}
+	}
+
+	private void checkFile() throws IOException {
 		// it might be that we do not have an ordinary file,
 		// so we can't write to it
 		if (file == null)
 			throw new IOException("File not given");
-		backup(file);
-
-		try (FileOutputStream fos = new FileOutputStream(file);) {
-			store(fos, "");
-			log.info("Saved file {}", file);
-		} catch (IOException ex) {
-			if (log.isWarnEnabled()) {
-				log.warn(ex.getMessage());
-			}
-			throw ex;
-		}
 	}
 
 	/**
 	 * Makes a daily backup of the actual file. Up to <code>maxBackups</code>
 	 * are maintained.
-	 * 
-	 * @param src the source file to backup
 	 */
-	protected void backup(File src) throws IOException {
+	protected void backup() throws IOException {
+		checkFile();
+
 		// Backup the file first
-		final File parent = src.getParentFile();
+		final File parent = file.getParentFile();
 
 		/*
 		 * Save the daily backup
 		 */
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		String today = df.format(new Date());
-		File backup = new File(parent, src.getName() + "." + today);
+		File backup = new File(parent, file.getName() + "." + today);
 		if (!backup.exists()) {
-			FileUtils.copyFile(src, backup);
+			FileUtils.copyFile(file, backup);
 			log.debug("Backup saved in {}", backup.getPath());
 		}
 
 		/*
 		 * Delete the oldest backups
 		 */
-		File[] oldBackups = parent.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.startsWith(src.getName() + ".") && name.substring(name.lastIndexOf('.') + 1).length() == 8;
-			}
-		});
+		deleteOldestBackups();
+	}
+
+	private void deleteOldestBackups() throws IOException {
+		List<File> oldBackups = getBackups();
+		if (oldBackups.size() > maxBackups) {
+			List<File> backupsToRetain = oldBackups.stream().limit(maxBackups).collect(Collectors.toList());
+			for (File backupFile : oldBackups)
+				if (!backupsToRetain.contains(backupFile))
+					FileUtil.strongDelete(backupFile);
+		}
+	}
+
+	public List<File> getBackups() throws IOException {
+		checkFile();
+
+		File[] oldBackups = file.getParentFile().listFiles((dir, name) -> name.startsWith(file.getName() + ".")
+				&& name.substring(name.lastIndexOf('.') + 1).length() == 8);
 
 		// Sort old backup by descending date
-		Arrays.sort(oldBackups, new Comparator<File>() {
-			public int compare(File f1, File f2) {
-				String date1 = f1.getName().substring(f1.getName().lastIndexOf('.') + 1);
-				String date2 = f2.getName().substring(f2.getName().lastIndexOf('.') + 1);
-				return date2.compareTo(date1);
-			}
+		Arrays.sort(oldBackups, (f1, f2) -> {
+			String date1 = f1.getName().substring(f1.getName().lastIndexOf('.') + 1);
+			String date2 = f2.getName().substring(f2.getName().lastIndexOf('.') + 1);
+			return date2.compareTo(date1);
 		});
 
-		if (oldBackups.length > maxBackups)
-			for (int i = maxBackups - 1; i < oldBackups.length; i++)
-				FileUtil.strongDelete(oldBackups[i]);
+		return Arrays.asList(oldBackups);
 	}
 
 	public String getString(String property) {

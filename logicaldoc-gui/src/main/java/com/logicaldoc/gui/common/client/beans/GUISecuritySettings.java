@@ -38,6 +38,8 @@ public class GUISecuritySettings implements Serializable {
 
 	private boolean enableAnonymousLogin = false;
 
+	private boolean cookiesSecure = false;
+
 	private boolean forceSsl = false;
 
 	private boolean allowSidInRequest = false;
@@ -243,5 +245,13 @@ public class GUISecuritySettings implements Serializable {
 
 	public void setPwdOccurrence(int pwdOccurrence) {
 		this.pwdOccurrence = pwdOccurrence;
+	}
+	
+	public boolean isCookiesSecure() {
+		return cookiesSecure;
+	}
+
+	public void setCookiesSecure(boolean cookiesSecure) {
+		this.cookiesSecure = cookiesSecure;
 	}
 }

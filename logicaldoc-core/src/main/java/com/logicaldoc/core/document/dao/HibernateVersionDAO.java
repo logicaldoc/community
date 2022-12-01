@@ -109,7 +109,7 @@ public class HibernateVersionDAO extends HibernatePersistentObjectDAO<Version> i
 		try {
 			// Checks the context property 'document.maxversions'
 			ContextProperties bean = new ContextProperties();
-			int maxVersions = bean.getInt("document.maxversions");
+			int maxVersions = bean.getInt("document.maxversions", 10);
 			Folder workspace = folderDAO.findWorkspace(version.getFolderId());
 			if (workspace != null && workspace.getMaxVersions() != null && workspace.getMaxVersions() > 0)
 				maxVersions = workspace.getMaxVersions();

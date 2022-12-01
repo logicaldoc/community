@@ -275,7 +275,7 @@ public class FolderSecurityPanel extends FolderDetailTab {
 		fields.add(export);
 		if (Feature.enabled(Feature.DIGITAL_SIGNATURE))
 			fields.add(sign);
-		if (Feature.enabled(Feature.IMPEX))
+		if (Feature.enabled(Feature.ARCHIVING) || Feature.enabled(Feature.IMPEX))
 			fields.add(archive);
 		if (Feature.enabled(Feature.WORKFLOW))
 			fields.add(workflow);

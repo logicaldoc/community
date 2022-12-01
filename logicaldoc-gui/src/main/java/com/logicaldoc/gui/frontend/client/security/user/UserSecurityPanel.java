@@ -85,8 +85,11 @@ public class UserSecurityPanel extends VLayout {
 
 		CheckboxItem enforceWorkingTime = new CheckboxItem("enforceworkingtime", I18N.message("enforceworkingtime"));
 		enforceWorkingTime.setValue(user.isEnforceWorkingTime());
-		if (!readonly)
+		if (readonly || "admin".equals(user.getUsername())) {
+			enforceWorkingTime.setDisabled(true);
+		} else {
 			enforceWorkingTime.addChangedHandler(changedHandler);
+		}
 
 		DateItem expire = ItemFactory.newDateItem("expireson", "expireson");
 		expire.setValue(user.getExpire());

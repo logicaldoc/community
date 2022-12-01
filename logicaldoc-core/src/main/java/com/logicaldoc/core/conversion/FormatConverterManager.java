@@ -557,8 +557,8 @@ public class FormatConverterManager {
 				String key = composeKey(i, o);
 				if (!converters.containsKey(key))
 					converters.put(key, new ArrayList<FormatConverter>());
-				if (!converters.get(composeKey(i, o)).contains(cnvrt))
-					converters.get(composeKey(i, o)).add(cnvrt);
+				if (!converters.get(key).contains(cnvrt))
+					converters.get(key).add(cnvrt);
 			}
 	}
 

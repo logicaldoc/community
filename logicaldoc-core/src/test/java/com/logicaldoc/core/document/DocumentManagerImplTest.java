@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Calendar;
 
 import org.junit.Test;
 
@@ -16,10 +18,13 @@ import com.logicaldoc.core.document.dao.VersionDAO;
 import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.parser.ParseException;
+import com.logicaldoc.core.security.Group;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.UserDAO;
+import com.logicaldoc.core.store.MockStorer;
 import com.logicaldoc.core.store.Storer;
 import com.logicaldoc.core.ticket.Ticket;
 import com.logicaldoc.util.Context;
@@ -64,7 +69,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testUpdate() throws PersistenceException {
+	public void testUpdate() throws PersistenceException, InterruptedException {
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
 		Assert.assertEquals("pippo.pdf", doc.getFileName());
@@ -87,12 +92,14 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		newDoc.setCustomId("xxxxxxxx");
 
 		documentManager.update(doc, newDoc, transaction);
-
 		Assert.assertEquals("pluto(1)", doc.getFileName());
+		Assert.assertEquals("1.1", doc.getVersion());
+		
+		Assert.assertEquals("1.1", verDao.queryForString("select ld_version from ld_version where ld_documentid="+doc.getId()+" and ld_version='"+doc.getVersion()+"'"));
 	}
 
 	@Test
-	public void testCreateDownloadTicket() throws PersistenceException {
+	public void testCreateDownloadTicket() throws PersistenceException, PermissionException, InterruptedException {
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
 
@@ -105,16 +112,45 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Ticket t = documentManager.createDownloadTicket(1L, null, null, null, null, null, transaction);
 		Assert.assertNotNull(t.getUrl());
 
-		synchronized (this) {
-			try {
-				wait(1000);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-			}
-		}
+		Thread.sleep(1000);
 
 		t = documentManager.createDownloadTicket(1L, null, 2, null, null, null, transaction);
 		Assert.assertNotNull(t.getUrl());
+
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, -2);
+		t = documentManager.createDownloadTicket(1L, null, null, cal.getTime(), null, null, transaction);
+		Assert.assertNotNull(t.getUrl());
+		Assert.assertTrue(t.isTicketExpired());
+
+		// Unexisting document
+		boolean exceptionHappened = false;
+		try {
+			documentManager.createDownloadTicket(99L, null, 2, null, null, null, transaction);
+		} catch (PersistenceException e) {
+			exceptionHappened = true;
+			Assert.assertEquals("Unexisting document 99", e.getMessage());
+		}
+		Assert.assertTrue(exceptionHappened);
+
+		// No download permission
+		exceptionHappened = false;
+		try {
+			transaction = new DocumentHistory();
+			User userWithourPermission = userDao.findByUsername("sebastian");
+			transaction.setUser(userWithourPermission);
+
+			userDao.jdbcUpdate("delete from ld_foldergroup where ld_folderid=" + doc.getFolder().getId());
+			userDao.jdbcUpdate("delete from ld_usergroup where ld_groupid=" + Group.GROUPID_ADMIN);
+
+			Assert.assertFalse(folderDao.isDownloadEnabled(doc.getFolder().getId(), userWithourPermission.getId()));
+
+			documentManager.createDownloadTicket(1L, null, 2, null, null, null, transaction);
+		} catch (PermissionException e) {
+			exceptionHappened = true;
+			Assert.assertTrue(e.getMessage().contains("does not have permission"));
+		}
+		Assert.assertTrue(exceptionHappened);
 	}
 
 	@Test
@@ -154,7 +190,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertEquals(5, doc.getPages());
 		Assert.assertEquals(55, documentManager.countPages(doc));
 	}
-	
+
 	@Test
 	public void testMoveToFolder() throws PersistenceException {
 		User user = userDao.findByUsername("admin");
@@ -173,21 +209,20 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		Folder newFolder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
 		documentManager.moveToFolder(doc, newFolder, transaction);
-		
+
 		doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
 		Assert.assertEquals(newFolder, doc.getFolder());
 	}
-	
+
 	@Test
 	public void testParseDocument() throws PersistenceException, ParseException {
 		Document doc = docDao.findById(1);
 		String text = documentManager.parseDocument(doc, null);
 		Assert.assertTrue(text.contains("Digital Day"));
-		
-		
+
 		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
-		
+
 		// Try with an alias
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
@@ -195,7 +230,64 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		text = documentManager.parseDocument(alias, null);
 		Assert.assertTrue(text.contains("Digital Day"));
 	}
-	
+
+	@Test
+	public void testEnforceFilesIntoFolderStorage()
+			throws PersistenceException, ParseException, IOException, InterruptedException {
+		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
+
+		DocumentHistory transaction = new DocumentHistory();
+		User user = userDao.findByUsername("admin");
+		transaction.setUser(user);
+
+		folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test/subfolder", true, null);
+		Assert.assertNull(folder.getStorage());
+
+		folder = folderDao.findByPathExtended("/Default/test", 1L);
+		folderDao.initialize(folder);
+		folder.setStorage(2);
+		folderDao.store(folder);
+
+		folder = folderDao.findByPathExtended("/Default/test", 1L);
+		folderDao.initialize(folder);
+		Assert.assertTrue(1 == folder.getStorages().size());
+		Assert.assertEquals(Integer.valueOf(2), folder.getStorage());
+
+		folder = folderDao.findByPathExtended("/Default/test/subfolder", 1L);
+		folderDao.initialize(folder);
+		Assert.assertNull(folder.getStorage());
+
+		Document doc = docDao.findById(1);
+		documentManager.moveToFolder(doc, folder, transaction);
+
+		String storeRoot = Context.get().getProperties().getPropertyWithSubstitutions("store.1.dir");
+		String store2Root = Context.get().getProperties().getPropertyWithSubstitutions("store.2.dir");
+
+		Assert.assertTrue(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
+
+		transaction = new DocumentHistory();
+		transaction.setUser(user);
+		Assert.assertEquals(1, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
+
+		Assert.assertFalse(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
+		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
+	}
+
+	@Test
+	public void testRename() throws PersistenceException, ParseException {
+		Document doc = docDao.findById(1);
+		docDao.initialize(doc);
+		docDao.store(doc);
+		Assert.assertEquals("pippo.pdf", doc.getFileName());
+
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setUser(userDao.findByUsername("admin"));
+		documentManager.rename(doc.getId(), "archimede.pdf", transaction);
+
+		doc = docDao.findById(1);
+		Assert.assertEquals("archimede.pdf", doc.getFileName());
+	}
+
 	@Test
 	public void testReindex() throws PersistenceException, ParseException {
 		Document doc = docDao.findById(1);
@@ -205,22 +297,21 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		docDao.store(doc);
 		doc = docDao.findById(1);
 		Assert.assertEquals(0, doc.getIndexed());
-		
+
 		Folder folder = folderDao.createPath(folderDao.findById(Folder.ROOTID), "/Default/test", true, null);
-		
+
 		// Create an alias
 		DocumentHistory transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
 		Document alias = documentManager.createAlias(doc, folder, null, transaction);
-		
+
 		transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
 		documentManager.reindex(doc.getId(), null, transaction);
-		
+
 		doc = docDao.findById(1);
 		Assert.assertEquals(1, doc.getIndexed());
-		
-		
+
 		doc = docDao.findById(1);
 		Assert.assertEquals(1, doc.getIndexed());
 		docDao.initialize(doc);
@@ -228,15 +319,15 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		docDao.store(doc);
 		doc = docDao.findById(1);
 		Assert.assertEquals(0, doc.getIndexed());
-		
+
 		transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("admin"));
 		documentManager.reindex(alias.getId(), null, transaction);
-		
+
 		doc = docDao.findById(1);
 		Assert.assertEquals(1, doc.getIndexed());
 	}
-	
+
 	@Test
 	public void testMakeImmutable() throws PersistenceException {
 		User user = userDao.findByUsername("admin");
@@ -279,20 +370,89 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		// raised
 		documentManager.lock(doc.getId(), 2, transaction);
 		documentManager.lock(doc.getId(), 2, transaction);
-		
+
 		// Now try to lock with an other user
 		transaction = new DocumentHistory();
 		transaction.setUser(userDao.findByUsername("boss"));
-		
-		boolean exceptionHappened=false;
+
+		boolean exceptionHappened = false;
 		try {
 			documentManager.lock(doc.getId(), 2, transaction);
 		} catch (PersistenceException e) {
-			exceptionHappened=true;
+			exceptionHappened = true;
 			Assert.assertTrue(e.getMessage().contains("is already locked by user"));
 		}
 		Assert.assertTrue(exceptionHappened);
-		
+	}
+
+	@Test
+	public void testUnLock() throws PersistenceException {
+		User adminUser = userDao.findByUsername("admin");
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setUser(adminUser);
+		transaction.setNotified(0);
+		documentManager.lock(1L, 2, transaction);
+
+		Document doc = docDao.findById(1);
+		Assert.assertEquals(2, doc.getStatus());
+		Assert.assertEquals(1L, doc.getLockUserId().longValue());
+
+		transaction = new DocumentHistory();
+		transaction.setUser(userDao.findByUsername("boss"));
+		transaction.setNotified(0);
+
+		// Locked by a different user
+		boolean exceptionHappened = false;
+		try {
+			documentManager.unlock(doc.getId(), transaction);
+		} catch (PersistenceException e) {
+			exceptionHappened = true;
+		}
+		Assert.assertTrue(exceptionHappened);
+
+		doc = docDao.findById(1);
+		Assert.assertEquals(2, doc.getStatus());
+		Assert.assertEquals(1L, doc.getLockUserId().longValue());
+
+		transaction = new DocumentHistory();
+		transaction.setUser(adminUser);
+		transaction.setNotified(0);
+		documentManager.unlock(doc.getId(), transaction);
+
+		doc = docDao.findById(1);
+		Assert.assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		Assert.assertNull(doc.getLockUserId());
+
+		// Already unlocked
+		documentManager.unlock(doc.getId(), transaction);
+		transaction.setUser(userDao.findByUsername("boss"));
+		doc = docDao.findById(1);
+		Assert.assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+		Assert.assertNull(doc.getLockUserId());
+	}
+
+	@Test
+	public void testMerge() throws PersistenceException, IOException {
+		Document doc1 = docDao.findById(1);
+		Assert.assertNotNull(doc1);
+		docDao.initialize(doc1);
+		Assert.assertEquals(55, documentManager.countPages(doc1));
+
+		Document doc3 = docDao.findById(3);
+		Assert.assertNotNull(doc3);
+		docDao.initialize(doc3);
+		Assert.assertEquals(1, documentManager.countPages(doc3));
+
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setUser(userDao.findByUsername("admin"));
+		Document mergedDoc = documentManager.merge(Arrays.asList(doc1, doc3), 1200L, "merged.pdf", transaction);
+		Assert.assertNotNull(mergedDoc);
+
+		mergedDoc = docDao.findById(mergedDoc.getId());
+		Assert.assertNotNull(mergedDoc);
+		docDao.initialize(mergedDoc);
+
+		Assert.assertEquals(56, documentManager.countPages(mergedDoc));
 	}
 
 	@Test
@@ -432,7 +592,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		// Reproduce an error in the storage
 		transaction.setComment("reason3");
-		storer.setRaiseError(true);
+		storer.setErrorOnStore(true);
 
 		boolean exceptionHappened = false;
 		try (InputStream is = getClass().getResourceAsStream("/abel.eml")) {
@@ -464,8 +624,12 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 	@Test
 	public void testDeleteVersion() throws PersistenceException {
+		DocumentHistory transaction = new DocumentHistory();
+		transaction.setSessionId("1234");
+		transaction.setUser(userDao.findByUsername("admin"));
+
 		Assert.assertNotNull(verDao.findById(11L));
-		documentManager.deleteVersion(11L, null);
+		documentManager.deleteVersion(11L, transaction);
 		Assert.assertNull(verDao.findById(11L));
 
 		Assert.assertNotNull(verDao.findById(13L));
@@ -554,6 +718,23 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
+	public void testArchiveFolder() throws PersistenceException, FileNotFoundException {
+		Document doc = docDao.findById(1L);
+		Assert.assertNotNull(doc);
+		Assert.assertEquals(AbstractDocument.DOC_UNLOCKED, doc.getStatus());
+
+		DocumentHistory history = new DocumentHistory();
+		history.setUserId(1L);
+		history.setUsername("admin");
+		history.setSession(SessionManager.get().newSession("admin", "admin", null));
+		Assert.assertEquals(4, documentManager.archiveFolder(6L, history));
+
+		doc = docDao.findById(1L);
+		Assert.assertNotNull(doc);
+		Assert.assertEquals(AbstractDocument.DOC_ARCHIVED, doc.getStatus());
+	}
+
+	@Test
 	public void testFailedStoreCreate() throws PersistenceException, FileNotFoundException {
 		Document doc = new Document();
 		doc.setFileName("failed.txt");
@@ -566,15 +747,16 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 
 		FileInputStream fis = new FileInputStream("pom.xml");
 
+		boolean exceptionHappened = false;
 		try {
-			storer.setRaiseError(true);
+			storer.setErrorOnStore(true);
 			documentManager.create(fis, doc, history);
-			Assert.fail("Expected an IOException to be thrown");
 		} catch (Exception e) {
-			// Noting to do
+			exceptionHappened = true;
 		} finally {
-			storer.setRaiseError(false);
+			storer.setErrorOnStore(false);
 		}
+		Assert.assertTrue(exceptionHappened);
 
 		// Now check that the document was deleted
 		Assert.assertTrue(doc.getId() != 0L);
@@ -606,13 +788,13 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		Assert.assertNotNull(documentNoteDao.findById(2L));
 
 		try {
-			storer.setRaiseError(true);
+			storer.setErrorOnStore(true);
 			documentManager.checkin(1L, file, "pippo", true, null, transaction);
 			Assert.fail("an exception should have been raised at this point");
 		} catch (Exception e) {
 			// Noting to do
 		} finally {
-			storer.setRaiseError(false);
+			storer.setErrorOnStore(false);
 		}
 
 		doc = docDao.findById(1L);

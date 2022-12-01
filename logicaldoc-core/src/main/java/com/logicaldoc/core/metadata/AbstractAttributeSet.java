@@ -4,8 +4,8 @@ package com.logicaldoc.core.metadata;
  * A base class for attribute sets and templates
  * 
  * @author Marco Meschieri - LogicalDOC
- * @since <product_release>
- *
+ * 
+ * @since 8.8.3
  */
 public class AbstractAttributeSet extends ExtensibleObject {
 	private static final long serialVersionUID = 1L;

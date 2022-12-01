@@ -569,8 +569,10 @@
 									dest="target/war" />
 								<delete
 									dir="target/war/WEB-INF/classes/com/logicaldoc/gui" />
-								<delete dir="target/war/work" />
-								<delete dir="target/war/META-INF" />
+								<delete dir="target/war/work" />						
+								<delete>
+  									<fileset dir="target/war/META-INF" includes="**" excludes="context.xml" />
+								</delete>								
 								<delete>
 									<fileset dir="target/war/WEB-INF/lib"
 										includes="gwt-user*,smartgwt-skin*,logicaldoc-webapp*,gwtevent*,guava-14*,guava-16*,log4j-1.*,slf4j-simple*" />

@@ -474,7 +474,7 @@ public class ZipUtil {
 	 * @param tarGzFile the .tar.gz file
 	 * @param targetDir the target folder to unpack to
 	 * 
-	 * @throws IOExceptionAn error processing the GZip or Tar
+	 * @throws IOException An error processing the GZip or Tar
 	 */
 	public void unGZipUnTar(File tarGzFile, File targetDir) throws IOException {
 		File tarFile = null;
@@ -517,6 +517,8 @@ public class ZipUtil {
 	 * 
 	 * @param gzFile the .gz file
 	 * @param targetFile the target file to unpack to
+	 *
+	 * @return size of the written file
 	 * 
 	 * @throws IOException Error processing the GZip
 	 */

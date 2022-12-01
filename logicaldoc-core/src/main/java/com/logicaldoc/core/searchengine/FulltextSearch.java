@@ -267,7 +267,7 @@ public class FulltextSearch extends Search {
 		Map<Long, Hit> hitsMap = new HashMap<Long, Hit>();
 		while (results != null && results.hasNext()) {
 			Hit hit = results.next();
-
+			
 			// Skip a document if not in the filter set
 			if (opt.getFilterIds() != null && !opt.getFilterIds().isEmpty()) {
 				if (!opt.getFilterIds().contains(hit.getId()))
@@ -350,10 +350,10 @@ public class FulltextSearch extends Search {
 		if (opt.getCreationTo() != null)
 			filters.add(HitField.CREATION + ":[* TO " + df.format(opt.getCreationTo()) + "T00:00:00Z]");
 
-		setFolderQueryFilters(opt, filters, accessibleFolderIds);
+		appendFolderQueryFilter(opt, filters, accessibleFolderIds);
 	}
 
-	private void setFolderQueryFilters(FulltextSearchOptions opt, List<String> filters,
+	private void appendFolderQueryFilter(FulltextSearchOptions opt, List<String> filters,
 			Collection<Long> accessibleFolderIds) throws SearchException {
 		FolderDAO fdao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		try {
@@ -364,9 +364,15 @@ public class FulltextSearch extends Search {
 			throw new SearchException(e1.getMessage(), e1);
 		}
 
+		StringBuilder foldersFilter=new StringBuilder();		
 		if (!accessibleFolderIds.isEmpty() && opt.getFolderId() != null) {
-			for (Long id : accessibleFolderIds)
-				filters.add(HitField.FOLDER_ID + ":" + (id < 0 ? "\\" : "") + id);
+			for (Long id : accessibleFolderIds) {
+				if(foldersFilter.length() > 0)
+					foldersFilter.append(" or ");
+				foldersFilter.append(HitField.FOLDER_ID + ":" + (id < 0 ? "\\" : "") + id);
+			}
+				
+			filters.add(" ("+foldersFilter.toString()+") ");
 		}
 	}
 

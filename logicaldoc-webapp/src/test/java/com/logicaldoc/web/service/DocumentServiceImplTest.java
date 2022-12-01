@@ -313,7 +313,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setId(0);
 		doc.setFileName("testcontent.txt");
 		doc.setCustomId(null);
-		doc = service.createWithContent(doc, "text content");
+		doc = service.createWithContent(doc, "text content", true);
 		Assert.assertNotNull(doc);
 		Assert.assertTrue(doc.getId() != 0L);
 
@@ -326,7 +326,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		doc.setId(0);
 		doc.setFileName("testcontent2.txt");
 		doc.setCustomId(null);
-		doc = service.createWithContent(doc, "");
+		doc = service.createWithContent(doc, " ", true);
 		Assert.assertNotNull(doc);
 		Assert.assertTrue(doc.getId() != 0L);
 

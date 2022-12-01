@@ -17,10 +17,11 @@ public class TemplatesDS extends DataSource {
 		DataSourceTextField id = new DataSourceTextField("id");
 		id.setPrimaryKey(true);
 		DataSourceTextField name = new DataSourceTextField("name");
+		DataSourceTextField description = new DataSourceTextField("description");
 		DataSourceTextField readonly = new DataSourceTextField("readonly");
 		DataSourceIntegerField documents = new DataSourceIntegerField("documents");
 		DataSourceIntegerField ttype = new DataSourceIntegerField("type");
-		setFields(id, name, documents, readonly, ttype);
+		setFields(id, name, description, documents, readonly, ttype);
 		setDataURL("data/templates.xml?withempty=" + withEmpty + (templateId != null ? "&templateId=" + templateId : "")
 				+ (type != null ? "&type=" + type : ""));
 		setClientOnly(true);

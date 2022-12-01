@@ -107,10 +107,10 @@ public class DashboardPanel extends VLayout {
 		if (Feature.visible(Feature.CALENDAR) && Menu.enabled(Menu.DASHBOARD_CALENDAR)) {
 			tabSet.addTab(calendarTab);
 			if (!Feature.enabled(Feature.CALENDAR))
-				workflowTab.setPane(new FeatureDisabled());
+				calendarTab.setPane(new FeatureDisabled());
 		}
 
-		if (Feature.visible(Feature.WORKFLOW)) {
+		if (Feature.visible(Feature.WORKFLOW) && Menu.enabled(Menu.DASHBOARD_WORKFLOW)) {
 			tabSet.addTab(workflowTab);
 			if (!Feature.enabled(Feature.WORKFLOW))
 				workflowTab.setPane(new FeatureDisabled());

@@ -176,7 +176,7 @@ public class WSFolder implements Serializable {
 					attribute.setMultiple(attr.getMultiple());
 					attribute.setParent(attr.getParent());
 					attribute.setPosition(attr.getPosition());
-					attribute.setValue(attr.getValue());
+					WSAttribute.setValue(attribute, attr.getValue());
 					attribute.setStringValues(attr.getStringValues());
 
 					if (attr.getType() == Attribute.TYPE_USER || attr.getType() == Attribute.TYPE_FOLDER) {

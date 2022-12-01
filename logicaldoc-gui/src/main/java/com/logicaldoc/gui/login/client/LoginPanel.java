@@ -621,7 +621,7 @@ public class LoginPanel extends VLayout {
 				}
 
 				public void onResponseReceived(Request request, Response response) {
-					if (response != null && response.getStatusCode() >= 200 && response.getStatusCode() <= 405) {
+					if (response != null && response.getStatusCode() < 400) {
 						SecurityService.Instance.get().getSession(language != null ? language.getValueAsString() : "en",
 								new AsyncCallback<GUISession>() {
 

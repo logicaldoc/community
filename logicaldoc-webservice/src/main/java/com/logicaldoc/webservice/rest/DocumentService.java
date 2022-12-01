@@ -348,10 +348,12 @@ public interface DocumentService {
 	 * @param docId identifier of the document
 	 * @param vote the vote
 	 * 
+	 * @return the voted document
+	 * 
 	 * @throws PersistenceException Error in the database 
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws PermissionException The current user does not have enough permissions
-	 * @throws AuthenticationException Invalid credentials 
+	 * @throws AuthenticationException Invalid credentials
 	 */
 	@PUT
 	@Path("/rateDocument")
@@ -401,7 +403,6 @@ public interface DocumentService {
 	 * @param docId The document id
 	 * @param folderId Identifier of the new document's folder
 	 * 
-	 * @throws IOException I/O error
 	 * @throws PersistenceException Error in the database 
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws PermissionException The current user does not have enough permissions
@@ -591,12 +592,13 @@ public interface DocumentService {
 	 * @throws PersistenceException Error in the database 
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials 
+	 * @throws PermissionException  The user does not have the download permission
 	 */
 	@POST
 	@Path("/createDownloadTicket")
 	@Consumes({ MediaType.APPLICATION_FORM_URLENCODED })
 	public String createDownloadTicket(long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException;
+			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException;
 
 	/**
 	 * Removes an existing link
@@ -775,7 +777,7 @@ public interface DocumentService {
 	 * 
 	 * @throws PersistenceException Error in the database 
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
+	 * @throws ParseException Error parsing the content
 	 * @throws AuthenticationException Invalid credentials 
 	 */
 	public void reindex(long docId, String content) throws AuthenticationException, ParseException, WebserviceException, PersistenceException;
@@ -846,8 +848,8 @@ public interface DocumentService {
 	 * @throws IOException I/O error
 	 * @throws PersistenceException Error in the database 
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
-	 * @throws AuthenticationException Invalid credentials 
+	 * @throws AuthenticationException Invalid credentials
+	 * @throws MessagingException Error in the communication with the mail server
 	 */
 	public void sendEmail(Long[] docIds, String recipients, String subject, String message) throws AuthenticationException, WebserviceException, PersistenceException, IOException, MessagingException;
 

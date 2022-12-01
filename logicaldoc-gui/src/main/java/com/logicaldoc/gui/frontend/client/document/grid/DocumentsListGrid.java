@@ -48,10 +48,15 @@ import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.OperatorId;
 import com.smartgwt.client.types.SortDirection;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.HTMLFlow;
 import com.smartgwt.client.widgets.events.DoubleClickEvent;
 import com.smartgwt.client.widgets.events.DoubleClickHandler;
+import com.smartgwt.client.widgets.events.KeyDownEvent;
+import com.smartgwt.client.widgets.events.KeyDownHandler;
+import com.smartgwt.client.widgets.events.KeyPressEvent;
+import com.smartgwt.client.widgets.events.KeyPressHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -522,6 +527,20 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 				fieldsMap.put(ext.getName(), ext);
 			}
 		}
+		
+		addKeyPressHandler(new KeyPressHandler() {
+			
+			@Override
+			public void onKeyPress(KeyPressEvent event) {
+				if(event.isCtrlKeyDown()) {
+					if("C".equals(event.getKeyName())) {
+      				   // we could thake the action to copy (CTRL + C) into the clipboard 
+					} else if("X".equals(event.getKeyName())) {
+						// we could thake the action to cut (CTRL + V)
+					}
+				}
+			}
+		});
 	}
 	
 	
@@ -646,6 +665,15 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 		if (record != null) {
 			DocumentGridUtil.updateRecord(document, record);
 			refreshRow(record);
+		}
+		
+		// Now consider the aliases
+		if(document.getDocRef()!=null) {
+			record = findRecord(document.getDocRef());
+			if (record != null) {
+				DocumentGridUtil.updateRecord(document, record);
+				refreshRow(record);	
+			}
 		}
 	}
 
@@ -778,6 +806,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			selectSingleRecord(record);
 			scrollToRow(rlist.indexOf(record));
 			Session.get().setHiliteDocId(null);
+			DocumentController.get().selected(getSelectedDocument());
 		}
 	}
 

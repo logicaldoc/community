@@ -542,8 +542,8 @@ insert into ld_group
 values     (-10000,CURRENT_TIMESTAMP,0,1,'publisher','Group of publishers',0,1,'local');
 
 insert into ld_user
-           (ld_id,ld_lastmodified,ld_deleted,ld_enabled,ld_username,ld_password,ld_passwordmd4,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_telephone2,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_welcomescreen,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime)
-values     (1,CURRENT_TIMESTAMP,0,1,'admin','d033e22ae348aeb566fc214aec3585c4da997','U8FeEPvxYRhKNCBsLa0K+1rD1tTtR6yctJIwxje2QMwEOlEQx9HuiA==','Admin','Admin','','','','','en','admin@admin.net','','',0,null,0,0,-1,1520,0,1,1,0);
+           (ld_id,ld_lastmodified,ld_deleted,ld_enabled,ld_username,ld_password,ld_passwordmd4,ld_name,ld_firstname,ld_street,ld_postalcode,ld_city,ld_country,ld_language,ld_email,ld_telephone,ld_telephone2,ld_type,ld_passwordchanged,ld_passwordexpires,ld_source,ld_quota,ld_welcomescreen,ld_passwordexpired,ld_tenantid,ld_recordversion,ld_enforcewrktime,ld_maxinactivity)
+values     (1,CURRENT_TIMESTAMP,0,1,'admin','d033e22ae348aeb566fc214aec3585c4da997','U8FeEPvxYRhKNCBsLa0K+1rD1tTtR6yctJIwxje2QMwEOlEQx9HuiA==','Admin','Admin','','','','','en','admin@admin.net','','',0,null,0,0,-1,1520,0,1,1,0,-1);
 insert into ld_group
            (ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_type,ld_recordversion,ld_source)
 values     (-1,CURRENT_TIMESTAMP,0,1,'_user_1',1,1,'local');

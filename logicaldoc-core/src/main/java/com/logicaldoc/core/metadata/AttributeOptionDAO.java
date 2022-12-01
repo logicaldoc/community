@@ -60,7 +60,7 @@ public interface AttributeOptionDAO extends PersistentObjectDAO<AttributeOption>
 	 * 
 	 * @param setId The attribute set id
 	 * @param attribute The attribute name (Optional)
-	 * @param caegory The category (Optional)
+	 * @param category The category (Optional)
 	 * 
 	 * @return The ordered list of options
 	 */

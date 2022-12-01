@@ -350,7 +350,7 @@ public interface PersistentObjectDAO<T extends PersistentObject> {
 	 * with a known outcome. The query is expected to be a single row/single
 	 * column query that results in a long value.
 	 * 
-	 * @param sql SQL query to execute
+	 * @param statement SQL query to execute
 	 * @param args arguments to bind to the query (leaving it to the
 	 *        PreparedStatement to guess the corresponding SQL type); may also
 	 *        contain SqlParameterValue objects which indicate not only the

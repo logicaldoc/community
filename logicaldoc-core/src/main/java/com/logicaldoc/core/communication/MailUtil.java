@@ -217,8 +217,6 @@ public class MailUtil {
 	 * @throws FileNotFoundException cannot open the file
 	 * @throws CMSException cannot read the content
 	 * @throws MessagingException cannot read the content
-	 * 
-	 * @ raised if the message cannot be read
 	 */
 	public static EMail msgToMail(File msgFile, boolean extractAttachmentContent)
 			throws FileNotFoundException, IOException, MessagingException, CMSException {

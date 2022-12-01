@@ -1,12 +1,12 @@
 package com.logicaldoc.web.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -46,16 +46,16 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 			for (long id : ids) {
 				dao.delete(id);
 			}
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
 	}
 
 	@Override
 	public void save(GUIContact contact) throws ServerException {
 		validateSession(getThreadLocalRequest());
+		ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 		try {
-			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 			Contact cnt = dao.findById(contact.getId());
 			if (cnt == null)
 				cnt = new Contact();
@@ -68,9 +68,10 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 			cnt.setMobile(contact.getMobile());
 			cnt.setUserId(contact.getUserId());
 			dao.store(cnt);
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
 		}
+
 	}
 
 	@Override
@@ -81,8 +82,8 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 			Contact contact = dao.findById(id);
 			return fromContact(contact);
-		} catch (Throwable t) {
-			return (GUIContact) throwServerException(session, log, t);
+		} catch (PersistenceException e) {
+			return (GUIContact) throwServerException(session, log, e);
 		}
 	}
 
@@ -114,14 +115,14 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 		ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 
-		List<GUIContact> contacts = new ArrayList<GUIContact>();
+		List<GUIContact> contacts = new ArrayList<>();
 
 		try (CSVFileReader reader = new CSVFileReader(file.getAbsolutePath(), separator.charAt(0),
 				delimiter.charAt(0));) {
 			if (skipFirstRow)
 				reader.readFields();
 
-			Vector<String> fields = reader.readFields();
+			List<String> fields = reader.readFields();
 			long i = 1;
 			while (fields != null) {
 				String emailStr = fields.get(email - 1);
@@ -144,44 +145,12 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 				contact.setEmail(emailStr);
 
-				try {
-					contact.setFirstName(fields.get(firstName - 1));
-				} catch (Throwable e) {
-					// Nothing to do
-				}
-				try {
-					contact.setLastName(fields.get(lastName - 1));
-				} catch (Throwable e) {
-					// Nothing to do
-				}
-				try {
-					contact.setEmail(fields.get(email - 1));
-				} catch (Throwable e) {
-					// Nothing to do
-				}
-				try {
-					contact.setAddress(fields.get(address - 1));
-				} catch (Throwable e) {
-					// Nothing to do
-				}
-				try {
-					contact.setCompany(fields.get(company - 1));
-				} catch (Throwable e) {
-					// Nothing to do
-				}
-				try {
-					contact.setMobile(fields.get(mobile - 1));
-				} catch (Throwable e) {
-					// Nothing to do
-				}
-				try {
-					contact.setPhone(fields.get(phone - 1));
-				} catch (Throwable e) {
-					// Nothing to do
-				}
-
-				if (StringUtils.isEmpty(contact.getEmail()))
-					continue;
+				contact.setFirstName(fields.get(firstName - 1));
+				contact.setLastName(fields.get(lastName - 1));
+				contact.setAddress(fields.get(address - 1));
+				contact.setCompany(fields.get(company - 1));
+				contact.setMobile(fields.get(mobile - 1));
+				contact.setPhone(fields.get(phone - 1));
 
 				GUIContact guiContact = fromContact(contact);
 				guiContact.setId(i++);
@@ -192,7 +161,7 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 
 				fields = reader.readFields();
 			}
-		} catch (Throwable e) {
+		} catch (IOException | PersistenceException e) {
 			log.error("Unable to parse contacs in CSV file", e);
 		} finally {
 			UploadServlet.cleanReceivedFiles(session.getSid());
@@ -204,24 +173,16 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 	@Override
 	public void shareContacts(long[] contactIds, long[] userIds, long[] groupIds) throws ServerException {
 		validateSession(getThreadLocalRequest());
-		try {
-			HashSet<Long> users = new HashSet<Long>();
-			if (userIds != null)
-				for (Long uId : userIds) {
-					if (!users.contains(uId))
-						users.add(uId);
-				}
-			if (groupIds != null) {
-				UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
-				for (Long gId : groupIds) {
-					Set<User> usrs = gDao.findByGroup(gId);
-					for (User user : usrs) {
-						if (!users.contains(user.getId()))
-							users.add(user.getId());
-					}
-				}
+		HashSet<Long> users = new HashSet<>();
+		if (userIds != null)
+			for (Long uId : userIds) {
+				if (!users.contains(uId))
+					users.add(uId);
 			}
 
+		appendUserIdsFromGroups(groupIds, users);
+
+		try {
 			ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
 			for (Long cId : contactIds) {
 				Contact originalContact = dao.findById(cId);
@@ -231,16 +192,34 @@ public class ContactServiceImpl extends AbstractRemoteService implements Contact
 						Contact cloned = new Contact(originalContact);
 						cloned.setId(0L);
 						cloned.setUserId(userId);
-						try {
-							dao.store(cloned);
-						} catch (PersistenceException e) {
-							log.warn("Cannot share contact {} with user {}", originalContact.getEmail(), userId);
-						}
+						storeContact(cloned);
 					}
 				}
 			}
-		} catch (Throwable e) {
+		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
+		}
+	}
+
+	private void storeContact(Contact contact) {
+		ContactDAO dao = (ContactDAO) Context.get().getBean(ContactDAO.class);
+		try {
+			dao.store(contact);
+		} catch (PersistenceException e) {
+			log.warn("Cannot share contact {} with user {}", contact.getEmail(), contact.getUserId());
+		}
+	}
+
+	private void appendUserIdsFromGroups(long[] groupIds, HashSet<Long> users) {
+		if (groupIds != null) {
+			UserDAO gDao = (UserDAO) Context.get().getBean(UserDAO.class);
+			for (Long gId : groupIds) {
+				Set<User> usrs = gDao.findByGroup(gId);
+				for (User user : usrs) {
+					if (!users.contains(user.getId()))
+						users.add(user.getId());
+				}
+			}
 		}
 	}
 }

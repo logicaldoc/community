@@ -108,7 +108,7 @@ public class WSUtil {
 						attribute.setMultiple(attr.getMultiple());
 						attribute.setParent(attr.getParent());
 						attribute.setPosition(attr.getPosition());
-						attribute.setValue(attr.getValue());
+						WSAttribute.setValue(attribute, attr.getValue());
 						attribute.setSetId(attr.getSetId());
 						attribute.setStringValues(attr.getStringValues());
 

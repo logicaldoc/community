@@ -38,11 +38,20 @@ public class FSStorer extends AbstractStorer {
 	@Override
 	public void delete(long docId) {
 		File docDir = getContainer(docId);
-		try {
-			if (docDir.exists())
-				FileUtils.forceDelete(docDir);
-		} catch (IOException e) {
-			log.error(e.getMessage());
+		int maxTrials = 20;
+		while (docDir.exists() && maxTrials > 0) {
+			FileUtil.strongDelete(docDir);
+			maxTrials--;
+		}
+	}
+
+	@Override
+	public void delete(long docId, String resource) {
+		File file = new File(getContainer(docId), resource);
+		int maxTrials = 20;
+		while (file.exists() && maxTrials > 0) {
+			FileUtil.strongDelete(file);
+			maxTrials--;
 		}
 	}
 
@@ -79,11 +88,11 @@ public class FSStorer extends AbstractStorer {
 
 	@Override
 	public void store(InputStream stream, long docId, String resource) throws IOException {
-		if (!isEnabled())
-			throw new IOException("Storer not enabled");
-
 		File file = null;
 		try {
+			if (!isEnabled())
+				throw new IOException("Storer not enabled");
+
 			File dir = getContainer(docId);
 			FileUtils.forceMkdir(dir);
 			file = new File(new StringBuilder(dir.getPath()).append("/").append(resource).toString());
@@ -137,17 +146,6 @@ public class FSStorer extends AbstractStorer {
 		File container = getContainer(docId);
 		File file = new File(container, resource);
 		return FileUtil.toByteArray(file, start, length);
-	}
-
-	@Override
-	public void delete(long docId, String resource) {
-		File file = new File(getContainer(docId), resource);
-		if (file.exists())
-			try {
-				FileUtils.forceDelete(file);
-			} catch (IOException e) {
-				log.error(e.getMessage());
-			}
 	}
 
 	@Override

@@ -279,7 +279,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 
 	@Override
 	public String createDownloadTicket(String sid, long docId, String suffix, Integer expireHours, String expireDate,
-			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException {
+			Integer maxDownloads) throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		return client.createDownloadTicket(sid, docId, suffix, expireHours, expireDate, maxDownloads);
 	}
 

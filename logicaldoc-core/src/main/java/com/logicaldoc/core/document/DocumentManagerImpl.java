@@ -47,6 +47,7 @@ import com.logicaldoc.core.security.Permission;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.SessionManager;
 import com.logicaldoc.core.security.User;
+import com.logicaldoc.core.security.authorization.PermissionException;
 import com.logicaldoc.core.security.dao.TenantDAO;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.store.Storer;
@@ -335,7 +336,7 @@ public class DocumentManagerImpl implements DocumentManager {
 			DocumentHistory transaction) throws IOException, PersistenceException {
 		validateTransaction(transaction);
 		assert transaction.getComment() != null : "No comment in transaction";
-		
+
 		// Write content to temporary file, then delete it
 		File tmp = FileUtil.createTempFile("checkin", "");
 		try {
@@ -601,9 +602,9 @@ public class DocumentManagerImpl implements DocumentManager {
 			setBarcodeTemplate(document, docVO);
 
 			// create a new version
+
 			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 					DocumentEvent.CHANGED.toString(), false);
-			versionDAO.store(version);
 
 			// Modify document history entry
 			document.setVersion(version.getVersion());
@@ -614,11 +615,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				documentDAO.store(document, transaction);
 			}
 
-			try {
-				versionDAO.delete(version.getId());
-			} catch (Throwable t) {
-				// Nothing to do
-			}
+			versionDAO.store(version);
 
 			markAliasesToIndex(document.getId());
 		} else {
@@ -995,7 +992,7 @@ public class DocumentManagerImpl implements DocumentManager {
 		 * may lead to hibernate's sessions rollbacks
 		 */
 		synchronized (this) {
-			Document document = documentDAO.findDocument(docId);
+			Document document = documentDAO.findById(docId);
 
 			if (document.getImmutable() == 0
 					|| ((document.getImmutable() == 1 && transaction.getUser().isMemberOf(Group.GROUP_ADMIN)))) {
@@ -1297,15 +1294,17 @@ public class DocumentManagerImpl implements DocumentManager {
 
 	@Override
 	public Ticket createDownloadTicket(long docId, String suffix, Integer expireHours, Date expireDate,
-			Integer maxDownloads, String urlPrefix, DocumentHistory transaction) throws PersistenceException {
+			Integer maxDownloads, String urlPrefix, DocumentHistory transaction)
+			throws PersistenceException, PermissionException {
 		validateTransaction(transaction);
 
 		Document document = documentDAO.findById(docId);
 		if (document == null)
-			throw new PersistenceException("Unexisting document");
+			throw new PersistenceException("Unexisting document " + docId);
 
 		if (!folderDAO.isDownloadEnabled(document.getFolder().getId(), transaction.getUserId()))
-			throw new RuntimeException("You don't have the download permission");
+			throw new PermissionException(transaction.getUsername(), "Folder " + document.getFolder().getId(),
+					Permission.DOWNLOAD);
 
 		Ticket ticket = prepareTicket(docId, transaction.getUser());
 		ticket.setSuffix(suffix);
@@ -1435,7 +1434,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public int enforceFilesIntoFolderStorage(long rootFolderId, DocumentHistory transaction)
 			throws PersistenceException, IOException {
 		Folder rootFolder = folderDAO.findFolder(rootFolderId);
-		if(rootFolder == null)
+		if (rootFolder == null)
 			throw new PersistenceException("Unexisting folder ID  " + rootFolderId);
 
 		if (transaction != null)
@@ -1487,7 +1486,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				// Check if one of the parent folders references the storer
 				List<Folder> parents = folderDAO.findParents(folder.getId());
 				Collections.reverse(parents);
-				
+
 				for (Folder parentFolder : parents) {
 					folderDAO.initialize(parentFolder);
 					if (parentFolder.getStorage() != null) {
@@ -1594,9 +1593,8 @@ public class DocumentManagerImpl implements DocumentManager {
 	 * @return The merged Pdf file
 	 * 
 	 * @throws IOException
-	 * @throws COSVisitorException
 	 */
-	private static File mergePdf(File[] pdfs) throws IOException {
+	private File mergePdf(File[] pdfs) throws IOException {
 		File tempDir = null;
 		try {
 			Path tempPath = Files.createTempDirectory(MERGE);
