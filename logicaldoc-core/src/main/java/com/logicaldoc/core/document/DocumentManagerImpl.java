@@ -602,9 +602,9 @@ public class DocumentManagerImpl implements DocumentManager {
 			setBarcodeTemplate(document, docVO);
 
 			// create a new version
+
 			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
 					DocumentEvent.CHANGED.toString(), false);
-			versionDAO.store(version);
 
 			// Modify document history entry
 			document.setVersion(version.getVersion());
@@ -615,11 +615,7 @@ public class DocumentManagerImpl implements DocumentManager {
 				documentDAO.store(document, transaction);
 			}
 
-			try {
-				versionDAO.delete(version.getId());
-			} catch (Throwable t) {
-				// Nothing to do
-			}
+			versionDAO.store(version);
 
 			markAliasesToIndex(document.getId());
 		} else {

@@ -69,7 +69,7 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 	}
 
 	@Test
-	public void testUpdate() throws PersistenceException {
+	public void testUpdate() throws PersistenceException, InterruptedException {
 		Document doc = docDao.findById(1);
 		Assert.assertNotNull(doc);
 		Assert.assertEquals("pippo.pdf", doc.getFileName());
@@ -92,8 +92,10 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		newDoc.setCustomId("xxxxxxxx");
 
 		documentManager.update(doc, newDoc, transaction);
-
 		Assert.assertEquals("pluto(1)", doc.getFileName());
+		Assert.assertEquals("1.1", doc.getVersion());
+		
+		Assert.assertEquals("1.1", verDao.queryForString("select ld_version from ld_version where ld_documentid="+doc.getId()+" and ld_version='"+doc.getVersion()+"'"));
 	}
 
 	@Test
