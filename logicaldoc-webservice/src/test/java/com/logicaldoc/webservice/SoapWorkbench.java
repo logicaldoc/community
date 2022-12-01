@@ -77,7 +77,7 @@ public class SoapWorkbench {
 
 			// bookmarkStuff(sid);
 
-			 metadataStuff(metadataClient, sid);
+			metadataStuff(metadataClient, sid);
 
 			// WSFolder newFolder = new WSFolder();
 			// newFolder.setName("ddddd");

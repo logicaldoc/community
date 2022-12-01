@@ -61,6 +61,7 @@ import com.logicaldoc.util.config.ContextProperties;
 import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.webservice.AbstractService;
 import com.logicaldoc.webservice.WebserviceException;
+import com.logicaldoc.webservice.model.WSAttribute;
 import com.logicaldoc.webservice.model.WSDocument;
 import com.logicaldoc.webservice.model.WSLink;
 import com.logicaldoc.webservice.model.WSNote;
@@ -563,7 +564,7 @@ public class SoapDocumentService extends AbstractService implements DocumentServ
 	private void updateDocument(String sid, WSDocument document)
 			throws AuthenticationException, WebserviceException, PersistenceException, PermissionException {
 		User user = validateSession(sid);
-
+		
 		Document doc = retrieveReadableDocument(document.getId(), user);
 		checkLocked(user, doc);
 		checkWriteEnable(user, doc.getFolder().getId());

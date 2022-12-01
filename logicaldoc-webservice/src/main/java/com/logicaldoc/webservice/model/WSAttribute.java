@@ -109,7 +109,8 @@ public class WSAttribute implements Serializable {
 
 	@Override
 	public String toString() {
-		return getName() + (getValue() != null ? (" - " + getValue().toString()) : "");
+		Object val = WSAttribute.getValue(this);
+		return getName() + (val != null ? (" - " + val.toString()) : "");
 	}
 
 	public String getStringValue() {
@@ -177,87 +178,92 @@ public class WSAttribute implements Serializable {
 	}
 
 	/**
-	 * Gets the attribute value. It can be as String, Long, Double or Date.
+	 * Gets the attribute value. It can be as String, Long, Double or Date. We
+	 * declare this static because do not want the value field to be serialized
+	 * in SOAP / REST
+	 * 
+	 * @param attribute the attribute instance
 	 * 
 	 * @return The attribute value as Object.
 	 */
-	public Object getValue() {
-		switch (type) {
+	public static Object getValue(WSAttribute attribute) {
+		switch (attribute.type) {
 		case TYPE_STRING:
-			return getStringValue();
+			return attribute.getStringValue();
 		case TYPE_INT:
-			return getIntValue();
+			return attribute.getIntValue();
 		case TYPE_BOOLEAN:
-			return getIntValue();
+			return attribute.getIntValue();
 		case TYPE_DOUBLE:
-			return getDoubleValue();
+			return attribute.getDoubleValue();
 		case TYPE_DATE:
-			return WSUtil.convertStringToDate(getDateValue());
+			return WSUtil.convertStringToDate(attribute.getDateValue());
 		case TYPE_USER:
-			return getIntValue();
+			return attribute.getIntValue();
 		case TYPE_FOLDER:
-			return getIntValue();
+			return attribute.getIntValue();
 		default:
-			return getStringValue();
+			return attribute.getStringValue();
 		}
 	}
 
 	/**
 	 * Sets the attribute value. It can be as String, Long, Double or Date.
 	 * 
-	 * @param value The attribute value.
+	 * @param attribute the attribute instance
+	 * @param value The attribute value
 	 */
-	public void setValue(Object value) {
-		if (getType() == WSAttribute.TYPE_USER && !(value instanceof WSUser)) {
+	public static void setValue(WSAttribute attribute, Object value) {
+		if (attribute.getType() == WSAttribute.TYPE_USER && !(value instanceof WSUser)) {
 			/*
 			 * Needed to fix JAXB logic that will invoke getValue(that returns a
 			 * Long) and setValue
 			 */
 			if (value instanceof Long)
-				this.intValue = (Long) value;
+				attribute.intValue = (Long) value;
 			else if (value instanceof String)
-				this.stringValue = (String) value;
+				attribute.stringValue = (String) value;
 			return;
 		}
 
 		if (value instanceof String) {
-			this.type = TYPE_STRING;
-			setStringValue((String) value);
+			attribute.type = TYPE_STRING;
+			attribute.setStringValue((String) value);
 		} else if (value instanceof Long) {
-			this.type = TYPE_INT;
-			setIntValue((Long) value);
+			attribute.type = TYPE_INT;
+			attribute.setIntValue((Long) value);
 		} else if (value instanceof Integer) {
-			this.type = TYPE_INT;
+			attribute.type = TYPE_INT;
 			if (value != null)
-				setIntValue(((Integer) value).longValue());
+				attribute.setIntValue(((Integer) value).longValue());
 		} else if (value instanceof Boolean) {
-			setIntValue(((Boolean) value).booleanValue() ? 1L : 0L);
-			this.type = TYPE_BOOLEAN;
+			attribute.setIntValue(((Boolean) value).booleanValue() ? 1L : 0L);
+			attribute.type = TYPE_BOOLEAN;
 		} else if (value instanceof Double) {
-			this.type = TYPE_DOUBLE;
-			setDoubleValue((Double) value);
+			attribute.type = TYPE_DOUBLE;
+			attribute.setDoubleValue((Double) value);
 		} else if (value instanceof Date) {
-			this.type = TYPE_DATE;
-			setDateValue(DateUtil.format((Date) value));
+			attribute.type = TYPE_DATE;
+			attribute.setDateValue(DateUtil.format((Date) value));
 		} else if (value instanceof WSUser) {
-			this.stringValue = ((WSUser) value).getFullName();
-			this.intValue = ((WSUser) value).getId();
-			this.type = TYPE_USER;
+			attribute.stringValue = ((WSUser) value).getFullName();
+			attribute.intValue = ((WSUser) value).getId();
+			attribute.type = TYPE_USER;
 		} else if (value instanceof WSFolder) {
-			this.stringValue = ((WSFolder) value).getName();
-			this.intValue = ((WSFolder) value).getId();
-			this.type = TYPE_FOLDER;
+			attribute.stringValue = ((WSFolder) value).getName();
+			attribute.intValue = ((WSFolder) value).getId();
+			attribute.type = TYPE_FOLDER;
 		} else {
-			this.type = TYPE_DATE;
+			attribute.type = TYPE_DATE;
 			if (value != null && value instanceof XMLGregorianCalendar) {
 				XMLGregorianCalendar theXGCal = (XMLGregorianCalendar) value;
 				GregorianCalendar theGCal = theXGCal.toGregorianCalendar();
 				Date theDate = theGCal.getTime();
-				setDateValue(DateUtil.format((Date) theDate));
+				attribute.setDateValue(DateUtil.format((Date) theDate));
 			} else if (value != null && value instanceof Date) {
-				setDateValue(DateUtil.format((Date) value));
+				attribute.setDateValue(DateUtil.format((Date) value));
 			} else
-				setDateValue(null);
+				attribute.setDateValue(null);
 		}
 	}
 
