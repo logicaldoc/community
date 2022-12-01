@@ -806,6 +806,7 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 			selectSingleRecord(record);
 			scrollToRow(rlist.indexOf(record));
 			Session.get().setHiliteDocId(null);
+			DocumentController.get().selected(getSelectedDocument());
 		}
 	}
 
