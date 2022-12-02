@@ -3,7 +3,11 @@ package com.logicaldoc.core.communication;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 import org.junit.Test;
 
@@ -123,4 +127,12 @@ public class MailUtilTest extends AbstractCoreTCase {
 		}
 	}
 
+	@Test
+	public void testExtractMessageText() throws MessagingException, IOException  {
+		MimeMessage mail = MailUtil.readMime(this.getClass().getResourceAsStream("/parche 2.eml"));
+		Assert.assertNotNull(mail);
+		
+		System.out.println(MailUtil.extractMessageText(mail));
+		Assert.assertTrue(MailUtil.extractMessageText(mail).startsWith("Hola Marco, el parche 2"));
+	}
 }
