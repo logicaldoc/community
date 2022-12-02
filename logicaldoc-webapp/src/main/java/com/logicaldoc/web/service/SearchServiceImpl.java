@@ -14,7 +14,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +44,7 @@ import com.logicaldoc.gui.common.client.beans.GUISearchOptions;
 import com.logicaldoc.gui.frontend.client.services.SearchService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.LocaleUtil;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Implementation of the SearchService
@@ -157,7 +157,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 				else if ("pdf".equals(hit.getDocRefType()))
 					h.setIcon("pdf");
 				else
-					h.setIcon(FilenameUtils.getBaseName(hit.getIcon()));
+					h.setIcon(FileUtil.getBaseName(hit.getIcon()));
 				guiResults.add(h);
 			}
 			result.setHits(guiResults.toArray(new GUIDocument[0]));

@@ -18,7 +18,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.LoggerFactory;
@@ -1308,12 +1307,12 @@ public class HibernateDocumentDAO extends HibernatePersistentObjectDAO<Document>
 
 	@Override
 	public Document findByPath(String path, long tenantId) throws PersistenceException {
-		String folderPath = FilenameUtils.getPath(path);
+		String folderPath = FileUtil.getPath(path);
 		Folder folder = folderDAO.findByPathExtended(folderPath, tenantId);
 		if (folder == null)
 			return null;
 
-		String fileName = FilenameUtils.getName(path);
+		String fileName = FileUtil.getName(path);
 		List<Document> docs = findByFileNameAndParentFolderId(folder.getId(), fileName, null, tenantId, null);
 		for (Document doc : docs) {
 			if (doc.getFileName().equals(fileName))

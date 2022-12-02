@@ -31,7 +31,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.cms.CMSException;
@@ -496,7 +495,7 @@ public class MailUtil {
 			return;
 
 		fileName = MimeUtility.decodeText(fileName);
-		fileName = FilenameUtils.getName(fileName);
+		fileName = FileUtil.getName(fileName);
 
 		EMailAttachment attachment = new EMailAttachment();
 		attachment.setFileName(fileName);

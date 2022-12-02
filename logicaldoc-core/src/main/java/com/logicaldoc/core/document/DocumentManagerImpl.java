@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -1075,8 +1074,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				type = FileUtil.getExtension(doc.getFileName());
 
 			if (StringUtils.isNotEmpty(aliasType)) {
-				alias.setFileName(FilenameUtils.getBaseName(doc.getFileName()) + "."
-						+ FileUtil.getExtension(aliasType).toLowerCase());
+				alias.setFileName(
+						FileUtil.getBaseName(doc.getFileName()) + "." + FileUtil.getExtension(aliasType).toLowerCase());
 				type = FileUtil.getExtension(aliasType).toLowerCase();
 			}
 

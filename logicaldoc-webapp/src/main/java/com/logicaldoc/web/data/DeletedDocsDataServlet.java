@@ -14,7 +14,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -25,6 +24,7 @@ import com.logicaldoc.core.folder.Folder;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for deleted documents data retrieval
@@ -126,7 +126,7 @@ public class DeletedDocsDataServlet extends AbstractDataServlet {
 			else
 				writer.print("<customId> </customId>");
 			writer.print("<icon>"
-					+ FilenameUtils.getBaseName(IconSelector.selectIcon(doc.getType(), doc.getDocRef() != null))
+					+ FileUtil.getBaseName(IconSelector.selectIcon(doc.getType(), doc.getDocRef() != null))
 					+ "</icon>");
 			writer.print("<version>" + doc.getVersion() + "</version>");
 			writer.print("<fileVersion>" + doc.getFileVersion() + "</fileVersion>");

@@ -16,8 +16,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -41,8 +39,8 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max, Locale locale)
-			throws PersistenceException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+			Locale locale) throws PersistenceException, IOException {
 
 		MenuDAO mDao = (MenuDAO) Context.get().getBean(MenuDAO.class);
 		boolean showSid = mDao.isReadEnable(Menu.SESSIONS, session.getUserId());
@@ -107,9 +105,9 @@ public class DocumentHistoryDataServlet extends AbstractDataServlet {
 			writer.print("<date>" + df.format((Date) cols[3]) + "</date>");
 			writer.print("<comment><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></comment>");
 			writer.print("<filename><![CDATA[" + (cols[5] == null ? "" : cols[5]) + "]]></filename>");
-			writer.print("<icon>"
-					+ FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[5])))
-					+ "</icon>");
+			writer.print(
+					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[5])))
+							+ "</icon>");
 			writer.print("<new>" + (1 == (Integer) cols[6]) + "</new>");
 			writer.print("<folderId>" + cols[7] + "</folderId>");
 			writer.print("<docId>" + cols[8] + "</docId>");

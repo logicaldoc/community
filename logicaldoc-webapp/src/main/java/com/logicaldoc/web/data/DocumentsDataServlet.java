@@ -18,7 +18,6 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -38,6 +37,7 @@ import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for documents data.
@@ -411,7 +411,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 					writer.print("<docrefType>" + doc.getDocRefType() + "</docrefType>");
 			}
 
-			writer.print("<icon>" + FilenameUtils.getBaseName(doc.getIcon()) + "</icon>");
+			writer.print("<icon>" + FileUtil.getBaseName(doc.getIcon()) + "</icon>");
 			writer.print("<version>" + doc.getVersion() + "</version>");
 			writer.print("<lastModified>" + (doc.getLastModified() != null ? df.format(doc.getLastModified()) : "")
 					+ "</lastModified>");

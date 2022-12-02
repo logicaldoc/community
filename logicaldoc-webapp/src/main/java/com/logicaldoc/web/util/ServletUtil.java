@@ -27,7 +27,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hsqldb.lib.StringUtil;
@@ -170,7 +169,7 @@ public class ServletUtil {
 
 		String filename = fileName;
 		if (filename == null)
-			filename = FilenameUtils.getName(resourcePath);
+			filename = FileUtil.getName(resourcePath);
 
 		File file = PluginRegistry.getPluginResource(pluginName, resourcePath);
 
@@ -255,7 +254,7 @@ public class ServletUtil {
 			filename = doc.getFileName();
 
 		if (StringUtils.isNotEmpty(suffix) && !suffix.endsWith(".p7m") && !suffix.endsWith(".m7m"))
-			filename = FilenameUtils.getBaseName(filename);
+			filename = FileUtil.getBaseName(filename);
 
 		if (!storer.exists(doc.getId(), resource)) {
 			throw new FileNotFoundException(resource);
@@ -383,12 +382,11 @@ public class ServletUtil {
 				// Return single part of file.
 				Range r = ranges.get(0);
 				response.setHeader("Content-Range", "bytes " + r.start + "-" + r.end + "/" + r.total);
-				
-				if(length == r.length)
-					response.setStatus(HttpServletResponse.SC_OK); // 200.		
+
+				if (length == r.length)
+					response.setStatus(HttpServletResponse.SC_OK); // 200.
 				else
 					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT); // 206.
-				
 
 				// Copy single part range.
 				storer.writeToStream(docId, resource, output, r.start, r.length);

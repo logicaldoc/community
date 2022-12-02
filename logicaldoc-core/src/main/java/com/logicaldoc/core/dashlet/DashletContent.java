@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -552,8 +551,8 @@ public class DashletContent extends HttpServlet {
 	}
 
 	private void printIcon(PrintWriter writer, String filename) {
-		writer.write("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(filename)))
-				+ "</icon>");
+		writer.write(
+				"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(filename))) + "</icon>");
 	}
 
 	private void handleContent(Dashlet dashlet, Map<String, Object> dashletDictionary, Automation automation,

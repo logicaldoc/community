@@ -13,8 +13,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.dao.DocumentHistoryDAO;
 import com.logicaldoc.core.security.Menu;
@@ -66,7 +64,7 @@ public class FolderHistoryDataServlet extends AbstractDataServlet {
 			writer.print("<filename><![CDATA[" + (cols[4] == null ? "" : cols[4]) + "]]></filename>");
 			if (cols[4] != null && !FileUtil.getExtension(cols[4].toString()).isEmpty())
 				writer.print("<icon>"
-						+ FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[4])))
+						+ FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[4])))
 						+ "</icon>");
 			else
 				writer.print("<icon>folder</icon>");

@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +53,7 @@ public class ZipConverter extends CompressedArchiveConverter {
 	}
 
 	private File gunzip(File input, String fileName) throws IOException {
-		String unpackedFileName = fileName.toLowerCase().endsWith(".tgz")
-				? FilenameUtils.getBaseName(fileName) + ".tar.gz"
+		String unpackedFileName = fileName.toLowerCase().endsWith(".tgz") ? FileUtil.getBaseName(fileName) + ".tar.gz"
 				: fileName;
 		unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
 		File ungzippedFile = FileUtil.createTempFile("parsegzip",

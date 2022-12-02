@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -18,6 +17,7 @@ import com.logicaldoc.core.document.dao.DocumentDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 public class LinksDataServlet extends AbstractDataServlet {
 
@@ -84,7 +84,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 				writer.print("<documentId>" + parent + "-" + cols[6] + "</documentId>");
 				writer.print("<filename><![CDATA[" + (String) cols[7] + "]]></filename>");
 				writer.print(
-						"<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[8])) + "</icon>");
+						"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[8])) + "</icon>");
 				writer.print("<direction>out</direction>");
 				if (cols[12] != null)
 					writer.print("<color><![CDATA[" + cols[12] + "]]></color>");
@@ -92,7 +92,7 @@ public class LinksDataServlet extends AbstractDataServlet {
 				writer.print("<documentId>" + parent + "-" + cols[3] + "</documentId>");
 				writer.print("<filename><![CDATA[" + (String) cols[4] + "]]></filename>");
 				writer.print(
-						"<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[5])) + "</icon>");
+						"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[5])) + "</icon>");
 				if (cols[11] != null)
 					writer.print("<color><![CDATA[" + cols[11] + "]]></color>");
 				writer.print("<direction>in</direction>");

@@ -12,7 +12,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +61,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		SessionManager.get().renew(sid);
 		return session;
 	}
-	
+
 	@Override
 	public boolean isConnected() throws ServerException {
 		Session session = DropboxServiceImpl.validateSession(getThreadLocalRequest());
@@ -206,7 +205,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		}
 	}
 
-	private void uploadDocument(Long docId, String path, Dropbox dropbox, Session session) throws IOException, PersistenceException {
+	private void uploadDocument(Long docId, String path, Dropbox dropbox, Session session)
+			throws IOException, PersistenceException {
 		Storer store = (Storer) Context.get().getBean(Storer.class);
 		DocumentDAO ddao = (DocumentDAO) Context.get().getBean(DocumentDAO.class);
 
@@ -243,7 +243,8 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		}
 	}
 
-	private void loadFoldersTree(long parentId, String parentPath, long userId, Map<Long, String> folders) throws PersistenceException {
+	private void loadFoldersTree(long parentId, String parentPath, long userId, Map<Long, String> folders)
+			throws PersistenceException {
 		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
 		folders.put(parentId, parentPath);
 		for (Folder folder : fDao.findChildren(parentId, userId)) {
@@ -263,7 +264,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 		try {
 			if (!fdao.isPermissionEnabled(Permission.IMPORT, targetFolder, session.getUserId()))
 				return 0;
-			
+
 			User user = session.getUser();
 			Dropbox dbox = new Dropbox();
 			String token = loadAccessToken(user);
@@ -296,7 +297,7 @@ public class DropboxServiceImpl extends RemoteServiceServlet implements DropboxS
 						transaction.setSession(session);
 
 						String folderPath = file.getPathDisplay().substring(rootPath.length());
-						folderPath = FilenameUtils.getPath(file.getPathDisplay());
+						folderPath = FileUtil.getPath(file.getPathDisplay());
 						folderPath = folderPath.replace("\\\\", "/");
 
 						Folder folder = fdao.createPath(root, folderPath, true, transaction);

@@ -11,13 +11,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.parser.ParserFactory;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for parsers data.
@@ -46,7 +45,7 @@ public class ParsersDataServlet extends AbstractDataServlet {
 		for (String ext : sort) {
 			writer.print("<parser>");
 			writer.print("<id>" + i + "</id>");
-			writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon(ext.toLowerCase())) + "</icon>");
+			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(ext.toLowerCase())) + "</icon>");
 			writer.print("<extension>" + ext.toLowerCase() + "</extension>");
 			writer.print(
 					"<name><![CDATA[" + ParserFactory.getParsers().get(ext).getClass().getSimpleName() + "]]></name>");

@@ -15,7 +15,6 @@ import java.util.zip.ZipEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream.UnicodeExtraFieldPolicy;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -257,7 +256,7 @@ public class ZipExport {
 		if (newName.length() > 250) {
 			String ext = FileUtil.getExtension(newName);
 			int maxSize = 250 - ext.length() - 1;
-			String name = FilenameUtils.getBaseName(newName).substring(0, maxSize);
+			String name = FileUtil.getBaseName(newName).substring(0, maxSize);
 			newName = name + "." + ext;
 		}
 		return newName;
@@ -292,7 +291,7 @@ public class ZipExport {
 
 			String fileName = document.getFileName();
 			if (pdfConversion)
-				fileName = FilenameUtils.getBaseName(fileName) + ".pdf";
+				fileName = FileUtil.getBaseName(fileName) + ".pdf";
 
 			ZipEntry entry = new ZipEntry(path + adjustFileNameForWindows(fileName));
 			entry.setMethod(ZipEntry.DEFLATED);
@@ -314,7 +313,7 @@ public class ZipExport {
 	 * @param folder The folder of the document to be inserted
 	 * @return The full path
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 */
 	private String getZipEntryPath(Folder folder) throws PersistenceException {
 		FolderDAO folderDao = (FolderDAO) Context.get().getBean(FolderDAO.class);

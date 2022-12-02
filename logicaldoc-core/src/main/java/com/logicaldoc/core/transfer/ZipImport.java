@@ -10,7 +10,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +31,7 @@ import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.core.util.UserUtil;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
 
 /**
@@ -98,7 +98,7 @@ public class ZipImport {
 
 			for (int i = 0; i < files.length; i++) {
 				if (StringUtils.isNotEmpty(files[i].getName())
-						|| StringUtils.isNotEmpty(FilenameUtils.getBaseName(files[i].getName())))
+						|| StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
 					try {
 						addEntry(files[i], parent);
 					} catch (PersistenceException e) {
@@ -155,7 +155,7 @@ public class ZipImport {
 
 			for (int i = 0; i < files.length; i++)
 				if (StringUtils.isNotEmpty(files[i].getName())
-						|| StringUtils.isNotEmpty(FilenameUtils.getBaseName(files[i].getName())))
+						|| StringUtils.isNotEmpty(FileUtil.getBaseName(files[i].getName())))
 					addEntry(files[i], folder);
 		} else {
 			// creates a document

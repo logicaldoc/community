@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,8 +60,7 @@ public class ZipParser extends AbstractParser {
 	}
 
 	private File gunzip(InputStream input, String fileName) throws IOException {
-		String unpackedFileName = fileName.toLowerCase().endsWith(".tgz")
-				? FilenameUtils.getBaseName(fileName) + ".tar.gz"
+		String unpackedFileName = fileName.toLowerCase().endsWith(".tgz") ? FileUtil.getBaseName(fileName) + ".tar.gz"
 				: fileName;
 		unpackedFileName = unpackedFileName.substring(0, unpackedFileName.lastIndexOf('.'));
 		File ungzippedFile = FileUtil.createTempFile("parsegzip",

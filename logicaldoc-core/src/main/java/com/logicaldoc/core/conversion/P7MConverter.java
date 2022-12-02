@@ -3,7 +3,6 @@ package com.logicaldoc.core.conversion;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +25,7 @@ public class P7MConverter extends AbstractFormatConverter {
 	public void internalConvert(String sid, Document document, File src, File dest) throws IOException {
 		File tmp = null;
 		try {
-			String baseName = FilenameUtils.getBaseName(document.getFileName());
+			String baseName = FileUtil.getBaseName(document.getFileName());
 			String enclosedExtension = FileUtil.getExtension(baseName).toLowerCase();
 			String targetExtension = FileUtil.getExtension(dest.getName()).toLowerCase();
 

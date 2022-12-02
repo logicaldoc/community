@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -37,6 +36,7 @@ import com.logicaldoc.gui.common.client.beans.GUISearchEngine;
 import com.logicaldoc.gui.frontend.client.services.SearchEngineService;
 import com.logicaldoc.util.Context;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * Implementation of the SearchEngineService
@@ -459,7 +459,7 @@ public class SearchEngineServiceImpl extends AbstractRemoteService implements Se
 					document.setPreviewPages(hit.getPreviewPages());
 					document.setNature(hit.getNature());
 					document.setFormId(hit.getFormId());
-					document.setIcon(FilenameUtils.getBaseName(hit.getIcon()));
+					document.setIcon(FileUtil.getBaseName(hit.getIcon()));
 					document.setPasswordProtected(hit.isPasswordProtected());
 					document.setLinks(hit.getLinks());
 					document.setOcrd(hit.getOcrd());

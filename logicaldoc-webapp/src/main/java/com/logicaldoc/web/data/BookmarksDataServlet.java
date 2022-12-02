@@ -10,14 +10,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Bookmark;
 import com.logicaldoc.core.document.dao.BookmarkDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for document bookmarks data.
@@ -71,7 +70,7 @@ public class BookmarksDataServlet extends AbstractDataServlet {
 			writer.print("<id>" + cols[0] + "</id>");
 			if (cols[7].toString().equals("0"))
 				writer.print(
-						"<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[1])) + "</icon>");
+						"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[1])) + "</icon>");
 			else
 				writer.print("<icon>folder</icon>");
 			writer.print("<name><![CDATA[" + (cols[2] == null ? "" : cols[2]) + "]]></name>");

@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +96,7 @@ public class ContextProperties extends OrderedProperties {
 		if (file == null || !file.exists())
 			return null;
 		File override = new File(file.getParentFile(),
-				FilenameUtils.getBaseName(file.getName()) + "-override." + FileUtil.getExtension(file.getName()));
+				FileUtil.getBaseName(file.getName()) + "-override." + FileUtil.getExtension(file.getName()));
 		return override.exists() ? override : null;
 	}
 

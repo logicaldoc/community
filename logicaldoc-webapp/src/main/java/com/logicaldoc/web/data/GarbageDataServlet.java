@@ -10,8 +10,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -20,6 +18,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for garbage data.
@@ -47,7 +46,7 @@ public class GarbageDataServlet extends AbstractDataServlet {
 			writer.print("<entry>");
 			writer.print("<id>" + doc.getId() + "</id>");
 			writer.print(
-					"<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon(doc.getFileExtension())) + "</icon>");
+					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(doc.getFileExtension())) + "</icon>");
 			writer.print("<filename><![CDATA[" + doc.getFileName() + "]]></filename>");
 			writer.print("<customId><![CDATA[" + doc.getCustomId() + "]]></customId>");
 			writer.print("<lastModified>" + df.format(doc.getLastModified()) + "</lastModified>");
