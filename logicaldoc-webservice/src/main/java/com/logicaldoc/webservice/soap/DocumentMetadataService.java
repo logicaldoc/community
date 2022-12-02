@@ -236,7 +236,7 @@ public interface DocumentMetadataService {
 
 
 	/**
-	 * Tests if a template is readable.
+	 * Checks if a template is readable.
 	 * 
 	 * @param sid Session identifier
 	 * @param templateId The template id

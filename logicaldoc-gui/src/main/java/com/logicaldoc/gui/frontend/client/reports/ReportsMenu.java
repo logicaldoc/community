@@ -69,7 +69,7 @@ public class ReportsMenu extends VLayout {
 			}
 		});
 
-		if (Feature.visible(Feature.ARCHIVING) && Menu.enabled(Menu.PARAMETERS)) {
+		if (Feature.visible(Feature.ARCHIVING) && Menu.enabled(Menu.ARCHIVED_DOCS)) {
 			addMember(archivedDocs);
 			if (!Feature.enabled(Feature.ARCHIVING)) {
 				archivedDocs.setDisabled(true);
