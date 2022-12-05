@@ -1693,7 +1693,7 @@ public class FolderNavigator extends TreeGrid implements FolderObserver {
 		return customActionsItem;
 	}
 
-	private void executeRoutine(long folderId, Long[] docIds, GUIAutomationRoutine routine) {
+	private void executeRoutine(long folderId, long[] docIds, GUIAutomationRoutine routine) {
 		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
 
 			@Override

@@ -26,9 +26,9 @@ public class FillRoutineParams extends Window {
 
 	private long folderId;
 
-	private Long[] docIds;
+	private long[] docIds;
 
-	public FillRoutineParams(String title, GUIAutomationRoutine routine, long folderId, Long[] docIds) {
+	public FillRoutineParams(String title, GUIAutomationRoutine routine, long folderId, long[] docIds) {
 		this.routine = routine;
 		this.folderId = folderId;
 		this.docIds = docIds;

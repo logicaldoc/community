@@ -87,7 +87,7 @@ public interface AutomationService extends RemoteService {
 	 * 
 	 * @throws ServerException an error happened in the server application
 	 */
-	public void execute(GUIAutomationRoutine routine, Long[] docIds, Long folderId) throws ServerException;
+	public void execute(GUIAutomationRoutine routine, long[] docIds, Long folderId) throws ServerException;
 
 	public static class Instance {
 		private static AutomationServiceAsync instance;
