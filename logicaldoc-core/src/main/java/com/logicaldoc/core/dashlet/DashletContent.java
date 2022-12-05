@@ -178,7 +178,7 @@ public class DashletContent extends HttpServlet {
 		writer.write("<version>" + history.getVersion() + "</version>");
 		writer.write("<date>" + df2.format(history.getDate()) + "</date>");
 		printField("comment", history.getComment(), writer);
-		printField("filename", history.getComment(), writer);
+		printField("filename", history.getFilename(), writer);
 		printIcon(writer, history.getFilename());
 		writer.write("<new>" + (1 == history.getIsNew()) + "</new>");
 		writer.write("<folderId>" + history.getFolderId() + "</folderId>");
