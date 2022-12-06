@@ -229,6 +229,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					Folder originalFolder = document.getFolder();
 					String originalVersion = document.getVersion();
 					String originalFileVersion = document.getFileVersion();
+					String originalFileName = document.getFileName();
 
 					document.copyAttributes(docVO);
 
@@ -236,6 +237,10 @@ public class DocumentManagerImpl implements DocumentManager {
 					document.setFolder(originalFolder);
 					document.setVersion(originalVersion);
 					document.setFileVersion(originalFileVersion);
+					if(StringUtils.isNotEmpty(filename))
+						document.setFileName(filename);
+					else
+						document.setFileName(originalFileName);
 				}
 
 				countPages(file, document);
