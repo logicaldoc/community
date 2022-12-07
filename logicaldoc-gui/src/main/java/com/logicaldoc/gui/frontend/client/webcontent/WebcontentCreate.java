@@ -7,6 +7,7 @@ import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.ItemFactory;
+import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.frontend.client.document.DocumentsPanel;
 import com.logicaldoc.gui.frontend.client.services.DocumentService;
 import com.smartgwt.client.types.HeaderControls;
@@ -47,7 +48,7 @@ public class WebcontentCreate extends Window {
 		form.setTitleOrientation(TitleOrientation.TOP);
 		form.setNumCols(1);
 
-		TextItem title = ItemFactory.newSimpleTextItem("title", "title", null);
+		TextItem title = ItemFactory.newTextItem("title", "title", null);
 		title.setRequired(true);
 		title.setWidth(200);
 
@@ -87,16 +88,21 @@ public class WebcontentCreate extends Window {
 		vo.setLanguage(I18N.getDefaultLocaleForDoc());
 		vo.setFolder(FolderController.get().getCurrentFolder());
 
+		LD.contactingServer();
 		DocumentService.Instance.get().createWithContent(vo, "<html><body></body></html>", true,
 				new AsyncCallback<GUIDocument>() {
 					@Override
 					public void onFailure(Throwable caught) {
+						LD.clearPrompt();
+						
 						GuiLog.serverError(caught);
 						destroy();
 					}
 
 					@Override
 					public void onSuccess(GUIDocument document) {
+						LD.clearPrompt();
+						
 						DocumentsPanel.get().refresh();
 						DocumentsPanel.get().selectDocument(document.getId(), true);
 

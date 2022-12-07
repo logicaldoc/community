@@ -1,7 +1,5 @@
 package com.logicaldoc.core.util;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.logicaldoc.util.io.FileUtil;
 
 /**
@@ -88,7 +86,7 @@ public class IconSelector {
 			icon = "generic.png";
 
 		if (shortcut)
-			icon = FilenameUtils.getBaseName(icon) + "-sc." + FileUtil.getExtension(icon);
+			icon = FileUtil.getBaseName(icon) + "-sc." + FileUtil.getExtension(icon);
 
 		return icon;
 	}

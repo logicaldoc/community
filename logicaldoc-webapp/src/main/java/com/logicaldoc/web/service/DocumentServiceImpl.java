@@ -32,7 +32,6 @@ import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -827,7 +826,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 		document.setPreviewPages(realDoc.getPreviewPages());
 		document.setNature(realDoc.getNature());
 		document.setFormId(realDoc.getFormId());
-		document.setIcon(FilenameUtils.getBaseName(doc.getIcon()));
+		document.setIcon(FileUtil.getBaseName(doc.getIcon()));
 		document.setPasswordProtected(realDoc.isPasswordProtected());
 		document.setLinks(realDoc.getLinks());
 		document.setOcrd(realDoc.getOcrd());
@@ -1660,7 +1659,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 				resource = storer.getResourceName(doc, null, "conversion.pdf");
 			}
 			att.setMimeType(MimeType.get("pdf"));
-			att.setFileName(FilenameUtils.getBaseName(doc.getFileName()) + ".pdf");
+			att.setFileName(FileUtil.getBaseName(doc.getFileName()) + ".pdf");
 		}
 
 		att.setData(storer.getBytes(doc.getId(), resource));

@@ -31,7 +31,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.cms.CMSException;
@@ -243,7 +242,16 @@ public class MailUtil {
 		return messageToMail(msg, extractAttachmentContent);
 	}
 
-	private static MimeMessage readMime(InputStream is) throws MessagingException {
+	/**
+	 * Constructs a MimeMessage from a stream
+	 * 
+	 * @param is the input stream
+	 * 
+	 * @return the creaed message
+	 * 
+	 * @throws MessagingException the contents are invalid
+	 */
+	public static MimeMessage readMime(InputStream is) throws MessagingException {
 		Properties props = System.getProperties();
 		props.put("mail.transport.protocol", "smtp");
 		props.put("mail.smtp.provider.class", CustomTransport.class.getName());
@@ -487,7 +495,7 @@ public class MailUtil {
 			return;
 
 		fileName = MimeUtility.decodeText(fileName);
-		fileName = FilenameUtils.getName(fileName);
+		fileName = FileUtil.getName(fileName);
 
 		EMailAttachment attachment = new EMailAttachment();
 		attachment.setFileName(fileName);
@@ -707,6 +715,62 @@ public class MailUtil {
 		} catch (Throwable t) {
 			log.warn(t.getMessage(), t);
 			return false;
+		}
+	}
+
+	/**
+	 * Extracts just the body of texts parts in the given email message
+	 * 
+	 * @param message the email message
+	 * 
+	 * @throws MessagingException Error in traversing the part
+	 * @throws IOException generic I/O error
+	 */
+	public static String extractMessageText(Message message) throws MessagingException, IOException {
+		StringBuilder messageText = new StringBuilder();
+		extractPartText(message.getContent(), messageText);
+		return messageText.toString();
+	}
+
+	/**
+	 * Extracts just the plain text body of the given part and all it's
+	 * sub-parts
+	 * 
+	 * @param content The part to elaborate
+	 * @param textBody The string builder that will receive the text
+	 * 
+	 * @throws MessagingException Error in traversing the part
+	 * @throws IOException generic I/O error
+	 */
+	private static void extractPartText(Object content, StringBuilder textBody) throws MessagingException, IOException {
+		if (content instanceof String) {
+			textBody.append("\n" + content.toString());
+		} else if (content instanceof Part) {
+			Part part = (Part) content;
+			String disposition = part.getDisposition();
+			String contentType = part.getContentType();
+
+			if ((disposition == null || "inline".equals(disposition)) && contentType != null) {
+				if (contentType.toLowerCase().startsWith("text/plain")) {
+					textBody.append(part.getContent());
+				}
+			}
+		} else if (content instanceof Multipart) {
+			Multipart multipart = (Multipart) content;
+			for (int i = 0, n = multipart.getCount(); i < n; i++) {
+				try {
+					BodyPart part = multipart.getBodyPart(i);
+
+					Object cont = part.getContent();
+					if (cont instanceof Multipart) {
+						extractPartText((Multipart) cont, textBody);
+					} else {
+						extractPartText((Part) part, textBody);
+					}
+				} catch (Throwable e) {
+					log.warn(e.getMessage(), e);
+				}
+			}
 		}
 	}
 

@@ -5,7 +5,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +34,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 				commandLine.append(" -alpha on ");
 			commandLine.append(" -compress JPEG -quality " + quality);
 			commandLine.append(" -resize x" + Integer.toString(size) + " " + src.getPath() + " " + dest.getPath());
-			
+
 			Exec.exec(commandLine.toString(), null, null, conf.getInt("converter.ImageConverter.timeout", 10));
 
 			if (!dest.exists() || dest.length() == 0) {
@@ -43,7 +42,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 				 * In case of multiple TIF pages, the output should be
 				 * name-0.jpg, name-1.jpg ...
 				 */
-				final String basename = FilenameUtils.getBaseName(dest.getName());
+				final String basename = FileUtil.getBaseName(dest.getName());
 				String testname = basename + "-0." + outExt;
 				File test = new File(dest.getParentFile(), testname);
 				if (test.exists()) {

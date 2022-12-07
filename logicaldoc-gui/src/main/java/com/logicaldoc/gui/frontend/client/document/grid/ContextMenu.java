@@ -1,7 +1,5 @@
 package com.logicaldoc.gui.frontend.client.document.grid;
 
-import java.util.Arrays;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -199,8 +197,7 @@ public class ContextMenu extends Menu {
 		workflow.addClickHandler(event -> new StartWorkflowDialog(selectionIds).show());
 
 		automation = new MenuItem(I18N.message("executeautomation"));
-		automation.addClickHandler(
-				event -> new AutomationDialog(folder.getId(), Arrays.asList(selectionIds).toArray(new Long[0])).show());
+		automation.addClickHandler(event -> new AutomationDialog(folder.getId(), selectionIds).show());
 
 		preview = preparePreview();
 
@@ -563,7 +560,7 @@ public class ContextMenu extends Menu {
 		item.setTitle(I18N.message("index"));
 		item.addClickHandler(event -> {
 			LD.contactingServer();
-			
+
 			Long[] docIds = new Long[selectionIds.length];
 			for (int i = 0; i < selectionIds.length; i++)
 				docIds[i] = Long.valueOf(selectionIds[i]);
@@ -1162,8 +1159,8 @@ public class ContextMenu extends Menu {
 				if ((action.getRoutineId() == null || action.getRoutineId().longValue() == 0L)
 						&& action.getAutomation() != null && !action.getAutomation().trim().isEmpty()) {
 					/*
-					 * An automation cript is specified directly, so launch it's
-					 * execution
+					 * An automation script is specified directly, so launch
+					 * it's execution
 					 */
 					GUIAutomationRoutine routine = new GUIAutomationRoutine();
 					routine.setAutomation(action.getAutomation());
@@ -1185,7 +1182,7 @@ public class ContextMenu extends Menu {
 										 * referenced, so open the input popup
 										 */
 										FillRoutineParams dialog = new FillRoutineParams(action.getName(), routine,
-												folderId, Arrays.asList(selectedDocIds).toArray(new Long[0]));
+												folderId, selectedDocIds);
 										dialog.show();
 									} else {
 										/*
@@ -1246,19 +1243,18 @@ public class ContextMenu extends Menu {
 	}
 
 	private void executeRoutine(long folderId, long[] docIds, GUIAutomationRoutine routine) {
-		AutomationService.Instance.get().execute(routine, Arrays.asList(docIds).toArray(new Long[0]), folderId,
-				new AsyncCallback<Void>() {
+		AutomationService.Instance.get().execute(routine, docIds, folderId, new AsyncCallback<Void>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						GuiLog.serverError(caught);
-					}
+			@Override
+			public void onFailure(Throwable caught) {
+				GuiLog.serverError(caught);
+			}
 
-					@Override
-					public void onSuccess(Void arg0) {
-						// Nothing to do
-					}
-				});
+			@Override
+			public void onSuccess(Void arg0) {
+				// Nothing to do
+			}
+		});
 	}
 
 	private void onRename(long docId, String newFilename) {

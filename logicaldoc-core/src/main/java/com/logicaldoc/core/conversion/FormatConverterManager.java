@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.java.plugin.registry.Extension;
 import org.slf4j.Logger;
@@ -211,7 +210,7 @@ public class FormatConverterManager {
 			convertToFile(document, fileVersion, out, transaction);
 			if (out.exists() && out.length() > 0) {
 				Document docVO = new Document();
-				docVO.setFileName(FilenameUtils.getBaseName(fileName) + "." + format);
+				docVO.setFileName(FileUtil.getBaseName(fileName) + "." + format);
 				docVO.setFolder(document.getFolder());
 				docVO.setLanguage(document.getLanguage());
 
@@ -313,7 +312,7 @@ public class FormatConverterManager {
 
 				history.setSession(session);
 				history.setEvent(UserEvent.FILE_CONVERSION.toString());
-				history.setFilename(FilenameUtils.getBaseName(inFilename) + "." + outFormat.toLowerCase());
+				history.setFilename(FileUtil.getBaseName(inFilename) + "." + outFormat.toLowerCase());
 				history.setFileSize(in.length());
 				history.setFilenameOld(inFilename);
 				history.setComment(String.format("%s -> %s", history.getFilenameOld(), history.getFilename()));

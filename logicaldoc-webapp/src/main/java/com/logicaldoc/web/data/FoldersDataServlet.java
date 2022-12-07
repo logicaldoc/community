@@ -11,7 +11,6 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
@@ -236,8 +235,7 @@ public class FoldersDataServlet extends AbstractDataServlet {
 						writer.print("<name><![CDATA[" + rs.getString(2) + "]]></name>");
 						writer.print("<type>file</type>");
 						writer.print("<customIcon>"
-								+ FilenameUtils
-										.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))
+								+ FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(rs.getString(2))))
 								+ "</customIcon>");
 						writer.print("<size>" + rs.getInt(3) + "</size>");
 						writer.print("<status>" + rs.getInt(7) + "</status>");

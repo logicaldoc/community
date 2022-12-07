@@ -11,7 +11,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
@@ -79,7 +78,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 			writer.print("<valid>" + (enabled && (maxCount == null || maxCount <= 0 || maxCount > count)
 					&& (expired == null || expired.after(new Date()))) + "</valid>");
 			writer.print("<filename><![CDATA[" + fileName + "]]></filename>");
-			writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(fileName)))
+			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(fileName)))
 					+ "</icon>");
 			writer.print("<folderId>" + set.getLong(11) + "</folderId>");
 			writer.print("</ticket>");

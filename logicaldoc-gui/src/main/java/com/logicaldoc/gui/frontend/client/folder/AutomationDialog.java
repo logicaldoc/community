@@ -43,7 +43,7 @@ public class AutomationDialog extends Window {
 
 	private TabSet tabSet = new TabSet();
 
-	public AutomationDialog(final Long folderId, final Long[] docIds) {
+	public AutomationDialog(final Long folderId, final long[] docIds) {
 		HeaderControl closeIcon = new HeaderControl(HeaderControl.CLOSE, new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				destroy();
@@ -154,7 +154,7 @@ public class AutomationDialog extends Window {
 		return tab;
 	}
 
-	private void onExecute(Long folderId, Long[] docIds) {
+	private void onExecute(Long folderId, long[] docIds) {
 		if (routine.getId() == 0L && !scriptForm.validate())
 			return;
 

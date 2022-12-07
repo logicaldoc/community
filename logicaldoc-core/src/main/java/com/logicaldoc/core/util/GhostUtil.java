@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,14 +59,13 @@ public class GhostUtil {
 		} else {
 			if ("png".equals(FileUtil.getExtension(dst.getName().toLowerCase())))
 				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=png16m", "-dBATCH", "-dNOPAUSE", "-r" + dpi,
-						"-sOutputFile=" + dst.getParent() + "/" + FilenameUtils.getBaseName(dst.getName()) + "-%04d."
+						"-sOutputFile=" + dst.getParent() + "/" + FileUtil.getBaseName(dst.getName()) + "-%04d."
 								+ FileUtil.getExtension(dst.getName()),
 						srcPdf.getPath() };
 			else
 				cmd = new String[] { ghostCommand, "-q", "-sDEVICE=jpeg", "-dJPEGQ=100", "-dQFactor=1", "-dBATCH",
-						"-dNOPAUSE", "-r" + dpi,
-						"-sOutputFile=" + dst.getParent() + "/" + FilenameUtils.getBaseName(dst.getName()) + "-%04d."
-								+ FileUtil.getExtension(dst.getName()),
+						"-dNOPAUSE", "-r" + dpi, "-sOutputFile=" + dst.getParent() + "/"
+								+ FileUtil.getBaseName(dst.getName()) + "-%04d." + FileUtil.getExtension(dst.getName()),
 						srcPdf.getPath() };
 		}
 
@@ -111,7 +109,7 @@ public class GhostUtil {
 
 				@Override
 				public boolean accept(File dir, String name) {
-					return name.startsWith(FilenameUtils.getBaseName(dst.getName()));
+					return name.startsWith(FileUtil.getBaseName(dst.getName()));
 				}
 			});
 			pages.addAll(Arrays.asList(children));

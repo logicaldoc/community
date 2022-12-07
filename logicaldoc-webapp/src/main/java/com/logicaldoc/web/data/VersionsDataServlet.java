@@ -14,8 +14,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.document.Document;
 import com.logicaldoc.core.document.dao.DocumentDAO;
@@ -24,6 +22,7 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.i18n.I18N;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for document versions data.
@@ -88,7 +87,7 @@ public class VersionsDataServlet extends AbstractDataServlet {
 			writer.print("<filename><![CDATA[" + (String) cols[8] + "]]></filename>");
 			writer.print("<customid><![CDATA[" + (cols[9] == null ? "" : cols[9]) + "]]></customid>");
 			writer.print("<size>" + cols[10] + "</size>");
-			writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[11])) + "</icon>");
+			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[11])) + "</icon>");
 			writer.print("<type>" + (String) cols[11] + "</type>");
 
 			if (cols[12] != null)

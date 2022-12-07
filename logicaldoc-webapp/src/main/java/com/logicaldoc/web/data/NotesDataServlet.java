@@ -12,7 +12,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +24,7 @@ import com.logicaldoc.core.document.dao.DocumentNoteDAO;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for document posts data.
@@ -120,7 +120,7 @@ public class NotesDataServlet extends AbstractDataServlet {
 			writer.print("<docId>" + set.getLong(5) + "</docId>");
 			writer.print("<filename><![CDATA[" + set.getString(6) + "]]></filename>");
 			writer.print("<icon>"
-					+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils.getExtension(set.getString(6))))
+					+ FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension(set.getString(6))))
 					+ "</icon>");
 			writer.print("<userId>" + set.getString(7) + "</userId>");
 			writer.print("<fileVersion><![CDATA[" + set.getString(10) + "]]></fileVersion>");

@@ -21,7 +21,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -230,6 +229,7 @@ public class DocumentManagerImpl implements DocumentManager {
 					Folder originalFolder = document.getFolder();
 					String originalVersion = document.getVersion();
 					String originalFileVersion = document.getFileVersion();
+					String originalFileName = document.getFileName();
 
 					document.copyAttributes(docVO);
 
@@ -237,6 +237,10 @@ public class DocumentManagerImpl implements DocumentManager {
 					document.setFolder(originalFolder);
 					document.setVersion(originalVersion);
 					document.setFileVersion(originalFileVersion);
+					if(StringUtils.isNotEmpty(filename))
+						document.setFileName(filename);
+					else
+						document.setFileName(originalFileName);
 				}
 
 				countPages(file, document);
@@ -1075,8 +1079,8 @@ public class DocumentManagerImpl implements DocumentManager {
 				type = FileUtil.getExtension(doc.getFileName());
 
 			if (StringUtils.isNotEmpty(aliasType)) {
-				alias.setFileName(FilenameUtils.getBaseName(doc.getFileName()) + "."
-						+ FileUtil.getExtension(aliasType).toLowerCase());
+				alias.setFileName(
+						FileUtil.getBaseName(doc.getFileName()) + "." + FileUtil.getExtension(aliasType).toLowerCase());
 				type = FileUtil.getExtension(aliasType).toLowerCase();
 			}
 

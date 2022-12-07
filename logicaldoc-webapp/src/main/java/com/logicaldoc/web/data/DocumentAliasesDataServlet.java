@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.logicaldoc.core.PersistenceException;
@@ -21,14 +20,15 @@ import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.util.IconSelector;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 
 public class DocumentAliasesDataServlet extends AbstractDataServlet {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max, Locale locale)
-			throws PersistenceException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+			Locale locale) throws PersistenceException, IOException {
 		Long docId = null;
 		if (StringUtils.isNotEmpty(request.getParameter("docId")))
 			docId = Long.parseLong(request.getParameter("docId"));
@@ -82,9 +82,9 @@ public class DocumentAliasesDataServlet extends AbstractDataServlet {
 			writer.print("<id>" + cols[0] + "</id>");
 			writer.print("<filename><![CDATA[" + cols[1] + "]]></filename>");
 			writer.print("<folderId>" + cols[2] + "</folderId>");
-			writer.print("<icon>"
-					+ FilenameUtils.getBaseName(IconSelector.selectIcon(FilenameUtils.getExtension((String) cols[1])))
-					+ "</icon>");
+			writer.print(
+					"<icon>" + FileUtil.getBaseName(IconSelector.selectIcon(FileUtil.getExtension((String) cols[1])))
+							+ "</icon>");
 			writer.print(
 					"<path><![CDATA[" + folderDAO.computePathExtended((Long) cols[2]) + "/" + cols[1] + "]]></path>");
 			writer.print("</alias>");

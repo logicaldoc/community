@@ -13,7 +13,6 @@ import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -116,7 +115,7 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 			else
 				writer.print("<customId> </customId>");
 			writer.print("<docref>" + (cols[2] != null ? cols[2] : "") + "</docref>");
-			writer.print("<icon>" + FilenameUtils.getBaseName(IconSelector.selectIcon((String) cols[3])) + "</icon>");
+			writer.print("<icon>" + FileUtil.getBaseName(IconSelector.selectIcon((String) cols[3])) + "</icon>");
 
 			writer.print("<version>" + cols[4] + "</version>");
 			writer.print("<lastModified>" + df.format(cols[5]) + "</lastModified>");
@@ -180,9 +179,9 @@ public class IndexingQueueDataServlet extends AbstractDataServlet {
 
 		StringBuilder where = new StringBuilder(queryFragments[0].replace("_entity.", "ld_"));
 
-		where.append((StringUtils.isNotEmpty(queryFragments[1])
-				? " order by " + queryFragments[1].replace("_entity.", "ld_")
-				: ""));
+		where.append(
+				(StringUtils.isNotEmpty(queryFragments[1]) ? " order by " + queryFragments[1].replace("_entity.", "ld_")
+						: ""));
 
 		return where.toString();
 	}

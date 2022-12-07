@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -302,10 +303,56 @@ public class FileUtil {
 	 * @return the base name
 	 */
 	public static String getBaseName(String fileName) {
-		if (fileName != null && fileName.contains(".")) {
-			return fileName.substring(0, fileName.indexOf('.'));
-		} else
-			return "";
+		String name=getName(fileName);
+		
+		try {
+			return FilenameUtils.getBaseName(name);
+		} catch (Exception e) {
+			if (name != null && name.contains(".")) {
+				return name.substring(0, name.indexOf('.'));
+			} else
+				return "";
+		}
+	}
+
+	/**
+	 * Gets the file name excluding the path
+	 * 
+	 * @param fileName name or path of the file
+	 * 
+	 * @return the file name
+	 */
+	public static String getName(String fileName) {
+		try {
+			return FilenameUtils.getName(fileName);
+		} catch (Exception e) {
+			if (fileName != null && fileName.contains("/"))
+				return fileName.substring(fileName.lastIndexOf('/') + 1);
+			else if (fileName != null && fileName.contains("\\"))
+				return fileName.substring(fileName.lastIndexOf('\\') + 1);
+			else
+				return fileName;
+		}
+	}
+	
+	/**
+	 * Gets the path part
+	 * 
+	 * @param fileName name or path of the file
+	 * 
+	 * @return the path
+	 */
+	public static String getPath(String fileName) {
+		try {
+			return FilenameUtils.getPath(fileName);
+		} catch (Exception e) {
+			if (fileName != null && fileName.contains("/"))
+				return fileName.substring(0, fileName.lastIndexOf('/'));
+			else if (fileName != null && fileName.contains("\\"))
+				return fileName.substring(0, fileName.lastIndexOf('\\'));
+			else
+				return fileName;
+		}
 	}
 
 	/**
@@ -606,7 +653,7 @@ public class FileUtil {
 		} catch (IOException e) {
 			log.warn(e.getMessage());
 		}
-		
+
 		if (file != null && file.exists())
 			try {
 				log.debug("Delete file {} using OS command", file.getAbsolutePath());

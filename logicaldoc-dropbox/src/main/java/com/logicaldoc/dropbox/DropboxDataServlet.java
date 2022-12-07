@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +17,7 @@ import com.dropbox.core.v2.files.Metadata;
 import com.logicaldoc.core.security.Session;
 import com.logicaldoc.core.security.User;
 import com.logicaldoc.core.util.IconSelector;
+import com.logicaldoc.util.io.FileUtil;
 
 /**
  * This servlet is responsible for retrieving Dropbox entries.
@@ -81,8 +81,8 @@ public class DropboxDataServlet extends HttpServlet {
 						writer.print("<type>" + ((entry instanceof FileMetadata) ? "file" : "folder") + "</type>");
 						if (entry instanceof FileMetadata)
 							writer.print("<iicon>"
-									+ FilenameUtils.getBaseName(IconSelector.selectIcon(
-											FilenameUtils.getExtension(entry.getName()).toLowerCase().trim()))
+									+ FileUtil.getBaseName(IconSelector.selectIcon(
+											FileUtil.getExtension(entry.getName()).toLowerCase().trim()))
 									+ "</iicon>");
 						else
 							writer.print("<iicon>folder</iicon>");

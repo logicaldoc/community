@@ -3,7 +3,6 @@ package com.logicaldoc.core.transfer;
 import java.io.File;
 import java.util.List;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,7 @@ import com.logicaldoc.core.folder.FolderDAO;
 import com.logicaldoc.core.folder.FolderHistory;
 import com.logicaldoc.core.security.dao.UserDAO;
 import com.logicaldoc.util.Context;
+import com.logicaldoc.util.io.FileUtil;
 import com.logicaldoc.util.io.ZipUtil;
 
 /**
@@ -53,7 +53,7 @@ public class InMemoryZipImport extends ZipImport {
 			zipUtil.setFileNameCharset(fileNameCharset);
 			List<String> entries = zipUtil.listEntries(zipsource);
 			for (String entry : entries) {
-				String relativePath = FilenameUtils.getPath(entry);
+				String relativePath = FileUtil.getPath(entry);
 				if (relativePath.startsWith("/"))
 					relativePath = relativePath.substring(1);
 				if (relativePath.endsWith("/"))
@@ -66,8 +66,8 @@ public class InMemoryZipImport extends ZipImport {
 				Folder folder = fDao.createPath(parent, relativePath, true, folderTransaction);
 
 				// Create the document
-				String fileName = FilenameUtils.getName(entry);
-				String title = FilenameUtils.getBaseName(fileName);
+				String fileName = FileUtil.getName(entry);
+				String title = FileUtil.getBaseName(fileName);
 
 				if (StringUtils.isEmpty(fileName) || StringUtils.isEmpty(title))
 					continue;
