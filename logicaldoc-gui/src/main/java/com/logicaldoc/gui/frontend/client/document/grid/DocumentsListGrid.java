@@ -989,12 +989,12 @@ public class DocumentsListGrid extends RefreshableListGrid implements DocumentsG
 
 	@Override
 	public void onDocumentBeginEditing(GUIDocument document) {
-		// Noting to do
+		updateDocument(document);
 	}
 
 	@Override
 	public void onDocumentCancelEditing(GUIDocument document) {
-		// Noting to do
+		updateDocument(document);
 	}
 
 	private Record findRecord(long docId) {
