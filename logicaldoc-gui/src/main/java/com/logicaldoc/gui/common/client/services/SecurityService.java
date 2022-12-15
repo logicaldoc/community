@@ -24,10 +24,11 @@ public interface SecurityService extends RemoteService {
 	 * Logs-in a user by an existing session ID (session reuse)
 	 * 
 	 * @param locale the currently used language specification
+	 * @sid the session ID (optional), if not provided it is taken by cookies
 	 * 
 	 * @return session informations
 	 */
-	public GUISession getSession(String locale);
+	public GUISession getSession(String locale, String sid);
 
 	/**
 	 * Changes the password of a user

@@ -54,7 +54,8 @@ public class LDAuthenticationSuccessHandler extends SavedRequestAwareAuthenticat
 		sidCookie.setHttpOnly(true);
 		sidCookie.setSecure(Context.get().getProperties().getBoolean("cookies.secure", false));	
 		response.addCookie(sidCookie);
-
+		response.setHeader("SID", token.getSid());
+		
 		if (requestedUrl != null) {
 			StringBuilder successUrl = new StringBuilder(requestedUrl);
 			if (requestedUrl.indexOf('?') != -1)
