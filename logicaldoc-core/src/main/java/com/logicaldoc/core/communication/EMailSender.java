@@ -259,10 +259,7 @@ public class EMailSender {
 	 * @throws MessagingException raised if the email cannot be sent
 	 */
 	public void send(EMail email) throws MessagingException {
-		TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		String tenantName = tDao.getTenantName(email.getTenantId());
-		if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
-			email.setAuthorAddress(null);
+		cleanAuthorAddress(email);
 
 		Session sess = newMailSession();
 
@@ -357,6 +354,18 @@ public class EMailSender {
 		 */
 		email.setSentDate(now);
 		historycizeOutgoingEmail(email, message, from);
+	}
+
+	private void cleanAuthorAddress(EMail email) {
+		try {
+			TenantDAO tDao = (TenantDAO) Context.get().getBean(TenantDAO.class);
+			String tenantName = tDao.getTenantName(email.getTenantId());
+			if (!Context.get().getProperties().getBoolean(tenantName + ".smtp.userasfrom", false))
+				email.setAuthorAddress(null);
+		} catch (Exception e) {
+			// Nothing to do, when using outside a Spring context this code
+			// fails but this is not a problem
+		}
 	}
 
 	private Session newMailSession() {
