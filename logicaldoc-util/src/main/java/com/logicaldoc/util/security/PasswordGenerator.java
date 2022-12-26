@@ -83,7 +83,7 @@ public class PasswordGenerator {
 	 */
 	public static String generate(int minLength, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
 			int maxSequenceSize, int maxOccurrences) {
-		if (minLength < 6)
+		if (minLength < 5)
 			throw new IllegalArgumentException(
 					String.format("Cannot generate password with less than %d chars", minLength));
 

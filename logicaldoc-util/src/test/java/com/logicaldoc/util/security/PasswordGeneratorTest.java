@@ -18,9 +18,9 @@ public class PasswordGeneratorTest extends TestCase {
 		// it is generated
 		for (int i = 0; i < 10000; i++) {
 			// Setup a generator with min 6 chars and restrictive conditions
-			String password = PasswordGenerator.generate(6, 2, 2, 2, 2, 3, 1);
+			String password = PasswordGenerator.generate(5, 2, 2, 2, 2, 3, 1);
 			Assert.assertNotNull(password);
-			Assert.assertTrue(password.length() >= 6);
+			Assert.assertTrue(password.length() >= 5);
 		}
 	}
 }
