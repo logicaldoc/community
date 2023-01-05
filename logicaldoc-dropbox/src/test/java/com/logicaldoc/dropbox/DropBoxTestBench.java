@@ -16,7 +16,7 @@ import com.dropbox.core.v2.files.Metadata;
 public class DropBoxTestBench {
 
 	public static void main(String[] args) throws IOException, URISyntaxException, DbxException {
-		String accessToken = "CcAxQnnVCzQAAAAAAAAAKKEhoJZ0FZ8K4ZTOO8gOgeRNE3G8Ly4yfdptP3_a3bMD";
+		String accessToken = "****access_token****";
 
 		Dropbox client = new Dropbox();
 		boolean entered = client.login(accessToken);
