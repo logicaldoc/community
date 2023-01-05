@@ -20,33 +20,33 @@ public class EMailSenderTestbench {
 		mail.setMessageText("test");
 
 // OFFICE 365 (TLS v1.2)
-		EMailSender sender = new EMailSender();
-		sender.setHost("smtp.office365.com");
-//		sender.setPassword("a@_^JqZX5bI]nA/");
+//		EMailSender sender = new EMailSender();
+//		sender.setHost("smtp.office365.com");
+//		sender.setPassword("****");
 //		sender.setUsername("m.meschieri@logicaldoc.com");
 //		sender.setSender("m.meschieri@logicaldoc.com");
 		
-//		sender.setPassword("2010aivilo");
+//		sender.setPassword("*****");
 //		sender.setUsername("shatzing5@outlook.com");
 //		sender.setSender("shatzing5@outlook.com");
 //		mail.setAuthorAddress("shatzing5@outlook.com");
 		
-		sender.setPassword("QHL@3}]j");
-		sender.setUsername("adminex@logicaldoc.eu");
-		sender.setSender("adminex@logicaldoc.eu");
-		mail.setAuthorAddress("adminex@logicaldoc.eu");
-		
-		sender.setAuthEncrypted(false);
-		sender.setConnectionSecurity(EMailSender.SECURITY_TLS);
-		sender.setPort(587);
-		sender.send(mail);
+//		sender.setPassword("******");
+//		sender.setUsername("adminex@logicaldoc.eu");
+//		sender.setSender("adminex@logicaldoc.eu");
+//		mail.setAuthorAddress("adminex@logicaldoc.eu");
+//		
+//		sender.setAuthEncrypted(false);
+//		sender.setConnectionSecurity(EMailSender.SECURITY_TLS);
+//		sender.setPort(587);
+//		sender.send(mail);
 
 		
 		
 // ARUBA SMTP		
 //		EMailSender sender = new EMailSender();
 //		sender.setHost("smtp.logicaldoc.com");
-//		sender.setPassword("paf75peRQT");
+//		sender.setPassword("****");
 //		sender.setUsername("m.meschieri@logicaldoc.com");
 //		sender.setSender("m.meschieri@logicaldoc.com");
 //		sender.setAuthEncrypted(false);
@@ -55,15 +55,15 @@ public class EMailSenderTestbench {
 //		sender.send(mail);
 
 // GMAIL SSL  (requires to define an App password in Google security)
-//		EMailSender sender = new EMailSender();
-//		sender.setHost("smtp.gmail.com");
-//		sender.setPassword("****");
-//		sender.setUsername("marco.meschieri@gmail.com");
-//		sender.setSender("marco.meschieri@gmail.com");
-//		sender.setAuthEncrypted(false);
-//		sender.setConnectionSecurity(EMailSender.SECURITY_SSL);
-//		sender.setPort(465);
-//		sender.send(mail);
+		EMailSender sender = new EMailSender();
+		sender.setHost("smtp.gmail.com");
+		sender.setPassword("+++put application password+++");
+		sender.setUsername("marco.meschieri@gmail.com");
+		sender.setSender("marco.meschieri@gmail.com");
+		sender.setAuthEncrypted(false);
+		sender.setConnectionSecurity(EMailSender.SECURITY_SSL);
+		sender.setPort(465);
+		sender.send(mail);
 
 // GMAIL TLS (TLS v1.2)
 //		EMailSender sender = new EMailSender();
