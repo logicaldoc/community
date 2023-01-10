@@ -52,7 +52,7 @@ public class Exec {
 	 * 
 	 * @return the return value
 	 * 
-	 * @param commandLine The command line to process
+	 * @param commandLine The command line to process. The path of the command must be listed in the allowed-commands.txt
 	 * @param directory The folder where the command will be executed
 	 * @param timeout The timeout in seconds
 	 * 
@@ -103,7 +103,7 @@ public class Exec {
 	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
 	 * 
-	 * @param commandLine the list of elements in the command line
+	 * @param commandLine the list of elements in the command line. The path of the command must be listed in the allowed-commands.txt
 	 *
 	 * @return the command execution return value
 	 * 
@@ -116,7 +116,7 @@ public class Exec {
 	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
 	 * 
-	 * @param commandLine the list of elements in the command line
+	 * @param commandLine the list of elements in the command line. The path of the command must be listed in the allowed-commands.txt
 	 * @param env the environment variables
 	 * @param dir the current folder
 	 * @param timeout maximum execution time expressed in seconds
@@ -180,7 +180,7 @@ public class Exec {
 	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
 	 * 
-	 * @param commandLine the command line string
+	 * @param commandLine the command line string. The path of the command must be listed in the allowed-commands.txt
 	 * @param env the execution environment
 	 * @param dir the current folder
 	 * 
@@ -313,7 +313,7 @@ public class Exec {
 	/**
 	 * Execute the command by using the Runtime.exec
 	 * 
-	 * @param commandLine the command line
+	 * @param commandLine the command line. The path of the command must be listed in the allowed-commands.txt
 	 * @param env the environment variables
 	 * @param dir the current execution directory
 	 * @param timeout maximum execution time expressed in seconds
