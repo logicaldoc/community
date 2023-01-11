@@ -16,9 +16,9 @@ public class GUIInfo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String release = "8.8.3";
+	private String release = "8.8.4";
 
-	private String year = "2006-2022";
+	private String year = "2006-2023";
 
 	private String userNo;
 

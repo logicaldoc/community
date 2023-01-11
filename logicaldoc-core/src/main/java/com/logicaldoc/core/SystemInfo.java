@@ -32,9 +32,9 @@ public class SystemInfo {
 
 	protected String product = "LogicalDOC";
 
-	protected String release = "8.8.3";
+	protected String release = "8.8.4";
 
-	protected String year = "2006-2022";
+	protected String year = "2006-2023";
 
 	protected String help = "https://docs.logicaldoc.com";
 
