@@ -11,8 +11,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.logicaldoc.core.PersistenceException;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
 import com.logicaldoc.core.security.authorization.PermissionException;
@@ -32,7 +30,8 @@ public interface FolderService {
 	@POST
 	@Path("/createSimple")
 	@Consumes({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-	public WSFolder createSimple(String folderPath) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public WSFolder createSimple(String folderPath)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	@POST
 	@Path("/createSimpleForm")
@@ -43,7 +42,8 @@ public interface FolderService {
 	@POST
 	@Path("/createSimpleJSON")
 	@Consumes({ MediaType.APPLICATION_JSON })
-	public WSFolder createSimpleJSON(String jsonstr) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public WSFolder createSimpleJSON(String jsonstr)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	@POST
 	@Path("/createPath")
@@ -59,9 +59,10 @@ public interface FolderService {
 	 * 
 	 * @return the folder
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
 	 */
 	@GET
@@ -75,7 +76,7 @@ public interface FolderService {
 	 * 
 	 * @return the root folder
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
 	 */
@@ -125,14 +126,16 @@ public interface FolderService {
 	 * 
 	 * @param folder The folders metadata(please compile the ID)
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
 	 */
 	@PUT
 	@Path("/update")
-	public void update(WSFolder folder) throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public void update(WSFolder folder)
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Renames an existing folder.
@@ -140,9 +143,10 @@ public interface FolderService {
 	 * @param folderId The folder id
 	 * @param name The new folder name
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
 	 */
 	@PUT
@@ -157,7 +161,7 @@ public interface FolderService {
 	 * @param folderId The folder id
 	 * @param parentId The folder id of the new parent folder
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
 	 */
@@ -175,9 +179,10 @@ public interface FolderService {
 	 * 
 	 * @return The newly created alias
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
 	 */
 	@POST
@@ -191,21 +196,23 @@ public interface FolderService {
 	 * 
 	 * @return A value object containing the workspace's metadata
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
 	 */
 	@GET
 	@Path("/getDefaultWorkspace")
-	public WSFolder getDefaultWorkspace() throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
+	public WSFolder getDefaultWorkspace()
+			throws AuthenticationException, PermissionException, WebserviceException, PersistenceException;
 
 	/**
 	 * Retrieves the list of all workspaces.
 	 * 
 	 * @return the list of all workspaces
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
 	 */
@@ -220,8 +227,8 @@ public interface FolderService {
 	 * 
 	 * @return True if the identifier denotes a readable folder, otherwise
 	 *         false.
-	 *         
-	 * @throws PersistenceException Error in the database 
+	 * 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
 	 */
@@ -237,7 +244,7 @@ public interface FolderService {
 	 * 
 	 * @return True if the identifier denotes a writable folder, otherwise false
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
 	 */
@@ -254,8 +261,8 @@ public interface FolderService {
 	 * 
 	 * @return True if the identifier denotes a granted permission, otherwise
 	 *         false
-	 *         
-	 * @throws PersistenceException Error in the database 
+	 * 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
 	 */
@@ -281,8 +288,8 @@ public interface FolderService {
 	 *        <li><b>replicate</b>: the new folder will have a copy of the
 	 *        security policies of the source folder</li>
 	 *        </ul>
-	 *        
-	 * @throws PersistenceException Error in the database 
+	 * 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
 	 */
@@ -303,10 +310,11 @@ public interface FolderService {
 	 *        user will be not granted to access the folder.
 	 * @param recursive recursion option. If true, the grant operation is
 	 *        applied also to the subfolders.
-	 *        
-	 * @throws PersistenceException Error in the database 
+	 * 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
 	 */
 	@PUT
@@ -326,10 +334,11 @@ public interface FolderService {
 	 *        group will be not granted to access the folder.
 	 * @param recursive recursion option. If true, the grant operation is
 	 *        applied also to the subfolders
-	 *        
-	 * @throws PersistenceException Error in the database 
+	 * 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
-	 * @throws PermissionException The current user does not have enough permissions
+	 * @throws PermissionException The current user does not have enough
+	 *         permissions
 	 * @throws AuthenticationException Invalid credentials
 	 */
 	@PUT
@@ -346,7 +355,7 @@ public interface FolderService {
 	 * @param folderId Folder id
 	 * @return 'error' if error occurred, the right objects collection
 	 * 
-	 * @throws PersistenceException Error in the database 
+	 * @throws PersistenceException Error in the database
 	 * @throws WebserviceException A generic error in the WebService
 	 * @throws AuthenticationException Invalid credentials
 	 */

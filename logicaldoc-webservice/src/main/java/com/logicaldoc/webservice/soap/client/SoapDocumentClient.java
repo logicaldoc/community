@@ -294,7 +294,7 @@ public class SoapDocumentClient extends SoapClient<DocumentService> implements D
 	}
 
 	@Override
-	public boolean unprotect(String sid, long docId, String password) throws PersistenceException {
+	public boolean unprotect(String sid, long docId, String password) throws PersistenceException, AuthenticationException, WebserviceException {
 		return client.unprotect(sid, docId, password);
 	}
 

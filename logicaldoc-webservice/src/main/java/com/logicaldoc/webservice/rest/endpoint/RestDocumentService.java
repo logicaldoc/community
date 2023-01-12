@@ -841,7 +841,7 @@ public class RestDocumentService extends SoapDocumentService implements Document
 	@Parameter(description = "Document ID", required = true)
 	long docId, @FormParam("password")
 	@Parameter(description = "A password", required = true)
-	String password) throws PersistenceException {
+	String password) throws PersistenceException, AuthenticationException, WebserviceException {
 		String sid = validateSession();
 		return super.unprotect(sid, docId, password);
 	}

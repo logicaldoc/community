@@ -889,8 +889,10 @@ public interface DocumentService {
 	 * @return was it uprotected?
 	 * 
 	 * @throws PersistenceException Error in the database  
+	 * @throws WebserviceException A generic error in the WebService
+	 * @throws AuthenticationException Invalid session
 	 */
-	public boolean unprotect(long docId, String password) throws PersistenceException;
+	public boolean unprotect(long docId, String password) throws PersistenceException, AuthenticationException, WebserviceException;
 
 	/**
 	 * Removes the password protection from the document
