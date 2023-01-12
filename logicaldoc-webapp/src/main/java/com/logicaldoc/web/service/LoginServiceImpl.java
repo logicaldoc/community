@@ -83,7 +83,7 @@ public class LoginServiceImpl extends RemoteServiceServlet implements LoginServi
 			Tenant tenant = tenantDao.findById(user.getTenantId());
 
 			ContextProperties config = Context.get().getProperties();
-			usr.setPasswordMinLenght(Integer.parseInt(config.getProperty(tenant.getName() + ".password.size")));
+			usr.setPasswordMinLenght(config.getInt(tenant.getName() + ".password.size", 6));
 
 			// Retrieve the reason for the last login failure
 			List<UserHistory> failures = userHistoryDao.findByUserIdAndEvent(user.getId(),

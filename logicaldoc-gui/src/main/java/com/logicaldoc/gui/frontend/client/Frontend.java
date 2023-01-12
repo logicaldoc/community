@@ -103,7 +103,7 @@ public class Frontend implements EntryPoint {
 
 				init(info);
 
-				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), new AsyncCallback<GUISession>() {
+				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), null, new AsyncCallback<GUISession>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

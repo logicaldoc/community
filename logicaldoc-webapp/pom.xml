@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.logicaldoc</groupId>
 		<artifactId>logicaldoc</artifactId>
-		<version>8.8.3</version>
+		<version>8.8.4</version>
 	</parent>
 	<artifactId>logicaldoc-webapp</artifactId>
 	<name>logicaldoc-webapp</name>
@@ -572,7 +572,10 @@
 								<delete dir="target/war/work" />						
 								<delete>
   									<fileset dir="target/war/META-INF" includes="**" excludes="context.xml" />
-								</delete>								
+								</delete>
+                                <delete>
+  									<fileset dir="target/war/WEB-INF/classes" includes="context.properties.*" />
+								</delete>															
 								<delete>
 									<fileset dir="target/war/WEB-INF/lib"
 										includes="gwt-user*,smartgwt-skin*,logicaldoc-webapp*,gwtevent*,guava-14*,guava-16*,log4j-1.*,slf4j-simple*" />

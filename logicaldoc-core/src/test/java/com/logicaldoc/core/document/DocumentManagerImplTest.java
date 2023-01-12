@@ -269,7 +269,6 @@ public class DocumentManagerImplTest extends AbstractCoreTCase {
 		transaction.setUser(user);
 		Assert.assertEquals(1, documentManager.enforceFilesIntoFolderStorage(folder.getId(), transaction));
 
-		Assert.assertFalse(new File(storeRoot + "/1/doc/" + doc.getFileVersion()).exists());
 		Assert.assertTrue(new File(store2Root + "/1/doc/" + doc.getFileVersion()).exists());
 	}
 

@@ -16,7 +16,7 @@ import com.logicaldoc.util.exec.Exec;
 public class SystemTool {
 
 	/**
-	 * Executes a command and gets it's output
+	 * Executes a command and gets it's output. The path of the command must be listed in the allowed-commands.txt
 	 * 
 	 * @param commandline the command to execute
 	 * 
@@ -31,7 +31,7 @@ public class SystemTool {
 	/**
 	 * Executes a command and gets it's output
 	 * 
-	 * @param commandline the command to execute
+	 * @param commandline the command to execute. The path of the command must be listed in the allowed-commands.txt
 	 * @param path the path to set as current folder before executing the
 	 *        command
 	 * 
@@ -46,7 +46,7 @@ public class SystemTool {
 	/**
 	 * Executes a command
 	 * 
-	 * @param commandline the command to execute
+	 * @param commandline the command to execute. The path of the command must be listed in the allowed-commands.txt
 	 * 
 	 * @return the execution's result
 	 * 
@@ -60,7 +60,7 @@ public class SystemTool {
 	/**
 	 * Executes a command
 	 * 
-	 * @param commandline the command to execute
+	 * @param commandline the command to execute. The path of the command must be listed in the allowed-commands.txt
 	 * @param path the path to set as current folder before executing the
 	 *        command
 	 * 

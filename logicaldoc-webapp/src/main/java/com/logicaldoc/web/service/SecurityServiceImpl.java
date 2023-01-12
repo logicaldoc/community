@@ -259,9 +259,13 @@ public class SecurityServiceImpl extends AbstractRemoteService implements Securi
 	}
 
 	@Override
-	public GUISession getSession(String locale) {
+	public GUISession getSession(String locale, String sid) {
 		try {
-			Session sess = validateSession(getThreadLocalRequest());
+			Session sess = null;
+			if(StringUtils.isEmpty(sid))
+				sess = validateSession(getThreadLocalRequest());
+			else
+				sess = validateSession(sid);
 			return loadSession(sess, locale);
 		} catch (ServerException e) {
 			log.debug(e.getMessage());

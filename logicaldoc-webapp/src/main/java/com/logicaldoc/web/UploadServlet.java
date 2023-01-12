@@ -19,6 +19,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,8 +193,14 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
 		try {
+			String tenant = "default";
 			String sid = getSid(request);
-			String tenant = SessionManager.get().get(sid).getTenantName();
+			
+			if (StringUtils.isEmpty(sid)) {
+				sid = "tmp";
+			} else {
+				tenant = SessionManager.get().get(sid).getTenantName();
+			}
 			File uploadDir = getUploadDir(sid);
 
 			// Check that we have a file upload request
@@ -227,7 +234,7 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 			// maximum file size to be uploaded (in bytes)
 			upload.setFileSizeMax(Context.get().getProperties().getLong(tenant + ".upload.maxsize", 10L) * 1024 * 1024);
 
-			Map<String, File> uploadedFiles = getReceivedFiles(sid);
+			Map<String, File> uploadedFiles = "tmp".equals(sid) ? getReceivedFiles(request.getSession(true)) : getReceivedFiles(sid);
 
 			// Parse the request to get uploaded file items.
 			List<FileItem> fileItems = upload.parseRequest(request);

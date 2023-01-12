@@ -109,12 +109,13 @@ public class LogDownload extends HttpServlet {
 	/**
 	 * Prepare all the support resources in one single zip: all the logs, the
 	 * context.properties, the snapshot of the env variables.
+	 * 
+	 * @throws IOException error creting a temporary file 
 	 */
-	private File prepareAllSupportResources(HttpServletRequest request, HttpServletResponse response) {
-		File tmp = null;
+	private File prepareAllSupportResources(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		File tmp = FileUtil.createTempFile("logs", ".zip");
 
 		try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tmp));) {
-			tmp = FileUtil.createTempFile("logs", ".zip");
 
 			LoggingConfigurator conf = new LoggingConfigurator();
 			Collection<String> appenders = conf.getLoggingFiles();

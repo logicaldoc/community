@@ -49,7 +49,7 @@ public interface SecurityServiceAsync {
 
 	void searchUsers(String username, String groupId, AsyncCallback<GUIUser[]> callback);
 
-	void getSession(String locale, AsyncCallback<GUISession> callback);
+	void getSession(String locale, String sid, AsyncCallback<GUISession> callback);
 
 	void loadBlockedEntities(AsyncCallback<GUISequence[]> callback);
 

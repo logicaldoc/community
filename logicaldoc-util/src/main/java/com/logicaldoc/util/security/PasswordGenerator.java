@@ -20,7 +20,7 @@ public class PasswordGenerator {
 
 	private static final String NUMBER = "0123456789";
 
-	private static final String OTHER_CHAR = "!@#$%&*()_+-=[]?{}/;";
+	private static final String OTHER_CHAR = "!@#$%&*()_+-=[]?{}/;,.";
 
 	private static final String PASSWORD_ALLOW_BASE = CHAR_LOWER + CHAR_UPPER + NUMBER + OTHER_CHAR;
 
@@ -71,7 +71,7 @@ public class PasswordGenerator {
 	/**
 	 * Generates a new password
 	 * 
-	 * @param length dimension of the password
+	 * @param minLength minimum dimension of the password
 	 * @param uppercaseChars minimum number of upper case chars
 	 * @param lowercaseChars minimum number of lower case chars
 	 * @param digits minimum number of digits
@@ -81,19 +81,26 @@ public class PasswordGenerator {
 	 * 
 	 * @return the generated password
 	 */
-	public static String generate(int length, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
+	public static String generate(int minLength, int uppercaseChars, int lowercaseChars, int digits, int specialChars,
 			int maxSequenceSize, int maxOccurrences) {
-		if (length < 1)
-			throw new IllegalArgumentException();
+		if (minLength < 5)
+			throw new IllegalArgumentException(
+					String.format("Cannot generate password with less than %d chars", minLength));
 
-		PasswordValidator validator = new PasswordValidator(length, uppercaseChars, lowercaseChars, digits,
+		PasswordValidator validator = new PasswordValidator(minLength, uppercaseChars, lowercaseChars, digits,
 				specialChars, maxSequenceSize, maxOccurrences, null);
 
 		String pswd = "";
 		boolean valid = false;
+		int i = 0;
 		while (!valid) {
-			pswd = generate(length);
+			pswd = generate(minLength);
 			valid = validator.validate(pswd).isEmpty();
+			i++;
+			if (i > 15) {
+				i = 0;
+				minLength++;
+			}
 		}
 		return pswd;
 	}

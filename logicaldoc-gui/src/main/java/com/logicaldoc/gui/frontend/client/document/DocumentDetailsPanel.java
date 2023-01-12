@@ -6,13 +6,11 @@ import com.logicaldoc.gui.common.client.Feature;
 import com.logicaldoc.gui.common.client.Menu;
 import com.logicaldoc.gui.common.client.ServerValidationException;
 import com.logicaldoc.gui.common.client.Session;
-import com.logicaldoc.gui.common.client.beans.GUIAttribute;
 import com.logicaldoc.gui.common.client.beans.GUIDocument;
 import com.logicaldoc.gui.common.client.i18n.I18N;
 import com.logicaldoc.gui.common.client.log.GuiLog;
 import com.logicaldoc.gui.common.client.observer.DocumentController;
 import com.logicaldoc.gui.common.client.observer.DocumentObserver;
-import com.logicaldoc.gui.common.client.observer.FolderController;
 import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.EditingTabSet;
@@ -626,10 +624,11 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 			@Override
 			public void onSuccess(GUIDocument result) {
 				hideSave();
+				setDocument(result);
 				DocumentController.get().modified(result);
-				
+
 				// If the document is an alias we should alter the file name
-				if(document.getDocRef()!=null) {
+				if (document.getDocRef() != null) {
 					result.setId(document.getDocRef());
 					result.setDocRef(document.getId());
 					result.setFileName(document.getFileName());

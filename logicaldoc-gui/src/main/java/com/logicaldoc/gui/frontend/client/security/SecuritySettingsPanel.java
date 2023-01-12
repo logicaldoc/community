@@ -69,7 +69,7 @@ public class SecuritySettingsPanel extends AdminPanel {
 		pwdSize.setWrapTitle(false);
 		pwdSize.setRequired(true);
 		pwdSize.setWidth(50);
-		pwdSize.setMin(4);
+		pwdSize.setMin(6);
 		pwdSize.setStep(1);
 
 		final SpinnerItem pwdExp = ItemFactory.newSpinnerItem("pwdExp", "expiration", settings.getPwdExpiration());

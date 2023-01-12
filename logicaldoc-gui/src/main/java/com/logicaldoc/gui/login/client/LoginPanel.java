@@ -611,8 +611,8 @@ public class LoginPanel extends VLayout {
 				data += "&j_secretkey=" + URL.encodeQueryString((String) secretKey.getValue());
 			if (CookiesManager.getSavedDevice() != null)
 				data += "&device=" + URL.encodeQueryString(CookiesManager.getSavedDevice());
-			data += "&" + PARAM_SUCCESSURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_SUCCESSURL));
-			data += "&" + PARAM_FAILUREURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_FAILUREURL));
+//			data += "&" + PARAM_SUCCESSURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_SUCCESSURL));
+//			data += "&" + PARAM_FAILUREURL + "=" + URL.encodeQueryString(Util.getJavascriptVariable(PARAM_FAILUREURL));
 
 			lockInput();
 			builder.sendRequest(data, new RequestCallback() {
@@ -623,7 +623,7 @@ public class LoginPanel extends VLayout {
 				public void onResponseReceived(Request request, Response response) {
 					if (response != null && response.getStatusCode() < 400) {
 						SecurityService.Instance.get().getSession(language != null ? language.getValueAsString() : "en",
-								new AsyncCallback<GUISession>() {
+								response.getHeader("SID"), new AsyncCallback<GUISession>() {
 
 									@Override
 									public void onFailure(Throwable caught) {
