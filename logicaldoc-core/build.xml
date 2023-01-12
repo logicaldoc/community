@@ -73,7 +73,7 @@
 				<echo message="Deploying into @{webroot}" />
 				<copy todir="@{webroot}/WEB-INF/classes" verbose="true">
 					<fileset dir="target/classes">
-						<include name="com/logicaldoc/core/automation/DocTool*" />+6
+						<include name="com/logicaldoc/core/automation/DocTool*" />
 						
 						<exclude name="com/logicaldoc/core/security/dao/HibernateTenant*" />
 						<exclude name="com/logicaldoc/core/security/authentication/AuthenticationChain*" />
