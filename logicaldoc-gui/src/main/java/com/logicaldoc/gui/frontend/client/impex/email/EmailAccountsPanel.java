@@ -9,9 +9,11 @@ import com.logicaldoc.gui.common.client.util.LD;
 import com.logicaldoc.gui.common.client.util.Util;
 import com.logicaldoc.gui.common.client.widgets.HTMLPanel;
 import com.logicaldoc.gui.common.client.widgets.InfoPanel;
+import com.logicaldoc.gui.common.client.widgets.grid.IntegerListGridField;
 import com.logicaldoc.gui.common.client.widgets.grid.RefreshableListGrid;
 import com.logicaldoc.gui.frontend.client.administration.AdminPanel;
 import com.logicaldoc.gui.frontend.client.services.EmailAccountService;
+import com.logicaldoc.gui.frontend.client.services.ImportFolderService;
 import com.smartgwt.client.data.AdvancedCriteria;
 import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
@@ -85,13 +87,17 @@ public class EmailAccountsPanel extends AdminPanel {
 		enabled.setImageURLSuffix(".gif");
 		enabled.setCanFilter(false);
 
+		
+		IntegerListGridField emails = new IntegerListGridField("emails", I18N.message("importedemails"));
+		emails.setAutoFitWidth(true);
+		
 		list = new RefreshableListGrid();
 		list.setEmptyMessage(I18N.message("notitemstoshow"));
 		list.setShowAllRecords(true);
 		list.setAutoFetchData(true);
 		list.setWidth100();
 		list.setHeight100();
-		list.setFields(enabled, id, email);
+		list.setFields(enabled, id, email, emails);
 		list.setSelectionType(SelectionStyle.SINGLE);
 		list.setShowRecordComponents(true);
 		list.setShowRecordComponentsByCell(true);
@@ -297,10 +303,37 @@ public class EmailAccountsPanel extends AdminPanel {
 			}
 		});
 
+		MenuItem resetCounter = new MenuItem();
+		resetCounter.setTitle(I18N.message("resetcounter"));
+		resetCounter.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				LD.ask(I18N.message("question"), I18N.message("confirmresetcounter"), new BooleanCallback() {
+					@Override
+					public void execute(Boolean value) {
+						if (value) {
+							EmailAccountService.Instance.get().resetCounter(id, new AsyncCallback<Void>() {
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(Void result) {
+									GuiLog.info(I18N.message("counterreseted"), null);
+									record.setAttribute("emails", "0");
+									list.refreshRow(list.getRecordIndex(record));
+								}
+							});
+						}
+					}
+				});
+			}
+		});
+		
 		if ("0".equals(record.getAttributeAsString("eenabled")))
-			contextMenu.setItems(test, disable, delete, resetCache);
+			contextMenu.setItems(test, disable, delete, resetCache, resetCounter);
 		else
-			contextMenu.setItems(test, enable, delete, resetCache);
+			contextMenu.setItems(test, enable, delete, resetCache, resetCounter);
 		contextMenu.showContextMenu();
 	}
 

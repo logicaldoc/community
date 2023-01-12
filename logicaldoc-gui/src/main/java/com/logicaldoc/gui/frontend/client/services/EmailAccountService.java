@@ -74,6 +74,15 @@ public interface EmailAccountService extends RemoteService {
 	 * @throws ServerException an error happened in the server application
 	 */
 	public void resetCache(long id) throws ServerException;
+	
+	/**
+	 * Reset the import counter
+	 * 
+	 * @param id identifier of the import folder
+	 * 
+	 * @throws ServerException an error happened in the server application
+	 */
+	public void resetCounter(long id) throws ServerException;
 
 	public static class Instance {
 		private static EmailAccountServiceAsync instance;
