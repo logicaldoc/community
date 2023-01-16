@@ -81,8 +81,10 @@ public class EventCollector {
 	 * @param history the history to notify
 	 */
 	public void newEvent(History history) {
-		if (!isEnabled())
+		if (!isEnabled()) {
+			log.debug("Aspect {} not enabled", ASPECT);
 			return;
+		}
 
 		if (!history.isNotifyEvent())
 			return;
@@ -120,12 +122,8 @@ public class EventCollector {
 			}
 		};
 
-		if (isEnabled()) {
-			ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);
-			pools.execute(notifier, "EventCollector");
-		} else {
-			log.debug("Aspect {} not enabled", ASPECT);
-		}
+		ThreadPools pools = (ThreadPools) Context.get().getBean(ThreadPools.class);
+		pools.execute(notifier, "EventCollector");
 	}
 
 	public ContextProperties getConfig() {
