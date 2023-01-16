@@ -105,6 +105,7 @@ public class WSUtil {
 						attribute.setName(name);
 						attribute.setMandatory(attr.getMandatory());
 						attribute.setHidden(attr.getHidden());
+						attribute.setReadonly(attr.getReadonly());
 						attribute.setMultiple(attr.getMultiple());
 						attribute.setParent(attr.getParent());
 						attribute.setPosition(attr.getPosition());
@@ -173,6 +174,7 @@ public class WSUtil {
 						Attribute att = new Attribute();
 						att.setMandatory(wsDoc.getAttributes()[i].getMandatory());
 						att.setHidden(wsDoc.getAttributes()[i].getHidden());
+						att.setReadonly(wsDoc.getAttributes()[i].getReadonly());
 						att.setMultiple(wsDoc.getAttributes()[i].getMultiple());
 						att.setParent(wsDoc.getAttributes()[i].getParent());
 						att.setDependsOn(wsDoc.getAttributes()[i].getDependsOn());
@@ -288,6 +290,7 @@ public class WSUtil {
 					attribute.setLabel(attr.getLabel());
 					attribute.setMandatory(attr.getMandatory());
 					attribute.setHidden(attr.getHidden());
+					attribute.setReadonly(attr.getReadonly());
 					attribute.setMultiple(attr.getMultiple());
 					attribute.setParent(attr.getParent());
 					attribute.setPosition(attr.getPosition());
@@ -330,6 +333,7 @@ public class WSUtil {
 					att.setLabel(wsSet.getAttributes()[i].getLabel());
 					att.setMandatory(wsSet.getAttributes()[i].getMandatory());
 					att.setHidden(wsSet.getAttributes()[i].getHidden());
+					att.setReadonly(wsSet.getAttributes()[i].getReadonly());
 					att.setMultiple(wsSet.getAttributes()[i].getMultiple());
 					att.setParent(wsSet.getAttributes()[i].getParent());
 					att.setDependsOn(wsSet.getAttributes()[i].getDependsOn());
@@ -372,6 +376,7 @@ public class WSUtil {
 					Attribute att = new Attribute();
 					att.setLabel(wsTemplate.getAttributes()[i].getLabel());
 					att.setHidden(wsTemplate.getAttributes()[i].getHidden());
+					att.setReadonly(wsTemplate.getAttributes()[i].getReadonly());
 					att.setMultiple(wsTemplate.getAttributes()[i].getMultiple());
 					att.setParent(wsTemplate.getAttributes()[i].getParent());
 					att.setDependsOn(wsTemplate.getAttributes()[i].getDependsOn());
@@ -423,6 +428,7 @@ public class WSUtil {
 					attribute.setLabel(attr.getLabel());
 					attribute.setMandatory(attr.getMandatory());
 					attribute.setHidden(attr.getHidden());
+					attribute.setReadonly(attr.getReadonly());
 					attribute.setMultiple(attr.getMultiple());
 					attribute.setParent(attr.getParent());
 					attribute.setPosition(attr.getPosition());

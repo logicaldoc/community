@@ -173,6 +173,7 @@ public class WSFolder implements Serializable {
 					attribute.setName(name);
 					attribute.setMandatory(attr.getMandatory());
 					attribute.setHidden(attr.getHidden());
+					attribute.setReadonly(attr.getReadonly());
 					attribute.setMultiple(attr.getMultiple());
 					attribute.setParent(attr.getParent());
 					attribute.setPosition(attr.getPosition());
@@ -206,6 +207,7 @@ public class WSFolder implements Serializable {
 						Attribute extAttribute = new Attribute();
 						extAttribute.setMandatory(attributes[i].getMandatory());
 						extAttribute.setHidden(attributes[i].getHidden());
+						extAttribute.setReadonly(attributes[i].getReadonly());
 						extAttribute.setMultiple(attributes[i].getMultiple());
 						extAttribute.setParent(attributes[i].getParent());
 						extAttribute.setDependsOn(attributes[i].getDependsOn());

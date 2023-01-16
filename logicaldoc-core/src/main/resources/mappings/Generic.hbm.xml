@@ -43,6 +43,7 @@
 				<property name="dependsOn" type="string" column="ld_dependson" length="255"/>
 				<property name="mandatory" type="int" column="ld_mandatory" not-null="true" />
 				<property name="hidden" type="int" column="ld_hidden" not-null="true"/>
+				<property name="readonly" type="int" column="ld_readonly" not-null="true"/>
 				<property name="multiple" type="int" column="ld_multiple" not-null="true"/>
 				<property name="type" type="int" column="ld_type" not-null="true" />
 				<property name="editor" type="int" column="ld_editor" not-null="true" />

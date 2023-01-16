@@ -255,6 +255,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 						if (objAttr != null) {
 							objAttr.setEditor(templAttr.getEditor());
 							objAttr.setHidden(templAttr.isHidden());
+							objAttr.setReadonly(templAttr.isReadonly());
 							objAttr.setLabel(templAttr.getLabel());
 							objAttr.setMandatory(templAttr.isMandatory());
 							objAttr.setMultiple(templAttr.isMultiple());
@@ -286,6 +287,7 @@ public class ExtendedPropertiesPanel extends HLayout {
 								for (GUIAttribute val : attrValues) {
 									val.setPosition(docAttr.getPosition());
 									val.setHidden(docAttr.isHidden());
+									val.setReadonly(docAttr.isReadonly());
 									val.setMandatory(docAttr.isMandatory());
 								}
 						}
@@ -307,7 +309,8 @@ public class ExtendedPropertiesPanel extends HLayout {
 
 			FormItem item = prepareAttributeItem(att);
 			if (item != null) {
-				item.setDisabled(!updateEnabled);
+				if(!updateEnabled)
+					item.setDisabled(true);
 				if (changedHandler != null)
 					item.addChangedHandler(changedHandler);
 				item.addChangedHandler(dependeciesHandler);
@@ -385,7 +388,10 @@ public class ExtendedPropertiesPanel extends HLayout {
 					&& att.getType() != GUIAttribute.TYPE_FOLDER)
 				item.setIcons(multiValIcons.toArray(new FormItemIcon[0]));
 			item.setRequired(checkMandatory ? att.isMandatory() : false);
+			if(att.isReadonly())
+				item.setDisabled(true);
 		}
+		
 
 		return item;
 	}

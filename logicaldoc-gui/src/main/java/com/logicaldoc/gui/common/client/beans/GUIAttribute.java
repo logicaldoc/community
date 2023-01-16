@@ -65,6 +65,8 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	private boolean hidden = false;
 
+	private boolean readonly = false;
+
 	private boolean multiple = false;
 
 	private String parent;
@@ -90,12 +92,9 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	private String initialization;
 
-	
 	public GUIAttribute() {
 	}
 
-	
-	
 	public GUIAttribute(GUIAttribute source) {
 		this.editor = source.editor;
 		this.stringValue = source.stringValue;
@@ -107,6 +106,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		this.type = source.type;
 		this.mandatory = source.mandatory;
 		this.hidden = source.hidden;
+		this.readonly = source.readonly;
 		this.multiple = source.multiple;
 		this.parent = source.parent;
 		this.dependsOn = source.dependsOn;
@@ -120,7 +120,7 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 		this.validation = source.validation;
 		this.initialization = source.initialization;
 	}
-	
+
 	public static boolean isForbidden(String name) {
 		for (String forbidden : FORBIDDEN_NAMES) {
 			if (forbidden.equals(name))
@@ -167,6 +167,14 @@ public class GUIAttribute implements Comparable<GUIAttribute>, Serializable {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public boolean isReadonly() {
+		return readonly;
+	}
+
+	public void setReadonly(boolean readonly) {
+		this.readonly = readonly;
 	}
 
 	/**

@@ -1,32 +1,32 @@
 insert into ld_attributeset
 			(ld_id, ld_lastmodified, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
 values (-1,CURRENT_TIMESTAMP,0,'default','default',1,0,1,1);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,0,0,'source', 'Source', 0, -1, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,0,1,'sourceAuthor', 'Author', 0, -1, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,0,2,'sourceId', 'Original ID', 0, -1, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,0,3,'sourceType', 'Type', 0, -1, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,0,4,'object', 'Object', 0, -1, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,0,5,'coverage', 'Coverage', 0, -1, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,0,6,'recipient', 'Recipient', 0, -1, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,3,7,'sourceDate', 'Date', 0, -1, 0, 0);
-insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-values (-1,0,3,7,'multi', 'Multi', 0, -1, 0, 1);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,0,'source', 'Source', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,1,'sourceAuthor', 'Author', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,2,'sourceId', 'Original ID', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,3,'sourceType', 'Type', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,4,'object', 'Object', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,5,'coverage', 'Coverage', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,0,6,'recipient', 'Recipient', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,3,7,'sourceDate', 'Date', 0, -1, 0, 0, 0);
+insert into ld_attributeset_ext(ld_attsetid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+values (-1,0,3,7,'multi', 'Multi', 0, -1, 0, 1, 0);
 
 insert into ld_template
 			(ld_id, ld_lastmodified, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
 values (-1,CURRENT_TIMESTAMP,0,'default','default',0,0,1,1);
 insert into ld_templategroup(ld_templateid, ld_groupid, ld_write) values (-1, 3, 0);
 
-insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple)
-select -1, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple from ld_attributeset_ext where ld_setid=-1;
+insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly)
+select -1, ld_mandatory, ld_type, ld_position, ld_name, ld_label, ld_editor, ld_setid, ld_hidden, ld_multiple, ld_readonly from ld_attributeset_ext where ld_setid=-1;
 
 
 insert into ld_tenant(ld_id,ld_lastmodified,ld_deleted,ld_tenantid,ld_name,ld_displayname,ld_type,ld_enabled,ld_recordversion)
@@ -151,8 +151,8 @@ values     (10,'2008-10-22 00:00:00',0,1,'testGroup','Group for tests',0,1);
 
 insert into ld_template (ld_id, ld_lastmodified,ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid,ld_recordversion)
 values (1, '2008-11-07 00:00:00',0,'test1','test1_desc',0,0,1,1);
-insert into ld_template_ext (ld_templateid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple)
-values (1, 0, 0, 0, 'val1', 'attr1',0,0,0);
+insert into ld_template_ext (ld_templateid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple, ld_readonly)
+values (1, 0, 0, 0, 'val1', 'attr1',0,0,0,0);
 insert into ld_template (ld_id, ld_lastmodified,ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid,ld_recordversion)
 values (2, '2008-11-07 00:00:00',0,'test2','test2_desc',0,0,1,1);
 
@@ -171,8 +171,8 @@ insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_t
 values (1201,CURRENT_TIMESTAMP,0,'ABC',1200,0,'2012-01-08 00:00:00','test description',0,1,1,5,0,1,'/1200/1201');
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templateid,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (1202,CURRENT_TIMESTAMP,0,'xyz',1201,0,1,0,1,1,6,0,'/1200/1201/1002');
-insert into ld_folder_ext (ld_folderid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple)
-values (1202, 0, 0, 0, 'test_val_1', 'val1',0,0,0);
+insert into ld_folder_ext (ld_folderid, ld_mandatory, ld_position, ld_type, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple, ld_readonly)
+values (1202, 0, 0, 0, 'test_val_1', 'val1',0,0,0,0);
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_deleteuserid,ld_tenantid,ld_recordversion,ld_position,ld_hidden,ld_path)
 values (1204,CURRENT_TIMESTAMP,1,'deleted',1201,0,0,3,1,1,7,0,'/1200/1201/1004');
 insert into ld_folder (ld_id,ld_lastmodified,ld_deleted,ld_name,ld_parentid,ld_type,ld_templocked,ld_tenantid,ld_recordversion,ld_position,ld_hidden)
@@ -342,8 +342,8 @@ values   (5,'2008-10-22 00:00:00',0,2,3,'',1,1);
 
 insert into ld_generic(ld_id, ld_lastmodified, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1, ld_integer2, ld_double1, ld_double2, ld_date1, ld_date2,ld_tenantid,ld_recordversion)
 values(1, '2008-11-19 00:00:00',0,'a','a1','str1','str2',0,1,1.5,1.6,'2008-11-20 00:00:00','2008-11-20 00:00:00',1,1);
-insert into ld_generic_ext(ld_genid, ld_mandatory, ld_type, ld_position, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple)
-values(1, 0, 0, 0, 'val1','att1',0,0,0);
+insert into ld_generic_ext(ld_genid, ld_mandatory, ld_type, ld_position, ld_stringvalue, ld_name, ld_editor, ld_hidden, ld_multiple, ld_readonly)
+values(1, 0, 0, 0, 'val1','att1',0,0,0,0);
 insert into ld_generic(ld_id, ld_lastmodified, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1, ld_integer2, ld_double1, ld_double2, ld_date1, ld_date2,ld_tenantid,ld_recordversion)
 values(2, '2008-11-19 00:00:00',0,'a','a2','str1','str2',10,11,1.5,1.6,'2008-11-20 00:00:00','2008-11-20 00:00:00',1,1);
 insert into ld_generic(ld_id, ld_lastmodified, ld_deleted, ld_type, ld_subtype, ld_string1, ld_string2, ld_integer1, ld_integer2, ld_double1, ld_double2, ld_date1, ld_date2,ld_tenantid,ld_recordversion)
@@ -425,8 +425,8 @@ values(3, CURRENT_TIMESTAMP, 0, 1, 'Alessandro', 'alessandro@acme.com',1,1);
 insert into ld_template
 			(ld_id, ld_lastmodified, ld_deleted, ld_name, ld_description, ld_readonly, ld_type, ld_tenantid, ld_recordversion)
 values (50,CURRENT_TIMESTAMP,0,'email','email',0,0,1,1);
-insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_stringvalue, ld_name, ld_label, ld_editor, ld_hidden, ld_multiple)
-values (50,0,0,0,'','sendername', 'Sender Name', 0, 0, 0);
+insert into ld_template_ext(ld_templateid, ld_mandatory, ld_type, ld_position, ld_stringvalue, ld_name, ld_label, ld_editor, ld_hidden, ld_multiple, ld_readonly)
+values (50,0,0,0,'','sendername', 'Sender Name', 0, 0, 0, 0);
 
 insert into ld_sequence(ld_id, ld_lastmodified, ld_deleted, ld_tenantid,ld_recordversion,ld_name,ld_value, ld_objectid)
 values(1, '2010-04-23 00:00:00',0,1,1,'customid-year_seq',5,0);

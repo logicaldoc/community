@@ -98,6 +98,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			att.setSet(rec.getAttributeAsString("set"));
 			att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
 			att.setHidden(rec.getAttributeAsBoolean("hidden"));
+			att.setReadonly(rec.getAttributeAsBoolean("readonly"));
 			att.setMultiple(rec.getAttributeAsBoolean("multiple"));
 			att.setSetId(Long.parseLong(rec.getAttributeAsString("setId")));
 			att.setEditor(Integer.parseInt(rec.getAttributeAsString("editor")));
@@ -184,6 +185,12 @@ public class TemplatePropertiesPanel extends HLayout {
 		multiple.setCanSort(false);
 		multiple.setAutoFitWidth(true);
 		multiple.setMinWidth(70);
+		
+		ListGridField readonly = new ListGridField("readonly", I18N.message("readonly"));
+		readonly.setCanEdit(false);
+		readonly.setCanSort(false);
+		readonly.setAutoFitWidth(true);
+		readonly.setMinWidth(70);
 
 		ListGridField type = new ListGridField("type", I18N.message("type"));
 		type.setCanEdit(false);
@@ -219,7 +226,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			}
 		});
 
-		attributesList.setFields(name, label, type, mandatory, hidden, multiple, preset, dependsOn, set);
+		attributesList.setFields(name, label, type, mandatory, hidden, readonly, multiple, preset, dependsOn, set);
 
 		Button addAttributes = new Button(I18N.message("addattributes"));
 		addAttributes.setMargin(2);
@@ -334,6 +341,26 @@ public class TemplatePropertiesPanel extends HLayout {
 				for (int i = 0; i < selection.length; i++) {
 					names[i] = selection[i].getAttribute("name");
 					template.getAttribute(names[i]).setHidden(true);
+				}
+
+				fillAttributesList();
+
+				if (changedHandler != null)
+					changedHandler.onChanged(null);
+			}
+		});
+		
+		MenuItem makeReadonly = new MenuItem();
+		makeReadonly.setTitle(I18N.message("makereadonly"));
+		makeReadonly.addClickHandler(new com.smartgwt.client.widgets.menu.events.ClickHandler() {
+			public void onClick(MenuItemClickEvent event) {
+				final ListGridRecord[] selection = attributesList.getSelectedRecords();
+				if (selection == null || selection.length == 0)
+					return;
+				final String[] names = new String[selection.length];
+				for (int i = 0; i < selection.length; i++) {
+					names[i] = selection[i].getAttribute("name");
+					template.getAttribute(names[i]).setReadonly(true);
 				}
 
 				fillAttributesList();
@@ -549,7 +576,7 @@ public class TemplatePropertiesPanel extends HLayout {
 		});
 		dependsOn.setEnabled(attributesList.getSelectedRecord().getAttributeAsBoolean("preset"));
 
-		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeHidden, dependsOn, initialization,
+		contextMenu.setItems(makeMandatory, makeOptional, makeVisible, makeReadonly, makeHidden, dependsOn, initialization,
 				resetInitialization, validation, resetValidation, delete);
 		contextMenu.showContextMenu();
 	}
@@ -576,6 +603,7 @@ public class TemplatePropertiesPanel extends HLayout {
 			record.setAttribute("editor", att.getEditor());
 			record.setAttribute("mandatory", att.isMandatory());
 			record.setAttribute("hidden", att.isHidden());
+			record.setAttribute("readonly", att.isReadonly());
 			record.setAttribute("multiple", att.isMultiple());
 			record.setAttribute("validation", att.getValidation());
 			record.setAttribute("initialization", att.getInitialization());
@@ -686,6 +714,7 @@ public class TemplatePropertiesPanel extends HLayout {
 					att.setDependsOn(rec.getAttributeAsString("dependsOn"));
 					att.setMandatory(rec.getAttributeAsBoolean("mandatory"));
 					att.setHidden(rec.getAttributeAsBoolean("hidden"));
+					att.setReadonly(rec.getAttributeAsBoolean("readonly"));
 					att.setMultiple(rec.getAttributeAsBoolean("multiple"));
 					att.setValidation(rec.getAttributeAsString("validation"));
 					att.setInitialization(rec.getAttributeAsString("initialization"));

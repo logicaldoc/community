@@ -324,6 +324,7 @@ public abstract class AbstractRemoteService extends RemoteServiceServlet {
 					att.setLabel(templateExtAttr.getLabel());
 					att.setMandatory(templateExtAttr.getMandatory() == 1);
 					att.setHidden(templateExtAttr.getHidden() == 1);
+					att.setReadonly(templateExtAttr.getReadonly() == 1);
 					att.setMultiple(templateExtAttr.getMultiple() == 1);
 					att.setParent(templateExtAttr.getParent());
 					att.setStringValues(templateExtAttr.getStringValues());

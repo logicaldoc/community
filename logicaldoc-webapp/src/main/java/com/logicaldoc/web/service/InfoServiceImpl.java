@@ -153,6 +153,7 @@ public class InfoServiceImpl extends AbstractRemoteService implements InfoServic
 					guiAtt.setDoubleValue(att.getDoubleValue());
 					guiAtt.setEditor(att.getEditor());
 					guiAtt.setHidden(att.getHidden() == 1);
+					guiAtt.setReadonly(att.getReadonly() == 1);
 					guiAtt.setIntValue(att.getIntValue());
 					guiAtt.setLabel(att.getLabel());
 					guiAtt.setMandatory(att.getMandatory() == 1);

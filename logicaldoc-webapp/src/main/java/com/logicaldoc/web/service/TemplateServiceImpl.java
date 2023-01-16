@@ -138,6 +138,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 							Attribute att = new Attribute();
 							att.setMandatory(attribute.isMandatory() ? 1 : 0);
 							att.setHidden(attribute.isHidden() ? 1 : 0);
+							att.setReadonly(attribute.isReadonly() ? 1 : 0);
 							att.setMultiple(attribute.isMultiple() ? 1 : 0);
 							att.setParent(attribute.getParent());
 							att.setDependsOn(attribute.getDependsOn());
@@ -255,6 +256,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 				att.setPosition(templateExtAttr.getPosition());
 				att.setMandatory(templateExtAttr.getMandatory() == 1 ? true : false);
 				att.setHidden(templateExtAttr.getHidden() == 1 ? true : false);
+				att.setReadonly(templateExtAttr.getReadonly() == 1 ? true : false);
 				att.setMultiple(templateExtAttr.getMultiple() == 1 ? true : false);
 				att.setParent(templateExtAttr.getParent());
 				att.setDependsOn(templateExtAttr.getDependsOn());
@@ -442,6 +444,7 @@ public class TemplateServiceImpl extends AbstractRemoteService implements Templa
 					guiAttribute.setLabel(templateExtAttr.getLabel());
 					guiAttribute.setMandatory(templateExtAttr.getMandatory() == 1);
 					guiAttribute.setHidden(templateExtAttr.getHidden() == 1);
+					guiAttribute.setReadonly(templateExtAttr.getReadonly() == 1);
 					guiAttribute.setMultiple(templateExtAttr.getMultiple() == 1);
 					guiAttribute.setParent(templateExtAttr.getParent());
 					guiAttribute.setDependsOn(templateExtAttr.getDependsOn());
