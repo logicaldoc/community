@@ -39,7 +39,7 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class UploadServlet extends HttpServlet implements SessionListener {
 
-	public static final String receivedFiles = "receivedFiles";
+	public static final String RECEIVED_FILES = "receivedFiles";
 
 	private static final long serialVersionUID = 1L;
 
@@ -133,10 +133,10 @@ public class UploadServlet extends HttpServlet implements SessionListener {
 	 */
 	public static Map<String, File> getReceivedFiles(HttpSession httpSession) {
 		@SuppressWarnings("unchecked")
-		Map<String, File> uploadedFiles = (Map<String, File>) httpSession.getAttribute(receivedFiles);
+		Map<String, File> uploadedFiles = (Map<String, File>) httpSession.getAttribute(RECEIVED_FILES);
 		if (uploadedFiles == null) {
 			uploadedFiles = new HashMap<String, File>();
-			httpSession.setAttribute(receivedFiles, uploadedFiles);
+			httpSession.setAttribute(RECEIVED_FILES, uploadedFiles);
 		}
 		return uploadedFiles;
 	}

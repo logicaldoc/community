@@ -25,6 +25,8 @@ import com.logicaldoc.util.sql.SqlUtil;
 public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<AttributeOption>
 		implements AttributeOptionDAO {
 
+	private static final String SET_ID = "setId";
+
 	public HibernateAttributeOptionDAO() {
 		super(AttributeOption.class);
 		super.log = LoggerFactory.getLogger(HibernatePersistentObjectDAO.class);
@@ -56,14 +58,14 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 			if (StringUtils.isEmpty(attribute)) {
 				if (StringUtils.isEmpty(category)) {
 					Map<String, Object> params = new HashMap<String, Object>();
-					params.put("setId", Long.valueOf(setId));
+					params.put(SET_ID, Long.valueOf(setId));
 
 					coll = (List<AttributeOption>) findByQuery(
 							"from AttributeOption _opt where _opt.deleted=0 and _opt.setId = :setId order by _opt.position asc",
 							params, null);
 				} else {
 					Map<String, Object> params = new HashMap<String, Object>();
-					params.put("setId", Long.valueOf(setId));
+					params.put(SET_ID, Long.valueOf(setId));
 					params.put("category", category);
 
 					coll = (List<AttributeOption>) findByQuery(
@@ -73,7 +75,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 			} else {
 				if (StringUtils.isEmpty(category)) {
 					Map<String, Object> params = new HashMap<String, Object>();
-					params.put("setId", Long.valueOf(setId));
+					params.put(SET_ID, Long.valueOf(setId));
 					params.put("attribute", attribute);
 
 					coll = (List<AttributeOption>) findByQuery(
@@ -81,7 +83,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 							params, null);
 				} else {
 					Map<String, Object> params = new HashMap<String, Object>();
-					params.put("setId", Long.valueOf(setId));
+					params.put(SET_ID, Long.valueOf(setId));
 					params.put("category", category);
 					params.put("attribute", attribute);
 
@@ -135,7 +137,7 @@ public class HibernateAttributeOptionDAO extends HibernatePersistentObjectDAO<At
 			buf.append(")");
 
 			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("setId", setId);
+			params.put(SET_ID, setId);
 
 			List<AttributeOption> options = findByQuery(
 					"from AttributeOption _opt where _opt.setId = :setId and _opt.attribute not in " + buf.toString(),

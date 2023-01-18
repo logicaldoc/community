@@ -745,7 +745,10 @@ public class MailUtil {
 	private static void extractPartText(Object content, StringBuilder textBody) throws MessagingException, IOException {
 		if (content instanceof String) {
 			textBody.append("\n" + content.toString());
-		} else if (content instanceof Part) {
+			return;
+		}
+
+		if (content instanceof Part) {
 			Part part = (Part) content;
 			String disposition = part.getDisposition();
 			String contentType = part.getContentType();
@@ -755,21 +758,28 @@ public class MailUtil {
 					textBody.append(part.getContent());
 				}
 			}
-		} else if (content instanceof Multipart) {
-			Multipart multipart = (Multipart) content;
-			for (int i = 0, n = multipart.getCount(); i < n; i++) {
-				try {
-					BodyPart part = multipart.getBodyPart(i);
+			return;
+		}
 
-					Object cont = part.getContent();
-					if (cont instanceof Multipart) {
-						extractPartText((Multipart) cont, textBody);
-					} else {
-						extractPartText((Part) part, textBody);
-					}
-				} catch (Throwable e) {
-					log.warn(e.getMessage(), e);
+		if (content instanceof Multipart) {
+			extractPartTextFromMultipart((Multipart) content, textBody);
+		}
+	}
+
+	private static void extractPartTextFromMultipart(Multipart multipart, StringBuilder textBody)
+			throws MessagingException {
+		for (int i = 0, n = multipart.getCount(); i < n; i++) {
+			try {
+				BodyPart part = multipart.getBodyPart(i);
+
+				Object cont = part.getContent();
+				if (cont instanceof Multipart) {
+					extractPartText((Multipart) cont, textBody);
+				} else {
+					extractPartText((Part) part, textBody);
 				}
+			} catch (Throwable e) {
+				log.warn(e.getMessage(), e);
 			}
 		}
 	}

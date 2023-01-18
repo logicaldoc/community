@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.realityforge.gwt.websockets.client.WebSocket;
+import org.realityforge.gwt.websockets.client.WebSocketListenerAdapter;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.client.rpc.SerializationStreamFactory;
@@ -29,7 +32,7 @@ import com.smartgwt.client.widgets.notify.NotifySettings;
  * @author Marco Meschieri - LogicalDOC
  * @since 8.1.1
  */
-public class WebSocketListener implements com.sksamuel.gwt.websockets.WebsocketListener {
+public class WebSocketListener extends WebSocketListenerAdapter {
 
 	private static final String COMMAND = "command";
 
@@ -78,21 +81,6 @@ public class WebSocketListener implements com.sksamuel.gwt.websockets.WebsocketL
 			GuiLog.error(e.getMessage(), null, e);
 		}
 		return null;
-	}
-
-	@Override
-	public void onClose() {
-		// do something on close
-	}
-
-	@Override
-	public void onMessage(String msg) {
-		onEvent(deserializeMessage(msg));
-	}
-
-	@Override
-	public void onOpen() {
-		// do something on open
 	}
 
 	private void onEvent(WebsocketMessage event) {
@@ -170,5 +158,16 @@ public class WebSocketListener implements com.sksamuel.gwt.websockets.WebsocketL
 			else if ("error".equals(event.getTarget()))
 				GuiLog.error(event.getPayload(), null, null);
 		}
+	}
+
+	@Override
+	public void onMessage(WebSocket webSocket, String data) {
+		onEvent(deserializeMessage(data));
+
+	}
+
+	@Override
+	public void onError(WebSocket webSocket) {
+		GuiLog.warn("Websockets error", null);
 	}
 }

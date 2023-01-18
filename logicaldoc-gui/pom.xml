@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>org.wisepersist</groupId>
 			<artifactId>gwt-uploader</artifactId>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.timepedia.exporter</groupId>
 			<artifactId>gwtexporter</artifactId>
@@ -71,11 +71,19 @@
 			<version>1.0.3</version>
 			<scope>compile</scope>
 		</dependency>
+		<!-- dependency> <groupId>com.sksamuel.gwt</groupId> <artifactId>gwt-websockets</artifactId> 
+			<version>1.0.4</version> <scope>compile</scope> </dependency -->
 		<dependency>
-			<groupId>com.sksamuel.gwt</groupId>
+			<groupId>org.realityforge.gwt.websockets</groupId>
 			<artifactId>gwt-websockets</artifactId>
-			<version>1.0.4</version>
+			<version>1.2</version>
 			<scope>compile</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.gwt</groupId>
+					<artifactId>gwt-dev</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -130,7 +138,6 @@
 				<configuration>
 					<extraJvmArgs>-XX:-UseGCOverheadLimit -Xmx4000m</extraJvmArgs>
 					<webappDirectory>./war</webappDirectory>
-					<gwtVersion>${gwt.version}</gwtVersion>
 					<modules>
 						<module>com.logicaldoc.gui.common.Common</module>
 						<module>com.logicaldoc.gui.frontend.Frontend</module>

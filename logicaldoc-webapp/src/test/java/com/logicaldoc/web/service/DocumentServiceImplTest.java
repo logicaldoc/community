@@ -169,7 +169,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		uploadedFiles.put("file6.msg", file6);
 		uploadedFiles.put("file7.eml", file7);
 
-		servletSession.setAttribute(UploadServlet.receivedFiles, uploadedFiles);
+		servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -385,7 +385,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(doc.getFileName(), tmpFile);
 
-			servletSession.setAttribute(UploadServlet.receivedFiles, uploadedFiles);
+			servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
 			service.replaceFile(doc.getId(), doc.getFileVersion(), "replace");
 			Assert.assertTrue(service.getContentAsString(7).contains("replaced contents"));
 		} finally {
@@ -494,7 +494,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 		Map<String, File> uploadedFiles = new HashMap<>();
 		File file3 = new File("target/repository/docs/3/doc/1.0");
 		uploadedFiles.put("test.zip", file3);
-		servletSession.setAttribute(UploadServlet.receivedFiles, uploadedFiles);
+		servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 		GUIDocument doc = service.getById(7);
 		Assert.assertEquals("1.0", doc.getVersion());
@@ -546,7 +546,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 
 		// Remove the uploaded files
 		@SuppressWarnings("unchecked")
-		Map<String, File> uploadedFiles = (Map<String, File>) servletSession.getAttribute(UploadServlet.receivedFiles);
+		Map<String, File> uploadedFiles = (Map<String, File>) servletSession.getAttribute(UploadServlet.RECEIVED_FILES);
 		uploadedFiles.clear();
 
 		doc.setId(0L);
@@ -606,7 +606,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			uploadedFiles.put(pdf1.getName(), pdf1);
 			uploadedFiles.put(pdf2.getName(), pdf2);
 
-			servletSession.setAttribute(UploadServlet.receivedFiles, uploadedFiles);
+			servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
 			Assert.assertEquals(2, createdDocs.length);
@@ -636,7 +636,7 @@ public class DocumentServiceImplTest extends AbstractWebappTCase {
 			Map<String, File> uploadedFiles = new HashMap<>();
 			uploadedFiles.put(pdf2.getName(), pdf2);
 
-			servletSession.setAttribute(UploadServlet.receivedFiles, uploadedFiles);
+			servletSession.setAttribute(UploadServlet.RECEIVED_FILES, uploadedFiles);
 
 			GUIDocument[] createdDocs = service.addDocuments(false, UTF_8, false, doc);
 			Assert.assertEquals(1, createdDocs.length);

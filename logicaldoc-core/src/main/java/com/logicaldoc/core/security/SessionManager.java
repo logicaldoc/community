@@ -370,24 +370,26 @@ public class SessionManager extends ConcurrentHashMap<String, Session> {
 
 	private String getSessionIdFromRequest(HttpServletRequest request) {
 		String sid = null;
-		if (request != null) {
-			if (request.getSession(false) != null && request.getSession(false).getAttribute(PARAM_SID) != null)
-				sid = (String) request.getSession(false).getAttribute(PARAM_SID);
-			else if (request.getAttribute(PARAM_SID) != null)
-				sid = (String) request.getAttribute(PARAM_SID);
-			else if (request.getParameter(PARAM_SID) != null)
-				sid = (String) request.getParameter(PARAM_SID);
-			else {
-				Cookie cookies[] = request.getCookies();
-				if (cookies != null)
-					for (Cookie cookie : cookies) {
-						if (COOKIE_SID.equals(cookie.getName())) {
-							sid = cookie.getValue();
-							break;
-						}
+		if (request == null)
+			return sid;
+
+		if (request.getSession(false) != null && request.getSession(false).getAttribute(PARAM_SID) != null)
+			sid = (String) request.getSession(false).getAttribute(PARAM_SID);
+		else if (request.getAttribute(PARAM_SID) != null)
+			sid = (String) request.getAttribute(PARAM_SID);
+		else if (request.getParameter(PARAM_SID) != null)
+			sid = (String) request.getParameter(PARAM_SID);
+		else {
+			Cookie cookies[] = request.getCookies();
+			if (cookies != null)
+				for (Cookie cookie : cookies) {
+					if (COOKIE_SID.equals(cookie.getName())) {
+						sid = cookie.getValue();
+						break;
 					}
-			}
+				}
 		}
+
 		return sid;
 	}
 

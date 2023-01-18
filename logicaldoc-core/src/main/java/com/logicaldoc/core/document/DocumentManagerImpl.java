@@ -66,6 +66,8 @@ import com.logicaldoc.util.time.TimeDiff.TimeField;
  */
 public class DocumentManagerImpl implements DocumentManager {
 
+	private static final String NO_COMMENT_IN_TRANSACTION = "No comment in transaction";
+
 	private static final String MERGE = "merge";
 
 	private static final String UNKNOWN = "unknown";
@@ -144,7 +146,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void replaceFile(long docId, String fileVersion, File newFile, DocumentHistory transaction)
 			throws PersistenceException, IOException {
 		validateTransaction(transaction);
-		assert transaction.getComment() != null : "No comment in transaction";
+		assert transaction.getComment() != null : NO_COMMENT_IN_TRANSACTION;
 
 		transaction.setEvent(DocumentEvent.VERSION_REPLACED.toString());
 		transaction.setComment(String.format("file version %s - %s", fileVersion, transaction.getComment()));
@@ -197,7 +199,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void checkin(long docId, File file, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws PersistenceException {
 		validateTransaction(transaction);
-		assert transaction.getComment() != null : "No comment in transaction";
+		assert transaction.getComment() != null : NO_COMMENT_IN_TRANSACTION;
 		assert filename != null : "File name is mandatory";
 
 		transaction.setEvent(DocumentEvent.CHECKEDIN.toString());
@@ -214,115 +216,116 @@ public class DocumentManagerImpl implements DocumentManager {
 			document.setComment(transaction.getComment());
 
 			Document oldDocument = null;
-			if (document.getImmutable() == 0) {
-				documentDAO.initialize(document);
+			if (document.getImmutable() != 0)
+				return;
 
-				oldDocument = new Document(document);
+			documentDAO.initialize(document);
 
-				// Check CustomId uniqueness
-				checkCustomIdUniquenessOnCheckin(document, docVO);
+			oldDocument = new Document(document);
 
-				/*
-				 * Now apply the metadata, if any
-				 */
-				if (docVO != null) {
-					Folder originalFolder = document.getFolder();
-					String originalVersion = document.getVersion();
-					String originalFileVersion = document.getFileVersion();
-					String originalFileName = document.getFileName();
+			// Check CustomId uniqueness
+			checkCustomIdUniquenessOnCheckin(document, docVO);
 
-					document.copyAttributes(docVO);
+			/*
+			 * Now apply the metadata, if any
+			 */
+			if (docVO != null) {
+				Folder originalFolder = document.getFolder();
+				String originalVersion = document.getVersion();
+				String originalFileVersion = document.getFileVersion();
+				String originalFileName = document.getFileName();
 
-					// Restore important original information
-					document.setFolder(originalFolder);
-					document.setVersion(originalVersion);
-					document.setFileVersion(originalFileVersion);
-					if(StringUtils.isNotEmpty(filename))
-						document.setFileName(filename);
-					else
-						document.setFileName(originalFileName);
-				}
+				document.copyAttributes(docVO);
 
-				countPages(file, document);
-
-				Map<String, Object> dictionary = new HashMap<String, Object>();
-
-				log.debug("Invoke listeners before checkin");
-				for (DocumentListener listener : listenerManager.getListeners())
-					listener.beforeCheckin(document, transaction, dictionary);
-
-				document.setStamped(0);
-				document.setSigned(0);
-				document.setOcrd(0);
-				document.setBarcoded(0);
-
-				if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
-					document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
-
-				documentDAO.store(document);
-
-				document = documentDAO.findById(document.getId());
-				Folder folder = document.getFolder();
-				documentDAO.initialize(document);
-
-				// create some strings containing paths
-				document.setFileName(filename);
-				document.setType(FileUtil.getExtension(filename));
-
-				// set other properties of the document
-				document.setDate(new Date());
-				document.setPublisher(transaction.getUsername());
-				document.setPublisherId(transaction.getUserId());
-				document.setStatus(AbstractDocument.DOC_UNLOCKED);
-				document.setLockUserId(null);
-				document.setFolder(folder);
-				document.setDigest(null);
-				document.setFileSize(file.length());
-				document.setExtResId(null);
-
-				// Create new version (a new version number is created)
-				Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
-						DocumentEvent.CHECKEDIN.toString(), release);
-
-				document.setStatus(AbstractDocument.DOC_UNLOCKED);
-				documentDAO.store(document, transaction);
-
-				// store the document in the repository (on the file system)
-				try {
-					storeFile(document, file);
-				} catch (IOException ioe) {
-					log.error("Cannot save the new version {} into the storage", document, ioe);
-
-					document.copyAttributes(oldDocument);
-					document.setOcrd(oldDocument.getOcrd());
-					document.setOcrTemplateId(oldDocument.getOcrTemplateId());
-					document.setBarcoded(oldDocument.getBarcoded());
-					document.setBarcodeTemplateId(oldDocument.getBarcodeTemplateId());
-					document.setIndexed(oldDocument.getIndexed());
-					document.setCustomId(oldDocument.getCustomId());
-					document.setStatus(oldDocument.getStatus());
-					document.setStamped(oldDocument.getStamped());
-					document.setSigned(oldDocument.getSigned());
-					document.setComment(oldDocument.getComment());
-					documentDAO.store(document);
-					throw new PersistenceException(ioe.getMessage());
-				}
-
-				version.setFileSize(document.getFileSize());
-				version.setDigest(null);
-				versionDAO.store(version);
-
-				log.debug("Stored version {}", version.getVersion());
-				log.debug("Invoke listeners after checkin");
-				for (DocumentListener listener : listenerManager.getListeners())
-					listener.afterCheckin(document, transaction, dictionary);
-				documentDAO.store(document);
-
-				log.debug("Checked in document {}", docId);
-
-				if (!document.getFileVersion().equals(oldFileVersion))
-					documentNoteDAO.copyAnnotations(document.getId(), oldFileVersion, document.getFileVersion());
+				// Restore important original information
+				document.setFolder(originalFolder);
+				document.setVersion(originalVersion);
+				document.setFileVersion(originalFileVersion);
+				if (StringUtils.isNotEmpty(filename))
+					document.setFileName(filename);
+				else
+					document.setFileName(originalFileName);
 			}
+
+			countPages(file, document);
+
+			Map<String, Object> dictionary = new HashMap<String, Object>();
+
+			log.debug("Invoke listeners before checkin");
+			for (DocumentListener listener : listenerManager.getListeners())
+				listener.beforeCheckin(document, transaction, dictionary);
+
+			document.setStamped(0);
+			document.setSigned(0);
+			document.setOcrd(0);
+			document.setBarcoded(0);
+
+			if (document.getIndexed() != AbstractDocument.INDEX_SKIP)
+				document.setIndexed(AbstractDocument.INDEX_TO_INDEX);
+
+			documentDAO.store(document);
+
+			document = documentDAO.findById(document.getId());
+			Folder folder = document.getFolder();
+			documentDAO.initialize(document);
+
+			// create some strings containing paths
+			document.setFileName(filename);
+			document.setType(FileUtil.getExtension(filename));
+
+			// set other properties of the document
+			document.setDate(new Date());
+			document.setPublisher(transaction.getUsername());
+			document.setPublisherId(transaction.getUserId());
+			document.setStatus(AbstractDocument.DOC_UNLOCKED);
+			document.setLockUserId(null);
+			document.setFolder(folder);
+			document.setDigest(null);
+			document.setFileSize(file.length());
+			document.setExtResId(null);
+
+			// Create new version (a new version number is created)
+			Version version = Version.create(document, transaction.getUser(), transaction.getComment(),
+					DocumentEvent.CHECKEDIN.toString(), release);
+
+			document.setStatus(AbstractDocument.DOC_UNLOCKED);
+			documentDAO.store(document, transaction);
+
+			// store the document in the repository (on the file system)
+			try {
+				storeFile(document, file);
+			} catch (IOException ioe) {
+				log.error("Cannot save the new version {} into the storage", document, ioe);
+
+				document.copyAttributes(oldDocument);
+				document.setOcrd(oldDocument.getOcrd());
+				document.setOcrTemplateId(oldDocument.getOcrTemplateId());
+				document.setBarcoded(oldDocument.getBarcoded());
+				document.setBarcodeTemplateId(oldDocument.getBarcodeTemplateId());
+				document.setIndexed(oldDocument.getIndexed());
+				document.setCustomId(oldDocument.getCustomId());
+				document.setStatus(oldDocument.getStatus());
+				document.setStamped(oldDocument.getStamped());
+				document.setSigned(oldDocument.getSigned());
+				document.setComment(oldDocument.getComment());
+				documentDAO.store(document);
+				throw new PersistenceException(ioe.getMessage());
+			}
+
+			version.setFileSize(document.getFileSize());
+			version.setDigest(null);
+			versionDAO.store(version);
+
+			log.debug("Stored version {}", version.getVersion());
+			log.debug("Invoke listeners after checkin");
+			for (DocumentListener listener : listenerManager.getListeners())
+				listener.afterCheckin(document, transaction, dictionary);
+			documentDAO.store(document);
+
+			log.debug("Checked in document {}", docId);
+
+			if (!document.getFileVersion().equals(oldFileVersion))
+				documentNoteDAO.copyAnnotations(document.getId(), oldFileVersion, document.getFileVersion());
 		}
 	}
 
@@ -339,7 +342,7 @@ public class DocumentManagerImpl implements DocumentManager {
 	public void checkin(long docId, InputStream content, String filename, boolean release, AbstractDocument docVO,
 			DocumentHistory transaction) throws IOException, PersistenceException {
 		validateTransaction(transaction);
-		assert transaction.getComment() != null : "No comment in transaction";
+		assert transaction.getComment() != null : NO_COMMENT_IN_TRANSACTION;
 
 		// Write content to temporary file, then delete it
 		File tmp = FileUtil.createTempFile("checkin", "");
@@ -477,8 +480,6 @@ public class DocumentManagerImpl implements DocumentManager {
 
 		log.debug("Reindexing document {} - {}", docId, doc.getFileName());
 
-		boolean alreadyIndexed = doc.getIndexed() == AbstractDocument.INDEX_INDEXED;
-
 		String cont = content;
 		long parsingTime = 0;
 		if (doc.getDocRef() != null) {
@@ -527,11 +528,9 @@ public class DocumentManagerImpl implements DocumentManager {
 		documentDAO.store(doc, transaction);
 
 		/*
-		 * If the document was already indexed, mark the aliases to be
-		 * re-indexed
+		 * Mark the aliases to be re-indexed
 		 */
-		if (alreadyIndexed)
-			markAliasesToIndex(docId);
+		markAliasesToIndex(docId);
 
 		return parsingTime;
 

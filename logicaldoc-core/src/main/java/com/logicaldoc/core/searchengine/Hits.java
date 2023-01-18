@@ -19,6 +19,8 @@ import com.logicaldoc.core.security.Tenant;
  */
 public class Hits implements Iterator<Hit>, Serializable {
 	
+	private static final String SCORE = "score";
+
 	private static final long serialVersionUID = 1L;
 
 	private transient Iterator<SolrDocument> internal;
@@ -69,7 +71,7 @@ public class Hits implements Iterator<Hit>, Serializable {
 				}
 		}
 
-		Float score = (Float) doc.getFieldValue("score");
+		Float score = (Float) doc.getFieldValue(SCORE);
 		if (score != null)
 			hit.setScore(createScore(rsp.getResults().getMaxScore(), score));
 		hit.setSummary(summary.toString());
@@ -91,8 +93,8 @@ public class Hits implements Iterator<Hit>, Serializable {
 		} else
 			hit.setTenantId(Tenant.DEFAULT_ID);
 
-		if (sdoc.getFieldValue("score") != null) {
-			Float score = (Float) sdoc.getFieldValue("score");
+		if (sdoc.getFieldValue(SCORE) != null) {
+			Float score = (Float) sdoc.getFieldValue(SCORE);
 			hit.setScore((int) (score * 100));
 		}
 

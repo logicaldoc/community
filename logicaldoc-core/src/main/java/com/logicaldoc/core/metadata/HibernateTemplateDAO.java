@@ -29,6 +29,10 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template> implements TemplateDAO {
 
+	private static final String TENANT_ID_EQUAL = ".tenantId=";
+
+	private static final String ORDER_BY = "order by ";
+
 	private UserDAO userDAO;
 
 	public HibernateTemplateDAO() {
@@ -43,7 +47,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll() {
 		try {
-			return findByWhere(" 1=1", "order by " + ENTITY + ".name", null);
+			return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Template>();
@@ -53,8 +57,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findAll(long tenantId) {
 		try {
-			return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "order by " + ENTITY + ".name",
-					null);
+			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Template>();
@@ -66,8 +69,9 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 		Template template = null;
 
 		try {
-			List<Template> coll = findByWhere(ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and "
-					+ ENTITY + ".tenantId=" + tenantId, null, null);
+			List<Template> coll = findByWhere(
+					ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and " + ENTITY + TENANT_ID_EQUAL + tenantId,
+					null, null);
 			if (coll.size() > 0)
 				template = coll.iterator().next();
 			if (template != null && template.getDeleted() == 1)
@@ -122,8 +126,8 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 	@Override
 	public List<Template> findByType(int type, long tenantId) {
 		try {
-			return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + ".tenantId=" + tenantId,
-					"order by " + ENTITY + ".name asc", null);
+			return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
+					ORDER_BY + ENTITY + ".name asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<Template>();
@@ -158,8 +162,7 @@ public class HibernateTemplateDAO extends HibernatePersistentObjectDAO<Template>
 			if (groups.isEmpty())
 				return false;
 
-			StringBuilder query = new StringBuilder(
-					"select distinct(" + ENTITY + ") from Template " + ENTITY + "  ");
+			StringBuilder query = new StringBuilder("select distinct(" + ENTITY + ") from Template " + ENTITY + "  ");
 			query.append(" left join " + ENTITY + ".templateGroups as _group ");
 			query.append(" where ");
 			if (write)

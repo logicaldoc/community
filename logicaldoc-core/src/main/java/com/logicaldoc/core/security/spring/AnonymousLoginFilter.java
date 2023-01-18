@@ -29,8 +29,8 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 	static final String FILTER_APPLIED = "__com_logicaldoc_core_security_spring_AnonymousLoginFilter_applied";
 
 	@Override
-	public void doFilter(ServletRequest rec, ServletResponse res, FilterChain chain) throws IOException,
-			ServletException {
+	public void doFilter(ServletRequest rec, ServletResponse res, FilterChain chain)
+			throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) rec;
 		HttpServletResponse response = (HttpServletResponse) res;
 
@@ -46,15 +46,14 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 		if ((authentication == null || (authentication != null && !authentication.isAuthenticated()))
 				&& "login".equals(request.getParameter("anonymous"))) {
 
-			String tenant = "default";
-			if (StringUtils.isNotEmpty(request.getParameter("tenant")))
-				tenant = request.getParameter("tenant");
+			String tenant = getTenant(request);
 
 			ContextProperties config = Context.get().getProperties();
 			if (config.getBoolean(tenant + ".anonymous.enabled")) {
-				LDAuthenticationToken authToken = new LDAuthenticationToken(config.getProperty(tenant + ".anonymous.user"));
-				AuthenticationManager authenticationManager = (AuthenticationManager) Context.get().getBean(
-						AuthenticationManager.class);
+				LDAuthenticationToken authToken = new LDAuthenticationToken(
+						config.getProperty(tenant + ".anonymous.user"));
+				AuthenticationManager authenticationManager = (AuthenticationManager) Context.get()
+						.getBean(AuthenticationManager.class);
 				try {
 					Authentication anonAuthentication = authenticationManager.authenticate(authToken);
 					if (anonAuthentication.isAuthenticated()) {
@@ -70,5 +69,12 @@ public class AnonymousLoginFilter extends GenericFilterBean {
 		}
 
 		chain.doFilter(request, response);
+	}
+
+	private String getTenant(HttpServletRequest request) {
+		String tenant = "default";
+		if (StringUtils.isNotEmpty(request.getParameter("tenant")))
+			tenant = request.getParameter("tenant");
+		return tenant;
 	}
 }

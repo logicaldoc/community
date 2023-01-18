@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.Callable;
 
 import javax.mail.MessagingException;
@@ -29,6 +30,7 @@ import org.apache.http.message.BasicNameValuePair;
 import com.logicaldoc.core.communication.EMail;
 import com.logicaldoc.core.communication.EMailAttachment;
 import com.logicaldoc.core.communication.MailUtil;
+import com.logicaldoc.util.exec.Exec;
 import com.logicaldoc.util.http.HttpUtil;
 import com.logicaldoc.util.io.FileUtil;
 import com.talanlabs.avatargenerator.Avatar;
@@ -37,13 +39,35 @@ import com.talanlabs.avatargenerator.IdenticonAvatar;
 public class CoreWorkBench {
 
 	public static void main(String[] args) throws Exception {
-		
-		
-		Long xx=null;
-		long pp = xx;
-		
-		System.out.println("ppp "+pp);
-		
+		double load = 0.8;
+		while (true) {
+            // Every 100ms, sleep for the percentage of unladen time
+            if (System.currentTimeMillis() % 100 == 0) {
+                Thread.sleep((long) Math.floor((1 - load) * 100));
+            }
+        }
+//		StringBuilder sb = new StringBuilder();
+//		Exec.exec("wmic cpu get loadpercentage", null, null, sb, 20);
+//		
+//		try {
+//			Thread.sleep(500);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//		}
+//		
+//		String output = sb.toString();
+//		int load = 0;
+//
+//		try (Scanner scanner = new Scanner(output)) {
+//			while (scanner.hasNextLine()) {
+//				// trim and remove all non printable chars
+//				String line = scanner.nextLine().trim().replaceAll("\\p{Zs}+", "");
+//				if (line.matches("^\\d+$")) {
+//					load = Integer.parseInt(line);
+//				}
+//			}
+//		}
+
 //		String[] timezones = TimeZone.getAvailableIDs();
 //		for (String timezone : timezones) {
 //			System.out.println(timezone);

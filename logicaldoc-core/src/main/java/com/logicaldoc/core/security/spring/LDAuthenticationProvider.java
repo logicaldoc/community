@@ -44,21 +44,11 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
 		String username = String.valueOf(auth.getPrincipal());
-		String password = String.valueOf(auth.getCredentials());
-
+		
 		HttpServletRequest httpReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
-		String jPassword = httpReq.getParameter("j_password");
-		if (jPassword != null && !jPassword.equals(password)) {
-			/*
-			 * When the password contains a % followed by two digits the
-			 * password read by Spring Security gets wrong. For instance the
-			 * password xx%89xx! is returned as xx?xx! So in case the password
-			 * is different from j_password parameter, we must use the
-			 * j_password
-			 */
-			password = jPassword;
-		}
+		
+		String password = getPassword(auth, httpReq);
 
 		String key = httpReq.getParameter("key");
 
@@ -154,6 +144,22 @@ public class LDAuthenticationProvider implements AuthenticationProvider {
 						(com.logicaldoc.core.security.authentication.AuthenticationException) ae);
 			throw new CredentialsExpiredException(ae.getMessage() != null ? ae.getMessage() : "badcredentials");
 		}
+	}
+
+	private String getPassword(UsernamePasswordAuthenticationToken auth, HttpServletRequest httpReq) {
+		String password = String.valueOf(auth.getCredentials());
+		String jPassword = httpReq.getParameter("j_password");
+		if (jPassword != null && !jPassword.equals(password)) {
+			/*
+			 * When the password contains a % followed by two digits the
+			 * password read by Spring Security gets wrong. For instance the
+			 * password xx%89xx! is returned as xx?xx! So in case the password
+			 * is different from j_password parameter, we must use the
+			 * j_password
+			 */
+			password = jPassword;
+		}
+		return password;
 	}
 
 	@Override

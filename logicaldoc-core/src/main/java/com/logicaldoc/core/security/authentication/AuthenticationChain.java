@@ -43,11 +43,11 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	@Override
 	public final User authenticate(String username, String password, String key, Client client)
 			throws AuthenticationException {
-		if (authenticators == null || authenticators.isEmpty())
-			init();
 
+		init();
+		
 		UserDAO userDao = (UserDAO) Context.get().getBean(UserDAO.class);
-
+		
 		User user = null;
 		try {
 			user = checkAnonymousLogin(username, key, client);
@@ -58,6 +58,44 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			return user;
 
 		List<AuthenticationException> errors = new ArrayList<AuthenticationException>();
+		user = authenticateUsingAuthenticators(username, password, key, client, user, errors);
+
+		/*
+		 * At the end we need to do in any case some default validations
+		 */
+		try {
+			defaultValidations(username, client);
+		} catch (AuthenticationException ae) {
+			errors.clear();
+			errors.add(ae);
+			user = null;
+		} catch (PersistenceException pe) {
+			log.error(pe.getMessage(), pe);
+			errors.clear();
+			user = null;
+		}
+
+		
+		log.debug("Collected authentication errors: {}", errors);
+
+		if (user != null) {
+			userDao.initialize(user);
+		} else if (!errors.isEmpty()) {
+			// In case of multiple errors, we consider the first one that is
+			// not a UserNotFound exception because it is normal that some
+			// authenticator does not find this user because not in it's domain
+			if (errors.size() > 1)
+				for (AuthenticationException err : errors)
+					if (!(err instanceof AccountNotFoundException))
+						throw err;
+			throw errors.get(0);
+		}
+
+		return user;
+	}
+
+	private User authenticateUsingAuthenticators(String username, String password, String key, Client client, User user,
+			List<AuthenticationException> errors) {
 		for (Authenticator cmp : authenticators) {
 			if (!cmp.isEnabled())
 				continue;
@@ -76,38 +114,6 @@ public class AuthenticationChain extends AbstractAuthenticator {
 			if (user != null)
 				break;
 		}
-
-		/*
-		 * At the end we need to do in any case some default validations
-		 */
-		try {
-			defaultValidations(username, client);
-		} catch (AuthenticationException ae) {
-			errors.clear();
-			errors.add(ae);
-			user = null;
-		} catch (PersistenceException pe) {
-			log.error(pe.getMessage(), pe);
-			errors.clear();
-			user = null;
-		}
-
-		if (errors != null && !errors.isEmpty())
-			log.debug("Collected authentication errors: {}", errors);
-
-		if (user != null) {
-			userDao.initialize(user);
-		} else if (!errors.isEmpty()) {
-			// In case of multiple errors, we consider the first one that is
-			// not a UserNotFound exception because it is normal that some
-			// authenticator does not find this user because not in it's domain
-			if (errors.size() > 1)
-				for (AuthenticationException err : errors)
-					if (!(err instanceof AccountNotFoundException))
-						throw err;
-			throw errors.get(0);
-		}
-
 		return user;
 	}
 
@@ -139,8 +145,8 @@ public class AuthenticationChain extends AbstractAuthenticator {
 
 	@Override
 	public User pickUser(String username) {
-		if (authenticators == null || authenticators.isEmpty())
-			init();
+		
+		init();
 
 		User user = null;
 		for (Authenticator cmp : authenticators) {
@@ -181,13 +187,7 @@ public class AuthenticationChain extends AbstractAuthenticator {
 		defaultValidations(username, client);
 
 		TenantDAO tdao = (TenantDAO) Context.get().getBean(TenantDAO.class);
-		Tenant t = null;
-		try {
-			t = user != null ? tdao.findById(user.getTenantId()) : null;
-		} catch (PersistenceException e) {
-			log.error(e.getMessage(), e);
-		}
-
+		Tenant t = user != null ? tdao.findById(user.getTenantId()) : null;
 		if (t != null)
 			tenant = t.getName();
 
@@ -212,6 +212,11 @@ public class AuthenticationChain extends AbstractAuthenticator {
 	 * Authentication declared in the core plug-in.
 	 */
 	private void init() {
+		if (!authenticators.isEmpty()) {
+			// initialize only if not already initialized
+			return;
+		}
+
 		Context context = Context.get();
 		PluginRegistry registry = PluginRegistry.getInstance();
 		Collection<Extension> exts = registry.getExtensions("logicaldoc-core", "Authentication");

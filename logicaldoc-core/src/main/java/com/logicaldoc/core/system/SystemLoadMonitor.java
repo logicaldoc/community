@@ -1,12 +1,19 @@
 package com.logicaldoc.core.system;
 
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.logicaldoc.util.SystemUtil;
 import com.logicaldoc.util.config.ContextProperties;
+import com.logicaldoc.util.exec.Exec;
 
 /**
  * This class monitors the system load and notifies the listeners accordingly
@@ -15,27 +22,18 @@ import com.logicaldoc.util.config.ContextProperties;
  * @since 6.7.1
  */
 public class SystemLoadMonitor {
+
 	protected static Logger log = LoggerFactory.getLogger(SystemLoadMonitor.class);
 
 	private ContextProperties config;
 
-	private int[][] samples = new int[60][60];
+	private CircularFifoQueue<Integer> samples = null;
 
-	private int[] averageCpuLoad = new int[2];
+	private int averageCpuLoad = 0;
 
 	private LoadTracker tracker = new LoadTracker();
 
 	private List<SystemLoadListener> listeners = new ArrayList<>();
-
-	public void setConfig(ContextProperties config) {
-		this.config = config;
-		setSamplesTotal(config.getInt("load.cpusamples"));
-	}
-
-	public void setSamplesTotal(int samplesTotal) {
-		samples = new int[samplesTotal][samplesTotal];
-		averageCpuLoad = new int[2];
-	}
 
 	public void addListener(SystemLoadListener listener) {
 		if (!listeners.contains(listener))
@@ -46,44 +44,127 @@ public class SystemLoadMonitor {
 		listeners.remove(listener);
 	}
 
-	/**
-	 * Gets the average CPU load computed in the last two minutes:<br>
-	 * <ol>
-	 * <li>first value: the 'average cpu usage' for the whole system</li>
-	 * <li>second value: the 'average cpu usage' for the JVM process</li>
-	 * </ol>
-	 * 
-	 * @return average CPU load infos
-	 */
-	public int[] getAverageCpuLoad() {
-		return averageCpuLoad;
+	public void setConfig(ContextProperties config) {
+		this.config = config;
+	}
+
+	private void initSamples() {
+		int wantedSamples = config.getInt("load.cpusamples", 60);
+
+		if (samples == null || samples.maxSize() != wantedSamples) {
+			CircularFifoQueue<Integer> newSamples = new CircularFifoQueue<>(wantedSamples);
+
+			/// Init the samples with all zeros
+			for (int i = 0; i < wantedSamples; i++)
+				newSamples.add(0);
+
+			// Copy the current samples
+			if (samples != null)
+				newSamples.addAll(samples);
+			samples = newSamples;
+		}
 	}
 
 	/**
-	 * Check if the 'recent' CPU load is over the limit defined in 'load.cpumax'
-	 * config parameter.
+	 * Retrieve the CPU load.
 	 * 
-	 * @return if the CPU is overloaded
+	 * @return current CPU load
 	 */
-	public boolean isCpuOverLoaded() {
-		int cpumax = config.getInt("load.cpumax", 50);
-		if (cpumax < 1)
-			return false;
-		else
-			return getCpuLoad()[0] > cpumax;
+	public int getCpuLoad() {
+		// try to get the CPU usage with JMX
+		OperatingSystemMXBean osMXBean = ManagementFactory.getOperatingSystemMXBean();
+		int load = (int) Math
+				.round((osMXBean.getSystemLoadAverage() / (double) osMXBean.getAvailableProcessors()) * 100d);
+		if (load < 0) {
+			// On some systems Java is not able to get the CPU usage so try to
+			// extract the information from the shell
+			load = SystemUtil.isWindows() ? getCpuLoadOnWindows() : getCpuLoadOnLinux();
+		}
+		if (load < 0)
+			load = 0;
+
+		if (log.isTraceEnabled())
+			log.trace("Got CPU load: {}", load);
+
+		return load;
 	}
 
-	/**
-	 * Retrieve the CPU load:<br>
-	 * <ol>
-	 * <li>first value: the 'recent cpu usage' for the whole system</li>
-	 * <li>second value: the 'recent cpu usage' for the JVM process</li>
-	 * </ol>
-	 * 
-	 * @return current CPU load infos
-	 */
-	public int[] getCpuLoad() {
-		return new int[] { 0, 0 };
+	private int getCpuLoadOnWindows() {
+		StringBuilder sb = new StringBuilder();
+		try {
+			Exec exec = new Exec();
+			exec.setOutPrefix(null);
+			exec.exec("wmic cpu get loadpercentage", null, null, sb, 5);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			log.warn(e1.getMessage(), e1);
+			return 0;
+		}
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// do not worry
+		}
+
+		/*
+		 * Typical output is: LoadPercentage 6
+		 */
+		String output = sb.toString();
+		int load = 0;
+
+		try (Scanner scanner = new Scanner(output)) {
+			while (scanner.hasNextLine()) {
+				// trim and remove all non printable chars
+				String line = scanner.nextLine().trim().replaceAll("\\p{Zs}+", "");
+				if (line.matches("^\\d+$")) {
+					load = Integer.parseInt(line);
+					break;
+				}
+			}
+		}
+
+		return load;
+	}
+
+	private int getCpuLoadOnLinux() {
+		StringBuilder sb = new StringBuilder();
+		try {
+			Exec exec = new Exec();
+			exec.setOutPrefix(null);
+			exec.exec("top -bn1", null, null, sb, 5);
+		} catch (IOException e1) {
+			log.warn(e1.getMessage(), e1);
+			return 0;
+		}
+
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// do not worry
+		}
+
+		/*
+		 * Typical output is: %Cpu(s): 98.5 us, 1.5 sy, 0.0 ni, 0.0 id, 0.0 wa,
+		 * 0.0 hi, 0.0 si, 0.0 ste
+		 */
+		String output = sb.toString();
+		int load = 0;
+
+		try (Scanner scanner = new Scanner(output)) {
+			while (scanner.hasNextLine()) {
+				// trim and remove all non printable chars
+				String line = scanner.nextLine().trim().toLowerCase().replaceAll("\\p{Zs}+", "");
+				if (line.startsWith("%cpu")) {
+					line = line.substring(line.indexOf(':') + 1).trim().toLowerCase();
+					line = line.substring(0, line.indexOf('u')).trim();
+					load = Math.round(Float.parseFloat(line));
+					break;
+				}
+			}
+		}
+
+		return load;
 	}
 
 	/**
@@ -97,7 +178,7 @@ public class SystemLoadMonitor {
 		if (cpumax < 1)
 			return false;
 		else
-			return averageCpuLoad[0] > cpumax;
+			return averageCpuLoad > cpumax;
 	}
 
 	public void stop() {
@@ -110,18 +191,39 @@ public class SystemLoadMonitor {
 	}
 
 	public void start() {
-		stop();
+		initSamples();
 		tracker.setPriority(Thread.MIN_PRIORITY);
 		tracker.start();
+		log.info("System load monitor started");
+	}
+
+	/**
+	 * Get a sample and stores it in the FIFO of samples, each time also
+	 * calculates the average CPU load
+	 */
+	private void pickCpuLoad() {
+		// Get an actual sample and store it
+		int sample = getCpuLoad();
+		samples.add(sample);
+
+		// Calculate and save the average load
+		averageCpuLoad = (int) Math.round(samples.stream().mapToDouble(s -> Double.valueOf(s)).average().getAsDouble());
+
+		if (log.isTraceEnabled())
+			log.trace("Average CPU load: {}", averageCpuLoad);
 	}
 
 	/*
-	 * This thread collects statistics about the system load in the last two
-	 * minutes
+	 * This thread collects statistics about the system load in the last time
+	 * (samples number * 1sec)
 	 */
 	class LoadTracker extends Thread {
 
 		private boolean running = true;
+
+		public boolean isRunning() {
+			return running;
+		}
 
 		public void end() {
 			running = false;
@@ -130,47 +232,39 @@ public class SystemLoadMonitor {
 		@Override
 		public void run() {
 			while (running) {
-				synchronized (SystemLoadMonitor.this) {
-					int i = 0;
-					while (i < samples.length && running) {
-						try {
-							SystemLoadMonitor.this.wait(2000);
-						} catch (InterruptedException e) {
-							Thread.currentThread().interrupt();
-						}
+				initSamples();
+				int i = 0;
+				while (i < samples.maxSize() && running) {
+					waitMilliseconds(1000);
 
-						// Get an actual sample and store it
-						int[] sample = getCpuLoad();
-						samples[i] = sample;
+					pickCpuLoad();
 
-						long totals[] = new long[2];
+					checkOverloadOrUnderload();
 
-						// Compute the average
-						for (int j = 0; j < samples.length; j++) {
-							totals[0] = totals[0] + samples[j][0];
-							totals[1] = totals[1] + samples[j][1];
-						}
-
-						int[] averageOld = new int[] { averageCpuLoad[0], averageCpuLoad[1] };
-						averageCpuLoad[0] = (int) Math.round(totals[0] / (float) samples.length);
-						averageCpuLoad[1] = (int) Math.round(totals[1] / (float) samples.length);
-
-						int cpuLoadMax = config.getInt("system.cpuload.max", 50);
-						if (cpuLoadMax > 0)
-							if (averageOld[0] <= cpuLoadMax && averageCpuLoad[0] > cpuLoadMax) {
-								log.warn("The system is overloaded (" + averageCpuLoad[0] + "%)");
-								for (SystemLoadListener listener : listeners) {
-									listener.onOverload(averageCpuLoad[0], averageCpuLoad[1]);
-								}
-							} else if (averageOld[0] > cpuLoadMax && averageCpuLoad[0] <= cpuLoadMax) {
-								log.warn("The system is underloaded (" + averageCpuLoad[0] + "%)");
-								for (SystemLoadListener listener : listeners) {
-									listener.onUnderload(averageCpuLoad[0], averageCpuLoad[1]);
-								}
-							}
-						i++;
-					}
+					i++;
 				}
+			}
+		}
+
+		private void checkOverloadOrUnderload() {
+			if (isAverageCpuOverLoaded()) {
+				log.warn("The system is overloaded (" + averageCpuLoad + "%)");
+				for (SystemLoadListener listener : listeners) {
+					listener.onOverload(averageCpuLoad, averageCpuLoad);
+				}
+			} else {
+				log.warn("The system is underloaded (" + averageCpuLoad + "%)");
+				for (SystemLoadListener listener : listeners) {
+					listener.onUnderload(averageCpuLoad, averageCpuLoad);
+				}
+			}
+		}
+
+		private void waitMilliseconds(long ms) {
+			try {
+				Thread.sleep(ms);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 		}
 	}

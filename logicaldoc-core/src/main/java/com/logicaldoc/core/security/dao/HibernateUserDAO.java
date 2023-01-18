@@ -137,8 +137,7 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			params.put("username", username);
 			params.put("name", name.toLowerCase());
 
-			return findByWhere(
-					"lower(" + ENTITY + ".name) like :name and " + ENTITY + ".username like :username",
+			return findByWhere("lower(" + ENTITY + ".name) like :name and " + ENTITY + ".username like :username",
 					params, null, null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -226,18 +225,10 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		boolean newUser = user.getId() == 0;
 		boolean passwordChanged = false;
-		boolean enabledChanged = false;
+		boolean enabledStatusChanged = false;
 
-		String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
-		passwordChanged = currentPassword == null || !currentPassword.equals(user.getPassword());
+		passwordChanged = processPasswordChanged(user);
 
-		if (passwordChanged) {
-			checkAlreadyUsedPassword(user);
-			checkPasswordStrength(user);
-		}
-
-		if ("admin".equals(user.getUsername()) && user.getType() != User.TYPE_DEFAULT)
-			throw new PersistenceException("User admin must be default type");
 		if (newUser && findByUsernameIgnoreCase(user.getUsername()) != null)
 			throw new PersistenceException(String.format(
 					"Another user exists with the same username %s (perhaps with different case)", user.getUsername()));
@@ -245,35 +236,22 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		if (user.getType() == User.TYPE_SYSTEM)
 			user.setType(User.TYPE_DEFAULT);
 
-		if (user.isReadonly()) {
-			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
-			Group guestGroup = gDao.findByName("guest", user.getTenantId());
-			Group userGroup = user.getUserGroup();
-			user.removeGroupMemberships(null);
-			user.addGroup(userGroup);
-			user.addGroup(guestGroup);
-		}
+		enforceReadOnlyUserGroups(user);
 
 		Map<String, Object> dictionary = new HashMap<String, Object>();
 
-		log.debug("Invoke listeners before store");
-		for (UserListener listener : userListenerManager.getListeners())
-			try {
-				listener.beforeStore(user, transaction, dictionary);
-			} catch (Exception e1) {
-				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e1);
-			}
+		invokeListenersBefore(user, transaction, dictionary);
 
 		if (newUser) {
 			user.setCreation(new Date());
 			user.setLastEnabled(user.getCreation());
 		} else {
 			int currentEnabled = queryForInt("select ld_enabled from ld_user where ld_id=" + user.getId());
-			enabledChanged = currentEnabled != user.getEnabled();
+			enabledStatusChanged = currentEnabled != user.getEnabled();
 
 			// Record the last enabled date in case the user is getting
 			// enabled
-			if (enabledChanged && user.getEnabled() == 1)
+			if (enabledStatusChanged && user.getEnabled() == 1)
 				user.setLastEnabled(new Date());
 
 			// In any case the last enabled must at least equal the creation
@@ -290,6 +268,39 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 
 		saveOrUpdate(user);
 
+		enforceUserGroupAssignment(user);
+
+		/*
+		 * Update the user-group assignments
+		 */
+		updateUserGroupAssignments(user);
+
+		// Save the password history to track the password change
+		recordPasswordChange(user, transaction, passwordChanged);
+
+		infokeListenersAfter(user, transaction, dictionary);
+
+		saveHistory(user, transaction, newUser);
+
+		// If the admin password may have been changed and the 'adminpasswd'
+		// also has to
+		// be updated
+		updateAdminPasswordSetting(user);
+
+		enforceReadOnlyUserPermissions(user);
+
+		saveEnabledOrDisabledHistory(user, transaction, enabledStatusChanged);
+	}
+
+	/**
+	 * Enforces the assignment of the special user group(the group that also
+	 * represents the user itself)
+	 * 
+	 * @param user The current user
+	 * 
+	 * @throws PersistenceException Error in the database
+	 */
+	private void enforceUserGroupAssignment(User user) throws PersistenceException {
 		GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
 		String userGroupName = user.getUserGroupName();
 		Group grp = groupDAO.findByName(userGroupName, user.getTenantId());
@@ -302,23 +313,19 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 		}
 		if (!user.isMemberOf(grp.getName()))
 			user.addGroup(grp);
+	}
 
-		/*
-		 * Update the user-group assignments
-		 */
-		{
-			jdbcUpdate("delete from ld_usergroup where ld_userid = ?", user.getId());
-			for (UserGroup ug : user.getUserGroups()) {
-				int exists = queryForInt("select count(*) from ld_group where ld_id=" + ug.getGroupId());
-				if (exists > 0) {
-					jdbcUpdate("insert into ld_usergroup(ld_userid, ld_groupid) values (" + user.getId() + ", "
-							+ ug.getGroupId() + ")");
-				} else
-					log.warn("It seems that the usergroup {} does not exist anymore", ug.getGroupId());
-			}
-		}
-
-		// Save the password history to track the password change
+	/**
+	 * Saves the password history to track the password change
+	 * 
+	 * @param user The current user
+	 * @param transaction The current session
+	 * @param passwordChanged A flag indicating
+	 * 
+	 * @throws PersistenceException
+	 */
+	private void recordPasswordChange(User user, UserHistory transaction, boolean passwordChanged)
+			throws PersistenceException {
 		if (passwordChanged) {
 			PasswordHistory pHist = new PasswordHistory();
 			pHist.setDate(transaction != null ? transaction.getDate() : new Date());
@@ -328,15 +335,72 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			passwordHistoryDAO.store(pHist);
 			passwordHistoryDAO.cleanOldHistories(user.getId(), getPasswordEnforce(user) * 2);
 		}
+	}
 
-		log.debug("Invoke listeners after store");
-		for (UserListener listener : userListenerManager.getListeners())
+	/**
+	 * Manipulates a read-only user in order to enforce the right group
+	 * assignments
+	 * 
+	 * @param user The current user
+	 * 
+	 * @throws PersistenceException Error in the database
+	 */
+	private void enforceReadOnlyUserGroups(User user) {
+		if (user.isReadonly()) {
+			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			Group guestGroup = gDao.findByName("guest", user.getTenantId());
+			Group userGroup = user.getUserGroup();
+			user.removeGroupMemberships(null);
+			user.addGroup(userGroup);
+			user.addGroup(guestGroup);
+		}
+	}
+
+	/**
+	 * Manipulates a read-only user in order to enforce the right guest
+	 * permissions
+	 * 
+	 * @param user The current user
+	 * 
+	 * @throws PersistenceException Error in the database
+	 */
+	private void enforceReadOnlyUserPermissions(User user) throws PersistenceException {
+		if (user.isReadonly()) {
+			user = findById(user.getId());
+			initialize(user);
+			GroupDAO groupDAO = (GroupDAO) Context.get().getBean(GroupDAO.class);
+			for (Group group : user.getGroups())
+				groupDAO.fixGuestPermissions(group);
+		}
+	}
+
+	/**
+	 * Updates the 'adminpasswd' setting if the user is the administrator
+	 * 
+	 * @param user the current user
+	 */
+	private void updateAdminPasswordSetting(User user) {
+		if ("admin".equals(user.getUsername()) && user.getTenantId() == Tenant.DEFAULT_ID) {
+			log.info("Updated adminpasswd");
+			config.setProperty("adminpasswd", user.getPassword());
 			try {
-				listener.afterStore(user, transaction, dictionary);
-			} catch (Exception e1) {
-				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e1);
+				config.write();
+			} catch (IOException e) {
+				log.warn("Cannot write the new admin password in the configuration file", e);
 			}
+		}
+	}
 
+	/**
+	 * Prepares and saves the right history when a user gets stored
+	 * 
+	 * @param user The current user
+	 * @param transaction The current transaction
+	 * @param newUser A flag indicating if the user is newly created
+	 * 
+	 * @throws PersistenceException Error in the database
+	 */
+	private void saveHistory(User user, UserHistory transaction, boolean newUser) throws PersistenceException {
 		if (newUser) {
 			saveDefaultDashlets(user);
 
@@ -349,30 +413,42 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			createdHistory.setEvent(UserEvent.CREATED.toString());
 			createdHistory.setComment(user.getUsername());
 			saveUserHistory(user, createdHistory);
-		} else if (transaction != null)
+		} else {
 			saveUserHistory(user, transaction);
-
-		// If the admin password was changed the 'adminpasswd' also has to
-		// be updated
-		if ("admin".equals(user.getUsername()) && user.getTenantId() == Tenant.DEFAULT_ID) {
-			log.info("Updated adminpasswd");
-			config.setProperty("adminpasswd", user.getPassword());
-			try {
-				config.write();
-			} catch (IOException e) {
-				log.warn("Cannot write the new admin password in the configuration file", e);
-			}
 		}
+	}
 
-		if (user.isReadonly()) {
-			user = findById(user.getId());
-			initialize(user);
-			for (Group group : user.getGroups())
-				groupDAO.fixGuestPermissions(group);
+	/**
+	 * Update the user-group assignments
+	 * 
+	 * @param user the current user
+	 * 
+	 * @throws PersistenceException Error in the database
+	 */
+	private void updateUserGroupAssignments(User user) throws PersistenceException {
+		jdbcUpdate("delete from ld_usergroup where ld_userid = ?", user.getId());
+		for (UserGroup ug : user.getUserGroups()) {
+			int exists = queryForInt("select count(*) from ld_group where ld_id=" + ug.getGroupId());
+			if (exists > 0) {
+				jdbcUpdate("insert into ld_usergroup(ld_userid, ld_groupid) values (" + user.getId() + ", "
+						+ ug.getGroupId() + ")");
+			} else
+				log.warn("It seems that the usergroup {} does not exist anymore", ug.getGroupId());
 		}
+	}
 
-		if (enabledChanged && (transaction == null || (!transaction.getEvent().equals(UserEvent.DISABLED.toString())
-				&& !transaction.getEvent().equals(UserEvent.ENABLED.toString())))) {
+	/**
+	 * Saves an history to record the changes in the enabled status of a user
+	 * 
+	 * @param user The current user
+	 * @param transaction the current session
+	 * @param enabledStatusChanged A flag indicating if the status has been
+	 *        modified
+	 */
+	private void saveEnabledOrDisabledHistory(User user, UserHistory transaction, boolean enabledStatusChanged) {
+		if (enabledStatusChanged
+				&& (transaction == null || (!transaction.getEvent().equals(UserEvent.DISABLED.toString())
+						&& !transaction.getEvent().equals(UserEvent.ENABLED.toString())))) {
 			UserHistory enabledOrDisabledHistory = new UserHistory();
 			if (transaction != null)
 				enabledOrDisabledHistory = new UserHistory(transaction);
@@ -384,6 +460,48 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			enabledOrDisabledHistory.setComment(null);
 			saveUserHistory(user, enabledOrDisabledHistory);
 		}
+	}
+
+	private void infokeListenersAfter(User user, UserHistory transaction, Map<String, Object> dictionary) {
+		log.debug("Invoke listeners after store");
+		for (UserListener listener : userListenerManager.getListeners())
+			try {
+				listener.afterStore(user, transaction, dictionary);
+			} catch (Exception e1) {
+				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e1);
+			}
+	}
+
+	private void invokeListenersBefore(User user, UserHistory transaction, Map<String, Object> dictionary) {
+		log.debug("Invoke listeners before store");
+		for (UserListener listener : userListenerManager.getListeners())
+			try {
+				listener.beforeStore(user, transaction, dictionary);
+			} catch (Exception e1) {
+				log.warn("Error in listener {}", listener.getClass().getSimpleName(), e1);
+			}
+	}
+
+	/**
+	 * Detects ad handles the password change. It verifies that the new password
+	 * has not been already used and complies with the quality rules.
+	 * 
+	 * @param user The current user
+	 * 
+	 * @return true id the password has been changed
+	 * 
+	 * @throws PersistenceException Error in the database
+	 */
+	private boolean processPasswordChanged(User user) throws PersistenceException {
+		boolean passwordChanged;
+		String currentPassword = queryForString("select ld_password from ld_user where ld_id=" + user.getId());
+		passwordChanged = currentPassword == null || !currentPassword.equals(user.getPassword());
+
+		if (passwordChanged) {
+			checkAlreadyUsedPassword(user);
+			checkPasswordStrength(user);
+		}
+		return passwordChanged;
 	}
 
 	private void saveDefaultDashlets(User user) throws PersistenceException {
@@ -713,8 +831,8 @@ public class HibernateUserDAO extends HibernatePersistentObjectDAO<User> impleme
 			GroupDAO gDao = (GroupDAO) Context.get().getBean(GroupDAO.class);
 			try {
 				List<Group> groups = gDao.findByWhere(
-						ENTITY + ".id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")",
-						null, null);
+						ENTITY + ".id in (" + StringUtil.arrayToString(groupIds.toArray(new Long[0]), ",") + ")", null,
+						null);
 				for (Group group : groups) {
 					user.getGroups().add(group);
 					user.getUserGroups().add(new UserGroup(group.getId()));

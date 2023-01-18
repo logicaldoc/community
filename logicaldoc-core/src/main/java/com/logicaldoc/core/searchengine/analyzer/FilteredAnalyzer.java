@@ -41,6 +41,8 @@ import com.logicaldoc.util.plugin.PluginRegistry;
  */
 public class FilteredAnalyzer extends AnalyzerWrapper {
 
+	private static final String INDEX_TOKENFILTER = "index.tokenfilter.";
+
 	protected static Logger log = LoggerFactory.getLogger(FilteredAnalyzer.class);
 
 	public static final ThreadLocal<String> lang = new ThreadLocal<String>() {
@@ -86,7 +88,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 			configs.put("lang", lang.get());
 
 			// Add the specific settings
-			Map<String, String> filterSettings = config.getProperties("index.tokenfilter." + filter + ".");
+			Map<String, String> filterSettings = config.getProperties(INDEX_TOKENFILTER + filter + ".");
 			for (String key : filterSettings.keySet()) {
 				String val = filterSettings.get(key);
 				if (StringUtils.isNotEmpty(val))
@@ -191,7 +193,7 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 			names.addAll(filters.keySet());
 		else {
 			for (String name : filters.keySet()) {
-				if ("enabled".equals(config.getProperty("index.tokenfilter." + name)))
+				if ("enabled".equals(config.getProperty(INDEX_TOKENFILTER + name)))
 					names.add(name);
 			}
 		}
@@ -199,8 +201,8 @@ public class FilteredAnalyzer extends AnalyzerWrapper {
 
 			@Override
 			public int compare(String name1, String name2) {
-				Integer pos1 = config.getInt("index.tokenfilter." + name1 + ".position", 1);
-				Integer pos2 = config.getInt("index.tokenfilter." + name2 + ".position", 1);
+				Integer pos1 = config.getInt(INDEX_TOKENFILTER + name1 + ".position", 1);
+				Integer pos2 = config.getInt(INDEX_TOKENFILTER + name2 + ".position", 1);
 				return pos1.compareTo(pos2);
 			}
 

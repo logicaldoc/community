@@ -36,6 +36,8 @@ import com.logicaldoc.util.Context;
  */
 public class FulltextSearch extends Search {
 
+	private static final String COLON_STAR_TO = ":[* TO ";
+
 	public static class HitMapper implements RowMapper<Hit> {
 
 		private Map<Long, Hit> hitsMap;
@@ -335,20 +337,20 @@ public class FulltextSearch extends Search {
 			filters.add(HitField.SIZE + ":[" + opt.getSizeMin() + " TO *]");
 
 		if (opt.getSizeMax() != null)
-			filters.add(HitField.SIZE + ":[* TO " + opt.getSizeMax() + "]");
+			filters.add(HitField.SIZE + COLON_STAR_TO + opt.getSizeMax() + "]");
 
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		if (opt.getDateFrom() != null)
 			filters.add(HitField.DATE + ":[" + df.format(opt.getDateFrom()) + "T00:00:00Z TO *]");
 
 		if (opt.getDateTo() != null)
-			filters.add(HitField.DATE + ":[* TO " + df.format(opt.getDateTo()) + "T00:00:00Z]");
+			filters.add(HitField.DATE + COLON_STAR_TO + df.format(opt.getDateTo()) + "T00:00:00Z]");
 
 		if (opt.getCreationFrom() != null)
 			filters.add(HitField.CREATION + ":[" + df.format(opt.getCreationFrom()) + "T00:00:00Z TO *]");
 
 		if (opt.getCreationTo() != null)
-			filters.add(HitField.CREATION + ":[* TO " + df.format(opt.getCreationTo()) + "T00:00:00Z]");
+			filters.add(HitField.CREATION + COLON_STAR_TO + df.format(opt.getCreationTo()) + "T00:00:00Z]");
 
 		appendFolderQueryFilter(opt, filters, accessibleFolderIds);
 	}

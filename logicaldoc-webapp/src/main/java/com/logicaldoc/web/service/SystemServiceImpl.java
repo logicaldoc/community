@@ -876,10 +876,10 @@ public class SystemServiceImpl extends AbstractRemoteService implements SystemSe
 
 		try {
 			if (pluginJarFile.exists()) {
-				if (Exec.isWindows())
+				if (new Exec().isWindows())
 					Runtime.getRuntime().exec("cmd.exe /c \"del /F /Q \"" + pluginJarFile.getAbsolutePath() + "\"\"");
 				else
-					Exec.exec("rm -rf \"" + pluginJarFile.getAbsolutePath() + "\"", null, null);
+					new Exec().exec("rm -rf \"" + pluginJarFile.getAbsolutePath() + "\"", null, null);
 			}
 		} catch (IOException e) {
 			throwServerException(session, log, e);

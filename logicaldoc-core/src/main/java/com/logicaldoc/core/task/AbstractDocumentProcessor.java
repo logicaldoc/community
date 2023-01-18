@@ -51,11 +51,7 @@ abstract public class AbstractDocumentProcessor extends Task {
 			List<Long> ids = (List<Long>) documentDao.queryForList("select ld_id from ld_document where " + where, null,
 					Long.class, max);
 
-			size = ids.size();
-			if (max < size && max > 0)
-				size = max;
-
-			log.info("Found a total of {} documents to be processed", size);
+			getSize(max, ids);
 
 			if (size > 0) {
 				String idsStr = ids.stream().map(id -> Long.toString(id)).collect(Collectors.joining(","));
@@ -120,6 +116,13 @@ abstract public class AbstractDocumentProcessor extends Task {
 			documentDao.bulkUpdate("set ld_transactionid=null where ld_transactionId='" + transactionId + "'",
 					(Map<String, Object>) null);
 		}
+	}
+
+	private void getSize(int max, List<Long> ids) {
+		size = ids.size();
+		if (max < size && max > 0)
+			size = max;
+		log.info("Found a total of {} documents to be processed", size);
 	}
 
 	private User loadUser() {
