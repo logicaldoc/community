@@ -43,6 +43,9 @@ public class FoldersDataServlet extends AbstractDataServlet {
 	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
 			Locale locale) throws PersistenceException, IOException {
 
+		max = (int) Context.get().getProperties().getLong(session.getTenantName() + ".gui.folder.maxchildren",
+				2000L);
+		
 		if (request.getParameter("parent") != null
 				&& (request.getParameter("parent").startsWith("d-") || request.getParameter("parent").equals("null"))) {
 			// The user clicked on a file
