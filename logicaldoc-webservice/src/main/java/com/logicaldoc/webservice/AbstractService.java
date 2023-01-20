@@ -255,13 +255,16 @@ public class AbstractService {
 	protected String validateSession() throws InvalidSessionException {
 		if (validateSession) {
 			String sid = getCurrentSessionId();
-			if (sid == null)
-				throw new InvalidSessionException();
+			if (sid == null || !SessionManager.get().isOpen(sid)) {
+				throw new InvalidSessionException(sid);
+			} else {
+				SessionManager.get().renew(sid);
+			}
 			return sid;
 		} else
 			return null;
 	}
-
+	
 	public static String convertDateToString(Date date) {
 		return DateUtil.format(date);
 	}

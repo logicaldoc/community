@@ -108,6 +108,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 					att.setPosition(attribute.getPosition());
 					att.setMandatory(attribute.getMandatory());
 					att.setHidden(attribute.getHidden());
+					att.setReadonly(attribute.getReadonly());
 					att.setMultiple(attribute.getMultiple());
 					att.setParent(attribute.getParent());
 					att.setLabel(attribute.getLabel());
@@ -253,6 +254,7 @@ public class SoapDocumentMetadataService extends AbstractService implements Docu
 					att.setPosition(attribute.getPosition());
 					att.setMandatory(attribute.getMandatory());
 					att.setHidden(attribute.getHidden());
+					att.setReadonly(attribute.getReadonly());
 					att.setMultiple(attribute.getMultiple());
 					att.setParent(attribute.getParent());
 					att.setLabel(attribute.getLabel());

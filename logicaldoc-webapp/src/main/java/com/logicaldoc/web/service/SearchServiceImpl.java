@@ -134,6 +134,7 @@ public class SearchServiceImpl extends AbstractRemoteService implements SearchSe
 					GUIAttribute ext = new GUIAttribute();
 					ext.setName(name);
 					ext.setHidden(e.getHidden() == 1);
+					ext.setReadonly(e.getReadonly() == 1);
 					ext.setMultiple(e.getMultiple() == 1);
 					ext.setSetId(e.getSetId());
 					ext.setDateValue(e.getDateValue());

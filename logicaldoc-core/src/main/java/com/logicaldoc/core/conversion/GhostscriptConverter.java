@@ -53,7 +53,7 @@ public class GhostscriptConverter extends AbstractFormatConverter {
 			String commandLine = getParameter("path") + " "
 					+ (arguments != null ? arguments : "") + " -sDEVICE=" + device + " "
 					+ pages + " -sOutputFile=" + dest.getPath() + " " + src.getPath();
-			Exec.exec(commandLine, null, null, timeout);
+			new Exec().exec(commandLine, null, null, timeout);
 
 			if (!dest.exists() || dest.length() < 1)
 				throw new Exception("Empty conversion");

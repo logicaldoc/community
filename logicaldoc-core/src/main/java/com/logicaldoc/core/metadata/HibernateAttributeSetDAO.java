@@ -21,6 +21,10 @@ import com.logicaldoc.util.sql.SqlUtil;
  */
 public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<AttributeSet> implements AttributeSetDAO {
 
+	private static final String TENANT_ID_EQUAL = ".tenantId=";
+
+	private static final String ORDER_BY = "order by ";
+
 	private AttributeOptionDAO optionsDao;
 
 	private TemplateDAO templateDao;
@@ -33,7 +37,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	@Override
 	public List<AttributeSet> findAll() {
 		try {
-			return findByWhere(" 1=1", "order by " + ENTITY + ".name", null);
+			return findByWhere(" 1=1", ORDER_BY + ENTITY + ".name", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<AttributeSet>();
@@ -43,7 +47,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	@Override
 	public List<AttributeSet> findAll(long tenantId) {
 		try {
-			return findByWhere(" " + ENTITY + ".tenantId=" + tenantId, "order by " + ENTITY + ".name",
+			return findByWhere(" " + ENTITY + TENANT_ID_EQUAL + tenantId, ORDER_BY + ENTITY + ".name",
 					null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
@@ -56,7 +60,7 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 		AttributeSet template = null;
 		try {
 			List<AttributeSet> coll = findByWhere(ENTITY + ".name = '" + SqlUtil.doubleQuotes(name) + "' and "
-					+ ENTITY + ".tenantId=" + tenantId, null, null);
+					+ ENTITY + TENANT_ID_EQUAL + tenantId, null, null);
 			if (coll.size() > 0)
 				template = coll.iterator().next();
 			if (template != null && template.getDeleted() == 1)
@@ -90,8 +94,8 @@ public class HibernateAttributeSetDAO extends HibernatePersistentObjectDAO<Attri
 	@Override
 	public List<AttributeSet> findByType(int type, long tenantId) {
 		try {
-			return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + ".tenantId=" + tenantId,
-					"order by " + ENTITY + ".name asc", null);
+			return findByWhere(ENTITY + ".type =" + type + " and " + ENTITY + TENANT_ID_EQUAL + tenantId,
+					ORDER_BY + ENTITY + ".name asc", null);
 		} catch (PersistenceException e) {
 			log.error(e.getMessage(), e);
 			return new ArrayList<AttributeSet>();

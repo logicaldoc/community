@@ -23,7 +23,7 @@ create table ld_document_ext (ld_docid bigint not null, ld_mandatory int not nul
                               ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                               ld_intvalue bigint, ld_doublevalue double, ld_datevalue datetime null, 
                               ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
-                              ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                              ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
                               ld_dependson varchar(255), primary key (ld_docid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_generic (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null, 
                          ld_deleted int not null, ld_tenantid bigint not null, ld_type varchar(255) not null, 
@@ -37,7 +37,7 @@ create table ld_generic_ext (ld_genid bigint not null, ld_mandatory int not null
                              ld_editor bigint not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                              ld_intvalue bigint, ld_doublevalue double, ld_datevalue datetime null, 
                              ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
-                             ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                             ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
                              ld_dependson varchar(255), primary key (ld_genid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_group (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null, 
                        ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255) not null, 
@@ -76,7 +76,7 @@ create table ld_template_ext (ld_templateid bigint not null, ld_mandatory int no
                               ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                               ld_intvalue bigint, ld_doublevalue double, ld_datevalue datetime null, ld_validation varchar(4000),
                               ld_initialization varchar(4000), ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint,
-                              ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                              ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
                               ld_dependson varchar(255), primary key (ld_templateid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_templategroup (ld_templateid bigint not null, ld_groupid bigint not null, ld_write int not null, 
                                primary key (ld_templateid, ld_groupid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;                              
@@ -88,7 +88,7 @@ create table ld_attributeset_ext (ld_attsetid bigint not null, ld_mandatory int 
                                   ld_editor int not null, ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                                   ld_intvalue bigint, ld_doublevalue double, ld_datevalue datetime null, ld_validation varchar(4000),
                                   ld_initialization varchar(4000), ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
-                                  ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                                  ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
                                   ld_dependson varchar(255), primary key (ld_setid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_ticket (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_ticketid varchar(255) not null, 
@@ -140,7 +140,7 @@ create table ld_version (ld_id bigint not null, ld_lastmodified datetime not nul
 create table ld_version_ext (ld_versionid bigint not null, ld_mandatory int not null, ld_type int not null, ld_editor int not null, 
                              ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), ld_intvalue bigint, ld_doublevalue double, 
                              ld_datevalue datetime null, ld_name varchar(255) not null, ld_label varchar(255), ld_setid bigint, 
-                             ld_hidden int not null, ld_multiple int not null, ld_parent varchar(255), 
+                             ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, ld_parent varchar(255), 
                              ld_dependson varchar(255), primary key (ld_versionid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_folder (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,
                         ld_deleted int not null, ld_tenantid bigint not null, ld_name varchar(255), 
@@ -154,7 +154,7 @@ create table ld_folder (ld_id bigint not null, ld_lastmodified datetime not null
 create table ld_folder_ext (ld_folderid bigint not null, ld_mandatory int not null, ld_type int not null, ld_editor int not null,
                             ld_position int not null, ld_stringvalue varchar(4000), ld_stringvalues varchar(4000), 
                             ld_intvalue bigint, ld_doublevalue double, ld_datevalue datetime null, ld_name varchar(255) not null, 
-                            ld_label varchar(255), ld_setid bigint, ld_hidden int not null, ld_multiple int not null, 
+                            ld_label varchar(255), ld_setid bigint, ld_hidden int not null, ld_readonly int not null, ld_multiple int not null, 
                             ld_parent varchar(255), ld_dependson varchar(255), primary key (ld_folderid, ld_name)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_folder_storage (ld_folderid bigint not null, ld_nodeid varchar(255) not null, ld_storageid int not null, primary key (ld_folderid, ld_nodeid)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 create table ld_folder_history (ld_id bigint not null, ld_lastmodified datetime not null, ld_recordversion bigint not null,

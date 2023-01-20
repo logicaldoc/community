@@ -69,6 +69,9 @@ public class WSAttribute implements Serializable {
 	@WSDoc(required = true)
 	private int hidden = 0;
 
+	@WSDoc(required = true)
+	private int readonly = 0;
+
 	@WSDoc(required = false)
 	private int position = 0;
 
@@ -337,5 +340,13 @@ public class WSAttribute implements Serializable {
 
 	public void setInitialization(String initialization) {
 		this.initialization = initialization;
+	}
+	
+	public int getReadonly() {
+		return readonly;
+	}
+
+	public void setReadonly(int readonly) {
+		this.readonly = readonly;
 	}
 }

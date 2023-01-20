@@ -7,10 +7,11 @@
   <inherits name='com.google.gwt.widgetideas.GWTCanvas'/>
   <inherits name='com.google.gwt.widgetideas.WidgetIdeas' />   
   <inherits name='com.google.gwt.libideas.LibIdeas' /> 
-  <inherits name='com.google.gwt.user.User' />
   <inherits name='com.google.gwt.xml.XML' />
   
-  <inherits name="com.sksamuel.gwt.GwtWebsockets" />
+  <!-- inherits name="com.sksamuel.gwt.GwtWebsockets" / -->
+  
+  <inherits name="org.realityforge.gwt.websockets.WebSockets"/>
   <inherits name="gdurelle.tagcloud.TagCloud"/>
     
   <!-- inherits name='edu.ycp.cs.dh.acegwt.AceGWT'/ -->

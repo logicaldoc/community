@@ -1053,6 +1053,8 @@ public interface DocumentService {
 	 * @return was it uprotected?
 	 * 
 	 * @throws PersistenceException Error in the database
+	 * @throws WebserviceException Error in the webservice
+	 * @throws AuthenticationException Invalid session
 	 */
 	@WebResult(name = "unprotect")
 	@WebMethod
@@ -1062,7 +1064,7 @@ public interface DocumentService {
 	String sid, @WSDoc(description = "the document id")
 	@WebParam(name = "docId")
 	long docId, @WebParam(name = "password")
-	String password) throws PersistenceException;
+	String password) throws PersistenceException, AuthenticationException, WebserviceException;
 
 	/**
 	 * Adds a new note for the given document

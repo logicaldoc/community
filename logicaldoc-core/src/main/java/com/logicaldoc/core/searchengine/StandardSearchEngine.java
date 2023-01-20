@@ -56,6 +56,10 @@ import com.logicaldoc.util.io.FileUtil;
  */
 public class StandardSearchEngine implements SearchEngine {
 
+	private static final String LOGICALDOC = "logicaldoc";
+
+	private static final String INDEX_DIR = "index.dir";
+
 	public static Version VERSION = Version.LUCENE_8_11_2;
 
 	protected static Logger log = LoggerFactory.getLogger(StandardSearchEngine.class);
@@ -577,8 +581,8 @@ public class StandardSearchEngine implements SearchEngine {
 	}
 
 	File getIndexDataFolder() throws IOException {
-		File indexdir = new File(config.getPropertyWithSubstitutions("index.dir"));
-		indexdir = new File(indexdir, "logicaldoc");
+		File indexdir = new File(config.getPropertyWithSubstitutions(INDEX_DIR));
+		indexdir = new File(indexdir, LOGICALDOC);
 		indexdir = new File(indexdir, "data");
 		return new File(indexdir, "index");
 	}
@@ -594,7 +598,7 @@ public class StandardSearchEngine implements SearchEngine {
 			System.setProperty("solr.disable.shardsWhitelist", "true");
 			System.setProperty("solr.http1", "true");
 			
-			File indexHome = new File(config.getPropertyWithSubstitutions("index.dir"));
+			File indexHome = new File(config.getPropertyWithSubstitutions(INDEX_DIR));
 			File solr_xml = new File(indexHome, "solr.xml");
 
 			if (!indexHome.exists()) {
@@ -605,8 +609,8 @@ public class StandardSearchEngine implements SearchEngine {
 				FileUtil.copyResource("/index/solr.xml", solr_xml);
 			}
 
-			File ldoc = new File(config.getPropertyWithSubstitutions("index.dir"));
-			ldoc = new File(ldoc, "logicaldoc");
+			File ldoc = new File(config.getPropertyWithSubstitutions(INDEX_DIR));
+			ldoc = new File(ldoc, LOGICALDOC);
 			if (!ldoc.exists()) {
 				ldoc.mkdirs();
 				ldoc.mkdir();
@@ -645,7 +649,7 @@ public class StandardSearchEngine implements SearchEngine {
 			FileUtil.strongDelete(new File(indexHome, "logicaldoc/data/index/" + IndexWriter.WRITE_LOCK_NAME));
 
 			CoreContainer container = new CoreContainer(indexHome.toPath(), null);
-			server = new EmbeddedSolrServer(container, "logicaldoc");
+			server = new EmbeddedSolrServer(container, LOGICALDOC);
 			container.load();
 
 			unlock();

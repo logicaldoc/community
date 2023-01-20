@@ -126,52 +126,51 @@ public class HibernateDeviceDAO extends HibernatePersistentObjectDAO<Device> imp
 	public Device findByDevice(Device device) {
 		if (device.getDeviceId() != null)
 			return findByDeviceId(device.getDeviceId());
-		else {
-			try {
-				Map<String, Object> params = new HashMap<String, Object>();
 
-				StringBuilder query = new StringBuilder();
+		Map<String, Object> params = new HashMap<String, Object>();
 
-				query.append(ENTITY + ".userId = :userId");
-				params.put("userId", device.getUserId());
+		StringBuilder query = new StringBuilder();
 
-				query.append(" and ");
-				if (device.getBrowser() != null) {
-					query.append(ENTITY + ".browser = :browser");
-					params.put("browser", device.getBrowser());
-				} else
-					query.append(ENTITY + ".browser is null");
+		query.append(ENTITY + ".userId = :userId");
+		params.put("userId", device.getUserId());
 
-				query.append(" and ");
-				if (device.getBrowserVersion() != null) {
-					query.append(ENTITY + ".browserVersion = :browserVersion");
-					params.put("browserVersion", device.getBrowserVersion());
-				} else
-					query.append(ENTITY + ".browserVersion is null");
+		query.append(" and ");
+		if (device.getBrowser() != null) {
+			query.append(ENTITY + ".browser = :browser");
+			params.put("browser", device.getBrowser());
+		} else
+			query.append(ENTITY + ".browser is null");
 
-				query.append(" and ");
-				if (device.getOperativeSystem() != null) {
-					query.append(ENTITY + ".operativeSystem = :operativeSystem");
-					params.put("operativeSystem", device.getOperativeSystem());
-				} else
-					query.append(ENTITY + ".operativeSystem is null");
+		query.append(" and ");
+		if (device.getBrowserVersion() != null) {
+			query.append(ENTITY + ".browserVersion = :browserVersion");
+			params.put("browserVersion", device.getBrowserVersion());
+		} else
+			query.append(ENTITY + ".browserVersion is null");
 
-				query.append(" and ");
-				if (device.getType() != null) {
-					query.append(ENTITY + ".type = :type");
-					params.put("type", device.getType());
-				} else
-					query.append(ENTITY + ".type is null");
+		query.append(" and ");
+		if (device.getOperativeSystem() != null) {
+			query.append(ENTITY + ".operativeSystem = :operativeSystem");
+			params.put("operativeSystem", device.getOperativeSystem());
+		} else
+			query.append(ENTITY + ".operativeSystem is null");
 
-				List<Device> devices = findByWhere(query.toString(), params, null, null);
-				if (devices.isEmpty())
-					return null;
-				else
-					return devices.get(0);
-			} catch (PersistenceException e) {
-				log.error(e.getMessage(), e);
+		query.append(" and ");
+		if (device.getType() != null) {
+			query.append(ENTITY + ".type = :type");
+			params.put("type", device.getType());
+		} else
+			query.append(ENTITY + ".type is null");
+
+		try {
+			List<Device> devices = findByWhere(query.toString(), params, null, null);
+			if (devices.isEmpty())
 				return null;
-			}
+			else
+				return devices.get(0);
+		} catch (PersistenceException e) {
+			log.error(e.getMessage(), e);
+			return null;
 		}
 	}
 

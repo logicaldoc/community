@@ -1,5 +1,7 @@
 package com.logicaldoc.gui.frontend.client;
 
+import org.realityforge.gwt.websockets.client.WebSocket;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.GWT.UncaughtExceptionHandler;
@@ -22,7 +24,6 @@ import com.logicaldoc.gui.common.client.websockets.WebSocketListener;
 import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.logicaldoc.gui.frontend.client.panels.MainPanel;
 import com.logicaldoc.gui.frontend.client.search.TagsForm;
-import com.sksamuel.gwt.websockets.Websocket;
 import com.smartgwt.client.types.EdgeName;
 import com.smartgwt.client.types.MultiMessageMode;
 import com.smartgwt.client.types.NotifyTransition;
@@ -31,14 +32,14 @@ import com.smartgwt.client.widgets.notify.Notify;
 import com.smartgwt.client.widgets.notify.NotifySettings;
 
 /**
- * The Frontend entry point
+ * The Frontend entry point.
  * 
  * @author Marco Meschieri - LogicalDOC
  * @since 6.0
  */
 public class Frontend implements EntryPoint {
 
-	private Websocket websocket = null;
+	private WebSocket websocket = null;
 
 	/**
 	 * Configure some interface defaults
@@ -103,27 +104,28 @@ public class Frontend implements EntryPoint {
 
 				init(info);
 
-				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), null, new AsyncCallback<GUISession>() {
+				SecurityService.Instance.get().getSession(Util.getLocaleInRequest(), null,
+						new AsyncCallback<GUISession>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						SC.warn(I18N.message("accessdenied") + " - " + caught.getMessage());
-					}
+							@Override
+							public void onFailure(Throwable caught) {
+								SC.warn(I18N.message("accessdenied") + " - " + caught.getMessage());
+							}
 
-					@Override
-					public void onSuccess(GUISession session) {
-						if (session == null || !session.isLoggedIn()) {
-							SC.warn(I18N.message("accessdenied"));
-						} else {
-							session.getInfo().setUserNo(info.getUserNo());
-							init(session.getInfo());
-							Session.get().init(session);
-							showMain();
-							connectWebsockets();
-							declareReloadTrigger(Frontend.this);
-						}
-					}
-				});
+							@Override
+							public void onSuccess(GUISession session) {
+								if (session == null || !session.isLoggedIn()) {
+									SC.warn(I18N.message("accessdenied"));
+								} else {
+									session.getInfo().setUserNo(info.getUserNo());
+									init(session.getInfo());
+									Session.get().init(session);
+									showMain();
+									connectWebsockets();
+									declareReloadTrigger(Frontend.this);
+								}
+							}
+						});
 			}
 		});
 	}
@@ -173,9 +175,9 @@ public class Frontend implements EntryPoint {
 	 */
 	public void connectWebsockets() {
 		if (Session.get().isServerPushEnabled()) {
-			websocket = new Websocket(Util.websocketUrl());
-			websocket.addListener(new WebSocketListener());
-			websocket.open();
+			websocket= WebSocket.newWebSocketIfSupported();			
+			websocket.setListener(new WebSocketListener());
+			websocket.connect(Util.websocketUrl());
 		}
 	}
 

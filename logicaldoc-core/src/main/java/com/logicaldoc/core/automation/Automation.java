@@ -37,6 +37,8 @@ import com.logicaldoc.util.config.ContextProperties;
  */
 public class Automation {
 
+	public static final String SYSTEM_DICTIONARY = "systemDictionary";
+
 	public static final String CURRENT_DATE = "CURRENT_DATE";
 
 	public static final String PRODUCT = "product";
@@ -64,6 +66,11 @@ public class Automation {
 	private Locale automationLocale = Locale.ENGLISH;
 
 	private long tenantId = Tenant.DEFAULT_ID;
+	
+	/**
+	 * A transient and system-wide dictionary used to store keys among automation executions 
+	 */
+	private static final Map<String, Object> systemDictionary = new ConcurrentHashMap<>();
 
 	public static synchronized void initialize() {
 		try {
@@ -179,6 +186,10 @@ public class Automation {
 
 		putServerUrl(clientDictionary);
 
+		
+		// Put the system dictionary
+		dictionary.put(SYSTEM_DICTIONARY, systemDictionary);
+		
 		/*
 		 * Merge the client dictionary
 		 */

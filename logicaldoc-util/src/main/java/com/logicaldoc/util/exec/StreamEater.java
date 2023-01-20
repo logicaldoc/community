@@ -8,7 +8,7 @@ import java.io.Writer;
 
 public class StreamEater implements Runnable {
 
-	private InputStream stream;
+	private InputStream inputStream;
 
 	private String prefix;
 
@@ -16,17 +16,17 @@ public class StreamEater implements Runnable {
 
 	private StringBuilder buffer;
 
-	public StreamEater(String prefix, InputStream stream, StringBuilder buffer) {
+	public StreamEater(String prefix, InputStream inputStream, StringBuilder buffer) {
 		super();
 		this.prefix = prefix;
-		this.stream = stream;
+		this.inputStream = inputStream;
 		this.buffer = buffer;
 	}
 
-	public StreamEater(String prefix, InputStream stream, Writer output) {
+	public StreamEater(String prefix, InputStream inptutStream, Writer output) {
 		super();
 		this.prefix = prefix;
-		this.stream = stream;
+		this.inputStream = inptutStream;
 		this.output = output;
 	}
 
@@ -35,22 +35,27 @@ public class StreamEater implements Runnable {
 	}
 
 	public void run() {
-		try (InputStreamReader isr = new InputStreamReader(stream); BufferedReader br = new BufferedReader(isr);) {
+		try (InputStreamReader isr = new InputStreamReader(inputStream); BufferedReader br = new BufferedReader(isr);) {
 			String line = br.readLine();
 			boolean firstLine = true;
 			while (line != null) {
-				System.out.println((prefix != null ? (prefix + ":") : "") + line);
+				if (prefix != null)
+					System.out.println(prefix + ": " + line);
+
 				if (output != null && line != null) {
 					if (!firstLine)
 						output.write("\n");
 					output.write(line);
 					output.flush();
 
-				} else if (buffer != null && line != null) {
+				}
+
+				if (buffer != null && line != null) {
 					if (!firstLine)
 						buffer.append("\n");
 					buffer.append(line);
 				}
+
 				firstLine = false;
 				line = br.readLine();
 			}

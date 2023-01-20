@@ -174,6 +174,7 @@ public class AddTemplateAttributeDialog extends Window {
 					record.setAttribute("editor", att.getEditor());
 					record.setAttribute("mandatory", att.isMandatory());
 					record.setAttribute("hidden", att.isHidden());
+					record.setAttribute("readonly", att.isReadonly());
 					record.setAttribute("multiple", att.isMultiple());
 					record.setAttribute("validation", att.getValidation());
 					record.setAttribute("initialization", att.getInitialization());

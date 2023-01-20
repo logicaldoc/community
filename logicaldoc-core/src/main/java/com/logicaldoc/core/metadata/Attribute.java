@@ -61,6 +61,8 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 	private int hidden = 0;
 
 	private int mandatory = 0;
+	
+	private int readonly = 0;
 
 	private int position = 0;
 
@@ -107,6 +109,7 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 		this.dateValue = source.dateValue;
 		this.type = source.type;
 		this.hidden = source.hidden;
+		this.readonly = source.readonly;
 		this.mandatory = source.mandatory;
 		this.position = source.position;
 		this.editor = source.editor;
@@ -363,5 +366,13 @@ public class Attribute implements Comparable<Attribute>, Serializable {
 
 	public void setDependsOn(String dependsOn) {
 		this.dependsOn = dependsOn;
+	}
+	
+	public int getReadonly() {
+		return readonly;
+	}
+
+	public void setReadonly(int readonly) {
+		this.readonly = readonly;
 	}
 }

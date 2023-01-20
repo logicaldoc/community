@@ -18,6 +18,8 @@ import com.logicaldoc.util.sql.SqlUtil;
  * @since 4.0
  */
 public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> implements GenericDAO {
+	private static final String AND = " and ";
+
 	public HibernateGenericDAO() {
 		super(Generic.class);
 		super.log = LoggerFactory.getLogger(HibernateGenericDAO.class);
@@ -45,11 +47,11 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 		Generic generic = null;
 		StringBuilder sb = new StringBuilder(" " + ENTITY + ".type = '" + SqlUtil.doubleQuotes(type) + "' and "
 				+ ENTITY + ".subtype='" + SqlUtil.doubleQuotes(subtype) + "' ");
-		sb.append(" and " + ENTITY + ".tenantId=" + tenantId);
+		sb.append(AND + ENTITY + ".tenantId=" + tenantId);
 		if (qualifier != null)
-			sb.append(" and " + ENTITY + ".qualifier=" + qualifier);
+			sb.append(AND + ENTITY + ".qualifier=" + qualifier);
 		else
-			sb.append(" and " + ENTITY + ".qualifier is null");
+			sb.append(AND + ENTITY + ".qualifier is null");
 		try {
 			Collection<Generic> coll = findByWhere(sb.toString(), null, null);
 			if (coll.size() > 0)
@@ -64,13 +66,13 @@ public class HibernateGenericDAO extends HibernatePersistentObjectDAO<Generic> i
 	public List<Generic> findByTypeAndSubtype(String type, String subtype, Long qualifier, Long tenantId) {
 		String query = " 1=1 ";
 		if (StringUtils.isNotEmpty(type))
-			query += " and " + ENTITY + ".type like '" + SqlUtil.doubleQuotes(type) + "' ";
+			query += AND + ENTITY + ".type like '" + SqlUtil.doubleQuotes(type) + "' ";
 		if (StringUtils.isNotEmpty(subtype))
-			query += " and " + ENTITY + ".subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
+			query += AND + ENTITY + ".subtype like '" + SqlUtil.doubleQuotes(subtype) + "' ";
 		if (qualifier != null)
-			query += " and " + ENTITY + ".qualifier = " + qualifier;
+			query += AND + ENTITY + ".qualifier = " + qualifier;
 		if (tenantId != null)
-			query += " and " + ENTITY + ".tenantId = " + tenantId;
+			query += AND + ENTITY + ".tenantId = " + tenantId;
 
 		try {
 			return findByWhere(query, null, null);

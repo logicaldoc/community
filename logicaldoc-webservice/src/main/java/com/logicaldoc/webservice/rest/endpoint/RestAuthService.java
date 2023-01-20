@@ -2,6 +2,8 @@ package com.logicaldoc.webservice.rest.endpoint;
 
 import java.util.HashMap;
 
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.logicaldoc.core.security.authentication.AuthenticationException;
+import com.logicaldoc.webservice.doc.WSDoc;
 import com.logicaldoc.webservice.rest.AuthService;
 import com.logicaldoc.webservice.soap.endpoint.SoapAuthService;
 
@@ -86,5 +89,25 @@ public class RestAuthService extends SoapAuthService implements AuthService {
 	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN })
 	public String getSid() {
 		return getCurrentSessionId();
+	}
+	
+	/**
+	 * Renews a session
+	 * 
+	 * @param sid identifier of the session
+	 */
+	@GET
+	@Path("/renew")
+	public void renew(@QueryParam("sid") String sid) {
+		super.renew(sid);
+	}
+	
+	/**
+	 * Renews the current session
+	 */
+	@GET
+	@Path("/renewcurrent")
+	public void renew() {
+		super.renew(getSid());
 	}
 }

@@ -48,6 +48,12 @@ public class AutomationCompletionProvider implements AceCompletionProvider {
 				new AceCompletionValue("$CalendarTool", "$CalendarTool", "variable", 10),
 				new AceCompletionValue("$I18N", "$I18N", "variable", 10),
 				new AceCompletionValue("$log", "$log", "variable", 10),
+				new AceCompletionValue("$systemDictionary", "$systemDictionary", "variable", 10),
+				new AceCompletionValue("$CURRENT_DATE", "$CURRENT_DATE", "variable", 10),
+				new AceCompletionValue("$dictionary", "$dictionary", "variable", 10),
+				new AceCompletionValue("$nl", "$nl", "variable", 10),
+				new AceCompletionValue("$tenantId", "$tenantId", "variable", 10),
+				
 				
 				new AceCompletionSnippet("info",
 						new AceCompletionSnippetSegment[] { new AceCompletionSnippetSegmentLiteral("$log.info( "),

@@ -128,6 +128,7 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 						att.setPosition(attribute.getPosition());
 						att.setMandatory(attribute.isMandatory() ? 1 : 0);
 						att.setHidden(attribute.isHidden() ? 1 : 0);
+						att.setReadonly(attribute.isReadonly() ? 1 : 0);
 						att.setMultiple(attribute.isMultiple() ? 1 : 0);
 						att.setParent(attribute.getParent());
 						att.setDependsOn(attribute.getDependsOn());
@@ -211,7 +212,8 @@ public class AttributeSetServiceImpl extends AbstractRemoteService implements At
 				att.setSetId(attributeSet.getId());
 				att.setPosition(extAttr.getPosition());
 				att.setMandatory(extAttr.getMandatory() == 1 ? true : false);
-				att.setHidden(extAttr.getHidden() == 1 ? true : false);
+				att.setHidden(extAttr.getHidden() == 1 ? true : false);			
+				att.setReadonly(extAttr.getReadonly() == 1 ? true : false);
 				att.setMultiple(extAttr.getMultiple() == 1 ? true : false);
 				att.setType(extAttr.getType());
 				att.setValidation(extAttr.getValidation());

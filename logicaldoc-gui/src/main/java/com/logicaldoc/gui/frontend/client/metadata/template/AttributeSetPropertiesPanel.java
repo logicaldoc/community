@@ -232,7 +232,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			removeChild(attributeSettingsForm1);
 		attributeSettingsForm1 = new DynamicForm();
 		attributeSettingsForm1.setTitleOrientation(TitleOrientation.LEFT);
-		attributeSettingsForm1.setNumCols(9);
+		attributeSettingsForm1.setNumCols(11);
 		attributeSettingsForm1.setWidth(1);
 
 		if (attributeSettingsForm2 != null)
@@ -263,6 +263,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 				clean();
 				attributeSettingsForm1.getField("mandatory").setDisabled(false);
 				attributeSettingsForm1.getField("hidden").setDisabled(false);
+				attributeSettingsForm1.getField("readonly").setDisabled(false);
 				attributeSettingsForm1.getField("multiple").setDisabled(false);
 				attributeSettingsForm2.getField("type").setDisabled(false);
 				attributeSettingsForm2.getField("editor").setDisabled(false);
@@ -299,7 +300,16 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		hidden.setWidth(50);
 		hidden.setDefaultValue(false);
 		hidden.setDisabled(attributeSet.isReadonly());
-
+		
+		// Readonly
+		final CheckboxItem readonly = new CheckboxItem();
+		readonly.setName("readonly");
+		readonly.setTitle(I18N.message("readonly"));
+		readonly.setRedrawOnChange(true);
+		readonly.setWidth(50);
+		readonly.setDefaultValue(false);
+		readonly.setDisabled(attributeSet.isReadonly());
+		
 		// Multiple
 		final CheckboxItem multiple = new CheckboxItem();
 		multiple.setName("multiple");
@@ -454,6 +464,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 						att.setLabel(label.getValueAsString());
 						att.setMandatory((Boolean) mandatory.getValue());
 						att.setHidden((Boolean) hidden.getValue());
+						att.setReadonly((Boolean) readonly.getValue());
 						att.setMultiple((Boolean) multiple.getValue());
 						att.setType(Integer.parseInt((String) type.getValueAsString()));
 						att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
@@ -474,6 +485,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 							att.setLabel(label.getValueAsString());
 							att.setMandatory((Boolean) mandatory.getValue());
 							att.setHidden((Boolean) hidden.getValue());
+							att.setReadonly((Boolean) readonly.getValue());
 							att.setMultiple((Boolean) multiple.getValue());
 							att.setType(Integer.parseInt(type.getValueAsString()));
 							att.setEditor(Integer.parseInt((String) editor.getValueAsString()));
@@ -509,7 +521,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			}
 		});
 
-		attributeSettingsForm1.setItems(attributeName, new SpacerItem(), mandatory, hidden, multiple);
+		attributeSettingsForm1.setItems(attributeName, new SpacerItem(), mandatory, readonly, hidden, multiple);
 		attributeSettingsForm2.setItems(label, type, editor, group, options, initialization, validation);
 		attributeButtonsForm.setItems(save, clean);
 
@@ -580,6 +592,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 		attributeSettingsForm2.setValue("label", (String) null);
 		attributeSettingsForm1.setValue("mandatory", false);
 		attributeSettingsForm1.setValue("hidden", false);
+		attributeSettingsForm1.setValue("readonly", false);
 		attributeSettingsForm1.setValue("multiple", false);
 		attributeSettingsForm2.setValue("type", GUIAttribute.TYPE_STRING);
 		attributeSettingsForm2.setValue("editor", GUIAttribute.EDITOR_DEFAULT);
@@ -696,6 +709,7 @@ public class AttributeSetPropertiesPanel extends HLayout {
 			attributeSettingsForm1.setValue("attributeName", extAttr.getName());
 			attributeSettingsForm1.setValue("mandatory", extAttr.isMandatory());
 			attributeSettingsForm1.setValue("hidden", extAttr.isHidden());
+			attributeSettingsForm1.setValue("readonly", extAttr.isReadonly());
 			attributeSettingsForm1.setValue("multiple", extAttr.isMultiple());
 			attributeSettingsForm2.setValue("label", extAttr.getLabel());
 			attributeSettingsForm2.setValue("type", extAttr.getType());

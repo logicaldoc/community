@@ -37,7 +37,7 @@ public class ImageConverter extends AbstractFormatConverter {
 			}
 
 			String commandLine = getParameter("path") + " -compress JPEG " + src.getPath() + " " + dest.getPath();
-			Exec.exec(commandLine, null, null, timeout);
+			new Exec().exec(commandLine, null, null, timeout);
 
 			if (!dest.exists() || dest.length() < 1)
 				throw new Exception("Empty conversion");

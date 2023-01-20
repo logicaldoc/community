@@ -38,11 +38,31 @@ public class Exec {
 	protected static Logger log = LoggerFactory.getLogger(Exec.class);
 
 	/**
+	 * For those methods that collect the output, this is the prefix to use for
+	 * the output print. Use null for disabling the out print.
+	 */
+	private String outPrefix = "out";
+
+	/**
+	 * For those methods that collect the output, this is the prefix to use for
+	 * the error print. Use null for disabling the error print.
+	 */
+	private String errPrefix = "err";
+
+	public void setErrPrefix(String errPrefix) {
+		this.errPrefix = errPrefix;
+	}
+
+	public void setOutPrefix(String outPrefix) {
+		this.outPrefix = outPrefix;
+	}
+
+	/**
 	 * Checks if you are running on Windows
 	 * 
 	 * @return true if the execution platform is Windows
 	 */
-	public static boolean isWindows() {
+	public boolean isWindows() {
 		boolean windows = System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
 		return windows;
 	}
@@ -52,13 +72,14 @@ public class Exec {
 	 * 
 	 * @return the return value
 	 * 
-	 * @param commandLine The command line to process. The path of the command must be listed in the allowed-commands.txt
+	 * @param commandLine The command line to process. The path of the command
+	 *        must be listed in the allowed-commands.txt
 	 * @param directory The folder where the command will be executed
 	 * @param timeout The timeout in seconds
 	 * 
 	 * @throws IOException raised in case of errors during execution
 	 */
-	public static int exec2(List<String> commandLine, File directory, int timeout) throws IOException {
+	public int exec2(List<String> commandLine, File directory, int timeout) throws IOException {
 		checkAllowed(commandLine.get(0));
 
 		log.debug("Executing command: {}", commandLine);
@@ -103,20 +124,22 @@ public class Exec {
 	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
 	 * 
-	 * @param commandLine the list of elements in the command line. The path of the command must be listed in the allowed-commands.txt
+	 * @param commandLine the list of elements in the command line. The path of
+	 *        the command must be listed in the allowed-commands.txt
 	 *
 	 * @return the command execution return value
 	 * 
 	 * @throws IOException raised in case of errors during execution
 	 */
-	public static int exec(List<String> commandLine) throws IOException {
+	public int exec(List<String> commandLine) throws IOException {
 		return exec(commandLine, null, null, -1);
 	}
 
 	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
 	 * 
-	 * @param commandLine the list of elements in the command line. The path of the command must be listed in the allowed-commands.txt
+	 * @param commandLine the list of elements in the command line. The path of
+	 *        the command must be listed in the allowed-commands.txt
 	 * @param env the environment variables
 	 * @param dir the current folder
 	 * @param timeout maximum execution time expressed in seconds
@@ -125,7 +148,7 @@ public class Exec {
 	 * 
 	 * @return the return code of the command
 	 */
-	public static int exec(final List<String> commandLine, String[] env, File dir, int timeout) throws IOException {
+	public int exec(final List<String> commandLine, String[] env, File dir, int timeout) throws IOException {
 		checkAllowed(commandLine.get(0));
 
 		int exit = 0;
@@ -152,9 +175,9 @@ public class Exec {
 			}
 		}
 
-		StreamEater errEater = new StreamEater("err", process.getErrorStream());
+		StreamEater errEater = new StreamEater(errPrefix, process.getErrorStream());
 
-		StreamEater outEater = new StreamEater("out", process.getInputStream());
+		StreamEater outEater = new StreamEater(outPrefix, process.getInputStream());
 
 		Thread a = new Thread(errEater);
 		a.start();
@@ -180,7 +203,8 @@ public class Exec {
 	/**
 	 * Execute the command by using the Runtime.getRuntime().exec()
 	 * 
-	 * @param commandLine the command line string. The path of the command must be listed in the allowed-commands.txt
+	 * @param commandLine the command line string. The path of the command must
+	 *        be listed in the allowed-commands.txt
 	 * @param env the execution environment
 	 * @param dir the current folder
 	 * 
@@ -188,7 +212,7 @@ public class Exec {
 	 * 
 	 * @throws IOException If the execution caused an error
 	 */
-	public static String exec(String commandLine, String[] env, File dir) throws IOException {
+	public String exec(String commandLine, String[] env, File dir) throws IOException {
 		checkAllowed(commandLine);
 
 		Process process = Runtime.getRuntime().exec(commandLine, env, dir != null ? dir : null);
@@ -200,7 +224,7 @@ public class Exec {
 		return out.toString();
 	}
 
-	public static int exec(final String commandLine, String[] env, File dir, StringBuilder buffer, int timeout)
+	public int exec(final String commandLine, String[] env, File dir, StringBuilder buffer, int timeout)
 			throws IOException {
 		checkAllowed(commandLine);
 
@@ -228,9 +252,9 @@ public class Exec {
 			}
 		}
 
-		StreamEater errEater = new StreamEater("err", process.getErrorStream());
+		StreamEater errEater = new StreamEater(errPrefix, process.getErrorStream());
 
-		StreamEater outEater = new StreamEater("out", process.getInputStream(), buffer);
+		StreamEater outEater = new StreamEater(outPrefix, process.getInputStream(), buffer);
 
 		Thread a = new Thread(errEater);
 		a.start();
@@ -253,7 +277,7 @@ public class Exec {
 		return exit;
 	}
 
-	public static int exec(final String commandLine, String[] env, File dir, Writer outputWriter, int timeout)
+	public int exec(final String commandLine, String[] env, File dir, Writer outputWriter, int timeout)
 			throws IOException {
 		checkAllowed(commandLine);
 
@@ -281,9 +305,9 @@ public class Exec {
 			}
 		}
 
-		StreamEater errEater = new StreamEater("err", process.getErrorStream());
+		StreamEater errEater = new StreamEater(errPrefix, process.getErrorStream());
 
-		StreamEater outEater = new StreamEater("out", process.getInputStream(), outputWriter);
+		StreamEater outEater = new StreamEater(outPrefix, process.getInputStream(), outputWriter);
 
 		Thread a = new Thread(errEater);
 		a.start();
@@ -313,7 +337,8 @@ public class Exec {
 	/**
 	 * Execute the command by using the Runtime.exec
 	 * 
-	 * @param commandLine the command line. The path of the command must be listed in the allowed-commands.txt
+	 * @param commandLine the command line. The path of the command must be
+	 *        listed in the allowed-commands.txt
 	 * @param env the environment variables
 	 * @param dir the current execution directory
 	 * @param timeout maximum execution time expressed in seconds
@@ -322,7 +347,7 @@ public class Exec {
 	 * 
 	 * @throws IOException raised if the command produced an error
 	 */
-	public static int exec(final String commandLine, String[] env, File dir, int timeout) throws IOException {
+	public int exec(final String commandLine, String[] env, File dir, int timeout) throws IOException {
 		return exec(commandLine, env, dir, (Writer) null, timeout);
 	}
 
@@ -417,7 +442,7 @@ public class Exec {
 	 * 
 	 * @return the normalized path
 	 */
-	public static String normalizePathForCommand(String srcPath) {
+	public String normalizePathForCommand(String srcPath) {
 		String normalizedPath = FilenameUtils.normalize(srcPath);
 		if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0)
 			normalizedPath = "\"" + normalizedPath + "\"";

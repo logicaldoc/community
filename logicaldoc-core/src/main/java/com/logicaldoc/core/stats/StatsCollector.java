@@ -8,8 +8,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.Consts;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -127,69 +129,29 @@ public class StatsCollector extends Task {
 		int groups = groupDAO.count();
 		log.debug("Collected users data");
 
-		long userdir = 0;
-		File userDir = UserUtil.getUsersDir();
-		userdir = FileUtils.sizeOfDirectory(userDir);
+		long userdir = calculateUserDirSize();
 		saveStatistic("userdir", userdir, Tenant.SYSTEM_ID);
 
-		long indexdir = 0;
-		File indexDir = new File(config.getPropertyWithSubstitutions("index.dir"));
-		if (indexDir.exists())
-			indexdir = FileUtils.sizeOfDirectory(indexDir);
+		long indexdir = calculateIndexDirSize();
 		saveStatistic("indexdir", indexdir, Tenant.SYSTEM_ID);
 
-		long importdir = 0;
-		File importDir = new File(config.getPropertyWithSubstitutions("conf.importdir"));
-		if (importDir.exists())
-			importdir = FileUtils.sizeOfDirectory(importDir);
+		long importdir = calculateImportDirSize();
 		saveStatistic("importdir", importdir, Tenant.SYSTEM_ID);
 
-		long exportdir = 0;
-		File exportDir = new File(config.getPropertyWithSubstitutions("conf.exportdir"));
-		if (exportDir.exists())
-			exportdir = FileUtils.sizeOfDirectory(exportDir);
+		long exportdir = calculateExportDirSize();
 		saveStatistic("exportdir", exportdir, Tenant.SYSTEM_ID);
 
-		long plugindir = 0;
-		File pluginsDir = PluginRegistry.getPluginsDir();
-		plugindir = FileUtils.sizeOfDirectory(pluginsDir);
+		long plugindir = calculatePluginDirSize();
 		saveStatistic("plugindir", plugindir, Tenant.SYSTEM_ID);
 
 		next();
 		if (interruptRequested)
 			return;
 
-		long dbdir = 0;
-
-		/*
-		 * Try to determine the database size by using proprietary queries
-		 */
-		try {
-			if ("mysql".equals(documentDAO.getDbms()))
-				dbdir = documentDAO.queryForLong(
-						"select sum(data_length+index_length) from information_schema.tables where table_schema=database();");
-			else if (documentDAO.isOracle())
-				dbdir = documentDAO.queryForLong("SELECT sum(bytes) FROM user_segments");
-			else if ("postgresql".equals(documentDAO.getDbms()))
-				dbdir = documentDAO.queryForLong("select pg_database_size(current_database())");
-		} catch (Throwable t) {
-			log.warn("Unable to determine the database size - {}", t.getMessage());
-		}
-
-		/*
-		 * Fall back to the database dir
-		 */
-		if (dbdir == 0) {
-			File dbDir = new File(config.getPropertyWithSubstitutions("conf.dbdir"));
-			if (dbDir.exists())
-				dbdir = FileUtils.sizeOfDirectory(dbDir);
-		}
+		long dbdir = calculateDatabaseSize();
 		saveStatistic("dbdir", dbdir, Tenant.SYSTEM_ID);
 
-		long logdir = 0;
-		File logsDir = new File(config.getPropertyWithSubstitutions("conf.logdir"));
-		if (logsDir.exists())
-			logdir = FileUtils.sizeOfDirectory(logsDir);
+		long logdir = calculateLogDirSize();
 		saveStatistic("logdir", logdir, Tenant.SYSTEM_ID);
 
 		log.info("Saved repository statistics");
@@ -205,9 +167,7 @@ public class StatsCollector extends Task {
 		long archiveddocs = docStats[4];
 		long docdir = docStats[5];
 
-		List<Tenant> tenants = tenantDAO.findAll();
-		for (Tenant tenant : tenants)
-			extractDocStats(tenant.getId());
+		calculateAllTenantsDocsStats();
 
 		log.info("Saved documents statistics");
 		next();
@@ -220,9 +180,7 @@ public class StatsCollector extends Task {
 		long[] pageStats = extractPageStats(Tenant.SYSTEM_ID);
 		long totalpages = pageStats[3];
 
-		tenants = tenantDAO.findAll();
-		for (Tenant tenant : tenants)
-			extractPageStats(tenant.getId());
+		calculateAllTenantsPageStats();
 
 		log.info("Saved pages statistics");
 		next();
@@ -237,8 +195,7 @@ public class StatsCollector extends Task {
 		long empty = fldStats[1];
 		long deletedfolders = fldStats[2];
 
-		for (Tenant tenant : tenants)
-			extractFldStats(tenant.getId());
+		calculateAllTenantsFolderStats();
 
 		log.info("Saved folder statistics");
 		next();
@@ -272,28 +229,27 @@ public class StatsCollector extends Task {
 			List<NameValuePair> postParams = new ArrayList<NameValuePair>();
 
 			// Add all statistics as parameters
-			postParams.add(new BasicNameValuePair("id", id != null ? id : ""));
-			postParams.add(new BasicNameValuePair("userno", userno != null ? userno : ""));
-			postParams.add(new BasicNameValuePair("sid", sid != null ? sid : ""));
+			postParams.add(new BasicNameValuePair("id", StringUtils.defaultString(id)));
+			postParams.add(new BasicNameValuePair("userno", StringUtils.defaultString(userno)));
+			postParams.add(new BasicNameValuePair("sid", StringUtils.defaultString(sid)));
 
-			postParams.add(new BasicNameValuePair("product_release", release != null ? release : ""));
-			postParams.add(new BasicNameValuePair("email", email != null ? email : ""));
-			postParams.add(
-					new BasicNameValuePair("product", StatsCollector.product != null ? StatsCollector.product : ""));
-			postParams.add(new BasicNameValuePair("product_name",
-					StatsCollector.productName != null ? StatsCollector.productName : ""));
+			postParams.add(new BasicNameValuePair("product_release", StringUtils.defaultString(release)));
+			postParams.add(new BasicNameValuePair("email", StringUtils.defaultString(email)));
+			postParams.add(new BasicNameValuePair("product", StringUtils.defaultString(StatsCollector.product)));
+			postParams
+					.add(new BasicNameValuePair("product_name", StringUtils.defaultString(StatsCollector.productName)));
 
-			postParams.add(new BasicNameValuePair("java_version", javaversion != null ? javaversion : ""));
-			postParams.add(new BasicNameValuePair("java_vendor", javavendor != null ? javavendor : ""));
-			postParams.add(new BasicNameValuePair("java_arch", javaarch != null ? javaarch : ""));
-			postParams.add(new BasicNameValuePair("dbms", dbms != null ? dbms : ""));
+			postParams.add(new BasicNameValuePair("java_version", StringUtils.defaultString(javaversion)));
+			postParams.add(new BasicNameValuePair("java_vendor", StringUtils.defaultString(javavendor)));
+			postParams.add(new BasicNameValuePair("java_arch", StringUtils.defaultString(javaarch)));
+			postParams.add(new BasicNameValuePair("dbms", StringUtils.defaultString(dbms)));
 
-			postParams.add(new BasicNameValuePair("os_name", osname != null ? osname : ""));
-			postParams.add(new BasicNameValuePair("os_version", osversion != null ? osversion : ""));
-			postParams.add(new BasicNameValuePair("file_encoding", fileencoding != null ? fileencoding : ""));
+			postParams.add(new BasicNameValuePair("os_name",  StringUtils.defaultString(osname)));
+			postParams.add(new BasicNameValuePair("os_version", StringUtils.defaultString(osversion)));
+			postParams.add(new BasicNameValuePair("file_encoding", StringUtils.defaultString(fileencoding)));
 
-			postParams.add(new BasicNameValuePair("user_language", userlanguage != null ? userlanguage : ""));
-			postParams.add(new BasicNameValuePair("user_country", usercountry != null ? usercountry : ""));
+			postParams.add(new BasicNameValuePair("user_language", StringUtils.defaultString(userlanguage)));
+			postParams.add(new BasicNameValuePair("user_country", StringUtils.defaultString(usercountry)));
 
 			// Sizing
 			postParams.add(new BasicNameValuePair("users", Integer.toString(users)));
@@ -321,24 +277,10 @@ public class StatsCollector extends Task {
 			 */
 			SimpleDateFormat isoDf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
-			Date lastLogin = null;
-			try {
-				lastLogin = (Date) documentDAO
-						.queryForObject("select max(ld_date) from ld_user_history where ld_deleted=0 and ld_event='"
-								+ UserEvent.LOGIN.toString() + "'", Date.class);
-			} catch (Throwable t) {
-				log.warn("Unable to retrieve last login statistics - {}", t.getMessage());
-			}
+			Date lastLogin = findLastLogin();
 			postParams.add(new BasicNameValuePair("last_login", lastLogin != null ? isoDf.format(lastLogin) : ""));
 
-			Date lastCreation = null;
-			try {
-				lastCreation = (Date) documentDAO
-						.queryForObject("select max(ld_date) from ld_history where ld_deleted=0 and ld_event='"
-								+ DocumentEvent.STORED + "'", Date.class);
-			} catch (Throwable t) {
-				log.warn("Unable to retrieve last creation statistics - {}", t.getMessage());
-			}
+			Date lastCreation = findLastCreation();
 			postParams.add(
 					new BasicNameValuePair("last_creation", lastCreation != null ? isoDf.format(lastCreation) : ""));
 
@@ -358,29 +300,145 @@ public class StatsCollector extends Task {
 			postParams.add(new BasicNameValuePair("reg_organization", regOrganization != null ? regOrganization : ""));
 			postParams.add(new BasicNameValuePair("reg_website", regWebsite != null ? regWebsite : ""));
 
-			HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
-			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, Consts.UTF_8);
-			post.setEntity(entity);
-
-			CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
-
-			// Execute request
-			try (CloseableHttpResponse response = httpclient.execute(post)) {
-				int responseStatusCode = response.getStatusLine().getStatusCode();
-				// log status code
-				log.debug("Response status code: {}", responseStatusCode);
-				if (responseStatusCode != 200)
-					throw new IOException(HttpUtil.getBodyString(response));
-			}
-
-			log.info("Statistics packaged");
+			postStatistics(postParams);
+			
 			next();
-			if (interruptRequested)
-				return;
 		} catch (Throwable t) {
 			log.warn("Troubles packaging the statistics");
 			log.debug("Unable to send statistics", t);
 		}
+	}
+
+	private void postStatistics(List<NameValuePair> postParams) throws IOException, ClientProtocolException {
+		HttpPost post = new HttpPost("http://stat.logicaldoc.com/stats/collect");
+		UrlEncodedFormEntity entity = new UrlEncodedFormEntity(postParams, Consts.UTF_8);
+		post.setEntity(entity);
+
+		CloseableHttpClient httpclient = HttpUtil.getNotValidatingClient(60);
+
+		// Execute request
+		try (CloseableHttpResponse response = httpclient.execute(post)) {
+			int responseStatusCode = response.getStatusLine().getStatusCode();
+			// log status code
+			log.debug("Response status code: {}", responseStatusCode);
+			if (responseStatusCode != 200)
+				throw new IOException(HttpUtil.getBodyString(response));
+		}
+		log.info("Statistics packaged");
+	}
+
+	private Date findLastLogin() {
+		Date lastLogin = null;
+		try {
+			lastLogin = (Date) documentDAO
+					.queryForObject("select max(ld_date) from ld_user_history where ld_deleted=0 and ld_event='"
+							+ UserEvent.LOGIN.toString() + "'", Date.class);
+		} catch (Throwable t) {
+			log.warn("Unable to retrieve last login statistics - {}", t.getMessage());
+		}
+		return lastLogin;
+	}
+
+	private Date findLastCreation() {
+		Date lastCreation = null;
+		try {
+			lastCreation = (Date) documentDAO
+					.queryForObject("select max(ld_date) from ld_history where ld_deleted=0 and ld_event='"
+							+ DocumentEvent.STORED + "'", Date.class);
+		} catch (Throwable t) {
+			log.warn("Unable to retrieve last creation statistics - {}", t.getMessage());
+		}
+		return lastCreation;
+	}
+
+	private void calculateAllTenantsFolderStats() {
+		for (Tenant tenant : tenantDAO.findAll())
+			extractFldStats(tenant.getId());
+	}
+
+	private void calculateAllTenantsPageStats() {
+		for (Tenant tenant : tenantDAO.findAll())
+			extractPageStats(tenant.getId());
+	}
+
+	private void calculateAllTenantsDocsStats() throws PersistenceException {
+		for (Tenant tenant : tenantDAO.findAll())
+			extractDocStats(tenant.getId());
+	}
+
+	private long calculateLogDirSize() {
+		long logdir = 0;
+		File logsDir = new File(config.getPropertyWithSubstitutions("conf.logdir"));
+		if (logsDir.exists())
+			logdir = FileUtils.sizeOfDirectory(logsDir);
+		return logdir;
+	}
+
+	private long calculatePluginDirSize() {
+		long plugindir = 0;
+		File pluginsDir = PluginRegistry.getPluginsDir();
+		plugindir = FileUtils.sizeOfDirectory(pluginsDir);
+		return plugindir;
+	}
+
+	private long calculateExportDirSize() {
+		long exportdir = 0;
+		File exportDir = new File(config.getPropertyWithSubstitutions("conf.exportdir"));
+		if (exportDir.exists())
+			exportdir = FileUtils.sizeOfDirectory(exportDir);
+		return exportdir;
+	}
+
+	private long calculateImportDirSize() {
+		long importdir = 0;
+		File importDir = new File(config.getPropertyWithSubstitutions("conf.importdir"));
+		if (importDir.exists())
+			importdir = FileUtils.sizeOfDirectory(importDir);
+		return importdir;
+	}
+
+	private long calculateIndexDirSize() {
+		long indexdir = 0;
+		File indexDir = new File(config.getPropertyWithSubstitutions("index.dir"));
+		if (indexDir.exists())
+			indexdir = FileUtils.sizeOfDirectory(indexDir);
+		return indexdir;
+	}
+
+	private long calculateUserDirSize() {
+		long userdir = 0;
+		File userDir = UserUtil.getUsersDir();
+		userdir = FileUtils.sizeOfDirectory(userDir);
+		return userdir;
+	}
+
+	private long calculateDatabaseSize() {
+		long dbdir = 0;
+
+		/*
+		 * Try to determine the database size by using proprietary queries
+		 */
+		try {
+			if ("mysql".equals(documentDAO.getDbms()))
+				dbdir = documentDAO.queryForLong(
+						"select sum(data_length+index_length) from information_schema.tables where table_schema=database();");
+			else if (documentDAO.isOracle())
+				dbdir = documentDAO.queryForLong("SELECT sum(bytes) FROM user_segments");
+			else if ("postgresql".equals(documentDAO.getDbms()))
+				dbdir = documentDAO.queryForLong("select pg_database_size(current_database())");
+		} catch (Throwable t) {
+			log.warn("Unable to determine the database size - {}", t.getMessage());
+		}
+
+		/*
+		 * Fall back to the database dir
+		 */
+		if (dbdir == 0) {
+			File dbDir = new File(config.getPropertyWithSubstitutions("conf.dbdir"));
+			if (dbDir.exists())
+				dbdir = FileUtils.sizeOfDirectory(dbDir);
+		}
+		return dbdir;
 	}
 
 	private void collectFeatureUsageStats(List<NameValuePair> postParams) {
@@ -508,8 +566,8 @@ public class StatsCollector extends Task {
 	 *         <li>docdir (total size of the whole repository)</li>
 	 *         <li>notindexabledocs</li>
 	 *         </ol>
-	 *         
-	 * @throws PersistenceException error at data layer 
+	 * 
+	 * @throws PersistenceException error at data layer
 	 */
 	private long[] extractDocStats(long tenantId) throws PersistenceException {
 		long[] stats = new long[7];

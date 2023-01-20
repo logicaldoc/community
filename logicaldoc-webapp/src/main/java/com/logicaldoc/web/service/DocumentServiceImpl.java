@@ -1008,6 +1008,7 @@ public class DocumentServiceImpl extends AbstractRemoteService implements Docume
 			att.setLabel(extAttr.getLabel());
 			att.setMandatory(extAttr.getMandatory() == 1);
 			att.setHidden(extAttr.getHidden() == 1);
+			att.setReadonly(extAttr.getReadonly() == 1);
 			att.setMultiple(extAttr.getMultiple() == 1);
 			att.setParent(extAttr.getParent());
 			att.setStringValues(extAttr.getStringValues());

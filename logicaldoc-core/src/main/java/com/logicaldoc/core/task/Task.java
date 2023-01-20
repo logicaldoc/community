@@ -115,9 +115,8 @@ public abstract class Task implements Runnable {
 	protected synchronized void next() {
 		setProgress(progress + 1);
 
-		// Reset the timeout
-		if (lockManager != null)
-			lockManager.get(getName(), transactionId);
+		// Get the lock
+		getLock();
 
 		if (systemLoadMonitor != null) {
 			boolean overload = false;
@@ -127,12 +126,9 @@ public abstract class Task implements Runnable {
 					overload = true;
 					log.info("Execution paused because of system overload");
 				}
-				try {
-					if (lockManager != null)
-						lockManager.get(getName(), transactionId);
-				} catch (Throwable e) {
-					// Nothing to do
-				}
+
+				// Always get the lock to maintain it
+				getLock();
 
 				synchronized (this) {
 					try {
@@ -148,6 +144,11 @@ public abstract class Task implements Runnable {
 			if (overload)
 				log.info("Execution resumed after system overload");
 		}
+	}
+
+	private void getLock() {
+		if (lockManager != null)
+			lockManager.get(getName(), transactionId);
 	}
 
 	protected synchronized void setProgress(long progress) {

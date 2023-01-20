@@ -35,7 +35,7 @@ public class ImageThumbnailBuilder extends AbstractThumbnailBuilder {
 			commandLine.append(" -compress JPEG -quality " + quality);
 			commandLine.append(" -resize x" + Integer.toString(size) + " " + src.getPath() + " " + dest.getPath());
 
-			Exec.exec(commandLine.toString(), null, null, conf.getInt("converter.ImageConverter.timeout", 10));
+			new Exec().exec(commandLine.toString(), null, null, conf.getInt("converter.ImageConverter.timeout", 10));
 
 			if (!dest.exists() || dest.length() == 0) {
 				/*
