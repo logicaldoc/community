@@ -1346,51 +1346,7 @@ public class ItemFactory {
 			}
 
 			if (att.getEditor() == GUIAttribute.EDITOR_LISTBOX && att.getSetId() != null) {
-				item = new ComboBoxItem(itemName);
-
-				final AttributeOptionsDS options = new AttributeOptionsDS(att.getSetId(),
-						att.getParent() != null ? att.getParent() : att.getName(), null, !att.isMandatory());
-				options.setCacheAllData(true);
-				item.setOptionDataSource(options);
-				item.setValueField("value");
-				item.setDisplayField("value");
-				item.setFetchMissingValues(true);
-				item.setAlwaysFetchMissingValues(true);
-				item.setValue(initialValue);
-
-				// When the user clicks on the item, preemptively load all the
-				// options to correctly do text completion
-				item.addEditorEnterHandler(new EditorEnterHandler() {
-
-					@Override
-					public void onEditorEnter(EditorEnterEvent event) {
-						options.fetchData(new Criteria());
-					}
-				});
-
-				// When the user ends the editing, restore the initial value if
-				// he does not select an existing option
-				item.addEditorExitHandler(new EditorExitHandler() {
-
-					@Override
-					public void onEditorExit(EditorExitEvent event) {
-						String val = event.getValue() != null ? event.getValue().toString() : null;
-						Record[] records = options.getCacheData();
-						boolean found = false;
-						if (records != null)
-							for (Record record : records) {
-								if (record.getAttributeAsString("value").equals(val)) {
-									found = true;
-									break;
-								}
-							}
-						if (!found)
-							event.getItem().setValue(initialValue);
-					}
-				});
-
-				if (!att.isMandatory())
-					((ComboBoxItem) item).setAllowEmptyValue(true);
+				item = buildComboBoxItemForStringAttribute(att, itemName, initialValue);
 			}
 
 			item.setTooltip(item.getValue() != null ? item.getValue().toString() : "");
@@ -1404,6 +1360,57 @@ public class ItemFactory {
 			item.setTitle(att.getName());
 		item.setWrapTitle(false);
 
+		return item;
+	}
+
+	private static FormItem buildComboBoxItemForStringAttribute(GUIAttribute att, String itemName,
+			final String initialValue) {
+		FormItem item;
+		item = new ComboBoxItem(itemName);
+
+		final AttributeOptionsDS options = new AttributeOptionsDS(att.getSetId(),
+				att.getParent() != null ? att.getParent() : att.getName(), null, !att.isMandatory());
+		options.setCacheAllData(true);
+		item.setOptionDataSource(options);
+		item.setValueField("value");
+		item.setDisplayField("value");
+		item.setFetchMissingValues(true);
+		item.setAlwaysFetchMissingValues(true);
+		item.setValue(initialValue);
+
+		// When the user clicks on the item, preemptively load all the
+		// options to correctly do text completion
+		item.addEditorEnterHandler(new EditorEnterHandler() {
+
+			@Override
+			public void onEditorEnter(EditorEnterEvent event) {
+				options.fetchData(new Criteria());
+			}
+		});
+
+		// When the user ends the editing, restore the initial value if
+		// he does not select an existing option
+		item.addEditorExitHandler(new EditorExitHandler() {
+
+			@Override
+			public void onEditorExit(EditorExitEvent event) {
+				String val = event.getValue() != null ? event.getValue().toString() : null;
+				Record[] records = options.getCacheData();
+				boolean found = false;
+				if (records != null)
+					for (Record record : records) {
+						if (record.getAttributeAsString("value").equals(val)) {
+							found = true;
+							break;
+						}
+					}
+				if (!found)
+					event.getItem().setValue(initialValue);
+			}
+		});
+
+		if (!att.isMandatory())
+			((ComboBoxItem) item).setAllowEmptyValue(true);
 		return item;
 	}
 

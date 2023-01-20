@@ -28,7 +28,12 @@ public class AttributeOptionsDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected boolean isSessionRequired() {
+		return false;
+	}
+
+	@Override
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale)
 			throws PersistenceException, IOException {
 

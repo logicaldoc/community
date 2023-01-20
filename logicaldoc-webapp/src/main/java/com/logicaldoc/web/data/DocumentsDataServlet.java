@@ -50,17 +50,19 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
+		int maxRecords=max!=null ? max:100;
+		
 		Context context = Context.get();
 		ContextProperties config = context.getProperties();
 		UserDAO udao = (UserDAO) context.getBean(UserDAO.class);
 		User user = udao.findById(session.getUserId());
 		udao.initialize(user);
-
+		
 		String sort = request.getParameter("sort");
-
+		
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 
@@ -119,8 +121,8 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 
 		if (status != null && status.intValue() != AbstractDocument.DOC_ARCHIVED) {
 			List<Document> docs = dao.findByLockUserAndStatus(session.getUserId(), status);
-			int begin = (page - 1) * max;
-			int end = Math.min(begin + max - 1, docs.size() - 1);
+			int begin = (page - 1) * maxRecords;
+			int end = Math.min(begin + maxRecords - 1, docs.size() - 1);
 			for (int i = begin; i <= end; i++) {
 				Document doc = docs.get(i);
 				if (!fDao.isReadEnabled(doc.getFolder().getId(), session.getUserId()))
@@ -352,7 +354,7 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 				if (doc.isPublishing() || user.isMemberOf(Group.GROUP_ADMIN) || user.isMemberOf("publisher"))
 					documents.add(doc);
 			}
-
+			
 			// If a sorting is specified sort the collection of documents
 			if (StringUtils.isNotEmpty(sort)) {
 				// make the sorting to be case insensitive (add lower
@@ -371,12 +373,12 @@ public class DocumentsDataServlet extends AbstractDataServlet {
 					ciSort.append(") ");
 					ciSort.append(direction);
 				}
-
+				
 				Collections.sort(documents, DocumentComparator.getComparator(ciSort.toString()));
 			}
-
-			int begin = (page - 1) * max;
-			int end = Math.min(begin + max - 1, documents.size() - 1);
+			
+			int begin = (page - 1) * maxRecords;
+			int end = Math.min(begin + maxRecords - 1, documents.size() - 1);
 			for (int i = begin; i <= end; i++)
 				documentRecords.add(documents.get(i));
 

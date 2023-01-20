@@ -32,7 +32,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
 		PrintWriter writer = response.getWriter();
@@ -47,7 +47,7 @@ public class TicketsDataServlet extends AbstractDataServlet {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 		df.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-		SqlRowSet set = dao.queryForRowSet(query.toString(), null, max);
+		SqlRowSet set = dao.queryForRowSet(query.toString(), null, max != null ? max : 100);
 
 		/*
 		 * Iterate over records composing the response XML document

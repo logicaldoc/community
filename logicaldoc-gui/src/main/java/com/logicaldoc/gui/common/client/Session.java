@@ -110,61 +110,77 @@ public class Session implements DocumentObserver {
 
 				Menu.init(session.getUser());
 
-				if (session.isLoggedIn()) {
-					for (SessionObserver listener : sessionObservers) {
-						listener.onUserLoggedIn(session.getUser());
-					}
-					boolean validSession = true;
-					GUIUser user = getUser();
-					for (GUIParameter parameter : parameters) {
-						if (parameter.getName().equals("messages"))
-							user.setMessages(Integer.parseInt(parameter.getValue()));
-						else if (parameter.getName().equals("workflows"))
-							user.setAssignedTasks(Integer.parseInt(parameter.getValue()));
-						else if (parameter.getName().equals("events"))
-							user.setUpcomingEvents(Integer.parseInt(parameter.getValue()));
-						else if (parameter.getName().equals("valid"))
-							validSession = Boolean.parseBoolean(parameter.getValue());
-					}
+				if (!session.isLoggedIn())
+					return;
 
-					UserController.get().changed(user);
+				notifyUserLoggedIn(session);
 
-					if (!validSession)
-						onInvalidSession();
+				GUIUser user = getUser();
+				boolean validSession = updateStatusIconCountsAndSessionValid(parameters, user);
 
-					Util.installCloseWindowAlert();
+				UserController.get().changed(user);
 
-					if (session.getInfo().getSessionHeartbeat() > 0) {
-						/*
-						 * Create the timer that synchronizes the session info
-						 */
-						timer = new Timer() {
-							public void run() {
-								InfoService.Instance.get().ping(new AsyncCallback<Boolean>() {
-									@Override
-									public void onFailure(Throwable caught) {
-										missedPingCount++;
-										if (missedPingCount >= 3)
-											onInvalidSession();
-									}
+				if (!validSession)
+					onInvalidSession();
 
-									@Override
-									public void onSuccess(Boolean active) {
-										missedPingCount = 0;
-										if (!active)
-											onInvalidSession();
-									}
-								});
-							}
-						};
+				Util.installCloseWindowAlert();
 
-						timer.scheduleRepeating(session.getInfo().getSessionHeartbeat() * 1000);
-					}
+				setupPingTimer(session);
+			}
+
+			private boolean updateStatusIconCountsAndSessionValid(GUIParameter[] parameters, GUIUser user) {
+				boolean validSession = false;
+				for (GUIParameter parameter : parameters) {
+					if (parameter.getName().equals("messages"))
+						user.setMessages(Integer.parseInt(parameter.getValue()));
+					else if (parameter.getName().equals("workflows"))
+						user.setAssignedTasks(Integer.parseInt(parameter.getValue()));
+					else if (parameter.getName().equals("events"))
+						user.setUpcomingEvents(Integer.parseInt(parameter.getValue()));
+					else if (parameter.getName().equals("valid"))
+						validSession = Boolean.parseBoolean(parameter.getValue());
 				}
+
+				return validSession;
 			}
 		});
 	}
 
+	private void setupPingTimer(final GUISession session) {
+		if (session.getInfo().getSessionHeartbeat() <= 0)
+			return;
+
+		/*
+		 * Create the timer that synchronizes the session info
+		 */
+		timer = new Timer() {
+			public void run() {
+				InfoService.Instance.get().ping(new AsyncCallback<Boolean>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						missedPingCount++;
+						if (missedPingCount >= 3)
+							onInvalidSession();
+					}
+
+					@Override
+					public void onSuccess(Boolean active) {
+						missedPingCount = 0;
+						if (!active)
+							onInvalidSession();
+					}
+				});
+			}
+		};
+
+		timer.scheduleRepeating(session.getInfo().getSessionHeartbeat() * 1000);
+	}
+
+	private void notifyUserLoggedIn(final GUISession session) {
+		for (SessionObserver listener : sessionObservers)
+			listener.onUserLoggedIn(session.getUser());
+	}
+	
 	public void onInvalidSession() {
 		timer.cancel();
 		SessionTimeout.get().show();

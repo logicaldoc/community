@@ -309,213 +309,77 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 	protected void refresh() {
 		hideSave();
 
+		ChangedHandler changeHandler = (ChangedEvent event) -> {
+			displaySave();
+		};
+
 		/*
 		 * Prepare the standard properties tab
 		 */
-		if (propertiesPanel != null) {
-			propertiesPanel.destroy();
-			if (propertiesTabPanel.contains(propertiesPanel))
-				propertiesTabPanel.removeMember(propertiesPanel);
-		}
-
-		ChangedHandler changeHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				displaySave();
-			}
-		};
-		try {
-			propertiesPanel = new StandardPropertiesPanel(document, changeHandler);
-			propertiesTabPanel.addMember(propertiesPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareStandardPropertiesTab(changeHandler);
 
 		/*
 		 * Prepare the extended properties tab
 		 */
-		if (extendedPropertiesPanel != null) {
-			extendedPropertiesPanel.destroy();
-			if (extendedPropertiesTabPanel.contains(extendedPropertiesPanel))
-				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
-		}
-		ChangedHandler templateChangedHandler = new ChangedHandler() {
-			@Override
-			public void onChanged(ChangedEvent event) {
-				document.setOcrTemplateId(null);
-				document.setBarcodeTemplateId(null);
-				if (capturePanel != null)
-					capturePanel.refresh(document.getTemplateId());
-			}
-		};
-		try {
-			extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, changeHandler,
-					templateChangedHandler);
-			extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareExtendedPropertiesTab(changeHandler);
 
 		/*
 		 * Prepare the retention policies tab
 		 */
-		if (retentionPoliciesPanel != null) {
-			retentionPoliciesPanel.destroy();
-			if (retentionPoliciesTabPanel.contains(retentionPoliciesPanel))
-				retentionPoliciesTabPanel.removeMember(retentionPoliciesPanel);
-		}
-		try {
-			retentionPoliciesPanel = new PublishingPanel(document, changeHandler);
-			retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareRetentionPoliciesTab(changeHandler);
 
 		/*
 		 * Prepare the OCR tab
 		 */
-		if (capturePanel != null) {
-			capturePanel.destroy();
-			if (captureTabPanel.contains(capturePanel))
-				captureTabPanel.removeMember(capturePanel);
-		}
-		try {
-			capturePanel = new DocumentCapturePanel(document, changeHandler, true);
-			captureTabPanel.addMember(capturePanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareCaptureTab(changeHandler);
 
 		/*
 		 * Prepare the versions tab
 		 */
-		if (versionsPanel != null) {
-			versionsPanel.destroy();
-			if (versionsTabPanel.contains(versionsPanel))
-				versionsTabPanel.removeMember(versionsPanel);
-		}
-		try {
-			versionsPanel = new VersionsPanel(document);
-			versionsTabPanel.addMember(versionsPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareVersionsTab();
 
 		/*
 		 * Prepare the history tab
 		 */
-		if (historyPanel != null) {
-			historyPanel.destroy();
-			if (historyTabPanel.contains(historyPanel))
-				historyTabPanel.removeMember(historyPanel);
-		}
-		try {
-			historyPanel = new DcoumentHistoryPanel(document);
-			historyTabPanel.addMember(historyPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareHistoryTab();
 
 		/*
 		 * Prepare the aliases tab
 		 */
-		if (aliasesPanel != null) {
-			aliasesPanel.destroy();
-			if (aliasesTabPanel.contains(aliasesPanel))
-				aliasesTabPanel.removeMember(aliasesPanel);
-		}
-
-		if (document.getDocRef() == null && Menu.enabled(Menu.ALIASES)) {
-			try {
-				aliasesPanel = new AliasesPanel(document);
-				aliasesTabPanel.addMember(aliasesPanel);
-				if (tabSet.getTab(ID_TAB_ALIASES) == null)
-					tabSet.addTab(aliasesTab);
-			} catch (Throwable t) {
-				// Nothing to do
-			}
-		} else
-			tabSet.removeTab(aliasesTab);
+		prepareAliasesTab();
 
 		/*
 		 * Prepare the links tab
 		 */
-		if (linksPanel != null) {
-			linksPanel.destroy();
-			if (linksTabPanel.contains(linksPanel))
-				linksTabPanel.removeMember(linksPanel);
-		}
-
-		try {
-			linksPanel = new LinksPanel(document);
-			linksTabPanel.addMember(linksPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareLInksTab();
 
 		/*
 		 * Prepare the signature tab
 		 */
-		if (signaturePanel != null) {
-			signaturePanel.destroy();
-			if (signatureTabPanel.contains(signaturePanel))
-				signatureTabPanel.removeMember(signaturePanel);
-		}
-		try {
-			signaturePanel = new DigitalSignaturePanel(document);
-			signatureTabPanel.addMember(signaturePanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareSignatureTab();
 
 		/*
 		 * Prepare the notes tab
 		 */
-		if (notesPanel != null) {
-			notesPanel.destroy();
-			if (notesTabPanel.contains(notesPanel))
-				notesTabPanel.removeMember(notesPanel);
-		}
-		try {
-			notesPanel = new NotesPanel(document);
-			notesTabPanel.addMember(notesPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareNotesTab();
 
 		/*
 		 * Prepare the preview tab
 		 */
-		if (previewPanel != null) {
-			previewPanel.destroy();
-			if (previewTabPanel.contains(previewPanel))
-				previewTabPanel.removeMember(previewPanel);
-		}
-		try {
-			previewPanel = new DetailsPreviewPanel(document);
-			previewTabPanel.addMember(previewPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		preparePreviewTab();
 
 		/*
 		 * Prepare the calendar tab
 		 */
-		if (calendarPanel != null) {
-			calendarPanel.destroy();
-			if (calendarTabPanel.contains(calendarPanel))
-				calendarTabPanel.removeMember(calendarPanel);
-		}
-		try {
-			calendarPanel = new DocumentCalendarPanel(document);
-			calendarTabPanel.addMember(calendarPanel);
-		} catch (Throwable t) {
-			// Nothing to do
-		}
+		prepareCalendarTab();
 
 		/*
 		 * Prepare the subscriptions tab
 		 */
+		prepareSubscriptionsTab();
+	}
+
+	private void prepareSubscriptionsTab() {
 		if (Feature.visible(Feature.AUDIT)) {
 			if (subscriptionsPanel != null) {
 				subscriptionsPanel.destroy();
@@ -534,6 +398,189 @@ public class DocumentDetailsPanel extends VLayout implements DocumentObserver {
 				}
 			} else
 				tabSet.removeTab(subscriptionsTab);
+		}
+	}
+
+	private void prepareCalendarTab() {
+		if (calendarPanel != null) {
+			calendarPanel.destroy();
+			if (calendarTabPanel.contains(calendarPanel))
+				calendarTabPanel.removeMember(calendarPanel);
+		}
+		try {
+			calendarPanel = new DocumentCalendarPanel(document);
+			calendarTabPanel.addMember(calendarPanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void preparePreviewTab() {
+		if (previewPanel != null) {
+			previewPanel.destroy();
+			if (previewTabPanel.contains(previewPanel))
+				previewTabPanel.removeMember(previewPanel);
+		}
+		try {
+			previewPanel = new DetailsPreviewPanel(document);
+			previewTabPanel.addMember(previewPanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareNotesTab() {
+		if (notesPanel != null) {
+			notesPanel.destroy();
+			if (notesTabPanel.contains(notesPanel))
+				notesTabPanel.removeMember(notesPanel);
+		}
+		try {
+			notesPanel = new NotesPanel(document);
+			notesTabPanel.addMember(notesPanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareSignatureTab() {
+		if (signaturePanel != null) {
+			signaturePanel.destroy();
+			if (signatureTabPanel.contains(signaturePanel))
+				signatureTabPanel.removeMember(signaturePanel);
+		}
+		try {
+			signaturePanel = new DigitalSignaturePanel(document);
+			signatureTabPanel.addMember(signaturePanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareLInksTab() {
+		if (linksPanel != null) {
+			linksPanel.destroy();
+			if (linksTabPanel.contains(linksPanel))
+				linksTabPanel.removeMember(linksPanel);
+		}
+
+		try {
+			linksPanel = new LinksPanel(document);
+			linksTabPanel.addMember(linksPanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareAliasesTab() {
+		if (aliasesPanel != null) {
+			aliasesPanel.destroy();
+			if (aliasesTabPanel.contains(aliasesPanel))
+				aliasesTabPanel.removeMember(aliasesPanel);
+		}
+
+		if (document.getDocRef() == null && Menu.enabled(Menu.ALIASES)) {
+			try {
+				aliasesPanel = new AliasesPanel(document);
+				aliasesTabPanel.addMember(aliasesPanel);
+				if (tabSet.getTab(ID_TAB_ALIASES) == null)
+					tabSet.addTab(aliasesTab);
+			} catch (Throwable t) {
+				// Nothing to do
+			}
+		} else
+			tabSet.removeTab(aliasesTab);
+	}
+
+	private void prepareHistoryTab() {
+		if (historyPanel != null) {
+			historyPanel.destroy();
+			if (historyTabPanel.contains(historyPanel))
+				historyTabPanel.removeMember(historyPanel);
+		}
+		try {
+			historyPanel = new DcoumentHistoryPanel(document);
+			historyTabPanel.addMember(historyPanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareVersionsTab() {
+		if (versionsPanel != null) {
+			versionsPanel.destroy();
+			if (versionsTabPanel.contains(versionsPanel))
+				versionsTabPanel.removeMember(versionsPanel);
+		}
+		try {
+			versionsPanel = new VersionsPanel(document);
+			versionsTabPanel.addMember(versionsPanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareCaptureTab(ChangedHandler changeHandler) {
+		if (capturePanel != null) {
+			capturePanel.destroy();
+			if (captureTabPanel.contains(capturePanel))
+				captureTabPanel.removeMember(capturePanel);
+		}
+		try {
+			capturePanel = new DocumentCapturePanel(document, changeHandler, true);
+			captureTabPanel.addMember(capturePanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareStandardPropertiesTab(ChangedHandler changeHandler) {
+		if (propertiesPanel != null) {
+			propertiesPanel.destroy();
+			if (propertiesTabPanel.contains(propertiesPanel))
+				propertiesTabPanel.removeMember(propertiesPanel);
+		}
+
+		try {
+			propertiesPanel = new StandardPropertiesPanel(document, changeHandler);
+			propertiesTabPanel.addMember(propertiesPanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareRetentionPoliciesTab(ChangedHandler changeHandler) {
+		if (retentionPoliciesPanel != null) {
+			retentionPoliciesPanel.destroy();
+			if (retentionPoliciesTabPanel.contains(retentionPoliciesPanel))
+				retentionPoliciesTabPanel.removeMember(retentionPoliciesPanel);
+		}
+		try {
+			retentionPoliciesPanel = new PublishingPanel(document, changeHandler);
+			retentionPoliciesTabPanel.addMember(retentionPoliciesPanel);
+		} catch (Throwable t) {
+			// Nothing to do
+		}
+	}
+
+	private void prepareExtendedPropertiesTab(ChangedHandler changeHandler) {
+		if (extendedPropertiesPanel != null) {
+			extendedPropertiesPanel.destroy();
+			if (extendedPropertiesTabPanel.contains(extendedPropertiesPanel))
+				extendedPropertiesTabPanel.removeMember(extendedPropertiesPanel);
+		}
+		ChangedHandler templateChangedHandler = (ChangedEvent event) -> {
+			document.setOcrTemplateId(null);
+			document.setBarcodeTemplateId(null);
+			if (capturePanel != null)
+				capturePanel.refresh(document.getTemplateId());
+		};
+		try {
+			extendedPropertiesPanel = new DocumentExtendedPropertiesPanel(document, changeHandler,
+					templateChangedHandler);
+			extendedPropertiesTabPanel.addMember(extendedPropertiesPanel);
+		} catch (Throwable t) {
+			// Nothing to do
 		}
 	}
 

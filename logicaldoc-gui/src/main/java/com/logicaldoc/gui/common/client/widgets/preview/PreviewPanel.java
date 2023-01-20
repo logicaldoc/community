@@ -27,7 +27,6 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.ResizedEvent;
-import com.smartgwt.client.widgets.events.ResizedHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 /**
@@ -68,70 +67,70 @@ public class PreviewPanel extends VLayout {
 		this.document = document;
 		this.docId = document.getDocRef() != null ? document.getDocRef() : document.getId();
 
-		if (Menu.enabled(Menu.PREVIEW)) {
-			DocumentProtectionManager.askForPassword(docId, new DocumentProtectionHandler() {
-
-				@Override
-				public void onUnprotected(GUIDocument doc) {
-					accessGranted = true;
-
-					if (Util.isMediaFile(document.getFileName().toLowerCase())) {
-						reloadMedia();
-					} else if (Util.isWebContentFile(document.getFileName().toLowerCase())) {
-						reloadHTML();
-					} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
-						reloadMail();
-					} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
-						FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
-								new AsyncCallback<GUIFolder>() {
-
-									@Override
-									public void onFailure(Throwable caught) {
-										GuiLog.serverError(caught);
-									}
-
-									@Override
-									public void onSuccess(GUIFolder folder) {
-										if (folder.isDownload())
-											reloadDICOM();
-										else
-											reloadPreview();
-									}
-								});
-
-					} else {
-						reloadPreview();
-					}
-
-					redraw();
-				}
-			});
-
-			addResizedHandler(new ResizedHandler() {
-
-				@Override
-				public void onResized(ResizedEvent event) {
-					if (getWidth() < 10L) {
-						// The panel has been closed
-						clearContent();
-						width = 0;
-						height = 0;
-						html = null;
-						preview = null;
-						dicom = null;
-						media = null;
-						mail = null;
-						reload = null;
-					} else if (!redrawing && (width != getWidth() || height != getHeight())) {
-						width = getWidth();
-						height = getHeight();
-						clearContent();
-						showReloadPanel();
-					}
-				}
-			});
-		} else {
+		if (!Menu.enabled(Menu.PREVIEW)) {
 			showDisabledPanel();
+			return;
+		}
+
+		DocumentProtectionManager.askForPassword(docId, new DocumentProtectionHandler() {
+
+			@Override
+			public void onUnprotected(GUIDocument doc) {
+				accessGranted = true;
+
+				if (Util.isMediaFile(document.getFileName().toLowerCase())) {
+					reloadMedia();
+				} else if (Util.isWebContentFile(document.getFileName().toLowerCase())) {
+					reloadHTML();
+				} else if (Util.isEmailFile(document.getFileName().toLowerCase())) {
+					reloadMail();
+				} else if (Util.isDICOMFile(document.getFileName().toLowerCase())) {
+					FolderService.Instance.get().getFolder(document.getFolder().getId(), false, false, false,
+							new AsyncCallback<GUIFolder>() {
+
+								@Override
+								public void onFailure(Throwable caught) {
+									GuiLog.serverError(caught);
+								}
+
+								@Override
+								public void onSuccess(GUIFolder folder) {
+									if (folder.isDownload())
+										reloadDICOM();
+									else
+										reloadPreview();
+								}
+							});
+				} else {
+					reloadPreview();
+				}
+
+				redraw();
+			}
+		});
+
+		addResizedHandler((ResizedEvent event) -> {
+			doResize();
+		});
+	}
+
+	private void doResize() {
+		if (getWidth() < 10L) {
+			// The panel has been closed
+			clearContent();
+			width = 0;
+			height = 0;
+			html = null;
+			preview = null;
+			dicom = null;
+			media = null;
+			mail = null;
+			reload = null;
+		} else if (!redrawing && (width != getWidth() || height != getHeight())) {
+			width = getWidth();
+			height = getHeight();
+			clearContent();
+			showReloadPanel();
 		}
 	}
 
@@ -141,27 +140,23 @@ public class PreviewPanel extends VLayout {
 			clearContent();
 			width = getWidth();
 			height = getHeight();
-			if (Menu.enabled(Menu.PREVIEW)) {
-				if (accessGranted) {
-					if (preview != null) {
-						if (getWidth() > 10)
-							reloadPreview();
-					} else if (html != null) {
-						if (getWidth() > 10)
-							reloadHTML();
-					} else if (dicom != null) {
-						if (getWidth() > 10)
-							reloadDICOM();
-					} else if (media != null) {
-						if (getWidth() > 10)
-							reloadMedia();
-					} else if (mail != null) {
-						if (getWidth() > 10)
-							reloadMail();
-					}
-				}
-			} else {
+			if (!Menu.enabled(Menu.PREVIEW)) {
 				showDisabledPanel();
+				return;
+			}
+
+			if (accessGranted && getWidth() > 10) {
+				if (preview != null) {
+					reloadPreview();
+				} else if (html != null) {
+					reloadHTML();
+				} else if (dicom != null) {
+					reloadDICOM();
+				} else if (media != null) {
+					reloadMedia();
+				} else if (mail != null) {
+					reloadMail();
+				}
 			}
 		} finally {
 			redrawing = false;

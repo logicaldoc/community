@@ -86,39 +86,59 @@ public class DashboardPanel extends VLayout {
 
 		tabSet.addTab(userTab);
 
-		if (Feature.visible(Feature.TAGS)) {
-			tabSet.addTab(tagsTab);
-			if (!Feature.enabled(Feature.TAGS))
-				tagsTab.setPane(new TagsDashboard());
-		}
+		addTagsTab();
 
-		if (Feature.visible(Feature.MESSAGES) && Menu.enabled(Menu.MESSAGES)) {
-			tabSet.addTab(messagesTab);
-			if (!Feature.enabled(Feature.MESSAGES))
-				messagesTab.setPane(new FeatureDisabled());
-		}
+		addMessagesTab();
 
-		if (Feature.visible(Feature.CHAT) && Menu.enabled(Menu.CHAT)) {
-			tabSet.addTab(chatTab);
-			if (!Feature.enabled(Feature.CHAT))
-				chatTab.setPane(new FeatureDisabled());
-		}
+		addChatTab();
 
-		if (Feature.visible(Feature.CALENDAR) && Menu.enabled(Menu.DASHBOARD_CALENDAR)) {
-			tabSet.addTab(calendarTab);
-			if (!Feature.enabled(Feature.CALENDAR))
-				calendarTab.setPane(new FeatureDisabled());
-		}
+		addCalendarTab();
 
+		addWorkflowTab();
+
+		setMembers(tabSet);
+
+		tabSet.selectTab(defaultOpenTab);
+	}
+
+	private void addWorkflowTab() {
 		if (Feature.visible(Feature.WORKFLOW) && Menu.enabled(Menu.DASHBOARD_WORKFLOW)) {
 			tabSet.addTab(workflowTab);
 			if (!Feature.enabled(Feature.WORKFLOW))
 				workflowTab.setPane(new FeatureDisabled());
 		}
+	}
 
-		setMembers(tabSet);
+	private void addCalendarTab() {
+		if (Feature.visible(Feature.CALENDAR) && Menu.enabled(Menu.DASHBOARD_CALENDAR)) {
+			tabSet.addTab(calendarTab);
+			if (!Feature.enabled(Feature.CALENDAR))
+				calendarTab.setPane(new FeatureDisabled());
+		}
+	}
 
-		tabSet.selectTab(defaultOpenTab);
+	private void addChatTab() {
+		if (Feature.visible(Feature.CHAT) && Menu.enabled(Menu.CHAT)) {
+			tabSet.addTab(chatTab);
+			if (!Feature.enabled(Feature.CHAT))
+				chatTab.setPane(new FeatureDisabled());
+		}
+	}
+
+	private void addMessagesTab() {
+		if (Feature.visible(Feature.MESSAGES) && Menu.enabled(Menu.MESSAGES)) {
+			tabSet.addTab(messagesTab);
+			if (!Feature.enabled(Feature.MESSAGES))
+				messagesTab.setPane(new FeatureDisabled());
+		}
+	}
+
+	private void addTagsTab() {
+		if (Feature.visible(Feature.TAGS)) {
+			tabSet.addTab(tagsTab);
+			if (!Feature.enabled(Feature.TAGS))
+				tagsTab.setPane(new TagsDashboard());
+		}
 	}
 
 	public static DashboardPanel get() {

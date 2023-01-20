@@ -84,61 +84,93 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 	}
 
 	private void onEvent(WebsocketMessage event) {
-		if (moniteredEvents.contains(event.getEvent())) {
-			if ("event.changed".equals(event.getEvent()) || "event.renamed".equals(event.getEvent())
-					|| "event.checkedin".equals(event.getEvent()) || "event.checkedout".equals(event.getEvent())
-					|| "event.locked".equals(event.getEvent()) || "event.unlocked".equals(event.getEvent())
-					|| "event.immutable".equals(event.getEvent()) || "event.signed".equals(event.getEvent())
-					|| "event.indexed".equals(event.getEvent()) || "event.stamped".equals(event.getEvent())
-					|| "event.password.protected".equals(event.getEvent())
-					|| "event.password.unprotected".equals(event.getEvent())
-					|| "event.workflowstatus".equals(event.getEvent())) {
-				if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
-					event.getDocument().setFolder(FolderController.get().getCurrentFolder());
-				DocumentController.get().modified(event.getDocument());
-			} else if ("event.stored".equals(event.getEvent())) {
-				if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
-					event.getDocument().setFolder(FolderController.get().getCurrentFolder());
-				DocumentController.get().stored(event.getDocument());
-			} else if ("event.moved".equals(event.getEvent())) {
-				if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
-					event.getDocument().setFolder(FolderController.get().getCurrentFolder());
-				DocumentController.get().moved(event.getDocument());
-			} else if ("event.deleted".equals(event.getEvent())) {
-				DocumentController.get().deleted(new GUIDocument[] { event.getDocument() });
-			} else if ("event.folder.renamed".equals(event.getEvent())
-					|| "event.folder.changed".equals(event.getEvent())) {
-				FolderController.get().modified(event.getFolder());
-			} else if ("event.folder.deleted".equals(event.getEvent())) {
-				FolderController.get().deleted(event.getFolder());
-			} else if ("event.folder.created".equals(event.getEvent())) {
-				FolderController.get().created(event.getFolder());
-			} else if ("event.folder.moved".equals(event.getEvent())) {
-				FolderController.get().moved(event.getFolder());
-			} else if ("event.user.messagereceived".equals(event.getEvent()) && Menu.enabled(Menu.MESSAGES)) {
-				if (event.getUserId() != null && event.getUserId() == Session.get().getUser().getId()) {
-					Session.get().getUser().setUnreadMessages(Session.get().getUser().getUnreadMessages() + 1);
-					UserController.get().changed(Session.get().getUser());
+		if (!moniteredEvents.contains(event.getEvent()))
+			return;
 
-					NotifySettings settings = new NotifySettings();
-					settings.setDuration(Session.get().getConfigAsInt("gui.popup.timeout") * 1000);
-					settings.setMessagePriority(Notify.MESSAGE);
-					settings.setPosition(EdgeName.T);
-
-					Notify.addMessage("<b>" + I18N.message("newmessagefrom", event.getAuthor()) + "</b>:<br/><br/>"
-							+ event.getComment(), null, null, settings);
-				}
-			} else if ("event.user.login".equals(event.getEvent())) {
-				UserController.get().loggedIn(event.getUsername());
-			} else if ("event.user.logout".equals(event.getEvent()) || "event.user.timeout".equals(event.getEvent())) {
-				UserController.get().loggedOut(event.getUsername());
-			} else if ("event.chat.newmessage".equals(event.getEvent())) {
-				ChatController.get().newMessage(event.getId(), event.getDate(), event.getUsername(),
-						event.getComment());
-			} else if (COMMAND.equals(event.getEvent()) && Session.get().getSid().equals(event.getSid())) {
-				processCommand(event);
-			}
+		if (isDocumentModifiedEvent(event)) {
+			handleDocumentModifiedEvent(event);
+		} else if ("event.stored".equals(event.getEvent())) {
+			handleStoredEvent(event);
+		} else if ("event.moved".equals(event.getEvent())) {
+			handleMovedEvent(event);
+		} else if ("event.deleted".equals(event.getEvent())) {
+			DocumentController.get().deleted(new GUIDocument[] { event.getDocument() });
+		} else if (isFolderModifiedEvent(event)) {
+			FolderController.get().modified(event.getFolder());
+		} else if ("event.folder.deleted".equals(event.getEvent())) {
+			FolderController.get().deleted(event.getFolder());
+		} else if ("event.folder.created".equals(event.getEvent())) {
+			FolderController.get().created(event.getFolder());
+		} else if ("event.folder.moved".equals(event.getEvent())) {
+			FolderController.get().moved(event.getFolder());
+		} else if ("event.user.messagereceived".equals(event.getEvent()) && Menu.enabled(Menu.MESSAGES)) {
+			handleMessageReceived(event);
+		} else if ("event.user.login".equals(event.getEvent())) {
+			UserController.get().loggedIn(event.getUsername());
+		} else if (isLogoutEvent(event)) {
+			UserController.get().loggedOut(event.getUsername());
+		} else if ("event.chat.newmessage".equals(event.getEvent())) {
+			ChatController.get().newMessage(event.getId(), event.getDate(), event.getUsername(), event.getComment());
+		} else if (isCommandEvent(event)) {
+			processCommand(event);
 		}
+	}
+
+	private boolean isCommandEvent(WebsocketMessage event) {
+		return COMMAND.equals(event.getEvent()) && Session.get().getSid().equals(event.getSid());
+	}
+
+	private boolean isLogoutEvent(WebsocketMessage event) {
+		return "event.user.logout".equals(event.getEvent()) || "event.user.timeout".equals(event.getEvent());
+	}
+
+	private void handleDocumentModifiedEvent(WebsocketMessage event) {
+		if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
+			event.getDocument().setFolder(FolderController.get().getCurrentFolder());
+		DocumentController.get().modified(event.getDocument());
+	}
+
+	private void handleStoredEvent(WebsocketMessage event) {
+		if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
+			event.getDocument().setFolder(FolderController.get().getCurrentFolder());
+		DocumentController.get().stored(event.getDocument());
+	}
+
+	private void handleMovedEvent(WebsocketMessage event) {
+		if (FolderController.get().getCurrentFolder().getId() == event.getDocument().getFolder().getId())
+			event.getDocument().setFolder(FolderController.get().getCurrentFolder());
+		DocumentController.get().moved(event.getDocument());
+	}
+
+	private void handleMessageReceived(WebsocketMessage event) {
+		if (event.getUserId() != null && event.getUserId() == Session.get().getUser().getId()) {
+			Session.get().getUser().setUnreadMessages(Session.get().getUser().getUnreadMessages() + 1);
+			UserController.get().changed(Session.get().getUser());
+
+			NotifySettings settings = new NotifySettings();
+			settings.setDuration(Session.get().getConfigAsInt("gui.popup.timeout") * 1000);
+			settings.setMessagePriority(Notify.MESSAGE);
+			settings.setPosition(EdgeName.T);
+
+			Notify.addMessage(
+					"<b>" + I18N.message("newmessagefrom", event.getAuthor()) + "</b>:<br/><br/>" + event.getComment(),
+					null, null, settings);
+		}
+	}
+
+	private boolean isFolderModifiedEvent(WebsocketMessage event) {
+		return "event.folder.renamed".equals(event.getEvent()) || "event.folder.changed".equals(event.getEvent());
+	}
+
+	private boolean isDocumentModifiedEvent(WebsocketMessage event) {
+		return "event.changed".equals(event.getEvent()) || "event.renamed".equals(event.getEvent())
+				|| "event.checkedin".equals(event.getEvent()) || "event.checkedout".equals(event.getEvent())
+				|| "event.locked".equals(event.getEvent()) || "event.unlocked".equals(event.getEvent())
+				|| "event.immutable".equals(event.getEvent()) || "event.signed".equals(event.getEvent())
+				|| "event.indexed".equals(event.getEvent()) || "event.stamped".equals(event.getEvent())
+				|| "event.password.protected".equals(event.getEvent())
+				|| "event.password.unprotected".equals(event.getEvent())
+				|| "event.workflowstatus".equals(event.getEvent());
 	}
 
 	/**
@@ -168,6 +200,6 @@ public class WebSocketListener extends WebSocketListenerAdapter {
 
 	@Override
 	public void onError(WebSocket webSocket) {
-		GuiLog.warn("Websockets error", null);
+		GuiLog.warn("Server link error", null);
 	}
 }

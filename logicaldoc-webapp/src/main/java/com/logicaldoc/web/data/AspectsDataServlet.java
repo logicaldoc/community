@@ -23,7 +23,7 @@ public class AspectsDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max, Locale locale)
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max, Locale locale)
 			throws PersistenceException, IOException {
 
 		List<String> aspects = RunLevel.getAspects();

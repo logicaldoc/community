@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.logicaldoc.gui.common.client.i18n.I18N;
-import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
@@ -33,42 +32,42 @@ public class EventsListGridField extends ColoredListGridField {
 
 	private void setup() {
 		setCanEdit(false);
-		setCellFormatter(new CellFormatter() {
-
-			@Override
-			public String format(Object value, ListGridRecord record, int rowNum, int colNum) {
-				try {
-					String decoded = "document";
-					if (value != null && !value.toString().isEmpty()) {
-						// Translate the set of events
-						String[] key = null;
-
-						if (!value.toString().contains(","))
-							key = new String[] { value.toString().trim() };
-						else
-							key = value.toString().split(",");
-						List<String> labels = new ArrayList<String>();
-						for (String string : key) {
-							if (string.trim().isEmpty())
-								continue;
-							labels.add(I18N.message(string.trim() + ".short"));
-						}
-
-						String str = labels.toString().substring(1);
-						decoded = str.substring(0, str.length() - 1);
-
-						String colorSpec = record.getAttributeAsString("color");
-						if (colorSpec != null && !colorSpec.isEmpty())
-							return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
-						else
-							return decoded != null ? decoded : "";
-					} else
-						return "";
-				} catch (Throwable e) {
+		setCellFormatter((Object value, ListGridRecord record, int rowNum, int colNum) -> {
+			try {
+				if (value != null && !value.toString().isEmpty()) {
+					return decodeEvents(value, record);
+				} else
 					return "";
-				}
+			} catch (Throwable e) {
+				return "";
 			}
 		});
+	}
+
+	private String decodeEvents(Object value, ListGridRecord record) {
+		String decoded = "document";
+		// Translate the set of events
+		String[] key = null;
+
+		if (!value.toString().contains(","))
+			key = new String[] { value.toString().trim() };
+		else
+			key = value.toString().split(",");
+		List<String> labels = new ArrayList<String>();
+		for (String string : key) {
+			if (string.trim().isEmpty())
+				continue;
+			labels.add(I18N.message(string.trim() + ".short"));
+		}
+
+		String str = labels.toString().substring(1);
+		decoded = str.substring(0, str.length() - 1);
+
+		String colorSpec = record.getAttributeAsString("color");
+		if (colorSpec != null && !colorSpec.isEmpty())
+			return "<span style='color: " + colorSpec + ";'>" + decoded + "</span>";
+		else
+			return decoded != null ? decoded : "";
 	}
 
 }

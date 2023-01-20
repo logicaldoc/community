@@ -6,6 +6,7 @@ import java.util.List;
 import com.logicaldoc.gui.common.client.Session;
 import com.logicaldoc.gui.common.client.beans.GUIFolder;
 import com.logicaldoc.gui.common.client.data.DocumentsDS;
+import com.logicaldoc.gui.frontend.client.folder.FolderNavigator;
 import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.events.DrawEvent;
 import com.smartgwt.client.widgets.events.DrawHandler;
@@ -32,7 +33,6 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 		DocumentsDS dataSource = new DocumentsDS(folder, null, pageSize, 1, null, false, false,
 				DocumentGridUtil.getSortSpec(this));
 		setDataSource(dataSource);
-		
 
 		final List<ListGridField> fields = new ArrayList<ListGridField>();
 
@@ -85,5 +85,13 @@ public class NavigatorDocumentsGrid extends DocumentsListGrid {
 				}
 			}
 		});
+
+		/**
+		 * When this grid is first drawn we noted that the
+		 * DocumentGridUtil.getSortSpec returns null and so the grid does not
+		 * get sorted, so we call the FolderNavigator.get().selectFolder and
+		 * then the grid displays correctly
+		 */
+		FolderNavigator.get().selectFolder(folder.getId());
 	}
 }

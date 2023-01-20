@@ -253,8 +253,8 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	private static Map<String, DocumentComparator> legacyComparators = new HashMap<>();
 
 	static {
-		legacyComparators.put("filename-CS", FILENAME_SORT_CS);
-		legacyComparators.put("filename-CI", FILENAME_SORT_CI);
+		legacyComparators.put("fileName-CS", FILENAME_SORT_CS);
+		legacyComparators.put("fileName-CI", FILENAME_SORT_CI);
 
 		legacyComparators.put("id-CS", ID_SORT);
 		legacyComparators.put("id-CI", ID_SORT);
@@ -274,8 +274,8 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 		legacyComparators.put("lastModified-CS", LASTMODIFIED_SORT);
 		legacyComparators.put("lastModified-CI", LASTMODIFIED_SORT);
 
-		legacyComparators.put("published-CS", PUBLISHED_SORT);
-		legacyComparators.put("published-CI", PUBLISHED_SORT);
+		legacyComparators.put("date-CS", PUBLISHED_SORT);
+		legacyComparators.put("date-CI", PUBLISHED_SORT);
 
 		legacyComparators.put("created-CS", CREATED_SORT);
 		legacyComparators.put("created-CI", CREATED_SORT);
@@ -311,6 +311,7 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken().trim();
+
 			String field = token.substring(0, token.indexOf(' '));
 			boolean asc = "asc".equals(token.substring(token.indexOf(' ') + 1));
 

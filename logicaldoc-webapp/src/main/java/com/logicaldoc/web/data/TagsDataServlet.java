@@ -32,7 +32,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, int max,
+	protected void service(HttpServletRequest request, HttpServletResponse response, Session session, Integer max,
 			Locale locale) throws PersistenceException, IOException {
 
 		FolderDAO fDao = (FolderDAO) Context.get().getBean(FolderDAO.class);
@@ -52,7 +52,7 @@ public class TagsDataServlet extends AbstractDataServlet {
 		if (request.getParameter("folderId") != null)
 			folderId = Long.parseLong(request.getParameter("folderId"));
 
-		long mx = config.getLong(session.getTenantName() + ".tag.select.maxtags", max);
+		long mx = config.getLong(session.getTenantName() + ".tag.select.maxtags", max != null ? max : 100);
 
 		HashMap<String, Long> tgs = new HashMap<String, Long>();
 

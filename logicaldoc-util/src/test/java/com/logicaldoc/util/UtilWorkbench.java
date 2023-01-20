@@ -8,8 +8,6 @@ public class UtilWorkbench {
 	 */
 	public static void main(String[] args) throws Exception {
 
-
-
 //		File file = new File("target/context.properties");
 //		ContextProperties context=new ContextProperties(file);
 //		context.setProperty("gui.welcome", "מגיע להופעה בישראל ואתם נהנים מהטבה ייחודית");

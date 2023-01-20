@@ -268,6 +268,7 @@ public class DocumentGridUtil {
 								: "desc");
 			}
 		}
+		
 		return sortSpec;
 	}
 

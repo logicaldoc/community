@@ -19,7 +19,6 @@ import com.smartgwt.client.widgets.form.ValuesManager;
 import com.smartgwt.client.widgets.form.fields.ButtonItem;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.form.fields.events.ClickEvent;
-import com.smartgwt.client.widgets.form.fields.events.ClickHandler;
 import com.smartgwt.client.widgets.form.validator.LengthRangeValidator;
 import com.smartgwt.client.widgets.form.validator.MatchesFieldValidator;
 
@@ -81,60 +80,61 @@ public class ChangePassword extends Window {
 		final ButtonItem apply = new ButtonItem();
 		apply.setTitle(I18N.message("apply"));
 		apply.setAutoFit(true);
-		apply.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				vm.validate();
-				if (!vm.hasErrors()) {
-					if (vm.getValueAsString(PASSWORD).equals(vm.getValueAsString(NEWPASSWORD))) {
-						Map<String, String> errors = new HashMap<String, String>();
-						errors.put(NEWPASSWORD, I18N.message("useanotherpassword"));
-						vm.setErrors(errors, true);
-						return;
-					}
-
-					apply.setDisabled(true);
-
-					SecurityService.Instance.get().changePassword(user.getId(), user.getId(),
-							vm.getValueAsString(PASSWORD), vm.getValueAsString(NEWPASSWORD), false,
-							new AsyncCallback<GUIValue>() {
-
-								@Override
-								public void onFailure(Throwable caught) {
-									apply.setDisabled(false);
-									SC.warn(caught.getMessage());
-								}
-
-								@Override
-								public void onSuccess(GUIValue val) {
-									apply.setDisabled(false);
-									int ret = Integer.parseInt(val.getCode());
-									if (ret > 0) {
-										// Alert the user
-										if (ret == 1)
-											GuiLog.warn(I18N.message("wrongpassword"), null);
-										else if (ret == 2)
-											GuiLog.warn(I18N.message("passwdnotnotified"), null);
-										else if (ret == 3) {
-											GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
-											newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
-										} else if (ret == 4) {
-											GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
-											newPass.setErrors(val.getValue());
-										} else
-											GuiLog.warn(I18N.message("genericerror"), null);
-									} else {
-										SC.say(I18N.message("yourpasswordhaschanged"));
-										GuiLog.info(I18N.message("event.user.passwordchanged"), null);
-										ChangePassword.this.destroy();
-									}
-								}
-							});
+		apply.addClickHandler((ClickEvent event) -> {
+			vm.validate();
+			if (!vm.hasErrors()) {
+				if (vm.getValueAsString(PASSWORD).equals(vm.getValueAsString(NEWPASSWORD))) {
+					Map<String, String> errors = new HashMap<String, String>();
+					errors.put(NEWPASSWORD, I18N.message("useanotherpassword"));
+					vm.setErrors(errors, true);
+					return;
 				}
+
+				apply.setDisabled(true);
+
+				doChangePassword(user, vm, newPass, apply);
 			}
 		});
 
 		form.setFields(password, newPass, newPassAgain, apply);
 
 		addItem(form);
+	}
+
+	private void doChangePassword(GUIUser user, final ValuesManager vm, PasswordItem newPass, final ButtonItem apply) {
+		SecurityService.Instance.get().changePassword(user.getId(), user.getId(), vm.getValueAsString(PASSWORD),
+				vm.getValueAsString(NEWPASSWORD), false, new AsyncCallback<GUIValue>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						apply.setDisabled(false);
+						SC.warn(caught.getMessage());
+					}
+
+					@Override
+					public void onSuccess(GUIValue val) {
+						apply.setDisabled(false);
+						int ret = Integer.parseInt(val.getCode());
+						if (ret > 0) {
+							// Alert the user
+							if (ret == 1)
+								GuiLog.warn(I18N.message("wrongpassword"), null);
+							else if (ret == 2)
+								GuiLog.warn(I18N.message("passwdnotnotified"), null);
+							else if (ret == 3) {
+								GuiLog.warn(I18N.message("passwdalreadyused", val.getValue()), null);
+								newPass.setErrors(I18N.message("passwdalreadyused", val.getValue()));
+							} else if (ret == 4) {
+								GuiLog.warn(I18N.message("passwdtooweak", val.getValue()), null);
+								newPass.setErrors(val.getValue());
+							} else
+								GuiLog.warn(I18N.message("genericerror"), null);
+						} else {
+							SC.say(I18N.message("yourpasswordhaschanged"));
+							GuiLog.info(I18N.message("event.user.passwordchanged"), null);
+							ChangePassword.this.destroy();
+						}
+					}
+				});
 	}
 }

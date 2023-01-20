@@ -107,6 +107,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 
 	private DocumentToolbar() {
 		setWidth100();
+		setHeight(27);
 
 		GUIFolder folder = FolderController.get().getCurrentFolder();
 		boolean downloadEnabled = folder != null && folder.isDownload();
@@ -120,193 +121,67 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 	}
 
 	protected void prepareButtons(boolean downloadEnabled, boolean writeEnabled, boolean signEnabled) {
-		refresh.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (FolderController.get().getCurrentFolder() != null)
-					FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
-			}
-		});
-		refresh.setDisabled(FolderController.get().getCurrentFolder() == null);
-		addButton(refresh);
+
+		addRefresh();
+
 		addSeparator();
 
-		download.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
+		addDownload();
 
-				GUIDocument[] selection = grid.getSelectedDocuments();
-				if (selection.length == 1) {
-					long id = selection[0].getId();
-					DocUtil.download(id, null);
-				} else {
-					String url = GWT.getHostPageBaseURL() + "zip-export?folderId="
-							+ FolderController.get().getCurrentFolder().getId();
-					for (GUIDocument record : selection) {
-						if (record.isPasswordProtected()) {
-							SC.warn(I18N.message("somedocsprotected"));
-							break;
-						}
-						url += "&docId=" + record.getId();
-					}
-					Util.download(url);
-				}
-			}
-		});
+		addPdf();
 
-		pdf.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
+		addConvert();
 
-				long[] selection = grid.getSelectedIds();
-				if (selection.length == 1) {
-					DocUtil.downloadPdfConversion(document.getId(), document.getVersion());
-				} else {
-					String url = Util.contextPath() + "convertpdf?open=true&docId=";
-					for (long id : selection)
-						url += Long.toString(id) + ",";
-					Util.download(url);
-				}
-			}
-		});
+		addOffice(downloadEnabled, writeEnabled);
 
-		convert.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				ConversionDialog dialog = new ConversionDialog(document);
-				dialog.show();
-				event.cancel();
-			}
-		});
+		addSeparator();
 
-		add.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsUploader uploader = new DocumentsUploader();
-				uploader.show();
-				event.cancel();
-			}
-		});
+		addUpload();
 
-		addForm.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				AddDocumentUsingForm dialog = new AddDocumentUsingForm();
-				dialog.show();
-				event.cancel();
-			}
-		});
+		addDropSpot();
 
-		subscribe.setDisabled(true);
-		subscribe.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
+		addScan();
 
-				SubscriptionDialog dialog = new SubscriptionDialog(null, grid.getSelectedIds());
-				dialog.show();
-			}
-		});
+		addForm();
 
-		dropSpot.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DropSpotPopup.openDropSpot();
-			}
-		});
+		addSubscribe();
 
-		scan.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				Util.openScan();
-			}
-		});
+		addArchive();
 
-		archive.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
+		if (Feature.visible(Feature.BULK_UPDATE) || Feature.visible(Feature.BULK_CHECKOUT))
+			addSeparator();
 
-				SendToArchiveDialog archiveDialog = new SendToArchiveDialog(grid.getSelectedIds(), true);
-				archiveDialog.show();
-			}
-		});
+		addBulkUpdate();
 
-		startWorkflow.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
+		addBulkCheckout();
 
-				StartWorkflowDialog workflowDialog = new StartWorkflowDialog(grid.getSelectedIds());
-				workflowDialog.show();
-			}
-		});
+		addStamp();
 
-		addCalendarEvent.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+		addDigitalSignature();
 
-				GUIDocument[] docs = grid.getSelectedDocuments();
+		addStartWorkflow();
 
-				GUICalendarEvent calEvent = new GUICalendarEvent();
-				calEvent.setCreator(Session.get().getUser().getFullName());
-				calEvent.setCreatorId(Session.get().getUser().getId());
-				GUIUser user = new GUIUser();
-				user.setId(Session.get().getUser().getId());
-				user.setUsername(Session.get().getUser().getUsername());
-				user.setFirstName(Session.get().getUser().getFirstName());
-				user.setName(Session.get().getUser().getName());
-				calEvent.addParticipant(user);
+		addCalendar();
 
-				if (docs != null && docs.length > 0) {
-					calEvent.setDocuments(docs);
-					calEvent.setTitle(Util.getBaseName(docs[0].getFileName()));
-					calEvent.setType(docs[0].getTemplate());
-				}
+		addSeparator();
 
-				calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
-				CalendarEventDialog eventDialog = new CalendarEventDialog(calEvent, null);
-				eventDialog.show();
-			}
-		});
+		addFilter();
 
-		list.setActionType(SelectionType.RADIO);
-		list.setRadioGroup("mode");
-		list.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_LIST);
-				DocumentsPanel.get().refresh(DocumentsGrid.MODE_LIST);
-			}
-		});
-		list.setDisabled(FolderController.get().getCurrentFolder() == null);
+		addPrint();
 
-		gallery.setActionType(SelectionType.RADIO);
-		gallery.setRadioGroup("mode");
-		gallery.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (FolderController.get().getCurrentFolder() != null)
-					CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_GALLERY);
-				DocumentsPanel.get().refresh(DocumentsGrid.MODE_GALLERY);
-			}
-		});
-		gallery.setDisabled(FolderController.get().getCurrentFolder() == null
-				|| !Session.get().getConfigAsBoolean("gui.galleryenabled"));
-		gallery.setVisible(Session.get().getConfigAsBoolean("gui.galleryenabled"));
+		addExport();
+
+		addSaveLayout();
+
+		addSeparator();
+
+		addList();
+
+		addGallery();
+
+		addSeparator();
+
+		addTogglePreview();
 
 		int mode = DocumentsGrid.MODE_LIST;
 		if (CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_MODE) != null
@@ -316,245 +191,9 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			list.setSelected(true);
 		else
 			gallery.setSelected(true);
+	}
 
-		setHeight(27);
-		addButton(download);
-
-		if (Feature.visible(Feature.PDF)) {
-			addButton(pdf);
-			if (!Feature.enabled(Feature.PDF) || !downloadEnabled) {
-				pdf.setDisabled(true);
-				pdf.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.FORMAT_CONVERSION)) {
-			addButton(convert);
-			if (!Feature.enabled(Feature.PDF)) {
-				convert.setDisabled(true);
-				convert.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.OFFICE)) {
-			addButton(office);
-
-			if (!Feature.enabled(Feature.OFFICE) || (document != null && !Util.isOfficeFile(document.getFileName()))
-					|| !downloadEnabled || !writeEnabled)
-				office.setDisabled(true);
-			else
-				office.setDisabled(false);
-
-			if (!Feature.enabled(Feature.OFFICE)) {
-				office.setDisabled(true);
-				office.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		addSeparator();
-		addButton(add);
-
-		if (Feature.visible(Feature.DROP_SPOT) && Menu.enabled(Menu.DROP_SPOT)) {
-			addButton(dropSpot);
-			if (!Feature.enabled(Feature.DROP_SPOT)) {
-				dropSpot.setDisabled(true);
-				dropSpot.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.SCAN) && Menu.enabled(Menu.SCAN)) {
-			addButton(scan);
-			if (!Feature.enabled(Feature.SCAN)) {
-				scan.setDisabled(true);
-				scan.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.FORM)) {
-			addButton(addForm);
-			if (!Feature.enabled(Feature.FORM)) {
-				addForm.setDisabled(true);
-				addForm.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		office.setTitle("<i class='fab fa-windows fa-lg fa-lg' aria-hidden='true'></i>");
-		office.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (document == null)
-					return;
-				Util.openEditWithOffice(document.getId());
-			}
-		});
-
-		bulkUpdate.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
-
-				GUIFolder currentFolder = FolderController.get().getCurrentFolder();
-				GUIDocument metadata = currentFolder.newDocument();
-				UpdateDialog dialog = new UpdateDialog(grid.getSelectedIds(), metadata, UpdateDialog.CONTEXT_UPDATE,
-						false);
-				dialog.show();
-			}
-		});
-
-		stamp.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
-
-				StampDialog dialog = new StampDialog(grid);
-				dialog.show();
-			}
-		});
-
-		sign.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
-
-				DigitalSignatureDialog dialog = new DigitalSignatureDialog(grid.getSelectedIds());
-				dialog.show();
-			}
-		});
-
-		bulkCheckout.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
-				if (grid.getSelectedCount() == 0)
-					return;
-
-				GUIDocument docs[] = grid.getSelectedDocuments();
-				List<Long> unlockedIds = new ArrayList<Long>();
-				for (GUIDocument doc : docs)
-					if (doc.getStatus() == 0 && doc.getImmutable() == 0)
-						unlockedIds.add(doc.getId());
-				Util.openBulkCheckout(unlockedIds);
-			}
-		});
-
-		if (Feature.visible(Feature.AUDIT)) {
-			addSeparator();
-			addButton(subscribe);
-			if (!Feature.enabled(Feature.AUDIT)) {
-				subscribe.setDisabled(true);
-				subscribe.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.IMPEX)) {
-			addSeparator();
-			addButton(archive);
-			if (!Feature.enabled(Feature.IMPEX)) {
-				archive.setDisabled(true);
-				archive.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.BULK_UPDATE) || Feature.visible(Feature.BULK_CHECKOUT))
-			addSeparator();
-
-		if (Feature.visible(Feature.BULK_UPDATE)) {
-			addButton(bulkUpdate);
-			if (!Feature.enabled(Feature.BULK_UPDATE)) {
-				bulkUpdate.setDisabled(true);
-				bulkUpdate.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.BULK_CHECKOUT)) {
-			addButton(bulkCheckout);
-			if (!Feature.enabled(Feature.BULK_CHECKOUT)) {
-				bulkCheckout.setDisabled(true);
-				bulkCheckout.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.STAMP)) {
-			addSeparator();
-			addButton(stamp);
-			if (!Feature.enabled(Feature.STAMP)) {
-				stamp.setDisabled(true);
-				stamp.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.DIGITAL_SIGNATURE)) {
-			addButton(sign);
-			if (!Feature.enabled(Feature.DIGITAL_SIGNATURE) || !signEnabled || !writeEnabled) {
-				sign.setDisabled(true);
-				sign.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.WORKFLOW)) {
-			addSeparator();
-			addButton(startWorkflow);
-			if (!Feature.enabled(Feature.WORKFLOW)) {
-				startWorkflow.setDisabled(true);
-				startWorkflow.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		if (Feature.visible(Feature.CALENDAR)) {
-			addSeparator();
-			addButton(addCalendarEvent);
-			if (!Feature.enabled(Feature.CALENDAR)) {
-				addCalendarEvent.setDisabled(true);
-				addCalendarEvent.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		addSeparator();
-		filter.setActionType(SelectionType.CHECKBOX);
-		addButton(filter);
-		filter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsPanel.get().toggleFilters();
-			}
-		});
-
-		addButton(print);
-		print.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DocumentsPanel.get().printPreview();
-			}
-		});
-
-		if (Feature.visible(Feature.EXPORT_CSV)) {
-			addButton(export);
-			export.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					DocumentsPanel.get().export();
-				}
-			});
-			if (!Feature.enabled(Feature.EXPORT_CSV)) {
-				export.setDisabled(true);
-				export.setTooltip(I18N.message("featuredisabled"));
-			}
-		}
-
-		saveLayout.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				saveGridState();
-			}
-		});
-		addButton(saveLayout);
-
+	private void addTogglePreview() {
 		try {
 			// Retrieve the saved preview width
 			String w = CookiesManager.get(CookiesManager.COOKIE_DOCSLIST_PREV_W);
@@ -586,12 +225,475 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				}
 			}
 		});
-
-		addSeparator();
-		addButton(list);
-		addButton(gallery);
-		addSeparator();
 		addButton(togglePreview);
+	}
+
+	private void addFilter() {
+		filter.setActionType(SelectionType.CHECKBOX);
+		addButton(filter);
+		filter.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DocumentsPanel.get().toggleFilters();
+			}
+		});
+	}
+
+	private void addGallery() {
+		gallery.setActionType(SelectionType.RADIO);
+		gallery.setRadioGroup("mode");
+		gallery.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (FolderController.get().getCurrentFolder() != null)
+					CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_GALLERY);
+				DocumentsPanel.get().refresh(DocumentsGrid.MODE_GALLERY);
+			}
+		});
+		gallery.setDisabled(FolderController.get().getCurrentFolder() == null
+				|| !Session.get().getConfigAsBoolean("gui.galleryenabled"));
+		gallery.setVisible(Session.get().getConfigAsBoolean("gui.galleryenabled"));
+		addButton(gallery);
+	}
+
+	private void addList() {
+		list.setActionType(SelectionType.RADIO);
+		list.setRadioGroup("mode");
+		list.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				CookiesManager.save(CookiesManager.COOKIE_DOCSLIST_MODE, DocumentsGrid.MODE_LIST);
+				DocumentsPanel.get().refresh(DocumentsGrid.MODE_LIST);
+			}
+		});
+		list.setDisabled(FolderController.get().getCurrentFolder() == null);
+		addButton(list);
+	}
+
+	private void addSaveLayout() {
+		saveLayout.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				saveGridState();
+			}
+		});
+		addButton(saveLayout);
+	}
+
+	private void addExport() {
+		if (Feature.visible(Feature.EXPORT_CSV)) {
+			addButton(export);
+			export.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsPanel.get().export();
+				}
+			});
+			if (!Feature.enabled(Feature.EXPORT_CSV)) {
+				export.setDisabled(true);
+				export.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addPrint() {
+		addButton(print);
+		print.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DocumentsPanel.get().printPreview();
+			}
+		});
+	}
+
+	private void addCalendar() {
+		if (Feature.visible(Feature.CALENDAR)) {
+			addSeparator();
+			addButton(addCalendarEvent);
+			if (!Feature.enabled(Feature.CALENDAR)) {
+				addCalendarEvent.setDisabled(true);
+				addCalendarEvent.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			addCalendarEvent.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+
+					GUIDocument[] docs = grid.getSelectedDocuments();
+
+					GUICalendarEvent calEvent = new GUICalendarEvent();
+					calEvent.setCreator(Session.get().getUser().getFullName());
+					calEvent.setCreatorId(Session.get().getUser().getId());
+					GUIUser user = new GUIUser();
+					user.setId(Session.get().getUser().getId());
+					user.setUsername(Session.get().getUser().getUsername());
+					user.setFirstName(Session.get().getUser().getFirstName());
+					user.setName(Session.get().getUser().getName());
+					calEvent.addParticipant(user);
+
+					if (docs != null && docs.length > 0) {
+						calEvent.setDocuments(docs);
+						calEvent.setTitle(Util.getBaseName(docs[0].getFileName()));
+						calEvent.setType(docs[0].getTemplate());
+					}
+
+					calEvent.addReminder(new GUIReminder(0, GUIReminder.TIME_UNIT_MINUTE));
+					CalendarEventDialog eventDialog = new CalendarEventDialog(calEvent, null);
+					eventDialog.show();
+				}
+			});
+		}
+	}
+
+	private void addStartWorkflow() {
+		if (Feature.visible(Feature.WORKFLOW)) {
+			addSeparator();
+			addButton(startWorkflow);
+			if (!Feature.enabled(Feature.WORKFLOW)) {
+				startWorkflow.setDisabled(true);
+				startWorkflow.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			startWorkflow.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+					if (grid.getSelectedCount() == 0)
+						return;
+
+					StartWorkflowDialog workflowDialog = new StartWorkflowDialog(grid.getSelectedIds());
+					workflowDialog.show();
+				}
+			});
+		}
+	}
+
+	private void addDigitalSignature() {
+		if (Feature.visible(Feature.DIGITAL_SIGNATURE)) {
+			addButton(sign);
+			sign.setTooltip(I18N.message("sign"));
+			if (!Feature.enabled(Feature.DIGITAL_SIGNATURE)) {
+				sign.setDisabled(true);
+				sign.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			sign.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+					if (grid.getSelectedCount() == 0)
+						return;
+
+					DigitalSignatureDialog dialog = new DigitalSignatureDialog(grid.getSelectedIds());
+					dialog.show();
+				}
+			});
+		}
+	}
+
+	private void addStamp() {
+		if (Feature.visible(Feature.STAMP)) {
+			addSeparator();
+			addButton(stamp);
+			stamp.setTooltip(I18N.message("stamp"));
+			if (!Feature.enabled(Feature.STAMP)) {
+				stamp.setDisabled(true);
+				stamp.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			stamp.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+					if (grid.getSelectedCount() == 0)
+						return;
+
+					StampDialog dialog = new StampDialog(grid);
+					dialog.show();
+				}
+			});
+		}
+	}
+
+	private void addBulkCheckout() {
+		if (Feature.visible(Feature.BULK_CHECKOUT)) {
+			addButton(bulkCheckout);
+			if (!Feature.enabled(Feature.BULK_CHECKOUT)) {
+				bulkCheckout.setDisabled(true);
+				bulkCheckout.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			bulkCheckout.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+					if (grid.getSelectedCount() == 0)
+						return;
+
+					GUIDocument docs[] = grid.getSelectedDocuments();
+					List<Long> unlockedIds = new ArrayList<Long>();
+					for (GUIDocument doc : docs)
+						if (doc.getStatus() == 0 && doc.getImmutable() == 0)
+							unlockedIds.add(doc.getId());
+					Util.openBulkCheckout(unlockedIds);
+				}
+			});
+		}
+	}
+
+	private void addBulkUpdate() {
+		if (Feature.visible(Feature.BULK_UPDATE)) {
+			addButton(bulkUpdate);
+			if (!Feature.enabled(Feature.BULK_UPDATE)) {
+				bulkUpdate.setDisabled(true);
+				bulkUpdate.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			bulkUpdate.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+					if (grid.getSelectedCount() == 0)
+						return;
+
+					GUIFolder currentFolder = FolderController.get().getCurrentFolder();
+					GUIDocument metadata = currentFolder.newDocument();
+					UpdateDialog dialog = new UpdateDialog(grid.getSelectedIds(), metadata, UpdateDialog.CONTEXT_UPDATE,
+							false);
+					dialog.show();
+				}
+			});
+		}
+	}
+
+	private void addArchive() {
+		if (Feature.visible(Feature.IMPEX)) {
+			addSeparator();
+			addButton(archive);
+			if (!Feature.enabled(Feature.IMPEX)) {
+				archive.setDisabled(true);
+				archive.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			archive.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+					if (grid.getSelectedCount() == 0)
+						return;
+
+					SendToArchiveDialog archiveDialog = new SendToArchiveDialog(grid.getSelectedIds(), true);
+					archiveDialog.show();
+				}
+			});
+		}
+	}
+
+	private void addSubscribe() {
+		if (Feature.visible(Feature.AUDIT)) {
+			addSeparator();
+			addButton(subscribe);
+			if (!Feature.enabled(Feature.AUDIT)) {
+				subscribe.setDisabled(true);
+				subscribe.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			subscribe.setDisabled(true);
+			subscribe.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+					if (grid.getSelectedCount() == 0)
+						return;
+
+					SubscriptionDialog dialog = new SubscriptionDialog(null, grid.getSelectedIds());
+					dialog.show();
+				}
+			});
+		}
+	}
+
+	private void addForm() {
+		if (Feature.visible(Feature.FORM)) {
+			addButton(addForm);
+			if (!Feature.enabled(Feature.FORM)) {
+				addForm.setDisabled(true);
+				addForm.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			addForm.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					AddDocumentUsingForm dialog = new AddDocumentUsingForm();
+					dialog.show();
+					event.cancel();
+				}
+			});
+		}
+	}
+
+	private void addScan() {
+		if (Feature.visible(Feature.SCAN) && Menu.enabled(Menu.SCAN)) {
+			addButton(scan);
+			if (!Feature.enabled(Feature.SCAN)) {
+				scan.setDisabled(true);
+				scan.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			scan.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					Util.openScan();
+				}
+			});
+		}
+	}
+
+	private void addUpload() {
+		add.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DocumentsUploader uploader = new DocumentsUploader();
+				uploader.show();
+				event.cancel();
+			}
+		});
+		addButton(add);
+	}
+
+	private void addDropSpot() {
+		if (Feature.visible(Feature.DROP_SPOT) && Menu.enabled(Menu.DROP_SPOT)) {
+			addButton(dropSpot);
+			if (!Feature.enabled(Feature.DROP_SPOT)) {
+				dropSpot.setDisabled(true);
+				dropSpot.setTooltip(I18N.message("featuredisabled"));
+			}
+			dropSpot.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DropSpotPopup.openDropSpot();
+				}
+			});
+		}
+	}
+
+	private void addOffice(boolean downloadEnabled, boolean writeEnabled) {
+		if (Feature.visible(Feature.OFFICE)) {
+			addButton(office);
+			office.setTooltip(I18N.message("editwithoffice"));
+			office.setTitle("<i class='fab fa-windows fa-lg fa-lg' aria-hidden='true'></i>");
+			office.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					if (document == null)
+						return;
+					Util.openEditWithOffice(document.getId());
+				}
+			});
+
+			if (!Feature.enabled(Feature.OFFICE) || (document != null && !Util.isOfficeFile(document.getFileName()))
+					|| !downloadEnabled || !writeEnabled)
+				office.setDisabled(true);
+			else
+				office.setDisabled(false);
+
+			if (!Feature.enabled(Feature.OFFICE)) {
+				office.setDisabled(true);
+				office.setTooltip(I18N.message("featuredisabled"));
+			}
+		}
+	}
+
+	private void addConvert() {
+		if (Feature.visible(Feature.FORMAT_CONVERSION)) {
+			addButton(convert);
+			convert.setTooltip(I18N.message("convert"));
+			if (!Feature.enabled(Feature.PDF)) {
+				convert.setDisabled(true);
+				convert.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			convert.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					ConversionDialog dialog = new ConversionDialog(document);
+					dialog.show();
+					event.cancel();
+				}
+			});
+		}
+	}
+
+	private void addPdf() {
+		if (Feature.visible(Feature.PDF)) {
+			addButton(pdf);
+			pdf.setTooltip(I18N.message("exportpdf"));
+			if (!Feature.enabled(Feature.PDF)) {
+				pdf.setDisabled(true);
+				pdf.setTooltip(I18N.message("featuredisabled"));
+			}
+
+			pdf.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+					if (grid.getSelectedCount() == 0)
+						return;
+
+					long[] selection = grid.getSelectedIds();
+					if (selection.length == 1) {
+						DocUtil.downloadPdfConversion(document.getId(), document.getVersion());
+					} else {
+						String url = Util.contextPath() + "convertpdf?open=true&docId=";
+						for (long id : selection)
+							url += Long.toString(id) + ",";
+						Util.download(url);
+					}
+				}
+			});
+		}
+	}
+
+	private void addDownload() {
+		addButton(download);
+		download.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				DocumentsGrid grid = DocumentsPanel.get().getDocumentsGrid();
+				if (grid.getSelectedCount() == 0)
+					return;
+
+				GUIDocument[] selection = grid.getSelectedDocuments();
+				if (selection.length == 1) {
+					long id = selection[0].getId();
+					DocUtil.download(id, null);
+				} else {
+					String url = GWT.getHostPageBaseURL() + "zip-export?folderId="
+							+ FolderController.get().getCurrentFolder().getId();
+					for (GUIDocument record : selection) {
+						if (record.isPasswordProtected()) {
+							SC.warn(I18N.message("somedocsprotected"));
+							break;
+						}
+						url += "&docId=" + record.getId();
+					}
+					Util.download(url);
+				}
+			}
+		});
+	}
+
+	private void addRefresh() {
+		refresh.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				if (FolderController.get().getCurrentFolder() != null)
+					FolderNavigator.get().selectFolder(FolderController.get().getCurrentFolder().getId());
+			}
+		});
+		refresh.setDisabled(FolderController.get().getCurrentFolder() == null);
+		addButton(refresh);
 	}
 
 	/**
@@ -605,6 +707,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 		try {
 			if (folder == null)
 				folder = FolderController.get().getCurrentFolder();
+			
 			boolean downloadEnabled = folder != null && folder.isDownload();
 			boolean writeEnabled = folder != null && folder.isWrite();
 			boolean signEnabled = folder != null && folder.hasPermission(Constants.PERMISSION_SIGN);
@@ -612,39 +715,7 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 			this.document = document;
 
 			if (document != null) {
-				download.setDisabled(!downloadEnabled);
-				office.setDisabled(!downloadEnabled);
-				pdf.setDisabled(!Feature.enabled(Feature.PDF) || !downloadEnabled);
-				if (!pdf.isDisabled())
-					pdf.setTooltip(I18N.message("exportpdf"));
-				convert.setDisabled(!Feature.enabled(Feature.FORMAT_CONVERSION));
-				if (!convert.isDisabled())
-					convert.setTooltip(I18N.message("convert"));
-				subscribe.setDisabled(!Feature.enabled(Feature.AUDIT));
-				bulkUpdate.setDisabled(!Feature.enabled(Feature.BULK_UPDATE) || !writeEnabled);
-				bulkCheckout.setDisabled(!Feature.enabled(Feature.BULK_CHECKOUT) || !downloadEnabled || !writeEnabled);
-				stamp.setDisabled(!Feature.enabled(Feature.STAMP) || !writeEnabled);
-				if (!stamp.isDisabled())
-					stamp.setTooltip(I18N.message("stamp"));
-				sign.setDisabled(!Feature.enabled(Feature.DIGITAL_SIGNATURE) || !writeEnabled || !signEnabled);
-				if (!sign.isDisabled())
-					sign.setTooltip(I18N.message("sign"));
-
-				boolean isOfficeFile = false;
-				if (document.getFileName() != null)
-					isOfficeFile = Util.isOfficeFile(document.getFileName());
-				else if (document.getType() != null)
-					isOfficeFile = Util.isOfficeFileType(document.getType());
-
-				office.setDisabled(
-						!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !downloadEnabled || !writeEnabled);
-				if (document.getStatus() != Constants.DOC_UNLOCKED
-						&& !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
-					if (document.getLockUserId() != null
-							&& Session.get().getUser().getId() != document.getLockUserId().longValue())
-						office.setDisabled(true);
-				}
-				office.setTooltip(I18N.message("editwithoffice"));
+				updateUsingDocument(document, downloadEnabled, writeEnabled, signEnabled);
 			} else {
 				download.setDisabled(true);
 				pdf.setDisabled(true);
@@ -660,41 +731,72 @@ public class DocumentToolbar extends ToolStrip implements FolderObserver {
 				addForm.setDisabled(true);
 			}
 
-			if (folder != null) {
-				refresh.setDisabled(false);
-				add.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE));
-				dropSpot.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE)
-						|| !folder.hasPermission(Constants.PERMISSION_IMPORT) || !Feature.enabled(Feature.DROP_SPOT));
-				addForm.setDisabled(
-						!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.FORM));
-				scan.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.SCAN));
-				archive.setDisabled(document == null || !folder.hasPermission(Constants.PERMISSION_ARCHIVE)
-						|| !Feature.enabled(Feature.IMPEX));
-				startWorkflow.setDisabled(document == null || !folder.hasPermission(Constants.PERMISSION_WORKFLOW)
-						|| !Feature.enabled(Feature.WORKFLOW));
-				addCalendarEvent.setDisabled(
-						!folder.hasPermission(Constants.PERMISSION_CALENDAR) || !Feature.enabled(Feature.CALENDAR));
-				list.setDisabled(false);
-				gallery.setDisabled(false);
-				togglePreview.setDisabled(false);
-			} else {
-				refresh.setDisabled(true);
-				add.setDisabled(true);
-				addForm.setDisabled(true);
-				office.setDisabled(true);
-				scan.setDisabled(true);
-				archive.setDisabled(true);
-				startWorkflow.setDisabled(true);
-				bulkUpdate.setDisabled(true);
-				bulkCheckout.setDisabled(true);
-				dropSpot.setDisabled(true);
-				addCalendarEvent.setDisabled(true);
-				list.setDisabled(false);
-				gallery.setDisabled(false);
-				togglePreview.setDisabled(false);
-			}
+			updateUsingFolder(document, folder);
 		} catch (Throwable t) {
 			// Nothing to do
+		}
+	}
+
+	private void updateUsingFolder(final GUIDocument document, GUIFolder folder) {
+		if (folder != null) {
+			refresh.setDisabled(false);
+			add.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE));
+			dropSpot.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE)
+					|| !folder.hasPermission(Constants.PERMISSION_IMPORT) || !Feature.enabled(Feature.DROP_SPOT));
+			addForm.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.FORM));
+			scan.setDisabled(!folder.hasPermission(Constants.PERMISSION_WRITE) || !Feature.enabled(Feature.SCAN));
+			archive.setDisabled(document == null || !folder.hasPermission(Constants.PERMISSION_ARCHIVE)
+					|| !Feature.enabled(Feature.IMPEX));
+			startWorkflow.setDisabled(document == null || !folder.hasPermission(Constants.PERMISSION_WORKFLOW)
+					|| !Feature.enabled(Feature.WORKFLOW));
+			addCalendarEvent.setDisabled(
+					!folder.hasPermission(Constants.PERMISSION_CALENDAR) || !Feature.enabled(Feature.CALENDAR));
+			list.setDisabled(false);
+			gallery.setDisabled(false);
+			togglePreview.setDisabled(false);
+		} else {
+			refresh.setDisabled(true);
+			add.setDisabled(true);
+			addForm.setDisabled(true);
+			office.setDisabled(true);
+			scan.setDisabled(true);
+			archive.setDisabled(true);
+			startWorkflow.setDisabled(true);
+			bulkUpdate.setDisabled(true);
+			bulkCheckout.setDisabled(true);
+			dropSpot.setDisabled(true);
+			addCalendarEvent.setDisabled(true);
+			list.setDisabled(false);
+			gallery.setDisabled(false);
+			togglePreview.setDisabled(false);
+		}
+	}
+
+	private void updateUsingDocument(final GUIDocument document, boolean downloadEnabled, boolean writeEnabled,
+			boolean signEnabled) {
+
+		download.setDisabled(!downloadEnabled);
+		office.setDisabled(!downloadEnabled);
+		pdf.setDisabled(!Feature.enabled(Feature.PDF) || !downloadEnabled);
+		convert.setDisabled(!Feature.enabled(Feature.FORMAT_CONVERSION));
+		subscribe.setDisabled(!Feature.enabled(Feature.AUDIT));
+		bulkUpdate.setDisabled(!Feature.enabled(Feature.BULK_UPDATE) || !writeEnabled);
+		bulkCheckout.setDisabled(!Feature.enabled(Feature.BULK_CHECKOUT) || !downloadEnabled || !writeEnabled);
+		stamp.setDisabled(!Feature.enabled(Feature.STAMP) || !writeEnabled);
+		sign.setDisabled(!Feature.enabled(Feature.DIGITAL_SIGNATURE) || !writeEnabled || !signEnabled);
+
+		boolean isOfficeFile = false;
+		if (document.getFileName() != null)
+			isOfficeFile = Util.isOfficeFile(document.getFileName());
+		else if (document.getType() != null)
+			isOfficeFile = Util.isOfficeFileType(document.getType());
+
+		office.setDisabled(!Feature.enabled(Feature.OFFICE) || !isOfficeFile || !downloadEnabled || !writeEnabled);
+		if (document.getStatus() != Constants.DOC_UNLOCKED
+				&& !Session.get().getUser().isMemberOf(Constants.GROUP_ADMIN)) {
+			if (document.getLockUserId() != null
+					&& Session.get().getUser().getId() != document.getLockUserId().longValue())
+				office.setDisabled(true);
 		}
 	}
 
