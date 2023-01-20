@@ -306,8 +306,6 @@ public abstract class DocumentComparator implements Comparator<AbstractDocument>
 	}
 
 	public static Comparator<AbstractDocument> getComparator(String sort) {
-		System.out.println("xx sort: " + sort);
-
 		StringTokenizer st = new StringTokenizer(sort, ",", false);
 		List<DocumentComparator> comparators = new ArrayList<DocumentComparator>();
 
